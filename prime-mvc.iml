@@ -34,6 +34,17 @@
       </library>
     </orderEntry>
     <orderEntry type="module-library">
+      <library name="jsp-api-2.0.jar">
+        <CLASSES>
+          <root url="jar://$SAVANT_REPOSITORY$/javax/servlet/jsp/jsp-api/2.0/jsp-api-2.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$SAVANT_REPOSITORY$/javax/servlet/jsp/jsp-api/2.0/jsp-api-2.0-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
       <library name="servlet-api-2.5.jar">
         <CLASSES>
           <root url="jar://$SAVANT_REPOSITORY$/javax/servlet/servlet-api/2.5/servlet-api-2.5.jar!/" />
