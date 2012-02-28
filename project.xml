@@ -15,7 +15,7 @@
   -->
 <project xmlns="http://www.inversoft.org/schemas/savant-1.5/project"
          name="prime-mvc"
-         group="prime-framework.org"
+         group="primeframework.org"
          version="1.0">
 
   <plugin group="plugins.savant.inversoft.org" name="ide" version="1.2"/>
@@ -29,8 +29,8 @@
   <property name="jdk.version" value="1.6"/>
 
   <release>
-    <publication name="prime-core" type="jar" compatType="minor" file="target/jars/${project.name}-${project.version}.jar"/>
-    <publication name="prime-core-test" type="jar" compatType="minor" file="target/jars/${project.name}-test-${project.version}.jar"/>
+    <publication name="prime-mvc" type="jar" compatType="minor" file="target/jars/${project.name}-${project.version}.jar"/>
+    <publication name="prime-mvc-test" type="jar" compatType="minor" file="target/jars/${project.name}-test-${project.version}.jar"/>
   </release>
 
   <dependencies>
@@ -51,8 +51,7 @@
       <artifact group="joda.org" name="joda-time" version="2.0"/>
     </artifact-group>
     <artifact-group type="test-compile">
-      <artifact group="easymock.org" name="easymock" version="2.2"/>
-      <artifact group="junit.org" name="junit" version="4.4"/>
+      <artifact group="easymock.org" name="easymock" version="3.1"/>
       <artifact group="testng.org" name="testng" version="5.11"/>
     </artifact-group>
   </dependencies>

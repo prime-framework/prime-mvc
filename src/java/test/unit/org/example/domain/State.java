@@ -20,7 +20,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.jcatapult.mvc.validation.annotation.ValidatorAnnotation;
+import org.primeframework.mvc.validation.annotation.ValidatorAnnotation;
 
 /**
  * <p>

@@ -17,7 +17,7 @@ package org.example.action;
 
 import java.util.List;
 
-import org.jcatapult.mvc.action.annotation.Action;
+import org.primeframework.mvc.action.annotation.Action;
 
 /**
  * <p>

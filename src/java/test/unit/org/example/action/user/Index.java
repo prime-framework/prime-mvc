@@ -15,7 +15,7 @@
  */
 package org.example.action.user;
 
-import org.jcatapult.mvc.action.annotation.Action;
+import org.primeframework.mvc.action.annotation.Action;
 
 /**
  * <p>

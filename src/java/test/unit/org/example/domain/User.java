@@ -22,8 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.jcatapult.mvc.validation.annotation.Required;
-import org.jcatapult.mvc.validation.annotation.ValidMap;
+import org.primeframework.mvc.validation.annotation.Required;
+import org.primeframework.mvc.validation.annotation.ValidMap;
 
 /**
  * <p>

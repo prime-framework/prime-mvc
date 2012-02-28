@@ -16,10 +16,10 @@
 package org.example.action.user;
 
 import org.example.domain.User;
-import org.jcatapult.mvc.action.annotation.Action;
-import org.jcatapult.mvc.action.annotation.ActionPrepareMethod;
-import org.jcatapult.mvc.result.form.annotation.FormPrepareMethod;
-import org.jcatapult.mvc.validation.annotation.Valid;
+import org.primeframework.mvc.action.annotation.Action;
+import org.primeframework.mvc.action.annotation.ActionPrepareMethod;
+import org.primeframework.mvc.result.form.annotation.FormPrepareMethod;
+import org.primeframework.mvc.validation.annotation.Valid;
 
 /**
  * <p>

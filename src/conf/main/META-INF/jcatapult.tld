@@ -25,7 +25,7 @@
   <tag>
     <description><![CDATA[Text field tag]]></description>
     <name>text</name>
-    <tag-class>org.jcatapult.mvc.result.form.jsp.TextTag</tag-class>
+    <tag-class>org.primeframework.mvc.result.form.jsp.TextTag</tag-class>
     <body-content>empty</body-content>
     <attribute>
       <description><![CDATA[The accesskey attribute]]></description>
@@ -208,7 +208,7 @@
   <tag>
     <description><![CDATA[Passowrd field tag]]></description>
     <name>password</name>
-    <tag-class>org.jcatapult.mvc.result.form.jsp.PasswordTag</tag-class>
+    <tag-class>org.primeframework.mvc.result.form.jsp.PasswordTag</tag-class>
     <body-content>empty</body-content>
     <attribute>
       <description><![CDATA[The accesskey attribute]]></description>
@@ -378,7 +378,7 @@
   <tag>
     <description><![CDATA[Textarea field tag]]></description>
     <name>textarea</name>
-    <tag-class>org.jcatapult.mvc.result.form.jsp.TextareaTag</tag-class>
+    <tag-class>org.primeframework.mvc.result.form.jsp.TextareaTag</tag-class>
     <body-content>empty</body-content>
     <attribute>
       <description><![CDATA[The accesskey attribute]]></description>
@@ -567,7 +567,7 @@
   <tag>
     <description><![CDATA[Checkbox field tag]]></description>
     <name>checkbox</name>
-    <tag-class>org.jcatapult.mvc.result.form.jsp.CheckboxTag</tag-class>
+    <tag-class>org.primeframework.mvc.result.form.jsp.CheckboxTag</tag-class>
     <body-content>empty</body-content>
     <attribute>
       <description><![CDATA[The accesskey attribute]]></description>
@@ -741,7 +741,7 @@
   </tag>
   <function>
     <name>message</name>
-    <function-class>org.jcatapult.mvc.result.message.jsp.MessageFunction</function-class>
+    <function-class>org.primeframework.mvc.result.message.jsp.MessageFunction</function-class>
     <function-signature>java.lang.String message(java.lang.String, java.lang.String)</function-signature>
   </function>
 </taglib>

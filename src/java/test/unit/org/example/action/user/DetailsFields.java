@@ -17,8 +17,8 @@ package org.example.action.user;
 
 import org.example.domain.UserField;
 import org.example.domain.AddressField;
-import org.jcatapult.mvc.action.annotation.Action;
-import org.jcatapult.mvc.validation.annotation.Valid;
+import org.primeframework.mvc.action.annotation.Action;
+import org.primeframework.mvc.validation.annotation.Valid;
 
 /**
  * <p>

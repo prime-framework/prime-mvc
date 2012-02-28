@@ -15,10 +15,11 @@
  */
 package org.example.domain;
 
-import org.jcatapult.mvc.parameter.annotation.PostParameterMethod;
-import org.jcatapult.mvc.parameter.annotation.PreParameter;
-import org.jcatapult.mvc.parameter.annotation.PreParameterMethod;
-import static org.junit.Assert.*;
+import org.primeframework.mvc.parameter.annotation.PostParameterMethod;
+import org.primeframework.mvc.parameter.annotation.PreParameter;
+import org.primeframework.mvc.parameter.annotation.PreParameterMethod;
+
+import static org.testng.Assert.*;
 
 /**
  * <p>
@@ -27,7 +28,7 @@ import static org.junit.Assert.*;
  *
  * @author Brian Pontarelli
  */
-@org.jcatapult.mvc.action.annotation.Action("{preField}")
+@org.primeframework.mvc.action.annotation.Action("{preField}")
 public class PreAndPostAction {
     @PreParameter
     public Integer preField;

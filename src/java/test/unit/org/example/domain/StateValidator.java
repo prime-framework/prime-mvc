@@ -17,7 +17,7 @@ package org.example.domain;
 
 import java.lang.annotation.Annotation;
 
-import org.jcatapult.mvc.validation.Validator;
+import org.primeframework.mvc.validation.Validator;
 
 /**
  * <p>
