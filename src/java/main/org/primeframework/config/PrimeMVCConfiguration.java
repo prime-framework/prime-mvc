@@ -24,13 +24,24 @@ package org.primeframework.config;
  * @author Brian Pontarelli
  */
 public interface PrimeMVCConfiguration {
-
+  /**
+   * @return The number of seconds to check for Freemarker template updates (max integer means never and 0 means always).
+   */
   int freemarkerCheckSeconds();
 
+  /**
+   * @return The number of seconds to check for message bundles updates (max integer means never and 0 means always).
+   */
   int l10nReloadSeconds();
-  
+
+  /**
+   * @return The types of files that are allowed to be uploaded.
+   */
   String[] fileUploadAllowedTypes();
 
+  /**
+   * @return
+   */
   long fileUploadMaxSize();
   
   boolean staticResourcesEnabled();

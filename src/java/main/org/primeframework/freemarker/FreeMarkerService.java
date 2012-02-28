@@ -24,79 +24,68 @@ import freemarker.template.ObjectWrapper;
 import com.google.inject.ImplementedBy;
 
 /**
- * <p>
- * This service provides support for FreeMarker to JCatapult libraries
- * and applications. In most cases callers need not know anything about
- * the implementation.
- * </p>
+ * This service provides support for FreeMarker to JCatapult libraries and applications. In most cases callers need not
+ * know anything about the implementation.
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @ImplementedBy(DefaultFreeMarkerService.class)
 public interface FreeMarkerService {
-    /**
-     * Renders the given template. This method renders the template into a StringWriter and then
-     * returns the String.
-     *
-     * @param   templateName The name of the template. Since this service is generic, this is the full
-     *          path to the template. For example, it would be <strong>/WEB-INF/emails/foo-html.ftl</strong>.
-     * @param   root This can be a Map or a FreeMarker model type that provides the values to the
-     *          template.
-     * @param   locale The locale used to find the template.
-     * @return  The template.
-     * @throws  FreeMarkerRenderException If the render fails.
-     * @throws  MissingTemplateException If the template is missing.
-     */
-    String render(String templateName, Object root, Locale locale)
+  /**
+   * Renders the given template. This method renders the template into a StringWriter and then returns the String.
+   *
+   * @param templateName The name of the template. Since this service is generic, this is the full path to the
+   *                     template. For example, it would be <strong>/WEB-INF/emails/foo-html.ftl</strong>.
+   * @param root         This can be a Map or a FreeMarker model type that provides the values to the template.
+   * @param locale       The locale used to find the template.
+   * @return The template.
+   * @throws FreeMarkerRenderException If the render fails.
+   * @throws MissingTemplateException  If the template is missing.
+   */
+  String render(String templateName, Object root, Locale locale)
     throws FreeMarkerRenderException, MissingTemplateException;
 
-    /**
-     * Renders the given template. This method renders the template into the given Writer.
-     *
-     * @param   writer The writer to output the render to.
-     * @param   templateName The name of the template. Since this service is generic, this is the full
-     *          path to the template. For example, it would be <strong>/WEB-INF/emails/foo-html.ftl</strong>.
-     * @param   root This can be a Map or a FreeMarker model type that provides the values to the
-     *          template.
-     * @param   locale The locale used to find the template.
-     * @throws  FreeMarkerRenderException If the render fails.
-     * @throws  MissingTemplateException If the template is missing.
-     */
-    void render(Writer writer, String templateName, Object root, Locale locale)
+  /**
+   * Renders the given template. This method renders the template into the given Writer.
+   *
+   * @param writer       The writer to output the render to.
+   * @param templateName The name of the template. Since this service is generic, this is the full path to the
+   *                     template. For example, it would be <strong>/WEB-INF/emails/foo-html.ftl</strong>.
+   * @param root         This can be a Map or a FreeMarker model type that provides the values to the template.
+   * @param locale       The locale used to find the template.
+   * @throws FreeMarkerRenderException If the render fails.
+   * @throws MissingTemplateException  If the template is missing.
+   */
+  void render(Writer writer, String templateName, Object root, Locale locale)
     throws FreeMarkerRenderException, MissingTemplateException;
 
-    /**
-     * Renders the given template. This method renders the template into a StringWriter and then
-     * returns the String.
-     *
-     * @param   templateName The name of the template. Since this service is generic, this is the full
-     *          path to the template. For example, it would be <strong>/WEB-INF/emails/foo-html.ftl</strong>.
-     * @param   root This can be a Map or a FreeMarker model type that provides the values to the
-     *          template.
-     * @param   locale The locale used to find the template.
-     * @param   objectWrapper The object wrapper to use for the Template instance that is created
-     *          by this method.
-     * @return  The template.
-     * @throws  FreeMarkerRenderException If the render fails.
-     * @throws  MissingTemplateException If the template is missing.
-     */
-    String render(String templateName, Object root, Locale locale, ObjectWrapper objectWrapper)
+  /**
+   * Renders the given template. This method renders the template into a StringWriter and then returns the String.
+   *
+   * @param templateName  The name of the template. Since this service is generic, this is the full path to the
+   *                      template. For example, it would be <strong>/WEB-INF/emails/foo-html.ftl</strong>.
+   * @param root          This can be a Map or a FreeMarker model type that provides the values to the template.
+   * @param locale        The locale used to find the template.
+   * @param objectWrapper The object wrapper to use for the Template instance that is created by this method.
+   * @return The template.
+   * @throws FreeMarkerRenderException If the render fails.
+   * @throws MissingTemplateException  If the template is missing.
+   */
+  String render(String templateName, Object root, Locale locale, ObjectWrapper objectWrapper)
     throws FreeMarkerRenderException, MissingTemplateException;
 
-    /**
-     * Renders the given template. This method renders the template into the given Writer.
-     *
-     * @param   writer The writer to output the render to.
-     * @param   templateName The name of the template. Since this service is generic, this is the full
-     *          path to the template. For example, it would be <strong>/WEB-INF/emails/foo-html.ftl</strong>.
-     * @param   root This can be a Map or a FreeMarker model type that provides the values to the
-     *          template.
-     * @param   locale The locale used to find the template.
-     * @param   objectWrapper The object wrapper to use for the Template instance that is created
-     *          by this method.
-     * @throws  FreeMarkerRenderException If the render fails.
-     * @throws  MissingTemplateException If the template is missing.
-     */
-    void render(Writer writer, String templateName, Object root, Locale locale, ObjectWrapper objectWrapper)
+  /**
+   * Renders the given template. This method renders the template into the given Writer.
+   *
+   * @param writer        The writer to output the render to.
+   * @param templateName  The name of the template. Since this service is generic, this is the full path to the
+   *                      template. For example, it would be <strong>/WEB-INF/emails/foo-html.ftl</strong>.
+   * @param root          This can be a Map or a FreeMarker model type that provides the values to the template.
+   * @param locale        The locale used to find the template.
+   * @param objectWrapper The object wrapper to use for the Template instance that is created by this method.
+   * @throws FreeMarkerRenderException If the render fails.
+   * @throws MissingTemplateException  If the template is missing.
+   */
+  void render(Writer writer, String templateName, Object root, Locale locale, ObjectWrapper objectWrapper)
     throws FreeMarkerRenderException, MissingTemplateException;
 }

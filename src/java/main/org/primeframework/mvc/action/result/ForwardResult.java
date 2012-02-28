@@ -116,13 +116,18 @@ public class ForwardResult extends AbstractResult<Forward> {
   /**
    * Locates the default Forward for an action invocation and result code from an action.
    * <p/>
-   * <p> Checks for results using this search order: </p>
+   * Checks for results using this search order:
    * <p/>
-   * <ol> <li>/WEB-INF/content/&lt;uri>-&lt;resultCode>.jsp</li> <li>/WEB-INF/content/&lt;uri>-&lt;resultCode>.ftl</li>
-   * <li>/WEB-INF/content/&lt;uri>.jsp</li> <li>/WEB-INF/content/&lt;uri>.ftl</li>
-   * <li>/WEB-INF/content/&lt;uri>/index.jsp</li> <li>/WEB-INF/content/&lt;uri>/index.ftl</li> </ol>
+   * <ol>
+   *   <li>/WEB-INF/content/&lt;uri>-&lt;resultCode>.jsp</li>
+   *   <li>/WEB-INF/content/&lt;uri>-&lt;resultCode>.ftl</li>
+   *   <li>/WEB-INF/content/&lt;uri>.jsp</li>
+   *   <li>/WEB-INF/content/&lt;uri>.ftl</li>
+   *   <li>/WEB-INF/content/&lt;uri>/index.jsp</li>
+   *   <li>/WEB-INF/content/&lt;uri>/index.ftl</li>
+   * </ol>
    * <p/>
-   * <p> If nothing is found this bombs out. </p>
+   * If nothing is found this bombs out.
    *
    * @param invocation The action invocation.
    * @param resultCode The result code from the action invocation.
@@ -139,16 +144,16 @@ public class ForwardResult extends AbstractResult<Forward> {
   }
 
   /**
-   * <p> Determines if there is an index resource available for the given action invocation. For example, if the
-   * action URI is: </p>
+   * Determines if there is an index resource available for the given action invocation. For example, if the action URI
+   * is:
    * <pre>
    * /foo
    * </pre>
-   * <p> And there is a resource at: </p>
+   * And there is a resource at:
    * <pre>
    * /foo/index.ftl
    * </pre>
-   * <p> We can redirect the request to that resource. </p>
+   * We can redirect the request to that resource.
    *
    * @param invocation The action invocation.
    * @return The redirect URI or null.

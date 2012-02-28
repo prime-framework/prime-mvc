@@ -20,31 +20,28 @@ import java.net.URL;
 import com.google.inject.ImplementedBy;
 
 /**
- * <p>
- * This interface determines path locations within the bounds of a container.
- * The container might be a J2EE container or a scheduler or just a simple
- * stand-alone JVM. This abstraction allows the application to find paths without
- * depending directly on container objects like the ServletContext.
- * </p>
+ * This interface determines path locations within the bounds of a container. The container might be a J2EE container or
+ * a scheduler or just a simple stand-alone JVM. This abstraction allows the application to find paths without depending
+ * directly on container objects like the ServletContext.
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @ImplementedBy(ServletContainerResolver.class)
 public interface ContainerResolver {
-    /**
-     * Returns the location on the file system of the container based path.
-     *
-     * @param   path The path.
-     * @return  The real path or null if the path could not be resolved.
-     */
-    String getRealPath(String path);
+  /**
+   * Returns the location on the file system of the container based path.
+   *
+   * @param path The path.
+   * @return The real path or null if the path could not be resolved.
+   */
+  String getRealPath(String path);
 
-    /**
-     * Returns the URL to the given path. This is allows containers that use JAR files or similar
-     * archives to retrieve files without extracting them.
-     *
-     * @param   path THe path to get the resource for.
-     * @return  The resource URL or null if it couldn't be resolved.
-     */
-    URL getResource(String path);
+  /**
+   * Returns the URL to the given path. This is allows containers that use JAR files or similar archives to retrieve
+   * files without extracting them.
+   *
+   * @param path THe path to get the resource for.
+   * @return The resource URL or null if it couldn't be resolved.
+   */
+  URL getResource(String path);
 }
