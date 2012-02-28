@@ -1,0 +1,57 @@
+<html>
+<head><title>Edit a user</title></head>
+<body>
+<div class="form">
+<form action="/user/edit" method="POST">
+<div class="text input control">
+<div class="label-container"><label for="user_name" class="label">Name</label></div>
+<div class="control-container"><input type="text" id="user_name" name="user.name"/></div>
+</div>
+<div class="text input control">
+<div class="label-container"><label for="user_age" class="label">Age</label></div>
+<div class="control-container"><input type="text" id="user_age" name="user.age"/></div>
+</div>
+<div class="text input control">
+<div class="label-container"><label for="user_addresses['home']_street" class="label">Home Street</label></div>
+<div class="control-container"><input type="text" id="user_addresses['home']_street" name="user.addresses['home'].street"/></div>
+</div>
+<div class="text input control">
+<div class="label-container"><label for="user_addresses['home']_city" class="label">Home City</label></div>
+<div class="control-container"><input type="text" id="user_addresses['home']_city" name="user.addresses['home'].city"/></div>
+</div>
+<div class="text input control">
+<div class="label-container"><label for="user_addresses['home']_state" class="label">Home State</label></div>
+<div class="control-container"><input type="text" id="user_addresses['home']_state" name="user.addresses['home'].state"/></div>
+</div>
+<div class="text input control">
+<div class="label-container"><label for="user_addresses['home']_zipcode" class="label">Home Zipcode</label></div>
+<div class="control-container"><input type="text" id="user_addresses['home']_zipcode" name="user.addresses['home'].zipcode"/></div>
+</div>
+<div class="text input control">
+<div class="label-container"><label for="user_addresses['home']_country" class="label">Home Country</label></div>
+<div class="control-container"><input type="text" id="user_addresses['home']_country" name="user.addresses['home'].country"/></div>
+</div>
+<div class="text input control">
+<div class="label-container"><label for="user_addresses['work']_street" class="label">Home Street</label></div>
+<div class="control-container"><input type="text" id="user_addresses['work']_street" name="user.addresses['work'].street"/></div>
+</div>
+<div class="text input control">
+<div class="label-container"><label for="user_addresses['work']_city" class="label">Home City</label></div>
+<div class="control-container"><input type="text" id="user_addresses['work']_city" name="user.addresses['work'].city"/></div>
+</div>
+<div class="text input control">
+<div class="label-container"><label for="user_addresses['work']_state" class="label">Home State</label></div>
+<div class="control-container"><input type="text" id="user_addresses['work']_state" name="user.addresses['work'].state"/></div>
+</div>
+<div class="text input control">
+<div class="label-container"><label for="user_addresses['work']_zipcode" class="label">Home Zipcode</label></div>
+<div class="control-container"><input type="text" id="user_addresses['work']_zipcode" name="user.addresses['work'].zipcode"/></div>
+</div>
+<div class="text input control">
+<div class="label-container"><label for="user_addresses['work']_country" class="label">Home Country</label></div>
+<div class="control-container"><input type="text" id="user_addresses['work']_country" name="user.addresses['work'].country"/></div>
+</div>
+</form>
+</div>
+</body>
+</html>

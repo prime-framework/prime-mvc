@@ -1,0 +1,21 @@
+--AaB03x
+content-disposition: form-data; name="field1"
+
+value1
+--AaB03x
+content-disposition: form-data; name="field2"
+
+value2
+--AaB03x
+content-disposition: form-data; name="userfiles"; filename="filename"
+Content-Type: text/plain
+Content-Transfer-Encoding: binary
+
+test
+--AaB03x
+content-disposition: form-data; name="userfiles"; filename="filename2"
+Content-Type: text/plain
+Content-Transfer-Encoding: binary
+
+test2
+--AaB03x--

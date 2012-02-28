@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<project>
+  <macrodef name="jar-post">
+    <sequential>
+      <jar destfile="target/jars/${project.name}-test-${project.version}.jar">
+        <fileset dir="target/classes/test/unit" includes="**/test/**/*"/>
+      </jar>
+
+      <!-- Source JAR -->
+      <jar destfile="target/jars/${project.name}-test-${project.version}-src.jar">
+        <fileset dir="src/java/test/unit" includes="**/test/**/*"/>
+      </jar>
+   </sequential>
+  </macrodef>
+</project>

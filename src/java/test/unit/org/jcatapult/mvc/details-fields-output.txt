@@ -1,0 +1,14 @@
+<html>
+<head><title>User details</title></head>
+<body>
+Name: Frank
+Age: 12
+Security questions:
+  One
+  Two
+Street: 123 Main St.
+City: Springfield
+State: IL
+Zipcode: 00000
+</body>
+</html>
