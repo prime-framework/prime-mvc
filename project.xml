@@ -44,7 +44,7 @@
     <artifact-group type="compile">
       <artifact group="commons.apache.org" name="commons-configuration" version="1.4"/>
       <artifact group="commons.apache.org" name="commons-fileupload" version="1.2.1"/>
-      <artifact group="commons.apache.org" name="commons-lang" version="2.3"/>
+      <artifact group="commons.apache.org" name="commons-lang3" version="3.0.1"/>
       <artifact group="freemarker.org" name="freemarker" version="2.3.16"/>
       <artifact group="inject.google.com" name="guice" version="3.0"/>
       <artifact group="java-net-commons.dev.java.net" name="java-net-commons" version="1.5.5"/>
