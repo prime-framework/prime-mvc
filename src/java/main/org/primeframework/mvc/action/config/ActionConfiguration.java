@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, JCatapult.org, All Rights Reserved
+ * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ public interface ActionConfiguration {
     String uri();
 
     /**
-     * Determines if this configuration can handle the given URI. Configuration objects provide
+     * Determines if this configuration can handle the given URI. PrimeMVCConfiguration objects provide
      * additional handling for URI parameters and other cases and this method uses the full incoming
      * URI to determine if the configuration can handle it.
      *

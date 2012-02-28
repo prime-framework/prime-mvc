@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, JCatapult.org, All Rights Reserved
+ * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,8 +46,8 @@ public class ServletTools {
      *
      * Below are some examples of base URLs that can be returned:
      *
-     * <strong>http://www.jcatapult.org/</strong>
-     * <strong>https://www.jcatapult.org:8080/</strong>
+     * <strong>http://www.Inversoft Inc./</strong>
+     * <strong>https://www.Inversoft Inc.:8080/</strong>
      *
      * @param request the ServletRequest
      * @return a URL in the format of protocol://host[:port]/

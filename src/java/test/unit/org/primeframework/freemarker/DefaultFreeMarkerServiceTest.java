@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, JCatapult.org, All Rights Reserved
+ * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,8 @@ import java.util.Map;
 
 import freemarker.ext.beans.BeansWrapper;
 import org.easymock.EasyMock;
-import org.primeframework.config.Configuration;
+import org.primeframework.config.PrimeMVCConfiguration;
 import org.primeframework.container.ContainerResolver;
-import org.primeframework.environment.EnvironmentResolver;
 import static org.testng.Assert.*;
 import org.testng.annotations.Test;
 
@@ -38,38 +37,30 @@ import org.testng.annotations.Test;
 public class DefaultFreeMarkerServiceTest {
     @Test
     public void testUse() {
-        Configuration config = EasyMock.createStrictMock(Configuration.class);
-        EasyMock.expect(config.getInt("jcatapult.freemarker-service.check-seconds", 2)).andReturn(2);
+        PrimeMVCConfiguration config = EasyMock.createStrictMock(PrimeMVCConfiguration.class);
+        EasyMock.expect(config.freemarkerCheckSeconds()).andReturn(2);
         EasyMock.replay(config);
-
-        EnvironmentResolver env = EasyMock.createStrictMock(EnvironmentResolver.class);
-        EasyMock.expect(env.getEnvironment()).andReturn("development");
-        EasyMock.replay(env);
 
         ContainerResolver containerResolver = EasyMock.createStrictMock(ContainerResolver.class);
         EasyMock.expect(containerResolver.getRealPath("src/java/test/unit/org/jcatapult/freemarker/test_en_US.ftl")).andReturn("src/java/test/unit/org/jcatapult/freemarker/test.ftl");
         EasyMock.replay(containerResolver);
 
-        DefaultFreeMarkerService service = new DefaultFreeMarkerService(config, env, new OverridingTemplateLoader(containerResolver));
+        DefaultFreeMarkerService service = new DefaultFreeMarkerService(config, new OverridingTemplateLoader(containerResolver));
         String result = service.render("src/java/test/unit/org/jcatapult/freemarker/test.ftl", new HashMap<String, Object>(), Locale.US);
         assertEquals("It worked!", result);
     }
 
     @Test
     public void objectWrapper() {
-        Configuration config = EasyMock.createStrictMock(Configuration.class);
-        EasyMock.expect(config.getInt("jcatapult.freemarker-service.check-seconds", 2)).andReturn(2);
+        PrimeMVCConfiguration config = EasyMock.createStrictMock(PrimeMVCConfiguration.class);
+        EasyMock.expect(config.freemarkerCheckSeconds()).andReturn(2);
         EasyMock.replay(config);
-
-        EnvironmentResolver env = EasyMock.createStrictMock(EnvironmentResolver.class);
-        EasyMock.expect(env.getEnvironment()).andReturn("development");
-        EasyMock.replay(env);
 
         ContainerResolver containerResolver = EasyMock.createStrictMock(ContainerResolver.class);
         EasyMock.expect(containerResolver.getRealPath("src/java/test/unit/org/jcatapult/freemarker/test-with-bean_en_US.ftl")).andReturn("src/java/test/unit/org/jcatapult/freemarker/test-with-bean.ftl");
         EasyMock.replay(containerResolver);
 
-        DefaultFreeMarkerService service = new DefaultFreeMarkerService(config, env, new OverridingTemplateLoader(containerResolver));
+        DefaultFreeMarkerService service = new DefaultFreeMarkerService(config,  new OverridingTemplateLoader(containerResolver));
 
         BeansWrapper ow = new BeansWrapper();
         ow.setExposeFields(true);
@@ -87,19 +78,15 @@ public class DefaultFreeMarkerServiceTest {
 
     @Test
     public void defaultObjectWrapper() {
-        Configuration config = EasyMock.createStrictMock(Configuration.class);
-        EasyMock.expect(config.getInt("jcatapult.freemarker-service.check-seconds", 2)).andReturn(2);
+        PrimeMVCConfiguration config = EasyMock.createStrictMock(PrimeMVCConfiguration.class);
+        EasyMock.expect(config.freemarkerCheckSeconds()).andReturn(2);
         EasyMock.replay(config);
-
-        EnvironmentResolver env = EasyMock.createStrictMock(EnvironmentResolver.class);
-        EasyMock.expect(env.getEnvironment()).andReturn("development");
-        EasyMock.replay(env);
 
         ContainerResolver containerResolver = EasyMock.createStrictMock(ContainerResolver.class);
         EasyMock.expect(containerResolver.getRealPath("src/java/test/unit/org/jcatapult/freemarker/test-with-bean_en_US.ftl")).andReturn("src/java/test/unit/org/jcatapult/freemarker/test-with-bean.ftl");
         EasyMock.replay(containerResolver);
 
-        DefaultFreeMarkerService service = new DefaultFreeMarkerService(config, env, new OverridingTemplateLoader(containerResolver));
+        DefaultFreeMarkerService service = new DefaultFreeMarkerService(config, new OverridingTemplateLoader(containerResolver));
 
         Bean bean = new Bean();
         bean.coolMap.put(1, "test");

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, JCatapult.org, All Rights Reserved
+ * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,152 +19,159 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.primeframework.config.AbstractPrimeMVCConfiguration;
+import org.primeframework.config.PrimeMVCConfiguration;
 import org.primeframework.guice.GuiceContainer;
-import org.primeframework.jndi.MockJNDI;
 import org.primeframework.servlet.ServletObjectsHolder;
 import org.primeframework.test.servlet.MockHttpServletRequest;
 import org.primeframework.test.servlet.MockHttpServletResponse;
 import org.primeframework.test.servlet.MockHttpSession;
 import org.primeframework.test.servlet.MockServletContext;
 import org.primeframework.test.servlet.WebTestHelper;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeSuite;
 
 import net.java.util.CollectionTools;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 
 /**
- * <p>
- * This class is a base test for the JCatapult framework that helps to boot-strap
- * testing by setting up JNDI, Guice and other things. This assumes that applications
- * are constructed in the manner specified by the JCatapult documentation in order
- * to find the correct configuration files.
- * </p>
+ * <p> This class is a base test for the JCatapult framework that helps to boot-strap testing by setting up JNDI, Guice
+ * and other things. This assumes that applications are constructed in the manner specified by the JCatapult
+ * documentation in order to find the correct configuration files. </p>
  *
- * @author  Brian Pontarelli and James Humphrey
+ * @author Brian Pontarelli and James Humphrey
  */
 public abstract class JCatapultBaseTest {
-    private static final Logger logger = Logger.getLogger(JCatapultBaseTest.class.getName());
-    public static final MockJNDI jndi = new MockJNDI();
-    protected List<Module> modules = CollectionTools.list();
-    protected Injector injector;
-    protected MockServletContext context;
-    protected MockHttpSession session;
-    protected MockHttpServletRequest request;
-    protected MockHttpServletResponse response;
+  private static final Logger logger = Logger.getLogger(JCatapultBaseTest.class.getName());
+  protected List<Module> modules = CollectionTools.list();
+  protected Injector injector;
+  protected MockServletContext context;
+  protected MockHttpSession session;
+  protected MockHttpServletRequest request;
+  protected MockHttpServletResponse response;
 
-    /**
-     * Sets up a mock JNDI tree and sets the environment to test.
-     */
-    @BeforeClass
-    public static void setUpJNDI() {
-        jndi.bind("java:comp/env/environment", "development");
-        jndi.activate();
-    }
+  /**
+   * Allows sub-classes to setup a different set of modules to use. This should be called from the constructor.
+   *
+   * @param modules The modules to use for injection.
+   */
+  public void setModules(Module... modules) {
+    this.modules = CollectionTools.llist(modules);
+  }
 
-    /**
-     * Allows sub-classes to setup a different set of modules to use. This should be called from the
-     * constructor.
-     *
-     * @param   modules The modules to use for injection.
-     */
-    public void setModules(Module... modules) {
-        this.modules = CollectionTools.llist(modules);
-    }
+  /**
+   * Allows sub-classes to setup a different set of modules to use. This should be called from the constructor.
+   *
+   * @param modules The modules to use for injection.
+   */
+  public void addModules(Module... modules) {
+    this.modules.addAll(CollectionTools.list(modules));
+  }
 
-    /**
-     * Allows sub-classes to setup a different set of modules to use. This should be called from the
-     * constructor.
-     *
-     * @param   modules The modules to use for injection.
-     */
-    public void addModules(Module... modules) {
-        this.modules.addAll(CollectionTools.list(modules));
-    }
+  /**
+   * Sets up Guice and PrimeMVCConfiguration.
+   */
+  @BeforeSuite
+  public void setUp() {
+    setUpServletObjects();
+    setUpGuice();
+  }
 
-    /**
-     * Sets up Guice and Configuration.
-     */
-    @BeforeSuite
-    public void setUp() {
-        setUpServletObjects();
-        setUpGuice();
-    }
+  /**
+   * Creates the servlet request, servlet response and context and puts them into the holder.
+   */
+  protected void setUpServletObjects() {
+    this.context = makeContext();
+    this.session = makeSession(context);
+    this.request = makeRequest(session);
+    this.response = makeResponse();
 
-    /**
-     * Creates the servlet request, servlet response and context and puts them into the holder.
-     */
-    protected void setUpServletObjects() {
-        this.context = makeContext();
-        this.session = makeSession(context);
-        this.request = makeRequest(session);
-        this.response = makeResponse();
+    ServletObjectsHolder.setServletContext(context);
+    ServletObjectsHolder.clearServletRequest();
+    ServletObjectsHolder.setServletRequest(new HttpServletRequestWrapper(request));
+    ServletObjectsHolder.clearServletResponse();
+    ServletObjectsHolder.setServletResponse(response);
+  }
 
-        ServletObjectsHolder.setServletContext(context);
-        ServletObjectsHolder.clearServletRequest();
-        ServletObjectsHolder.setServletRequest(new HttpServletRequestWrapper(request));
-        ServletObjectsHolder.clearServletResponse();
-        ServletObjectsHolder.setServletResponse(response);
-    }
+  /**
+   * Constructs a request whose URI is /test, Locale is US, is a GET and encoded using UTF-8 by calling the by calling
+   * the {@link WebTestHelper#makeRequest(MockHttpSession)} method.
+   *
+   * @param session The mock session.
+   * @return The mock request.
+   */
+  protected MockHttpServletRequest makeRequest(MockHttpSession session) {
+    return WebTestHelper.makeRequest(session);
+  }
 
-    /**
-     * Constructs a request whose URI is /test, Locale is US, is a GET and encoded using UTF-8
-     * by calling the by calling the {@link WebTestHelper#makeRequest(MockHttpSession)} method.
-     *
-     * @param   session The mock session.
-     * @return  The mock request.
-     */
-    protected MockHttpServletRequest makeRequest(MockHttpSession session) {
-        return WebTestHelper.makeRequest(session);
-    }
+  /**
+   * Constructs a mock response by calling the {@link WebTestHelper#makeResponse()} method.
+   *
+   * @return The mock response.
+   */
+  protected MockHttpServletResponse makeResponse() {
+    return WebTestHelper.makeResponse();
+  }
 
-    /**
-     * Constructs a mock response by calling the {@link WebTestHelper#makeResponse()} method.
-     *
-     * @return  The mock response.
-     */
-    protected MockHttpServletResponse makeResponse() {
-        return WebTestHelper.makeResponse();
-    }
+  /**
+   * Constructs a mock session by calling the {@link WebTestHelper#makeSession(MockServletContext)} method.
+   *
+   * @param context The mock servlet context.
+   * @return The mock session.
+   */
+  protected MockHttpSession makeSession(MockServletContext context) {
+    return WebTestHelper.makeSession(context);
+  }
 
-    /**
-     * Constructs a mock session by calling the {@link WebTestHelper#makeSession(MockServletContext)} method.
-     *
-     * @param   context The mock servlet context.
-     * @return  The mock session.
-     */
-    protected MockHttpSession makeSession(MockServletContext context) {
-        return WebTestHelper.makeSession(context);
-    }
+  /**
+   * Constructs a mock servlet context by calling the {@link WebTestHelper#makeContext()} method.
+   *
+   * @return The mock context.
+   */
+  protected MockServletContext makeContext() {
+    return WebTestHelper.makeContext();
+  }
 
-    /**
-     * Constructs a mock servlet context by calling the {@link WebTestHelper#makeContext()} method.
-     *
-     * @return  The mock context.
-     */
-    protected MockServletContext makeContext() {
-        return WebTestHelper.makeContext();
-    }
+  /**
+   * Sets up the configuration and then the injector.
+   */
+  public void setUpGuice() {
+    if (modules.size() > 0) {
+      StringBuffer moduleNames = new StringBuffer(" ");
+      for (Module module : modules) {
+        moduleNames.append(module.getClass().getName()).append(" ");
+      }
 
-    /**
-     * Sets up the configuration and then the injector.
-     */
-    public void setUpGuice() {
-        if (modules.size() > 0) {
-            StringBuffer moduleNames = new StringBuffer(" ");
-            for (Module module : modules) {
-                moduleNames.append(module.getClass().getName()).append(" ");
+      logger.fine("Setting up injection with modules [" + moduleNames.toString() + "]");
+      GuiceContainer.setGuiceModules(modules.toArray(new Module[modules.size()]));
+    } else {
+      GuiceContainer.setGuiceModules(new AbstractModule() {
+        @Override
+        protected void configure() {
+          bind(PrimeMVCConfiguration.class).toInstance(new AbstractPrimeMVCConfiguration() {
+            @Override
+            public int freemarkerCheckSeconds() {
+              return 2;
             }
 
-            logger.fine("Setting up injection with modules [" + moduleNames.toString() + "]");
-            GuiceContainer.setGuiceModules(modules.toArray(new Module[modules.size()]));
-        }
+            @Override
+            public int l10nReloadSeconds() {
+              return 1;
+            }
 
-        GuiceContainer.inject();
-        GuiceContainer.initialize();
-        injector = GuiceContainer.getInjector();
-        injector.injectMembers(this);
+            @Override
+            public boolean allowUnknownParameters() {
+              return false;
+            }
+          });
+        }
+      });
     }
+
+    GuiceContainer.initialize();
+    injector = GuiceContainer.getInjector();
+    injector.injectMembers(this);
+  }
 }

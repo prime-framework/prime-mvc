@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, JCatapult.org, All Rights Reserved
+ * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.easymock.EasyMock;
-import org.primeframework.config.Configuration;
+import org.primeframework.config.PrimeMVCConfiguration;
 import org.primeframework.test.servlet.MockServletContext;
 import org.primeframework.container.ServletContainerResolver;
 import static org.testng.Assert.*;
@@ -38,7 +38,7 @@ import static net.java.util.CollectionTools.*;
 public class ResourceBundleMessageProviderTest {
     @Test
     public void testSearch() {
-        Configuration config = EasyMock.createStrictMock(Configuration.class);
+        PrimeMVCConfiguration config = EasyMock.createStrictMock(PrimeMVCConfiguration.class);
         EasyMock.expect(config.getLong("jcatapult.l10n.reload-check-seconds", 1)).andReturn(1l).times(2);
         EasyMock.replay(config);
 
@@ -55,7 +55,7 @@ public class ResourceBundleMessageProviderTest {
 
     @Test
     public void testFormat() {
-        Configuration config = EasyMock.createStrictMock(Configuration.class);
+        PrimeMVCConfiguration config = EasyMock.createStrictMock(PrimeMVCConfiguration.class);
         EasyMock.expect(config.getLong("jcatapult.l10n.reload-check-seconds", 1)).andReturn(1l).times(2);
         EasyMock.replay(config);
 
@@ -73,7 +73,7 @@ public class ResourceBundleMessageProviderTest {
 
     @Test
     public void testMissing() {
-        Configuration config = EasyMock.createStrictMock(Configuration.class);
+        PrimeMVCConfiguration config = EasyMock.createStrictMock(PrimeMVCConfiguration.class);
         EasyMock.expect(config.getLong("jcatapult.l10n.reload-check-seconds", 1)).andReturn(1l);
         EasyMock.replay(config);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, JCatapult.org, All Rights Reserved
+ * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,13 +34,13 @@ public class ServletToolsTest {
 
         HttpServletRequest req = EasyMock.createStrictMock(HttpServletRequest.class);
         EasyMock.expect(req.getScheme()).andReturn("http");
-        EasyMock.expect(req.getServerName()).andReturn("www.jcatapult.org");
+        EasyMock.expect(req.getServerName()).andReturn("www.Inversoft Inc.");
         EasyMock.expect(req.getServerPort()).andReturn(0);
         EasyMock.replay(req);
 
         URL url = ServletTools.getBaseUrl(req);
 
-        Assert.assertEquals("http://www.jcatapult.org/", url.toString());
+        Assert.assertEquals("http://www.Inversoft Inc./", url.toString());
     }
 
     @Test
@@ -48,12 +48,12 @@ public class ServletToolsTest {
 
         HttpServletRequest req = EasyMock.createStrictMock(HttpServletRequest.class);
         EasyMock.expect(req.getScheme()).andReturn("http");
-        EasyMock.expect(req.getServerName()).andReturn("www.jcatapult.org");
+        EasyMock.expect(req.getServerName()).andReturn("www.Inversoft Inc.");
         EasyMock.expect(req.getServerPort()).andReturn(8080);
         EasyMock.replay(req);
 
         URL url = ServletTools.getBaseUrl(req);
 
-        Assert.assertEquals("http://www.jcatapult.org:8080/", url.toString());
+        Assert.assertEquals("http://www.Inversoft Inc.:8080/", url.toString());
     }
 }

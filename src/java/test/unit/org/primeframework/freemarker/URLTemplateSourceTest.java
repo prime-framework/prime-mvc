@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, JCatapult.org, All Rights Reserved
+ * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,8 +47,8 @@ public class URLTemplateSourceTest {
      */
     @Test
     public void testClassPath() throws IOException {
-        File file = new File("target/classes/main/jcatapult-default.properties");
-        URLTemplateSource source = new URLTemplateSource(Thread.currentThread().getContextClassLoader().getResource("jcatapult-default.properties"));
+        File file = new File("target/classes/test/unit/logging.properties");
+        URLTemplateSource source = new URLTemplateSource(Thread.currentThread().getContextClassLoader().getResource("logging.properties"));
         assertTrue(source.lastModified() > file.lastModified());
         assertEquals(source.lastModified(), source.lastModified());
         assertNotNull(source.getInputStream());

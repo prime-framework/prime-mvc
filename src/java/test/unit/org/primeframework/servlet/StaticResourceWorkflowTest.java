@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, JCatapult.org, All Rights Reserved
+ * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.easymock.EasyMock;
-import org.primeframework.config.Configuration;
+import org.primeframework.config.PrimeMVCConfiguration;
 import static org.testng.Assert.*;
+
 import org.testng.annotations.Test;
 
 /**
@@ -43,7 +44,7 @@ public class StaticResourceWorkflowTest {
      */
     @Test
     public void testNewRequest() throws IOException, ServletException {
-        Configuration configuration = makeConfiguration();
+        PrimeMVCConfiguration configuration = makeConfiguration();
 
         ServletContext context = EasyMock.createStrictMock(ServletContext.class);
         EasyMock.expect(context.getResource("/component/2.1.1/test.jpg")).andReturn(null);
@@ -90,7 +91,7 @@ public class StaticResourceWorkflowTest {
      */
     @Test
     public void testNewRequestContext() throws IOException, ServletException {
-        Configuration configuration = makeConfiguration();
+        PrimeMVCConfiguration configuration = makeConfiguration();
 
         ServletContext context = EasyMock.createStrictMock(ServletContext.class);
         EasyMock.expect(context.getResource("/component/2.1.1/test.jpg")).andReturn(null);
@@ -137,7 +138,7 @@ public class StaticResourceWorkflowTest {
      */
     @Test
     public void testCacheRequest() throws IOException, ServletException {
-        Configuration configuration = makeConfiguration();
+        PrimeMVCConfiguration configuration = makeConfiguration();
 
         ServletContext context = EasyMock.createStrictMock(ServletContext.class);
         EasyMock.expect(context.getResource("/component/2.1.1/test.jpg")).andReturn(null);
@@ -170,7 +171,7 @@ public class StaticResourceWorkflowTest {
      */
     @Test
     public void testBadRequest() throws IOException, ServletException {
-        Configuration configuration = makeConfiguration();
+        PrimeMVCConfiguration configuration = makeConfiguration();
 
         ServletContext context = EasyMock.createStrictMock(ServletContext.class);
         EasyMock.expect(context.getResource("/component/2.1.1/bad.jpg")).andReturn(null);
@@ -202,7 +203,7 @@ public class StaticResourceWorkflowTest {
      */
     @Test
     public void testNormal() throws IOException, ServletException {
-        Configuration configuration = makeConfiguration();
+        PrimeMVCConfiguration configuration = makeConfiguration();
 
         ServletContext context = EasyMock.createStrictMock(ServletContext.class);
         EasyMock.replay(context);
@@ -224,8 +225,8 @@ public class StaticResourceWorkflowTest {
         EasyMock.verify(configuration, req, res, wc);
     }
 
-    private Configuration makeConfiguration() {
-        Configuration configuration = EasyMock.createStrictMock(Configuration.class);
+    private PrimeMVCConfiguration makeConfiguration() {
+        PrimeMVCConfiguration configuration = EasyMock.createStrictMock(PrimeMVCConfiguration.class);
         EasyMock.expect(configuration.getStringArray("jcatapult.static-resource.prefixes")).andReturn(null);
         EasyMock.expect(configuration.getBoolean("jcatapult.static-resource.enabled", true)).andReturn(true);
         EasyMock.replay(configuration);

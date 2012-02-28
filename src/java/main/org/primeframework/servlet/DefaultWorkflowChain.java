@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, JCatapult.org, All Rights Reserved
+ * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,46 +20,55 @@ import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.primeframework.mvc.servlet.MVCWorkflow;
+
+import com.google.inject.Inject;
+import static java.util.Arrays.*;
+
 /**
- * <p>
- * This class is the default chain that first iterates over all the Workflow
- * instances that were resolved in the {@link JCatapultFilter} using the
- * {@link WorkflowResolver} implementation. After all the Workflows have been
- * invoked, this continues to invoke the rest of the FilterChain that was passed
- * into the JCatapultFilter.
- * </p>
+ * This class is the default chain that first iterates over all the Workflow instances that were resolved in the
+ * {@link JCatapultFilter} using the {@link WorkflowChain} implementation. After all the Workflows have been invoked,
+ * this continues to invoke the rest of the FilterChain that was passed into the JCatapultFilter.
  *
  * @author Brian Pontarelli
  */
 public class DefaultWorkflowChain implements WorkflowChain {
-    private final Iterable<Workflow> workflows;
-    private final FilterChain filterChain;
-    private Iterator<Workflow> iterator;
+  private final Iterable<Workflow> workflows;
+  private FilterChain filterChain;
+  private Iterator<Workflow> iterator;
 
-    public DefaultWorkflowChain(Iterable<Workflow> workflows, FilterChain filterChain) {
-        this.workflows = workflows;
-        this.filterChain = filterChain;
-        this.iterator = workflows.iterator();
-    }
+  @Inject
+  public DefaultWorkflowChain(CoreWorkflow coreWorkflow, MVCWorkflow mvcWorkflow) {
+    workflows = asList(coreWorkflow, mvcWorkflow);
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void continueWorkflow() throws IOException, ServletException {
-        if (iterator.hasNext()) {
-            Workflow workflow = iterator.next();
-            workflow.perform(this);
-        } else {
-            filterChain.doFilter(ServletObjectsHolder.getServletRequest(), ServletObjectsHolder.getServletResponse());
-        }
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void start(FilterChain filterChain) throws IOException, ServletException {
+    this.filterChain = filterChain;
+    continueWorkflow();
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void reset() {
-        iterator = workflows.iterator();
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void continueWorkflow() throws IOException, ServletException {
+    if (iterator.hasNext()) {
+      Workflow workflow = iterator.next();
+      workflow.perform(this);
+    } else {
+      filterChain.doFilter(ServletObjectsHolder.getServletRequest(), ServletObjectsHolder.getServletResponse());
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void reset() {
+    iterator = workflows.iterator();
+  }
 }

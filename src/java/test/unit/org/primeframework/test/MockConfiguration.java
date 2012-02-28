@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, JCatapult.org, All Rights Reserved
+ * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,27 +25,27 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.HashSet;
 
-import org.primeframework.config.Configuration;
+import org.primeframework.config.PrimeMVCConfiguration;
 
 /**
  * <p>
  * This is a mock configuration object that delegates to another
- * Configuration instance, but also allows specific properties to
+ * PrimeMVCConfiguration instance, but also allows specific properties to
  * be mocked out. This can be used in a unit tests via a little glue like this:
  * </p>
  *
  * <pre>
  *
- * protected Configuration config;
+ * protected PrimeMVCConfiguration config;
  *
  * {@code @Inject}
- * public void setConfiguration(Configuration config) {
+ * public void setConfiguration(PrimeMVCConfiguration config) {
  *   this.config = config;
  * }
  *
  * {@code @Test}
  * protected void mock() {
- *   Configuration mock = new MockConfiguration(config);
+ *   PrimeMVCConfiguration mock = new MockConfiguration(config);
  *   mock.addParameter("foo", "bar");
  *   ...
  * }
@@ -53,11 +53,11 @@ import org.primeframework.config.Configuration;
  *
  * @author Brian Pontarelli
  */
-public class MockConfiguration implements Configuration {
+public class MockConfiguration implements PrimeMVCConfiguration {
     private final Map<String, Object> parameters = new HashMap<String, Object>();
-    private final Configuration configuration;
+    private final PrimeMVCConfiguration configuration;
 
-    public MockConfiguration(Configuration configuration) {
+    public MockConfiguration(PrimeMVCConfiguration configuration) {
         this.configuration = configuration;
     }
 

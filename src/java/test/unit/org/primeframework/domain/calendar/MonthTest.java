@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2006, JCatapult.org, All Rights Reserved
+ * Copyright (c) 2001-2006, Inversoft Inc., All Rights Reserved
  */
 package org.primeframework.domain.calendar;
 

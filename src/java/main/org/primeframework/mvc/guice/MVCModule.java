@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, JCatapult.org, All Rights Reserved
+ * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,75 +54,71 @@ import org.primeframework.mvc.result.message.control.Message;
 import com.google.inject.AbstractModule;
 
 /**
- * <p>
- * This class is the main Guice Module that sets up the JCatapult
- * MVC.
- * </p>
+ * This class is the main Guice Module that sets up the JCatapult MVC.
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class MVCModule extends AbstractModule {
-    protected void configure() {
-        configureConverters();
-        configureModels();
-        configureFreeMarker();
-    }
+  protected void configure() {
+    configureConverters();
+    configureModels();
+    configureFreeMarker();
+  }
 
-    /**
-     * Binds all of the default type converters.
-     */
-    protected void configureConverters() {
-        bind(BooleanConverter.class);
-        bind(CharacterConverter.class);
-        bind(CollectionConverter.class);
-        bind(DateTimeConverter.class);
-        bind(EnumConverter.class);
-        bind(FileConverter.class);
-        bind(LocalDateConverter.class);
-        bind(LocaleConverter.class);
-        bind(MoneyConverter.class);
-        bind(NumberConverter.class);
-        bind(StringConverter.class);
+  /**
+   * Binds all of the default type converters.
+   */
+  protected void configureConverters() {
+    bind(BooleanConverter.class);
+    bind(CharacterConverter.class);
+    bind(CollectionConverter.class);
+    bind(DateTimeConverter.class);
+    bind(EnumConverter.class);
+    bind(FileConverter.class);
+    bind(LocalDateConverter.class);
+    bind(LocaleConverter.class);
+    bind(MoneyConverter.class);
+    bind(NumberConverter.class);
+    bind(StringConverter.class);
 
-        // Inject the registry so that the Class to Class mapping is setup
-        requestStaticInjection(DefaultConverterProvider.class);
-    }
+    // Inject the registry so that the Class to Class mapping is setup
+    requestStaticInjection(DefaultConverterProvider.class);
+  }
 
-    /**
-     * This binds the models so that they can be resolved by the FreeMarker result handling and
-     * dynamically added to the Map as directives under the jc key and using the class name as the
-     * directive name.
-     */
-    protected void configureModels() {
-        bind(ActionMessages.class);
-        bind(Button.class);
-        bind(Checkbox.class);
-        bind(CheckboxList.class);
-        bind(CountriesSelect.class);
-        bind(FieldMessages.class);
-        bind(File.class);
-        bind(Form.class);
-        bind(Hidden.class);
-        bind(Image.class);
-        bind(Message.class);
-        bind(MonthsSelect.class);
-        bind(Password.class);
-        bind(RadioList.class);
-        bind(Reset.class);
-        bind(Select.class);
-        bind(StatesSelect.class);
-        bind(Submit.class);
-        bind(Text.class);
-        bind(Textarea.class);
-        bind(YearsSelect.class);
+  /**
+   * This binds the models so that they can be resolved by the FreeMarker result handling and dynamically added to the
+   * Map as directives under the jc key and using the class name as the directive name.
+   */
+  protected void configureModels() {
+    bind(ActionMessages.class);
+    bind(Button.class);
+    bind(Checkbox.class);
+    bind(CheckboxList.class);
+    bind(CountriesSelect.class);
+    bind(FieldMessages.class);
+    bind(File.class);
+    bind(Form.class);
+    bind(Hidden.class);
+    bind(Image.class);
+    bind(Message.class);
+    bind(MonthsSelect.class);
+    bind(Password.class);
+    bind(RadioList.class);
+    bind(Reset.class);
+    bind(Select.class);
+    bind(StatesSelect.class);
+    bind(Submit.class);
+    bind(Text.class);
+    bind(Textarea.class);
+    bind(YearsSelect.class);
 
-        requestStaticInjection(ForwardResult.class);
-    }
+    requestStaticInjection(ForwardResult.class);
+  }
 
-    /**
-     * Sets up the JspTaglib handling and ServletContext for the FreeMarkerMap.
-     */
-    protected void configureFreeMarker() {
-        requestStaticInjection(FreeMarkerMap.class);
-    }
+  /**
+   * Sets up the JspTaglib handling and ServletContext for the FreeMarkerMap.
+   */
+  protected void configureFreeMarker() {
+    requestStaticInjection(FreeMarkerMap.class);
+  }
 }

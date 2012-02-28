@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, JCatapult.org, All Rights Reserved
+ * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import java.util.Locale;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 
-import org.primeframework.config.Configuration;
+import org.primeframework.config.PrimeMVCConfiguration;
 import org.primeframework.container.ContainerResolver;
 
 import com.google.inject.Inject;
@@ -53,9 +53,9 @@ public class WebControl extends ResourceBundle.Control {
     private final long reloadCheckSeconds;
 
     @Inject
-    public WebControl(ContainerResolver containerResolver, Configuration configuration) {
+    public WebControl(ContainerResolver containerResolver, PrimeMVCConfiguration configuration) {
         this.containerResolver = containerResolver;
-        this.reloadCheckSeconds = configuration.getLong("jcatapult.l10n.reload-check-seconds", 1);
+        this.reloadCheckSeconds = configuration.l10nReloadSeconds();
     }
 
     /**

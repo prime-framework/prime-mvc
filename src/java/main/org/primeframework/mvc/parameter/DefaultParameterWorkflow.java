@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, JCatapult.org, All Rights Reserved
+ * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,11 +29,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
-import static net.java.lang.ObjectTools.*;
-import org.primeframework.config.Configuration;
-import org.primeframework.environment.EnvironmentResolver;
+import org.primeframework.config.PrimeMVCConfiguration;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.message.MessageStore;
@@ -49,6 +45,10 @@ import org.primeframework.mvc.util.RequestKeys;
 import org.primeframework.servlet.WorkflowChain;
 import org.primeframework.servlet.multipart.FileInfo;
 
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
+import static net.java.lang.ObjectTools.*;
+
 /**
  * <p>
  * This class uses the {@link ExpressionEvaluator} to process the incoming
@@ -59,11 +59,6 @@ import org.primeframework.servlet.multipart.FileInfo;
  * @author  Brian Pontarelli
  */
 public class DefaultParameterWorkflow implements ParameterWorkflow {
-    public static final String[] DEFAULT_TYPES = {
-        "text/plain", "text/xml", "text/rtf", "text/richtext", "text/html", "text/css",
-        "image/jpeg", "image/gif", "image/png", "image/pjpeg", "image/tiff",
-        "video/dv", "video/h261", "video/h262", "video/h263", "video/h264", "video/jpeg", "video/mp4", "video/mpeg", "video/mpv", "video/ogg", "video/quicktime", "video/x-flv",
-        "application/msword", "application/pdf", "application/msword", "application/msexcel", "application/mspowerpoint"};
     public static final String CHECKBOX_PREFIX = "__jc_cb_";
     public static final String RADIOBUTTON_PREFIX = "__jc_rb_";
     public static final String ACTION_PREFIX = "__jc_a_";
@@ -73,7 +68,7 @@ public class DefaultParameterWorkflow implements ParameterWorkflow {
     private final ActionInvocationStore actionInvocationStore;
     private final MessageStore messageStore;
     private final ExpressionEvaluator expressionEvaluator;
-    private final EnvironmentResolver resolver;
+    private final PrimeMVCConfiguration configuration;
 
     private final long maxSize;
     private final String[] contentTypes;
@@ -82,19 +77,14 @@ public class DefaultParameterWorkflow implements ParameterWorkflow {
     @Inject
     public DefaultParameterWorkflow(HttpServletRequest request, ActionInvocationStore actionInvocationStore,
                                     MessageStore messageStore, ExpressionEvaluator expressionEvaluator,
-                                    EnvironmentResolver resolver, Configuration configuration) {
+                                    PrimeMVCConfiguration configuration) {
         this.request = request;
         this.actionInvocationStore = actionInvocationStore;
         this.messageStore = messageStore;
         this.expressionEvaluator = expressionEvaluator;
-        this.resolver = resolver;
-
-        String[] types = configuration.getStringArray("jcatapult.mvc.file-upload.allowed-content-types");
-        if (types.length == 0) {
-            types = DEFAULT_TYPES;
-        }
-        this.contentTypes = types;
-        this.maxSize = configuration.getLong("jcatapult.mvc.file-upload.max-size", 1024000);
+      this.configuration = configuration;
+        this.contentTypes = configuration.fileUploadAllowedTypes();
+        this.maxSize = configuration.fileUploadMaxSize();
     }
 
     @Inject(optional = true)
@@ -307,10 +297,9 @@ public class DefaultParameterWorkflow implements ParameterWorkflow {
             } catch (ConversionException ce) {
                 messageStore.addConversionError(key, actionInvocation.actionURI(), struct.attributes, (Object[]) struct.values);
             } catch (ExpressionException ee) {
-                String env = resolver.getEnvironment();
-                if (env.startsWith("dev")) {
-                    throw ee;
-                }
+              if (!configuration.allowUnknownParameters()) {
+                throw ee;
+              }
 
                 logger.log(Level.FINE, "Invalid parameter to action [" + action.getClass().getName() + "]", ee);
             }

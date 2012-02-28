@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, JCatapult.org, All Rights Reserved
+ * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,31 +15,36 @@
  */
 package org.primeframework.servlet;
 
+import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import java.io.IOException;
 
+import com.google.inject.ImplementedBy;
+
 /**
- * <p>
- * This interface defines how {@link Workflow} instances pass control to
- * the next Workflow or back to the JCatapultFilter.
- * </p>
+ * This interface defines how {@link Workflow} instances pass control to the next Workflow or back to the
+ * JCatapultFilter.
  *
  * @author Brian Pontarelli
  */
+@ImplementedBy(DefaultWorkflowChain.class)
 public interface WorkflowChain {
-    /**
-     * Invokes the next {@link Workflow} in the chain, or if all the workflows have been invoked
-     * this should pass control back to the JCatapultFilter to continue processing the HTTP request
-     * down the filter chain.
-     *
-     * @throws  IOException If the workflows or filters throw IOException.
-     * @throws  ServletException If the workflows or filters throw ServletException.
-     */
-    void continueWorkflow() throws IOException, ServletException;
+  void start(FilterChain filterChain) throws IOException, ServletException;
 
-    /**
-     * This method resets the workflow to its initial state. This is useful when the workflow needs to be reprocessed
-     * completely for any reason (such as security exceptions).
-     */
-    void reset();
+  /**
+   * Invokes the next {@link Workflow} in the chain, or if all the workflows have been invoked this should pass
+   * control back to the JCatapultFilter to continue processing the HTTP request down the filter chain.
+   *
+   * @throws IOException      If the workflows or filters throw IOException.
+   * @throws ServletException If the workflows or filters throw ServletException.
+   */
+  void continueWorkflow() throws IOException, ServletException;
+
+  /**
+   * This method resets the workflow to its initial state. This is useful when the workflow needs to be reprocessed
+   * completely for any reason (such as security exceptions).
+   */
+  void reset();
+
+  Iterable<Workflow> workflows();
 }

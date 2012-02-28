@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, JCatapult.org, All Rights Reserved
+ * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.primeframework.config.Configuration;
+import org.primeframework.config.PrimeMVCConfiguration;
 
 import com.google.inject.Inject;
 
@@ -66,26 +66,12 @@ public class StaticResourceWorkflow implements Workflow {
 
     @Inject
     public StaticResourceWorkflow(ServletContext context, HttpServletRequest request,
-            HttpServletResponse response, Configuration configuration) {
+            HttpServletResponse response, PrimeMVCConfiguration configuration) {
         this.context = context;
         this.request = request;
         this.response = response;
-        this.staticPrefixes = getPrefixes(configuration);
-        this.enabled = configuration.getBoolean("jcatapult.static-resource.enabled", true);
-    }
-
-    /**
-     * Does the prefix lookup from the configuration.
-     *
-     * @param   configuration The configuration to lookup the prefixes from.
-     * @return The prefixes and never null.
-     */
-    private String[] getPrefixes(Configuration configuration) {
-        String[] prefixes = configuration.getStringArray("jcatapult.static-resource.prefixes");
-        if (prefixes == null || prefixes.length == 0) {
-            prefixes = new String[]{"/module", "/component", "/static", "/jcatapult"};
-        }
-        return prefixes;
+        this.staticPrefixes = configuration.staticResourcePrefixes();
+        this.enabled = configuration.staticResourcesEnabled();
     }
 
     /**
