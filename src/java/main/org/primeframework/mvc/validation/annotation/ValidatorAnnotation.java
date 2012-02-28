@@ -23,17 +23,15 @@ import java.lang.annotation.Target;
 import org.primeframework.mvc.validation.Validator;
 
 /**
- * <p>
- * This annotation marks an annotation as being a validator annotation.
- * </p>
+ * <p> This annotation marks an annotation as being a validator annotation. </p>
  *
  * @author Brian Pontarelli
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.ANNOTATION_TYPE)
 public @interface ValidatorAnnotation {
-    /**
-     * @return  The class that implements the validator annotation's processing.
-     */
-    Class<? extends Validator> value();
+  /**
+   * @return The class that implements the validator annotation's processing.
+   */
+  Class<? extends Validator> value();
 }

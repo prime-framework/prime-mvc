@@ -19,42 +19,36 @@ import java.io.Writer;
 import java.util.Map;
 
 /**
- * <p>
- * This interface defines a control is called from a JSP tag
- * library or from a FreeMarker template to render some HTML
- * or other type of output.
- * </p>
+ * <p> This interface defines a control is called from a JSP tag library or from a FreeMarker template to render some
+ * HTML or other type of output. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public interface Control {
-    /**
-     * Renders the start of the control. If the control doesn't have a start and an end, this method
-     * should be empty.
-     *
-     * @param   writer The writer to write the output to.
-     * @param   attributes The attributes that are passed from the JSP tag or the FreeMarker
-     *          directive.
-     * @param   dynamicAttributes The dynamic attributes that are passed to the tag. These are
-     *          described in the class comment of the {@link org.primeframework.mvc.parameter.ParameterWorkflow}
-     *          class. In most cases these are used for type conversion, such as date formats and
-     *          currency codes.
-     */
-    void renderStart(Writer writer, Map<String, Object> attributes, Map<String, String> dynamicAttributes);
+  /**
+   * Renders the start of the control. If the control doesn't have a start and an end, this method should be empty.
+   *
+   * @param writer            The writer to write the output to.
+   * @param attributes        The attributes that are passed from the JSP tag or the FreeMarker directive.
+   * @param dynamicAttributes The dynamic attributes that are passed to the tag. These are described in the class
+   *                          comment of the {@link org.primeframework.mvc.parameter.ParameterWorkflow} class. In most
+   *                          cases these are used for type conversion, such as date formats and currency codes.
+   */
+  void renderStart(Writer writer, Map<String, Object> attributes, Map<String, String> dynamicAttributes);
 
-    /**
-     * Renders the body of the control.
-     *
-     * @param   writer The writer to write the body to.
-     * @param   body The body.
-     */
-    void renderBody(Writer writer, Body body);
+  /**
+   * Renders the body of the control.
+   *
+   * @param writer The writer to write the body to.
+   * @param body   The body.
+   */
+  void renderBody(Writer writer, Body body);
 
-    /**
-     * Renders the end of the control. If the control doesn't have a start and an end, this method
-     * should be perform the main rendering.
-     *
-     * @param   writer The writer to write the output to.
-     */
-    void renderEnd(Writer writer);
+  /**
+   * Renders the end of the control. If the control doesn't have a start and an end, this method should be perform the
+   * main rendering.
+   *
+   * @param writer The writer to write the output to.
+   */
+  void renderEnd(Writer writer);
 }

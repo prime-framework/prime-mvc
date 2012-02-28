@@ -15,18 +15,15 @@
  */
 package org.primeframework.mvc.scope;
 
-import org.primeframework.servlet.Workflow;
+import org.primeframework.mvc.servlet.Workflow;
 
 import com.google.inject.ImplementedBy;
 
 /**
- * <p>
- * This interface marks a class as the scope retrieval part of the MVC
- * workflow. This part is how the JCatapult MVC loads values from the action
- * into various scopes.
- * </p>
+ * <p> This interface marks a class as the scope retrieval part of the MVC workflow. This part is how the JCatapult MVC
+ * loads values from the action into various scopes. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @ImplementedBy(DefaultScopeRetrievalWorkflow.class)
 public interface ScopeRetrievalWorkflow extends Workflow {

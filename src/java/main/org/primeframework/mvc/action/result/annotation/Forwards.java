@@ -21,18 +21,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * <p>
- * This annotation is a container for {@link Forward} annotations.
- * </p>
+ * <p> This annotation is a container for {@link Forward} annotations. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @ResultContainerAnnotation()
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface Forwards {
-    /**
-     * @return  The list of forwards.
-     */
-    Forward[] value();
+  /**
+   * @return The list of forwards.
+   */
+  Forward[] value();
 }

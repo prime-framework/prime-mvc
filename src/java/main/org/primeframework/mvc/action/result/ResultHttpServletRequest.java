@@ -15,11 +15,11 @@
  */
 package org.primeframework.mvc.action.result;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
 
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.parameter.el.ExpressionException;
@@ -27,57 +27,55 @@ import org.primeframework.mvc.parameter.el.ExpressionException;
 import net.java.util.IteratorEnumeration;
 
 /**
- * <p>
- * This class is a servlet request wrapper that interacts with the expression
- * evaluator in order to pull out attributes from the action.
- * </p>
+ * <p> This class is a servlet request wrapper that interacts with the expression evaluator in order to pull out
+ * attributes from the action. </p>
  *
  * @author Brian Pontarelli
  */
 public class ResultHttpServletRequest extends HttpServletRequestWrapper {
-    private final ExpressionEvaluator expressionEvaluator;
-    private final Object action;
+  private final ExpressionEvaluator expressionEvaluator;
+  private final Object action;
 
-    public ResultHttpServletRequest(HttpServletRequest request, Object action,
-            ExpressionEvaluator expressionEvaluator) {
-        super(request);
-        this.action = action;
-        this.expressionEvaluator = expressionEvaluator;
+  public ResultHttpServletRequest(HttpServletRequest request, Object action,
+                                  ExpressionEvaluator expressionEvaluator) {
+    super(request);
+    this.action = action;
+    this.expressionEvaluator = expressionEvaluator;
+  }
+
+  /**
+   * First checks if the action has an attribute with the given name by attempting to get the value from the expression
+   * evaluator. If that fails this calls super.
+   *
+   * @param name The name of the attribute.
+   * @return The attribute or null if it doesn't exist.
+   */
+  @Override
+  public Object getAttribute(String name) {
+    Object value;
+    try {
+      value = expressionEvaluator.getValue(name, action);
+    } catch (ExpressionException e) {
+      value = super.getAttribute(name);
     }
 
-    /**
-     * First checks if the action has an attribute with the given name by attempting to get the
-     * value from the expression evaluator. If that fails this calls super.
-     *
-     * @param   name The name of the attribute.
-     * @return  The attribute or null if it doesn't exist.
-     */
-    @Override
-    public Object getAttribute(String name) {
-        Object value;
-        try {
-            value = expressionEvaluator.getValue(name, action);
-        } catch (ExpressionException e) {
-            value = super.getAttribute(name);
-        }
+    return value;
+  }
 
-        return value;
+  /**
+   * @return A combined enumeration that contains all of the member names from the action and all of the request
+   *         attribute names from super.
+   */
+  @Override
+  public Enumeration getAttributeNames() {
+    Set<String> names = new HashSet<String>(expressionEvaluator.getAllMembers(action.getClass()));
+
+    Enumeration en = super.getAttributeNames();
+    while (en.hasMoreElements()) {
+      String name = (String) en.nextElement();
+      names.add(name);
     }
 
-    /**
-     * @return  A combined enumeration that contains all of the member names from the action and all
-     *          of the request attribute names from super.
-     */
-    @Override
-    public Enumeration getAttributeNames() {
-        Set<String> names = new HashSet<String>(expressionEvaluator.getAllMembers(action.getClass()));
-
-        Enumeration en = super.getAttributeNames();
-        while (en.hasMoreElements()) {
-            String name = (String) en.nextElement();
-            names.add(name);
-        }
-
-        return new IteratorEnumeration(names.iterator());
-    }
+    return new IteratorEnumeration(names.iterator());
+  }
 }

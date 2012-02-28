@@ -15,17 +15,15 @@
  */
 package org.primeframework.mvc.action;
 
-import org.primeframework.servlet.Workflow;
+import org.primeframework.mvc.servlet.Workflow;
 
 import com.google.inject.ImplementedBy;
 
 /**
- * <p>
- * This class defines a workflow that is used to prepare an action to have
- * parameters set onto it and also to be invoked.
- * </p>
+ * <p> This class defines a workflow that is used to prepare an action to have parameters set onto it and also to be
+ * invoked. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @ImplementedBy(DefaultActionPrepareWorkflow.class)
 public interface ActionPrepareWorkflow extends Workflow {

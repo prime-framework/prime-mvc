@@ -19,43 +19,40 @@ import org.primeframework.mvc.result.control.annotation.ControlAttribute;
 import org.primeframework.mvc.result.control.annotation.ControlAttributes;
 
 /**
- * <p>
- * This class is the control for a input type=password.
- * </p>
+ * <p> This class is the control for a input type=password. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @ControlAttributes(
-    required = {
-        @ControlAttribute(name = "name")
-    },
-    optional = {
-        @ControlAttribute(name = "disabled", types = {boolean.class, Boolean.class}),
-        @ControlAttribute(name = "maxlength", types = {int.class, Integer.class}),
-        @ControlAttribute(name = "readonly", types = {boolean.class, Boolean.class}),
-        @ControlAttribute(name = "required", types = {boolean.class, Boolean.class}),
-        @ControlAttribute(name = "size", types = {int.class, Integer.class}),
-        @ControlAttribute(name = "tabindex", types = {int.class, Integer.class})
-    }
+  required = {
+    @ControlAttribute(name = "name")
+  },
+  optional = {
+    @ControlAttribute(name = "disabled", types = {boolean.class, Boolean.class}),
+    @ControlAttribute(name = "maxlength", types = {int.class, Integer.class}),
+    @ControlAttribute(name = "readonly", types = {boolean.class, Boolean.class}),
+    @ControlAttribute(name = "required", types = {boolean.class, Boolean.class}),
+    @ControlAttribute(name = "size", types = {int.class, Integer.class}),
+    @ControlAttribute(name = "tabindex", types = {int.class, Integer.class})
+  }
 )
 public class Password extends AbstractInput {
-    public Password() {
-        super(true);
-    }
+  public Password() {
+    super(true);
+  }
 
-    /**
-     * Removes the value attribute for security.
-     *
-     */
-    protected void addAdditionalAttributes() {
-        super.addAdditionalAttributes();
-        attributes.remove("value");
-    }
+  /**
+   * Removes the value attribute for security.
+   */
+  protected void addAdditionalAttributes() {
+    super.addAdditionalAttributes();
+    attributes.remove("value");
+  }
 
-    /**
-     * @return  password.ftl
-     */
-    protected String endTemplateName() {
-        return "password.ftl";
-    }
+  /**
+   * @return password.ftl
+   */
+  protected String endTemplateName() {
+    return "password.ftl";
+  }
 }

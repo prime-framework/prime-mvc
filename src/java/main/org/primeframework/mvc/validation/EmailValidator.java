@@ -20,28 +20,26 @@ import java.util.regex.Pattern;
 import org.primeframework.mvc.validation.annotation.Email;
 
 /**
- * <p>
- * This class verifies that the value is an email address using a relaxed regex
- * (because the all two letter TLDs are allowed).
- * </p>
+ * <p> This class verifies that the value is an email address using a relaxed regex (because the all two letter TLDs are
+ * allowed). </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class EmailValidator implements Validator<Email> {
-    public static final Pattern emailPattern = Pattern.compile("[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+(?:[a-z]{2}|aero|asia|biz|cat|com|coop|edu|gov|info|int|jobs|mil|mobi|museum|name|net|org|pro|tel|travel)");
+  public static final Pattern emailPattern = Pattern.compile("[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+(?:[a-z]{2}|aero|asia|biz|cat|com|coop|edu|gov|info|int|jobs|mil|mobi|museum|name|net|org|pro|tel|travel)");
 
-    /**
-     * @param   annotation Not used.
-     * @param   container Not used.
-     * @param   value The value to check.
-     * @return  True if the value matches the pattern, false otherwise.
-     */
-    public boolean validate(Email annotation, Object container, Object value) {
-        if (value == null) {
-            return true;
-        }
-        
-        String email = value.toString();
-        return emailPattern.matcher(email.toLowerCase()).matches();
+  /**
+   * @param annotation Not used.
+   * @param container  Not used.
+   * @param value      The value to check.
+   * @return True if the value matches the pattern, false otherwise.
+   */
+  public boolean validate(Email annotation, Object container, Object value) {
+    if (value == null) {
+      return true;
     }
+
+    String email = value.toString();
+    return emailPattern.matcher(email.toLowerCase()).matches();
+  }
 }

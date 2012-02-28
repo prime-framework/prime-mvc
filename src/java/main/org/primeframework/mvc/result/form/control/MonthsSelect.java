@@ -21,47 +21,42 @@ import java.util.TreeMap;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.primeframework.mvc.result.control.annotation.ControlAttributes;
 import org.primeframework.mvc.result.control.annotation.ControlAttribute;
+import org.primeframework.mvc.result.control.annotation.ControlAttributes;
 
 /**
- * <p>
- * This class is the control for a select box that contains months.
- * </p>
+ * <p> This class is the control for a select box that contains months. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @ControlAttributes(
-    required = {
-        @ControlAttribute(name = "name")
-    },
-    optional = {
-        @ControlAttribute(name = "disabled", types = {boolean.class, Boolean.class}),
-        @ControlAttribute(name = "multiple", types = {boolean.class, Boolean.class}),
-        @ControlAttribute(name = "readonly", types = {boolean.class, Boolean.class}),
-        @ControlAttribute(name = "required", types = {boolean.class, Boolean.class}),
-        @ControlAttribute(name = "size", types = {int.class, Integer.class}),
-        @ControlAttribute(name = "tabindex", types = {int.class, Integer.class})
-    }
+  required = {
+    @ControlAttribute(name = "name")
+  },
+  optional = {
+    @ControlAttribute(name = "disabled", types = {boolean.class, Boolean.class}),
+    @ControlAttribute(name = "multiple", types = {boolean.class, Boolean.class}),
+    @ControlAttribute(name = "readonly", types = {boolean.class, Boolean.class}),
+    @ControlAttribute(name = "required", types = {boolean.class, Boolean.class}),
+    @ControlAttribute(name = "size", types = {int.class, Integer.class}),
+    @ControlAttribute(name = "tabindex", types = {int.class, Integer.class})
+  }
 )
 public class MonthsSelect extends Select {
-    /**
-     * <p>
-     * Calls super then adds the months Map.
-     * </p>
-     *
-     */
-    @Override
-    protected void addAdditionalAttributes() {
-        super.addAdditionalAttributes();
+  /**
+   * <p> Calls super then adds the months Map. </p>
+   */
+  @Override
+  protected void addAdditionalAttributes() {
+    super.addAdditionalAttributes();
 
-        Map<Integer, String> months = new TreeMap<Integer, String>();
-        DateTimeFormatter formatter = DateTimeFormat.forPattern("MMMM").withLocale(locale);
-        for (int i = 1; i <= 12; i++) {
-            LocalDate date = new LocalDate(2008, i, 1);
-            months.put(i, formatter.print(date));
-        }
-
-        attributes.put("items", months);
+    Map<Integer, String> months = new TreeMap<Integer, String>();
+    DateTimeFormatter formatter = DateTimeFormat.forPattern("MMMM").withLocale(locale);
+    for (int i = 1; i <= 12; i++) {
+      LocalDate date = new LocalDate(2008, i, 1);
+      months.put(i, formatter.print(date));
     }
+
+    attributes.put("items", months);
+  }
 }

@@ -18,14 +18,12 @@ package org.primeframework.mvc.result.form.jsp;
 import org.primeframework.mvc.result.form.control.Password;
 
 /**
- * <p>
- * This is the password JSP taglib.
- * </p>
+ * <p> This is the password JSP taglib. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class PasswordTag extends AbstractInputTag<Password> {
-    protected Class<Password> controlClass() {
-        return Password.class;
-    }
+  protected Class<Password> controlClass() {
+    return Password.class;
+  }
 }

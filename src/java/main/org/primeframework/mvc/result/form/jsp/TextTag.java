@@ -18,17 +18,15 @@ package org.primeframework.mvc.result.form.jsp;
 import org.primeframework.mvc.result.form.control.Text;
 
 /**
- * <p>
- * This is the JSP taglib class for the text tag.
- * </p>
+ * <p> This is the JSP taglib class for the text tag. </p>
  *
  * @author Brian Pontarelli
  */
 public class TextTag extends AbstractValueTag<Text> {
-    /**
-     * @return  The {@link Text} class.
-     */
-    protected Class<Text> controlClass() {
-        return Text.class;
-    }
+  /**
+   * @return The {@link Text} class.
+   */
+  protected Class<Text> controlClass() {
+    return Text.class;
+  }
 }

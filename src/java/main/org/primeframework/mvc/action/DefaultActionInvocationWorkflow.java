@@ -20,17 +20,14 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.lang.reflect.Method;
 
+import org.primeframework.mvc.servlet.WorkflowChain;
+import org.primeframework.mvc.util.MethodTools;
+
 import com.google.inject.Inject;
 
-import org.primeframework.mvc.util.MethodTools;
-import org.primeframework.servlet.WorkflowChain;
-
 /**
- * <p>
- * This class is the default implementation of the action invocation workflow.
- * It looks up the ActionInvocation using the ActionMappingWorkflow and the
- * invokes the action using reflection.
- * </p>
+ * <p> This class is the default implementation of the action invocation workflow. It looks up the ActionInvocation
+ * using the ActionMappingWorkflow and the invokes the action using reflection. </p>
  *
  * @author Brian Pontarelli
  */
@@ -47,15 +44,9 @@ public class DefaultActionInvocationWorkflow implements ActionInvocationWorkflow
   /**
    * Performs the action invocation using this process.
    * <p/>
-   * <h3>Action-less request</h3>
-   * <ol>
-   * <li>Continue down the chain</li>
-   * </ul>
+   * <h3>Action-less request</h3> <ol> <li>Continue down the chain</li> </ul>
    * <p/>
-   * <h3>Action request</h3>
-   * <ol>
-   * <li>Invoke the action</li>
-   * </ul>
+   * <h3>Action request</h3> <ol> <li>Invoke the action</li> </ul>
    *
    * @param chain The chain.
    * @throws IOException      If the chain throws an IOException.
@@ -84,15 +75,15 @@ public class DefaultActionInvocationWorkflow implements ActionInvocationWorkflow
   }
 
   /**
-   * Invokes the execute method on the action. This first checks if there is an extension and if
-   * there is it looks for a method with the same name. Next, it looks for a method that matches
-   * the current method (i.e. get or post) and finally falls back to execute.
+   * Invokes the execute method on the action. This first checks if there is an extension and if there is it looks for a
+   * method with the same name. Next, it looks for a method that matches the current method (i.e. get or post) and
+   * finally falls back to execute.
    *
    * @param actionInvocation The action invocation.
    * @param httpMethod       The HTTP method used (get or post).
    * @return The result code from the execute method and never null.
-   * @throws ServletException If the execute method doesn't exist, has the wrong signature, couldn't
-   *                          be invoked, threw an exception or returned null.
+   * @throws ServletException If the execute method doesn't exist, has the wrong signature, couldn't be invoked, threw
+   *                          an exception or returned null.
    */
   protected String execute(ActionInvocation actionInvocation, String httpMethod) throws ServletException {
     Object action = actionInvocation.action();
@@ -139,7 +130,7 @@ public class DefaultActionInvocationWorkflow implements ActionInvocationWorkflow
     }
 
     verify(method);
-    
+
     String result = MethodTools.invoke(method, action);
     if (result == null) {
       throw new ServletException("The action class [" + action.getClass() + "] returned " +

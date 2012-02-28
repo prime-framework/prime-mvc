@@ -20,19 +20,17 @@ import java.lang.annotation.Annotation;
 import org.primeframework.mvc.validation.Validator;
 
 /**
- * <p>
- * This is a simple test validator.
- * </p>
+ * <p> This is a simple test validator. </p>
  *
  * @author Brian Pontarelli
  */
 public class StateValidator implements Validator {
-    public boolean validate(Annotation annotation, Object container, Object value) {
-        Address address = (Address) container;
-        if (address != null && address.getCountry() != null && address.getCountry().equals("US")) {
-            return value != null;
-        }
-
-        return true;
+  public boolean validate(Annotation annotation, Object container, Object value) {
+    Address address = (Address) container;
+    if (address != null && address.getCountry() != null && address.getCountry().equals("US")) {
+      return value != null;
     }
+
+    return true;
+  }
 }

@@ -23,19 +23,16 @@ import java.lang.annotation.Target;
 import org.primeframework.mvc.action.result.Result;
 
 /**
- * <p>
- * This annotation is a marker that is used to mark custom result annotations
- * so that JCatapult can determine which annotations on an action class are
- * results annotations.
- * </p>
+ * <p> This annotation is a marker that is used to mark custom result annotations so that JCatapult can determine which
+ * annotations on an action class are results annotations. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.ANNOTATION_TYPE)
 public @interface ResultAnnotation {
-    /**
-     * @return  The class that implements the result annotation's processing.
-     */
-    Class<? extends Result> value();
+  /**
+   * @return The class that implements the result annotation's processing.
+   */
+  Class<? extends Result> value();
 }

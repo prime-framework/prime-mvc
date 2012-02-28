@@ -15,24 +15,22 @@
  */
 package org.primeframework.mvc.parameter.convert.annotation;
 
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.lang.annotation.ElementType;
 
 /**
- * <p>
- * This annotation must be placed on all implementations of the
- * {@link org.primeframework.mvc.parameter.convert.GlobalConverter} interface.
- * </p>
+ * <p> This annotation must be placed on all implementations of the {@link org.primeframework.mvc.parameter.convert.GlobalConverter}
+ * interface. </p>
  *
  * @author Brian Pontarelli
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface GlobalConverter {
-    /**
-     * @return  Converters must define the types that they convert using this parameter.
-     */
-    Class<?>[] forTypes();
+  /**
+   * @return Converters must define the types that they convert using this parameter.
+   */
+  Class<?>[] forTypes();
 }

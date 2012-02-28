@@ -23,10 +23,7 @@ import java.lang.annotation.Target;
 import org.primeframework.mvc.action.result.XMLStreamResult;
 
 /**
- * <p>
- * This annotation marks a result from an action as a Streaming XML result
- * using a xml string from the action.
- * </p>
+ * <p> This annotation marks a result from an action as a Streaming XML result using a xml string from the action. </p>
  *
  * @author jhumphrey
  */
@@ -34,18 +31,18 @@ import org.primeframework.mvc.action.result.XMLStreamResult;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface XMLStream {
-    /**
-     * @return  The result code from the action's execute method that this Result is associated with.
-     */
-    String code() default "success";
+  /**
+   * @return The result code from the action's execute method that this Result is associated with.
+   */
+  String code() default "success";
 
-    /**
-     * @return  The HTTP status code.
-     */
-    int status() default 200;
+  /**
+   * @return The HTTP status code.
+   */
+  int status() default 200;
 
-    /**
-     * @return  The name of the property of the action that represents an XML string.
-     */
-    String property() default "xml";
+  /**
+   * @return The name of the property of the action that represents an XML string.
+   */
+  String property() default "xml";
 }

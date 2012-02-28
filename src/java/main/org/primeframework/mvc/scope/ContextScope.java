@@ -22,34 +22,31 @@ import org.primeframework.mvc.scope.annotation.Context;
 import com.google.inject.Inject;
 
 /**
- * <p>
- * This is the request scope which fetches and stores values in the
- * ServletContext.
- * </p>
+ * <p> This is the request scope which fetches and stores values in the ServletContext. </p>
  *
  * @author Brian Pontarelli
  */
 public class ContextScope implements Scope<Context> {
-    private final ServletContext context;
+  private final ServletContext context;
 
-    @Inject
-    public ContextScope(ServletContext context) {
-        this.context = context;
-    }
+  @Inject
+  public ContextScope(ServletContext context) {
+    this.context = context;
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    public Object get(String fieldName, Context scope) {
-        String key = scope.value().equals("##field-name##") ? fieldName : scope.value();
-        return context.getAttribute(key);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  public Object get(String fieldName, Context scope) {
+    String key = scope.value().equals("##field-name##") ? fieldName : scope.value();
+    return context.getAttribute(key);
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void set(String fieldName, Object value, Context scope) {
-        String key = scope.value().equals("##field-name##") ? fieldName : scope.value();
-        context.setAttribute(key, value);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  public void set(String fieldName, Object value, Context scope) {
+    String key = scope.value().equals("##field-name##") ? fieldName : scope.value();
+    context.setAttribute(key, value);
+  }
 }

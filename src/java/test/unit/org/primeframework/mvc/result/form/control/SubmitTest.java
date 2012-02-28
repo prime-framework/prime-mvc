@@ -24,92 +24,90 @@ import com.google.inject.Inject;
 import static net.java.util.CollectionTools.*;
 
 /**
- * <p>
- * This tests the submit control.
- * </p>
+ * <p> This tests the submit control. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class SubmitTest extends ControlBaseTest {
-    @Inject public Submit submit;
+  @Inject public Submit submit;
 
-    @Test
-    public void testActionLess() {
-        ais.setCurrent(new DefaultActionInvocation(null, "/button", null, null));
-        run(submit,
-            mapNV("name", "button", "value", "test-value", "class", "css-class", "bundle", "/button-bundle"),
-            null, "<input type=\"hidden\" name=\"button@param\" value=\"param-value\"/>\n" +
-            "<input type=\"hidden\" name=\"__jc_a_button\" value=\"\"/>\n" +
-            "<div class=\"css-class-submit-button css-class-button css-class-control submit-button button control\">\n" +
-            "<div class=\"label-container\"> </div>\n" +
-            "<div class=\"control-container\"><input type=\"submit\" class=\"css-class\" id=\"button\" name=\"button\" value=\"Button-Bundle\"/></div>\n" +
-            "</div>\n");
-    }
+  @Test
+  public void testActionLess() {
+    ais.setCurrent(new DefaultActionInvocation(null, "/button", null, null));
+    run(submit,
+      mapNV("name", "button", "value", "test-value", "class", "css-class", "bundle", "/button-bundle"),
+      null, "<input type=\"hidden\" name=\"button@param\" value=\"param-value\"/>\n" +
+      "<input type=\"hidden\" name=\"__jc_a_button\" value=\"\"/>\n" +
+      "<div class=\"css-class-submit-button css-class-button css-class-control submit-button button control\">\n" +
+      "<div class=\"label-container\"> </div>\n" +
+      "<div class=\"control-container\"><input type=\"submit\" class=\"css-class\" id=\"button\" name=\"button\" value=\"Button-Bundle\"/></div>\n" +
+      "</div>\n");
+  }
 
-    @Test
-    public void testAction() {
-        ais.setCurrent(new DefaultActionInvocation(new Edit(), "/button", null, null));
-        run(submit,
-            mapNV("name", "button", "value", "test-value"),
-            null, "<input type=\"hidden\" name=\"button@param\" value=\"param-value\"/>\n" +
-            "<input type=\"hidden\" name=\"__jc_a_button\" value=\"\"/>\n" +
-            "<div class=\"submit-button button control\">\n" +
-            "<div class=\"label-container\"> </div>\n" +
-            "<div class=\"control-container\"><input type=\"submit\" id=\"button\" name=\"button\" value=\"Button\"/></div>\n" +
-            "</div>\n");
-    }
+  @Test
+  public void testAction() {
+    ais.setCurrent(new DefaultActionInvocation(new Edit(), "/button", null, null));
+    run(submit,
+      mapNV("name", "button", "value", "test-value"),
+      null, "<input type=\"hidden\" name=\"button@param\" value=\"param-value\"/>\n" +
+      "<input type=\"hidden\" name=\"__jc_a_button\" value=\"\"/>\n" +
+      "<div class=\"submit-button button control\">\n" +
+      "<div class=\"label-container\"> </div>\n" +
+      "<div class=\"control-container\"><input type=\"submit\" id=\"button\" name=\"button\" value=\"Button\"/></div>\n" +
+      "</div>\n");
+  }
 
-    @Test
-    public void html() {
-        ais.setCurrent(new DefaultActionInvocation(new Edit(), "/button", null, null));
-        run(submit,
-            mapNV("name", "html", "value", "test-value"),
-            null, "<input type=\"hidden\" name=\"html@param\" value=\"param-value\"/>\n" +
-            "<input type=\"hidden\" name=\"__jc_a_html\" value=\"\"/>\n" +
-            "<div class=\"submit-button button control\">\n" +
-            "<div class=\"label-container\"> </div>\n" +
-            "<div class=\"control-container\"><input type=\"submit\" id=\"html\" name=\"html\" value=\"&lt;Button&gt;\"/></div>\n" +
-            "</div>\n");
-    }
+  @Test
+  public void html() {
+    ais.setCurrent(new DefaultActionInvocation(new Edit(), "/button", null, null));
+    run(submit,
+      mapNV("name", "html", "value", "test-value"),
+      null, "<input type=\"hidden\" name=\"html@param\" value=\"param-value\"/>\n" +
+      "<input type=\"hidden\" name=\"__jc_a_html\" value=\"\"/>\n" +
+      "<div class=\"submit-button button control\">\n" +
+      "<div class=\"label-container\"> </div>\n" +
+      "<div class=\"control-container\"><input type=\"submit\" id=\"html\" name=\"html\" value=\"&lt;Button&gt;\"/></div>\n" +
+      "</div>\n");
+  }
 
-    @Test
-    public void testActionAttribute() {
-        ais.setCurrent(new DefaultActionInvocation(new Edit(), "/button", null, null));
-        run(submit,
-            mapNV("name", "button", "action", "/foo", "value", "test-value"),
-            null, "<input type=\"hidden\" name=\"button@param\" value=\"param-value\"/>\n" +
-            "<input type=\"hidden\" name=\"__jc_a_button\" value=\"/foo\"/>\n" +
-            "<div class=\"submit-button button control\">\n" +
-            "<div class=\"label-container\"> </div>\n" +
-            "<div class=\"control-container\"><input type=\"submit\" id=\"button\" name=\"button\" value=\"Button\"/></div>\n" +
-            "</div>\n");
-    }
+  @Test
+  public void testActionAttribute() {
+    ais.setCurrent(new DefaultActionInvocation(new Edit(), "/button", null, null));
+    run(submit,
+      mapNV("name", "button", "action", "/foo", "value", "test-value"),
+      null, "<input type=\"hidden\" name=\"button@param\" value=\"param-value\"/>\n" +
+      "<input type=\"hidden\" name=\"__jc_a_button\" value=\"/foo\"/>\n" +
+      "<div class=\"submit-button button control\">\n" +
+      "<div class=\"label-container\"> </div>\n" +
+      "<div class=\"control-container\"><input type=\"submit\" id=\"button\" name=\"button\" value=\"Button\"/></div>\n" +
+      "</div>\n");
+  }
 
-    @Test
-    public void testActionAttributeContext() {
-        request.setContextPath("/context");
-        ais.setCurrent(new DefaultActionInvocation(new Edit(), "/button", null, null));
-        run(submit,
-            mapNV("name", "button", "action", "/foo", "value", "test-value"),
-            null, "<input type=\"hidden\" name=\"button@param\" value=\"param-value\"/>\n" +
-            "<input type=\"hidden\" name=\"__jc_a_button\" value=\"/context/foo\"/>\n" +
-            "<div class=\"submit-button button control\">\n" +
-            "<div class=\"label-container\"> </div>\n" +
-            "<div class=\"control-container\"><input type=\"submit\" id=\"button\" name=\"button\" value=\"Button\"/></div>\n" +
-            "</div>\n");
-    }
+  @Test
+  public void testActionAttributeContext() {
+    request.setContextPath("/context");
+    ais.setCurrent(new DefaultActionInvocation(new Edit(), "/button", null, null));
+    run(submit,
+      mapNV("name", "button", "action", "/foo", "value", "test-value"),
+      null, "<input type=\"hidden\" name=\"button@param\" value=\"param-value\"/>\n" +
+      "<input type=\"hidden\" name=\"__jc_a_button\" value=\"/context/foo\"/>\n" +
+      "<div class=\"submit-button button control\">\n" +
+      "<div class=\"label-container\"> </div>\n" +
+      "<div class=\"control-container\"><input type=\"submit\" id=\"button\" name=\"button\" value=\"Button\"/></div>\n" +
+      "</div>\n");
+  }
 
-    @Test
-    public void testActionAttributeContextRelative() {
-        request.setContextPath("/context");
-        ais.setCurrent(new DefaultActionInvocation(new Edit(), "/button", null, null));
-        run(submit,
-            mapNV("name", "button", "action", "foo", "value", "test-value"),
-            null, "<input type=\"hidden\" name=\"button@param\" value=\"param-value\"/>\n" +
-            "<input type=\"hidden\" name=\"__jc_a_button\" value=\"foo\"/>\n" +
-            "<div class=\"submit-button button control\">\n" +
-            "<div class=\"label-container\"> </div>\n" +
-            "<div class=\"control-container\"><input type=\"submit\" id=\"button\" name=\"button\" value=\"Button\"/></div>\n" +
-            "</div>\n");
-    }
+  @Test
+  public void testActionAttributeContextRelative() {
+    request.setContextPath("/context");
+    ais.setCurrent(new DefaultActionInvocation(new Edit(), "/button", null, null));
+    run(submit,
+      mapNV("name", "button", "action", "foo", "value", "test-value"),
+      null, "<input type=\"hidden\" name=\"button@param\" value=\"param-value\"/>\n" +
+      "<input type=\"hidden\" name=\"__jc_a_button\" value=\"foo\"/>\n" +
+      "<div class=\"submit-button button control\">\n" +
+      "<div class=\"label-container\"> </div>\n" +
+      "<div class=\"control-container\"><input type=\"submit\" id=\"button\" name=\"button\" value=\"Button\"/></div>\n" +
+      "</div>\n");
+  }
 }

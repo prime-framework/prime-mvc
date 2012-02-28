@@ -16,53 +16,47 @@
 package org.primeframework.mvc.util;
 
 /**
- * <p>
- * This converts the class name into a URI using this method:
- * </p>
- *
- * <ul>
- * <li>Find the first instance of <em>action</em></li>
- * <li>Trim everything before that</li>
- * <li>Replace periods (.) with forward slashes (/)</li>
- * <li>Break on camel case and join back with dashes (-)</li>
- * <li>Lower case the entire thing</li>
- * </ul>
+ * <p> This converts the class name into a URI using this method: </p>
+ * <p/>
+ * <ul> <li>Find the first instance of <em>action</em></li> <li>Trim everything before that</li> <li>Replace periods (.)
+ * with forward slashes (/)</li> <li>Break on camel case and join back with dashes (-)</li> <li>Lower case the entire
+ * thing</li> </ul>
  *
  * @author Brian Pontarelli
  */
 public class DefaultURIBuilder implements URIBuilder {
-    /**
-     * {@inheritDoc}
-     */
-    public String build(Class<?> type) {
-        // Determine the URI
-        String fullName = type.getName();
-        int index = fullName.indexOf("action");
-        String lessPackage = fullName.substring(index + 6).replace('.', '/');
+  /**
+   * {@inheritDoc}
+   */
+  public String build(Class<?> type) {
+    // Determine the URI
+    String fullName = type.getName();
+    int index = fullName.indexOf("action");
+    String lessPackage = fullName.substring(index + 6).replace('.', '/');
 
-        // Convert to underscores
-        char[] ca = lessPackage.toCharArray();
-        StringBuilder build = new StringBuilder("" + ca[0]);
-        boolean lower = true;
-        boolean previousWasCharacter = false;
-        for (int i = 1; i < ca.length; i++) {
-            char c = ca[i];
-            if (Character.isUpperCase(c) && previousWasCharacter && lower) {
-                build.append("-");
-                lower = false;
-            } else if (Character.isUpperCase(c) && previousWasCharacter) {
-                if (i + 1 < ca.length && Character.isLowerCase(ca[i + 1])) {
-                    build.append("-");
-                }
-            } else if (!Character.isUpperCase(c)) {
-                lower = true;
-            }
-
-            build.append(c);
-
-            previousWasCharacter = Character.isJavaIdentifierPart(c);
+    // Convert to underscores
+    char[] ca = lessPackage.toCharArray();
+    StringBuilder build = new StringBuilder("" + ca[0]);
+    boolean lower = true;
+    boolean previousWasCharacter = false;
+    for (int i = 1; i < ca.length; i++) {
+      char c = ca[i];
+      if (Character.isUpperCase(c) && previousWasCharacter && lower) {
+        build.append("-");
+        lower = false;
+      } else if (Character.isUpperCase(c) && previousWasCharacter) {
+        if (i + 1 < ca.length && Character.isLowerCase(ca[i + 1])) {
+          build.append("-");
         }
+      } else if (!Character.isUpperCase(c)) {
+        lower = true;
+      }
 
-        return build.toString().toLowerCase();
+      build.append(c);
+
+      previousWasCharacter = Character.isJavaIdentifierPart(c);
     }
+
+    return build.toString().toLowerCase();
+  }
 }

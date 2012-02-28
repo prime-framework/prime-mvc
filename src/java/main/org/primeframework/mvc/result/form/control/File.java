@@ -15,36 +15,34 @@
  */
 package org.primeframework.mvc.result.form.control;
 
-import org.primeframework.mvc.result.control.annotation.ControlAttributes;
 import org.primeframework.mvc.result.control.annotation.ControlAttribute;
+import org.primeframework.mvc.result.control.annotation.ControlAttributes;
 
 /**
- * <p>
- * This class is the control for a input type=file.
- * </p>
+ * <p> This class is the control for a input type=file. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @ControlAttributes(
-    required = {
-        @ControlAttribute(name = "name")
-    },
-    optional = {
-        @ControlAttribute(name = "disabled", types = {boolean.class, Boolean.class}),
-        @ControlAttribute(name = "required", types = {boolean.class, Boolean.class}),
-        @ControlAttribute(name = "size", types = {int.class, Integer.class}),
-        @ControlAttribute(name = "tabindex", types = {int.class, Integer.class})
-    }
+  required = {
+    @ControlAttribute(name = "name")
+  },
+  optional = {
+    @ControlAttribute(name = "disabled", types = {boolean.class, Boolean.class}),
+    @ControlAttribute(name = "required", types = {boolean.class, Boolean.class}),
+    @ControlAttribute(name = "size", types = {int.class, Integer.class}),
+    @ControlAttribute(name = "tabindex", types = {int.class, Integer.class})
+  }
 )
 public class File extends AbstractInput {
-    public File() {
-        super(true);
-    }
+  public File() {
+    super(true);
+  }
 
-    /**
-     * @return  file.ftl
-     */
-    protected String endTemplateName() {
-        return "file.ftl";
-    }
+  /**
+   * @return file.ftl
+   */
+  protected String endTemplateName() {
+    return "file.ftl";
+  }
 }

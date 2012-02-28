@@ -20,19 +20,17 @@ import java.lang.annotation.Annotation;
 import com.google.inject.ImplementedBy;
 
 /**
- * <p>
- * This is the provider for scopes.
- * </p>
+ * <p> This is the provider for scopes. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @ImplementedBy(DefaultScopeProvider.class)
 public interface ScopeProvider {
-    /**
-     * Looks up the scope for the given annotation.
-     *
-     * @param   scopeAnnotation The scope annotation.
-     * @return  The Scope and never null.
-     */
-    Scope lookup(Class<? extends Annotation> scopeAnnotation);
+  /**
+   * Looks up the scope for the given annotation.
+   *
+   * @param scopeAnnotation The scope annotation.
+   * @return The Scope and never null.
+   */
+  Scope lookup(Class<? extends Annotation> scopeAnnotation);
 }

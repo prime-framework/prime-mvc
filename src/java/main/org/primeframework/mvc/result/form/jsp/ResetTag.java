@@ -18,17 +18,15 @@ package org.primeframework.mvc.result.form.jsp;
 import org.primeframework.mvc.result.form.control.Reset;
 
 /**
- * <p>
- * This class is the JSP taglib for the reset control.
- * </p>
+ * <p> This class is the JSP taglib for the reset control. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class ResetTag extends AbstractInputTag<Reset> {
-    /**
-     * @return  The {@link Reset} class.
-     */
-    protected Class<Reset> controlClass() {
-        return Reset.class;
-    }
+  /**
+   * @return The {@link Reset} class.
+   */
+  protected Class<Reset> controlClass() {
+    return Reset.class;
+  }
 }

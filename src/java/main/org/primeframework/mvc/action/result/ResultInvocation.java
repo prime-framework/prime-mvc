@@ -18,26 +18,24 @@ package org.primeframework.mvc.action.result;
 import java.lang.annotation.Annotation;
 
 /**
- * <p>
- * This class models the information necessary to invoke a result.
- * </p>
+ * <p> This class models the information necessary to invoke a result. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public interface ResultInvocation {
-    /**
-     * @return  The annotation for the result. This is always non-null so that the annotation type
-     *          can be used to locate the correct {@link Result} instance.
-     */
-    Annotation annotation();
+  /**
+   * @return The annotation for the result. This is always non-null so that the annotation type can be used to locate
+   *         the correct {@link Result} instance.
+   */
+  Annotation annotation();
 
-    /**
-     * @return  The URI for this result invocation.
-     */
-    String uri();
+  /**
+   * @return The URI for this result invocation.
+   */
+  String uri();
 
-    /**
-     * @return  The result code from the action invocation or <em>null</em> if there is not action.
-     */
-    String resultCode();
+  /**
+   * @return The result code from the action invocation or <em>null</em> if there is not action.
+   */
+  String resultCode();
 }

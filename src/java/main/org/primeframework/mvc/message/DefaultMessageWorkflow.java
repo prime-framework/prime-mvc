@@ -15,41 +15,39 @@
  */
 package org.primeframework.mvc.message;
 
-import java.io.IOException;
 import javax.servlet.ServletException;
+import java.io.IOException;
 
 import org.primeframework.mvc.message.scope.FlashScope;
-import org.primeframework.servlet.WorkflowChain;
+import org.primeframework.mvc.servlet.WorkflowChain;
 
 import com.google.inject.Inject;
 
 /**
- * <p>
- * This is the default message workflow implementation. It removes
- * all flash messages from the session and places them in the request.
- * </p>
+ * <p> This is the default message workflow implementation. It removes all flash messages from the session and places
+ * them in the request. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class DefaultMessageWorkflow implements MessageWorkflow {
-    private final FlashScope flashScope;
+  private final FlashScope flashScope;
 
-    @Inject
-    public DefaultMessageWorkflow(FlashScope flashScope) {
-        this.flashScope = flashScope;
-    }
+  @Inject
+  public DefaultMessageWorkflow(FlashScope flashScope) {
+    this.flashScope = flashScope;
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void perform(WorkflowChain chain) throws IOException, ServletException {
-        flashScope.transferFlash();
-        chain.continueWorkflow();
-    }
+  /**
+   * {@inheritDoc}
+   */
+  public void perform(WorkflowChain chain) throws IOException, ServletException {
+    flashScope.transferFlash();
+    chain.continueWorkflow();
+  }
 
-    /**
-     * Does nothing.
-     */
-    public void destroy() {
-    }
+  /**
+   * Does nothing.
+   */
+  public void destroy() {
+  }
 }

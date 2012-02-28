@@ -18,79 +18,78 @@ package org.primeframework.mvc.parameter.el;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
-import static net.java.lang.ObjectTools.*;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
 
+import static net.java.lang.ObjectTools.*;
+
 /**
- * <p>
- * This class models a collection accessor during expression evaluation.
- * </p>
+ * <p> This class models a collection accessor during expression evaluation. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class MapAccessor extends Accessor {
-    Object key;
-    MemberAccessor memberAccessor;
+  Object key;
+  MemberAccessor memberAccessor;
 
-    public MapAccessor(ConverterProvider converterProvider, Accessor accessor, String index, MemberAccessor memberAccessor) {
-        super(converterProvider, accessor);
+  public MapAccessor(ConverterProvider converterProvider, Accessor accessor, String index, MemberAccessor memberAccessor) {
+    super(converterProvider, accessor);
 
-        String path = memberAccessor.toString();
-        Type objectType = super.type;
-        super.type = TypeTools.componentType(objectType, path);
-        this.memberAccessor = memberAccessor;
+    String path = memberAccessor.toString();
+    Type objectType = super.type;
+    super.type = TypeTools.componentType(objectType, path);
+    this.memberAccessor = memberAccessor;
 
-        Class<?> keyType = TypeTools.rawType(TypeTools.keyType(objectType, path));
-        GlobalConverter converter = converterProvider.lookup(keyType);
-        if (converter == null) {
-            throw new ConversionException("No type converter is registered for the type [" + keyType + "], which is the " +
-                "type for the key of the map at [" + path + "]");
-        }
-
-        this.key = converter.convertFromStrings(keyType, null, path, index);
+    Class<?> keyType = TypeTools.rawType(TypeTools.keyType(objectType, path));
+    GlobalConverter converter = converterProvider.lookup(keyType);
+    if (converter == null) {
+      throw new ConversionException("No type converter is registered for the type [" + keyType + "], which is the " +
+        "type for the key of the map at [" + path + "]");
     }
 
-    /**
-     * @return  The memberAccessor member variable.
-     */
-    public MemberAccessor getMemberAccessor() {
-        return memberAccessor;
-    }
+    this.key = converter.convertFromStrings(keyType, null, path, index);
+  }
 
-    /**
-     * @return  Always false. The reason is that since this retrieves from a Collection, we want
-     *          it to look like a non-indexed property so that the context will invoke the method.
-     */
-    public boolean isIndexed() {
-        return false;
-    }
+  /**
+   * @return The memberAccessor member variable.
+   */
+  public MemberAccessor getMemberAccessor() {
+    return memberAccessor;
+  }
 
-    public Object get(Context context) {
-        try {
-            return getValueFromCollection(this.object, key);
-        } catch (IndexOutOfBoundsException e) {
-            return null;
-        }
-    }
+  /**
+   * @return Always false. The reason is that since this retrieves from a Collection, we want it to look like a
+   *         non-indexed property so that the context will invoke the method.
+   */
+  public boolean isIndexed() {
+    return false;
+  }
 
-    public void set(String[] values, Context context) {
-        set(convert(context, memberAccessor.field, values), context);
+  public Object get(Context context) {
+    try {
+      return getValueFromCollection(this.object, key);
+    } catch (IndexOutOfBoundsException e) {
+      return null;
     }
+  }
 
-    public void set(Object value, Context context) {
-        setValueIntoCollection(object, key, value);
-    }
+  public void set(String[] values, Context context) {
+    set(convert(context, memberAccessor.field, values), context);
+  }
 
-    /**
-     * Returns the annotation of the member this collection belongs to.
-     *
-     * @param   type The annotation type.
-     * @return  The annotation or null.
-     */
-    @Override
-    protected <T extends Annotation> T getAnnotation(Class<T> type) {
-        return memberAccessor.getAnnotation(type);
-    }
+  public void set(Object value, Context context) {
+    setValueIntoCollection(object, key, value);
+  }
+
+  /**
+   * Returns the annotation of the member this collection belongs to.
+   *
+   * @param type The annotation type.
+   * @return The annotation or null.
+   */
+  @Override
+  protected <T extends Annotation> T getAnnotation(Class<T> type) {
+    return memberAccessor.getAnnotation(type);
+  }
 }

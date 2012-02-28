@@ -15,72 +15,71 @@
  */
 package org.primeframework.mvc.action.result;
 
-import java.io.IOException;
-import java.io.InputStream;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
 
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.result.annotation.Stream;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 
-import com.google.inject.Inject;
 import net.java.lang.StringTools;
 
+import com.google.inject.Inject;
+
 /**
- * <p>
- * This result writes bytes to the response output steam.
- * </p>
+ * <p> This result writes bytes to the response output steam. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class StreamResult extends AbstractResult<Stream> {
-    private final HttpServletResponse response;
+  private final HttpServletResponse response;
 
-    @Inject
-    public StreamResult(ExpressionEvaluator expressionEvaluator, HttpServletResponse response) {
-        super(expressionEvaluator);
-        this.response = response;
+  @Inject
+  public StreamResult(ExpressionEvaluator expressionEvaluator, HttpServletResponse response) {
+    super(expressionEvaluator);
+    this.response = response;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void execute(Stream stream, ActionInvocation invocation) throws IOException, ServletException {
+    String property = stream.property();
+    String length = expand(stream.length(), invocation.action());
+    String name = expand(stream.name(), invocation.action());
+    String type = expand(stream.type(), invocation.action());
+
+    Object object = expressionEvaluator.getValue(property, invocation.action());
+    if (object == null || !(object instanceof InputStream)) {
+      throw new IOException("Invalid property [" + property + "] for Stream result. This " +
+        "property returned null or an Object that is not an InputStream.");
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void execute(Stream stream, ActionInvocation invocation) throws IOException, ServletException {
-        String property = stream.property();
-        String length = expand(stream.length(), invocation.action());
-        String name = expand(stream.name(), invocation.action());
-        String type = expand(stream.type(), invocation.action());
+    response.setContentType(type);
 
-        Object object = expressionEvaluator.getValue(property, invocation.action());
-        if (object == null || !(object instanceof InputStream)) {
-            throw new IOException("Invalid property [" + property + "] for Stream result. This " +
-                "property returned null or an Object that is not an InputStream.");
-        }
-
-        response.setContentType(type);
-
-        if (!StringTools.isTrimmedEmpty(length)) {
-            response.setContentLength(Integer.parseInt(length));
-        }
-
-        if (!StringTools.isTrimmedEmpty(name)) {
-            response.setHeader("Content-Disposition", "attachment; filename=\"" + name + "\"");
-        }
-
-        InputStream is = (InputStream) object;
-        ServletOutputStream sos = response.getOutputStream();
-        try {
-            // Then output the file
-            byte[] b = new byte[8192];
-            int len;
-            while ((len = is.read(b)) != -1) {
-                sos.write(b, 0, len);
-            }
-        } finally {
-            sos.flush();
-            sos.close();
-        }
+    if (!StringTools.isTrimmedEmpty(length)) {
+      response.setContentLength(Integer.parseInt(length));
     }
+
+    if (!StringTools.isTrimmedEmpty(name)) {
+      response.setHeader("Content-Disposition", "attachment; filename=\"" + name + "\"");
+    }
+
+    InputStream is = (InputStream) object;
+    ServletOutputStream sos = response.getOutputStream();
+    try {
+      // Then output the file
+      byte[] b = new byte[8192];
+      int len;
+      while ((len = is.read(b)) != -1) {
+        sos.write(b, 0, len);
+      }
+    } finally {
+      sos.flush();
+      sos.close();
+    }
+  }
 }

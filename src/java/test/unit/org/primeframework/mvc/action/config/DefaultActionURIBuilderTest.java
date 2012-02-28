@@ -15,24 +15,23 @@
  */
 package org.primeframework.mvc.action.config;
 
-import static org.testng.Assert.*;
-import org.testng.annotations.Test;
 import org.primeframework.mvc.util.DefaultURIBuilder;
+import org.testng.annotations.Test;
+
+import static org.testng.Assert.*;
 
 /**
- * <p>
- * This class tests the default action URI builder.
- * </p>
+ * <p> This class tests the default action URI builder. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class DefaultActionURIBuilderTest {
-    /**
-     * Tests the URI builder.
-     */
-    @Test
-    public void testBuild() {
-        DefaultURIBuilder builder = new DefaultURIBuilder();
-        assertEquals("/config/default-action-uri-builder-test", builder.build(this.getClass()));
-    }
+  /**
+   * Tests the URI builder.
+   */
+  @Test
+  public void testBuild() {
+    DefaultURIBuilder builder = new DefaultURIBuilder();
+    assertEquals("/config/default-action-uri-builder-test", builder.build(this.getClass()));
+  }
 }

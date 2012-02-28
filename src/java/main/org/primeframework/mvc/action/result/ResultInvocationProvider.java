@@ -20,30 +20,27 @@ import org.primeframework.mvc.action.ActionInvocation;
 import com.google.inject.ImplementedBy;
 
 /**
- * <p>
- * This interface defines the mechanism used to load and cache results.
- * This should be flexible enough to support new results being added,
- * results being updated and results being removed during development.
- * </p>
+ * <p> This interface defines the mechanism used to load and cache results. This should be flexible enough to support
+ * new results being added, results being updated and results being removed during development. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @ImplementedBy(DefaultResultInvocationProvider.class)
 public interface ResultInvocationProvider {
-    /**
-     * Determines the result invocation for the given URI and result code.
-     *
-     * @param invocation
-     * @return  The result invocation for the URI or null if nothing could be found or inferred.
-     */
-    ResultInvocation lookup(ActionInvocation invocation);
+  /**
+   * Determines the result invocation for the given URI and result code.
+   *
+   * @param invocation
+   * @return The result invocation for the URI or null if nothing could be found or inferred.
+   */
+  ResultInvocation lookup(ActionInvocation invocation);
 
-    /**
-     * Determines the result invocation for the given action invocation, URI and result code.
-     *
-     * @param   invocation The ActionInvocation which is used to look for annotations.
-     * @param   resultCode The result code or null of there isn't a result code.
-     * @return  The result invocation for the URI or null if nothing could be found or inferred.
-     */
-    ResultInvocation lookup(ActionInvocation invocation, String resultCode);
+  /**
+   * Determines the result invocation for the given action invocation, URI and result code.
+   *
+   * @param invocation The ActionInvocation which is used to look for annotations.
+   * @param resultCode The result code or null of there isn't a result code.
+   * @return The result invocation for the URI or null if nothing could be found or inferred.
+   */
+  ResultInvocation lookup(ActionInvocation invocation, String resultCode);
 }

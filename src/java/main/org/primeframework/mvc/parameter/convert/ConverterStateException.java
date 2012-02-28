@@ -16,28 +16,25 @@
 package org.primeframework.mvc.parameter.convert;
 
 /**
- * <p>
- * This is a runtime exception thrown when the state of the current
- * conversion is such that conversion can never proceed. This is
- * normally fatal and requires developer correction.
- * </p>
+ * <p> This is a runtime exception thrown when the state of the current conversion is such that conversion can never
+ * proceed. This is normally fatal and requires developer correction. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class ConverterStateException extends RuntimeException {
-    public ConverterStateException() {
-        super();
-    }
+  public ConverterStateException() {
+    super();
+  }
 
-    public ConverterStateException(String message) {
-        super(message);
-    }
+  public ConverterStateException(String message) {
+    super(message);
+  }
 
-    public ConverterStateException(String message, Throwable cause) {
-        super(message, cause);
-    }
+  public ConverterStateException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
-    public ConverterStateException(Throwable cause) {
-        super(cause);
-    }
+  public ConverterStateException(Throwable cause) {
+    super(cause);
+  }
 }

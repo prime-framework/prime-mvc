@@ -20,9 +20,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- * <p>
- * This class provides some helpers for common tasks regarding methods.
- * </p>
+ * <p> This class provides some helpers for common tasks regarding methods. </p>
  *
  * @author Brian Pontarelli
  */
@@ -59,8 +57,8 @@ public class MethodTools {
   /**
    * Invokes the given method on the given class and handles propagation of runtime exceptions.
    *
-   * @param method     The method to invoke.
-   * @param obj        The object to invoke the methods on.
+   * @param method The method to invoke.
+   * @param obj    The object to invoke the methods on.
    * @return The return from the method invocation.
    */
   @SuppressWarnings("unchecked")

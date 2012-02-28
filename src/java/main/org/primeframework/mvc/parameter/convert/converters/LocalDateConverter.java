@@ -18,75 +18,74 @@ package org.primeframework.mvc.parameter.convert.converters;
 import java.lang.reflect.Type;
 import java.util.Map;
 
+import org.joda.time.LocalDate;
+import org.joda.time.ReadablePartial;
+import org.joda.time.format.DateTimeFormat;
 import org.primeframework.mvc.parameter.convert.AbstractGlobalConverter;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.convert.annotation.GlobalConverter;
-import org.joda.time.LocalDate;
-import org.joda.time.ReadablePartial;
-import org.joda.time.format.DateTimeFormat;
+
+import net.java.lang.StringTools;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import net.java.lang.StringTools;
 
 /**
- * <p>
- * This converts to and from LocalDate.
- * </p>
+ * <p> This converts to and from LocalDate. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @GlobalConverter(forTypes = {LocalDate.class})
 @SuppressWarnings("unchecked")
 public class LocalDateConverter extends AbstractGlobalConverter {
-    private boolean emptyIsNull = true;
+  private boolean emptyIsNull = true;
 
-    @Inject(optional = true)
-    public void setEmptyStringIsNull(@Named("jcatapult.mvc.emptyStringIsNull") boolean emptyIsNull) {
-        this.emptyIsNull = emptyIsNull;
-    }
+  @Inject(optional = true)
+  public void setEmptyStringIsNull(@Named("jcatapult.mvc.emptyStringIsNull") boolean emptyIsNull) {
+    this.emptyIsNull = emptyIsNull;
+  }
 
-    protected Object stringToObject(String value, Type convertTo, Map<String, String> attributes, String expression)
+  protected Object stringToObject(String value, Type convertTo, Map<String, String> attributes, String expression)
     throws ConversionException, ConverterStateException {
-        if (emptyIsNull && StringTools.isTrimmedEmpty(value)) {
-            return null;
-        }
-
-        String format = attributes.get("dateTimeFormat");
-        if (format == null) {
-            throw new ConverterStateException("You must provide the dateTimeFormat dynamic attribute for " +
-                "the form fields [" + expression + "] that maps to LocalDate properties in the action. " +
-                "If you are using a text field it will look like this: [@jc.text _dateTimeFormat=\"MM/dd/yyyy\"]");
-        }
-
-        return toLocalDate(value, format);
+    if (emptyIsNull && StringTools.isTrimmedEmpty(value)) {
+      return null;
     }
 
-    protected Object stringsToObject(String[] values, Type convertTo, Map<String, String> attributes, String expression)
+    String format = attributes.get("dateTimeFormat");
+    if (format == null) {
+      throw new ConverterStateException("You must provide the dateTimeFormat dynamic attribute for " +
+        "the form fields [" + expression + "] that maps to LocalDate properties in the action. " +
+        "If you are using a text field it will look like this: [@jc.text _dateTimeFormat=\"MM/dd/yyyy\"]");
+    }
+
+    return toLocalDate(value, format);
+  }
+
+  protected Object stringsToObject(String[] values, Type convertTo, Map<String, String> attributes, String expression)
     throws ConversionException, ConverterStateException {
-        throw new UnsupportedOperationException("You are attempting to map a form field that contains " +
-            "multiple parameters to a property on the action class that is of type LocalDate. This isn't " +
-            "allowed.");
-    }
+    throw new UnsupportedOperationException("You are attempting to map a form field that contains " +
+      "multiple parameters to a property on the action class that is of type LocalDate. This isn't " +
+      "allowed.");
+  }
 
-    protected String objectToString(Object value, Type convertFrom, Map<String, String> attributes, String expression)
+  protected String objectToString(Object value, Type convertFrom, Map<String, String> attributes, String expression)
     throws ConversionException, ConverterStateException {
-        String format = attributes.get("dateTimeFormat");
-        if (format == null) {
-            throw new ConverterStateException("You must provide the dateTimeFormat dynamic attribute for " +
-                "the form fields [" + expression + "] that maps to LocalDate properties in the action. " +
-                "If you are using a text field it will look like this: [@jc.text _dateTimeFormat=\"MM/dd/yyyy\"]");
-        }
-
-        return DateTimeFormat.forPattern(format).print((ReadablePartial) value);
+    String format = attributes.get("dateTimeFormat");
+    if (format == null) {
+      throw new ConverterStateException("You must provide the dateTimeFormat dynamic attribute for " +
+        "the form fields [" + expression + "] that maps to LocalDate properties in the action. " +
+        "If you are using a text field it will look like this: [@jc.text _dateTimeFormat=\"MM/dd/yyyy\"]");
     }
 
-    private LocalDate toLocalDate(String value, String format) {
-        try {
-            return DateTimeFormat.forPattern(format).parseDateTime(value).toLocalDate();
-        } catch (IllegalArgumentException e) {
-            throw new ConversionException("Invalid date [" + value + "] for format [" + format + "]", e);
-        }
+    return DateTimeFormat.forPattern(format).print((ReadablePartial) value);
+  }
+
+  private LocalDate toLocalDate(String value, String format) {
+    try {
+      return DateTimeFormat.forPattern(format).parseDateTime(value).toLocalDate();
+    } catch (IllegalArgumentException e) {
+      throw new ConversionException("Invalid date [" + value + "] for format [" + format + "]", e);
     }
+  }
 }

@@ -18,28 +18,24 @@ package org.primeframework.mvc.servlet;
 import javax.servlet.ServletException;
 import java.io.IOException;
 
-import org.primeframework.servlet.WorkflowChain;
-
 /**
- * <p>
- * This is a mock workflow chain for testing.
- * </p>
+ * <p> This is a mock workflow chain for testing. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class MockWorkflowChain implements WorkflowChain {
-    private final Runnable runnable;
+  private final Runnable runnable;
 
-    public MockWorkflowChain(Runnable runnable) {
-        this.runnable = runnable;
-    }
+  public MockWorkflowChain(Runnable runnable) {
+    this.runnable = runnable;
+  }
 
-    @Override
-    public void continueWorkflow() throws IOException, ServletException {
-        runnable.run();
-    }
+  @Override
+  public void continueWorkflow() throws IOException, ServletException {
+    runnable.run();
+  }
 
-    @Override
-    public void reset() {
-    }
+  @Override
+  public void reset() {
+  }
 }

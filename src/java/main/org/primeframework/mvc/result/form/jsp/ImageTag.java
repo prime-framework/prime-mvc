@@ -18,71 +18,69 @@ package org.primeframework.mvc.result.form.jsp;
 import org.primeframework.mvc.result.form.control.Image;
 
 /**
- * <p>
- * This class is the JSP taglib for the button control.
- * </p>
+ * <p> This class is the JSP taglib for the button control. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class ImageTag extends AbstractInputTag<Image> {
-    /**
-     * Retrieves the tags ismap attribute
-     *
-     * @return	Returns the tags ismap attribute
-     */
-    public Boolean getIsmap() {
-        return (Boolean) attributes.get("ismap");
-    }
+  /**
+   * Retrieves the tags ismap attribute
+   *
+   * @return Returns the tags ismap attribute
+   */
+  public Boolean getIsmap() {
+    return (Boolean) attributes.get("ismap");
+  }
 
-    /**
-     * Populates the tags ismap attribute
-     *
-     * @param	ismap The value of the tags ismap attribute
-     */
-    public void setIsmap(Boolean ismap) {
-        attributes.put("ismap", ismap);
-    }
+  /**
+   * Populates the tags ismap attribute
+   *
+   * @param ismap The value of the tags ismap attribute
+   */
+  public void setIsmap(Boolean ismap) {
+    attributes.put("ismap", ismap);
+  }
 
-    /**
-     * Retrieves the tags usemap attribute
-     *
-     * @return	Returns the tags usemap attribute
-     */
-    public String getUsemap() {
-        return (String) attributes.get("usemap");
-    }
+  /**
+   * Retrieves the tags usemap attribute
+   *
+   * @return Returns the tags usemap attribute
+   */
+  public String getUsemap() {
+    return (String) attributes.get("usemap");
+  }
 
-    /**
-     * Populates the tags usemap attribute
-     *
-     * @param	usemap The value of the tags usemap attribute
-     */
-    public void setUsemap(String usemap) {
-        attributes.put("usemap", usemap);
-    }
+  /**
+   * Populates the tags usemap attribute
+   *
+   * @param usemap The value of the tags usemap attribute
+   */
+  public void setUsemap(String usemap) {
+    attributes.put("usemap", usemap);
+  }
 
-    /**
-     * Retrieves the tags src attribute
-     *
-     * @return	Returns the tags src attribute
-     */
-    public String getSrc() {
-        return (String) attributes.get("src");
-    }
+  /**
+   * Retrieves the tags src attribute
+   *
+   * @return Returns the tags src attribute
+   */
+  public String getSrc() {
+    return (String) attributes.get("src");
+  }
 
-    /**
-     * Populates the tags src attribute
-     *
-     * @param	src The value of the tags src attribute
-     */
-    public void setSrc(String src) {
-        attributes.put("src", src);
-    }
+  /**
+   * Populates the tags src attribute
+   *
+   * @param src The value of the tags src attribute
+   */
+  public void setSrc(String src) {
+    attributes.put("src", src);
+  }
 
-    /**
-     * @return  The {@link Image} class.
-     */
-    protected Class<Image> controlClass() {
-        return Image.class;
-    }
+  /**
+   * @return The {@link Image} class.
+   */
+  protected Class<Image> controlClass() {
+    return Image.class;
+  }
 }

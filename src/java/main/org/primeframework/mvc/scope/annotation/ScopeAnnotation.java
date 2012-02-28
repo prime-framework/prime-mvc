@@ -23,18 +23,16 @@ import java.lang.annotation.Target;
 import org.primeframework.mvc.scope.Scope;
 
 /**
- * <p>
- * This annotation should be used to mark scope annotations so that they can be
- * located by the JCatapult parameter handling mechanism.
- * </p>
+ * <p> This annotation should be used to mark scope annotations so that they can be located by the JCatapult parameter
+ * handling mechanism. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.ANNOTATION_TYPE)
 public @interface ScopeAnnotation {
-    /**
-     * @return  The class that implements the scope annotation's processing.
-     */
-    Class<? extends Scope> value();
+  /**
+   * @return The class that implements the scope annotation's processing.
+   */
+  Class<? extends Scope> value();
 }

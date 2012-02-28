@@ -21,24 +21,21 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * <p>
- * This class defines a single attribute that a control can have passed to it.
- * Since FreeMarker doesn't provide a mechanism for ensuring directives have
- * the correct attributes or types, this annotation is used instead.
- * </p>
+ * <p> This class defines a single attribute that a control can have passed to it. Since FreeMarker doesn't provide a
+ * mechanism for ensuring directives have the correct attributes or types, this annotation is used instead. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface ControlAttribute {
-    /**
-     * @return  The name of the attribute.
-     */
-    String name();
+  /**
+   * @return The name of the attribute.
+   */
+  String name();
 
-    /**
-     * @return  The types that can be passed for this attribute.
-     */
-    Class<?>[] types() default {String.class};
+  /**
+   * @return The types that can be passed for this attribute.
+   */
+  Class<?>[] types() default {String.class};
 }

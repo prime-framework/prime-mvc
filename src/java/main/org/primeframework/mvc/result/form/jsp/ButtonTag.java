@@ -18,17 +18,15 @@ package org.primeframework.mvc.result.form.jsp;
 import org.primeframework.mvc.result.form.control.Button;
 
 /**
- * <p>
- * This class is the JSP taglib for the button control.
- * </p>
+ * <p> This class is the JSP taglib for the button control. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class ButtonTag extends AbstractInputTag<Button> {
-    /**
-     * @return  The {@link Button} class.
-     */
-    protected Class<Button> controlClass() {
-        return Button.class;
-    }
+  /**
+   * @return The {@link Button} class.
+   */
+  protected Class<Button> controlClass() {
+    return Button.class;
+  }
 }

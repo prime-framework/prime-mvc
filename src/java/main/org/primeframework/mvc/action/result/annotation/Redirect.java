@@ -31,27 +31,27 @@ import org.primeframework.mvc.action.result.RedirectResult;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface Redirect {
-    /**
-     * @return The result code from the action's execute method that this Result is associated with.
-     */
-    String code() default "success";
+  /**
+   * @return The result code from the action's execute method that this Result is associated with.
+   */
+  String code() default "success";
 
-    /**
-     * @return The redirect URI.
-     */
-    String uri();
+  /**
+   * @return The redirect URI.
+   */
+  String uri();
 
-    /**
-     * @return Whether or not this is a permanent redirect (301) or a temporary redirect (302).
-     */
-    boolean perm() default false;
+  /**
+   * @return Whether or not this is a permanent redirect (301) or a temporary redirect (302).
+   */
+  boolean perm() default false;
 
-    /**
-     * @return Whether or not variable replacements inside the URI string should be encoded or not. In some cases, you
-     *         want to encode variables when they contain UTF-8 characters and are part of the URL query parameters.
-     *         For example, "/foo?user=${bar}" and the bar variable contains unicode characters. In other cases, you
-     *         don't want to encode the variables. For example, if they variable contains the entire URI such as
-     *         "${uri}". This defaults to false to maintain backwards compatibility.
-     */
-    boolean encodeVariables() default false;
+  /**
+   * @return Whether or not variable replacements inside the URI string should be encoded or not. In some cases, you
+   *         want to encode variables when they contain UTF-8 characters and are part of the URL query parameters. For
+   *         example, "/foo?user=${bar}" and the bar variable contains unicode characters. In other cases, you don't
+   *         want to encode the variables. For example, if they variable contains the entire URI such as "${uri}". This
+   *         defaults to false to maintain backwards compatibility.
+   */
+  boolean encodeVariables() default false;
 }

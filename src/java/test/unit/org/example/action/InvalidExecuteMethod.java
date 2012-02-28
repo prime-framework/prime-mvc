@@ -18,17 +18,15 @@ package org.example.action;
 import org.primeframework.mvc.action.annotation.Action;
 
 /**
- * <p>
- * This is a simple test action.
- * </p>
+ * <p> This is a simple test action. </p>
  *
  * @author Brian Pontarelli
  */
 @Action
 public class InvalidExecuteMethod {
-    public boolean invoked = false;
+  public boolean invoked = false;
 
-    public void execute() {
-        invoked = true;
-    }
+  public void execute() {
+    invoked = true;
+  }
 }

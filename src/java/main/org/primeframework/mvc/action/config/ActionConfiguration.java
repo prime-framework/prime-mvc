@@ -16,36 +16,33 @@
 package org.primeframework.mvc.action.config;
 
 /**
- * <p>
- * This interface defines the public API that describes an action
- * configuration.
- * </p>
+ * <p> This interface defines the public API that describes an action configuration. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public interface ActionConfiguration {
-    /**
-     * @return  The action class or null if the configuration is for an class-less action.
-     */
-    Class<?> actionClass();
+  /**
+   * @return The action class or null if the configuration is for an class-less action.
+   */
+  Class<?> actionClass();
 
-    /**
-     * @return  The URI that the action is mapped to.
-     */
-    String uri();
+  /**
+   * @return The URI that the action is mapped to.
+   */
+  String uri();
 
-    /**
-     * Determines if this configuration can handle the given URI. PrimeMVCConfiguration objects provide
-     * additional handling for URI parameters and other cases and this method uses the full incoming
-     * URI to determine if the configuration can handle it.
-     *
-     * @param   uri The full incoming URI.
-     * @return  True if this configuration can handle the URI, false if not.
-     */
-    boolean canHandle(String uri);
+  /**
+   * Determines if this configuration can handle the given URI. PrimeMVCConfiguration objects provide additional
+   * handling for URI parameters and other cases and this method uses the full incoming URI to determine if the
+   * configuration can handle it.
+   *
+   * @param uri The full incoming URI.
+   * @return True if this configuration can handle the URI, false if not.
+   */
+  boolean canHandle(String uri);
 
-    /**
-     * @return  The URI parameter mapping pattern.
-     */
-    String uriParameterPattern();
+  /**
+   * @return The URI parameter mapping pattern.
+   */
+  String uriParameterPattern();
 }

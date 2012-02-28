@@ -27,476 +27,475 @@ import org.example.action.user.Edit;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.DefaultActionInvocation;
 import org.primeframework.mvc.scope.annotation.ActionSession;
-import static org.testng.Assert.*;
 import org.testng.annotations.Test;
 
+import static org.testng.Assert.*;
+
 /**
- * <p>
- * This class tests the action session scope.
- * </p>
+ * <p> This class tests the action session scope. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class ActionSessionScopeTest {
-    @Test
-    public void get() {
-        Object value = new Object();
-        Map<String, Map<String, Object>> map = new HashMap<String, Map<String, Object>>();
-        Map<String, Object> as = new HashMap<String, Object>();
-        map.put("org.example.action.user.Edit", as);
-        as.put("test", value);
+  @Test
+  public void get() {
+    Object value = new Object();
+    Map<String, Map<String, Object>> map = new HashMap<String, Map<String, Object>>();
+    Map<String, Object> as = new HashMap<String, Object>();
+    map.put("org.example.action.user.Edit", as);
+    as.put("test", value);
 
-        HttpSession session = EasyMock.createStrictMock(HttpSession.class);
-        EasyMock.expect(session.getAttribute("jcatapultActionSession")).andReturn(map);
-        EasyMock.replay(session);
+    HttpSession session = EasyMock.createStrictMock(HttpSession.class);
+    EasyMock.expect(session.getAttribute("jcatapultActionSession")).andReturn(map);
+    EasyMock.replay(session);
 
-        HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-        EasyMock.expect(request.getSession(false)).andReturn(session);
-        EasyMock.replay(request);
+    HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
+    EasyMock.expect(request.getSession(false)).andReturn(session);
+    EasyMock.replay(request);
 
-        ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
-        EasyMock.expect(ais.getCurrent()).andReturn(new DefaultActionInvocation(new Edit(), null, null, null));
-        EasyMock.replay(ais);
+    ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
+    EasyMock.expect(ais.getCurrent()).andReturn(new DefaultActionInvocation(new Edit(), null, null, null));
+    EasyMock.replay(ais);
 
-        ActionSessionScope scope = new ActionSessionScope(request, ais);
-        assertSame(value, scope.get("test", new ActionSession() {
-            public String value() {
-                return "##field-name##";
-            }
+    ActionSessionScope scope = new ActionSessionScope(request, ais);
+    assertSame(value, scope.get("test", new ActionSession() {
+      public String value() {
+        return "##field-name##";
+      }
 
-            public Class<?> action() {
-                return ActionSession.class;
-            }
+      public Class<?> action() {
+        return ActionSession.class;
+      }
 
-            public Class<? extends Annotation> annotationType() {
-                return ActionSession.class;
-            }
-        }));
+      public Class<? extends Annotation> annotationType() {
+        return ActionSession.class;
+      }
+    }));
 
-        EasyMock.verify(session, request, ais);
-    }
+    EasyMock.verify(session, request, ais);
+  }
 
-    @Test
-    public void getNoSession() {
-        HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-        EasyMock.expect(request.getSession(false)).andReturn(null);
-        EasyMock.replay(request);
+  @Test
+  public void getNoSession() {
+    HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
+    EasyMock.expect(request.getSession(false)).andReturn(null);
+    EasyMock.replay(request);
 
-        ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
-        EasyMock.replay(ais);
+    ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
+    EasyMock.replay(ais);
 
-        ActionSessionScope scope = new ActionSessionScope(request, ais);
-        assertNull(scope.get("test", new ActionSession() {
-            public String value() {
-                return "##field-name##";
-            }
+    ActionSessionScope scope = new ActionSessionScope(request, ais);
+    assertNull(scope.get("test", new ActionSession() {
+      public String value() {
+        return "##field-name##";
+      }
 
-            public Class<?> action() {
-                return ActionSession.class;
-            }
+      public Class<?> action() {
+        return ActionSession.class;
+      }
 
-            public Class<? extends Annotation> annotationType() {
-                return ActionSession.class;
-            }
-        }));
+      public Class<? extends Annotation> annotationType() {
+        return ActionSession.class;
+      }
+    }));
 
-        EasyMock.verify(request, ais);
-    }
+    EasyMock.verify(request, ais);
+  }
 
-    @Test
-    public void getOtherActionSession() {
-        Object value = new Object();
-        Map<String, Map<String, Object>> map = new HashMap<String, Map<String, Object>>();
-        Map<String, Object> as = new HashMap<String, Object>();
-        map.put("org.example.action.Simple", as);
-        as.put("test", value);
+  @Test
+  public void getOtherActionSession() {
+    Object value = new Object();
+    Map<String, Map<String, Object>> map = new HashMap<String, Map<String, Object>>();
+    Map<String, Object> as = new HashMap<String, Object>();
+    map.put("org.example.action.Simple", as);
+    as.put("test", value);
 
-        HttpSession session = EasyMock.createStrictMock(HttpSession.class);
-        EasyMock.expect(session.getAttribute("jcatapultActionSession")).andReturn(map);
-        EasyMock.replay(session);
+    HttpSession session = EasyMock.createStrictMock(HttpSession.class);
+    EasyMock.expect(session.getAttribute("jcatapultActionSession")).andReturn(map);
+    EasyMock.replay(session);
 
-        HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-        EasyMock.expect(request.getSession(false)).andReturn(session);
-        EasyMock.replay(request);
+    HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
+    EasyMock.expect(request.getSession(false)).andReturn(session);
+    EasyMock.replay(request);
 
-        ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
-        EasyMock.replay(ais);
+    ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
+    EasyMock.replay(ais);
 
-        ActionSessionScope scope = new ActionSessionScope(request, ais);
-        assertSame(value, scope.get("test", new ActionSession() {
-            public String value() {
-                return "##field-name##";
-            }
+    ActionSessionScope scope = new ActionSessionScope(request, ais);
+    assertSame(value, scope.get("test", new ActionSession() {
+      public String value() {
+        return "##field-name##";
+      }
 
-            public Class<?> action() {
-                return Simple.class;
-            }
+      public Class<?> action() {
+        return Simple.class;
+      }
 
-            public Class<? extends Annotation> annotationType() {
-                return ActionSession.class;
-            }
-        }));
+      public Class<? extends Annotation> annotationType() {
+        return ActionSession.class;
+      }
+    }));
 
-        EasyMock.verify(session, request, ais);
-    }
+    EasyMock.verify(session, request, ais);
+  }
 
-    @Test
-    public void getDifferentKey() {
-        Object value = new Object();
-        Map<String, Map<String, Object>> map = new HashMap<String, Map<String, Object>>();
-        Map<String, Object> as = new HashMap<String, Object>();
-        map.put("org.example.action.user.Edit", as);
-        as.put("other", value);
+  @Test
+  public void getDifferentKey() {
+    Object value = new Object();
+    Map<String, Map<String, Object>> map = new HashMap<String, Map<String, Object>>();
+    Map<String, Object> as = new HashMap<String, Object>();
+    map.put("org.example.action.user.Edit", as);
+    as.put("other", value);
 
-        HttpSession session = EasyMock.createStrictMock(HttpSession.class);
-        EasyMock.expect(session.getAttribute("jcatapultActionSession")).andReturn(map);
-        EasyMock.replay(session);
+    HttpSession session = EasyMock.createStrictMock(HttpSession.class);
+    EasyMock.expect(session.getAttribute("jcatapultActionSession")).andReturn(map);
+    EasyMock.replay(session);
 
-        HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-        EasyMock.expect(request.getSession(false)).andReturn(session);
-        EasyMock.replay(request);
+    HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
+    EasyMock.expect(request.getSession(false)).andReturn(session);
+    EasyMock.replay(request);
 
-        ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
-        EasyMock.expect(ais.getCurrent()).andReturn(new DefaultActionInvocation(new Edit(), null, null, null));
-        EasyMock.replay(ais);
+    ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
+    EasyMock.expect(ais.getCurrent()).andReturn(new DefaultActionInvocation(new Edit(), null, null, null));
+    EasyMock.replay(ais);
 
-        ActionSessionScope scope = new ActionSessionScope(request, ais);
-        assertSame(value, scope.get("test", new ActionSession() {
-            public String value() {
-                return "other";
-            }
+    ActionSessionScope scope = new ActionSessionScope(request, ais);
+    assertSame(value, scope.get("test", new ActionSession() {
+      public String value() {
+        return "other";
+      }
 
-            public Class<?> action() {
-                return ActionSession.class;
-            }
+      public Class<?> action() {
+        return ActionSession.class;
+      }
 
-            public Class<? extends Annotation> annotationType() {
-                return ActionSession.class;
-            }
-        }));
+      public Class<? extends Annotation> annotationType() {
+        return ActionSession.class;
+      }
+    }));
 
-        EasyMock.verify(session, request, ais);
-    }
+    EasyMock.verify(session, request, ais);
+  }
 
-    @Test
-    public void getDifferentKeyOtherActionSession() {
-        Object value = new Object();
-        Map<String, Map<String, Object>> map = new HashMap<String, Map<String, Object>>();
-        Map<String, Object> as = new HashMap<String, Object>();
-        map.put("org.example.action.Simple", as);
-        as.put("other", value);
+  @Test
+  public void getDifferentKeyOtherActionSession() {
+    Object value = new Object();
+    Map<String, Map<String, Object>> map = new HashMap<String, Map<String, Object>>();
+    Map<String, Object> as = new HashMap<String, Object>();
+    map.put("org.example.action.Simple", as);
+    as.put("other", value);
 
-        HttpSession session = EasyMock.createStrictMock(HttpSession.class);
-        EasyMock.expect(session.getAttribute("jcatapultActionSession")).andReturn(map);
-        EasyMock.replay(session);
+    HttpSession session = EasyMock.createStrictMock(HttpSession.class);
+    EasyMock.expect(session.getAttribute("jcatapultActionSession")).andReturn(map);
+    EasyMock.replay(session);
 
-        HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-        EasyMock.expect(request.getSession(false)).andReturn(session);
-        EasyMock.replay(request);
+    HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
+    EasyMock.expect(request.getSession(false)).andReturn(session);
+    EasyMock.replay(request);
 
-        ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
-        EasyMock.replay(ais);
+    ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
+    EasyMock.replay(ais);
 
-        ActionSessionScope scope = new ActionSessionScope(request, ais);
-        assertSame(value, scope.get("test", new ActionSession() {
-            public String value() {
-                return "other";
-            }
+    ActionSessionScope scope = new ActionSessionScope(request, ais);
+    assertSame(value, scope.get("test", new ActionSession() {
+      public String value() {
+        return "other";
+      }
 
-            public Class<?> action() {
-                return Simple.class;
-            }
+      public Class<?> action() {
+        return Simple.class;
+      }
 
-            public Class<? extends Annotation> annotationType() {
-                return ActionSession.class;
-            }
-        }));
+      public Class<? extends Annotation> annotationType() {
+        return ActionSession.class;
+      }
+    }));
 
-        EasyMock.verify(session, request, ais);
-    }
+    EasyMock.verify(session, request, ais);
+  }
 
-    @Test
-    public void failedGetNoAction() {
-        Object value = new Object();
-        Map<String, Map<String, Object>> map = new HashMap<String, Map<String, Object>>();
-        Map<String, Object> as = new HashMap<String, Object>();
-        map.put("org.example.action.user.Edit", as);
-        as.put("test", value);
+  @Test
+  public void failedGetNoAction() {
+    Object value = new Object();
+    Map<String, Map<String, Object>> map = new HashMap<String, Map<String, Object>>();
+    Map<String, Object> as = new HashMap<String, Object>();
+    map.put("org.example.action.user.Edit", as);
+    as.put("test", value);
 
-        HttpSession session = EasyMock.createStrictMock(HttpSession.class);
-        EasyMock.expect(session.getAttribute("jcatapultActionSession")).andReturn(map);
-        EasyMock.replay(session);
+    HttpSession session = EasyMock.createStrictMock(HttpSession.class);
+    EasyMock.expect(session.getAttribute("jcatapultActionSession")).andReturn(map);
+    EasyMock.replay(session);
 
-        HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-        EasyMock.expect(request.getSession(false)).andReturn(session);
-        EasyMock.replay(request);
+    HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
+    EasyMock.expect(request.getSession(false)).andReturn(session);
+    EasyMock.replay(request);
 
-        ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
-        EasyMock.expect(ais.getCurrent()).andReturn(new DefaultActionInvocation(null, null, null, null));
-        EasyMock.replay(ais);
+    ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
+    EasyMock.expect(ais.getCurrent()).andReturn(new DefaultActionInvocation(null, null, null, null));
+    EasyMock.replay(ais);
 
-        ActionSessionScope scope = new ActionSessionScope(request, ais);
-        try {
-            scope.get("test", new ActionSession() {
-                public String value() {
-                    return "##field-name##";
-                }
-
-                public Class<?> action() {
-                    return ActionSession.class;
-                }
-
-                public Class<? extends Annotation> annotationType() {
-                    return ActionSession.class;
-                }
-            });
-            fail("Should have failed");
-        } catch (IllegalStateException e) {
-            // Expected
+    ActionSessionScope scope = new ActionSessionScope(request, ais);
+    try {
+      scope.get("test", new ActionSession() {
+        public String value() {
+          return "##field-name##";
         }
 
-        EasyMock.verify(session, request, ais);
-    }
-
-    @Test
-    public void set() {
-        Object value = new Object();
-        Map<String, Map<String, Object>> map = new HashMap<String, Map<String, Object>>();
-
-        HttpSession session = EasyMock.createStrictMock(HttpSession.class);
-        EasyMock.expect(session.getAttribute("jcatapultActionSession")).andReturn(map);
-        EasyMock.replay(session);
-
-        HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-        EasyMock.expect(request.getSession(true)).andReturn(session);
-        EasyMock.replay(request);
-
-        ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
-        EasyMock.expect(ais.getCurrent()).andReturn(new DefaultActionInvocation(new Edit(), null, null, null));
-        EasyMock.replay(ais);
-
-        ActionSessionScope scope = new ActionSessionScope(request, ais);
-        scope.set("test", value, new ActionSession() {
-            public String value() {
-                return "##field-name##";
-            }
-
-            public Class<?> action() {
-                return ActionSession.class;
-            }
-
-            public Class<? extends Annotation> annotationType() {
-                return ActionSession.class;
-            }
-        });
-        assertSame(value, map.get("org.example.action.user.Edit").get("test"));
-
-        EasyMock.verify(session, request, ais);
-    }
-
-    @Test
-    public void setNull() {
-        Map<String, Map<String, Object>> map = new HashMap<String, Map<String, Object>>();
-        map.put("org.example.action.user.Edit", new HashMap<String, Object>());
-        map.get("org.example.action.user.Edit").put("test", "value");
-
-        HttpSession session = EasyMock.createStrictMock(HttpSession.class);
-        EasyMock.expect(session.getAttribute("jcatapultActionSession")).andReturn(map);
-        EasyMock.replay(session);
-
-        HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-        EasyMock.expect(request.getSession(false)).andReturn(session);
-        EasyMock.replay(request);
-
-        ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
-        EasyMock.expect(ais.getCurrent()).andReturn(new DefaultActionInvocation(new Edit(), null, null, null));
-        EasyMock.replay(ais);
-
-        ActionSessionScope scope = new ActionSessionScope(request, ais);
-        scope.set("test", null, new ActionSession() {
-            public String value() {
-                return "##field-name##";
-            }
-
-            public Class<?> action() {
-                return ActionSession.class;
-            }
-
-            public Class<? extends Annotation> annotationType() {
-                return ActionSession.class;
-            }
-        });
-        assertFalse(map.get("org.example.action.user.Edit").containsKey("test"));
-
-        EasyMock.verify(session, request, ais);
-    }
-
-    @Test
-    public void setNullNoSession() {
-        HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-        EasyMock.expect(request.getSession(false)).andReturn(null);
-        EasyMock.replay(request);
-
-        ActionSessionScope scope = new ActionSessionScope(request, null);
-        scope.set("test", null, new ActionSession() {
-            public String value() {
-                return "##field-name##";
-            }
-
-            public Class<?> action() {
-                return ActionSession.class;
-            }
-
-            public Class<? extends Annotation> annotationType() {
-                return ActionSession.class;
-            }
-        });
-
-        EasyMock.verify(request);
-    }
-
-    @Test
-    public void setOtherActionSession() {
-        Object value = new Object();
-        Map<String, Map<String, Object>> map = new HashMap<String, Map<String, Object>>();
-
-        HttpSession session = EasyMock.createStrictMock(HttpSession.class);
-        EasyMock.expect(session.getAttribute("jcatapultActionSession")).andReturn(map);
-        EasyMock.replay(session);
-
-        HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-        EasyMock.expect(request.getSession(true)).andReturn(session);
-        EasyMock.replay(request);
-
-        ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
-        EasyMock.replay(ais);
-
-        ActionSessionScope scope = new ActionSessionScope(request, ais);
-        scope.set("test", value, new ActionSession() {
-            public String value() {
-                return "##field-name##";
-            }
-
-            public Class<?> action() {
-                return Simple.class;
-            }
-
-            public Class<? extends Annotation> annotationType() {
-                return ActionSession.class;
-            }
-        });
-        assertSame(value, map.get("org.example.action.Simple").get("test"));
-
-        EasyMock.verify(session, request, ais);
-    }
-
-    @Test
-    public void setDifferentKey() {
-        Object value = new Object();
-        Map<String, Map<String, Object>> map = new HashMap<String, Map<String, Object>>();
-
-        HttpSession session = EasyMock.createStrictMock(HttpSession.class);
-        EasyMock.expect(session.getAttribute("jcatapultActionSession")).andReturn(map);
-        EasyMock.replay(session);
-
-        HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-        EasyMock.expect(request.getSession(true)).andReturn(session);
-        EasyMock.replay(request);
-
-        ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
-        EasyMock.expect(ais.getCurrent()).andReturn(new DefaultActionInvocation(new Edit(), null, null, null));
-        EasyMock.replay(ais);
-
-        ActionSessionScope scope = new ActionSessionScope(request, ais);
-        scope.set("test", value, new ActionSession() {
-            public String value() {
-                return "other";
-            }
-
-            public Class<?> action() {
-                return ActionSession.class;
-            }
-
-            public Class<? extends Annotation> annotationType() {
-                return ActionSession.class;
-            }
-        });
-        assertSame(value, map.get("org.example.action.user.Edit").get("other"));
-
-        EasyMock.verify(session, request, ais);
-    }
-
-    @Test
-    public void setDifferentKeyOtherActionSession() {
-        Object value = new Object();
-        Map<String, Map<String, Object>> map = new HashMap<String, Map<String, Object>>();
-
-        HttpSession session = EasyMock.createStrictMock(HttpSession.class);
-        EasyMock.expect(session.getAttribute("jcatapultActionSession")).andReturn(map);
-        EasyMock.replay(session);
-
-        HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-        EasyMock.expect(request.getSession(true)).andReturn(session);
-        EasyMock.replay(request);
-
-        ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
-        EasyMock.replay(ais);
-
-        ActionSessionScope scope = new ActionSessionScope(request, ais);
-        scope.set("test", value, new ActionSession() {
-            public String value() {
-                return "other";
-            }
-
-            public Class<?> action() {
-                return Simple.class;
-            }
-
-            public Class<? extends Annotation> annotationType() {
-                return ActionSession.class;
-            }
-        });
-        assertSame(value, map.get("org.example.action.Simple").get("other"));
-
-        EasyMock.verify(session, request, ais);
-    }
-
-    @Test
-    public void failedSetNoAction() {
-        Map<String, Map<String, Object>> map = new HashMap<String, Map<String, Object>>();
-
-        HttpSession session = EasyMock.createStrictMock(HttpSession.class);
-        EasyMock.expect(session.getAttribute("jcatapultActionSession")).andReturn(map);
-        EasyMock.replay(session);
-
-        HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-        EasyMock.expect(request.getSession(true)).andReturn(session);
-        EasyMock.replay(request);
-
-        ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
-        EasyMock.expect(ais.getCurrent()).andReturn(new DefaultActionInvocation(null, null, null, null));
-        EasyMock.replay(ais);
-
-        ActionSessionScope scope = new ActionSessionScope(request, ais);
-        try {
-            scope.set("test", new Object(), new ActionSession() {
-                public String value() {
-                    return "##field-name##";
-                }
-
-                public Class<?> action() {
-                    return ActionSession.class;
-                }
-
-                public Class<? extends Annotation> annotationType() {
-                    return ActionSession.class;
-                }
-            });
-            fail("Should have failed");
-        } catch (IllegalStateException e) {
-            // Expected
+        public Class<?> action() {
+          return ActionSession.class;
         }
 
-        EasyMock.verify(session, request, ais);
+        public Class<? extends Annotation> annotationType() {
+          return ActionSession.class;
+        }
+      });
+      fail("Should have failed");
+    } catch (IllegalStateException e) {
+      // Expected
     }
+
+    EasyMock.verify(session, request, ais);
+  }
+
+  @Test
+  public void set() {
+    Object value = new Object();
+    Map<String, Map<String, Object>> map = new HashMap<String, Map<String, Object>>();
+
+    HttpSession session = EasyMock.createStrictMock(HttpSession.class);
+    EasyMock.expect(session.getAttribute("jcatapultActionSession")).andReturn(map);
+    EasyMock.replay(session);
+
+    HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
+    EasyMock.expect(request.getSession(true)).andReturn(session);
+    EasyMock.replay(request);
+
+    ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
+    EasyMock.expect(ais.getCurrent()).andReturn(new DefaultActionInvocation(new Edit(), null, null, null));
+    EasyMock.replay(ais);
+
+    ActionSessionScope scope = new ActionSessionScope(request, ais);
+    scope.set("test", value, new ActionSession() {
+      public String value() {
+        return "##field-name##";
+      }
+
+      public Class<?> action() {
+        return ActionSession.class;
+      }
+
+      public Class<? extends Annotation> annotationType() {
+        return ActionSession.class;
+      }
+    });
+    assertSame(value, map.get("org.example.action.user.Edit").get("test"));
+
+    EasyMock.verify(session, request, ais);
+  }
+
+  @Test
+  public void setNull() {
+    Map<String, Map<String, Object>> map = new HashMap<String, Map<String, Object>>();
+    map.put("org.example.action.user.Edit", new HashMap<String, Object>());
+    map.get("org.example.action.user.Edit").put("test", "value");
+
+    HttpSession session = EasyMock.createStrictMock(HttpSession.class);
+    EasyMock.expect(session.getAttribute("jcatapultActionSession")).andReturn(map);
+    EasyMock.replay(session);
+
+    HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
+    EasyMock.expect(request.getSession(false)).andReturn(session);
+    EasyMock.replay(request);
+
+    ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
+    EasyMock.expect(ais.getCurrent()).andReturn(new DefaultActionInvocation(new Edit(), null, null, null));
+    EasyMock.replay(ais);
+
+    ActionSessionScope scope = new ActionSessionScope(request, ais);
+    scope.set("test", null, new ActionSession() {
+      public String value() {
+        return "##field-name##";
+      }
+
+      public Class<?> action() {
+        return ActionSession.class;
+      }
+
+      public Class<? extends Annotation> annotationType() {
+        return ActionSession.class;
+      }
+    });
+    assertFalse(map.get("org.example.action.user.Edit").containsKey("test"));
+
+    EasyMock.verify(session, request, ais);
+  }
+
+  @Test
+  public void setNullNoSession() {
+    HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
+    EasyMock.expect(request.getSession(false)).andReturn(null);
+    EasyMock.replay(request);
+
+    ActionSessionScope scope = new ActionSessionScope(request, null);
+    scope.set("test", null, new ActionSession() {
+      public String value() {
+        return "##field-name##";
+      }
+
+      public Class<?> action() {
+        return ActionSession.class;
+      }
+
+      public Class<? extends Annotation> annotationType() {
+        return ActionSession.class;
+      }
+    });
+
+    EasyMock.verify(request);
+  }
+
+  @Test
+  public void setOtherActionSession() {
+    Object value = new Object();
+    Map<String, Map<String, Object>> map = new HashMap<String, Map<String, Object>>();
+
+    HttpSession session = EasyMock.createStrictMock(HttpSession.class);
+    EasyMock.expect(session.getAttribute("jcatapultActionSession")).andReturn(map);
+    EasyMock.replay(session);
+
+    HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
+    EasyMock.expect(request.getSession(true)).andReturn(session);
+    EasyMock.replay(request);
+
+    ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
+    EasyMock.replay(ais);
+
+    ActionSessionScope scope = new ActionSessionScope(request, ais);
+    scope.set("test", value, new ActionSession() {
+      public String value() {
+        return "##field-name##";
+      }
+
+      public Class<?> action() {
+        return Simple.class;
+      }
+
+      public Class<? extends Annotation> annotationType() {
+        return ActionSession.class;
+      }
+    });
+    assertSame(value, map.get("org.example.action.Simple").get("test"));
+
+    EasyMock.verify(session, request, ais);
+  }
+
+  @Test
+  public void setDifferentKey() {
+    Object value = new Object();
+    Map<String, Map<String, Object>> map = new HashMap<String, Map<String, Object>>();
+
+    HttpSession session = EasyMock.createStrictMock(HttpSession.class);
+    EasyMock.expect(session.getAttribute("jcatapultActionSession")).andReturn(map);
+    EasyMock.replay(session);
+
+    HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
+    EasyMock.expect(request.getSession(true)).andReturn(session);
+    EasyMock.replay(request);
+
+    ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
+    EasyMock.expect(ais.getCurrent()).andReturn(new DefaultActionInvocation(new Edit(), null, null, null));
+    EasyMock.replay(ais);
+
+    ActionSessionScope scope = new ActionSessionScope(request, ais);
+    scope.set("test", value, new ActionSession() {
+      public String value() {
+        return "other";
+      }
+
+      public Class<?> action() {
+        return ActionSession.class;
+      }
+
+      public Class<? extends Annotation> annotationType() {
+        return ActionSession.class;
+      }
+    });
+    assertSame(value, map.get("org.example.action.user.Edit").get("other"));
+
+    EasyMock.verify(session, request, ais);
+  }
+
+  @Test
+  public void setDifferentKeyOtherActionSession() {
+    Object value = new Object();
+    Map<String, Map<String, Object>> map = new HashMap<String, Map<String, Object>>();
+
+    HttpSession session = EasyMock.createStrictMock(HttpSession.class);
+    EasyMock.expect(session.getAttribute("jcatapultActionSession")).andReturn(map);
+    EasyMock.replay(session);
+
+    HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
+    EasyMock.expect(request.getSession(true)).andReturn(session);
+    EasyMock.replay(request);
+
+    ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
+    EasyMock.replay(ais);
+
+    ActionSessionScope scope = new ActionSessionScope(request, ais);
+    scope.set("test", value, new ActionSession() {
+      public String value() {
+        return "other";
+      }
+
+      public Class<?> action() {
+        return Simple.class;
+      }
+
+      public Class<? extends Annotation> annotationType() {
+        return ActionSession.class;
+      }
+    });
+    assertSame(value, map.get("org.example.action.Simple").get("other"));
+
+    EasyMock.verify(session, request, ais);
+  }
+
+  @Test
+  public void failedSetNoAction() {
+    Map<String, Map<String, Object>> map = new HashMap<String, Map<String, Object>>();
+
+    HttpSession session = EasyMock.createStrictMock(HttpSession.class);
+    EasyMock.expect(session.getAttribute("jcatapultActionSession")).andReturn(map);
+    EasyMock.replay(session);
+
+    HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
+    EasyMock.expect(request.getSession(true)).andReturn(session);
+    EasyMock.replay(request);
+
+    ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
+    EasyMock.expect(ais.getCurrent()).andReturn(new DefaultActionInvocation(null, null, null, null));
+    EasyMock.replay(ais);
+
+    ActionSessionScope scope = new ActionSessionScope(request, ais);
+    try {
+      scope.set("test", new Object(), new ActionSession() {
+        public String value() {
+          return "##field-name##";
+        }
+
+        public Class<?> action() {
+          return ActionSession.class;
+        }
+
+        public Class<? extends Annotation> annotationType() {
+          return ActionSession.class;
+        }
+      });
+      fail("Should have failed");
+    } catch (IllegalStateException e) {
+      // Expected
+    }
+
+    EasyMock.verify(session, request, ais);
+  }
 }

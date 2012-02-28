@@ -15,51 +15,52 @@
  */
 package org.primeframework.mvc.parameter;
 
-import org.primeframework.test.JCatapultBaseTest;
-import static org.testng.Assert.*;
+import org.primeframework.mvc.test.JCatapultBaseTest;
 import org.testng.annotations.Test;
+
+import static org.testng.Assert.*;
 
 /**
  * @author jhumphrey
  */
 public class InternalParametersTest extends JCatapultBaseTest {
 
-    @Test
-    public void testStringTrue() {
-        request.setParameter(InternalParameters.JCATAPULT_EXECUTE_VALIDATION, "true");
-        boolean keyState = InternalParameters.is(request, InternalParameters.JCATAPULT_EXECUTE_VALIDATION);
-        assertTrue(keyState);
-    }
+  @Test
+  public void testStringTrue() {
+    request.setParameter(InternalParameters.JCATAPULT_EXECUTE_VALIDATION, "true");
+    boolean keyState = InternalParameters.is(request, InternalParameters.JCATAPULT_EXECUTE_VALIDATION);
+    assertTrue(keyState);
+  }
 
-    @Test
-    public void testStringFalse() {
-        request.setParameter(InternalParameters.JCATAPULT_EXECUTE_VALIDATION, "false");
-        boolean keyState = InternalParameters.is(request, InternalParameters.JCATAPULT_EXECUTE_VALIDATION);
-        assertFalse(keyState);
-    }
+  @Test
+  public void testStringFalse() {
+    request.setParameter(InternalParameters.JCATAPULT_EXECUTE_VALIDATION, "false");
+    boolean keyState = InternalParameters.is(request, InternalParameters.JCATAPULT_EXECUTE_VALIDATION);
+    assertFalse(keyState);
+  }
 
-    @Test
-    public void testStringBad() {
-        try {
-            request.setParameter(InternalParameters.JCATAPULT_EXECUTE_VALIDATION, "bad");
-            InternalParameters.is(request, InternalParameters.JCATAPULT_EXECUTE_VALIDATION);
-            fail("Should have failed");
-        } catch (Exception e) {
-            // Expected
-        }
+  @Test
+  public void testStringBad() {
+    try {
+      request.setParameter(InternalParameters.JCATAPULT_EXECUTE_VALIDATION, "bad");
+      InternalParameters.is(request, InternalParameters.JCATAPULT_EXECUTE_VALIDATION);
+      fail("Should have failed");
+    } catch (Exception e) {
+      // Expected
     }
+  }
 
-    @Test
-    public void testBooleanTrue() {
-        request.setAttribute(InternalParameters.JCATAPULT_EXECUTE_VALIDATION, true);
-        boolean keyState = InternalParameters.is(request, InternalParameters.JCATAPULT_EXECUTE_VALIDATION);
-        assertTrue(keyState);
-    }
+  @Test
+  public void testBooleanTrue() {
+    request.setAttribute(InternalParameters.JCATAPULT_EXECUTE_VALIDATION, true);
+    boolean keyState = InternalParameters.is(request, InternalParameters.JCATAPULT_EXECUTE_VALIDATION);
+    assertTrue(keyState);
+  }
 
-    @Test
-    public void testBooleanFalse() {
-        request.setAttribute(InternalParameters.JCATAPULT_EXECUTE_VALIDATION, false);
-        boolean keyState = InternalParameters.is(request, InternalParameters.JCATAPULT_EXECUTE_VALIDATION);
-        assertFalse(keyState);
-    }
+  @Test
+  public void testBooleanFalse() {
+    request.setAttribute(InternalParameters.JCATAPULT_EXECUTE_VALIDATION, false);
+    boolean keyState = InternalParameters.is(request, InternalParameters.JCATAPULT_EXECUTE_VALIDATION);
+    assertFalse(keyState);
+  }
 }

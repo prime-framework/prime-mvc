@@ -17,31 +17,31 @@ package org.primeframework.mvc.result.form.control;
 
 import java.util.List;
 
+import org.primeframework.mvc.freemarker.FieldSupportBeansWrapper;
+
+import net.java.lang.ObjectTools;
+
 import freemarker.template.TemplateMethodModelEx;
 import freemarker.template.TemplateModelException;
-import net.java.lang.ObjectTools;
-import org.primeframework.freemarker.FieldSupportBeansWrapper;
 
 /**
- * <p>
- * This class is a FreeMarker method that can be invoked within the control templates
- * to create a CSS class. It takes any number of parameters and joins them using
- * dashes. If the first value is null, this returns an empty String.
+ * <p> This class is a FreeMarker method that can be invoked within the control templates to create a CSS class. It
+ * takes any number of parameters and joins them using dashes. If the first value is null, this returns an empty String.
  * </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class MakeClassMethod implements TemplateMethodModelEx {
-    public Object exec(List arguments) throws TemplateModelException {
-        if (arguments.size() == 0) {
-            return FieldSupportBeansWrapper.INSTANCE.wrap("");
-        }
-        
-        Object first = arguments.get(0);
-        if (first == null) {
-            return FieldSupportBeansWrapper.INSTANCE.wrap("");
-        }
-
-        return FieldSupportBeansWrapper.INSTANCE.wrap(ObjectTools.join(arguments, "-"));
+  public Object exec(List arguments) throws TemplateModelException {
+    if (arguments.size() == 0) {
+      return FieldSupportBeansWrapper.INSTANCE.wrap("");
     }
+
+    Object first = arguments.get(0);
+    if (first == null) {
+      return FieldSupportBeansWrapper.INSTANCE.wrap("");
+    }
+
+    return FieldSupportBeansWrapper.INSTANCE.wrap(ObjectTools.join(arguments, "-"));
+  }
 }

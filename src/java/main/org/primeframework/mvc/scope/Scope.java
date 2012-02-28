@@ -18,28 +18,26 @@ package org.primeframework.mvc.scope;
 import java.lang.annotation.Annotation;
 
 /**
- * <p>
- * This interface defines the handler for a specific scope.
- * </p>
+ * <p> This interface defines the handler for a specific scope. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public interface Scope<T extends Annotation> {
-    /**
-     * Retrieve the value from the scope based on the name given.
-     *
-     * @param   fieldName The name of the field.
-     * @param   scope The scope annotation from the field.
-     * @return  The value or null if it doesn't exist in the scope.
-     */
-    Object get(String fieldName, T scope);
+  /**
+   * Retrieve the value from the scope based on the name given.
+   *
+   * @param fieldName The name of the field.
+   * @param scope     The scope annotation from the field.
+   * @return The value or null if it doesn't exist in the scope.
+   */
+  Object get(String fieldName, T scope);
 
-    /**
-     * Sets the value into the scope.
-     *
-     * @param   fieldName The name to store the value under in the scope.
-     * @param   scope The scope annotation from the field.
-     * @param   value The value.
-     */
-    void set(String fieldName, Object value, T scope);
+  /**
+   * Sets the value into the scope.
+   *
+   * @param fieldName The name to store the value under in the scope.
+   * @param scope     The scope annotation from the field.
+   * @param value     The value.
+   */
+  void set(String fieldName, Object value, T scope);
 }

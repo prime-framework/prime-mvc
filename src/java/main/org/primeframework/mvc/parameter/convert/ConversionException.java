@@ -16,28 +16,25 @@
 package org.primeframework.mvc.parameter.convert;
 
 /**
- * <p>
- * This is a runtime exception thrown when type conversion fails. This
- * is normally NOT fatal and is caused by the user of the application
- * putting the wrong information into a form.
- * </p>
+ * <p> This is a runtime exception thrown when type conversion fails. This is normally NOT fatal and is caused by the
+ * user of the application putting the wrong information into a form. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class ConversionException extends RuntimeException {
-    public ConversionException() {
-        super();
-    }
+  public ConversionException() {
+    super();
+  }
 
-    public ConversionException(String message) {
-        super(message);
-    }
+  public ConversionException(String message) {
+    super(message);
+  }
 
-    public ConversionException(String message, Throwable cause) {
-        super(message, cause);
-    }
+  public ConversionException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
-    public ConversionException(Throwable cause) {
-        super(cause);
-    }
+  public ConversionException(Throwable cause) {
+    super(cause);
+  }
 }

@@ -18,17 +18,15 @@ package org.primeframework.mvc.result.control;
 import java.io.Writer;
 
 /**
- * <p>
- * This interface defines how a control can manage it's body content.
- * </p>
+ * <p> This interface defines how a control can manage it's body content. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public interface Body {
-    /**
-     * Reners this body the given writer.
-     *
-     * @param   writer The writer.
-     */
-    void render(Writer writer);
+  /**
+   * Reners this body the given writer.
+   *
+   * @param writer The writer.
+   */
+  void render(Writer writer);
 }

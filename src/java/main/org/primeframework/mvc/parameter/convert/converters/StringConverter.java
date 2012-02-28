@@ -18,48 +18,47 @@ package org.primeframework.mvc.parameter.convert.converters;
 import java.lang.reflect.Type;
 import java.util.Map;
 
-import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.convert.AbstractGlobalConverter;
+import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.convert.annotation.GlobalConverter;
+
+import net.java.lang.StringTools;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import static net.java.lang.ObjectTools.*;
-import net.java.lang.StringTools;
 
 /**
- * <p>
- * This converts to and from Strings.
- * </p>
+ * <p> This converts to and from Strings. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @GlobalConverter(forTypes = {String.class})
 @SuppressWarnings("unchecked")
 public class StringConverter extends AbstractGlobalConverter {
-    private boolean emptyIsNull = true;
+  private boolean emptyIsNull = true;
 
-    @Inject(optional = true)
-    public void setEmptyStringIsNull(@Named("jcatapult.mvc.emptyStringIsNull") boolean emptyIsNull) {
-        this.emptyIsNull = emptyIsNull;
-    }
+  @Inject(optional = true)
+  public void setEmptyStringIsNull(@Named("jcatapult.mvc.emptyStringIsNull") boolean emptyIsNull) {
+    this.emptyIsNull = emptyIsNull;
+  }
 
-    protected Object stringToObject(String value, Type convertTo, Map<String, String> attributes, String expression)
+  protected Object stringToObject(String value, Type convertTo, Map<String, String> attributes, String expression)
     throws org.primeframework.mvc.parameter.convert.ConversionException, ConverterStateException {
-        if (emptyIsNull && StringTools.isTrimmedEmpty(value)) {
-            return null;
-        }
-
-        return value;
+    if (emptyIsNull && StringTools.isTrimmedEmpty(value)) {
+      return null;
     }
 
-    protected Object stringsToObject(String[] values, Type convertTo, Map<String, String> attributes, String expression)
+    return value;
+  }
+
+  protected Object stringsToObject(String[] values, Type convertTo, Map<String, String> attributes, String expression)
     throws org.primeframework.mvc.parameter.convert.ConversionException, ConverterStateException {
-        return join(values, ",");
-    }
+    return join(values, ",");
+  }
 
-    protected String objectToString(Object value, Type convertFrom, Map<String, String> attributes, String expression)
+  protected String objectToString(Object value, Type convertFrom, Map<String, String> attributes, String expression)
     throws org.primeframework.mvc.parameter.convert.ConversionException, ConverterStateException {
-        return value.toString();
-    }
+    return value.toString();
+  }
 }

@@ -16,15 +16,13 @@
 package org.example.domain;
 
 /**
- * <p>
- * This is a test address with fields.
- * </p>
+ * <p> This is a test address with fields. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class AddressField {
-    public String street;
-    public String city;
-    public String state;
-    public String zipcode;
+  public String street;
+  public String city;
+  public String state;
+  public String zipcode;
 }

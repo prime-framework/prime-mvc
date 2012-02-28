@@ -23,20 +23,18 @@ import java.lang.annotation.Target;
 import org.primeframework.mvc.scope.RequestScope;
 
 /**
- * <p>
- * This annotation should be used to mark member fields of actions that should be
- * fetched and stored in the HttpServletRequest.
- * </p>
+ * <p> This annotation should be used to mark member fields of actions that should be fetched and stored in the
+ * HttpServletRequest. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @Retention(RetentionPolicy.RUNTIME)
 @ScopeAnnotation(RequestScope.class)
 @Target(ElementType.FIELD)
 public @interface Request {
-    /**
-     * @return  This attribute determines the name under which that the value is stored in the request.
-     *          The default name is the name of the field that the annotation is put on.
-     */
-    String value() default "##field-name##";
+  /**
+   * @return This attribute determines the name under which that the value is stored in the request. The default name is
+   *         the name of the field that the annotation is put on.
+   */
+  String value() default "##field-name##";
 }

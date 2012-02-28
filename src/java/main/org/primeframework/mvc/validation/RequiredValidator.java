@@ -22,34 +22,32 @@ import java.util.Map;
 import org.primeframework.mvc.validation.annotation.Required;
 
 /**
- * <p>
- * This class verifies that the value is not null.
- * </p>
+ * <p> This class verifies that the value is not null. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class RequiredValidator implements Validator<Required> {
-    /**
-     * @param   annotation Not used.
-     * @param   container Not used.
-     * @param   value The value to check.
-     * @return  True if the value is not null, false if it is null.
-     */
-    public boolean validate(Required annotation, Object container, Object value) {
-        if (value != null && value instanceof Collection) {
-            Collection c = (Collection) value;
-            return !c.isEmpty();
-        }
-
-        if (value != null && value instanceof Map) {
-            Map c = (Map) value;
-            return !c.isEmpty();
-        }
-
-        if (value != null && value.getClass().isArray()) {
-            return Array.getLength(value) > 0;
-        }
-
-        return value != null;
+  /**
+   * @param annotation Not used.
+   * @param container  Not used.
+   * @param value      The value to check.
+   * @return True if the value is not null, false if it is null.
+   */
+  public boolean validate(Required annotation, Object container, Object value) {
+    if (value != null && value instanceof Collection) {
+      Collection c = (Collection) value;
+      return !c.isEmpty();
     }
+
+    if (value != null && value instanceof Map) {
+      Map c = (Map) value;
+      return !c.isEmpty();
+    }
+
+    if (value != null && value.getClass().isArray()) {
+      return Array.getLength(value) > 0;
+    }
+
+    return value != null;
+  }
 }

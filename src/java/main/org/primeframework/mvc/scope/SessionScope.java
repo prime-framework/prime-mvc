@@ -23,54 +23,51 @@ import org.primeframework.mvc.scope.annotation.Session;
 import com.google.inject.Inject;
 
 /**
- * <p>
- * This is the request scope which fetches and stores values in the
- * HttpSession.
- * </p>
+ * <p> This is the request scope which fetches and stores values in the HttpSession. </p>
  *
  * @author Brian Pontarelli
  */
 public class SessionScope implements Scope<Session> {
-    private final HttpServletRequest request;
+  private final HttpServletRequest request;
 
-    @Inject
-    public SessionScope(HttpServletRequest request) {
-        this.request = request;
+  @Inject
+  public SessionScope(HttpServletRequest request) {
+    this.request = request;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public Object get(String fieldName, Session scope) {
+    HttpSession session = request.getSession(false);
+    if (session != null) {
+      String key = scope.value().equals("##field-name##") ? fieldName : scope.value();
+      return session.getAttribute(key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public Object get(String fieldName, Session scope) {
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-            String key = scope.value().equals("##field-name##") ? fieldName : scope.value();
-            return session.getAttribute(key);
-        }
+    return null;
+  }
 
-        return null;
+  /**
+   * {@inheritDoc}
+   */
+  public void set(String fieldName, Object value, Session scope) {
+    HttpSession session;
+    if (value != null) {
+      session = request.getSession(true);
+    } else {
+      session = request.getSession(false);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void set(String fieldName, Object value, Session scope) {
-        HttpSession session;
-        if (value != null) {
-            session = request.getSession(true);
-        } else {
-            session = request.getSession(false);
-        }
-
-        if (session == null) {
-            return;
-        }
-
-        String key = scope.value().equals("##field-name##") ? fieldName : scope.value();
-        if (value != null) {
-            session.setAttribute(key, value);
-        } else {
-            session.removeAttribute(key);
-        }
+    if (session == null) {
+      return;
     }
+
+    String key = scope.value().equals("##field-name##") ? fieldName : scope.value();
+    if (value != null) {
+      session.setAttribute(key, value);
+    } else {
+      session.removeAttribute(key);
+    }
+  }
 }

@@ -15,44 +15,43 @@
  */
 package org.primeframework.mvc.action;
 
-import java.io.IOException;
 import javax.servlet.ServletException;
+import java.io.IOException;
 
 import org.primeframework.mvc.action.annotation.ActionPrepareMethod;
+import org.primeframework.mvc.servlet.WorkflowChain;
 import org.primeframework.mvc.util.MethodTools;
-import org.primeframework.servlet.WorkflowChain;
 
 import com.google.inject.Inject;
 
 /**
- * <p>
- * This implements the action prepare workflow and invokes any method that
- * is annotated with the @PrepareMethod annotation.
- * </p>
+ * <p> This implements the action prepare workflow and invokes any method that is annotated with the @PrepareMethod
+ * annotation. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class DefaultActionPrepareWorkflow implements ActionPrepareWorkflow {
-    private final ActionInvocationStore actionInvocationStore;
+  private final ActionInvocationStore actionInvocationStore;
 
-    @Inject
-    public DefaultActionPrepareWorkflow(ActionInvocationStore actionInvocationStore) {
-        this.actionInvocationStore = actionInvocationStore;
+  @Inject
+  public DefaultActionPrepareWorkflow(ActionInvocationStore actionInvocationStore) {
+    this.actionInvocationStore = actionInvocationStore;
+  }
+
+  /**
+   * Calls any method annotated with the {@link org.primeframework.mvc.action.annotation.ActionPrepareMethod}
+   * annotation.
+   *
+   * @param workflowChain The workflow chain that is called after preparation.
+   * @throws IOException      If the chain throws.
+   * @throws ServletException If the chain throws.
+   */
+  public void perform(WorkflowChain workflowChain) throws IOException, ServletException {
+    Object action = actionInvocationStore.getCurrent().action();
+    if (action != null) {
+      MethodTools.invokeAllWithAnnotation(action, ActionPrepareMethod.class);
     }
 
-    /**
-     * Calls any method annotated with the {@link org.primeframework.mvc.action.annotation.ActionPrepareMethod} annotation.
-     *
-     * @param   workflowChain The workflow chain that is called after preparation.
-     * @throws  IOException If the chain throws.
-     * @throws  ServletException If the chain throws.
-     */
-    public void perform(WorkflowChain workflowChain) throws IOException, ServletException {
-        Object action = actionInvocationStore.getCurrent().action();
-        if (action != null) {
-            MethodTools.invokeAllWithAnnotation(action, ActionPrepareMethod.class);
-        }
-
-        workflowChain.continueWorkflow();
-    }
+    workflowChain.continueWorkflow();
+  }
 }

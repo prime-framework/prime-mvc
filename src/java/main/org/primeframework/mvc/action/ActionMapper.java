@@ -18,22 +18,19 @@ package org.primeframework.mvc.action;
 import com.google.inject.ImplementedBy;
 
 /**
- * <p>
- * This interface defines the method that maps URIs to actions.
- * </p>
+ * <p> This interface defines the method that maps URIs to actions. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @ImplementedBy(DefaultActionMapper.class)
 public interface ActionMapper {
-    /**
-     * Maps the given URI to an action invocation.
-     *
-     * @param   uri The URI.
-     * @param   executeResult This flag is set into the ActionInvocation to control whether or not
-     *          the result is executed or not.
-     * @return  The action invocation and never null. This invocation might be a redirect for index
-     *          handling.
-     */
-    ActionInvocation map(String uri, boolean executeResult);
+  /**
+   * Maps the given URI to an action invocation.
+   *
+   * @param uri           The URI.
+   * @param executeResult This flag is set into the ActionInvocation to control whether or not the result is executed or
+   *                      not.
+   * @return The action invocation and never null. This invocation might be a redirect for index handling.
+   */
+  ActionInvocation map(String uri, boolean executeResult);
 }

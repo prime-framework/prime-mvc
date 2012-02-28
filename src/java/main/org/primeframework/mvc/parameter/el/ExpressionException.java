@@ -16,26 +16,24 @@
 package org.primeframework.mvc.parameter.el;
 
 /**
- * <p>
- * This is an exception that is thrown when expression processing fails.
- * </p>
+ * <p> This is an exception that is thrown when expression processing fails. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class ExpressionException extends RuntimeException {
-    public ExpressionException() {
-        super();
-    }
+  public ExpressionException() {
+    super();
+  }
 
-    public ExpressionException(String message) {
-        super(message);
-    }
+  public ExpressionException(String message) {
+    super(message);
+  }
 
-    public ExpressionException(String message, Throwable cause) {
-        super(message, cause);
-    }
+  public ExpressionException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
-    public ExpressionException(Throwable cause) {
-        super(cause);
-    }
+  public ExpressionException(Throwable cause) {
+    super(cause);
+  }
 }

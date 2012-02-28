@@ -15,17 +15,15 @@
  */
 package org.primeframework.mvc.result.form.annotation;
 
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.lang.annotation.ElementType;
 
 /**
- * <p>
- * This annotation defines a method that is a form preparer.
- * </p>
+ * <p> This annotation defines a method that is a form preparer. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

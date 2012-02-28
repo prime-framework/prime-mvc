@@ -23,20 +23,18 @@ import java.lang.annotation.Target;
 import org.primeframework.mvc.scope.SessionScope;
 
 /**
- * <p>
- * This annotation should be used to mark member fields of actions that should be
- * fetched and stored in the HttpSession.
- * </p>
+ * <p> This annotation should be used to mark member fields of actions that should be fetched and stored in the
+ * HttpSession. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @Retention(RetentionPolicy.RUNTIME)
 @ScopeAnnotation(SessionScope.class)
 @Target(ElementType.FIELD)
 public @interface Session {
-    /**
-     * @return  This attribute determines the name under which that the value is stored in the session.
-     *          The default name is the name of the field that the annotation is put on.
-     */
-    String value() default "##field-name##";
+  /**
+   * @return This attribute determines the name under which that the value is stored in the session. The default name is
+   *         the name of the field that the annotation is put on.
+   */
+  String value() default "##field-name##";
 }

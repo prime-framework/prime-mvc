@@ -23,41 +23,37 @@ import java.lang.annotation.Target;
 import org.primeframework.mvc.validation.MinMaxLengthValidator;
 
 /**
- * <p>
- * This class can be used to annotation fields such that the field is
- * validated to ensure that the length of a value is within the bounds
- * set in the annotation. This will work on Strings and check the length
- * of the String, Collections and check the size of the collection,
- * Maps and check the size of the Map, and arrays and check the length of
- * the array.
- * </p>
+ * <p> This class can be used to annotation fields such that the field is validated to ensure that the length of a value
+ * is within the bounds set in the annotation. This will work on Strings and check the length of the String, Collections
+ * and check the size of the collection, Maps and check the size of the Map, and arrays and check the length of the
+ * array. </p>
  *
- * @author  Chadwick K. Boggs
+ * @author Chadwick K. Boggs
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 @ValidatorAnnotation(MinMaxLengthValidator.class)
 public @interface MinMaxLength {
-    /**
-     * @return  Sets the min length for the field. This defaults to 0.
-     */
-    int min() default 0;
+  /**
+   * @return Sets the min length for the field. This defaults to 0.
+   */
+  int min() default 0;
 
-    /**
-     * @return  Sets the max length for the field. This defaults to Integer.MAX_VALUE.
-     */
-    int max() default Integer.MAX_VALUE;
+  /**
+   * @return Sets the max length for the field. This defaults to Integer.MAX_VALUE.
+   */
+  int max() default Integer.MAX_VALUE;
 
-    /**
-     * @return  The message key that is used if the field is null. The default is based on the fields
-     *          fully qualified name in the current parameters and the String <code>minmaxlength</code>
-     *          is appended to that. For example: <code>user.description.minmaxlength</code>.
-     */
-    String key() default "";
+  /**
+   * @return The message key that is used if the field is null. The default is based on the fields fully qualified name
+   *         in the current parameters and the String <code>minmaxlength</code> is appended to that. For example:
+   *         <code>user.description.minmaxlength</code>.
+   */
+  String key() default "";
 
-    /**
-     * @return  The validation groups that this validation will be run in. Groups are specified in
-     *          an action and can control how validation is performed. This defaults to all groups.
-     */
-    String[] groups() default {};
+  /**
+   * @return The validation groups that this validation will be run in. Groups are specified in an action and can
+   *         control how validation is performed. This defaults to all groups.
+   */
+  String[] groups() default {};
 }

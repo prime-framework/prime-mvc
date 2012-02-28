@@ -26,188 +26,186 @@ import org.primeframework.mvc.validation.annotation.Required;
 import org.primeframework.mvc.validation.annotation.ValidMap;
 
 /**
- * <p>
- * This is a test user.
- * </p>
+ * <p> This is a test user. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class User {
-    @Required
-    private String name;
-    @Required
-    private Integer age;
-    private boolean male;
-    @ValidMap(keys = {"home", "work"})
-    private Map<String, Address> addresses = new HashMap<String, Address>();
-    private List<User> siblings = new ArrayList<User>();
-    @Required
-    private String[] securityQuestions;
+  @Required
+  private String name;
+  @Required
+  private Integer age;
+  private boolean male;
+  @ValidMap(keys = {"home", "work"})
+  private Map<String, Address> addresses = new HashMap<String, Address>();
+  private List<User> siblings = new ArrayList<User>();
+  @Required
+  private String[] securityQuestions;
 
-    private int month;
-    private int year;
-    private File profile;
-    private String password;
+  private int month;
+  private int year;
+  private File profile;
+  private String password;
 
-    private int[] intIDs;
-    private Set<String> setIDs;
-    private List<Integer> listIDs;
-    private Boolean maleWrapper;
+  private int[] intIDs;
+  private Set<String> setIDs;
+  private List<Integer> listIDs;
+  private Boolean maleWrapper;
 
-    private boolean active;
+  private boolean active;
 
-    private Map<Integer, Integer> ids = new HashMap<Integer, Integer>();
+  private Map<Integer, Integer> ids = new HashMap<Integer, Integer>();
 
-    public String getName() {
-        return name;
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public Integer getAge() {
+    return age;
+  }
+
+  public void setAge(Integer age) {
+    this.age = age;
+  }
+
+  public boolean isMale() {
+    return male;
+  }
+
+  public void setMale(boolean male) {
+    this.male = male;
+  }
+
+  public Map<String, Address> getAddresses() {
+    return addresses;
+  }
+
+  public Address getAddress(String type) {
+    return addresses.get(type);
+  }
+
+  public void setAddresses(Map<String, Address> addresses) {
+    this.addresses = addresses;
+  }
+
+  public void setAddress(String type, Address address) {
+    this.addresses.put(type, address);
+  }
+
+  public List<User> getSiblings() {
+    return siblings;
+  }
+
+  public User getSibling(int index) {
+    if (index >= this.siblings.size()) {
+      return null;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    return siblings.get(index);
+  }
 
-    public Integer getAge() {
-        return age;
-    }
+  public void setSiblings(List<User> siblings) {
+    this.siblings = siblings;
+  }
 
-    public void setAge(Integer age) {
-        this.age = age;
+  public void setSibling(int index, User sibling) {
+    if (index >= this.siblings.size()) {
+      for (int i = this.siblings.size(); i <= index; i++) {
+        this.siblings.add(null);
+      }
     }
+    this.siblings.set(index, sibling);
+  }
 
-    public boolean isMale() {
-        return male;
-    }
+  public String[] getSecurityQuestions() {
+    return securityQuestions;
+  }
 
-    public void setMale(boolean male) {
-        this.male = male;
-    }
+  public void setSecurityQuestions(String[] securityQuestions) {
+    this.securityQuestions = securityQuestions;
+  }
 
-    public Map<String, Address> getAddresses() {
-        return addresses;
-    }
+  public boolean isActive() {
+    return active;
+  }
 
-    public Address getAddress(String type) {
-        return addresses.get(type);
-    }
+  public void setActive(boolean active) {
+    this.active = active;
+  }
 
-    public void setAddresses(Map<String, Address> addresses) {
-        this.addresses = addresses;
-    }
+  public int[] getIntIDs() {
+    return intIDs;
+  }
 
-    public void setAddress(String type, Address address) {
-        this.addresses.put(type, address);
-    }
+  public void setIntIDs(int[] intIDs) {
+    this.intIDs = intIDs;
+  }
 
-    public List<User> getSiblings() {
-        return siblings;
-    }
+  public Set<String> getSetIDs() {
+    return setIDs;
+  }
 
-    public User getSibling(int index) {
-        if (index >= this.siblings.size()) {
-            return null;
-        }
+  public void setSetIDs(Set<String> setIDs) {
+    this.setIDs = setIDs;
+  }
 
-        return siblings.get(index);
-    }
+  public List<Integer> getListIDs() {
+    return listIDs;
+  }
 
-    public void setSiblings(List<User> siblings) {
-        this.siblings = siblings;
-    }
+  public void setListIDs(List<Integer> listIDs) {
+    this.listIDs = listIDs;
+  }
 
-    public void setSibling(int index, User sibling) {
-        if (index >= this.siblings.size()) {
-            for (int i = this.siblings.size(); i <= index; i++) {
-                this.siblings.add(null);
-            }
-        }
-        this.siblings.set(index, sibling);
-    }
+  public Boolean getMaleWrapper() {
+    return maleWrapper;
+  }
 
-    public String[] getSecurityQuestions() {
-        return securityQuestions;
-    }
+  public void setMaleWrapper(Boolean maleWrapper) {
+    this.maleWrapper = maleWrapper;
+  }
 
-    public void setSecurityQuestions(String[] securityQuestions) {
-        this.securityQuestions = securityQuestions;
-    }
+  public File getProfile() {
+    return profile;
+  }
 
-    public boolean isActive() {
-        return active;
-    }
+  public void setProfile(File profile) {
+    this.profile = profile;
+  }
 
-    public void setActive(boolean active) {
-        this.active = active;
-    }
+  public int getMonth() {
+    return month;
+  }
 
-    public int[] getIntIDs() {
-        return intIDs;
-    }
+  public void setMonth(int month) {
+    this.month = month;
+  }
 
-    public void setIntIDs(int[] intIDs) {
-        this.intIDs = intIDs;
-    }
+  public String getPassword() {
+    return password;
+  }
 
-    public Set<String> getSetIDs() {
-        return setIDs;
-    }
+  public void setPassword(String password) {
+    this.password = password;
+  }
 
-    public void setSetIDs(Set<String> setIDs) {
-        this.setIDs = setIDs;
-    }
+  public int getYear() {
+    return year;
+  }
 
-    public List<Integer> getListIDs() {
-        return listIDs;
-    }
+  public void setYear(int year) {
+    this.year = year;
+  }
 
-    public void setListIDs(List<Integer> listIDs) {
-        this.listIDs = listIDs;
-    }
+  public Map<Integer, Integer> getIds() {
+    return ids;
+  }
 
-    public Boolean getMaleWrapper() {
-        return maleWrapper;
-    }
-
-    public void setMaleWrapper(Boolean maleWrapper) {
-        this.maleWrapper = maleWrapper;
-    }
-
-    public File getProfile() {
-        return profile;
-    }
-
-    public void setProfile(File profile) {
-        this.profile = profile;
-    }
-
-    public int getMonth() {
-        return month;
-    }
-
-    public void setMonth(int month) {
-        this.month = month;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public int getYear() {
-        return year;
-    }
-
-    public void setYear(int year) {
-        this.year = year;
-    }
-
-    public Map<Integer, Integer> getIds() {
-        return ids;
-    }
-
-    public void setIds(Map<Integer, Integer> ids) {
-        this.ids = ids;
-    }
+  public void setIds(Map<Integer, Integer> ids) {
+    this.ids = ids;
+  }
 }

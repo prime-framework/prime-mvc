@@ -18,53 +18,51 @@ package org.primeframework.mvc.result.form.jsp;
 import org.primeframework.mvc.result.form.control.CountriesSelect;
 
 /**
- * <p>
- * This class is the JSP taglib for the countries select control.
- * </p>
+ * <p> This class is the JSP taglib for the countries select control. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class CountriesSelectTag extends SelectTag<CountriesSelect> {
-    /**
-     * Retrieves the tags includeBlank attribute
-     *
-     * @return	Returns the tags includeBlank attribute
-     */
-    public Boolean getIncludeBlank() {
-        return (Boolean) attributes.get("includeBlank");
-    }
+  /**
+   * Retrieves the tags includeBlank attribute
+   *
+   * @return Returns the tags includeBlank attribute
+   */
+  public Boolean getIncludeBlank() {
+    return (Boolean) attributes.get("includeBlank");
+  }
 
-    /**
-     * Populates the tags includeBlank attribute
-     *
-     * @param	includeBlank The value of the tags includeBlank attribute
-     */
-    public void setIncludeBlank(Boolean includeBlank) {
-        attributes.put("includeBlank", includeBlank);
-    }
+  /**
+   * Populates the tags includeBlank attribute
+   *
+   * @param includeBlank The value of the tags includeBlank attribute
+   */
+  public void setIncludeBlank(Boolean includeBlank) {
+    attributes.put("includeBlank", includeBlank);
+  }
 
-    /**
-     * Retrieves the tags preferredCodes attribute
-     *
-     * @return	Returns the tags preferredCodes attribute
-     */
-    public String getPreferredCodes() {
-        return (String) attributes.get("preferredCodes");
-    }
+  /**
+   * Retrieves the tags preferredCodes attribute
+   *
+   * @return Returns the tags preferredCodes attribute
+   */
+  public String getPreferredCodes() {
+    return (String) attributes.get("preferredCodes");
+  }
 
-    /**
-     * Populates the tags preferredCodes attribute
-     *
-     * @param	preferredCodes The value of the tags preferredCodes attribute
-     */
-    public void setPreferredCodes(String preferredCodes) {
-        attributes.put("preferredCodes", preferredCodes);
-    }
+  /**
+   * Populates the tags preferredCodes attribute
+   *
+   * @param preferredCodes The value of the tags preferredCodes attribute
+   */
+  public void setPreferredCodes(String preferredCodes) {
+    attributes.put("preferredCodes", preferredCodes);
+  }
 
-    /**
-     * @return  The {@link CountriesSelect} class.
-     */
-    protected Class<CountriesSelect> controlClass() {
-        return CountriesSelect.class;
-    }
+  /**
+   * @return The {@link CountriesSelect} class.
+   */
+  protected Class<CountriesSelect> controlClass() {
+    return CountriesSelect.class;
+  }
 }

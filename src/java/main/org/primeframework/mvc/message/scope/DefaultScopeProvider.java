@@ -23,37 +23,35 @@ import org.primeframework.mvc.ObjectFactory;
 import com.google.inject.Inject;
 
 /**
- * <p>
- * This class implements the scope provider interface.
- * </p>
+ * <p> This class implements the scope provider interface. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class DefaultScopeProvider implements ScopeProvider {
-    private final ObjectFactory objectFactory;
+  private final ObjectFactory objectFactory;
 
-    @Inject
-    public DefaultScopeProvider(ObjectFactory objectFactory) {
-        this.objectFactory = objectFactory;
+  @Inject
+  public DefaultScopeProvider(ObjectFactory objectFactory) {
+    this.objectFactory = objectFactory;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public Scope lookup(MessageScope scope) {
+    return objectFactory.create(scope.getType());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public List<Scope> getAllScopes() {
+    MessageScope[] scopes = MessageScope.values();
+    List<Scope> result = new ArrayList<Scope>();
+    for (MessageScope scope : scopes) {
+      result.add(lookup(scope));
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public Scope lookup(MessageScope scope) {
-        return objectFactory.create(scope.getType());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public List<Scope> getAllScopes() {
-        MessageScope[] scopes = MessageScope.values();
-        List<Scope> result = new ArrayList<Scope>();
-        for (MessageScope scope : scopes) {
-            result.add(lookup(scope));
-        }
-
-        return result;
-    }
+    return result;
+  }
 }

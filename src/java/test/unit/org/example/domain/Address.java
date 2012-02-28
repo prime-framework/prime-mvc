@@ -18,61 +18,59 @@ package org.example.domain;
 import org.primeframework.mvc.validation.annotation.Required;
 
 /**
- * <p>
- * This is a test address.
- * </p>
+ * <p> This is a test address. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class Address {
-    @Required
-    private String street;
-    @Required
-    private String city;
-    @State
-    private String state;
-    @Zipcode
-    private String zipcode;
-    @Required
-    private String country;
+  @Required
+  private String street;
+  @Required
+  private String city;
+  @State
+  private String state;
+  @Zipcode
+  private String zipcode;
+  @Required
+  private String country;
 
-    public String getStreet() {
-        return street;
-    }
+  public String getStreet() {
+    return street;
+  }
 
-    public void setStreet(String street) {
-        this.street = street;
-    }
+  public void setStreet(String street) {
+    this.street = street;
+  }
 
-    public String getCity() {
-        return city;
-    }
+  public String getCity() {
+    return city;
+  }
 
-    public void setCity(String city) {
-        this.city = city;
-    }
+  public void setCity(String city) {
+    this.city = city;
+  }
 
-    public String getState() {
-        return state;
-    }
+  public String getState() {
+    return state;
+  }
 
-    public void setState(String state) {
-        this.state = state;
-    }
+  public void setState(String state) {
+    this.state = state;
+  }
 
-    public String getZipcode() {
-        return zipcode;
-    }
+  public String getZipcode() {
+    return zipcode;
+  }
 
-    public void setZipcode(String zipcode) {
-        this.zipcode = zipcode;
-    }
+  public void setZipcode(String zipcode) {
+    this.zipcode = zipcode;
+  }
 
-    public String getCountry() {
-        return country;
-    }
+  public String getCountry() {
+    return country;
+  }
 
-    public void setCountry(String country) {
-        this.country = country;
-    }
+  public void setCountry(String country) {
+    this.country = country;
+  }
 }

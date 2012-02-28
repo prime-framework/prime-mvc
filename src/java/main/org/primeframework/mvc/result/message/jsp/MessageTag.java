@@ -15,40 +15,38 @@
  */
 package org.primeframework.mvc.result.message.jsp;
 
+import org.primeframework.mvc.l10n.MessageProvider;
 import org.primeframework.mvc.result.jsp.AbstractControlTag;
 import org.primeframework.mvc.result.message.control.Message;
 
 /**
- * <p>
- * This class is a JSP taglib that can retrieve messages from the
- * {@link org.primeframework.l10n.MessageProvider} and output them.
- * </p>
+ * <p> This class is a JSP taglib that can retrieve messages from the {@link MessageProvider} and output them. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class MessageTag extends AbstractControlTag<Message> {
 
-    /**
-     * @return  The tags key attribute that is the key of the message to fetch.
-     */
-    public String getKey() {
-        return (String) attributes.get("key");
-    }
+  /**
+   * @return The tags key attribute that is the key of the message to fetch.
+   */
+  public String getKey() {
+    return (String) attributes.get("key");
+  }
 
-    /**
-     * Populates the tags key attribute that is the key of the message to fetch.
-     *
-     * @param	key The key.
-     */
-    public void setKey(String key) {
-        attributes.put("key", key);
-    }
+  /**
+   * Populates the tags key attribute that is the key of the message to fetch.
+   *
+   * @param key The key.
+   */
+  public void setKey(String key) {
+    attributes.put("key", key);
+  }
 
-    /**
-     * @return  Message.class
-     */
-    @Override
-    protected Class<Message> controlClass() {
-        return Message.class;
-    }
+  /**
+   * @return Message.class
+   */
+  @Override
+  protected Class<Message> controlClass() {
+    return Message.class;
+  }
 }

@@ -25,48 +25,46 @@ import com.google.inject.Inject;
 import static net.java.util.CollectionTools.*;
 
 /**
- * <p>
- * This class tests the action messages control.
- * </p>
+ * <p> This class tests the action messages control. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class ActionMessagesTest extends ControlBaseTest {
-    @Inject ActionMessages actionMessages;
+  @Inject ActionMessages actionMessages;
 
-    @Test
-    public void testActionMessages() {
-        Edit action = new Edit();
+  @Test
+  public void testActionMessages() {
+    Edit action = new Edit();
 
-        ais.setCurrent(new DefaultActionInvocation(action, "/user/edit", null, null));
+    ais.setCurrent(new DefaultActionInvocation(action, "/user/edit", null, null));
 
-        messageStore.addActionMessage(MessageScope.REQUEST, "actionError1");
-        messageStore.addActionMessage(MessageScope.REQUEST, "actionError2");
+    messageStore.addActionMessage(MessageScope.REQUEST, "actionError1");
+    messageStore.addActionMessage(MessageScope.REQUEST, "actionError2");
 
-        run(actionMessages,
-            mapNV("errors", false),
-            null, "<ul class=\"action-messages\">\n" +
-            "  <li class=\"action-message\">error1</li>\n" +
-            "  <li class=\"action-message\">error2</li>\n" +
-            "</ul>\n"
-        );
-    }
+    run(actionMessages,
+      mapNV("errors", false),
+      null, "<ul class=\"action-messages\">\n" +
+      "  <li class=\"action-message\">error1</li>\n" +
+      "  <li class=\"action-message\">error2</li>\n" +
+      "</ul>\n"
+    );
+  }
 
-    @Test
-    public void testActionMessageError() {
-        Edit action = new Edit();
+  @Test
+  public void testActionMessageError() {
+    Edit action = new Edit();
 
-        ais.setCurrent(new DefaultActionInvocation(action, "/user/edit", null, null));
+    ais.setCurrent(new DefaultActionInvocation(action, "/user/edit", null, null));
 
-        messageStore.addActionError(MessageScope.REQUEST, "actionError1");
-        messageStore.addActionError(MessageScope.REQUEST, "actionError2");
+    messageStore.addActionError(MessageScope.REQUEST, "actionError1");
+    messageStore.addActionError(MessageScope.REQUEST, "actionError2");
 
-        run(actionMessages,
-            mapNV("errors", true),
-            null, "<ul class=\"action-errors\">\n" +
-            "  <li class=\"action-error\">error1</li>\n" +
-            "  <li class=\"action-error\">error2</li>\n" +
-            "</ul>\n"
-        );
-    }
+    run(actionMessages,
+      mapNV("errors", true),
+      null, "<ul class=\"action-errors\">\n" +
+      "  <li class=\"action-error\">error1</li>\n" +
+      "  <li class=\"action-error\">error2</li>\n" +
+      "</ul>\n"
+    );
+  }
 }

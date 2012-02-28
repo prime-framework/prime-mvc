@@ -15,38 +15,37 @@
  */
 package org.primeframework.mvc.action;
 
-import java.io.IOException;
 import javax.servlet.ServletException;
+import java.io.IOException;
 
 import org.easymock.EasyMock;
 import org.example.action.user.Edit;
-import org.primeframework.servlet.WorkflowChain;
-import org.primeframework.test.JCatapultBaseTest;
-import static org.testng.Assert.*;
+import org.primeframework.mvc.servlet.WorkflowChain;
+import org.primeframework.mvc.test.JCatapultBaseTest;
 import org.testng.annotations.Test;
 
+import static org.testng.Assert.*;
+
 /**
- * <p>
- * This class tests the default action prepare workflow.
- * </p>
+ * <p> This class tests the default action prepare workflow. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class DefaultActionPrepareWorkflowTest extends JCatapultBaseTest {
-    @Test
-    public void testPrepare() throws IOException, ServletException {
-        Edit edit = new Edit();
-        ActionInvocationStore store = EasyMock.createStrictMock(ActionInvocationStore.class);
-        EasyMock.expect(store.getCurrent()).andReturn(new DefaultActionInvocation(edit, "/foo", null, null));
-        EasyMock.replay(store);
+  @Test
+  public void testPrepare() throws IOException, ServletException {
+    Edit edit = new Edit();
+    ActionInvocationStore store = EasyMock.createStrictMock(ActionInvocationStore.class);
+    EasyMock.expect(store.getCurrent()).andReturn(new DefaultActionInvocation(edit, "/foo", null, null));
+    EasyMock.replay(store);
 
-        WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);
-        chain.continueWorkflow();
-        EasyMock.replay(chain);
+    WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);
+    chain.continueWorkflow();
+    EasyMock.replay(chain);
 
-        DefaultActionPrepareWorkflow workflow = new DefaultActionPrepareWorkflow(store);
-        workflow.perform(chain);
+    DefaultActionPrepareWorkflow workflow = new DefaultActionPrepareWorkflow(store);
+    workflow.perform(chain);
 
-        assertTrue(edit.actionPrepared);
-    }
+    assertTrue(edit.actionPrepared);
+  }
 }

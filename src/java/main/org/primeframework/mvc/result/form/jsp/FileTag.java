@@ -18,35 +18,33 @@ package org.primeframework.mvc.result.form.jsp;
 import org.primeframework.mvc.result.form.control.File;
 
 /**
- * <p>
- * This class is the JSP taglib for the file control.
- * </p>
+ * <p> This class is the JSP taglib for the file control. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class FileTag extends AbstractInputTag<File> {
-    /**
-     * Retrieves the tags accept attribute
-     *
-     * @return	Returns the tags accept attribute
-     */
-    public String getAccept() {
-        return (String) attributes.get("accept");
-    }
+  /**
+   * Retrieves the tags accept attribute
+   *
+   * @return Returns the tags accept attribute
+   */
+  public String getAccept() {
+    return (String) attributes.get("accept");
+  }
 
-    /**
-     * Populates the tags accept attribute
-     *
-     * @param	accept The value of the tags accept attribute
-     */
-    public void setAccept(String accept) {
-        attributes.put("accept", accept);
-    }
+  /**
+   * Populates the tags accept attribute
+   *
+   * @param accept The value of the tags accept attribute
+   */
+  public void setAccept(String accept) {
+    attributes.put("accept", accept);
+  }
 
-    /**
-     * @return  The {@link File} class.
-     */
-    protected Class<File> controlClass() {
-        return File.class;
-    }
+  /**
+   * @return The {@link File} class.
+   */
+  protected Class<File> controlClass() {
+    return File.class;
+  }
 }

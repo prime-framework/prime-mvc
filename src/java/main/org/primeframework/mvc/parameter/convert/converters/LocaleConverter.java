@@ -23,54 +23,53 @@ import org.primeframework.mvc.parameter.convert.AbstractGlobalConverter;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.convert.annotation.GlobalConverter;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
 import net.java.lang.StringTools;
 
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
+
 /**
- * <p>
- * This converts to and from Locales.
- * </p>
+ * <p> This converts to and from Locales. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @GlobalConverter(forTypes = {Locale.class})
 @SuppressWarnings("unchecked")
 public class LocaleConverter extends AbstractGlobalConverter {
-    private boolean emptyIsNull = true;
+  private boolean emptyIsNull = true;
 
-    @Inject(optional = true)
-    public void setEmptyStringIsNull(@Named("jcatapult.mvc.emptyStringIsNull") boolean emptyIsNull) {
-        this.emptyIsNull = emptyIsNull;
-    }
+  @Inject(optional = true)
+  public void setEmptyStringIsNull(@Named("jcatapult.mvc.emptyStringIsNull") boolean emptyIsNull) {
+    this.emptyIsNull = emptyIsNull;
+  }
 
-    protected Object stringToObject(String value, Type convertTo, Map<String, String> attributes, String expression)
+  protected Object stringToObject(String value, Type convertTo, Map<String, String> attributes, String expression)
     throws org.primeframework.mvc.parameter.convert.ConversionException, ConverterStateException {
-        if (emptyIsNull && StringTools.isTrimmedEmpty(value)) {
-            return null;
-        }
-
-        String[] parts = value.split("_");
-        return toLocale(parts);
+    if (emptyIsNull && StringTools.isTrimmedEmpty(value)) {
+      return null;
     }
 
-    protected Object stringsToObject(String[] values, Type convertTo, Map<String, String> attributes, String expression)
+    String[] parts = value.split("_");
+    return toLocale(parts);
+  }
+
+  protected Object stringsToObject(String[] values, Type convertTo, Map<String, String> attributes, String expression)
     throws org.primeframework.mvc.parameter.convert.ConversionException, ConverterStateException {
-        return toLocale(values);
-    }
+    return toLocale(values);
+  }
 
-    protected String objectToString(Object value, Type convertFrom, Map<String, String> attributes, String expression)
+  protected String objectToString(Object value, Type convertFrom, Map<String, String> attributes, String expression)
     throws org.primeframework.mvc.parameter.convert.ConversionException, ConverterStateException {
-        return value.toString();
+    return value.toString();
+  }
+
+  private Locale toLocale(String[] parts) {
+    if (parts.length == 1) {
+      return new Locale(parts[0]);
+    } else if (parts.length == 2) {
+      return new Locale(parts[0], parts[1]);
     }
 
-    private Locale toLocale(String[] parts) {
-        if (parts.length == 1) {
-            return new Locale(parts[0]);
-        } else if (parts.length == 2) {
-            return new Locale(parts[0], parts[1]);
-        }
-
-        return new Locale(parts[0], parts[1], parts[2]);
-    }
+    return new Locale(parts[0], parts[1], parts[2]);
+  }
 }

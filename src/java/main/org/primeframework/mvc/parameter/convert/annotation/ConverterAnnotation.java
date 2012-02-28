@@ -23,20 +23,17 @@ import java.lang.annotation.Target;
 import org.primeframework.mvc.parameter.convert.AnnotationConverter;
 
 /**
- * <p>
- * This annotation marks an annotation type as a converter annotation.
- * This allows JCatapult to determine the class that will perform the
- * conversion for the field that the converter annotation is placed on.
- * </p>
+ * <p> This annotation marks an annotation type as a converter annotation. This allows JCatapult to determine the class
+ * that will perform the conversion for the field that the converter annotation is placed on. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.ANNOTATION_TYPE)
 public @interface ConverterAnnotation {
-    /**
-     * @return  The Converter class that will perform the conversion for the conversion annotation
-     *          that this annotation is placed on.
-     */
-    Class<? extends AnnotationConverter> value();
+  /**
+   * @return The Converter class that will perform the conversion for the conversion annotation that this annotation is
+   *         placed on.
+   */
+  Class<? extends AnnotationConverter> value();
 }

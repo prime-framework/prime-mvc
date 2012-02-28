@@ -18,17 +18,15 @@ package org.primeframework.mvc.result.form.jsp;
 import org.primeframework.mvc.result.form.control.Submit;
 
 /**
- * <p>
- * This class is the JSP taglib for the submit control.
- * </p>
+ * <p> This class is the JSP taglib for the submit control. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class SubmitTag extends AbstractInputTag<Submit> {
-    /**
-     * @return  The {@link Submit} class.
-     */
-    protected Class<Submit> controlClass() {
-        return Submit.class;
-    }
+  /**
+   * @return The {@link Submit} class.
+   */
+  protected Class<Submit> controlClass() {
+    return Submit.class;
+  }
 }

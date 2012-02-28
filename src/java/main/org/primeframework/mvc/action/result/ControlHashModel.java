@@ -22,68 +22,67 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.primeframework.mvc.ObjectFactory;
+import org.primeframework.mvc.freemarker.FieldSupportBeansWrapper;
+import org.primeframework.mvc.result.control.Control;
+import org.primeframework.mvc.result.control.FreeMarkerControlProxy;
+
 import freemarker.ext.beans.CollectionModel;
 import freemarker.template.TemplateCollectionModel;
 import freemarker.template.TemplateHashModelEx;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
-import org.primeframework.freemarker.FieldSupportBeansWrapper;
-import org.primeframework.mvc.ObjectFactory;
-import org.primeframework.mvc.result.control.Control;
-import org.primeframework.mvc.result.control.FreeMarkerControlProxy;
 
 /**
- * <p>
- * This class is a hash that stores the {@link Control} classes so that they
- * can be used from the FreeMarker templates.
- * </p>
+ * <p> This class is a hash that stores the {@link Control} classes so that they can be used from the FreeMarker
+ * templates. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class ControlHashModel implements TemplateHashModelEx {
-    private final ObjectFactory objectFactory;
-    private final Map<String, Class<? extends Control>> controls;
+  private final ObjectFactory objectFactory;
+  private final Map<String, Class<? extends Control>> controls;
 
-    public ControlHashModel(ObjectFactory objectFactory, Map<String, Class<? extends Control>> controls) {
-        this.objectFactory = objectFactory;
-        this.controls = controls;
+  public ControlHashModel(ObjectFactory objectFactory, Map<String, Class<? extends Control>> controls) {
+    this.objectFactory = objectFactory;
+    this.controls = controls;
+  }
+
+  public TemplateCollectionModel keys() throws TemplateModelException {
+    return new CollectionModel(keySet(), FieldSupportBeansWrapper.INSTANCE);
+  }
+
+  public int size() {
+    return controls.size();
+  }
+
+  public boolean isEmpty() {
+    return controls.isEmpty();
+  }
+
+  public TemplateModel get(String key) {
+    Class<? extends Control> type = controls.get(key);
+    if (type != null) {
+      return new FreeMarkerControlProxy(objectFactory.create(type));
     }
 
-    public TemplateCollectionModel keys() throws TemplateModelException {
-        return new CollectionModel(keySet(), FieldSupportBeansWrapper.INSTANCE);
+    return null;
+  }
+
+  public TemplateCollectionModel values() {
+    return new CollectionModel(valueCollection(), FieldSupportBeansWrapper.INSTANCE);
+  }
+
+  public Set<String> keySet() {
+    return new HashSet<String>(controls.keySet());
+  }
+
+  public Collection<?> valueCollection() {
+    List<TemplateModel> all = new ArrayList<TemplateModel>();
+    for (String name : controls.keySet()) {
+      all.add(new FreeMarkerControlProxy(objectFactory.create(controls.get(name))));
     }
 
-    public int size() {
-        return controls.size();
-    }
-
-    public boolean isEmpty() {
-        return controls.isEmpty();
-    }
-
-    public TemplateModel get(String key) {
-        Class<? extends Control> type = controls.get(key);
-        if (type != null) {
-            return new FreeMarkerControlProxy(objectFactory.create(type));
-        }
-
-        return null;
-    }
-
-    public TemplateCollectionModel values() {
-        return new CollectionModel(valueCollection(), FieldSupportBeansWrapper.INSTANCE);
-    }
-
-    public Set<String> keySet() {
-        return new HashSet<String>(controls.keySet());
-    }
-
-    public Collection<?> valueCollection() {
-        List<TemplateModel> all = new ArrayList<TemplateModel>();
-        for (String name : controls.keySet()) {
-            all.add(new FreeMarkerControlProxy(objectFactory.create(controls.get(name))));
-        }
-
-        return all;
-    }
+    return all;
+  }
 }

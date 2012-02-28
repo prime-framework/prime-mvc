@@ -18,15 +18,13 @@ package org.example.action.user;
 import org.primeframework.mvc.action.annotation.Action;
 
 /**
- * <p>
- * This is a test index action.
- * </p>
+ * <p> This is a test index action. </p>
  *
  * @author Brian Pontarelli
  */
 @Action
 public class Index {
-    public String execute() {
-        return null;
-    }
+  public String execute() {
+    return null;
+  }
 }

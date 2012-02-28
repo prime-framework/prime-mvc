@@ -15,43 +15,42 @@
  */
 package org.primeframework.mvc.action.config;
 
-import java.util.Map;
 import javax.servlet.ServletContext;
+import java.util.Map;
 
 import org.easymock.EasyMock;
-import static org.easymock.EasyMock.*;
 import org.example.action.Simple;
 import org.example.action.user.Index;
+import org.primeframework.mvc.test.Capture;
 import org.primeframework.mvc.util.DefaultURIBuilder;
-import org.primeframework.test.Capture;
-import static org.testng.Assert.*;
 import org.testng.annotations.Test;
 
+import static org.easymock.EasyMock.*;
+import static org.testng.Assert.*;
+
 /**
- * <p>
- * This class tests the default action configuration provider.
- * </p>
+ * <p> This class tests the default action configuration provider. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class DefaultActionConfigurationProviderTest {
-    @Test
-    public void testConfigure() {
-        ServletContext context = EasyMock.createStrictMock(ServletContext.class);
-        Capture c = new Capture();
-        context.setAttribute(eq(DefaultActionConfigurationProvider.ACTION_CONFIGURATION_KEY), c.capture());
-        EasyMock.replay(context);
+  @Test
+  public void testConfigure() {
+    ServletContext context = EasyMock.createStrictMock(ServletContext.class);
+    Capture c = new Capture();
+    context.setAttribute(eq(DefaultActionConfigurationProvider.ACTION_CONFIGURATION_KEY), c.capture());
+    EasyMock.replay(context);
 
-        new DefaultActionConfigurationProvider(context, new DefaultURIBuilder());
+    new DefaultActionConfigurationProvider(context, new DefaultURIBuilder());
 
-        Map<String, ActionConfiguration> config = (Map<String, ActionConfiguration>) c.object;
-        assertNotNull(config.get("/simple"));
-        assertSame(Simple.class, config.get("/simple").actionClass());
-        assertEquals("/simple", config.get("/simple").uri());
+    Map<String, ActionConfiguration> config = (Map<String, ActionConfiguration>) c.object;
+    assertNotNull(config.get("/simple"));
+    assertSame(Simple.class, config.get("/simple").actionClass());
+    assertEquals("/simple", config.get("/simple").uri());
 
-        assertNotNull(config.get("/user/index"));
-        assertSame(Index.class, config.get("/user/index").actionClass());
-        assertEquals("/user/index", config.get("/user/index").uri());
-    }
+    assertNotNull(config.get("/user/index"));
+    assertSame(Index.class, config.get("/user/index").actionClass());
+    assertEquals("/user/index", config.get("/user/index").uri());
+  }
 
 }

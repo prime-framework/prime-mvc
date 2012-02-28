@@ -18,29 +18,26 @@ package org.primeframework.mvc.result.form.jsp;
 import org.primeframework.mvc.result.control.Control;
 
 /**
- * <p>
- * This class is an abstract class for controls that use the value from the
- * action, including file and hidden.
- * </p>
+ * <p> This class is an abstract class for controls that use the value from the action, including file and hidden. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public abstract class AbstractValueTag<T extends Control> extends AbstractInputTag<T> {
-    /**
-     * Retrieves the tags defaultValue attribute
-     *
-     * @return	Returns the tags defaultValue attribute
-     */
-    public String getDefaultValue() {
-        return (String) attributes.get("defaultValue");
-    }
+  /**
+   * Retrieves the tags defaultValue attribute
+   *
+   * @return Returns the tags defaultValue attribute
+   */
+  public String getDefaultValue() {
+    return (String) attributes.get("defaultValue");
+  }
 
-    /**
-     * Populates the tags defaultValue attribute
-     *
-     * @param	defaultValue The value of the tags defaultValue attribute
-     */
-    public void setDefaultValue(String defaultValue) {
-        attributes.put("defaultValue", defaultValue);
-    }
+  /**
+   * Populates the tags defaultValue attribute
+   *
+   * @param defaultValue The value of the tags defaultValue attribute
+   */
+  public void setDefaultValue(String defaultValue) {
+    attributes.put("defaultValue", defaultValue);
+  }
 }

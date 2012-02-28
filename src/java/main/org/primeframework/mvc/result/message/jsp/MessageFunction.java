@@ -17,54 +17,52 @@ package org.primeframework.mvc.result.message.jsp;
 
 import java.io.StringWriter;
 
-import org.primeframework.guice.GuiceContainer;
+import org.primeframework.mvc.guice.GuiceContainer;
+import org.primeframework.mvc.l10n.MessageProvider;
 import org.primeframework.mvc.result.message.control.Message;
 
-import static net.java.util.CollectionTools.mapNV;
+import static net.java.util.CollectionTools.*;
 
 /**
- * <p>
- * This class is a JSP function that can retrieve messages from the
- * {@link org.primeframework.l10n.MessageProvider} and output them.
- * </p>
+ * <p> This class is a JSP function that can retrieve messages from the {@link MessageProvider} and output them. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class MessageFunction {
 
-    /**
-     * Retrieves the message for the given key and the current action invocation.
-     *
-     * @param   key The key.
-     * @return  The message.
-     */
-    public static String message(String key) {
-        return getMessage(key, null);
-    }
+  /**
+   * Retrieves the message for the given key and the current action invocation.
+   *
+   * @param key The key.
+   * @return The message.
+   */
+  public static String message(String key) {
+    return getMessage(key, null);
+  }
 
-    /**
-     * Retrieves the message for the given key and bundle.
-     *
-     * @param   key The key.
-     * @param   bundle The bundle.
-     * @return  The message.
-     */
-    public static String message(String key, String bundle) {
-        return getMessage(key, bundle);
-    }
+  /**
+   * Retrieves the message for the given key and bundle.
+   *
+   * @param key    The key.
+   * @param bundle The bundle.
+   * @return The message.
+   */
+  public static String message(String key, String bundle) {
+    return getMessage(key, bundle);
+  }
 
-    /**
-     * Grabs the message using the {@link Message} control.
-     *
-     * @param   key The key.
-     * @param   bundle (Optional) The bundle name.
-     * @return  The message.
-     */
-    protected static String getMessage(String key, String bundle) {
-        StringWriter writer = new StringWriter();
-        Message message = GuiceContainer.getInjector().getInstance(Message.class);
-        message.renderStart(writer, mapNV("key", key, "bundle", bundle), null);
-        message.renderEnd(writer);
-        return writer.toString();
-    }
+  /**
+   * Grabs the message using the {@link Message} control.
+   *
+   * @param key    The key.
+   * @param bundle (Optional) The bundle name.
+   * @return The message.
+   */
+  protected static String getMessage(String key, String bundle) {
+    StringWriter writer = new StringWriter();
+    Message message = GuiceContainer.getInjector().getInstance(Message.class);
+    message.renderStart(writer, mapNV("key", key, "bundle", bundle), null);
+    message.renderEnd(writer);
+    return writer.toString();
+  }
 }

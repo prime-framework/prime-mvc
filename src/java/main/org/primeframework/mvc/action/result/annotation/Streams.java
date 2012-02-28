@@ -21,18 +21,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * <p>
- * This annotation is a container for {@link Stream} annotations.
- * </p>
+ * <p> This annotation is a container for {@link Stream} annotations. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @ResultContainerAnnotation()
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface Streams {
-    /**
-     * @return  The list of streams.
-     */
-    public abstract Stream[] value();
+  /**
+   * @return The list of streams.
+   */
+  public abstract Stream[] value();
 }

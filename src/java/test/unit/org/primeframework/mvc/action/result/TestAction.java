@@ -18,11 +18,9 @@ package org.primeframework.mvc.action.result;
 import org.primeframework.mvc.action.result.annotation.Forward;
 
 /**
- * <p>
- * This is a test action with an annotation.
- * </p>
+ * <p> This is a test action with an annotation. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @Forward(page = "foo.jsp")
 public class TestAction {

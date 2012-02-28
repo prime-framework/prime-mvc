@@ -17,16 +17,14 @@ package org.primeframework.mvc.action.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * <p>
- * This annotation defines a method that invoked to prepare an action
- * prior to parameters being set or invocation.
+ * <p> This annotation defines a method that invoked to prepare an action prior to parameters being set or invocation.
  * </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

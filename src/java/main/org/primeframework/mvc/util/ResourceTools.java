@@ -19,31 +19,29 @@ import javax.servlet.ServletContext;
 import java.net.MalformedURLException;
 
 /**
- * <p>
- * This class provides resource utility methods.
- * </p>
+ * <p> This class provides resource utility methods. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class ResourceTools {
-    /**
-     * Locates a resource in the servlet context or the classloader for the given path.
-     *
-     * @param   servletContext The servlet context.
-     * @param   path The path.
-     * @return  The path or null if the resource doesn't exist.
-     */
-    public static String findResource(ServletContext servletContext, String path) {
-        try {
-            String classLoaderPath = path.substring(1, path.length());
-            if (servletContext.getResource(path) != null ||
-                    Thread.currentThread().getContextClassLoader().getResource(classLoaderPath) != null) {
-                return path;
-            }
-        } catch (MalformedURLException e) {
-            // Ignore because we are searching and somethings might be bad URLs
-        }
-
-        return null;
+  /**
+   * Locates a resource in the servlet context or the classloader for the given path.
+   *
+   * @param servletContext The servlet context.
+   * @param path           The path.
+   * @return The path or null if the resource doesn't exist.
+   */
+  public static String findResource(ServletContext servletContext, String path) {
+    try {
+      String classLoaderPath = path.substring(1, path.length());
+      if (servletContext.getResource(path) != null ||
+        Thread.currentThread().getContextClassLoader().getResource(classLoaderPath) != null) {
+        return path;
+      }
+    } catch (MalformedURLException e) {
+      // Ignore because we are searching and somethings might be bad URLs
     }
+
+    return null;
+  }
 }

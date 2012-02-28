@@ -16,33 +16,31 @@
 package org.primeframework.mvc.result.form.control;
 
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-import org.primeframework.mvc.result.control.annotation.ControlAttributes;
 import org.primeframework.mvc.result.control.annotation.ControlAttribute;
+import org.primeframework.mvc.result.control.annotation.ControlAttributes;
 
 import com.google.inject.Inject;
 
 /**
- * <p>
- * This class is the control for a input type=hidden.
- * </p>
+ * <p> This class is the control for a input type=hidden. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @ControlAttributes(
-    required = {
-        @ControlAttribute(name = "name")
-    }
+  required = {
+    @ControlAttribute(name = "name")
+  }
 )
 public class Hidden extends AbstractValueInput {
-    @Inject
-    public Hidden(ExpressionEvaluator expressionEvaluator) {
-        super(expressionEvaluator, false);
-    }
+  @Inject
+  public Hidden(ExpressionEvaluator expressionEvaluator) {
+    super(expressionEvaluator, false);
+  }
 
-    /**
-     * @return  hidden.ftl
-     */
-    protected String endTemplateName() {
-        return "hidden.ftl";
-    }
+  /**
+   * @return hidden.ftl
+   */
+  protected String endTemplateName() {
+    return "hidden.ftl";
+  }
 }

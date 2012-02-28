@@ -19,31 +19,30 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import com.google.inject.Inject;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.result.annotation.Header;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 
+import com.google.inject.Inject;
+
 /**
- * <p>
- * This result returns a header only response.
- * </p>
+ * <p> This result returns a header only response. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class HeaderResult extends AbstractResult<Header> {
-    private final HttpServletResponse response;
+  private final HttpServletResponse response;
 
-    @Inject
-    public HeaderResult(ExpressionEvaluator expressionEvaluator, HttpServletResponse response) {
-        super(expressionEvaluator);
-        this.response = response;
-    }
+  @Inject
+  public HeaderResult(ExpressionEvaluator expressionEvaluator, HttpServletResponse response) {
+    super(expressionEvaluator);
+    this.response = response;
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void execute(Header header, ActionInvocation invocation) throws IOException, ServletException {
-        setStatus(header.status(), header.statusStr(), invocation.action(), response);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  public void execute(Header header, ActionInvocation invocation) throws IOException, ServletException {
+    setStatus(header.status(), header.statusStr(), invocation.action(), response);
+  }
 }

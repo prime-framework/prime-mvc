@@ -26,125 +26,123 @@ import com.google.inject.Inject;
 import static net.java.util.CollectionTools.*;
 
 /**
- * <p>
- * This tests the text control.
- * </p>
+ * <p> This tests the text control. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class TextTest extends ControlBaseTest {
-    @Inject public Text text;
+  @Inject public Text text;
 
-    @Test
-    public void testActionLess() {
-        ais.setCurrent(new DefaultActionInvocation(null, "/text", null, null));
-        run(text,
-            mapNV("name", "test", "class", "css-class", "bundle", "/text-bundle"),
-            null, "<input type=\"hidden\" name=\"test@param\" value=\"param-value\"/>\n" +
-            "<div class=\"css-class-text css-class-input css-class-control text input control\">\n" +
-            "<div class=\"label-container\"><label for=\"test\" class=\"label\">Test</label></div>\n" +
-            "<div class=\"control-container\"><input type=\"text\" class=\"css-class\" id=\"test\" name=\"test\"/></div>\n" +
-            "</div>\n");
-    }
+  @Test
+  public void testActionLess() {
+    ais.setCurrent(new DefaultActionInvocation(null, "/text", null, null));
+    run(text,
+      mapNV("name", "test", "class", "css-class", "bundle", "/text-bundle"),
+      null, "<input type=\"hidden\" name=\"test@param\" value=\"param-value\"/>\n" +
+      "<div class=\"css-class-text css-class-input css-class-control text input control\">\n" +
+      "<div class=\"label-container\"><label for=\"test\" class=\"label\">Test</label></div>\n" +
+      "<div class=\"control-container\"><input type=\"text\" class=\"css-class\" id=\"test\" name=\"test\"/></div>\n" +
+      "</div>\n");
+  }
 
-    @Test
-    public void testAction() {
-        Edit action = new Edit();
-        action.user = new User();
-        action.user.setName("Brian");
+  @Test
+  public void testAction() {
+    Edit action = new Edit();
+    action.user = new User();
+    action.user.setName("Brian");
 
-        ais.setCurrent(new DefaultActionInvocation(action, "/text", null, null));
-        run(text,
-            mapNV("name", "user.name"),
-            null, "<input type=\"hidden\" name=\"user.name@param\" value=\"param-value\"/>\n" +
-            "<div class=\"text input control\">\n" +
-            "<div class=\"label-container\"><label for=\"user_name\" class=\"label\">Your name</label></div>\n" +
-            "<div class=\"control-container\"><input type=\"text\" id=\"user_name\" name=\"user.name\" value=\"Brian\"/></div>\n" +
-            "</div>\n");
-    }
+    ais.setCurrent(new DefaultActionInvocation(action, "/text", null, null));
+    run(text,
+      mapNV("name", "user.name"),
+      null, "<input type=\"hidden\" name=\"user.name@param\" value=\"param-value\"/>\n" +
+      "<div class=\"text input control\">\n" +
+      "<div class=\"label-container\"><label for=\"user_name\" class=\"label\">Your name</label></div>\n" +
+      "<div class=\"control-container\"><input type=\"text\" id=\"user_name\" name=\"user.name\" value=\"Brian\"/></div>\n" +
+      "</div>\n");
+  }
 
-    @Test
-    public void html() {
-        Edit action = new Edit();
-        action.user = new User();
-        action.user.setName("<Brian>");
+  @Test
+  public void html() {
+    Edit action = new Edit();
+    action.user = new User();
+    action.user.setName("<Brian>");
 
-        ais.setCurrent(new DefaultActionInvocation(action, "/text", null, null));
-        run(text,
-            mapNV("name", "user.name"),
-            null, "<input type=\"hidden\" name=\"user.name@param\" value=\"param-value\"/>\n" +
-            "<div class=\"text input control\">\n" +
-            "<div class=\"label-container\"><label for=\"user_name\" class=\"label\">Your name</label></div>\n" +
-            "<div class=\"control-container\"><input type=\"text\" id=\"user_name\" name=\"user.name\" value=\"&lt;Brian&gt;\"/></div>\n" +
-            "</div>\n");
-    }
+    ais.setCurrent(new DefaultActionInvocation(action, "/text", null, null));
+    run(text,
+      mapNV("name", "user.name"),
+      null, "<input type=\"hidden\" name=\"user.name@param\" value=\"param-value\"/>\n" +
+      "<div class=\"text input control\">\n" +
+      "<div class=\"label-container\"><label for=\"user_name\" class=\"label\">Your name</label></div>\n" +
+      "<div class=\"control-container\"><input type=\"text\" id=\"user_name\" name=\"user.name\" value=\"&lt;Brian&gt;\"/></div>\n" +
+      "</div>\n");
+  }
 
-    @Test
-    public void testFieldErrors() {
-        Edit action = new Edit();
-        action.user = new User();
-        action.user.setName("Barry");
+  @Test
+  public void testFieldErrors() {
+    Edit action = new Edit();
+    action.user = new User();
+    action.user.setName("Barry");
 
-        ais.setCurrent(new DefaultActionInvocation(action, "/text", null, null));
+    ais.setCurrent(new DefaultActionInvocation(action, "/text", null, null));
 
-        messageStore.addFieldError(MessageScope.REQUEST, "user.name", "fieldError1");
-        messageStore.addFieldError(MessageScope.REQUEST, "user.name", "fieldError2");
+    messageStore.addFieldError(MessageScope.REQUEST, "user.name", "fieldError1");
+    messageStore.addFieldError(MessageScope.REQUEST, "user.name", "fieldError2");
 
-        run(text,
-            mapNV("name", "user.name"),
-            null, "<input type=\"hidden\" name=\"user.name@param\" value=\"param-value\"/>\n" +
-            "<div class=\"text input control\">\n" +
-            "<div class=\"label-container\"><label for=\"user_name\" class=\"label\"><span class=\"error\">Your name (Name is required, Name must be cool)</span></label></div>\n" +
-            "<div class=\"control-container\"><input type=\"text\" id=\"user_name\" name=\"user.name\" value=\"Barry\"/></div>\n" +
-            "</div>\n");
-    }
+    run(text,
+      mapNV("name", "user.name"),
+      null, "<input type=\"hidden\" name=\"user.name@param\" value=\"param-value\"/>\n" +
+      "<div class=\"text input control\">\n" +
+      "<div class=\"label-container\"><label for=\"user_name\" class=\"label\"><span class=\"error\">Your name (Name is required, Name must be cool)</span></label></div>\n" +
+      "<div class=\"control-container\"><input type=\"text\" id=\"user_name\" name=\"user.name\" value=\"Barry\"/></div>\n" +
+      "</div>\n");
+  }
 
-    @Test
-    public void testDefaultValue() {
-        Edit action = new Edit();
+  @Test
+  public void testDefaultValue() {
+    Edit action = new Edit();
 
-        ais.setCurrent(new DefaultActionInvocation(action, "/text", null, null));
+    ais.setCurrent(new DefaultActionInvocation(action, "/text", null, null));
 
-        run(text,
-            mapNV("name", "user.name", "defaultValue", "John"),
-            null, "<input type=\"hidden\" name=\"user.name@param\" value=\"param-value\"/>\n" +
-            "<div class=\"text input control\">\n" +
-            "<div class=\"label-container\"><label for=\"user_name\" class=\"label\">Your name</label></div>\n" +
-            "<div class=\"control-container\"><input type=\"text\" id=\"user_name\" name=\"user.name\" value=\"John\"/></div>\n" +
-            "</div>\n");
-    }
+    run(text,
+      mapNV("name", "user.name", "defaultValue", "John"),
+      null, "<input type=\"hidden\" name=\"user.name@param\" value=\"param-value\"/>\n" +
+      "<div class=\"text input control\">\n" +
+      "<div class=\"label-container\"><label for=\"user_name\" class=\"label\">Your name</label></div>\n" +
+      "<div class=\"control-container\"><input type=\"text\" id=\"user_name\" name=\"user.name\" value=\"John\"/></div>\n" +
+      "</div>\n");
+  }
 
-    @Test
-    public void testHardCodedValue() {
-        Edit action = new Edit();
-        action.user = new User();
-        action.user.setName("Brian");
+  @Test
+  public void testHardCodedValue() {
+    Edit action = new Edit();
+    action.user = new User();
+    action.user.setName("Brian");
 
-        ais.setCurrent(new DefaultActionInvocation(action, "/text", null, null));
+    ais.setCurrent(new DefaultActionInvocation(action, "/text", null, null));
 
-        run(text,
-            mapNV("name", "user.name", "value", "Barry"),
-            null, "<input type=\"hidden\" name=\"user.name@param\" value=\"param-value\"/>\n" +
-            "<div class=\"text input control\">\n" +
-            "<div class=\"label-container\"><label for=\"user_name\" class=\"label\">Your name</label></div>\n" +
-            "<div class=\"control-container\"><input type=\"text\" id=\"user_name\" name=\"user.name\" value=\"Barry\"/></div>\n" +
-            "</div>\n");
-    }
+    run(text,
+      mapNV("name", "user.name", "value", "Barry"),
+      null, "<input type=\"hidden\" name=\"user.name@param\" value=\"param-value\"/>\n" +
+      "<div class=\"text input control\">\n" +
+      "<div class=\"label-container\"><label for=\"user_name\" class=\"label\">Your name</label></div>\n" +
+      "<div class=\"control-container\"><input type=\"text\" id=\"user_name\" name=\"user.name\" value=\"Barry\"/></div>\n" +
+      "</div>\n");
+  }
 
-    @Test
-    public void testLabelKey() {
-        Edit action = new Edit();
-        action.user = new User();
-        action.user.setName("Brian");
+  @Test
+  public void testLabelKey() {
+    Edit action = new Edit();
+    action.user = new User();
+    action.user.setName("Brian");
 
-        ais.setCurrent(new DefaultActionInvocation(action, "/text", null, null));
+    ais.setCurrent(new DefaultActionInvocation(action, "/text", null, null));
 
-        run(text,
-            mapNV("name", "user.name", "labelKey", "label-key"),
-            null, "<input type=\"hidden\" name=\"user.name@param\" value=\"param-value\"/>\n" +
-            "<div class=\"text input control\">\n" +
-            "<div class=\"label-container\"><label for=\"user_name\" class=\"label\">Foo bar</label></div>\n" +
-            "<div class=\"control-container\"><input type=\"text\" id=\"user_name\" name=\"user.name\" value=\"Brian\"/></div>\n" +
-            "</div>\n");
-    }
+    run(text,
+      mapNV("name", "user.name", "labelKey", "label-key"),
+      null, "<input type=\"hidden\" name=\"user.name@param\" value=\"param-value\"/>\n" +
+      "<div class=\"text input control\">\n" +
+      "<div class=\"label-container\"><label for=\"user_name\" class=\"label\">Foo bar</label></div>\n" +
+      "<div class=\"control-container\"><input type=\"text\" id=\"user_name\" name=\"user.name\" value=\"Brian\"/></div>\n" +
+      "</div>\n");
+  }
 }

@@ -19,65 +19,64 @@ import java.io.File;
 import java.lang.reflect.Type;
 import java.util.Map;
 
+import org.primeframework.mvc.parameter.convert.AbstractGlobalConverter;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
-import org.primeframework.mvc.parameter.convert.AbstractGlobalConverter;
 import org.primeframework.mvc.parameter.convert.annotation.GlobalConverter;
 
-import static net.java.lang.ObjectTools.*;
 import net.java.lang.StringTools;
 
+import static net.java.lang.ObjectTools.*;
+
 /**
- * <p>
- * This class converts to and from the java.io.File class.
- * </p>
+ * <p> This class converts to and from the java.io.File class. </p>
  *
  * @author Brian Pontarelli
  */
 @GlobalConverter(forTypes = {File.class})
 @SuppressWarnings("unchecked")
 public class FileConverter extends AbstractGlobalConverter {
-    /**
-     * Returns null if the value is null, otherwise this returns a new File of the value.
-     *
-     * @param   attributes Can contain the parentDir attribute which if the String is relative will
-     * @param expression
-     */
-    protected Object stringToObject(String value, Type convertTo, Map<String, String> attributes, String expression)
+  /**
+   * Returns null if the value is null, otherwise this returns a new File of the value.
+   *
+   * @param attributes Can contain the parentDir attribute which if the String is relative will
+   * @param expression
+   */
+  protected Object stringToObject(String value, Type convertTo, Map<String, String> attributes, String expression)
     throws ConversionException, ConverterStateException {
-        if (StringTools.isTrimmedEmpty(value)) {
-            return null;
-        }
-
-        if (value.charAt(0) == File.separatorChar || value.charAt(0) == '\\') {
-            return new File(value);
-        }
-
-        if (attributes != null) {
-            String parent = attributes.get("parentDir");
-            if (parent != null) {
-                return new File(parent, value);
-            }
-        }
-
-        return new File(value);
+    if (StringTools.isTrimmedEmpty(value)) {
+      return null;
     }
 
-    /**
-     * Joins the values and then sends the new joined String to the stringToObject method.
-     */
-    protected Object stringsToObject(String[] values, Type convertTo, Map<String, String> attributes, String expression)
-    throws ConversionException, ConverterStateException {
-        String joined = join(values, File.separator);
-        return stringToObject(joined, convertTo, attributes, expression);
+    if (value.charAt(0) == File.separatorChar || value.charAt(0) == '\\') {
+      return new File(value);
     }
 
-    /**
-     * Returns the absolute path of the file.
-     */
-    protected String objectToString(Object value, Type convertFrom, Map<String, String> attributes, String expression)
-    throws ConversionException, ConverterStateException {
-        File file = (File) value;
-        return file.getAbsolutePath();
+    if (attributes != null) {
+      String parent = attributes.get("parentDir");
+      if (parent != null) {
+        return new File(parent, value);
+      }
     }
+
+    return new File(value);
+  }
+
+  /**
+   * Joins the values and then sends the new joined String to the stringToObject method.
+   */
+  protected Object stringsToObject(String[] values, Type convertTo, Map<String, String> attributes, String expression)
+    throws ConversionException, ConverterStateException {
+    String joined = join(values, File.separator);
+    return stringToObject(joined, convertTo, attributes, expression);
+  }
+
+  /**
+   * Returns the absolute path of the file.
+   */
+  protected String objectToString(Object value, Type convertFrom, Map<String, String> attributes, String expression)
+    throws ConversionException, ConverterStateException {
+    File file = (File) value;
+    return file.getAbsolutePath();
+  }
 }

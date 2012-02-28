@@ -18,17 +18,15 @@ package org.example.action.user;
 import org.primeframework.mvc.action.annotation.Action;
 
 /**
- * <p>
- * This class is a simple edit action for testing.
- * </p>
+ * <p> This class is a simple edit action for testing. </p>
  *
  * @author Brian Pontarelli
  */
 @Action("{id}")
 public class RESTEdit {
-    public int id;
+  public int id;
 
-    public String execute() {
-        return "success";
-    }
+  public String execute() {
+    return "success";
+  }
 }

@@ -19,61 +19,59 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 
-import org.primeframework.guice.GuiceContainer;
 import org.primeframework.mvc.action.ActionInvocationStore;
+import org.primeframework.mvc.guice.GuiceContainer;
 import org.primeframework.mvc.result.control.Body;
 import org.primeframework.mvc.result.control.Control;
+
 import static org.testng.Assert.*;
 
 /**
- * <p>
- * This class is a test helper that assists in testing custom controls.
- * </p>
+ * <p> This class is a test helper that assists in testing custom controls. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class ControlTestRunner {
-    /**
-     * Tests the given control and returns a builder that can be used to build up attributes, the
-     * body, etc.
-     *
-     * @param   control The control.
-     * @return  The ControlBuilder.
-     */
-    public ControlBuilder test(Control control) {
-        return new ControlBuilder(control);
+  /**
+   * Tests the given control and returns a builder that can be used to build up attributes, the body, etc.
+   *
+   * @param control The control.
+   * @return The ControlBuilder.
+   */
+  public ControlBuilder test(Control control) {
+    return new ControlBuilder(control);
+  }
+
+  /**
+   * Runs the control and verifies the output.
+   *
+   * @param builder The builder.
+   */
+  static void run(final ControlBuilder builder) {
+    // Setup the action invocation if it isn't null
+    ActionInvocationStore ais = GuiceContainer.getInjector().getInstance(ActionInvocationStore.class);
+    if (builder.actionInvocation != null) {
+      ais.setCurrent(builder.actionInvocation);
     }
 
-    /**
-     * Runs the control and verifies the output.
-     *
-     * @param   builder The builder.
-     */
-    static void run(final ControlBuilder builder) {
-        // Setup the action invocation if it isn't null
-        ActionInvocationStore ais = GuiceContainer.getInjector().getInstance(ActionInvocationStore.class);
-        if (builder.actionInvocation != null) {
-            ais.setCurrent(builder.actionInvocation);
+    // Run the control
+    Control control = builder.control;
+    StringWriter writer = new StringWriter();
+    control.renderStart(writer, builder.attributes, builder.dynamicAttributes);
+
+    if (builder.body != null) {
+      control.renderBody(writer, new Body() {
+        public void render(Writer writer) {
+          try {
+            writer.write(builder.body);
+          } catch (IOException e) {
+            throw new RuntimeException(e);
+          }
         }
-
-        // Run the control
-        Control control = builder.control;
-        StringWriter writer = new StringWriter();
-        control.renderStart(writer, builder.attributes, builder.dynamicAttributes);
-
-        if (builder.body != null) {
-            control.renderBody(writer, new Body() {
-                public void render(Writer writer) {
-                    try {
-                        writer.write(builder.body);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            });
-        }
-
-        control.renderEnd(writer);
-        assertEquals(builder.result, writer.toString());
+      });
     }
+
+    control.renderEnd(writer);
+    assertEquals(builder.result, writer.toString());
+  }
 }

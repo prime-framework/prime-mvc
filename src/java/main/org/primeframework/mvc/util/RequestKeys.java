@@ -16,15 +16,13 @@
 package org.primeframework.mvc.util;
 
 /**
- * <p>
- * This class stores request keys.
- * </p>
+ * <p> This class stores request keys. </p>
  *
  * @author Brian Pontarelli
  */
 public final class RequestKeys {
-    /**
-     * The name of the attribute in the HttpServletRequest that stores the file information.
-     */
-    public static final String FILE_ATTRIBUTE = "__jc_request_body_files";
+  /**
+   * The name of the attribute in the HttpServletRequest that stores the file information.
+   */
+  public static final String FILE_ATTRIBUTE = "__jc_request_body_files";
 }

@@ -20,24 +20,22 @@ import java.util.List;
 import com.google.inject.ImplementedBy;
 
 /**
- * <p>
- * This is the provider for scopes.
- * </p>
+ * <p> This is the provider for scopes. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @ImplementedBy(DefaultScopeProvider.class)
 public interface ScopeProvider {
-    /**
-     * Looks up the scope for the given annotation.
-     *
-     * @param   scope The scope enum value.
-     * @return  The Scope and never null.
-     */
-    Scope lookup(MessageScope scope);
+  /**
+   * Looks up the scope for the given annotation.
+   *
+   * @param scope The scope enum value.
+   * @return The Scope and never null.
+   */
+  Scope lookup(MessageScope scope);
 
-    /**
-     * @return  All of the registered scopes.
-     */
-    List<Scope> getAllScopes();
+  /**
+   * @return All of the registered scopes.
+   */
+  List<Scope> getAllScopes();
 }

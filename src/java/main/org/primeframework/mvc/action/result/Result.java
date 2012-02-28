@@ -15,27 +15,25 @@
  */
 package org.primeframework.mvc.action.result;
 
+import javax.servlet.ServletException;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
-import javax.servlet.ServletException;
 
 import org.primeframework.mvc.action.ActionInvocation;
 
 /**
- * <p>
- * This interface defines the public API for the result.
- * </p>
+ * <p> This interface defines the public API for the result. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public interface Result<T extends Annotation> {
-    /**
-     * Executes the result.
-     *
-     * @param   annoation The annotation that caused the result to be invoked.
-     * @param   invocation The action invocation (if there is one)
-     * @throws  IOException If there is any IO error rendering the result.
-     * @throws  ServletException If there is any servlet error rendering the result.
-     */
-    void execute(T annoation, ActionInvocation invocation) throws IOException, ServletException;
+  /**
+   * Executes the result.
+   *
+   * @param annoation  The annotation that caused the result to be invoked.
+   * @param invocation The action invocation (if there is one)
+   * @throws IOException      If there is any IO error rendering the result.
+   * @throws ServletException If there is any servlet error rendering the result.
+   */
+  void execute(T annoation, ActionInvocation invocation) throws IOException, ServletException;
 }

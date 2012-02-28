@@ -23,10 +23,7 @@ import java.lang.annotation.Target;
 import org.primeframework.mvc.action.result.StreamResult;
 
 /**
- * <p>
- * This annotation marks a result from an action as a Streaming result using
- * an InputStream from the action.
- * </p>
+ * <p> This annotation marks a result from an action as a Streaming result using an InputStream from the action. </p>
  *
  * @author Brian Pontarelli
  */
@@ -34,40 +31,38 @@ import org.primeframework.mvc.action.result.StreamResult;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface Stream {
-    /**
-     * @return  The result code from the action's execute method that this Result is associated with.
-     */
-    String code() default "success";
+  /**
+   * @return The result code from the action's execute method that this Result is associated with.
+   */
+  String code() default "success";
 
-    /**
-     * @return  The content type of the InputStream. This is used to set the HTTP header and disposition
-     *          so that the browser can correctly handle the response. This defaults to
-     *          <code>${type}</code>, which means that its value is set dynamically using the value
-     *          from the <code>type</code> property of the action.
-     */
-    String type() default "${type}";
+  /**
+   * @return The content type of the InputStream. This is used to set the HTTP header and disposition so that the
+   *         browser can correctly handle the response. This defaults to <code>${type}</code>, which means that its
+   *         value is set dynamically using the value from the <code>type</code> property of the action.
+   */
+  String type() default "${type}";
 
-    /**
-     * @return  The file name sent back to the client. This is used to set the content disposition
-     *          header so that the browser displays the correct name when saving the response to a
-     *          file. This defaults to <code>${name}</code>, which means that its value is set
-     *          dynamically using the value from the <code>name</code> property of the action.
-     */
-    String name() default "${name}";
+  /**
+   * @return The file name sent back to the client. This is used to set the content disposition header so that the
+   *         browser displays the correct name when saving the response to a file. This defaults to
+   *         <code>${name}</code>, which means that its value is set dynamically using the value from the
+   *         <code>name</code> property of the action.
+   */
+  String name() default "${name}";
 
-    /**
-     * @return  The content length sent back to the client. This is used to set the content length
-     *          header so that the browser displays a progress bar when downloading the file. This
-     *          defaults to <code>${length}</code>, which means that its value is set dynamically
-     *          using the value from the <code>length</code> property of the action.
-     */
-    String length() default "${length}";
+  /**
+   * @return The content length sent back to the client. This is used to set the content length header so that the
+   *         browser displays a progress bar when downloading the file. This defaults to <code>${length}</code>, which
+   *         means that its value is set dynamically using the value from the <code>length</code> property of the
+   *         action.
+   */
+  String length() default "${length}";
 
-    /**
-     * @return  The name of the property of the action that returns an InputStream. The bytes from
-     *          this InputStream are sent back to the browser via the ServletOutputStream. This
-     *          defaults to <code>stream</code>, which means the getStream method of the action should
-     *          return the InputStream.
-     */
-    String property() default "stream";
+  /**
+   * @return The name of the property of the action that returns an InputStream. The bytes from this InputStream are
+   *         sent back to the browser via the ServletOutputStream. This defaults to <code>stream</code>, which means the
+   *         getStream method of the action should return the InputStream.
+   */
+  String property() default "stream";
 }

@@ -25,90 +25,88 @@ import static net.java.util.CollectionTools.*;
 import static org.testng.Assert.*;
 
 /**
- * <p>
- * This class tests the min max validator.
- * </p>
+ * <p> This class tests the min max validator. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class MinMaxLengthValidatorTest {
-    @Test
-    public void collections() {
-        MinMaxLengthValidator validator = new MinMaxLengthValidator();
-        assertTrue(validator.validate(new MinMaxLengthImpl(0, 10), null, asList(1, 2, 3)));
-        assertFalse(validator.validate(new MinMaxLengthImpl(0, 2), null, asList(1, 2, 3)));
-        assertFalse(validator.validate(new MinMaxLengthImpl(4, 10), null, asList(1, 2, 3)));
+  @Test
+  public void collections() {
+    MinMaxLengthValidator validator = new MinMaxLengthValidator();
+    assertTrue(validator.validate(new MinMaxLengthImpl(0, 10), null, asList(1, 2, 3)));
+    assertFalse(validator.validate(new MinMaxLengthImpl(0, 2), null, asList(1, 2, 3)));
+    assertFalse(validator.validate(new MinMaxLengthImpl(4, 10), null, asList(1, 2, 3)));
+  }
+
+  @Test
+  public void arrays() {
+    MinMaxLengthValidator validator = new MinMaxLengthValidator();
+    assertTrue(validator.validate(new MinMaxLengthImpl(0, 10), null, array(1, 2, 3)));
+    assertFalse(validator.validate(new MinMaxLengthImpl(0, 2), null, array(1, 2, 3)));
+    assertFalse(validator.validate(new MinMaxLengthImpl(4, 10), null, array(1, 2, 3)));
+
+    assertTrue(validator.validate(new MinMaxLengthImpl(0, 10), null, new int[]{1, 2, 3}));
+    assertFalse(validator.validate(new MinMaxLengthImpl(0, 2), null, new int[]{1, 2, 3}));
+    assertFalse(validator.validate(new MinMaxLengthImpl(4, 10), null, new int[]{1, 2, 3}));
+  }
+
+  @Test
+  public void maps() {
+    MinMaxLengthValidator validator = new MinMaxLengthValidator();
+    assertTrue(validator.validate(new MinMaxLengthImpl(0, 10), null, map("1", "2", "3", "4", "5", "6")));
+    assertFalse(validator.validate(new MinMaxLengthImpl(0, 2), null, map("1", "2", "3", "4", "5", "6")));
+    assertFalse(validator.validate(new MinMaxLengthImpl(4, 10), null, map("1", "2", "3", "4", "5", "6")));
+  }
+
+  @Test
+  public void strings() {
+    MinMaxLengthValidator validator = new MinMaxLengthValidator();
+    assertTrue(validator.validate(new MinMaxLengthImpl(0, 10), null, "123"));
+    assertFalse(validator.validate(new MinMaxLengthImpl(0, 2), null, "123"));
+    assertFalse(validator.validate(new MinMaxLengthImpl(4, 10), null, "123"));
+  }
+
+  @Test
+  public void other() {
+    Object obj = new Object();
+    MinMaxLengthValidator validator = new MinMaxLengthValidator();
+    assertTrue(validator.validate(new MinMaxLengthImpl(0, 50), null, obj));
+    assertFalse(validator.validate(new MinMaxLengthImpl(0, 20), null, obj));
+    assertFalse(validator.validate(new MinMaxLengthImpl(60, 100), null, obj));
+  }
+
+  public class MinMaxLengthImpl implements MinMaxLength {
+    private final int min;
+    private final int max;
+
+    public MinMaxLengthImpl(int min, int max) {
+      this.min = min;
+      this.max = max;
     }
 
-    @Test
-    public void arrays() {
-        MinMaxLengthValidator validator = new MinMaxLengthValidator();
-        assertTrue(validator.validate(new MinMaxLengthImpl(0, 10), null, array(1, 2, 3)));
-        assertFalse(validator.validate(new MinMaxLengthImpl(0, 2), null, array(1, 2, 3)));
-        assertFalse(validator.validate(new MinMaxLengthImpl(4, 10), null, array(1, 2, 3)));
-
-        assertTrue(validator.validate(new MinMaxLengthImpl(0, 10), null, new int[]{1, 2, 3}));
-        assertFalse(validator.validate(new MinMaxLengthImpl(0, 2), null, new int[]{1, 2, 3}));
-        assertFalse(validator.validate(new MinMaxLengthImpl(4, 10), null, new int[]{1, 2, 3}));
+    @Override
+    public int min() {
+      return min;
     }
 
-    @Test
-    public void maps() {
-        MinMaxLengthValidator validator = new MinMaxLengthValidator();
-        assertTrue(validator.validate(new MinMaxLengthImpl(0, 10), null, map("1", "2", "3", "4", "5", "6")));
-        assertFalse(validator.validate(new MinMaxLengthImpl(0, 2), null, map("1", "2", "3", "4", "5", "6")));
-        assertFalse(validator.validate(new MinMaxLengthImpl(4, 10), null, map("1", "2", "3", "4", "5", "6")));
+    @Override
+    public int max() {
+      return max;
     }
 
-    @Test
-    public void strings() {
-        MinMaxLengthValidator validator = new MinMaxLengthValidator();
-        assertTrue(validator.validate(new MinMaxLengthImpl(0, 10), null, "123"));
-        assertFalse(validator.validate(new MinMaxLengthImpl(0, 2), null, "123"));
-        assertFalse(validator.validate(new MinMaxLengthImpl(4, 10), null, "123"));
+    @Override
+    public String key() {
+      return null;
     }
 
-    @Test
-    public void other() {
-        Object obj = new Object();
-        MinMaxLengthValidator validator = new MinMaxLengthValidator();
-        assertTrue(validator.validate(new MinMaxLengthImpl(0, 50), null, obj));
-        assertFalse(validator.validate(new MinMaxLengthImpl(0, 20), null, obj));
-        assertFalse(validator.validate(new MinMaxLengthImpl(60, 100), null, obj));
+    @Override
+    public String[] groups() {
+      return new String[0];
     }
 
-    public class MinMaxLengthImpl implements MinMaxLength {
-        private final int min;
-        private final int max;
-
-        public MinMaxLengthImpl(int min, int max) {
-            this.min = min;
-            this.max = max;
-        }
-
-        @Override
-        public int min() {
-            return min;
-        }
-
-        @Override
-        public int max() {
-            return max;
-        }
-
-        @Override
-        public String key() {
-            return null;
-        }
-
-        @Override
-        public String[] groups() {
-            return new String[0];
-        }
-
-        @Override
-        public Class<? extends Annotation> annotationType() {
-            return MinMaxLength.class;
-        }
+    @Override
+    public Class<? extends Annotation> annotationType() {
+      return MinMaxLength.class;
     }
+  }
 }

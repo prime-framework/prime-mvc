@@ -21,146 +21,145 @@ import java.lang.annotation.Annotation;
 
 import org.easymock.EasyMock;
 import org.primeframework.mvc.scope.annotation.Session;
-import static org.testng.Assert.*;
 import org.testng.annotations.Test;
 
+import static org.testng.Assert.*;
+
 /**
- * <p>
- * This class tests the action session scope.
- * </p>
+ * <p> This class tests the action session scope. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class SessionScopeTest {
-    @Test
-    public void get() {
-        HttpSession session = EasyMock.createStrictMock(HttpSession.class);
-        EasyMock.expect(session.getAttribute("test")).andReturn("value");
-        EasyMock.replay(session);
+  @Test
+  public void get() {
+    HttpSession session = EasyMock.createStrictMock(HttpSession.class);
+    EasyMock.expect(session.getAttribute("test")).andReturn("value");
+    EasyMock.replay(session);
 
-        HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-        EasyMock.expect(request.getSession(false)).andReturn(session);
-        EasyMock.replay(request);
+    HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
+    EasyMock.expect(request.getSession(false)).andReturn(session);
+    EasyMock.replay(request);
 
-        SessionScope scope = new SessionScope(request);
-        assertSame("value", scope.get("test", new Session() {
-            public String value() {
-                return "##field-name##";
-            }
+    SessionScope scope = new SessionScope(request);
+    assertSame("value", scope.get("test", new Session() {
+      public String value() {
+        return "##field-name##";
+      }
 
-            public Class<?> action() {
-                return Session.class;
-            }
+      public Class<?> action() {
+        return Session.class;
+      }
 
-            public Class<? extends Annotation> annotationType() {
-                return Session.class;
-            }
-        }));
+      public Class<? extends Annotation> annotationType() {
+        return Session.class;
+      }
+    }));
 
-        EasyMock.verify(session, request);
-    }
+    EasyMock.verify(session, request);
+  }
 
-    @Test
-    public void getNoSession() {
-        HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-        EasyMock.expect(request.getSession(false)).andReturn(null);
-        EasyMock.replay(request);
+  @Test
+  public void getNoSession() {
+    HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
+    EasyMock.expect(request.getSession(false)).andReturn(null);
+    EasyMock.replay(request);
 
-        SessionScope scope = new SessionScope(request);
-        assertNull(scope.get("test", new Session() {
-            public String value() {
-                return "##field-name##";
-            }
+    SessionScope scope = new SessionScope(request);
+    assertNull(scope.get("test", new Session() {
+      public String value() {
+        return "##field-name##";
+      }
 
-            public Class<?> action() {
-                return Session.class;
-            }
+      public Class<?> action() {
+        return Session.class;
+      }
 
-            public Class<? extends Annotation> annotationType() {
-                return Session.class;
-            }
-        }));
+      public Class<? extends Annotation> annotationType() {
+        return Session.class;
+      }
+    }));
 
-        EasyMock.verify(request);
-    }
+    EasyMock.verify(request);
+  }
 
-    @Test
-    public void set() {
-        HttpSession session = EasyMock.createStrictMock(HttpSession.class);
-        session.setAttribute("test", "value");
-        EasyMock.replay(session);
+  @Test
+  public void set() {
+    HttpSession session = EasyMock.createStrictMock(HttpSession.class);
+    session.setAttribute("test", "value");
+    EasyMock.replay(session);
 
-        HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-        EasyMock.expect(request.getSession(true)).andReturn(session);
-        EasyMock.replay(request);
+    HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
+    EasyMock.expect(request.getSession(true)).andReturn(session);
+    EasyMock.replay(request);
 
-        SessionScope scope = new SessionScope(request);
-        scope.set("test", "value", new Session() {
-            public String value() {
-                return "##field-name##";
-            }
+    SessionScope scope = new SessionScope(request);
+    scope.set("test", "value", new Session() {
+      public String value() {
+        return "##field-name##";
+      }
 
-            public Class<?> action() {
-                return Session.class;
-            }
+      public Class<?> action() {
+        return Session.class;
+      }
 
-            public Class<? extends Annotation> annotationType() {
-                return Session.class;
-            }
-        });
+      public Class<? extends Annotation> annotationType() {
+        return Session.class;
+      }
+    });
 
-        EasyMock.verify(session, request);
-    }
+    EasyMock.verify(session, request);
+  }
 
-    @Test
-    public void setNullSession() {
-        HttpSession session = EasyMock.createStrictMock(HttpSession.class);
-        session.removeAttribute("test");
-        EasyMock.replay(session);
+  @Test
+  public void setNullSession() {
+    HttpSession session = EasyMock.createStrictMock(HttpSession.class);
+    session.removeAttribute("test");
+    EasyMock.replay(session);
 
-        HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-        EasyMock.expect(request.getSession(false)).andReturn(session);
-        EasyMock.replay(request);
+    HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
+    EasyMock.expect(request.getSession(false)).andReturn(session);
+    EasyMock.replay(request);
 
-        SessionScope scope = new SessionScope(request);
-        scope.set("test", null, new Session() {
-            public String value() {
-                return "##field-name##";
-            }
+    SessionScope scope = new SessionScope(request);
+    scope.set("test", null, new Session() {
+      public String value() {
+        return "##field-name##";
+      }
 
-            public Class<?> action() {
-                return Session.class;
-            }
+      public Class<?> action() {
+        return Session.class;
+      }
 
-            public Class<? extends Annotation> annotationType() {
-                return Session.class;
-            }
-        });
+      public Class<? extends Annotation> annotationType() {
+        return Session.class;
+      }
+    });
 
-        EasyMock.verify(session, request);
-    }
+    EasyMock.verify(session, request);
+  }
 
-    @Test
-    public void setNullNoSession() {
-        HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-        EasyMock.expect(request.getSession(false)).andReturn(null);
-        EasyMock.replay(request);
+  @Test
+  public void setNullNoSession() {
+    HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
+    EasyMock.expect(request.getSession(false)).andReturn(null);
+    EasyMock.replay(request);
 
-        SessionScope scope = new SessionScope(request);
-        scope.set("test", null, new Session() {
-            public String value() {
-                return "##field-name##";
-            }
+    SessionScope scope = new SessionScope(request);
+    scope.set("test", null, new Session() {
+      public String value() {
+        return "##field-name##";
+      }
 
-            public Class<?> action() {
-                return Session.class;
-            }
+      public Class<?> action() {
+        return Session.class;
+      }
 
-            public Class<? extends Annotation> annotationType() {
-                return Session.class;
-            }
-        });
+      public Class<? extends Annotation> annotationType() {
+        return Session.class;
+      }
+    });
 
-        EasyMock.verify(request);
-    }
+    EasyMock.verify(request);
+  }
 }

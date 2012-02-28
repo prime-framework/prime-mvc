@@ -16,13 +16,11 @@
 package org.primeframework.mvc.parameter.convert.converters;
 
 /**
- * <p>
- * This
- * </p>
+ * <p> This </p>
  *
  * @author Brian Pontarelli
  */
 public enum TestEnum {
-    value1,
-    value2
+  value1,
+  value2
 }

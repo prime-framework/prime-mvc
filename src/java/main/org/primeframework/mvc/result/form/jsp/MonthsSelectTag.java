@@ -18,18 +18,16 @@ package org.primeframework.mvc.result.form.jsp;
 import org.primeframework.mvc.result.form.control.MonthsSelect;
 
 /**
- * <p>
- * This class is the JSP taglib for the months select control.
- * </p>
+ * <p> This class is the JSP taglib for the months select control. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class MonthsSelectTag extends SelectTag<MonthsSelect> {
 
-    /**
-     * @return  The {@link MonthsSelect} class.
-     */
-    protected Class<MonthsSelect> controlClass() {
-        return MonthsSelect.class;
-    }
+  /**
+   * @return The {@link MonthsSelect} class.
+   */
+  protected Class<MonthsSelect> controlClass() {
+    return MonthsSelect.class;
+  }
 }

@@ -15,67 +15,65 @@
  */
 package org.primeframework.mvc.parameter;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
 
 import net.java.util.IteratorEnumeration;
 
 /**
- * <p>
- * This class is an HttpServletRequestWrapper that supports new parameters. 
- * </p>
+ * <p> This class is an HttpServletRequestWrapper that supports new parameters. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @SuppressWarnings("unchecked")
 public class ParameterHttpServletRequest extends HttpServletRequestWrapper {
-    private final Map<String, String[]> parameters;
+  private final Map<String, String[]> parameters;
 
-    public ParameterHttpServletRequest(HttpServletRequest httpServletRequest, Map<String, String[]> parameters) {
-        super(httpServletRequest);
-        this.parameters = parameters;
+  public ParameterHttpServletRequest(HttpServletRequest httpServletRequest, Map<String, String[]> parameters) {
+    super(httpServletRequest);
+    this.parameters = parameters;
+  }
+
+  public String getParameter(String key) {
+    if (parameters != null && parameters.containsKey(key) && parameters.get(key) != null) {
+      return parameters.get(key)[0];
     }
 
-    public String getParameter(String key) {
-        if (parameters != null && parameters.containsKey(key) && parameters.get(key) != null) {
-            return parameters.get(key)[0];
-        }
+    return super.getParameter(key);
+  }
 
-        return super.getParameter(key);
+  public Map getParameterMap() {
+    Map<String, String[]> complete = new HashMap<String, String[]>();
+    if (parameters != null) {
+      complete.putAll(parameters);
     }
 
-    public Map getParameterMap() {
-        Map<String, String[]> complete = new HashMap<String, String[]>();
-        if (parameters != null) {
-            complete.putAll(parameters);
-        }
+    complete.putAll(super.getParameterMap());
 
-        complete.putAll(super.getParameterMap());
+    return complete;
+  }
 
-        return complete;
+  public Enumeration getParameterNames() {
+    Set<String> names = new HashSet<String>();
+    if (parameters != null) {
+      names.addAll(parameters.keySet());
     }
 
-    public Enumeration getParameterNames() {
-        Set<String> names = new HashSet<String>();
-        if (parameters != null) {
-            names.addAll(parameters.keySet());
-        }
+    names.addAll(super.getParameterMap().keySet());
 
-        names.addAll(super.getParameterMap().keySet());
+    return new IteratorEnumeration(names.iterator());
+  }
 
-        return new IteratorEnumeration(names.iterator());
+  public String[] getParameterValues(String key) {
+    if (parameters != null && parameters.containsKey(key) && parameters.get(key) != null) {
+      return parameters.get(key);
     }
 
-    public String[] getParameterValues(String key) {
-        if (parameters != null && parameters.containsKey(key) && parameters.get(key) != null) {
-            return parameters.get(key);
-        }
-
-        return super.getParameterValues(key);
-    }
+    return super.getParameterValues(key);
+  }
 }

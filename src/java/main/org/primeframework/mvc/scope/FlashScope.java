@@ -20,94 +20,91 @@ import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.inject.Inject;
 import org.primeframework.mvc.scope.annotation.Flash;
 
+import com.google.inject.Inject;
+
 /**
- * <p>
- * This is the flash scope which stores values in the HttpSession inside
- * a Map under the flash key <code>jcatapultFlash</code>. It fetches
- * values from both the HttpServletRequest and HttpSession under that key.
- * This allows for flash objects to be migrated from the session to the request
- * during request handling so that they are not persisted in the session
- * forever. However, it also allows flash values to be retrieved during the
- * initial request from the session.
- * </p>
+ * <p> This is the flash scope which stores values in the HttpSession inside a Map under the flash key
+ * <code>jcatapultFlash</code>. It fetches values from both the HttpServletRequest and HttpSession under that key. This
+ * allows for flash objects to be migrated from the session to the request during request handling so that they are not
+ * persisted in the session forever. However, it also allows flash values to be retrieved during the initial request
+ * from the session. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @SuppressWarnings("unchecked")
 public class FlashScope implements Scope<Flash> {
-    public static final String FLASH_KEY = "jcatapultFlash";
-    private final HttpServletRequest request;
+  public static final String FLASH_KEY = "jcatapultFlash";
+  private final HttpServletRequest request;
 
-    @Inject
-    public FlashScope(HttpServletRequest request) {
-        this.request = request;
+  @Inject
+  public FlashScope(HttpServletRequest request) {
+    this.request = request;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public Object get(String fieldName, Flash scope) {
+    Map<String, Object> flash = (Map<String, Object>) request.getAttribute(FLASH_KEY);
+
+    String key = scope.value().equals("##field-name##") ? fieldName : scope.value();
+    if (flash == null || !flash.containsKey(key)) {
+      HttpSession session = request.getSession(false);
+      if (session != null) {
+        flash = (Map<String, Object>) session.getAttribute(FLASH_KEY);
+      }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public Object get(String fieldName, Flash scope) {
-        Map<String, Object> flash = (Map<String, Object>) request.getAttribute(FLASH_KEY);
-
-        String key = scope.value().equals("##field-name##") ? fieldName : scope.value();
-        if (flash == null || !flash.containsKey(key)) {
-            HttpSession session = request.getSession(false);
-            if (session != null) {
-                flash = (Map<String, Object>) session.getAttribute(FLASH_KEY);
-            }
-        }
-
-        if (flash == null) {
-            return null;
-        }
-
-        return flash.get(key);
+    if (flash == null) {
+      return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void set(String fieldName, Object value, Flash scope) {
-        HttpSession session;
-        if (value != null) {
-            session = request.getSession(true);
-        } else {
-            session = request.getSession(false);
-        }
+    return flash.get(key);
+  }
 
-        if (session == null) {
-            return;
-        }
-        
-        Map<String, Object> flash = (Map<String, Object>) session.getAttribute(FLASH_KEY);
-
-        if (flash == null) {
-            flash = new HashMap<String, Object>();
-            session.setAttribute(FLASH_KEY, flash);
-        }
-
-        String key = scope.value().equals("##field-name##") ? fieldName : scope.value();
-        if (value != null) {
-            flash.put(key, value);
-        } else {
-            flash.remove(key);
-        }
+  /**
+   * {@inheritDoc}
+   */
+  public void set(String fieldName, Object value, Flash scope) {
+    HttpSession session;
+    if (value != null) {
+      session = request.getSession(true);
+    } else {
+      session = request.getSession(false);
     }
 
-    /**
-     * Moves the flash from the session to the request.
-     */
-    public void transferFlash() {
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-            Map<String, Object> flash = (Map<String, Object>) session.getAttribute(FLASH_KEY);
-            if (flash != null) {
-                session.removeAttribute(FLASH_KEY);
-                request.setAttribute(FLASH_KEY, flash);
-            }
-        }
+    if (session == null) {
+      return;
     }
+
+    Map<String, Object> flash = (Map<String, Object>) session.getAttribute(FLASH_KEY);
+
+    if (flash == null) {
+      flash = new HashMap<String, Object>();
+      session.setAttribute(FLASH_KEY, flash);
+    }
+
+    String key = scope.value().equals("##field-name##") ? fieldName : scope.value();
+    if (value != null) {
+      flash.put(key, value);
+    } else {
+      flash.remove(key);
+    }
+  }
+
+  /**
+   * Moves the flash from the session to the request.
+   */
+  public void transferFlash() {
+    HttpSession session = request.getSession(false);
+    if (session != null) {
+      Map<String, Object> flash = (Map<String, Object>) session.getAttribute(FLASH_KEY);
+      if (flash != null) {
+        session.removeAttribute(FLASH_KEY);
+        request.setAttribute(FLASH_KEY, flash);
+      }
+    }
+  }
 }

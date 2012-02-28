@@ -22,38 +22,35 @@ import org.primeframework.mvc.scope.annotation.Request;
 import com.google.inject.Inject;
 
 /**
- * <p>
- * This is the request scope which fetches and stores values in the
- * HttpServletRequest.
- * </p>
+ * <p> This is the request scope which fetches and stores values in the HttpServletRequest. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class RequestScope implements Scope<Request> {
-    private final HttpServletRequest request;
+  private final HttpServletRequest request;
 
-    @Inject
-    public RequestScope(HttpServletRequest request) {
-        this.request = request;
-    }
+  @Inject
+  public RequestScope(HttpServletRequest request) {
+    this.request = request;
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    public Object get(String fieldName, Request scope) {
-        String key = scope.value().equals("##field-name##") ? fieldName : scope.value();
-        return request.getAttribute(key);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  public Object get(String fieldName, Request scope) {
+    String key = scope.value().equals("##field-name##") ? fieldName : scope.value();
+    return request.getAttribute(key);
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void set(String fieldName, Object value, Request scope) {
-        String key = scope.value().equals("##field-name##") ? fieldName : scope.value();
-        if (value != null) {
-            request.setAttribute(key, value);
-        } else {
-            request.removeAttribute(key);
-        }
+  /**
+   * {@inheritDoc}
+   */
+  public void set(String fieldName, Object value, Request scope) {
+    String key = scope.value().equals("##field-name##") ? fieldName : scope.value();
+    if (value != null) {
+      request.setAttribute(key, value);
+    } else {
+      request.removeAttribute(key);
     }
+  }
 }

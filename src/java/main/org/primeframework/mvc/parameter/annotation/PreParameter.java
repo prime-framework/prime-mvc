@@ -15,20 +15,17 @@
  */
 package org.primeframework.mvc.parameter.annotation;
 
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.lang.annotation.ElementType;
 
 /**
- * <p>
- * This annotation defines a field or property that is set prior to any
- * other parameter handling including invoking the PreParameterMethod methods,
- * setting parameters into the action, invoking the PostParameterMethod methods,
- * or validation.
- * </p>
+ * <p> This annotation defines a field or property that is set prior to any other parameter handling including invoking
+ * the PreParameterMethod methods, setting parameters into the action, invoking the PostParameterMethod methods, or
+ * validation. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.FIELD})

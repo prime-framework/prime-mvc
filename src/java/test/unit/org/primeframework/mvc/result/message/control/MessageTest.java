@@ -21,72 +21,70 @@ import org.primeframework.mvc.result.control.ControlBaseTest;
 import org.testng.annotations.Test;
 
 import com.google.inject.Inject;
-import static java.util.Arrays.asList;
+import static java.util.Arrays.*;
 import static net.java.util.CollectionTools.*;
 import static org.testng.Assert.*;
 
 /**
- * <p>
- * This class tests the message control.
- * </p>
+ * <p> This class tests the message control. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class MessageTest extends ControlBaseTest {
-    @Inject Message message;
+  @Inject Message message;
 
-    @Test
-    public void testMessageAction() {
-        Edit action = new Edit();
-        ais.setCurrent(new DefaultActionInvocation(action, "/user/edit", null, null));
-        run(message,
-            mapNV("key", "key"),
-            null, "American English Message"
-        );
-    }
+  @Test
+  public void testMessageAction() {
+    Edit action = new Edit();
+    ais.setCurrent(new DefaultActionInvocation(action, "/user/edit", null, null));
+    run(message,
+      mapNV("key", "key"),
+      null, "American English Message"
+    );
+  }
 
-    @Test
-    public void testMessageBundle() {
-        Edit action = new Edit();
-        ais.setCurrent(new DefaultActionInvocation(action, "/user/edit", null, null));
-        run(message,
-            mapNV("key", "key", "bundle", "/user/edit-bundle"),
-            null, "Bundle Message"
-        );
-    }
+  @Test
+  public void testMessageBundle() {
+    Edit action = new Edit();
+    ais.setCurrent(new DefaultActionInvocation(action, "/user/edit", null, null));
+    run(message,
+      mapNV("key", "key", "bundle", "/user/edit-bundle"),
+      null, "Bundle Message"
+    );
+  }
 
-    @Test
-    public void messageBundleWithParams() {
-        Edit action = new Edit();
-        ais.setCurrent(new DefaultActionInvocation(action, "/user/edit", null, null));
-        run(message,
-            mapNV("key", "params", "bundle", "/user/edit-bundle", "values", asList("Params")),
-            null, "Params Message"
-        );
-    }
+  @Test
+  public void messageBundleWithParams() {
+    Edit action = new Edit();
+    ais.setCurrent(new DefaultActionInvocation(action, "/user/edit", null, null));
+    run(message,
+      mapNV("key", "params", "bundle", "/user/edit-bundle", "values", asList("Params")),
+      null, "Params Message"
+    );
+  }
 
-    @Test
-    public void testMessageFailure() {
-        Edit action = new Edit();
-        ais.setCurrent(new DefaultActionInvocation(action, "/user/edit", null, null));
-        try {
-            run(message,
-            mapNV("key", "bad"),
-                null, "Bundle message"
-            );
-            fail("Should have failed");
-        } catch (IllegalStateException e) {
-            // Expected
-        }
+  @Test
+  public void testMessageFailure() {
+    Edit action = new Edit();
+    ais.setCurrent(new DefaultActionInvocation(action, "/user/edit", null, null));
+    try {
+      run(message,
+        mapNV("key", "bad"),
+        null, "Bundle message"
+      );
+      fail("Should have failed");
+    } catch (IllegalStateException e) {
+      // Expected
     }
+  }
 
-    @Test
-    public void testDefaultMessage() {
-        Edit action = new Edit();
-        ais.setCurrent(new DefaultActionInvocation(action, "/user/edit", null, null));
-        run(message,
-            mapNV("key", "bad", "default", "Message"),
-            null, "Message"
-        );
-    }
+  @Test
+  public void testDefaultMessage() {
+    Edit action = new Edit();
+    ais.setCurrent(new DefaultActionInvocation(action, "/user/edit", null, null));
+    run(message,
+      mapNV("key", "bad", "default", "Message"),
+      null, "Message"
+    );
+  }
 }

@@ -23,32 +23,30 @@ import java.lang.annotation.Target;
 import org.primeframework.mvc.action.result.HeaderResult;
 
 /**
- * <p>
- * This annotation marks a result from an action as a header only result.
- * </p>
+ * <p> This annotation marks a result from an action as a header only result. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @ResultAnnotation(HeaderResult.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface Header {
-    /**
-     * @return  The result code from the action's execute method that this Result is associated with.
-     */
-    String code() default "success";
+  /**
+   * @return The result code from the action's execute method that this Result is associated with.
+   */
+  String code() default "success";
 
-    /**
-     * @return  The status code.
-     */
-    int status() default 200;
+  /**
+   * @return The status code.
+   */
+  int status() default 200;
 
-    /**
-     * @return  Overrides the status parameter. If this is set, JCatapult use the value of this parameter
-     *          and first expand it. It uses the <code>${variable}</code> notation that is common for
-     *          variable expanders. After it has been expanded, the result is converted into an int.
-     *          Therefore, you can specify either a number as a String, or a variable expansion. Here
-     *          are some examples: <code>"${myStatus}"</code>, <code>"200"</code>, <code>"40${someField}"</code>
-     */
-    String statusStr() default "";
+  /**
+   * @return Overrides the status parameter. If this is set, JCatapult use the value of this parameter and first expand
+   *         it. It uses the <code>${variable}</code> notation that is common for variable expanders. After it has been
+   *         expanded, the result is converted into an int. Therefore, you can specify either a number as a String, or a
+   *         variable expansion. Here are some examples: <code>"${myStatus}"</code>, <code>"200"</code>,
+   *         <code>"40${someField}"</code>
+   */
+  String statusStr() default "";
 }

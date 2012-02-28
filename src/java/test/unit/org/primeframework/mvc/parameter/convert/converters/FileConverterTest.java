@@ -20,61 +20,59 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
-import static org.testng.Assert.*;
 import org.testng.annotations.Test;
 
 import static net.java.util.CollectionTools.*;
+import static org.testng.Assert.*;
 
 /**
- * <p>
- * This tests the file converter.
- * </p>
+ * <p> This tests the file converter. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class FileConverterTest {
-    /**
-     * Test the conversion from Strings.
-     */
-    @Test
-    public void testFromStrings() {
-        Map<String, String> map = new HashMap<String, String>();
-        GlobalConverter converter = new FileConverter();
-        File f = (File) converter.convertFromStrings(File.class, map, "testExpr", array((String) null));
-        assertNull(f);
+  /**
+   * Test the conversion from Strings.
+   */
+  @Test
+  public void testFromStrings() {
+    Map<String, String> map = new HashMap<String, String>();
+    GlobalConverter converter = new FileConverter();
+    File f = (File) converter.convertFromStrings(File.class, map, "testExpr", array((String) null));
+    assertNull(f);
 
-        f = (File) converter.convertFromStrings(File.class, map, "testExpr", array(""));
-        assertNull(f);
+    f = (File) converter.convertFromStrings(File.class, map, "testExpr", array(""));
+    assertNull(f);
 
-        f = (File) converter.convertFromStrings(File.class, map, "testExpr", array("/tmp"));
-        assertEquals("/tmp", f.getAbsolutePath());
+    f = (File) converter.convertFromStrings(File.class, map, "testExpr", array("/tmp"));
+    assertEquals("/tmp", f.getAbsolutePath());
 
-        f = (File) converter.convertFromStrings(File.class, map, "testExpr", array("/tmp", "jcatapult"));
-        assertEquals("/tmp/jcatapult", f.getAbsolutePath());
+    f = (File) converter.convertFromStrings(File.class, map, "testExpr", array("/tmp", "jcatapult"));
+    assertEquals("/tmp/jcatapult", f.getAbsolutePath());
 
-        f = (File) converter.convertFromStrings(File.class, map, "testExpr", array("project.xml"));
-        assertEquals(new File("project.xml").getAbsolutePath(), f.getAbsolutePath());
+    f = (File) converter.convertFromStrings(File.class, map, "testExpr", array("project.xml"));
+    assertEquals(new File("project.xml").getAbsolutePath(), f.getAbsolutePath());
 
-        File[] fa = (File[]) converter.convertFromStrings(File[].class, map, "testExpr", array("project.xml", "build.xml"));
-        assertEquals(new File("project.xml").getAbsolutePath(), fa[0].getAbsolutePath());
-        assertEquals(new File("build.xml").getAbsolutePath(), fa[1].getAbsolutePath());
+    File[] fa = (File[]) converter.convertFromStrings(File[].class, map, "testExpr", array("project.xml", "build.xml"));
+    assertEquals(new File("project.xml").getAbsolutePath(), fa[0].getAbsolutePath());
+    assertEquals(new File("build.xml").getAbsolutePath(), fa[1].getAbsolutePath());
 
-        // Test parentDir
-        map.put("parentDir", "/tmp");
-        f = (File) converter.convertFromStrings(File.class, map, "testExpr", array("project.xml"));
-        assertEquals(new File("/tmp/project.xml").getAbsolutePath(), f.getAbsolutePath());
-    }
+    // Test parentDir
+    map.put("parentDir", "/tmp");
+    f = (File) converter.convertFromStrings(File.class, map, "testExpr", array("project.xml"));
+    assertEquals(new File("/tmp/project.xml").getAbsolutePath(), f.getAbsolutePath());
+  }
 
-    /**
-     * Test the conversion from Strings.
-     */
-    @Test
-    public void testToStrings() {
-        GlobalConverter converter = new FileConverter();
-        String str = converter.convertToString(File.class, null, "testExpr", null);
-        assertNull(str);
+  /**
+   * Test the conversion from Strings.
+   */
+  @Test
+  public void testToStrings() {
+    GlobalConverter converter = new FileConverter();
+    String str = converter.convertToString(File.class, null, "testExpr", null);
+    assertNull(str);
 
-        str = converter.convertToString(File.class, null, "testExpr", new File("project.xml"));
-        assertEquals(new File("project.xml").getAbsolutePath(), str);
-    }
+    str = converter.convertToString(File.class, null, "testExpr", new File("project.xml"));
+    assertEquals(new File("project.xml").getAbsolutePath(), str);
+  }
 }

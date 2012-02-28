@@ -17,27 +17,25 @@ package org.primeframework.mvc.parameter.fileupload.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * <p>
- * This annotation is used to mark a file upload field or method on an action
- * and provide the maximum size or allowed content types.
- * </p>
+ * <p> This annotation is used to mark a file upload field or method on an action and provide the maximum size or
+ * allowed content types. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.METHOD})
 public @interface FileUpload {
-    /**
-     * @return  The maximum size of the file.
-     */
-    long maxSize() default -1;
+  /**
+   * @return The maximum size of the file.
+   */
+  long maxSize() default -1;
 
-    /**
-     * @return  The allowed content types of the file.
-     */
-    String[] contentTypes() default {};
+  /**
+   * @return The allowed content types of the file.
+   */
+  String[] contentTypes() default {};
 }

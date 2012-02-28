@@ -15,25 +15,24 @@
  */
 package org.primeframework.mvc.validation;
 
-import static org.testng.Assert.*;
 import org.testng.annotations.Test;
 
+import static org.testng.Assert.*;
+
 /**
- * <p>
- * This tests the email validator.
- * </p>
+ * <p> This tests the email validator. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class EmailValidatorTest {
-    @Test
-    public void testSimpleEmail() {
-        EmailValidator validator = new EmailValidator();
-        assertTrue(validator.validate(null, null, "test@test.com"));
-        assertTrue(validator.validate(null, null, "brian.pontarelli@example.com.il"));
-        assertFalse(validator.validate(null, null, "frank"));
-        assertFalse(validator.validate(null, null, "frank@"));
-        assertFalse(validator.validate(null, null, "@frank@"));
-        assertFalse(validator.validate(null, null, "frank@bad"));
-    }
+  @Test
+  public void testSimpleEmail() {
+    EmailValidator validator = new EmailValidator();
+    assertTrue(validator.validate(null, null, "test@test.com"));
+    assertTrue(validator.validate(null, null, "brian.pontarelli@example.com.il"));
+    assertFalse(validator.validate(null, null, "frank"));
+    assertFalse(validator.validate(null, null, "frank@"));
+    assertFalse(validator.validate(null, null, "@frank@"));
+    assertFalse(validator.validate(null, null, "frank@bad"));
+  }
 }

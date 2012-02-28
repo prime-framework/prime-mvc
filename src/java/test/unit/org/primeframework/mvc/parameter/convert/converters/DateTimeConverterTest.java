@@ -17,65 +17,62 @@ package org.primeframework.mvc.parameter.convert.converters;
 
 import java.util.Locale;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
-import org.joda.time.DateTime;
-import static org.testng.Assert.*;
-
-import org.joda.time.DateTimeZone;
 import org.testng.annotations.Test;
 
 import static net.java.util.CollectionTools.*;
+import static org.testng.Assert.*;
 
 /**
- * <p>
- * This tests the date time converter.
- * </p>
+ * <p> This tests the date time converter. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class DateTimeConverterTest {
-    /**
-     * Test the conversion from Strings.
-     */
-    @Test
-    public void fromStrings() {
-        GlobalConverter converter = new DateTimeConverter();
-        DateTime value = (DateTime) converter.convertFromStrings(DateTime.class, null, "testExpr", array((String) null));
-        assertNull(value);
+  /**
+   * Test the conversion from Strings.
+   */
+  @Test
+  public void fromStrings() {
+    GlobalConverter converter = new DateTimeConverter();
+    DateTime value = (DateTime) converter.convertFromStrings(DateTime.class, null, "testExpr", array((String) null));
+    assertNull(value);
 
-        value = (DateTime) converter.convertFromStrings(Locale.class, map("dateTimeFormat", "MM-dd-yyyy"), "testExpr", array("07-08-2008"));
-        assertEquals(7, value.getMonthOfYear());
-        assertEquals(8, value.getDayOfMonth());
-        assertEquals(2008, value.getYear());
+    value = (DateTime) converter.convertFromStrings(Locale.class, map("dateTimeFormat", "MM-dd-yyyy"), "testExpr", array("07-08-2008"));
+    assertEquals(7, value.getMonthOfYear());
+    assertEquals(8, value.getDayOfMonth());
+    assertEquals(2008, value.getYear());
 
 
-        value = (DateTime) converter.convertFromStrings(Locale.class, map("dateTimeFormat", "MM-dd-yyyy hh:mm:ss aa Z"), "testExpr", array("07-08-2008 10:13:34 AM -0800"));
-        assertEquals(7, value.getMonthOfYear());
-        assertEquals(8, value.getDayOfMonth());
-        assertEquals(2008, value.getYear());
-        assertEquals(10, value.getHourOfDay());
-        assertEquals(13, value.getMinuteOfHour());
-        assertEquals(34, value.getSecondOfMinute());
-        assertEquals(DateTimeZone.forOffsetHours(-8), value.getZone());
+    value = (DateTime) converter.convertFromStrings(Locale.class, map("dateTimeFormat", "MM-dd-yyyy hh:mm:ss aa Z"), "testExpr", array("07-08-2008 10:13:34 AM -0800"));
+    assertEquals(7, value.getMonthOfYear());
+    assertEquals(8, value.getDayOfMonth());
+    assertEquals(2008, value.getYear());
+    assertEquals(10, value.getHourOfDay());
+    assertEquals(13, value.getMinuteOfHour());
+    assertEquals(34, value.getSecondOfMinute());
+    assertEquals(DateTimeZone.forOffsetHours(-8), value.getZone());
 
-        try {
-            converter.convertFromStrings(Locale.class, map("dateTimeFormat", "MM-dd-yyyy"), "testExpr", array("07/08/2008"));
-            fail("Should have failed");
-        } catch (ConversionException e) {
-        }
+    try {
+      converter.convertFromStrings(Locale.class, map("dateTimeFormat", "MM-dd-yyyy"), "testExpr", array("07/08/2008"));
+      fail("Should have failed");
+    } catch (ConversionException e) {
     }
+  }
 
-    /**
-     * Test the conversion from Strings.
-     */
-    @Test
-    public void toStrings() {
-        GlobalConverter converter = new DateTimeConverter();
-        String str = converter.convertToString(DateTime.class, null, "testExpr", null);
-        assertNull(str);
+  /**
+   * Test the conversion from Strings.
+   */
+  @Test
+  public void toStrings() {
+    GlobalConverter converter = new DateTimeConverter();
+    String str = converter.convertToString(DateTime.class, null, "testExpr", null);
+    assertNull(str);
 
-        str = converter.convertToString(DateTime.class, map("dateTimeFormat", "MM-dd-yyyy"), "testExpr", new DateTime(2008, 7, 8, 1, 1, 1, 0));
-        assertEquals("07-08-2008", str);
-    }
+    str = converter.convertToString(DateTime.class, map("dateTimeFormat", "MM-dd-yyyy"), "testExpr", new DateTime(2008, 7, 8, 1, 1, 1, 0));
+    assertEquals("07-08-2008", str);
+  }
 }

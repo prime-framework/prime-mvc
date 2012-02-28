@@ -16,12 +16,10 @@
 package org.example.domain;
 
 /**
- * <p>
- * This is a test action with fields.
- * </p>
+ * <p> This is a test action with fields. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class ActionField {
-    public UserField user;
+  public UserField user;
 }

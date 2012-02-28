@@ -15,30 +15,28 @@
  */
 package org.primeframework.mvc.servlet;
 
-import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 
 /**
- * <p>
- * This request is a URI proxy.
- * </p>
+ * <p> This request is a URI proxy. </p>
  *
  * @author Brian Pontarelli
  */
 public class URIHttpServletRequest extends HttpServletRequestWrapper {
-    private String uri;
+  private String uri;
 
-    public URIHttpServletRequest(HttpServletRequest httpServletRequest, String uri) {
-        super(httpServletRequest);
-        this.uri = uri;
-    }
+  public URIHttpServletRequest(HttpServletRequest httpServletRequest, String uri) {
+    super(httpServletRequest);
+    this.uri = uri;
+  }
 
-    @Override
-    public String getRequestURI() {
-        return uri;
-    }
+  @Override
+  public String getRequestURI() {
+    return uri;
+  }
 
-    public void setRequestURI(String uri) {
-        this.uri = uri;
-    }
+  public void setRequestURI(String uri) {
+    this.uri = uri;
+  }
 }

@@ -23,27 +23,24 @@ import java.lang.annotation.Target;
 import org.primeframework.mvc.validation.EmailValidator;
 
 /**
- * <p>
- * This annotation is a validation annotation that indicates a field is
- * an email.
- * </p>
+ * <p> This annotation is a validation annotation that indicates a field is an email. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 @ValidatorAnnotation(EmailValidator.class)
 public @interface Email {
-    /**
-     * @return  The message key that is used if the field is null. The default is based on the fields
-     *          fully qualified name in the current parameters and the String <code>email</code>
-     *          is appended to that. For example: <code>user.login.email</code>.
-     */
-    public abstract String key() default "";
+  /**
+   * @return The message key that is used if the field is null. The default is based on the fields fully qualified name
+   *         in the current parameters and the String <code>email</code> is appended to that. For example:
+   *         <code>user.login.email</code>.
+   */
+  public abstract String key() default "";
 
-    /**
-     * @return  The validation groups that this validation will be run in. Groups are specified in
-     *          an action and can control how validation is performed. This defaults to all groups.
-     */
-    public abstract String[] groups() default {};
+  /**
+   * @return The validation groups that this validation will be run in. Groups are specified in an action and can
+   *         control how validation is performed. This defaults to all groups.
+   */
+  public abstract String[] groups() default {};
 }

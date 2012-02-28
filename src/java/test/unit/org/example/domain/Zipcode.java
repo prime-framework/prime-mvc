@@ -23,9 +23,7 @@ import java.lang.annotation.Target;
 import org.primeframework.mvc.validation.annotation.ValidatorAnnotation;
 
 /**
- * <p>
- * This is a test annotation.
- * </p>
+ * <p> This is a test annotation. </p>
  *
  * @author Brian Pontarelli
  */
@@ -33,5 +31,5 @@ import org.primeframework.mvc.validation.annotation.ValidatorAnnotation;
 @Target(ElementType.FIELD)
 @ValidatorAnnotation(StateValidator.class)
 public @interface Zipcode {
-    String key() default "";
+  String key() default "";
 }

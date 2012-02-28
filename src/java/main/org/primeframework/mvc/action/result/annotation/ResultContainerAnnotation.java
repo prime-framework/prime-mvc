@@ -21,12 +21,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * <p>
- * This annotation is a marker that is used to mark container annotations that
- * store multiple custom result annotations.
- * </p>
+ * <p> This annotation is a marker that is used to mark container annotations that store multiple custom result
+ * annotations. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.ANNOTATION_TYPE)

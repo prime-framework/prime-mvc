@@ -29,44 +29,42 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 /**
- * <p>
- * This converts to and from Enums.
- * </p>
+ * <p> This converts to and from Enums. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @GlobalConverter(forTypes = {Enum.class})
 @SuppressWarnings("unchecked")
 public class EnumConverter extends AbstractGlobalConverter {
-    private boolean emptyIsNull = true;
+  private boolean emptyIsNull = true;
 
-    @Inject(optional = true)
-    public void setEmptyStringIsNull(@Named("jcatapult.mvc.emptyStringIsNull") boolean emptyIsNull) {
-        this.emptyIsNull = emptyIsNull;
-    }
+  @Inject(optional = true)
+  public void setEmptyStringIsNull(@Named("jcatapult.mvc.emptyStringIsNull") boolean emptyIsNull) {
+    this.emptyIsNull = emptyIsNull;
+  }
 
-    protected Object stringToObject(String value, Type convertTo, Map<String, String> attributes, String expression)
+  protected Object stringToObject(String value, Type convertTo, Map<String, String> attributes, String expression)
     throws ConversionException, ConverterStateException {
-        if (emptyIsNull && StringTools.isTrimmedEmpty(value)) {
-            return null;
-        }
-
-      try {
-        return Enum.valueOf((Class<Enum>) convertTo, value);
-      } catch (IllegalArgumentException e) {
-        throw new ConversionException(e);
-      }
+    if (emptyIsNull && StringTools.isTrimmedEmpty(value)) {
+      return null;
     }
 
-    protected Object stringsToObject(String[] values, Type convertTo, Map<String, String> attributes, String expression)
+    try {
+      return Enum.valueOf((Class<Enum>) convertTo, value);
+    } catch (IllegalArgumentException e) {
+      throw new ConversionException(e);
+    }
+  }
+
+  protected Object stringsToObject(String[] values, Type convertTo, Map<String, String> attributes, String expression)
     throws ConversionException, ConverterStateException {
-        throw new UnsupportedOperationException("You are attempting to map a form field that contains " +
-            "multiple parameters to a property on the action class that is of type Enum. This isn't " +
-            "allowed.");
-    }
+    throw new UnsupportedOperationException("You are attempting to map a form field that contains " +
+      "multiple parameters to a property on the action class that is of type Enum. This isn't " +
+      "allowed.");
+  }
 
-    protected String objectToString(Object value, Type convertFrom, Map<String, String> attributes, String expression)
+  protected String objectToString(Object value, Type convertFrom, Map<String, String> attributes, String expression)
     throws ConversionException, ConverterStateException {
-        return value.toString();
-    }
+    return value.toString();
+  }
 }

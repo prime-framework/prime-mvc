@@ -15,37 +15,33 @@
  */
 package org.primeframework.mvc;
 
-import java.io.IOException;
 import javax.servlet.ServletException;
+import java.io.IOException;
 
-import org.primeframework.mvc.test.WebappTestRunner;
-import org.primeframework.test.JCatapultBaseTest;
-import static org.testng.Assert.*;
+import org.primeframework.mvc.test.JCatapultBaseTest;
 import org.testng.annotations.Test;
 
 import net.java.io.FileTools;
 
 /**
- * <p>
- * This class tests the MVC from a high level perspective.
- * </p>
+ * <p> This class tests the MVC from a high level perspective. </p>
  *
  * @author Brian Pontarelli
  */
 public class GlobalTest extends JCatapultBaseTest {
-    @Test
-    public void testRenderFTL() throws IOException, ServletException {
-        WebappTestRunner runner = new WebappTestRunner();
-        runner.test("/user/edit").get();
-        assertEquals(FileTools.read("src/java/test/unit/org/jcatapult/mvc/edit-output.txt").toString(),
-            runner.response.getStream().toString());
-    }
+  @Test
+  public void testRenderFTL() throws IOException, ServletException {
+    WebappTestRunner runner = new WebappTestRunner();
+    runner.test("/user/edit").get();
+    assertEquals(FileTools.read("src/java/test/unit/org/jcatapult/mvc/edit-output.txt").toString(),
+      runner.response.getStream().toString());
+  }
 
-    @Test
-    public void testNonFormFields() throws IOException, ServletException {
-        WebappTestRunner runner = new WebappTestRunner();
-        runner.test("/user/details-fields").get();
-        assertEquals(FileTools.read("src/java/test/unit/org/jcatapult/mvc/details-fields-output.txt").toString(),
-            runner.response.getStream().toString());
-    }
+  @Test
+  public void testNonFormFields() throws IOException, ServletException {
+    WebappTestRunner runner = new WebappTestRunner();
+    runner.test("/user/details-fields").get();
+    assertEquals(FileTools.read("src/java/test/unit/org/jcatapult/mvc/details-fields-output.txt").toString(),
+      runner.response.getStream().toString());
+  }
 }

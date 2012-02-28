@@ -20,29 +20,27 @@ import java.io.Writer;
 import freemarker.template.TemplateDirectiveBody;
 
 /**
- * <p>
- * This class is a proxy for the FreeMarker directive body.
- * </p>
+ * <p> This class is a proxy for the FreeMarker directive body. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class FreeMarkerBodyProxy implements Body {
-    private final TemplateDirectiveBody body;
+  private final TemplateDirectiveBody body;
 
-    public FreeMarkerBodyProxy(TemplateDirectiveBody body) {
-        this.body = body;
-    }
+  public FreeMarkerBodyProxy(TemplateDirectiveBody body) {
+    this.body = body;
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void render(Writer writer) {
-        if (body != null) {
-            try {
-                body.render(writer);
-            } catch (Exception e) {
-                throw new IllegalStateException(e);
-            }
-        }
+  /**
+   * {@inheritDoc}
+   */
+  public void render(Writer writer) {
+    if (body != null) {
+      try {
+        body.render(writer);
+      } catch (Exception e) {
+        throw new IllegalStateException(e);
+      }
     }
+  }
 }

@@ -22,35 +22,33 @@ import org.primeframework.mvc.result.control.annotation.ControlAttribute;
 import org.primeframework.mvc.result.control.annotation.ControlAttributes;
 
 /**
- * <p>
- * This class is the control for a select box.
- * </p>
+ * <p> This class is the control for a select box. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @ControlAttributes(
-    required = {
-        @ControlAttribute(name = "name"),
-        @ControlAttribute(name = "items", types = {Collection.class, Map.class, Object[].class})
-    },
-    optional = {
-        @ControlAttribute(name = "disabled", types = {boolean.class, Boolean.class}),
-        @ControlAttribute(name = "multiple", types = {boolean.class, Boolean.class}),
-        @ControlAttribute(name = "readonly", types = {boolean.class, Boolean.class}),
-        @ControlAttribute(name = "required", types = {boolean.class, Boolean.class}),
-        @ControlAttribute(name = "size", types = {int.class, Integer.class}),
-        @ControlAttribute(name = "tabindex", types = {int.class, Integer.class})
-    }
+  required = {
+    @ControlAttribute(name = "name"),
+    @ControlAttribute(name = "items", types = {Collection.class, Map.class, Object[].class})
+  },
+  optional = {
+    @ControlAttribute(name = "disabled", types = {boolean.class, Boolean.class}),
+    @ControlAttribute(name = "multiple", types = {boolean.class, Boolean.class}),
+    @ControlAttribute(name = "readonly", types = {boolean.class, Boolean.class}),
+    @ControlAttribute(name = "required", types = {boolean.class, Boolean.class}),
+    @ControlAttribute(name = "size", types = {int.class, Integer.class}),
+    @ControlAttribute(name = "tabindex", types = {int.class, Integer.class})
+  }
 )
 public class Select extends AbstractListInput {
-    public Select() {
-        super(true);
-    }
+  public Select() {
+    super(true);
+  }
 
-    /**
-     * @return  select.ftl
-     */
-    protected String endTemplateName() {
-        return "select.ftl";
-    }
+  /**
+   * @return select.ftl
+   */
+  protected String endTemplateName() {
+    return "select.ftl";
+  }
 }

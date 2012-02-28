@@ -22,31 +22,29 @@ import org.primeframework.mvc.result.form.annotation.FormPrepareMethod;
 import org.primeframework.mvc.validation.annotation.Valid;
 
 /**
- * <p>
- * This class is a simple edit action for testing.
- * </p>
+ * <p> This class is a simple edit action for testing. </p>
  *
  * @author Brian Pontarelli
  */
 @Action
 public class Edit {
-    @Valid
-    public User user;
+  @Valid
+  public User user;
 
-    public boolean actionPrepared = false;
-    public boolean formPrepared = false;
+  public boolean actionPrepared = false;
+  public boolean formPrepared = false;
 
-    public String execute() {
-        return "success";
-    }
+  public String execute() {
+    return "success";
+  }
 
-    @ActionPrepareMethod
-    public void prepare() {
-        actionPrepared = true;
-    }
+  @ActionPrepareMethod
+  public void prepare() {
+    actionPrepared = true;
+  }
 
-    @FormPrepareMethod
-    public void formPrepare() {
-        formPrepared = true;
-    }
+  @FormPrepareMethod
+  public void formPrepare() {
+    formPrepared = true;
+  }
 }

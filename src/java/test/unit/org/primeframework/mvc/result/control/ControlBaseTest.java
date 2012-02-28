@@ -15,56 +15,53 @@
  */
 package org.primeframework.mvc.result.control;
 
+import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.io.IOException;
 import java.util.Map;
 
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.message.MessageStore;
-import org.primeframework.test.JCatapultBaseTest;
-import static org.testng.Assert.*;
-
+import org.primeframework.mvc.test.JCatapultBaseTest;
 
 import com.google.inject.Inject;
 import static net.java.util.CollectionTools.*;
+import static org.testng.Assert.*;
 
 /**
- * <p>
- * This class is a base test for the controls.
- * </p>
+ * <p> This class is a base test for the controls. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class ControlBaseTest extends JCatapultBaseTest {
-    @Inject protected ActionInvocationStore ais;
-    @Inject protected MessageStore messageStore;
+  @Inject protected ActionInvocationStore ais;
+  @Inject protected MessageStore messageStore;
 
-    /**
-     * Runs the control and verifies the output.
-     *
-     * @param   control The control to run.
-     * @param   attributes The attributes passed to the control.
-     * @param   body The body.
-     * @param   expected The expected output.
-     */
-    protected void run(Control control, Map<String, Object> attributes, final String body, String expected) {
-        StringWriter writer = new StringWriter();
-        control.renderStart(writer, attributes, map("param", "param-value"));
-        
-        if (body != null) {
-            control.renderBody(writer, new Body() {
-                public void render(Writer writer) {
-                    try {
-                        writer.write(body);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            });
+  /**
+   * Runs the control and verifies the output.
+   *
+   * @param control    The control to run.
+   * @param attributes The attributes passed to the control.
+   * @param body       The body.
+   * @param expected   The expected output.
+   */
+  protected void run(Control control, Map<String, Object> attributes, final String body, String expected) {
+    StringWriter writer = new StringWriter();
+    control.renderStart(writer, attributes, map("param", "param-value"));
+
+    if (body != null) {
+      control.renderBody(writer, new Body() {
+        public void render(Writer writer) {
+          try {
+            writer.write(body);
+          } catch (IOException e) {
+            throw new RuntimeException(e);
+          }
         }
-
-        control.renderEnd(writer);
-        assertEquals(expected, writer.toString());
+      });
     }
+
+    control.renderEnd(writer);
+    assertEquals(expected, writer.toString());
+  }
 }

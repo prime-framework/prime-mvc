@@ -15,16 +15,12 @@
  */
 package org.primeframework.mvc.servlet;
 
-import org.primeframework.servlet.Workflow;
-
 import com.google.inject.ImplementedBy;
 
 /**
- * <p>
- * This interface defines the main entry point for the JCatapult MVC.
- * </p>
+ * <p> This interface defines the main entry point for the JCatapult MVC. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @ImplementedBy(DefaultMVCWorkflow.class)
 public interface MVCWorkflow extends Workflow {

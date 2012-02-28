@@ -16,41 +16,39 @@
 package org.primeframework.mvc.result.form.control;
 
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-import org.primeframework.mvc.result.control.annotation.ControlAttributes;
 import org.primeframework.mvc.result.control.annotation.ControlAttribute;
+import org.primeframework.mvc.result.control.annotation.ControlAttributes;
 
 import com.google.inject.Inject;
 
 /**
- * <p>
- * This class is the control for a input type=text.
- * </p>
+ * <p> This class is the control for a input type=text. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @ControlAttributes(
-    required = {
-        @ControlAttribute(name = "name")
-    },
-    optional = {
-        @ControlAttribute(name = "disabled", types = {boolean.class, Boolean.class}),
-        @ControlAttribute(name = "meaxlength", types = {int.class, Integer.class}),
-        @ControlAttribute(name = "readonly", types = {boolean.class, Boolean.class}),
-        @ControlAttribute(name = "required", types = {boolean.class, Boolean.class}),
-        @ControlAttribute(name = "size", types = {int.class, Integer.class}),
-        @ControlAttribute(name = "tabindex", types = {int.class, Integer.class})
-    }
+  required = {
+    @ControlAttribute(name = "name")
+  },
+  optional = {
+    @ControlAttribute(name = "disabled", types = {boolean.class, Boolean.class}),
+    @ControlAttribute(name = "meaxlength", types = {int.class, Integer.class}),
+    @ControlAttribute(name = "readonly", types = {boolean.class, Boolean.class}),
+    @ControlAttribute(name = "required", types = {boolean.class, Boolean.class}),
+    @ControlAttribute(name = "size", types = {int.class, Integer.class}),
+    @ControlAttribute(name = "tabindex", types = {int.class, Integer.class})
+  }
 )
 public class Text extends AbstractValueInput {
-    @Inject
-    public Text(ExpressionEvaluator expressionEvaluator) {
-        super(expressionEvaluator, true);
-    }
+  @Inject
+  public Text(ExpressionEvaluator expressionEvaluator) {
+    super(expressionEvaluator, true);
+  }
 
-    /**
-     * @return  text.ftl
-     */
-    protected String endTemplateName() {
-        return "text.ftl";
-    }
+  /**
+   * @return text.ftl
+   */
+  protected String endTemplateName() {
+    return "text.ftl";
+  }
 }

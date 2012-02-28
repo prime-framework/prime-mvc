@@ -18,75 +18,74 @@ package org.primeframework.mvc.parameter.convert.converters;
 import java.lang.reflect.Type;
 import java.util.Map;
 
+import org.joda.time.DateTime;
+import org.joda.time.ReadableInstant;
+import org.joda.time.format.DateTimeFormat;
 import org.primeframework.mvc.parameter.convert.AbstractGlobalConverter;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.convert.annotation.GlobalConverter;
-import org.joda.time.DateTime;
-import org.joda.time.ReadableInstant;
-import org.joda.time.format.DateTimeFormat;
+
+import net.java.lang.StringTools;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import net.java.lang.StringTools;
 
 /**
- * <p>
- * This converts to and from DateTime.
- * </p>
+ * <p> This converts to and from DateTime. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @GlobalConverter(forTypes = {DateTime.class})
 @SuppressWarnings("unchecked")
 public class DateTimeConverter extends AbstractGlobalConverter {
-    private boolean emptyIsNull = true;
+  private boolean emptyIsNull = true;
 
-    @Inject(optional = true)
-    public void setEmptyStringIsNull(@Named("jcatapult.mvc.emptyStringIsNull") boolean emptyIsNull) {
-        this.emptyIsNull = emptyIsNull;
-    }
+  @Inject(optional = true)
+  public void setEmptyStringIsNull(@Named("jcatapult.mvc.emptyStringIsNull") boolean emptyIsNull) {
+    this.emptyIsNull = emptyIsNull;
+  }
 
-    protected Object stringToObject(String value, Type convertTo, Map<String, String> attributes, String expression)
+  protected Object stringToObject(String value, Type convertTo, Map<String, String> attributes, String expression)
     throws ConversionException, ConverterStateException {
-        if (emptyIsNull && StringTools.isTrimmedEmpty(value)) {
-            return null;
-        }
-
-        String format = attributes.get("dateTimeFormat");
-        if (format == null) {
-            throw new ConverterStateException("You must provide the dateTimeFormat dynamic attribute for " +
-                "the form fields [" + expression + "] that maps to DateTime properties in the action. " +
-                "If you are using a text field it will look like this: [@jc.text _dateTimeFormat=\"MM/dd/yyyy\"]");
-        }
-
-        return toDateTime(value, format);
+    if (emptyIsNull && StringTools.isTrimmedEmpty(value)) {
+      return null;
     }
 
-    protected Object stringsToObject(String[] values, Type convertTo, Map<String, String> attributes, String expression)
+    String format = attributes.get("dateTimeFormat");
+    if (format == null) {
+      throw new ConverterStateException("You must provide the dateTimeFormat dynamic attribute for " +
+        "the form fields [" + expression + "] that maps to DateTime properties in the action. " +
+        "If you are using a text field it will look like this: [@jc.text _dateTimeFormat=\"MM/dd/yyyy\"]");
+    }
+
+    return toDateTime(value, format);
+  }
+
+  protected Object stringsToObject(String[] values, Type convertTo, Map<String, String> attributes, String expression)
     throws ConversionException, ConverterStateException {
-        throw new UnsupportedOperationException("You are attempting to map a form field that contains " +
-            "multiple parameters to a property on the action class that is of type DateTime. This isn't " +
-            "allowed.");
-    }
+    throw new UnsupportedOperationException("You are attempting to map a form field that contains " +
+      "multiple parameters to a property on the action class that is of type DateTime. This isn't " +
+      "allowed.");
+  }
 
-    protected String objectToString(Object value, Type convertFrom, Map<String, String> attributes, String expression)
+  protected String objectToString(Object value, Type convertFrom, Map<String, String> attributes, String expression)
     throws ConversionException, ConverterStateException {
-        String format = attributes.get("dateTimeFormat");
-        if (format == null) {
-            throw new ConverterStateException("You must provide the dateTimeFormat dynamic attribute for " +
-                "the form fields [" + expression + "] that maps to DateTime properties in the action. " +
-                "If you are using a text field it will look like this: [@jc.text _dateTimeFormat=\"MM/dd/yyyy\"]");
-        }
-
-        return DateTimeFormat.forPattern(format).print((ReadableInstant) value);
+    String format = attributes.get("dateTimeFormat");
+    if (format == null) {
+      throw new ConverterStateException("You must provide the dateTimeFormat dynamic attribute for " +
+        "the form fields [" + expression + "] that maps to DateTime properties in the action. " +
+        "If you are using a text field it will look like this: [@jc.text _dateTimeFormat=\"MM/dd/yyyy\"]");
     }
 
-    private DateTime toDateTime(String value, String format) {
-        try {
-            return DateTimeFormat.forPattern(format).withOffsetParsed().parseDateTime(value);
-        } catch (IllegalArgumentException e) {
-            throw new ConversionException("Invalid date [" + value + "] for format [" + format + "]", e);
-        }
+    return DateTimeFormat.forPattern(format).print((ReadableInstant) value);
+  }
+
+  private DateTime toDateTime(String value, String format) {
+    try {
+      return DateTimeFormat.forPattern(format).withOffsetParsed().parseDateTime(value);
+    } catch (IllegalArgumentException e) {
+      throw new ConversionException("Invalid date [" + value + "] for format [" + format + "]", e);
     }
+  }
 }

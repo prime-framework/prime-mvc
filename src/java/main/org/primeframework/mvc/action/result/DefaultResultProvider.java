@@ -23,36 +23,30 @@ import org.primeframework.mvc.action.result.annotation.ResultAnnotation;
 import com.google.inject.Inject;
 
 /**
- * <p>
- * This class is the manager for all the Results. It loads the Results from
- * Guice. Therefore, if you want to define a custom result, create a new
- * annotation, annotate your annotation with the
- * {@link org.primeframework.mvc.action.result.annotation.ResultAnnotation}
- * annotation, and then begin annotating classes. This class will taken care
- * for using the ResultAnnotation's value to determine the Result implementation
- * to construct and use.
- * </p>
+ * <p> This class is the manager for all the Results. It loads the Results from Guice. Therefore, if you want to define
+ * a custom result, create a new annotation, annotate your annotation with the {@link
+ * org.primeframework.mvc.action.result.annotation.ResultAnnotation} annotation, and then begin annotating classes. This
+ * class will taken care for using the ResultAnnotation's value to determine the Result implementation to construct and
+ * use. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class DefaultResultProvider implements ResultProvider {
-    private final ObjectFactory objectFactory;
+  private final ObjectFactory objectFactory;
 
-    @Inject
-    public DefaultResultProvider(ObjectFactory objectFactory) {
-        this.objectFactory = objectFactory;
-    }
+  @Inject
+  public DefaultResultProvider(ObjectFactory objectFactory) {
+    this.objectFactory = objectFactory;
+  }
 
-    /**
-     * <p>
-     * Returns the result for the given annotation.
-     * </p>
-     *
-     * @param   annotation The annotation.
-     * @return  The Result or null if one was not found
-     */
-    public Result lookup(Class<? extends Annotation> annotation) {
-        ResultAnnotation ra = annotation.getAnnotation(ResultAnnotation.class);
-        return objectFactory.create(ra.value());
-    }
+  /**
+   * <p> Returns the result for the given annotation. </p>
+   *
+   * @param annotation The annotation.
+   * @return The Result or null if one was not found
+   */
+  public Result lookup(Class<? extends Annotation> annotation) {
+    ResultAnnotation ra = annotation.getAnnotation(ResultAnnotation.class);
+    return objectFactory.create(ra.value());
+  }
 }

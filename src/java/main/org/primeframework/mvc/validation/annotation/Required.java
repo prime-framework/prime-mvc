@@ -23,27 +23,24 @@ import java.lang.annotation.Target;
 import org.primeframework.mvc.validation.RequiredValidator;
 
 /**
- * <p>
- * This annotation is a validation annotation that indicates a field is
- * required.
- * </p>
+ * <p> This annotation is a validation annotation that indicates a field is required. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 @ValidatorAnnotation(RequiredValidator.class)
 public @interface Required {
-    /**
-     * @return  The message key that is used if the field is null. The default is based on the fields
-     *          fully qualified name in the current parameters and the String <code>required</code>
-     *          is appended to that. For example: <code>user.name.required</code>.
-     */
-    String key() default "";
+  /**
+   * @return The message key that is used if the field is null. The default is based on the fields fully qualified name
+   *         in the current parameters and the String <code>required</code> is appended to that. For example:
+   *         <code>user.name.required</code>.
+   */
+  String key() default "";
 
-    /**
-     * @return  The validation groups that this validation will be run in. Groups are specified in
-     *          an action and can control how validation is performed. This defaults to all groups.
-     */
-    String[] groups() default {};
+  /**
+   * @return The validation groups that this validation will be run in. Groups are specified in an action and can
+   *         control how validation is performed. This defaults to all groups.
+   */
+  String[] groups() default {};
 }

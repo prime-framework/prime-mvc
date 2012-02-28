@@ -25,128 +25,126 @@ import org.primeframework.mvc.parameter.convert.ConverterProvider;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
 
 /**
- * <p>
- * This
- * </p>
+ * <p> This </p>
  *
  * @author Brian Pontarelli
  */
 public class Context {
-    private final String expression;
-    private final List<String> atoms;
-    private final HttpServletRequest request;
-    private final Map<String, String> attributes;
-    private final Locale locale;
-    private final ConverterProvider converterProvider;
+  private final String expression;
+  private final List<String> atoms;
+  private final HttpServletRequest request;
+  private final Map<String, String> attributes;
+  private final Locale locale;
+  private final ConverterProvider converterProvider;
 
-    private Class<?> type;
-    private Object object;
-    private Accessor accessor;
-    private int index;
+  private Class<?> type;
+  private Object object;
+  private Accessor accessor;
+  private int index;
 
-    public Context(ConverterProvider converterProvider, String expression, List<String> atoms,
-            HttpServletRequest request, Locale locale, Map<String, String> attributes) {
-        this.expression = expression;
-        this.atoms = atoms;
-        this.request = request;
-        this.locale = locale;
-        this.attributes = attributes;
-        this.converterProvider = converterProvider;
+  public Context(ConverterProvider converterProvider, String expression, List<String> atoms,
+                 HttpServletRequest request, Locale locale, Map<String, String> attributes) {
+    this.expression = expression;
+    this.atoms = atoms;
+    this.request = request;
+    this.locale = locale;
+    this.attributes = attributes;
+    this.converterProvider = converterProvider;
+  }
+
+  public Context(ConverterProvider converterProvider, String expression, List<String> atoms) {
+    this(converterProvider, expression, atoms, null, null, null);
+  }
+
+  /**
+   * @return The full expression that this context is managing.
+   */
+  public String getExpression() {
+    return expression;
+  }
+
+  public void init(Object object) {
+    this.object = object;
+    this.type = object.getClass();
+  }
+
+  public boolean skip() {
+    return accessor != null && accessor.isIndexed();
+  }
+
+  public void initAccessor(String name) {
+    // This is the indexed case, so the name is the index to the method
+    if (accessor != null && accessor.isIndexed()) {
+      accessor = new IndexedAccessor(converterProvider, (MemberAccessor) accessor, name);
+    } else if (Collection.class.isAssignableFrom(type) || object.getClass().isArray()) {
+      GlobalConverter converter = converterProvider.lookup(Integer.class);
+      Integer index = (Integer) converter.convertFromStrings(Integer.class, null, null, name);
+
+      accessor = new IndexedCollectionAccessor(converterProvider, accessor, index, accessor.getMemberAccessor());
+    } else if (Map.class.isAssignableFrom(type)) {
+      accessor = new MapAccessor(converterProvider, accessor, name, accessor.getMemberAccessor());
+    } else {
+      accessor = new MemberAccessor(converterProvider, type, name);
     }
+  }
 
-    public Context(ConverterProvider converterProvider, String expression, List<String> atoms) {
-        this(converterProvider, expression, atoms, null, null, null);
-    }
+  public Object getCurrentValue() {
+    return accessor.get(object, this);
+  }
 
-    /**
-     * @return  The full expression that this context is managing.
-     */
-    public String getExpression() {
-        return expression;
-    }
+  public void setCurrentValue(String[] values) {
+    accessor.set(object, values, this);
+  }
 
-    public void init(Object object) {
-        this.object = object;
-        this.type = object.getClass();
-    }
+  public void setCurrentValue(Object value) {
+    accessor.set(object, value, this);
+  }
 
-    public boolean skip() {
-        return accessor != null && accessor.isIndexed();
-    }
+  public Object createValue() {
+    // Peek at the next atom, in case this is an array
+    Object key = hasNext() ? peek() : null;
+    Object value = accessor.createValue(key);
+    accessor.set(object, value, this);
+    return value;
+  }
 
-    public void initAccessor(String name) {
-        // This is the indexed case, so the name is the index to the method
-        if (accessor != null && accessor.isIndexed()) {
-            accessor = new IndexedAccessor(converterProvider, (MemberAccessor) accessor, name);
-        } else if (Collection.class.isAssignableFrom(type) || object.getClass().isArray()) {
-            GlobalConverter converter = converterProvider.lookup(Integer.class);
-            Integer index = (Integer) converter.convertFromStrings(Integer.class, null, null, name);
+  public String peek() {
+    return atoms.get(index);
+  }
 
-            accessor = new IndexedCollectionAccessor(converterProvider, accessor, index, accessor.getMemberAccessor());
-        } else if (Map.class.isAssignableFrom(type)) {
-            accessor = new MapAccessor(converterProvider, accessor, name, accessor.getMemberAccessor());
-        } else {
-            accessor = new MemberAccessor(converterProvider, type, name);
-        }
-    }
+  public String next() {
+    return atoms.get(index++);
+  }
 
-    public Object getCurrentValue() {
-        return accessor.get(object, this);
-    }
+  public boolean hasNext() {
+    return index < atoms.size();
+  }
 
-    public void setCurrentValue(String[] values) {
-        accessor.set(object, values, this);
-    }
+  public HttpServletRequest getRequest() {
+    return request;
+  }
 
-    public void setCurrentValue(Object value) {
-        accessor.set(object, value, this);
-    }
+  public Map<String, String> getAttributes() {
+    return attributes;
+  }
 
-    public Object createValue() {
-        // Peek at the next atom, in case this is an array
-        Object key = hasNext() ? peek() : null;
-        Object value = accessor.createValue(key);
-        accessor.set(object, value, this);
-        return value;
-    }
+  public Class<?> getType() {
+    return type;
+  }
 
-    public String peek() {
-        return atoms.get(index);
-    }
+  public Object getObject() {
+    return object;
+  }
 
-    public String next() {
-        return atoms.get(index++);
-    }
+  public Accessor getAccessor() {
+    return accessor;
+  }
 
-    public boolean hasNext() {
-        return index < atoms.size();
-    }
+  public int getIndex() {
+    return index;
+  }
 
-    public HttpServletRequest getRequest() {
-        return request;
-    }
-
-    public Map<String, String> getAttributes() {
-        return attributes;
-    }
-
-    public Class<?> getType() {
-        return type;
-    }
-
-    public Object getObject() {
-        return object;
-    }
-
-    public Accessor getAccessor() {
-        return accessor;
-    }
-
-    public int getIndex() {
-        return index;
-    }
-
-    public Locale getLocale() {
-        return locale;
-    }
+  public Locale getLocale() {
+    return locale;
+  }
 }

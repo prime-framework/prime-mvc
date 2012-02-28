@@ -19,8 +19,6 @@ import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.List;
 
-import com.google.inject.Inject;
-import static java.util.Arrays.*;
 import org.primeframework.mvc.action.ActionInvocationWorkflow;
 import org.primeframework.mvc.action.ActionMappingWorkflow;
 import org.primeframework.mvc.action.ActionPrepareWorkflow;
@@ -31,46 +29,44 @@ import org.primeframework.mvc.parameter.URIParameterWorkflow;
 import org.primeframework.mvc.scope.ScopeRetrievalWorkflow;
 import org.primeframework.mvc.scope.ScopeStorageWorkflow;
 import org.primeframework.mvc.validation.ValidationWorkflow;
-import org.primeframework.servlet.SubWorkflowChain;
-import org.primeframework.servlet.Workflow;
-import org.primeframework.servlet.WorkflowChain;
+
+import com.google.inject.Inject;
+import static java.util.Arrays.*;
 
 /**
- * <p>
- * This class is the main entry point for the JCatapult MVC. It creates the
- * default workflow that is used to process requests.
- * </p>
+ * <p> This class is the main entry point for the JCatapult MVC. It creates the default workflow that is used to process
+ * requests. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class DefaultMVCWorkflow implements MVCWorkflow {
-    private List<Workflow> workflows;
+  private List<Workflow> workflows;
 
-    @Inject
-    public DefaultMVCWorkflow(ActionMappingWorkflow actionMappingWorkflow,
-                              ScopeRetrievalWorkflow scopeRetrievalWorkflow,
-                              MessageWorkflow messageWorkflow,
-                              URIParameterWorkflow uriParameterWorkflow,
-                              ActionPrepareWorkflow actionPrepareWorkflow,
-                              ParameterWorkflow parameterWorkflow,
-                              ValidationWorkflow validationWorkflow,
-                              ActionInvocationWorkflow actionInvocationWorkflow,
-                              ScopeStorageWorkflow scopeStorageWorkflow,
-                              ResultInvocationWorkflow resultInvocationWorflow) {
-        workflows = asList(actionMappingWorkflow, scopeRetrievalWorkflow, messageWorkflow, 
-            uriParameterWorkflow, actionPrepareWorkflow, parameterWorkflow, validationWorkflow,
-            actionInvocationWorkflow, scopeStorageWorkflow, resultInvocationWorflow);
-    }
+  @Inject
+  public DefaultMVCWorkflow(ActionMappingWorkflow actionMappingWorkflow,
+                            ScopeRetrievalWorkflow scopeRetrievalWorkflow,
+                            MessageWorkflow messageWorkflow,
+                            URIParameterWorkflow uriParameterWorkflow,
+                            ActionPrepareWorkflow actionPrepareWorkflow,
+                            ParameterWorkflow parameterWorkflow,
+                            ValidationWorkflow validationWorkflow,
+                            ActionInvocationWorkflow actionInvocationWorkflow,
+                            ScopeStorageWorkflow scopeStorageWorkflow,
+                            ResultInvocationWorkflow resultInvocationWorflow) {
+    workflows = asList(actionMappingWorkflow, scopeRetrievalWorkflow, messageWorkflow,
+      uriParameterWorkflow, actionPrepareWorkflow, parameterWorkflow, validationWorkflow,
+      actionInvocationWorkflow, scopeStorageWorkflow, resultInvocationWorflow);
+  }
 
-    /**
-     * Creates a sub-chain of the MVC workflows and invokes it.
-     *
-     * @param   chain The chain.
-     * @throws  java.io.IOException If the sub-chain throws an IOException
-     * @throws  javax.servlet.ServletException If the sub-chain throws an ServletException
-     */
-    public void perform(WorkflowChain chain) throws IOException, ServletException {
-        SubWorkflowChain subChain = new SubWorkflowChain(workflows, chain);
-        subChain.continueWorkflow();
-    }
+  /**
+   * Creates a sub-chain of the MVC workflows and invokes it.
+   *
+   * @param chain The chain.
+   * @throws java.io.IOException            If the sub-chain throws an IOException
+   * @throws javax.servlet.ServletException If the sub-chain throws an ServletException
+   */
+  public void perform(WorkflowChain chain) throws IOException, ServletException {
+    SubWorkflowChain subChain = new SubWorkflowChain(workflows, chain);
+    subChain.continueWorkflow();
+  }
 }

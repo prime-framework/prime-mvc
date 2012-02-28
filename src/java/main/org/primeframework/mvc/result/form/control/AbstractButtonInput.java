@@ -21,44 +21,42 @@ import java.util.Map;
 import com.google.inject.Inject;
 
 /**
- * <p>
- * This class is the abstract control for a button input. Button tags are simple
- * in that the value attribute is dynamic and message based.
- * </p>
+ * <p> This class is the abstract control for a button input. Button tags are simple in that the value attribute is
+ * dynamic and message based. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public abstract class AbstractButtonInput extends AbstractInput {
-    protected final HttpServletRequest request;
+  protected final HttpServletRequest request;
 
-    @Inject
-    public AbstractButtonInput(HttpServletRequest request) {
-        super(true);
-        this.request = request;
+  @Inject
+  public AbstractButtonInput(HttpServletRequest request) {
+    super(true);
+    this.request = request;
+  }
+
+  /**
+   * Calls the super method and then moves the label parameter to the value attribute since the value is viewable by the
+   * user.
+   *
+   * @return The fixed parameters map.
+   */
+  @Override
+  protected Map<String, Object> makeParameters() {
+    Map<String, Object> parameters = super.makeParameters();
+    Object label = parameters.remove("label");
+    attributes.put("value", label);
+
+    String action = (String) attributes.remove("action");
+    if (action != null) {
+      String contextPath = request.getContextPath();
+      if (action.startsWith("/") && contextPath.length() > 0) {
+        action = contextPath + action;
+      }
+
+      parameters.put("actionURI", action);
     }
 
-    /**
-     * Calls the super method and then moves the label parameter to the value attribute since the
-     * value is viewable by the user.
-     *
-     * @return  The fixed parameters map.
-     */
-    @Override
-    protected Map<String, Object> makeParameters() {
-        Map<String, Object> parameters = super.makeParameters();
-        Object label = parameters.remove("label");
-        attributes.put("value", label);
-
-        String action = (String) attributes.remove("action");
-        if (action != null) {
-            String contextPath = request.getContextPath();
-            if (action.startsWith("/") && contextPath.length() > 0) {
-                action = contextPath + action;
-            }
-            
-            parameters.put("actionURI", action);
-        }
-
-        return parameters;
-    }
+    return parameters;
+  }
 }

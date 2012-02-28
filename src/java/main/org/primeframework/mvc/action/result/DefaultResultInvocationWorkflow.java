@@ -20,95 +20,86 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 
-import com.google.inject.Inject;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
-import org.primeframework.servlet.WorkflowChain;
+import org.primeframework.mvc.servlet.WorkflowChain;
+
+import com.google.inject.Inject;
 
 /**
- * <p>
- * This class implements the ResultInvoccationWorkflow.
- * </p>
+ * <p> This class implements the ResultInvoccationWorkflow. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow {
-    private final HttpServletResponse response;
-    private final ActionInvocationStore actionInvocationStore;
-    private final ResultInvocationProvider resultInvocationProvider;
-    private final ResultProvider resultProvider;
+  private final HttpServletResponse response;
+  private final ActionInvocationStore actionInvocationStore;
+  private final ResultInvocationProvider resultInvocationProvider;
+  private final ResultProvider resultProvider;
 
-    @Inject
-    public DefaultResultInvocationWorkflow(HttpServletResponse response,
-                                           ActionInvocationStore actionInvocationStore,
-                                           ResultInvocationProvider resultInvocationProvider,
-                                           ResultProvider resultProvider) {
-        this.response = response;
-        this.actionInvocationStore = actionInvocationStore;
-        this.resultInvocationProvider = resultInvocationProvider;
-        this.resultProvider = resultProvider;
-    }
+  @Inject
+  public DefaultResultInvocationWorkflow(HttpServletResponse response,
+                                         ActionInvocationStore actionInvocationStore,
+                                         ResultInvocationProvider resultInvocationProvider,
+                                         ResultProvider resultProvider) {
+    this.response = response;
+    this.actionInvocationStore = actionInvocationStore;
+    this.resultInvocationProvider = resultInvocationProvider;
+    this.resultProvider = resultProvider;
+  }
 
-    /**
-     * Performs the action invocation using this process.
-     *
-     * <h3>Action-less request</h3>
-     * <ol>
-     * <li>Lookup an action-less result invocation</li>
-     * <li>If it doesn't exist, continue down the chain</li>
-     * <li>If it does exist, call the ResultRegistry to find the Result</li>
-     * <li>Invoke the Result</li>
-     * </ul>
-     *
-     * <h3>Action request</h3>
-     * <ol>
-     * <li>Lookup an result invocation using the action invocation, action URI and result code from the action</li>
-     * <li>If it doesn't exist, error out</li>
-     * <li>If it does exist, call the ResultRegistry to find the Result</li>
-     * <li>Invoke the Result</li>
-     * </ul>
-     *
-     * @param   chain The chain.
-     * @throws  IOException If the chain throws an IOException.
-     * @throws  ServletException If the chain throws a ServletException or if the result can't be found.
-     */
-    @SuppressWarnings("unchecked")
-    public void perform(WorkflowChain chain) throws IOException, ServletException {
-        ActionInvocation invocation = actionInvocationStore.getCurrent();
-        if (invocation.executeResult()) {
-            ResultInvocation resultInvocation;
-            if (invocation.action() == null) {
-                // Try a default result mapping just for the URI
-                resultInvocation = resultInvocationProvider.lookup(invocation);
-                if (resultInvocation == null) {
-                    chain.continueWorkflow();
-                    return;
-                }
-            } else {
-                String resultCode = invocation.resultCode();
-                resultInvocation = resultInvocationProvider.lookup(invocation, resultCode);
-                if (resultInvocation == null) {
-                    response.setStatus(404);
-                    if (invocation.configuration() != null) {
-                        throw new ServletException("Missing result for action class [" +
-                            invocation.configuration().actionClass() + "] URI [" + invocation.actionURI() +
-                            "] and result code [" + resultCode + "]");
-                    } else {
-                        throw new ServletException("Missing result for actionless URI [" + invocation.actionURI() +
-                            "] and result code [" + resultCode + "]");
-                    }
-                }
-            }
-
-            Annotation annotation = resultInvocation.annotation();
-            Result result = resultProvider.lookup(annotation.annotationType());
-            if (result == null) {
-                throw new ServletException("Unmapped result annotationType [" + annotation.getClass() +
-                    "]. You probably need to define a Result implementation that maps to this annotationType " +
-                    "and then add that Result implementation to your Guice Module.");
-            }
-
-            result.execute(annotation, invocation);
+  /**
+   * Performs the action invocation using this process.
+   * <p/>
+   * <h3>Action-less request</h3> <ol> <li>Lookup an action-less result invocation</li> <li>If it doesn't exist,
+   * continue down the chain</li> <li>If it does exist, call the ResultRegistry to find the Result</li> <li>Invoke the
+   * Result</li> </ul>
+   * <p/>
+   * <h3>Action request</h3> <ol> <li>Lookup an result invocation using the action invocation, action URI and result
+   * code from the action</li> <li>If it doesn't exist, error out</li> <li>If it does exist, call the ResultRegistry to
+   * find the Result</li> <li>Invoke the Result</li> </ul>
+   *
+   * @param chain The chain.
+   * @throws IOException      If the chain throws an IOException.
+   * @throws ServletException If the chain throws a ServletException or if the result can't be found.
+   */
+  @SuppressWarnings("unchecked")
+  public void perform(WorkflowChain chain) throws IOException, ServletException {
+    ActionInvocation invocation = actionInvocationStore.getCurrent();
+    if (invocation.executeResult()) {
+      ResultInvocation resultInvocation;
+      if (invocation.action() == null) {
+        // Try a default result mapping just for the URI
+        resultInvocation = resultInvocationProvider.lookup(invocation);
+        if (resultInvocation == null) {
+          chain.continueWorkflow();
+          return;
         }
+      } else {
+        String resultCode = invocation.resultCode();
+        resultInvocation = resultInvocationProvider.lookup(invocation, resultCode);
+        if (resultInvocation == null) {
+          response.setStatus(404);
+          if (invocation.configuration() != null) {
+            throw new ServletException("Missing result for action class [" +
+              invocation.configuration().actionClass() + "] URI [" + invocation.actionURI() +
+              "] and result code [" + resultCode + "]");
+          } else {
+            throw new ServletException("Missing result for actionless URI [" + invocation.actionURI() +
+              "] and result code [" + resultCode + "]");
+          }
+        }
+      }
+
+      Annotation annotation = resultInvocation.annotation();
+      Result result = resultProvider.lookup(annotation.annotationType());
+      if (result == null) {
+        throw new ServletException("Unmapped result annotationType [" + annotation.getClass() +
+          "]. You probably need to define a Result implementation that maps to this annotationType " +
+          "and then add that Result implementation to your Guice Module.");
+      }
+
+      result.execute(annotation, invocation);
     }
+  }
 }

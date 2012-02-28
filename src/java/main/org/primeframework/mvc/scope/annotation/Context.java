@@ -23,20 +23,18 @@ import java.lang.annotation.Target;
 import org.primeframework.mvc.scope.ContextScope;
 
 /**
- * <p>
- * This annotation should be used to mark member fields of actions that should be
- * fetched and stored in the ServletContext.
- * </p>
+ * <p> This annotation should be used to mark member fields of actions that should be fetched and stored in the
+ * ServletContext. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @Retention(RetentionPolicy.RUNTIME)
 @ScopeAnnotation(ContextScope.class)
 @Target(ElementType.FIELD)
 public @interface Context {
-    /**
-     * @return  This attribute determines the name under which that the value is stored in the context.
-     *          The default name is the name of the field that the annotation is put on.
-     */
-    String value() default "##field-name##";
+  /**
+   * @return This attribute determines the name under which that the value is stored in the context. The default name is
+   *         the name of the field that the annotation is put on.
+   */
+  String value() default "##field-name##";
 }

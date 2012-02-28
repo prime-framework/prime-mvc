@@ -15,59 +15,57 @@
  */
 package org.primeframework.mvc.result.form.control;
 
-import java.util.Map;
 import java.util.Collection;
+import java.util.Map;
 
-import org.primeframework.mvc.result.control.annotation.ControlAttributes;
 import org.primeframework.mvc.result.control.annotation.ControlAttribute;
+import org.primeframework.mvc.result.control.annotation.ControlAttributes;
 
 /**
- * <p>
- * This class is the control for a radio button.
- * </p>
+ * <p> This class is the control for a radio button. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @ControlAttributes(
-    required = {
-        @ControlAttribute(name = "name"),
-        @ControlAttribute(name = "items", types = {Collection.class, Map.class, Object[].class})
-    },
-    optional = {
-        @ControlAttribute(name = "disabled", types = {boolean.class, Boolean.class}),
-        @ControlAttribute(name = "readonly", types = {boolean.class, Boolean.class}),
-        @ControlAttribute(name = "required", types = {boolean.class, Boolean.class}),
-        @ControlAttribute(name = "size", types = {int.class, Integer.class}),
-        @ControlAttribute(name = "tabindex", types = {int.class, Integer.class})
-    }
+  required = {
+    @ControlAttribute(name = "name"),
+    @ControlAttribute(name = "items", types = {Collection.class, Map.class, Object[].class})
+  },
+  optional = {
+    @ControlAttribute(name = "disabled", types = {boolean.class, Boolean.class}),
+    @ControlAttribute(name = "readonly", types = {boolean.class, Boolean.class}),
+    @ControlAttribute(name = "required", types = {boolean.class, Boolean.class}),
+    @ControlAttribute(name = "size", types = {int.class, Integer.class}),
+    @ControlAttribute(name = "tabindex", types = {int.class, Integer.class})
+  }
 )
 public class RadioList extends AbstractListInput {
-    public RadioList() {
-        super(true);
+  public RadioList() {
+    super(true);
+  }
+
+  /**
+   * Removes the uncheckedValue attribute and moves it to the parameters.
+   *
+   * @return The Map.
+   */
+  @Override
+  protected Map<String, Object> makeParameters() {
+    Map<String, Object> params = super.makeParameters();
+    String uncheckedValue = (String) attributes.remove("uncheckedValue");
+    if (uncheckedValue != null) {
+      params.put("uncheckedValue", uncheckedValue);
+    } else {
+      params.put("uncheckedValue", "");
     }
 
-    /**
-     * Removes the uncheckedValue attribute and moves it to the parameters.
-     *
-     * @return  The Map.
-     */
-    @Override
-    protected Map<String, Object> makeParameters() {
-        Map<String, Object> params = super.makeParameters();
-        String uncheckedValue = (String) attributes.remove("uncheckedValue");
-        if (uncheckedValue != null) {
-            params.put("uncheckedValue", uncheckedValue);
-        } else {
-            params.put("uncheckedValue", "");
-        }
+    return params;
+  }
 
-        return params;
-    }
-
-    /**
-     * @return  radio-list.ftl
-     */
-    protected String endTemplateName() {
-        return "radio-list.ftl";
-    }
+  /**
+   * @return radio-list.ftl
+   */
+  protected String endTemplateName() {
+    return "radio-list.ftl";
+  }
 }

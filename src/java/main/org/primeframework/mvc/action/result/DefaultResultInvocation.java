@@ -18,32 +18,30 @@ package org.primeframework.mvc.action.result;
 import java.lang.annotation.Annotation;
 
 /**
- * <p>
- * This class is the default result invocation.
- * </p>
+ * <p> This class is the default result invocation. </p>
  *
  * @author Brian Pontarelli
  */
 public class DefaultResultInvocation implements ResultInvocation {
-    private final Annotation annotation;
-    private final String uri;
-    private final String resultCode;
+  private final Annotation annotation;
+  private final String uri;
+  private final String resultCode;
 
-    public DefaultResultInvocation(Annotation annotation, String uri, String resultCode) {
-        this.annotation = annotation;
-        this.uri = uri;
-        this.resultCode = resultCode;
-    }
+  public DefaultResultInvocation(Annotation annotation, String uri, String resultCode) {
+    this.annotation = annotation;
+    this.uri = uri;
+    this.resultCode = resultCode;
+  }
 
-    public Annotation annotation() {
-        return annotation;
-    }
+  public Annotation annotation() {
+    return annotation;
+  }
 
-    public String uri() {
-        return uri;
-    }
+  public String uri() {
+    return uri;
+  }
 
-    public String resultCode() {
-        return resultCode;
-    }
+  public String resultCode() {
+    return resultCode;
+  }
 }

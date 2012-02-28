@@ -16,21 +16,19 @@
 package org.primeframework.mvc.message.scope;
 
 /**
- * <p>
- * This enumeration specifies the different types of messages. Currently,
- * these are just plain messages and errors.
+ * <p> This enumeration specifies the different types of messages. Currently, these are just plain messages and errors.
  * </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public enum MessageType {
-    /**
-     * Describes non-error messages. These are simply information all messages.
-     */
-    PLAIN,
+  /**
+   * Describes non-error messages. These are simply information all messages.
+   */
+  PLAIN,
 
-    /**
-     * Describes all error messages.
-     */
-    ERROR
+  /**
+   * Describes all error messages.
+   */
+  ERROR
 }

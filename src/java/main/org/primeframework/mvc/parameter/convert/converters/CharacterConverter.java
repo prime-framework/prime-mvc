@@ -22,39 +22,37 @@ import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.convert.annotation.GlobalConverter;
 
 /**
- * <p>
- * This class is the type converter for characters.
- * </p>
+ * <p> This class is the type converter for characters. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @GlobalConverter(forTypes = {Character.class, char.class})
 @SuppressWarnings("unchecked")
 public class CharacterConverter extends AbstractPrimitiveConverter {
-    /**
-     * Returns a single character with a unicode value of 0.
-     */
-    protected Object defaultPrimitive(Class convertTo, Map<String, String> attributes)
+  /**
+   * Returns a single character with a unicode value of 0.
+   */
+  protected Object defaultPrimitive(Class convertTo, Map<String, String> attributes)
     throws ConversionException, ConverterStateException {
-        return new Character('\u0000');
+    return new Character('\u0000');
+  }
+
+  /**
+   * If String is longer than one character, this throws an exception. Otherwise, that character is returned. If the
+   * value is null or empty, this throws an exception.
+   */
+  protected Object stringToPrimitive(String value, Class convertTo, Map<String, String> attributes)
+    throws ConversionException, ConverterStateException {
+    if (value.length() > 1) {
+      throw new ConversionException("Conversion from String to character must be a String" +
+        " of length 1 - [" + value + "] is invalid");
     }
 
-    /**
-     * If String is longer than one character, this throws an exception. Otherwise, that character is
-     * returned. If the value is null or empty, this throws an exception.
-     */
-    protected Object stringToPrimitive(String value, Class convertTo, Map<String, String> attributes)
-    throws ConversionException, ConverterStateException {
-        if (value.length() > 1) {
-            throw new ConversionException("Conversion from String to character must be a String" +
-                " of length 1 - [" + value + "] is invalid");
-        }
+    return new Character(value.charAt(0));
+  }
 
-        return new Character(value.charAt(0));
-    }
-
-    protected  String primitiveToString(Object value, Class convertFrom, Map<String, String> attributes)
+  protected String primitiveToString(Object value, Class convertFrom, Map<String, String> attributes)
     throws ConversionException, ConverterStateException {
-        return value.toString();
-    }
+    return value.toString();
+  }
 }

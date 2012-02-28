@@ -23,65 +23,62 @@ import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 
 /**
- * <p>
- * This result performs a servlet forward to a JSP or renders a FreeMarker
- * template depending on the extension of the page.
- * </p>
+ * <p> This result performs a servlet forward to a JSP or renders a FreeMarker template depending on the extension of
+ * the page. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public abstract class AbstractResult<U extends Annotation> implements Result<U> {
-    protected final ExpressionEvaluator expressionEvaluator;
+  protected final ExpressionEvaluator expressionEvaluator;
 
-    protected AbstractResult(ExpressionEvaluator expressionEvaluator) {
-        this.expressionEvaluator = expressionEvaluator;
+  protected AbstractResult(ExpressionEvaluator expressionEvaluator) {
+    this.expressionEvaluator = expressionEvaluator;
+  }
+
+  /**
+   * If the action invocation isn't null, this returns an instance of the {@link ResultHttpServletRequest} class.
+   *
+   * @param invocation The action invocation.
+   * @param request    The request.
+   * @return The wrapped request or the request passed in, depending.
+   */
+  protected HttpServletRequest wrapRequest(ActionInvocation invocation, HttpServletRequest request) {
+    if (invocation.action() != null) {
+      return new ResultHttpServletRequest(request, invocation.action(), expressionEvaluator);
     }
 
-    /**
-     * If the action invocation isn't null, this returns an instance of the {@link ResultHttpServletRequest}
-     * class.
-     *
-     * @param   invocation The action invocation.
-     * @param   request The request.
-     * @return  The wrapped request or the request passed in, depending.
-     */
-    protected HttpServletRequest wrapRequest(ActionInvocation invocation, HttpServletRequest request) {
-        if (invocation.action() != null) {
-            return new ResultHttpServletRequest(request, invocation.action(), expressionEvaluator);
-        }
+    return request;
+  }
 
-        return request;
+  /**
+   * Expands any variables in the String.
+   *
+   * @param str    The String to expand.
+   * @param action The action used to expand.
+   * @return The result.
+   */
+  protected String expand(String str, Object action) {
+    if (action != null) {
+      return expressionEvaluator.expand(str, action);
     }
 
-    /**
-     * Expands any variables in the String.
-     *
-     * @param   str The String to expand.
-     * @param   action The action used to expand.
-     * @return  The result.
-     */
-    protected String expand(String str, Object action) {
-        if (action != null) {
-            return expressionEvaluator.expand(str, action);
-        }
+    return str;
+  }
 
-        return str;
+  /**
+   * Sets the status into the response. If the String <code>statusStr</code> is set, it overrides the int code.
+   *
+   * @param status    The default code to use.
+   * @param statusStr The String to expand and convert to an int (if specified).
+   * @param action    The action to use for expansion.
+   * @param response  The response to set the status into.
+   */
+  protected void setStatus(int status, String statusStr, Object action, HttpServletResponse response) {
+    int code = status;
+    if (!statusStr.isEmpty()) {
+      code = Integer.valueOf(expand(statusStr, action));
     }
 
-    /**
-     * Sets the status into the response. If the String <code>statusStr</code> is set, it overrides the int code.
-     *
-     * @param   status The default code to use.
-     * @param   statusStr The String to expand and convert to an int (if specified).
-     * @param   action The action to use for expansion.
-     * @param   response The response to set the status into.
-     */
-    protected void setStatus(int status, String statusStr, Object action, HttpServletResponse response) {
-        int code = status;
-        if (!statusStr.isEmpty()) {
-            code = Integer.valueOf(expand(statusStr, action));
-        }
-
-        response.setStatus(code);
-    }
+    response.setStatus(code);
+  }
 }

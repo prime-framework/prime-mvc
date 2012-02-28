@@ -18,17 +18,15 @@ package org.primeframework.mvc.result.form.jsp;
 import org.primeframework.mvc.result.form.control.Hidden;
 
 /**
- * <p>
- * This class is the JSP taglib for the hidden control.
- * </p>
+ * <p> This class is the JSP taglib for the hidden control. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class HiddenTag extends AbstractValueTag<Hidden> {
-    /**
-     * @return  The {@link Hidden} class.
-     */
-    protected Class<Hidden> controlClass() {
-        return Hidden.class;
-    }
+  /**
+   * @return The {@link Hidden} class.
+   */
+  protected Class<Hidden> controlClass() {
+    return Hidden.class;
+  }
 }

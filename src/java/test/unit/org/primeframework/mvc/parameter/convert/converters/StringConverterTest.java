@@ -16,48 +16,46 @@
 package org.primeframework.mvc.parameter.convert.converters;
 
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
-import static org.testng.Assert.*;
 import org.testng.annotations.Test;
 
 import static net.java.util.CollectionTools.*;
+import static org.testng.Assert.*;
 
 /**
- * <p>
- * This tests the String converter.
- * </p>
+ * <p> This tests the String converter. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class StringConverterTest {
-    /**
-     * Test the conversion from Strings.
-     */
-    @Test
-    public void testFromStrings() {
-        GlobalConverter converter = new StringConverter();
-        String str = (String) converter.convertFromStrings(String.class, null, "testExpr", array((String) null));
-        assertNull(str);
+  /**
+   * Test the conversion from Strings.
+   */
+  @Test
+  public void testFromStrings() {
+    GlobalConverter converter = new StringConverter();
+    String str = (String) converter.convertFromStrings(String.class, null, "testExpr", array((String) null));
+    assertNull(str);
 
-        str = (String) converter.convertFromStrings(String.class, null, "testExpr", array(""));
-        assertNull(str);
+    str = (String) converter.convertFromStrings(String.class, null, "testExpr", array(""));
+    assertNull(str);
 
-        str = (String) converter.convertFromStrings(String.class, null, "testExpr", array("a"));
-        assertEquals("a", str);
+    str = (String) converter.convertFromStrings(String.class, null, "testExpr", array("a"));
+    assertEquals("a", str);
 
-        str = (String) converter.convertFromStrings(String.class, null, "testExpr", array("a", "b"));
-        assertEquals("a,b", str);
-    }
+    str = (String) converter.convertFromStrings(String.class, null, "testExpr", array("a", "b"));
+    assertEquals("a,b", str);
+  }
 
-    /**
-     * Test the conversion from Strings.
-     */
-    @Test
-    public void testToStrings() {
-        GlobalConverter converter = new StringConverter();
-        String str = converter.convertToString(String.class, null, "testExpr", null);
-        assertNull(str);
+  /**
+   * Test the conversion from Strings.
+   */
+  @Test
+  public void testToStrings() {
+    GlobalConverter converter = new StringConverter();
+    String str = converter.convertToString(String.class, null, "testExpr", null);
+    assertNull(str);
 
-        str = converter.convertToString(String.class, null, "testExpr", "foo");
-        assertEquals("foo", str);
-    }
+    str = converter.convertToString(String.class, null, "testExpr", "foo");
+    assertEquals("foo", str);
+  }
 }

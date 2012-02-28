@@ -20,57 +20,54 @@ import java.util.Collection;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 
 /**
- * <p>
- * This interface defines the information about an action invocation.
- * </p>
+ * <p> This interface defines the information about an action invocation. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public interface ActionInvocation {
-    /**
-     * @return  The action object.
-     */
-    Object action();
+  /**
+   * @return The action object.
+   */
+  Object action();
 
-    /**
-     * @return  The action URI that maps to the action object. This does not include the extension.
-     */
-    String actionURI();
+  /**
+   * @return The action URI that maps to the action object. This does not include the extension.
+   */
+  String actionURI();
 
-    /**
-     * @return  The URI extension or null if there isn't one.
-     */
-    String extension();
+  /**
+   * @return The URI extension or null if there isn't one.
+   */
+  String extension();
 
-    /**
-     * @return  The additional parts of the URI that come after the action URI.
-     */
-    Collection<String> uriParameters();
+  /**
+   * @return The additional parts of the URI that come after the action URI.
+   */
+  Collection<String> uriParameters();
 
-    /**
-     * @return  The action configuration for this invocation or null if there isn't one.
-     */
-    ActionConfiguration configuration();
+  /**
+   * @return The action configuration for this invocation or null if there isn't one.
+   */
+  ActionConfiguration configuration();
 
-    /**
-     * @return  True if the result should be executed, false otherwise.
-     */
-    boolean executeResult();
+  /**
+   * @return True if the result should be executed, false otherwise.
+   */
+  boolean executeResult();
 
-    /**
-     * @return  True if the action should be executed, false otherwise.
-     */
-    boolean executeAction();
+  /**
+   * @return True if the action should be executed, false otherwise.
+   */
+  boolean executeAction();
 
-    /**
-     * @return  The default result code to use if the action is not executed according to the
-     *          {@link #executeAction()} method. Or the result code from the action after it
-     *          has been invoked.
-     */
-    String resultCode();
+  /**
+   * @return The default result code to use if the action is not executed according to the {@link #executeAction()}
+   *         method. Or the result code from the action after it has been invoked.
+   */
+  String resultCode();
 
-    /**
-     * @return  The URI, including the extension if there is one.
-     */
-    String uri();
+  /**
+   * @return The URI, including the extension if there is one.
+   */
+  String uri();
 }

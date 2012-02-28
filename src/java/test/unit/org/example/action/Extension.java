@@ -18,18 +18,16 @@ package org.example.action;
 import org.primeframework.mvc.action.annotation.Action;
 
 /**
- * <p>
- * This is a simple test action.
- * </p>
+ * <p> This is a simple test action. </p>
  *
  * @author Brian Pontarelli
  */
 @Action
 public abstract class Extension {
-    public boolean baseInvoked = false;
+  public boolean baseInvoked = false;
 
-    public String json() {
-        baseInvoked = true;
-        return "json";
-    }
+  public String json() {
+    baseInvoked = true;
+    return "json";
+  }
 }

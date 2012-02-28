@@ -18,20 +18,17 @@ package org.primeframework.mvc.util;
 import com.google.inject.ImplementedBy;
 
 /**
- * <p>
- * This interface defines how a package and class name are converted into
- * a URI.
- * </p>
+ * <p> This interface defines how a package and class name are converted into a URI. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @ImplementedBy(DefaultURIBuilder.class)
 public interface URIBuilder {
-    /**
-     * Converts the class name into a URI.
-     *
-     * @param   type The class to convert to a URI.
-     * @return  The URI.
-     */
-    String build(Class<?> type);
+  /**
+   * Converts the class name into a URI.
+   *
+   * @param type The class to convert to a URI.
+   * @return The URI.
+   */
+  String build(Class<?> type);
 }

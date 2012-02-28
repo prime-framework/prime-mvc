@@ -15,33 +15,31 @@
  */
 package org.example.action.user;
 
-import org.example.domain.UserField;
 import org.example.domain.AddressField;
+import org.example.domain.UserField;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.validation.annotation.Valid;
 
 /**
- * <p>
- * This class is a simple edit action for testing.
- * </p>
+ * <p> This class is a simple edit action for testing. </p>
  *
  * @author Brian Pontarelli
  */
 @Action
 public class DetailsFields {
-    @Valid
-    public UserField user;
+  @Valid
+  public UserField user;
 
-    public String execute() {
-        user = new UserField();
-        user.age = 12;
-        user.name = "Frank";
-        user.securityQuestions = new String[]{"One", "Two"};
-        user.addresses.put("home", new AddressField());
-        user.addresses.get("home").street = "123 Main St.";
-        user.addresses.get("home").city = "Springfield";
-        user.addresses.get("home").state = "IL";
-        user.addresses.get("home").zipcode = "00000";
-        return "success";
-    }
+  public String execute() {
+    user = new UserField();
+    user.age = 12;
+    user.name = "Frank";
+    user.securityQuestions = new String[]{"One", "Two"};
+    user.addresses.put("home", new AddressField());
+    user.addresses.get("home").street = "123 Main St.";
+    user.addresses.get("home").city = "Springfield";
+    user.addresses.get("home").state = "IL";
+    user.addresses.get("home").zipcode = "00000";
+    return "success";
+  }
 }

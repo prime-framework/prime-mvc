@@ -20,55 +20,53 @@ import java.util.Map;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.scope.MessageType;
 import org.primeframework.mvc.result.control.AbstractControl;
-import org.primeframework.mvc.result.control.annotation.ControlAttributes;
 import org.primeframework.mvc.result.control.annotation.ControlAttribute;
+import org.primeframework.mvc.result.control.annotation.ControlAttributes;
 
 import com.google.inject.Inject;
 
 /**
- * <p>
- * This class is the control that outputs the action messages.
- * </p>
+ * <p> This class is the control that outputs the action messages. </p>
  *
  * @author Brian Pontarelli
  */
 @ControlAttributes(
-    required = {
-        @ControlAttribute(name = "errors", types = {boolean.class, Boolean.class})
-    }
+  required = {
+    @ControlAttribute(name = "errors", types = {boolean.class, Boolean.class})
+  }
 )
 public class ActionMessages extends AbstractControl {
-    private final MessageStore messageStore;
+  private final MessageStore messageStore;
 
-    @Inject
-    public ActionMessages(MessageStore messageStore) {
-        this.messageStore = messageStore;
-    }
+  @Inject
+  public ActionMessages(MessageStore messageStore) {
+    this.messageStore = messageStore;
+  }
 
-    /**
-     * Adds the action messages.
-     *
-     * @return  The parameters with the action messages added.
-     */
-    @Override
-    protected Map<String, Object> makeParameters() {
-        Map<String, Object> parameters = super.makeParameters();
-        parameters.put("action_messages", messageStore.getActionMessages(MessageType.PLAIN));
-        parameters.put("action_errors", messageStore.getActionMessages(MessageType.ERROR));
-        return parameters;
-    }
+  /**
+   * Adds the action messages.
+   *
+   * @return The parameters with the action messages added.
+   */
+  @Override
+  protected Map<String, Object> makeParameters() {
+    Map<String, Object> parameters = super.makeParameters();
+    parameters.put("action_messages", messageStore.getActionMessages(MessageType.PLAIN));
+    parameters.put("action_errors", messageStore.getActionMessages(MessageType.ERROR));
+    return parameters;
+  }
 
-    /**
-     * @return  Null.
-     */
-    protected String startTemplateName() {
-        return null;
-    }
+  /**
+   * @return Null.
+   */
+  protected String startTemplateName() {
+    return null;
+  }
 
-    /**
-     * @return  The actionmessages.ftl.
-     */
-    protected String endTemplateName() {
-        return "action-messages.ftl";
-    }
+  /**
+   * @return The actionmessages.ftl.
+   */
+  protected String endTemplateName() {
+    return "action-messages.ftl";
+  }
 }

@@ -20,27 +20,23 @@ import java.util.Map;
 import com.google.inject.ImplementedBy;
 
 /**
- * <p>
- * This interface defines the mechanism used to load and cache action
- * configuration. This should be flexible enough to support new actions
- * being added, actions being updated and actions being removed during
- * development.
- * </p>
+ * <p> This interface defines the mechanism used to load and cache action configuration. This should be flexible enough
+ * to support new actions being added, actions being updated and actions being removed during development. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @ImplementedBy(DefaultActionConfigurationProvider.class)
 public interface ActionConfigurationProvider {
-    /**
-     * Locates the action configuration for the given URI.
-     *
-     * @param   uri The URI.
-     * @return  The action configuration for the URI or null if nothing could be found or inferred.
-     */
-    ActionConfiguration lookup(String uri);
+  /**
+   * Locates the action configuration for the given URI.
+   *
+   * @param uri The URI.
+   * @return The action configuration for the URI or null if nothing could be found or inferred.
+   */
+  ActionConfiguration lookup(String uri);
 
-    /**
-     * @return  The current set of known configuration.
-     */
-    Map<String, ActionConfiguration> knownConfiguration();
+  /**
+   * @return The current set of known configuration.
+   */
+  Map<String, ActionConfiguration> knownConfiguration();
 }

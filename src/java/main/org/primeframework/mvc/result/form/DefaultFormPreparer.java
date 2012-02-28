@@ -24,41 +24,39 @@ import org.primeframework.mvc.result.form.annotation.FormPrepareMethod;
 import com.google.inject.Inject;
 
 /**
- * <p>
- * This is the default implementation of the FormPreparer interface.
- * </p>
+ * <p> This is the default implementation of the FormPreparer interface. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class DefaultFormPreparer implements FormPreparer {
-    private final ActionInvocationStore actionInvocationStore;
+  private final ActionInvocationStore actionInvocationStore;
 
-    @Inject
-    public DefaultFormPreparer(ActionInvocationStore actionInvocationStore) {
-        this.actionInvocationStore = actionInvocationStore;
+  @Inject
+  public DefaultFormPreparer(ActionInvocationStore actionInvocationStore) {
+    this.actionInvocationStore = actionInvocationStore;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void prepare() {
+    // Get the action object
+    ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
+    Object action = actionInvocation.action();
+    if (action == null) {
+      return;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void prepare() {
-        // Get the action object
-        ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
-        Object action = actionInvocation.action();
-        if (action == null) {
-            return;
+    Class<?> actionClass = action.getClass();
+    Method[] methods = actionClass.getMethods();
+    for (Method method : methods) {
+      if (method.getAnnotation(FormPrepareMethod.class) != null) {
+        try {
+          method.invoke(action);
+        } catch (Exception e) {
+          throw new RuntimeException("Unable to call FormPrepareMethod method [" + method + "]", e);
         }
-
-        Class<?> actionClass = action.getClass();
-        Method[] methods = actionClass.getMethods();
-        for (Method method : methods) {
-            if (method.getAnnotation(FormPrepareMethod.class) != null) {
-                try {
-                    method.invoke(action);
-                } catch (Exception e) {
-                    throw new RuntimeException("Unable to call FormPrepareMethod method [" + method + "]", e);
-                }
-            }
-        }
+      }
     }
+  }
 }

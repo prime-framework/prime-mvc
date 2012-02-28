@@ -18,68 +18,66 @@ package org.primeframework.mvc.result.form.jsp;
 import org.primeframework.mvc.result.form.control.Textarea;
 
 /**
- * <p>
- * This class is the textarea JSP taglib.
- * </p>
+ * <p> This class is the textarea JSP taglib. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class TextareaTag extends AbstractInputTag<Textarea> {
-    /**
-     * Retrieves the tags rows attribute
-     *
-     * @return	Returns the tags rows attribute
-     */
-    public String getRows() {
-        return (String) attributes.get("rows");
-    }
+  /**
+   * Retrieves the tags rows attribute
+   *
+   * @return Returns the tags rows attribute
+   */
+  public String getRows() {
+    return (String) attributes.get("rows");
+  }
 
-    /**
-     * Populates the tags rows attribute
-     *
-     * @param	rows The value of the tags rows attribute
-     */
-    public void setRows(String rows) {
-        attributes.put("rows", rows);
-    }
+  /**
+   * Populates the tags rows attribute
+   *
+   * @param rows The value of the tags rows attribute
+   */
+  public void setRows(String rows) {
+    attributes.put("rows", rows);
+  }
 
-    /**
-     * Retrieves the tags cols attribute
-     *
-     * @return	Returns the tags cols attribute
-     */
-    public String getCols() {
-        return (String) attributes.get("cols");
-    }
+  /**
+   * Retrieves the tags cols attribute
+   *
+   * @return Returns the tags cols attribute
+   */
+  public String getCols() {
+    return (String) attributes.get("cols");
+  }
 
-    /**
-     * Populates the tags cols attribute
-     *
-     * @param	cols The value of the tags cols attribute
-     */
-    public void setCols(String cols) {
-        attributes.put("cols", cols);
-    }
+  /**
+   * Populates the tags cols attribute
+   *
+   * @param cols The value of the tags cols attribute
+   */
+  public void setCols(String cols) {
+    attributes.put("cols", cols);
+  }
 
-    /**
-     * Retrieves the tags defaultValue attribute
-     *
-     * @return	Returns the tags defaultValue attribute
-     */
-    public String getDefaultValue() {
-        return (String) attributes.get("defaultValue");
-    }
+  /**
+   * Retrieves the tags defaultValue attribute
+   *
+   * @return Returns the tags defaultValue attribute
+   */
+  public String getDefaultValue() {
+    return (String) attributes.get("defaultValue");
+  }
 
-    /**
-     * Populates the tags defaultValue attribute
-     *
-     * @param	defaultValue The value of the tags defaultValue attribute
-     */
-    public void setDefaultValue(String defaultValue) {
-        attributes.put("defaultValue", defaultValue);
-    }
+  /**
+   * Populates the tags defaultValue attribute
+   *
+   * @param defaultValue The value of the tags defaultValue attribute
+   */
+  public void setDefaultValue(String defaultValue) {
+    attributes.put("defaultValue", defaultValue);
+  }
 
-    protected Class<Textarea> controlClass() {
-        return Textarea.class;
-    }
+  protected Class<Textarea> controlClass() {
+    return Textarea.class;
+  }
 }

@@ -18,71 +18,69 @@ package org.primeframework.mvc.result.form.jsp;
 import org.primeframework.mvc.result.form.control.YearsSelect;
 
 /**
- * <p>
- * This class is the JSP taglib for the years select control.
- * </p>
+ * <p> This class is the JSP taglib for the years select control. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class YearsSelectTag extends SelectTag<YearsSelect> {
-    /**
-     * Retrieves the tags startYear attribute
-     *
-     * @return	Returns the tags startYear attribute
-     */
-    public Integer getStartYear() {
-        return (Integer) attributes.get("startYear");
-    }
+  /**
+   * Retrieves the tags startYear attribute
+   *
+   * @return Returns the tags startYear attribute
+   */
+  public Integer getStartYear() {
+    return (Integer) attributes.get("startYear");
+  }
 
-    /**
-     * Populates the tags startYear attribute
-     *
-     * @param	startYear The value of the tags startYear attribute
-     */
-    public void setStartYear(Integer startYear) {
-        attributes.put("startYear", startYear);
-    }
+  /**
+   * Populates the tags startYear attribute
+   *
+   * @param startYear The value of the tags startYear attribute
+   */
+  public void setStartYear(Integer startYear) {
+    attributes.put("startYear", startYear);
+  }
 
-    /**
-     * Retrieves the tags endYear attribute
-     *
-     * @return	Returns the tags endYear attribute
-     */
-    public Integer getEndYear() {
-        return (Integer) attributes.get("endYear");
-    }
+  /**
+   * Retrieves the tags endYear attribute
+   *
+   * @return Returns the tags endYear attribute
+   */
+  public Integer getEndYear() {
+    return (Integer) attributes.get("endYear");
+  }
 
-    /**
-     * Populates the tags endYear attribute
-     *
-     * @param	endYear The value of the tags endYear attribute
-     */
-    public void setEndYear(Integer endYear) {
-        attributes.put("endYear", endYear);
-    }
+  /**
+   * Populates the tags endYear attribute
+   *
+   * @param endYear The value of the tags endYear attribute
+   */
+  public void setEndYear(Integer endYear) {
+    attributes.put("endYear", endYear);
+  }
 
-    /**
-     * Retrieves the tags numberOfYears attribute
-     *
-     * @return	Returns the tags numberOfYears attribute
-     */
-    public Integer getNumberOfYears() {
-        return (Integer) attributes.get("numberOfYears");
-    }
+  /**
+   * Retrieves the tags numberOfYears attribute
+   *
+   * @return Returns the tags numberOfYears attribute
+   */
+  public Integer getNumberOfYears() {
+    return (Integer) attributes.get("numberOfYears");
+  }
 
-    /**
-     * Populates the tags numberOfYears attribute
-     *
-     * @param	numberOfYears The value of the tags numberOfYears attribute
-     */
-    public void setNumberOfYears(Integer numberOfYears) {
-        attributes.put("numberOfYears", numberOfYears);
-    }
+  /**
+   * Populates the tags numberOfYears attribute
+   *
+   * @param numberOfYears The value of the tags numberOfYears attribute
+   */
+  public void setNumberOfYears(Integer numberOfYears) {
+    attributes.put("numberOfYears", numberOfYears);
+  }
 
-    /**
-     * @return  The {@link YearsSelect} class.
-     */
-    protected Class<YearsSelect> controlClass() {
-        return YearsSelect.class;
-    }
+  /**
+   * @return The {@link YearsSelect} class.
+   */
+  protected Class<YearsSelect> controlClass() {
+    return YearsSelect.class;
+  }
 }

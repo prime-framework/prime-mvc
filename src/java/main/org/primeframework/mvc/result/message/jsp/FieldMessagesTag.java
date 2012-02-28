@@ -19,55 +19,48 @@ import org.primeframework.mvc.result.jsp.AbstractControlTag;
 import org.primeframework.mvc.result.message.control.FieldMessages;
 
 /**
- * <p>
- * This class is a JSP taglib that can retrieve field messages from the
- * {@link org.primeframework.mvc.message.MessageStore} and output them using a
- * FreeMarker template.
- * </p>
+ * <p> This class is a JSP taglib that can retrieve field messages from the {@link
+ * org.primeframework.mvc.message.MessageStore} and output them using a FreeMarker template. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class FieldMessagesTag extends AbstractControlTag<FieldMessages> {
-    /**
-     * @return  The tags errors flag that determines if field errors or plain action messages are
-     *          output.
-     */
-    public Boolean getErrors() {
-        return (Boolean) attributes.get("errors");
-    }
+  /**
+   * @return The tags errors flag that determines if field errors or plain action messages are output.
+   */
+  public Boolean getErrors() {
+    return (Boolean) attributes.get("errors");
+  }
 
-    /**
-     * Populates the tags errors attribute that determines if field errors or plain action messages are
-     * output.
-     *
-     * @param	errors The error flag.
-     */
-    public void setErrors(Boolean errors) {
-        attributes.put("errors", errors);
-    }
+  /**
+   * Populates the tags errors attribute that determines if field errors or plain action messages are output.
+   *
+   * @param errors The error flag.
+   */
+  public void setErrors(Boolean errors) {
+    attributes.put("errors", errors);
+  }
 
-    /**
-     * @return  The tags fields value that specifies the names of the fields whose messages should
-     *          be output.
-     */
-    public Boolean getFields() {
-        return (Boolean) attributes.get("fields");
-    }
+  /**
+   * @return The tags fields value that specifies the names of the fields whose messages should be output.
+   */
+  public Boolean getFields() {
+    return (Boolean) attributes.get("fields");
+  }
 
-    /**
-     * Populates the tags fields attribute  that specifies the names of the fields whose messages should
-     * be output.
-     *
-     * @param	fields The fields attribute.
-     */
-    public void setFields(Boolean fields) {
-        attributes.put("fields", fields);
-    }
+  /**
+   * Populates the tags fields attribute  that specifies the names of the fields whose messages should be output.
+   *
+   * @param fields The fields attribute.
+   */
+  public void setFields(Boolean fields) {
+    attributes.put("fields", fields);
+  }
 
-    /**
-     * @return  The FieldMessages class.
-     */
-    protected Class<FieldMessages> controlClass() {
-        return FieldMessages.class;
-    }
+  /**
+   * @return The FieldMessages class.
+   */
+  protected Class<FieldMessages> controlClass() {
+    return FieldMessages.class;
+  }
 }

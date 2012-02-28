@@ -25,95 +25,92 @@ import java.util.Map;
 import com.google.inject.Inject;
 
 /**
- * <p>
- * This is the message scope which fetches and stores values in the
- * HttpServletRequest.
- * </p>
+ * <p> This is the message scope which fetches and stores values in the HttpServletRequest. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @SuppressWarnings("unchecked")
 public class RequestScope extends AbstractJEEScope {
-    private final HttpServletRequest request;
+  private final HttpServletRequest request;
 
-    @Inject
-    public RequestScope(HttpServletRequest request) {
-        this.request = request;
+  @Inject
+  public RequestScope(HttpServletRequest request) {
+    this.request = request;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public Map<String, List<String>> getFieldMessages(MessageType type) {
+    FieldMessages messages = (FieldMessages) request.getAttribute(fieldKey(type));
+    if (messages == null) {
+      return Collections.emptyMap();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public Map<String, List<String>> getFieldMessages(MessageType type) {
-        FieldMessages messages = (FieldMessages) request.getAttribute(fieldKey(type));
-        if (messages == null) {
-            return Collections.emptyMap();
-        }
+    // Copy the map to protect it
+    return new LinkedHashMap<String, List<String>>(messages);
+  }
 
-        // Copy the map to protect it
-        return new LinkedHashMap<String, List<String>>(messages);
+  /**
+   * {@inheritDoc}
+   */
+  public void addFieldMessage(MessageType type, String fieldName, String message) {
+    String key = fieldKey(type);
+    FieldMessages messages = (FieldMessages) request.getAttribute(key);
+    if (messages == null) {
+      messages = new FieldMessages();
+      request.setAttribute(key, messages);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void addFieldMessage(MessageType type, String fieldName, String message) {
-        String key = fieldKey(type);
-        FieldMessages messages = (FieldMessages) request.getAttribute(key);
-        if (messages == null) {
-            messages = new FieldMessages();
-            request.setAttribute(key, messages);
-        }
+    messages.addMessage(fieldName, message);
+  }
 
-        messages.addMessage(fieldName, message);
+  /**
+   * {@inheritDoc}
+   */
+  public List<String> getActionMessages(MessageType type) {
+    List<String> messages = (List<String>) request.getAttribute(actionKey(type));
+    if (messages == null) {
+      return Collections.emptyList();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public List<String> getActionMessages(MessageType type) {
-        List<String> messages = (List<String>) request.getAttribute(actionKey(type));
-        if (messages == null) {
-            return Collections.emptyList();
-        }
+    // Copy the map to protect it
+    return new ArrayList<String>(messages);
+  }
 
-        // Copy the map to protect it
-        return new ArrayList<String>(messages);
+  /**
+   * {@inheritDoc}
+   */
+  public void addActionMessage(MessageType type, String message) {
+    String key = actionKey(type);
+    List<String> messages = (List<String>) request.getAttribute(key);
+    if (messages == null) {
+      messages = new ArrayList<String>();
+      request.setAttribute(key, messages);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void addActionMessage(MessageType type, String message) {
-        String key = actionKey(type);
-        List<String> messages = (List<String>) request.getAttribute(key);
-        if (messages == null) {
-            messages = new ArrayList<String>();
-            request.setAttribute(key, messages);
-        }
+    messages.add(message);
+  }
 
-        messages.add(message);
+  /**
+   * {@inheritDoc}
+   */
+  public void clearActionMessages(MessageType type) {
+    if (type == MessageType.ERROR) {
+      request.removeAttribute(ACTION_ERROR_KEY);
+    } else {
+      request.removeAttribute(ACTION_MESSAGE_KEY);
     }
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void clearActionMessages(MessageType type) {
-        if (type == MessageType.ERROR) {
-            request.removeAttribute(ACTION_ERROR_KEY);
-        } else {
-            request.removeAttribute(ACTION_MESSAGE_KEY);
-        }
+  /**
+   * {@inheritDoc}
+   */
+  public void clearFieldMessages(MessageType type) {
+    if (type == MessageType.ERROR) {
+      request.removeAttribute(FIELD_ERROR_KEY);
+    } else {
+      request.removeAttribute(FIELD_MESSAGE_KEY);
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void clearFieldMessages(MessageType type) {
-        if (type == MessageType.ERROR) {
-            request.removeAttribute(FIELD_ERROR_KEY);
-        } else {
-            request.removeAttribute(FIELD_MESSAGE_KEY);
-        }
-    }
+  }
 }

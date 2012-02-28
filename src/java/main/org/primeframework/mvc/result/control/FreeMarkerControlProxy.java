@@ -20,102 +20,100 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.primeframework.mvc.freemarker.FieldSupportBeansWrapper;
+
 import freemarker.core.Environment;
 import freemarker.template.TemplateDirectiveBody;
 import freemarker.template.TemplateDirectiveModel;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
-import org.primeframework.freemarker.FieldSupportBeansWrapper;
 
 /**
- * <p>
- * This class is a proxy between FreeMarker and the JCatapult MVC controls.
- * </p>
+ * <p> This class is a proxy between FreeMarker and the JCatapult MVC controls. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class FreeMarkerControlProxy implements TemplateDirectiveModel {
-    private final Control control;
+  private final Control control;
 
-    public FreeMarkerControlProxy(Control control) {
-        this.control = control;
-    }
+  public FreeMarkerControlProxy(Control control) {
+    this.control = control;
+  }
 
-    /**
-     * Chains to the {@link Control#renderStart(java.io.Writer , java.util.Map , java.util.Map)}
-     * method and the {@link Control#renderEnd(java.io.Writer)}
-     *
-     * @param   env The FreeMarker environment.
-     * @param   params The parameters passed to this control in the FTL file.
-     * @param   loopVars Loop variables (not really used).
-     * @param   body The body of the directive.
-     */
-    @SuppressWarnings("unchecked")
-    public void execute(Environment env, Map params, TemplateModel[] loopVars, TemplateDirectiveBody body)
+  /**
+   * Chains to the {@link Control#renderStart(java.io.Writer, java.util.Map, java.util.Map)} method and the {@link
+   * Control#renderEnd(java.io.Writer)}
+   *
+   * @param env      The FreeMarker environment.
+   * @param params   The parameters passed to this control in the FTL file.
+   * @param loopVars Loop variables (not really used).
+   * @param body     The body of the directive.
+   */
+  @SuppressWarnings("unchecked")
+  public void execute(Environment env, Map params, TemplateModel[] loopVars, TemplateDirectiveBody body)
     throws IOException, TemplateException {
-        Map<String, String> dynamicAttributes = makeDynamicAttributes(params);
-        Map<String, Object> attributes = makeAttributes(params);
+    Map<String, String> dynamicAttributes = makeDynamicAttributes(params);
+    Map<String, Object> attributes = makeAttributes(params);
 
-        control.renderStart(env.getOut(), attributes, dynamicAttributes);
-        control.renderBody(env.getOut(), new FreeMarkerBodyProxy(body));
-        control.renderEnd(env.getOut());
+    control.renderStart(env.getOut(), attributes, dynamicAttributes);
+    control.renderBody(env.getOut(), new FreeMarkerBodyProxy(body));
+    control.renderEnd(env.getOut());
+  }
+
+  /**
+   * Executes the FreeMarker directive body if it is not null. Sub-classes can overwrite this method to change the body
+   * handling.
+   *
+   * @param env  The environment that can be used to get the writer. This default implementation uses this writer.
+   * @param body The body.
+   * @throws TemplateException If the body fails to render.
+   * @throws IOException       If the render can't write to the writer.
+   */
+  protected void executeBody(Environment env, TemplateDirectiveBody body) throws IOException, TemplateException {
+    if (body != null) {
+      body.render(env.getOut());
+    }
+  }
+
+  /**
+   * Creates the list of dynamic attributes from the given Map of parameters passed ot the control.
+   *
+   * @param params The parameters passed to this control in the FTL file.
+   * @return The dynamic attributes.
+   */
+  @SuppressWarnings("unchecked")
+  protected Map<String, String> makeDynamicAttributes(Map params) {
+    Map<String, String> dynamicAttributes = new HashMap<String, String>();
+    for (Iterator<String> i = params.keySet().iterator(); i.hasNext(); ) {
+      String key = i.next();
+      if (key.startsWith("_")) {
+        Object value = params.get(key);
+        dynamicAttributes.put(key.substring(1), value.toString());
+        i.remove();
+      }
+    }
+    return dynamicAttributes;
+  }
+
+  /**
+   * Makes the attributes from the parameters passed to the control by unwrapping the FreeMarker models.
+   *
+   * @param params The parameters passed to this control in the FTL file.
+   * @return The attributes.
+   * @throws freemarker.template.TemplateModelException
+   *          If the unwrapping fails.
+   */
+  protected Map<String, Object> makeAttributes(Map params) throws TemplateModelException {
+    Map<String, Object> attributes = new HashMap<String, Object>(params.size());
+    for (Object o : params.entrySet()) {
+      Map.Entry entry = (Map.Entry) o;
+      Object value = entry.getValue();
+      if (value != null) {
+        attributes.put((String) entry.getKey(), FieldSupportBeansWrapper.INSTANCE.unwrap((TemplateModel) value));
+      }
     }
 
-    /**
-     * Executes the FreeMarker directive body if it is not null. Sub-classes can overwrite this method
-     * to change the body handling.
-     *
-     * @param   env The environment that can be used to get the writer. This default implementation
-     *          uses this writer.
-     * @param   body The body.
-     * @throws  TemplateException If the body fails to render.
-     * @throws  IOException If the render can't write to the writer.
-     */
-    protected void executeBody(Environment env, TemplateDirectiveBody body) throws IOException, TemplateException {
-        if (body != null) {
-            body.render(env.getOut());
-        }
-    }
-
-    /**
-     * Creates the list of dynamic attributes from the given Map of parameters passed ot the control.
-     *
-     * @param   params The parameters passed to this control in the FTL file.
-     * @return  The dynamic attributes.
-     */
-    @SuppressWarnings("unchecked")
-    protected Map<String, String> makeDynamicAttributes(Map params) {
-        Map<String, String> dynamicAttributes = new HashMap<String, String>();
-        for (Iterator<String> i = params.keySet().iterator(); i.hasNext();) {
-            String key = i.next();
-            if (key.startsWith("_")) {
-                Object value = params.get(key);
-                dynamicAttributes.put(key.substring(1), value.toString());
-                i.remove();
-            }
-        }
-        return dynamicAttributes;
-    }
-
-    /**
-     * Makes the attributes from the parameters passed to the control by unwrapping the FreeMarker
-     * models.
-     *
-     * @param   params The parameters passed to this control in the FTL file.
-     * @return  The attributes.
-     * @throws freemarker.template.TemplateModelException If the unwrapping fails.
-     */
-    protected Map<String, Object> makeAttributes(Map params) throws TemplateModelException {
-        Map<String, Object> attributes = new HashMap<String, Object>(params.size());
-        for (Object o : params.entrySet()) {
-            Map.Entry entry = (Map.Entry) o;
-            Object value = entry.getValue();
-            if (value != null) {
-                attributes.put((String) entry.getKey(), FieldSupportBeansWrapper.INSTANCE.unwrap((TemplateModel) value));
-            }
-        }
-
-        return attributes;
-    }
+    return attributes;
+  }
 }

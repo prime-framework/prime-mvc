@@ -15,33 +15,28 @@
  */
 package org.primeframework.mvc.validation.annotation;
 
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.lang.annotation.ElementType;
 
 /**
- * <p>
- * This annotation marks a Map in a bean as requiring validation.
- * By default, the validation framework does not traverse down the object
- * graph.
- * </p>
+ * <p> This annotation marks a Map in a bean as requiring validation. By default, the validation framework does not
+ * traverse down the object graph. </p>
  *
  * @author Brian Pontarelli
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface ValidMap {
-    /**
-     * @return  A list of groups that the value should be validated for. By default it is validated
-     *          for all groups.
-     */
-    String[] groups() default {};
+  /**
+   * @return A list of groups that the value should be validated for. By default it is validated for all groups.
+   */
+  String[] groups() default {};
 
-    /**
-     * @return  The required keys that should be in the Map. If the Map is null, these are used to
-     *          validate the component type of the Map (i.e. the second generic type
-     *          Map&lt;String, Address> is Address).
-     */
-    String[] keys();
+  /**
+   * @return The required keys that should be in the Map. If the Map is null, these are used to validate the component
+   *         type of the Map (i.e. the second generic type Map&lt;String, Address> is Address).
+   */
+  String[] keys();
 }

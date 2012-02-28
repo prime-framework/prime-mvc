@@ -26,146 +26,143 @@ import java.util.Map;
 import com.google.inject.Inject;
 
 /**
- * <p>
- * This is the message scope which fetches and stores values in the
- * HttpSession.
- * </p>
+ * <p> This is the message scope which fetches and stores values in the HttpSession. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @SuppressWarnings("unchecked")
 public class SessionScope extends AbstractJEEScope {
-    private final HttpServletRequest request;
+  private final HttpServletRequest request;
 
-    @Inject
-    public SessionScope(HttpServletRequest request) {
-        this.request = request;
+  @Inject
+  public SessionScope(HttpServletRequest request) {
+    this.request = request;
+  }
+
+  /**
+   * Correctly synchronizes the session.
+   *
+   * @param type Used to determine the key to lookup the message map from.
+   * @return The Map or an empty map if the session doesn't contain the FieldMessages yet.
+   */
+  public Map<String, List<String>> getFieldMessages(MessageType type) {
+    HttpSession session = request.getSession(false);
+    if (session != null) {
+      FieldMessages messages;
+      synchronized (session) {
+        messages = (FieldMessages) session.getAttribute(fieldKey(type));
+        if (messages == null) {
+          return Collections.emptyMap();
+        }
+
+        // Copy the map to protect it from threading
+        return new LinkedHashMap<String, List<String>>(messages);
+      }
     }
 
-    /**
-     * Correctly synchronizes the session.
-     *
-     * @param   type Used to determine the key to lookup the message map from.
-     * @return  The Map or an empty map if the session doesn't contain the FieldMessages yet.
-     */
-    public Map<String, List<String>> getFieldMessages(MessageType type) {
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-            FieldMessages messages;
-            synchronized (session) {
-                messages = (FieldMessages) session.getAttribute(fieldKey(type));
-                if (messages == null) {
-                    return Collections.emptyMap();
-                }
+    return Collections.emptyMap();
+  }
 
-                // Copy the map to protect it from threading
-                return new LinkedHashMap<String, List<String>>(messages);
-            }
-        }
-
-        return Collections.emptyMap();
+  /**
+   * Correctly synchronizes the context and the FieldMessages object.
+   *
+   * @param type      Used to determine the key to lookup the message map from.
+   * @param fieldName The name of the field.
+   * @param message   The message to append.
+   */
+  public void addFieldMessage(MessageType type, String fieldName, String message) {
+    HttpSession session = request.getSession(true);
+    FieldMessages messages;
+    synchronized (session) {
+      String key = fieldKey(type);
+      messages = (FieldMessages) session.getAttribute(key);
+      if (messages == null) {
+        messages = new FieldMessages();
+        session.setAttribute(key, messages);
+      }
     }
 
-    /**
-     * Correctly synchronizes the context and the FieldMessages object.
-     *
-     * @param   type Used to determine the key to lookup the message map from.
-     * @param   fieldName The name of the field.
-     * @param   message The message to append.
-     */
-    public void addFieldMessage(MessageType type, String fieldName, String message) {
-        HttpSession session = request.getSession(true);
-        FieldMessages messages;
-        synchronized (session) {
-            String key = fieldKey(type);
-            messages = (FieldMessages) session.getAttribute(key);
-            if (messages == null) {
-                messages = new FieldMessages();
-                session.setAttribute(key, messages);
-            }
+    synchronized (messages) {
+      messages.addMessage(fieldName, message);
+    }
+  }
+
+  /**
+   * Correctly synchronizes the session.
+   *
+   * @param type Used to determine the key to lookup the message map from.
+   * @return The List or an empty List if the session doesn't contain the action messages yet.
+   */
+  public List<String> getActionMessages(MessageType type) {
+    HttpSession session = request.getSession(false);
+    if (session != null) {
+      List<String> messages;
+      synchronized (session) {
+        messages = (List<String>) session.getAttribute(actionKey(type));
+        if (messages == null) {
+          return Collections.emptyList();
         }
 
-        synchronized (messages) {
-            messages.addMessage(fieldName, message);
-        }
+        // Copy the map to protect it from threading
+        return new ArrayList<String>(messages);
+      }
     }
 
-    /**
-     * Correctly synchronizes the session.
-     *
-     * @param   type Used to determine the key to lookup the message map from.
-     * @return  The List or an empty List if the session doesn't contain the action messages yet.
-     */
-    public List<String> getActionMessages(MessageType type) {
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-            List<String> messages;
-            synchronized (session) {
-                messages = (List<String>) session.getAttribute(actionKey(type));
-                if (messages == null) {
-                    return Collections.emptyList();
-                }
+    return Collections.emptyList();
+  }
 
-                // Copy the map to protect it from threading
-                return new ArrayList<String>(messages);
-            }
-        }
-
-        return Collections.emptyList();
+  /**
+   * Correctly synchronizes the session and the action messages List.
+   *
+   * @param type    Used to determine the key to lookup the message map from.
+   * @param message The message to append.
+   */
+  public void addActionMessage(MessageType type, String message) {
+    HttpSession session = request.getSession(true);
+    List<String> messages;
+    synchronized (session) {
+      String key = actionKey(type);
+      messages = (List<String>) session.getAttribute(key);
+      if (messages == null) {
+        messages = new ArrayList<String>();
+        session.setAttribute(key, messages);
+      }
     }
 
-    /**
-     * Correctly synchronizes the session and the action messages List.
-     *
-     * @param   type Used to determine the key to lookup the message map from.
-     * @param   message The message to append.
-     */
-    public void addActionMessage(MessageType type, String message) {
-        HttpSession session = request.getSession(true);
-        List<String> messages;
-        synchronized (session) {
-            String key = actionKey(type);
-            messages = (List<String>) session.getAttribute(key);
-            if (messages == null) {
-                messages = new ArrayList<String>();
-                session.setAttribute(key, messages);
-            }
-        }
-
-        synchronized (messages) {
-            messages.add(message);
-        }
+    synchronized (messages) {
+      messages.add(message);
     }
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void clearActionMessages(MessageType type) {
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-            synchronized (session) {
-                if (type == MessageType.ERROR) {
-                    session.removeAttribute(ACTION_ERROR_KEY);
-                } else {
-                    session.removeAttribute(ACTION_MESSAGE_KEY);
-                }
-            }
+  /**
+   * {@inheritDoc}
+   */
+  public void clearActionMessages(MessageType type) {
+    HttpSession session = request.getSession(false);
+    if (session != null) {
+      synchronized (session) {
+        if (type == MessageType.ERROR) {
+          session.removeAttribute(ACTION_ERROR_KEY);
+        } else {
+          session.removeAttribute(ACTION_MESSAGE_KEY);
         }
+      }
     }
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void clearFieldMessages(MessageType type) {
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-            synchronized (session) {
-                if (type == MessageType.ERROR) {
-                    session.removeAttribute(FIELD_ERROR_KEY);
-                } else {
-                    session.removeAttribute(FIELD_MESSAGE_KEY);
-                }
-            }
+  /**
+   * {@inheritDoc}
+   */
+  public void clearFieldMessages(MessageType type) {
+    HttpSession session = request.getSession(false);
+    if (session != null) {
+      synchronized (session) {
+        if (type == MessageType.ERROR) {
+          session.removeAttribute(FIELD_ERROR_KEY);
+        } else {
+          session.removeAttribute(FIELD_MESSAGE_KEY);
         }
+      }
     }
+  }
 }

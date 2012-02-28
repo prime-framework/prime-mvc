@@ -15,17 +15,14 @@
  */
 package org.primeframework.mvc.action;
 
-import org.primeframework.servlet.Workflow;
+import org.primeframework.mvc.servlet.Workflow;
 
 import com.google.inject.ImplementedBy;
 
 /**
- * <p>
- * This interface defines how actions are invoked by the JCatapult
- * MVC.
- * </p>
+ * <p> This interface defines how actions are invoked by the JCatapult MVC. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @ImplementedBy(DefaultActionInvocationWorkflow.class)
 public interface ActionInvocationWorkflow extends Workflow {

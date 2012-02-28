@@ -19,59 +19,57 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <p>
- * This interface defines the handler for a specific message scope.
- * </p>
+ * <p> This interface defines the handler for a specific message scope. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public interface Scope {
-    /**
-     * Retrieve a Map of all of the field messages stored in the scope. This Map is not live and
-     * modifications are not stored in the scope.
-     *
-     * @param   type The type of messages to retrieve.
-     * @return  The Map and never null.
-     */
-    Map<String, List<String>> getFieldMessages(MessageType type);
+  /**
+   * Retrieve a Map of all of the field messages stored in the scope. This Map is not live and modifications are not
+   * stored in the scope.
+   *
+   * @param type The type of messages to retrieve.
+   * @return The Map and never null.
+   */
+  Map<String, List<String>> getFieldMessages(MessageType type);
 
-    /**
-     * Sets a field message.
-     *
-     * @param   type The type of messages to retrieve.
-     * @param   fieldName The name of the field.
-     * @param   message The message.
-     */
-    void addFieldMessage(MessageType type, String fieldName, String message);
+  /**
+   * Sets a field message.
+   *
+   * @param type      The type of messages to retrieve.
+   * @param fieldName The name of the field.
+   * @param message   The message.
+   */
+  void addFieldMessage(MessageType type, String fieldName, String message);
 
-    /**
-     * Retrieve a List of all of the action messages stored in the scope. This List is not live and
-     * modifications are not stored in the scope.
-     *
-     * @param   type The type of messages to retrieve.
-     * @return  The List and never null.
-     */
-    List<String> getActionMessages(MessageType type);
+  /**
+   * Retrieve a List of all of the action messages stored in the scope. This List is not live and modifications are not
+   * stored in the scope.
+   *
+   * @param type The type of messages to retrieve.
+   * @return The List and never null.
+   */
+  List<String> getActionMessages(MessageType type);
 
-    /**
-     * Sets an action message.
-     *
-     * @param   type The type of messages to retrieve.
-     * @param   message The message.
-     */
-    void addActionMessage(MessageType type, String message);
+  /**
+   * Sets an action message.
+   *
+   * @param type    The type of messages to retrieve.
+   * @param message The message.
+   */
+  void addActionMessage(MessageType type, String message);
 
-    /**
-     * Clears all of the action messages of the given type from the scope completely.
-     *
-     * @param   type The message type to clear.
-     */
-    void clearActionMessages(MessageType type);
+  /**
+   * Clears all of the action messages of the given type from the scope completely.
+   *
+   * @param type The message type to clear.
+   */
+  void clearActionMessages(MessageType type);
 
-    /**
-     * Clears all of the field messages of the given type from the scope completely.
-     *
-     * @param   type The message type to clear.
-     */
-    void clearFieldMessages(MessageType type);
+  /**
+   * Clears all of the field messages of the given type from the scope completely.
+   *
+   * @param type The message type to clear.
+   */
+  void clearFieldMessages(MessageType type);
 }

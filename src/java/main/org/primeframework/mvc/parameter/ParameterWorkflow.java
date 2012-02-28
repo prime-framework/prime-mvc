@@ -15,18 +15,15 @@
  */
 package org.primeframework.mvc.parameter;
 
-import org.primeframework.servlet.Workflow;
+import org.primeframework.mvc.servlet.Workflow;
 
 import com.google.inject.ImplementedBy;
 
 /**
- * <p>
- * This interface marks a class as the parameter handling part of the MVC
- * workflow. This part is how the JCatapult MVC pulls HTTP request
- * parameters and set them into actions.
- * </p>
+ * <p> This interface marks a class as the parameter handling part of the MVC workflow. This part is how the JCatapult
+ * MVC pulls HTTP request parameters and set them into actions. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @ImplementedBy(DefaultParameterWorkflow.class)
 public interface ParameterWorkflow extends Workflow {

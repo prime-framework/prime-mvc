@@ -19,57 +19,55 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <p>
- * This is a test action.
- * </p>
+ * <p> This is a test action. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class Action {
-    private int[] roleIds;
-    private List<Integer> selectionIds;
-    private Map<String, List<Integer>> choices;
-    private Map<String, Integer[]> associations;
+  private int[] roleIds;
+  private List<Integer> selectionIds;
+  private Map<String, List<Integer>> choices;
+  private Map<String, Integer[]> associations;
 
-    private User user;
+  private User user;
 
-    public User getUser() {
-        return user;
-    }
+  public User getUser() {
+    return user;
+  }
 
-    public void setUser(User value) {
-        this.user = value;
-    }
+  public void setUser(User value) {
+    this.user = value;
+  }
 
-    public int[] getRoleIds() {
-        return roleIds;
-    }
+  public int[] getRoleIds() {
+    return roleIds;
+  }
 
-    public void setRoleIds(int[] roleIds) {
-        this.roleIds = roleIds;
-    }
+  public void setRoleIds(int[] roleIds) {
+    this.roleIds = roleIds;
+  }
 
-    public List<Integer> getSelectionIds() {
-        return selectionIds;
-    }
+  public List<Integer> getSelectionIds() {
+    return selectionIds;
+  }
 
-    public void setSelectionIds(List<Integer> selectionIds) {
-        this.selectionIds = selectionIds;
-    }
+  public void setSelectionIds(List<Integer> selectionIds) {
+    this.selectionIds = selectionIds;
+  }
 
-    public Map<String, List<Integer>> getChoices() {
-        return choices;
-    }
+  public Map<String, List<Integer>> getChoices() {
+    return choices;
+  }
 
-    public void setChoices(Map<String, List<Integer>> choices) {
-        this.choices = choices;
-    }
+  public void setChoices(Map<String, List<Integer>> choices) {
+    this.choices = choices;
+  }
 
-    public Map<String, Integer[]> getAssociations() {
-        return associations;
-    }
+  public Map<String, Integer[]> getAssociations() {
+    return associations;
+  }
 
-    public void setAssociations(Map<String, Integer[]> associations) {
-        this.associations = associations;
-    }
+  public void setAssociations(Map<String, Integer[]> associations) {
+    this.associations = associations;
+  }
 }

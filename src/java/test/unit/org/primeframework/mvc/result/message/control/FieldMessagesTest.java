@@ -25,79 +25,77 @@ import com.google.inject.Inject;
 import static net.java.util.CollectionTools.*;
 
 /**
- * <p>
- * This class tests the field messages control.
- * </p>
+ * <p> This class tests the field messages control. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class FieldMessagesTest extends ControlBaseTest {
-    @Inject FieldMessages fieldMessages;
+  @Inject FieldMessages fieldMessages;
 
-    @Test
-    public void testFieldMessages() {
-        Edit action = new Edit();
+  @Test
+  public void testFieldMessages() {
+    Edit action = new Edit();
 
-        ais.setCurrent(new DefaultActionInvocation(action, "/user/edit", null, null));
+    ais.setCurrent(new DefaultActionInvocation(action, "/user/edit", null, null));
 
-        messageStore.addFieldMessage(MessageScope.REQUEST, "field", "fieldError1");
-        messageStore.addFieldMessage(MessageScope.REQUEST, "field", "fieldError2");
-        run(fieldMessages,
-            mapNV("errors", false),
-            null, "<ul class=\"field-errors\">\n" +
-            "  <li class=\"field-error\">error1</li>\n" +
-            "  <li class=\"field-error\">error2</li>\n" +
-            "</ul>\n"
-        );
-    }
+    messageStore.addFieldMessage(MessageScope.REQUEST, "field", "fieldError1");
+    messageStore.addFieldMessage(MessageScope.REQUEST, "field", "fieldError2");
+    run(fieldMessages,
+      mapNV("errors", false),
+      null, "<ul class=\"field-errors\">\n" +
+      "  <li class=\"field-error\">error1</li>\n" +
+      "  <li class=\"field-error\">error2</li>\n" +
+      "</ul>\n"
+    );
+  }
 
-    @Test
-    public void testFieldMessageError() {
-        Edit action = new Edit();
+  @Test
+  public void testFieldMessageError() {
+    Edit action = new Edit();
 
-        ais.setCurrent(new DefaultActionInvocation(action, "/user/edit", null, null));
+    ais.setCurrent(new DefaultActionInvocation(action, "/user/edit", null, null));
 
-        messageStore.addFieldError(MessageScope.REQUEST, "field", "fieldError1");
-        messageStore.addFieldError(MessageScope.REQUEST, "field", "fieldError2");
+    messageStore.addFieldError(MessageScope.REQUEST, "field", "fieldError1");
+    messageStore.addFieldError(MessageScope.REQUEST, "field", "fieldError2");
 
-        run(fieldMessages,
-            mapNV("errors", true),
-            null, "<ul class=\"field-errors\">\n" +
-            "  <li class=\"field-error\">error1</li>\n" +
-            "  <li class=\"field-error\">error2</li>\n" +
-            "</ul>\n"
-        );
-    }
+    run(fieldMessages,
+      mapNV("errors", true),
+      null, "<ul class=\"field-errors\">\n" +
+      "  <li class=\"field-error\">error1</li>\n" +
+      "  <li class=\"field-error\">error2</li>\n" +
+      "</ul>\n"
+    );
+  }
 
-    @Test
-    public void testFieldMessageNamedMissing() {
-        Edit action = new Edit();
+  @Test
+  public void testFieldMessageNamedMissing() {
+    Edit action = new Edit();
 
-        ais.setCurrent(new DefaultActionInvocation(action, "/user/edit", null, null));
+    ais.setCurrent(new DefaultActionInvocation(action, "/user/edit", null, null));
 
-        messageStore.addFieldMessage(MessageScope.REQUEST, "field", "fieldError1");
-        messageStore.addFieldMessage(MessageScope.REQUEST, "field", "fieldError2");
+    messageStore.addFieldMessage(MessageScope.REQUEST, "field", "fieldError1");
+    messageStore.addFieldMessage(MessageScope.REQUEST, "field", "fieldError2");
 
-        run(fieldMessages,
-            mapNV("errors", false, "fields", "missing"),
-            null, ""
-        );
-    }
+    run(fieldMessages,
+      mapNV("errors", false, "fields", "missing"),
+      null, ""
+    );
+  }
 
-    @Test
-    public void testFieldMessageNamed() {
-        Edit action = new Edit();
+  @Test
+  public void testFieldMessageNamed() {
+    Edit action = new Edit();
 
-        ais.setCurrent(new DefaultActionInvocation(action, "/user/edit", null, null));
+    ais.setCurrent(new DefaultActionInvocation(action, "/user/edit", null, null));
 
-        messageStore.addFieldMessage(MessageScope.REQUEST, "field", "fieldError1");
-        messageStore.addFieldMessage(MessageScope.REQUEST, "field", "fieldError2");
-        run(fieldMessages,
-            mapNV("errors", false, "fields", "field"),
-            null, "<ul class=\"field-errors\">\n" +
-            "  <li class=\"field-error\">error1</li>\n" +
-            "  <li class=\"field-error\">error2</li>\n" +
-            "</ul>\n"
-        );
-    }
+    messageStore.addFieldMessage(MessageScope.REQUEST, "field", "fieldError1");
+    messageStore.addFieldMessage(MessageScope.REQUEST, "field", "fieldError2");
+    run(fieldMessages,
+      mapNV("errors", false, "fields", "field"),
+      null, "<ul class=\"field-errors\">\n" +
+      "  <li class=\"field-error\">error1</li>\n" +
+      "  <li class=\"field-error\">error2</li>\n" +
+      "</ul>\n"
+    );
+  }
 }

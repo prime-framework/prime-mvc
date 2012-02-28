@@ -20,21 +20,17 @@ import java.lang.annotation.Annotation;
 import com.google.inject.ImplementedBy;
 
 /**
- * <p>
- * This interface defines the provider that creates Results.
- * </p>
+ * <p> This interface defines the provider that creates Results. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @ImplementedBy(DefaultResultProvider.class)
 public interface ResultProvider {
-    /**
-     * <p>
-     * Returns the result for the given annotation.
-     * </p>
-     *
-     * @param   annotation The annotation.
-     * @return  The Result or null if one was not found
-     */
-    Result lookup(Class<? extends Annotation> annotation);
+  /**
+   * <p> Returns the result for the given annotation. </p>
+   *
+   * @param annotation The annotation.
+   * @return The Result or null if one was not found
+   */
+  Result lookup(Class<? extends Annotation> annotation);
 }

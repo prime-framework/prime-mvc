@@ -17,70 +17,68 @@ package org.primeframework.mvc.parameter.el;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
- * <p>
- * This class is a small helper class that is used to store the read and write methods of a bean
- * property as well as a flag that determines if it is indexed.
- * </p>
+ * <p> This class is a small helper class that is used to store the read and write methods of a bean property as well as
+ * a flag that determines if it is indexed. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class PropertyInfo {
-    private String name;
-    private final Map<String, Method> methods = new HashMap<String, Method>();
-    private Class<?> klass;
-    private Class<?> type;
-    private boolean indexed;
-    private Type genericType;
+  private String name;
+  private final Map<String, Method> methods = new HashMap<String, Method>();
+  private Class<?> klass;
+  private Class<?> type;
+  private boolean indexed;
+  private Type genericType;
 
-    public String getName() {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public Class<?> getKlass() {
-        return klass;
-    }
+  public Class<?> getKlass() {
+    return klass;
+  }
 
-    public void setKlass(Class<?> klass) {
-        this.klass = klass;
-    }
+  public void setKlass(Class<?> klass) {
+    this.klass = klass;
+  }
 
-    public Class<?> getType() {
-        return type;
-    }
+  public Class<?> getType() {
+    return type;
+  }
 
-    public void setType(Class<?> type) {
-        this.type = type;
-    }
+  public void setType(Class<?> type) {
+    this.type = type;
+  }
 
-    public boolean isIndexed() {
-        return indexed;
-    }
+  public boolean isIndexed() {
+    return indexed;
+  }
 
-    public void setIndexed(boolean indexed) {
-        this.indexed = indexed;
-    }
+  public void setIndexed(boolean indexed) {
+    this.indexed = indexed;
+  }
 
-    public Type getGenericType() {
-        return genericType;
-    }
+  public Type getGenericType() {
+    return genericType;
+  }
 
-    public void setGenericType(Type genericType) {
-        this.genericType = genericType;
-    }
+  public void setGenericType(Type genericType) {
+    this.genericType = genericType;
+  }
 
-    public Map<String, Method> getMethods() {
-        return methods;
-    }
+  public Map<String, Method> getMethods() {
+    return methods;
+  }
 
-    public String toString() {
-        return "Property named [" + name + "] in class [" + klass + "]";
-    }
+  public String toString() {
+    return "Property named [" + name + "] in class [" + klass + "]";
+  }
 }

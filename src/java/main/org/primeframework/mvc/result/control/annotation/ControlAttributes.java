@@ -21,26 +21,22 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * <p>
- * This class defines the attributes that a control must have in order to
- * properly render. Since FreeMarker doesn't provide a mechanism for ensuring
- * directives have the correct attributes, this annotation is used instead.
- * It could be used in the future to generate the TLD files.
- * </p>
+ * <p> This class defines the attributes that a control must have in order to properly render. Since FreeMarker doesn't
+ * provide a mechanism for ensuring directives have the correct attributes, this annotation is used instead. It could be
+ * used in the future to generate the TLD files. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface ControlAttributes {
-    /**
-     * @return  This sets the list of required attributes that a control must have in order to function
-     *          properly.
-     */
-    ControlAttribute[] required() default {};
+  /**
+   * @return This sets the list of required attributes that a control must have in order to function properly.
+   */
+  ControlAttribute[] required() default {};
 
-    /**
-     * @return  This sets the list of optional attributes that a control can also have.
-     */
-    ControlAttribute[] optional() default {};
+  /**
+   * @return This sets the list of optional attributes that a control can also have.
+   */
+  ControlAttribute[] optional() default {};
 }

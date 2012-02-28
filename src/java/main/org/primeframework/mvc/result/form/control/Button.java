@@ -23,33 +23,31 @@ import org.primeframework.mvc.result.control.annotation.ControlAttributes;
 import com.google.inject.Inject;
 
 /**
- * <p>
- * This class is the control for a button button.
- * </p>
+ * <p> This class is the control for a button button. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @ControlAttributes(
-    required = {
-        @ControlAttribute(name = "name")
-    },
-    optional = {
-        @ControlAttribute(name = "disabled", types = {boolean.class, Boolean.class}),
-        @ControlAttribute(name = "required", types = {boolean.class, Boolean.class}),
-        @ControlAttribute(name = "size", types = {int.class, Integer.class}),
-        @ControlAttribute(name = "tabindex", types = {int.class, Integer.class})
-    }
+  required = {
+    @ControlAttribute(name = "name")
+  },
+  optional = {
+    @ControlAttribute(name = "disabled", types = {boolean.class, Boolean.class}),
+    @ControlAttribute(name = "required", types = {boolean.class, Boolean.class}),
+    @ControlAttribute(name = "size", types = {int.class, Integer.class}),
+    @ControlAttribute(name = "tabindex", types = {int.class, Integer.class})
+  }
 )
 public class Button extends AbstractButtonInput {
-    @Inject
-    public Button(HttpServletRequest request) {
-        super(request);
-    }
+  @Inject
+  public Button(HttpServletRequest request) {
+    super(request);
+  }
 
-    /**
-     * @return  button.ftl
-     */
-    protected String endTemplateName() {
-        return "button.ftl";
-    }
+  /**
+   * @return button.ftl
+   */
+  protected String endTemplateName() {
+    return "button.ftl";
+  }
 }

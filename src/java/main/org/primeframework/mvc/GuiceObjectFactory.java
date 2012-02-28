@@ -17,41 +17,39 @@ package org.primeframework.mvc;
 
 import java.util.List;
 
-import org.primeframework.guice.GuiceTools;
+import org.primeframework.mvc.guice.GuiceTools;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 
 /**
- * <p>
- * This is the default implementation of the ObjectFactory that uses Guice.
- * </p>
+ * <p> This is the default implementation of the ObjectFactory that uses Guice. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class GuiceObjectFactory implements ObjectFactory {
-    private final Injector injector;
+  private final Injector injector;
 
-    @Inject
-    public GuiceObjectFactory(Injector injector) {
-        this.injector = injector;
-    }
+  @Inject
+  public GuiceObjectFactory(Injector injector) {
+    this.injector = injector;
+  }
 
-    /**
-     * Creates the class using Guice from the Injector from Guice.
-     *
-     * @param   klass The class to create.
-     * @return  The Object and never null.
-     */
-    public <T> T create(Class<T> klass) {
-        return injector.getInstance(klass);
-    }
+  /**
+   * Creates the class using Guice from the Injector from Guice.
+   *
+   * @param klass The class to create.
+   * @return The Object and never null.
+   */
+  public <T> T create(Class<T> klass) {
+    return injector.getInstance(klass);
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @SuppressWarnings("unchecked")
-    public <T> List<Class<? extends T>> getAllForType(Class<T> type) {
-      return GuiceTools.getTypes(injector, type);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @SuppressWarnings("unchecked")
+  public <T> List<Class<? extends T>> getAllForType(Class<T> type) {
+    return GuiceTools.getTypes(injector, type);
+  }
 }

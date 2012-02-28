@@ -23,36 +23,30 @@ import org.primeframework.mvc.validation.annotation.ValidatorAnnotation;
 import com.google.inject.Inject;
 
 /**
- * <p>
- * This class is the manager for all the Validators. It loads the Validators from
- * Guice. Therefore, if you want to define a custom validator, create a new
- * annotation, annotate your annotation with the
- * {@link org.primeframework.mvc.validation.annotation.ValidatorAnnotation}
- * annotation, and then begin annotating classes. This class will taken care
- * for using the ResultAnnotation's value to determine the Result implementation
- * to construct and use.
- * </p>
+ * <p> This class is the manager for all the Validators. It loads the Validators from Guice. Therefore, if you want to
+ * define a custom validator, create a new annotation, annotate your annotation with the {@link
+ * org.primeframework.mvc.validation.annotation.ValidatorAnnotation} annotation, and then begin annotating classes. This
+ * class will taken care for using the ResultAnnotation's value to determine the Result implementation to construct and
+ * use. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class DefaultValidatorProvider implements ValidatorProvider {
-    private final ObjectFactory objectFactory;
+  private final ObjectFactory objectFactory;
 
-    @Inject
-    public DefaultValidatorProvider(ObjectFactory objectFactory) {
-        this.objectFactory = objectFactory;
-    }
+  @Inject
+  public DefaultValidatorProvider(ObjectFactory objectFactory) {
+    this.objectFactory = objectFactory;
+  }
 
-    /**
-     * <p>
-     * Returns the Validator for the given annotation.
-     * </p>
-     *
-     * @param   annotation The annotation.
-     * @return  The Validator.
-     */
-    public Validator lookup(Class<? extends Annotation> annotation) {
-        ValidatorAnnotation ra = annotation.getAnnotation(ValidatorAnnotation.class);
-        return objectFactory.create(ra.value());
-    }
+  /**
+   * <p> Returns the Validator for the given annotation. </p>
+   *
+   * @param annotation The annotation.
+   * @return The Validator.
+   */
+  public Validator lookup(Class<? extends Annotation> annotation) {
+    ValidatorAnnotation ra = annotation.getAnnotation(ValidatorAnnotation.class);
+    return objectFactory.create(ra.value());
+  }
 }

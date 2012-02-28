@@ -20,19 +20,17 @@ import java.util.List;
 import org.primeframework.mvc.action.annotation.Action;
 
 /**
- * <p>
- * This class is a simple edit action for testing.
- * </p>
+ * <p> This class is a simple edit action for testing. </p>
  *
  * @author Brian Pontarelli
  */
 @Action("{firstName}/static/{lastName}/{*theRest}")
 public class ComplexRest {
-    public String firstName;
-    public String lastName;
-    public List<String> theRest;
+  public String firstName;
+  public String lastName;
+  public List<String> theRest;
 
-    public String execute() {
-        return "success";
-    }
+  public String execute() {
+    return "success";
+  }
 }

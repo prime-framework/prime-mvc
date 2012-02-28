@@ -23,38 +23,34 @@ import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import com.google.inject.Inject;
 
 /**
- * <p>
- * This class an abstract Control implementation that is useful for creating new
- * components that will contain sbippets of functionality that might normally exist
- * inside the result FTL or JSP. An example might be pagination controls or a
- * search result table or a CRUD form. This provides access to the {@link FreeMarkerMap}
- * so that the component can use all of the JCatapult MVC controls (i.e.
- * form, text, actionmessage, etc) and also provides access to values from
- * the current action.
- * </p>
+ * <p> This class an abstract Control implementation that is useful for creating new components that will contain
+ * sbippets of functionality that might normally exist inside the result FTL or JSP. An example might be pagination
+ * controls or a search result table or a CRUD form. This provides access to the {@link FreeMarkerMap} so that the
+ * component can use all of the JCatapult MVC controls (i.e. form, text, actionmessage, etc) and also provides access to
+ * values from the current action. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public abstract class AbstractComponentControl extends AbstractControl {
-    protected ExpressionEvaluator expressionEvaluator;
-    protected HttpServletResponse response;
+  protected ExpressionEvaluator expressionEvaluator;
+  protected HttpServletResponse response;
 
-    @Inject
-    public void setExpressionEvaluator(ExpressionEvaluator expressionEvaluator) {
-        this.expressionEvaluator = expressionEvaluator;
-    }
+  @Inject
+  public void setExpressionEvaluator(ExpressionEvaluator expressionEvaluator) {
+    this.expressionEvaluator = expressionEvaluator;
+  }
 
-    @Inject
-    public void setResponse(HttpServletResponse response) {
-        this.response = response;
-    }
+  @Inject
+  public void setResponse(HttpServletResponse response) {
+    this.response = response;
+  }
 
-    /**
-     * Converts the given parameters into a FreeMarkerMap root node.
-     *
-     * @return  The root, which is a {@link FreeMarkerMap}.
-     */
-    protected Object makeRoot() {
-        return new FreeMarkerMap(request, response, expressionEvaluator, actionInvocationStore, parameters);
-    }
+  /**
+   * Converts the given parameters into a FreeMarkerMap root node.
+   *
+   * @return The root, which is a {@link FreeMarkerMap}.
+   */
+  protected Object makeRoot() {
+    return new FreeMarkerMap(request, response, expressionEvaluator, actionInvocationStore, parameters);
+  }
 }

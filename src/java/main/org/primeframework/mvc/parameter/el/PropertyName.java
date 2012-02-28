@@ -16,27 +16,24 @@
 package org.primeframework.mvc.parameter.el;
 
 /**
- * <p>
- * This class stores the information about JavaBean methods including the prefix
- * and propertyName.
- * </p>
+ * <p> This class stores the information about JavaBean methods including the prefix and propertyName. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class PropertyName {
-    private final String prefix;
-    private final String name;
+  private final String prefix;
+  private final String name;
 
-    public PropertyName(String prefix, String name) {
-        this.prefix = prefix;
-        this.name = name;
-    }
+  public PropertyName(String prefix, String name) {
+    this.prefix = prefix;
+    this.name = name;
+  }
 
-    public String getPrefix() {
-        return prefix;
-    }
+  public String getPrefix() {
+    return prefix;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 }

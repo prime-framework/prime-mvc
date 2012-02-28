@@ -18,72 +18,71 @@ package org.primeframework.mvc.parameter.convert.converters;
 import java.util.Collections;
 import java.util.Locale;
 
-import static net.java.util.CollectionTools.*;
-import org.primeframework.domain.commerce.Money;
+import org.primeframework.mvc.domain.commerce.Money;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
-import static org.testng.Assert.*;
 import org.testng.annotations.Test;
 
+import static net.java.util.CollectionTools.*;
+import static org.testng.Assert.*;
+
 /**
- * <p>
- * This tests the Money converter.
- * </p>
+ * <p> This tests the Money converter. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class MoneyConverterTest {
-    /**
-     * Test the conversion from Strings.
-     */
-    @Test
-    public void testFromStrings() {
-        GlobalConverter converter = new MoneyConverter();
-        Money value = (Money) converter.convertFromStrings(Money.class, null, "testExpr", array((String) null));
-        assertNull(value);
+  /**
+   * Test the conversion from Strings.
+   */
+  @Test
+  public void testFromStrings() {
+    GlobalConverter converter = new MoneyConverter();
+    Money value = (Money) converter.convertFromStrings(Money.class, null, "testExpr", array((String) null));
+    assertNull(value);
 
-        value = (Money) converter.convertFromStrings(Locale.class, map("currencyCode", "USD"), "testExpr", array("7.00"));
-        assertTrue(Money.valueOfUSD("7.00").equalsExact(value));
+    value = (Money) converter.convertFromStrings(Locale.class, map("currencyCode", "USD"), "testExpr", array("7.00"));
+    assertTrue(Money.valueOfUSD("7.00").equalsExact(value));
 
-        value = (Money) converter.convertFromStrings(Locale.class, map("currencyCode", "USD"), "testExpr", array("$7.00"));
-        assertTrue(Money.valueOfUSD("7.00").equalsExact(value));
+    value = (Money) converter.convertFromStrings(Locale.class, map("currencyCode", "USD"), "testExpr", array("$7.00"));
+    assertTrue(Money.valueOfUSD("7.00").equalsExact(value));
 
-        try {
-            converter.convertFromStrings(Locale.class, map("currencyCode", "USD"), "testExpr", array("a"));
-            fail("Should have failed");
-        } catch (ConversionException e) {
-        }
-
-        try {
-            converter.convertFromStrings(Locale.class, map("currencyCode", "BAD"), "testExpr", array("a"));
-            fail("Should have failed");
-        } catch (ConverterStateException e) {
-        }
-
-        try {
-            converter.convertFromStrings(Locale.class, map("currencyCode", ""), "testExpr", array("a"));
-            fail("Should have failed");
-        } catch (ConverterStateException e) {
-        }
-
-        try {
-            converter.convertFromStrings(Locale.class, Collections.<String, String>emptyMap(), "testExpr", array("7.00"));
-            fail("Should have failed");
-        } catch (ConverterStateException e) {
-        }
+    try {
+      converter.convertFromStrings(Locale.class, map("currencyCode", "USD"), "testExpr", array("a"));
+      fail("Should have failed");
+    } catch (ConversionException e) {
     }
 
-    /**
-     * Test the conversion from Strings.
-     */
-    @Test
-    public void testToStrings() {
-        GlobalConverter converter = new MoneyConverter();
-        String str = converter.convertToString(Money.class, null, "testExpr", null);
-        assertNull(str);
-
-        str = converter.convertToString(Money.class, Collections.<String, String>emptyMap(), "testExpr", Money.valueOfUSD("7.00"));
-        assertEquals("7.00", str);
+    try {
+      converter.convertFromStrings(Locale.class, map("currencyCode", "BAD"), "testExpr", array("a"));
+      fail("Should have failed");
+    } catch (ConverterStateException e) {
     }
+
+    try {
+      converter.convertFromStrings(Locale.class, map("currencyCode", ""), "testExpr", array("a"));
+      fail("Should have failed");
+    } catch (ConverterStateException e) {
+    }
+
+    try {
+      converter.convertFromStrings(Locale.class, Collections.<String, String>emptyMap(), "testExpr", array("7.00"));
+      fail("Should have failed");
+    } catch (ConverterStateException e) {
+    }
+  }
+
+  /**
+   * Test the conversion from Strings.
+   */
+  @Test
+  public void testToStrings() {
+    GlobalConverter converter = new MoneyConverter();
+    String str = converter.convertToString(Money.class, null, "testExpr", null);
+    assertNull(str);
+
+    str = converter.convertToString(Money.class, Collections.<String, String>emptyMap(), "testExpr", Money.valueOfUSD("7.00"));
+    assertEquals("7.00", str);
+  }
 }

@@ -21,18 +21,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * <p>
- * This annotation is a container for headers.
- * </p>
+ * <p> This annotation is a container for headers. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @ResultContainerAnnotation()
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface Headers {
-    /**
-     * @return  The headers.
-     */
-    public abstract Header[] value();
+  /**
+   * @return The headers.
+   */
+  public abstract Header[] value();
 }

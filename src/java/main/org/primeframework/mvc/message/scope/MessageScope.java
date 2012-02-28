@@ -16,49 +16,45 @@
 package org.primeframework.mvc.message.scope;
 
 /**
- * <p>
- * This class contains the various scopes that messages can be stored
- * in the JCatapult MessageStore.
- * </p>
+ * <p> This class contains the various scopes that messages can be stored in the JCatapult MessageStore. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public enum MessageScope {
-    /**
-     * The request scope, when messages are stored in the request.
-     */
-    REQUEST(RequestScope.class),
+  /**
+   * The request scope, when messages are stored in the request.
+   */
+  REQUEST(RequestScope.class),
 
-    /**
-     * The flash scope, when messages are stored in the session, but are only available on the next
-     * request.
-     */
-    FLASH(FlashScope.class),
+  /**
+   * The flash scope, when messages are stored in the session, but are only available on the next request.
+   */
+  FLASH(FlashScope.class),
 
-    /**
-     * The session scope, when messages are stored in the session.
-     */
-    SESSION(SessionScope.class),
+  /**
+   * The session scope, when messages are stored in the session.
+   */
+  SESSION(SessionScope.class),
 
-    /**
-     * The action session scope, when messages are stored in the session, but are only associated and
-     * available to a specific action.
-     */
-    ACTION_SESSION(ActionSessionScope.class),
+  /**
+   * The action session scope, when messages are stored in the session, but are only associated and available to a
+   * specific action.
+   */
+  ACTION_SESSION(ActionSessionScope.class),
 
-    /**
-     * The servlet context scope, when messages are stored in the servlet context. Useful for messages
-     * that should be displayed to all users.
-     */
-    CONTEXT(ContextScope.class);
+  /**
+   * The servlet context scope, when messages are stored in the servlet context. Useful for messages that should be
+   * displayed to all users.
+   */
+  CONTEXT(ContextScope.class);
 
-    private final Class<? extends Scope> type;
+  private final Class<? extends Scope> type;
 
-    private MessageScope(Class<? extends Scope> type) {
-        this.type = type;
-    }
+  private MessageScope(Class<? extends Scope> type) {
+    this.type = type;
+  }
 
-    public Class<? extends Scope> getType() {
-        return type;
-    }
+  public Class<? extends Scope> getType() {
+    return type;
+  }
 }

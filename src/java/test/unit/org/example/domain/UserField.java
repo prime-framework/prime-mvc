@@ -15,24 +15,22 @@
  */
 package org.example.domain;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
- * <p>
- * This is a test user with fields.
- * </p>
+ * <p> This is a test user with fields. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class UserField {
-    public String name;
-    public Integer age;
-    public Map<String, AddressField> addresses = new HashMap<String, AddressField>();
-    public List<UserField> siblings = new ArrayList<UserField>();
-    public String[] securityQuestions;
-    public boolean active;
-    public Map<Integer, Integer> ids = new HashMap<Integer, Integer>();
+  public String name;
+  public Integer age;
+  public Map<String, AddressField> addresses = new HashMap<String, AddressField>();
+  public List<UserField> siblings = new ArrayList<UserField>();
+  public String[] securityQuestions;
+  public boolean active;
+  public Map<Integer, Integer> ids = new HashMap<Integer, Integer>();
 }

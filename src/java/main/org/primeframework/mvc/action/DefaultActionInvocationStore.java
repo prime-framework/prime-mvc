@@ -15,73 +15,71 @@
  */
 package org.primeframework.mvc.action;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayDeque;
 import java.util.Deque;
-import javax.servlet.http.HttpServletRequest;
 
 import com.google.inject.Inject;
 
 /**
- * <p>
- * This class is the default action invocation store.
- * </p>
+ * <p> This class is the default action invocation store. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @SuppressWarnings("unchecked")
 public class DefaultActionInvocationStore implements ActionInvocationStore {
-    public static final String ACTION_INVOCATION_DEQUE_KEY = "jcatapultActionInvocationDeque";
-    public static final String ACTION_INVOCATION_KEY = "jcatapultActionInvocation";
-    private final HttpServletRequest request;
+  public static final String ACTION_INVOCATION_DEQUE_KEY = "jcatapultActionInvocationDeque";
+  public static final String ACTION_INVOCATION_KEY = "jcatapultActionInvocation";
+  private final HttpServletRequest request;
 
-    @Inject
-    public DefaultActionInvocationStore(HttpServletRequest request) {
-        this.request = request;
+  @Inject
+  public DefaultActionInvocationStore(HttpServletRequest request) {
+    this.request = request;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public ActionInvocation getCurrent() {
+    Deque deque = (Deque) request.getAttribute(ACTION_INVOCATION_DEQUE_KEY);
+    if (deque == null) {
+      return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public ActionInvocation getCurrent() {
-        Deque deque = (Deque) request.getAttribute(ACTION_INVOCATION_DEQUE_KEY);
-        if (deque == null) {
-            return null;
-        }
+    return (ActionInvocation) deque.peek();
+  }
 
-        return (ActionInvocation) deque.peek();
+  /**
+   * {@inheritDoc}
+   */
+  public void setCurrent(ActionInvocation invocation) {
+    Deque deque = (Deque) request.getAttribute(ACTION_INVOCATION_DEQUE_KEY);
+    if (deque == null) {
+      deque = new ArrayDeque();
+      request.setAttribute(ACTION_INVOCATION_DEQUE_KEY, deque);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void setCurrent(ActionInvocation invocation) {
-        Deque deque = (Deque) request.getAttribute(ACTION_INVOCATION_DEQUE_KEY);
-        if (deque == null) {
-            deque = new ArrayDeque();
-            request.setAttribute(ACTION_INVOCATION_DEQUE_KEY, deque);
-        }
+    deque.push(invocation);
+    request.setAttribute(ACTION_INVOCATION_KEY, invocation);
+  }
 
-        deque.push(invocation);
-        request.setAttribute(ACTION_INVOCATION_KEY, invocation);
+  /**
+   * {@inheritDoc}
+   */
+  public void removeCurrent() {
+    Deque deque = (Deque) request.getAttribute(ACTION_INVOCATION_DEQUE_KEY);
+    if (deque == null) {
+      return;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void removeCurrent() {
-        Deque deque = (Deque) request.getAttribute(ACTION_INVOCATION_DEQUE_KEY);
-        if (deque == null) {
-            return;
-        }
+    deque.poll();
+    request.removeAttribute(ACTION_INVOCATION_KEY);
+  }
 
-        deque.poll();
-        request.removeAttribute(ACTION_INVOCATION_KEY);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Deque<ActionInvocation> getDeque() {
-        return (Deque<ActionInvocation>) request.getAttribute(ACTION_INVOCATION_DEQUE_KEY);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  public Deque<ActionInvocation> getDeque() {
+    return (Deque<ActionInvocation>) request.getAttribute(ACTION_INVOCATION_DEQUE_KEY);
+  }
 }

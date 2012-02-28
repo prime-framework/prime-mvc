@@ -20,22 +20,17 @@ import java.lang.annotation.Annotation;
 import com.google.inject.ImplementedBy;
 
 /**
- * <p>
- * This interface defines the provider that creates validators based on
- * annotations.
- * </p>
+ * <p> This interface defines the provider that creates validators based on annotations. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @ImplementedBy(DefaultValidatorProvider.class)
 public interface ValidatorProvider {
-    /**
-     * <p>
-     * Returns the validator for the given annotation.
-     * </p>
-     *
-     * @param   annotation The annotation.
-     * @return  The Validator or null if one was not found
-     */
-    Validator lookup(Class<? extends Annotation> annotation);
+  /**
+   * <p> Returns the validator for the given annotation. </p>
+   *
+   * @param annotation The annotation.
+   * @return The Validator or null if one was not found
+   */
+  Validator lookup(Class<? extends Annotation> annotation);
 }

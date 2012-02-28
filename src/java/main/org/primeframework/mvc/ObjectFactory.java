@@ -20,30 +20,27 @@ import java.util.List;
 import com.google.inject.ImplementedBy;
 
 /**
- * <p>
- * This interface defines how objects that are required by the MVC are
- * created.
- * </p>
+ * <p> This interface defines how objects that are required by the MVC are created. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @ImplementedBy(GuiceObjectFactory.class)
 public interface ObjectFactory {
-    /**
-     * Creates the class given. If the object cannot be created, a RuntimeException is thrown.
-     *
-     * @param   klass The class.
-     * @return  The Object and never null.
-     */
-    <T> T create(Class<T> klass);
+  /**
+   * Creates the class given. If the object cannot be created, a RuntimeException is thrown.
+   *
+   * @param klass The class.
+   * @return The Object and never null.
+   */
+  <T> T create(Class<T> klass);
 
-    /**
-     * Locates all of the Class that implement the given type. This might be via extension,
-     * implementation, etc. This will only return the known classes, usually by looking them up via
-     * the Guice Bindings. This doesn't perform any classpath parsing.
-     *
-     * @param   type The type to find the classes for.
-     * @return  A list of types or an empty list.
-     */
-    <T> List<Class<? extends T>> getAllForType(Class<T> type);
+  /**
+   * Locates all of the Class that implement the given type. This might be via extension, implementation, etc. This will
+   * only return the known classes, usually by looking them up via the Guice Bindings. This doesn't perform any
+   * classpath parsing.
+   *
+   * @param type The type to find the classes for.
+   * @return A list of types or an empty list.
+   */
+  <T> List<Class<? extends T>> getAllForType(Class<T> type);
 }

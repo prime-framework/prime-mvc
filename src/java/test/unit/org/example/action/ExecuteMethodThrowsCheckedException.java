@@ -20,18 +20,16 @@ import java.io.IOException;
 import org.primeframework.mvc.action.annotation.Action;
 
 /**
- * <p>
- * This is a simple test action.
- * </p>
+ * <p> This is a simple test action. </p>
  *
  * @author Brian Pontarelli
  */
 @Action
 public class ExecuteMethodThrowsCheckedException {
-    public boolean invoked = false;
+  public boolean invoked = false;
 
-    public String execute() throws IOException {
-        invoked = true;
-        throw new IOException();
-    }
+  public String execute() throws IOException {
+    invoked = true;
+    throw new IOException();
+  }
 }

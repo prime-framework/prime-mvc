@@ -22,41 +22,38 @@ import org.primeframework.mvc.parameter.convert.ConverterProvider;
 import static net.java.lang.reflect.ReflectionTools.*;
 
 /**
- * <p>
- * This models a indexed property that takes a single parameter for the
- * getter that is the index or key and two parameters for the setter,
- * the index/key and value.
- * </p>
+ * <p> This models a indexed property that takes a single parameter for the getter that is the index or key and two
+ * parameters for the setter, the index/key and value. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class IndexedAccessor extends MemberAccessor {
-    String index;
+  String index;
 
-    public IndexedAccessor(ConverterProvider converterProvider, MemberAccessor accessor, String index) {
-        super(converterProvider, accessor);
-        this.index = index;
-    }
+  public IndexedAccessor(ConverterProvider converterProvider, MemberAccessor accessor, String index) {
+    super(converterProvider, accessor);
+    this.index = index;
+  }
 
-    /**
-     * @return  Always false. The reason is that since this invokes the indexed property, we want
-     *          it to look like a non-indexed property so that the context will invoke the method.
-     */
-    public boolean isIndexed() {
-        return false;
-    }
+  /**
+   * @return Always false. The reason is that since this invokes the indexed property, we want it to look like a
+   *         non-indexed property so that the context will invoke the method.
+   */
+  public boolean isIndexed() {
+    return false;
+  }
 
-    public Object get(Context context) {
-        Method getter = propertyInfo.getMethods().get("get");
-        return invokeMethod(getter, this.object, index);
-    }
+  public Object get(Context context) {
+    Method getter = propertyInfo.getMethods().get("get");
+    return invokeMethod(getter, this.object, index);
+  }
 
-    public void set(String[] values, Context context) {
-        set(convert(context, field, values), context);
-    }
+  public void set(String[] values, Context context) {
+    set(convert(context, field, values), context);
+  }
 
-    public void set(Object value, Context context) {
-        Method setter = propertyInfo.getMethods().get("set");
-        invokeMethod(setter, object, index, value);
-    }
+  public void set(Object value, Context context) {
+    Method setter = propertyInfo.getMethods().get("set");
+    invokeMethod(setter, object, index, value);
+  }
 }

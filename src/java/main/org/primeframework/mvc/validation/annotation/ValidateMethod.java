@@ -15,18 +15,16 @@
  */
 package org.primeframework.mvc.validation.annotation;
 
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.lang.annotation.ElementType;
 
 /**
- * <p>
- * This annotation is used to mark a method of an action as a validate
- * method. These methods are invoked by the {@link org.primeframework.mvc.validation.ValidationWorkflow}.
- * </p>
+ * <p> This annotation is used to mark a method of an action as a validate method. These methods are invoked by the
+ * {@link org.primeframework.mvc.validation.ValidationWorkflow}. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

@@ -15,17 +15,14 @@
  */
 package org.primeframework.mvc.validation;
 
-import org.primeframework.servlet.Workflow;
+import org.primeframework.mvc.servlet.Workflow;
 
 import com.google.inject.ImplementedBy;
 
 /**
- * <p>
- * This is the validation workflow that performs validation on the action
- * and its fields.
- * </p>
+ * <p> This is the validation workflow that performs validation on the action and its fields. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @ImplementedBy(DefaultValidationWorkflow.class)
 public interface ValidationWorkflow extends Workflow {

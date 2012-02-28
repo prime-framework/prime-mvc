@@ -23,48 +23,45 @@ import org.primeframework.mvc.result.control.annotation.ControlAttributes;
 import com.google.inject.Inject;
 
 /**
- * <p>
- * This class is the control for an image button.
- * </p>
+ * <p> This class is the control for an image button. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @ControlAttributes(
-    required = {
-        @ControlAttribute(name = "name")
-    },
-    optional = {
-        @ControlAttribute(name = "disabled", types = {boolean.class, Boolean.class}),
-        @ControlAttribute(name = "ismap", types = {boolean.class, Boolean.class}),
-        @ControlAttribute(name = "required", types = {boolean.class, Boolean.class}),
-        @ControlAttribute(name = "size", types = {int.class, Integer.class}),
-        @ControlAttribute(name = "tabindex", types = {int.class, Integer.class})
-    }
+  required = {
+    @ControlAttribute(name = "name")
+  },
+  optional = {
+    @ControlAttribute(name = "disabled", types = {boolean.class, Boolean.class}),
+    @ControlAttribute(name = "ismap", types = {boolean.class, Boolean.class}),
+    @ControlAttribute(name = "required", types = {boolean.class, Boolean.class}),
+    @ControlAttribute(name = "size", types = {int.class, Integer.class}),
+    @ControlAttribute(name = "tabindex", types = {int.class, Integer.class})
+  }
 )
 public class Image extends AbstractButtonInput {
-    @Inject
-    public Image(HttpServletRequest request) {
-        super(request);
-    }
+  @Inject
+  public Image(HttpServletRequest request) {
+    super(request);
+  }
 
-    /**
-     * Calls super and then moves the ismap attribute out and if it is true set it back in as the
-     * String <code>ismap</code>.
-     *
-     */
-    @Override
-    protected void addAdditionalAttributes() {
-        super.addAdditionalAttributes();
-        Boolean ismap = (Boolean) attributes.remove("ismap");
-        if (ismap != null && ismap) {
-            attributes.put("ismap", "ismap");
-        }
+  /**
+   * Calls super and then moves the ismap attribute out and if it is true set it back in as the String
+   * <code>ismap</code>.
+   */
+  @Override
+  protected void addAdditionalAttributes() {
+    super.addAdditionalAttributes();
+    Boolean ismap = (Boolean) attributes.remove("ismap");
+    if (ismap != null && ismap) {
+      attributes.put("ismap", "ismap");
     }
+  }
 
-    /**
-     * @return  image.ftl
-     */
-    protected String endTemplateName() {
-        return "image.ftl";
-    }
+  /**
+   * @return image.ftl
+   */
+  protected String endTemplateName() {
+    return "image.ftl";
+  }
 }

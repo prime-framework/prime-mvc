@@ -15,10 +15,10 @@
  */
 package org.primeframework.mvc.action.result.annotation;
 
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.lang.annotation.ElementType;
 
 /**
  * This annotation is a container for {@link XMLStream} annotations.
@@ -29,8 +29,8 @@ import java.lang.annotation.ElementType;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface XMLStreams {
-    /**
-     * @return  The list of xml streams.
-     */
-    public abstract XMLStream[] value();
+  /**
+   * @return The list of xml streams.
+   */
+  public abstract XMLStream[] value();
 }

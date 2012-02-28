@@ -15,104 +15,103 @@
  */
 package org.primeframework.mvc.action.result;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
 import java.net.URLEncoder;
 import java.util.HashMap;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import net.java.variable.ExpanderException;
-import net.java.variable.ExpanderStrategy;
-import net.java.variable.VariableExpander;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.result.annotation.Redirect;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 
+import net.java.variable.ExpanderException;
+import net.java.variable.ExpanderStrategy;
+import net.java.variable.VariableExpander;
+
 import com.google.inject.Inject;
 
 /**
- * <p>
- * This result performs a HTTP redirect to a URL.
- * </p>
+ * <p> This result performs a HTTP redirect to a URL. </p>
  *
  * @author Brian Pontarelli
  */
 public class RedirectResult extends AbstractResult<Redirect> {
-    private final HttpServletRequest request;
-    private final HttpServletResponse response;
+  private final HttpServletRequest request;
+  private final HttpServletResponse response;
 
-    @Inject
-    public RedirectResult(ExpressionEvaluator expressionEvaluator, HttpServletResponse response,
-                          HttpServletRequest request) {
-        super(expressionEvaluator);
-        this.response = response;
-        this.request = request;
+  @Inject
+  public RedirectResult(ExpressionEvaluator expressionEvaluator, HttpServletResponse response,
+                        HttpServletRequest request) {
+    super(expressionEvaluator);
+    this.response = response;
+    this.request = request;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void execute(final Redirect redirect, final ActionInvocation invocation) throws IOException, ServletException {
+    String uri = VariableExpander.expand(redirect.uri(), new ExpanderStrategy() {
+      public String expand(String variableName) throws ExpanderException {
+        try {
+          String val = expressionEvaluator.getValue(variableName, invocation.action(), new HashMap<String, String>());
+          if (redirect.encodeVariables()) {
+            val = URLEncoder.encode(val, "UTF-8");
+          }
+
+          return val;
+        } catch (UnsupportedEncodingException e) {
+          throw new ExpanderException(e);
+        }
+      }
+    });
+
+    String context = request.getContextPath();
+    if (context.length() > 0 && uri.startsWith("/")) {
+      uri = context + uri;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void execute(final Redirect redirect, final ActionInvocation invocation) throws IOException, ServletException {
-        String uri = VariableExpander.expand(redirect.uri(), new ExpanderStrategy() {
-            public String expand(String variableName) throws ExpanderException {
-                try {
-                    String val = expressionEvaluator.getValue(variableName, invocation.action(), new HashMap<String, String>());
-                    if (redirect.encodeVariables()) {
-                        val = URLEncoder.encode(val, "UTF-8");
-                    }
-                    
-                    return val;
-                } catch (UnsupportedEncodingException e) {
-                    throw new ExpanderException(e);
-                }
-            }
-        });
+    boolean perm = redirect.perm();
 
-        String context = request.getContextPath();
-        if (context.length() > 0 && uri.startsWith("/")) {
-            uri = context + uri;
-        }
+    response.setStatus(perm ? 301 : 302);
+    response.sendRedirect(uri);
+  }
 
-        boolean perm = redirect.perm();
+  public static class RedirectImpl implements Redirect {
+    private final String code;
+    private final String uri;
+    private final boolean perm;
+    private final boolean encode;
 
-        response.setStatus(perm ? 301 : 302);
-        response.sendRedirect(uri);
+    public RedirectImpl(String uri, String code, boolean perm, boolean encode) {
+      this.uri = uri;
+      this.code = code;
+      this.perm = perm;
+      this.encode = encode;
     }
 
-    public static class RedirectImpl implements Redirect {
-        private final String code;
-        private final String uri;
-        private final boolean perm;
-        private final boolean encode;
-
-        public RedirectImpl(String uri, String code, boolean perm, boolean encode) {
-            this.uri = uri;
-            this.code = code;
-            this.perm = perm;
-            this.encode = encode;
-        }
-
-        public String code() {
-            return code;
-        }
-
-        public String uri() {
-            return uri;
-        }
-
-        public boolean perm() {
-            return perm;
-        }
-
-        public boolean encodeVariables() {
-            return encode;
-        }
-
-        public Class<? extends Annotation> annotationType() {
-            return Redirect.class;
-        }
+    public String code() {
+      return code;
     }
+
+    public String uri() {
+      return uri;
+    }
+
+    public boolean perm() {
+      return perm;
+    }
+
+    public boolean encodeVariables() {
+      return encode;
+    }
+
+    public Class<? extends Annotation> annotationType() {
+      return Redirect.class;
+    }
+  }
 }

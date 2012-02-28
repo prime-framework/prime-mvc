@@ -18,41 +18,39 @@ package org.primeframework.mvc.result.form.control;
 import java.util.Collection;
 import java.util.Map;
 
-import org.primeframework.mvc.result.control.annotation.ControlAttributes;
 import org.primeframework.mvc.result.control.annotation.ControlAttribute;
+import org.primeframework.mvc.result.control.annotation.ControlAttributes;
 
 import com.google.inject.Inject;
 
 /**
- * <p>
- * This class is the control for a set of checkboxs.
- * </p>
+ * <p> This class is the control for a set of checkboxs. </p>
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 @ControlAttributes(
-    required = {
-        @ControlAttribute(name = "name"),
-        @ControlAttribute(name = "items", types = {Collection.class, Map.class, Object[].class})
-    },
-    optional = {
-        @ControlAttribute(name = "disabled", types = {boolean.class, Boolean.class}),
-        @ControlAttribute(name = "readonly", types = {boolean.class, Boolean.class}),
-        @ControlAttribute(name = "required", types = {boolean.class, Boolean.class}),
-        @ControlAttribute(name = "size", types = {int.class, Integer.class}),
-        @ControlAttribute(name = "tabindex", types = {int.class, Integer.class})
-    }
+  required = {
+    @ControlAttribute(name = "name"),
+    @ControlAttribute(name = "items", types = {Collection.class, Map.class, Object[].class})
+  },
+  optional = {
+    @ControlAttribute(name = "disabled", types = {boolean.class, Boolean.class}),
+    @ControlAttribute(name = "readonly", types = {boolean.class, Boolean.class}),
+    @ControlAttribute(name = "required", types = {boolean.class, Boolean.class}),
+    @ControlAttribute(name = "size", types = {int.class, Integer.class}),
+    @ControlAttribute(name = "tabindex", types = {int.class, Integer.class})
+  }
 )
 public class CheckboxList extends AbstractListInput {
-    @Inject
-    public CheckboxList() {
-        super(true);
-    }
+  @Inject
+  public CheckboxList() {
+    super(true);
+  }
 
-    /**
-     * @return  checkbox-list.ftl
-     */
-    protected String endTemplateName() {
-        return "checkbox-list.ftl";
-    }
+  /**
+   * @return checkbox-list.ftl
+   */
+  protected String endTemplateName() {
+    return "checkbox-list.ftl";
+  }
 }
