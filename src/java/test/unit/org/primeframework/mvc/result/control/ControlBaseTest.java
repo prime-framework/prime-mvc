@@ -62,6 +62,6 @@ public class ControlBaseTest extends JCatapultBaseTest {
     }
 
     control.renderEnd(writer);
-    assertEquals(expected, writer.toString());
+    assertEquals(writer.toString(), expected);
   }
 }

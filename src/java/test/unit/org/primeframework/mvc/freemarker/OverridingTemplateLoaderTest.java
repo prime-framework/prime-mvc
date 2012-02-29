@@ -67,11 +67,12 @@ public class OverridingTemplateLoaderTest {
   @Test
   public void testClassPath() throws IOException {
     ContainerResolver resolver = EasyMock.createStrictMock(ContainerResolver.class);
+    EasyMock.expect(resolver.getRealPath("logging.properties")).andReturn("target/classes/test/unit/logging.properties");
     EasyMock.replay(resolver);
 
     OverridingTemplateLoader loader = new OverridingTemplateLoader(resolver);
     URLTemplateSource source = (URLTemplateSource) loader.findTemplateSource("logging.properties");
-    File file = new File("target/classes/test/unit/logging.properties");
+    File file = new File("src/conf/test/unit/logging.properties");
     assertTrue(loader.getLastModified(source) > file.lastModified());
     assertEquals(loader.getLastModified(source), loader.getLastModified(source));
     assertNotNull(loader.getReader(source, "UTF-8"));

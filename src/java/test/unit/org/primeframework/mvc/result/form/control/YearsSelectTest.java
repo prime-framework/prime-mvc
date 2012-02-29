@@ -42,7 +42,6 @@ public class YearsSelectTest extends ControlBaseTest {
       "<div class=\"label-container\"><label for=\"test\" class=\"label\">Test</label></div>\n" +
       "<div class=\"control-container\">\n" +
       "<select class=\"css-class\" id=\"test\" name=\"test\">\n" +
-      "<option value=\"2011\">2011</option>\n" +
       "<option value=\"2012\">2012</option>\n" +
       "<option value=\"2013\">2013</option>\n" +
       "<option value=\"2014\">2014</option>\n" +
@@ -52,6 +51,7 @@ public class YearsSelectTest extends ControlBaseTest {
       "<option value=\"2018\">2018</option>\n" +
       "<option value=\"2019\">2019</option>\n" +
       "<option value=\"2020\">2020</option>\n" +
+      "<option value=\"2021\">2021</option>\n" +
       "</select>\n" +
       "</div>\n" +
       "</div>\n");

@@ -225,7 +225,8 @@ public class StaticResourceWorkflowTest {
 
   private PrimeMVCConfiguration makeConfiguration() {
     PrimeMVCConfiguration configuration = EasyMock.createStrictMock(PrimeMVCConfiguration.class);
-    EasyMock.expect(configuration.staticResourcePrefixes()).andReturn(null);
+    String[] prefixes = new String[]{"/module", "/component", "/static", "/jcatapult"};
+    EasyMock.expect(configuration.staticResourcePrefixes()).andReturn(prefixes);
     EasyMock.expect(configuration.staticResourcesEnabled()).andReturn(true);
     EasyMock.replay(configuration);
     return configuration;

@@ -28,7 +28,7 @@ import org.primeframework.mvc.config.AbstractPrimeMVCConfiguration;
 import org.primeframework.mvc.config.PrimeMVCConfiguration;
 import org.primeframework.mvc.guice.GuiceContainer;
 import org.primeframework.mvc.servlet.ServletObjectsHolder;
-import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 
 import net.java.util.CollectionTools;
 
@@ -73,7 +73,7 @@ public abstract class JCatapultBaseTest {
   /**
    * Sets up Guice and PrimeMVCConfiguration.
    */
-  @BeforeClass
+  @BeforeMethod
   public void setUp() {
     setUpServletObjects();
     setUpGuice();
