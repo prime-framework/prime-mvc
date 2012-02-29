@@ -16,7 +16,7 @@
  */
 package org.primeframework.mvc.domain.commerce;
 
-import org.joda.time.YearMonthDay;
+import org.joda.time.LocalDate;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -84,12 +84,12 @@ public class CreditCardTest {
     CreditCard cc = new CreditCard();
     cc.setExpirationMonth(2);
     cc.setExpirationYear(2009);
-    YearMonthDay ymd = cc.getExpirationDate();
-    assertEquals(28, ymd.getDayOfMonth());
+    LocalDate localDate = cc.getExpirationDate();
+    assertEquals(28, localDate.getDayOfMonth());
 
     cc.setExpirationMonth(4);
     cc.setExpirationYear(2010);
-    ymd = cc.getExpirationDate();
-    assertEquals(30, ymd.getDayOfMonth());
+    localDate = cc.getExpirationDate();
+    assertEquals(30, localDate.getDayOfMonth());
   }
 }

@@ -22,7 +22,7 @@ import java.util.Map;
 import org.easymock.EasyMock;
 import org.primeframework.mvc.config.PrimeMVCConfiguration;
 import org.primeframework.mvc.container.ServletContainerResolver;
-import org.primeframework.mvc.test.servlet.MockServletContext;
+import org.primeframework.mock.servlet.MockServletContext;
 import org.testng.annotations.Test;
 
 import static net.java.util.CollectionTools.*;

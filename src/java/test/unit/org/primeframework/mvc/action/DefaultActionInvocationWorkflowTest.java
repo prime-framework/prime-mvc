@@ -20,8 +20,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
+import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.easymock.IArgumentMatcher;
 import org.example.action.ExecuteMethodThrowsCheckedException;
 import org.example.action.ExecuteMethodThrowsException;
 import org.example.action.ExtensionInheritance;
@@ -34,7 +34,7 @@ import org.primeframework.mvc.action.config.DefaultActionConfiguration;
 import org.primeframework.mvc.servlet.WorkflowChain;
 import org.testng.annotations.Test;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.capture;
 import static org.testng.Assert.*;
 
 /**
@@ -70,12 +70,15 @@ public class DefaultActionInvocationWorkflowTest {
     EasyMock.replay(request);
 
     Simple simple = new Simple();
+
     ActionInvocation invocation = new DefaultActionInvocation(simple, "/foo/bar", null, null);
+
     ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
     EasyMock.expect(ais.getCurrent()).andReturn(invocation);
     ais.removeCurrent();
+
     Capture<ActionInvocation> capture = new Capture<ActionInvocation>();
-    ais.setCurrent(capture.capture());
+    ais.setCurrent(capture(capture));
     EasyMock.replay(ais);
 
     WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);
@@ -86,7 +89,7 @@ public class DefaultActionInvocationWorkflowTest {
     workflow.perform(chain);
 
     assertTrue(simple.invoked);
-    assertEquals("success", capture.object.resultCode());
+    assertEquals("success", capture.getValue().resultCode());
 
     EasyMock.verify(request, ais, chain);
   }
@@ -217,7 +220,7 @@ public class DefaultActionInvocationWorkflowTest {
     EasyMock.expect(ais.getCurrent()).andReturn(invocation);
     ais.removeCurrent();
     Capture<ActionInvocation> capture = new Capture<ActionInvocation>();
-    ais.setCurrent(capture.capture());
+    ais.setCurrent(capture(capture));
     EasyMock.replay(ais);
 
     WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);
@@ -229,9 +232,9 @@ public class DefaultActionInvocationWorkflowTest {
 
     assertFalse(action.baseInvoked);
     assertTrue(action.invoked);
-    assertEquals("ajax", capture.object.resultCode());
-    assertEquals("/foo/bar", capture.object.actionURI());
-    assertEquals("/foo/bar.ajax", capture.object.uri());
+    assertEquals("ajax", capture.getValue().resultCode());
+    assertEquals("/foo/bar", capture.getValue().actionURI());
+    assertEquals("/foo/bar.ajax", capture.getValue().uri());
 
     EasyMock.verify(request, ais, chain);
   }
@@ -248,7 +251,7 @@ public class DefaultActionInvocationWorkflowTest {
     EasyMock.expect(ais.getCurrent()).andReturn(invocation);
     ais.removeCurrent();
     Capture<ActionInvocation> capture = new Capture<ActionInvocation>();
-    ais.setCurrent(capture.capture());
+    ais.setCurrent(capture(capture));
     EasyMock.replay(ais);
 
     WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);
@@ -260,9 +263,9 @@ public class DefaultActionInvocationWorkflowTest {
 
     assertTrue(action.baseInvoked);
     assertFalse(action.invoked);
-    assertEquals("json", capture.object.resultCode());
-    assertEquals("/foo/bar", capture.object.actionURI());
-    assertEquals("/foo/bar.json", capture.object.uri());
+    assertEquals("json", capture.getValue().resultCode());
+    assertEquals("/foo/bar", capture.getValue().actionURI());
+    assertEquals("/foo/bar.json", capture.getValue().uri());
 
     EasyMock.verify(request, ais, chain);
   }
@@ -279,7 +282,7 @@ public class DefaultActionInvocationWorkflowTest {
     EasyMock.expect(ais.getCurrent()).andReturn(invocation);
     ais.removeCurrent();
     Capture<ActionInvocation> capture = new Capture<ActionInvocation>();
-    ais.setCurrent(capture.capture());
+    ais.setCurrent(capture(capture));
     EasyMock.replay(ais);
 
     WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);
@@ -290,7 +293,7 @@ public class DefaultActionInvocationWorkflowTest {
     workflow.perform(chain);
 
     assertTrue(action.invoked);
-    assertEquals("success", capture.object.resultCode());
+    assertEquals("success", capture.getValue().resultCode());
 
     EasyMock.verify(request, ais, chain);
   }
@@ -307,7 +310,7 @@ public class DefaultActionInvocationWorkflowTest {
     EasyMock.expect(ais.getCurrent()).andReturn(invocation);
     ais.removeCurrent();
     Capture<ActionInvocation> capture = new Capture<ActionInvocation>();
-    ais.setCurrent(capture.capture());
+    ais.setCurrent(capture(capture));
     EasyMock.replay(ais);
 
     WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);
@@ -318,33 +321,8 @@ public class DefaultActionInvocationWorkflowTest {
     workflow.perform(chain);
 
     assertTrue(action.invoked);
-    assertEquals("success", capture.object.resultCode());
+    assertEquals("success", capture.getValue().resultCode());
 
     EasyMock.verify(request, ais, chain);
-  }
-
-  /**
-   * <p> This class is an EasyMock capture for capturing a parameter to a method and then later retrieving it for
-   * verification. </p>
-   *
-   * @author Brian Pontarelli
-   */
-  @SuppressWarnings("unchecked")
-  public class Capture<T> {
-    public T object;
-
-    public T capture() {
-      reportMatcher(new IArgumentMatcher() {
-        public boolean matches(Object argument) {
-          Capture.this.object = (T) argument;
-          return true;
-        }
-
-        public void appendTo(StringBuffer buffer) {
-        }
-      });
-
-      return null;
-    }
   }
 }

@@ -22,12 +22,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.example.action.user.Edit;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.DefaultActionInvocation;
-import org.primeframework.mvc.test.Capture;
 import org.testng.annotations.Test;
 
 import static java.util.Arrays.*;
@@ -105,7 +105,7 @@ public class ActionSessionScopeTest {
 
   @Test
   public void testSetActionMessage() {
-    Capture map = new Capture();
+    Capture<Object> map = new Capture<Object>();
     HttpSession session = makeSession(map, ActionSessionScope.ACTION_SESSION_ACTION_MESSAGE_KEY);
     HttpServletRequest request = makeRequest(session, true);
 
@@ -194,7 +194,7 @@ public class ActionSessionScopeTest {
 
   @Test
   public void testSetActionError() {
-    Capture map = new Capture();
+    Capture<Object> map = new Capture<Object>();
     HttpSession session = makeSession(map, ActionSessionScope.ACTION_SESSION_ACTION_ERROR_KEY);
     HttpServletRequest request = makeRequest(session, true);
 
@@ -287,7 +287,7 @@ public class ActionSessionScopeTest {
 
   @Test
   public void testSetFieldMessage() {
-    Capture map = new Capture();
+    Capture<Object> map = new Capture<Object>();
     HttpSession session = makeSession(map, ActionSessionScope.ACTION_SESSION_FIELD_MESSAGE_KEY);
     HttpServletRequest request = makeRequest(session, true);
 
@@ -380,7 +380,7 @@ public class ActionSessionScopeTest {
 
   @Test
   public void testSetFieldError() {
-    Capture map = new Capture();
+    Capture<Object> map = new Capture<Object>();
     HttpSession session = makeSession(map, ActionSessionScope.ACTION_SESSION_FIELD_ERROR_KEY);
     HttpServletRequest request = makeRequest(session, true);
 
@@ -415,16 +415,16 @@ public class ActionSessionScopeTest {
     return request;
   }
 
-  private HttpSession makeSession(Capture map, String key) {
+  private HttpSession makeSession(Capture<Object> map, String key) {
     HttpSession session = EasyMock.createStrictMock(HttpSession.class);
     EasyMock.expect(session.getAttribute(key)).andReturn(null);
-    session.setAttribute(eq(key), map.capture());
+    session.setAttribute(eq(key), EasyMock.capture(map));
     EasyMock.replay(session);
     return session;
   }
 
   private void verifyAction(Capture map, HttpSession session, HttpServletRequest request) {
-    Map<String, List<String>> actionSession = (Map<String, List<String>>) map.object;
+    Map<String, List<String>> actionSession = (Map<String, List<String>>) map.getValue();
     assertEquals(1, actionSession.size());
     assertEquals(1, actionSession.get("org.example.action.user.Edit").size());
     assertEquals("Test message", actionSession.get("org.example.action.user.Edit").get(0));
@@ -433,7 +433,7 @@ public class ActionSessionScopeTest {
   }
 
   private void verifyField(Capture map, HttpSession session, HttpServletRequest request) {
-    Map<String, Map<String, List<String>>> actionSession = (Map<String, Map<String, List<String>>>) map.object;
+    Map<String, Map<String, List<String>>> actionSession = (Map<String, Map<String, List<String>>>) map.getValue();
     assertEquals(1, actionSession.size());
     assertEquals(1, actionSession.get("org.example.action.user.Edit").size());
     assertEquals(1, actionSession.get("org.example.action.user.Edit").get("user.name").size());

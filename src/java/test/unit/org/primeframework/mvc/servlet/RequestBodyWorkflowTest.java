@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2010, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,10 +25,9 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.easymock.EasyMock;
-import org.primeframework.mvc.servlet.multipart.FileInfo;
-import org.primeframework.mvc.test.Capture;
-import org.primeframework.mvc.test.servlet.MockServletInputStream;
-import org.primeframework.mvc.test.servlet.MockWorkflowChain;
+import org.easymock.Capture;
+import org.primeframework.mock.servlet.FileInfo;
+import org.primeframework.mock.servlet.MockServletInputStream;
 import org.testng.annotations.Test;
 
 import net.java.io.FileTools;
@@ -196,15 +195,15 @@ public class RequestBodyWorkflowTest {
     EasyMock.expect(request.getInputStream()).andReturn(new MockServletInputStream(body.getBytes()));
     EasyMock.expect(request.getCharacterEncoding()).andReturn("UTF-8");
     EasyMock.expect(request.getContentLength()).andReturn(body.length());
-    final Capture capture = new Capture();
-    request.setAttribute(eq(RequestKeys.FILE_ATTRIBUTE), capture.<Object>capture());
+    final Capture<Map<String, List<FileInfo>>> capture = new Capture<Map<String, List<FileInfo>>>();
+    request.setAttribute(eq(RequestKeys.FILE_ATTRIBUTE), capture(capture));
     EasyMock.replay(request);
 
     final AtomicBoolean run = new AtomicBoolean(false);
     MockWorkflowChain chain = new MockWorkflowChain(new Runnable() {
       @Override
       public void run() {
-        Map<String, List<FileInfo>> files = (Map<String, List<FileInfo>>) capture.object;
+        Map<String, List<FileInfo>> files = capture.getValue();
         assertEquals(1, files.size());
         try {
           assertEquals(FileTools.read(files.get("userfile").get(0).file).toString(), "test");
@@ -236,15 +235,15 @@ public class RequestBodyWorkflowTest {
     EasyMock.expect(request.getInputStream()).andReturn(new MockServletInputStream(body.getBytes()));
     EasyMock.expect(request.getCharacterEncoding()).andReturn("UTF-8");
     EasyMock.expect(request.getContentLength()).andReturn(body.length());
-    final Capture capture = new Capture();
-    request.setAttribute(eq(RequestKeys.FILE_ATTRIBUTE), capture.<Object>capture());
+    final Capture<Map<String, List<FileInfo>>> capture = new Capture<Map<String, List<FileInfo>>>();
+    request.setAttribute(eq(RequestKeys.FILE_ATTRIBUTE), capture(capture));
     EasyMock.replay(request);
 
     final AtomicBoolean run = new AtomicBoolean(false);
     MockWorkflowChain chain = new MockWorkflowChain(new Runnable() {
       @Override
       public void run() {
-        Map<String, List<FileInfo>> files = (Map<String, List<FileInfo>>) capture.object;
+        Map<String, List<FileInfo>> files = capture.getValue();
         assertEquals(1, files.size());
         try {
           assertEquals(FileTools.read(files.get("userfiles").get(0).file).toString(), "test");

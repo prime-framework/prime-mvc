@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2010, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,8 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.primeframework.mvc.test.servlet.MockHttpServletRequest;
-import org.primeframework.mvc.test.servlet.MockServletContext;
+import org.primeframework.mock.servlet.MockHttpServletRequest;
+import org.primeframework.mock.servlet.MockServletContext;
 import org.testng.annotations.Test;
 
 import net.java.io.FileTools;

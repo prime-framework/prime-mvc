@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.primeframework.mock.servlet.FileInfo;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.config.PrimeMVCConfiguration;
@@ -41,7 +42,6 @@ import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.parameter.el.ExpressionException;
 import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
 import org.primeframework.mvc.servlet.WorkflowChain;
-import org.primeframework.mvc.servlet.multipart.FileInfo;
 import org.primeframework.mvc.util.MethodTools;
 import org.primeframework.mvc.util.RequestKeys;
 

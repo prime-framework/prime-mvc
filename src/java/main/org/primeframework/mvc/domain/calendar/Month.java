@@ -15,7 +15,7 @@
  */
 package org.primeframework.mvc.domain.calendar;
 
-import org.joda.time.YearMonthDay;
+import org.joda.time.LocalDate;
 
 /**
  * <p> This enumerates the months in the gregorian calendar and adds some extra functionality to each month. </p>
@@ -48,7 +48,7 @@ public enum Month {
    * @return Returns the number of days in the month.
    */
   public int getDays() {
-    return getDays(new YearMonthDay().getYear());
+    return getDays(new LocalDate().getYear());
   }
 
   /**
@@ -78,7 +78,7 @@ public enum Month {
    * @return The month and never null.
    * @throws ArrayIndexOutOfBoundsException If the month parameter is less than 1 or greater than 12.
    */
-  public static final Month getMonthOneBased(int month) {
+  public static Month getMonthOneBased(int month) {
     return values()[month - 1];
   }
 }

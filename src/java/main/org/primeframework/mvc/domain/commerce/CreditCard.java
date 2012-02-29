@@ -22,7 +22,7 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
 import java.io.Serializable;
 
-import org.joda.time.YearMonthDay;
+import org.joda.time.LocalDate;
 import org.primeframework.mvc.domain.calendar.Month;
 import org.primeframework.mvc.domain.location.Address;
 
@@ -106,9 +106,9 @@ public class CreditCard implements Serializable {
    * @return A YearMonthDay that is the expiration date. This uses the last day of the month since most credit cards
    *         expire on the last day of the month.
    */
-  public YearMonthDay getExpirationDate() {
+  public LocalDate getExpirationDate() {
     int day = Month.getMonthOneBased(expirationMonth).getDays(expirationYear);
-    return new YearMonthDay(expirationYear, expirationMonth, day);
+    return new LocalDate(expirationYear, expirationMonth, day);
   }
 
   public boolean isVerified() {

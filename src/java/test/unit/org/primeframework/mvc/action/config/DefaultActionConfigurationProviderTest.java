@@ -18,10 +18,10 @@ package org.primeframework.mvc.action.config;
 import javax.servlet.ServletContext;
 import java.util.Map;
 
+import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.example.action.Simple;
 import org.example.action.user.Index;
-import org.primeframework.mvc.test.Capture;
 import org.primeframework.mvc.util.DefaultURIBuilder;
 import org.testng.annotations.Test;
 
@@ -37,13 +37,13 @@ public class DefaultActionConfigurationProviderTest {
   @Test
   public void testConfigure() {
     ServletContext context = EasyMock.createStrictMock(ServletContext.class);
-    Capture c = new Capture();
-    context.setAttribute(eq(DefaultActionConfigurationProvider.ACTION_CONFIGURATION_KEY), c.capture());
+    Capture<Map<String, ActionConfiguration>> c = new Capture<Map<String, ActionConfiguration>>();
+    context.setAttribute(eq(DefaultActionConfigurationProvider.ACTION_CONFIGURATION_KEY), capture(c));
     EasyMock.replay(context);
 
     new DefaultActionConfigurationProvider(context, new DefaultURIBuilder());
 
-    Map<String, ActionConfiguration> config = (Map<String, ActionConfiguration>) c.object;
+    Map<String, ActionConfiguration> config = c.getValue();
     assertNotNull(config.get("/simple"));
     assertSame(Simple.class, config.get("/simple").actionClass());
     assertEquals("/simple", config.get("/simple").uri());

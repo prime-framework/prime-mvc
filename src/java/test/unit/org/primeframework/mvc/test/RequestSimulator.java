@@ -30,11 +30,11 @@ import org.primeframework.mvc.guice.GuiceContainer;
 import org.primeframework.mvc.servlet.JCatapultFilter;
 import org.primeframework.mvc.servlet.JCatapultServletContextListener;
 import org.primeframework.mvc.servlet.ServletObjectsHolder;
-import org.primeframework.mvc.test.servlet.MockHttpServletRequest;
-import org.primeframework.mvc.test.servlet.MockHttpServletResponse;
-import org.primeframework.mvc.test.servlet.MockHttpSession;
-import org.primeframework.mvc.test.servlet.MockServletContext;
-import org.primeframework.mvc.test.servlet.WebTestHelper;
+import org.primeframework.mock.servlet.MockHttpServletRequest;
+import org.primeframework.mock.servlet.MockHttpServletResponse;
+import org.primeframework.mock.servlet.MockHttpSession;
+import org.primeframework.mock.servlet.MockServletContext;
+import org.primeframework.mock.servlet.WebTestHelper;
 
 import com.google.inject.Module;
 

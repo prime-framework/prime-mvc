@@ -49,10 +49,12 @@
       <artifact group="inject.google.com" name="guice" version="3.0"/>
       <artifact group="java-net-commons.dev.java.net" name="java-net-commons" version="1.5.5"/>
       <artifact group="joda.org" name="joda-time" version="2.0"/>
+      <artifact group="primeframework.org" name="prime-mock" version="1.0-{integration}"/>
     </artifact-group>
     <artifact-group type="test-compile">
       <artifact group="easymock.org" name="easymock" version="3.1"/>
       <artifact group="testng.org" name="testng" version="5.11"/>
+      <artifact group="primeframework.org" name="prime-mock" version="1.0-{integration}"/>
     </artifact-group>
   </dependencies>
 </project>

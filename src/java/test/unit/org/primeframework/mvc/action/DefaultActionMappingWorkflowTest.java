@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.example.action.ComplexRest;
 import org.example.action.user.Edit;
@@ -28,11 +29,11 @@ import org.primeframework.mvc.ObjectFactory;
 import org.primeframework.mvc.action.config.ActionConfigurationProvider;
 import org.primeframework.mvc.action.config.DefaultActionConfiguration;
 import org.primeframework.mvc.servlet.WorkflowChain;
-import org.primeframework.mvc.test.Capture;
 import org.primeframework.mvc.test.JCatapultBaseTest;
 import org.testng.annotations.Test;
 
 import static java.util.Arrays.*;
+import static org.easymock.EasyMock.capture;
 import static org.testng.Assert.*;
 
 /**
@@ -111,9 +112,9 @@ public class DefaultActionMappingWorkflowTest extends JCatapultBaseTest {
     EasyMock.expect(provider.lookup("/admin/user/rest-edit")).andReturn(new DefaultActionConfiguration(RESTEdit.class, "/admin/user/rest-edit"));
     EasyMock.replay(provider);
 
-    Capture capture = new Capture();
+    Capture<ActionInvocation> capture = new Capture<ActionInvocation>();
     ActionInvocationStore store = EasyMock.createStrictMock(ActionInvocationStore.class);
-    store.setCurrent((ActionInvocation) capture.capture());
+    store.setCurrent(capture(capture));
     store.removeCurrent();
     EasyMock.replay(store);
 
@@ -128,7 +129,7 @@ public class DefaultActionMappingWorkflowTest extends JCatapultBaseTest {
     DefaultActionMappingWorkflow workflow = new DefaultActionMappingWorkflow(request, response, store, new DefaultActionMapper(provider, factory));
     workflow.perform(chain);
 
-    ActionInvocation ai = (ActionInvocation) capture.object;
+    ActionInvocation ai = capture.getValue();
     assertEquals("/admin/user/rest-edit", ai.actionURI());
     assertCollections(asList("12"), ai.uriParameters());
     assertNull(ai.extension());
@@ -160,9 +161,9 @@ public class DefaultActionMappingWorkflowTest extends JCatapultBaseTest {
     EasyMock.expect(provider.lookup("/complex-rest")).andReturn(new DefaultActionConfiguration(ComplexRest.class, "/complex-rest"));
     EasyMock.replay(provider);
 
-    Capture capture = new Capture();
+    Capture<ActionInvocation> capture = new Capture<ActionInvocation>();
     ActionInvocationStore store = EasyMock.createStrictMock(ActionInvocationStore.class);
-    store.setCurrent((ActionInvocation) capture.capture());
+    store.setCurrent(capture(capture));
     store.removeCurrent();
     EasyMock.replay(store);
 
@@ -177,7 +178,7 @@ public class DefaultActionMappingWorkflowTest extends JCatapultBaseTest {
     DefaultActionMappingWorkflow workflow = new DefaultActionMappingWorkflow(request, response, store, new DefaultActionMapper(provider, factory));
     workflow.perform(chain);
 
-    ActionInvocation ai = (ActionInvocation) capture.object;
+    ActionInvocation ai = capture.getValue();
     assertEquals("/complex-rest", ai.actionURI());
     assertCollections(asList("brian", "static", "pontarelli", "then", "a", "bunch", "of", "stuff"), ai.uriParameters());
     assertNull(ai.extension());
@@ -222,9 +223,9 @@ public class DefaultActionMappingWorkflowTest extends JCatapultBaseTest {
     EasyMock.expect(provider.lookup(uri)).andReturn(new DefaultActionConfiguration(Edit.class, uri));
     EasyMock.replay(provider);
 
-    Capture capture = new Capture();
+    Capture<ActionInvocation> capture = new Capture<ActionInvocation>();
     ActionInvocationStore store = EasyMock.createStrictMock(ActionInvocationStore.class);
-    store.setCurrent((ActionInvocation) capture.capture());
+    store.setCurrent(capture(capture));
     store.removeCurrent();
     EasyMock.replay(store);
 
@@ -239,7 +240,7 @@ public class DefaultActionMappingWorkflowTest extends JCatapultBaseTest {
     DefaultActionMappingWorkflow workflow = new DefaultActionMappingWorkflow(request, response, store, new DefaultActionMapper(provider, factory));
     workflow.perform(chain);
 
-    ActionInvocation ai = (ActionInvocation) capture.object;
+    ActionInvocation ai = capture.getValue();
     assertEquals(uri, ai.actionURI());
     assertEquals(extension, ai.extension());
     assertNotNull(ai.configuration());

@@ -22,9 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import org.primeframework.mvc.test.servlet.MockHttpServletRequest;
-import org.primeframework.mvc.test.servlet.MockHttpServletRequest.Method;
-import org.primeframework.mvc.test.servlet.MockServletInputStream;
+import org.primeframework.mock.servlet.MockHttpServletRequest;
+import org.primeframework.mock.servlet.MockHttpServletRequest.Method;
+import org.primeframework.mock.servlet.MockServletInputStream;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;

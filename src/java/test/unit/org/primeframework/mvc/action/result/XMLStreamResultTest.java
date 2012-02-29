@@ -9,7 +9,7 @@ import org.easymock.EasyMock;
 import org.primeframework.mvc.action.DefaultActionInvocation;
 import org.primeframework.mvc.action.result.annotation.XMLStream;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-import org.primeframework.mvc.test.servlet.MockServletOutputStream;
+import org.primeframework.mock.servlet.MockServletOutputStream;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.*;

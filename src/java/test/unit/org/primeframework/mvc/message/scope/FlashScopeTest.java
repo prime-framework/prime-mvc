@@ -21,8 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.primeframework.mvc.test.Capture;
 import org.testng.annotations.Test;
 
 import static org.easymock.EasyMock.*;
@@ -116,10 +116,10 @@ public class FlashScopeTest {
     }
 
     {
-      Capture list = new Capture();
+      Capture<List<String>> list = new Capture<List<String>>();
       HttpSession session = EasyMock.createStrictMock(HttpSession.class);
       EasyMock.expect(session.getAttribute(key)).andReturn(null);
-      session.setAttribute(eq(key), list.capture());
+      session.setAttribute(eq(key), capture(list));
       EasyMock.replay(session);
 
       HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
@@ -128,7 +128,7 @@ public class FlashScopeTest {
 
       FlashScope scope = new FlashScope(request);
       scope.addActionMessage(type, "Test message");
-      List<String> messages = (List<String>) list.object;
+      List<String> messages = list.getValue();
       assertEquals(1, messages.size());
       assertEquals("Test message", messages.get(0));
 
@@ -219,10 +219,10 @@ public class FlashScopeTest {
     }
 
     {
-      Capture capture = new Capture();
+      Capture<FieldMessages> capture = new Capture<FieldMessages>();
       HttpSession session = EasyMock.createStrictMock(HttpSession.class);
       EasyMock.expect(session.getAttribute(key)).andReturn(null);
-      session.setAttribute(eq(key), capture.capture());
+      session.setAttribute(eq(key), capture(capture));
       EasyMock.replay(session);
 
       HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
@@ -231,7 +231,7 @@ public class FlashScopeTest {
 
       FlashScope scope = new FlashScope(request);
       scope.addFieldMessage(type, "user.name", "Test message");
-      FieldMessages messages = (FieldMessages) capture.object;
+      FieldMessages messages = capture.getValue();
       assertEquals(1, messages.size());
       assertEquals(1, messages.get("user.name").size());
       assertEquals("Test message", messages.get("user.name").get(0));

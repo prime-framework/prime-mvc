@@ -21,7 +21,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Set;
 
-import org.primeframework.mvc.test.servlet.MockServletContext;
+import org.primeframework.mock.servlet.MockServletContext;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.*;

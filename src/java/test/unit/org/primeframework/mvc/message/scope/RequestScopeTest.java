@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.primeframework.mvc.test.Capture;
 import org.testng.annotations.Test;
 
 import static java.util.Arrays.*;
@@ -82,15 +82,15 @@ public class RequestScopeTest {
     }
 
     {
-      Capture list = new Capture();
+      Capture<List<String>> list = new Capture<List<String>>();
       HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
       EasyMock.expect(request.getAttribute(key)).andReturn(null);
-      request.setAttribute(eq(key), list.capture());
+      request.setAttribute(eq(key), capture(list));
       EasyMock.replay(request);
 
       RequestScope scope = new RequestScope(request);
       scope.addActionMessage(type, "Test message");
-      List<String> messages = (List<String>) list.object;
+      List<String> messages = list.getValue();
       assertEquals(1, messages.size());
       assertEquals("Test message", messages.get(0));
 
@@ -150,15 +150,15 @@ public class RequestScopeTest {
     }
 
     {
-      Capture map = new Capture();
+      Capture<Map<String, List<String>>> map = new Capture<Map<String, List<String>>>();
       HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
       EasyMock.expect(request.getAttribute(key)).andReturn(null);
-      request.setAttribute(eq(key), map.capture());
+      request.setAttribute(eq(key), capture(map));
       EasyMock.replay(request);
 
       RequestScope scope = new RequestScope(request);
       scope.addFieldMessage(type, "user.name", "Test message");
-      Map<String, List<String>> messages = (Map<String, List<String>>) map.object;
+      Map<String, List<String>> messages = map.getValue();
       assertEquals(1, messages.size());
       assertEquals(1, messages.get("user.name").size());
       assertEquals("Test message", messages.get("user.name").get(0));

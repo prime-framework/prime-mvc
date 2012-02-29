@@ -21,8 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.primeframework.mvc.test.Capture;
 import org.testng.annotations.Test;
 
 import static java.util.Arrays.*;
@@ -107,10 +107,10 @@ public class SessionScopeTest {
     }
 
     {
-      Capture list = new Capture();
+      Capture<List<String>> list = new Capture<List<String>>();
       HttpSession session = EasyMock.createStrictMock(HttpSession.class);
       EasyMock.expect(session.getAttribute(key)).andReturn(null);
-      session.setAttribute(eq(key), list.capture());
+      session.setAttribute(eq(key), capture(list));
       EasyMock.replay(session);
 
       HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
@@ -119,7 +119,7 @@ public class SessionScopeTest {
 
       SessionScope scope = new SessionScope(request);
       scope.addActionMessage(type, "Test message");
-      List<String> messages = (List<String>) list.object;
+      List<String> messages = list.getValue();
       assertEquals(1, messages.size());
       assertEquals("Test message", messages.get(0));
 
@@ -203,10 +203,10 @@ public class SessionScopeTest {
     }
 
     {
-      Capture map = new Capture();
+      Capture<Map<String, List<String>>> map = new Capture<Map<String, List<String>>>();
       HttpSession session = EasyMock.createStrictMock(HttpSession.class);
       EasyMock.expect(session.getAttribute(key)).andReturn(null);
-      session.setAttribute(eq(key), map.capture());
+      session.setAttribute(eq(key), capture(map));
       EasyMock.replay(session);
 
       HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
@@ -215,7 +215,7 @@ public class SessionScopeTest {
 
       SessionScope scope = new SessionScope(request);
       scope.addFieldMessage(type, "user.name", "Test message");
-      Map<String, List<String>> messages = (Map<String, List<String>>) map.object;
+      Map<String, List<String>> messages = map.getValue();
       assertEquals(1, messages.size());
       assertEquals(1, messages.get("user.name").size());
       assertEquals("Test message", messages.get("user.name").get(0));
