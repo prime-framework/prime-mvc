@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,16 +19,16 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.primeframework.mvc.config.AbstractPrimeMVCConfiguration;
-import org.primeframework.mvc.config.PrimeMVCConfiguration;
-import org.primeframework.mvc.guice.GuiceContainer;
-import org.primeframework.mvc.servlet.ServletObjectsHolder;
 import org.primeframework.mock.servlet.MockHttpServletRequest;
 import org.primeframework.mock.servlet.MockHttpServletResponse;
 import org.primeframework.mock.servlet.MockHttpSession;
 import org.primeframework.mock.servlet.MockServletContext;
 import org.primeframework.mock.servlet.WebTestHelper;
-import org.testng.annotations.BeforeSuite;
+import org.primeframework.mvc.config.AbstractPrimeMVCConfiguration;
+import org.primeframework.mvc.config.PrimeMVCConfiguration;
+import org.primeframework.mvc.guice.GuiceContainer;
+import org.primeframework.mvc.servlet.ServletObjectsHolder;
+import org.testng.annotations.BeforeClass;
 
 import net.java.util.CollectionTools;
 
@@ -73,7 +73,7 @@ public abstract class JCatapultBaseTest {
   /**
    * Sets up Guice and PrimeMVCConfiguration.
    */
-  @BeforeSuite
+  @BeforeClass
   public void setUp() {
     setUpServletObjects();
     setUpGuice();
