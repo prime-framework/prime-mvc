@@ -38,6 +38,7 @@ public class DefaultWorkflowChain implements WorkflowChain {
   @Inject
   public DefaultWorkflowChain(CoreWorkflow coreWorkflow, MVCWorkflow mvcWorkflow) {
     workflows = asList(coreWorkflow, mvcWorkflow);
+    iterator = workflows.iterator();
   }
 
   /**

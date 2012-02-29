@@ -111,7 +111,9 @@ public class RequestSimulator {
    * @throws ServletException If the initialization of the JCatapultServletContextListener failed.
    */
   public void initialize(Module... modules) throws ServletException {
-    GuiceContainer.setGuiceModules(modules);
+    if (modules != null && modules.length > 0) {
+      GuiceContainer.setGuiceModules(modules);
+    }
     JCatapultServletContextListener listener = new JCatapultServletContextListener();
     listener.contextInitialized(new ServletContextEvent(this.context));
     filter.init(new FilterConfig() {
