@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.primeframework.mvc.servlet;
 
+import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.Iterator;
@@ -33,6 +34,11 @@ public class SubWorkflowChain implements WorkflowChain {
     this.workflows = workflows;
     this.workflowChain = workflowChain;
     this.iterator = workflows.iterator();
+  }
+
+  @Override
+  public void start(FilterChain filterChain) throws IOException, ServletException {
+    continueWorkflow();
   }
 
   /**
@@ -55,5 +61,10 @@ public class SubWorkflowChain implements WorkflowChain {
   public void reset() {
     iterator = workflows.iterator();
     workflowChain.reset();
+  }
+
+  @Override
+  public Iterable<Workflow> workflows() {
+    return workflows;
   }
 }

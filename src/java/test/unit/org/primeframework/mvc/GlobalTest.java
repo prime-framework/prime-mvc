@@ -19,9 +19,12 @@ import javax.servlet.ServletException;
 import java.io.IOException;
 
 import org.primeframework.mvc.test.JCatapultBaseTest;
+import org.primeframework.mvc.test.RequestSimulator;
 import org.testng.annotations.Test;
 
 import net.java.io.FileTools;
+
+import static org.testng.Assert.*;
 
 /**
  * <p> This class tests the MVC from a high level perspective. </p>
@@ -31,17 +34,17 @@ import net.java.io.FileTools;
 public class GlobalTest extends JCatapultBaseTest {
   @Test
   public void testRenderFTL() throws IOException, ServletException {
-    WebappTestRunner runner = new WebappTestRunner();
-    runner.test("/user/edit").get();
+    RequestSimulator simulator = new RequestSimulator();
+    simulator.test("/user/edit").get();
     assertEquals(FileTools.read("src/java/test/unit/org/jcatapult/mvc/edit-output.txt").toString(),
-      runner.response.getStream().toString());
+      simulator.response.getStream().toString());
   }
 
   @Test
   public void testNonFormFields() throws IOException, ServletException {
-    WebappTestRunner runner = new WebappTestRunner();
-    runner.test("/user/details-fields").get();
+    RequestSimulator simulator = new RequestSimulator();
+    simulator.test("/user/details-fields").get();
     assertEquals(FileTools.read("src/java/test/unit/org/jcatapult/mvc/details-fields-output.txt").toString(),
-      runner.response.getStream().toString());
+      simulator.response.getStream().toString());
   }
 }

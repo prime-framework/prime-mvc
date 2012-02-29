@@ -37,7 +37,7 @@ public class ResourceBundleMessageProviderTest {
   @Test
   public void testSearch() {
     PrimeMVCConfiguration config = EasyMock.createStrictMock(PrimeMVCConfiguration.class);
-    EasyMock.expect(config.getLong("jcatapult.l10n.reload-check-seconds", 1)).andReturn(1l).times(2);
+    EasyMock.expect(config.l10nReloadSeconds()).andReturn(1).times(2);
     EasyMock.replay(config);
 
     MockServletContext context = new MockServletContext(new File("src/java/test/unit"));
@@ -54,7 +54,7 @@ public class ResourceBundleMessageProviderTest {
   @Test
   public void testFormat() {
     PrimeMVCConfiguration config = EasyMock.createStrictMock(PrimeMVCConfiguration.class);
-    EasyMock.expect(config.getLong("jcatapult.l10n.reload-check-seconds", 1)).andReturn(1l).times(2);
+    EasyMock.expect(config.l10nReloadSeconds()).andReturn(1).times(2);
     EasyMock.replay(config);
 
     MockServletContext context = new MockServletContext(new File("src/java/test/unit"));
@@ -72,7 +72,7 @@ public class ResourceBundleMessageProviderTest {
   @Test
   public void testMissing() {
     PrimeMVCConfiguration config = EasyMock.createStrictMock(PrimeMVCConfiguration.class);
-    EasyMock.expect(config.getLong("jcatapult.l10n.reload-check-seconds", 1)).andReturn(1l);
+    EasyMock.expect(config.l10nReloadSeconds()).andReturn(1);
     EasyMock.replay(config);
 
     MockServletContext context = new MockServletContext(new File("src/java/test/unit"));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,5 +68,10 @@ public class DefaultWorkflowChain implements WorkflowChain {
   @Override
   public void reset() {
     iterator = workflows.iterator();
+  }
+
+  @Override
+  public Iterable<Workflow> workflows() {
+    return workflows;
   }
 }

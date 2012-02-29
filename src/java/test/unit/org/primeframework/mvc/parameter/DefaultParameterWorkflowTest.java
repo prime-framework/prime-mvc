@@ -108,11 +108,11 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
     EasyMock.replay(chain);
 
     PrimeMVCConfiguration config = EasyMock.createStrictMock(PrimeMVCConfiguration.class);
-    EasyMock.expect(config.getStringArray("jcatapult.mvc.file-upload.allowed-content-types")).andReturn(new String[0]);
-    EasyMock.expect(config.getLong("jcatapult.mvc.file-upload.max-size", 1024000)).andReturn(10l);
+    EasyMock.expect(config.fileUploadAllowedTypes()).andReturn(new String[0]);
+    EasyMock.expect(config.fileUploadMaxSize()).andReturn(10l);
     EasyMock.replay(config);
 
-    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, messageStore, expressionEvaluator, null, config);
+    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, messageStore, expressionEvaluator, config);
     workflow.perform(chain);
 
     EasyMock.verify(request, expressionEvaluator, invocation, actionInvocationStore, messageStore, config, chain);
@@ -153,8 +153,8 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
     EasyMock.replay(chain);
 
     PrimeMVCConfiguration config = EasyMock.createStrictMock(PrimeMVCConfiguration.class);
-    EasyMock.expect(config.getStringArray("jcatapult.mvc.file-upload.allowed-content-types")).andReturn(new String[0]);
-    EasyMock.expect(config.getLong("jcatapult.mvc.file-upload.max-size", 1024000)).andReturn(10l);
+    EasyMock.expect(config.fileUploadAllowedTypes()).andReturn(new String[0]);
+    EasyMock.expect(config.fileUploadMaxSize()).andReturn(10l);
     EasyMock.replay(config);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, messageStore, expressionEvaluator, config);
@@ -205,8 +205,8 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
     EasyMock.replay(chain);
 
     PrimeMVCConfiguration config = EasyMock.createStrictMock(PrimeMVCConfiguration.class);
-    EasyMock.expect(config.getStringArray("jcatapult.mvc.file-upload.allowed-content-types")).andReturn(new String[0]);
-    EasyMock.expect(config.getLong("jcatapult.mvc.file-upload.max-size", 1024000)).andReturn(10l);
+    EasyMock.expect(config.fileUploadAllowedTypes()).andReturn(new String[0]);
+    EasyMock.expect(config.fileUploadMaxSize()).andReturn(10l);
     EasyMock.replay(config);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, messageStore, expressionEvaluator, config);
@@ -256,8 +256,8 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
     EasyMock.replay(chain);
 
     PrimeMVCConfiguration config = EasyMock.createStrictMock(PrimeMVCConfiguration.class);
-    EasyMock.expect(config.getStringArray("jcatapult.mvc.file-upload.allowed-content-types")).andReturn(new String[0]);
-    EasyMock.expect(config.getLong("jcatapult.mvc.file-upload.max-size", 1024000)).andReturn(10l);
+    EasyMock.expect(config.fileUploadAllowedTypes()).andReturn(new String[0]);
+    EasyMock.expect(config.fileUploadMaxSize()).andReturn(10l);
     EasyMock.replay(config);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, messageStore, expressionEvaluator, config);
@@ -308,8 +308,8 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
     EasyMock.replay(chain);
 
     PrimeMVCConfiguration config = EasyMock.createStrictMock(PrimeMVCConfiguration.class);
-    EasyMock.expect(config.getStringArray("jcatapult.mvc.file-upload.allowed-content-types")).andReturn(new String[0]);
-    EasyMock.expect(config.getLong("jcatapult.mvc.file-upload.max-size", 1024000)).andReturn(10l);
+    EasyMock.expect(config.fileUploadAllowedTypes()).andReturn(new String[0]);
+    EasyMock.expect(config.fileUploadMaxSize()).andReturn(10l);
     EasyMock.replay(config);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, messageStore, expressionEvaluator, config);
@@ -351,8 +351,8 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
     EasyMock.replay(chain);
 
     PrimeMVCConfiguration config = EasyMock.createStrictMock(PrimeMVCConfiguration.class);
-    EasyMock.expect(config.getStringArray("jcatapult.mvc.file-upload.allowed-content-types")).andReturn(new String[0]);
-    EasyMock.expect(config.getLong("jcatapult.mvc.file-upload.max-size", 1024000)).andReturn(10l);
+    EasyMock.expect(config.fileUploadAllowedTypes()).andReturn(new String[0]);
+    EasyMock.expect(config.fileUploadMaxSize()).andReturn(10l);
     EasyMock.replay(config);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, messageStore, expressionEvaluator, config);
@@ -375,8 +375,8 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
     EasyMock.replay(request);
 
     PrimeMVCConfiguration config = EasyMock.createStrictMock(PrimeMVCConfiguration.class);
-    EasyMock.expect(config.getStringArray("jcatapult.mvc.file-upload.allowed-content-types")).andReturn(new String[0]);
-    EasyMock.expect(config.getLong("jcatapult.mvc.file-upload.max-size", 1024000)).andReturn(1024000l);
+    EasyMock.expect(config.fileUploadAllowedTypes()).andReturn(new String[0]);
+    EasyMock.expect(config.fileUploadMaxSize()).andReturn(1024000l);
     EasyMock.replay(config);
 
     Object action = new Object();
@@ -416,8 +416,8 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
     EasyMock.replay(request);
 
     PrimeMVCConfiguration config = EasyMock.createStrictMock(PrimeMVCConfiguration.class);
-    EasyMock.expect(config.getStringArray("jcatapult.mvc.file-upload.allowed-content-types")).andReturn(new String[0]);
-    EasyMock.expect(config.getLong("jcatapult.mvc.file-upload.max-size", 1024000)).andReturn(1024000l);
+    EasyMock.expect(config.fileUploadAllowedTypes()).andReturn(new String[0]);
+    EasyMock.expect(config.fileUploadMaxSize()).andReturn(1024000l);
     EasyMock.replay(config);
 
     Object action = new Object();
@@ -455,8 +455,8 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
     EasyMock.replay(request);
 
     PrimeMVCConfiguration config = EasyMock.createStrictMock(PrimeMVCConfiguration.class);
-    EasyMock.expect(config.getStringArray("jcatapult.mvc.file-upload.allowed-content-types")).andReturn(new String[0]);
-    EasyMock.expect(config.getLong("jcatapult.mvc.file-upload.max-size", 1024000)).andReturn(1l);
+    EasyMock.expect(config.fileUploadAllowedTypes()).andReturn(new String[0]);
+    EasyMock.expect(config.fileUploadMaxSize()).andReturn(1l);
     EasyMock.replay(config);
 
     Object action = new Object();
@@ -498,8 +498,8 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
     EasyMock.replay(request);
 
     PrimeMVCConfiguration config = EasyMock.createStrictMock(PrimeMVCConfiguration.class);
-    EasyMock.expect(config.getStringArray("jcatapult.mvc.file-upload.allowed-content-types")).andReturn(new String[]{"test/xml"});
-    EasyMock.expect(config.getLong("jcatapult.mvc.file-upload.max-size", 1024000)).andReturn(10l);
+    EasyMock.expect(config.fileUploadAllowedTypes()).andReturn(new String[]{"test/xml"});
+    EasyMock.expect(config.fileUploadMaxSize()).andReturn(10l);
     EasyMock.replay(config);
 
     Object action = new Object();
@@ -541,8 +541,8 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
     EasyMock.replay(request);
 
     PrimeMVCConfiguration config = EasyMock.createStrictMock(PrimeMVCConfiguration.class);
-    EasyMock.expect(config.getStringArray("jcatapult.mvc.file-upload.allowed-content-types")).andReturn(new String[0]);
-    EasyMock.expect(config.getLong("jcatapult.mvc.file-upload.max-size", 1024000)).andReturn(1024000l);
+    EasyMock.expect(config.fileUploadAllowedTypes()).andReturn(new String[0]);
+    EasyMock.expect(config.fileUploadMaxSize()).andReturn(1024000l);
     EasyMock.replay(config);
 
     Object action = new Object();
@@ -596,8 +596,8 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
     EasyMock.replay(request);
 
     PrimeMVCConfiguration config = EasyMock.createStrictMock(PrimeMVCConfiguration.class);
-    EasyMock.expect(config.getStringArray("jcatapult.mvc.file-upload.allowed-content-types")).andReturn(new String[0]);
-    EasyMock.expect(config.getLong("jcatapult.mvc.file-upload.max-size", 1024000)).andReturn(1024000l);
+    EasyMock.expect(config.fileUploadAllowedTypes()).andReturn(new String[0]);
+    EasyMock.expect(config.fileUploadMaxSize()).andReturn(1024000l);
     EasyMock.replay(config);
 
     Object action = new Object();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -225,8 +225,8 @@ public class StaticResourceWorkflowTest {
 
   private PrimeMVCConfiguration makeConfiguration() {
     PrimeMVCConfiguration configuration = EasyMock.createStrictMock(PrimeMVCConfiguration.class);
-    EasyMock.expect(configuration.getStringArray("jcatapult.static-resource.prefixes")).andReturn(null);
-    EasyMock.expect(configuration.getBoolean("jcatapult.static-resource.enabled", true)).andReturn(true);
+    EasyMock.expect(configuration.staticResourcePrefixes()).andReturn(null);
+    EasyMock.expect(configuration.staticResourcesEnabled()).andReturn(true);
     EasyMock.replay(configuration);
     return configuration;
   }

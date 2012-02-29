@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ import java.util.logging.Logger;
 import org.primeframework.mvc.guice.GuiceContainer;
 
 /**
- * <p> This class bootstraps the entire JCatapult system. This must be defined as the first servlet context listener
- * that is initialized otherwise JCatapult might fail to startup correctly. </p>
+ * This class bootstraps the entire JCatapult system. This must be defined as the first servlet context listener that is
+ * initialized otherwise JCatapult might fail to startup correctly.
  *
  * @author Brian Pontarelli
  */
@@ -47,7 +47,6 @@ public class JCatapultServletContextListener implements ServletContextListener {
    * Initialize the {@link GuiceContainer}.
    */
   protected void initGuice() {
-    GuiceContainer.inject();
     GuiceContainer.initialize();
   }
 

@@ -15,6 +15,7 @@
  */
 package org.primeframework.mvc.servlet;
 
+import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import java.io.IOException;
 
@@ -25,6 +26,16 @@ import java.io.IOException;
  */
 public class MockWorkflowChain implements WorkflowChain {
   private final Runnable runnable;
+
+  @Override
+  public void start(FilterChain filterChain) throws IOException, ServletException {
+    continueWorkflow();
+  }
+
+  @Override
+  public Iterable<Workflow> workflows() {
+    return null;
+  }
 
   public MockWorkflowChain(Runnable runnable) {
     this.runnable = runnable;
