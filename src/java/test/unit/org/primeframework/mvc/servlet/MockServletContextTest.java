@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,7 +12,6 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
- *
  */
 package org.primeframework.mvc.servlet;
 
@@ -34,15 +33,15 @@ import static org.testng.Assert.*;
 public class MockServletContextTest {
   @Test
   public void testResource() throws MalformedURLException {
-    MockServletContext context = new MockServletContext(new File("src/java/test/unit/org/jcatapult/servlet"));
+    MockServletContext context = new MockServletContext(new File("src/java/test/unit/org/primeframework/mvc/servlet"));
     URL url = context.getResource("/MockServletContextTest.java");
     assertNotNull(url);
-    assertEquals(new File("src/java/test/unit/org/jcatapult/servlet/MockServletContextTest.java").toURI().toURL(), url);
+    assertEquals(new File("src/java/test/unit/org/primeframework/mvc/servlet/MockServletContextTest.java").toURI().toURL(), url);
   }
 
   @Test
   public void testResourcePath() throws MalformedURLException {
-    MockServletContext context = new MockServletContext(new File("src/java/test/unit/org/jcatapult/servlet"));
+    MockServletContext context = new MockServletContext(new File("src/java/test/unit/org/primeframework/mvc/servlet"));
     Set<String> urls = context.getResourcePaths("/WEB-INF/lib");
     assertNotNull(urls);
     assertTrue(urls.size() > 1);

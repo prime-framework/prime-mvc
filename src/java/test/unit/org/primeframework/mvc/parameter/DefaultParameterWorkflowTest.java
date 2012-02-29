@@ -367,7 +367,7 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
   @Test
   public void filesNoAnnotation() throws IOException, ServletException {
     Map<String, List<FileInfo>> files = new HashMap<String, List<FileInfo>>();
-    files.put("userfile", asList(new FileInfo(new java.io.File("src/java/test/unit/org/jcatapult/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain")));
+    files.put("userfile", asList(new FileInfo(new java.io.File("src/java/test/unit/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain")));
 
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
     EasyMock.expect(request.getParameterMap()).andReturn(new HashMap());
@@ -407,8 +407,8 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
   public void multipleFilesNoAnnotation() throws IOException, ServletException {
     Map<String, List<FileInfo>> files = new HashMap<String, List<FileInfo>>();
     files.put("userfiles", asList(
-      new FileInfo(new java.io.File("src/java/test/unit/org/jcatapult/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain"),
-      new FileInfo(new java.io.File("src/java/test/unit/org/jcatapult/mvc/parameter/test-file-upload.txt"), "test-file-upload2.txt", "text/plain")));
+      new FileInfo(new java.io.File("src/java/test/unit/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain"),
+      new FileInfo(new java.io.File("src/java/test/unit/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload2.txt", "text/plain")));
 
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
     EasyMock.expect(request.getParameterMap()).andReturn(new HashMap());
@@ -447,7 +447,7 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
   @Test
   public void filesNoAnnotationSizeError() throws IOException, ServletException {
     Map<String, List<FileInfo>> files = new HashMap<String, List<FileInfo>>();
-    files.put("userfile", new ArrayList<FileInfo>(asList(new FileInfo(new java.io.File("src/java/test/unit/org/jcatapult/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain"))));
+    files.put("userfile", new ArrayList<FileInfo>(asList(new FileInfo(new java.io.File("src/java/test/unit/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain"))));
 
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
     EasyMock.expect(request.getParameterMap()).andReturn(new HashMap());
@@ -490,7 +490,7 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
   @Test
   public void filesNoAnnotationContentTypeError() throws IOException, ServletException {
     Map<String, List<FileInfo>> files = new HashMap<String, List<FileInfo>>();
-    files.put("userfile", new ArrayList<FileInfo>(asList(new FileInfo(new java.io.File("src/java/test/unit/org/jcatapult/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain"))));
+    files.put("userfile", new ArrayList<FileInfo>(asList(new FileInfo(new java.io.File("src/java/test/unit/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain"))));
 
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
     EasyMock.expect(request.getParameterMap()).andReturn(new HashMap());
@@ -533,7 +533,7 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
   @Test
   public void filesAnnotationSizeError() throws IOException, ServletException {
     Map<String, List<FileInfo>> files = new HashMap<String, List<FileInfo>>();
-    files.put("userfile", new ArrayList<FileInfo>(asList(new FileInfo(new java.io.File("src/java/test/unit/org/jcatapult/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain"))));
+    files.put("userfile", new ArrayList<FileInfo>(asList(new FileInfo(new java.io.File("src/java/test/unit/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain"))));
 
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
     EasyMock.expect(request.getParameterMap()).andReturn(new HashMap());
@@ -588,7 +588,7 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
   @Test
   public void filesAnnotationContentTypeError() throws IOException, ServletException {
     Map<String, List<FileInfo>> files = new HashMap<String, List<FileInfo>>();
-    files.put("userfile", new ArrayList<FileInfo>(asList(new FileInfo(new java.io.File("src/java/test/unit/org/jcatapult/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain"))));
+    files.put("userfile", new ArrayList<FileInfo>(asList(new FileInfo(new java.io.File("src/java/test/unit/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain"))));
 
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
     EasyMock.expect(request.getParameterMap()).andReturn(new HashMap());

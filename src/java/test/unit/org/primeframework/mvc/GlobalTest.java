@@ -36,7 +36,7 @@ public class GlobalTest extends JCatapultBaseTest {
   public void testRenderFTL() throws IOException, ServletException {
     RequestSimulator simulator = new RequestSimulator();
     simulator.test("/user/edit").get();
-    assertEquals(FileTools.read("src/java/test/unit/org/jcatapult/mvc/edit-output.txt").toString(),
+    assertEquals(FileTools.read("src/java/test/unit/org/primeframework/mvc/edit-output.txt").toString(),
       simulator.response.getStream().toString());
   }
 
@@ -44,7 +44,7 @@ public class GlobalTest extends JCatapultBaseTest {
   public void testNonFormFields() throws IOException, ServletException {
     RequestSimulator simulator = new RequestSimulator();
     simulator.test("/user/details-fields").get();
-    assertEquals(FileTools.read("src/java/test/unit/org/jcatapult/mvc/details-fields-output.txt").toString(),
+    assertEquals(FileTools.read("src/java/test/unit/org/primeframework/mvc/details-fields-output.txt").toString(),
       simulator.response.getStream().toString());
   }
 }

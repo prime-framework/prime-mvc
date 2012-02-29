@@ -187,7 +187,7 @@ public class RequestBodyWorkflowTest {
 
   @Test
   public void singleFiles() throws IOException, ServletException {
-    String body = FileTools.read("src/java/test/unit/org/jcatapult/servlet/http-test-body-single-file.txt").toString();
+    String body = FileTools.read("src/java/test/unit/org/primeframework/mvc/servlet/http-test-body-single-file.txt").toString();
 
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
     EasyMock.expect(request.getParameterMap()).andReturn(new HashMap());
@@ -227,7 +227,7 @@ public class RequestBodyWorkflowTest {
 
   @Test
   public void multipleFiles() throws IOException, ServletException {
-    String body = FileTools.read("src/java/test/unit/org/jcatapult/servlet/http-test-body-multiple-files.txt").toString();
+    String body = FileTools.read("src/java/test/unit/org/primeframework/mvc/servlet/http-test-body-multiple-files.txt").toString();
 
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
     EasyMock.expect(request.getParameterMap()).andReturn(new HashMap());
