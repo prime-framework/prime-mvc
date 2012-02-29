@@ -1,5 +1,14 @@
 <?xml version="1.0" ?>
 <project>
+
+  <macrodef name="compile-main-post">
+    <sequential>
+      <copy todir="target/classes/main">
+        <fileset dir="src/ftl/main" includes="**"/>
+      </copy>
+    </sequential>
+  </macrodef>
+
   <macrodef name="jar-post">
     <sequential>
       <jar destfile="target/jars/${project.name}-test-${project.version}.jar">

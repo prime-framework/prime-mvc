@@ -62,4 +62,11 @@ public interface PrimeMVCConfiguration {
    * @return Whether or not unknown pamareters should be allowed or if they should throw an exception.
    */
   boolean allowUnknownParameters();
+
+  /**
+   * Set to true if actions should ignore empty parameters.  Defaults to false
+   *
+   * @return true or false
+   */
+  boolean ignoreEmptyParameters();
 }

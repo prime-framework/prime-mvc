@@ -46,7 +46,6 @@ import org.primeframework.mvc.util.MethodTools;
 import org.primeframework.mvc.util.RequestKeys;
 
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 import static net.java.lang.ObjectTools.*;
 
 /**
@@ -69,7 +68,6 @@ public class DefaultParameterWorkflow implements ParameterWorkflow {
 
   private final long maxSize;
   private final String[] contentTypes;
-  private boolean ignoreEmptyParameters = false;
 
   @Inject
   public DefaultParameterWorkflow(HttpServletRequest request, ActionInvocationStore actionInvocationStore,
@@ -82,11 +80,6 @@ public class DefaultParameterWorkflow implements ParameterWorkflow {
     this.configuration = configuration;
     this.contentTypes = configuration.fileUploadAllowedTypes();
     this.maxSize = configuration.fileUploadMaxSize();
-  }
-
-  @Inject(optional = true)
-  public void setIgnoreEmptyParamaters(@Named("jcatapult.mvc.ignoreEmptyParameters") boolean ignoreEmptyParameters) {
-    this.ignoreEmptyParameters = ignoreEmptyParameters;
   }
 
   /**
@@ -191,7 +184,7 @@ public class DefaultParameterWorkflow implements ParameterWorkflow {
           // block will only ever add the values to the structure if they contain at least
           // one non-empty String.
           String[] values = parameters.get(parameter);
-          if (!ignoreEmptyParameters || !empty(values)) {
+          if (!configuration.ignoreEmptyParameters() || !empty(values)) {
             s.values = values;
           }
         }

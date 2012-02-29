@@ -8,6 +8,9 @@
       <sourceFolder url="file://$MODULE_DIR$/src/java/main" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/java/test/integration" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/java/test/unit" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/conf/test/unit" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/ftl/main" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/web/test" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />

@@ -52,4 +52,9 @@ public abstract class AbstractPrimeMVCConfiguration implements PrimeMVCConfigura
   public boolean propagateRuntimeExceptions() {
     return true;
   }
+
+  @Override
+  public boolean ignoreEmptyParameters() {
+    return false;
+  }
 }
