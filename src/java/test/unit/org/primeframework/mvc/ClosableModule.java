@@ -13,13 +13,15 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.guice;
+package org.primeframework.mvc;
+
+import org.primeframework.mvc.guice.TestClosable;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;
 
 /**
- * <p> This is a test module. </p>
+ * This is a test module.
  *
  * @author Brian Pontarelli
  */

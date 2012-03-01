@@ -24,13 +24,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.primeframework.mvc.action.annotation.Action;
+import org.primeframework.mvc.util.ClassClasspathResolver;
 import org.primeframework.mvc.util.URIBuilder;
 
 import net.java.lang.ClassClassLoaderResolver;
 
 import com.google.inject.Inject;
+import com.google.inject.Module;
 import com.google.inject.Singleton;
-import static net.java.util.CollectionTools.*;
 
 /**
  * <p> This class loads the configuration by scanning the classpath for packages and action classes. </p>
@@ -50,11 +51,10 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
   public DefaultActionConfigurationProvider(ServletContext context, URIBuilder uriBuilder) {
     this.context = context;
 
-    ClassClassLoaderResolver resolver = new ClassClassLoaderResolver();
+    ClassClasspathResolver resolver = new ClassClasspathResolver();
     Set<Class<?>> actionClassses;
     try {
-      actionClassses = resolver.findByLocators(new ClassClassLoaderResolver.AnnotatedWith(Action.class),
-        true, array("org.jcatapult.mvc.*", "org.hibernate.*"), "action");
+      actionClassses = resolver.findByLocators(new ClassClasspathResolver.AnnotatedWith(Action.class), true, null, "action");
     } catch (IOException e) {
       throw new RuntimeException("Error discovering action classes", e);
     }

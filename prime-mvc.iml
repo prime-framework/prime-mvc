@@ -82,13 +82,13 @@
       </library>
     </orderEntry>
     <orderEntry type="module-library">
-      <library name="prime-mock-1.0-IB20120229014954684.jar">
+      <library name="prime-mock-1.0-IB20120301194208375.jar">
         <CLASSES>
-          <root url="jar://$SAVANT_REPOSITORY$/org/primeframework/prime-mock/1.0-{integration}/prime-mock-1.0-IB20120229014954684.jar!/" />
+          <root url="jar://$SAVANT_REPOSITORY$/org/primeframework/prime-mock/1.0-{integration}/prime-mock-1.0-IB20120301194208375.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$SAVANT_REPOSITORY$/org/primeframework/prime-mock/1.0-{integration}/prime-mock-1.0-IB20120229014954684-src.jar!/" />
+          <root url="jar://$SAVANT_REPOSITORY$/org/primeframework/prime-mock/1.0-{integration}/prime-mock-1.0-IB20120301194208375-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -111,6 +111,17 @@
         <JAVADOC />
         <SOURCES>
           <root url="jar://$SAVANT_REPOSITORY$/org/apache/commons/commons-io/1.3.2/commons-io-1.3.2-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="asm-3.1.jar">
+        <CLASSES>
+          <root url="jar://$SAVANT_REPOSITORY$/org/objectweb/asm/asm/3.1/asm-3.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$SAVANT_REPOSITORY$/org/objectweb/asm/asm/3.1/asm-3.1-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -232,17 +243,6 @@
         <JAVADOC />
         <SOURCES>
           <root url="jar://$SAVANT_REPOSITORY$/org/junit/junit/4.4/junit-4.4-src.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library name="asm-3.1.jar">
-        <CLASSES>
-          <root url="jar://$SAVANT_REPOSITORY$/org/objectweb/asm/asm/3.1/asm-3.1.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$SAVANT_REPOSITORY$/org/objectweb/asm/asm/3.1/asm-3.1-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>

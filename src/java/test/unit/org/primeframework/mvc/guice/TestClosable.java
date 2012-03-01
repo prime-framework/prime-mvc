@@ -19,7 +19,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 /**
- * <p> This </p>
+ * This
  *
  * @author Brian Pontarelli
  */

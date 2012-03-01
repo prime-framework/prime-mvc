@@ -254,6 +254,9 @@
       </value>
     </option>
   </component>
+  <component name="ProjectDictionaryState">
+    <dictionary name="bpontarelli" />
+  </component>
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/prime-mvc.iml" filepath="$PROJECT_DIR$/prime-mvc.iml" />

@@ -19,36 +19,46 @@ import javax.servlet.ServletContext;
 
 import org.apache.commons.configuration.FileConfiguration;
 import org.easymock.EasyMock;
+import org.primeframework.mvc.ClosableModule;
+import org.primeframework.mvc.config.AbstractPrimeMVCConfiguration;
+import org.primeframework.mvc.config.PrimeMVCConfiguration;
 import org.primeframework.mvc.servlet.ServletObjectsHolder;
+import org.primeframework.mvc.test.JCatapultBaseTest;
 import org.testng.annotations.Test;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 import static org.testng.Assert.*;
 
 /**
- * <p> This class tests the GuiceContainer. </p>
+ * This class tests the GuiceContainer.
  *
  * @author Brian Pontarelli
  */
-public class GuiceContainerTest {
+public class GuiceContainerTest extends JCatapultBaseTest {
   @Test
-  public void testExplicitModules() {
-    GuiceContainer.setGuiceModules();
-    GuiceContainer.setExcludeGuiceModules(null);
-    GuiceContainer.setGuiceModulesNames("org.jcatapult.guice.TestModule1 , org.jcatapult.guice.TestModule2");
-//    GuiceContainer.setLoadFromClasspath(false);
-    GuiceContainer.initialize();
-    Injector injector = GuiceContainer.getInjector();
-    assertNotNull(injector.getInstance(TestClass1.class));
-    assertNotNull(injector.getInstance(TestClass2.class));
-  }
+  public void shutdownAndExplicitModules() {
+    GuiceContainer.setGuiceModules(new AbstractModule() {
+      @Override
+      protected void configure() {
+        bind(PrimeMVCConfiguration.class).toInstance(new AbstractPrimeMVCConfiguration() {
+          @Override
+          public int freemarkerCheckSeconds() {
+            return 2;
+          }
 
-  @Test
-  public void shutdown() {
-    GuiceContainer.setGuiceModules();
-    GuiceContainer.setExcludeGuiceModules(null);
-    GuiceContainer.setGuiceModulesNames("org.jcatapult.guice.ClosableModule");
-//    GuiceContainer.setLoadFromClasspath(false);
+          @Override
+          public int l10nReloadSeconds() {
+            return 1;
+          }
+
+          @Override
+          public boolean allowUnknownParameters() {
+            return false;
+          }
+        });
+      }
+    }, new ClosableModule());
     GuiceContainer.initialize();
     Injector injector = GuiceContainer.getInjector();
     assertNotNull(injector.getInstance(TestClosable.class));
@@ -60,14 +70,11 @@ public class GuiceContainerTest {
   }
 
   @Test
-  public void testImplicitModules() {
+  public void implicitModules() {
     ServletContext context = EasyMock.createStrictMock(ServletContext.class);
     EasyMock.replay(context);
     ServletObjectsHolder.setServletContext(context);
 
-    GuiceContainer.setGuiceModules();
-    GuiceContainer.setExcludeGuiceModules(null);
-    GuiceContainer.setGuiceModulesNames(null);
     GuiceContainer.initialize();
     Injector injector = GuiceContainer.getInjector();
     assertNotNull(injector.getInstance(TestClass1.class));
