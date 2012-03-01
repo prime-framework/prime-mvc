@@ -23,8 +23,8 @@ import java.lang.annotation.Target;
 import org.primeframework.mvc.action.result.Result;
 
 /**
- * <p> This annotation is a marker that is used to mark custom result annotations so that JCatapult can determine which
- * annotations on an action class are results annotations. </p>
+ * This annotation is a marker that is used to mark custom result annotations so that JCatapult can determine which
+ * annotations on an action class are results annotations.
  *
  * @author Brian Pontarelli
  */

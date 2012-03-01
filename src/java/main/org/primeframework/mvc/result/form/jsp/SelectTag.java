@@ -19,7 +19,7 @@ import javax.servlet.jsp.JspException;
 import java.util.Collection;
 import java.util.Map;
 
-import org.primeframework.mvc.l10n.MessageProvider;
+import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.result.form.control.Select;
 
 /**

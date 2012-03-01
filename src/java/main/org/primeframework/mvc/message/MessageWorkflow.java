@@ -20,8 +20,8 @@ import org.primeframework.mvc.servlet.Workflow;
 import com.google.inject.ImplementedBy;
 
 /**
- * <p> This interface defines the workflow process that handles messages. The most common processing is for the flash
- * scope. Messages in the flash scope usually need to be transferred into the request during request processing. </p>
+ * This interface defines the workflow process that handles messages. The most common processing is for the flash scope.
+ * Messages in the flash scope usually need to be transferred into the request during request processing.
  *
  * @author Brian Pontarelli
  */

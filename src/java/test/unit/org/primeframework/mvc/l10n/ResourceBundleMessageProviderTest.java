@@ -23,6 +23,9 @@ import org.easymock.EasyMock;
 import org.primeframework.mvc.config.PrimeMVCConfiguration;
 import org.primeframework.mvc.container.ServletContainerResolver;
 import org.primeframework.mock.servlet.MockServletContext;
+import org.primeframework.mvc.message.l10n.MissingMessageException;
+import org.primeframework.mvc.message.l10n.ResourceBundleMessageProvider;
+import org.primeframework.mvc.message.l10n.WebControl;
 import org.testng.annotations.Test;
 
 import static net.java.util.CollectionTools.*;
@@ -42,12 +45,12 @@ public class ResourceBundleMessageProviderTest {
 
     MockServletContext context = new MockServletContext(new File("src/java/test/unit"));
 
-    ResourceBundleMessageProvider provider = new ResourceBundleMessageProvider(Locale.US, new WebControl(new ServletContainerResolver(context), config));
+    ResourceBundleMessageProvider provider = new ResourceBundleMessageProvider(Locale.US, new WebControl(new ServletContainerResolver(context), config), invocationStore);
     assertEquals("American English Message", provider.getMessage("/l10n/Test", "key"));
     assertEquals("Package Message", provider.getMessage("/l10n/NonExistent", "key"));
     assertEquals("Super Package Message", provider.getMessage("/badPackage/Test", "key"));
 
-    provider = new ResourceBundleMessageProvider(Locale.GERMAN, new WebControl(new ServletContainerResolver(context), config));
+    provider = new ResourceBundleMessageProvider(Locale.GERMAN, new WebControl(new ServletContainerResolver(context), config), invocationStore);
     assertEquals("Default Message", provider.getMessage("/l10n/Test", "key"));
   }
 
@@ -60,12 +63,12 @@ public class ResourceBundleMessageProviderTest {
     MockServletContext context = new MockServletContext(new File("src/java/test/unit"));
 
     Map<String, String> attributes = map("c", "c", "a", "a");
-    ResourceBundleMessageProvider provider = new ResourceBundleMessageProvider(Locale.US, new WebControl(new ServletContainerResolver(context), config));
+    ResourceBundleMessageProvider provider = new ResourceBundleMessageProvider(Locale.US, new WebControl(new ServletContainerResolver(context), config), invocationStore);
     assertEquals("American English Message b a c", provider.getMessage("/l10n/Test", "format_key", attributes, "b"));
     assertEquals("Package Message b a c", provider.getMessage("/l10n/NonExistent", "format_key", attributes, "b"));
     assertEquals("Super Package Message b a c", provider.getMessage("/badPackage/Test", "format_key", attributes, "b"));
 
-    provider = new ResourceBundleMessageProvider(Locale.GERMAN, new WebControl(new ServletContainerResolver(context), config));
+    provider = new ResourceBundleMessageProvider(Locale.GERMAN, new WebControl(new ServletContainerResolver(context), config), invocationStore);
     assertEquals("Default Message b a c", provider.getMessage("/l10n/Test", "format_key", attributes, "b"));
   }
 
@@ -77,7 +80,7 @@ public class ResourceBundleMessageProviderTest {
 
     MockServletContext context = new MockServletContext(new File("src/java/test/unit"));
 
-    ResourceBundleMessageProvider provider = new ResourceBundleMessageProvider(Locale.US, new WebControl(new ServletContainerResolver(context), config));
+    ResourceBundleMessageProvider provider = new ResourceBundleMessageProvider(Locale.US, new WebControl(new ServletContainerResolver(context), config), invocationStore);
     try {
       provider.getMessage("/l10n/Test", "bad_key");
       fail("Should have failed");

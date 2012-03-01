@@ -20,8 +20,8 @@ import java.util.Map;
 import com.google.inject.ImplementedBy;
 
 /**
- * <p> This interface defines the mechanism used to load and cache action configuration. This should be flexible enough
- * to support new actions being added, actions being updated and actions being removed during development. </p>
+ * This interface defines the mechanism used to load and cache action configuration. This should be flexible enough to
+ * support new actions being added, actions being updated and actions being removed during development.
  *
  * @author Brian Pontarelli
  */

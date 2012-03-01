@@ -20,7 +20,7 @@ import java.util.List;
 import com.google.inject.ImplementedBy;
 
 /**
- * <p> This is the provider for scopes. </p>
+ * This is the provider for scopes.
  *
  * @author Brian Pontarelli
  */

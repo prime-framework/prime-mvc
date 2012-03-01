@@ -19,13 +19,11 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
-
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import org.primeframework.mvc.action.result.ForwardResult;
 import org.primeframework.mvc.action.result.freemarker.FreeMarkerMap;
-import org.primeframework.mvc.l10n.WebControl;
+import org.primeframework.mvc.message.l10n.WebControl;
 import org.primeframework.mvc.locale.DefaultLocaleStore;
 import org.primeframework.mvc.locale.annotation.CurrentLocale;
 import org.primeframework.mvc.parameter.convert.DefaultConverterProvider;
@@ -98,7 +96,6 @@ public class MVCModule extends AbstractModule {
    * Configures the servlet objects and the method header for injection.
    */
   protected void configureServletObjects() {
-
     if (ServletObjectsHolder.getServletContext() == null) {
       return;
     }
@@ -185,8 +182,6 @@ public class MVCModule extends AbstractModule {
     bind(Text.class);
     bind(Textarea.class);
     bind(YearsSelect.class);
-
-    requestStaticInjection(ForwardResult.class);
   }
 
   /**

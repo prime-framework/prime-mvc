@@ -54,9 +54,9 @@ import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
 
 /**
- * <p> This class is a FreeMarker model that provides access in the templates to the request, session and contet
- * attributes as well as values from the action and the Control directives via the {@link
- * org.primeframework.mvc.action.result.ControlHashModel} class. </p>
+ * This class is a FreeMarker model that provides access in the templates to the request, session and context attributes
+ * as well as values from the action and the Control directives via the {@link org.primeframework.mvc.action.result.ControlHashModel}
+ * class.
  *
  * @author Brian Pontarelli
  */
@@ -67,7 +67,7 @@ public class FreeMarkerMap implements TemplateHashModelEx {
   public static final String SESSION = "session";
   public static final String APPLICATION_MODEL = "Application";
   public static final String APPLICATION = "application";
-  public static final String JCATAPULT_TAGS = "jc";
+  public static final String TAG_PREFIX = "prime";
   public static final String JSP_TAGLIBS = "JspTaglibs";
 
   private static final Map<String, Class<? extends TemplateModel>> models = new HashMap<String, Class<? extends TemplateModel>>();
@@ -134,7 +134,7 @@ public class FreeMarkerMap implements TemplateHashModelEx {
     }, FieldSupportBeansWrapper.INSTANCE));
     objects.put(APPLICATION, context);
     objects.put(JSP_TAGLIBS, taglibFactory);
-    objects.put(JCATAPULT_TAGS, new ControlHashModel(objectFactory, controls));
+    objects.put(TAG_PREFIX, new ControlHashModel(objectFactory, controls));
 
     objects.putAll(additionalValues);
 
@@ -148,6 +148,8 @@ public class FreeMarkerMap implements TemplateHashModelEx {
     this.request = request;
     this.expressionEvaluator = expressionEvaluator;
     this.actionInvocationStore = actionInvocationStore;
+
+    // TODO add debugging for figuring out what scope an object is in
   }
 
   public int size() {

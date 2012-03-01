@@ -34,11 +34,11 @@ import static org.testng.Assert.*;
  * @author Brian Pontarelli
  */
 @SuppressWarnings("unchecked")
-public class ContextScopeTest {
+public class ApplicationScopeTest {
   @Test
   public void testAction() {
-    action(ContextScope.ACTION_ERROR_KEY, MessageType.ERROR);
-    action(ContextScope.ACTION_MESSAGE_KEY, MessageType.PLAIN);
+    action(ApplicationScope.ACTION_ERROR_KEY, MessageType.ERROR);
+    action(ApplicationScope.ACTION_MESSAGE_KEY, MessageType.PLAIN);
   }
 
   protected void action(String key, MessageType type) {
@@ -47,7 +47,7 @@ public class ContextScopeTest {
       EasyMock.expect(context.getAttribute(key)).andReturn(asList("Test message"));
       EasyMock.replay(context);
 
-      ContextScope scope = new ContextScope(context);
+      ApplicationScope scope = new ApplicationScope(context);
       List<String> messages = scope.getActionMessages(type);
       assertEquals(1, messages.size());
       assertEquals("Test message", messages.get(0));
@@ -60,7 +60,7 @@ public class ContextScopeTest {
       EasyMock.expect(context.getAttribute(key)).andReturn(null);
       EasyMock.replay(context);
 
-      ContextScope scope = new ContextScope(context);
+      ApplicationScope scope = new ApplicationScope(context);
       List<String> messages = scope.getActionMessages(type);
       assertEquals(0, messages.size());
 
@@ -73,7 +73,7 @@ public class ContextScopeTest {
       EasyMock.expect(context.getAttribute(key)).andReturn(messages);
       EasyMock.replay(context);
 
-      ContextScope scope = new ContextScope(context);
+      ApplicationScope scope = new ApplicationScope(context);
       scope.addActionMessage(type, "Test message");
       assertEquals(1, messages.size());
       assertEquals("Test message", messages.get(0));
@@ -88,7 +88,7 @@ public class ContextScopeTest {
       context.setAttribute(eq(key), EasyMock.capture(list));
       EasyMock.replay(context);
 
-      ContextScope scope = new ContextScope(context);
+      ApplicationScope scope = new ApplicationScope(context);
       scope.addActionMessage(type, "Test message");
       List<String> messages = list.getValue();
       assertEquals(1, messages.size());
@@ -100,8 +100,8 @@ public class ContextScopeTest {
 
   @Test
   public void testField() {
-    field(ContextScope.FIELD_ERROR_KEY, MessageType.ERROR);
-    field(ContextScope.FIELD_MESSAGE_KEY, MessageType.PLAIN);
+    field(ApplicationScope.FIELD_ERROR_KEY, MessageType.ERROR);
+    field(ApplicationScope.FIELD_MESSAGE_KEY, MessageType.PLAIN);
   }
 
   protected void field(String key, MessageType type) {
@@ -113,7 +113,7 @@ public class ContextScopeTest {
       EasyMock.expect(context.getAttribute(key)).andReturn(fm);
       EasyMock.replay(context);
 
-      ContextScope scope = new ContextScope(context);
+      ApplicationScope scope = new ApplicationScope(context);
       Map<String, List<String>> messages = scope.getFieldMessages(type);
       assertEquals(1, messages.size());
       assertEquals(1, messages.get("user.name").size());
@@ -127,7 +127,7 @@ public class ContextScopeTest {
       EasyMock.expect(context.getAttribute(key)).andReturn(null);
       EasyMock.replay(context);
 
-      ContextScope scope = new ContextScope(context);
+      ApplicationScope scope = new ApplicationScope(context);
       Map<String, List<String>> messages = scope.getFieldMessages(type);
       assertEquals(0, messages.size());
 
@@ -140,7 +140,7 @@ public class ContextScopeTest {
       EasyMock.expect(context.getAttribute(key)).andReturn(messages);
       EasyMock.replay(context);
 
-      ContextScope scope = new ContextScope(context);
+      ApplicationScope scope = new ApplicationScope(context);
       scope.addFieldMessage(type, "user.name", "Test message");
       assertEquals(1, messages.size());
       assertEquals(1, messages.get("user.name").size());
@@ -156,7 +156,7 @@ public class ContextScopeTest {
       context.setAttribute(eq(key), capture(map));
       EasyMock.replay(context);
 
-      ContextScope scope = new ContextScope(context);
+      ApplicationScope scope = new ApplicationScope(context);
       scope.addFieldMessage(type, "user.name", "Test message");
       Map<String, List<String>> messages = map.getValue();
       assertEquals(1, messages.size());

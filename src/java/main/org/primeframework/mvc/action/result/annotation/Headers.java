@@ -21,7 +21,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * <p> This annotation is a container for headers. </p>
+ * This annotation is a container for headers.
  *
  * @author Brian Pontarelli
  */

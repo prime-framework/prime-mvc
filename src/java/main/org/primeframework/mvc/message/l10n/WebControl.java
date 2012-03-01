@@ -14,7 +14,7 @@
  * language governing permissions and limitations under the License.
  *
  */
-package org.primeframework.mvc.l10n;
+package org.primeframework.mvc.message.l10n;
 
 import java.io.File;
 import java.io.FileInputStream;

@@ -18,19 +18,20 @@ package org.primeframework.mvc.message.scope;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
+
+import org.primeframework.mvc.message.Message;
 
 import com.google.inject.Inject;
 
 /**
- * <p> This is the message scope which fetches and stores values in the HttpServletRequest. </p>
+ * This is the message scope which fetches and stores values in the HttpServletRequest.
  *
  * @author Brian Pontarelli
  */
 @SuppressWarnings("unchecked")
-public class RequestScope extends AbstractJEEScope {
+public class RequestScope implements Scope {
+  private static final String KEY = "primeMessages";
   private final HttpServletRequest request;
 
   @Inject
@@ -38,79 +39,24 @@ public class RequestScope extends AbstractJEEScope {
     this.request = request;
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  public Map<String, List<String>> getFieldMessages(MessageType type) {
-    FieldMessages messages = (FieldMessages) request.getAttribute(fieldKey(type));
+  @Override
+  public void add(Message message) {
+    List<Message> messages = (List<Message>) request.getAttribute(KEY);
     if (messages == null) {
-      return Collections.emptyMap();
-    }
-
-    // Copy the map to protect it
-    return new LinkedHashMap<String, List<String>>(messages);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public void addFieldMessage(MessageType type, String fieldName, String message) {
-    String key = fieldKey(type);
-    FieldMessages messages = (FieldMessages) request.getAttribute(key);
-    if (messages == null) {
-      messages = new FieldMessages();
-      request.setAttribute(key, messages);
-    }
-
-    messages.addMessage(fieldName, message);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public List<String> getActionMessages(MessageType type) {
-    List<String> messages = (List<String>) request.getAttribute(actionKey(type));
-    if (messages == null) {
-      return Collections.emptyList();
-    }
-
-    // Copy the map to protect it
-    return new ArrayList<String>(messages);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public void addActionMessage(MessageType type, String message) {
-    String key = actionKey(type);
-    List<String> messages = (List<String>) request.getAttribute(key);
-    if (messages == null) {
-      messages = new ArrayList<String>();
-      request.setAttribute(key, messages);
+      messages = new ArrayList<Message>();
+      request.setAttribute(KEY, messages);
     }
 
     messages.add(message);
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  public void clearActionMessages(MessageType type) {
-    if (type == MessageType.ERROR) {
-      request.removeAttribute(ACTION_ERROR_KEY);
-    } else {
-      request.removeAttribute(ACTION_MESSAGE_KEY);
+  @Override
+  public List<Message> get() {
+    List<Message> messages = (List<Message>) request.getAttribute(KEY);
+    if (messages != null) {
+      return messages;
     }
-  }
 
-  /**
-   * {@inheritDoc}
-   */
-  public void clearFieldMessages(MessageType type) {
-    if (type == MessageType.ERROR) {
-      request.removeAttribute(FIELD_ERROR_KEY);
-    } else {
-      request.removeAttribute(FIELD_MESSAGE_KEY);
-    }
+    return Collections.emptyList();
   }
 }

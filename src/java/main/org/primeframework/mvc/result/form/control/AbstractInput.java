@@ -17,9 +17,9 @@ package org.primeframework.mvc.result.form.control;
 
 import java.util.Map;
 
-import org.primeframework.mvc.l10n.MessageProvider;
+import org.primeframework.mvc.message.Message;
+import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.message.MessageStore;
-import org.primeframework.mvc.message.scope.MessageType;
 import org.primeframework.mvc.result.control.AbstractControl;
 
 import com.google.inject.Inject;
@@ -83,22 +83,14 @@ public abstract class AbstractInput extends AbstractControl {
     Map<String, Object> map = super.makeParameters();
     if (labeled) {
       String name = (String) attributes.get("name");
-      String bundleName = determineBundleName(attributes);
-      if (bundleName == null) {
-        throw new IllegalStateException("Unable to locate the label message for the field named [" +
-          name + "]. If you don't have an action class for the URL, you define the bundle to " +
-          "use to localize the form. This bundle is specified either on the control tag or the " +
-          "form tag.");
-      }
-
       String labelKey = (String) attributes.remove("labelKey");
-      String label = null;
+      Message label = null;
       if (labelKey != null) {
-        label = messageProvider.getMessage(bundleName, labelKey, locale, dynamicAttributes);
+        label = messageProvider.getMessage(labelKey);
       }
 
       if (label == null) {
-        label = messageProvider.getMessage(bundleName, name, locale, dynamicAttributes);
+        label = messageProvider.getMessage(name);
       }
 
       if (label == null) {
@@ -113,7 +105,7 @@ public abstract class AbstractInput extends AbstractControl {
       map.put("label", label);
 
       // Add the field messages and errors as a list or null
-      map.put("field_messages", messageStore.getFieldMessages(MessageType.PLAIN).get(name));
+      map.put("messages", messageStore.get());
       map.put("field_errors", messageStore.getFieldMessages(MessageType.ERROR).get(name));
 
       // Remove the required attribute and move it up

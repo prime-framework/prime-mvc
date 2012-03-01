@@ -23,7 +23,7 @@ import java.lang.annotation.Target;
 import org.primeframework.mvc.action.result.HeaderResult;
 
 /**
- * <p> This annotation marks a result from an action as a header only result. </p>
+ * This annotation marks a result from an action as a header only result.
  *
  * @author Brian Pontarelli
  */

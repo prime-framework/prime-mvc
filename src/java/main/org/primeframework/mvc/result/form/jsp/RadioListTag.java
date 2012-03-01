@@ -15,7 +15,7 @@
  */
 package org.primeframework.mvc.result.form.jsp;
 
-import org.primeframework.mvc.l10n.MessageProvider;
+import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.result.form.control.RadioList;
 
 /**

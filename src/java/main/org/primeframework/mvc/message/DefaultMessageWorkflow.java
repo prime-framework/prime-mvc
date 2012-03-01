@@ -24,8 +24,8 @@ import org.primeframework.mvc.servlet.WorkflowChain;
 import com.google.inject.Inject;
 
 /**
- * <p> This is the default message workflow implementation. It removes all flash messages from the session and places
- * them in the request. </p>
+ * This is the default message workflow implementation. It removes all flash messages from the session and places them
+ * in the request.
  *
  * @author Brian Pontarelli
  */
@@ -43,11 +43,5 @@ public class DefaultMessageWorkflow implements MessageWorkflow {
   public void perform(WorkflowChain chain) throws IOException, ServletException {
     flashScope.transferFlash();
     chain.continueWorkflow();
-  }
-
-  /**
-   * Does nothing.
-   */
-  public void destroy() {
   }
 }

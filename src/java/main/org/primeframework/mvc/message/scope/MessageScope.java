@@ -16,7 +16,7 @@
 package org.primeframework.mvc.message.scope;
 
 /**
- * <p> This class contains the various scopes that messages can be stored in the JCatapult MessageStore. </p>
+ * This class contains the various scopes that messages can be stored in the MessageStore.
  *
  * @author Brian Pontarelli
  */
@@ -37,16 +37,10 @@ public enum MessageScope {
   SESSION(SessionScope.class),
 
   /**
-   * The action session scope, when messages are stored in the session, but are only associated and available to a
-   * specific action.
+   * The servlet context (application) scope, when messages are stored in the servlet context. Useful for messages that
+   * should be displayed to all users.
    */
-  ACTION_SESSION(ActionSessionScope.class),
-
-  /**
-   * The servlet context scope, when messages are stored in the servlet context. Useful for messages that should be
-   * displayed to all users.
-   */
-  CONTEXT(ContextScope.class);
+  APPLICATION(ApplicationScope.class);
 
   private final Class<? extends Scope> type;
 

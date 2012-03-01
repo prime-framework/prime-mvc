@@ -15,7 +15,7 @@
  */
 package org.primeframework.mvc.result.message.jsp;
 
-import org.primeframework.mvc.l10n.MessageProvider;
+import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.result.jsp.AbstractControlTag;
 import org.primeframework.mvc.result.message.control.Message;
 

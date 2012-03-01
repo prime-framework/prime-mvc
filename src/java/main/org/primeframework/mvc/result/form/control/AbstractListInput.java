@@ -20,7 +20,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.primeframework.mvc.l10n.MessageProvider;
+import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 
 import com.google.inject.Inject;

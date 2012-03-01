@@ -21,7 +21,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * <p> This annotation is a container for {@link Stream} annotations. </p>
+ * This annotation is a container for {@link Stream} annotations.
  *
  * @author Brian Pontarelli
  */

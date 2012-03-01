@@ -20,7 +20,7 @@ import java.util.Collection;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 
 /**
- * <p> This interface defines the information about an action invocation. </p>
+ * This interface defines the information about an action invocation.
  *
  * @author Brian Pontarelli
  */

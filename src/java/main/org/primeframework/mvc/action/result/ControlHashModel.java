@@ -34,8 +34,7 @@ import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
 
 /**
- * <p> This class is a hash that stores the {@link Control} classes so that they can be used from the FreeMarker
- * templates. </p>
+ * This class is a hash that stores the {@link Control} classes so that they can be used from the FreeMarker templates.
  *
  * @author Brian Pontarelli
  */

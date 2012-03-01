@@ -23,7 +23,7 @@ import java.lang.annotation.Target;
 import org.primeframework.mvc.action.result.XMLStreamResult;
 
 /**
- * <p> This annotation marks a result from an action as a Streaming XML result using a xml string from the action. </p>
+ * This annotation marks a result from an action as a Streaming XML result using a xml string from the action.
  *
  * @author jhumphrey
  */

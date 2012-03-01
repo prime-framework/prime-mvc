@@ -23,7 +23,7 @@ import org.primeframework.mvc.ObjectFactory;
 import com.google.inject.Inject;
 
 /**
- * <p> This class implements the scope provider interface. </p>
+ * This class implements the scope provider interface.
  *
  * @author Brian Pontarelli
  */

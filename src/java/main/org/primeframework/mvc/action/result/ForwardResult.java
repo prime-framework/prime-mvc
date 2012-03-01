@@ -53,10 +53,9 @@ public class ForwardResult extends AbstractResult<Forward> {
   private final ActionInvocationStore actionInvocationStore;
 
   @Inject
-  public ForwardResult(@CurrentLocale Locale locale, ServletContext servletContext,
-                       HttpServletRequest request, HttpServletResponse response,
-                       ExpressionEvaluator expressionEvaluator, FreeMarkerService freeMarkerService,
-                       ActionInvocationStore actionInvocationStore) {
+  public ForwardResult(@CurrentLocale Locale locale, ServletContext servletContext, HttpServletRequest request,
+                       HttpServletResponse response, ExpressionEvaluator expressionEvaluator,
+                       FreeMarkerService freeMarkerService, ActionInvocationStore actionInvocationStore) {
     super(expressionEvaluator);
     this.locale = locale;
     this.servletContext = servletContext;

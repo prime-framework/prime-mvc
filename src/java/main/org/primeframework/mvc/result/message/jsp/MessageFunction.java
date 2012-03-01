@@ -18,7 +18,7 @@ package org.primeframework.mvc.result.message.jsp;
 import java.io.StringWriter;
 
 import org.primeframework.mvc.guice.GuiceContainer;
-import org.primeframework.mvc.l10n.MessageProvider;
+import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.result.message.control.Message;
 
 import static net.java.util.CollectionTools.*;

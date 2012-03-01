@@ -21,7 +21,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * <p> This annotation is used to mark a class as being a JCatapult MVC action. </p>
+ * This annotation is used to mark a class as being a JCatapult MVC action.
  *
  * @author Brian Pontarelli
  */
@@ -33,19 +33,18 @@ public @interface Action {
    *         handle. This is also known as RESTful URI handling. The pattern is derived from the current WADL
    *         specification from Sun. The base URI for the action is fixed based on the package and class name. However,
    *         everything after the base can be set into properties or fields of the action class using the WADL pattern
-   *         here. The pattern is like this:<br/> <br/>
-   *         <pre>
-   *                          {id}
-   *                          </pre>
-   *         <p> If the classes base URI is /admin/user/edit, the full specification for the URI that action can handle
-   *         would be: </p>
-   *         <pre>
-   *                          /admin/user/edit/{id}
-   *                          </pre>
-   *         <p> If the URI is <strong>/admin/user/edit/42</strong>, the value of 42 would be added to the HTTP request
+   *         here. The pattern is like this:
+   *         <p/>
+   *         {@code {id}}
+   *         <p/>
+   *         If the classes base URI is /admin/user/edit, the full specification for the URI that action can handle
+   *         would be:
+   *         <p/>
+   *         {@code {/admin/user/edit/{id}}
+   *         <p/>
+   *         If the URI is <strong>/admin/user/edit/42</strong>, the value of 42 would be added to the HTTP request
    *         parameters under the key <strong>id</strong>. In most cases this means that the value will also be set into
    *         the action, but it could also be used as a {@link org.primeframework.mvc.parameter.annotation.PreParameter}.
-   *         </p>
    */
   String value() default "";
 

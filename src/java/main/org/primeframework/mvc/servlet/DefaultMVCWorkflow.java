@@ -21,7 +21,6 @@ import java.util.List;
 
 import org.primeframework.mvc.action.ActionInvocationWorkflow;
 import org.primeframework.mvc.action.ActionMappingWorkflow;
-import org.primeframework.mvc.action.ActionPrepareWorkflow;
 import org.primeframework.mvc.action.result.ResultInvocationWorkflow;
 import org.primeframework.mvc.message.MessageWorkflow;
 import org.primeframework.mvc.parameter.ParameterWorkflow;
@@ -34,8 +33,8 @@ import com.google.inject.Inject;
 import static java.util.Arrays.*;
 
 /**
- * <p> This class is the main entry point for the JCatapult MVC. It creates the default workflow that is used to process
- * requests. </p>
+ * This class is the main entry point for the JCatapult MVC. It creates the default workflow that is used to process
+ * requests.
  *
  * @author Brian Pontarelli
  */
@@ -47,15 +46,13 @@ public class DefaultMVCWorkflow implements MVCWorkflow {
                             ScopeRetrievalWorkflow scopeRetrievalWorkflow,
                             MessageWorkflow messageWorkflow,
                             URIParameterWorkflow uriParameterWorkflow,
-                            ActionPrepareWorkflow actionPrepareWorkflow,
                             ParameterWorkflow parameterWorkflow,
                             ValidationWorkflow validationWorkflow,
                             ActionInvocationWorkflow actionInvocationWorkflow,
                             ScopeStorageWorkflow scopeStorageWorkflow,
                             ResultInvocationWorkflow resultInvocationWorflow) {
-    workflows = asList(actionMappingWorkflow, scopeRetrievalWorkflow, messageWorkflow,
-      uriParameterWorkflow, actionPrepareWorkflow, parameterWorkflow, validationWorkflow,
-      actionInvocationWorkflow, scopeStorageWorkflow, resultInvocationWorflow);
+    workflows = asList(actionMappingWorkflow, scopeRetrievalWorkflow, messageWorkflow, uriParameterWorkflow,
+      parameterWorkflow, validationWorkflow, actionInvocationWorkflow, scopeStorageWorkflow, resultInvocationWorflow);
   }
 
   /**

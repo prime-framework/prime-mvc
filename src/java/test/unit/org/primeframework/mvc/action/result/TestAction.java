@@ -18,7 +18,7 @@ package org.primeframework.mvc.action.result;
 import org.primeframework.mvc.action.result.annotation.Forward;
 
 /**
- * <p> This is a test action with an annotation. </p>
+ * This is a test action with an annotation.
  *
  * @author Brian Pontarelli
  */

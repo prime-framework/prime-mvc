@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.primeframework.mvc.message.MessageStore;
-import org.primeframework.mvc.message.scope.MessageType;
 import org.primeframework.mvc.result.control.AbstractControl;
 import org.primeframework.mvc.result.control.annotation.ControlAttribute;
 import org.primeframework.mvc.result.control.annotation.ControlAttributes;

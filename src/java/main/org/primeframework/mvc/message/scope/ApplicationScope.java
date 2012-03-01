@@ -15,8 +15,7 @@
  */
 package org.primeframework.mvc.message.scope;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import javax.servlet.ServletContext;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -26,42 +25,37 @@ import org.primeframework.mvc.message.Message;
 import com.google.inject.Inject;
 
 /**
- * This is the message scope which fetches and stores values in the HttpSession.
+ * This is the message scope which fetches and stores values in the ServletContext. The values are stored in the servlet
+ * context using a variety of different keys.
  *
  * @author Brian Pontarelli
  */
 @SuppressWarnings("unchecked")
-public class SessionScope implements Scope {
+public class ApplicationScope implements Scope {
   private static final String KEY = "primeMessages";
-  private final HttpServletRequest request;
+  private final ServletContext context;
 
   @Inject
-  public SessionScope(HttpServletRequest request) {
-    this.request = request;
+  public ApplicationScope(ServletContext context) {
+    this.context = context;
   }
 
   @Override
   public void add(Message message) {
-    HttpSession session = request.getSession(false);
-    if (session != null) {
-      List<Message> messages = (List<Message>) session.getAttribute(KEY);
-      if (messages == null) {
-        messages = new ArrayList<Message>();
-        session.setAttribute(KEY, messages);
-      }
-      
-      messages.add(message);
+    List<Message> messages = (List<Message>) context.getAttribute(KEY);
+    if (messages == null) {
+      messages = new ArrayList<Message>();
+      context.setAttribute(KEY, messages);
     }
+    
+    messages.add(message);
   }
 
   @Override
   public List<Message> get() {
-    HttpSession session = request.getSession(false);
-    if (session != null) {
-      List<Message> messages = (List<Message>) session.getAttribute(KEY);
-      if (messages != null) {
-        return messages;
-      }
+    List<Message> messages = (List<Message>) context.getAttribute(KEY);
+    if (messages != null) {
+      return messages;
     }
 
     return Collections.emptyList();

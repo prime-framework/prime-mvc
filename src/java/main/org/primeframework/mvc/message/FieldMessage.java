@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,22 +13,13 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.message.scope;
+package org.primeframework.mvc.message;
 
 /**
- * <p> This enumeration specifies the different types of messages. Currently, these are just plain messages and errors.
- * </p>
+ * This
  *
  * @author Brian Pontarelli
  */
-public enum MessageType {
-  /**
-   * Describes non-error messages. These are simply information all messages.
-   */
-  PLAIN,
-
-  /**
-   * Describes all error messages.
-   */
-  ERROR
+public interface FieldMessage extends Message {
+  String getField();
 }

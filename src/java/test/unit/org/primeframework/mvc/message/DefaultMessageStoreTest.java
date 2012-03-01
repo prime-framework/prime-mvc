@@ -22,9 +22,8 @@ import org.easymock.EasyMock;
 import org.example.action.user.Edit;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.DefaultActionInvocation;
-import org.primeframework.mvc.l10n.MessageProvider;
+import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.message.scope.MessageScope;
-import org.primeframework.mvc.message.scope.MessageType;
 import org.primeframework.mvc.message.scope.Scope;
 import org.primeframework.mvc.message.scope.ScopeProvider;
 import org.testng.annotations.Test;
@@ -32,7 +31,7 @@ import org.testng.annotations.Test;
 import static net.java.util.CollectionTools.*;
 
 /**
- * <p> This tests the default message store. </p>
+ * This tests the default message store.
  *
  * @author Brian Pontarelli
  */

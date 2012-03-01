@@ -18,7 +18,7 @@ package org.primeframework.mvc.action.config;
 import org.primeframework.mvc.action.annotation.Action;
 
 /**
- * <p> This class is the default implementation of the action configuration. </p>
+ * This class is the default implementation of the action configuration.
  *
  * @author Brian Pontarelli
  */

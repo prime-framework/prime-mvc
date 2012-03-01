@@ -32,7 +32,6 @@ import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.DefaultActionInvocation;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.scope.MessageScope;
-import org.primeframework.mvc.message.scope.MessageType;
 import org.primeframework.mvc.parameter.DefaultParameterWorkflow;
 import org.primeframework.mvc.parameter.InternalParameters;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;

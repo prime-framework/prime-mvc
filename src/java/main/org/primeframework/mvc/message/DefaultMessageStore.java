@@ -16,231 +16,55 @@
 package org.primeframework.mvc.message;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.primeframework.mvc.action.ActionInvocation;
-import org.primeframework.mvc.action.ActionInvocationStore;
-import org.primeframework.mvc.l10n.MessageProvider;
-import org.primeframework.mvc.l10n.MissingMessageException;
 import org.primeframework.mvc.message.scope.MessageScope;
-import org.primeframework.mvc.message.scope.MessageType;
 import org.primeframework.mvc.message.scope.Scope;
 import org.primeframework.mvc.message.scope.ScopeProvider;
 
 import com.google.inject.Inject;
 
 /**
- * <p> This is the default message workflow implementation. It removes all flash messages from the session and places
- * them in the request. </p>
+ * This is the default message workflow implementation. It removes all flash messages from the session and places them
+ * in the request.
  *
  * @author Brian Pontarelli
  */
 public class DefaultMessageStore implements MessageStore {
-  private final ActionInvocationStore actionInvocationStore;
-  private final MessageProvider messageProvider;
   private final ScopeProvider scopeProvider;
 
   @Inject
-  public DefaultMessageStore(ActionInvocationStore actionInvocationStore, MessageProvider messageProvider,
-                             ScopeProvider scopeProvider) {
-    this.actionInvocationStore = actionInvocationStore;
-    this.messageProvider = messageProvider;
+  public DefaultMessageStore(ScopeProvider scopeProvider) {
     this.scopeProvider = scopeProvider;
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  public void addConversionError(String field, String uri, Map<String, String> dynamicAttributes, Object... values)
-    throws MissingMessageException {
-    String key = field + ".conversionError";
-    String message = messageProvider.getMessage(uri, key, dynamicAttributes, (Object[]) values);
+  @Override
+  public void add(Message message) {
     Scope scope = scopeProvider.lookup(MessageScope.REQUEST);
-    scope.addFieldMessage(MessageType.ERROR, field, message);
+    scope.add(message);
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  public void addFileUploadSizeError(String field, String uri, long size) throws MissingMessageException {
-    String key = field + ".fileUploadSize";
-    String message = messageProvider.getMessage(uri, key, size);
-    Scope scope = scopeProvider.lookup(MessageScope.REQUEST);
-    scope.addFieldMessage(MessageType.ERROR, field, message);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public void addFileUploadContentTypeError(String field, String uri, String contentType) throws MissingMessageException {
-    String key = field + ".fileUploadContentType";
-    String message = messageProvider.getMessage(uri, key, contentType);
-    Scope scope = scopeProvider.lookup(MessageScope.REQUEST);
-    scope.addFieldMessage(MessageType.ERROR, field, message);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public void addFieldMessage(MessageScope scope, String field, String uri, String key, Object... values)
-    throws MissingMessageException {
-    String message = messageProvider.getMessage(uri, key, (Object[]) values);
+  @Override
+  public void add(MessageScope scope, Message message) {
     Scope s = scopeProvider.lookup(scope);
-    s.addFieldMessage(MessageType.PLAIN, field, message);
+    s.add(message);
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  public void addFieldMessage(MessageScope scope, String field, String key, Object... values)
-    throws MissingMessageException {
-    ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
-    addFieldMessage(scope, field, actionInvocation.actionURI(), key, values);
+  @Override
+  public List<Message> get() {
+    List<Message> messages = new ArrayList<Message>();
+    List<Scope> scopes = scopeProvider.getAllScopes();
+    for (Scope scope : scopes) {
+      messages.addAll(scope.get());
+    }
+    return messages;
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  public void addFieldError(MessageScope scope, String field, String uri, String key, Object... values)
-    throws MissingMessageException {
-    String message = messageProvider.getMessage(uri, key, (Object[]) values);
+  @Override
+  public List<Message> get(MessageScope scope) {
+    List<Message> messages = new ArrayList<Message>();
     Scope s = scopeProvider.lookup(scope);
-    s.addFieldMessage(MessageType.ERROR, field, message);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public void addFieldError(MessageScope scope, String field, String key, Object... values)
-    throws MissingMessageException {
-    ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
-    addFieldError(scope, field, actionInvocation.actionURI(), key, values);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public void addActionMessage(MessageScope scope, String uri, String key, Object... values)
-    throws MissingMessageException {
-    String message = messageProvider.getMessage(uri, key, (Object[]) values);
-    Scope s = scopeProvider.lookup(scope);
-    s.addActionMessage(MessageType.PLAIN, message);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public void addActionMessage(MessageScope scope, String key, Object... values)
-    throws MissingMessageException {
-    ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
-    addActionMessage(scope, actionInvocation.actionURI(), key, values);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public void addActionError(MessageScope scope, String uri, String key, Object... values)
-    throws MissingMessageException {
-    String message = messageProvider.getMessage(uri, key, (Object[]) values);
-    Scope s = scopeProvider.lookup(scope);
-    s.addActionMessage(MessageType.ERROR, message);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public void addActionError(MessageScope scope, String key, Object... values)
-    throws MissingMessageException {
-    ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
-    addActionError(scope, actionInvocation.actionURI(), key, values);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public List<String> getActionMessages(MessageType type) {
-    List<String> allMessages = new ArrayList<String>();
-    List<Scope> allScopes = scopeProvider.getAllScopes();
-    for (Scope scope : allScopes) {
-      List<String> messages = scope.getActionMessages(type);
-      if (messages != null) {
-        allMessages.addAll(messages);
-      }
-    }
-
-    return allMessages;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public List<String> getActionMessages() {
-    return getActionMessages(MessageType.PLAIN);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public List<String> getActionErrors() {
-    return getActionMessages(MessageType.ERROR);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public Map<String, List<String>> getFieldMessages(MessageType type) {
-    Map<String, List<String>> allMessages = new LinkedHashMap<String, List<String>>();
-    List<Scope> allScopes = scopeProvider.getAllScopes();
-    for (Scope scope : allScopes) {
-      Map<String, List<String>> messages = scope.getFieldMessages(type);
-      if (messages != null) {
-        allMessages.putAll(messages);
-      }
-    }
-
-    return allMessages;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public Map<String, List<String>> getFieldMessages() {
-    return getFieldMessages(MessageType.PLAIN);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public Map<String, List<String>> getFieldErrors() {
-    return getFieldMessages(MessageType.ERROR);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public void clearActionMessages(MessageType type) {
-    List<Scope> allScopes = scopeProvider.getAllScopes();
-    for (Scope scope : allScopes) {
-      scope.clearActionMessages(type);
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public void clearFieldMessages(MessageType type) {
-    List<Scope> allScopes = scopeProvider.getAllScopes();
-    for (Scope scope : allScopes) {
-      scope.clearFieldMessages(type);
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public boolean contains(MessageType type) {
-    return !getActionMessages(type).isEmpty() || !getFieldMessages(type).isEmpty();
+    messages.addAll(s.get());
+    return messages;
   }
 }

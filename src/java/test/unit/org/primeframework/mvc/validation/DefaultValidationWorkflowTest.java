@@ -25,7 +25,6 @@ import org.example.domain.User;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.DefaultActionInvocation;
 import org.primeframework.mvc.message.MessageStore;
-import org.primeframework.mvc.message.scope.MessageType;
 import org.primeframework.mvc.parameter.InternalParameters;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.servlet.WorkflowChain;

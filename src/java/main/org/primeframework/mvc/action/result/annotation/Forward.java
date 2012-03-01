@@ -24,7 +24,7 @@ import java.lang.annotation.Target;
 import org.primeframework.mvc.action.result.ForwardResult;
 
 /**
- * <p> This annotation marks a result from an action as a forward to a JSP or FreeMarker template. </p>
+ * This annotation marks a result from an action as a forward to a JSP or FreeMarker template.
  *
  * @author Brian Pontarelli
  */

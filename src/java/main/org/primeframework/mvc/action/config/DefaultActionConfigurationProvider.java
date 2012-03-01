@@ -27,16 +27,11 @@ import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.util.ClassClasspathResolver;
 import org.primeframework.mvc.util.URIBuilder;
 
-import net.java.lang.ClassClassLoaderResolver;
-
 import com.google.inject.Inject;
-import com.google.inject.Module;
 import com.google.inject.Singleton;
 
 /**
- * <p> This class loads the configuration by scanning the classpath for packages and action classes. </p>
- * <p/>
- * TODO add ability to override actions from components and such
+ * This class loads the configuration by scanning the classpath for packages and action classes.
  *
  * @author Brian Pontarelli
  */

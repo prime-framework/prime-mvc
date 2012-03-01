@@ -16,60 +16,24 @@
 package org.primeframework.mvc.message.scope;
 
 import java.util.List;
-import java.util.Map;
+
+import org.primeframework.mvc.message.Message;
 
 /**
- * <p> This interface defines the handler for a specific message scope. </p>
+ * This interface defines the handler for a specific message scope.
  *
  * @author Brian Pontarelli
  */
 public interface Scope {
   /**
-   * Retrieve a Map of all of the field messages stored in the scope. This Map is not live and modifications are not
-   * stored in the scope.
+   * Adds the message to the scope.
    *
-   * @param type The type of messages to retrieve.
-   * @return The Map and never null.
-   */
-  Map<String, List<String>> getFieldMessages(MessageType type);
-
-  /**
-   * Sets a field message.
-   *
-   * @param type      The type of messages to retrieve.
-   * @param fieldName The name of the field.
-   * @param message   The message.
-   */
-  void addFieldMessage(MessageType type, String fieldName, String message);
-
-  /**
-   * Retrieve a List of all of the action messages stored in the scope. This List is not live and modifications are not
-   * stored in the scope.
-   *
-   * @param type The type of messages to retrieve.
-   * @return The List and never null.
-   */
-  List<String> getActionMessages(MessageType type);
-
-  /**
-   * Sets an action message.
-   *
-   * @param type    The type of messages to retrieve.
    * @param message The message.
    */
-  void addActionMessage(MessageType type, String message);
+  void add(Message message);
 
   /**
-   * Clears all of the action messages of the given type from the scope completely.
-   *
-   * @param type The message type to clear.
+   * @return All the messages in the scope.
    */
-  void clearActionMessages(MessageType type);
-
-  /**
-   * Clears all of the field messages of the given type from the scope completely.
-   *
-   * @param type The message type to clear.
-   */
-  void clearFieldMessages(MessageType type);
+  List<Message> get();
 }

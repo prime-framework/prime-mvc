@@ -20,11 +20,12 @@ import java.util.Deque;
 import com.google.inject.ImplementedBy;
 
 /**
- * <p> This class defines the mechanism used to locate action invocation objects. During a request, the invocation is
- * set using the {@link #setCurrent(ActionInvocation)} method and then can be retrieved any number of times using the
- * {@link #getCurrent()} method. </p> <p/> <p> Action invocations are always stored in a stack in order to allow
- * different actions to be invoked on top of each other. This is useful for invoking actions from FTL files and JSP
- * tags. </p>
+ * This class defines the mechanism used to locate action invocation objects. During a request, the invocation is set
+ * using the {@link #setCurrent(ActionInvocation)} method and then can be retrieved any number of times using the {@link
+ * #getCurrent()} method.
+ * <p/>
+ * Action invocations are always stored in a stack in order to allow different actions to be invoked on top of each
+ * other. This is useful for invoking actions from FTL files and JSP tags.
  *
  * @author Brian Pontarelli
  */

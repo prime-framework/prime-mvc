@@ -16,7 +16,7 @@
 package org.primeframework.mvc.action.config;
 
 /**
- * <p> This interface defines the public API that describes an action configuration. </p>
+ * This interface defines the public API that describes an action configuration.
  *
  * @author Brian Pontarelli
  */

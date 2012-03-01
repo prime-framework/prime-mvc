@@ -23,8 +23,8 @@ import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 
 /**
- * <p> This result performs a servlet forward to a JSP or renders a FreeMarker template depending on the extension of
- * the page. </p>
+ * This result performs a servlet forward to a JSP or renders a FreeMarker template depending on the extension of the
+ * page.
  *
  * @author Brian Pontarelli
  */

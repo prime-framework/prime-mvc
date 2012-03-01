@@ -13,18 +13,27 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.action;
-
-import org.primeframework.mvc.servlet.Workflow;
-
-import com.google.inject.ImplementedBy;
+package org.primeframework.mvc.message.l10n;
 
 /**
- * <p> This class defines a workflow that is used to prepare an action to have parameters set onto it and also to be
- * invoked. </p>
+ * <p> This exception is thrown when error messages are missing. </p>
  *
  * @author Brian Pontarelli
  */
-@ImplementedBy(DefaultActionPrepareWorkflow.class)
-public interface ActionPrepareWorkflow extends Workflow {
+public class MissingMessageException extends RuntimeException {
+  public MissingMessageException() {
+    super();
+  }
+
+  public MissingMessageException(String message) {
+    super(message);
+  }
+
+  public MissingMessageException(String message, Throwable cause) {
+    super(message, cause);
+  }
+
+  public MissingMessageException(Throwable cause) {
+    super(cause);
+  }
 }

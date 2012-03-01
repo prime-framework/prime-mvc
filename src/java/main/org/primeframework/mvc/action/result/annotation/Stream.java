@@ -23,7 +23,7 @@ import java.lang.annotation.Target;
 import org.primeframework.mvc.action.result.StreamResult;
 
 /**
- * <p> This annotation marks a result from an action as a Streaming result using an InputStream from the action. </p>
+ * This annotation marks a result from an action as a Streaming result using an InputStream from the action.
  *
  * @author Brian Pontarelli
  */

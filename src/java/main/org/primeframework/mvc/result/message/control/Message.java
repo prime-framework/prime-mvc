@@ -22,8 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.primeframework.mvc.l10n.MessageProvider;
-import org.primeframework.mvc.l10n.MissingMessageException;
+import org.primeframework.mvc.message.l10n.MessageProvider;
+import org.primeframework.mvc.message.l10n.MissingMessageException;
 import org.primeframework.mvc.result.control.AbstractControl;
 import org.primeframework.mvc.result.control.annotation.ControlAttribute;
 import org.primeframework.mvc.result.control.annotation.ControlAttributes;

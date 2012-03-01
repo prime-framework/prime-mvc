@@ -13,28 +13,28 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.l10n;
+package org.primeframework.mvc.message.l10n;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
+import java.util.Formatter;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.Queue;
 import java.util.ResourceBundle;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.ResourceBundle.Control;
 
+import org.primeframework.mvc.action.ActionInvocation;
+import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.locale.annotation.CurrentLocale;
+import org.primeframework.mvc.message.FieldMessage;
+import org.primeframework.mvc.message.Message;
 
 import com.google.inject.Inject;
-import static java.util.Arrays.*;
 
 /**
- * <p> This implements the MessageProvider using ResourceBundles inside the web context. It also adds the additional
- * step of looking for multiple bundles if the message isn't initially found. The search method is: </p> <p/>
+ * This implements the MessageProvider using ResourceBundles inside the web context. It also adds the additional step of
+ * looking for multiple bundles if the message isn't initially found. The search method is:
+ * <p/>
  * <pre>
  * uri = /foo/bar
  * locale = en_US
@@ -49,44 +49,60 @@ import static java.util.Arrays.*;
  * /WEB-INF/message/package_en
  * /WEB-INF/message/package
  * </pre>
- * <p/> <p> This stops when /WEB-INF/message is hit. </p> <p/> <p> Once the message is found, it is formatted using the
- * {@link java.text.MessageFormat} class. The values are passed in order. The attributes Map is also passed to the
- * format as well. The attributes are always after the values and are in alphabetically order based on the keys for each
- * attribute. </p>
+ * <p/>
+ * This stops when /WEB-INF/message is hit.
+ * <p/>
+ * Once the message is found, it is formatted using the {@link java.text.MessageFormat} class. The values are passed in
+ * order. The attributes Map is also passed to the format as well. The attributes are always after the values and are in
+ * alphabetically order based on the keys for each attribute.
  *
  * @author Brian Pontarelli
  */
 public class ResourceBundleMessageProvider implements MessageProvider {
   private final Locale locale;
   private final ResourceBundle.Control control;
+  private final ActionInvocationStore invocationStore;
 
   @Inject
-  public ResourceBundleMessageProvider(@CurrentLocale Locale locale, ResourceBundle.Control control) {
+  public ResourceBundleMessageProvider(@CurrentLocale Locale locale, Control control, ActionInvocationStore invocationStore) {
     this.locale = locale;
     this.control = control;
+    this.invocationStore = invocationStore;
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  public String getMessage(String uri, String key, Map<String, String> attributes, Object... values)
-    throws MissingMessageException {
-    String message = findMessage(uri, key);
-    List<Object> params = new ArrayList<Object>(asList(values));
-    SortedSet<String> sortedKeys = new TreeSet<String>(attributes.keySet());
-    for (String sortedKey : sortedKeys) {
-      params.add(attributes.get(sortedKey));
-    }
-
-    return MessageFormat.format(message, params.toArray());
+  @Override
+  public Message getMessage(String key, Object... values) throws MissingMessageException {
+    ActionInvocation actionInvocation = invocationStore.getCurrent();
+    String template = findMessage(actionInvocation.actionURI(), key);
+    Formatter f = new Formatter();
+    f.format(locale, template, values);
+    final String message = f.out().toString();
+    return new Message() {
+      @Override
+      public String toString() {
+        return message;
+      }
+    };
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  public String getMessage(String uri, String key, Object... values) throws MissingMessageException {
-    String message = findMessage(uri, key);
-    return MessageFormat.format(message, values);
+  @Override
+  public FieldMessage getFieldMessage(final String field, String key, Object... values) throws MissingMessageException {
+    ActionInvocation actionInvocation = invocationStore.getCurrent();
+    String template = findMessage(actionInvocation.actionURI(), key);
+    Formatter f = new Formatter();
+    f.format(locale, template, values);
+    final String message = f.out().toString();
+    return new FieldMessage() {
+      @Override
+      public String getField() {
+        return field;
+      }
+
+      @Override
+      public String toString() {
+        return message;
+      }
+    };
   }
 
   /**
@@ -110,7 +126,7 @@ public class ResourceBundleMessageProvider implements MessageProvider {
       "] and key [" + key + "]");
   }
 
-  private Queue<String> determineBundles(String bundle) {
+  protected Queue<String> determineBundles(String bundle) {
     Queue<String> names = new LinkedList<String>();
     names.offer(bundle);
 

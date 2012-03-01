@@ -17,7 +17,7 @@ package org.example.action.user;
 
 import org.example.domain.User;
 import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.action.annotation.ActionPrepareMethod;
+import org.primeframework.mvc.parameter.annotation.PreParameterMethod;
 import org.primeframework.mvc.result.form.annotation.FormPrepareMethod;
 import org.primeframework.mvc.validation.annotation.Valid;
 
@@ -31,16 +31,16 @@ public class Edit {
   @Valid
   public User user;
 
-  public boolean actionPrepared = false;
+  public boolean preParameter = false;
   public boolean formPrepared = false;
 
   public String execute() {
     return "success";
   }
 
-  @ActionPrepareMethod
+  @PreParameterMethod
   public void prepare() {
-    actionPrepared = true;
+    preParameter = true;
   }
 
   @FormPrepareMethod
