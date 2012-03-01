@@ -383,7 +383,7 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
     EasyMock.replay(request);
 
     PrimeMVCConfiguration config = EasyMock.createStrictMock(PrimeMVCConfiguration.class);
-    EasyMock.expect(config.fileUploadAllowedTypes()).andReturn(new String[0]);
+    EasyMock.expect(config.fileUploadAllowedTypes()).andReturn(new String[]{"text/plain"});
     EasyMock.expect(config.fileUploadMaxSize()).andReturn(1024000l);
     EasyMock.replay(config);
 
@@ -424,7 +424,7 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
     EasyMock.replay(request);
 
     PrimeMVCConfiguration config = EasyMock.createStrictMock(PrimeMVCConfiguration.class);
-    EasyMock.expect(config.fileUploadAllowedTypes()).andReturn(new String[0]);
+    EasyMock.expect(config.fileUploadAllowedTypes()).andReturn(new String[]{"text/plain"});
     EasyMock.expect(config.fileUploadMaxSize()).andReturn(1024000l);
     EasyMock.replay(config);
 
