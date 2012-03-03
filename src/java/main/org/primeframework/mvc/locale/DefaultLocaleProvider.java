@@ -22,25 +22,27 @@ import java.util.Locale;
 import com.google.inject.Inject;
 
 /**
- * <p> This is the default LocaleProvider implementation. </p>
+ * This is the default LocaleProvider implementation.
  *
  * @author Brian Pontarelli
  */
-public class DefaultLocaleStore implements LocaleStore {
-  public static final String LOCALE_KEY = "jcatapultLocale";
+public class DefaultLocaleProvider implements LocaleProvider {
+  public static final String LOCALE_KEY = "primeLocale";
   private final HttpServletRequest request;
 
   @Inject
-  public DefaultLocaleStore(HttpServletRequest request) {
+  public DefaultLocaleProvider(HttpServletRequest request) {
     this.request = request;
   }
 
   /**
    * Looks up the Locale using this search order:
    * <p/>
-   * <ol> <li>If there is a session, look for an attribute under the {@link #LOCALE_KEY}</li> <li>If there is not a
-   * session, look for an request attribute under the {@link #LOCALE_KEY}</li> <li>If the locale hasn't been found, get
-   * it from the request</li> </ol>
+   * <ol>
+   *   <li>If there is a session, look for an attribute under the {@link #LOCALE_KEY}</li>
+   *   <li>If there is not a session, look for an request attribute under the {@link #LOCALE_KEY}</li>
+   *   <li>If the locale hasn't been found, get it from the request</li>
+   * </ol>
    *
    * @return The Locale and never null.
    */

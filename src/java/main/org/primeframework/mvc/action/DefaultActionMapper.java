@@ -25,7 +25,7 @@ import org.primeframework.mvc.action.config.ActionConfigurationProvider;
 import com.google.inject.Inject;
 
 /**
- * <p> This class is the defult action mapper implementation. </p>
+ * This class is the default action mapper implementation.
  *
  * @author Brian Pontarelli
  */

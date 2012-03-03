@@ -18,7 +18,7 @@ package org.primeframework.mvc.action.result;
 import java.lang.annotation.Annotation;
 
 /**
- * <p> This class is the default result invocation. </p>
+ * This class is the default result invocation.
  *
  * @author Brian Pontarelli
  */

@@ -26,7 +26,7 @@ import com.google.inject.Injector;
 import com.google.inject.Key;
 
 /**
- * <p> This class provides helper functions for Guice. </p>
+ * This class provides helper functions for Guice.
  *
  * @author Brian Pontarelli
  */

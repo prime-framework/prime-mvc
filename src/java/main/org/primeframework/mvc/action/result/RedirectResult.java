@@ -23,9 +23,13 @@ import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
 import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.List;
 
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.result.annotation.Redirect;
+import org.primeframework.mvc.message.Message;
+import org.primeframework.mvc.message.MessageStore;
+import org.primeframework.mvc.message.scope.MessageScope;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 
 import net.java.variable.ExpanderException;
@@ -35,18 +39,21 @@ import net.java.variable.VariableExpander;
 import com.google.inject.Inject;
 
 /**
- * <p> This result performs a HTTP redirect to a URL. </p>
+ * This result performs a HTTP redirect to a URL. This also transfers all messages from the request to the flash. If we
+ * don't transfer the messages they will be lost after the redirect.
  *
  * @author Brian Pontarelli
  */
 public class RedirectResult extends AbstractResult<Redirect> {
+  private final MessageStore messageStore;
   private final HttpServletRequest request;
   private final HttpServletResponse response;
 
   @Inject
-  public RedirectResult(ExpressionEvaluator expressionEvaluator, HttpServletResponse response,
+  public RedirectResult(MessageStore messageStore, ExpressionEvaluator expressionEvaluator, HttpServletResponse response,
                         HttpServletRequest request) {
     super(expressionEvaluator);
+    this.messageStore = messageStore;
     this.response = response;
     this.request = request;
   }
@@ -55,6 +62,9 @@ public class RedirectResult extends AbstractResult<Redirect> {
    * {@inheritDoc}
    */
   public void execute(final Redirect redirect, final ActionInvocation invocation) throws IOException, ServletException {
+    List<Message> messages = messageStore.get(MessageScope.REQUEST);
+    messageStore.addAll(MessageScope.FLASH, messages);
+
     String uri = VariableExpander.expand(redirect.uri(), new ExpanderStrategy() {
       public String expand(String variableName) throws ExpanderException {
         try {

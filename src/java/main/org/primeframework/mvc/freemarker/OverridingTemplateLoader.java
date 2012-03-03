@@ -65,6 +65,8 @@ public class OverridingTemplateLoader implements TemplateLoader {
         }
       }
     } catch (SecurityException e) {
+      // This means we couldn't access to the file according to the security manager (not the file system). In this case
+      // we skip this lookup and move to the classpath and other lookups.
     }
 
     // If it fails, try to open it with servletContext.getResource.

@@ -29,7 +29,7 @@ import java.util.Locale;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.annotation.Forward;
-import org.primeframework.mvc.action.result.freemarker.FreeMarkerMap;
+import org.primeframework.mvc.freemarker.FreeMarkerMap;
 import org.primeframework.mvc.freemarker.FreeMarkerService;
 import org.primeframework.mvc.locale.annotation.CurrentLocale;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
@@ -117,9 +117,14 @@ public class ForwardResult extends AbstractResult<Forward> {
    * <p/>
    * Checks for results using this search order:
    * <p/>
-   * <ol> <li>/WEB-INF/content/&lt;uri>-&lt;resultCode>.jsp</li> <li>/WEB-INF/content/&lt;uri>-&lt;resultCode>.ftl</li>
-   * <li>/WEB-INF/content/&lt;uri>.jsp</li> <li>/WEB-INF/content/&lt;uri>.ftl</li>
-   * <li>/WEB-INF/content/&lt;uri>/index.jsp</li> <li>/WEB-INF/content/&lt;uri>/index.ftl</li> </ol>
+   * <ol>
+   *   <li>/WEB-INF/content/&lt;uri>-&lt;resultCode>.jsp</li>
+   *   <li>/WEB-INF/content/&lt;uri>-&lt;resultCode>.ftl</li>
+   *   <li>/WEB-INF/content/&lt;uri>.jsp</li>
+   *   <li>/WEB-INF/content/&lt;uri>.ftl</li>
+   *   <li>/WEB-INF/content/&lt;uri>/index.jsp</li>
+   *   <li>/WEB-INF/content/&lt;uri>/index.ftl</li>
+   * </ol>
    * <p/>
    * If nothing is found this bombs out.
    *

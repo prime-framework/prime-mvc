@@ -22,8 +22,7 @@ import java.net.URL;
 import com.google.inject.Inject;
 
 /**
- * <p> This class implemenets the path resolver using the ServletContext and calling the getRealPath method on that.
- * </p>
+ * This class implements the path resolver using the ServletContext and calling the getRealPath method on that.
  *
  * @author Brian Pontarelli
  */

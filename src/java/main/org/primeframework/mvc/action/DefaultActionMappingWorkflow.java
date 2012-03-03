@@ -28,10 +28,10 @@ import org.primeframework.mvc.servlet.WorkflowChain;
 import com.google.inject.Inject;
 
 /**
- * <p> This class is the default implementation of the ActionWorkflow. During the perform method, this class pulls the
- * action information from the HTTP request URI and loads the action object from the GuiceContainer (for now). The way
+ * This class is the default implementation of the ActionWorkflow. During the perform method, this class pulls the
+ * action information from the HTTP request URI and loads the action object from the GuiceBootstrap (for now). The way
  * that the action class is determined is based on the ActionConfigurationProvider interface. This interface is used to
- * create the configuration and cache it. </p>
+ * create the configuration and cache it.
  *
  * @author Brian Pontarelli
  */

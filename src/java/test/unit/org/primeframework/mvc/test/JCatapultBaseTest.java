@@ -26,7 +26,7 @@ import org.primeframework.mock.servlet.MockServletContext;
 import org.primeframework.mock.servlet.WebTestHelper;
 import org.primeframework.mvc.config.AbstractPrimeMVCConfiguration;
 import org.primeframework.mvc.config.PrimeMVCConfiguration;
-import org.primeframework.mvc.guice.GuiceContainer;
+import org.primeframework.mvc.guice.GuiceBootstrap;
 import org.primeframework.mvc.servlet.ServletObjectsHolder;
 import org.testng.annotations.BeforeMethod;
 
@@ -145,9 +145,9 @@ public abstract class JCatapultBaseTest {
       }
 
       logger.fine("Setting up injection with modules [" + moduleNames.toString() + "]");
-      GuiceContainer.setGuiceModules(modules.toArray(new Module[modules.size()]));
+      GuiceBootstrap.setGuiceModules(modules.toArray(new Module[modules.size()]));
     } else {
-      GuiceContainer.setGuiceModules(new AbstractModule() {
+      GuiceBootstrap.setGuiceModules(new AbstractModule() {
         @Override
         protected void configure() {
           bind(PrimeMVCConfiguration.class).toInstance(new AbstractPrimeMVCConfiguration() {
@@ -170,8 +170,8 @@ public abstract class JCatapultBaseTest {
       });
     }
 
-    GuiceContainer.initialize();
-    injector = GuiceContainer.getInjector();
+    GuiceBootstrap.initialize();
+    injector = GuiceBootstrap.getInjector();
     injector.injectMembers(this);
   }
 }

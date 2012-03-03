@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * <p> This class is a static storage location for the servlet context. This is necessary because we need some method of
  * determining the location on disk of the email FreeMarker templates. </p> <p/> <p> This class is setup as long as the
- * JCatapultFilter is placed into the web.xml file and is the first filter in the chain. </p>
+ * PrimeFilter is placed into the web.xml file and is the first filter in the chain. </p>
  *
  * @author Brian Pontarelli
  */

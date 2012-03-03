@@ -25,8 +25,8 @@ import static java.util.Arrays.*;
 
 /**
  * This class is the default chain that first iterates over all the Workflow instances that were resolved in the {@link
- * JCatapultFilter} using the {@link WorkflowChain} implementation. After all the Workflows have been invoked, this
- * continues to invoke the rest of the FilterChain that was passed into the JCatapultFilter.
+ * PrimeFilter} using the {@link WorkflowChain} implementation. After all the Workflows have been invoked, this
+ * continues to invoke the rest of the FilterChain that was passed into the PrimeFilter.
  *
  * @author Brian Pontarelli
  */

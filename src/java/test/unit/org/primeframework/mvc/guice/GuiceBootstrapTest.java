@@ -31,14 +31,14 @@ import com.google.inject.Injector;
 import static org.testng.Assert.*;
 
 /**
- * This class tests the GuiceContainer.
+ * This class tests the GuiceBootstrap.
  *
  * @author Brian Pontarelli
  */
-public class GuiceContainerTest extends JCatapultBaseTest {
+public class GuiceBootstrapTest extends JCatapultBaseTest {
   @Test
   public void shutdownAndExplicitModules() {
-    GuiceContainer.setGuiceModules(new AbstractModule() {
+    GuiceBootstrap.setGuiceModules(new AbstractModule() {
       @Override
       protected void configure() {
         bind(PrimeMVCConfiguration.class).toInstance(new AbstractPrimeMVCConfiguration() {
@@ -59,14 +59,14 @@ public class GuiceContainerTest extends JCatapultBaseTest {
         });
       }
     }, new ClosableModule());
-    GuiceContainer.initialize();
-    Injector injector = GuiceContainer.getInjector();
+    GuiceBootstrap.initialize();
+    Injector injector = GuiceBootstrap.getInjector();
     assertNotNull(injector.getInstance(TestClosable.class));
     assertTrue(injector.getInstance(TestClosable.class).open);
 
-    GuiceContainer.shutdown();
+    GuiceBootstrap.shutdown();
     assertFalse(injector.getInstance(TestClosable.class).open);
-    assertNull(GuiceContainer.getInjector());
+    assertNull(GuiceBootstrap.getInjector());
   }
 
   @Test
@@ -75,8 +75,8 @@ public class GuiceContainerTest extends JCatapultBaseTest {
     EasyMock.replay(context);
     ServletObjectsHolder.setServletContext(context);
 
-    GuiceContainer.initialize();
-    Injector injector = GuiceContainer.getInjector();
+    GuiceBootstrap.initialize();
+    Injector injector = GuiceBootstrap.getInjector();
     assertNotNull(injector.getInstance(TestClass1.class));
     assertNotNull(injector.getInstance(TestInterface1.class));
     assertNotNull(injector.getInstance(TestClass2.class));

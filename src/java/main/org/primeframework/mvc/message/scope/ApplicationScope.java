@@ -17,6 +17,7 @@ package org.primeframework.mvc.message.scope;
 
 import javax.servlet.ServletContext;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -49,6 +50,17 @@ public class ApplicationScope implements Scope {
     }
     
     messages.add(message);
+  }
+
+  @Override
+  public void addAll(Collection<Message> messages) {
+    List<Message> scopeMessages = (List<Message>) context.getAttribute(KEY);
+    if (scopeMessages == null) {
+      scopeMessages = new ArrayList<Message>();
+      context.setAttribute(KEY, scopeMessages);
+    }
+
+    scopeMessages.addAll(messages);
   }
 
   @Override

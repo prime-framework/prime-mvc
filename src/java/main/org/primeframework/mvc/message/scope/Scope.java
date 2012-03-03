@@ -15,6 +15,7 @@
  */
 package org.primeframework.mvc.message.scope;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.primeframework.mvc.message.Message;
@@ -31,6 +32,13 @@ public interface Scope {
    * @param message The message.
    */
   void add(Message message);
+
+  /**
+   * Adds all the messages to the scope.
+   *
+   * @param messages The messages.
+   */
+  void addAll(Collection<Message> messages);
 
   /**
    * @return All the messages in the scope.

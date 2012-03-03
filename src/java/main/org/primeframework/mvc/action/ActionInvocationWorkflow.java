@@ -20,7 +20,7 @@ import org.primeframework.mvc.servlet.Workflow;
 import com.google.inject.ImplementedBy;
 
 /**
- * <p> This interface defines how actions are invoked by the JCatapult MVC. </p>
+ * This interface defines how actions are invoked by the MVC.
  *
  * @author Brian Pontarelli
  */

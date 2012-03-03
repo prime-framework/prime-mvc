@@ -27,7 +27,7 @@ import java.util.Locale;
 
 import org.primeframework.mvc.action.DefaultActionInvocation;
 import org.primeframework.mvc.action.result.annotation.Forward;
-import org.primeframework.mvc.action.result.freemarker.FreeMarkerMap;
+import org.primeframework.mvc.freemarker.FreeMarkerMap;
 import org.primeframework.mvc.freemarker.FreeMarkerService;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.testng.annotations.Test;

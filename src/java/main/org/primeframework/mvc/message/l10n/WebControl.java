@@ -32,13 +32,9 @@ import com.google.inject.Inject;
 import static java.util.Arrays.*;
 
 /**
- * <p> This class handles loading of resource bundles using the servlet context from the directory WEB-INF/messages.
- * </p> <p/> <p> This reloads by default. The check interval is set to 1 second by default. This interval can be
- * controlled using the configuration property named: </p>
+ * This class handles loading of resource bundles using the servlet context from the directory WEB-INF/messages.
  * <p/>
- * <pre>
- * jcatapult.l10n.reload-check-seconds
- * </pre>
+ * This reloads based on the setting in the {@link PrimeMVCConfiguration} interface.
  *
  * @author Brian Pontarelli
  */
@@ -76,13 +72,13 @@ public class WebControl extends ResourceBundle.Control {
   }
 
   /**
-   * First tries to load the bundle using the getRealPath method on the ServletContext. If that doesn't work because the
-   * application is a WAR, this uses the getResourceAsStream method on the ServletContext.
+   * First tries to load the bundle using the getRealPath method on the ServletContext. If that doesn't work because
+   * the application is a WAR, this uses the getResourceAsStream method on the ServletContext.
    *
    * @param uri    The current URI.
-   * @param locale Not used.
+   * @param locale The locale used to find the properties file.
    * @param format Not used.
-   * @param loader Not used.
+   * @param loader Used to lookup the resource if the ContainerResolver can't find it.
    * @param reload Not used.
    * @return The property resource bundle and never null.
    * @throws IOException              If the file couldn't be read.
@@ -131,7 +127,7 @@ public class WebControl extends ResourceBundle.Control {
    * modified since the last load.
    *
    * @param uri      The current URI, used to construct the bundle name.
-   * @param locale   Not used.
+   * @param locale   The locale used to find the properties file.
    * @param format   Not used.
    * @param loader   Not used.
    * @param bundle   Not used.

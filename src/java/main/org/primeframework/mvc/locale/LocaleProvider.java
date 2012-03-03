@@ -13,22 +13,25 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.guice.annotation;
+package org.primeframework.mvc.locale;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.util.Locale;
 
-import org.primeframework.mvc.guice.GuiceContainer;
+import com.google.inject.ImplementedBy;
+import com.google.inject.Provider;
 
 /**
- * This annotation allows a Module to define that it is optional and must be explicitly included in the list of Guice
- * modules that the {@link GuiceContainer} will load. Therefore, it is empty and just a marker annotation.
+ * This is a provider that handles Locale information. The user might select a new Locale from the browser, the
+ * application might change the Locale, or the Locale might already be persisted in the users session.
  *
  * @author Brian Pontarelli
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE})
-public @interface Optional {
+@ImplementedBy(DefaultLocaleProvider.class)
+public interface LocaleProvider extends Provider<Locale> {
+  /**
+   * Stores a new Locale.
+   *
+   * @param locale The new Locale.
+   */
+  void set(Locale locale);
 }

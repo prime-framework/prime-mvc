@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.action.result.freemarker;
+package org.primeframework.mvc.freemarker;
 
 import javax.servlet.GenericServlet;
 import javax.servlet.ServletConfig;
@@ -37,7 +37,6 @@ import org.primeframework.mvc.ObjectFactory;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.ControlHashModel;
-import org.primeframework.mvc.freemarker.FieldSupportBeansWrapper;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.parameter.el.ExpressionException;
 import org.primeframework.mvc.result.control.Control;

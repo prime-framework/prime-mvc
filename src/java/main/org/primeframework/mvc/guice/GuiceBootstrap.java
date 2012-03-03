@@ -31,96 +31,57 @@ import com.google.inject.Key;
 import com.google.inject.Module;
 
 /**
- * This class is a singleton that allows Guice to be configured by JCatapult and then used in places like Struts or
- * anywhere else in the container. This should be one of the only places that is a singleton in the entire JCatapult
- * system and within any application since it allows for classes to be injected after construction (like JSP tag
- * libraries) and the like.
+ * This class bootstraps Guice.
  *
  * @author Brian Pontarelli
  */
 @SuppressWarnings("unchecked")
-public class GuiceContainer {
-  private static final Logger logger = Logger.getLogger(GuiceContainer.class.getName());
-  private static Module[] guiceModules;
-  private static Injector injector;
-
-  /**
-   * @return Retrieves the injector that is setup via the {@link #initialize()} method.
-   */
-  public static Injector getInjector() {
-    return injector;
-  }
-
-  /**
-   * The list of guice modules to use if guice is being setup by the filter.
-   *
-   * @param guiceModules A list of guice modules to use.
-   */
-  public static void setGuiceModules(Module... guiceModules) {
-    GuiceContainer.guiceModules = guiceModules;
-  }
+public class GuiceBootstrap {
+  private static final Logger logger = Logger.getLogger(GuiceBootstrap.class.getName());
 
   /**
    * Please do not invoke this method unless you know what you are doing. This initializes Guice and does it once only
-   * so that synchronization is not used. This is called by the JCatapultFilter in its constructor and should cover all
-   * cases.
+   * so that synchronization is not used. This is called by the PrimeServletContextListener when the context is created
+   * and should cover all cases.
+   *
+   * @return The Guice injector.
    */
-  public static void initialize() {
-    logger.fine("Initializing JCatapult's Guice support");
+  public static Injector initialize(Module... modules) {
+    logger.fine("Initializing Guice");
 
     Set<Class<? extends Module>> classes = new HashSet<Class<? extends Module>>();
     addFromClasspath(classes);
-    addFromConfiguration(classes);
 
-    List<Module> modules = new ArrayList<Module>();
+    List<Module> allModules = new ArrayList<Module>();
     for (Class<? extends Module> moduleClass : classes) {
       try {
-        modules.add(moduleClass.newInstance());
+        allModules.add(moduleClass.newInstance());
       } catch (Exception e) {
         throw new RuntimeException(e);
       }
     }
 
-    if (GuiceContainer.guiceModules != null) {
-      for (Module module : GuiceContainer.guiceModules) {
-        if (classes.contains(module.getClass())) {
-          continue;
-        }
-
-        modules.add(module);
+    for (Module module : modules) {
+      if (classes.contains(module.getClass())) {
+        continue;
       }
+
+      allModules.add(module);
     }
 
-    GuiceContainer.injector = Guice.createInjector(modules);
+    return Guice.createInjector(allModules);
   }
 
   /**
-   * Shuts down the Guice container by locating all of the {@link Closable} classes and calling Close on each of them.
-   * This method sets the Injector to null and returns it.
+   * Shuts down the Guice injector by locating all of the {@link Closable} classes and calling Close on each of them.
    *
-   * @return The Injector in case it is needed afterwards.
+   * @param injector The Injector to shutdown.
    */
-  public static Injector shutdown() {
+  public static void shutdown(Injector injector) {
     List<Key<? extends Closable>> keys = GuiceTools.getKeys(injector, Closable.class);
     for (Key<? extends Closable> key : keys) {
       Closable closable = injector.getInstance(key);
       closable.close();
-    }
-
-    injector = null;
-    guiceModules = null;
-
-    return injector;
-  }
-
-  private static void addFromConfiguration(Set<Class<? extends Module>> modules) {
-    // If there is nothing to build, return
-    if (GuiceContainer.guiceModules == null || GuiceContainer.guiceModules.length == 0) {
-      return;
-    }
-
-    for (Class<? extends Module> module : modules) {
-      logger.fine("Adding module [" + module + "] from configuration to the Guice injector.");
     }
   }
 

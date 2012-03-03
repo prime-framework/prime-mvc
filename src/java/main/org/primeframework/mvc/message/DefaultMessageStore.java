@@ -16,6 +16,7 @@
 package org.primeframework.mvc.message;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.primeframework.mvc.message.scope.MessageScope;
@@ -48,6 +49,12 @@ public class DefaultMessageStore implements MessageStore {
   public void add(MessageScope scope, Message message) {
     Scope s = scopeProvider.lookup(scope);
     s.add(message);
+  }
+
+  @Override
+  public void addAll(MessageScope scope, Collection<Message> messages) {
+    Scope s = scopeProvider.lookup(scope);
+    s.addAll(messages);
   }
 
   @Override

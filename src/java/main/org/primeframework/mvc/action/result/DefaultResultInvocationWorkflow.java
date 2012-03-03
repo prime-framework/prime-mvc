@@ -27,7 +27,7 @@ import org.primeframework.mvc.servlet.WorkflowChain;
 import com.google.inject.Inject;
 
 /**
- * <p> This class implements the ResultInvoccationWorkflow. </p>
+ * This class implements the ResultInvocationWorkflow.
  *
  * @author Brian Pontarelli
  */
@@ -38,10 +38,8 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
   private final ResultProvider resultProvider;
 
   @Inject
-  public DefaultResultInvocationWorkflow(HttpServletResponse response,
-                                         ActionInvocationStore actionInvocationStore,
-                                         ResultInvocationProvider resultInvocationProvider,
-                                         ResultProvider resultProvider) {
+  public DefaultResultInvocationWorkflow(HttpServletResponse response, ActionInvocationStore actionInvocationStore,
+                                         ResultInvocationProvider resultInvocationProvider, ResultProvider resultProvider) {
     this.response = response;
     this.actionInvocationStore = actionInvocationStore;
     this.resultInvocationProvider = resultInvocationProvider;
@@ -51,13 +49,23 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
   /**
    * Performs the action invocation using this process.
    * <p/>
-   * <h3>Action-less request</h3> <ol> <li>Lookup an action-less result invocation</li> <li>If it doesn't exist,
-   * continue down the chain</li> <li>If it does exist, call the ResultRegistry to find the Result</li> <li>Invoke the
-   * Result</li> </ul>
+   * <h3>Action-less request</h3>
    * <p/>
-   * <h3>Action request</h3> <ol> <li>Lookup an result invocation using the action invocation, action URI and result
-   * code from the action</li> <li>If it doesn't exist, error out</li> <li>If it does exist, call the ResultRegistry to
-   * find the Result</li> <li>Invoke the Result</li> </ul>
+   * <ul>
+   *   <li>Lookup an action-less result invocation</li>
+   *   <li>If it doesn't exist, continue down the chain</li>
+   *   <li>If it does exist, call the ResultRegistry to find the Result</li>
+   *   <li>Invoke the Result</li>
+   * </ul>
+   * <p/>
+   * <h3>Action request</h3>
+   * <p/>
+   * <ul>
+   *   <li>Lookup an result invocation using the action invocation, action URI and result code from the action</li>
+   *   <li>If it doesn't exist, error out</li>
+   *   <li>If it does exist, call the ResultRegistry to find the Result</li>
+   *   <li>Invoke the Result</li>
+   * </ul>
    *
    * @param chain The chain.
    * @throws IOException      If the chain throws an IOException.

@@ -22,8 +22,8 @@ import java.util.Collections;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 
 /**
- * <p> This class is the default action invocation implementation. It provides a simple immutable Struct for containing
- * the values of the invocation. </p>
+ * This class is the default action invocation implementation. It provides a simple immutable Struct for containing
+ * the values of the invocation.
  *
  * @author Brian Pontarelli
  */
@@ -49,7 +49,8 @@ public class DefaultActionInvocation implements ActionInvocation {
   }
 
   public DefaultActionInvocation(Object action, String uri, String extension, Collection<String> uriParameters,
-                                 ActionConfiguration configuration, boolean executeResult, boolean executeAction, String resultCode) {
+                                 ActionConfiguration configuration, boolean executeResult, boolean executeAction,
+                                 String resultCode) {
     this.action = action;
     this.uri = uri;
     this.extension = extension;

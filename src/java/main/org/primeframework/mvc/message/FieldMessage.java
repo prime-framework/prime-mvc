@@ -16,10 +16,13 @@
 package org.primeframework.mvc.message;
 
 /**
- * This
+ * This interface defines a field message.
  *
  * @author Brian Pontarelli
  */
 public interface FieldMessage extends Message {
+  /**
+   * @return The field name associated with the message.
+   */
   String getField();
 }

@@ -22,8 +22,8 @@ import java.net.URL;
 import java.net.URLConnection;
 
 /**
- * <p> Encapsulates a URL to a FreeMaker template and also maintains access to the URLConnection and also the
- * InputStream. </p>
+ * Encapsulates a URL to a FreeMaker template and also maintains access to the URLConnection and also the
+ * InputStream.
  *
  * @author Brian Pontarelli
  */

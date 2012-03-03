@@ -15,20 +15,23 @@
  */
 package org.primeframework.mvc.servlet;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import java.util.logging.Logger;
 
-import org.primeframework.mvc.guice.GuiceContainer;
+import org.primeframework.mvc.guice.GuiceBootstrap;
+
+import com.google.inject.Injector;
 
 /**
- * This class bootstraps the entire JCatapult system. This must be defined as the first servlet context listener that is
- * initialized otherwise JCatapult might fail to startup correctly.
+ * This class bootstraps the Prime by creating a Guice injector and putting it in the ServletContext.
  *
  * @author Brian Pontarelli
  */
-public class JCatapultServletContextListener implements ServletContextListener {
-  private static final Logger logger = Logger.getLogger(JCatapultServletContextListener.class.getName());
+public class PrimeServletContextListener implements ServletContextListener {
+  private static final Logger logger = Logger.getLogger(PrimeServletContextListener.class.getName());
+  public static final String GUICE_INJECTOR_KEY = "guiceInjector";
 
   /**
    * Initialize the ServletContext into the {@link ServletObjectsHolder} and initializes Guice.
@@ -36,26 +39,22 @@ public class JCatapultServletContextListener implements ServletContextListener {
    * @param event The event to get the ServletContext from.
    */
   public void contextInitialized(ServletContextEvent event) {
-    logger.info("Initializing JCatapult");
-    ServletObjectsHolder.setServletContext(event.getServletContext());
+    logger.info("Initializing Prime");
+    ServletContext context = event.getServletContext();
+    ServletObjectsHolder.setServletContext(context);
 
-    // setup guice and set it into the servlet context
-    initGuice();
+    // Start guice and set it into the servlet context
+    context.setAttribute(GUICE_INJECTOR_KEY, GuiceBootstrap.initialize());
   }
 
   /**
-   * Initialize the {@link GuiceContainer}.
-   */
-  protected void initGuice() {
-    GuiceContainer.initialize();
-  }
-
-  /**
-   * Shuts down the GuiceContainer.
+   * Shuts down the GuiceBootstrap.
    *
    * @param event Not used.
    */
   public void contextDestroyed(ServletContextEvent event) {
-    GuiceContainer.shutdown();
+    ServletContext context = event.getServletContext();
+    Injector injector = (Injector) context.getAttribute(GUICE_INJECTOR_KEY);
+    GuiceBootstrap.shutdown(injector);
   }
 }

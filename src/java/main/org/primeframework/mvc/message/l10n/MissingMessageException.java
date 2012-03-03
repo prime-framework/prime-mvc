@@ -16,7 +16,7 @@
 package org.primeframework.mvc.message.l10n;
 
 /**
- * <p> This exception is thrown when error messages are missing. </p>
+ * This exception is thrown when error messages are missing.
  *
  * @author Brian Pontarelli
  */

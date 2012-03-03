@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,22 +13,20 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.locale.annotation;
+package org.primeframework.mvc.freemarker.guice;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.primeframework.mvc.freemarker.FreeMarkerMap;
 
-import com.google.inject.BindingAnnotation;
+import com.google.inject.AbstractModule;
 
 /**
- * This annotation is used to provide an injection point for Guice to inject the current locale.
+ * This class is a module for the Prime MVC FreeMarker support.
  *
  * @author Brian Pontarelli
  */
-@BindingAnnotation
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.PARAMETER})
-public @interface CurrentLocale {
+public class FreeMarkerModule extends AbstractModule {
+  @Override
+  protected void configure() {
+    requestStaticInjection(FreeMarkerMap.class);
+  }
 }

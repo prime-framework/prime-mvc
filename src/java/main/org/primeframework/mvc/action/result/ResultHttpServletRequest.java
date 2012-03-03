@@ -27,8 +27,8 @@ import org.primeframework.mvc.parameter.el.ExpressionException;
 import net.java.util.IteratorEnumeration;
 
 /**
- * <p> This class is a servlet request wrapper that interacts with the expression evaluator in order to pull out
- * attributes from the action. </p>
+ * This class is a servlet request wrapper that interacts with the expression evaluator in order to pull out attributes
+ * from the action.
  *
  * @author Brian Pontarelli
  */
@@ -36,8 +36,7 @@ public class ResultHttpServletRequest extends HttpServletRequestWrapper {
   private final ExpressionEvaluator expressionEvaluator;
   private final Object action;
 
-  public ResultHttpServletRequest(HttpServletRequest request, Object action,
-                                  ExpressionEvaluator expressionEvaluator) {
+  public ResultHttpServletRequest(HttpServletRequest request, Object action, ExpressionEvaluator expressionEvaluator) {
     super(request);
     this.action = action;
     this.expressionEvaluator = expressionEvaluator;

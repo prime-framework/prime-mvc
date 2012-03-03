@@ -18,6 +18,7 @@ package org.primeframework.mvc.message.scope;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -44,13 +45,31 @@ public class SessionScope implements Scope {
   public void add(Message message) {
     HttpSession session = request.getSession(false);
     if (session != null) {
-      List<Message> messages = (List<Message>) session.getAttribute(KEY);
-      if (messages == null) {
-        messages = new ArrayList<Message>();
-        session.setAttribute(KEY, messages);
+      synchronized (session) {
+        List<Message> messages = (List<Message>) session.getAttribute(KEY);
+        if (messages == null) {
+          messages = new ArrayList<Message>();
+          session.setAttribute(KEY, messages);
+        }
+
+        messages.add(message);
       }
-      
-      messages.add(message);
+    }
+  }
+
+  @Override
+  public void addAll(Collection<Message> messages) {
+    HttpSession session = request.getSession(false);
+    if (session != null) {
+      synchronized (session) {
+        List<Message> scopeMessages = (List<Message>) session.getAttribute(KEY);
+        if (scopeMessages == null) {
+          scopeMessages = new ArrayList<Message>();
+          session.setAttribute(KEY, scopeMessages);
+        }
+
+        scopeMessages.addAll(messages);
+      }
     }
   }
 
@@ -58,9 +77,11 @@ public class SessionScope implements Scope {
   public List<Message> get() {
     HttpSession session = request.getSession(false);
     if (session != null) {
-      List<Message> messages = (List<Message>) session.getAttribute(KEY);
-      if (messages != null) {
-        return messages;
+      synchronized (session) {
+        List<Message> messages = (List<Message>) session.getAttribute(KEY);
+        if (messages != null) {
+          return messages;
+        }
       }
     }
 

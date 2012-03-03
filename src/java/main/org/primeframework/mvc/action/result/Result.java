@@ -22,7 +22,7 @@ import java.lang.annotation.Annotation;
 import org.primeframework.mvc.action.ActionInvocation;
 
 /**
- * <p> This interface defines the public API for the result. </p>
+ * This interface defines the public API for the result.
  *
  * @author Brian Pontarelli
  */
@@ -30,10 +30,10 @@ public interface Result<T extends Annotation> {
   /**
    * Executes the result.
    *
-   * @param annoation  The annotation that caused the result to be invoked.
+   * @param annotation The annotation that caused the result to be invoked.
    * @param invocation The action invocation (if there is one)
    * @throws IOException      If there is any IO error rendering the result.
    * @throws ServletException If there is any servlet error rendering the result.
    */
-  void execute(T annoation, ActionInvocation invocation) throws IOException, ServletException;
+  void execute(T annotation, ActionInvocation invocation) throws IOException, ServletException;
 }

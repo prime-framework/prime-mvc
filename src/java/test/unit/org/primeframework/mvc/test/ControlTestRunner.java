@@ -20,7 +20,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 
 import org.primeframework.mvc.action.ActionInvocationStore;
-import org.primeframework.mvc.guice.GuiceContainer;
+import org.primeframework.mvc.guice.GuiceBootstrap;
 import org.primeframework.mvc.result.control.Body;
 import org.primeframework.mvc.result.control.Control;
 
@@ -49,7 +49,7 @@ public class ControlTestRunner {
    */
   static void run(final ControlBuilder builder) {
     // Setup the action invocation if it isn't null
-    ActionInvocationStore ais = GuiceContainer.getInjector().getInstance(ActionInvocationStore.class);
+    ActionInvocationStore ais = GuiceBootstrap.getInjector().getInstance(ActionInvocationStore.class);
     if (builder.actionInvocation != null) {
       ais.setCurrent(builder.actionInvocation);
     }

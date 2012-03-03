@@ -122,8 +122,7 @@ public class ResourceBundleMessageProvider implements MessageProvider {
       }
     }
 
-    throw new MissingMessageException("Message could not be found for bundle name [" + bundle +
-      "] and key [" + key + "]");
+    throw new MissingMessageException("Message could not be found for bundle name [" + bundle + "] and key [" + key + "]");
   }
 
   protected Queue<String> determineBundles(String bundle) {

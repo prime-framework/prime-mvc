@@ -22,7 +22,7 @@ import com.google.inject.ImplementedBy;
 
 /**
  * This interface defines how localized messages can be found and processed. A common implementation will use
- * ResourceBundles and TextFormatters or something similar.
+ * ResourceBundles and TextFormatter or something similar.
  *
  * @author Brian Pontarelli
  */

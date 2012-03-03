@@ -20,8 +20,8 @@ import org.primeframework.mvc.action.ActionInvocation;
 import com.google.inject.ImplementedBy;
 
 /**
- * <p> This interface defines the mechanism used to load and cache results. This should be flexible enough to support
- * new results being added, results being updated and results being removed during development. </p>
+ * This interface defines the mechanism used to load and cache results. This should be flexible enough to support new
+ * results being added, results being updated and results being removed during development.
  *
  * @author Brian Pontarelli
  */
@@ -30,7 +30,7 @@ public interface ResultInvocationProvider {
   /**
    * Determines the result invocation for the given URI and result code.
    *
-   * @param invocation
+   * @param invocation The current action invocation to lookup the result for.
    * @return The result invocation for the URI or null if nothing could be found or inferred.
    */
   ResultInvocation lookup(ActionInvocation invocation);

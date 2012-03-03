@@ -29,8 +29,8 @@ import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import com.google.inject.Inject;
 
 /**
- * <p> This result writes bytes which represent xml to the response output stream and sets the content type to
- * "application/xhtml+xml" </p>
+ * This result writes bytes which represent xml to the response output stream and sets the content type to
+ * "application/xhtml+xml"
  *
  * @author jhumphrey
  */

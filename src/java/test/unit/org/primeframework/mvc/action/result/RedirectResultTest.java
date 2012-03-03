@@ -50,7 +50,7 @@ public class RedirectResultTest {
     replay(response);
 
     Redirect redirect = new RedirectImpl("success", "http://www.google.com", true, false);
-    RedirectResult forwardResult = new RedirectResult(ee, response, request);
+    RedirectResult forwardResult = new RedirectResult(messageStore, ee, response, request);
     forwardResult.execute(redirect, new DefaultActionInvocation(null, "/foo", "", null));
 
     verify(response);
@@ -71,7 +71,7 @@ public class RedirectResultTest {
     replay(response);
 
     Redirect redirect = new RedirectImpl("success", "/foo/bar.jsp", false, false);
-    RedirectResult forwardResult = new RedirectResult(ee, response, request);
+    RedirectResult forwardResult = new RedirectResult(messageStore, ee, response, request);
     forwardResult.execute(redirect, new DefaultActionInvocation(null, "foo", "", null));
 
     verify(response);
@@ -92,7 +92,7 @@ public class RedirectResultTest {
     replay(response);
 
     Redirect redirect = new RedirectImpl("success", "/foo/bar.jsp", false, false);
-    RedirectResult forwardResult = new RedirectResult(ee, response, request);
+    RedirectResult forwardResult = new RedirectResult(messageStore, ee, response, request);
     forwardResult.execute(redirect, new DefaultActionInvocation(null, "foo", "", null));
 
     verify(response);
@@ -113,7 +113,7 @@ public class RedirectResultTest {
     replay(response);
 
     Redirect redirect = new RedirectImpl("success", "foo/bar.jsp", false, false);
-    RedirectResult forwardResult = new RedirectResult(ee, response, request);
+    RedirectResult forwardResult = new RedirectResult(messageStore, ee, response, request);
     forwardResult.execute(redirect, new DefaultActionInvocation(null, "foo", "", null));
 
     verify(response);
@@ -136,7 +136,7 @@ public class RedirectResultTest {
     replay(response);
 
     Redirect redirect = new RedirectImpl("success", "${foo}", false, false);
-    RedirectResult forwardResult = new RedirectResult(ee, response, request);
+    RedirectResult forwardResult = new RedirectResult(messageStore, ee, response, request);
     forwardResult.execute(redirect, new DefaultActionInvocation(action, "foo", "", null));
 
     verify(response);
@@ -159,7 +159,7 @@ public class RedirectResultTest {
     replay(response);
 
     Redirect redirect = new RedirectImpl("success", "${foo}", false, true);
-    RedirectResult forwardResult = new RedirectResult(ee, response, request);
+    RedirectResult forwardResult = new RedirectResult(messageStore, ee, response, request);
     forwardResult.execute(redirect, new DefaultActionInvocation(action, "foo", "", null));
 
     verify(response);

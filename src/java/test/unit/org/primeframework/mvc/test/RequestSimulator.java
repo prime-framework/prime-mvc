@@ -26,9 +26,9 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.IOException;
 import java.util.Enumeration;
 
-import org.primeframework.mvc.guice.GuiceContainer;
-import org.primeframework.mvc.servlet.JCatapultFilter;
-import org.primeframework.mvc.servlet.JCatapultServletContextListener;
+import org.primeframework.mvc.guice.GuiceBootstrap;
+import org.primeframework.mvc.servlet.PrimeFilter;
+import org.primeframework.mvc.servlet.PrimeServletContextListener;
 import org.primeframework.mvc.servlet.ServletObjectsHolder;
 import org.primeframework.mock.servlet.MockHttpServletRequest;
 import org.primeframework.mock.servlet.MockHttpServletResponse;
@@ -40,7 +40,7 @@ import com.google.inject.Module;
 
 /**
  * <p> This class provides a method for testing a full invocation of JCatapult. This simulates the JEE web objects
- * (HttpServletRequest, etc.) and an invocation of the JCatapultFilter. You can also simulate multiple invocations
+ * (HttpServletRequest, etc.) and an invocation of the PrimeFilter. You can also simulate multiple invocations
  * across a single session by using the same instance of this class multiple times. </p>
  * <p/>
  * <h3>Examples</h3>
@@ -75,7 +75,7 @@ public class RequestSimulator {
   public MockHttpServletResponse response;
   public MockServletContext context;
   public MockHttpSession session;
-  public JCatapultFilter filter = new JCatapultFilter();
+  public PrimeFilter filter = new PrimeFilter();
   public boolean contextInitialized;
 
   public RequestSimulator() {
@@ -108,13 +108,13 @@ public class RequestSimulator {
    * against the same injector.
    *
    * @param modules A list of modules that contain mocks and other guice injections for the test.
-   * @throws ServletException If the initialization of the JCatapultServletContextListener failed.
+   * @throws ServletException If the initialization of the PrimeServletContextListener failed.
    */
   public void initialize(Module... modules) throws ServletException {
     if (modules != null && modules.length > 0) {
-      GuiceContainer.setGuiceModules(modules);
+      GuiceBootstrap.setGuiceModules(modules);
     }
-    JCatapultServletContextListener listener = new JCatapultServletContextListener();
+    PrimeServletContextListener listener = new PrimeServletContextListener();
     listener.contextInitialized(new ServletContextEvent(this.context));
     filter.init(new FilterConfig() {
       @Override
@@ -181,7 +181,7 @@ public class RequestSimulator {
    * @return The instance.
    */
   public <T> T get(Class<T> type) {
-    return GuiceContainer.getInjector().getInstance(type);
+    return GuiceBootstrap.getInjector().getInstance(type);
   }
 
   /**

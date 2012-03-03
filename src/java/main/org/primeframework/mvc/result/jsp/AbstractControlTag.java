@@ -21,7 +21,7 @@ import javax.servlet.jsp.tagext.TagSupport;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.primeframework.mvc.guice.GuiceContainer;
+import org.primeframework.mvc.guice.GuiceBootstrap;
 import org.primeframework.mvc.result.control.Control;
 
 /**
@@ -77,7 +77,7 @@ public abstract class AbstractControlTag<T extends Control> extends TagSupport i
 
   @Override
   public int doStartTag() {
-    control = GuiceContainer.getInjector().getInstance(controlClass());
+    control = GuiceBootstrap.getInjector().getInstance(controlClass());
     control.renderStart(pageContext.getOut(), attributes, parameterAttributes);
     return Tag.EVAL_PAGE;
   }

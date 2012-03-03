@@ -20,7 +20,7 @@ import java.lang.annotation.Annotation;
 import com.google.inject.ImplementedBy;
 
 /**
- * <p> This interface defines the provider that creates Results. </p>
+ * This interface defines the provider that creates Results.
  *
  * @author Brian Pontarelli
  */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,25 +13,23 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.locale;
+package org.primeframework.mvc.locale.guice;
 
 import java.util.Locale;
 
-import com.google.inject.ImplementedBy;
-import com.google.inject.Provider;
+import org.primeframework.mvc.locale.DefaultLocaleProvider;
+import org.primeframework.mvc.locale.annotation.CurrentLocale;
+
+import com.google.inject.AbstractModule;
 
 /**
- * <p> This is a provider that handles Locale information. The user might select a new Locale from the browser, the
- * application might change the Locale, or the Locale might already be persisted in the users session. </p>
+ * This class is a Guice module for the Prime MVC Locale handling.
  *
  * @author Brian Pontarelli
  */
-@ImplementedBy(DefaultLocaleStore.class)
-public interface LocaleStore extends Provider<Locale> {
-  /**
-   * Stores a new Locale.
-   *
-   * @param locale The new Locale.
-   */
-  void set(Locale locale);
+public class LocaleModule extends AbstractModule {
+  @Override
+  protected void configure() {
+    bind(Locale.class).annotatedWith(CurrentLocale.class).toProvider(DefaultLocaleProvider.class);
+  }
 }

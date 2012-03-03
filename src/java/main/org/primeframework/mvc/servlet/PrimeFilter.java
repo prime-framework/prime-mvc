@@ -29,52 +29,33 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.primeframework.mvc.config.PrimeMVCConfiguration;
-import org.primeframework.mvc.guice.GuiceContainer;
 
-import com.google.inject.Inject;
+import com.google.inject.Injector;
 
 /**
- * This is the main Servlet filter for the JCatapult framework. This will setup the {@link ServletObjectsHolder}, the
- * JPA context (if the project is using JPA) and any other JCatapult configuration that is needed.
+ * This is the main Servlet filter for the Prime MVC. This will setup the {@link ServletObjectsHolder} so that the
+ * request, response and session can be injected.
  * <p/>
- * This filter can optionally perform a number of other tasks as well. First, it can create a Guice injector and place
- * it into the ServletContext under the key <strong>guiceInjector</strong>. This can be turned on using the JCatapult
- * configuration file and setting the property <strong>jcatapult.filter.guice.init</strong> to true. In order to specify
- * the Guice modules to use, the property <strong>jcatapult.filter.guice.modules</strong> should contain a comma
- * separated list of modules.
- * <p/>
- * This filter can also initialize and WILL initialize JPA on startup. This will create an EntityManagerFactory using
- * either a persistence unit named <strong>punit</strong> or using the value of the
- * <strong>jcatapult.filter.jpa.unit</strong> JCatapult configuration property. You can turn off JPA setup using the
- * <strong>jcatapult.filter.jpa.enabled</strong> boolean property. If this parameter is set to <strong>false</strong>,
- * JPA will not be setup.
+ * Next, this filter will lookup the WorkflowChain from Guice and then call {@link WorkflowChain#start(FilterChain)} on
+ * it.
  *
  * @author Brian Pontarelli
  */
-public class JCatapultFilter implements Filter {
-  private static final Logger logger = Logger.getLogger(JCatapultFilter.class.getName());
-  public static final String ORIGINAL_REQUEST_URI = "ORIGINAL_REQUEST_URI";
-  private PrimeMVCConfiguration configuration;
+public class PrimeFilter implements Filter {
+  private static final Logger logger = Logger.getLogger(PrimeFilter.class.getName());
+  private Injector injector;
 
   /**
-   * Sets the configuration.
+   * Does nothing.
    *
-   * @param configuration The configuration.
-   */
-  @Inject
-  public void setConfiguration(PrimeMVCConfiguration configuration) {
-    this.configuration = configuration;
-  }
-
-  /**
-   * This fetches the top level workflows for JCatapult using the {@link WorkflowResolver} that is fetched from the
-   * Guice injector, which is retrieved from {@link GuiceContainer}. This requires that the {@link
-   * JCatapultServletContextListener} is setup in web.xml.
-   *
-   * @param filterConfig The filter config to get the init params from.
+   * @param filterConfig Not used.
    */
   public void init(FilterConfig filterConfig) throws ServletException {
-    GuiceContainer.getInjector().injectMembers(this);
+    this.injector = (Injector) filterConfig.getServletContext().getAttribute(PrimeServletContextListener.GUICE_INJECTOR_KEY);
+    if (this.injector == null) {
+      throw new ServletException("Guice was not initialized. You must define a ServletContext listener to setup Guice or " +
+        "use the PrimeServletContextListener");
+    }
   }
 
   /**
@@ -87,16 +68,14 @@ public class JCatapultFilter implements Filter {
    * @throws ServletException If the chain throws an exception.
    */
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-    throws IOException, ServletException {
+  throws IOException, ServletException {
     long start = System.currentTimeMillis();
-    if (request.getAttribute(ORIGINAL_REQUEST_URI) == null) {
-      request.setAttribute(ORIGINAL_REQUEST_URI, ServletTools.getRequestURI((HttpServletRequest) request));
-    }
-
+    PrimeMVCConfiguration configuration = injector.getInstance(PrimeMVCConfiguration.class);
     ServletObjectsHolder.setServletRequest(new HttpServletRequestWrapper((HttpServletRequest) request));
     ServletObjectsHolder.setServletResponse((HttpServletResponse) response);
+
     try {
-      WorkflowChain workflowChain = GuiceContainer.getInjector().getInstance(WorkflowChain.class);
+      WorkflowChain workflowChain = injector.getInstance(WorkflowChain.class);
       workflowChain.start(chain);
     } catch (RuntimeException re) {
       boolean propogate = configuration.propagateRuntimeExceptions();
@@ -108,7 +87,7 @@ public class JCatapultFilter implements Filter {
     } finally {
       if (logger.isLoggable(Level.FINEST)) {
         long end = System.currentTimeMillis();
-        logger.finest("Processing time in JCatapultFilter [" + (end - start) + "]");
+        logger.finest("Processing time in PrimeFilter [" + (end - start) + "]");
       }
 
       ServletObjectsHolder.clearServletRequest();

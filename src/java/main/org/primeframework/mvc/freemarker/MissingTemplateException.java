@@ -17,7 +17,7 @@
 package org.primeframework.mvc.freemarker;
 
 /**
- * <p> This exception is a runtime that is thrown when FreeMarker template is missing. </p>
+ * This exception is a runtime that is thrown when FreeMarker template is missing.
  *
  * @author Brian Pontarelli
  */

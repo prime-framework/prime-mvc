@@ -17,6 +17,7 @@ package org.primeframework.mvc.message.scope;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -48,6 +49,17 @@ public class RequestScope implements Scope {
     }
 
     messages.add(message);
+  }
+
+  @Override
+  public void addAll(Collection<Message> messages) {
+    List<Message> scopeMessages = (List<Message>) request.getAttribute(KEY);
+    if (scopeMessages == null) {
+      scopeMessages = new ArrayList<Message>();
+      request.setAttribute(KEY, scopeMessages);
+    }
+
+    scopeMessages.addAll(messages);
   }
 
   @Override

@@ -23,11 +23,10 @@ import org.primeframework.mvc.action.result.annotation.ResultAnnotation;
 import com.google.inject.Inject;
 
 /**
- * <p> This class is the manager for all the Results. It loads the Results from Guice. Therefore, if you want to define
- * a custom result, create a new annotation, annotate your annotation with the {@link
- * org.primeframework.mvc.action.result.annotation.ResultAnnotation} annotation, and then begin annotating classes. This
- * class will taken care for using the ResultAnnotation's value to determine the Result implementation to construct and
- * use. </p>
+ * This class is the manager for all the Results. It loads the Results from Guice. Therefore, if you want to define a
+ * custom result, create a new annotation, annotate your annotation with the {@link ResultAnnotation} annotation, and
+ * then begin annotating classes. This class will taken care for using the ResultAnnotation's value to determine the
+ * Result implementation to construct and use.
  *
  * @author Brian Pontarelli
  */
@@ -40,7 +39,7 @@ public class DefaultResultProvider implements ResultProvider {
   }
 
   /**
-   * <p> Returns the result for the given annotation. </p>
+   * Returns the result for the given annotation.
    *
    * @param annotation The annotation.
    * @return The Result or null if one was not found

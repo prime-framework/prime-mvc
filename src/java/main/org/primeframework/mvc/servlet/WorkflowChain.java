@@ -23,7 +23,7 @@ import com.google.inject.ImplementedBy;
 
 /**
  * This interface defines how {@link Workflow} instances pass control to the next Workflow or back to the
- * JCatapultFilter.
+ * PrimeFilter.
  *
  * @author Brian Pontarelli
  */
@@ -33,7 +33,7 @@ public interface WorkflowChain {
 
   /**
    * Invokes the next {@link Workflow} in the chain, or if all the workflows have been invoked this should pass control
-   * back to the JCatapultFilter to continue processing the HTTP request down the filter chain.
+   * back to the PrimeFilter to continue processing the HTTP request down the filter chain.
    *
    * @throws IOException      If the workflows or filters throw IOException.
    * @throws ServletException If the workflows or filters throw ServletException.

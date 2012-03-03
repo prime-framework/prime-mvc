@@ -26,7 +26,7 @@ import org.primeframework.mvc.validation.annotation.Required;
 import org.primeframework.mvc.validation.annotation.ValidMap;
 
 /**
- * <p> This is a test user. </p>
+ * This is a test user.
  *
  * @author Brian Pontarelli
  */

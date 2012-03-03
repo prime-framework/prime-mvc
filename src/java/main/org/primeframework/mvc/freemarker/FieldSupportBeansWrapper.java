@@ -18,7 +18,7 @@ package org.primeframework.mvc.freemarker;
 import freemarker.ext.beans.BeansWrapper;
 
 /**
- * <p> This class is the default FreeMarker wrapper for JCatapult. It supports fields, beans, and simple Maps. </p>
+ * This class is the default FreeMarker wrapper for JCatapult. It supports fields, beans, and simple Maps.
  *
  * @author Brian Pontarelli
  */

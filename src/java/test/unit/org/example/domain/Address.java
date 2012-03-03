@@ -18,7 +18,7 @@ package org.example.domain;
 import org.primeframework.mvc.validation.annotation.Required;
 
 /**
- * <p> This is a test address. </p>
+ * This is a test address.
  *
  * @author Brian Pontarelli
  */

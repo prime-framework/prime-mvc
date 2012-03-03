@@ -33,7 +33,7 @@ public class DefaultLocaleStoreTest {
   @Test
   public void testStoreSession() {
     HttpSession session = EasyMock.createStrictMock(HttpSession.class);
-    session.setAttribute(DefaultLocaleStore.LOCALE_KEY, Locale.GERMANY);
+    session.setAttribute(DefaultLocaleProvider.LOCALE_KEY, Locale.GERMANY);
     EasyMock.replay(session);
 
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
@@ -41,7 +41,7 @@ public class DefaultLocaleStoreTest {
     request.setAttribute("javax.servlet.jsp.jstl.fmt.locale", Locale.GERMANY);
     EasyMock.replay(request);
 
-    DefaultLocaleStore provider = new DefaultLocaleStore(request);
+    DefaultLocaleProvider provider = new DefaultLocaleProvider(request);
     provider.set(Locale.GERMANY);
 
     EasyMock.verify(request, session);
@@ -51,11 +51,11 @@ public class DefaultLocaleStoreTest {
   public void testStoreRequest() {
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
     EasyMock.expect(request.getSession(false)).andReturn(null);
-    request.setAttribute(DefaultLocaleStore.LOCALE_KEY, Locale.GERMANY);
+    request.setAttribute(DefaultLocaleProvider.LOCALE_KEY, Locale.GERMANY);
     request.setAttribute("javax.servlet.jsp.jstl.fmt.locale", Locale.GERMANY);
     EasyMock.replay(request);
 
-    DefaultLocaleStore provider = new DefaultLocaleStore(request);
+    DefaultLocaleProvider provider = new DefaultLocaleProvider(request);
     provider.set(Locale.GERMANY);
 
     EasyMock.verify(request);
@@ -64,7 +64,7 @@ public class DefaultLocaleStoreTest {
   @Test
   public void testLookupSession() {
     HttpSession session = EasyMock.createStrictMock(HttpSession.class);
-    EasyMock.expect(session.getAttribute(DefaultLocaleStore.LOCALE_KEY)).andReturn(Locale.CANADA);
+    EasyMock.expect(session.getAttribute(DefaultLocaleProvider.LOCALE_KEY)).andReturn(Locale.CANADA);
     EasyMock.replay(session);
 
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
@@ -72,7 +72,7 @@ public class DefaultLocaleStoreTest {
     request.setAttribute("javax.servlet.jsp.jstl.fmt.locale", Locale.CANADA);
     EasyMock.replay(request);
 
-    DefaultLocaleStore provider = new DefaultLocaleStore(request);
+    DefaultLocaleProvider provider = new DefaultLocaleProvider(request);
     assertEquals(Locale.CANADA, provider.get());
 
     EasyMock.verify(session);
@@ -82,11 +82,11 @@ public class DefaultLocaleStoreTest {
   public void testLookupRequest() {
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
     EasyMock.expect(request.getSession(false)).andReturn(null);
-    EasyMock.expect(request.getAttribute(DefaultLocaleStore.LOCALE_KEY)).andReturn(Locale.CANADA);
+    EasyMock.expect(request.getAttribute(DefaultLocaleProvider.LOCALE_KEY)).andReturn(Locale.CANADA);
     request.setAttribute("javax.servlet.jsp.jstl.fmt.locale", Locale.CANADA);
     EasyMock.replay(request);
 
-    DefaultLocaleStore provider = new DefaultLocaleStore(request);
+    DefaultLocaleProvider provider = new DefaultLocaleProvider(request);
     assertEquals(Locale.CANADA, provider.get());
 
     EasyMock.verify(request);
@@ -96,12 +96,12 @@ public class DefaultLocaleStoreTest {
   public void testLookupClient() {
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
     EasyMock.expect(request.getSession(false)).andReturn(null);
-    EasyMock.expect(request.getAttribute(DefaultLocaleStore.LOCALE_KEY)).andReturn(null);
+    EasyMock.expect(request.getAttribute(DefaultLocaleProvider.LOCALE_KEY)).andReturn(null);
     EasyMock.expect(request.getLocale()).andReturn(Locale.CANADA);
     request.setAttribute("javax.servlet.jsp.jstl.fmt.locale", Locale.CANADA);
     EasyMock.replay(request);
 
-    DefaultLocaleStore provider = new DefaultLocaleStore(request);
+    DefaultLocaleProvider provider = new DefaultLocaleProvider(request);
     assertEquals(Locale.CANADA, provider.get());
 
     EasyMock.verify(request);

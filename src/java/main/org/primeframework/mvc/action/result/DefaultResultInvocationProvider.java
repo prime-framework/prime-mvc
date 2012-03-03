@@ -31,7 +31,7 @@ import static java.util.Arrays.*;
 import static net.java.lang.reflect.ReflectionTools.*;
 
 /**
- * <p> This class is the default implementation of the result provider. </p>
+ * This class is the default implementation of the result provider.
  *
  * @author Brian Pontarelli
  */
@@ -44,7 +44,7 @@ public class DefaultResultInvocationProvider implements ResultInvocationProvider
   }
 
   /**
-   * <p> Delegates to the {@link ForwardResult#defaultResult(ActionInvocation, String)} method. </p>
+   * Delegates to the {@link ForwardResult#defaultResult(ActionInvocation, String)} method.
    *
    * @param invocation The current action invocation.
    * @return The result invocation that is a forward or redirect, depending on the situation. Or null if there isn't a
@@ -67,10 +67,12 @@ public class DefaultResultInvocationProvider implements ResultInvocationProvider
   }
 
   /**
-   * <p> Checks for results using this search order: </p>
+   * Checks for results using this search order:
    * <p/>
-   * <ol> <li>Action annotations that are {@link ResultAnnotation}s, have a code method whose return value matches the
-   * result code</li> <li>Delegates to the {@link ForwardResult#defaultResult(ActionInvocation, String)} method. </li>
+   * <ol>
+   *   <li>Action annotations that are {@link ResultAnnotation}s, have a code method whose return value matches the
+   * result code</li>
+   *   <li>Delegates to the {@link ForwardResult#defaultResult(ActionInvocation, String)} method.</li>
    * </ol>
    *
    * @param invocation The action invocation used to look for annotations.

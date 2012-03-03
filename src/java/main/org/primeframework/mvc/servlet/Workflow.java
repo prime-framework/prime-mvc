@@ -19,7 +19,7 @@ import javax.servlet.ServletException;
 import java.io.IOException;
 
 /**
- * <p> This interface defines a unit of work that should be performed prior to the JCatapultFilter passing control down
+ * <p> This interface defines a unit of work that should be performed prior to the PrimeFilter passing control down
  * the J2EE filter chain. </p>
  *
  * @author Brian Pontarelli
@@ -29,7 +29,7 @@ public interface Workflow {
    * Performs a task.
    *
    * @param workflowChain This chain should be called if the Workflow wants to continue processing the request by the
-   *                      next Workflow in the chain or by the next J2EE filter in the chain after the JCatapultFilter.
+   *                      next Workflow in the chain or by the next J2EE filter in the chain after the PrimeFilter.
    * @throws IOException      If the workflow had any IO problems.
    * @throws ServletException If the workflow had any servlet problems.
    */

@@ -30,7 +30,7 @@ import net.java.lang.StringTools;
 import com.google.inject.Inject;
 
 /**
- * <p> This result writes bytes to the response output steam. </p>
+ * This result writes bytes to the response output steam.
  *
  * @author Brian Pontarelli
  */

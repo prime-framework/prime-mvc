@@ -20,7 +20,7 @@ import org.primeframework.mvc.servlet.Workflow;
 import com.google.inject.ImplementedBy;
 
 /**
- * <p> This interface defines how results are invoked based on the result from the Actions or the URI. </p>
+ * This interface defines how results are invoked based on the result from the Actions or the URI.
  *
  * @author Brian Pontarelli
  */

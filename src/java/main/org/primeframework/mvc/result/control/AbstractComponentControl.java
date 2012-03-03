@@ -17,7 +17,7 @@ package org.primeframework.mvc.result.control;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.primeframework.mvc.action.result.freemarker.FreeMarkerMap;
+import org.primeframework.mvc.freemarker.FreeMarkerMap;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 
 import com.google.inject.Inject;

@@ -22,7 +22,7 @@ import java.util.Deque;
 import com.google.inject.Inject;
 
 /**
- * <p> This class is the default action invocation store. </p>
+ * This class is the default action invocation store.
  *
  * @author Brian Pontarelli
  */

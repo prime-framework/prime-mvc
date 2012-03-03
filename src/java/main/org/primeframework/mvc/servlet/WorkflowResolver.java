@@ -18,23 +18,23 @@ package org.primeframework.mvc.servlet;
 import java.util.List;
 
 /**
- * <p> This class is used by the {@link JCatapultFilter} to allow additional processing to occur during an HTTP request
- * rather than defining HTTP filters in web.xml. The JCatapultFilter uses this interface to determine the list of {@link
+ * <p> This class is used by the {@link PrimeFilter} to allow additional processing to occur during an HTTP request
+ * rather than defining HTTP filters in web.xml. The PrimeFilter uses this interface to determine the list of {@link
  * Workflow} implementations to invoke and the order to invoke them in. </p>
  *
  * @author Brian Pontarelli
  */
 public interface WorkflowResolver {
   /**
-   * Called in the {@link JCatapultFilter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse,
+   * Called in the {@link PrimeFilter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse,
    * javax.servlet.FilterChain)} method in order to get the list of Workflow implementations that should be invoked.
    *
-   * @return The list of workflows that should be invoked by the JCatapultFilter.
+   * @return The list of workflows that should be invoked by the PrimeFilter.
    */
   List<Workflow> resolve();
 
   /**
-   * Called in the {@link JCatapultFilter#destroy()} method in order to get the list of Workflow classes that should
+   * Called in the {@link PrimeFilter#destroy()} method in order to get the list of Workflow classes that should
    * destroyed.
    *
    * @return The list of workflow classes.

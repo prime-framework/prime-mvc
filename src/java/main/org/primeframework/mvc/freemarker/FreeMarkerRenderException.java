@@ -17,7 +17,7 @@
 package org.primeframework.mvc.freemarker;
 
 /**
- * <p> This exception is a runtime that is thrown when FreeMarker rendering fails. </p>
+ * This exception is a runtime that is thrown when FreeMarker rendering fails.
  *
  * @author Brian Pontarelli
  */

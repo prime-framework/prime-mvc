@@ -18,6 +18,7 @@ package org.primeframework.mvc.message.scope;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.primeframework.mvc.message.Message;
@@ -53,6 +54,20 @@ public class FlashScope implements Scope {
       }
 
       messages.add(message);
+    }
+  }
+
+  @Override
+  public void addAll(Collection<Message> messages) {
+    HttpSession session = request.getSession(true);
+    synchronized (session) {
+      List<Message> scopeMessages = (List<Message>) session.getAttribute(KEY);
+      if (scopeMessages == null) {
+        scopeMessages = new ArrayList<Message>();
+        session.setAttribute(KEY, scopeMessages);
+      }
+
+      scopeMessages.addAll(messages);
     }
   }
 

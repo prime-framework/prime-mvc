@@ -18,7 +18,7 @@ package org.primeframework.mvc.action.result;
 import java.lang.annotation.Annotation;
 
 /**
- * <p> This class models the information necessary to invoke a result. </p>
+ * This class models the information necessary to invoke a result.
  *
  * @author Brian Pontarelli
  */

@@ -26,7 +26,7 @@ import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import com.google.inject.Inject;
 
 /**
- * <p> This result returns a header only response. </p>
+ * This result returns a header only response.
  *
  * @author Brian Pontarelli
  */

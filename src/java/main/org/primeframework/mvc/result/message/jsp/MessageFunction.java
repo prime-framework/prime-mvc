@@ -17,7 +17,7 @@ package org.primeframework.mvc.result.message.jsp;
 
 import java.io.StringWriter;
 
-import org.primeframework.mvc.guice.GuiceContainer;
+import org.primeframework.mvc.guice.GuiceBootstrap;
 import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.result.message.control.Message;
 
@@ -60,7 +60,7 @@ public class MessageFunction {
    */
   protected static String getMessage(String key, String bundle) {
     StringWriter writer = new StringWriter();
-    Message message = GuiceContainer.getInjector().getInstance(Message.class);
+    Message message = GuiceBootstrap.getInjector().getInstance(Message.class);
     message.renderStart(writer, mapNV("key", key, "bundle", bundle), null);
     message.renderEnd(writer);
     return writer.toString();
