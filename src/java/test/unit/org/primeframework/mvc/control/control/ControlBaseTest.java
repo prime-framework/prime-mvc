@@ -13,57 +13,49 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.test;
+package org.primeframework.mvc.control.control;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.Map;
 
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.control.Body;
 import org.primeframework.mvc.control.Control;
-import org.primeframework.mvc.guice.GuiceBootstrap;
+import org.primeframework.mvc.message.MessageStore;
+import org.primeframework.mvc.test.JCatapultBaseTest;
 
+import com.google.inject.Inject;
+import static net.java.util.CollectionTools.*;
 import static org.testng.Assert.*;
 
 /**
- * <p> This class is a test helper that assists in testing custom controls. </p>
+ * <p> This class is a base test for the controls. </p>
  *
  * @author Brian Pontarelli
  */
-public class ControlTestRunner {
-  /**
-   * Tests the given control and returns a builder that can be used to build up attributes, the body, etc.
-   *
-   * @param control The control.
-   * @return The ControlBuilder.
-   */
-  public ControlBuilder test(Control control) {
-    return new ControlBuilder(control);
-  }
+public class ControlBaseTest extends JCatapultBaseTest {
+  @Inject protected ActionInvocationStore ais;
+  @Inject protected MessageStore messageStore;
 
   /**
    * Runs the control and verifies the output.
    *
-   * @param builder The builder.
+   * @param control    The control to run.
+   * @param attributes The attributes passed to the control.
+   * @param body       The body.
+   * @param expected   The expected output.
    */
-  static void run(final ControlBuilder builder) {
-    // Setup the action invocation if it isn't null
-    ActionInvocationStore ais = GuiceBootstrap.getInjector().getInstance(ActionInvocationStore.class);
-    if (builder.actionInvocation != null) {
-      ais.setCurrent(builder.actionInvocation);
-    }
-
-    // Run the control
-    Control control = builder.control;
+  protected void run(Control control, Map<String, Object> attributes, final String body, String expected) {
     StringWriter writer = new StringWriter();
-    control.renderStart(writer, builder.attributes, builder.dynamicAttributes);
+    control.renderStart(writer, attributes, map("param", "param-value"));
 
-    if (builder.body != null) {
+    if (body != null) {
       control.renderBody(writer, new Body() {
         public void render(Writer writer) {
           try {
-            writer.write(builder.body);
+            writer.write(body);
           } catch (IOException e) {
             throw new RuntimeException(e);
           }
@@ -72,6 +64,6 @@ public class ControlTestRunner {
     }
 
     control.renderEnd(writer);
-    assertEquals(builder.result, writer.toString());
+    assertEquals(writer.toString(), expected);
   }
 }

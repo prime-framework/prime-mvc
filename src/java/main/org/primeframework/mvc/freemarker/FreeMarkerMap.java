@@ -37,9 +37,9 @@ import org.primeframework.mvc.ObjectFactory;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.ControlHashModel;
+import org.primeframework.mvc.control.Control;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.parameter.el.ExpressionException;
-import org.primeframework.mvc.result.control.Control;
 
 import com.google.inject.Inject;
 import freemarker.ext.beans.CollectionModel;

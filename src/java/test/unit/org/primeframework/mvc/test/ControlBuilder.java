@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.primeframework.mvc.action.ActionInvocation;
-import org.primeframework.mvc.result.control.Control;
+import org.primeframework.mvc.control.Control;
 
 /**
  * <p> This class is a builder that helps create a test control configuration and expected result. </p>

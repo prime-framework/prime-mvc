@@ -23,9 +23,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.primeframework.mvc.ObjectFactory;
+import org.primeframework.mvc.control.Control;
+import org.primeframework.mvc.control.FreeMarkerControlProxy;
 import org.primeframework.mvc.freemarker.FieldSupportBeansWrapper;
-import org.primeframework.mvc.result.control.Control;
-import org.primeframework.mvc.result.control.FreeMarkerControlProxy;
 
 import freemarker.ext.beans.CollectionModel;
 import freemarker.template.TemplateCollectionModel;
