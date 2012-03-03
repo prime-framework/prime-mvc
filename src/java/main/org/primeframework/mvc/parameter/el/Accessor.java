@@ -42,7 +42,7 @@ import org.primeframework.mvc.parameter.convert.annotation.ConverterAnnotation;
 import static net.java.lang.reflect.ReflectionTools.*;
 
 /**
- * <p> This </p>
+ * This class provides the base accessor support.
  *
  * @author Brian Pontarelli
  */
@@ -88,10 +88,10 @@ public abstract class Accessor {
   }
 
   /**
-   * <p> After the object is originally get or set, this method can be called to update the value. This method should
-   * only work if the {@link #set(Object, String[], Context)} or {@link #get(Object, Context)} method was called first.
-   * </p> <p/> <p> <strong>NOTE:</strong> Accessors are not thread safe and need not be because a new one is created for
-   * each atom. </p>
+   * After the object is originally get or set, this method can be called to update the value. This method should only
+   * work if the {@link #set(Object, String[], Context)} or {@link #get(Object, Context)} method was called first.
+   * <p/>
+   * <strong>NOTE:</strong> Accessors are not thread safe and need not be because a new one is created for each atom.
    *
    * @param value   The value to update the accessor with.
    * @param context The current context.

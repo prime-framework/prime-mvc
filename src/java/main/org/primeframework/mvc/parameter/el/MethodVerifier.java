@@ -19,8 +19,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
 /**
- * <p> This interface defines a mechanism for the {@link MemberAccessor} class to verify that a JavaBean method is
- * valid. These methods need not conform to the JavaBean specification. </p>
+ * This interface defines a mechanism for the {@link MemberAccessor} class to verify that a JavaBean method is valid.
+ * These methods need not conform to the JavaBean specification.
  *
  * @author Brian Pontarelli
  */
@@ -32,7 +32,7 @@ public interface MethodVerifier {
    * @param method The method to verify.
    * @param info   The info about the property if needed. This might not be completely filled out yet because it is
    *               built as the reflection occurs.
-   * @return An error if the property method is invali or null if the method is valid.
+   * @return An error if the property method is invalid or null if the method is valid.
    */
   String isValid(Method method, PropertyInfo info);
 

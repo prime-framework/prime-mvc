@@ -18,6 +18,7 @@ package org.primeframework.mvc.parameter.convert.converters;
 import java.lang.reflect.Type;
 import java.util.Map;
 
+import org.primeframework.mvc.config.PrimeMVCConfiguration;
 import org.primeframework.mvc.parameter.convert.AbstractGlobalConverter;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.convert.annotation.GlobalConverter;
@@ -25,22 +26,20 @@ import org.primeframework.mvc.parameter.convert.annotation.GlobalConverter;
 import net.java.lang.StringTools;
 
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 import static net.java.lang.ObjectTools.*;
 
 /**
- * <p> This converts to and from Strings. </p>
+ * This converts to and from Strings.
  *
  * @author Brian Pontarelli
  */
 @GlobalConverter(forTypes = {String.class})
-@SuppressWarnings("unchecked")
 public class StringConverter extends AbstractGlobalConverter {
-  private boolean emptyIsNull = true;
+  private final boolean emptyIsNull;
 
-  @Inject(optional = true)
-  public void setEmptyStringIsNull(@Named("jcatapult.mvc.emptyStringIsNull") boolean emptyIsNull) {
-    this.emptyIsNull = emptyIsNull;
+  @Inject
+  public StringConverter(PrimeMVCConfiguration configuration) {
+    this.emptyIsNull = configuration.emptyParametersAreNull();
   }
 
   protected Object stringToObject(String value, Type convertTo, Map<String, String> attributes, String expression)

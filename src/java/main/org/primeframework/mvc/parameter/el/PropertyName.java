@@ -16,7 +16,7 @@
 package org.primeframework.mvc.parameter.el;
 
 /**
- * <p> This class stores the information about JavaBean methods including the prefix and propertyName. </p>
+ * This class stores the information about JavaBean methods including the prefix and propertyName.
  *
  * @author Brian Pontarelli
  */

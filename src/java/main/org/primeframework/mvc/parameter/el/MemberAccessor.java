@@ -34,7 +34,7 @@ import org.primeframework.mvc.parameter.convert.ConverterProvider;
 import static net.java.lang.reflect.ReflectionTools.*;
 
 /**
- * <p> This </p>
+ * This class provides member access.
  *
  * @author Brian Pontarelli
  */
@@ -286,9 +286,10 @@ public class MemberAccessor extends Accessor {
   }
 
   /**
-   * <p> Using the given Method, it returns the name of the java bean property and the prefix of the method. </p>
+   * Using the given Method, it returns the name of the java bean property and the prefix of the method.
    * <p/>
    * <h3>Examples:</h3>
+   * <p/>
    * <pre>
    * getFoo -> get, foo
    * getX -> get, x
@@ -323,7 +324,7 @@ public class MemberAccessor extends Accessor {
   }
 
   /**
-   * <p> This handles invoking the getter method. </p>
+   * This handles invoking the getter method.
    *
    * @param method The method to invoke.
    * @param object The object to invoke the method on.
@@ -362,8 +363,8 @@ public class MemberAccessor extends Accessor {
   }
 
   /**
-   * <p> This handles invoking the setter method and also will handle a single special case where the setter method
-   * takes a single object and the value is a collection with a single value. </p>
+   * This handles invoking the setter method and also will handle a single special case where the setter method takes a
+   * single object and the value is a collection with a single value.
    *
    * @param method The method to invoke.
    * @param object The object to invoke the method on.
@@ -419,7 +420,7 @@ public class MemberAccessor extends Accessor {
   }
 
   /**
-   * <p> This handles fetching a field value. </p>
+   * This handles fetching a field value.
    *
    * @param field  The field to get.
    * @param object The object to get he field from.
@@ -439,8 +440,8 @@ public class MemberAccessor extends Accessor {
   }
 
   /**
-   * <p> This handles setting a value on a field and also will handle a single special case where the setter method
-   * takes a single object and the value is a collection with a single value. </p>
+   * This handles setting a value on a field and also will handle a single special case where the setter method takes a
+   * single object and the value is a collection with a single value.
    *
    * @param field  The field to set.
    * @param object The object to set the field on.

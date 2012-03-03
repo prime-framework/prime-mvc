@@ -40,9 +40,9 @@ import static net.java.lang.ObjectTools.*;
 import static net.java.util.CollectionTools.*;
 
 /**
- * <p> This converts to and from Collection types. This handles complex parameterized types by first creating the
+ * This converts to and from Collection types. This handles complex parameterized types by first creating the
  * Collection instance (ArrayList, HashSet, LinkedList, etc) and then by leveraging the other converters for the
- * parameterized type. </p>
+ * parameterized type.
  *
  * @author Brian Pontarelli
  */

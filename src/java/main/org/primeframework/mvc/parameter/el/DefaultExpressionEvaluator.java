@@ -40,9 +40,8 @@ import net.java.variable.VariableExpander;
 import com.google.inject.Inject;
 
 /**
- * <p> This class is the default implementation of the ExpressionEvaluator service. This provides a robust expression
- * processing facility that leverages JavaBean properties, fields and generics to get and set values into Objects. </p>
- * <p/> <p> TODO fully document here </p>
+ * This class is the default implementation of the ExpressionEvaluator service. This provides a robust expression
+ * processing facility that leverages JavaBean properties, fields and generics to get and set values into Objects.
  *
  * @author Brian Pontarelli
  */
@@ -239,7 +238,7 @@ public class DefaultExpressionEvaluator implements ExpressionEvaluator {
    * class which store the name and the indices (which could be null or any object). This is broken on the '.'
    * character.
    *
-   * @param expression The expression strng to break down.
+   * @param expression The expression string to break down.
    * @return A new ArrayList of PropertyInfo objects.
    * @throws ExpressionException If the property string is invalid.
    */

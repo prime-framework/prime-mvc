@@ -21,15 +21,20 @@ import java.lang.reflect.Type;
 import net.java.lang.StringTools;
 
 /**
- * <p> This class verifies JavaBean standard setter methods. The forms of the methods are as follows: </p>
+ * This class verifies JavaBean standard setter methods. The forms of the methods are as follows:
  * <p/>
- * <h3>Indexed methods</h3> <h4>Store</h4>
+ * <h3>Indexed methods</h3>
+ * <p/>
+ * <h4>Store</h4>
+ * <p/>
  * <pre>
  * public void setFoo(int index, Object obj)
  * public void setBool(int index, boolean bool)
  * </pre>
+ * <h3>Normal methods</h3>
  * <p/>
- * <h3>Normal methods</h3> <h4>Storage</h4>
+ * <h4>Storage</h4>
+ * <p/>
  * <pre>
  * public void setFoo(Object o)
  * </pre>

@@ -22,8 +22,8 @@ import org.primeframework.mvc.parameter.convert.ConverterProvider;
 import static net.java.lang.reflect.ReflectionTools.*;
 
 /**
- * <p> This models a indexed property that takes a single parameter for the getter that is the index or key and two
- * parameters for the setter, the index/key and value. </p>
+ * This models a indexed property that takes a single parameter for the getter that is the index or key and two
+ * parameters for the setter, the index/key and value.
  *
  * @author Brian Pontarelli
  */

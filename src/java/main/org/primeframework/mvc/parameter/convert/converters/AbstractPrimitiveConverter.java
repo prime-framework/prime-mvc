@@ -18,15 +18,13 @@ package org.primeframework.mvc.parameter.convert.converters;
 import java.lang.reflect.Type;
 import java.util.Map;
 
+import org.primeframework.mvc.config.PrimeMVCConfiguration;
 import org.primeframework.mvc.parameter.convert.AbstractGlobalConverter;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.el.TypeTools;
 
 import net.java.lang.StringTools;
-
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
 
 /**
  * <p> Overrides the abstract type converter to add abstract methods for handling primitives. </p>
@@ -35,11 +33,10 @@ import com.google.inject.name.Named;
  */
 @SuppressWarnings("unchecked")
 public abstract class AbstractPrimitiveConverter extends AbstractGlobalConverter {
-  private boolean emptyIsNull = true;
+  private final boolean emptyIsNull;
 
-  @Inject(optional = true)
-  public void setEmptyStringIsNull(@Named("jcatapult.mvc.emptyStringIsNull") boolean emptyIsNull) {
-    this.emptyIsNull = emptyIsNull;
+  protected AbstractPrimitiveConverter(PrimeMVCConfiguration configuration) {
+    this.emptyIsNull = configuration.emptyParametersAreNull();
   }
 
   protected Object stringToObject(String value, Type convertTo, Map<String, String> attributes, String expression)
@@ -74,8 +71,13 @@ public abstract class AbstractPrimitiveConverter extends AbstractGlobalConverter
    * types.
    *
    * @param convertTo The type of primitive to return the default value for.
+   * @param attributes Any attributes associated with the parameter being converted. Parameter attributes are described
+   *                   in the {@link org.primeframework.mvc.parameter.ParameterWorkflow} class comment.
    * @return The wrapper that contains the default value for the primitive.
    * @throws ConversionException If the default value could not be determined.
+   * @throws ConverterStateException If the state of the request, response, locale or attributes was such that
+   *                                 conversion could not occur. This is normally a fatal exception that is fixable
+   *                                 during development but not in production.
    */
   protected abstract Object defaultPrimitive(Class convertTo, Map<String, String> attributes)
     throws ConversionException, ConverterStateException;

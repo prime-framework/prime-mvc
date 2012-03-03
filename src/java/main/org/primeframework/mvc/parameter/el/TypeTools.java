@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * <p> This is a toolkit that assists with generics. </p>
+ * This is a toolkit that assists with generics.
  *
  * @author Brian Pontarelli
  */
@@ -31,7 +31,7 @@ public class TypeTools {
   /**
    * Determines the component type. Lists is the first type, Map is the second type, etc.
    *
-   * @param type The parameterized type.
+   * @param type The parametrized type.
    * @param path The path to the type, used in exception message.
    * @return The component type.
    */
@@ -65,7 +65,7 @@ public class TypeTools {
   /**
    * Determines the key type for a Map.
    *
-   * @param type The parameterized type.
+   * @param type The parametrized type.
    * @param path The path to the type, used in exception message.
    * @return The key type.
    */
@@ -86,7 +86,7 @@ public class TypeTools {
    * Determines the final component type. This continues to loop over Collections until it hits a non-parameterized
    * type.
    *
-   * @param type The parameterized type.
+   * @param type The parametrized type.
    * @param path The path to the type, used in exception message.
    * @return The final component type.
    */

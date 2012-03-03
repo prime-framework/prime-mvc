@@ -23,8 +23,8 @@ import java.lang.annotation.Target;
 import org.primeframework.mvc.parameter.convert.AnnotationConverter;
 
 /**
- * <p> This annotation marks an annotation type as a converter annotation. This allows JCatapult to determine the class
- * that will perform the conversion for the field that the converter annotation is placed on. </p>
+ * This annotation marks an annotation type as a converter annotation. This allows Prime to determine the class that
+ * will perform the conversion for the field that the converter annotation is placed on.
  *
  * @author Brian Pontarelli
  */

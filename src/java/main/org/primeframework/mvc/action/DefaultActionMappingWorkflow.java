@@ -28,15 +28,12 @@ import org.primeframework.mvc.servlet.WorkflowChain;
 import com.google.inject.Inject;
 
 /**
- * This class is the default implementation of the ActionWorkflow. During the perform method, this class pulls the
- * action information from the HTTP request URI and loads the action object from the GuiceBootstrap (for now). The way
- * that the action class is determined is based on the ActionConfigurationProvider interface. This interface is used to
- * create the configuration and cache it.
+ * This class is the default implementation of the ActionMappingWorkflow. During the perform method, this class
+ * determines the action that will be invoked based on the URI and put it into the ActionInvocationStore.
  *
  * @author Brian Pontarelli
  */
 public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
-
   private final HttpServletRequest request;
   private final HttpServletResponse response;
   private final ActionMapper actionMapper;
@@ -63,7 +60,7 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
   public void perform(WorkflowChain chain) throws IOException, ServletException {
     // First, see if they hit a different button
     String uri = determineURI();
-    boolean executeResult = InternalParameters.is(request, InternalParameters.JCATAPULT_EXECUTE_RESULT);
+    boolean executeResult = InternalParameters.is(request, InternalParameters.EXECUTE_RESULT);
     ActionInvocation invocation = actionMapper.map(uri, executeResult);
 
     // This case is redirect because they URI maps to something new and there isn't an action

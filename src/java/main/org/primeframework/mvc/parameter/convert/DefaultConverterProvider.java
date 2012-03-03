@@ -31,13 +31,15 @@ import com.google.inject.Inject;
 import static java.util.Arrays.*;
 
 /**
- * <p> This class is the manager for all the Converters. It loads the global type converters from Guice. Therefore, if
- * you want to supply a global custom type converter, just add it to a Guice module and place it in your classpath.
- * JCatapult will discover the module and load it up. </p> <p/> <p> A converter for a given type will be retrieved when
- * the manager is queried for that type and all sub class of that type, unless another converter is registered for a sub
- * class of the type. For example, registering a convert for the type Number would ensure that Integer, Double, Float,
- * etc. used that converter for conversions. If a converter was registered for Number and another converter for Double,
- * the converter for Number would handle all sub-class of Number (Integer, etc.) except Double. </p>
+ * This class is the manager for all the Converters. It loads the global type converters from Guice. Therefore, if you
+ * want to supply a global custom type converter, just add it to a Guice module and place it in your classpath.
+ * JCatapult will discover the module and load it up.
+ * <p/>
+ * A converter for a given type will be retrieved when the manager is queried for that type and all sub class of that
+ * type, unless another converter is registered for a sub class of the type. For example, registering a convert for the
+ * type Number would ensure that Integer, Double, Float, etc. used that converter for conversions. If a converter was
+ * registered for Number and another converter for Double, the converter for Number would handle all sub-class of
+ * Number (Integer, etc.) except Double.
  *
  * @author Brian Pontarelli
  */
@@ -69,19 +71,19 @@ public class DefaultConverterProvider implements ConverterProvider {
   }
 
   /**
-   * <p> Returns the global type converter for the given type. This converter is either the converter associated with
-   * the given type of associated with a super class of the given type. This principle also works with arrays. If the
-   * type is an array, then what happens is that the array type is asked for its component type using the method
+   * Returns the global type converter for the given type. This converter is either the converter associated with the
+   * given type of associated with a super class of the given type. This principle also works with arrays. If the type
+   * is an array, then what happens is that the array type is asked for its component type using the method
    * getComponentType and this type is used to query the manager. So, the converter registered for Number is returned
-   * Double[] is queried (because Double is queried and since no converter was register for it, then Number is checked).
-   * </p>
+   * Double[] is queried (because Double is queried and since no converter was register for it, then Number is
+   * checked).
    * <p/>
-   * <p> Normal types work the exact same way. First the type is checked and then its parents are checked until Object
-   * is reached, in which case null is returned. </p>
+   * Normal types work the exact same way. First the type is checked and then its parents are checked until Object is
+   * reached, in which case null is returned.
    * <p/>
-   * <p> Primitive values are treated as their wrapper classes. So, if int.class is passed into this method (queried)
-   * then either a converter registered for Integer, or Number or null is returned depending on what converters have
-   * been registered so far. </p>
+   * Primitive values are treated as their wrapper classes. So, if int.class is passed into this method (queried) then
+   * either a converter registered for Integer, or Number or null is returned depending on what converters have been
+   * registered so far.
    *
    * @param type The type to start with when looking for converters
    * @return The converter or null if one was not found
@@ -133,7 +135,7 @@ public class DefaultConverterProvider implements ConverterProvider {
   }
 
   /**
-   * <p> Returns the Converter for the given annotation. </p>
+   * Returns the Converter for the given annotation.
    *
    * @param annotation The annotation.
    * @return The Converter.

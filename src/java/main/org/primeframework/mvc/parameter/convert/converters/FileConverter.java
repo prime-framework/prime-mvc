@@ -29,18 +29,17 @@ import net.java.lang.StringTools;
 import static net.java.lang.ObjectTools.*;
 
 /**
- * <p> This class converts to and from the java.io.File class. </p>
+ * This class converts to and from the java.io.File class.
  *
  * @author Brian Pontarelli
  */
 @GlobalConverter(forTypes = {File.class})
-@SuppressWarnings("unchecked")
 public class FileConverter extends AbstractGlobalConverter {
   /**
    * Returns null if the value is null, otherwise this returns a new File of the value.
    *
    * @param attributes Can contain the parentDir attribute which if the String is relative will
-   * @param expression
+   * @param expression No used.
    */
   protected Object stringToObject(String value, Type convertTo, Map<String, String> attributes, String expression)
     throws ConversionException, ConverterStateException {

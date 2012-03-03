@@ -48,9 +48,10 @@ import static java.util.Arrays.*;
 import static net.java.lang.ObjectTools.*;
 
 /**
- * <p> This workflow performs all the validation on the current action. </p> <p/> <p> Validation can be turned off by
- * setting a form field by the name 'jcatapultExecuteValidation' to false. This is best accomplished by setting a hidden
- * input field as follows: </p>
+ * This workflow performs all the validation on the current action.
+ * <p/>
+ * Validation can be turned off by setting a form field by the name 'primeExecuteValidation' to false. This is best
+ * accomplished by setting a hidden input field as follows:
  * <p/>
  * <pre>
  * &lt;input type="hidden" name="jcatapultExecuteValidation" value="false"/>
@@ -89,7 +90,7 @@ public class DefaultValidationWorkflow implements ValidationWorkflow {
     if (request.getMethod().equals("POST") || containsSubmitButton(request)) {
       ActionInvocation invocation = actionInvocationStore.getCurrent();
       Object action = invocation.action();
-      boolean executeValidation = InternalParameters.is(request, InternalParameters.JCATAPULT_EXECUTE_VALIDATION);
+      boolean executeValidation = InternalParameters.is(request, InternalParameters.EXECUTE_VALIDATION);
       if (action != null && executeValidation) {
         validate(action);
         if (messageStore.contains(MessageType.ERROR)) {
@@ -103,7 +104,7 @@ public class DefaultValidationWorkflow implements ValidationWorkflow {
   }
 
   /**
-   * Determines if the request contains a submit button, which means a form was subnitted using a GET.
+   * Determines if the request contains a submit button, which means a form was submitted using a GET.
    *
    * @param request The request.
    * @return True if the form contains a submit button, false otherwise.

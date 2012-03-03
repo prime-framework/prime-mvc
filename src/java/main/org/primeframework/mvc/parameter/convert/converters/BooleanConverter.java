@@ -17,20 +17,27 @@ package org.primeframework.mvc.parameter.convert.converters;
 
 import java.util.Map;
 
+import org.primeframework.mvc.config.PrimeMVCConfiguration;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.convert.annotation.GlobalConverter;
 
 import net.java.lang.StringTools;
 
+import com.google.inject.Inject;
+
 /**
- * <p> This class is the type covnerter for booleans. </p>
+ * This class is the type converter for booleans.
  *
  * @author Brian Pontarelli
  */
 @GlobalConverter(forTypes = {Boolean.class, boolean.class})
-@SuppressWarnings("unchecked")
 public class BooleanConverter extends AbstractPrimitiveConverter {
+  @Inject
+  public BooleanConverter(PrimeMVCConfiguration configuration) {
+    super(configuration);
+  }
+
   /**
    * Returns false.
    */

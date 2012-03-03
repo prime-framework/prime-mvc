@@ -21,18 +21,27 @@ import java.lang.reflect.Type;
 import net.java.lang.StringTools;
 
 /**
- * <p> This class verifies JavaBean standard getter methods. The forms of the methods are as follows: </p> <p/>
- * <h3>Indexed methods</h3> <h4>Retrieval</h4>
+ * This class verifies JavaBean standard getter methods. The forms of the methods are as follows:
+ * <p/>
+ * <h3>Indexed methods</h3>
+ * <p/>
+ * <h4>Retrieval</h4>
+ * <p/>
  * <pre>
  * public Object getFoo(int index)
  * public boolean isFoo(int index)
  * </pre>
- * <p/> <h3>Normal methods</h3> <h4>Retrieval</h4>
+ * <p/>
+ * <h3>Normal methods</h3>
+ * <p/>
+ * <h4>Retrieval</h4>
+ * <p/>
  * <pre>
  * public Object getFoo()
  * public boolean isFoo()
  * </pre>
- * <p/> <p> All <b>is</b> methods must have a return type of boolean regardless of being indexed or not. </p>
+ * <p/>
+ * All <b>is</b> methods must have a return type of boolean regardless of being indexed or not.
  *
  * @author Brian Pontarelli
  */
@@ -50,13 +59,12 @@ public class GetMethodVerifier implements MethodVerifier {
   public static final int IS_LENGTH = IS_STRING.length();
 
   /**
-   * <p> Verifies that the method is either a get, set or is method. It must follow the standard JavaBean convention. If
-   * the method is indexed it can have an int parameter. See the class comment for all of the forms of the methods.
-   * </p>
+   * Verifies that the method is either a get, set or is method. It must follow the standard JavaBean convention. If the
+   * method is indexed it can have an int parameter. See the class comment for all of the forms of the methods.
    * <p/>
-   * <p> This method not only checks the method given, but it also checks that the property is correctly defined with
+   * This method not only checks the method given, but it also checks that the property is correctly defined with
    * respect to the other methods. For example a read/write property must have both a get/is and a set method and the
-   * methods of each must both be indexed or not. </p>
+   * methods of each must both be indexed or not.
    *
    * @param method The method to verify.
    * @param info   Used to determine if the property is indexed or not and verify the methods are correct.

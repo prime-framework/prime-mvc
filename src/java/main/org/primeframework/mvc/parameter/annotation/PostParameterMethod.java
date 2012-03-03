@@ -21,9 +21,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * <p> This annotation defines a method that is invoked after the parameters are set into the action but before
- * validation and the action invocation. This is useful if you need to further setup objects or perform any additional
- * work on the fields of the action prior to validation and action invocation. </p>
+ * This annotation defines a method that is invoked after the parameters are set into the action but before validation
+ * and the action invocation. This is useful if you need to further setup objects or perform any additional work on the
+ * fields of the action prior to validation and action invocation.
  *
  * @author Brian Pontarelli
  */

@@ -21,9 +21,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * <p> This annotation defines a field or property that is set prior to any other parameter handling including invoking
- * the PreParameterMethod methods, setting parameters into the action, invoking the PostParameterMethod methods, or
- * validation. </p>
+ * This annotation defines a field or property that is set prior to any other parameter handling including invoking the
+ * PreParameterMethod methods, setting parameters into the action, invoking the PostParameterMethod methods, or
+ * validation.
  *
  * @author Brian Pontarelli
  */

@@ -21,8 +21,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * <p> This annotation is used to mark a file upload field or method on an action and provide the maximum size or
- * allowed content types. </p>
+ * This annotation is used to mark a file upload field or method on an action and provide the maximum size or allowed content types.
  *
  * @author Brian Pontarelli
  */

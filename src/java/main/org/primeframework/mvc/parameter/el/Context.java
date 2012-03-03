@@ -25,7 +25,7 @@ import org.primeframework.mvc.parameter.convert.ConverterProvider;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
 
 /**
- * <p> This </p>
+ * This class is the evaluation context.
  *
  * @author Brian Pontarelli
  */

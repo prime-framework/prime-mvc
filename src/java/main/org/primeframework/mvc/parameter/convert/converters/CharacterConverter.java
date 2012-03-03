@@ -17,24 +17,31 @@ package org.primeframework.mvc.parameter.convert.converters;
 
 import java.util.Map;
 
+import org.primeframework.mvc.config.PrimeMVCConfiguration;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.convert.annotation.GlobalConverter;
 
+import com.google.inject.Inject;
+
 /**
- * <p> This class is the type converter for characters. </p>
+ * This class is the type converter for characters.
  *
  * @author Brian Pontarelli
  */
 @GlobalConverter(forTypes = {Character.class, char.class})
-@SuppressWarnings("unchecked")
 public class CharacterConverter extends AbstractPrimitiveConverter {
+  @Inject
+  public CharacterConverter(PrimeMVCConfiguration configuration) {
+    super(configuration);
+  }
+
   /**
    * Returns a single character with a unicode value of 0.
    */
   protected Object defaultPrimitive(Class convertTo, Map<String, String> attributes)
     throws ConversionException, ConverterStateException {
-    return new Character('\u0000');
+    return '\u0000';
   }
 
   /**
@@ -48,7 +55,7 @@ public class CharacterConverter extends AbstractPrimitiveConverter {
         " of length 1 - [" + value + "] is invalid");
     }
 
-    return new Character(value.charAt(0));
+    return value.charAt(0);
   }
 
   protected String primitiveToString(Object value, Class convertFrom, Map<String, String> attributes)

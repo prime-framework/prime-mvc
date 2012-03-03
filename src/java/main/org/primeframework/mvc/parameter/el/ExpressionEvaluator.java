@@ -26,8 +26,8 @@ import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import com.google.inject.ImplementedBy;
 
 /**
- * <p> This interface defines the mechanism by which expressions are evaluated in order to get values from Objects and
- * set values from the HTTP request parameters into Objects. </p>
+ * This interface defines the mechanism by which expressions are evaluated in order to get values from Objects and set
+ * values from the HTTP request parameters into Objects.
  *
  * @author Brian Pontarelli
  */
@@ -52,7 +52,7 @@ public interface ExpressionEvaluator {
    * @param attributes The attributes for the expression. These attributes are only available if the user submitted a
    *                   form and a particular parameter had some attributes associated with it. Those attributes are
    *                   stored in the HttpServletRequest and can be fetched via the ParameterWorkflow. These are passed
-   *                   to the Converter to assist in coversion from objects to Strings.
+   *                   to the Converter to assist in conversion from objects to Strings.
    * @return The String value from the object. This value has been converted.
    * @throws ExpressionException If the expression is invalid or there was an error during processing.
    */
@@ -80,7 +80,7 @@ public interface ExpressionEvaluator {
    * @param attributes The attributes for the expression. These attributes are only available if the user submitted a
    *                   form and a particular parameter had some attributes associated with it. Those attributes are
    *                   stored in the HttpServletRequest and can be fetched via the ParameterWorkflow. These are passed
-   *                   to the Converter to assist in coversion from objects to Strings.
+   *                   to the Converter to assist in conversion from objects to Strings.
    * @throws ConversionException     If the conversion failed.
    * @throws ConverterStateException If there isn't a converter or the converter could not run because it was missing a
    *                                 required attribute.
@@ -120,7 +120,7 @@ public interface ExpressionEvaluator {
    *
    * @param type       The type of the annotation.
    * @param expression The expression.
-   * @param object     The object.
+   * @param action     The action.
    * @return The annotation or null.
    */
   <T extends Annotation> T getAnnotation(Class<T> type, String expression, Object action);

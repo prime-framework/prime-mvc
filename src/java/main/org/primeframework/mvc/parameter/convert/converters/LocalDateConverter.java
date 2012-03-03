@@ -21,6 +21,7 @@ import java.util.Map;
 import org.joda.time.LocalDate;
 import org.joda.time.ReadablePartial;
 import org.joda.time.format.DateTimeFormat;
+import org.primeframework.mvc.config.PrimeMVCConfiguration;
 import org.primeframework.mvc.parameter.convert.AbstractGlobalConverter;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
@@ -29,21 +30,19 @@ import org.primeframework.mvc.parameter.convert.annotation.GlobalConverter;
 import net.java.lang.StringTools;
 
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 
 /**
- * <p> This converts to and from LocalDate. </p>
+ * This converts to and from LocalDate.
  *
  * @author Brian Pontarelli
  */
 @GlobalConverter(forTypes = {LocalDate.class})
-@SuppressWarnings("unchecked")
 public class LocalDateConverter extends AbstractGlobalConverter {
-  private boolean emptyIsNull = true;
+  private final boolean emptyIsNull;
 
-  @Inject(optional = true)
-  public void setEmptyStringIsNull(@Named("jcatapult.mvc.emptyStringIsNull") boolean emptyIsNull) {
-    this.emptyIsNull = emptyIsNull;
+  @Inject
+  public LocalDateConverter(PrimeMVCConfiguration configuration) {
+    this.emptyIsNull = configuration.emptyParametersAreNull();
   }
 
   protected Object stringToObject(String value, Type convertTo, Map<String, String> attributes, String expression)

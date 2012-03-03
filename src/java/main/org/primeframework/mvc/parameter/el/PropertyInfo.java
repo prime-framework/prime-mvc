@@ -21,8 +21,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * <p> This class is a small helper class that is used to store the read and write methods of a bean property as well as
- * a flag that determines if it is indexed. </p>
+ * This class is a small helper class that is used to store the read and write methods of a bean property as well as a
+ * flag that determines if it is indexed.
  *
  * @author Brian Pontarelli
  */

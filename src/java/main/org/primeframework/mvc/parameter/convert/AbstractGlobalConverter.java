@@ -25,10 +25,13 @@ import org.primeframework.mvc.parameter.el.TypeTools;
 import net.java.lang.StringTools;
 
 /**
- * <p> This class is the base type converter for all the type converters that handle Object types. If you are writing a
+ * This class is the base type converter for all the type converters that handle Object types. If you are writing a
  * converter for primitive types, use the {@link org.primeframework.mvc.parameter.convert.converters.AbstractPrimitiveConverter}
- * class. </p> <p/> <p> This class mostly delegates between the various method calls by passing in default values or
- * performing casting. Each method describes how it functions. </p>
+ * class.
+ * <p/>
+ * This class mostly delegates between the various method calls by passing in default values or performing casting.
+ * Each
+ * method describes how it functions.
  *
  * @author Brian Pontarelli
  */
@@ -37,9 +40,13 @@ public abstract class AbstractGlobalConverter implements GlobalConverter {
   /**
    * Handles the following cases:
    * <p/>
-   * <ul> <li>Null - returns null</li> <li>Type is an array - calls stringToArray</li> <li>Type is not an array and
-   * values length is 1 or 0 - calls stringToObject</li> <li>Type is an array and values length is > 1 - calls
-   * stringsToArray</li> <li>Type is not an array and values length is > 1 - calls stringsToObject</li> </ul>
+   * <ul>
+   * <li>Null - returns null</li>
+   * <li>Type is an array - calls stringToArray</li>
+   * <li>Type is not an array and values length is 1 or 0 - calls stringToObject</li>
+   * <li>Type is an array and values length is > 1 - calls stringsToArray</li>
+   * <li>Type is not an array and values length is > 1 - calls stringsToObject</li>
+   * </ul>
    *
    * @param convertTo         The type to convert to.
    * @param dynamicAttributes The dynamic attributes used to assist in conversion.
@@ -85,8 +92,9 @@ public abstract class AbstractGlobalConverter implements GlobalConverter {
   }
 
   /**
-   * Gets the first parameter type is the given type is a parameterized type. If it isn't, this returns null. If the
-   * type has multiple parameters, only the first is returned.
+   * Gets the first parameter type is the given type is a parametrized type. If it isn't, this returns null. If the
+   * type
+   * has multiple parameters, only the first is returned.
    *
    * @param type The type.
    * @return The first parameter type.

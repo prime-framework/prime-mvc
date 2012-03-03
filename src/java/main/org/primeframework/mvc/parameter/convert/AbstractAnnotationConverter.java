@@ -26,9 +26,11 @@ import org.primeframework.mvc.parameter.el.TypeTools;
 import net.java.lang.StringTools;
 
 /**
- * <p> This class is the base type converter for all the annotaiton type converters that handle Object types. </p> <p/>
- * <p> This class mostly delegates between the various method calls by passing in default values or performing casting.
- * Each method describes how it functions. </p>
+ * This class is the base type converter for all the annotaiton type converters that handle Object types.
+ * <p/>
+ * This class mostly delegates between the various method calls by passing in default values or performing casting.
+ * Each
+ * method describes how it functions.
  *
  * @author Brian Pontarelli
  */
@@ -37,9 +39,13 @@ public abstract class AbstractAnnotationConverter<T extends Annotation> implemen
   /**
    * Handles the following cases:
    * <p/>
-   * <ul> <li>Null - returns null</li> <li>Type is an array - calls stringToArray</li> <li>Type is not an array and
-   * values length is 1 or 0 - calls stringToObject</li> <li>Type is an array and values length is > 1 - calls
-   * stringsToArray</li> <li>Type is not an array and values length is > 1 - calls stringsToObject</li> </ul>
+   * <ul>
+   * <li>Null - returns null</li>
+   * <li>Type is an array - calls stringToArray</li>
+   * <li>Type is not an array and values length is 1 or 0 - calls stringToObject</li>
+   * <li>Type is an array and values length is > 1 - calls stringsToArray</li>
+   * <li>Type is not an array and values length is > 1 - calls stringsToObject</li>
+   * </ul>
    *
    * @param annotation        The annotation from the field.
    * @param values            The values to convert.
@@ -86,8 +92,8 @@ public abstract class AbstractAnnotationConverter<T extends Annotation> implemen
   }
 
   /**
-   * Gets the first parameter type is the given type is a parameterized type. If it isn't, this returns null. If the
-   * type has multiple parameters, only the first is returned.
+   * Gets the first parameter type is the given type is a parametrized type. If it isn't, this returns null. If the type
+   * has multiple parameters, only the first is returned.
    *
    * @param type The type.
    * @return The first parameter type.

@@ -25,7 +25,7 @@ import org.primeframework.mvc.parameter.convert.GlobalConverter;
 import static net.java.lang.ObjectTools.*;
 
 /**
- * <p> This class models a collection accessor during expression evaluation. </p>
+ * This class models a collection accessor during expression evaluation.
  *
  * @author Brian Pontarelli
  */

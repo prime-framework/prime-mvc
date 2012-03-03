@@ -19,40 +19,47 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Map;
 
+import org.primeframework.mvc.config.PrimeMVCConfiguration;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.convert.annotation.GlobalConverter;
 
+import com.google.inject.Inject;
+
 /**
- * <p> This is the type converter for primitives and wrapper classes of numbers. </p>
+ * This is the type converter for primitives and wrapper classes of numbers.
  *
  * @author Brian Pontarelli
  */
 @GlobalConverter(forTypes = {byte.class, short.class, int.class, long.class, float.class, double.class,
   Number.class, BigDecimal.class, BigInteger.class})
-@SuppressWarnings("unchecked")
 public class NumberConverter extends AbstractPrimitiveConverter {
+  @Inject
+  public NumberConverter(PrimeMVCConfiguration configuration) {
+    super(configuration);
+  }
+
   /**
    * Returns 0 for everything but in the correct wrapper classes.
    */
   protected Object defaultPrimitive(Class convertTo, Map<String, String> attributes)
     throws ConversionException, ConverterStateException {
     if (convertTo == Byte.TYPE || convertTo == Byte.class) {
-      return new Byte((byte) 0);
+      return (byte) 0;
     } else if (convertTo == Short.TYPE || convertTo == Short.class) {
-      return new Short((short) 0);
+      return (short) 0;
     } else if (convertTo == Integer.TYPE || convertTo == Integer.class) {
-      return new Integer(0);
+      return 0;
     } else if (convertTo == Long.TYPE || convertTo == Long.class) {
-      return new Long(0l);
+      return 0l;
     } else if (convertTo == Float.TYPE || convertTo == Float.class) {
-      return new Float(0.0f);
+      return 0.0f;
     } else if (convertTo == BigInteger.class) {
       return BigInteger.ZERO;
     } else if (convertTo == BigDecimal.class) {
-      return new BigDecimal(new Double(0.0).doubleValue());
+      return new BigDecimal(0.0d);
     } else if (convertTo == Double.TYPE || convertTo == Double.class) {
-      return new Double(0.0);
+      return 0.0d;
     }
 
     throw new ConverterStateException("Invalid type for NumberConverter [" + convertTo + "]");

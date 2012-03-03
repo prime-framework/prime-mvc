@@ -16,7 +16,7 @@
 package org.primeframework.mvc.parameter.el;
 
 /**
- * <p> This is an exception that is thrown when expression processing fails. </p>
+ * This is an exception that is thrown when expression processing fails.
  *
  * @author Brian Pontarelli
  */

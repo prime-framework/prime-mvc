@@ -16,8 +16,8 @@
 package org.primeframework.mvc.parameter.convert;
 
 /**
- * <p> This is a runtime exception thrown when type conversion fails. This is normally NOT fatal and is caused by the
- * user of the application putting the wrong information into a form. </p>
+ * This is a runtime exception thrown when type conversion fails. This is normally NOT fatal and is caused by the user
+ * of the application putting the wrong information into a form.
  *
  * @author Brian Pontarelli
  */

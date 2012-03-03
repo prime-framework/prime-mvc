@@ -20,8 +20,7 @@ import org.primeframework.mvc.servlet.Workflow;
 import com.google.inject.ImplementedBy;
 
 /**
- * <p> This class handles additional URI parameters that are parts of the URI that come after the action part of the
- * URI. </p>
+ * This class handles additional URI parameters that are parts of the URI that come after the action part of the URI.
  *
  * @author Brian Pontarelli
  */

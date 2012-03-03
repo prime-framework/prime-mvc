@@ -49,8 +49,8 @@ import com.google.inject.Inject;
 import static net.java.lang.ObjectTools.*;
 
 /**
- * <p> This class uses the {@link ExpressionEvaluator} to process the incoming request parameters. It also handles check
- * boxes, submit buttons and radio buttons. </p>
+ * This class uses the {@link ExpressionEvaluator} to process the incoming request parameters. It also handles check
+ * boxes, submit buttons and radio buttons.
  *
  * @author Brian Pontarelli
  */
@@ -132,7 +132,7 @@ public class DefaultParameterWorkflow implements ParameterWorkflow {
    * delimiter character.
    *
    * @param parameters The request parameters.
-   * @return The parameters to set into the aciton.
+   * @return The parameters to set into the action.
    */
   protected Parameters getValuesToSet(Map<String, String[]> parameters) {
     Parameters result = new Parameters();

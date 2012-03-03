@@ -16,8 +16,8 @@
 package org.primeframework.mvc.parameter.convert;
 
 /**
- * <p> This is a runtime exception thrown when the state of the current conversion is such that conversion can never
- * proceed. This is normally fatal and requires developer correction. </p>
+ * This is a runtime exception thrown when the state of the current conversion is such that conversion can never
+ * proceed. This is normally fatal and requires developer correction.
  *
  * @author Brian Pontarelli
  */

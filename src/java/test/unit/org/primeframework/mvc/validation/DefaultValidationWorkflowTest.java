@@ -58,7 +58,7 @@ public class DefaultValidationWorkflowTest extends JCatapultBaseTest {
   @Test
   public void testValidationTurnedOff() throws IOException, ServletException {
     request.setPost(true);
-    request.setParameter(InternalParameters.JCATAPULT_EXECUTE_VALIDATION, "false");
+    request.setParameter(InternalParameters.EXECUTE_VALIDATION, "false");
 
     Edit action = new Edit();
     action.user = new User();

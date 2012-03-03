@@ -20,8 +20,8 @@ import javax.servlet.http.HttpServletRequest;
 import net.java.lang.StringTools;
 
 /**
- * <p> This class handles all of the parameters that control the JCatapult MVC internal behavior like validation, result
- * execution, action execution, etc. </p>
+ * This class handles all of the parameters that control the JCatapult MVC internal behavior like validation, result
+ * execution, action execution, etc.
  *
  * @author Brian Pontarelli
  */
@@ -30,13 +30,13 @@ public final class InternalParameters {
    * HTTP request parameter or scoped attribute from the request that indicates if the result should be executed or not.
    * By default the result is always executed, but this can be used to suppress that behavior.
    */
-  public static final String JCATAPULT_EXECUTE_RESULT = "jcatapultExecuteResult";
+  public static final String EXECUTE_RESULT = "primeExecuteResult";
 
   /**
    * HTTP request parameter or scoped attribute from the request that indicates if validation should be executed or not.
    * By default the validation is always executed, but this can be used to suppress that behavior.
    */
-  public static final String JCATAPULT_EXECUTE_VALIDATION = "jcatapultExecuteValidation";
+  public static final String EXECUTE_VALIDATION = "primeExecuteValidation";
 
 
   /**
@@ -54,7 +54,6 @@ public final class InternalParameters {
     }
 
     Object value = request.getParameter(key);
-
     if (value == null) {
       value = request.getAttribute(key);
     }
@@ -75,6 +74,6 @@ public final class InternalParameters {
    * @return True if it is, false otherwise.
    */
   public static boolean isInternalParameter(String key) {
-    return key.equals(JCATAPULT_EXECUTE_RESULT) || key.equals(JCATAPULT_EXECUTE_VALIDATION);
+    return key.equals(EXECUTE_RESULT) || key.equals(EXECUTE_VALIDATION);
   }
 }

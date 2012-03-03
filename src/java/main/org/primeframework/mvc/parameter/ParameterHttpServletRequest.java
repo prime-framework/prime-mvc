@@ -26,7 +26,7 @@ import java.util.Set;
 import net.java.util.IteratorEnumeration;
 
 /**
- * <p> This class is an HttpServletRequestWrapper that supports new parameters. </p>
+ * This class is an HttpServletRequestWrapper that supports new parameters.
  *
  * @author Brian Pontarelli
  */

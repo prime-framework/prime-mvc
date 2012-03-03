@@ -69,4 +69,9 @@ public interface PrimeMVCConfiguration {
    * @return true or false
    */
   boolean ignoreEmptyParameters();
+
+  /**
+   * @return True if empty HTTP request parameters should be considered null values by the conversion system.
+   */
+  boolean emptyParametersAreNull();
 }
