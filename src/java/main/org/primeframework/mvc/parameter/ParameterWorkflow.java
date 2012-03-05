@@ -15,13 +15,12 @@
  */
 package org.primeframework.mvc.parameter;
 
-import org.primeframework.mvc.servlet.Workflow;
+import org.primeframework.mvc.workflow.Workflow;
 
 import com.google.inject.ImplementedBy;
 
 /**
- * This interface marks a class as the parameter handling part of the MVC workflow. This part is how the Prime MVC
- * pulls
+ * This interface marks a class as the parameter handling part of the MVC workflow. This part is how the Prime MVC pulls
  * HTTP request parameters and set them into actions.
  *
  * @author Brian Pontarelli

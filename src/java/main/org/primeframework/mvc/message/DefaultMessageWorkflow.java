@@ -19,7 +19,7 @@ import javax.servlet.ServletException;
 import java.io.IOException;
 
 import org.primeframework.mvc.message.scope.FlashScope;
-import org.primeframework.mvc.servlet.WorkflowChain;
+import org.primeframework.mvc.workflow.WorkflowChain;
 
 import com.google.inject.Inject;
 

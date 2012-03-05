@@ -20,12 +20,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
+import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.servlet.ServletObjectsHolder;
-import org.primeframework.mvc.servlet.annotation.HTTPMethod;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Provider;
-import com.google.inject.Singleton;
+import com.google.inject.Provides;
 
 /**
  * This class is a Guice module for the Prime MVC servlet object support.
@@ -35,43 +34,26 @@ import com.google.inject.Singleton;
 public class ServletModule extends AbstractModule {
   @Override
   protected void configure() {
-    if (ServletObjectsHolder.getServletContext() == null) {
-      return;
-    }
+    bind(ServletContext.class).toInstance(ServletObjectsHolder.getServletContext());
+  }
+  
+  @Provides
+  public HttpServletRequest request() {
+    return ServletObjectsHolder.getServletRequest();
+  }
 
-    // Bind the servlet context
-    bind(ServletContext.class).toProvider(new Provider<ServletContext>() {
-      public ServletContext get() {
-        return ServletObjectsHolder.getServletContext();
-      }
-    }).in(Singleton.class);
+  @Provides
+  public HttpServletRequestWrapper requestWrapper() {
+    return ServletObjectsHolder.getServletRequest();
+  }
 
-    // Bind the servlet request
-    bind(HttpServletRequest.class).toProvider(new Provider<HttpServletRequest>() {
-      public HttpServletRequest get() {
-        return ServletObjectsHolder.getServletRequest();
-      }
-    });
+  @Provides
+  public HttpServletResponse response() {
+    return ServletObjectsHolder.getServletResponse();
+  }
 
-    // Bind the servlet request wrapper
-    bind(HttpServletRequestWrapper.class).toProvider(new Provider<HttpServletRequestWrapper>() {
-      public HttpServletRequestWrapper get() {
-        return ServletObjectsHolder.getServletRequest();
-      }
-    });
-
-    // Bind the servlet response
-    bind(HttpServletResponse.class).toProvider(new Provider<HttpServletResponse>() {
-      public HttpServletResponse get() {
-        return ServletObjectsHolder.getServletResponse();
-      }
-    });
-
-    // Bind the HTTP method
-    bind(String.class).annotatedWith(HTTPMethod.class).toProvider(new Provider<String>() {
-      public String get() {
-        return ServletObjectsHolder.getServletRequest().getMethod();
-      }
-    });
+  @Provides
+  public HTTPMethod method() {
+    return HTTPMethod.valueOf(ServletObjectsHolder.getServletRequest().getMethod());
   }
 }

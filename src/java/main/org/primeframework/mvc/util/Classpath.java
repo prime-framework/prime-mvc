@@ -39,18 +39,6 @@ import static java.util.Collections.*;
 public class Classpath {
   private List<String> names = new ArrayList<String>();
 
-  public Classpath() {
-  }
-
-  /**
-   * Copies the given classpath's entries into this new classpath.
-   *
-   * @param classpath The classpath to copy.
-   */
-  public Classpath(Classpath classpath) {
-    this.names.addAll(classpath.names);
-  }
-
   /**
    * Makes a new classpath with the given names.
    *

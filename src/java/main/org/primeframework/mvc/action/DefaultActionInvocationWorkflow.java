@@ -20,7 +20,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.lang.reflect.Method;
 
-import org.primeframework.mvc.servlet.WorkflowChain;
+import org.primeframework.mvc.action.result.ResultStore;
+import org.primeframework.mvc.workflow.WorkflowChain;
 import org.primeframework.mvc.util.MethodTools;
 
 import com.google.inject.Inject;
@@ -32,11 +33,14 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 public class DefaultActionInvocationWorkflow implements ActionInvocationWorkflow {
-  private final HttpServletRequest request;
   private final ActionInvocationStore actionInvocationStore;
+  private final ResultStore resultStore;
+  private final HttpServletRequest request;
 
   @Inject
-  public DefaultActionInvocationWorkflow(HttpServletRequest request, ActionInvocationStore actionInvocationStore) {
+  public DefaultActionInvocationWorkflow(ActionInvocationStore actionInvocationStore, ResultStore resultStore,
+                                         HttpServletRequest request) {
+    this.resultStore = resultStore;
     this.request = request;
     this.actionInvocationStore = actionInvocationStore;
   }
@@ -64,18 +68,9 @@ public class DefaultActionInvocationWorkflow implements ActionInvocationWorkflow
   public void perform(WorkflowChain chain) throws IOException, ServletException {
     ActionInvocation invocation = actionInvocationStore.getCurrent();
     if (invocation.action() != null) {
-      String resultCode;
       if (invocation.executeAction()) {
-        resultCode = execute(invocation, request.getMethod());
-
-        // Remove the action and put in a new one with the result code
-        actionInvocationStore.removeCurrent();
-        invocation = new DefaultActionInvocation(invocation.action(), invocation.actionURI(), invocation.extension(),
-          invocation.uriParameters(), invocation.configuration(), invocation.executeResult(), invocation.executeAction(),
-          resultCode);
-        actionInvocationStore.setCurrent(invocation);
-      } else {
-        resultCode = invocation.resultCode();
+        String resultCode = execute(invocation, request.getMethod());
+        resultStore.set(resultCode);
       }
     }
 

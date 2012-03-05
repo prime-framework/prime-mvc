@@ -245,7 +245,7 @@ public abstract class AbstractAnnotationConverter<T extends Annotation> implemen
     }
 
     int length = Array.getLength(value);
-    StringBuffer str = new StringBuffer();
+    StringBuilder str = new StringBuilder();
     for (int i = 0; i < length; i++) {
       Object o = Array.get(value, i);
       str.append(convertToString(annotation, o, value.getClass().getComponentType(), dynamicAttributes));

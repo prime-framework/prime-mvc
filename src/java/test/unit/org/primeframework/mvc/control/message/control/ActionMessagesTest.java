@@ -17,7 +17,6 @@ package org.primeframework.mvc.control.message.control;
 
 import org.example.action.user.Edit;
 import org.primeframework.mvc.action.DefaultActionInvocation;
-import org.primeframework.mvc.control.message.ActionMessages;
 import org.primeframework.mvc.message.scope.MessageScope;
 import org.primeframework.mvc.control.control.ControlBaseTest;
 import org.testng.annotations.Test;

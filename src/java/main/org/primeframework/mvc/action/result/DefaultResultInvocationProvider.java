@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.primeframework.mvc.action.ActionInvocation;
+import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.RedirectResult.RedirectImpl;
 import org.primeframework.mvc.action.result.annotation.ResultAnnotation;
 import org.primeframework.mvc.action.result.annotation.ResultContainerAnnotation;
@@ -36,21 +37,23 @@ import static net.java.lang.reflect.ReflectionTools.*;
  * @author Brian Pontarelli
  */
 public class DefaultResultInvocationProvider implements ResultInvocationProvider {
+  private final ActionInvocationStore actionInvocationStore;
   private final ForwardResult forwardResult;
 
   @Inject
-  public DefaultResultInvocationProvider(ForwardResult forwardResult) {
+  public DefaultResultInvocationProvider(ActionInvocationStore actionInvocationStore, ForwardResult forwardResult) {
+    this.actionInvocationStore = actionInvocationStore;
     this.forwardResult = forwardResult;
   }
 
   /**
    * Delegates to the {@link ForwardResult#defaultResult(ActionInvocation, String)} method.
    *
-   * @param invocation The current action invocation.
    * @return The result invocation that is a forward or redirect, depending on the situation. Or null if there isn't a
    *         forwardable resource in the web application for the given URI.
    */
-  public ResultInvocation lookup(final ActionInvocation invocation) {
+  public ResultInvocation lookup() {
+    ActionInvocation invocation = actionInvocationStore.getCurrent();
     Annotation annotation = forwardResult.defaultResult(invocation, null);
     if (annotation == null) {
       // Determine if there is an index page that we can redirect to for this URI. This index page would result in
@@ -75,11 +78,11 @@ public class DefaultResultInvocationProvider implements ResultInvocationProvider
    *   <li>Delegates to the {@link ForwardResult#defaultResult(ActionInvocation, String)} method.</li>
    * </ol>
    *
-   * @param invocation The action invocation used to look for annotations.
    * @param resultCode The result code from the action invocation.
    * @return The result invocation from the annotation or a forward based on any pages that were found.
    */
-  public ResultInvocation lookup(ActionInvocation invocation, String resultCode) {
+  public ResultInvocation lookup(String resultCode) {
+    ActionInvocation invocation = actionInvocationStore.getCurrent();
     String uri = invocation.actionURI();
     Object action = invocation.action();
     List<Annotation> annotations = getAllAnnotations(action.getClass());

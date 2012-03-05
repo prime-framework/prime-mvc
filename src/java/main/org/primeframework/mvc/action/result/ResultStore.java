@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2010, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,16 +13,28 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.servlet;
+package org.primeframework.mvc.action.result;
 
 /**
- * <p> This class stores keys that specific things are stored in the request. </p>
+ * Stores the result code of the current request.
  *
  * @author Brian Pontarelli
  */
-public final class RequestKeys {
+public interface ResultStore {
   /**
-   * The name of the attribute in the HttpServletRequest that stores the file information.
+   * @return The current result code.
    */
-  public static final String FILE_ATTRIBUTE = "__jc_request_body_files";
+  String get();
+
+  /**
+   * Sets the result code.
+   *
+   * @param resultCode The new result code.
+   */
+  void set(String resultCode);
+
+  /**
+   * Clears the result code.
+   */
+  void clear();
 }

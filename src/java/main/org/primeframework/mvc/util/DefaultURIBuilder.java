@@ -16,11 +16,15 @@
 package org.primeframework.mvc.util;
 
 /**
- * <p> This converts the class name into a URI using this method: </p>
+ * This converts the class name into a URI using this method:
  * <p/>
- * <ul> <li>Find the first instance of <em>action</em></li> <li>Trim everything before that</li> <li>Replace periods (.)
- * with forward slashes (/)</li> <li>Break on camel case and join back with dashes (-)</li> <li>Lower case the entire
- * thing</li> </ul>
+ * <ul>
+ *   <li>Find the first instance of <em>action</em></li>
+ *   <li>Trim everything before that</li>
+ *   <li>Replace periods (.) with forward slashes (/)</li>
+ *   <li>Break on camel case and join back with dashes (-)</li>
+ *   <li>Lower case the entire thing</li>
+ * </ul>
  *
  * @author Brian Pontarelli
  */

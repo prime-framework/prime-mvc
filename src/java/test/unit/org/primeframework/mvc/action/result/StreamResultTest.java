@@ -55,7 +55,7 @@ public class StreamResultTest {
     EasyMock.replay(response);
 
     Stream stream = new StreamImpl("success", "foo.zip", "10", "application/octet-stream", "stream");
-    StreamResult streamResult = new StreamResult(ee, response);
+    StreamResult streamResult = new StreamResult(ee, response, actionInvocationStore);
     streamResult.execute(stream, new DefaultActionInvocation(action, "/foo", "", null));
 
     assertEquals("test", sos.toString());

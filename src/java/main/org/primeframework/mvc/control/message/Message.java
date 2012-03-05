@@ -15,23 +15,20 @@
  */
 package org.primeframework.mvc.control.message;
 
-import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.primeframework.mvc.control.AbstractControl;
-import org.primeframework.mvc.message.l10n.MessageProvider;
-import org.primeframework.mvc.message.l10n.MissingMessageException;
 import org.primeframework.mvc.control.annotation.ControlAttribute;
 import org.primeframework.mvc.control.annotation.ControlAttributes;
+import org.primeframework.mvc.message.l10n.MessageProvider;
+import org.primeframework.mvc.message.l10n.MissingMessageException;
 
 import com.google.inject.Inject;
 import freemarker.template.TemplateMethodModel;
 import freemarker.template.TemplateModelException;
-import static net.java.util.CollectionTools.*;
 
 /**
  * This class a FreeMarker method model and a control for retrieving messages.
@@ -95,18 +92,14 @@ public class Message extends AbstractControl implements TemplateMethodModel {
    * @throws TemplateModelException If the action is null and bundle is not specified.
    */
   public Object exec(List arguments) throws TemplateModelException {
-    if (arguments.size() != 1 || arguments.size() != 2) {
+    if (arguments.size() < 1) {
       throw new TemplateModelException("Invalid parameters to the message method. This method " +
-        "takes one or two parameters like this: message(key) or message(key, bundle)");
+        "takes one or more parameters like this: message(key) or message(key, values...)");
     }
 
-    StringWriter writer = new StringWriter();
     String key = (String) arguments.get(0);
-    String bundle = (String) (arguments.size() > 1 ? arguments.get(1) : null);
-    Map<String, Object> attributes = mapNV("key", key, "bundle", bundle);
-    renderStart(writer, attributes, new HashMap<String, String>());
-    renderEnd(writer);
-    return writer.toString();
+    org.primeframework.mvc.message.Message message = messageProvider.getMessage(key, arguments.subList(1, arguments.size()).toArray());
+    return message.toString();
   }
 
   @Override

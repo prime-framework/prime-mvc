@@ -13,13 +13,10 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.servlet;
+package org.primeframework.mvc.workflow;
 
-import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import java.io.IOException;
-
-import com.google.inject.ImplementedBy;
 
 /**
  * This interface defines how {@link Workflow} instances pass control to the next Workflow or back to the
@@ -27,10 +24,7 @@ import com.google.inject.ImplementedBy;
  *
  * @author Brian Pontarelli
  */
-@ImplementedBy(DefaultWorkflowChain.class)
 public interface WorkflowChain {
-  void start(FilterChain filterChain) throws IOException, ServletException;
-
   /**
    * Invokes the next {@link Workflow} in the chain, or if all the workflows have been invoked this should pass control
    * back to the PrimeFilter to continue processing the HTTP request down the filter chain.
@@ -39,12 +33,4 @@ public interface WorkflowChain {
    * @throws ServletException If the workflows or filters throw ServletException.
    */
   void continueWorkflow() throws IOException, ServletException;
-
-  /**
-   * This method resets the workflow to its initial state. This is useful when the workflow needs to be reprocessed
-   * completely for any reason (such as security exceptions).
-   */
-  void reset();
-
-  Iterable<Workflow> workflows();
 }

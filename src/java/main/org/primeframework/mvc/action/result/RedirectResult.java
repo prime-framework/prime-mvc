@@ -25,7 +25,7 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 
-import org.primeframework.mvc.action.ActionInvocation;
+import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.annotation.Redirect;
 import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;
@@ -48,27 +48,30 @@ public class RedirectResult extends AbstractResult<Redirect> {
   private final MessageStore messageStore;
   private final HttpServletRequest request;
   private final HttpServletResponse response;
+  private final ActionInvocationStore actionInvocationStore;
 
   @Inject
   public RedirectResult(MessageStore messageStore, ExpressionEvaluator expressionEvaluator, HttpServletResponse response,
-                        HttpServletRequest request) {
+                        HttpServletRequest request, ActionInvocationStore actionInvocationStore) {
     super(expressionEvaluator);
     this.messageStore = messageStore;
     this.response = response;
     this.request = request;
+    this.actionInvocationStore = actionInvocationStore;
   }
 
   /**
    * {@inheritDoc}
    */
-  public void execute(final Redirect redirect, final ActionInvocation invocation) throws IOException, ServletException {
+  public void execute(final Redirect redirect) throws IOException, ServletException {
     List<Message> messages = messageStore.get(MessageScope.REQUEST);
     messageStore.addAll(MessageScope.FLASH, messages);
 
     String uri = VariableExpander.expand(redirect.uri(), new ExpanderStrategy() {
       public String expand(String variableName) throws ExpanderException {
         try {
-          String val = expressionEvaluator.getValue(variableName, invocation.action(), new HashMap<String, String>());
+          Object action = actionInvocationStore.getCurrent().action();
+          String val = expressionEvaluator.getValue(variableName, action, new HashMap<String, String>());
           if (redirect.encodeVariables()) {
             val = URLEncoder.encode(val, "UTF-8");
           }

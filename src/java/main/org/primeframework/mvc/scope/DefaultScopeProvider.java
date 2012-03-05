@@ -17,22 +17,22 @@ package org.primeframework.mvc.scope;
 
 import java.lang.annotation.Annotation;
 
-import org.primeframework.mvc.ObjectFactory;
 import org.primeframework.mvc.scope.annotation.ScopeAnnotation;
 
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 
 /**
- * <p> This class implements the scope provider interface. </p>
+ * This class implements the scope provider interface and creates scope instances via Guice.
  *
  * @author Brian Pontarelli
  */
 public class DefaultScopeProvider implements ScopeProvider {
-  private final ObjectFactory objectFactory;
+  private final Injector injector;
 
   @Inject
-  public DefaultScopeProvider(ObjectFactory objectFactory) {
-    this.objectFactory = objectFactory;
+  public DefaultScopeProvider(Injector injector) {
+    this.injector = injector;
   }
 
   /**
@@ -40,6 +40,6 @@ public class DefaultScopeProvider implements ScopeProvider {
    */
   public Scope lookup(Class<? extends Annotation> scopeAnnotation) {
     ScopeAnnotation ca = scopeAnnotation.getAnnotation(ScopeAnnotation.class);
-    return objectFactory.create(ca.value());
+    return injector.getInstance(ca.value());
   }
 }

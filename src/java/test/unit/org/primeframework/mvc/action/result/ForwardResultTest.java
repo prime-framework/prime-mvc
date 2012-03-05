@@ -59,7 +59,7 @@ public class ForwardResultTest {
     replay(context);
 
     Forward forward = new ForwardResult.ForwardImpl("/foo/bar.jsp", null);
-    ForwardResult forwardResult = new ForwardResult(Locale.CANADA, context, request, response, null, null, null);
+    ForwardResult forwardResult = new ForwardResult(actionInvocationStore, null, null, context, request, response, null, Locale.CANADA);
     forwardResult.execute(forward, new DefaultActionInvocation(null, "/foo/bar", null, null));
 
     verify(context, dispatcher, request, response);
@@ -84,7 +84,7 @@ public class ForwardResultTest {
     replay(context);
 
     Forward forward = new ForwardResult.ForwardImpl("bar.jsp", null);
-    ForwardResult forwardResult = new ForwardResult(Locale.GERMAN, context, request, response, null, null, null);
+    ForwardResult forwardResult = new ForwardResult(actionInvocationStore, null, null, context, request, response, null, Locale.GERMAN);
     forwardResult.execute(forward, new DefaultActionInvocation(null, "/action", null, null));
 
     verify(context, dispatcher, request, response);
@@ -109,7 +109,7 @@ public class ForwardResultTest {
     replay(context);
 
     Forward forward = new ForwardResult.ForwardImpl("bar.jsp", null, "text/html; charset=UTF-8", 300);
-    ForwardResult forwardResult = new ForwardResult(Locale.GERMAN, context, request, response, null, null, null);
+    ForwardResult forwardResult = new ForwardResult(actionInvocationStore, null, null, context, request, response, null, Locale.GERMAN);
     forwardResult.execute(forward, new DefaultActionInvocation(null, "/action", null, null));
 
     verify(context, dispatcher, request);
@@ -140,7 +140,7 @@ public class ForwardResultTest {
     replay(ee);
 
     Forward forward = new ForwardResult.ForwardImpl("${page}", null, "${contentType}", 300);
-    ForwardResult forwardResult = new ForwardResult(Locale.GERMAN, context, request, response, ee, null, null);
+    ForwardResult forwardResult = new ForwardResult(actionInvocationStore, null, null, context, request, response, ee, Locale.GERMAN);
     forwardResult.execute(forward, new DefaultActionInvocation(action, "/action", null, null));
 
     verify(context, dispatcher, request);
@@ -165,7 +165,7 @@ public class ForwardResultTest {
     replay(context);
 
     Forward forward = new ForwardResult.ForwardImpl("bar.jsp", null, "text/javascript; charset=UTF-8", 200);
-    ForwardResult forwardResult = new ForwardResult(Locale.GERMAN, context, request, response, null, null, null);
+    ForwardResult forwardResult = new ForwardResult(actionInvocationStore, null, null, context, request, response, null, Locale.GERMAN);
     forwardResult.execute(forward, new DefaultActionInvocation(null, "/action", null, null));
 
     verify(context, dispatcher, request);
@@ -200,7 +200,7 @@ public class ForwardResultTest {
     replay(context);
 
     Forward forward = new ForwardResult.ForwardImpl("", "failure");
-    ForwardResult forwardResult = new ForwardResult(Locale.GERMAN, context, request, response, null, service, null);
+    ForwardResult forwardResult = new ForwardResult(actionInvocationStore, service, null, context, request, response, null, Locale.GERMAN);
     forwardResult.execute(forward, new DefaultActionInvocation(null, "/action", "js", null));
 
     verify(context, service, request);

@@ -17,10 +17,10 @@ package org.primeframework.mvc.action.result;
 
 import java.lang.annotation.Annotation;
 
-import org.primeframework.mvc.ObjectFactory;
 import org.primeframework.mvc.action.result.annotation.ResultAnnotation;
 
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 
 /**
  * This class is the manager for all the Results. It loads the Results from Guice. Therefore, if you want to define a
@@ -31,11 +31,11 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 public class DefaultResultProvider implements ResultProvider {
-  private final ObjectFactory objectFactory;
+  private final Injector injector;
 
   @Inject
-  public DefaultResultProvider(ObjectFactory objectFactory) {
-    this.objectFactory = objectFactory;
+  public DefaultResultProvider(Injector injector) {
+    this.injector = injector;
   }
 
   /**
@@ -46,6 +46,6 @@ public class DefaultResultProvider implements ResultProvider {
    */
   public Result lookup(Class<? extends Annotation> annotation) {
     ResultAnnotation ra = annotation.getAnnotation(ResultAnnotation.class);
-    return objectFactory.create(ra.value());
+    return injector.getInstance(ra.value());
   }
 }

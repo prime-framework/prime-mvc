@@ -44,7 +44,7 @@ public class XMLStreamResultTest {
     EasyMock.replay(response);
 
     XMLStream xmlStream = new XMLStreamResultTest.XMLStreamImpl("success", "xml", 200);
-    XMLStreamResult streamResult = new XMLStreamResult(ee, response);
+    XMLStreamResult streamResult = new XMLStreamResult(ee, response, actionInvocationStore);
     streamResult.execute(xmlStream, new DefaultActionInvocation(action, "/foo", "", null));
 
     assertEquals("<xml/>", sos.toString());

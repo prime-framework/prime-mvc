@@ -15,7 +15,7 @@
  */
 package org.primeframework.mvc.parameter;
 
-import org.primeframework.mvc.servlet.Workflow;
+import org.primeframework.mvc.workflow.Workflow;
 
 import com.google.inject.ImplementedBy;
 

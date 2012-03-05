@@ -29,6 +29,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.primeframework.mvc.config.PrimeMVCConfiguration;
+import org.primeframework.mvc.workflow.MVCWorkflow;
 
 import com.google.inject.Injector;
 
@@ -36,8 +37,7 @@ import com.google.inject.Injector;
  * This is the main Servlet filter for the Prime MVC. This will setup the {@link ServletObjectsHolder} so that the
  * request, response and session can be injected.
  * <p/>
- * Next, this filter will lookup the WorkflowChain from Guice and then call {@link WorkflowChain#start(FilterChain)} on
- * it.
+ * Next, this filter will use the {@link FilterWorkflowChain} in conjunction with the {@link MVCWorkflow} to invoke Prime.
  *
  * @author Brian Pontarelli
  */
@@ -75,8 +75,8 @@ public class PrimeFilter implements Filter {
     ServletObjectsHolder.setServletResponse((HttpServletResponse) response);
 
     try {
-      WorkflowChain workflowChain = injector.getInstance(WorkflowChain.class);
-      workflowChain.start(chain);
+      FilterWorkflowChain workflowChain = new FilterWorkflowChain(chain, injector.getInstance(MVCWorkflow.class));
+      workflowChain.continueWorkflow();
     } catch (RuntimeException re) {
       boolean propogate = configuration.propagateRuntimeExceptions();
       if (propogate) {

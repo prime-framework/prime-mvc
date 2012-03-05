@@ -28,7 +28,7 @@ import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.DefaultActionInvocation;
 import org.primeframework.mvc.action.config.DefaultActionConfiguration;
 import org.primeframework.mvc.action.result.annotation.Forward;
-import org.primeframework.mvc.servlet.WorkflowChain;
+import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.*;
@@ -66,7 +66,7 @@ public class DefaultResultInvocationWorkflowTest {
     WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);
     EasyMock.replay(chain);
 
-    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(response, ais, rip, resultProvider);
+    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(response, ais, rip, resultProvider, resultStore);
     workflow.perform(chain);
 
     EasyMock.verify(response, ais, rip, result, resultProvider, chain);
@@ -96,7 +96,7 @@ public class DefaultResultInvocationWorkflowTest {
     chain.continueWorkflow();
     EasyMock.replay(chain);
 
-    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(response, ais, rip, resultProvider);
+    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(response, ais, rip, resultProvider, resultStore);
     workflow.perform(chain);
 
     EasyMock.verify(response, ais, rip, result, resultProvider, chain);
@@ -108,7 +108,7 @@ public class DefaultResultInvocationWorkflowTest {
     EasyMock.replay(response);
 
     Simple simple = new Simple();
-    ActionInvocation invocation = new DefaultActionInvocation(simple, "/foo/bar", null, null, new DefaultActionConfiguration(Simple.class, "/foo/bar"), true, true, "success");
+    ActionInvocation invocation = new DefaultActionInvocation(simple, "/foo/bar", null, null, new DefaultActionConfiguration(Simple.class, "/foo/bar"), true);
     ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
     EasyMock.expect(ais.getCurrent()).andReturn(invocation);
     EasyMock.replay(ais);
@@ -130,7 +130,7 @@ public class DefaultResultInvocationWorkflowTest {
     WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);
     EasyMock.replay(chain);
 
-    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(response, ais, rip, resultProvider);
+    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(response, ais, rip, resultProvider, resultStore);
     workflow.perform(chain);
 
     EasyMock.verify(response, ais, rip, result, resultProvider, chain);
@@ -142,7 +142,7 @@ public class DefaultResultInvocationWorkflowTest {
     EasyMock.replay(response);
 
     Simple simple = new Simple();
-    ActionInvocation invocation = new DefaultActionInvocation(simple, "/foo/bar", null, null, new DefaultActionConfiguration(Simple.class, "/foo/bar"), false, true, "success");
+    ActionInvocation invocation = new DefaultActionInvocation(simple, "/foo/bar", null, null, new DefaultActionConfiguration(Simple.class, "/foo/bar"), false);
     ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
     EasyMock.expect(ais.getCurrent()).andReturn(invocation);
     EasyMock.replay(ais);
@@ -159,7 +159,7 @@ public class DefaultResultInvocationWorkflowTest {
     WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);
     EasyMock.replay(chain);
 
-    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(response, ais, rip, resultProvider);
+    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(response, ais, rip, resultProvider, resultStore);
     workflow.perform(chain);
 
     EasyMock.verify(response, ais, rip, result, resultProvider, chain);
@@ -172,7 +172,7 @@ public class DefaultResultInvocationWorkflowTest {
     EasyMock.replay(response);
 
     Simple simple = new Simple();
-    ActionInvocation invocation = new DefaultActionInvocation(simple, "/foo/bar", null, null, new DefaultActionConfiguration(Simple.class, "/foo/bar"), true, true, "success");
+    ActionInvocation invocation = new DefaultActionInvocation(simple, "/foo/bar", null, null, new DefaultActionConfiguration(Simple.class, "/foo/bar"), true);
     ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
     EasyMock.expect(ais.getCurrent()).andReturn(invocation);
     EasyMock.replay(ais);
@@ -187,7 +187,7 @@ public class DefaultResultInvocationWorkflowTest {
     WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);
     EasyMock.replay(chain);
 
-    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(response, ais, rip, resultProvider);
+    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(response, ais, rip, resultProvider, resultStore);
     try {
       workflow.perform(chain);
       fail("Should have failed with 404");
@@ -205,7 +205,7 @@ public class DefaultResultInvocationWorkflowTest {
     EasyMock.replay(response);
 
     Simple simple = new Simple();
-    ActionInvocation invocation = new DefaultActionInvocation(simple, "/foo/bar", null, null, new DefaultActionConfiguration(Simple.class, "/foo/bar"), true, true, "success");
+    ActionInvocation invocation = new DefaultActionInvocation(simple, "/foo/bar", null, null, new DefaultActionConfiguration(Simple.class, "/foo/bar"), true);
     ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
     EasyMock.expect(ais.getCurrent()).andReturn(invocation);
     EasyMock.replay(ais);
@@ -223,7 +223,7 @@ public class DefaultResultInvocationWorkflowTest {
     WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);
     EasyMock.replay(chain);
 
-    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(response, ais, rip, resultProvider);
+    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(response, ais, rip, resultProvider, resultStore);
     try {
       workflow.perform(chain);
       fail("Should have failed");
@@ -241,7 +241,7 @@ public class DefaultResultInvocationWorkflowTest {
     EasyMock.replay(response);
 
     ExtensionInheritance action = new ExtensionInheritance();
-    ActionInvocation invocation = new DefaultActionInvocation(action, "/foo/bar", "ajax", null, new DefaultActionConfiguration(Simple.class, "/foo/bar"), true, true, "ajax");
+    ActionInvocation invocation = new DefaultActionInvocation(action, "/foo/bar", "ajax", null, new DefaultActionConfiguration(Simple.class, "/foo/bar"), true);
     ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
     EasyMock.expect(ais.getCurrent()).andReturn(invocation);
     EasyMock.replay(ais);
@@ -263,7 +263,7 @@ public class DefaultResultInvocationWorkflowTest {
     WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);
     EasyMock.replay(chain);
 
-    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(response, ais, rip, resultProvider);
+    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(response, ais, rip, resultProvider, resultStore);
     workflow.perform(chain);
 
     EasyMock.verify(response, ais, rip, resultProvider, chain);

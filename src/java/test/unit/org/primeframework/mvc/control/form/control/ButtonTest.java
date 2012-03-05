@@ -38,7 +38,7 @@ public class ButtonTest extends ControlBaseTest {
     run(button,
       mapNV("name", "button", "value", "test-value", "bundle", "/button-bundle"),
       null, "<input type=\"hidden\" name=\"button@param\" value=\"param-value\"/>\n" +
-      "<input type=\"hidden\" name=\"__jc_a_button\" value=\"\"/>\n" +
+      "<input type=\"hidden\" name=\"__a_button\" value=\"\"/>\n" +
       "<div class=\"button-button button control\">\n" +
       "<div class=\"label-container\"> </div>\n" +
       "<div class=\"control-container\"><input type=\"button\" id=\"button\" name=\"button\" value=\"Button-Bundle\"/></div>\n" +
@@ -51,7 +51,7 @@ public class ButtonTest extends ControlBaseTest {
     run(button,
       mapNV("name", "button", "value", "test-value", "class", "css-class"),
       null, "<input type=\"hidden\" name=\"button@param\" value=\"param-value\"/>\n" +
-      "<input type=\"hidden\" name=\"__jc_a_button\" value=\"\"/>\n" +
+      "<input type=\"hidden\" name=\"__a_button\" value=\"\"/>\n" +
       "<div class=\"css-class-button-button css-class-button css-class-control button-button button control\">\n" +
       "<div class=\"label-container\"> </div>\n" +
       "<div class=\"control-container\"><input type=\"button\" class=\"css-class\" id=\"button\" name=\"button\" value=\"Button\"/></div>\n" +
@@ -64,7 +64,7 @@ public class ButtonTest extends ControlBaseTest {
     run(button,
       mapNV("name", "button", "action", "/foo", "value", "test-value"),
       null, "<input type=\"hidden\" name=\"button@param\" value=\"param-value\"/>\n" +
-      "<input type=\"hidden\" name=\"__jc_a_button\" value=\"/foo\"/>\n" +
+      "<input type=\"hidden\" name=\"__a_button\" value=\"/foo\"/>\n" +
       "<div class=\"button-button button control\">\n" +
       "<div class=\"label-container\"> </div>\n" +
       "<div class=\"control-container\"><input type=\"button\" id=\"button\" name=\"button\" value=\"Button\"/></div>\n" +
@@ -77,7 +77,7 @@ public class ButtonTest extends ControlBaseTest {
     run(button,
       mapNV("name", "html", "action", "/foo", "value", "test-value"),
       null, "<input type=\"hidden\" name=\"html@param\" value=\"param-value\"/>\n" +
-      "<input type=\"hidden\" name=\"__jc_a_html\" value=\"/foo\"/>\n" +
+      "<input type=\"hidden\" name=\"__a_html\" value=\"/foo\"/>\n" +
       "<div class=\"button-button button control\">\n" +
       "<div class=\"label-container\"> </div>\n" +
       "<div class=\"control-container\"><input type=\"button\" id=\"html\" name=\"html\" value=\"&lt;Button&gt;\"/></div>\n" +
@@ -91,7 +91,7 @@ public class ButtonTest extends ControlBaseTest {
     run(button,
       mapNV("name", "button", "action", "/foo", "value", "test-value"),
       null, "<input type=\"hidden\" name=\"button@param\" value=\"param-value\"/>\n" +
-      "<input type=\"hidden\" name=\"__jc_a_button\" value=\"/context/foo\"/>\n" +
+      "<input type=\"hidden\" name=\"__a_button\" value=\"/context/foo\"/>\n" +
       "<div class=\"button-button button control\">\n" +
       "<div class=\"label-container\"> </div>\n" +
       "<div class=\"control-container\"><input type=\"button\" id=\"button\" name=\"button\" value=\"Button\"/></div>\n" +
@@ -105,7 +105,7 @@ public class ButtonTest extends ControlBaseTest {
     run(button,
       mapNV("name", "button", "action", "foo", "value", "test-value"),
       null, "<input type=\"hidden\" name=\"button@param\" value=\"param-value\"/>\n" +
-      "<input type=\"hidden\" name=\"__jc_a_button\" value=\"foo\"/>\n" +
+      "<input type=\"hidden\" name=\"__a_button\" value=\"foo\"/>\n" +
       "<div class=\"button-button button control\">\n" +
       "<div class=\"label-container\"> </div>\n" +
       "<div class=\"control-container\"><input type=\"button\" id=\"button\" name=\"button\" value=\"Button\"/></div>\n" +

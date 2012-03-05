@@ -30,7 +30,7 @@ import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
 
 /**
- * <p> This class is a proxy between FreeMarker and the JCatapult MVC controls. </p>
+ * This class is a proxy between FreeMarker and the Prime MVC controls.
  *
  * @author Brian Pontarelli
  */
@@ -50,7 +50,6 @@ public class FreeMarkerControlProxy implements TemplateDirectiveModel {
    * @param loopVars Loop variables (not really used).
    * @param body     The body of the directive.
    */
-  @SuppressWarnings("unchecked")
   public void execute(Environment env, Map params, TemplateModel[] loopVars, TemplateDirectiveBody body)
     throws IOException, TemplateException {
     Map<String, String> dynamicAttributes = makeDynamicAttributes(params);
@@ -101,8 +100,7 @@ public class FreeMarkerControlProxy implements TemplateDirectiveModel {
    *
    * @param params The parameters passed to this control in the FTL file.
    * @return The attributes.
-   * @throws freemarker.template.TemplateModelException
-   *          If the unwrapping fails.
+   * @throws freemarker.template.TemplateModelException If the unwrapping fails.
    */
   protected Map<String, Object> makeAttributes(Map params) throws TemplateModelException {
     Map<String, Object> attributes = new HashMap<String, Object>(params.size());

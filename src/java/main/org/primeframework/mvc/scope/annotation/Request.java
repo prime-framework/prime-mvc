@@ -23,8 +23,8 @@ import java.lang.annotation.Target;
 import org.primeframework.mvc.scope.RequestScope;
 
 /**
- * <p> This annotation should be used to mark member fields of actions that should be fetched and stored in the
- * HttpServletRequest. </p>
+ * This annotation should be used to mark member fields of actions that should be fetched and stored in the
+ * HttpServletRequest.
  *
  * @author Brian Pontarelli
  */

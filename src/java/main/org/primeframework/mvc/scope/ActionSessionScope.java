@@ -27,16 +27,16 @@ import org.primeframework.mvc.scope.annotation.ActionSession;
 import com.google.inject.Inject;
 
 /**
- * <p> This is the request scope which fetches and stores values in the HttpSession, but those values are associated
- * with a specific action. In order to accomplish this, a Map is put into the session under the key
- * <strong>jcatapultActionSession</code> and the values are stored inside that Map. The key is the name of the action
- * class and the value is a Map. The second Map's key is the fieldName and the value is the value being stored. </p>
+ * This is the request scope which fetches and stores values in the HttpSession, but those values are associated with a
+ * specific action. In order to accomplish this, a Map is put into the session under the key
+ * <strong>primeActionSession</code> and the values are stored inside that Map. The key is the name of the action
+ * class and the value is a Map. The second Map's key is the fieldName and the value is the value being stored.
  *
  * @author Brian Pontarelli
  */
 @SuppressWarnings("unchecked")
 public class ActionSessionScope implements Scope<ActionSession> {
-  public static final String ACTION_SESSION_KEY = "jcatapultActionSession";
+  public static final String ACTION_SESSION_KEY = "primeActionSession";
   private final ActionInvocationStore actionInvocationStore;
   private final HttpServletRequest request;
 

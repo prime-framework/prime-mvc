@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,24 +12,24 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
- *
  */
-package org.primeframework.mvc.servlet.annotation;
+package org.primeframework.mvc.parameter;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.primeframework.mvc.parameter.ParameterParser.Parameters;
 
-import com.google.inject.BindingAnnotation;
+import com.google.inject.ImplementedBy;
 
 /**
- * <p> This annotation can be used to inject the HTTP method header into action classes. </p>
+ * This interface handles setting parameters into an object.
  *
  * @author Brian Pontarelli
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.PARAMETER)
-@BindingAnnotation()
-public @interface HTTPMethod {
+@ImplementedBy(DefaultParameterHandler.class)
+public interface ParameterHandler {
+  /**
+   * Handles the parameters.
+   *
+   * @param parameters The parameters.
+   */
+  void handle(Parameters parameters);
 }

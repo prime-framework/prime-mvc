@@ -24,12 +24,12 @@ import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.scope.annotation.ScopeAnnotation;
-import org.primeframework.mvc.servlet.WorkflowChain;
+import org.primeframework.mvc.workflow.WorkflowChain;
 
 import com.google.inject.Inject;
 
 /**
- * <p> This class implements the storage. </p>
+ * This class implements the scope storage workflow that handles scope storage after the request is finished.
  *
  * @author Brian Pontarelli
  */
@@ -39,8 +39,7 @@ public class DefaultScopeStorageWorkflow implements ScopeStorageWorkflow {
   private final ScopeProvider scopeProvider;
 
   @Inject
-  public DefaultScopeStorageWorkflow(ActionInvocationStore actionInvocationStore,
-                                     ExpressionEvaluator expressionEvaluator,
+  public DefaultScopeStorageWorkflow(ActionInvocationStore actionInvocationStore, ExpressionEvaluator expressionEvaluator,
                                      ScopeProvider scopeProvider) {
     this.actionInvocationStore = actionInvocationStore;
     this.expressionEvaluator = expressionEvaluator;

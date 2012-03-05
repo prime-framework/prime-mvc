@@ -19,7 +19,7 @@ import javax.servlet.ServletContext;
 import java.net.MalformedURLException;
 
 /**
- * <p> This class provides resource utility methods. </p>
+ * This class provides resource utility methods.
  *
  * @author Brian Pontarelli
  */

@@ -21,13 +21,11 @@ import java.util.Map;
 /**
  * Converters are used to convert objects from one type to another, convert strings to objects and to convert from
  * objects and strings to arrays of objects. The way that this is setup is that a Converter implementation is
- * registered
- * with the ConverterRegistry. The registry can then be queried for a particular Conveter (see {@link
- * ConverterProvider}
- * for more information about retrieval). Next, the Converter can be used for conversions using one of the methods
- * described below. Any given Converter may be used to convert to many different types because of the way that the
- * ConverterRegistry searches for Converters. Because of this flexibility when converting the Converter must be told
- * what type to convert to. This is the reason for the second Class parameter on all of the convert methods.
+ * registered with the ConverterRegistry. The registry can then be queried for a particular Conveter (see {@link
+ * ConverterProvider} for more information about retrieval). Next, the Converter can be used for conversions using one
+ * of the methods described below. Any given Converter may be used to convert to many different types because of the way
+ * that the ConverterRegistry searches for Converters. Because of this flexibility when converting the Converter must
+ * be told what type to convert to. This is the reason for the second Class parameter on all of the convert methods.
  * <p/>
  * The type that appears on all of the methods in this interface can be any type that is support by the Converter, but
  * generally is a type that is the type or a sub-type of the type the converter is registered for. For example, let's
@@ -79,11 +77,6 @@ import java.util.Map;
  * @author Brian Pontarelli
  */
 public interface GlobalConverter {
-  /**
-   * The default string that denotes different values in an array.
-   */
-  String DEFAULT_ARRAY_SEPARATOR = ",";
-
   /**
    * Converts the given object to the given type.
    * <p/>

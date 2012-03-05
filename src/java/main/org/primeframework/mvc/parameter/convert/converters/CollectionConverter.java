@@ -42,7 +42,7 @@ import static net.java.util.CollectionTools.*;
 /**
  * This converts to and from Collection types. This handles complex parameterized types by first creating the
  * Collection instance (ArrayList, HashSet, LinkedList, etc) and then by leveraging the other converters for the
- * parameterized type.
+ * parametrized type.
  *
  * @author Brian Pontarelli
  */

@@ -27,7 +27,7 @@ import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.DefaultActionInvocation;
 import org.primeframework.mvc.action.config.DefaultActionConfiguration;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-import org.primeframework.mvc.servlet.WorkflowChain;
+import org.primeframework.mvc.workflow.WorkflowChain;
 import org.primeframework.mvc.test.JCatapultBaseTest;
 import org.testng.annotations.Test;
 
@@ -77,7 +77,7 @@ public class DefaultURIParameterWorkflowTest extends JCatapultBaseTest {
     RESTEdit action = new RESTEdit();
     ActionInvocationStore store = EasyMock.createStrictMock(ActionInvocationStore.class);
     EasyMock.expect(store.getCurrent()).andReturn(
-      new DefaultActionInvocation(action, "/admin/user/rest-edit/12", null, asList("12"), new DefaultActionConfiguration(RESTEdit.class, "/admin/user/rest-edit"), true, true, null));
+      new DefaultActionInvocation(action, "/admin/user/rest-edit/12", null, asList("12"), new DefaultActionConfiguration(RESTEdit.class, "/admin/user/rest-edit"), true));
     EasyMock.replay(store);
 
     WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);
@@ -106,7 +106,7 @@ public class DefaultURIParameterWorkflowTest extends JCatapultBaseTest {
     EasyMock.expect(store.getCurrent()).andReturn(
       new DefaultActionInvocation(action, "/complex-rest/brian/static/pontarelli/then/a/bunch/of/stuff", null,
         asList("brian", "static", "pontarelli", "then", "a", "bunch", "of", "stuff"),
-        new DefaultActionConfiguration(ComplexRest.class, "/complex-rest/brian/static/pontarelli/then/a/bunch/of/stuff"), true, true, null));
+        new DefaultActionConfiguration(ComplexRest.class, "/complex-rest/brian/static/pontarelli/then/a/bunch/of/stuff"), true));
     EasyMock.replay(store);
 
     WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);

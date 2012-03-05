@@ -19,8 +19,7 @@ import java.io.Writer;
 import java.util.Map;
 
 /**
- * <p> This interface defines a control is called from a JSP tag library or from a FreeMarker template to render some
- * HTML or other type of output. </p>
+ * This interface defines a control is called from a FreeMarker template to render some HTML or other type of output.
  *
  * @author Brian Pontarelli
  */
@@ -51,4 +50,9 @@ public interface Control {
    * @param writer The writer to write the output to.
    */
   void renderEnd(Writer writer);
+
+  /**
+   * @return The name of the control as it will exist in the FTL control hash.
+   */
+  String getName();
 }

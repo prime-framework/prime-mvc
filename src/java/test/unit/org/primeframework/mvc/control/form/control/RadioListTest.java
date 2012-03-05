@@ -61,7 +61,7 @@ public class RadioListTest extends ControlBaseTest {
       "</div>\n" +
       "</div>\n" +
       "</div>\n" +
-      "<input type=\"hidden\" name=\"__jc_rb_test\" value=\"\"/>\n");
+      "<input type=\"hidden\" name=\"__rb_test\" value=\"\"/>\n");
   }
 
   @Test
@@ -87,7 +87,7 @@ public class RadioListTest extends ControlBaseTest {
       "</div>\n" +
       "</div>\n" +
       "</div>\n" +
-      "<input type=\"hidden\" name=\"__jc_rb_user.addresses['work'].country\" value=\"\"/>\n");
+      "<input type=\"hidden\" name=\"__rb_user.addresses['work'].country\" value=\"\"/>\n");
   }
 
   @Test
@@ -113,7 +113,7 @@ public class RadioListTest extends ControlBaseTest {
       "</div>\n" +
       "</div>\n" +
       "</div>\n" +
-      "<input type=\"hidden\" name=\"__jc_rb_user.addresses['work'].country\" value=\"\"/>\n");
+      "<input type=\"hidden\" name=\"__rb_user.addresses['work'].country\" value=\"\"/>\n");
   }
 
   @Test
@@ -143,7 +143,7 @@ public class RadioListTest extends ControlBaseTest {
       "</div>\n" +
       "</div>\n" +
       "</div>\n" +
-      "<input type=\"hidden\" name=\"__jc_rb_user.addresses['work'].country\" value=\"\"/>\n");
+      "<input type=\"hidden\" name=\"__rb_user.addresses['work'].country\" value=\"\"/>\n");
   }
 
   @Test
@@ -172,7 +172,7 @@ public class RadioListTest extends ControlBaseTest {
       "</div>\n" +
       "</div>\n" +
       "</div>\n" +
-      "<input type=\"hidden\" name=\"__jc_rb_user.addresses['work'].country\" value=\"\"/>\n");
+      "<input type=\"hidden\" name=\"__rb_user.addresses['work'].country\" value=\"\"/>\n");
   }
 
   @Test
@@ -201,7 +201,7 @@ public class RadioListTest extends ControlBaseTest {
       "</div>\n" +
       "</div>\n" +
       "</div>\n" +
-      "<input type=\"hidden\" name=\"__jc_rb_user.addresses['work'].country\" value=\"US\"/>\n");
+      "<input type=\"hidden\" name=\"__rb_user.addresses['work'].country\" value=\"US\"/>\n");
   }
 
   public static <T> Map<T, T> lmap(T... values) {

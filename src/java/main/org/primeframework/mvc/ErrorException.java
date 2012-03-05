@@ -13,20 +13,32 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.freemarker.guice;
-
-import org.primeframework.mvc.freemarker.FreeMarkerMap;
-
-import com.google.inject.AbstractModule;
+package org.primeframework.mvc;
 
 /**
- * This class is a module for the Prime MVC FreeMarker support.
+ * Base class for exceptions that cause Prime to invoke the error workflow.
  *
  * @author Brian Pontarelli
  */
-public class FreeMarkerModule extends AbstractModule {
-  @Override
-  protected void configure() {
-    requestStaticInjection(FreeMarkerMap.class);
+public class ErrorException extends RuntimeException {
+  public final String resultCode;
+
+  public ErrorException(String resultCode) {
+    this.resultCode = resultCode;
+  }
+
+  public ErrorException(String resultCode, String message) {
+    super(message);
+    this.resultCode = resultCode;
+  }
+
+  public ErrorException(String resultCode, String message, Throwable cause) {
+    super(message, cause);
+    this.resultCode = resultCode;
+  }
+
+  public ErrorException(String resultCode, Throwable cause) {
+    super(cause);
+    this.resultCode = resultCode;
   }
 }

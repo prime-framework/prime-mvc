@@ -24,12 +24,13 @@ import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.scope.annotation.ScopeAnnotation;
-import org.primeframework.mvc.servlet.WorkflowChain;
+import org.primeframework.mvc.workflow.WorkflowChain;
 
 import com.google.inject.Inject;
 
 /**
- * <p> This class is the retrieval implementation. </p>
+ * This class is the retrieval workflow that loads the scope values and puts them in the action at the start of the
+ * request.
  *
  * @author Brian Pontarelli
  */
@@ -40,10 +41,8 @@ public class DefaultScopeRetrievalWorkflow implements ScopeRetrievalWorkflow {
   private final ScopeProvider scopeProvider;
 
   @Inject
-  public DefaultScopeRetrievalWorkflow(ActionInvocationStore actionInvocationStore,
-                                       ExpressionEvaluator expressionEvaluator,
-                                       FlashScope flashScope,
-                                       ScopeProvider scopeProvider) {
+  public DefaultScopeRetrievalWorkflow(ActionInvocationStore actionInvocationStore, ExpressionEvaluator expressionEvaluator,
+                                       FlashScope flashScope, ScopeProvider scopeProvider) {
     this.actionInvocationStore = actionInvocationStore;
     this.expressionEvaluator = expressionEvaluator;
     this.flashScope = flashScope;

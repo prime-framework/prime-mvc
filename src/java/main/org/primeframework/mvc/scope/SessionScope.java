@@ -23,7 +23,7 @@ import org.primeframework.mvc.scope.annotation.Session;
 import com.google.inject.Inject;
 
 /**
- * <p> This is the request scope which fetches and stores values in the HttpSession. </p>
+ * This is the request scope which fetches and stores values in the HttpSession.
  *
  * @author Brian Pontarelli
  */
@@ -41,8 +41,10 @@ public class SessionScope implements Scope<Session> {
   public Object get(String fieldName, Session scope) {
     HttpSession session = request.getSession(false);
     if (session != null) {
-      String key = scope.value().equals("##field-name##") ? fieldName : scope.value();
-      return session.getAttribute(key);
+      synchronized (session) {
+        String key = scope.value().equals("##field-name##") ? fieldName : scope.value();
+        return session.getAttribute(key);
+      }
     }
 
     return null;
@@ -63,11 +65,13 @@ public class SessionScope implements Scope<Session> {
       return;
     }
 
-    String key = scope.value().equals("##field-name##") ? fieldName : scope.value();
-    if (value != null) {
-      session.setAttribute(key, value);
-    } else {
-      session.removeAttribute(key);
+    synchronized (session) {
+      String key = scope.value().equals("##field-name##") ? fieldName : scope.value();
+      if (value != null) {
+        session.setAttribute(key, value);
+      } else {
+        session.removeAttribute(key);
+      }
     }
   }
 }

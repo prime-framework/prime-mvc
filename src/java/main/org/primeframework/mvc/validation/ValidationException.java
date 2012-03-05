@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,22 +15,27 @@
  */
 package org.primeframework.mvc.validation;
 
-import java.lang.annotation.Annotation;
-
-import com.google.inject.ImplementedBy;
+import org.primeframework.mvc.ErrorException;
 
 /**
- * <p> This interface defines the provider that creates validators based on annotations. </p>
+ * Thrown when validation fails.
  *
  * @author Brian Pontarelli
  */
-@ImplementedBy(DefaultValidatorProvider.class)
-public interface ValidatorProvider {
-  /**
-   * <p> Returns the validator for the given annotation. </p>
-   *
-   * @param annotation The annotation.
-   * @return The Validator or null if one was not found
-   */
-  Validator lookup(Class<? extends Annotation> annotation);
+public class ValidationException extends ErrorException {
+  public ValidationException() {
+    super("input");
+  }
+
+  public ValidationException(String message) {
+    super("input", message);
+  }
+
+  public ValidationException(String message, Throwable cause) {
+    super("input", message, cause);
+  }
+
+  public ValidationException(Throwable cause) {
+    super("input", cause);
+  }
 }

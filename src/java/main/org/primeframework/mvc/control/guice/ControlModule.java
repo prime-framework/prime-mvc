@@ -15,6 +15,7 @@
  */
 package org.primeframework.mvc.control.guice;
 
+import org.primeframework.mvc.control.Control;
 import org.primeframework.mvc.control.form.Button;
 import org.primeframework.mvc.control.form.Checkbox;
 import org.primeframework.mvc.control.form.CheckboxList;
@@ -33,11 +34,10 @@ import org.primeframework.mvc.control.form.Submit;
 import org.primeframework.mvc.control.form.Text;
 import org.primeframework.mvc.control.form.Textarea;
 import org.primeframework.mvc.control.form.YearsSelect;
-import org.primeframework.mvc.control.message.ActionMessages;
-import org.primeframework.mvc.control.message.FieldMessages;
 import org.primeframework.mvc.control.message.Message;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.multibindings.MapBinder;
 
 /**
  * This class is a Guice module that configures the Prime MVC controls.
@@ -47,26 +47,28 @@ import com.google.inject.AbstractModule;
 public class ControlModule extends AbstractModule {
   @Override
   protected void configure() {
-    bind(ActionMessages.class);
-    bind(Button.class);
-    bind(Checkbox.class);
-    bind(CheckboxList.class);
-    bind(CountriesSelect.class);
-    bind(FieldMessages.class);
-    bind(File.class);
-    bind(Form.class);
-    bind(Hidden.class);
-    bind(Image.class);
-    bind(Message.class);
-    bind(MonthsSelect.class);
-    bind(Password.class);
-    bind(RadioList.class);
-    bind(Reset.class);
-    bind(Select.class);
-    bind(StatesSelect.class);
-    bind(Submit.class);
-    bind(Text.class);
-    bind(Textarea.class);
-    bind(YearsSelect.class);
+    MapBinder<String, Control> mapBinder = MapBinder.newMapBinder(binder(), String.class, Control.class);
+    mapBinder.permitDuplicates();
+    
+    mapBinder.addBinding("prime").to(Button.class);
+    mapBinder.addBinding("prime").to(Checkbox.class);
+    mapBinder.addBinding("prime").to(CheckboxList.class);
+    mapBinder.addBinding("prime").to(CountriesSelect.class);
+    mapBinder.addBinding("prime").to(File.class);
+    mapBinder.addBinding("prime").to(Form.class);
+    mapBinder.addBinding("prime").to(Hidden.class);
+    mapBinder.addBinding("prime").to(Image.class);
+    mapBinder.addBinding("prime").to(MonthsSelect.class);
+    mapBinder.addBinding("prime").to(Password.class);
+    mapBinder.addBinding("prime").to(RadioList.class);
+    mapBinder.addBinding("prime").to(Reset.class);
+    mapBinder.addBinding("prime").to(Select.class);
+    mapBinder.addBinding("prime").to(StatesSelect.class);
+    mapBinder.addBinding("prime").to(Submit.class);
+    mapBinder.addBinding("prime").to(Text.class);
+    mapBinder.addBinding("prime").to(Textarea.class);
+    mapBinder.addBinding("prime").to(YearsSelect.class);
+
+    mapBinder.addBinding("prime").to(Message.class);
   }
 }

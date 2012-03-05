@@ -172,7 +172,7 @@ public class DefaultExpressionEvaluator implements ExpressionEvaluator {
   /**
    * {@inheritDoc}
    */
-  public String expand(String str, final Object object)
+  public String expand(String str, final Object object, boolean encode)
     throws ExpressionException {
     return VariableExpander.expand(str, new ExpanderStrategy() {
       public String expand(String variableName) throws ExpanderException {

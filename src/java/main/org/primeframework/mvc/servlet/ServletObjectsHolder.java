@@ -20,9 +20,9 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * <p> This class is a static storage location for the servlet context. This is necessary because we need some method of
- * determining the location on disk of the email FreeMarker templates. </p> <p/> <p> This class is setup as long as the
- * PrimeFilter is placed into the web.xml file and is the first filter in the chain. </p>
+ * This class is a static storage location for the servlet objects so that they can be later injected via providers.
+ * <p/>
+ * This class is setup as long as the PrimeFilter is placed into the web.xml file and is the first filter in the chain.
  *
  * @author Brian Pontarelli
  */

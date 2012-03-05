@@ -18,7 +18,7 @@ package org.primeframework.mvc.util;
 import com.google.inject.ImplementedBy;
 
 /**
- * <p> This interface defines how a package and class name are converted into a URI. </p>
+ * This interface defines how a package and class name are converted into a URI.
  *
  * @author Brian Pontarelli
  */

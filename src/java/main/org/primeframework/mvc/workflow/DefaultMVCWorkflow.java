@@ -13,15 +13,17 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.servlet;
+package org.primeframework.mvc.workflow;
 
 import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.List;
 
+import org.primeframework.mvc.ErrorException;
 import org.primeframework.mvc.action.ActionInvocationWorkflow;
 import org.primeframework.mvc.action.ActionMappingWorkflow;
 import org.primeframework.mvc.action.result.ResultInvocationWorkflow;
+import org.primeframework.mvc.action.result.ResultStore;
 import org.primeframework.mvc.message.MessageWorkflow;
 import org.primeframework.mvc.parameter.ParameterWorkflow;
 import org.primeframework.mvc.parameter.URIParameterWorkflow;
@@ -33,16 +35,22 @@ import com.google.inject.Inject;
 import static java.util.Arrays.*;
 
 /**
- * This class is the main entry point for the JCatapult MVC. It creates the default workflow that is used to process
- * requests.
+ * This class is the main entry point for the Prime MVC. It uses the workflows passed into the constructor in the order
+ * they are passed in. It also catches {@link ErrorException} and then processes errors using a error workflow set. The
+ * error set consists of the {@link ScopeStorageWorkflow} followed by the {@link ResultInvocationWorkflow}.
  *
  * @author Brian Pontarelli
  */
 public class DefaultMVCWorkflow implements MVCWorkflow {
-  private List<Workflow> workflows;
+  private final ResultStore resultStore;
+  private final List<Workflow> workflows;
+  private final List<Workflow> errorWorkflows;
 
   @Inject
-  public DefaultMVCWorkflow(ActionMappingWorkflow actionMappingWorkflow,
+  public DefaultMVCWorkflow(ResultStore resultStore,
+                            RequestBodyWorkflow requestBodyWorkflow,
+                            StaticResourceWorkflow staticResourceWorkflow,
+                            ActionMappingWorkflow actionMappingWorkflow,
                             ScopeRetrievalWorkflow scopeRetrievalWorkflow,
                             MessageWorkflow messageWorkflow,
                             URIParameterWorkflow uriParameterWorkflow,
@@ -51,19 +59,29 @@ public class DefaultMVCWorkflow implements MVCWorkflow {
                             ActionInvocationWorkflow actionInvocationWorkflow,
                             ScopeStorageWorkflow scopeStorageWorkflow,
                             ResultInvocationWorkflow resultInvocationWorflow) {
-    workflows = asList(actionMappingWorkflow, scopeRetrievalWorkflow, messageWorkflow, uriParameterWorkflow,
-      parameterWorkflow, validationWorkflow, actionInvocationWorkflow, scopeStorageWorkflow, resultInvocationWorflow);
+    this.resultStore = resultStore;
+    workflows = asList(requestBodyWorkflow, staticResourceWorkflow, actionMappingWorkflow, scopeRetrievalWorkflow,
+      messageWorkflow, uriParameterWorkflow, parameterWorkflow, validationWorkflow, actionInvocationWorkflow,
+      scopeStorageWorkflow, resultInvocationWorflow);
+
+    errorWorkflows = asList(scopeStorageWorkflow, resultInvocationWorflow);
   }
 
   /**
    * Creates a sub-chain of the MVC workflows and invokes it.
    *
    * @param chain The chain.
-   * @throws java.io.IOException            If the sub-chain throws an IOException
-   * @throws javax.servlet.ServletException If the sub-chain throws an ServletException
+   * @throws IOException            If the sub-chain throws an IOException
+   * @throws ServletException If the sub-chain throws an ServletException
    */
   public void perform(WorkflowChain chain) throws IOException, ServletException {
-    SubWorkflowChain subChain = new SubWorkflowChain(workflows, chain);
-    subChain.continueWorkflow();
+    try {
+      SubWorkflowChain subChain = new SubWorkflowChain(workflows, chain);
+      subChain.continueWorkflow();
+    } catch (ErrorException e) {
+      resultStore.set(e.resultCode);
+      SubWorkflowChain errorChain = new SubWorkflowChain(errorWorkflows, chain);
+      errorChain.continueWorkflow();
+    }
   }
 }

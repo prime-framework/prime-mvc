@@ -13,25 +13,36 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.servlet;
+package org.primeframework.mvc.workflow;
 
 import javax.servlet.ServletException;
 import java.io.IOException;
+import java.util.Iterator;
 
 /**
- * <p> This interface defines a unit of work that should be performed prior to the PrimeFilter passing control down
- * the J2EE filter chain. </p>
+ * This class is a sub-workflow chain that can be used to chain multiple workflows under a single workflow.
  *
  * @author Brian Pontarelli
  */
-public interface Workflow {
+public class SubWorkflowChain implements WorkflowChain {
+  private final WorkflowChain outer;
+  private Iterator<Workflow> iterator;
+
+  public SubWorkflowChain(Iterable<Workflow> workflows, WorkflowChain outer) {
+    this.outer = outer;
+    this.iterator = workflows.iterator();
+  }
+
   /**
-   * Performs a task.
-   *
-   * @param workflowChain This chain should be called if the Workflow wants to continue processing the request by the
-   *                      next Workflow in the chain or by the next J2EE filter in the chain after the PrimeFilter.
-   * @throws IOException      If the workflow had any IO problems.
-   * @throws ServletException If the workflow had any servlet problems.
+   * {@inheritDoc}
    */
-  void perform(WorkflowChain workflowChain) throws IOException, ServletException;
+  @Override
+  public void continueWorkflow() throws IOException, ServletException {
+    if (iterator.hasNext()) {
+      Workflow workflow = iterator.next();
+      workflow.perform(this);
+    } else {
+      outer.continueWorkflow();
+    }
+  }
 }

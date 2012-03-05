@@ -29,15 +29,14 @@ import java.util.Deque;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.primeframework.mvc.ObjectFactory;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
-import org.primeframework.mvc.action.result.ControlHashModel;
+import org.primeframework.mvc.action.result.ControlsHashModel;
 import org.primeframework.mvc.control.Control;
+import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.parameter.el.ExpressionException;
 
@@ -54,8 +53,7 @@ import freemarker.template.TemplateModelException;
 
 /**
  * This class is a FreeMarker model that provides access in the templates to the request, session and context attributes
- * as well as values from the action and the Control directives via the {@link org.primeframework.mvc.action.result.ControlHashModel}
- * class.
+ * as well as values from the action and the Control directives via the {@link ControlsHashModel} class.
  *
  * @author Brian Pontarelli
  */
@@ -66,47 +64,26 @@ public class FreeMarkerMap implements TemplateHashModelEx {
   public static final String SESSION = "session";
   public static final String APPLICATION_MODEL = "Application";
   public static final String APPLICATION = "application";
-  public static final String TAG_PREFIX = "prime";
   public static final String JSP_TAGLIBS = "JspTaglibs";
+  public static final String MESSAGES = "messages";
 
-  private static final Map<String, Class<? extends TemplateModel>> models = new HashMap<String, Class<? extends TemplateModel>>();
-  private static final Map<String, Class<? extends Control>> controls = new HashMap<String, Class<? extends Control>>();
-  private static TaglibFactory taglibFactory;
-  private static ObjectFactory objectFactory;
-
-  private static ServletContext context;
-  private final Map<String, Object> objects = new HashMap<String, Object>();
   private final HttpServletRequest request;
   private final ExpressionEvaluator expressionEvaluator;
   private final ActionInvocationStore actionInvocationStore;
+  private final Map<String, Object> objects = new HashMap<String, Object>();
+  private final ServletContext context;
+  private final TaglibFactory taglibFactory;
 
-  /**
-   * Initializes the ServletContext and the JSP taglib support for FreeMaker and also the TemplateModel classes that are
-   * bound into the ObjectFactory.
-   *
-   * @param context       The context.
-   * @param objectFactory Used to get the template models.
-   */
   @Inject
-  public static void initialize(ServletContext context, ObjectFactory objectFactory) {
-    FreeMarkerMap.taglibFactory = new TaglibFactory(context);
-    FreeMarkerMap.context = context;
-
-    List<Class<? extends TemplateModel>> types = objectFactory.getAllForType(TemplateModel.class);
-    for (Class<? extends TemplateModel> type : types) {
-      models.put(type.getSimpleName().toLowerCase(), type);
-    }
-
-    List<Class<? extends Control>> controlTypess = objectFactory.getAllForType(Control.class);
-    for (Class<? extends Control> controlType : controlTypess) {
-      controls.put(controlType.getSimpleName().toLowerCase(), controlType);
-    }
-
-    FreeMarkerMap.objectFactory = objectFactory;
-  }
-
-  public FreeMarkerMap(HttpServletRequest request, HttpServletResponse response,
-                       ExpressionEvaluator expressionEvaluator, ActionInvocationStore actionInvocationStore, Map<String, Object> additionalValues) {
+  public FreeMarkerMap(ServletContext context, HttpServletRequest request, HttpServletResponse response,
+                       ExpressionEvaluator expressionEvaluator, ActionInvocationStore actionInvocationStore,
+                       MessageStore messageStore, Map<String, Set<Control>> controlSets) {
+    this.context = context;
+    this.taglibFactory = new TaglibFactory(context);
+    this.request = request;
+    this.expressionEvaluator = expressionEvaluator;
+    this.actionInvocationStore = actionInvocationStore;
+    
     objects.put(REQUEST_MODEL, new HttpRequestHashModel(request, response, FieldSupportBeansWrapper.INSTANCE));
     objects.put(REQUEST, request);
     HttpSession session = request.getSession(false);
@@ -126,27 +103,19 @@ public class FreeMarkerMap implements TemplateHashModelEx {
 
       @Override
       public ServletContext getServletContext() {
-        return context;
+        return FreeMarkerMap.this.context;
       }
 
 
     }, FieldSupportBeansWrapper.INSTANCE));
     objects.put(APPLICATION, context);
-    objects.put(JSP_TAGLIBS, taglibFactory);
-    objects.put(TAG_PREFIX, new ControlHashModel(objectFactory, controls));
+    objects.put(JSP_TAGLIBS, new TaglibFactory(context));
+    objects.put(MESSAGES, messageStore.get());
 
-    objects.putAll(additionalValues);
-
-    // Add any additional FreeMarker models that are registered
-    for (String key : models.keySet()) {
-      if (!objects.containsKey(key)) {
-        objects.put(key, objectFactory.create(models.get(key)));
-      }
+    // Add the controls
+    for (String prefix : controlSets.keySet()) {
+      objects.put(prefix, new ControlsHashModel(controlSets.get(prefix)));
     }
-
-    this.request = request;
-    this.expressionEvaluator = expressionEvaluator;
-    this.actionInvocationStore = actionInvocationStore;
 
     // TODO add debugging for figuring out what scope an object is in
   }
@@ -228,14 +197,15 @@ public class FreeMarkerMap implements TemplateHashModelEx {
   }
 
   public TemplateCollectionModel keys() {
-    Set<String> keys = append(objects.keySet(), iterable(request.getAttributeNames()));
+    Set<String> keys = new HashSet<String>(objects.keySet());
+    keys.addAll(enumToSet(request.getAttributeNames()));
 
     HttpSession session = request.getSession(false);
     if (session != null) {
-      keys.addAll(append(iterable(session.getAttributeNames())));
+      keys.addAll(enumToSet(session.getAttributeNames()));
     }
 
-    keys.addAll(append(iterable(context.getAttributeNames())));
+    keys.addAll(enumToSet(context.getAttributeNames()));
 
     Deque<ActionInvocation> actionInvocations = actionInvocationStore.getDeque();
     if (actionInvocations != null) {
@@ -298,23 +268,12 @@ public class FreeMarkerMap implements TemplateHashModelEx {
     return count;
   }
 
-  private <T> Set<T> append(Iterable<T>... iterables) {
-    Set<T> set = new HashSet<T>();
-    for (Iterable<T> iterable : iterables) {
-      for (T key : iterable) {
-        set.add(key);
-      }
+  private Set<String> enumToSet(Enumeration enumeration) {
+    Set<String> set = new HashSet<String>();
+    while (enumeration.hasMoreElements()) {
+      set.add((String) enumeration.nextElement());
     }
 
     return set;
-  }
-
-  private Iterable<String> iterable(Enumeration enumeration) {
-    List<String> list = new ArrayList<String>();
-    while (enumeration.hasMoreElements()) {
-      list.add((String) enumeration.nextElement());
-    }
-
-    return list;
   }
 }

@@ -28,6 +28,8 @@ import org.easymock.EasyMock;
 import org.easymock.Capture;
 import org.primeframework.mock.servlet.FileInfo;
 import org.primeframework.mock.servlet.MockServletInputStream;
+import org.primeframework.mvc.workflow.RequestBodyWorkflow;
+import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
 
 import net.java.io.FileTools;

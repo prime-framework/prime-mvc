@@ -20,6 +20,8 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.primeframework.mvc.message.EmptyMessage;
+import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 
@@ -67,20 +69,12 @@ public abstract class AbstractListInput extends AbstractInput {
     String headerValue = (String) attributes.remove("headerValue");
     String headerL10n = (String) attributes.remove("headerL10n");
     if (headerValue != null) {
-      String message = "";
+      Message message = new EmptyMessage();
       if (headerL10n != null) {
-        String bundleName = determineBundleName(attributes);
-        if (bundleName == null) {
-          throw new IllegalStateException("Unable to locate the localized text for a header " +
-            "option in the select box named [" + attributes.get("name") + "]. If you " +
-            "don't have an action class for the URL, you must define the bundle used " +
-            "to localize the select using the bundle attribute.");
-        }
-
-        message = messageProvider.getMessage(bundleName, headerL10n);
+        message = messageProvider.getMessage(headerL10n);
       }
 
-      options.put(headerValue, new Option(message, false));
+      options.put(headerValue, new Option(message.toString(), false));
     }
 
     // Grab the value
@@ -98,13 +92,13 @@ public abstract class AbstractListInput extends AbstractInput {
         Collection c = (Collection) items;
         for (Object o : c) {
           Object value = makeValue(o, null, valueExpr);
-          options.put(value.toString(), makeOption(o, value, beanValue, attributes, textExpr, l10nExpr));
+          options.put(value.toString(), makeOption(o, value, beanValue, textExpr, l10nExpr));
         }
       } else if (items instanceof Map) {
         Map<?, ?> m = (Map<?, ?>) items;
         for (Map.Entry entry : m.entrySet()) {
           Object value = makeValue(entry.getValue(), entry.getKey(), valueExpr);
-          Option option = makeOption(entry.getValue(), value, beanValue, attributes, textExpr, l10nExpr);
+          Option option = makeOption(entry.getValue(), value, beanValue, textExpr, l10nExpr);
           options.put(value.toString(), option);
         }
       } else if (items.getClass().isArray()) {
@@ -112,7 +106,7 @@ public abstract class AbstractListInput extends AbstractInput {
         for (int i = 0; i < length; i++) {
           Object itemsValue = Array.get(items, i);
           Object value = makeValue(itemsValue, null, valueExpr);
-          Option option = makeOption(itemsValue, value, beanValue, attributes, textExpr, l10nExpr);
+          Option option = makeOption(itemsValue, value, beanValue, textExpr, l10nExpr);
           options.put(value.toString(), option);
         }
       }
@@ -128,33 +122,27 @@ public abstract class AbstractListInput extends AbstractInput {
    * text for the option from the object. Otherwise, the object is converted to a String for the text. Also, if the
    * object exists in the given Collection the option is set to selected.
    *
+   *
    * @param itemsValue The current value from the items collection/array/map.
    * @param value      The value of the option. This could have been from the items Map or the valueExpr evaluation.
    * @param beanValue  The value from the bean, used to determine selected state.
-   * @param attributes used to get the text for the option.
    * @param textExpr   The textExpr attribute.
    * @param l10nExpr   The l10nExpr attribute.
    * @return The option and never null.
    */
-  private Option makeOption(Object itemsValue, Object value, Object beanValue, Map<String, Object> attributes,
-                            String textExpr, String l10nExpr) {
+  private Option makeOption(Object itemsValue, Object value, Object beanValue, String textExpr, String l10nExpr) {
     if (itemsValue == null) {
       return new Option("", false);
     }
 
     String text = null;
     if (l10nExpr != null) {
-      String bundleName = determineBundleName(attributes);
-      if (bundleName == null) {
-        throw new IllegalStateException("Unable to locate the localized text for an option " +
-          "in the select input for the field named [" + attributes.get("name") + "]. If " +
-          "you don't have an action class for the URL, you must define the bundle used " +
-          "to localize the select using the bundle attribute.");
-      }
-
       Object l10nKey = expressionEvaluator.getValue(l10nExpr, itemsValue);
       if (l10nKey != null) {
-        text = messageProvider.getMessage(bundleName, l10nKey.toString());
+        Message message = messageProvider.getMessage(l10nKey.toString());
+        if (message != null) {
+          text = message.toString();
+        }
       }
     }
 

@@ -18,7 +18,7 @@ package org.primeframework.mvc.scope;
 import java.lang.annotation.Annotation;
 
 /**
- * <p> This interface defines the handler for a specific scope. </p>
+ * This interface defines the handler for a specific scope.
  *
  * @author Brian Pontarelli
  */

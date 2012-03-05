@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,18 @@
  */
 package org.primeframework.mvc.servlet;
 
-import com.google.inject.ImplementedBy;
-
 /**
- * <p> This interface defines the main entry point for the JCatapult MVC. </p>
+ * This enum lists all of the HTTP methods. These are injectable.
  *
  * @author Brian Pontarelli
  */
-@ImplementedBy(DefaultMVCWorkflow.class)
-public interface MVCWorkflow extends Workflow {
+public enum HTTPMethod {
+  GET,
+  POST,
+  PUT,
+  DELETE,
+  HEAD,
+  TRACE,
+  OPTIONS,
+  CONNECT
 }

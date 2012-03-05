@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,30 +13,28 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.servlet;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
+package org.primeframework.mvc.action.result;
 
 /**
- * <p> This request is a URI proxy. </p>
+ * The default implementation of the result code store. It uses a ThreadLocal.
  *
  * @author Brian Pontarelli
  */
-public class URIHttpServletRequest extends HttpServletRequestWrapper {
-  private String uri;
-
-  public URIHttpServletRequest(HttpServletRequest httpServletRequest, String uri) {
-    super(httpServletRequest);
-    this.uri = uri;
+public class ThreadLocalResultStore implements ResultStore {
+  private final static ThreadLocal<String> store = new ThreadLocal<String>();
+  
+  @Override
+  public String get() {
+    return store.get();
   }
 
   @Override
-  public String getRequestURI() {
-    return uri;
+  public void set(String resultCode) {
+    store.set(resultCode);
   }
 
-  public void setRequestURI(String uri) {
-    this.uri = uri;
+  @Override
+  public void clear() {
+    store.remove();
   }
 }

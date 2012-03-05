@@ -45,7 +45,7 @@ public abstract class AbstractPrimeMVCConfiguration implements PrimeMVCConfigura
 
   @Override
   public String[] staticResourcePrefixes() {
-    return new String[]{"/module", "/component", "/static", "/jcatapult"};
+    return new String[]{"/static"};
   }
 
   @Override

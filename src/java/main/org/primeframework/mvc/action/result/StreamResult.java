@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.primeframework.mvc.action.ActionInvocation;
+import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.annotation.Stream;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 
@@ -36,23 +36,27 @@ import com.google.inject.Inject;
  */
 public class StreamResult extends AbstractResult<Stream> {
   private final HttpServletResponse response;
+  private final ActionInvocationStore actionInvocationStore;
 
   @Inject
-  public StreamResult(ExpressionEvaluator expressionEvaluator, HttpServletResponse response) {
+  public StreamResult(ExpressionEvaluator expressionEvaluator, HttpServletResponse response,
+                      ActionInvocationStore actionInvocationStore) {
     super(expressionEvaluator);
     this.response = response;
+    this.actionInvocationStore = actionInvocationStore;
   }
 
   /**
    * {@inheritDoc}
    */
-  public void execute(Stream stream, ActionInvocation invocation) throws IOException, ServletException {
+  public void execute(Stream stream) throws IOException, ServletException {
+    Object action = actionInvocationStore.getCurrent().action();
     String property = stream.property();
-    String length = expand(stream.length(), invocation.action());
-    String name = expand(stream.name(), invocation.action());
-    String type = expand(stream.type(), invocation.action());
+    String length = expand(stream.length(), action);
+    String name = expand(stream.name(), action);
+    String type = expand(stream.type(), action);
 
-    Object object = expressionEvaluator.getValue(property, invocation.action());
+    Object object = expressionEvaluator.getValue(property, action);
     if (object == null || !(object instanceof InputStream)) {
       throw new IOException("Invalid property [" + property + "] for Stream result. This " +
         "property returned null or an Object that is not an InputStream.");

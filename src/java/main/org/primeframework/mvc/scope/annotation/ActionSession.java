@@ -23,8 +23,8 @@ import java.lang.annotation.Target;
 import org.primeframework.mvc.scope.ActionSessionScope;
 
 /**
- * <p> This annotation should be used to mark member fields of actions that should be fetched and stored in the
- * HttpSession but only accessible by the current action. </p>
+ * This annotation should be used to mark member fields of actions that should be fetched and stored in the HttpSession
+ * but only accessible by the current action.
  *
  * @author Brian Pontarelli
  */

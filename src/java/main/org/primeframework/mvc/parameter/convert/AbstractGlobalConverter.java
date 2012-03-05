@@ -35,7 +35,6 @@ import net.java.lang.StringTools;
  *
  * @author Brian Pontarelli
  */
-@SuppressWarnings("unchecked")
 public abstract class AbstractGlobalConverter implements GlobalConverter {
   /**
    * Handles the following cases:
@@ -240,7 +239,7 @@ public abstract class AbstractGlobalConverter implements GlobalConverter {
     }
 
     int length = Array.getLength(value);
-    StringBuffer str = new StringBuffer();
+    StringBuilder str = new StringBuilder();
     for (int i = 0; i < length; i++) {
       Object o = Array.get(value, i);
       str.append(convertToString(value.getClass().getComponentType(), dynamicAttributes, expression, o));

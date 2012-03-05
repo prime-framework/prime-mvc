@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.primeframework.mvc.action.ActionInvocation;
+import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.annotation.XMLStream;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 
@@ -36,17 +37,21 @@ import com.google.inject.Inject;
  */
 public class XMLStreamResult extends AbstractResult<XMLStream> {
   private final HttpServletResponse response;
+  private final ActionInvocationStore actionInvocationStore;
 
   @Inject
-  public XMLStreamResult(ExpressionEvaluator expressionEvaluator, HttpServletResponse response) {
+  public XMLStreamResult(ExpressionEvaluator expressionEvaluator, HttpServletResponse response, 
+                         ActionInvocationStore actionInvocationStore) {
     super(expressionEvaluator);
     this.response = response;
+    this.actionInvocationStore = actionInvocationStore;
   }
 
-  public void execute(XMLStream xmlStream, ActionInvocation invocation) throws IOException, ServletException {
+  public void execute(XMLStream xmlStream) throws IOException, ServletException {
     String xml = xmlStream.property();
 
-    Object object = expressionEvaluator.getValue(xml, invocation.action());
+    Object action = actionInvocationStore.getCurrent().action();
+    Object object = expressionEvaluator.getValue(xml, action);
     if (object == null || !(object instanceof String)) {
       throw new IOException("Invalid property [" + xml + "] for XMLStream result. This " +
         "property returned null or an Object that is not a String.");

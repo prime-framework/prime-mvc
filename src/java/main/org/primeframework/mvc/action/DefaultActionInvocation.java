@@ -34,8 +34,6 @@ public class DefaultActionInvocation implements ActionInvocation {
   private final Collection<String> uriParameters;
   private final ActionConfiguration configuration;
   private final boolean executeResult;
-  private final boolean executeAction;
-  private final String resultCode;
 
   public DefaultActionInvocation(Object action, String uri, String extension, ActionConfiguration configuration) {
     this.action = action;
@@ -43,22 +41,17 @@ public class DefaultActionInvocation implements ActionInvocation {
     this.extension = extension;
     this.uriParameters = new ArrayList<String>();
     this.configuration = configuration;
-    this.executeAction = true;
     this.executeResult = true;
-    this.resultCode = null;
   }
 
   public DefaultActionInvocation(Object action, String uri, String extension, Collection<String> uriParameters,
-                                 ActionConfiguration configuration, boolean executeResult, boolean executeAction,
-                                 String resultCode) {
+                                 ActionConfiguration configuration, boolean executeResult) {
     this.action = action;
     this.uri = uri;
     this.extension = extension;
     this.uriParameters = uriParameters;
     this.configuration = configuration;
     this.executeResult = executeResult;
-    this.executeAction = executeAction;
-    this.resultCode = resultCode;
   }
 
   /**
@@ -101,20 +94,6 @@ public class DefaultActionInvocation implements ActionInvocation {
    */
   public boolean executeResult() {
     return executeResult;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public boolean executeAction() {
-    return executeAction;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public String resultCode() {
-    return resultCode;
   }
 
   /**

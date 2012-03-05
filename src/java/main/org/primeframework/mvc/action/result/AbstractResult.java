@@ -57,7 +57,7 @@ public abstract class AbstractResult<U extends Annotation> implements Result<U> 
    * @param action The action used to expand.
    * @return The result.
    */
-  protected String expand(String str, Object action) {
+  protected String expand(String str, Object action, boolean encode) {
     if (action != null) {
       return expressionEvaluator.expand(str, action);
     }

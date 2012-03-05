@@ -48,7 +48,7 @@ public class CheckboxTest extends ControlBaseTest {
       null, "<input type=\"hidden\" name=\"test@param\" value=\"param-value\"/>\n" +
       "<div class=\"css-class-checkbox css-class-input css-class-control checkbox input control\">\n" +
       "<div class=\"label-container\"><label for=\"test\" class=\"label\">Test<span class=\"required\">*</span></label></div>\n" +
-      "<div class=\"control-container\"><input type=\"checkbox\" class=\"css-class\" id=\"test\" name=\"test\" value=\"test-value\"/><input type=\"hidden\" name=\"__jc_cb_test\" value=\"\"/></div>\n" +
+      "<div class=\"control-container\"><input type=\"checkbox\" class=\"css-class\" id=\"test\" name=\"test\" value=\"test-value\"/><input type=\"hidden\" name=\"__cb_test\" value=\"\"/></div>\n" +
       "</div>\n");
   }
 
@@ -113,7 +113,7 @@ public class CheckboxTest extends ControlBaseTest {
       "<div class=\"label-container\"><label for=\"" + property.replace(".", "_") + "\" class=\"label\">Male?</label></div>\n" +
       "<div class=\"control-container\"><input type=\"checkbox\" " + (flag ? "checked=\"checked\" " : "") +
       "id=\"" + property.replace(".", "_") + "\" name=\"" + property + "\" value=\"" + value.replace("<", "&lt;").replace(">", "&gt;") +
-      "\"/><input type=\"hidden\" name=\"__jc_cb_" + property + "\" value=\"\"/></div>\n" +
+      "\"/><input type=\"hidden\" name=\"__cb_" + property + "\" value=\"\"/></div>\n" +
       "</div>\n");
   }
 
@@ -127,7 +127,7 @@ public class CheckboxTest extends ControlBaseTest {
       null, "<input type=\"hidden\" name=\"user.maleWrapper@param\" value=\"param-value\"/>\n" +
       "<div class=\"checkbox input control\">\n" +
       "<div class=\"label-container\"><label for=\"user_maleWrapper\" class=\"label\">Male?</label></div>\n" +
-      "<div class=\"control-container\"><input type=\"checkbox\" checked=\"checked\" id=\"user_maleWrapper\" name=\"user.maleWrapper\" value=\"true\"/><input type=\"hidden\" name=\"__jc_cb_user.maleWrapper\" value=\"\"/></div>\n" +
+      "<div class=\"control-container\"><input type=\"checkbox\" checked=\"checked\" id=\"user_maleWrapper\" name=\"user.maleWrapper\" value=\"true\"/><input type=\"hidden\" name=\"__cb_user.maleWrapper\" value=\"\"/></div>\n" +
       "</div>\n");
   }
 
@@ -141,7 +141,7 @@ public class CheckboxTest extends ControlBaseTest {
       null, "<input type=\"hidden\" name=\"user.male@param\" value=\"param-value\"/>\n" +
       "<div class=\"checkbox input control\">\n" +
       "<div class=\"label-container\"><label for=\"user_male\" class=\"label\">Male?</label></div>\n" +
-      "<div class=\"control-container\"><input type=\"checkbox\" checked=\"checked\" id=\"user_male\" name=\"user.male\" value=\"true\"/><input type=\"hidden\" name=\"__jc_cb_user.male\" value=\"\"/></div>\n" +
+      "<div class=\"control-container\"><input type=\"checkbox\" checked=\"checked\" id=\"user_male\" name=\"user.male\" value=\"true\"/><input type=\"hidden\" name=\"__cb_user.male\" value=\"\"/></div>\n" +
       "</div>\n");
   }
 
@@ -158,7 +158,7 @@ public class CheckboxTest extends ControlBaseTest {
       null, "<input type=\"hidden\" name=\"user.male@param\" value=\"param-value\"/>\n" +
       "<div class=\"checkbox input control\">\n" +
       "<div class=\"label-container\"><label for=\"user_male\" class=\"label\"><span class=\"error\">Male? (Must be male, Check this box dude!)</span></label></div>\n" +
-      "<div class=\"control-container\"><input type=\"checkbox\" id=\"user_male\" name=\"user.male\" value=\"true\"/><input type=\"hidden\" name=\"__jc_cb_user.male\" value=\"\"/></div>\n" +
+      "<div class=\"control-container\"><input type=\"checkbox\" id=\"user_male\" name=\"user.male\" value=\"true\"/><input type=\"hidden\" name=\"__cb_user.male\" value=\"\"/></div>\n" +
       "</div>\n");
   }
 
@@ -172,7 +172,7 @@ public class CheckboxTest extends ControlBaseTest {
       null, "<input type=\"hidden\" name=\"user.maleWrapper@param\" value=\"param-value\"/>\n" +
       "<div class=\"checkbox input control\">\n" +
       "<div class=\"label-container\"><label for=\"user_maleWrapper\" class=\"label\">Male?</label></div>\n" +
-      "<div class=\"control-container\"><input type=\"checkbox\" id=\"user_maleWrapper\" name=\"user.maleWrapper\" value=\"true\"/><input type=\"hidden\" name=\"__jc_cb_user.maleWrapper\" value=\"false\"/></div>\n" +
+      "<div class=\"control-container\"><input type=\"checkbox\" id=\"user_maleWrapper\" name=\"user.maleWrapper\" value=\"true\"/><input type=\"hidden\" name=\"__cb_user.maleWrapper\" value=\"false\"/></div>\n" +
       "</div>\n");
   }
 }

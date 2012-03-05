@@ -15,25 +15,16 @@
  */
 package org.primeframework.mvc.validation;
 
-import java.lang.annotation.Annotation;
-
 /**
- * <p> This interface defines a validator. </p>
+ * This interface defines how Prime handles validation.
  *
  * @author Brian Pontarelli
  */
-public interface Validator<T extends Annotation> {
+public interface Validator {
   /**
-   * Validates the given value against the given annotation.
+   * Validates the request and if validation fails throws a ValidationException.
    *
-   * @param annotation The annotation that is associated with this validator and that was placed on a bean property or
-   *                   field.
-   * @param container  This is the Object that contains the bean property or field being validated. This is useful when
-   *                   a specific validation is dependent on other properties of an Object. For example, an address
-   *                   might have special validator on the state property that ensures the state is only specified for
-   *                   countries that have states.
-   * @param value      The bean property or field value.
-   * @return True if the validation passes, false otherwise.
+   * @throws ValidationException If validation fails.
    */
-  boolean validate(T annotation, Object container, Object value);
+  void validate() throws ValidationException;
 }

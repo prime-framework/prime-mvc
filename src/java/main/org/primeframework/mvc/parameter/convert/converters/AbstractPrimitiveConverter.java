@@ -27,7 +27,7 @@ import org.primeframework.mvc.parameter.el.TypeTools;
 import net.java.lang.StringTools;
 
 /**
- * <p> Overrides the abstract type converter to add abstract methods for handling primitives. </p>
+ * Overrides the abstract type converter to add abstract methods for handling primitives.
  *
  * @author Brian Pontarelli
  */

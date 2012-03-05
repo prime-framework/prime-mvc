@@ -23,7 +23,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.annotation.Annotation;
-import java.util.HashMap;
 import java.util.Locale;
 
 import org.primeframework.mvc.action.ActionInvocation;
@@ -45,22 +44,24 @@ import com.google.inject.Inject;
  */
 public class ForwardResult extends AbstractResult<Forward> {
   public static final String DIR = "/WEB-INF/content";
-  private final Locale locale;
+  private final ActionInvocationStore actionInvocationStore;
+  private final FreeMarkerService freeMarkerService;
   private final ServletContext servletContext;
   private final HttpServletRequest request;
   private final HttpServletResponse response;
-  private final FreeMarkerService freeMarkerService;
-  private final ActionInvocationStore actionInvocationStore;
+  private final FreeMarkerMap freeMarkerMap;
+  private final Locale locale;
 
   @Inject
-  public ForwardResult(@CurrentLocale Locale locale, ServletContext servletContext, HttpServletRequest request,
-                       HttpServletResponse response, ExpressionEvaluator expressionEvaluator,
-                       FreeMarkerService freeMarkerService, ActionInvocationStore actionInvocationStore) {
+  public ForwardResult(ActionInvocationStore actionInvocationStore, ExpressionEvaluator expressionEvaluator,
+                       FreeMarkerService freeMarkerService, ServletContext servletContext, HttpServletRequest request,
+                       HttpServletResponse response, FreeMarkerMap freeMarkerMap, @CurrentLocale Locale locale) {
     super(expressionEvaluator);
     this.locale = locale;
     this.servletContext = servletContext;
     this.request = request;
     this.response = response;
+    this.freeMarkerMap = freeMarkerMap;
     this.freeMarkerService = freeMarkerService;
     this.actionInvocationStore = actionInvocationStore;
   }
@@ -68,7 +69,8 @@ public class ForwardResult extends AbstractResult<Forward> {
   /**
    * {@inheritDoc}
    */
-  public void execute(Forward forward, ActionInvocation invocation) throws IOException, ServletException {
+  public void execute(Forward forward) throws IOException, ServletException {
+    ActionInvocation invocation = actionInvocationStore.getCurrent();
     Object action = invocation.action();
 
     // Set the content type for the response
@@ -86,8 +88,7 @@ public class ForwardResult extends AbstractResult<Forward> {
     }
 
     if (page == null) {
-      throw new RuntimeException("Unable to locate result for URI [" + invocation.uri() +
-        "] and result code [" + code + "]");
+      throw new RuntimeException("Unable to locate result for URI [" + invocation.uri() + "] and result code [" + code + "]");
     }
 
     page = expand(page, action);
@@ -107,8 +108,7 @@ public class ForwardResult extends AbstractResult<Forward> {
       requestDispatcher.forward(wrapRequest(invocation, request), response);
     } else if (page.endsWith(".ftl")) {
       PrintWriter writer = response.getWriter();
-      FreeMarkerMap map = new FreeMarkerMap(request, response, expressionEvaluator, actionInvocationStore, new HashMap<String, Object>());
-      freeMarkerService.render(writer, page, map, locale);
+      freeMarkerService.render(writer, page, freeMarkerMap, locale);
     }
   }
 

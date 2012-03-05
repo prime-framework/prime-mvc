@@ -31,7 +31,7 @@ import org.example.action.MissingExecuteMethod;
 import org.example.action.Post;
 import org.example.action.Simple;
 import org.primeframework.mvc.action.config.DefaultActionConfiguration;
-import org.primeframework.mvc.servlet.WorkflowChain;
+import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
 
 import static org.easymock.EasyMock.capture;
@@ -57,7 +57,7 @@ public class DefaultActionInvocationWorkflowTest {
     chain.continueWorkflow();
     EasyMock.replay(chain);
 
-    DefaultActionInvocationWorkflow workflow = new DefaultActionInvocationWorkflow(request, ais);
+    DefaultActionInvocationWorkflow workflow = new DefaultActionInvocationWorkflow(ais, resultStore, request);
     workflow.perform(chain);
 
     EasyMock.verify(request, ais, chain);
@@ -85,7 +85,7 @@ public class DefaultActionInvocationWorkflowTest {
     chain.continueWorkflow();
     EasyMock.replay(chain);
 
-    DefaultActionInvocationWorkflow workflow = new DefaultActionInvocationWorkflow(request, ais);
+    DefaultActionInvocationWorkflow workflow = new DefaultActionInvocationWorkflow(ais, resultStore, request);
     workflow.perform(chain);
 
     assertTrue(simple.invoked);
@@ -109,7 +109,7 @@ public class DefaultActionInvocationWorkflowTest {
     WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);
     EasyMock.replay(chain);
 
-    DefaultActionInvocationWorkflow workflow = new DefaultActionInvocationWorkflow(request, ais);
+    DefaultActionInvocationWorkflow workflow = new DefaultActionInvocationWorkflow(ais, resultStore, request);
     try {
       workflow.perform(chain);
       fail("Should have failed");
@@ -136,7 +136,7 @@ public class DefaultActionInvocationWorkflowTest {
     WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);
     EasyMock.replay(chain);
 
-    DefaultActionInvocationWorkflow workflow = new DefaultActionInvocationWorkflow(request, ais);
+    DefaultActionInvocationWorkflow workflow = new DefaultActionInvocationWorkflow(ais, resultStore, request);
     try {
       workflow.perform(chain);
       fail("Should have failed");
@@ -165,7 +165,7 @@ public class DefaultActionInvocationWorkflowTest {
     WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);
     EasyMock.replay(chain);
 
-    DefaultActionInvocationWorkflow workflow = new DefaultActionInvocationWorkflow(request, ais);
+    DefaultActionInvocationWorkflow workflow = new DefaultActionInvocationWorkflow(ais, resultStore, request);
     try {
       workflow.perform(chain);
       fail("Should have failed");
@@ -193,7 +193,7 @@ public class DefaultActionInvocationWorkflowTest {
     WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);
     EasyMock.replay(chain);
 
-    DefaultActionInvocationWorkflow workflow = new DefaultActionInvocationWorkflow(request, ais);
+    DefaultActionInvocationWorkflow workflow = new DefaultActionInvocationWorkflow(ais, resultStore, request);
     try {
       workflow.perform(chain);
       fail("Should have failed");
@@ -227,7 +227,7 @@ public class DefaultActionInvocationWorkflowTest {
     chain.continueWorkflow();
     EasyMock.replay(chain);
 
-    DefaultActionInvocationWorkflow workflow = new DefaultActionInvocationWorkflow(request, ais);
+    DefaultActionInvocationWorkflow workflow = new DefaultActionInvocationWorkflow(ais, resultStore, request);
     workflow.perform(chain);
 
     assertFalse(action.baseInvoked);
@@ -258,7 +258,7 @@ public class DefaultActionInvocationWorkflowTest {
     chain.continueWorkflow();
     EasyMock.replay(chain);
 
-    DefaultActionInvocationWorkflow workflow = new DefaultActionInvocationWorkflow(request, ais);
+    DefaultActionInvocationWorkflow workflow = new DefaultActionInvocationWorkflow(ais, resultStore, request);
     workflow.perform(chain);
 
     assertTrue(action.baseInvoked);
@@ -289,7 +289,7 @@ public class DefaultActionInvocationWorkflowTest {
     chain.continueWorkflow();
     EasyMock.replay(chain);
 
-    DefaultActionInvocationWorkflow workflow = new DefaultActionInvocationWorkflow(request, ais);
+    DefaultActionInvocationWorkflow workflow = new DefaultActionInvocationWorkflow(ais, resultStore, request);
     workflow.perform(chain);
 
     assertTrue(action.invoked);
@@ -317,7 +317,7 @@ public class DefaultActionInvocationWorkflowTest {
     chain.continueWorkflow();
     EasyMock.replay(chain);
 
-    DefaultActionInvocationWorkflow workflow = new DefaultActionInvocationWorkflow(request, ais);
+    DefaultActionInvocationWorkflow workflow = new DefaultActionInvocationWorkflow(ais, resultStore, request);
     workflow.perform(chain);
 
     assertTrue(action.invoked);

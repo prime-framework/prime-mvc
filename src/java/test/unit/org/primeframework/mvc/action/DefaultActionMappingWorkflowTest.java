@@ -25,10 +25,9 @@ import org.easymock.EasyMock;
 import org.example.action.ComplexRest;
 import org.example.action.user.Edit;
 import org.example.action.user.RESTEdit;
-import org.primeframework.mvc.ObjectFactory;
 import org.primeframework.mvc.action.config.ActionConfigurationProvider;
 import org.primeframework.mvc.action.config.DefaultActionConfiguration;
-import org.primeframework.mvc.servlet.WorkflowChain;
+import org.primeframework.mvc.workflow.WorkflowChain;
 import org.primeframework.mvc.test.JCatapultBaseTest;
 import org.testng.annotations.Test;
 
@@ -46,8 +45,8 @@ public class DefaultActionMappingWorkflowTest extends JCatapultBaseTest {
   public void testDifferentButtonClick() throws IOException, ServletException {
     request.setUri("/admin/user/edit");
     request.setPost(true);
-    request.setParameter("__jc_a_submit", "");
-    request.setParameter("__jc_a_cancel", "/admin/user/cancel");
+    request.setParameter("__a_submit", "");
+    request.setParameter("__a_cancel", "/admin/user/cancel");
     request.setParameter("cancel", "Cancel");
 
     run("/admin/user/cancel", null);
@@ -57,8 +56,8 @@ public class DefaultActionMappingWorkflowTest extends JCatapultBaseTest {
   public void testDifferentButtonClickRelativeURI() throws IOException, ServletException {
     request.setUri("/admin/user/edit");
     request.setPost(true);
-    request.setParameter("__jc_a_submit", "");
-    request.setParameter("__jc_a_cancel", "cancel");
+    request.setParameter("__a_submit", "");
+    request.setParameter("__a_cancel", "cancel");
     request.setParameter("cancel", "Cancel");
 
     run("/admin/user/cancel", null);
@@ -68,8 +67,8 @@ public class DefaultActionMappingWorkflowTest extends JCatapultBaseTest {
   public void testRequestURI() throws IOException, ServletException {
     request.setUri("/admin/user/edit");
     request.setPost(true);
-    request.setParameter("__jc_a_submit", "");
-    request.setParameter("__jc_a_cancel", "cancel");
+    request.setParameter("__a_submit", "");
+    request.setParameter("__a_cancel", "cancel");
     request.setParameter("submit", "Submit");
 
     run("/admin/user/edit", null);
@@ -80,8 +79,8 @@ public class DefaultActionMappingWorkflowTest extends JCatapultBaseTest {
     request.setUri("/context-path/admin/user/edit");
     request.setContextPath("/context-path");
     request.setPost(true);
-    request.setParameter("__jc_a_submit", "");
-    request.setParameter("__jc_a_cancel", "cancel");
+    request.setParameter("__a_submit", "");
+    request.setParameter("__a_cancel", "cancel");
     request.setParameter("submit", "Submit");
 
     run("/admin/user/edit", null);
@@ -91,8 +90,8 @@ public class DefaultActionMappingWorkflowTest extends JCatapultBaseTest {
   public void testExtension() throws IOException, ServletException {
     request.setUri("/admin/user/edit.xml");
     request.setPost(true);
-    request.setParameter("__jc_a_submit", "");
-    request.setParameter("__jc_a_cancel", "cancel");
+    request.setParameter("__a_submit", "");
+    request.setParameter("__a_cancel", "cancel");
     request.setParameter("submit", "Submit");
 
     run("/admin/user/edit", "xml");
@@ -102,8 +101,8 @@ public class DefaultActionMappingWorkflowTest extends JCatapultBaseTest {
   public void testURIParameters() throws IOException, ServletException {
     request.setUri("/admin/user/rest-edit/12");
     request.setPost(true);
-    request.setParameter("__jc_a_submit", "");
-    request.setParameter("__jc_a_cancel", "cancel");
+    request.setParameter("__a_submit", "");
+    request.setParameter("__a_cancel", "cancel");
     request.setParameter("submit", "Submit");
 
     ActionConfigurationProvider provider = EasyMock.createStrictMock(ActionConfigurationProvider.class);
@@ -144,8 +143,8 @@ public class DefaultActionMappingWorkflowTest extends JCatapultBaseTest {
   public void testURIParametersComplexWithWildcard() throws IOException, ServletException {
     request.setUri("/complex-rest/brian/static/pontarelli/then/a/bunch/of/stuff");
     request.setPost(true);
-    request.setParameter("__jc_a_submit", "");
-    request.setParameter("__jc_a_cancel", "cancel");
+    request.setParameter("__a_submit", "");
+    request.setParameter("__a_cancel", "cancel");
     request.setParameter("submit", "Submit");
 
     ActionConfigurationProvider provider = EasyMock.createStrictMock(ActionConfigurationProvider.class);
@@ -193,8 +192,8 @@ public class DefaultActionMappingWorkflowTest extends JCatapultBaseTest {
   public void testRedirectToIndex() throws IOException, ServletException {
     request.setUri("/foo");
     request.setPost(true);
-    request.setParameter("__jc_a_submit", "");
-    request.setParameter("__jc_a_cancel", "cancel");
+    request.setParameter("__a_submit", "");
+    request.setParameter("__a_cancel", "cancel");
     request.setParameter("submit", "Submit");
 
     ActionConfigurationProvider provider = EasyMock.createStrictMock(ActionConfigurationProvider.class);

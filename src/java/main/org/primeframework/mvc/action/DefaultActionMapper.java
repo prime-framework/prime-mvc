@@ -18,11 +18,11 @@ package org.primeframework.mvc.action;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-import org.primeframework.mvc.ObjectFactory;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.config.ActionConfigurationProvider;
 
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 
 /**
  * This class is the default action mapper implementation.
@@ -31,12 +31,12 @@ import com.google.inject.Inject;
  */
 public class DefaultActionMapper implements ActionMapper {
   private final ActionConfigurationProvider actionConfigurationProvider;
-  private final ObjectFactory objectFactory;
+  private final Injector injector;
 
   @Inject
-  public DefaultActionMapper(ActionConfigurationProvider actionConfigurationProvider, ObjectFactory objectFactory) {
+  public DefaultActionMapper(ActionConfigurationProvider actionConfigurationProvider, Injector injector) {
     this.actionConfigurationProvider = actionConfigurationProvider;
-    this.objectFactory = objectFactory;
+    this.injector = injector;
   }
 
   /**
@@ -95,11 +95,10 @@ public class DefaultActionMapper implements ActionMapper {
 
     Object action = null;
     if (actionConfiguration != null) {
-      action = objectFactory.create(actionConfiguration.actionClass());
+      action = injector.getInstance(actionConfiguration.actionClass());
     }
 
-    return new DefaultActionInvocation(action, uri, extension,
-      uriParameters, actionConfiguration, executeResult, true, null);
+    return new DefaultActionInvocation(action, uri, extension, uriParameters, actionConfiguration, executeResult);
   }
 
   private String determineExtension(String uri) {

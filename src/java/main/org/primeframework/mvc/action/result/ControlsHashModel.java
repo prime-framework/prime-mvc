@@ -17,12 +17,11 @@ package org.primeframework.mvc.action.result;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.primeframework.mvc.ObjectFactory;
 import org.primeframework.mvc.control.Control;
 import org.primeframework.mvc.control.FreeMarkerControlProxy;
 import org.primeframework.mvc.freemarker.FieldSupportBeansWrapper;
@@ -38,17 +37,17 @@ import freemarker.template.TemplateModelException;
  *
  * @author Brian Pontarelli
  */
-public class ControlHashModel implements TemplateHashModelEx {
-  private final ObjectFactory objectFactory;
-  private final Map<String, Class<? extends Control>> controls;
+public class ControlsHashModel implements TemplateHashModelEx {
+  private final Map<String, Control> controls = new HashMap<String, Control>();
 
-  public ControlHashModel(ObjectFactory objectFactory, Map<String, Class<? extends Control>> controls) {
-    this.objectFactory = objectFactory;
-    this.controls = controls;
+  public ControlsHashModel(Set<Control> controls) {
+    for (Control control : controls) {
+      this.controls.put(control.getName(), control);
+    }
   }
 
   public TemplateCollectionModel keys() throws TemplateModelException {
-    return new CollectionModel(keySet(), FieldSupportBeansWrapper.INSTANCE);
+    return new CollectionModel(controls.keySet(), FieldSupportBeansWrapper.INSTANCE);
   }
 
   public int size() {
@@ -60,28 +59,18 @@ public class ControlHashModel implements TemplateHashModelEx {
   }
 
   public TemplateModel get(String key) {
-    Class<? extends Control> type = controls.get(key);
-    if (type != null) {
-      return new FreeMarkerControlProxy(objectFactory.create(type));
-    }
-
-    return null;
+    return new FreeMarkerControlProxy(controls.get(key));
   }
 
   public TemplateCollectionModel values() {
     return new CollectionModel(valueCollection(), FieldSupportBeansWrapper.INSTANCE);
   }
 
-  public Set<String> keySet() {
-    return new HashSet<String>(controls.keySet());
-  }
-
-  public Collection<?> valueCollection() {
-    List<TemplateModel> all = new ArrayList<TemplateModel>();
-    for (String name : controls.keySet()) {
-      all.add(new FreeMarkerControlProxy(objectFactory.create(controls.get(name))));
+  private Collection<FreeMarkerControlProxy> valueCollection() {
+    List<FreeMarkerControlProxy> all = new ArrayList<FreeMarkerControlProxy>();
+    for (Control control : controls.values()) {
+      all.add(new FreeMarkerControlProxy(control));
     }
-
     return all;
   }
 }

@@ -24,6 +24,8 @@ import java.io.IOException;
 
 import org.easymock.EasyMock;
 import org.primeframework.mvc.config.PrimeMVCConfiguration;
+import org.primeframework.mvc.workflow.StaticResourceWorkflow;
+import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.*;

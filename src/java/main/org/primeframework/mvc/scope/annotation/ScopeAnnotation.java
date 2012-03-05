@@ -23,8 +23,8 @@ import java.lang.annotation.Target;
 import org.primeframework.mvc.scope.Scope;
 
 /**
- * <p> This annotation should be used to mark scope annotations so that they can be located by the JCatapult parameter
- * handling mechanism. </p>
+ * This annotation should be used to mark scope annotations so that they can be located by the JCatapult parameter
+ * handling mechanism.
  *
  * @author Brian Pontarelli
  */

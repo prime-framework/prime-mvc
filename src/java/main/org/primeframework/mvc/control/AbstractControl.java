@@ -24,20 +24,20 @@ import java.util.TreeMap;
 
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
+import org.primeframework.mvc.control.annotation.ControlAttribute;
+import org.primeframework.mvc.control.annotation.ControlAttributes;
 import org.primeframework.mvc.control.form.AppendAttributesMethod;
 import org.primeframework.mvc.control.form.JoinMethod;
 import org.primeframework.mvc.freemarker.FreeMarkerService;
 import org.primeframework.mvc.locale.annotation.CurrentLocale;
-import org.primeframework.mvc.control.annotation.ControlAttribute;
-import org.primeframework.mvc.control.annotation.ControlAttributes;
 
 import net.java.error.ErrorList;
 
 import com.google.inject.Inject;
 
 /**
- * <p> This class an abstract Control implementation that is useful for creating new controls that might need access to
- * things such as the request, the action invocation and attributes. </p>
+ * This class an abstract Control implementation that is useful for creating new controls that might need access to
+ * things such as the request, the action invocation and attributes.
  *
  * @author Brian Pontarelli
  */
@@ -61,10 +61,10 @@ public abstract class AbstractControl implements Control {
   }
 
   /**
-   * <p> Implements the controls renderStart method that is called directly by the JSP taglibs. This method is the main
+   * Implements the controls renderStart method that is called directly by the JSP taglibs. This method is the main
    * render point for the control and it uses the {@link FreeMarkerService} to render the control. Sub-classes need to
    * implement a number of methods in order to setup the Map that is passed to FreeMarker as well as determine the name
-   * of the template. </p>
+   * of the template.
    *
    * @param writer            The writer to output to.
    * @param attributes        The attributes.
@@ -100,10 +100,10 @@ public abstract class AbstractControl implements Control {
   }
 
   /**
-   * <p> Implements the controls renderEnd method that is called directly by the JSP taglibs. This method is the main
-   * render point for the control and it uses the {@link FreeMarkerService} to render the control. Sub-classes need to
+   * Implements the controls renderEnd method that is called directly by the JSP taglibs. This method is the main render
+   * point for the control and it uses the {@link FreeMarkerService} to render the control. Sub-classes need to
    * implement a number of methods in order to setup the Map that is passed to FreeMarker as well as determine the name
-   * of the template. </p>
+   * of the template
    *
    * @param writer The writer to output to.
    */
@@ -115,8 +115,8 @@ public abstract class AbstractControl implements Control {
   }
 
   /**
-   * <p> Creats the parameters Map that is the root node used by the FreeMarker template when rendering. This places
-   * these values in the root map: </p>
+   * Creates the parameters Map that is the root node used by the FreeMarker template when rendering. This places these
+   * values in the root map:
    * <p/>
    * <ul> <li>attributes - The attributes</li> <li>dynamic_attributes - The dynamic attributes</li>
    * <li>append_attributes - A FreeMarker method that appends attributes ({@link AppendAttributesMethod})</li> </ul>
@@ -147,26 +147,6 @@ public abstract class AbstractControl implements Control {
    * determine values, checked states, selected options, etc.
    */
   protected void addAdditionalAttributes() {
-  }
-
-  /**
-   * Determines the bundle name using the attribute first, then the request attribute named <code>
-   * jcatapultControlBundle</code> and then finally the action class name.
-   *
-   * @param attributes The attributes.
-   * @return The bundle name or null.
-   */
-  protected String determineBundleName(Map<String, Object> attributes) {
-    String bundleName;
-    if (attributes.get("bundle") != null) {
-      bundleName = (String) attributes.remove("bundle");
-    } else if (request.getAttribute("jcatapultControlBundle") != null) {
-      bundleName = (String) request.getAttribute("jcatapultControlBundle");
-    } else {
-      bundleName = currentInvocation().actionURI();
-    }
-
-    return bundleName;
   }
 
   /**

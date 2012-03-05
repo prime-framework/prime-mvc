@@ -40,7 +40,7 @@ import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.parameter.el.ExpressionException;
 import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
-import org.primeframework.mvc.servlet.WorkflowChain;
+import org.primeframework.mvc.workflow.WorkflowChain;
 import org.primeframework.mvc.test.JCatapultBaseTest;
 import org.primeframework.mvc.util.RequestKeys;
 import org.testng.annotations.Test;
@@ -113,7 +113,7 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
     EasyMock.expect(config.ignoreEmptyParameters()).andReturn(false).times(4);
     EasyMock.replay(config);
 
-    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, messageStore, expressionEvaluator, config);
+    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, messageStore, messageProvider, expressionEvaluator, config);
     workflow.perform(chain);
 
     EasyMock.verify(request, expressionEvaluator, invocation, actionInvocationStore, messageStore, config, chain);
@@ -160,7 +160,7 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
     EasyMock.expect(config.allowUnknownParameters()).andReturn(false);
     EasyMock.replay(config);
 
-    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, messageStore, expressionEvaluator, config);
+    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, messageStore, messageProvider, expressionEvaluator, config);
     workflow.logger = Logger.getLogger("test");
     try {
       workflow.perform(chain);
@@ -215,7 +215,7 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
     EasyMock.expect(config.allowUnknownParameters()).andReturn(true);
     EasyMock.replay(config);
 
-    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, messageStore, expressionEvaluator, config);
+    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, messageStore, messageProvider, expressionEvaluator, config);
     workflow.logger = Logger.getLogger("test");
     workflow.perform(chain);
 
@@ -230,10 +230,10 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
     Action action = new Action();
 
     Map<String, String[]> values = new HashMap<String, String[]>();
-    values.put("__jc_cb_user.checkbox['null']", array(""));
-    values.put("__jc_cb_user.checkbox['default']", array("false"));
-    values.put("__jc_rb_user.radio['null']", array(""));
-    values.put("__jc_rb_user.radio['default']", array("false"));
+    values.put("__cb_user.checkbox['null']", array(""));
+    values.put("__cb_user.checkbox['default']", array("false"));
+    values.put("__rb_user.radio['null']", array(""));
+    values.put("__rb_user.radio['default']", array("false"));
 
     final HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
     EasyMock.expect(request.getParameterMap()).andReturn(values);
@@ -266,7 +266,7 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
     EasyMock.expect(config.fileUploadMaxSize()).andReturn(10l);
     EasyMock.replay(config);
 
-    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, messageStore, expressionEvaluator, config);
+    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, messageStore, messageProvider, expressionEvaluator, config);
     workflow.perform(chain);
 
     EasyMock.verify(request, expressionEvaluator, invocation, actionInvocationStore, messageStore, config, chain);
@@ -281,7 +281,7 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
     Action action = new Action();
 
     Map<String, String[]> values = new HashMap<String, String[]>();
-    values.put("__jc_a_submit", array(""));
+    values.put("__a_submit", array(""));
     values.put("submit.x", array("1"));
     values.put("submit.y", array("2"));
 
@@ -319,7 +319,7 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
     EasyMock.expect(config.ignoreEmptyParameters()).andReturn(false).times(2);
     EasyMock.replay(config);
 
-    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, messageStore, expressionEvaluator, config);
+    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, messageStore, messageProvider, expressionEvaluator, config);
     workflow.perform(chain);
 
     EasyMock.verify(request, expressionEvaluator, invocation, actionInvocationStore, messageStore, config, chain);
@@ -363,7 +363,7 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
     EasyMock.expect(config.ignoreEmptyParameters()).andReturn(false).times(3);
     EasyMock.replay(config);
 
-    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, messageStore, expressionEvaluator, config);
+    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, messageStore, messageProvider, expressionEvaluator, config);
     workflow.perform(chain);
 
     assertTrue(action.preCalled);
@@ -405,7 +405,7 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
     chain.continueWorkflow();
     EasyMock.replay(chain);
 
-    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, null, expressionEvaluator, config);
+    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, null, messageProvider, expressionEvaluator, config);
     workflow.perform(chain);
 
     EasyMock.verify(request, config, chain, actionInvocationStore, invocation, expressionEvaluator);
@@ -446,7 +446,7 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
     chain.continueWorkflow();
     EasyMock.replay(chain);
 
-    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, null, expressionEvaluator, config);
+    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, null, messageProvider, expressionEvaluator, config);
     workflow.perform(chain);
 
     EasyMock.verify(request, config, chain, actionInvocationStore, invocation, expressionEvaluator);
@@ -489,7 +489,7 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
     chain.continueWorkflow();
     EasyMock.replay(chain);
 
-    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, messageStore, expressionEvaluator, config);
+    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, messageStore, messageProvider, expressionEvaluator, config);
     workflow.perform(chain);
 
     EasyMock.verify(request, config, chain, actionInvocationStore, invocation, expressionEvaluator, messageStore);
@@ -532,7 +532,7 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
     chain.continueWorkflow();
     EasyMock.replay(chain);
 
-    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, messageStore, expressionEvaluator, config);
+    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, messageStore, messageProvider, expressionEvaluator, config);
     workflow.perform(chain);
 
     EasyMock.verify(request, config, chain, actionInvocationStore, invocation, expressionEvaluator, messageStore);
@@ -587,7 +587,7 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
     chain.continueWorkflow();
     EasyMock.replay(chain);
 
-    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, messageStore, expressionEvaluator, config);
+    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, messageStore, messageProvider, expressionEvaluator, config);
     workflow.perform(chain);
 
     EasyMock.verify(request, config, chain, actionInvocationStore, invocation, expressionEvaluator, messageStore);
@@ -642,7 +642,7 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
     chain.continueWorkflow();
     EasyMock.replay(chain);
 
-    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, messageStore, expressionEvaluator, config);
+    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, messageStore, messageProvider, expressionEvaluator, config);
     workflow.perform(chain);
 
     EasyMock.verify(request, config, chain, actionInvocationStore, invocation, expressionEvaluator, messageStore);

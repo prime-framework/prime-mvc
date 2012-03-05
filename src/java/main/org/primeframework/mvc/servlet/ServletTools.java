@@ -25,11 +25,10 @@ import java.util.logging.Logger;
 
 /**
  * Toolkit for Servlet related tasks
- * <p/>
- * User: jhumphrey Date: Apr 23, 2008
+ *
+ * @author James Humphrey
  */
 public class ServletTools {
-
   private static final Logger logger = Logger.getLogger(ServletTools.class.getName());
 
   /**

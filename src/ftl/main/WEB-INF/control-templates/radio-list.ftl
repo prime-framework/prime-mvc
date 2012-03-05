@@ -11,4 +11,4 @@
 [/#list]
 </div>
 </div>
-<input type="hidden" name="__jc_rb_${attributes['name']}" value="${uncheckedValue?html}"/>
+<input type="hidden" name="__rb_${attributes['name']}" value="${uncheckedValue?html}"/>

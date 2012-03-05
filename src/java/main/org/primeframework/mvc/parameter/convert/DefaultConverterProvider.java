@@ -16,24 +16,20 @@
 package org.primeframework.mvc.parameter.convert;
 
 import java.lang.annotation.Annotation;
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import org.primeframework.mvc.ObjectFactory;
 import org.primeframework.mvc.parameter.convert.annotation.ConverterAnnotation;
 
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 import static java.util.Arrays.*;
 
 /**
  * This class is the manager for all the Converters. It loads the global type converters from Guice. Therefore, if you
  * want to supply a global custom type converter, just add it to a Guice module and place it in your classpath.
- * JCatapult will discover the module and load it up.
+ * Prime will discover the module and load it up.
  * <p/>
  * A converter for a given type will be retrieved when the manager is queried for that type and all sub class of that
  * type, unless another converter is registered for a sub class of the type. For example, registering a convert for the
@@ -44,30 +40,13 @@ import static java.util.Arrays.*;
  * @author Brian Pontarelli
  */
 public class DefaultConverterProvider implements ConverterProvider {
-  private static final Logger logger = Logger.getLogger(ConverterProvider.class.getName());
-  private final static Map<Class<?>, Class<?>> converters = new HashMap<Class<?>, Class<?>>();
-  private final ObjectFactory objectFactory;
+  private final Injector injector;
+  private final Map<Class<?>, GlobalConverter> converters;
 
   @Inject
-  public static void initialize(ObjectFactory objectFactory) {
-    List<Class<? extends GlobalConverter>> types = objectFactory.getAllForType(GlobalConverter.class);
-    for (Class<? extends GlobalConverter> type : types) {
-      org.primeframework.mvc.parameter.convert.annotation.GlobalConverter converter =
-        type.getAnnotation(org.primeframework.mvc.parameter.convert.annotation.GlobalConverter.class);
-      Class<?>[] convertTypes = converter.forTypes();
-      for (Class<?> convertType : convertTypes) {
-        if (logger.isLoggable(Level.FINE)) {
-          logger.fine("Registering converter class [" + converter.getClass() + "] for type [" + convertType + "]");
-        }
-
-        converters.put(convertType, type);
-      }
-    }
-  }
-
-  @Inject
-  public DefaultConverterProvider(ObjectFactory objectFactory) {
-    this.objectFactory = objectFactory;
+  public DefaultConverterProvider(Injector injector, Map<Class<?>, GlobalConverter> converters) {
+    this.injector = injector;
+    this.converters = converters;
   }
 
   /**
@@ -100,11 +79,11 @@ public class DefaultConverterProvider implements ConverterProvider {
     // The local type becomes null when it is an interface or a primitive and the
     // super class is asked for
     while (localType != null && localType != Object.class) {
-      Class<?> converterType = converters.get(localType);
-      if (converterType == null) {
+      GlobalConverter converter = converters.get(localType);
+      if (converter == null) {
         localType = localType.getSuperclass();
       } else {
-        return (GlobalConverter) objectFactory.create(converterType);
+        return converter;
       }
     }
 
@@ -113,9 +92,9 @@ public class DefaultConverterProvider implements ConverterProvider {
     Class<?> inter;
     while ((inter = interfaces.poll()) != null) {
       // First, check the interface
-      Class<?> converterType = converters.get(inter);
-      if (converterType != null) {
-        return (GlobalConverter) objectFactory.create(converterType);
+      GlobalConverter converter = converters.get(inter);
+      if (converter != null) {
+        return converter;
       }
 
       // Next, append the interfaces for this interface
@@ -142,6 +121,6 @@ public class DefaultConverterProvider implements ConverterProvider {
    */
   public AnnotationConverter lookup(Annotation annotation) {
     ConverterAnnotation ra = annotation.annotationType().getAnnotation(ConverterAnnotation.class);
-    return objectFactory.create(ra.value());
+    return injector.getInstance(ra.value());
   }
 }

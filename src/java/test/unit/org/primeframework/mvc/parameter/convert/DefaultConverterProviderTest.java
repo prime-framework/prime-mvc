@@ -15,8 +15,6 @@
  */
 package org.primeframework.mvc.parameter.convert;
 
-import org.primeframework.mvc.GuiceObjectFactory;
-import org.primeframework.mvc.guice.GuiceBootstrap;
 import org.primeframework.mvc.parameter.convert.converters.BooleanConverter;
 import org.primeframework.mvc.parameter.convert.converters.CharacterConverter;
 import org.primeframework.mvc.parameter.convert.converters.NumberConverter;
@@ -37,7 +35,7 @@ public class DefaultConverterProviderTest extends JCatapultBaseTest {
    */
   @Test
   public void testLookups() {
-    ConverterProvider provider = new DefaultConverterProvider(new GuiceObjectFactory(GuiceBootstrap.getInjector()));
+    ConverterProvider provider = new DefaultConverterProvider(injector);
     GlobalConverter tc = provider.lookup(Character.class);
     assertSame(CharacterConverter.class, tc.getClass());
     tc = provider.lookup(Character.TYPE);

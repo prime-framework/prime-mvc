@@ -20,7 +20,7 @@ import java.io.Writer;
 import freemarker.template.TemplateDirectiveBody;
 
 /**
- * <p> This class is a proxy for the FreeMarker directive body. </p>
+ * This class is a proxy for the FreeMarker directive body.
  *
  * @author Brian Pontarelli
  */

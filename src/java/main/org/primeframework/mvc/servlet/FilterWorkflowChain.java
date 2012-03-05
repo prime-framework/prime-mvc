@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2010, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,39 +17,39 @@ package org.primeframework.mvc.servlet;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import org.primeframework.mvc.workflow.DefaultWorkflowChain;
 import org.primeframework.mvc.workflow.Workflow;
-import org.primeframework.mvc.workflow.WorkflowChain;
 
 /**
- * <p> This is a mock workflow chain for testing. </p>
+ * A WorkflowChain that ends with the FilterChain being invoked.
  *
  * @author Brian Pontarelli
  */
-public class MockWorkflowChain implements WorkflowChain {
-  private final Runnable runnable;
+public class FilterWorkflowChain extends DefaultWorkflowChain {
+  private final FilterChain filterChain;
+  private final HttpServletRequest request;
+  private final HttpServletResponse response;
 
-  @Override
-  public void start(FilterChain filterChain) throws IOException, ServletException {
-    continueWorkflow();
+  public FilterWorkflowChain(FilterChain filterChain, HttpServletRequest request, HttpServletResponse response, Workflow... workflows) {
+    super(workflows);
+    this.filterChain = filterChain;
+    this.request = request;
+    this.response = response;
   }
 
-  @Override
-  public Iterable<Workflow> workflows() {
-    return null;
-  }
-
-  public MockWorkflowChain(Runnable runnable) {
-    this.runnable = runnable;
-  }
-
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void continueWorkflow() throws IOException, ServletException {
-    runnable.run();
-  }
-
-  @Override
-  public void reset() {
+    if (iterator.hasNext()) {
+      super.continueWorkflow();
+    } else {
+      filterChain.doFilter(request, response);
+    }
   }
 }

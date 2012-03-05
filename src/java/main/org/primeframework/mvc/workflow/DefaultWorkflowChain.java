@@ -13,32 +13,25 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.servlet;
+package org.primeframework.mvc.workflow;
 
-import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.Iterator;
 
+import static java.util.Arrays.*;
+
 /**
- * <p> This class is a sub-workflow chain that can be used to chain multiple workflows under a single workflow. </p>
+ * This class is the default chain that iterates over all the Workflow instances passed in.
  *
  * @author Brian Pontarelli
  */
-public class SubWorkflowChain implements WorkflowChain {
-  private final Iterable<Workflow> workflows;
-  private final WorkflowChain workflowChain;
-  private Iterator<Workflow> iterator;
+public class DefaultWorkflowChain implements WorkflowChain {
+  protected final Iterator<Workflow> iterator;
 
-  public SubWorkflowChain(Iterable<Workflow> workflows, WorkflowChain workflowChain) {
-    this.workflows = workflows;
-    this.workflowChain = workflowChain;
-    this.iterator = workflows.iterator();
-  }
-
-  @Override
-  public void start(FilterChain filterChain) throws IOException, ServletException {
-    continueWorkflow();
+  public DefaultWorkflowChain(Workflow... workflows) {
+    Iterable<Workflow> workflowList = asList(workflows);
+    iterator = workflowList.iterator();
   }
 
   /**
@@ -49,22 +42,6 @@ public class SubWorkflowChain implements WorkflowChain {
     if (iterator.hasNext()) {
       Workflow workflow = iterator.next();
       workflow.perform(this);
-    } else {
-      workflowChain.continueWorkflow();
     }
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void reset() {
-    iterator = workflows.iterator();
-    workflowChain.reset();
-  }
-
-  @Override
-  public Iterable<Workflow> workflows() {
-    return workflows;
   }
 }

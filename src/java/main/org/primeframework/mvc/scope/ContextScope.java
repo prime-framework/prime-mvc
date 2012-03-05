@@ -22,7 +22,7 @@ import org.primeframework.mvc.scope.annotation.Context;
 import com.google.inject.Inject;
 
 /**
- * <p> This is the request scope which fetches and stores values in the ServletContext. </p>
+ * This is the request scope which fetches and stores values in the ServletContext.
  *
  * @author Brian Pontarelli
  */

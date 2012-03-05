@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.servlet;
+package org.primeframework.mvc.workflow;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -27,24 +27,21 @@ import java.util.Calendar;
 import java.util.logging.Logger;
 
 import org.primeframework.mvc.config.PrimeMVCConfiguration;
+import org.primeframework.mvc.servlet.ServletTools;
 
 import com.google.inject.Inject;
 
 /**
- * <p> This class handles static resources via the JCatapult workflow chain. In order to handle resources that will be
- * coming from JAR files and the web application directories, this first checks the incoming request URI against a
- * pre-defined set of prefixes. This set of prefixes is controlled using the configuration parameter named
- * <code>jcatapult.static-resource.prefixes</code> which is a string array configuration (meaning you can specify it
- * using a comma-seperated list or multiple configuration values with the same name). The default list of prefixes is:
- * </p> <p/>
+ * This class handles static resources via the Prime workflow chain. In order to handle resources that will be coming
+ * from JAR files and the web application directories, this first checks the incoming request URI against a configured
+ * set of prefixes. This set of prefixes is controlled using the configuration interface. The default list of prefixes
+ * is:
+ * <p/>
  * <pre>
- * /module
- * /component
- * /jcatapult
  * /static
  * </pre>
- * <p/> <p> This workflow can also be turned off completely using the configuration parameter named
- * <code>jcatapult.static-resource.enabled<code>. </p>
+ * <p/>
+ * This workflow can also be turned off completely using the configuration interface.
  *
  * @author Brian Pontarelli
  */

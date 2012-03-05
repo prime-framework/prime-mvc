@@ -56,17 +56,6 @@ public interface ActionInvocation {
   boolean executeResult();
 
   /**
-   * @return True if the action should be executed, false otherwise.
-   */
-  boolean executeAction();
-
-  /**
-   * @return The default result code to use if the action is not executed according to the {@link #executeAction()}
-   *         method. Or the result code from the action after it has been invoked.
-   */
-  String resultCode();
-
-  /**
    * @return The URI, including the extension if there is one.
    */
   String uri();

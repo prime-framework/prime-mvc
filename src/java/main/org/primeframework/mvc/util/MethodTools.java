@@ -20,7 +20,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- * <p> This class provides some helpers for common tasks regarding methods. </p>
+ * This class provides some helpers for common tasks regarding methods.
  *
  * @author Brian Pontarelli
  */

@@ -27,7 +27,7 @@ import org.primeframework.mvc.action.DefaultActionInvocation;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.parameter.InternalParameters;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-import org.primeframework.mvc.servlet.WorkflowChain;
+import org.primeframework.mvc.workflow.WorkflowChain;
 import org.primeframework.mvc.test.JCatapultBaseTest;
 import org.testng.annotations.Test;
 
@@ -91,7 +91,7 @@ public class DefaultValidationWorkflowTest extends JCatapultBaseTest {
   @Test
   public void testValidationOnForGet() throws IOException, ServletException {
     request.setPost(false);
-    request.setParameter("__jc_a_foo", "");
+    request.setParameter("__a_foo", "");
 
     Edit action = new Edit();
     action.user = new User();

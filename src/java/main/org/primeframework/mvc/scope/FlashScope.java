@@ -25,17 +25,17 @@ import org.primeframework.mvc.scope.annotation.Flash;
 import com.google.inject.Inject;
 
 /**
- * <p> This is the flash scope which stores values in the HttpSession inside a Map under the flash key
- * <code>jcatapultFlash</code>. It fetches values from both the HttpServletRequest and HttpSession under that key. This
+ * This is the flash scope which stores values in the HttpSession inside a Map under the flash key
+ * <code>primeFlash</code>. It fetches values from both the HttpServletRequest and HttpSession under that key. This
  * allows for flash objects to be migrated from the session to the request during request handling so that they are not
  * persisted in the session forever. However, it also allows flash values to be retrieved during the initial request
- * from the session. </p>
+ * from the session.
  *
  * @author Brian Pontarelli
  */
 @SuppressWarnings("unchecked")
 public class FlashScope implements Scope<Flash> {
-  public static final String FLASH_KEY = "jcatapultFlash";
+  public static final String FLASH_KEY = "primeFlash";
   private final HttpServletRequest request;
 
   @Inject
@@ -53,7 +53,9 @@ public class FlashScope implements Scope<Flash> {
     if (flash == null || !flash.containsKey(key)) {
       HttpSession session = request.getSession(false);
       if (session != null) {
-        flash = (Map<String, Object>) session.getAttribute(FLASH_KEY);
+        synchronized (session) {
+          flash = (Map<String, Object>) session.getAttribute(FLASH_KEY);
+        }
       }
     }
 
@@ -79,11 +81,13 @@ public class FlashScope implements Scope<Flash> {
       return;
     }
 
-    Map<String, Object> flash = (Map<String, Object>) session.getAttribute(FLASH_KEY);
-
-    if (flash == null) {
-      flash = new HashMap<String, Object>();
-      session.setAttribute(FLASH_KEY, flash);
+    Map<String, Object> flash;
+    synchronized (session) {
+      flash = (Map<String, Object>) session.getAttribute(FLASH_KEY);
+      if (flash == null) {
+        flash = new HashMap<String, Object>();
+        session.setAttribute(FLASH_KEY, flash);
+      }
     }
 
     String key = scope.value().equals("##field-name##") ? fieldName : scope.value();
@@ -100,10 +104,12 @@ public class FlashScope implements Scope<Flash> {
   public void transferFlash() {
     HttpSession session = request.getSession(false);
     if (session != null) {
-      Map<String, Object> flash = (Map<String, Object>) session.getAttribute(FLASH_KEY);
-      if (flash != null) {
-        session.removeAttribute(FLASH_KEY);
-        request.setAttribute(FLASH_KEY, flash);
+      synchronized (session) {
+        Map<String, Object> flash = (Map<String, Object>) session.getAttribute(FLASH_KEY);
+        if (flash != null) {
+          session.removeAttribute(FLASH_KEY);
+          request.setAttribute(FLASH_KEY, flash);
+        }
       }
     }
   }

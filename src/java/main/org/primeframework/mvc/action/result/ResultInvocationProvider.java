@@ -30,17 +30,15 @@ public interface ResultInvocationProvider {
   /**
    * Determines the result invocation for the given URI and result code.
    *
-   * @param invocation The current action invocation to lookup the result for.
    * @return The result invocation for the URI or null if nothing could be found or inferred.
    */
-  ResultInvocation lookup(ActionInvocation invocation);
+  ResultInvocation lookup();
 
   /**
    * Determines the result invocation for the given action invocation, URI and result code.
    *
-   * @param invocation The ActionInvocation which is used to look for annotations.
    * @param resultCode The result code or null of there isn't a result code.
    * @return The result invocation for the URI or null if nothing could be found or inferred.
    */
-  ResultInvocation lookup(ActionInvocation invocation, String resultCode);
+  ResultInvocation lookup(String resultCode);
 }

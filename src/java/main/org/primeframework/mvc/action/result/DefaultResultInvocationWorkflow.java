@@ -22,7 +22,7 @@ import java.lang.annotation.Annotation;
 
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
-import org.primeframework.mvc.servlet.WorkflowChain;
+import org.primeframework.mvc.workflow.WorkflowChain;
 
 import com.google.inject.Inject;
 
@@ -36,14 +36,17 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
   private final ActionInvocationStore actionInvocationStore;
   private final ResultInvocationProvider resultInvocationProvider;
   private final ResultProvider resultProvider;
+  private final ResultStore resultStore;
 
   @Inject
   public DefaultResultInvocationWorkflow(HttpServletResponse response, ActionInvocationStore actionInvocationStore,
-                                         ResultInvocationProvider resultInvocationProvider, ResultProvider resultProvider) {
+                                         ResultInvocationProvider resultInvocationProvider, ResultProvider resultProvider,
+                                         ResultStore resultStore) {
     this.response = response;
     this.actionInvocationStore = actionInvocationStore;
     this.resultInvocationProvider = resultInvocationProvider;
     this.resultProvider = resultProvider;
+    this.resultStore = resultStore;
   }
 
   /**
@@ -78,14 +81,14 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
       ResultInvocation resultInvocation;
       if (invocation.action() == null) {
         // Try a default result mapping just for the URI
-        resultInvocation = resultInvocationProvider.lookup(invocation);
+        resultInvocation = resultInvocationProvider.lookup();
         if (resultInvocation == null) {
           chain.continueWorkflow();
           return;
         }
       } else {
-        String resultCode = invocation.resultCode();
-        resultInvocation = resultInvocationProvider.lookup(invocation, resultCode);
+        String resultCode = resultStore.get();
+        resultInvocation = resultInvocationProvider.lookup(resultCode);
         if (resultInvocation == null) {
           response.setStatus(404);
           if (invocation.configuration() != null) {
@@ -107,7 +110,7 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
           "and then add that Result implementation to your Guice Module.");
       }
 
-      result.execute(annotation, invocation);
+      result.execute(annotation);
     }
   }
 }

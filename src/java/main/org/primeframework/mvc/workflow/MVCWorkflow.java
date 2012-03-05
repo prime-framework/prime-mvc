@@ -13,25 +13,15 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.validation.annotation;
+package org.primeframework.mvc.workflow;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-import org.primeframework.mvc.validation.Validator;
+import com.google.inject.ImplementedBy;
 
 /**
- * <p> This annotation marks an annotation as being a validator annotation. </p>
+ * This interface defines the main entry point for the Prime MVC.
  *
  * @author Brian Pontarelli
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.ANNOTATION_TYPE)
-public @interface ValidatorAnnotation {
-  /**
-   * @return The class that implements the validator annotation's processing.
-   */
-  Class<? extends Validator> value();
+@ImplementedBy(DefaultMVCWorkflow.class)
+public interface MVCWorkflow extends Workflow {
 }

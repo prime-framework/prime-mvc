@@ -214,13 +214,13 @@
       </library>
     </orderEntry>
     <orderEntry type="module-library">
-      <library name="java-net-commons-1.5.5.jar">
+      <library name="guice-multibindings-3.0.jar">
         <CLASSES>
-          <root url="jar://$SAVANT_REPOSITORY$/net/java/dev/java-net-commons/java-net-commons/1.5.5/java-net-commons-1.5.5.jar!/" />
+          <root url="jar://$SAVANT_REPOSITORY$/com/google/inject/extensions/guice-multibindings/3.0/guice-multibindings-3.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$SAVANT_REPOSITORY$/net/java/dev/java-net-commons/java-net-commons/1.5.5/java-net-commons-1.5.5-src.jar!/" />
+          <root url="jar://$SAVANT_REPOSITORY$/com/google/inject/extensions/guice-multibindings/3.0/guice-multibindings-3.0-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>

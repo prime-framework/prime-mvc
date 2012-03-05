@@ -18,9 +18,8 @@ package org.primeframework.mvc.message.scope;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.primeframework.mvc.ObjectFactory;
-
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 
 /**
  * This class implements the scope provider interface.
@@ -28,18 +27,18 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 public class DefaultScopeProvider implements ScopeProvider {
-  private final ObjectFactory objectFactory;
+  private final Injector injector;
 
   @Inject
-  public DefaultScopeProvider(ObjectFactory objectFactory) {
-    this.objectFactory = objectFactory;
+  public DefaultScopeProvider(Injector injector) {
+    this.injector = injector;
   }
 
   /**
    * {@inheritDoc}
    */
   public Scope lookup(MessageScope scope) {
-    return objectFactory.create(scope.getType());
+    return injector.getInstance(scope.getType());
   }
 
   /**

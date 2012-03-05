@@ -19,7 +19,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import org.primeframework.mvc.action.ActionInvocation;
+import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.annotation.Header;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 
@@ -32,17 +32,20 @@ import com.google.inject.Inject;
  */
 public class HeaderResult extends AbstractResult<Header> {
   private final HttpServletResponse response;
+  private final ActionInvocationStore actionInvocationStore;
 
   @Inject
-  public HeaderResult(ExpressionEvaluator expressionEvaluator, HttpServletResponse response) {
+  public HeaderResult(ExpressionEvaluator expressionEvaluator, HttpServletResponse response, ActionInvocationStore actionInvocationStore) {
     super(expressionEvaluator);
     this.response = response;
+    this.actionInvocationStore = actionInvocationStore;
   }
 
   /**
    * {@inheritDoc}
    */
-  public void execute(Header header, ActionInvocation invocation) throws IOException, ServletException {
-    setStatus(header.status(), header.statusStr(), invocation.action(), response);
+  public void execute(Header header) throws IOException, ServletException {
+    Object action = actionInvocationStore.getCurrent().action();
+    setStatus(header.status(), header.statusStr(), action, response);
   }
 }

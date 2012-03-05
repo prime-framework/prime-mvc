@@ -38,7 +38,7 @@ public class ImageTest extends ControlBaseTest {
     run(image,
       mapNV("name", "image", "value", "test-value", "class", "css-class", "bundle", "/image-bundle", "src", "foo.gif"),
       null, "<input type=\"hidden\" name=\"image@param\" value=\"param-value\"/>\n" +
-      "<input type=\"hidden\" name=\"__jc_a_image\" value=\"\"/>\n" +
+      "<input type=\"hidden\" name=\"__a_image\" value=\"\"/>\n" +
       "<div class=\"css-class-image-button css-class-button css-class-control image-button button control\">\n" +
       "<div class=\"label-container\"> </div>\n" +
       "<div class=\"control-container\"><input type=\"image\" class=\"css-class\" id=\"image\" name=\"image\" src=\"foo.gif\" value=\"Image-Bundle\"/></div>\n" +
@@ -51,7 +51,7 @@ public class ImageTest extends ControlBaseTest {
     run(image,
       mapNV("name", "image", "value", "test-value", "src", "foo.gif"),
       null, "<input type=\"hidden\" name=\"image@param\" value=\"param-value\"/>\n" +
-      "<input type=\"hidden\" name=\"__jc_a_image\" value=\"\"/>\n" +
+      "<input type=\"hidden\" name=\"__a_image\" value=\"\"/>\n" +
       "<div class=\"image-button button control\">\n" +
       "<div class=\"label-container\"> </div>\n" +
       "<div class=\"control-container\"><input type=\"image\" id=\"image\" name=\"image\" src=\"foo.gif\" value=\"Image\"/></div>\n" +
@@ -64,7 +64,7 @@ public class ImageTest extends ControlBaseTest {
     run(image,
       mapNV("name", "html", "value", "test-value", "src", "foo.gif"),
       null, "<input type=\"hidden\" name=\"html@param\" value=\"param-value\"/>\n" +
-      "<input type=\"hidden\" name=\"__jc_a_html\" value=\"\"/>\n" +
+      "<input type=\"hidden\" name=\"__a_html\" value=\"\"/>\n" +
       "<div class=\"image-button button control\">\n" +
       "<div class=\"label-container\"> </div>\n" +
       "<div class=\"control-container\"><input type=\"image\" id=\"html\" name=\"html\" src=\"foo.gif\" value=\"&lt;Image&gt;\"/></div>\n" +
@@ -77,7 +77,7 @@ public class ImageTest extends ControlBaseTest {
     run(image,
       mapNV("name", "image", "action", "/foo", "value", "test-value", "src", "foo.gif"),
       null, "<input type=\"hidden\" name=\"image@param\" value=\"param-value\"/>\n" +
-      "<input type=\"hidden\" name=\"__jc_a_image\" value=\"/foo\"/>\n" +
+      "<input type=\"hidden\" name=\"__a_image\" value=\"/foo\"/>\n" +
       "<div class=\"image-button button control\">\n" +
       "<div class=\"label-container\"> </div>\n" +
       "<div class=\"control-container\"><input type=\"image\" id=\"image\" name=\"image\" src=\"foo.gif\" value=\"Image\"/></div>\n" +
@@ -90,7 +90,7 @@ public class ImageTest extends ControlBaseTest {
     run(image,
       mapNV("name", "image", "value", "test-value", "ismap", true, "src", "foo.gif"),
       null, "<input type=\"hidden\" name=\"image@param\" value=\"param-value\"/>\n" +
-      "<input type=\"hidden\" name=\"__jc_a_image\" value=\"\"/>\n" +
+      "<input type=\"hidden\" name=\"__a_image\" value=\"\"/>\n" +
       "<div class=\"image-button button control\">\n" +
       "<div class=\"label-container\"> </div>\n" +
       "<div class=\"control-container\"><input type=\"image\" id=\"image\" ismap=\"ismap\" name=\"image\" src=\"foo.gif\" value=\"Image\"/></div>\n" +
@@ -104,7 +104,7 @@ public class ImageTest extends ControlBaseTest {
     run(image,
       mapNV("name", "image", "value", "test-value", "action", "/foo", "src", "foo.gif"),
       null, "<input type=\"hidden\" name=\"image@param\" value=\"param-value\"/>\n" +
-      "<input type=\"hidden\" name=\"__jc_a_image\" value=\"/context/foo\"/>\n" +
+      "<input type=\"hidden\" name=\"__a_image\" value=\"/context/foo\"/>\n" +
       "<div class=\"image-button button control\">\n" +
       "<div class=\"label-container\"> </div>\n" +
       "<div class=\"control-container\"><input type=\"image\" id=\"image\" name=\"image\" src=\"foo.gif\" value=\"Image\"/></div>\n" +
@@ -118,7 +118,7 @@ public class ImageTest extends ControlBaseTest {
     run(image,
       mapNV("name", "image", "value", "test-value", "action", "foo", "src", "foo.gif"),
       null, "<input type=\"hidden\" name=\"image@param\" value=\"param-value\"/>\n" +
-      "<input type=\"hidden\" name=\"__jc_a_image\" value=\"foo\"/>\n" +
+      "<input type=\"hidden\" name=\"__a_image\" value=\"foo\"/>\n" +
       "<div class=\"image-button button control\">\n" +
       "<div class=\"label-container\"> </div>\n" +
       "<div class=\"control-container\"><input type=\"image\" id=\"image\" name=\"image\" src=\"foo.gif\" value=\"Image\"/></div>\n" +

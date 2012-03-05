@@ -23,7 +23,7 @@ import java.util.Set;
 
 import org.primeframework.mvc.parameter.InternalParameters;
 import org.primeframework.mvc.servlet.ServletTools;
-import org.primeframework.mvc.servlet.WorkflowChain;
+import org.primeframework.mvc.workflow.WorkflowChain;
 
 import com.google.inject.Inject;
 
@@ -79,7 +79,7 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
     String uri = null;
     Set<String> keys = request.getParameterMap().keySet();
     for (String key : keys) {
-      if (key.startsWith("__jc_a_")) {
+      if (key.startsWith("__a_")) {
         String actionParameterName = key.substring(7);
         String actionParameterValue = request.getParameter(key);
         if (request.getParameter(actionParameterName) != null && actionParameterValue.trim().length() > 0) {
