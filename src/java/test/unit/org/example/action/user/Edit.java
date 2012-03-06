@@ -15,11 +15,12 @@
  */
 package org.example.action.user;
 
+import javax.validation.Valid;
+
 import org.example.domain.User;
 import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.parameter.annotation.PreParameterMethod;
 import org.primeframework.mvc.control.form.annotation.FormPrepareMethod;
-import org.primeframework.mvc.validation.annotation.Valid;
+import org.primeframework.mvc.parameter.annotation.PreParameterMethod;
 
 /**
  * This class is a simple edit action for testing.

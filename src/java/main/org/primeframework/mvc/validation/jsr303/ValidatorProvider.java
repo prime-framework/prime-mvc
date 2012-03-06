@@ -20,8 +20,6 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
-import org.hibernate.validator.HibernateValidator;
-
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
@@ -41,7 +39,7 @@ public class ValidatorProvider implements Provider<Validator> {
   @Override
   public Validator get() {
     ValidatorFactory factory = Validation.
-            byProvider(HibernateValidator.class).
+            byDefaultProvider().
             configure().
             constraintValidatorFactory(constraintValidatorFactory).
             buildValidatorFactory();

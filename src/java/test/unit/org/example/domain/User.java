@@ -15,6 +15,8 @@
  */
 package org.example.domain;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,8 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.primeframework.mvc.validation.annotation.Required;
-import org.primeframework.mvc.validation.annotation.ValidMap;
+import org.hibernate.validator.constraints.NotBlank;
 
 /**
  * This is a test user.
@@ -31,15 +32,15 @@ import org.primeframework.mvc.validation.annotation.ValidMap;
  * @author Brian Pontarelli
  */
 public class User {
-  @Required
+  @NotBlank
   private String name;
-  @Required
+  @NotBlank
   private Integer age;
   private boolean male;
-  @ValidMap(keys = {"home", "work"})
+  @Valid
   private Map<String, Address> addresses = new HashMap<String, Address>();
   private List<User> siblings = new ArrayList<User>();
-  @Required
+  @NotNull
   private String[] securityQuestions;
 
   private int month;

@@ -108,7 +108,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     FieldMessage message = new SimpleFieldMessage("foo", "bar");
     MessageProvider provider = createStrictMock(MessageProvider.class);
-    expect(provider.getFieldMessage(eq("user.inches"), eq("user.inches.conversionError"), aryEq(ArrayUtils.toArray("tall")))).andReturn(message);
+    expect(provider.getFieldMessage(eq("user.inches"), eq("user.inches.conversionError"), (Object[]) aryEq(ArrayUtils.toArray("tall")))).andReturn(message);
     replay(provider);
 
     MessageStore messageStore = createStrictMock(MessageStore.class);
@@ -519,7 +519,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     FieldMessage message = new SimpleFieldMessage("foo", "bar");
     MessageProvider provider = createStrictMock(MessageProvider.class);
-    expect(provider.getFieldMessage(eq("userfile"), eq("userfile.fileUploadSizeError"), aryEq(ArrayUtils.toArray("1")))).andReturn(message);
+    expect(provider.getFieldMessage(eq("userfile"), eq("userfile.fileUploadSizeError"), (Object[]) aryEq(ArrayUtils.toArray("1")))).andReturn(message);
     replay(provider);
 
     MessageStore messageStore = createStrictMock(MessageStore.class);
@@ -569,7 +569,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     FieldMessage message = new SimpleFieldMessage("foo", "bar");
     MessageProvider provider = createStrictMock(MessageProvider.class);
-    expect(provider.getFieldMessage(eq("userfile"), eq("userfile.fileUploadContentTypeError"), aryEq(ArrayUtils.toArray("text/plain")))).andReturn(message);
+    expect(provider.getFieldMessage(eq("userfile"), eq("userfile.fileUploadContentTypeError"), (Object[]) aryEq(ArrayUtils.toArray("text/plain")))).andReturn(message);
     replay(provider);
 
     MessageStore messageStore = createStrictMock(MessageStore.class);
@@ -631,7 +631,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     FieldMessage message = new SimpleFieldMessage("foo", "bar");
     MessageProvider provider = createStrictMock(MessageProvider.class);
-    expect(provider.getFieldMessage(eq("userfile"), eq("userfile.fileUploadSizeError"), aryEq(ArrayUtils.toArray("1")))).andReturn(message);
+    expect(provider.getFieldMessage(eq("userfile"), eq("userfile.fileUploadSizeError"), (Object[]) aryEq(ArrayUtils.toArray("1")))).andReturn(message);
     replay(provider);
 
     MessageStore messageStore = createStrictMock(MessageStore.class);
@@ -693,7 +693,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     FieldMessage message = new SimpleFieldMessage("foo", "bar");
     MessageProvider provider = createStrictMock(MessageProvider.class);
-    expect(provider.getFieldMessage(eq("userfile"), eq("userfile.fileUploadContentTypeError"), aryEq(ArrayUtils.toArray("text/plain")))).andReturn(message);
+    expect(provider.getFieldMessage(eq("userfile"), eq("userfile.fileUploadContentTypeError"), (Object[]) aryEq(ArrayUtils.toArray("text/plain")))).andReturn(message);
     replay(provider);
 
     MessageStore messageStore = createStrictMock(MessageStore.class);

@@ -15,10 +15,11 @@
  */
 package org.example.action.user;
 
+import javax.validation.Valid;
+
 import org.example.domain.AddressField;
 import org.example.domain.UserField;
 import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.validation.annotation.Valid;
 
 /**
  * This class is a simple edit action for testing.

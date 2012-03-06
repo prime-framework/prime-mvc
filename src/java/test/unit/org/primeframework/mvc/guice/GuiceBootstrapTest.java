@@ -17,7 +17,6 @@ package org.primeframework.mvc.guice;
 
 import javax.servlet.ServletContext;
 
-import org.apache.commons.configuration.FileConfiguration;
 import org.easymock.EasyMock;
 import org.primeframework.mvc.ClosableModule;
 import org.primeframework.mvc.PrimeBaseTest;
@@ -100,13 +99,6 @@ public class GuiceBootstrapTest extends PrimeBaseTest {
     assertNotNull(injector.getInstance(TestClass4.class));
     assertNotNull(injector.getInstance(TestInterface4.class));
     assertNotNull(injector.getInstance(ServletContext.class));
-
-    try {
-      injector.getInstance(FileConfiguration.class);
-      fail("Should have failed");
-    } catch (Exception e) {
-      // Expected since Guice throws exceptions for missing bindings
-    }
 
     try {
       injector.getInstance(TestInterface3.class);

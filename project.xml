@@ -37,21 +37,21 @@
     </artifact-group>
     <artifact-group type="compile">
       <artifact group="asm.objectweb.org" name="asm" version="3.1"/>
-      <artifact group="commons.apache.org" name="commons-configuration" version="1.4"/>
       <artifact group="commons.apache.org" name="commons-fileupload" version="1.2.1"/>
       <artifact group="commons.apache.org" name="commons-lang3" version="3.0.1"/>
       <artifact group="extensions.inject.google.com" name="guice-multibindings" version="3.0"/>
       <artifact group="freemarker.org" name="freemarker" version="2.3.16"/>
-      <artifact group="hibernate.org" name="hibernate-validator" version="4.2.0"/>
       <artifact group="inject.google.com" name="guice" version="3.0"/>
       <artifact group="joda.org" name="joda-time" version="2.0"/>
       <artifact group="primeframework.org" name="prime-mock" version="1.0-{integration}"/>
       <artifact group="validation.javax" name="validation-api" version="1.0.0"/>
     </artifact-group>
     <artifact-group type="test-compile">
+      <artifact group="commons.apache.org" name="commons-io" version="1.3.2"/>
       <artifact group="easymock.org" name="easymock" version="3.1"/>
-      <artifact group="testng.org" name="testng" version="5.11"/>
+      <artifact group="hibernate.org" name="hibernate-validator" version="4.2.0"/>
       <artifact group="primeframework.org" name="prime-mock" version="1.0-{integration}"/>
+      <artifact group="testng.org" name="testng" version="5.11"/>
     </artifact-group>
   </dependencies>
 </project>

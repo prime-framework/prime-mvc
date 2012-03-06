@@ -17,11 +17,9 @@ package org.primeframework.mvc.validation.jsr303;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
-import java.lang.annotation.ElementType;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
-import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
+import org.apache.commons.lang3.StringUtils;
 import org.primeframework.mvc.ErrorException;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.message.FieldMessage;
@@ -71,19 +69,7 @@ public class JSRValidationProcessor implements ValidationProcessor {
       }
 
       String propertyPath = violation.getPropertyPath().toString();
-      Object invalidValue = null;
-      if (violation.getInvalidValue() != null) {
-        ConstraintDescriptorImpl descriptor = (ConstraintDescriptorImpl) violation.getConstraintDescriptor();
-
-        // if class level violation, then use the message as the invalid value.
-        // See CleanSpeakValidator for additional details
-        if (descriptor.getElementType().equals(ElementType.TYPE)) {
-          invalidValue = violation.getMessage();
-        } else {
-          invalidValue = violation.getInvalidValue();
-        }
-      }
-
+      Object invalidValue = violation.getInvalidValue();
       FieldMessage message = provider.getFieldMessage(propertyPath, "[" + constraint + "]" + propertyPath, invalidValue);
       messageStore.add(message);
     }

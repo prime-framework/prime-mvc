@@ -121,7 +121,7 @@ public class DefaultParameterHandler implements ParameterHandler {
       try {
         expressionEvaluator.setValue(key, action, struct.values, struct.attributes);
       } catch (ConversionException ce) {
-        FieldMessage message = messageProvider.getFieldMessage(key, key + ".conversionError", struct.values);
+        FieldMessage message = messageProvider.getFieldMessage(key, key + ".conversionError", (Object[]) struct.values);
         messageStore.add(message);
       } catch (ExpressionException ee) {
         if (!allowUnknownParameters) {

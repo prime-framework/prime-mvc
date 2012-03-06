@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.validation.guice;
+package org.primeframework.mvc.validation.jsr303.guice;
 
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.Validator;
