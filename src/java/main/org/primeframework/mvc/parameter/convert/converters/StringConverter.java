@@ -18,15 +18,13 @@ package org.primeframework.mvc.parameter.convert.converters;
 import java.lang.reflect.Type;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.primeframework.mvc.config.PrimeMVCConfiguration;
 import org.primeframework.mvc.parameter.convert.AbstractGlobalConverter;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.convert.annotation.GlobalConverter;
 
-import net.java.lang.StringTools;
-
 import com.google.inject.Inject;
-import static net.java.lang.ObjectTools.*;
 
 /**
  * This converts to and from Strings.
@@ -44,7 +42,7 @@ public class StringConverter extends AbstractGlobalConverter {
 
   protected Object stringToObject(String value, Type convertTo, Map<String, String> attributes, String expression)
     throws org.primeframework.mvc.parameter.convert.ConversionException, ConverterStateException {
-    if (emptyIsNull && StringTools.isTrimmedEmpty(value)) {
+    if (emptyIsNull && StringUtils.isBlank(value)) {
       return null;
     }
 
@@ -53,7 +51,7 @@ public class StringConverter extends AbstractGlobalConverter {
 
   protected Object stringsToObject(String[] values, Type convertTo, Map<String, String> attributes, String expression)
     throws org.primeframework.mvc.parameter.convert.ConversionException, ConverterStateException {
-    return join(values, ",");
+    return StringUtils.join(values, ",");
   }
 
   protected String objectToString(Object value, Type convertFrom, Map<String, String> attributes, String expression)

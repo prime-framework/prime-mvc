@@ -33,7 +33,7 @@ import com.google.inject.Inject;
  */
 @SuppressWarnings("unchecked")
 public class SessionScope implements Scope {
-  private static final String KEY = "primeMessages";
+  public static final String KEY = "primeMessages";
   private final HttpServletRequest request;
 
   @Inject
@@ -43,33 +43,29 @@ public class SessionScope implements Scope {
 
   @Override
   public void add(Message message) {
-    HttpSession session = request.getSession(false);
-    if (session != null) {
-      synchronized (session) {
-        List<Message> messages = (List<Message>) session.getAttribute(KEY);
-        if (messages == null) {
-          messages = new ArrayList<Message>();
-          session.setAttribute(KEY, messages);
-        }
-
-        messages.add(message);
+    HttpSession session = request.getSession(true);
+    synchronized (session) {
+      List<Message> messages = (List<Message>) session.getAttribute(KEY);
+      if (messages == null) {
+        messages = new ArrayList<Message>();
+        session.setAttribute(KEY, messages);
       }
+
+      messages.add(message);
     }
   }
 
   @Override
   public void addAll(Collection<Message> messages) {
-    HttpSession session = request.getSession(false);
-    if (session != null) {
-      synchronized (session) {
-        List<Message> scopeMessages = (List<Message>) session.getAttribute(KEY);
-        if (scopeMessages == null) {
-          scopeMessages = new ArrayList<Message>();
-          session.setAttribute(KEY, scopeMessages);
-        }
-
-        scopeMessages.addAll(messages);
+    HttpSession session = request.getSession(true);
+    synchronized (session) {
+      List<Message> scopeMessages = (List<Message>) session.getAttribute(KEY);
+      if (scopeMessages == null) {
+        scopeMessages = new ArrayList<Message>();
+        session.setAttribute(KEY, scopeMessages);
       }
+
+      scopeMessages.addAll(messages);
     }
   }
 

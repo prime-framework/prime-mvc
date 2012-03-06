@@ -15,8 +15,6 @@
  */
 package org.example.domain;
 
-import org.primeframework.mvc.validation.annotation.Required;
-
 /**
  * This is a test address.
  *

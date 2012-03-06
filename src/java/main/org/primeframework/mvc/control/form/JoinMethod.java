@@ -17,9 +17,8 @@ package org.primeframework.mvc.control.form;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.primeframework.mvc.freemarker.FieldSupportBeansWrapper;
-
-import net.java.lang.ObjectTools;
 
 import freemarker.template.TemplateMethodModelEx;
 import freemarker.template.TemplateModelException;
@@ -42,6 +41,6 @@ public class JoinMethod implements TemplateMethodModelEx {
       return FieldSupportBeansWrapper.INSTANCE.wrap("");
     }
 
-    return FieldSupportBeansWrapper.INSTANCE.wrap(ObjectTools.join(arguments.subList(1, arguments.size()), first.toString()));
+    return FieldSupportBeansWrapper.INSTANCE.wrap(StringUtils.join(arguments.subList(1, arguments.size()), first.toString()));
   }
 }

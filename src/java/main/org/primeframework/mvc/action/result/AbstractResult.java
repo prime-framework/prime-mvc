@@ -55,11 +55,12 @@ public abstract class AbstractResult<U extends Annotation> implements Result<U> 
    *
    * @param str    The String to expand.
    * @param action The action used to expand.
+   * @param encode Whether or not variable replacements are URL encoded.
    * @return The result.
    */
   protected String expand(String str, Object action, boolean encode) {
     if (action != null) {
-      return expressionEvaluator.expand(str, action);
+      return expressionEvaluator.expand(str, action, encode);
     }
 
     return str;
@@ -76,7 +77,7 @@ public abstract class AbstractResult<U extends Annotation> implements Result<U> 
   protected void setStatus(int status, String statusStr, Object action, HttpServletResponse response) {
     int code = status;
     if (!statusStr.isEmpty()) {
-      code = Integer.valueOf(expand(statusStr, action));
+      code = Integer.valueOf(expand(statusStr, action, false));
     }
 
     response.setStatus(code);

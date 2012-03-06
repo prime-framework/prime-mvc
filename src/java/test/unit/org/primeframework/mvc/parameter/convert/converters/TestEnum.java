@@ -16,7 +16,7 @@
 package org.primeframework.mvc.parameter.convert.converters;
 
 /**
- * <p> This </p>
+ * Test enum for the EnumConverter.
  *
  * @author Brian Pontarelli
  */

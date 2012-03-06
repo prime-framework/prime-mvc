@@ -18,7 +18,7 @@ package org.primeframework.mvc.guice;
 import com.google.inject.AbstractModule;
 
 /**
- * <p> This is a test module. </p>
+ * This is a test module.
  *
  * @author Brian Pontarelli
  */

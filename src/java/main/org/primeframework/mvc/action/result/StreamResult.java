@@ -21,11 +21,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.commons.lang3.StringUtils;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.annotation.Stream;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-
-import net.java.lang.StringTools;
 
 import com.google.inject.Inject;
 
@@ -52,9 +51,9 @@ public class StreamResult extends AbstractResult<Stream> {
   public void execute(Stream stream) throws IOException, ServletException {
     Object action = actionInvocationStore.getCurrent().action();
     String property = stream.property();
-    String length = expand(stream.length(), action);
-    String name = expand(stream.name(), action);
-    String type = expand(stream.type(), action);
+    String length = expand(stream.length(), action, false);
+    String name = expand(stream.name(), action, true);
+    String type = expand(stream.type(), action, false);
 
     Object object = expressionEvaluator.getValue(property, action);
     if (object == null || !(object instanceof InputStream)) {
@@ -64,11 +63,11 @@ public class StreamResult extends AbstractResult<Stream> {
 
     response.setContentType(type);
 
-    if (!StringTools.isTrimmedEmpty(length)) {
+    if (StringUtils.isNotBlank(length)) {
       response.setContentLength(Integer.parseInt(length));
     }
 
-    if (!StringTools.isTrimmedEmpty(name)) {
+    if (StringUtils.isNotBlank(name)) {
       response.setHeader("Content-Disposition", "attachment; filename=\"" + name + "\"");
     }
 

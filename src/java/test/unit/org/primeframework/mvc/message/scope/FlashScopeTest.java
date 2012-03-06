@@ -18,225 +18,101 @@ package org.primeframework.mvc.message.scope;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
-import org.easymock.Capture;
-import org.easymock.EasyMock;
+import org.primeframework.mvc.message.Message;
+import org.primeframework.mvc.message.SimpleMessage;
 import org.testng.annotations.Test;
 
+import static java.util.Arrays.*;
 import static org.easymock.EasyMock.*;
 import static org.testng.Assert.*;
 
 /**
- * <p> This tests the flash scope. </p>
+ * This tests the flash scope.
  *
  * @author Brian Pontarelli
  */
-@SuppressWarnings("unchecked")
 public class FlashScopeTest {
   @Test
-  public void testAction() {
-    action(FlashScope.FLASH_ACTION_ERRORS_KEY, MessageType.ERROR);
-    action(FlashScope.FLASH_ACTION_MESSAGES_KEY, MessageType.PLAIN);
-  }
+  public void get() {
+    HttpSession session = createStrictMock(HttpSession.class);
+    expect(session.getAttribute(FlashScope.KEY)).andReturn(asList(new SimpleMessage("Session")));
+    replay(session);
 
-  protected void action(String key, MessageType type) {
-    {
-      List<String> sessionMessages = new ArrayList<String>();
-      sessionMessages.add("Test session message");
-      List<String> requestMessages = new ArrayList<String>();
-      requestMessages.add("Test request message");
+    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
+    expect(request.getAttribute(FlashScope.KEY)).andReturn(asList(new SimpleMessage("Request")));
+    expect(request.getSession(false)).andReturn(session);
+    replay(request);
 
-      HttpSession session = EasyMock.createStrictMock(HttpSession.class);
-      EasyMock.expect(session.getAttribute(key)).andReturn(sessionMessages);
-      EasyMock.replay(session);
+    FlashScope scope = new FlashScope(request);
+    List<Message> messages = scope.get();
+    assertEquals(messages.size(), 2);
+    assertEquals(messages.get(0), "Request");
+    assertEquals(messages.get(1), "Session");
 
-      HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-      EasyMock.expect(request.getAttribute(key)).andReturn(requestMessages);
-      EasyMock.expect(request.getSession(false)).andReturn(session);
-      EasyMock.replay(request);
-
-      FlashScope scope = new FlashScope(request);
-      List<String> messages = scope.getActionMessages(type);
-      assertEquals(2, messages.size());
-      assertEquals("Test request message", messages.get(0));
-      assertEquals("Test session message", messages.get(1));
-
-      EasyMock.verify(request, session);
-    }
-
-    {
-      HttpSession session = EasyMock.createStrictMock(HttpSession.class);
-      EasyMock.expect(session.getAttribute(key)).andReturn(null);
-      EasyMock.replay(session);
-
-      HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-      EasyMock.expect(request.getAttribute(key)).andReturn(null);
-      EasyMock.expect(request.getSession(false)).andReturn(session);
-      EasyMock.replay(request);
-
-      FlashScope scope = new FlashScope(request);
-      List<String> messages = scope.getActionMessages(type);
-      assertEquals(0, messages.size());
-
-      EasyMock.verify(request, session);
-    }
-
-    {
-      HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-      EasyMock.expect(request.getAttribute(key)).andReturn(null);
-      EasyMock.expect(request.getSession(false)).andReturn(null);
-      EasyMock.replay(request);
-
-      FlashScope scope = new FlashScope(request);
-      List<String> messages = scope.getActionMessages(type);
-      assertEquals(0, messages.size());
-
-      EasyMock.verify(request);
-    }
-
-    {
-      List<String> messages = new ArrayList<String>();
-
-      HttpSession session = EasyMock.createStrictMock(HttpSession.class);
-      EasyMock.expect(session.getAttribute(key)).andReturn(messages);
-      EasyMock.replay(session);
-
-      HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-      EasyMock.expect(request.getSession(true)).andReturn(session);
-      EasyMock.replay(request);
-
-      FlashScope scope = new FlashScope(request);
-      scope.addActionMessage(type, "Test message");
-      assertEquals(1, messages.size());
-      assertEquals("Test message", messages.get(0));
-
-      EasyMock.verify(request, session);
-    }
-
-    {
-      Capture<List<String>> list = new Capture<List<String>>();
-      HttpSession session = EasyMock.createStrictMock(HttpSession.class);
-      EasyMock.expect(session.getAttribute(key)).andReturn(null);
-      session.setAttribute(eq(key), capture(list));
-      EasyMock.replay(session);
-
-      HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-      EasyMock.expect(request.getSession(true)).andReturn(session);
-      EasyMock.replay(request);
-
-      FlashScope scope = new FlashScope(request);
-      scope.addActionMessage(type, "Test message");
-      List<String> messages = list.getValue();
-      assertEquals(1, messages.size());
-      assertEquals("Test message", messages.get(0));
-
-      EasyMock.verify(request, session);
-    }
+    verify(session, request);
   }
 
   @Test
-  public void testField() {
-    field(FlashScope.FLASH_FIELD_ERRORS_KEY, MessageType.ERROR);
-    field(FlashScope.FLASH_FIELD_MESSAGES_KEY, MessageType.PLAIN);
+  public void add() {
+    List<Message> messages = new ArrayList<Message>();
+
+    HttpSession session = createStrictMock(HttpSession.class);
+    expect(session.getAttribute(FlashScope.KEY)).andReturn(messages);
+    replay(session);
+
+    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
+    expect(request.getSession(true)).andReturn(session);
+    replay(request);
+
+    FlashScope scope = new FlashScope(request);
+    scope.add(new SimpleMessage("Foo"));
+    assertEquals(messages.size(), 1);
+    assertEquals(messages.get(0), "Foo");
+
+    verify(session, request);
   }
 
-  protected void field(String key, MessageType type) {
-    {
-      FieldMessages sessionMessages = new FieldMessages();
-      sessionMessages.addMessage("user.name", "Test session message");
-      FieldMessages requestMessages = new FieldMessages();
-      requestMessages.addMessage("user.name", "Test request message");
+  @Test
+  public void addAll() {
+    List<Message> messages = new ArrayList<Message>();
 
-      HttpSession session = EasyMock.createStrictMock(HttpSession.class);
-      EasyMock.expect(session.getAttribute(key)).andReturn(sessionMessages);
-      EasyMock.replay(session);
+    HttpSession session = createStrictMock(HttpSession.class);
+    expect(session.getAttribute(FlashScope.KEY)).andReturn(messages);
+    replay(session);
 
-      HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-      EasyMock.expect(request.getAttribute(key)).andReturn(requestMessages);
-      EasyMock.expect(request.getSession(false)).andReturn(session);
-      EasyMock.replay(request);
+    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
+    expect(request.getSession(true)).andReturn(session);
+    replay(request);
 
-      FlashScope scope = new FlashScope(request);
-      Map<String, List<String>> messages = scope.getFieldMessages(type);
-      assertEquals(1, messages.size());
-      assertEquals(2, messages.get("user.name").size());
-      assertEquals("Test request message", messages.get("user.name").get(0));
-      assertEquals("Test session message", messages.get("user.name").get(1));
+    FlashScope scope = new FlashScope(request);
+    scope.addAll(Arrays.<Message>asList(new SimpleMessage("Foo"), new SimpleMessage("Bar")));
+    assertEquals(messages.size(), 2);
+    assertEquals(messages.get(0), "Foo");
+    assertEquals(messages.get(1), "Bar");
 
-      EasyMock.verify(request, session);
-    }
+    verify(session, request);
+  }
 
-    {
-      HttpSession session = EasyMock.createStrictMock(HttpSession.class);
-      EasyMock.expect(session.getAttribute(key)).andReturn(null);
-      EasyMock.replay(session);
+  @Test
+  public void transferFlash() {
+    List<Message> messages = new ArrayList<Message>();
 
-      HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-      EasyMock.expect(request.getAttribute(key)).andReturn(null);
-      EasyMock.expect(request.getSession(false)).andReturn(session);
-      EasyMock.replay(request);
+    HttpSession session = createStrictMock(HttpSession.class);
+    expect(session.getAttribute(FlashScope.KEY)).andReturn(messages);
+    session.removeAttribute(FlashScope.KEY);
+    replay(session);
 
-      FlashScope scope = new FlashScope(request);
-      Map<String, List<String>> messages = scope.getFieldMessages(type);
-      assertEquals(0, messages.size());
+    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
+    expect(request.getSession(true)).andReturn(session);
+    request.setAttribute(FlashScope.KEY, messages);
+    replay(request);
 
-      EasyMock.verify(request, session);
-    }
+    FlashScope scope = new FlashScope(request);
+    scope.transferFlash();
 
-    {
-      HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-      EasyMock.expect(request.getAttribute(key)).andReturn(null);
-      EasyMock.expect(request.getSession(false)).andReturn(null);
-      EasyMock.replay(request);
-
-      FlashScope scope = new FlashScope(request);
-      Map<String, List<String>> messages = scope.getFieldMessages(type);
-      assertEquals(0, messages.size());
-
-      EasyMock.verify(request);
-    }
-
-    {
-      FieldMessages messages = new FieldMessages();
-
-      HttpSession session = EasyMock.createStrictMock(HttpSession.class);
-      EasyMock.expect(session.getAttribute(key)).andReturn(messages);
-      EasyMock.replay(session);
-
-      HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-      EasyMock.expect(request.getSession(true)).andReturn(session);
-      EasyMock.replay(request);
-
-      FlashScope scope = new FlashScope(request);
-      scope.addFieldMessage(type, "user.name", "Test message");
-      assertEquals(1, messages.size());
-      assertEquals(1, messages.get("user.name").size());
-      assertEquals("Test message", messages.get("user.name").get(0));
-
-      EasyMock.verify(request, session);
-    }
-
-    {
-      Capture<FieldMessages> capture = new Capture<FieldMessages>();
-      HttpSession session = EasyMock.createStrictMock(HttpSession.class);
-      EasyMock.expect(session.getAttribute(key)).andReturn(null);
-      session.setAttribute(eq(key), capture(capture));
-      EasyMock.replay(session);
-
-      HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-      EasyMock.expect(request.getSession(true)).andReturn(session);
-      EasyMock.replay(request);
-
-      FlashScope scope = new FlashScope(request);
-      scope.addFieldMessage(type, "user.name", "Test message");
-      FieldMessages messages = capture.getValue();
-      assertEquals(1, messages.size());
-      assertEquals(1, messages.get("user.name").size());
-      assertEquals("Test message", messages.get("user.name").get(0));
-
-      EasyMock.verify(request, session);
-    }
+    verify(session, request);
   }
 }

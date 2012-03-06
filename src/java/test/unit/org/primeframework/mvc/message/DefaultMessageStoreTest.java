@@ -15,20 +15,16 @@
  */
 package org.primeframework.mvc.message;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.easymock.EasyMock;
-import org.example.action.user.Edit;
-import org.primeframework.mvc.action.ActionInvocationStore;
-import org.primeframework.mvc.action.DefaultActionInvocation;
-import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.message.scope.MessageScope;
 import org.primeframework.mvc.message.scope.Scope;
 import org.primeframework.mvc.message.scope.ScopeProvider;
 import org.testng.annotations.Test;
 
-import static net.java.util.CollectionTools.*;
+import static org.easymock.EasyMock.*;
+import static org.testng.Assert.*;
 
 /**
  * This tests the default message store.
@@ -37,236 +33,141 @@ import static net.java.util.CollectionTools.*;
  */
 public class DefaultMessageStoreTest {
   @Test
-  public void testConversionError() {
-    Map<String, String> attributes = new HashMap<String, String>();
-    String[] values = array("value1", "value2");
+  public void request() {
+    Message message = new SimpleFieldMessage("foo.bar", "message");
 
-    ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
-    EasyMock.replay(ais);
+    Scope scope = createStrictMock(Scope.class);
+    scope.add(message);
+    replay(scope);
 
-    MessageProvider mp = EasyMock.createStrictMock(MessageProvider.class);
-    EasyMock.expect(mp.getMessage("bundle", "foo.bar.conversionError", attributes, (Object[])values)).andReturn("message");
-    EasyMock.replay(mp);
+    ScopeProvider sp = createStrictMock(ScopeProvider.class);
+    expect(sp.lookup(MessageScope.REQUEST)).andReturn(scope);
+    replay(sp);
 
-    Scope scope = EasyMock.createStrictMock(Scope.class);
-    scope.addFieldMessage(MessageType.ERROR, "foo.bar", "message");
-    EasyMock.replay(scope);
+    DefaultMessageStore store = new DefaultMessageStore(sp);
+    store.add(message);
 
-    ScopeProvider sp = EasyMock.createStrictMock(ScopeProvider.class);
-    EasyMock.expect(sp.lookup(MessageScope.REQUEST)).andReturn(scope);
-    EasyMock.replay(sp);
-
-    DefaultMessageStore store = new DefaultMessageStore(ais, mp, sp);
-    store.addConversionError("foo.bar", "bundle", attributes, (Object[]) values);
-
-    EasyMock.verify(ais, mp, scope, sp);
+    verify(scope, sp);
   }
 
   @Test
-  public void testAddFieldMessage() {
-    String[] values = array("value1", "value2");
+  public void scoped() {
+    Message message = new SimpleFieldMessage("foo.bar", "message");
 
-    ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
-    EasyMock.replay(ais);
+    Scope scope = createStrictMock(Scope.class);
+    scope.add(message);
+    replay(scope);
 
-    MessageProvider mp = EasyMock.createStrictMock(MessageProvider.class);
-    EasyMock.expect(mp.getMessage("bundle", "key", (Object[])values)).andReturn("message");
-    EasyMock.replay(mp);
+    ScopeProvider sp = createStrictMock(ScopeProvider.class);
+    expect(sp.lookup(MessageScope.FLASH)).andReturn(scope);
+    replay(sp);
 
-    Scope scope = EasyMock.createStrictMock(Scope.class);
-    scope.addFieldMessage(MessageType.PLAIN, "foo.bar", "message");
-    EasyMock.replay(scope);
+    DefaultMessageStore store = new DefaultMessageStore(sp);
+    store.add(MessageScope.FLASH, message);
 
-    ScopeProvider sp = EasyMock.createStrictMock(ScopeProvider.class);
-    EasyMock.expect(sp.lookup(MessageScope.ACTION_SESSION)).andReturn(scope);
-    EasyMock.replay(sp);
-
-    DefaultMessageStore store = new DefaultMessageStore(ais, mp, sp);
-    store.addFieldMessage(MessageScope.ACTION_SESSION, "foo.bar", "bundle", "key", (Object[]) values);
-
-    EasyMock.verify(ais, mp, scope, sp);
+    verify(scope, sp);
   }
 
   @Test
-  public void testAddFieldMessageAction() {
-    Edit action = new Edit();
-    String[] values = array("value1", "value2");
+  public void bulk() {
+    List<Message> messages = new ArrayList<Message>();
+    messages.add(new SimpleFieldMessage("foo.bar", "message"));
+    messages.add(new SimpleFieldMessage("foo.baz", "message"));
 
-    ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
-    EasyMock.expect(ais.getCurrent()).andReturn(new DefaultActionInvocation(action, "/foo/bar", null, null));
-    EasyMock.replay(ais);
+    Scope scope = createStrictMock(Scope.class);
+    scope.addAll(messages);
+    replay(scope);
 
-    MessageProvider mp = EasyMock.createStrictMock(MessageProvider.class);
-    EasyMock.expect(mp.getMessage("/foo/bar", "key", (Object[])values)).andReturn("message");
-    EasyMock.replay(mp);
+    ScopeProvider sp = createStrictMock(ScopeProvider.class);
+    expect(sp.lookup(MessageScope.SESSION)).andReturn(scope);
+    replay(sp);
 
-    Scope scope = EasyMock.createStrictMock(Scope.class);
-    scope.addFieldMessage(MessageType.PLAIN, "foo.bar", "message");
-    EasyMock.replay(scope);
+    DefaultMessageStore store = new DefaultMessageStore(sp);
+    store.addAll(MessageScope.SESSION, messages);
 
-    ScopeProvider sp = EasyMock.createStrictMock(ScopeProvider.class);
-    EasyMock.expect(sp.lookup(MessageScope.ACTION_SESSION)).andReturn(scope);
-    EasyMock.replay(sp);
-
-    DefaultMessageStore store = new DefaultMessageStore(ais, mp, sp);
-    store.addFieldMessage(MessageScope.ACTION_SESSION, "foo.bar", "key", (Object[]) values);
-
-    EasyMock.verify(ais, mp, scope, sp);
+    verify(scope, sp);
   }
 
   @Test
-  public void testAddFieldError() {
-    String[] values = array("value1", "value2");
+  public void get() {
+    List<Message> requestMessages = new ArrayList<Message>();
+    requestMessages.add(new SimpleMessage("request1"));
+    requestMessages.add(new SimpleMessage("request2"));
 
-    ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
-    EasyMock.replay(ais);
+    List<Message> flashMessages = new ArrayList<Message>();
+    flashMessages.add(new SimpleMessage("flash1"));
+    flashMessages.add(new SimpleMessage("flash2"));
 
-    MessageProvider mp = EasyMock.createStrictMock(MessageProvider.class);
-    EasyMock.expect(mp.getMessage("bundle", "key", (Object[])values)).andReturn("message");
-    EasyMock.replay(mp);
+    List<Message> sessionMessages = new ArrayList<Message>();
+    sessionMessages.add(new SimpleMessage("session1"));
+    sessionMessages.add(new SimpleMessage("session2"));
 
-    Scope scope = EasyMock.createStrictMock(Scope.class);
-    scope.addFieldMessage(MessageType.ERROR, "foo.bar", "message");
-    EasyMock.replay(scope);
+    List<Message> applicationMessages = new ArrayList<Message>();
+    applicationMessages.add(new SimpleMessage("application1"));
+    applicationMessages.add(new SimpleMessage("applicaiton2"));
 
-    ScopeProvider sp = EasyMock.createStrictMock(ScopeProvider.class);
-    EasyMock.expect(sp.lookup(MessageScope.ACTION_SESSION)).andReturn(scope);
-    EasyMock.replay(sp);
+    Scope request = createStrictMock(Scope.class);
+    expect(request.get()).andReturn(requestMessages);
+    replay(request);
 
-    DefaultMessageStore store = new DefaultMessageStore(ais, mp, sp);
-    store.addFieldError(MessageScope.ACTION_SESSION, "foo.bar", "bundle", "key", (Object[]) values);
+    Scope flash = createStrictMock(Scope.class);
+    expect(flash.get()).andReturn(flashMessages);
+    replay(flash);
 
-    EasyMock.verify(ais, mp, scope, sp);
+    Scope session = createStrictMock(Scope.class);
+    expect(session.get()).andReturn(sessionMessages);
+    replay(session);
+
+    Scope application = createStrictMock(Scope.class);
+    expect(application.get()).andReturn(applicationMessages);
+    replay(application);
+
+    ScopeProvider sp = createStrictMock(ScopeProvider.class);
+    expect(sp.lookup(MessageScope.REQUEST)).andReturn(request);
+    expect(sp.lookup(MessageScope.FLASH)).andReturn(flash);
+    expect(sp.lookup(MessageScope.SESSION)).andReturn(session);
+    expect(sp.lookup(MessageScope.APPLICATION)).andReturn(application);
+    replay(sp);
+
+    DefaultMessageStore store = new DefaultMessageStore(sp);
+    List<Message> messages = store.get();
+    assertEquals(messages.size(), 8);
+    
+    int index = 0;
+    assertEquals(messages.get(index++).toString(), "request1");
+    assertEquals(messages.get(index++).toString(), "request2");
+    assertEquals(messages.get(index++).toString(), "flash1");
+    assertEquals(messages.get(index++).toString(), "flash2");
+    assertEquals(messages.get(index++).toString(), "session1");
+    assertEquals(messages.get(index++).toString(), "session2");
+    assertEquals(messages.get(index++).toString(), "application1");
+    assertEquals(messages.get(index).toString(), "application2");
+
+    verify(request, flash, session, application, sp);
   }
 
   @Test
-  public void testAddFieldErrorAction() {
-    Edit action = new Edit();
-    String[] values = array("value1", "value2");
+  public void getScope() {
+    List<Message> requestMessages = new ArrayList<Message>();
+    requestMessages.add(new SimpleMessage("request1"));
+    requestMessages.add(new SimpleMessage("request2"));
 
-    ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
-    EasyMock.expect(ais.getCurrent()).andReturn(new DefaultActionInvocation(action, "/foo/bar", null, null));
-    EasyMock.replay(ais);
+    Scope request = createStrictMock(Scope.class);
+    expect(request.get()).andReturn(requestMessages);
+    replay(request);
 
-    MessageProvider mp = EasyMock.createStrictMock(MessageProvider.class);
-    EasyMock.expect(mp.getMessage("/foo/bar", "key", (Object[])values)).andReturn("message");
-    EasyMock.replay(mp);
+    ScopeProvider sp = createStrictMock(ScopeProvider.class);
+    expect(sp.lookup(MessageScope.REQUEST)).andReturn(request);
+    replay(sp);
 
-    Scope scope = EasyMock.createStrictMock(Scope.class);
-    scope.addFieldMessage(MessageType.ERROR, "foo.bar", "message");
-    EasyMock.replay(scope);
+    DefaultMessageStore store = new DefaultMessageStore(sp);
+    List<Message> messages = store.get(MessageScope.REQUEST);
+    assertEquals(messages.size(), 2);
 
-    ScopeProvider sp = EasyMock.createStrictMock(ScopeProvider.class);
-    EasyMock.expect(sp.lookup(MessageScope.ACTION_SESSION)).andReturn(scope);
-    EasyMock.replay(sp);
+    int index = 0;
+    assertEquals(messages.get(index++).toString(), "request1");
+    assertEquals(messages.get(index).toString(), "request2");
 
-    DefaultMessageStore store = new DefaultMessageStore(ais, mp, sp);
-    store.addFieldError(MessageScope.ACTION_SESSION, "foo.bar", "key", (Object[]) values);
-
-    EasyMock.verify(ais, mp, scope, sp);
-  }
-
-  @Test
-  public void testAddActionMessage() {
-    String[] values = array("value1", "value2");
-
-    ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
-    EasyMock.replay(ais);
-
-    MessageProvider mp = EasyMock.createStrictMock(MessageProvider.class);
-    EasyMock.expect(mp.getMessage("bundle", "key", (Object[])values)).andReturn("message");
-    EasyMock.replay(mp);
-
-    Scope scope = EasyMock.createStrictMock(Scope.class);
-    scope.addActionMessage(MessageType.PLAIN, "message");
-    EasyMock.replay(scope);
-
-    ScopeProvider sp = EasyMock.createStrictMock(ScopeProvider.class);
-    EasyMock.expect(sp.lookup(MessageScope.ACTION_SESSION)).andReturn(scope);
-    EasyMock.replay(sp);
-
-    DefaultMessageStore store = new DefaultMessageStore(ais, mp, sp);
-    store.addActionMessage(MessageScope.ACTION_SESSION, "bundle", "key", (Object[]) values);
-
-    EasyMock.verify(ais, mp, scope, sp);
-  }
-
-  @Test
-  public void testAddActionMessageAction() {
-    Edit action = new Edit();
-    String[] values = array("value1", "value2");
-
-    ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
-    EasyMock.expect(ais.getCurrent()).andReturn(new DefaultActionInvocation(action, "/foo/bar", null, null));
-    EasyMock.replay(ais);
-
-    MessageProvider mp = EasyMock.createStrictMock(MessageProvider.class);
-    EasyMock.expect(mp.getMessage("/foo/bar", "key", (Object[])values)).andReturn("message");
-    EasyMock.replay(mp);
-
-    Scope scope = EasyMock.createStrictMock(Scope.class);
-    scope.addActionMessage(MessageType.PLAIN, "message");
-    EasyMock.replay(scope);
-
-    ScopeProvider sp = EasyMock.createStrictMock(ScopeProvider.class);
-    EasyMock.expect(sp.lookup(MessageScope.ACTION_SESSION)).andReturn(scope);
-    EasyMock.replay(sp);
-
-    DefaultMessageStore store = new DefaultMessageStore(ais, mp, sp);
-    store.addActionMessage(MessageScope.ACTION_SESSION, "key", (Object[]) values);
-
-    EasyMock.verify(ais, mp, scope, sp);
-  }
-
-  @Test
-  public void testAddActionError() {
-    String[] values = array("value1", "value2");
-
-    ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
-    EasyMock.replay(ais);
-
-    MessageProvider mp = EasyMock.createStrictMock(MessageProvider.class);
-    EasyMock.expect(mp.getMessage("bundle", "key", (Object[])values)).andReturn("message");
-    EasyMock.replay(mp);
-
-    Scope scope = EasyMock.createStrictMock(Scope.class);
-    scope.addActionMessage(MessageType.ERROR, "message");
-    EasyMock.replay(scope);
-
-    ScopeProvider sp = EasyMock.createStrictMock(ScopeProvider.class);
-    EasyMock.expect(sp.lookup(MessageScope.ACTION_SESSION)).andReturn(scope);
-    EasyMock.replay(sp);
-
-    DefaultMessageStore store = new DefaultMessageStore(ais, mp, sp);
-    store.addActionError(MessageScope.ACTION_SESSION, "bundle", "key", (Object[]) values);
-
-    EasyMock.verify(ais, mp, scope, sp);
-  }
-
-  @Test
-  public void testAddActionErrorAction() {
-    Edit action = new Edit();
-    String[] values = array("value1", "value2");
-
-    ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
-    EasyMock.expect(ais.getCurrent()).andReturn(new DefaultActionInvocation(action, "/foo/bar", null, null));
-    EasyMock.replay(ais);
-
-    MessageProvider mp = EasyMock.createStrictMock(MessageProvider.class);
-    EasyMock.expect(mp.getMessage("/foo/bar", "key", (Object[])values)).andReturn("message");
-    EasyMock.replay(mp);
-
-    Scope scope = EasyMock.createStrictMock(Scope.class);
-    scope.addActionMessage(MessageType.ERROR, "message");
-    EasyMock.replay(scope);
-
-    ScopeProvider sp = EasyMock.createStrictMock(ScopeProvider.class);
-    EasyMock.expect(sp.lookup(MessageScope.ACTION_SESSION)).andReturn(scope);
-    EasyMock.replay(sp);
-
-    DefaultMessageStore store = new DefaultMessageStore(ais, mp, sp);
-    store.addActionError(MessageScope.ACTION_SESSION, "key", (Object[]) values);
-
-    EasyMock.verify(ais, mp, scope, sp);
+    verify(request, sp);
   }
 }

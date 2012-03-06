@@ -20,6 +20,7 @@ import java.lang.reflect.Method;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.control.form.annotation.FormPrepareMethod;
+import org.primeframework.mvc.util.MethodTools;
 
 import com.google.inject.Inject;
 
@@ -51,11 +52,7 @@ public class DefaultFormPreparer implements FormPreparer {
     Method[] methods = actionClass.getMethods();
     for (Method method : methods) {
       if (method.getAnnotation(FormPrepareMethod.class) != null) {
-        try {
-          method.invoke(action);
-        } catch (Exception e) {
-          throw new RuntimeException("Unable to call FormPrepareMethod method [" + method + "]", e);
-        }
+        MethodTools.invoke(method, action);
       }
     }
   }

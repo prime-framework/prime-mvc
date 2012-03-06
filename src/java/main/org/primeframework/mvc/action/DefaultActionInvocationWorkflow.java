@@ -68,10 +68,8 @@ public class DefaultActionInvocationWorkflow implements ActionInvocationWorkflow
   public void perform(WorkflowChain chain) throws IOException, ServletException {
     ActionInvocation invocation = actionInvocationStore.getCurrent();
     if (invocation.action() != null) {
-      if (invocation.executeAction()) {
-        String resultCode = execute(invocation, request.getMethod());
-        resultStore.set(resultCode);
-      }
+      String resultCode = execute(invocation, request.getMethod());
+      resultStore.set(resultCode);
     }
 
     chain.continueWorkflow();
@@ -112,7 +110,7 @@ public class DefaultActionInvocationWorkflow implements ActionInvocationWorkflow
     // Handle HEAD requests using a GET
     if (method == null && httpMethod.equals("HEAD")) {
       try {
-        method = action.getClass().getMethod("GET");
+        method = action.getClass().getMethod("get");
       } catch (NoSuchMethodException e) {
         // Ignore
       }
@@ -152,10 +150,9 @@ public class DefaultActionInvocationWorkflow implements ActionInvocationWorkflow
    */
   protected void verify(Method method) throws ServletException {
     if (method.getReturnType() != String.class || method.getParameterTypes().length != 0) {
-      throw new ServletException("The action class [" + method.getDeclaringClass().getClass() +
-        "] has defined an execute method named [" + method.getName() + "] that is invalid. " +
-        "Execute methods must have zero paramters and return a String like this: " +
-        "[public String execute()].");
+      throw new ServletException("The action class [" + method.getDeclaringClass().getClass() + "] has defined an " +
+        "execute method named [" + method.getName() + "] that is invalid. Execute methods must have zero parameters " +
+        "and return a String like this: [public String execute()].");
     }
   }
 }

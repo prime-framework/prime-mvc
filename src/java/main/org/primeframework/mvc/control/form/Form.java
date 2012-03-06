@@ -51,6 +51,11 @@ public class Form extends AbstractControl {
     this.actionMapper = actionMapper;
   }
 
+  @Override
+  public String getName() {
+    return "form";
+  }
+
   /**
    * If the user supplied a prepare action URI, that action is inokved.
    */

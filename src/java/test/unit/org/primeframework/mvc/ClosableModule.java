@@ -21,7 +21,7 @@ import com.google.inject.Binder;
 import com.google.inject.Module;
 
 /**
- * This is a test module.
+ * Test module outside of a package named Guice to test explicit modules.
  *
  * @author Brian Pontarelli
  */

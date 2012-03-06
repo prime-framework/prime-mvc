@@ -20,23 +20,29 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
+import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.DefaultActionInvocation;
 import org.primeframework.mvc.action.result.annotation.Redirect;
+import org.primeframework.mvc.message.Message;
+import org.primeframework.mvc.message.MessageStore;
+import org.primeframework.mvc.message.scope.MessageScope;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.testng.annotations.Test;
 
 import static org.easymock.EasyMock.*;
 
 /**
- * <p> This class tests the redirect result. </p>
+ * This class tests the redirect result.
  *
  * @author Brian Pontarelli
  */
 public class RedirectResultTest {
   @Test
-  public void testFullyQualified() throws IOException, ServletException {
+  public void fullyQualified() throws IOException, ServletException {
     ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
     replay(ee);
 
@@ -49,15 +55,25 @@ public class RedirectResultTest {
     response.sendRedirect("http://www.google.com");
     replay(response);
 
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, "/foo", "", null));
+    replay(store);
+
+    List<Message> messages = new ArrayList<Message>();
+    MessageStore messageStore = createStrictMock(MessageStore.class);
+    expect(messageStore.get()).andReturn(messages);
+    messageStore.addAll(MessageScope.FLASH, messages);
+    replay(messageStore);
+
     Redirect redirect = new RedirectImpl("success", "http://www.google.com", true, false);
-    RedirectResult forwardResult = new RedirectResult(messageStore, ee, response, request, actionInvocationStore);
-    forwardResult.execute(redirect, new DefaultActionInvocation(null, "/foo", "", null));
+    RedirectResult forwardResult = new RedirectResult(messageStore, ee, response, request, store);
+    forwardResult.execute(redirect);
 
     verify(response);
   }
 
   @Test
-  public void testRelative() throws IOException, ServletException {
+  public void relative() throws IOException, ServletException {
     ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
     replay(ee);
 
@@ -70,15 +86,25 @@ public class RedirectResultTest {
     response.sendRedirect("/foo/bar.jsp");
     replay(response);
 
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, "foo", "", null));
+    replay(store);
+
+    List<Message> messages = new ArrayList<Message>();
+    MessageStore messageStore = createStrictMock(MessageStore.class);
+    expect(messageStore.get()).andReturn(messages);
+    messageStore.addAll(MessageScope.FLASH, messages);
+    replay(messageStore);
+
     Redirect redirect = new RedirectImpl("success", "/foo/bar.jsp", false, false);
-    RedirectResult forwardResult = new RedirectResult(messageStore, ee, response, request, actionInvocationStore);
-    forwardResult.execute(redirect, new DefaultActionInvocation(null, "foo", "", null));
+    RedirectResult forwardResult = new RedirectResult(messageStore, ee, response, request, store);
+    forwardResult.execute(redirect);
 
     verify(response);
   }
 
   @Test
-  public void testRelativeContext() throws IOException, ServletException {
+  public void relativeContext() throws IOException, ServletException {
     ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
     replay(ee);
 
@@ -91,15 +117,25 @@ public class RedirectResultTest {
     response.sendRedirect("/context-path/foo/bar.jsp");
     replay(response);
 
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, "foo", "", null));
+    replay(store);
+
+    List<Message> messages = new ArrayList<Message>();
+    MessageStore messageStore = createStrictMock(MessageStore.class);
+    expect(messageStore.get()).andReturn(messages);
+    messageStore.addAll(MessageScope.FLASH, messages);
+    replay(messageStore);
+
     Redirect redirect = new RedirectImpl("success", "/foo/bar.jsp", false, false);
-    RedirectResult forwardResult = new RedirectResult(messageStore, ee, response, request, actionInvocationStore);
-    forwardResult.execute(redirect, new DefaultActionInvocation(null, "foo", "", null));
+    RedirectResult forwardResult = new RedirectResult(messageStore, ee, response, request, store);
+    forwardResult.execute(redirect);
 
     verify(response);
   }
 
   @Test
-  public void testRelativeContextNoSlash() throws IOException, ServletException {
+  public void relativeContextNoSlash() throws IOException, ServletException {
     ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
     replay(ee);
 
@@ -112,15 +148,25 @@ public class RedirectResultTest {
     response.sendRedirect("foo/bar.jsp");
     replay(response);
 
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, "foo", "", null));
+    replay(store);
+
+    List<Message> messages = new ArrayList<Message>();
+    MessageStore messageStore = createStrictMock(MessageStore.class);
+    expect(messageStore.get()).andReturn(messages);
+    messageStore.addAll(MessageScope.FLASH, messages);
+    replay(messageStore);
+
     Redirect redirect = new RedirectImpl("success", "foo/bar.jsp", false, false);
-    RedirectResult forwardResult = new RedirectResult(messageStore, ee, response, request, actionInvocationStore);
-    forwardResult.execute(redirect, new DefaultActionInvocation(null, "foo", "", null));
+    RedirectResult forwardResult = new RedirectResult(messageStore, ee, response, request, store);
+    forwardResult.execute(redirect);
 
     verify(response);
   }
 
   @Test
-  public void testExpand() throws IOException, ServletException {
+  public void expand() throws IOException, ServletException {
     Object action = new Object();
     ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
     expect(ee.getValue(eq("foo"), same(action), isA(Map.class))).andReturn("result");
@@ -135,15 +181,25 @@ public class RedirectResultTest {
     response.sendRedirect("result");
     replay(response);
 
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(action, "foo", "", null));
+    replay(store);
+
+    List<Message> messages = new ArrayList<Message>();
+    MessageStore messageStore = createStrictMock(MessageStore.class);
+    expect(messageStore.get()).andReturn(messages);
+    messageStore.addAll(MessageScope.FLASH, messages);
+    replay(messageStore);
+
     Redirect redirect = new RedirectImpl("success", "${foo}", false, false);
-    RedirectResult forwardResult = new RedirectResult(messageStore, ee, response, request, actionInvocationStore);
-    forwardResult.execute(redirect, new DefaultActionInvocation(action, "foo", "", null));
+    RedirectResult forwardResult = new RedirectResult(messageStore, ee, response, request, store);
+    forwardResult.execute(redirect);
 
     verify(response);
   }
 
   @Test
-  public void testExpandEncode() throws IOException, ServletException {
+  public void expandEncode() throws IOException, ServletException {
     Object action = new Object();
     ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
     expect(ee.getValue(eq("foo"), same(action), isA(Map.class))).andReturn("/result");
@@ -158,9 +214,19 @@ public class RedirectResultTest {
     response.sendRedirect("%2Fresult");
     replay(response);
 
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(action, "foo", "", null));
+    replay(store);
+
+    List<Message> messages = new ArrayList<Message>();
+    MessageStore messageStore = createStrictMock(MessageStore.class);
+    expect(messageStore.get()).andReturn(messages);
+    messageStore.addAll(MessageScope.FLASH, messages);
+    replay(messageStore);
+
     Redirect redirect = new RedirectImpl("success", "${foo}", false, true);
-    RedirectResult forwardResult = new RedirectResult(messageStore, ee, response, request, actionInvocationStore);
-    forwardResult.execute(redirect, new DefaultActionInvocation(action, "foo", "", null));
+    RedirectResult forwardResult = new RedirectResult(messageStore, ee, response, request, store);
+    forwardResult.execute(redirect);
 
     verify(response);
   }

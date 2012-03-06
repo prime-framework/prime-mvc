@@ -19,10 +19,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
-import java.net.URLEncoder;
-import java.util.HashMap;
 import java.util.List;
 
 import org.primeframework.mvc.action.ActionInvocationStore;
@@ -31,10 +28,6 @@ import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.scope.MessageScope;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-
-import net.java.variable.ExpanderException;
-import net.java.variable.ExpanderStrategy;
-import net.java.variable.VariableExpander;
 
 import com.google.inject.Inject;
 
@@ -67,22 +60,7 @@ public class RedirectResult extends AbstractResult<Redirect> {
     List<Message> messages = messageStore.get(MessageScope.REQUEST);
     messageStore.addAll(MessageScope.FLASH, messages);
 
-    String uri = VariableExpander.expand(redirect.uri(), new ExpanderStrategy() {
-      public String expand(String variableName) throws ExpanderException {
-        try {
-          Object action = actionInvocationStore.getCurrent().action();
-          String val = expressionEvaluator.getValue(variableName, action, new HashMap<String, String>());
-          if (redirect.encodeVariables()) {
-            val = URLEncoder.encode(val, "UTF-8");
-          }
-
-          return val;
-        } catch (UnsupportedEncodingException e) {
-          throw new ExpanderException(e);
-        }
-      }
-    });
-
+    String uri = expand(redirect.uri(), actionInvocationStore.getCurrent().action(), true);
     String context = request.getContextPath();
     if (context.length() > 0 && uri.startsWith("/")) {
       uri = context + uri;

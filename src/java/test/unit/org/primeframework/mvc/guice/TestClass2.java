@@ -16,7 +16,7 @@
 package org.primeframework.mvc.guice;
 
 /**
- * <p> This is a test class. </p>
+ * This is a test class.
  *
  * @author Brian Pontarelli
  */

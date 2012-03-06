@@ -15,34 +15,32 @@
  */
 package org.primeframework.mvc.parameter.convert.converters;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.primeframework.mvc.MockConfiguration;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
 import org.testng.annotations.Test;
 
-import static net.java.util.CollectionTools.*;
 import static org.testng.Assert.*;
 
 /**
- * <p> This tests the String converter. </p>
+ * This tests the String converter.
  *
  * @author Brian Pontarelli
  */
 public class StringConverterTest {
-  /**
-   * Test the conversion from Strings.
-   */
   @Test
-  public void testFromStrings() {
-    GlobalConverter converter = new StringConverter();
-    String str = (String) converter.convertFromStrings(String.class, null, "testExpr", array((String) null));
+  public void fromStrings() {
+    GlobalConverter converter = new StringConverter(new MockConfiguration());
+    String str = (String) converter.convertFromStrings(String.class, null, "testExpr", ArrayUtils.toArray((String) null));
     assertNull(str);
 
-    str = (String) converter.convertFromStrings(String.class, null, "testExpr", array(""));
+    str = (String) converter.convertFromStrings(String.class, null, "testExpr", ArrayUtils.toArray(""));
     assertNull(str);
 
-    str = (String) converter.convertFromStrings(String.class, null, "testExpr", array("a"));
+    str = (String) converter.convertFromStrings(String.class, null, "testExpr", ArrayUtils.toArray("a"));
     assertEquals("a", str);
 
-    str = (String) converter.convertFromStrings(String.class, null, "testExpr", array("a", "b"));
+    str = (String) converter.convertFromStrings(String.class, null, "testExpr", ArrayUtils.toArray("a", "b"));
     assertEquals("a,b", str);
   }
 
@@ -50,8 +48,8 @@ public class StringConverterTest {
    * Test the conversion from Strings.
    */
   @Test
-  public void testToStrings() {
-    GlobalConverter converter = new StringConverter();
+  public void toStrings() {
+    GlobalConverter converter = new StringConverter(new MockConfiguration());
     String str = converter.convertToString(String.class, null, "testExpr", null);
     assertNull(str);
 

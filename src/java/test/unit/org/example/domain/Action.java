@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <p> This is a test action. </p>
+ * This is a test action.
  *
  * @author Brian Pontarelli
  */

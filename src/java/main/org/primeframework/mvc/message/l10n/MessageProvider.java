@@ -50,31 +50,4 @@ public interface MessageProvider {
    * @throws MissingMessageException If the message is missing.
    */
   FieldMessage getFieldMessage(String field, String key, Object... values) throws MissingMessageException;
-  
-  /**
-   * Gets a field message for a conversion error.
-   *
-   * @param field The field that failed to be converted.
-   * @param values The values of the field (as Strings).
-   * @return The FieldMessage.
-   */
-  FieldMessage getFieldConversion(String field, String... values);
-
-  /**
-   * Gets a field message for a file upload error when the file is too large.
-   *
-   * @param field The field.
-   * @param length The length of the file.
-   * @return The FieldMessage.
-   */
-  FieldMessage getFileUploadSize(String field, long length);
-
-  /**
-   * Gets a field message for a file upload error when the file is an invalid type.
-   *
-   * @param field The field.
-   * @param contentType The content type of the file.
-   * @return The FieldMessage.
-   */
-  FieldMessage getFileUploadContentType(String field, String contentType);
 }

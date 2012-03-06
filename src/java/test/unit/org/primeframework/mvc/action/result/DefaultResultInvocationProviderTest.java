@@ -20,199 +20,231 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Locale;
 
-import org.easymock.EasyMock;
-import org.primeframework.mvc.action.ActionInvocation;
+import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.DefaultActionInvocation;
 import org.primeframework.mvc.action.result.annotation.Forward;
 import org.primeframework.mvc.action.result.annotation.Redirect;
 import org.testng.annotations.Test;
 
+import static org.easymock.EasyMock.*;
 import static org.testng.Assert.*;
 
 /**
- * <p> This class tests the default result invocation provider. </p>
+ * This class tests the default result invocation provider.
  *
  * @author Brian Pontarelli
  */
 public class DefaultResultInvocationProviderTest {
   @Test
-  public void testActionLess() throws MalformedURLException {
-    ServletContext context = EasyMock.createStrictMock(ServletContext.class);
-    EasyMock.expect(context.getResource("/WEB-INF/content/foo/bar.jsp")).andReturn(null);
-    EasyMock.expect(context.getResource("/WEB-INF/content/foo/bar.ftl")).andReturn(new URL("http://google.com"));
-    EasyMock.replay(context);
+  public void actionLess() throws MalformedURLException {
+    ServletContext context = createStrictMock(ServletContext.class);
+    expect(context.getResource("/WEB-INF/content/foo/bar.jsp")).andReturn(null);
+    expect(context.getResource("/WEB-INF/content/foo/bar.ftl")).andReturn(new URL("http://google.com"));
+    replay(context);
 
-    ActionInvocation ai = new DefaultActionInvocation(null, "/foo/bar", null, null);
-    DefaultResultInvocationProvider provider = new DefaultResultInvocationProvider(actionInvocationStore, new ForwardResult(actionInvocationStore, null, null, context, null, null, null, Locale.CANADA));
-    ResultInvocation invocation = provider.lookup(ai);
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, "/foo/bar", null, null));
+    replay(store);
+
+    DefaultResultInvocationProvider provider = new DefaultResultInvocationProvider(store, new ForwardResult(store, null, null, context, null, null, null, Locale.CANADA));
+    ResultInvocation invocation = provider.lookup();
     assertNotNull(invocation);
     assertNull(invocation.resultCode());
     assertEquals("/foo/bar", invocation.uri());
     assertNull(((Forward) invocation.annotation()).code());
     assertEquals("/WEB-INF/content/foo/bar.ftl", ((Forward) invocation.annotation()).page());
 
-    EasyMock.verify(context);
+    verify(context);
   }
 
   @Test
-  public void testActionLessWithExtension() throws MalformedURLException {
-    ServletContext context = EasyMock.createStrictMock(ServletContext.class);
-    EasyMock.expect(context.getResource("/WEB-INF/content/foo/bar-ajax.jsp")).andReturn(null);
-    EasyMock.expect(context.getResource("/WEB-INF/content/foo/bar-ajax.ftl")).andReturn(null);
-    EasyMock.expect(context.getResource("/WEB-INF/content/foo/bar.jsp")).andReturn(null);
-    EasyMock.expect(context.getResource("/WEB-INF/content/foo/bar.ftl")).andReturn(new URL("http://google.com"));
-    EasyMock.replay(context);
+  public void actionLessWithExtension() throws MalformedURLException {
+    ServletContext context = createStrictMock(ServletContext.class);
+    expect(context.getResource("/WEB-INF/content/foo/bar-ajax.jsp")).andReturn(null);
+    expect(context.getResource("/WEB-INF/content/foo/bar-ajax.ftl")).andReturn(null);
+    expect(context.getResource("/WEB-INF/content/foo/bar.jsp")).andReturn(null);
+    expect(context.getResource("/WEB-INF/content/foo/bar.ftl")).andReturn(new URL("http://google.com"));
+    replay(context);
 
-    ActionInvocation ai = new DefaultActionInvocation(null, "/foo/bar", "ajax", null);
-    DefaultResultInvocationProvider provider = new DefaultResultInvocationProvider(actionInvocationStore, new ForwardResult(actionInvocationStore, null, null, context, null, null, null, Locale.CANADA));
-    ResultInvocation invocation = provider.lookup(ai);
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, "/foo/bar", "ajax", null));
+    replay(store);
+
+    DefaultResultInvocationProvider provider = new DefaultResultInvocationProvider(store, new ForwardResult(store, null, null, context, null, null, null, Locale.CANADA));
+    ResultInvocation invocation = provider.lookup();
     assertNotNull(invocation);
     assertNull(invocation.resultCode());
     assertEquals("/foo/bar", invocation.uri());
     assertNull(((Forward) invocation.annotation()).code());
     assertEquals("/WEB-INF/content/foo/bar.ftl", ((Forward) invocation.annotation()).page());
 
-    EasyMock.verify(context);
+    verify(context);
   }
 
   @Test
-  public void testActionLessRedirectForIndexPage() throws MalformedURLException {
-    ServletContext context = EasyMock.createStrictMock(ServletContext.class);
-    EasyMock.expect(context.getResource("/WEB-INF/content/foo/bar.jsp")).andReturn(null);
-    EasyMock.expect(context.getResource("/WEB-INF/content/foo/bar.ftl")).andReturn(null);
-    EasyMock.expect(context.getResource("/WEB-INF/content/foo/bar/index.jsp")).andReturn(null);
-    EasyMock.expect(context.getResource("/WEB-INF/content/foo/bar/index.ftl")).andReturn(new URL("http://google.com"));
-    EasyMock.replay(context);
+  public void actionLessRedirectForIndexPage() throws MalformedURLException {
+    ServletContext context = createStrictMock(ServletContext.class);
+    expect(context.getResource("/WEB-INF/content/foo/bar.jsp")).andReturn(null);
+    expect(context.getResource("/WEB-INF/content/foo/bar.ftl")).andReturn(null);
+    expect(context.getResource("/WEB-INF/content/foo/bar/index.jsp")).andReturn(null);
+    expect(context.getResource("/WEB-INF/content/foo/bar/index.ftl")).andReturn(new URL("http://google.com"));
+    replay(context);
 
-    ActionInvocation ai = new DefaultActionInvocation(null, "/foo/bar", null, null);
-    DefaultResultInvocationProvider provider = new DefaultResultInvocationProvider(actionInvocationStore, new ForwardResult(actionInvocationStore, null, null, context, null, null, null, Locale.CANADA));
-    ResultInvocation invocation = provider.lookup(ai);
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, "/foo/bar", null, null));
+    replay(store);
+
+    DefaultResultInvocationProvider provider = new DefaultResultInvocationProvider(store, new ForwardResult(store, null, null, context, null, null, null, Locale.CANADA));
+    ResultInvocation invocation = provider.lookup();
     assertNotNull(invocation);
     assertNull(invocation.resultCode());
     assertEquals("/foo/bar", invocation.uri());
     assertNull(((Redirect) invocation.annotation()).code());
     assertEquals("/foo/bar/", ((Redirect) invocation.annotation()).uri());
 
-    EasyMock.verify(context);
+    verify(context);
   }
 
   @Test
-  public void testActionLessRedirectForIndexPageWithExtension() throws MalformedURLException {
-    ServletContext context = EasyMock.createStrictMock(ServletContext.class);
-    EasyMock.expect(context.getResource("/WEB-INF/content/foo/bar-ajax.jsp")).andReturn(null);
-    EasyMock.expect(context.getResource("/WEB-INF/content/foo/bar-ajax.ftl")).andReturn(null);
-    EasyMock.expect(context.getResource("/WEB-INF/content/foo/bar.jsp")).andReturn(null);
-    EasyMock.expect(context.getResource("/WEB-INF/content/foo/bar.ftl")).andReturn(null);
-    EasyMock.expect(context.getResource("/WEB-INF/content/foo/bar/index.jsp")).andReturn(null);
-    EasyMock.expect(context.getResource("/WEB-INF/content/foo/bar/index.ftl")).andReturn(new URL("http://google.com"));
-    EasyMock.replay(context);
+  public void actionLessRedirectForIndexPageWithExtension() throws MalformedURLException {
+    ServletContext context = createStrictMock(ServletContext.class);
+    expect(context.getResource("/WEB-INF/content/foo/bar-ajax.jsp")).andReturn(null);
+    expect(context.getResource("/WEB-INF/content/foo/bar-ajax.ftl")).andReturn(null);
+    expect(context.getResource("/WEB-INF/content/foo/bar.jsp")).andReturn(null);
+    expect(context.getResource("/WEB-INF/content/foo/bar.ftl")).andReturn(null);
+    expect(context.getResource("/WEB-INF/content/foo/bar/index.jsp")).andReturn(null);
+    expect(context.getResource("/WEB-INF/content/foo/bar/index.ftl")).andReturn(new URL("http://google.com"));
+    replay(context);
 
-    ActionInvocation ai = new DefaultActionInvocation(null, "/foo/bar", "ajax", null);
-    DefaultResultInvocationProvider provider = new DefaultResultInvocationProvider(actionInvocationStore, new ForwardResult(actionInvocationStore, null, null, context, null, null, null, Locale.CANADA));
-    ResultInvocation invocation = provider.lookup(ai);
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, "/foo/bar", "ajax", null));
+    replay(store);
+
+    DefaultResultInvocationProvider provider = new DefaultResultInvocationProvider(store, new ForwardResult(store, null, null, context, null, null, null, Locale.CANADA));
+    ResultInvocation invocation = provider.lookup();
     assertNotNull(invocation);
     assertNull(invocation.resultCode());
     assertEquals("/foo/bar", invocation.uri());
     assertNull(((Redirect) invocation.annotation()).code());
     assertEquals("/foo/bar/", ((Redirect) invocation.annotation()).uri());
 
-    EasyMock.verify(context);
+    verify(context);
   }
 
   @Test
-  public void testActionLessIndexPage() throws MalformedURLException {
-    ServletContext context = EasyMock.createStrictMock(ServletContext.class);
-    EasyMock.expect(context.getResource("/WEB-INF/content/foo/bar/index.jsp")).andReturn(null);
-    EasyMock.expect(context.getResource("/WEB-INF/content/foo/bar/index.ftl")).andReturn(new URL("http://google.com"));
-    EasyMock.replay(context);
+  public void actionLessIndexPage() throws MalformedURLException {
+    ServletContext context = createStrictMock(ServletContext.class);
+    expect(context.getResource("/WEB-INF/content/foo/bar/index.jsp")).andReturn(null);
+    expect(context.getResource("/WEB-INF/content/foo/bar/index.ftl")).andReturn(new URL("http://google.com"));
+    replay(context);
 
-    ActionInvocation ai = new DefaultActionInvocation(null, "/foo/bar/", null, null);
-    DefaultResultInvocationProvider provider = new DefaultResultInvocationProvider(actionInvocationStore, new ForwardResult(actionInvocationStore, null, null, context, null, null, null, Locale.CANADA));
-    ResultInvocation invocation = provider.lookup(ai);
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, "/foo/bar/", null, null));
+    replay(store);
+
+    DefaultResultInvocationProvider provider = new DefaultResultInvocationProvider(store, new ForwardResult(store, null, null, context, null, null, null, Locale.CANADA));
+    ResultInvocation invocation = provider.lookup();
     assertNotNull(invocation);
     assertNull(invocation.resultCode());
     assertEquals("/foo/bar/", invocation.uri());
     assertNull(((Forward) invocation.annotation()).code());
     assertEquals("/WEB-INF/content/foo/bar/index.ftl", ((Forward) invocation.annotation()).page());
 
-    EasyMock.verify(context);
+    verify(context);
   }
 
   @Test
-  public void testActionAnnotation() {
-    ServletContext context = EasyMock.createStrictMock(ServletContext.class);
-    EasyMock.replay(context);
+  public void actionAnnotation() {
+    ServletContext context = createStrictMock(ServletContext.class);
+    replay(context);
 
     TestAction action = new TestAction();
-    DefaultResultInvocationProvider provider = new DefaultResultInvocationProvider(actionInvocationStore, new ForwardResult(actionInvocationStore, null, null, context, null, null, null, Locale.CANADA));
-    ResultInvocation invocation = provider.lookup(new DefaultActionInvocation(action, "/foo/bar", null, null), "success");
+
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(action, "/foo/bar", null, null));
+    replay(store);
+
+    DefaultResultInvocationProvider provider = new DefaultResultInvocationProvider(store, new ForwardResult(store, null, null, context, null, null, null, Locale.CANADA));
+    ResultInvocation invocation = provider.lookup("success");
     assertNotNull(invocation);
     assertEquals("success", invocation.resultCode());
     assertEquals("/foo/bar", invocation.uri());
     assertEquals("success", ((Forward) invocation.annotation()).code());
     assertEquals("foo.jsp", ((Forward) invocation.annotation()).page());
 
-    EasyMock.verify(context);
+    verify(context);
   }
 
   @Test
-  public void testActionNoAnnotation() throws MalformedURLException {
-    ServletContext context = EasyMock.createStrictMock(ServletContext.class);
-    EasyMock.expect(context.getResource("/WEB-INF/content/foo/bar-error.jsp")).andReturn(null);
-    EasyMock.expect(context.getResource("/WEB-INF/content/foo/bar-error.ftl")).andReturn(new URL("http://google.com"));
-    EasyMock.replay(context);
+  public void actionNoAnnotation() throws MalformedURLException {
+    ServletContext context = createStrictMock(ServletContext.class);
+    expect(context.getResource("/WEB-INF/content/foo/bar-error.jsp")).andReturn(null);
+    expect(context.getResource("/WEB-INF/content/foo/bar-error.ftl")).andReturn(new URL("http://google.com"));
+    replay(context);
 
     TestAction action = new TestAction();
-    DefaultResultInvocationProvider provider = new DefaultResultInvocationProvider(actionInvocationStore, new ForwardResult(actionInvocationStore, null, null, context, null, null, null, Locale.CANADA));
-    ResultInvocation invocation = provider.lookup(new DefaultActionInvocation(action, "/foo/bar", null, null), "error");
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(action, "/foo/bar", null, null));
+    replay(store);
+
+    DefaultResultInvocationProvider provider = new DefaultResultInvocationProvider(store, new ForwardResult(store, null, null, context, null, null, null, Locale.CANADA));
+    ResultInvocation invocation = provider.lookup("error");
     assertNotNull(invocation);
     assertEquals("error", invocation.resultCode());
     assertEquals("/foo/bar", invocation.uri());
     assertEquals("error", ((Forward) invocation.annotation()).code());
     assertEquals("/WEB-INF/content/foo/bar-error.ftl", ((Forward) invocation.annotation()).page());
 
-    EasyMock.verify(context);
+    verify(context);
   }
 
   @Test
-  public void testActionNoAnnotationWithExtension() throws MalformedURLException {
-    ServletContext context = EasyMock.createStrictMock(ServletContext.class);
-    EasyMock.expect(context.getResource("/WEB-INF/content/foo/bar-ajax-error.jsp")).andReturn(null);
-    EasyMock.expect(context.getResource("/WEB-INF/content/foo/bar-ajax-error.ftl")).andReturn(null);
-    EasyMock.expect(context.getResource("/WEB-INF/content/foo/bar-ajax.jsp")).andReturn(null);
-    EasyMock.expect(context.getResource("/WEB-INF/content/foo/bar-ajax.ftl")).andReturn(null);
-    EasyMock.expect(context.getResource("/WEB-INF/content/foo/bar-error.jsp")).andReturn(null);
-    EasyMock.expect(context.getResource("/WEB-INF/content/foo/bar-error.ftl")).andReturn(new URL("http://google.com"));
-    EasyMock.replay(context);
+  public void actionNoAnnotationWithExtension() throws MalformedURLException {
+    ServletContext context = createStrictMock(ServletContext.class);
+    expect(context.getResource("/WEB-INF/content/foo/bar-ajax-error.jsp")).andReturn(null);
+    expect(context.getResource("/WEB-INF/content/foo/bar-ajax-error.ftl")).andReturn(null);
+    expect(context.getResource("/WEB-INF/content/foo/bar-ajax.jsp")).andReturn(null);
+    expect(context.getResource("/WEB-INF/content/foo/bar-ajax.ftl")).andReturn(null);
+    expect(context.getResource("/WEB-INF/content/foo/bar-error.jsp")).andReturn(null);
+    expect(context.getResource("/WEB-INF/content/foo/bar-error.ftl")).andReturn(new URL("http://google.com"));
+    replay(context);
 
     TestAction action = new TestAction();
-    DefaultResultInvocationProvider provider = new DefaultResultInvocationProvider(actionInvocationStore, new ForwardResult(actionInvocationStore, null, null, context, null, null, null, Locale.CANADA));
-    ResultInvocation invocation = provider.lookup(new DefaultActionInvocation(action, "/foo/bar", "ajax", null), "error");
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(action, "/foo/bar", "ajax", null));
+    replay(store);
+
+    DefaultResultInvocationProvider provider = new DefaultResultInvocationProvider(store, new ForwardResult(store, null, null, context, null, null, null, Locale.CANADA));
+    ResultInvocation invocation = provider.lookup("error");
     assertNotNull(invocation);
     assertEquals("error", invocation.resultCode());
     assertEquals("/foo/bar", invocation.uri());
     assertEquals("error", ((Forward) invocation.annotation()).code());
     assertEquals("/WEB-INF/content/foo/bar-error.ftl", ((Forward) invocation.annotation()).page());
 
-    EasyMock.verify(context);
+    verify(context);
   }
 
   @Test
   public void testActionNoAnnotationIndexPage() throws MalformedURLException {
-    ServletContext context = EasyMock.createStrictMock(ServletContext.class);
-    EasyMock.expect(context.getResource("/WEB-INF/content/foo/bar/index.jsp")).andReturn(null);
-    EasyMock.expect(context.getResource("/WEB-INF/content/foo/bar/index.ftl")).andReturn(new URL("http://google.com"));
-    EasyMock.replay(context);
+    ServletContext context = createStrictMock(ServletContext.class);
+    expect(context.getResource("/WEB-INF/content/foo/bar/index.jsp")).andReturn(null);
+    expect(context.getResource("/WEB-INF/content/foo/bar/index.ftl")).andReturn(new URL("http://google.com"));
+    replay(context);
 
     TestAction action = new TestAction();
-    DefaultResultInvocationProvider provider = new DefaultResultInvocationProvider(actionInvocationStore, new ForwardResult(actionInvocationStore, null, null, context, null, null, null, Locale.CANADA));
-    ResultInvocation invocation = provider.lookup(new DefaultActionInvocation(action, "/foo/bar/", null, null), "error");
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(action, "/foo/bar/", "", null));
+    replay(store);
+
+    DefaultResultInvocationProvider provider = new DefaultResultInvocationProvider(store, new ForwardResult(store, null, null, context, null, null, null, Locale.CANADA));
+    ResultInvocation invocation = provider.lookup("error");
     assertNotNull(invocation);
     assertEquals("error", invocation.resultCode());
     assertEquals("/foo/bar/", invocation.uri());
     assertEquals("error", ((Forward) invocation.annotation()).code());
     assertEquals("/WEB-INF/content/foo/bar/index.ftl", ((Forward) invocation.annotation()).page());
 
-    EasyMock.verify(context);
+    verify(context);
   }
 }

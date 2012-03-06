@@ -47,6 +47,11 @@ public class CheckboxList extends AbstractListInput {
     super(true);
   }
 
+  @Override
+  public String getName() {
+    return "checkbox_list";
+  }
+
   /**
    * @return checkbox-list.ftl
    */

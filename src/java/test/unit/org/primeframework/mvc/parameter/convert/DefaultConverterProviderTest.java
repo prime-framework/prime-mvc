@@ -15,27 +15,34 @@
  */
 package org.primeframework.mvc.parameter.convert;
 
+import java.util.Map;
+
+import org.primeframework.mvc.PrimeBaseTest;
+import org.primeframework.mvc.guice.GuiceBootstrap;
 import org.primeframework.mvc.parameter.convert.converters.BooleanConverter;
 import org.primeframework.mvc.parameter.convert.converters.CharacterConverter;
 import org.primeframework.mvc.parameter.convert.converters.NumberConverter;
 import org.primeframework.mvc.parameter.convert.converters.StringConverter;
-import org.primeframework.mvc.test.JCatapultBaseTest;
 import org.testng.annotations.Test;
 
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
 import static org.testng.Assert.*;
 
 /**
- * <p> This class tests the converter registry </p>
+ * This class tests the converter registry.
  *
  * @author Brian Pontarelli
  */
-public class DefaultConverterProviderTest extends JCatapultBaseTest {
+public class DefaultConverterProviderTest extends PrimeBaseTest {
   /**
-   * Test the lookup of converters
+   * Test the lookup of converters.
    */
   @Test
-  public void testLookups() {
-    ConverterProvider provider = new DefaultConverterProvider(injector);
+  public void lookups() {
+    Injector injector = GuiceBootstrap.initialize();
+    ConverterProvider provider = new DefaultConverterProvider(injector, injector.getInstance(Key.get(new TypeLiteral<Map<Class<?>, GlobalConverter>>(){})));
     GlobalConverter tc = provider.lookup(Character.class);
     assertSame(CharacterConverter.class, tc.getClass());
     tc = provider.lookup(Character.TYPE);

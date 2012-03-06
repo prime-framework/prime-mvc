@@ -16,7 +16,7 @@
 package org.example.domain;
 
 /**
- * <p> This is a test action with fields. </p>
+ * This is a test action with fields.
  *
  * @author Brian Pontarelli
  */

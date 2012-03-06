@@ -45,6 +45,11 @@ public class Checkbox extends AbstractCheckedInput {
     super(expressionEvaluator);
   }
 
+  @Override
+  public String getName() {
+    return "checkbox";
+  }
+
   /**
    * @return checkbox.ftl
    */

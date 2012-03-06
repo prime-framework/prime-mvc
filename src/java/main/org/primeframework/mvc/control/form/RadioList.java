@@ -44,6 +44,11 @@ public class RadioList extends AbstractListInput {
     super(true);
   }
 
+  @Override
+  public String getName() {
+    return "radio_list";
+  }
+
   /**
    * Removes the uncheckedValue attribute and moves it to the parameters.
    *

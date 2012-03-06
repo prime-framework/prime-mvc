@@ -32,7 +32,7 @@ import com.google.inject.Inject;
  */
 @SuppressWarnings("unchecked")
 public class RequestScope implements Scope {
-  private static final String KEY = "primeMessages";
+  public static final String KEY = "primeMessages";
   private final HttpServletRequest request;
 
   @Inject

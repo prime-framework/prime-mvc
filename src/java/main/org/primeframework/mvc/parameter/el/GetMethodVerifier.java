@@ -18,8 +18,6 @@ package org.primeframework.mvc.parameter.el;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
-import net.java.lang.StringTools;
-
 /**
  * This class verifies JavaBean standard getter methods. The forms of the methods are as follows:
  * <p/>
@@ -46,18 +44,6 @@ import net.java.lang.StringTools;
  * @author Brian Pontarelli
  */
 public class GetMethodVerifier implements MethodVerifier {
-  /**
-   * The string that starts standard Java bean retrieval methods <tt>get</tt>.
-   */
-  public static final String GET_STRING = "get";
-  public static final int GET_LENGTH = GET_STRING.length();
-
-  /**
-   * The string that starts standard Java bean boolean retrieval methods <tt>is</tt>.
-   */
-  public static final String IS_STRING = "is";
-  public static final int IS_LENGTH = IS_STRING.length();
-
   /**
    * Verifies that the method is either a get, set or is method. It must follow the standard JavaBean convention. If the
    * method is indexed it can have an int parameter. See the class comment for all of the forms of the methods.
@@ -137,33 +123,5 @@ public class GetMethodVerifier implements MethodVerifier {
    */
   public static boolean isValidIndexedGetter(Method method) {
     return (method.getParameterTypes().length == 1 && method.getReturnType() != Void.TYPE);
-  }
-
-  /**
-   * Using the propertyName, returns the Java Bean standard getter method name. If the parameter String starts with
-   * white space or only contains white space or is empty, the it is simply concatenated to the GET constant of this
-   * class. It is the job of the calling code to make certain that the parameter is a properly formatted String if that
-   * check is desired.
-   *
-   * @param propertyName The property name to make into the name of the getter method.
-   * @return The name of the getter method or null if propertyName is empty or null.
-   * @throws NullPointerException If the parameter is null.
-   */
-  public static String makeGetter(String propertyName) {
-    return GET_STRING + StringTools.capitalize(propertyName);
-  }
-
-  /**
-   * Using the propertyName, returns the Java Bean standard boolean getter method name. If the parameter String starts
-   * with white space or only contains white space or is empty, the it is simply concatenated to the IS constant of this
-   * class. It is the job of the calling code to make certain that the parameter is a properly formatted String if that
-   * check is desired.
-   *
-   * @param propertyName The property name to make into the name of the is method.
-   * @return The name of the is method or null if propertyName is empty or null.
-   * @throws NullPointerException If the parameter is null.
-   */
-  public static String makeIs(String propertyName) {
-    return IS_STRING + StringTools.capitalize(propertyName);
   }
 }

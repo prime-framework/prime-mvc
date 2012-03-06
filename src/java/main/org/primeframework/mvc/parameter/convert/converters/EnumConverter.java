@@ -18,13 +18,12 @@ package org.primeframework.mvc.parameter.convert.converters;
 import java.lang.reflect.Type;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.primeframework.mvc.config.PrimeMVCConfiguration;
 import org.primeframework.mvc.parameter.convert.AbstractGlobalConverter;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.convert.annotation.GlobalConverter;
-
-import net.java.lang.StringTools;
 
 import com.google.inject.Inject;
 
@@ -45,7 +44,7 @@ public class EnumConverter extends AbstractGlobalConverter {
 
   protected Object stringToObject(String value, Type convertTo, Map<String, String> attributes, String expression)
     throws ConversionException, ConverterStateException {
-    if (emptyIsNull && StringTools.isTrimmedEmpty(value)) {
+    if (emptyIsNull && StringUtils.isBlank(value)) {
       return null;
     }
 

@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.apache.commons.lang3.StringUtils;
 import org.primeframework.mvc.parameter.convert.AbstractGlobalConverter;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
@@ -36,8 +37,6 @@ import org.primeframework.mvc.parameter.el.TypeTools;
 
 import com.google.inject.Inject;
 import static java.util.Arrays.*;
-import static net.java.lang.ObjectTools.*;
-import static net.java.util.CollectionTools.*;
 
 /**
  * This converts to and from Collection types. This handles complex parameterized types by first creating the
@@ -72,11 +71,11 @@ public class CollectionConverter extends AbstractGlobalConverter {
   protected Object stringToObject(String value, Type convertTo, Map<String, String> dynamicAttributes,
                                   String expression)
     throws ConversionException, ConverterStateException {
-    return stringsToObject(array(value), convertTo, dynamicAttributes, expression);
+    return stringsToObject(StringUtils.split(value, ','), convertTo, dynamicAttributes, expression);
   }
 
   /**
-   * Creates the correct collection type and then converts the value Strings to the parameterized type (if one exists)
+   * Creates the correct collection type and then converts the value Strings to the parametrized type (if one exists)
    * and then adds each one. If there is no parameterized type, this just shoves the String values in the collection.
    *
    * @param values            The values.
@@ -105,7 +104,7 @@ public class CollectionConverter extends AbstractGlobalConverter {
       }
 
       for (String value : values) {
-        collection.add(converter.convertFromStrings(parameter, dynamicAttributes, expression, array(value)));
+        collection.add(converter.convertFromStrings(parameter, dynamicAttributes, expression, StringUtils.split(value, ',')));
       }
     }
 
@@ -131,7 +130,7 @@ public class CollectionConverter extends AbstractGlobalConverter {
     Collection collection = (Collection) value;
     Class<?> parameter = parameterType(convertFrom);
     if (parameter == null) {
-      return join(collection, ",");
+      return StringUtils.join(collection, ",");
     } else {
       GlobalConverter converter = provider.lookup(parameter);
       if (converter == null) {

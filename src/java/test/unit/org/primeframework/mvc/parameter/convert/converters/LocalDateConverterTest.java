@@ -17,51 +17,47 @@ package org.primeframework.mvc.parameter.convert.converters;
 
 import java.util.Locale;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.joda.time.LocalDate;
+import org.primeframework.mvc.MockConfiguration;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
+import org.primeframework.mvc.util.MapBuilder;
 import org.testng.annotations.Test;
 
-import static net.java.util.CollectionTools.*;
 import static org.testng.Assert.*;
 
 /**
- * <p> This tests the local date converter. </p>
+ * This tests the local date converter.
  *
  * @author Brian Pontarelli
  */
 public class LocalDateConverterTest {
-  /**
-   * Test the conversion from Strings.
-   */
   @Test
-  public void testFromStrings() {
-    GlobalConverter converter = new LocalDateConverter();
-    LocalDate value = (LocalDate) converter.convertFromStrings(LocalDate.class, null, "testExpr", array((String) null));
+  public void fromStrings() {
+    GlobalConverter converter = new LocalDateConverter(new MockConfiguration());
+    LocalDate value = (LocalDate) converter.convertFromStrings(LocalDate.class, null, "testExpr", ArrayUtils.toArray((String) null));
     assertNull(value);
 
-    value = (LocalDate) converter.convertFromStrings(Locale.class, map("dateTimeFormat", "MM-dd-yyyy"), "testExpr", array("07-08-2008"));
+    value = (LocalDate) converter.convertFromStrings(Locale.class, MapBuilder.asMap("dateTimeFormat", "MM-dd-yyyy"), "testExpr", ArrayUtils.toArray("07-08-2008"));
     assertEquals(7, value.getMonthOfYear());
     assertEquals(8, value.getDayOfMonth());
     assertEquals(2008, value.getYear());
 
     try {
-      converter.convertFromStrings(Locale.class, map("dateTimeFormat", "MM-dd-yyyy"), "testExpr", array("07/08/2008"));
+      converter.convertFromStrings(Locale.class, MapBuilder.asMap("dateTimeFormat", "MM-dd-yyyy"), "testExpr", ArrayUtils.toArray("07/08/2008"));
       fail("Should have failed");
     } catch (ConversionException e) {
     }
   }
 
-  /**
-   * Test the conversion from Strings.
-   */
   @Test
-  public void testToStrings() {
-    GlobalConverter converter = new LocalDateConverter();
+  public void toStrings() {
+    GlobalConverter converter = new LocalDateConverter(new MockConfiguration());
     String str = converter.convertToString(LocalDate.class, null, "testExpr", null);
     assertNull(str);
 
-    str = converter.convertToString(LocalDate.class, map("dateTimeFormat", "MM-dd-yyyy"), "testExpr", new LocalDate(2008, 7, 8));
+    str = converter.convertToString(LocalDate.class, MapBuilder.asMap("dateTimeFormat", "MM-dd-yyyy"), "testExpr", new LocalDate(2008, 7, 8));
     assertEquals("07-08-2008", str);
   }
 }

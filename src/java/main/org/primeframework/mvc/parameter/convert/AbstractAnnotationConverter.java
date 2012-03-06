@@ -21,9 +21,8 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.primeframework.mvc.parameter.el.TypeTools;
-
-import net.java.lang.StringTools;
 
 /**
  * This class is the base type converter for all the annotaiton type converters that handle Object types.
@@ -34,7 +33,6 @@ import net.java.lang.StringTools;
  *
  * @author Brian Pontarelli
  */
-@SuppressWarnings("unchecked")
 public abstract class AbstractAnnotationConverter<T extends Annotation> implements AnnotationConverter<T> {
   /**
    * Handles the following cases:
@@ -163,7 +161,7 @@ public abstract class AbstractAnnotationConverter<T extends Annotation> implemen
 
     Object finalArray;
     Class<?> rawType = TypeTools.rawType(convertTo);
-    if (StringTools.isTrimmedEmpty(value)) {
+    if (StringUtils.isBlank(value)) {
       finalArray = Array.newInstance(rawType.getComponentType(), 0);
     } else {
       String[] parts = value.split(",");

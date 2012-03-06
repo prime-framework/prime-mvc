@@ -57,4 +57,9 @@ public abstract class AbstractPrimeMVCConfiguration implements PrimeMVCConfigura
   public boolean ignoreEmptyParameters() {
     return false;
   }
+
+  @Override
+  public boolean emptyParametersAreNull() {
+    return true;
+  }
 }

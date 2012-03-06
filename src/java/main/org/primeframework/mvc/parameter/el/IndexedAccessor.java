@@ -18,8 +18,7 @@ package org.primeframework.mvc.parameter.el;
 import java.lang.reflect.Method;
 
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
-
-import static net.java.lang.reflect.ReflectionTools.*;
+import org.primeframework.mvc.util.MethodTools;
 
 /**
  * This models a indexed property that takes a single parameter for the getter that is the index or key and two
@@ -45,7 +44,11 @@ public class IndexedAccessor extends MemberAccessor {
 
   public Object get(Context context) {
     Method getter = propertyInfo.getMethods().get("get");
-    return invokeMethod(getter, this.object, index);
+    if (getter.getParameterTypes().length == 0) {
+      return MethodTools.invoke(getter, this.object);
+    }
+
+    return MethodTools.invoke(getter, this.object, index);
   }
 
   public void set(String[] values, Context context) {
@@ -54,6 +57,10 @@ public class IndexedAccessor extends MemberAccessor {
 
   public void set(Object value, Context context) {
     Method setter = propertyInfo.getMethods().get("set");
-    invokeMethod(setter, object, index, value);
+    if (setter.getParameterTypes().length == 1) {
+      MethodTools.invoke(setter, this.object, value);
+    } else {
+      MethodTools.invoke(setter, this.object, index, value);
+    }
   }
 }

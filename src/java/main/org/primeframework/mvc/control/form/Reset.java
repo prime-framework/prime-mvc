@@ -44,6 +44,11 @@ public class Reset extends AbstractButtonInput {
     super(request);
   }
 
+  @Override
+  public String getName() {
+    return "reset";
+  }
+
   /**
    * @return reset.ftl
    */

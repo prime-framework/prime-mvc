@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <p> This is a test user with fields. </p>
+ * This is a test user with fields.
  *
  * @author Brian Pontarelli
  */

@@ -18,13 +18,12 @@ package org.primeframework.mvc.parameter.convert.converters;
 import java.lang.reflect.Type;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.primeframework.mvc.config.PrimeMVCConfiguration;
 import org.primeframework.mvc.parameter.convert.AbstractGlobalConverter;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.el.TypeTools;
-
-import net.java.lang.StringTools;
 
 /**
  * Overrides the abstract type converter to add abstract methods for handling primitives.
@@ -41,7 +40,7 @@ public abstract class AbstractPrimitiveConverter extends AbstractGlobalConverter
 
   protected Object stringToObject(String value, Type convertTo, Map<String, String> attributes, String expression)
     throws ConversionException, ConverterStateException {
-    if (emptyIsNull && StringTools.isTrimmedEmpty(value)) {
+    if (emptyIsNull && StringUtils.isBlank(value)) {
       value = null;
     }
 

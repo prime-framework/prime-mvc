@@ -18,7 +18,7 @@ package org.example.action.user;
 import org.primeframework.mvc.action.annotation.Action;
 
 /**
- * <p> This is a test index action. </p>
+ * This is a test index action.
  *
  * @author Brian Pontarelli
  */

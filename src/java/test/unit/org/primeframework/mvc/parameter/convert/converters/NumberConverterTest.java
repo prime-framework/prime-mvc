@@ -15,15 +15,16 @@
  */
 package org.primeframework.mvc.parameter.convert.converters;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.primeframework.mvc.MockConfiguration;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
 import org.testng.annotations.Test;
 
-import static net.java.util.CollectionTools.*;
 import static org.testng.Assert.*;
 
 /**
- * <p> This tests the number converter. </p>
+ * This tests the number converter.
  *
  * @author Brian Pontarelli
  */
@@ -32,135 +33,135 @@ public class NumberConverterTest {
    * Test the conversion from Strings.
    */
   @Test
-  public void testFromStrings() {
-    GlobalConverter converter = new NumberConverter();
-    Byte bw = (Byte) converter.convertFromStrings(Byte.class, null, "testExpr", array((String) null));
+  public void fromStrings() {
+    GlobalConverter converter = new NumberConverter(new MockConfiguration());
+    Byte bw = (Byte) converter.convertFromStrings(Byte.class, null, "testExpr", ArrayUtils.toArray((String) null));
     assertNull(bw);
 
-    Short sw = (Short) converter.convertFromStrings(Short.class, null, "testExpr", array((String) null));
+    Short sw = (Short) converter.convertFromStrings(Short.class, null, "testExpr", ArrayUtils.toArray((String) null));
     assertNull(sw);
 
-    Integer iw = (Integer) converter.convertFromStrings(Integer.class, null, "testExpr", array((String) null));
+    Integer iw = (Integer) converter.convertFromStrings(Integer.class, null, "testExpr", ArrayUtils.toArray((String) null));
     assertNull(iw);
 
-    Long lw = (Long) converter.convertFromStrings(Long.class, null, "testExpr", array((String) null));
+    Long lw = (Long) converter.convertFromStrings(Long.class, null, "testExpr", ArrayUtils.toArray((String) null));
     assertNull(lw);
 
-    Float fw = (Float) converter.convertFromStrings(Float.class, null, "testExpr", array((String) null));
+    Float fw = (Float) converter.convertFromStrings(Float.class, null, "testExpr", ArrayUtils.toArray((String) null));
     assertNull(fw);
 
-    Double dw = (Double) converter.convertFromStrings(Double.class, null, "testExpr", array((String) null));
+    Double dw = (Double) converter.convertFromStrings(Double.class, null, "testExpr", ArrayUtils.toArray((String) null));
     assertNull(dw);
 
-    byte b = (Byte) converter.convertFromStrings(Byte.TYPE, null, "testExpr", array((String) null));
+    byte b = (Byte) converter.convertFromStrings(Byte.TYPE, null, "testExpr", ArrayUtils.toArray((String) null));
     assertEquals(0, b);
 
-    short s = (Short) converter.convertFromStrings(Short.TYPE, null, "testExpr", array((String) null));
+    short s = (Short) converter.convertFromStrings(Short.TYPE, null, "testExpr", ArrayUtils.toArray((String) null));
     assertEquals(0, s);
 
-    int i = (Integer) converter.convertFromStrings(Integer.TYPE, null, "testExpr", array((String) null));
+    int i = (Integer) converter.convertFromStrings(Integer.TYPE, null, "testExpr", ArrayUtils.toArray((String) null));
     assertEquals(0, i);
 
-    long l = (Long) converter.convertFromStrings(Long.TYPE, null, "testExpr", array((String) null));
+    long l = (Long) converter.convertFromStrings(Long.TYPE, null, "testExpr", ArrayUtils.toArray((String) null));
     assertEquals(0, l);
 
-    float f = (Float) converter.convertFromStrings(Float.TYPE, null, "testExpr", array((String) null));
+    float f = (Float) converter.convertFromStrings(Float.TYPE, null, "testExpr", ArrayUtils.toArray((String) null));
     assertEquals(0, f, 0);
 
-    double d = (Double) converter.convertFromStrings(Double.TYPE, null, "testExpr", array((String) null));
+    double d = (Double) converter.convertFromStrings(Double.TYPE, null, "testExpr", ArrayUtils.toArray((String) null));
     assertEquals(0, d, 0);
 
-    bw = (Byte) converter.convertFromStrings(Byte.class, null, "testExpr", array("1"));
+    bw = (Byte) converter.convertFromStrings(Byte.class, null, "testExpr", ArrayUtils.toArray("1"));
     assertEquals(1, (byte) bw);
 
-    sw = (Short) converter.convertFromStrings(Short.class, null, "testExpr", array("1"));
+    sw = (Short) converter.convertFromStrings(Short.class, null, "testExpr", ArrayUtils.toArray("1"));
     assertEquals(1, (short) sw);
 
-    iw = (Integer) converter.convertFromStrings(Integer.class, null, "testExpr", array("1"));
+    iw = (Integer) converter.convertFromStrings(Integer.class, null, "testExpr", ArrayUtils.toArray("1"));
     assertEquals(1, (int) iw);
 
-    lw = (Long) converter.convertFromStrings(Long.class, null, "testExpr", array("1"));
+    lw = (Long) converter.convertFromStrings(Long.class, null, "testExpr", ArrayUtils.toArray("1"));
     assertEquals(1l, (long) lw);
 
-    fw = (Float) converter.convertFromStrings(Float.class, null, "testExpr", array("1"));
-    assertEquals(1f, (float) fw, 0);
+    fw = (Float) converter.convertFromStrings(Float.class, null, "testExpr", ArrayUtils.toArray("1"));
+    assertEquals(1f, fw, 0);
 
-    dw = (Double) converter.convertFromStrings(Double.class, null, "testExpr", array("1"));
-    assertEquals(1d, (double) dw, 0);
+    dw = (Double) converter.convertFromStrings(Double.class, null, "testExpr", ArrayUtils.toArray("1"));
+    assertEquals(1d, dw, 0);
 
-    bw = (Byte) converter.convertFromStrings(Byte.class, null, "testExpr", array("   "));
+    bw = (Byte) converter.convertFromStrings(Byte.class, null, "testExpr", ArrayUtils.toArray("   "));
     assertNull(bw);
 
-    sw = (Short) converter.convertFromStrings(Short.class, null, "testExpr", array("   "));
+    sw = (Short) converter.convertFromStrings(Short.class, null, "testExpr", ArrayUtils.toArray("   "));
     assertNull(sw);
 
-    iw = (Integer) converter.convertFromStrings(Integer.class, null, "testExpr", array("   "));
+    iw = (Integer) converter.convertFromStrings(Integer.class, null, "testExpr", ArrayUtils.toArray("   "));
     assertNull(iw);
 
-    lw = (Long) converter.convertFromStrings(Long.class, null, "testExpr", array("   "));
+    lw = (Long) converter.convertFromStrings(Long.class, null, "testExpr", ArrayUtils.toArray("   "));
     assertNull(lw);
 
-    fw = (Float) converter.convertFromStrings(Float.class, null, "testExpr", array("   "));
+    fw = (Float) converter.convertFromStrings(Float.class, null, "testExpr", ArrayUtils.toArray("   "));
     assertNull(fw);
 
-    dw = (Double) converter.convertFromStrings(Double.class, null, "testExpr", array("   "));
+    dw = (Double) converter.convertFromStrings(Double.class, null, "testExpr", ArrayUtils.toArray("   "));
     assertNull(dw);
 
-    b = (Byte) converter.convertFromStrings(Byte.TYPE, null, "testExpr", array("   "));
+    b = (Byte) converter.convertFromStrings(Byte.TYPE, null, "testExpr", ArrayUtils.toArray("   "));
     assertEquals(0, b);
 
-    s = (Short) converter.convertFromStrings(Short.TYPE, null, "testExpr", array("   "));
+    s = (Short) converter.convertFromStrings(Short.TYPE, null, "testExpr", ArrayUtils.toArray("   "));
     assertEquals(0, s);
 
-    i = (Integer) converter.convertFromStrings(Integer.TYPE, null, "testExpr", array("   "));
+    i = (Integer) converter.convertFromStrings(Integer.TYPE, null, "testExpr", ArrayUtils.toArray("   "));
     assertEquals(0, i);
 
-    l = (Long) converter.convertFromStrings(Long.TYPE, null, "testExpr", array("   "));
+    l = (Long) converter.convertFromStrings(Long.TYPE, null, "testExpr", ArrayUtils.toArray("   "));
     assertEquals(0, l);
 
-    f = (Float) converter.convertFromStrings(Float.TYPE, null, "testExpr", array("   "));
+    f = (Float) converter.convertFromStrings(Float.TYPE, null, "testExpr", ArrayUtils.toArray("   "));
     assertEquals(0, f, 0);
 
-    d = (Double) converter.convertFromStrings(Double.TYPE, null, "testExpr", array("   "));
+    d = (Double) converter.convertFromStrings(Double.TYPE, null, "testExpr", ArrayUtils.toArray("   "));
     assertEquals(0, d, 0);
 
     try {
-      converter.convertFromStrings(Byte.class, null, "testExpr", array("bad"));
+      converter.convertFromStrings(Byte.class, null, "testExpr", ArrayUtils.toArray("bad"));
       fail("Should have failed");
     } catch (ConversionException ce) {
       // Expected
     }
 
     try {
-      converter.convertFromStrings(Short.class, null, "testExpr", array("bad"));
+      converter.convertFromStrings(Short.class, null, "testExpr", ArrayUtils.toArray("bad"));
       fail("Should have failed");
     } catch (ConversionException ce) {
       // Expected
     }
 
     try {
-      converter.convertFromStrings(Integer.class, null, "testExpr", array("bad"));
+      converter.convertFromStrings(Integer.class, null, "testExpr", ArrayUtils.toArray("bad"));
       fail("Should have failed");
     } catch (ConversionException ce) {
       // Expected
     }
 
     try {
-      converter.convertFromStrings(Long.class, null, "testExpr", array("bad"));
+      converter.convertFromStrings(Long.class, null, "testExpr", ArrayUtils.toArray("bad"));
       fail("Should have failed");
     } catch (ConversionException ce) {
       // Expected
     }
 
     try {
-      converter.convertFromStrings(Float.class, null, "testExpr", array("bad"));
+      converter.convertFromStrings(Float.class, null, "testExpr", ArrayUtils.toArray("bad"));
       fail("Should have failed");
     } catch (ConversionException ce) {
       // Expected
     }
 
     try {
-      converter.convertFromStrings(Double.class, null, "testExpr", array("bad"));
+      converter.convertFromStrings(Double.class, null, "testExpr", ArrayUtils.toArray("bad"));
       fail("Should have failed");
     } catch (ConversionException ce) {
       // Expected
@@ -171,8 +172,8 @@ public class NumberConverterTest {
    * Test the conversion from Strings.
    */
   @Test
-  public void testToStrings() {
-    GlobalConverter converter = new NumberConverter();
+  public void toStrings() {
+    GlobalConverter converter = new NumberConverter(new MockConfiguration());
     String str = converter.convertToString(Integer.class, null, "testExpr", null);
     assertNull(str);
 

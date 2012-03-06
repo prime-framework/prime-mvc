@@ -30,8 +30,7 @@ import org.primeframework.mvc.control.form.AppendAttributesMethod;
 import org.primeframework.mvc.control.form.JoinMethod;
 import org.primeframework.mvc.freemarker.FreeMarkerService;
 import org.primeframework.mvc.locale.annotation.CurrentLocale;
-
-import net.java.error.ErrorList;
+import org.primeframework.mvc.util.ErrorList;
 
 import com.google.inject.Inject;
 
@@ -209,7 +208,7 @@ public abstract class AbstractControl implements Control {
         Class<?>[] attributeTypes = controlAttribute.types();
         boolean found = false;
         for (Class<?> attributeType : attributeTypes) {
-          found |= attributeType.isInstance(value);
+          found = attributeType.isInstance(value);
           if (found) {
             break;
           }

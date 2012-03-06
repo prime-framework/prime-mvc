@@ -26,7 +26,7 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
 /**
- * <p> This class tests the action session scope. </p>
+ * This class tests the action session scope.
  *
  * @author Brian Pontarelli
  */

@@ -26,13 +26,13 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
 /**
- * <p> This tests the OverridingTemplateLoader class. </p>
+ * This tests the OverridingTemplateLoader class.
  *
  * @author Brian Pontarelli
  */
 public class OverridingTemplateLoaderTest {
   @Test
-  public void testRealPath() throws IOException {
+  public void realPath() throws IOException {
     ContainerResolver resolver = EasyMock.createStrictMock(ContainerResolver.class);
     EasyMock.expect(resolver.getRealPath("project.xml")).andReturn("project.xml");
     EasyMock.replay(resolver);
@@ -48,7 +48,7 @@ public class OverridingTemplateLoaderTest {
   }
 
   @Test
-  public void testResource() throws IOException {
+  public void resource() throws IOException {
     ContainerResolver resolver = EasyMock.createStrictMock(ContainerResolver.class);
     EasyMock.expect(resolver.getRealPath("project.xml")).andReturn(null);
     EasyMock.expect(resolver.getResource("project.xml")).andReturn(new File("project.xml").toURI().toURL());
@@ -65,7 +65,7 @@ public class OverridingTemplateLoaderTest {
   }
 
   @Test
-  public void testClassPath() throws IOException {
+  public void classPath() throws IOException {
     ContainerResolver resolver = EasyMock.createStrictMock(ContainerResolver.class);
     EasyMock.expect(resolver.getRealPath("logging.properties")).andReturn("target/classes/test/unit/logging.properties");
     EasyMock.replay(resolver);

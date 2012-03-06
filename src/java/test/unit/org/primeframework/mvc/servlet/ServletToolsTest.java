@@ -19,23 +19,25 @@ package org.primeframework.mvc.servlet;
 import javax.servlet.http.HttpServletRequest;
 import java.net.URL;
 
-import org.easymock.EasyMock;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import static org.easymock.EasyMock.*;
+
 /**
- * User: jhumphrey Date: Apr 23, 2008
+ * ServletTools test.
+ *
+ * @author James Humphrey
  */
 public class ServletToolsTest {
 
   @Test
   public void testBuildBaseUrlWithPortZero() {
-
-    HttpServletRequest req = EasyMock.createStrictMock(HttpServletRequest.class);
-    EasyMock.expect(req.getScheme()).andReturn("http");
-    EasyMock.expect(req.getServerName()).andReturn("www.Inversoft Inc.");
-    EasyMock.expect(req.getServerPort()).andReturn(0);
-    EasyMock.replay(req);
+    HttpServletRequest req = createStrictMock(HttpServletRequest.class);
+    expect(req.getScheme()).andReturn("http");
+    expect(req.getServerName()).andReturn("www.Inversoft Inc.");
+    expect(req.getServerPort()).andReturn(0);
+    replay(req);
 
     URL url = ServletTools.getBaseUrl(req);
 
@@ -44,12 +46,11 @@ public class ServletToolsTest {
 
   @Test
   public void testBuildBaseUrlWithPort() {
-
-    HttpServletRequest req = EasyMock.createStrictMock(HttpServletRequest.class);
-    EasyMock.expect(req.getScheme()).andReturn("http");
-    EasyMock.expect(req.getServerName()).andReturn("www.Inversoft Inc.");
-    EasyMock.expect(req.getServerPort()).andReturn(8080);
-    EasyMock.replay(req);
+    HttpServletRequest req = createStrictMock(HttpServletRequest.class);
+    expect(req.getScheme()).andReturn("http");
+    expect(req.getServerName()).andReturn("www.Inversoft Inc.");
+    expect(req.getServerPort()).andReturn(8080);
+    replay(req);
 
     URL url = ServletTools.getBaseUrl(req);
 

@@ -15,30 +15,18 @@
  */
 package org.primeframework.mvc.servlet;
 
-import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import java.io.IOException;
 
-import org.primeframework.mvc.workflow.Workflow;
 import org.primeframework.mvc.workflow.WorkflowChain;
 
 /**
- * <p> This is a mock workflow chain for testing. </p>
+ * This is a mock workflow chain for testing.
  *
  * @author Brian Pontarelli
  */
 public class MockWorkflowChain implements WorkflowChain {
   private final Runnable runnable;
-
-  @Override
-  public void start(FilterChain filterChain) throws IOException, ServletException {
-    continueWorkflow();
-  }
-
-  @Override
-  public Iterable<Workflow> workflows() {
-    return null;
-  }
 
   public MockWorkflowChain(Runnable runnable) {
     this.runnable = runnable;
@@ -47,9 +35,5 @@ public class MockWorkflowChain implements WorkflowChain {
   @Override
   public void continueWorkflow() throws IOException, ServletException {
     runnable.run();
-  }
-
-  @Override
-  public void reset() {
   }
 }

@@ -17,8 +17,6 @@ package org.primeframework.mvc.parameter;
 
 import javax.servlet.http.HttpServletRequest;
 
-import net.java.lang.StringTools;
-
 /**
  * This class handles all of the parameters that control the JCatapult MVC internal behavior like validation, result
  * execution, action execution, etc.
@@ -59,7 +57,7 @@ public final class InternalParameters {
     }
 
     String str = value == null ? null : value.toString().toLowerCase();
-    if (str != null && !StringTools.isValidBoolean(str)) {
+    if (str != null && !isValidBoolean(str)) {
       throw new IllegalArgumentException("Invalid value [" + str + "] for key [" + key +
         "]. Must be either the string [true] or [false].");
     }
@@ -75,5 +73,9 @@ public final class InternalParameters {
    */
   public static boolean isInternalParameter(String key) {
     return key.equals(EXECUTE_RESULT) || key.equals(EXECUTE_VALIDATION);
+  }
+
+  private static boolean isValidBoolean(String str) {
+    return str != null && (str.equals("true") || str.equals("false"));
   }
 }

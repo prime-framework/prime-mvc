@@ -21,7 +21,7 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
 /**
- * <p> This class tests the default action URI builder. </p>
+ * This class tests the default action URI builder.
  *
  * @author Brian Pontarelli
  */
@@ -30,7 +30,7 @@ public class DefaultActionURIBuilderTest {
    * Tests the URI builder.
    */
   @Test
-  public void testBuild() {
+  public void build() {
     DefaultURIBuilder builder = new DefaultURIBuilder();
     assertEquals("/config/default-action-uri-builder-test", builder.build(this.getClass()));
   }

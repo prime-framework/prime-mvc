@@ -24,13 +24,13 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
 /**
- * <p> This tests the URLTemplateSource class. </p>
+ * This tests the URLTemplateSource class.
  *
  * @author Brian Pontarelli
  */
 public class URLTemplateSourceTest {
   @Test
-  public void testFile() throws IOException {
+  public void file() throws IOException {
     File file = new File("project.xml");
     URLTemplateSource source = new URLTemplateSource(file.toURI().toURL());
     assertEquals(source.lastModified(), file.lastModified());
@@ -45,7 +45,7 @@ public class URLTemplateSourceTest {
    * @throws IOException Never probably.
    */
   @Test
-  public void testClassPath() throws IOException {
+  public void classPath() throws IOException {
     File file = new File("src/conf/test/unit/logging.properties");
     URLTemplateSource source = new URLTemplateSource(Thread.currentThread().getContextClassLoader().getResource("logging.properties"));
     assertTrue(source.lastModified() > file.lastModified());

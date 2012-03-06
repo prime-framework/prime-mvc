@@ -15,72 +15,67 @@
  */
 package org.primeframework.mvc.parameter.convert.converters;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.primeframework.mvc.MockConfiguration;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
 import org.testng.annotations.Test;
 
-import static net.java.util.CollectionTools.*;
 import static org.testng.Assert.*;
 
 /**
- * <p> This tests the character converter. </p>
+ * This tests the character converter.
  *
  * @author Brian Pontarelli
  */
 public class CharacterConverterTest {
-  /**
-   * Test the conversion from Strings.
-   */
   @Test
-  public void testFromStrings() {
-    GlobalConverter converter = new CharacterConverter();
-    Character cw = (Character) converter.convertFromStrings(Character.class, null, "testExpr", array((String) null));
+  public void fromStrings() {
+    GlobalConverter converter = new CharacterConverter(new MockConfiguration());
+    Character cw = (Character) converter.convertFromStrings(Character.class, null, "testExpr", ArrayUtils.toArray((String) null));
     assertNull(cw);
 
-    char c = (Character) converter.convertFromStrings(Character.TYPE, null, "testExpr", array((String) null));
+    char c = (Character) converter.convertFromStrings(Character.TYPE, null, "testExpr", ArrayUtils.toArray((String) null));
     assertEquals('\u0000', c);
 
-    cw = (Character) converter.convertFromStrings(Character.class, null, "testExpr", array("c"));
+    cw = (Character) converter.convertFromStrings(Character.class, null, "testExpr", ArrayUtils.toArray("c"));
     assertEquals('c', (char) cw);
 
-    c = (Character) converter.convertFromStrings(Character.TYPE, null, "testExpr", array("c"));
+    c = (Character) converter.convertFromStrings(Character.TYPE, null, "testExpr", ArrayUtils.toArray("c"));
     assertEquals('c', c);
 
-    cw = (Character) converter.convertFromStrings(Character.class, null, "testExpr", array(" "));
+    cw = (Character) converter.convertFromStrings(Character.class, null, "testExpr", ArrayUtils.toArray(" "));
     assertNull(cw);
 
-    c = (Character) converter.convertFromStrings(Character.TYPE, null, "testExpr", array(" "));
+    c = (Character) converter.convertFromStrings(Character.TYPE, null, "testExpr", ArrayUtils.toArray(" "));
     assertEquals(0, c);
 
-    Character[] ca = (Character[]) converter.convertFromStrings(Character[].class, null, "testExpr", array("c", "d"));
+    Character[] ca = (Character[]) converter.convertFromStrings(Character[].class, null, "testExpr", ArrayUtils.toArray("c", "d"));
     assertEquals((Character) 'c', ca[0]);
     assertEquals((Character) 'd', ca[1]);
 
-    char[] cpa = (char[]) converter.convertFromStrings(char[].class, null, "testExpr", array("c", "d"));
+    char[] cpa = (char[]) converter.convertFromStrings(char[].class, null, "testExpr", ArrayUtils.toArray("c", "d"));
     assertEquals('c', cpa[0]);
     assertEquals('d', cpa[1]);
 
     try {
-      converter.convertFromStrings(Character.class, null, "testExpr", array("bad"));
+      converter.convertFromStrings(Character.class, null, "testExpr", ArrayUtils.toArray("bad"));
       fail("Should have failed");
     } catch (ConversionException ce) {
       // Expected
     }
 
     try {
-      converter.convertFromStrings(Character.TYPE, null, "testExpr", array("bad"));
+      converter.convertFromStrings(Character.TYPE, null, "testExpr", ArrayUtils.toArray("bad"));
       fail("Should have failed");
     } catch (ConversionException ce) {
       // Expected
     }
   }
 
-  /**
-   * Test the conversion from Strings.
-   */
   @Test
-  public void testToStrings() {
-    GlobalConverter converter = new BooleanConverter();
+  public void toStrings() {
+    GlobalConverter converter = new BooleanConverter(new MockConfiguration());
     String str = converter.convertToString(Character.class, null, "testExpr", null);
     assertNull(str);
 

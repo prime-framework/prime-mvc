@@ -56,15 +56,14 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
    * @throws IOException      If the chain throws an exception.
    * @throws ServletException If the chain throws an exception.
    */
-  @SuppressWarnings("unchecked")
   public void perform(WorkflowChain chain) throws IOException, ServletException {
     // First, see if they hit a different button
     String uri = determineURI();
     boolean executeResult = InternalParameters.is(request, InternalParameters.EXECUTE_RESULT);
     ActionInvocation invocation = actionMapper.map(uri, executeResult);
 
-    // This case is redirect because they URI maps to something new and there isn't an action
-    // associated with it, so it isn't a RESTful request.
+    // This case is a redirect because they URI maps to something new and there isn't an action associated with it. For
+    // example, this is how the index handling works.
     if (!invocation.uri().equals(uri) && invocation.action() == null) {
       response.sendRedirect(invocation.uri());
       return;
@@ -75,6 +74,7 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
     actionInvocationStore.removeCurrent();
   }
 
+  @SuppressWarnings("unchecked")
   private String determineURI() {
     String uri = null;
     Set<String> keys = request.getParameterMap().keySet();

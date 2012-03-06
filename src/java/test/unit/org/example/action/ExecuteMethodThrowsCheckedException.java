@@ -20,7 +20,7 @@ import java.io.IOException;
 import org.primeframework.mvc.action.annotation.Action;
 
 /**
- * <p> This is a simple test action. </p>
+ * This is a simple test action.
  *
  * @author Brian Pontarelli
  */

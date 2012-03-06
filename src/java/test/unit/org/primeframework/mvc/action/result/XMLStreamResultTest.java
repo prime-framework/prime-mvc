@@ -5,24 +5,24 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 
-import org.easymock.EasyMock;
+import org.primeframework.mock.servlet.MockServletOutputStream;
+import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.DefaultActionInvocation;
 import org.primeframework.mvc.action.result.annotation.XMLStream;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-import org.primeframework.mock.servlet.MockServletOutputStream;
 import org.testng.annotations.Test;
 
+import static org.easymock.EasyMock.*;
 import static org.testng.Assert.*;
 
 /**
- * <p> This class tests the XML Stream result. </p>
+ * This class tests the XML Stream result.
  *
  * @author jhumphrey
  */
 public class XMLStreamResultTest {
   @Test
-  public void testExplicit() throws IOException, ServletException {
-
+  public void explicit() throws IOException, ServletException {
     String property = "xml";
     String propertyValue = "<xml/>";
     byte[] propertyBytes = propertyValue.getBytes();
@@ -30,26 +30,30 @@ public class XMLStreamResultTest {
     String contentType = "application/xhtml+xml";
 
     Object action = new Object();
-    ExpressionEvaluator ee = EasyMock.createStrictMock(ExpressionEvaluator.class);
-    EasyMock.expect(ee.getValue(property, action)).andReturn(propertyValue);
-    EasyMock.replay(ee);
+    ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
+    expect(ee.getValue(property, action)).andReturn(propertyValue);
+    replay(ee);
 
     MockServletOutputStream sos = new MockServletOutputStream();
-    HttpServletResponse response = EasyMock.createStrictMock(HttpServletResponse.class);
+    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
     response.setStatus(200);
     response.setCharacterEncoding("UTF-8");
     response.setContentType(contentType);
     response.setContentLength(propertyBytesLen);
-    EasyMock.expect(response.getOutputStream()).andReturn(sos);
-    EasyMock.replay(response);
+    expect(response.getOutputStream()).andReturn(sos);
+    replay(response);
+
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(action, "/foo", "", null));
+    replay(store);
 
     XMLStream xmlStream = new XMLStreamResultTest.XMLStreamImpl("success", "xml", 200);
-    XMLStreamResult streamResult = new XMLStreamResult(ee, response, actionInvocationStore);
-    streamResult.execute(xmlStream, new DefaultActionInvocation(action, "/foo", "", null));
+    XMLStreamResult streamResult = new XMLStreamResult(ee, response, store);
+    streamResult.execute(xmlStream);
 
     assertEquals("<xml/>", sos.toString());
 
-    EasyMock.verify(ee, response);
+    verify(ee, response);
   }
 
   public class XMLStreamImpl implements XMLStream {

@@ -15,55 +15,50 @@
  */
 package org.primeframework.mvc.parameter.convert.converters;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.primeframework.mvc.MockConfiguration;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
 import org.testng.annotations.Test;
 
-import static net.java.util.CollectionTools.*;
 import static org.testng.Assert.*;
 
 /**
- * <p> This tests the enum converter. </p>
+ * This tests the enum converter.
  *
  * @author Brian Pontarelli
  */
 public class EnumConverterTest {
-  /**
-   * Test the conversion from Strings.
-   */
   @Test
-  public void testFromStrings() {
-    GlobalConverter converter = new EnumConverter();
-    TestEnum e = (TestEnum) converter.convertFromStrings(TestEnum.class, null, "testExpr", array((String) null));
+  public void fromStrings() {
+    GlobalConverter converter = new EnumConverter(new MockConfiguration());
+    TestEnum e = (TestEnum) converter.convertFromStrings(TestEnum.class, null, "testExpr", ArrayUtils.toArray((String) null));
     assertNull(e);
 
-    e = (TestEnum) converter.convertFromStrings(TestEnum.class, null, "testExpr", array("value1"));
+    e = (TestEnum) converter.convertFromStrings(TestEnum.class, null, "testExpr", ArrayUtils.toArray("value1"));
     assertSame(e, TestEnum.value1);
 
-    e = (TestEnum) converter.convertFromStrings(TestEnum.class, null, "testExpr", array("value2"));
+    e = (TestEnum) converter.convertFromStrings(TestEnum.class, null, "testExpr", ArrayUtils.toArray("value2"));
     assertSame(e, TestEnum.value2);
 
     try {
-      converter.convertFromStrings(TestEnum.class, null, "testExpr", array("value3"));
+      converter.convertFromStrings(TestEnum.class, null, "testExpr", ArrayUtils.toArray("value3"));
       fail("Should have thrown conversion exception");
     } catch (ConversionException e1) {
       // Expected
     }
 
     try {
-      converter.convertFromStrings(TestEnum.class, null, "testExpr", array("value1", "value2"));
+      converter.convertFromStrings(TestEnum.class, null, "testExpr", ArrayUtils.toArray("value1", "value2"));
       fail("Should have failed");
     } catch (UnsupportedOperationException e1) {
       // Expected
     }
   }
 
-  /**
-   * Test the conversion from Strings.
-   */
   @Test
-  public void testToStrings() {
-    GlobalConverter converter = new EnumConverter();
+  public void toStrings() {
+    GlobalConverter converter = new EnumConverter(new MockConfiguration());
     String str = converter.convertToString(TestEnum.class, null, "testExpr", null);
     assertNull(str);
 

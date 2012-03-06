@@ -74,7 +74,7 @@ public class ForwardResult extends AbstractResult<Forward> {
     Object action = invocation.action();
 
     // Set the content type for the response
-    String contentType = expand(forward.contentType(), action);
+    String contentType = expand(forward.contentType(), action, false);
     response.setContentType(contentType);
 
     // Set the status code
@@ -91,7 +91,7 @@ public class ForwardResult extends AbstractResult<Forward> {
       throw new RuntimeException("Unable to locate result for URI [" + invocation.uri() + "] and result code [" + code + "]");
     }
 
-    page = expand(page, action);
+    page = expand(page, action, false);
     if (!page.startsWith("/")) {
       // Strip off the last part of the URI since it is relative
       String uri = invocation.actionURI();

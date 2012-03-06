@@ -41,8 +41,6 @@ import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
 import org.primeframework.mvc.util.MethodTools;
 
 import com.google.inject.Inject;
-import static net.java.lang.ObjectTools.arrayContains;
-
 /**
  * This class is the default parameter handler. It sets all of the parameters into the action in the following order
  * (while invoking the correct methods in the order):
@@ -123,7 +121,7 @@ public class DefaultParameterHandler implements ParameterHandler {
       try {
         expressionEvaluator.setValue(key, action, struct.values, struct.attributes);
       } catch (ConversionException ce) {
-        FieldMessage message = messageProvider.getFieldConversion(key, struct.values);
+        FieldMessage message = messageProvider.getFieldMessage(key, key + ".conversionError", struct.values);
         messageStore.add(message);
       } catch (ExpressionException ee) {
         if (!allowUnknownParameters) {
@@ -151,12 +149,12 @@ public class DefaultParameterHandler implements ParameterHandler {
         FileInfo info = i.next();
         if ((fileUpload != null && tooBig(info, fileUpload)) ||
           ((fileUpload == null || fileUpload.maxSize() == -1) && tooBig(info))) {
-          FieldMessage message = messageProvider.getFileUploadSize(key, info.file.length());
+          FieldMessage message = messageProvider.getFieldMessage(key, key + ".fileUploadSizeError", info.file.length());
           messageStore.add(message);
           i.remove();
         } else if ((fileUpload != null && invalidContentType(info, fileUpload)) ||
           ((fileUpload == null || fileUpload.contentTypes().length == 0) && invalidContentType(info))) {
-          FieldMessage message = messageProvider.getFileUploadContentType(key, info.getContentType());
+          FieldMessage message = messageProvider.getFieldMessage(key, key + ".fileUploadContentTypeError", info.getContentType());
           messageStore.add(message);
           i.remove();
         }
@@ -198,7 +196,7 @@ public class DefaultParameterHandler implements ParameterHandler {
    * @return False if the file is okay, true if it is an invalid type.
    */
   private boolean invalidContentType(FileInfo info, FileUpload fileUpload) {
-    return fileUpload.contentTypes().length != 0 && !arrayContains(fileUpload.contentTypes(), info.contentType);
+    return fileUpload.contentTypes().length != 0 && !ArrayUtils.contains(fileUpload.contentTypes(), info.contentType);
   }
 
   /**

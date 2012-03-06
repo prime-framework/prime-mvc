@@ -35,7 +35,7 @@ import com.google.inject.Inject;
  */
 @SuppressWarnings("unchecked")
 public class FlashScope implements Scope {
-  private static final String KEY = "primeFlashMessages";
+  public static final String KEY = "primeFlashMessages";
   private final HttpServletRequest request;
 
   @Inject

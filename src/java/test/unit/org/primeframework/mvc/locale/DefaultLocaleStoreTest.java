@@ -25,13 +25,13 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
 /**
- * <p> This tests the default locale store. </p>
+ * This tests the default locale store.
  *
  * @author Brian Pontarelli
  */
 public class DefaultLocaleStoreTest {
   @Test
-  public void testStoreSession() {
+  public void storeSession() {
     HttpSession session = EasyMock.createStrictMock(HttpSession.class);
     session.setAttribute(DefaultLocaleProvider.LOCALE_KEY, Locale.GERMANY);
     EasyMock.replay(session);
@@ -48,7 +48,7 @@ public class DefaultLocaleStoreTest {
   }
 
   @Test
-  public void testStoreRequest() {
+  public void storeRequest() {
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
     EasyMock.expect(request.getSession(false)).andReturn(null);
     request.setAttribute(DefaultLocaleProvider.LOCALE_KEY, Locale.GERMANY);
@@ -62,7 +62,7 @@ public class DefaultLocaleStoreTest {
   }
 
   @Test
-  public void testLookupSession() {
+  public void lookupSession() {
     HttpSession session = EasyMock.createStrictMock(HttpSession.class);
     EasyMock.expect(session.getAttribute(DefaultLocaleProvider.LOCALE_KEY)).andReturn(Locale.CANADA);
     EasyMock.replay(session);
@@ -79,7 +79,7 @@ public class DefaultLocaleStoreTest {
   }
 
   @Test
-  public void testLookupRequest() {
+  public void lookupRequest() {
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
     EasyMock.expect(request.getSession(false)).andReturn(null);
     EasyMock.expect(request.getAttribute(DefaultLocaleProvider.LOCALE_KEY)).andReturn(Locale.CANADA);
@@ -93,7 +93,7 @@ public class DefaultLocaleStoreTest {
   }
 
   @Test
-  public void testLookupClient() {
+  public void lookupClient() {
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
     EasyMock.expect(request.getSession(false)).andReturn(null);
     EasyMock.expect(request.getAttribute(DefaultLocaleProvider.LOCALE_KEY)).andReturn(null);

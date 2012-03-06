@@ -25,11 +25,8 @@ import org.primeframework.mvc.action.result.RedirectResult.RedirectImpl;
 import org.primeframework.mvc.action.result.annotation.ResultAnnotation;
 import org.primeframework.mvc.action.result.annotation.ResultContainerAnnotation;
 
-import net.java.lang.reflect.ReflectionException;
-
 import com.google.inject.Inject;
 import static java.util.Arrays.*;
-import static net.java.lang.reflect.ReflectionTools.*;
 
 /**
  * This class is the default implementation of the result provider.
@@ -94,18 +91,17 @@ public class DefaultResultInvocationProvider implements ResultInvocationProvider
       } else if (annotation.annotationType().isAnnotationPresent(ResultContainerAnnotation.class)) {
         // There are multiple annotations inside the value
         try {
-          Annotation[] results = (Annotation[]) invokeMethod("value", annotation);
+          Annotation[] results = (Annotation[]) annotation.getClass().getMethod("value").invoke(annotation);
           for (Annotation result : results) {
             if (matchesCode(resultCode, result)) {
               return new DefaultResultInvocation(result, uri, resultCode);
             }
           }
-        } catch (ReflectionException e) {
+        } catch (Exception e) {
           throw new RuntimeException("Custom result annotation containers must have a method " +
             "named [value] that is an array of result annotations.");
         }
       }
-
     }
 
     Annotation annotation = forwardResult.defaultResult(invocation, resultCode);
@@ -135,11 +131,11 @@ public class DefaultResultInvocationProvider implements ResultInvocationProvider
 
   private boolean matchesCode(String resultCode, Annotation annotation) {
     try {
-      String code = (String) invokeMethod("code", annotation);
+      String code = (String) annotation.getClass().getMethod("code").invoke(annotation);
       if (code.equals(resultCode)) {
         return true;
       }
-    } catch (ReflectionException e) {
+    } catch (Exception e) {
       throw new RuntimeException("Custom result annotations must have a method named " +
         "[code] that contains the result code they are associated with.");
     }

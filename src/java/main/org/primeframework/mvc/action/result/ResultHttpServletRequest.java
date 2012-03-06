@@ -23,8 +23,7 @@ import java.util.Set;
 
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.parameter.el.ExpressionException;
-
-import net.java.util.IteratorEnumeration;
+import org.primeframework.mvc.util.IteratorEnumeration;
 
 /**
  * This class is a servlet request wrapper that interacts with the expression evaluator in order to pull out attributes
@@ -66,7 +65,7 @@ public class ResultHttpServletRequest extends HttpServletRequestWrapper {
    *         attribute names from super.
    */
   @Override
-  public Enumeration getAttributeNames() {
+  public Enumeration<String> getAttributeNames() {
     Set<String> names = new HashSet<String>(expressionEvaluator.getAllMembers(action.getClass()));
 
     Enumeration en = super.getAttributeNames();
@@ -75,6 +74,6 @@ public class ResultHttpServletRequest extends HttpServletRequestWrapper {
       names.add(name);
     }
 
-    return new IteratorEnumeration(names.iterator());
+    return new IteratorEnumeration<String>(names.iterator());
   }
 }

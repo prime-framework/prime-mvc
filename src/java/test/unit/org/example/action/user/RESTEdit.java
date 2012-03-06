@@ -18,7 +18,7 @@ package org.example.action.user;
 import org.primeframework.mvc.action.annotation.Action;
 
 /**
- * <p> This class is a simple edit action for testing. </p>
+ * This class is a simple edit action for testing.
  *
  * @author Brian Pontarelli
  */

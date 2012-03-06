@@ -16,35 +16,34 @@
 package org.primeframework.mvc;
 
 import javax.servlet.ServletException;
+import java.io.File;
 import java.io.IOException;
 
-import org.primeframework.mvc.test.JCatapultBaseTest;
+import org.apache.commons.io.FileUtils;
 import org.primeframework.mvc.test.RequestSimulator;
 import org.testng.annotations.Test;
-
-import net.java.io.FileTools;
 
 import static org.testng.Assert.*;
 
 /**
- * <p> This class tests the MVC from a high level perspective. </p>
+ * This class tests the MVC from a high level perspective.
  *
  * @author Brian Pontarelli
  */
-public class GlobalTest extends JCatapultBaseTest {
+public class GlobalTest extends PrimeBaseTest {
   @Test
-  public void testRenderFTL() throws IOException, ServletException {
+  public void renderFTL() throws IOException, ServletException {
     RequestSimulator simulator = new RequestSimulator();
     simulator.test("/user/edit").get();
-    assertEquals(FileTools.read("src/java/test/unit/org/primeframework/mvc/edit-output.txt").toString(),
+    assertEquals(FileUtils.readFileToString(new File("src/java/test/unit/org/primeframework/mvc/edit-output.txt")),
       simulator.response.getStream().toString());
   }
 
   @Test
-  public void testNonFormFields() throws IOException, ServletException {
+  public void nonFormFields() throws IOException, ServletException {
     RequestSimulator simulator = new RequestSimulator();
     simulator.test("/user/details-fields").get();
-    assertEquals(FileTools.read("src/java/test/unit/org/primeframework/mvc/details-fields-output.txt").toString(),
+    assertEquals(FileUtils.readFileToString(new File("src/java/test/unit/org/primeframework/mvc/details-fields-output.txt")),
       simulator.response.getStream().toString());
   }
 }

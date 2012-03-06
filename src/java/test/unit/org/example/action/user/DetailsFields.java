@@ -21,7 +21,7 @@ import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.validation.annotation.Valid;
 
 /**
- * <p> This class is a simple edit action for testing. </p>
+ * This class is a simple edit action for testing.
  *
  * @author Brian Pontarelli
  */

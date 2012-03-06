@@ -18,27 +18,28 @@ package org.primeframework.mvc.servlet;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.easymock.EasyMock;
+import org.apache.commons.io.FileUtils;
 import org.easymock.Capture;
+import org.easymock.EasyMock;
 import org.primeframework.mock.servlet.FileInfo;
 import org.primeframework.mock.servlet.MockServletInputStream;
+import org.primeframework.mvc.util.RequestKeys;
 import org.primeframework.mvc.workflow.RequestBodyWorkflow;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
-
-import net.java.io.FileTools;
 
 import static org.easymock.EasyMock.*;
 import static org.testng.Assert.*;
 
 /**
- * <p> This class tests the request body workflow. </p>
+ * This class tests the request body workflow.
  *
  * @author Brian Pontarelli
  */
@@ -189,7 +190,7 @@ public class RequestBodyWorkflowTest {
 
   @Test
   public void singleFiles() throws IOException, ServletException {
-    String body = FileTools.read("src/java/test/unit/org/primeframework/mvc/servlet/http-test-body-single-file.txt").toString();
+    String body = FileUtils.readFileToString(new File("src/java/test/unit/org/primeframework/mvc/servlet/http-test-body-single-file.txt"));
 
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
     EasyMock.expect(request.getParameterMap()).andReturn(new HashMap());
@@ -208,7 +209,7 @@ public class RequestBodyWorkflowTest {
         Map<String, List<FileInfo>> files = capture.getValue();
         assertEquals(1, files.size());
         try {
-          assertEquals(FileTools.read(files.get("userfile").get(0).file).toString(), "test");
+          assertEquals(FileUtils.readFileToString(files.get("userfile").get(0).file), "test");
         } catch (IOException e) {
           throw new RuntimeException(e);
         }
@@ -229,7 +230,7 @@ public class RequestBodyWorkflowTest {
 
   @Test
   public void multipleFiles() throws IOException, ServletException {
-    String body = FileTools.read("src/java/test/unit/org/primeframework/mvc/servlet/http-test-body-multiple-files.txt").toString();
+    String body = FileUtils.readFileToString(new File("src/java/test/unit/org/primeframework/mvc/servlet/http-test-body-multiple-files.txt"));
 
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
     EasyMock.expect(request.getParameterMap()).andReturn(new HashMap());
@@ -248,8 +249,8 @@ public class RequestBodyWorkflowTest {
         Map<String, List<FileInfo>> files = capture.getValue();
         assertEquals(1, files.size());
         try {
-          assertEquals(FileTools.read(files.get("userfiles").get(0).file).toString(), "test");
-          assertEquals(FileTools.read(files.get("userfiles").get(1).file).toString(), "test2");
+          assertEquals(FileUtils.readFileToString(files.get("userfiles").get(0).file), "test");
+          assertEquals(FileUtils.readFileToString(files.get("userfiles").get(1).file), "test2");
         } catch (IOException e) {
           throw new RuntimeException(e);
         }

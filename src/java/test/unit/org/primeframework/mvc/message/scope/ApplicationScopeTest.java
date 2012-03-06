@@ -17,11 +17,11 @@ package org.primeframework.mvc.message.scope;
 
 import javax.servlet.ServletContext;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
-import org.easymock.Capture;
-import org.easymock.EasyMock;
+import org.primeframework.mvc.message.Message;
+import org.primeframework.mvc.message.SimpleMessage;
 import org.testng.annotations.Test;
 
 import static java.util.Arrays.*;
@@ -29,141 +29,56 @@ import static org.easymock.EasyMock.*;
 import static org.testng.Assert.*;
 
 /**
- * <p> This tests the context scope. </p>
+ * This tests the application scope.
  *
  * @author Brian Pontarelli
  */
 @SuppressWarnings("unchecked")
 public class ApplicationScopeTest {
   @Test
-  public void testAction() {
-    action(ApplicationScope.ACTION_ERROR_KEY, MessageType.ERROR);
-    action(ApplicationScope.ACTION_MESSAGE_KEY, MessageType.PLAIN);
-  }
+  public void get() {
+    ServletContext context = createStrictMock(ServletContext.class);
+    expect(context.getAttribute(ApplicationScope.KEY)).andReturn(asList(new SimpleMessage("Test message")));
+    replay(context);
 
-  protected void action(String key, MessageType type) {
-    {
-      ServletContext context = EasyMock.createStrictMock(ServletContext.class);
-      EasyMock.expect(context.getAttribute(key)).andReturn(asList("Test message"));
-      EasyMock.replay(context);
+    ApplicationScope scope = new ApplicationScope(context);
+    List<Message> messages = scope.get();
+    assertEquals(messages.size(), 1);
+    assertEquals(messages.get(0), "Test message");
 
-      ApplicationScope scope = new ApplicationScope(context);
-      List<String> messages = scope.getActionMessages(type);
-      assertEquals(1, messages.size());
-      assertEquals("Test message", messages.get(0));
-
-      EasyMock.verify(context);
-    }
-
-    {
-      ServletContext context = EasyMock.createStrictMock(ServletContext.class);
-      EasyMock.expect(context.getAttribute(key)).andReturn(null);
-      EasyMock.replay(context);
-
-      ApplicationScope scope = new ApplicationScope(context);
-      List<String> messages = scope.getActionMessages(type);
-      assertEquals(0, messages.size());
-
-      EasyMock.verify(context);
-    }
-
-    {
-      List<String> messages = new ArrayList<String>();
-      ServletContext context = EasyMock.createStrictMock(ServletContext.class);
-      EasyMock.expect(context.getAttribute(key)).andReturn(messages);
-      EasyMock.replay(context);
-
-      ApplicationScope scope = new ApplicationScope(context);
-      scope.addActionMessage(type, "Test message");
-      assertEquals(1, messages.size());
-      assertEquals("Test message", messages.get(0));
-
-      EasyMock.verify(context);
-    }
-
-    {
-      Capture<List<String>> list = new Capture<List<String>>();
-      ServletContext context = EasyMock.createStrictMock(ServletContext.class);
-      EasyMock.expect(context.getAttribute(key)).andReturn(null);
-      context.setAttribute(eq(key), EasyMock.capture(list));
-      EasyMock.replay(context);
-
-      ApplicationScope scope = new ApplicationScope(context);
-      scope.addActionMessage(type, "Test message");
-      List<String> messages = list.getValue();
-      assertEquals(1, messages.size());
-      assertEquals("Test message", messages.get(0));
-
-      EasyMock.verify(context);
-    }
+    verify(context);
   }
 
   @Test
-  public void testField() {
-    field(ApplicationScope.FIELD_ERROR_KEY, MessageType.ERROR);
-    field(ApplicationScope.FIELD_MESSAGE_KEY, MessageType.PLAIN);
+  public void add() {
+    List<Message> messages = new ArrayList<Message>();
+
+    ServletContext context = createStrictMock(ServletContext.class);
+    expect(context.getAttribute(ApplicationScope.KEY)).andReturn(messages);
+    replay(context);
+
+    ApplicationScope scope = new ApplicationScope(context);
+    scope.add(new SimpleMessage("Foo"));
+    assertEquals(messages.size(), 1);
+    assertEquals(messages.get(0), "Foo");
+
+    verify(context);
   }
 
-  protected void field(String key, MessageType type) {
-    {
-      FieldMessages fm = new FieldMessages();
-      fm.addMessage("user.name", "Test message");
+  @Test
+  public void addAll() {
+    List<Message> messages = new ArrayList<Message>();
 
-      ServletContext context = EasyMock.createStrictMock(ServletContext.class);
-      EasyMock.expect(context.getAttribute(key)).andReturn(fm);
-      EasyMock.replay(context);
+    ServletContext context = createStrictMock(ServletContext.class);
+    expect(context.getAttribute(ApplicationScope.KEY)).andReturn(messages);
+    replay(context);
 
-      ApplicationScope scope = new ApplicationScope(context);
-      Map<String, List<String>> messages = scope.getFieldMessages(type);
-      assertEquals(1, messages.size());
-      assertEquals(1, messages.get("user.name").size());
-      assertEquals("Test message", messages.get("user.name").get(0));
+    ApplicationScope scope = new ApplicationScope(context);
+    scope.addAll(Arrays.<Message>asList(new SimpleMessage("Foo"), new SimpleMessage("Bar")));
+    assertEquals(messages.size(), 2);
+    assertEquals(messages.get(0), "Foo");
+    assertEquals(messages.get(1), "Bar");
 
-      EasyMock.verify(context);
-    }
-
-    {
-      ServletContext context = EasyMock.createStrictMock(ServletContext.class);
-      EasyMock.expect(context.getAttribute(key)).andReturn(null);
-      EasyMock.replay(context);
-
-      ApplicationScope scope = new ApplicationScope(context);
-      Map<String, List<String>> messages = scope.getFieldMessages(type);
-      assertEquals(0, messages.size());
-
-      EasyMock.verify(context);
-    }
-
-    {
-      FieldMessages messages = new FieldMessages();
-      ServletContext context = EasyMock.createStrictMock(ServletContext.class);
-      EasyMock.expect(context.getAttribute(key)).andReturn(messages);
-      EasyMock.replay(context);
-
-      ApplicationScope scope = new ApplicationScope(context);
-      scope.addFieldMessage(type, "user.name", "Test message");
-      assertEquals(1, messages.size());
-      assertEquals(1, messages.get("user.name").size());
-      assertEquals("Test message", messages.get("user.name").get(0));
-
-      EasyMock.verify(context);
-    }
-
-    {
-      Capture<Map<String, List<String>>> map = new Capture<Map<String, List<String>>>();
-      ServletContext context = EasyMock.createStrictMock(ServletContext.class);
-      EasyMock.expect(context.getAttribute(key)).andReturn(null);
-      context.setAttribute(eq(key), capture(map));
-      EasyMock.replay(context);
-
-      ApplicationScope scope = new ApplicationScope(context);
-      scope.addFieldMessage(type, "user.name", "Test message");
-      Map<String, List<String>> messages = map.getValue();
-      assertEquals(1, messages.size());
-      assertEquals(1, messages.get("user.name").size());
-      assertEquals("Test message", messages.get("user.name").get(0));
-
-      EasyMock.verify(context);
-    }
+    verify(context);
   }
 }

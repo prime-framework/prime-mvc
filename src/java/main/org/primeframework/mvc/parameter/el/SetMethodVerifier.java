@@ -18,8 +18,6 @@ package org.primeframework.mvc.parameter.el;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
-import net.java.lang.StringTools;
-
 /**
  * This class verifies JavaBean standard setter methods. The forms of the methods are as follows:
  * <p/>
@@ -42,12 +40,6 @@ import net.java.lang.StringTools;
  * @author Brian Pontarelli
  */
 public class SetMethodVerifier implements MethodVerifier {
-  /**
-   * The string that starts standard Java bean update methods <tt>set</tt>
-   */
-  public static final String SET_STRING = "set";
-  public static final int SET_LENGTH = SET_STRING.length();
-
   public String isValid(Method method, PropertyInfo info) {
     Method read = info.getMethods().get("get");
     Method write = info.getMethods().get("set");
@@ -118,19 +110,5 @@ public class SetMethodVerifier implements MethodVerifier {
    */
   public static boolean isValidIndexedSetter(Method method) {
     return (method.getParameterTypes().length == 2 && method.getReturnType() == Void.TYPE);
-  }
-
-  /**
-   * Using the propertyName, returns the Java Bean standard setter method name. If the parameter String starts with
-   * white space or only contains white space or is empty, the it is simply concatenated to the SET constant of this
-   * class. It is the job of the calling code to make certain that the parameter is a properly formatted String if that
-   * check is desired.
-   *
-   * @param propertyName The property name to make into the name of the setter method.
-   * @return The name of the setter method or null if propertyName is empty or null.
-   * @throws NullPointerException If the parameter is null.
-   */
-  public static String makeSetter(String propertyName) {
-    return SET_STRING + StringTools.capitalize(propertyName);
   }
 }

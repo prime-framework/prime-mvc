@@ -18,6 +18,7 @@ package org.primeframework.mvc.servlet;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -43,7 +44,7 @@ import com.google.inject.Injector;
  */
 public class PrimeFilter implements Filter {
   private static final Logger logger = Logger.getLogger(PrimeFilter.class.getName());
-  private Injector injector;
+  private ServletContext context;
 
   /**
    * Does nothing.
@@ -51,11 +52,7 @@ public class PrimeFilter implements Filter {
    * @param filterConfig Not used.
    */
   public void init(FilterConfig filterConfig) throws ServletException {
-    this.injector = (Injector) filterConfig.getServletContext().getAttribute(PrimeServletContextListener.GUICE_INJECTOR_KEY);
-    if (this.injector == null) {
-      throw new ServletException("Guice was not initialized. You must define a ServletContext listener to setup Guice or " +
-        "use the PrimeServletContextListener");
-    }
+    this.context = filterConfig.getServletContext();
   }
 
   /**
@@ -70,12 +67,21 @@ public class PrimeFilter implements Filter {
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
   throws IOException, ServletException {
     long start = System.currentTimeMillis();
+
+    Injector injector = (Injector) context.getAttribute(PrimeServletContextListener.GUICE_INJECTOR_KEY);
+    if (injector == null) {
+      throw new ServletException("Guice was not initialized. You must define a ServletContext listener to setup Guice or " +
+        "use the PrimeServletContextListener");
+    }
+
+    HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+    HttpServletResponse httpServletResponse = (HttpServletResponse) response;
     PrimeMVCConfiguration configuration = injector.getInstance(PrimeMVCConfiguration.class);
-    ServletObjectsHolder.setServletRequest(new HttpServletRequestWrapper((HttpServletRequest) request));
-    ServletObjectsHolder.setServletResponse((HttpServletResponse) response);
+    ServletObjectsHolder.setServletRequest(new HttpServletRequestWrapper(httpServletRequest));
+    ServletObjectsHolder.setServletResponse(httpServletResponse);
 
     try {
-      FilterWorkflowChain workflowChain = new FilterWorkflowChain(chain, injector.getInstance(MVCWorkflow.class));
+      FilterWorkflowChain workflowChain = new FilterWorkflowChain(chain, httpServletRequest, httpServletResponse, injector.getInstance(MVCWorkflow.class));
       workflowChain.continueWorkflow();
     } catch (RuntimeException re) {
       boolean propogate = configuration.propagateRuntimeExceptions();

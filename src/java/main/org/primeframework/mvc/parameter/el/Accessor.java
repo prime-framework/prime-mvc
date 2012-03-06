@@ -21,9 +21,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -32,14 +34,13 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.primeframework.mvc.ErrorException;
 import org.primeframework.mvc.parameter.convert.AnnotationConverter;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
 import org.primeframework.mvc.parameter.convert.annotation.ConverterAnnotation;
-
-import static net.java.lang.reflect.ReflectionTools.*;
 
 /**
  * This class provides the base accessor support.
@@ -140,7 +141,11 @@ public abstract class Accessor {
 
       value = Array.newInstance(typeClass.getComponentType(), Integer.parseInt(key.toString()) + 1);
     } else {
-      value = instantiate(typeClass);
+      try {
+        value = typeClass.newInstance();
+      } catch (Exception e) {
+        throw new ErrorException("Unable to instantiate object [" + typeClass.getName() + "]");
+      }
     }
 
     return value;
@@ -184,6 +189,59 @@ public abstract class Accessor {
     }
 
     return newValue;
+  }
+
+  /**
+   * Gets a value from a collection using the index. This supports Arrays, Lists and Collections.
+   *
+   * @param index The index.
+   * @return The value or null if the index is out of bounds.
+   */
+  protected Object getValueFromCollection(int index) {
+    if (this.object.getClass().isArray()) {
+      if (Array.getLength(this.object) <= index) {
+        return null;
+      }
+
+      return Array.get(this.object, index);
+    } else if (this.object instanceof List) {
+      List l = (List) this.object;
+      if (l.size() <= index) {
+        return null;
+      }
+
+      return l.get(index);
+    } else {
+      Iterator iter = ((Collection) this.object).iterator();
+      Object value = null;
+      for (int i = 0; i < index; i++) {
+        if (iter.hasNext()) {
+          value = iter.next();
+        } else {
+          return null;
+        }
+      }
+
+      return value;
+    }
+  }
+
+  /**
+   * Sets the given value into the collection at the given index.
+   *
+   * @param index The index.
+   * @param value The value.
+   */
+  protected void setValueIntoCollection(int index, Object value) {
+    if (this.object.getClass().isArray()) {
+      Array.set(this.object, index, value);
+    } else if (this.object instanceof List) {
+      List l = (List) this.object;
+      l.set(index, value);
+    } else {
+      throw new ErrorException("You can only set values into arrays and Lists. You are setting a parameter into [" +
+        getMemberAccessor() + "] which is of type [" + this.object.getClass() + "]");
+    }
   }
 
   public String toString() {

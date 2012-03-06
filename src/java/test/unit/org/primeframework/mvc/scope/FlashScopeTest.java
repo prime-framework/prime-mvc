@@ -28,7 +28,7 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
 /**
- * <p> This class tests the flash scope. </p>
+ * This class tests the flash scope.
  *
  * @author Brian Pontarelli
  */

@@ -18,7 +18,6 @@ package org.primeframework.mvc.parameter.el;
 import java.beans.Introspector;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Collections;
@@ -30,8 +29,7 @@ import java.util.Set;
 import java.util.WeakHashMap;
 
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
-
-import static net.java.lang.reflect.ReflectionTools.*;
+import org.primeframework.mvc.util.MethodTools;
 
 /**
  * This class provides member access.
@@ -90,15 +88,13 @@ public class MemberAccessor extends Accessor {
     PropertyInfo bpi = map.get(name);
     if (bpi == null) {
       this.propertyInfo = null;
-      this.field = findField(declaringClass, name);
-    } else {
       try {
         this.field = declaringClass.getDeclaredField(name);
       } catch (NoSuchFieldException e) {
         // We did our best and now we have to bail on the field
         this.field = null;
       }
-
+    } else {
       this.propertyInfo = bpi;
     }
 
@@ -329,37 +325,13 @@ public class MemberAccessor extends Accessor {
    * @param method The method to invoke.
    * @param object The object to invoke the method on.
    * @return The return value of the method.
-   * @throws ExpressionException If any mishap occurred whilst Reflecting sire. All the exceptions that could be thrown
-   *                             whilst invoking will be wrapped inside the ReflectionException.
-   * @throws RuntimeException    If the target of the InvocationTargetException is a RuntimeException, in which case, it
-   *                             is re-thrown.
-   * @throws Error               If the target of the InvocationTargetException is an Error, in which case, it is
-   *                             re-thrown.
+   * @throws RuntimeException If the target of the InvocationTargetException is a RuntimeException, in which case, it is
+   *                          re-thrown.
+   * @throws Error            If the target of the InvocationTargetException is an Error, in which case, it is
+   *                          re-thrown.
    */
-  public static Object invokeGetter(Method method, Object object)
-    throws ExpressionException, RuntimeException, Error {
-    try {
-      // I think we have a winner
-      return method.invoke(object);
-    } catch (IllegalAccessException iae) {
-      throw new ExpressionException("Illegal access for method [" + method + "]", iae);
-    } catch (IllegalArgumentException iare) {
-      throw new ExpressionException("Illegal argument for method [" + method + "]", iare);
-    } catch (InvocationTargetException ite) {
-
-      // Check if the target is a runtime or error and re-throw it
-      Throwable target = ite.getTargetException();
-
-      if (target instanceof RuntimeException) {
-        throw (RuntimeException) target;
-      }
-
-      if (target instanceof Error) {
-        throw (Error) target;
-      }
-
-      throw new ExpressionException("Method [" + method + "] threw an exception [" + target.toString() + "]", target);
-    }
+  public static Object invokeGetter(Method method, Object object) throws RuntimeException, Error {
+    return MethodTools.invoke(method, object);
   }
 
   /**
@@ -369,15 +341,12 @@ public class MemberAccessor extends Accessor {
    * @param method The method to invoke.
    * @param object The object to invoke the method on.
    * @param value  The value to set into the method.
-   * @throws ExpressionException If any mishap occurred whilst Reflecting sire. All the exceptions that could be thrown
-   *                             whilst invoking will be wrapped inside the ReflectionException.
-   * @throws RuntimeException    If the target of the InvocationTargetException is a RuntimeException, in which case, it
-   *                             is re-thrown.
-   * @throws Error               If the target of the InvocationTargetException is an Error, in which case, it is
-   *                             re-thrown.
+   * @throws RuntimeException If the target of the InvocationTargetException is a RuntimeException, in which case, it is
+   *                          re-thrown.
+   * @throws Error            If the target of the InvocationTargetException is an Error, in which case, it is
+   *                          re-thrown.
    */
-  public static void invokeSetter(Method method, Object object, Object value)
-    throws ExpressionException, RuntimeException, Error {
+  public static void invokeSetter(Method method, Object object, Object value) throws RuntimeException, Error {
     Class[] types = method.getParameterTypes();
     if (types.length != 1) {
       throw new ExpressionException("Invalid method [" + method + "] it should take a single parameter");
@@ -395,28 +364,7 @@ public class MemberAccessor extends Accessor {
       }
     }
 
-    try {
-      // I think we have a winner
-      method.invoke(object, value);
-    } catch (IllegalAccessException iae) {
-      throw new ExpressionException("Illegal access for method [" + method + "]", iae);
-    } catch (IllegalArgumentException iare) {
-      throw new ExpressionException("Illegal argument for method [" + method + "]", iare);
-    } catch (InvocationTargetException ite) {
-
-      // Check if the target is a runtime or error and re-throw it
-      Throwable target = ite.getTargetException();
-
-      if (target instanceof RuntimeException) {
-        throw (RuntimeException) target;
-      }
-
-      if (target instanceof Error) {
-        throw (Error) target;
-      }
-
-      throw new ExpressionException("Method [" + method + "] threw an exception [" + target.toString() + "]", target);
-    }
+    MethodTools.invoke(method, object, value);
   }
 
   /**
@@ -435,7 +383,7 @@ public class MemberAccessor extends Accessor {
     } catch (IllegalAccessException iae) {
       throw new ExpressionException("Illegal access for field [" + field + "]", iae);
     } catch (IllegalArgumentException iare) {
-      throw new ExpressionException("Illegal agrument for field [" + field + "]", iare);
+      throw new ExpressionException("Illegal argument for field [" + field + "]", iare);
     }
   }
 
@@ -468,7 +416,7 @@ public class MemberAccessor extends Accessor {
     } catch (IllegalAccessException iae) {
       throw new ExpressionException("Illegal access for field [" + field + "]", iae);
     } catch (IllegalArgumentException iare) {
-      throw new ExpressionException("Illegal agrument for field [" + field + "]", iare);
+      throw new ExpressionException("Illegal argument for field [" + field + "]", iare);
     }
   }
 }

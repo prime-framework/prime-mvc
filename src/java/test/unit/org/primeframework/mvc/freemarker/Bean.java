@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * <p> This is a simple JavaBean. </p>
+ * This is a simple JavaBean.
  *
  * @author Brian Pontarelli
  */

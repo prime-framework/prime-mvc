@@ -22,10 +22,9 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.apache.commons.lang3.StringUtils;
 import org.primeframework.mvc.control.annotation.ControlAttribute;
 import org.primeframework.mvc.control.annotation.ControlAttributes;
-
-import static net.java.lang.StringTools.*;
 
 /**
  * This class is the control for a select box.
@@ -47,6 +46,11 @@ import static net.java.lang.StringTools.*;
   }
 )
 public class CountriesSelect extends Select {
+  @Override
+  public String getName() {
+    return "countries_select";
+  }
+
   /**
    * Adds the countries Map and then calls super.
    */
@@ -70,7 +74,7 @@ public class CountriesSelect extends Select {
     SortedSet<Locale> alphabetical = new TreeSet<Locale>(new LocaleComparator(locale));
     Locale[] locales = Locale.getAvailableLocales();
     for (Locale locale : locales) {
-      if (!isTrimmedEmpty(locale.getCountry()) && !isTrimmedEmpty(locale.getDisplayCountry(locale))) {
+      if (StringUtils.isNotBlank(locale.getCountry()) && StringUtils.isNotBlank(locale.getDisplayCountry(locale))) {
         alphabetical.add(locale);
       }
     }

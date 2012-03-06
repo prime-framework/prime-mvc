@@ -51,6 +51,11 @@ public class Message extends AbstractControl implements TemplateMethodModel {
     this.messageProvider = messageProvider;
   }
 
+  @Override
+  public String getName() {
+    return "message";
+  }
+
   /**
    * Determines the bundle and then gets the message and puts it into the attributes.
    */

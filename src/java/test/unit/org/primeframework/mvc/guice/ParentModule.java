@@ -18,7 +18,7 @@ package org.primeframework.mvc.guice;
 import com.google.inject.AbstractModule;
 
 /**
- * <p> This class tests the parent child relationship when loading modules from the classpath. </p>
+ * This class tests the parent child relationship when loading modules from the classpath.
  *
  * @author Brian Pontarelli
  */

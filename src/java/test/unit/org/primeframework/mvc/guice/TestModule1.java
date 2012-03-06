@@ -19,7 +19,7 @@ import com.google.inject.Binder;
 import com.google.inject.Module;
 
 /**
- * <p> This is a test module. </p>
+ * This is a test module.
  *
  * @author Brian Pontarelli
  */

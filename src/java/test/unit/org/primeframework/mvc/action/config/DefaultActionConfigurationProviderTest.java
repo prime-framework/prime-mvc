@@ -29,13 +29,13 @@ import static org.easymock.EasyMock.*;
 import static org.testng.Assert.*;
 
 /**
- * <p> This class tests the default action configuration provider. </p>
+ * This class tests the default action configuration provider.
  *
  * @author Brian Pontarelli
  */
 public class DefaultActionConfigurationProviderTest {
   @Test
-  public void testConfigure() {
+  public void configure() {
     ServletContext context = EasyMock.createStrictMock(ServletContext.class);
     Capture<Map<String, ActionConfiguration>> c = new Capture<Map<String, ActionConfiguration>>();
     context.setAttribute(eq(DefaultActionConfigurationProvider.ACTION_CONFIGURATION_KEY), capture(c));

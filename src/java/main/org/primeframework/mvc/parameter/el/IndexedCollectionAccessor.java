@@ -21,8 +21,6 @@ import java.util.List;
 
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
 
-import static net.java.lang.ObjectTools.*;
-
 /**
  * This class models a collection accessor during expression evaluation.
  *
@@ -48,18 +46,15 @@ public class IndexedCollectionAccessor extends Accessor {
   }
 
   /**
-   * @return Always false. The reason is that since this retrieves from a Collection, we want it to look like a non-indexed property so that the context will invoke the method.
+   * @return Always false. The reason is that since this retrieves from a Collection, we want it to look like a
+   *         non-indexed property so that the context will invoke the method.
    */
   public boolean isIndexed() {
     return false;
   }
 
   public Object get(Context context) {
-    try {
-      return getValueFromCollection(this.object, index);
-    } catch (IndexOutOfBoundsException e) {
-      return null;
-    }
+    return getValueFromCollection(index);
   }
 
   public void set(String[] values, Context context) {
@@ -69,7 +64,7 @@ public class IndexedCollectionAccessor extends Accessor {
   public void set(Object value, Context context) {
     object = pad(object, context);
 
-    setValueIntoCollection(object, index, value);
+    setValueIntoCollection(index, value);
   }
 
   /**
@@ -86,10 +81,12 @@ public class IndexedCollectionAccessor extends Accessor {
   /**
    * Adds padding to the array or list so that it can hold the item being inserted.
    *
-   * @param object  The object to pad. If this isn't a List or an array, this method does nothing and just returns the Object.
+   * @param object  The object to pad. If this isn't a List or an array, this method does nothing and just returns the
+   *                Object.
    * @param context The current context.
    * @return The padded list or array.
    */
+  @SuppressWarnings("unchecked")
   private Object pad(Object object, Context context) {
     if (object instanceof List) {
       List list = ((List) object);
@@ -99,7 +96,7 @@ public class IndexedCollectionAccessor extends Accessor {
           list.add(null);
         }
       }
-    } else if (isArray(object)) {
+    } else if (object.getClass().isArray()) {
       int length = Array.getLength(object);
       if (length <= index) {
         Object newArray = Array.newInstance(object.getClass().getComponentType(), index + 1);

@@ -19,7 +19,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 /**
- * This
+ * A test closable.
  *
  * @author Brian Pontarelli
  */

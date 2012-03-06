@@ -19,14 +19,11 @@ import java.io.File;
 import java.lang.reflect.Type;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.primeframework.mvc.parameter.convert.AbstractGlobalConverter;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.convert.annotation.GlobalConverter;
-
-import net.java.lang.StringTools;
-
-import static net.java.lang.ObjectTools.*;
 
 /**
  * This class converts to and from the java.io.File class.
@@ -43,7 +40,7 @@ public class FileConverter extends AbstractGlobalConverter {
    */
   protected Object stringToObject(String value, Type convertTo, Map<String, String> attributes, String expression)
     throws ConversionException, ConverterStateException {
-    if (StringTools.isTrimmedEmpty(value)) {
+    if (StringUtils.isBlank(value)) {
       return null;
     }
 
@@ -66,7 +63,7 @@ public class FileConverter extends AbstractGlobalConverter {
    */
   protected Object stringsToObject(String[] values, Type convertTo, Map<String, String> attributes, String expression)
     throws ConversionException, ConverterStateException {
-    String joined = join(values, File.separator);
+    String joined = StringUtils.join(values, File.separator);
     return stringToObject(joined, convertTo, attributes, expression);
   }
 

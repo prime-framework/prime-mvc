@@ -16,7 +16,7 @@
 package org.primeframework.mvc.guice;
 
 /**
- * <p> This class tests the parent child relationship when loading modules from the classpath. </p>
+ * This class tests the parent child relationship when loading modules from the classpath.
  *
  * @author Brian Pontarelli
  */

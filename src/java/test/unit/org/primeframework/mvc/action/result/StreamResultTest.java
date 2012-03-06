@@ -22,27 +22,29 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 
 import org.easymock.EasyMock;
+import org.primeframework.mock.servlet.MockServletOutputStream;
+import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.DefaultActionInvocation;
 import org.primeframework.mvc.action.result.annotation.Stream;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-import org.primeframework.mock.servlet.MockServletOutputStream;
 import org.testng.annotations.Test;
 
+import static org.easymock.EasyMock.*;
 import static org.testng.Assert.*;
 
 /**
- * <p> This class tests the stream result. </p>
+ * This class tests the stream result.
  *
  * @author Brian Pontarelli
  */
 public class StreamResultTest {
   @Test
-  public void testExplicit() throws IOException, ServletException {
+  public void explicit() throws IOException, ServletException {
     Object action = new Object();
     ExpressionEvaluator ee = EasyMock.createStrictMock(ExpressionEvaluator.class);
-    EasyMock.expect(ee.expand("10", action)).andReturn("10");
-    EasyMock.expect(ee.expand("foo.zip", action)).andReturn("foo.zip");
-    EasyMock.expect(ee.expand("application/octet-stream", action)).andReturn("application/octet-stream");
+    EasyMock.expect(ee.expand("10", action, false)).andReturn("10");
+    EasyMock.expect(ee.expand("foo.zip", action, false)).andReturn("foo.zip");
+    EasyMock.expect(ee.expand("application/octet-stream", action, false)).andReturn("application/octet-stream");
     EasyMock.expect(ee.getValue("stream", action)).andReturn(new ByteArrayInputStream("test".getBytes()));
     EasyMock.replay(ee);
 
@@ -54,9 +56,13 @@ public class StreamResultTest {
     EasyMock.expect(response.getOutputStream()).andReturn(sos);
     EasyMock.replay(response);
 
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(action, "/foo", "", null));
+    replay(store);
+
     Stream stream = new StreamImpl("success", "foo.zip", "10", "application/octet-stream", "stream");
-    StreamResult streamResult = new StreamResult(ee, response, actionInvocationStore);
-    streamResult.execute(stream, new DefaultActionInvocation(action, "/foo", "", null));
+    StreamResult streamResult = new StreamResult(ee, response, store);
+    streamResult.execute(stream);
 
     assertEquals("test", sos.toString());
 

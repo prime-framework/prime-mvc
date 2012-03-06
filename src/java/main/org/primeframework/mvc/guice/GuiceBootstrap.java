@@ -44,6 +44,7 @@ public class GuiceBootstrap {
    * so that synchronization is not used. This is called by the PrimeServletContextListener when the context is created
    * and should cover all cases.
    *
+   * @param modules The modules to initialize Guice with.
    * @return The Guice injector.
    */
   public static Injector initialize(Module... modules) {

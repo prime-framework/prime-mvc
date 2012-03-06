@@ -16,7 +16,6 @@
 package org.primeframework.mvc.util;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,9 +38,7 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 
-import net.java.io.DirFilter;
-
-import static java.util.Arrays.asList;
+import static java.util.Arrays.*;
 
 /**
  * Locates classes within the current ClassLoader/ClassPath. This class begins from a directory and locates all the
@@ -110,13 +107,13 @@ public class ClassClasspathResolver<U> {
 
   private File findFirstDirectory(File dir, String locator) {
     // Loop over the files
-    Queue<File> files = new LinkedList<File>(safeListFiles(dir, new DirFilter()));
+    Queue<File> files = new LinkedList<File>(safeListFiles(dir));
     while (!files.isEmpty()) {
       File file = files.poll();
       if (file.isDirectory() && file.getName().equals(locator)) {
         return file;
       } else if (file.isDirectory()) {
-        files.addAll(safeListFiles(file, new DirFilter()));
+        files.addAll(safeListFiles(file));
       }
     }
 
@@ -128,16 +125,10 @@ public class ClassClasspathResolver<U> {
    * and cause major issues. This performs that method in a null safe manner.
    *
    * @param dir    The directory to list the files for.
-   * @param filter The file filter (optional).
    * @return A List of Files, which is never null.
    */
-  private List<File> safeListFiles(File dir, FileFilter filter) {
-    File[] files;
-    if (filter == null) {
-      files = dir.listFiles();
-    } else {
-      files = dir.listFiles(filter);
-    }
+  private List<File> safeListFiles(File dir) {
+    File[] files = dir.listFiles();
 
     if (files == null) {
       return Collections.emptyList();
@@ -146,16 +137,15 @@ public class ClassClasspathResolver<U> {
     return asList(files);
   }
 
-  private Collection<Class<U>> loadFromDirectory(File dir, Test<Class<U>> test, boolean recursive)
-    throws IOException {
+  private Collection<Class<U>> loadFromDirectory(File dir, Test<Class<U>> test, boolean recursive) throws IOException {
     Set<Class<U>> matches = new HashSet<Class<U>>();
 
     // Loop over the files
-    Queue<File> files = new LinkedList<File>(safeListFiles(dir, null));
+    Queue<File> files = new LinkedList<File>(safeListFiles(dir));
     while (!files.isEmpty()) {
       File file = files.poll();
       if (file.isDirectory() && recursive) {
-        files.addAll(safeListFiles(file, null));
+        files.addAll(safeListFiles(file));
       } else if (file.isFile()) {
         // This file matches, test it
         Testable<Class<U>> testable = test.prepare(file);

@@ -23,14 +23,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import net.java.util.IteratorEnumeration;
+import org.primeframework.mvc.util.IteratorEnumeration;
 
 /**
  * This class is an HttpServletRequestWrapper that supports new parameters.
  *
  * @author Brian Pontarelli
  */
-@SuppressWarnings("unchecked")
 public class ParameterHttpServletRequest extends HttpServletRequestWrapper {
   private final Map<String, String[]> parameters;
 
@@ -47,6 +46,7 @@ public class ParameterHttpServletRequest extends HttpServletRequestWrapper {
     return super.getParameter(key);
   }
 
+  @SuppressWarnings("unchecked")
   public Map getParameterMap() {
     Map<String, String[]> complete = new HashMap<String, String[]>();
     if (parameters != null) {
@@ -58,7 +58,8 @@ public class ParameterHttpServletRequest extends HttpServletRequestWrapper {
     return complete;
   }
 
-  public Enumeration getParameterNames() {
+  @SuppressWarnings("unchecked")
+  public Enumeration<String> getParameterNames() {
     Set<String> names = new HashSet<String>();
     if (parameters != null) {
       names.addAll(parameters.keySet());
@@ -66,7 +67,7 @@ public class ParameterHttpServletRequest extends HttpServletRequestWrapper {
 
     names.addAll(super.getParameterMap().keySet());
 
-    return new IteratorEnumeration(names.iterator());
+    return new IteratorEnumeration<String>(names.iterator());
   }
 
   public String[] getParameterValues(String key) {

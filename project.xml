@@ -28,18 +28,12 @@
   <!-- compile properties -->
   <property name="jdk.version" value="1.6"/>
 
-  <release>
-    <publication name="prime-mvc" type="jar" compatType="minor" file="target/jars/${project.name}-${project.version}.jar"/>
-    <publication name="prime-mvc-test" type="jar" compatType="minor" file="target/jars/${project.name}-test-${project.version}.jar"/>
-  </release>
-
   <dependencies>
     <artifact-group type="compile-only">
       <artifact group="inject.javax" name="inject-api" version="1.0"/>
       <artifact group="persistence.javax" name="persistence-api" version="2.0.1"/>
       <artifact group="servlet.javax" name="servlet-api" version="2.5"/>
       <artifact group="jsp.servlet.javax" name="jsp-api" version="2.0"/>
-
     </artifact-group>
     <artifact-group type="compile">
       <artifact group="asm.objectweb.org" name="asm" version="3.1"/>
@@ -48,9 +42,11 @@
       <artifact group="commons.apache.org" name="commons-lang3" version="3.0.1"/>
       <artifact group="extensions.inject.google.com" name="guice-multibindings" version="3.0"/>
       <artifact group="freemarker.org" name="freemarker" version="2.3.16"/>
+      <artifact group="hibernate.org" name="hibernate-validator" version="4.2.0"/>
       <artifact group="inject.google.com" name="guice" version="3.0"/>
       <artifact group="joda.org" name="joda-time" version="2.0"/>
       <artifact group="primeframework.org" name="prime-mock" version="1.0-{integration}"/>
+      <artifact group="validation.javax" name="validation-api" version="1.0.0"/>
     </artifact-group>
     <artifact-group type="test-compile">
       <artifact group="easymock.org" name="easymock" version="3.1"/>

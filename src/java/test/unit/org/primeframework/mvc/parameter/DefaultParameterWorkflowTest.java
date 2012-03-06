@@ -25,143 +25,150 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
-import org.easymock.EasyMock;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.easymock.IArgumentMatcher;
 import org.example.domain.Action;
 import org.example.domain.PreAndPostAction;
 import org.primeframework.mock.servlet.FileInfo;
+import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.config.PrimeMVCConfiguration;
+import org.primeframework.mvc.message.FieldMessage;
 import org.primeframework.mvc.message.MessageStore;
+import org.primeframework.mvc.message.SimpleFieldMessage;
+import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.parameter.el.ExpressionException;
 import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
-import org.primeframework.mvc.workflow.WorkflowChain;
-import org.primeframework.mvc.test.JCatapultBaseTest;
+import org.primeframework.mvc.util.MapBuilder;
 import org.primeframework.mvc.util.RequestKeys;
+import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
-
-import net.java.io.FileTools;
 
 import com.google.inject.Inject;
 import static java.util.Arrays.*;
-import static net.java.util.CollectionTools.*;
 import static org.easymock.EasyMock.*;
 import static org.testng.Assert.*;
 
 /**
- * <p> This tests the default parameters workflow. </p>
+ * This tests the default parameters workflow.
  *
  * @author Brian Pontarelli
  */
-@SuppressWarnings({"ALL"})
-public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
+public class DefaultParameterWorkflowTest extends PrimeBaseTest {
   @Inject public ExpressionEvaluator expressionEvaluator;
 
-  /*
-  * Tests the workflow method.
-  */
   @Test
   public void simpleParameters() throws IOException, ServletException {
     Action action = new Action();
 
     Map<String, String[]> values = new LinkedHashMap<String, String[]>();
-    values.put("user.addresses['home'].city", array("Boulder"));
-    values.put("user.age", array("32"));
-    values.put("user.age@dateFormat", array("MM/dd/yyyy"));
-    values.put("user.inches", array("tall"));
-    values.put("user.name", array(""));
+    values.put("user.addresses['home'].city", ArrayUtils.toArray("Boulder"));
+    values.put("user.age", ArrayUtils.toArray("32"));
+    values.put("user.age@dateFormat", ArrayUtils.toArray("MM/dd/yyyy"));
+    values.put("user.inches", ArrayUtils.toArray("tall"));
+    values.put("user.name", ArrayUtils.toArray(""));
 
-    final HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-    EasyMock.expect(request.getParameterMap()).andReturn(values);
-    EasyMock.expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(null);
-    EasyMock.replay(request);
+    final HttpServletRequest request = createStrictMock(HttpServletRequest.class);
+    expect(request.getParameterMap()).andReturn(values);
+    expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(null);
+    replay(request);
 
-    ExpressionEvaluator expressionEvaluator = EasyMock.createStrictMock(ExpressionEvaluator.class);
+    ExpressionEvaluator expressionEvaluator = createStrictMock(ExpressionEvaluator.class);
     expect(expressionEvaluator.getAllMembers(action.getClass())).andReturn(new HashSet<String>());
-    expressionEvaluator.setValue(eq("user.addresses['home'].city"), same(action), aryEq(array("Boulder")), eq(new HashMap<String, String>()));
-    expressionEvaluator.setValue(eq("user.age"), same(action), aryEq(array("32")), eq(map("dateFormat", "MM/dd/yyyy")));
-    expressionEvaluator.setValue(eq("user.inches"), same(action), aryEq(array("tall")), eq(new HashMap<String, String>()));
+    expressionEvaluator.setValue(eq("user.addresses['home'].city"), same(action), aryEq(ArrayUtils.toArray("Boulder")), eq(new HashMap<String, String>()));
+    expressionEvaluator.setValue(eq("user.age"), same(action), aryEq(ArrayUtils.toArray("32")), eq(MapBuilder.asMap("dateFormat", "MM/dd/yyyy")));
+    expressionEvaluator.setValue(eq("user.inches"), same(action), aryEq(ArrayUtils.toArray("tall")), eq(new HashMap<String, String>()));
     expectLastCall().andThrow(new ConversionException());
-    expressionEvaluator.setValue(eq("user.name"), same(action), aryEq(array("")), eq(new HashMap<String, String>()));
-    EasyMock.replay(expressionEvaluator);
+    expressionEvaluator.setValue(eq("user.name"), same(action), aryEq(ArrayUtils.toArray("")), eq(new HashMap<String, String>()));
+    replay(expressionEvaluator);
 
-    ActionInvocation invocation = EasyMock.createStrictMock(ActionInvocation.class);
-    EasyMock.expect(invocation.action()).andReturn(action);
-    EasyMock.expect(invocation.actionURI()).andReturn("/test");
-    EasyMock.replay(invocation);
+    ActionInvocation invocation = createStrictMock(ActionInvocation.class);
+    expect(invocation.action()).andReturn(action);
+    expect(invocation.actionURI()).andReturn("/test");
+    replay(invocation);
 
-    ActionInvocationStore actionInvocationStore = EasyMock.createStrictMock(ActionInvocationStore.class);
-    EasyMock.expect(actionInvocationStore.getCurrent()).andReturn(invocation);
-    EasyMock.replay(actionInvocationStore);
+    ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
+    expect(actionInvocationStore.getCurrent()).andReturn(invocation);
+    replay(actionInvocationStore);
 
-    MessageStore messageStore = EasyMock.createStrictMock(MessageStore.class);
-    messageStore.addConversionError(eq("user.inches"), eq("/test"), eq(new HashMap<String, String>()), eq("tall"));
-    EasyMock.replay(messageStore);
-
-    WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);
+    WorkflowChain chain = createStrictMock(WorkflowChain.class);
     chain.continueWorkflow();
-    EasyMock.replay(chain);
+    replay(chain);
 
-    PrimeMVCConfiguration config = EasyMock.createStrictMock(PrimeMVCConfiguration.class);
-    EasyMock.expect(config.fileUploadAllowedTypes()).andReturn(new String[0]);
-    EasyMock.expect(config.fileUploadMaxSize()).andReturn(10l);
-    EasyMock.expect(config.ignoreEmptyParameters()).andReturn(false).times(4);
-    EasyMock.replay(config);
+    PrimeMVCConfiguration config = createStrictMock(PrimeMVCConfiguration.class);
+    expect(config.fileUploadAllowedTypes()).andReturn(new String[0]);
+    expect(config.fileUploadMaxSize()).andReturn(10l);
+    expect(config.ignoreEmptyParameters()).andReturn(false).times(4);
+    replay(config);
 
-    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, messageStore, messageProvider, expressionEvaluator, config);
+    FieldMessage message = new SimpleFieldMessage("foo", "bar");
+    MessageProvider provider = createStrictMock(MessageProvider.class);
+    expect(provider.getFieldMessage(eq("user.inches"), eq("user.inches.conversionError"), aryEq(ArrayUtils.toArray("tall")))).andReturn(message);
+    replay(provider);
+
+    MessageStore messageStore = createStrictMock(MessageStore.class);
+    messageStore.add(message);
+    replay(messageStore);
+
+    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
+      new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request), 
+      new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 
-    EasyMock.verify(request, expressionEvaluator, invocation, actionInvocationStore, messageStore, config, chain);
+    verify(request, expressionEvaluator, invocation, actionInvocationStore, messageStore, config, chain, provider);
   }
 
-  /*
-  * Tests the invalid parameters in development mode.
-  */
   @Test
   public void invalidParametersDev() throws IOException, ServletException {
     Action action = new Action();
 
     Map<String, String[]> values = new LinkedHashMap<String, String[]>();
-    values.put("user.age", array("32"));
+    values.put("user.age", ArrayUtils.toArray("32"));
 
-    final HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-    EasyMock.expect(request.getParameterMap()).andReturn(values);
-    EasyMock.replay(request);
+    final HttpServletRequest request = createStrictMock(HttpServletRequest.class);
+    expect(request.getParameterMap()).andReturn(values);
+    replay(request);
 
-    ExpressionEvaluator expressionEvaluator = EasyMock.createStrictMock(ExpressionEvaluator.class);
+    ExpressionEvaluator expressionEvaluator = createStrictMock(ExpressionEvaluator.class);
     expect(expressionEvaluator.getAllMembers(action.getClass())).andReturn(new HashSet<String>());
-    expressionEvaluator.setValue(eq("user.age"), same(action), aryEq(array("32")), eq(new HashMap<String, String>()));
+    expressionEvaluator.setValue(eq("user.age"), same(action), aryEq(ArrayUtils.toArray("32")), eq(new HashMap<String, String>()));
     expectLastCall().andThrow(new ExpressionException());
-    EasyMock.replay(expressionEvaluator);
+    replay(expressionEvaluator);
 
-    ActionInvocation invocation = EasyMock.createStrictMock(ActionInvocation.class);
-    EasyMock.expect(invocation.action()).andReturn(action);
-    EasyMock.replay(invocation);
+    ActionInvocation invocation = createStrictMock(ActionInvocation.class);
+    expect(invocation.action()).andReturn(action);
+    replay(invocation);
 
-    ActionInvocationStore actionInvocationStore = EasyMock.createStrictMock(ActionInvocationStore.class);
-    EasyMock.expect(actionInvocationStore.getCurrent()).andReturn(invocation);
-    EasyMock.replay(actionInvocationStore);
+    ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
+    expect(actionInvocationStore.getCurrent()).andReturn(invocation);
+    replay(actionInvocationStore);
 
-    MessageStore messageStore = EasyMock.createStrictMock(MessageStore.class);
-    EasyMock.replay(messageStore);
+    MessageStore messageStore = createStrictMock(MessageStore.class);
+    replay(messageStore);
 
-    WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);
-    EasyMock.replay(chain);
+    WorkflowChain chain = createStrictMock(WorkflowChain.class);
+    replay(chain);
 
-    PrimeMVCConfiguration config = EasyMock.createStrictMock(PrimeMVCConfiguration.class);
-    EasyMock.expect(config.fileUploadAllowedTypes()).andReturn(new String[0]);
-    EasyMock.expect(config.fileUploadMaxSize()).andReturn(10l);
-    EasyMock.expect(config.ignoreEmptyParameters()).andReturn(false);
-    EasyMock.expect(config.allowUnknownParameters()).andReturn(false);
-    EasyMock.replay(config);
+    PrimeMVCConfiguration config = createStrictMock(PrimeMVCConfiguration.class);
+    expect(config.fileUploadAllowedTypes()).andReturn(new String[0]);
+    expect(config.fileUploadMaxSize()).andReturn(10l);
+    expect(config.ignoreEmptyParameters()).andReturn(false);
+    expect(config.allowUnknownParameters()).andReturn(false);
+    replay(config);
 
-    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, messageStore, messageProvider, expressionEvaluator, config);
-    workflow.logger = Logger.getLogger("test");
+    MessageProvider provider = createStrictMock(MessageProvider.class);
+    replay(provider);
+
+    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
+      new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
+      new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
+    workflow.perform(chain);
+
     try {
       workflow.perform(chain);
       fail("Should have thrown an exception");
@@ -169,160 +176,164 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
       // Expected
     }
 
-    EasyMock.verify(request, expressionEvaluator, invocation, actionInvocationStore, messageStore, config, chain);
+    verify(request, expressionEvaluator, invocation, actionInvocationStore, messageStore, config, chain, provider);
   }
 
-  /*
-  * Tests the invalid parameters in production mode.
-  */
   @Test
   public void invalidParametersProduction() throws IOException, ServletException {
     Action action = new Action();
 
     Map<String, String[]> values = new LinkedHashMap<String, String[]>();
-    values.put("user.age", array("32"));
+    values.put("user.age", ArrayUtils.toArray("32"));
 
-    final HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-    EasyMock.expect(request.getParameterMap()).andReturn(values);
-    EasyMock.expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(null);
-    EasyMock.replay(request);
+    final HttpServletRequest request = createStrictMock(HttpServletRequest.class);
+    expect(request.getParameterMap()).andReturn(values);
+    expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(null);
+    replay(request);
 
-    ExpressionEvaluator expressionEvaluator = EasyMock.createStrictMock(ExpressionEvaluator.class);
+    ExpressionEvaluator expressionEvaluator = createStrictMock(ExpressionEvaluator.class);
     expect(expressionEvaluator.getAllMembers(action.getClass())).andReturn(new HashSet<String>());
-    expressionEvaluator.setValue(eq("user.age"), same(action), aryEq(array("32")), eq(new HashMap<String, String>()));
+    expressionEvaluator.setValue(eq("user.age"), same(action), aryEq(ArrayUtils.toArray("32")), eq(new HashMap<String, String>()));
     expectLastCall().andThrow(new ExpressionException());
-    EasyMock.replay(expressionEvaluator);
+    replay(expressionEvaluator);
 
-    ActionInvocation invocation = EasyMock.createStrictMock(ActionInvocation.class);
-    EasyMock.expect(invocation.action()).andReturn(action);
-    EasyMock.replay(invocation);
+    ActionInvocation invocation = createStrictMock(ActionInvocation.class);
+    expect(invocation.action()).andReturn(action);
+    replay(invocation);
 
-    ActionInvocationStore actionInvocationStore = EasyMock.createStrictMock(ActionInvocationStore.class);
-    EasyMock.expect(actionInvocationStore.getCurrent()).andReturn(invocation);
-    EasyMock.replay(actionInvocationStore);
+    ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
+    expect(actionInvocationStore.getCurrent()).andReturn(invocation);
+    replay(actionInvocationStore);
 
-    MessageStore messageStore = EasyMock.createStrictMock(MessageStore.class);
-    EasyMock.replay(messageStore);
+    MessageStore messageStore = createStrictMock(MessageStore.class);
+    replay(messageStore);
 
-    WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);
+    WorkflowChain chain = createStrictMock(WorkflowChain.class);
     chain.continueWorkflow();
-    EasyMock.replay(chain);
+    replay(chain);
 
-    PrimeMVCConfiguration config = EasyMock.createStrictMock(PrimeMVCConfiguration.class);
-    EasyMock.expect(config.fileUploadAllowedTypes()).andReturn(new String[0]);
-    EasyMock.expect(config.fileUploadMaxSize()).andReturn(10l);
-    EasyMock.expect(config.ignoreEmptyParameters()).andReturn(false);
-    EasyMock.expect(config.allowUnknownParameters()).andReturn(true);
-    EasyMock.replay(config);
+    PrimeMVCConfiguration config = createStrictMock(PrimeMVCConfiguration.class);
+    expect(config.fileUploadAllowedTypes()).andReturn(new String[0]);
+    expect(config.fileUploadMaxSize()).andReturn(10l);
+    expect(config.ignoreEmptyParameters()).andReturn(false);
+    expect(config.allowUnknownParameters()).andReturn(true);
+    replay(config);
 
-    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, messageStore, messageProvider, expressionEvaluator, config);
-    workflow.logger = Logger.getLogger("test");
+    MessageProvider provider = createStrictMock(MessageProvider.class);
+    replay(provider);
+
+    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
+      new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
+      new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 
-    EasyMock.verify(request, expressionEvaluator, invocation, actionInvocationStore, messageStore, config, chain);
+    verify(request, expressionEvaluator, invocation, actionInvocationStore, messageStore, config, chain, provider);
   }
 
-  /*
-  * Tests radio buttons and checkboxes.
-  */
   @Test
   public void radioButtonsCheckBoxes() throws IOException, ServletException {
     Action action = new Action();
 
     Map<String, String[]> values = new HashMap<String, String[]>();
-    values.put("__cb_user.checkbox['null']", array(""));
-    values.put("__cb_user.checkbox['default']", array("false"));
-    values.put("__rb_user.radio['null']", array(""));
-    values.put("__rb_user.radio['default']", array("false"));
+    values.put("__cb_user.checkbox['null']", ArrayUtils.toArray(""));
+    values.put("__cb_user.checkbox['default']", ArrayUtils.toArray("false"));
+    values.put("__rb_user.radio['null']", ArrayUtils.toArray(""));
+    values.put("__rb_user.radio['default']", ArrayUtils.toArray("false"));
 
-    final HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-    EasyMock.expect(request.getParameterMap()).andReturn(values);
-    EasyMock.expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(null);
-    EasyMock.replay(request);
+    final HttpServletRequest request = createStrictMock(HttpServletRequest.class);
+    expect(request.getParameterMap()).andReturn(values);
+    expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(null);
+    replay(request);
 
-    ExpressionEvaluator expressionEvaluator = EasyMock.createNiceMock(ExpressionEvaluator.class);
+    ExpressionEvaluator expressionEvaluator = createNiceMock(ExpressionEvaluator.class);
     expect(expressionEvaluator.getAllMembers(action.getClass())).andReturn(new HashSet<String>());
-    expressionEvaluator.setValue(eq("user.checkbox['default']"), same(action), aryEq(array("false")), eq(new HashMap<String, String>()));
-    expressionEvaluator.setValue(eq("user.radio['default']"), same(action), aryEq(array("false")), eq(new HashMap<String, String>()));
-    EasyMock.replay(expressionEvaluator);
+    expressionEvaluator.setValue(eq("user.checkbox['default']"), same(action), aryEq(ArrayUtils.toArray("false")), eq(new HashMap<String, String>()));
+    expressionEvaluator.setValue(eq("user.radio['default']"), same(action), aryEq(ArrayUtils.toArray("false")), eq(new HashMap<String, String>()));
+    replay(expressionEvaluator);
 
-    ActionInvocation invocation = EasyMock.createStrictMock(ActionInvocation.class);
-    EasyMock.expect(invocation.action()).andReturn(action);
-    EasyMock.replay(invocation);
+    ActionInvocation invocation = createStrictMock(ActionInvocation.class);
+    expect(invocation.action()).andReturn(action);
+    replay(invocation);
 
-    ActionInvocationStore actionInvocationStore = EasyMock.createStrictMock(ActionInvocationStore.class);
-    EasyMock.expect(actionInvocationStore.getCurrent()).andReturn(invocation);
-    EasyMock.replay(actionInvocationStore);
+    ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
+    expect(actionInvocationStore.getCurrent()).andReturn(invocation);
+    replay(actionInvocationStore);
 
-    MessageStore messageStore = EasyMock.createStrictMock(MessageStore.class);
-    EasyMock.replay(messageStore);
+    MessageStore messageStore = createStrictMock(MessageStore.class);
+    replay(messageStore);
 
-    WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);
+    WorkflowChain chain = createStrictMock(WorkflowChain.class);
     chain.continueWorkflow();
-    EasyMock.replay(chain);
+    replay(chain);
 
-    PrimeMVCConfiguration config = EasyMock.createStrictMock(PrimeMVCConfiguration.class);
-    EasyMock.expect(config.fileUploadAllowedTypes()).andReturn(new String[0]);
-    EasyMock.expect(config.fileUploadMaxSize()).andReturn(10l);
-    EasyMock.replay(config);
+    PrimeMVCConfiguration config = createStrictMock(PrimeMVCConfiguration.class);
+    expect(config.fileUploadAllowedTypes()).andReturn(new String[0]);
+    expect(config.fileUploadMaxSize()).andReturn(10l);
+    replay(config);
 
-    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, messageStore, messageProvider, expressionEvaluator, config);
+    MessageProvider provider = createStrictMock(MessageProvider.class);
+    replay(provider);
+
+    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
+      new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
+      new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 
-    EasyMock.verify(request, expressionEvaluator, invocation, actionInvocationStore, messageStore, config, chain);
+    verify(request, expressionEvaluator, invocation, actionInvocationStore, messageStore, config, chain, provider);
   }
 
-  /*
-  * Tests image submit button which will try to set the x and y values into the action, but they
-  * should be optional and therefore throw exceptions that are ignored.
-  */
   @Test
   public void imageSubmitButton() throws IOException, ServletException {
     Action action = new Action();
 
     Map<String, String[]> values = new HashMap<String, String[]>();
-    values.put("__a_submit", array(""));
-    values.put("submit.x", array("1"));
-    values.put("submit.y", array("2"));
+    values.put("__a_submit", ArrayUtils.toArray(""));
+    values.put("submit.x", ArrayUtils.toArray("1"));
+    values.put("submit.y", ArrayUtils.toArray("2"));
 
-    final HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-    EasyMock.expect(request.getParameterMap()).andReturn(values);
-    EasyMock.expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(null);
-    EasyMock.replay(request);
+    final HttpServletRequest request = createStrictMock(HttpServletRequest.class);
+    expect(request.getParameterMap()).andReturn(values);
+    expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(null);
+    replay(request);
 
-    ExpressionEvaluator expressionEvaluator = EasyMock.createNiceMock(ExpressionEvaluator.class);
+    ExpressionEvaluator expressionEvaluator = createNiceMock(ExpressionEvaluator.class);
     expect(expressionEvaluator.getAllMembers(action.getClass())).andReturn(new HashSet<String>());
-    expressionEvaluator.setValue(eq("submit.x"), same(action), aryEq(array("1")), eq(new HashMap<String, String>()));
+    expressionEvaluator.setValue(eq("submit.x"), same(action), aryEq(ArrayUtils.toArray("1")), eq(new HashMap<String, String>()));
     expectLastCall().andThrow(new ExpressionException("Not property x"));
-    expressionEvaluator.setValue(eq("submit.y"), same(action), aryEq(array("2")), eq(new HashMap<String, String>()));
+    expressionEvaluator.setValue(eq("submit.y"), same(action), aryEq(ArrayUtils.toArray("2")), eq(new HashMap<String, String>()));
     expectLastCall().andThrow(new ExpressionException("Not property y"));
-    EasyMock.replay(expressionEvaluator);
+    replay(expressionEvaluator);
 
-    ActionInvocation invocation = EasyMock.createStrictMock(ActionInvocation.class);
-    EasyMock.expect(invocation.action()).andReturn(action);
-    EasyMock.replay(invocation);
+    ActionInvocation invocation = createStrictMock(ActionInvocation.class);
+    expect(invocation.action()).andReturn(action);
+    replay(invocation);
 
-    ActionInvocationStore actionInvocationStore = EasyMock.createStrictMock(ActionInvocationStore.class);
-    EasyMock.expect(actionInvocationStore.getCurrent()).andReturn(invocation);
-    EasyMock.replay(actionInvocationStore);
+    ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
+    expect(actionInvocationStore.getCurrent()).andReturn(invocation);
+    replay(actionInvocationStore);
 
-    MessageStore messageStore = EasyMock.createStrictMock(MessageStore.class);
-    EasyMock.replay(messageStore);
+    MessageStore messageStore = createStrictMock(MessageStore.class);
+    replay(messageStore);
 
-    WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);
+    WorkflowChain chain = createStrictMock(WorkflowChain.class);
     chain.continueWorkflow();
-    EasyMock.replay(chain);
+    replay(chain);
 
-    PrimeMVCConfiguration config = EasyMock.createStrictMock(PrimeMVCConfiguration.class);
-    EasyMock.expect(config.fileUploadAllowedTypes()).andReturn(new String[0]);
-    EasyMock.expect(config.fileUploadMaxSize()).andReturn(10l);
-    EasyMock.expect(config.ignoreEmptyParameters()).andReturn(false).times(2);
-    EasyMock.replay(config);
+    PrimeMVCConfiguration config = createStrictMock(PrimeMVCConfiguration.class);
+    expect(config.fileUploadAllowedTypes()).andReturn(new String[0]);
+    expect(config.fileUploadMaxSize()).andReturn(10l);
+    expect(config.ignoreEmptyParameters()).andReturn(false).times(2);
+    replay(config);
 
-    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, messageStore, messageProvider, expressionEvaluator, config);
+    MessageProvider provider = createStrictMock(MessageProvider.class);
+    replay(provider);
+
+    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
+      new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
+      new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 
-    EasyMock.verify(request, expressionEvaluator, invocation, actionInvocationStore, messageStore, config, chain);
+    verify(request, expressionEvaluator, invocation, actionInvocationStore, messageStore, config, chain, provider);
   }
 
   /*
@@ -333,43 +344,48 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
     PreAndPostAction action = new PreAndPostAction();
 
     Map<String, String[]> values = new HashMap<String, String[]>();
-    values.put("preField", array("1"));
-    values.put("preProperty", array("Pre property"));
-    values.put("notPre", array("Not pre"));
+    values.put("preField", ArrayUtils.toArray("1"));
+    values.put("preProperty", ArrayUtils.toArray("Pre property"));
+    values.put("notPre", ArrayUtils.toArray("Not pre"));
 
-    final HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-    EasyMock.expect(request.getParameterMap()).andReturn(values);
-    EasyMock.expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(null);
-    EasyMock.replay(request);
+    final HttpServletRequest request = createStrictMock(HttpServletRequest.class);
+    expect(request.getParameterMap()).andReturn(values);
+    expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(null);
+    replay(request);
 
-    ActionInvocation invocation = EasyMock.createStrictMock(ActionInvocation.class);
-    EasyMock.expect(invocation.action()).andReturn(action);
-    EasyMock.replay(invocation);
+    ActionInvocation invocation = createStrictMock(ActionInvocation.class);
+    expect(invocation.action()).andReturn(action);
+    replay(invocation);
 
-    ActionInvocationStore actionInvocationStore = EasyMock.createStrictMock(ActionInvocationStore.class);
-    EasyMock.expect(actionInvocationStore.getCurrent()).andReturn(invocation);
-    EasyMock.replay(actionInvocationStore);
+    ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
+    expect(actionInvocationStore.getCurrent()).andReturn(invocation);
+    replay(actionInvocationStore);
 
-    MessageStore messageStore = EasyMock.createStrictMock(MessageStore.class);
-    EasyMock.replay(messageStore);
+    MessageStore messageStore = createStrictMock(MessageStore.class);
+    replay(messageStore);
 
-    WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);
+    WorkflowChain chain = createStrictMock(WorkflowChain.class);
     chain.continueWorkflow();
-    EasyMock.replay(chain);
+    replay(chain);
 
-    PrimeMVCConfiguration config = EasyMock.createStrictMock(PrimeMVCConfiguration.class);
-    EasyMock.expect(config.fileUploadAllowedTypes()).andReturn(new String[0]);
-    EasyMock.expect(config.fileUploadMaxSize()).andReturn(10l);
-    EasyMock.expect(config.ignoreEmptyParameters()).andReturn(false).times(3);
-    EasyMock.replay(config);
+    PrimeMVCConfiguration config = createStrictMock(PrimeMVCConfiguration.class);
+    expect(config.fileUploadAllowedTypes()).andReturn(new String[0]);
+    expect(config.fileUploadMaxSize()).andReturn(10l);
+    expect(config.ignoreEmptyParameters()).andReturn(false).times(3);
+    replay(config);
 
-    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, messageStore, messageProvider, expressionEvaluator, config);
+    MessageProvider provider = createStrictMock(MessageProvider.class);
+    replay(provider);
+
+    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
+      new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
+      new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 
     assertTrue(action.preCalled);
     assertTrue(action.postCalled);
 
-    EasyMock.verify(request, invocation, actionInvocationStore, messageStore, config, chain);
+    verify(request, invocation, actionInvocationStore, messageStore, config, chain, provider);
   }
 
   @Test
@@ -377,38 +393,46 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
     Map<String, List<FileInfo>> files = new HashMap<String, List<FileInfo>>();
     files.put("userfile", asList(new FileInfo(new java.io.File("src/java/test/unit/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain")));
 
-    HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-    EasyMock.expect(request.getParameterMap()).andReturn(new HashMap());
-    EasyMock.expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(files);
-    EasyMock.replay(request);
+    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
+    expect(request.getParameterMap()).andReturn(new HashMap());
+    expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(files);
+    replay(request);
 
-    PrimeMVCConfiguration config = EasyMock.createStrictMock(PrimeMVCConfiguration.class);
-    EasyMock.expect(config.fileUploadAllowedTypes()).andReturn(new String[]{"text/plain"});
-    EasyMock.expect(config.fileUploadMaxSize()).andReturn(1024000l);
-    EasyMock.replay(config);
+    PrimeMVCConfiguration config = createStrictMock(PrimeMVCConfiguration.class);
+    expect(config.fileUploadAllowedTypes()).andReturn(new String[]{"text/plain"});
+    expect(config.fileUploadMaxSize()).andReturn(1024000l);
+    replay(config);
 
     Object action = new Object();
-    ExpressionEvaluator expressionEvaluator = EasyMock.createStrictMock(ExpressionEvaluator.class);
-    EasyMock.expect(expressionEvaluator.getAnnotation(FileUpload.class, "userfile", action)).andReturn(null);
-    expressionEvaluator.setValue(eq("userfile"), same(action), capture());
-    EasyMock.replay(expressionEvaluator);
+    ExpressionEvaluator expressionEvaluator = createStrictMock(ExpressionEvaluator.class);
+    expect(expressionEvaluator.getAnnotation(FileUpload.class, "userfile", action)).andReturn(null);
+    expressionEvaluator.setValue(eq("userfile"), same(action), assertFile());
+    replay(expressionEvaluator);
 
-    ActionInvocation invocation = EasyMock.createStrictMock(ActionInvocation.class);
-    EasyMock.expect(invocation.action()).andReturn(action);
-    EasyMock.replay(invocation);
+    ActionInvocation invocation = createStrictMock(ActionInvocation.class);
+    expect(invocation.action()).andReturn(action);
+    replay(invocation);
 
-    ActionInvocationStore actionInvocationStore = EasyMock.createStrictMock(ActionInvocationStore.class);
-    EasyMock.expect(actionInvocationStore.getCurrent()).andReturn(invocation);
-    EasyMock.replay(actionInvocationStore);
+    ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
+    expect(actionInvocationStore.getCurrent()).andReturn(invocation);
+    replay(actionInvocationStore);
 
-    WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);
+    WorkflowChain chain = createStrictMock(WorkflowChain.class);
     chain.continueWorkflow();
-    EasyMock.replay(chain);
+    replay(chain);
 
-    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, null, messageProvider, expressionEvaluator, config);
+    MessageStore messageStore = createStrictMock(MessageStore.class);
+    replay(messageStore);
+
+    MessageProvider provider = createStrictMock(MessageProvider.class);
+    replay(provider);
+
+    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
+      new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
+      new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 
-    EasyMock.verify(request, config, chain, actionInvocationStore, invocation, expressionEvaluator);
+    verify(request, config, chain, actionInvocationStore, invocation, expressionEvaluator, messageStore, provider);
   }
 
   @Test
@@ -418,38 +442,46 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
       new FileInfo(new java.io.File("src/java/test/unit/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain"),
       new FileInfo(new java.io.File("src/java/test/unit/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload2.txt", "text/plain")));
 
-    HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-    EasyMock.expect(request.getParameterMap()).andReturn(new HashMap());
-    EasyMock.expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(files);
-    EasyMock.replay(request);
+    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
+    expect(request.getParameterMap()).andReturn(new HashMap());
+    expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(files);
+    replay(request);
 
-    PrimeMVCConfiguration config = EasyMock.createStrictMock(PrimeMVCConfiguration.class);
-    EasyMock.expect(config.fileUploadAllowedTypes()).andReturn(new String[]{"text/plain"});
-    EasyMock.expect(config.fileUploadMaxSize()).andReturn(1024000l);
-    EasyMock.replay(config);
+    PrimeMVCConfiguration config = createStrictMock(PrimeMVCConfiguration.class);
+    expect(config.fileUploadAllowedTypes()).andReturn(new String[]{"text/plain"});
+    expect(config.fileUploadMaxSize()).andReturn(1024000l);
+    replay(config);
 
     Object action = new Object();
-    ExpressionEvaluator expressionEvaluator = EasyMock.createStrictMock(ExpressionEvaluator.class);
-    EasyMock.expect(expressionEvaluator.getAnnotation(FileUpload.class, "userfiles", action)).andReturn(null);
+    ExpressionEvaluator expressionEvaluator = createStrictMock(ExpressionEvaluator.class);
+    expect(expressionEvaluator.getAnnotation(FileUpload.class, "userfiles", action)).andReturn(null);
     expressionEvaluator.setValue(eq("userfiles"), same(action), captureMultiple());
-    EasyMock.replay(expressionEvaluator);
+    replay(expressionEvaluator);
 
-    ActionInvocation invocation = EasyMock.createStrictMock(ActionInvocation.class);
-    EasyMock.expect(invocation.action()).andReturn(action);
-    EasyMock.replay(invocation);
+    ActionInvocation invocation = createStrictMock(ActionInvocation.class);
+    expect(invocation.action()).andReturn(action);
+    replay(invocation);
 
-    ActionInvocationStore actionInvocationStore = EasyMock.createStrictMock(ActionInvocationStore.class);
-    EasyMock.expect(actionInvocationStore.getCurrent()).andReturn(invocation);
-    EasyMock.replay(actionInvocationStore);
+    ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
+    expect(actionInvocationStore.getCurrent()).andReturn(invocation);
+    replay(actionInvocationStore);
 
-    WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);
+    WorkflowChain chain = createStrictMock(WorkflowChain.class);
     chain.continueWorkflow();
-    EasyMock.replay(chain);
+    replay(chain);
 
-    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, null, messageProvider, expressionEvaluator, config);
+    MessageStore messageStore = createStrictMock(MessageStore.class);
+    replay(messageStore);
+
+    MessageProvider provider = createStrictMock(MessageProvider.class);
+    replay(provider);
+
+    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
+      new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
+      new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 
-    EasyMock.verify(request, config, chain, actionInvocationStore, invocation, expressionEvaluator);
+    verify(request, config, chain, actionInvocationStore, invocation, expressionEvaluator, messageStore, provider);
   }
 
   @Test
@@ -457,42 +489,49 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
     Map<String, List<FileInfo>> files = new HashMap<String, List<FileInfo>>();
     files.put("userfile", new ArrayList<FileInfo>(asList(new FileInfo(new java.io.File("src/java/test/unit/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain"))));
 
-    HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-    EasyMock.expect(request.getParameterMap()).andReturn(new HashMap());
-    EasyMock.expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(files);
-    EasyMock.replay(request);
+    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
+    expect(request.getParameterMap()).andReturn(new HashMap());
+    expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(files);
+    replay(request);
 
-    PrimeMVCConfiguration config = EasyMock.createStrictMock(PrimeMVCConfiguration.class);
-    EasyMock.expect(config.fileUploadAllowedTypes()).andReturn(new String[0]);
-    EasyMock.expect(config.fileUploadMaxSize()).andReturn(1l);
-    EasyMock.replay(config);
+    PrimeMVCConfiguration config = createStrictMock(PrimeMVCConfiguration.class);
+    expect(config.fileUploadAllowedTypes()).andReturn(new String[0]);
+    expect(config.fileUploadMaxSize()).andReturn(1l);
+    replay(config);
 
     Object action = new Object();
-    ExpressionEvaluator expressionEvaluator = EasyMock.createStrictMock(ExpressionEvaluator.class);
-    EasyMock.expect(expressionEvaluator.getAnnotation(FileUpload.class, "userfile", action)).andReturn(null);
-    EasyMock.replay(expressionEvaluator);
+    ExpressionEvaluator expressionEvaluator = createStrictMock(ExpressionEvaluator.class);
+    expect(expressionEvaluator.getAnnotation(FileUpload.class, "userfile", action)).andReturn(null);
+    replay(expressionEvaluator);
 
-    ActionInvocation invocation = EasyMock.createStrictMock(ActionInvocation.class);
-    EasyMock.expect(invocation.action()).andReturn(action);
-    EasyMock.expect(invocation.actionURI()).andReturn("/test");
-    EasyMock.replay(invocation);
+    ActionInvocation invocation = createStrictMock(ActionInvocation.class);
+    expect(invocation.action()).andReturn(action);
+    expect(invocation.actionURI()).andReturn("/test");
+    replay(invocation);
 
-    ActionInvocationStore actionInvocationStore = EasyMock.createStrictMock(ActionInvocationStore.class);
-    EasyMock.expect(actionInvocationStore.getCurrent()).andReturn(invocation);
-    EasyMock.replay(actionInvocationStore);
+    ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
+    expect(actionInvocationStore.getCurrent()).andReturn(invocation);
+    replay(actionInvocationStore);
 
-    MessageStore messageStore = EasyMock.createStrictMock(MessageStore.class);
-    messageStore.addFileUploadSizeError("userfile", "/test", 5);
-    EasyMock.replay(messageStore);
-
-    WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);
+    WorkflowChain chain = createStrictMock(WorkflowChain.class);
     chain.continueWorkflow();
-    EasyMock.replay(chain);
+    replay(chain);
 
-    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, messageStore, messageProvider, expressionEvaluator, config);
+    FieldMessage message = new SimpleFieldMessage("foo", "bar");
+    MessageProvider provider = createStrictMock(MessageProvider.class);
+    expect(provider.getFieldMessage(eq("userfile"), eq("userfile.fileUploadSizeError"), aryEq(ArrayUtils.toArray("1")))).andReturn(message);
+    replay(provider);
+
+    MessageStore messageStore = createStrictMock(MessageStore.class);
+    messageStore.add(message);
+    replay(messageStore);
+
+    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
+      new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
+      new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 
-    EasyMock.verify(request, config, chain, actionInvocationStore, invocation, expressionEvaluator, messageStore);
+    verify(request, config, chain, actionInvocationStore, invocation, expressionEvaluator, messageStore, provider);
   }
 
   @Test
@@ -500,42 +539,49 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
     Map<String, List<FileInfo>> files = new HashMap<String, List<FileInfo>>();
     files.put("userfile", new ArrayList<FileInfo>(asList(new FileInfo(new java.io.File("src/java/test/unit/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain"))));
 
-    HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-    EasyMock.expect(request.getParameterMap()).andReturn(new HashMap());
-    EasyMock.expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(files);
-    EasyMock.replay(request);
+    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
+    expect(request.getParameterMap()).andReturn(new HashMap());
+    expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(files);
+    replay(request);
 
-    PrimeMVCConfiguration config = EasyMock.createStrictMock(PrimeMVCConfiguration.class);
-    EasyMock.expect(config.fileUploadAllowedTypes()).andReturn(new String[]{"test/xml"});
-    EasyMock.expect(config.fileUploadMaxSize()).andReturn(10l);
-    EasyMock.replay(config);
+    PrimeMVCConfiguration config = createStrictMock(PrimeMVCConfiguration.class);
+    expect(config.fileUploadAllowedTypes()).andReturn(new String[]{"test/xml"});
+    expect(config.fileUploadMaxSize()).andReturn(10l);
+    replay(config);
 
     Object action = new Object();
-    ExpressionEvaluator expressionEvaluator = EasyMock.createStrictMock(ExpressionEvaluator.class);
-    EasyMock.expect(expressionEvaluator.getAnnotation(FileUpload.class, "userfile", action)).andReturn(null);
-    EasyMock.replay(expressionEvaluator);
+    ExpressionEvaluator expressionEvaluator = createStrictMock(ExpressionEvaluator.class);
+    expect(expressionEvaluator.getAnnotation(FileUpload.class, "userfile", action)).andReturn(null);
+    replay(expressionEvaluator);
 
-    ActionInvocation invocation = EasyMock.createStrictMock(ActionInvocation.class);
-    EasyMock.expect(invocation.action()).andReturn(action);
-    EasyMock.expect(invocation.actionURI()).andReturn("/test");
-    EasyMock.replay(invocation);
+    ActionInvocation invocation = createStrictMock(ActionInvocation.class);
+    expect(invocation.action()).andReturn(action);
+    expect(invocation.actionURI()).andReturn("/test");
+    replay(invocation);
 
-    ActionInvocationStore actionInvocationStore = EasyMock.createStrictMock(ActionInvocationStore.class);
-    EasyMock.expect(actionInvocationStore.getCurrent()).andReturn(invocation);
-    EasyMock.replay(actionInvocationStore);
+    ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
+    expect(actionInvocationStore.getCurrent()).andReturn(invocation);
+    replay(actionInvocationStore);
 
-    MessageStore messageStore = EasyMock.createStrictMock(MessageStore.class);
-    messageStore.addFileUploadContentTypeError("userfile", "/test", "text/plain");
-    EasyMock.replay(messageStore);
-
-    WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);
+    WorkflowChain chain = createStrictMock(WorkflowChain.class);
     chain.continueWorkflow();
-    EasyMock.replay(chain);
+    replay(chain);
 
-    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, messageStore, messageProvider, expressionEvaluator, config);
+    FieldMessage message = new SimpleFieldMessage("foo", "bar");
+    MessageProvider provider = createStrictMock(MessageProvider.class);
+    expect(provider.getFieldMessage(eq("userfile"), eq("userfile.fileUploadContentTypeError"), aryEq(ArrayUtils.toArray("text/plain")))).andReturn(message);
+    replay(provider);
+
+    MessageStore messageStore = createStrictMock(MessageStore.class);
+    messageStore.add(message);
+    replay(messageStore);
+
+    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
+      new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
+      new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 
-    EasyMock.verify(request, config, chain, actionInvocationStore, invocation, expressionEvaluator, messageStore);
+    verify(request, config, chain, actionInvocationStore, invocation, expressionEvaluator, messageStore, provider);
   }
 
   @Test
@@ -543,19 +589,19 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
     Map<String, List<FileInfo>> files = new HashMap<String, List<FileInfo>>();
     files.put("userfile", new ArrayList<FileInfo>(asList(new FileInfo(new java.io.File("src/java/test/unit/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain"))));
 
-    HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-    EasyMock.expect(request.getParameterMap()).andReturn(new HashMap());
-    EasyMock.expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(files);
-    EasyMock.replay(request);
+    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
+    expect(request.getParameterMap()).andReturn(new HashMap());
+    expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(files);
+    replay(request);
 
-    PrimeMVCConfiguration config = EasyMock.createStrictMock(PrimeMVCConfiguration.class);
-    EasyMock.expect(config.fileUploadAllowedTypes()).andReturn(new String[0]);
-    EasyMock.expect(config.fileUploadMaxSize()).andReturn(1024000l);
-    EasyMock.replay(config);
+    PrimeMVCConfiguration config = createStrictMock(PrimeMVCConfiguration.class);
+    expect(config.fileUploadAllowedTypes()).andReturn(new String[0]);
+    expect(config.fileUploadMaxSize()).andReturn(1024000l);
+    replay(config);
 
     Object action = new Object();
-    ExpressionEvaluator expressionEvaluator = EasyMock.createStrictMock(ExpressionEvaluator.class);
-    EasyMock.expect(expressionEvaluator.getAnnotation(FileUpload.class, "userfile", action)).andReturn(new FileUpload() {
+    ExpressionEvaluator expressionEvaluator = createStrictMock(ExpressionEvaluator.class);
+    expect(expressionEvaluator.getAnnotation(FileUpload.class, "userfile", action)).andReturn(new FileUpload() {
       public long maxSize() {
         return 1;
       }
@@ -568,29 +614,36 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
         return FileUpload.class;
       }
     });
-    EasyMock.replay(expressionEvaluator);
+    replay(expressionEvaluator);
 
-    ActionInvocation invocation = EasyMock.createStrictMock(ActionInvocation.class);
-    EasyMock.expect(invocation.action()).andReturn(action);
-    EasyMock.expect(invocation.actionURI()).andReturn("/test");
-    EasyMock.replay(invocation);
+    ActionInvocation invocation = createStrictMock(ActionInvocation.class);
+    expect(invocation.action()).andReturn(action);
+    expect(invocation.actionURI()).andReturn("/test");
+    replay(invocation);
 
-    ActionInvocationStore actionInvocationStore = EasyMock.createStrictMock(ActionInvocationStore.class);
-    EasyMock.expect(actionInvocationStore.getCurrent()).andReturn(invocation);
-    EasyMock.replay(actionInvocationStore);
+    ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
+    expect(actionInvocationStore.getCurrent()).andReturn(invocation);
+    replay(actionInvocationStore);
 
-    MessageStore messageStore = EasyMock.createStrictMock(MessageStore.class);
-    messageStore.addFileUploadSizeError("userfile", "/test", 5);
-    EasyMock.replay(messageStore);
-
-    WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);
+    WorkflowChain chain = createStrictMock(WorkflowChain.class);
     chain.continueWorkflow();
-    EasyMock.replay(chain);
+    replay(chain);
 
-    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, messageStore, messageProvider, expressionEvaluator, config);
+    FieldMessage message = new SimpleFieldMessage("foo", "bar");
+    MessageProvider provider = createStrictMock(MessageProvider.class);
+    expect(provider.getFieldMessage(eq("userfile"), eq("userfile.fileUploadSizeError"), aryEq(ArrayUtils.toArray("1")))).andReturn(message);
+    replay(provider);
+
+    MessageStore messageStore = createStrictMock(MessageStore.class);
+    messageStore.add(message);
+    replay(messageStore);
+
+    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
+      new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
+      new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 
-    EasyMock.verify(request, config, chain, actionInvocationStore, invocation, expressionEvaluator, messageStore);
+    verify(request, config, chain, actionInvocationStore, invocation, expressionEvaluator, messageStore, provider);
   }
 
   @Test
@@ -598,19 +651,19 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
     Map<String, List<FileInfo>> files = new HashMap<String, List<FileInfo>>();
     files.put("userfile", new ArrayList<FileInfo>(asList(new FileInfo(new java.io.File("src/java/test/unit/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain"))));
 
-    HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-    EasyMock.expect(request.getParameterMap()).andReturn(new HashMap());
-    EasyMock.expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(files);
-    EasyMock.replay(request);
+    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
+    expect(request.getParameterMap()).andReturn(new HashMap());
+    expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(files);
+    replay(request);
 
-    PrimeMVCConfiguration config = EasyMock.createStrictMock(PrimeMVCConfiguration.class);
-    EasyMock.expect(config.fileUploadAllowedTypes()).andReturn(new String[0]);
-    EasyMock.expect(config.fileUploadMaxSize()).andReturn(1024000l);
-    EasyMock.replay(config);
+    PrimeMVCConfiguration config = createStrictMock(PrimeMVCConfiguration.class);
+    expect(config.fileUploadAllowedTypes()).andReturn(new String[0]);
+    expect(config.fileUploadMaxSize()).andReturn(1024000l);
+    replay(config);
 
     Object action = new Object();
-    ExpressionEvaluator expressionEvaluator = EasyMock.createStrictMock(ExpressionEvaluator.class);
-    EasyMock.expect(expressionEvaluator.getAnnotation(FileUpload.class, "userfile", action)).andReturn(new FileUpload() {
+    ExpressionEvaluator expressionEvaluator = createStrictMock(ExpressionEvaluator.class);
+    expect(expressionEvaluator.getAnnotation(FileUpload.class, "userfile", action)).andReturn(new FileUpload() {
       public long maxSize() {
         return 10;
       }
@@ -623,33 +676,40 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
         return FileUpload.class;
       }
     });
-    EasyMock.replay(expressionEvaluator);
+    replay(expressionEvaluator);
 
-    ActionInvocation invocation = EasyMock.createStrictMock(ActionInvocation.class);
-    EasyMock.expect(invocation.action()).andReturn(action);
-    EasyMock.expect(invocation.actionURI()).andReturn("/test");
-    EasyMock.replay(invocation);
+    ActionInvocation invocation = createStrictMock(ActionInvocation.class);
+    expect(invocation.action()).andReturn(action);
+    expect(invocation.actionURI()).andReturn("/test");
+    replay(invocation);
 
-    ActionInvocationStore actionInvocationStore = EasyMock.createStrictMock(ActionInvocationStore.class);
-    EasyMock.expect(actionInvocationStore.getCurrent()).andReturn(invocation);
-    EasyMock.replay(actionInvocationStore);
+    ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
+    expect(actionInvocationStore.getCurrent()).andReturn(invocation);
+    replay(actionInvocationStore);
 
-    MessageStore messageStore = EasyMock.createStrictMock(MessageStore.class);
-    messageStore.addFileUploadContentTypeError("userfile", "/test", "text/plain");
-    EasyMock.replay(messageStore);
-
-    WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);
+    WorkflowChain chain = createStrictMock(WorkflowChain.class);
     chain.continueWorkflow();
-    EasyMock.replay(chain);
+    replay(chain);
 
-    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(request, actionInvocationStore, messageStore, messageProvider, expressionEvaluator, config);
+    FieldMessage message = new SimpleFieldMessage("foo", "bar");
+    MessageProvider provider = createStrictMock(MessageProvider.class);
+    expect(provider.getFieldMessage(eq("userfile"), eq("userfile.fileUploadContentTypeError"), aryEq(ArrayUtils.toArray("text/plain")))).andReturn(message);
+    replay(provider);
+
+    MessageStore messageStore = createStrictMock(MessageStore.class);
+    messageStore.add(message);
+    replay(messageStore);
+
+    DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
+      new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
+      new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 
-    EasyMock.verify(request, config, chain, actionInvocationStore, invocation, expressionEvaluator, messageStore);
+    verify(request, config, chain, actionInvocationStore, invocation, expressionEvaluator, messageStore, provider);
   }
 
   @SuppressWarnings("unchecked")
-  public <T> T capture() {
+  public <T> T assertFile() {
     reportMatcher(new IArgumentMatcher() {
       public boolean matches(Object argument) {
         List<FileInfo> list = (List<FileInfo>) argument;
@@ -659,7 +719,7 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
         assertEquals("text/plain", list.get(0).contentType);
         assertEquals("test-file-upload.txt", list.get(0).name);
         try {
-          assertEquals("1234\n", FileTools.read(list.get(0).file).toString());
+          assertEquals("1234\n", FileUtils.readFileToString(list.get(0).file));
         } catch (IOException e) {
           throw new RuntimeException(e);
         }
@@ -687,8 +747,8 @@ public class DefaultParameterWorkflowTest extends JCatapultBaseTest {
         assertEquals("test-file-upload.txt", list.get(0).name);
         assertEquals("test-file-upload2.txt", list.get(1).name);
         try {
-          assertEquals("1234\n", FileTools.read(list.get(0).file).toString());
-          assertEquals("1234\n", FileTools.read(list.get(1).file).toString());
+          assertEquals("1234\n", FileUtils.readFileToString(list.get(0).file));
+          assertEquals("1234\n", FileUtils.readFileToString(list.get(1).file));
         } catch (IOException e) {
           throw new RuntimeException(e);
         }

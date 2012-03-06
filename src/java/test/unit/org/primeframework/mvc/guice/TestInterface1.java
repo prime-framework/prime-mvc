@@ -16,7 +16,7 @@
 package org.primeframework.mvc.guice;
 
 /**
- * <p> This interface is a simple test interface with no default implementation. </p>
+ * This interface is a simple test interface with no default implementation.
  *
  * @author Brian Pontarelli
  */

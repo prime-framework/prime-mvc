@@ -17,15 +17,14 @@ package org.primeframework.mvc.parameter.el;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.Map;
 
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
 
-import static net.java.lang.ObjectTools.*;
-
 /**
- * This class models a collection accessor during expression evaluation.
+ * This class models a Map accessor during expression evaluation.
  *
  * @author Brian Pontarelli
  */
@@ -67,19 +66,16 @@ public class MapAccessor extends Accessor {
   }
 
   public Object get(Context context) {
-    try {
-      return getValueFromCollection(this.object, key);
-    } catch (IndexOutOfBoundsException e) {
-      return null;
-    }
+    return ((Map) this.object).get(key);
   }
 
   public void set(String[] values, Context context) {
     set(convert(context, memberAccessor.field, values), context);
   }
 
+  @SuppressWarnings("unchecked")
   public void set(Object value, Context context) {
-    setValueIntoCollection(object, key, value);
+    ((Map) this.object).put(key, value);
   }
 
   /**

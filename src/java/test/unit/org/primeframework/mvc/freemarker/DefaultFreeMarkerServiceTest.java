@@ -29,13 +29,13 @@ import freemarker.ext.beans.BeansWrapper;
 import static org.testng.Assert.*;
 
 /**
- * <p> This class test the default free marker service. </p>
+ * This class test the default free marker service.
  *
  * @author Brian Pontarelli
  */
 public class DefaultFreeMarkerServiceTest {
   @Test
-  public void testUse() {
+  public void use() {
     PrimeMVCConfiguration config = EasyMock.createStrictMock(PrimeMVCConfiguration.class);
     EasyMock.expect(config.freemarkerCheckSeconds()).andReturn(2);
     EasyMock.replay(config);

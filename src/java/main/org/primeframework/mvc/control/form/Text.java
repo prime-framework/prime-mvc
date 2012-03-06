@@ -45,6 +45,11 @@ public class Text extends AbstractValueInput {
     super(expressionEvaluator, true);
   }
 
+  @Override
+  public String getName() {
+    return "text";
+  }
+
   /**
    * @return text.ftl
    */

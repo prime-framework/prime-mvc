@@ -22,8 +22,6 @@ import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.convert.annotation.GlobalConverter;
 
-import net.java.lang.StringTools;
-
 import com.google.inject.Inject;
 
 /**
@@ -47,8 +45,7 @@ public class BooleanConverter extends AbstractPrimitiveConverter {
   }
 
   /**
-   * Uses Boolean.valueOf. Throws an exception if the String is not a valid boolean as dictated by the {@link
-   * StringTools#isValidBoolean(String)} method.
+   * Uses Boolean.valueOf.
    */
   protected Object stringToPrimitive(String value, Class convertTo, Map<String, String> attributes)
     throws ConversionException, ConverterStateException {

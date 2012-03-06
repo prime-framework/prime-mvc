@@ -19,6 +19,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import org.primeframework.mvc.ErrorException;
+
 /**
  * This class provides some helpers for common tasks regarding methods.
  *
@@ -59,21 +61,27 @@ public class MethodTools {
    *
    * @param method The method to invoke.
    * @param obj    The object to invoke the methods on.
+   * @param params The parameters passed to the method.
    * @return The return from the method invocation.
    */
   @SuppressWarnings("unchecked")
-  public static <T> T invoke(Method method, Object obj) {
+  public static <T> T invoke(Method method, Object obj, Object... params) {
     try {
-      return (T) method.invoke(obj);
+      return (T) method.invoke(obj, params);
     } catch (IllegalAccessException e) {
-      throw new RuntimeException("Unable to call method [" + method + "] because it isn't accessible", e);
+      throw new ErrorException("Unable to call method [" + method + "] because it isn't accessible", e);
+    } catch (IllegalArgumentException e) {
+      throw new ErrorException("Unable to call method [" + method + "] because the incorrect parameters were passed to it", e);
     } catch (InvocationTargetException e) {
       Throwable target = e.getTargetException();
       if (target instanceof RuntimeException) {
         throw (RuntimeException) target;
       }
+      if (target instanceof Error) {
+        throw (Error) target;
+      }
 
-      throw new RuntimeException("Unable to call method [" + method + "]", e);
+      throw new ErrorException("Unable to call method [" + method + "]", e);
     }
   }
 }

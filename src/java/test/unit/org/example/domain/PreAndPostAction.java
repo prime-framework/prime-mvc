@@ -22,7 +22,7 @@ import org.primeframework.mvc.parameter.annotation.PreParameterMethod;
 import static org.testng.Assert.*;
 
 /**
- * <p> This class hs pre and post handling in it. </p>
+ * This class hs pre and post handling in it.
  *
  * @author Brian Pontarelli
  */

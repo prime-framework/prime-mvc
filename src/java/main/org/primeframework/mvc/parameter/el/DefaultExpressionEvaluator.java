@@ -16,7 +16,9 @@
 package org.primeframework.mvc.parameter.el;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -27,15 +29,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 
+import org.apache.commons.lang3.text.StrLookup;
+import org.apache.commons.lang3.text.StrSubstitutor;
 import org.primeframework.mvc.locale.annotation.CurrentLocale;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
-
-import net.java.variable.ExpanderException;
-import net.java.variable.ExpanderStrategy;
-import net.java.variable.VariableExpander;
 
 import com.google.inject.Inject;
 
@@ -172,13 +172,22 @@ public class DefaultExpressionEvaluator implements ExpressionEvaluator {
   /**
    * {@inheritDoc}
    */
-  public String expand(String str, final Object object, boolean encode)
+  public String expand(final String str, final Object object, final boolean encode)
     throws ExpressionException {
-    return VariableExpander.expand(str, new ExpanderStrategy() {
-      public String expand(String variableName) throws ExpanderException {
-        return getValue(variableName, object, new HashMap<String, String>());
+    return new StrSubstitutor(new StrLookup<String>() {
+      public String lookup(String name) {
+        String value = getValue(name, object, new HashMap<String, String>());
+        if (encode) {
+          try {
+            value = URLEncoder.encode(value, "UTF-8");
+          } catch (UnsupportedEncodingException e) {
+            // Impossible
+          }
+        }
+        
+        return value;
       }
-    });
+    }).replace(str);
   }
 
   /**

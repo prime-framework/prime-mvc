@@ -116,7 +116,7 @@ public class DefaultActionMapper implements ActionMapper {
         }
       }
 
-      if (!good) {
+      if (!good || extension.contains("/")) {
         extension = null;
       }
     }

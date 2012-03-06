@@ -31,19 +31,13 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
 /**
- * <p> This tests the static resource workflow. </p>
+ * This tests the static resource workflow.
  *
  * @author Brian Pontarelli
  */
 public class StaticResourceWorkflowTest {
-  /**
-   * Tests that a new request returns the byte stream.
-   *
-   * @throws IOException      Never.
-   * @throws ServletException Never.
-   */
   @Test
-  public void testNewRequest() throws IOException, ServletException {
+  public void newRequest() throws IOException, ServletException {
     PrimeMVCConfiguration configuration = makeConfiguration();
 
     ServletContext context = EasyMock.createStrictMock(ServletContext.class);
@@ -83,14 +77,8 @@ public class StaticResourceWorkflowTest {
     assertEquals("Test\n", build.toString());
   }
 
-  /**
-   * Tests that a new request with a context path returns the byte stream.
-   *
-   * @throws IOException      Never.
-   * @throws ServletException Never.
-   */
   @Test
-  public void testNewRequestContext() throws IOException, ServletException {
+  public void newRequestContext() throws IOException, ServletException {
     PrimeMVCConfiguration configuration = makeConfiguration();
 
     ServletContext context = EasyMock.createStrictMock(ServletContext.class);
@@ -130,14 +118,8 @@ public class StaticResourceWorkflowTest {
     assertEquals("Test\n", build.toString());
   }
 
-  /**
-   * Tests that a cache request returns never expire.
-   *
-   * @throws IOException      Never.
-   * @throws ServletException Never.
-   */
   @Test
-  public void testCacheRequest() throws IOException, ServletException {
+  public void cacheRequest() throws IOException, ServletException {
     PrimeMVCConfiguration configuration = makeConfiguration();
 
     ServletContext context = EasyMock.createStrictMock(ServletContext.class);
@@ -163,14 +145,8 @@ public class StaticResourceWorkflowTest {
     EasyMock.verify(configuration, req, res, wc);
   }
 
-  /**
-   * Tests that a bad request returns 404.
-   *
-   * @throws IOException      Never.
-   * @throws ServletException Never.
-   */
   @Test
-  public void testBadRequest() throws IOException, ServletException {
+  public void badRequest() throws IOException, ServletException {
     PrimeMVCConfiguration configuration = makeConfiguration();
 
     ServletContext context = EasyMock.createStrictMock(ServletContext.class);
@@ -195,14 +171,8 @@ public class StaticResourceWorkflowTest {
     EasyMock.verify(configuration, req, res, wc);
   }
 
-  /**
-   * Tests that a normal request goes through to the chain.
-   *
-   * @throws IOException      Never.
-   * @throws ServletException Never.
-   */
   @Test
-  public void testNormal() throws IOException, ServletException {
+  public void normal() throws IOException, ServletException {
     PrimeMVCConfiguration configuration = makeConfiguration();
 
     ServletContext context = EasyMock.createStrictMock(ServletContext.class);

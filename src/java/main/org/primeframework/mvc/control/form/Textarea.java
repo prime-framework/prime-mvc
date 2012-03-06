@@ -49,6 +49,11 @@ public class Textarea extends AbstractInput {
     this.expressionEvaluator = expressionEvaluator;
   }
 
+  @Override
+  public String getName() {
+    return "textarea";
+  }
+
   /**
    * Adds a String attribute named <strong>value</strong> by pulling the value associated with the control. However, if
    * there is already a value attribute, it is always used. Likewise, if the value attribute is missing, the value

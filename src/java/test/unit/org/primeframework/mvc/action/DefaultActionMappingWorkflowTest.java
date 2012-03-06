@@ -25,24 +25,25 @@ import org.easymock.EasyMock;
 import org.example.action.ComplexRest;
 import org.example.action.user.Edit;
 import org.example.action.user.RESTEdit;
+import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.config.ActionConfigurationProvider;
 import org.primeframework.mvc.action.config.DefaultActionConfiguration;
 import org.primeframework.mvc.workflow.WorkflowChain;
-import org.primeframework.mvc.test.JCatapultBaseTest;
 import org.testng.annotations.Test;
 
+import com.google.inject.Injector;
 import static java.util.Arrays.*;
 import static org.easymock.EasyMock.capture;
 import static org.testng.Assert.*;
 
 /**
- * <p> This class tests the default action mapping workflow. </p>
+ * This class tests the default action mapping workflow.
  *
  * @author Brian Pontarelli
  */
-public class DefaultActionMappingWorkflowTest extends JCatapultBaseTest {
+public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
   @Test
-  public void testDifferentButtonClick() throws IOException, ServletException {
+  public void differentButtonClick() throws IOException, ServletException {
     request.setUri("/admin/user/edit");
     request.setPost(true);
     request.setParameter("__a_submit", "");
@@ -53,7 +54,7 @@ public class DefaultActionMappingWorkflowTest extends JCatapultBaseTest {
   }
 
   @Test
-  public void testDifferentButtonClickRelativeURI() throws IOException, ServletException {
+  public void differentButtonClickRelativeURI() throws IOException, ServletException {
     request.setUri("/admin/user/edit");
     request.setPost(true);
     request.setParameter("__a_submit", "");
@@ -64,7 +65,7 @@ public class DefaultActionMappingWorkflowTest extends JCatapultBaseTest {
   }
 
   @Test
-  public void testRequestURI() throws IOException, ServletException {
+  public void requestURI() throws IOException, ServletException {
     request.setUri("/admin/user/edit");
     request.setPost(true);
     request.setParameter("__a_submit", "");
@@ -75,7 +76,7 @@ public class DefaultActionMappingWorkflowTest extends JCatapultBaseTest {
   }
 
   @Test
-  public void testRequestURIContext() throws IOException, ServletException {
+  public void requestURIContext() throws IOException, ServletException {
     request.setUri("/context-path/admin/user/edit");
     request.setContextPath("/context-path");
     request.setPost(true);
@@ -87,7 +88,7 @@ public class DefaultActionMappingWorkflowTest extends JCatapultBaseTest {
   }
 
   @Test
-  public void testExtension() throws IOException, ServletException {
+  public void extension() throws IOException, ServletException {
     request.setUri("/admin/user/edit.xml");
     request.setPost(true);
     request.setParameter("__a_submit", "");
@@ -98,7 +99,7 @@ public class DefaultActionMappingWorkflowTest extends JCatapultBaseTest {
   }
 
   @Test
-  public void testURIParameters() throws IOException, ServletException {
+  public void uriParameters() throws IOException, ServletException {
     request.setUri("/admin/user/rest-edit/12");
     request.setPost(true);
     request.setParameter("__a_submit", "");
@@ -117,15 +118,15 @@ public class DefaultActionMappingWorkflowTest extends JCatapultBaseTest {
     store.removeCurrent();
     EasyMock.replay(store);
 
-    ObjectFactory factory = EasyMock.createStrictMock(ObjectFactory.class);
-    EasyMock.expect(factory.create(RESTEdit.class)).andReturn(new RESTEdit());
-    EasyMock.replay(factory);
+    Injector injector = EasyMock.createStrictMock(Injector.class);
+    EasyMock.expect(injector.getInstance(RESTEdit.class)).andReturn(new RESTEdit());
+    EasyMock.replay(injector);
 
     WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);
     chain.continueWorkflow();
     EasyMock.replay(chain);
 
-    DefaultActionMappingWorkflow workflow = new DefaultActionMappingWorkflow(request, response, store, new DefaultActionMapper(provider, factory));
+    DefaultActionMappingWorkflow workflow = new DefaultActionMappingWorkflow(request, response, store, new DefaultActionMapper(provider, injector));
     workflow.perform(chain);
 
     ActionInvocation ai = capture.getValue();
@@ -133,14 +134,13 @@ public class DefaultActionMappingWorkflowTest extends JCatapultBaseTest {
     assertCollections(asList("12"), ai.uriParameters());
     assertNull(ai.extension());
     assertNotNull(ai.configuration());
-    assertTrue(ai.executeAction());
     assertTrue(ai.executeResult());
 
-    EasyMock.verify(provider, store, factory, chain);
+    EasyMock.verify(provider, store, injector, chain);
   }
 
   @Test
-  public void testURIParametersComplexWithWildcard() throws IOException, ServletException {
+  public void uirParametersComplexWithWildcard() throws IOException, ServletException {
     request.setUri("/complex-rest/brian/static/pontarelli/then/a/bunch/of/stuff");
     request.setPost(true);
     request.setParameter("__a_submit", "");
@@ -166,15 +166,15 @@ public class DefaultActionMappingWorkflowTest extends JCatapultBaseTest {
     store.removeCurrent();
     EasyMock.replay(store);
 
-    ObjectFactory factory = EasyMock.createStrictMock(ObjectFactory.class);
-    EasyMock.expect(factory.create(ComplexRest.class)).andReturn(new ComplexRest());
-    EasyMock.replay(factory);
+    Injector injector = EasyMock.createStrictMock(Injector.class);
+    EasyMock.expect(injector.getInstance(ComplexRest.class)).andReturn(new ComplexRest());
+    EasyMock.replay(injector);
 
     WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);
     chain.continueWorkflow();
     EasyMock.replay(chain);
 
-    DefaultActionMappingWorkflow workflow = new DefaultActionMappingWorkflow(request, response, store, new DefaultActionMapper(provider, factory));
+    DefaultActionMappingWorkflow workflow = new DefaultActionMappingWorkflow(request, response, store, new DefaultActionMapper(provider, injector));
     workflow.perform(chain);
 
     ActionInvocation ai = capture.getValue();
@@ -182,14 +182,13 @@ public class DefaultActionMappingWorkflowTest extends JCatapultBaseTest {
     assertCollections(asList("brian", "static", "pontarelli", "then", "a", "bunch", "of", "stuff"), ai.uriParameters());
     assertNull(ai.extension());
     assertNotNull(ai.configuration());
-    assertTrue(ai.executeAction());
     assertTrue(ai.executeResult());
 
-    EasyMock.verify(provider, store, factory, chain);
+    EasyMock.verify(provider, store, injector, chain);
   }
 
   @Test
-  public void testRedirectToIndex() throws IOException, ServletException {
+  public void redirectToIndex() throws IOException, ServletException {
     request.setUri("/foo");
     request.setPost(true);
     request.setParameter("__a_submit", "");
@@ -204,17 +203,17 @@ public class DefaultActionMappingWorkflowTest extends JCatapultBaseTest {
     ActionInvocationStore store = EasyMock.createStrictMock(ActionInvocationStore.class);
     EasyMock.replay(store);
 
-    ObjectFactory factory = EasyMock.createStrictMock(ObjectFactory.class);
-    EasyMock.replay(factory);
+    Injector injector = EasyMock.createStrictMock(Injector.class);
+    EasyMock.replay(injector);
 
     WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);
     EasyMock.replay(chain);
 
-    DefaultActionMappingWorkflow workflow = new DefaultActionMappingWorkflow(request, response, store, new DefaultActionMapper(provider, factory));
+    DefaultActionMappingWorkflow workflow = new DefaultActionMappingWorkflow(request, response, store, new DefaultActionMapper(provider, injector));
     workflow.perform(chain);
 
     assertEquals("/foo/", response.getRedirect());
-    EasyMock.verify(provider, store, factory, chain);
+    EasyMock.verify(provider, store, injector, chain);
   }
 
   private void run(String uri, String extension) throws IOException, ServletException {
@@ -228,25 +227,24 @@ public class DefaultActionMappingWorkflowTest extends JCatapultBaseTest {
     store.removeCurrent();
     EasyMock.replay(store);
 
-    ObjectFactory factory = EasyMock.createStrictMock(ObjectFactory.class);
-    EasyMock.expect(factory.create(Edit.class)).andReturn(new Edit());
-    EasyMock.replay(factory);
+    Injector injector = EasyMock.createStrictMock(Injector.class);
+    EasyMock.expect(injector.getInstance(Edit.class)).andReturn(new Edit());
+    EasyMock.replay(injector);
 
     WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);
     chain.continueWorkflow();
     EasyMock.replay(chain);
 
-    DefaultActionMappingWorkflow workflow = new DefaultActionMappingWorkflow(request, response, store, new DefaultActionMapper(provider, factory));
+    DefaultActionMappingWorkflow workflow = new DefaultActionMappingWorkflow(request, response, store, new DefaultActionMapper(provider, injector));
     workflow.perform(chain);
 
     ActionInvocation ai = capture.getValue();
     assertEquals(uri, ai.actionURI());
     assertEquals(extension, ai.extension());
     assertNotNull(ai.configuration());
-    assertTrue(ai.executeAction());
     assertTrue(ai.executeResult());
 
-    EasyMock.verify(provider, store, factory, chain);
+    EasyMock.verify(provider, store, injector, chain);
   }
 
   private void assertCollections(Collection<String> strings, Collection<String> strings1) {
