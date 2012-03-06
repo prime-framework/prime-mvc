@@ -181,13 +181,13 @@
       </library>
     </orderEntry>
     <orderEntry type="module-library">
-      <library name="freemarker-2.3.16.jar">
+      <library name="guice-multibindings-3.0.jar">
         <CLASSES>
-          <root url="jar://$SAVANT_REPOSITORY$/org/freemarker/freemarker/2.3.16/freemarker-2.3.16.jar!/" />
+          <root url="jar://$SAVANT_REPOSITORY$/com/google/inject/extensions/guice-multibindings/3.0/guice-multibindings-3.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$SAVANT_REPOSITORY$/org/freemarker/freemarker/2.3.16/freemarker-2.3.16-src.jar!/" />
+          <root url="jar://$SAVANT_REPOSITORY$/com/google/inject/extensions/guice-multibindings/3.0/guice-multibindings-3.0-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -214,35 +214,46 @@
       </library>
     </orderEntry>
     <orderEntry type="module-library">
-      <library name="guice-multibindings-3.0.jar">
+      <library name="freemarker-2.3.16.jar">
         <CLASSES>
-          <root url="jar://$SAVANT_REPOSITORY$/com/google/inject/extensions/guice-multibindings/3.0/guice-multibindings-3.0.jar!/" />
+          <root url="jar://$SAVANT_REPOSITORY$/org/freemarker/freemarker/2.3.16/freemarker-2.3.16.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$SAVANT_REPOSITORY$/com/google/inject/extensions/guice-multibindings/3.0/guice-multibindings-3.0-src.jar!/" />
+          <root url="jar://$SAVANT_REPOSITORY$/org/freemarker/freemarker/2.3.16/freemarker-2.3.16-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
-      <library name="hsqldb-1.8.9.jar">
+      <library name="hibernate-validator-4.2.0.jar">
         <CLASSES>
-          <root url="jar://$SAVANT_REPOSITORY$/org/hsqldb/hsqldb/1.8.9/hsqldb-1.8.9.jar!/" />
+          <root url="jar://$SAVANT_REPOSITORY$/org/hibernate/hibernate-validator/4.2.0/hibernate-validator-4.2.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$SAVANT_REPOSITORY$/org/hsqldb/hsqldb/1.8.9/hsqldb-1.8.9-src.jar!/" />
+          <root url="jar://$SAVANT_REPOSITORY$/org/hibernate/hibernate-validator/4.2.0/hibernate-validator-4.2.0-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
-      <library name="junit-4.4.jar">
+      <library name="validation-api-1.0.0.jar">
         <CLASSES>
-          <root url="jar://$SAVANT_REPOSITORY$/org/junit/junit/4.4/junit-4.4.jar!/" />
+          <root url="jar://$SAVANT_REPOSITORY$/javax/validation/validation-api/1.0.0/validation-api-1.0.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$SAVANT_REPOSITORY$/org/junit/junit/4.4/junit-4.4-src.jar!/" />
+          <root url="jar://$SAVANT_REPOSITORY$/javax/validation/validation-api/1.0.0/validation-api-1.0.0-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="slf4j-api-1.6.1.jar">
+        <CLASSES>
+          <root url="jar://$SAVANT_REPOSITORY$/org/slf4j/slf4j-api/1.6.1/slf4j-api-1.6.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$SAVANT_REPOSITORY$/org/slf4j/slf4j-api/1.6.1/slf4j-api-1.6.1-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>

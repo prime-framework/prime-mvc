@@ -29,33 +29,33 @@ import static org.easymock.EasyMock.*;
 public class DefaultValidationWorkflowTest extends PrimeBaseTest {
   @Test
   public void success() throws Exception {
-    Validator validator = createStrictMock(Validator.class);
-    validator.validate();
-    replay(validator);
+    ValidationProcessor validationProcessor = createStrictMock(ValidationProcessor.class);
+    validationProcessor.validate();
+    replay(validationProcessor);
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
     chain.continueWorkflow();
     replay(chain);
 
-    DefaultValidationWorkflow workflow = new DefaultValidationWorkflow(validator);
+    DefaultValidationWorkflow workflow = new DefaultValidationWorkflow(validationProcessor);
     workflow.perform(chain);
     
-    verify(validator, chain);
+    verify(validationProcessor, chain);
   }
 
   @Test
   public void failure() throws Exception {
-    Validator validator = createStrictMock(Validator.class);
-    validator.validate();
+    ValidationProcessor validationProcessor = createStrictMock(ValidationProcessor.class);
+    validationProcessor.validate();
     expectLastCall().andThrow(new ValidationException());
-    replay(validator);
+    replay(validationProcessor);
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
     replay(chain);
 
-    DefaultValidationWorkflow workflow = new DefaultValidationWorkflow(validator);
+    DefaultValidationWorkflow workflow = new DefaultValidationWorkflow(validationProcessor);
     workflow.perform(chain);
 
-    verify(validator, chain);
+    verify(validationProcessor, chain);
   }
 }

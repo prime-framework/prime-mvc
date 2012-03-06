@@ -28,22 +28,22 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 public class DefaultValidationWorkflow implements ValidationWorkflow {
-  private final Validator validator;
+  private final ValidationProcessor validationProcessor;
 
   @Inject
-  public DefaultValidationWorkflow(Validator validator) {
-    this.validator = validator;
+  public DefaultValidationWorkflow(ValidationProcessor validationProcessor) {
+    this.validationProcessor = validationProcessor;
   }
 
   /**
-   * Invokes the validator.
+   * Invokes the validationProcessor.
    *
    * @param chain The chain.
    * @throws IOException      If the chain throws.
    * @throws ServletException If the chain throws.
    */
   public void perform(WorkflowChain chain) throws IOException, ServletException {
-    validator.validate();
+    validationProcessor.validate();
     chain.continueWorkflow();
   }
 }

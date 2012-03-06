@@ -15,12 +15,17 @@
  */
 package org.primeframework.mvc.validation;
 
+import org.primeframework.mvc.validation.jsr303.JSRValidationProcessor;
+
+import com.google.inject.ImplementedBy;
+
 /**
  * This interface defines how Prime handles validation.
  *
  * @author Brian Pontarelli
  */
-public interface Validator {
+@ImplementedBy(JSRValidationProcessor.class)
+public interface ValidationProcessor {
   /**
    * Validates the request and if validation fails throws a ValidationException.
    *
