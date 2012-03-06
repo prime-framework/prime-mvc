@@ -76,41 +76,45 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
    */
   @SuppressWarnings("unchecked")
   public void perform(WorkflowChain chain) throws IOException, ServletException {
-    ActionInvocation invocation = actionInvocationStore.getCurrent();
-    if (invocation.executeResult()) {
-      ResultInvocation resultInvocation;
-      if (invocation.action() == null) {
-        // Try a default result mapping just for the URI
-        resultInvocation = resultInvocationProvider.lookup();
-        if (resultInvocation == null) {
-          chain.continueWorkflow();
-          return;
-        }
-      } else {
-        String resultCode = resultStore.get();
-        resultInvocation = resultInvocationProvider.lookup(resultCode);
-        if (resultInvocation == null) {
-          response.setStatus(404);
-          if (invocation.configuration() != null) {
-            throw new ServletException("Missing result for action class [" +
-              invocation.configuration().actionClass() + "] URI [" + invocation.actionURI() +
-              "] and result code [" + resultCode + "]");
-          } else {
-            throw new ServletException("Missing result for actionless URI [" + invocation.actionURI() +
-              "] and result code [" + resultCode + "]");
+    try {
+      ActionInvocation invocation = actionInvocationStore.getCurrent();
+      if (invocation.executeResult()) {
+        ResultInvocation resultInvocation;
+        if (invocation.action() == null) {
+          // Try a default result mapping just for the URI
+          resultInvocation = resultInvocationProvider.lookup();
+          if (resultInvocation == null) {
+            chain.continueWorkflow();
+            return;
+          }
+        } else {
+          String resultCode = resultStore.get();
+          resultInvocation = resultInvocationProvider.lookup(resultCode);
+          if (resultInvocation == null) {
+            response.setStatus(404);
+            if (invocation.configuration() != null) {
+              throw new ServletException("Missing result for action class [" +
+                invocation.configuration().actionClass() + "] URI [" + invocation.actionURI() +
+                "] and result code [" + resultCode + "]");
+            } else {
+              throw new ServletException("Missing result for actionless URI [" + invocation.actionURI() +
+                "] and result code [" + resultCode + "]");
+            }
           }
         }
+  
+        Annotation annotation = resultInvocation.annotation();
+        Result result = resultProvider.lookup(annotation.annotationType());
+        if (result == null) {
+          throw new ServletException("Unmapped result annotationType [" + annotation.getClass() +
+            "]. You probably need to define a Result implementation that maps to this annotationType " +
+            "and then add that Result implementation to your Guice Module.");
+        }
+  
+        result.execute(annotation);
       }
-
-      Annotation annotation = resultInvocation.annotation();
-      Result result = resultProvider.lookup(annotation.annotationType());
-      if (result == null) {
-        throw new ServletException("Unmapped result annotationType [" + annotation.getClass() +
-          "]. You probably need to define a Result implementation that maps to this annotationType " +
-          "and then add that Result implementation to your Guice Module.");
-      }
-
-      result.execute(annotation);
+    } finally {
+      resultStore.clear();
     }
   }
 }

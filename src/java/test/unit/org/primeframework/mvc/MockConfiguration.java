@@ -19,40 +19,36 @@ import org.primeframework.mvc.config.AbstractPrimeMVCConfiguration;
 
 /**
  * This is a mock configuration object that delegates to another PrimeMVCConfiguration instance, but also allows
- * specific properties to be mocked out. This can be used in a unit tests via a little glue like this:
- * <pre>
- *
- * protected PrimeMVCConfiguration config;
- *
- * {@code @Inject}
- * public void setConfiguration(PrimeMVCConfiguration config) {
- *   this.config = config;
- * }
- *
- * {@code @Test}
- * protected void mock() {
- *   PrimeMVCConfiguration mock = new MockConfiguration(config);
- *   mock.addParameter("foo", "bar");
- *   ...
- * }
- * </pre>
+ * specific properties to be mocked out.
  *
  * @author Brian Pontarelli
  */
 public class MockConfiguration extends AbstractPrimeMVCConfiguration {
+  private int freemarkerCheckSeconds;
+  private int l10nReloadSeconds;
+  private boolean allowUnknownParameters;
+  
+  public MockConfiguration() {
+  }
+
+  public MockConfiguration(int freemarkerCheckSeconds, int l10nReloadSeconds, boolean allowUnknownParameters) {
+    this.freemarkerCheckSeconds = freemarkerCheckSeconds;
+    this.l10nReloadSeconds = l10nReloadSeconds;
+    this.allowUnknownParameters = allowUnknownParameters;
+  }
 
   @Override
   public int freemarkerCheckSeconds() {
-    return 0;
+    return freemarkerCheckSeconds;
   }
 
   @Override
   public int l10nReloadSeconds() {
-    return 0;
+    return l10nReloadSeconds;
   }
 
   @Override
   public boolean allowUnknownParameters() {
-    return false;
+    return allowUnknownParameters;
   }
 }

@@ -36,6 +36,7 @@ import org.primeframework.mvc.parameter.convert.converters.NumberConverter;
 import org.primeframework.mvc.parameter.convert.converters.StringConverter;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 
 /**
@@ -46,7 +47,7 @@ import com.google.inject.multibindings.MapBinder;
 public class ConverterModule extends AbstractModule {
   @Override
   protected void configure() {
-    MapBinder<Class, GlobalConverter> binder = MapBinder.newMapBinder(binder(), Class.class, GlobalConverter.class);
+    MapBinder<Class<?>, GlobalConverter> binder = MapBinder.newMapBinder(binder(), new TypeLiteral<Class<?>>(){}, TypeLiteral.get(GlobalConverter.class));
     binder.addBinding(Boolean.class).to(BooleanConverter.class).asEagerSingleton();
     binder.addBinding(boolean.class).to(BooleanConverter.class).asEagerSingleton();
     binder.addBinding(Character.class).to(CharacterConverter.class).asEagerSingleton();

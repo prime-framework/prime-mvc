@@ -22,12 +22,14 @@ import org.primeframework.mock.servlet.MockHttpServletResponse;
 import org.primeframework.mock.servlet.MockHttpSession;
 import org.primeframework.mock.servlet.MockServletContext;
 import org.primeframework.mock.servlet.WebTestHelper;
+import org.primeframework.mvc.config.PrimeMVCConfiguration;
 import org.primeframework.mvc.guice.GuiceBootstrap;
 import org.primeframework.mvc.servlet.ServletObjectsHolder;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 
 /**
@@ -45,7 +47,11 @@ public abstract class PrimeBaseTest {
 
   @BeforeSuite
   public static void init() {
-    injector = GuiceBootstrap.initialize();
+    WebTestHelper.setupContext();
+    WebTestHelper.setupSession();
+    ServletObjectsHolder.setServletContext(WebTestHelper.context);
+
+    injector = GuiceBootstrap.initialize(new TestModule());
   }
   
   /**
@@ -53,9 +59,8 @@ public abstract class PrimeBaseTest {
    */
   @BeforeMethod
   public void setUp() {
-    WebTestHelper.setUp();
+    WebTestHelper.setupRequestResponse();
 
-    ServletObjectsHolder.setServletContext(WebTestHelper.context);
     ServletObjectsHolder.setServletRequest(new HttpServletRequestWrapper(WebTestHelper.request));
     ServletObjectsHolder.setServletResponse(WebTestHelper.response);
 
@@ -66,5 +71,12 @@ public abstract class PrimeBaseTest {
   public void tearDown() {
     ServletObjectsHolder.clearServletRequest();
     ServletObjectsHolder.clearServletResponse();
+  }
+  
+  public static class TestModule extends AbstractModule {
+    @Override
+    protected void configure() {
+      bind(PrimeMVCConfiguration.class).toInstance(new MockConfiguration());
+    }
   }
 }

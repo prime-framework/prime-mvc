@@ -16,6 +16,7 @@
 package org.primeframework.mvc.util;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,6 +32,7 @@ import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Attribute;
 import org.objectweb.asm.ClassReader;
@@ -92,8 +94,8 @@ public class ClassClasspathResolver<U> {
       File f = new File(name);
       if (f.isDirectory()) {
         for (String locator : locators) {
-          File dir = findFirstDirectory(f, locator);
-          if (dir != null) {
+          Set<File> directories = findDirectories(f, locator);
+          for (File dir : directories) {
             matches.addAll(loadFromDirectory(dir, test, recursive));
           }
         }
@@ -105,30 +107,33 @@ public class ClassClasspathResolver<U> {
     return matches;
   }
 
-  private File findFirstDirectory(File dir, String locator) {
-    // Loop over the files
-    Queue<File> files = new LinkedList<File>(safeListFiles(dir));
+  private Set<File> findDirectories(File dir, String locator) {
+    // Loop over the files using tail-recursion
+    Set<File> directories = new HashSet<File>();
+    Queue<File> files = new LinkedList<File>(safeListFiles(dir, DirectoryFileFilter.INSTANCE));
     while (!files.isEmpty()) {
       File file = files.poll();
       if (file.isDirectory() && file.getName().equals(locator)) {
-        return file;
+        directories.add(file);
       } else if (file.isDirectory()) {
-        files.addAll(safeListFiles(file));
+        files.addAll(safeListFiles(file, null));
       }
     }
 
-    return null;
+    return directories;
   }
 
   /**
    * This provides a safe mechanism for listing all of the files in a directory. The listFiles method can return null
    * and cause major issues. This performs that method in a null safe manner.
    *
+   *
    * @param dir    The directory to list the files for.
+   * @param filter An optional FileFilter.
    * @return A List of Files, which is never null.
    */
-  private List<File> safeListFiles(File dir) {
-    File[] files = dir.listFiles();
+  private List<File> safeListFiles(File dir, FileFilter filter) {
+    File[] files = dir.listFiles(filter);
 
     if (files == null) {
       return Collections.emptyList();
@@ -141,11 +146,11 @@ public class ClassClasspathResolver<U> {
     Set<Class<U>> matches = new HashSet<Class<U>>();
 
     // Loop over the files
-    Queue<File> files = new LinkedList<File>(safeListFiles(dir));
+    Queue<File> files = new LinkedList<File>(safeListFiles(dir, null));
     while (!files.isEmpty()) {
       File file = files.poll();
       if (file.isDirectory() && recursive) {
-        files.addAll(safeListFiles(file));
+        files.addAll(safeListFiles(file, null));
       } else if (file.isFile()) {
         // This file matches, test it
         Testable<Class<U>> testable = test.prepare(file);
