@@ -43,7 +43,7 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 public class ForwardResult extends AbstractResult<Forward> {
-  public static final String DIR = "/WEB-INF/content";
+  public static final String DIR = "/WEB-INF/templates";
   private final ActionInvocationStore actionInvocationStore;
   private final FreeMarkerService freeMarkerService;
   private final ServletContext servletContext;
@@ -118,12 +118,12 @@ public class ForwardResult extends AbstractResult<Forward> {
    * Checks for results using this search order:
    * <p/>
    * <ol>
-   *   <li>/WEB-INF/content/&lt;uri>-&lt;resultCode>.jsp</li>
-   *   <li>/WEB-INF/content/&lt;uri>-&lt;resultCode>.ftl</li>
-   *   <li>/WEB-INF/content/&lt;uri>.jsp</li>
-   *   <li>/WEB-INF/content/&lt;uri>.ftl</li>
-   *   <li>/WEB-INF/content/&lt;uri>/index.jsp</li>
-   *   <li>/WEB-INF/content/&lt;uri>/index.ftl</li>
+   *   <li>/WEB-INF/templates/&lt;uri>-&lt;resultCode>.jsp</li>
+   *   <li>/WEB-INF/templates/&lt;uri>-&lt;resultCode>.ftl</li>
+   *   <li>/WEB-INF/templates/&lt;uri>.jsp</li>
+   *   <li>/WEB-INF/templates/&lt;uri>.ftl</li>
+   *   <li>/WEB-INF/templates/&lt;uri>/index.jsp</li>
+   *   <li>/WEB-INF/templates/&lt;uri>/index.ftl</li>
    * </ol>
    * <p/>
    * If nothing is found this bombs out.

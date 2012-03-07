@@ -161,6 +161,6 @@ public class WebControl extends ResourceBundle.Control {
       uri = uri + "index";
     }
 
-    return "/WEB-INF/message" + toBundleName(uri, locale) + ".properties";
+    return "/WEB-INF/messages" + toBundleName(uri, locale) + ".properties";
   }
 }

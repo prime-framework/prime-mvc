@@ -89,7 +89,7 @@ public class ForwardResultTest {
     dispatcher.forward(request, response);
     replay(dispatcher);
 
-    expect(request.getRequestDispatcher("/WEB-INF/content/bar.jsp")).andReturn(dispatcher);
+    expect(request.getRequestDispatcher("/WEB-INF/templates/bar.jsp")).andReturn(dispatcher);
     replay(request);
 
     ServletContext context = createStrictMock(ServletContext.class);
@@ -118,7 +118,7 @@ public class ForwardResultTest {
     dispatcher.forward(request, response);
     replay(dispatcher);
 
-    expect(request.getRequestDispatcher("/WEB-INF/content/bar.jsp")).andReturn(dispatcher);
+    expect(request.getRequestDispatcher("/WEB-INF/templates/bar.jsp")).andReturn(dispatcher);
     replay(request);
 
     ServletContext context = createStrictMock(ServletContext.class);
@@ -147,7 +147,7 @@ public class ForwardResultTest {
     dispatcher.forward(isA(HttpServletRequest.class), same(response));
     replay(dispatcher);
 
-    expect(request.getRequestDispatcher("/WEB-INF/content/bar.jsp")).andReturn(dispatcher);
+    expect(request.getRequestDispatcher("/WEB-INF/templates/bar.jsp")).andReturn(dispatcher);
     replay(request);
 
     ServletContext context = createStrictMock(ServletContext.class);
@@ -182,7 +182,7 @@ public class ForwardResultTest {
     dispatcher.forward(request, response);
     replay(dispatcher);
 
-    expect(request.getRequestDispatcher("/WEB-INF/content/bar.jsp")).andReturn(dispatcher);
+    expect(request.getRequestDispatcher("/WEB-INF/templates/bar.jsp")).andReturn(dispatcher);
     replay(request);
 
     ServletContext context = createStrictMock(ServletContext.class);
@@ -213,18 +213,18 @@ public class ForwardResultTest {
     replay(request);
 
     FreeMarkerService service = createStrictMock(FreeMarkerService.class);
-    service.render(same(writer), eq("/WEB-INF/content/action.ftl"), isA(FreeMarkerMap.class), same(Locale.GERMAN));
+    service.render(same(writer), eq("/WEB-INF/templates/action.ftl"), isA(FreeMarkerMap.class), same(Locale.GERMAN));
     replay(service);
 
     ServletContext context = createStrictMock(ServletContext.class);
-    expect(context.getResource("/WEB-INF/content/action-js-failure.jsp")).andReturn(null);
-    expect(context.getResource("/WEB-INF/content/action-js-failure.ftl")).andReturn(null);
-    expect(context.getResource("/WEB-INF/content/action-js.jsp")).andReturn(null);
-    expect(context.getResource("/WEB-INF/content/action-js.ftl")).andReturn(null);
-    expect(context.getResource("/WEB-INF/content/action-failure.jsp")).andReturn(null);
-    expect(context.getResource("/WEB-INF/content/action-failure.ftl")).andReturn(null);
-    expect(context.getResource("/WEB-INF/content/action.jsp")).andReturn(null);
-    expect(context.getResource("/WEB-INF/content/action.ftl")).andReturn(new URL("http://localhost"));
+    expect(context.getResource("/WEB-INF/templates/action-js-failure.jsp")).andReturn(null);
+    expect(context.getResource("/WEB-INF/templates/action-js-failure.ftl")).andReturn(null);
+    expect(context.getResource("/WEB-INF/templates/action-js.jsp")).andReturn(null);
+    expect(context.getResource("/WEB-INF/templates/action-js.ftl")).andReturn(null);
+    expect(context.getResource("/WEB-INF/templates/action-failure.jsp")).andReturn(null);
+    expect(context.getResource("/WEB-INF/templates/action-failure.ftl")).andReturn(null);
+    expect(context.getResource("/WEB-INF/templates/action.jsp")).andReturn(null);
+    expect(context.getResource("/WEB-INF/templates/action.ftl")).andReturn(new URL("http://localhost"));
     replay(context);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);

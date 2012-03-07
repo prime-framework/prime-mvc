@@ -38,8 +38,8 @@ public class DefaultResultInvocationProviderTest {
   @Test
   public void actionLess() throws MalformedURLException {
     ServletContext context = createStrictMock(ServletContext.class);
-    expect(context.getResource("/WEB-INF/content/foo/bar.jsp")).andReturn(null);
-    expect(context.getResource("/WEB-INF/content/foo/bar.ftl")).andReturn(new URL("http://google.com"));
+    expect(context.getResource("/WEB-INF/templates/foo/bar.jsp")).andReturn(null);
+    expect(context.getResource("/WEB-INF/templates/foo/bar.ftl")).andReturn(new URL("http://google.com"));
     replay(context);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
@@ -52,7 +52,7 @@ public class DefaultResultInvocationProviderTest {
     assertNull(invocation.resultCode());
     assertEquals("/foo/bar", invocation.uri());
     assertNull(((Forward) invocation.annotation()).code());
-    assertEquals("/WEB-INF/content/foo/bar.ftl", ((Forward) invocation.annotation()).page());
+    assertEquals("/WEB-INF/templates/foo/bar.ftl", ((Forward) invocation.annotation()).page());
 
     verify(context);
   }
@@ -60,10 +60,10 @@ public class DefaultResultInvocationProviderTest {
   @Test
   public void actionLessWithExtension() throws MalformedURLException {
     ServletContext context = createStrictMock(ServletContext.class);
-    expect(context.getResource("/WEB-INF/content/foo/bar-ajax.jsp")).andReturn(null);
-    expect(context.getResource("/WEB-INF/content/foo/bar-ajax.ftl")).andReturn(null);
-    expect(context.getResource("/WEB-INF/content/foo/bar.jsp")).andReturn(null);
-    expect(context.getResource("/WEB-INF/content/foo/bar.ftl")).andReturn(new URL("http://google.com"));
+    expect(context.getResource("/WEB-INF/templates/foo/bar-ajax.jsp")).andReturn(null);
+    expect(context.getResource("/WEB-INF/templates/foo/bar-ajax.ftl")).andReturn(null);
+    expect(context.getResource("/WEB-INF/templates/foo/bar.jsp")).andReturn(null);
+    expect(context.getResource("/WEB-INF/templates/foo/bar.ftl")).andReturn(new URL("http://google.com"));
     replay(context);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
@@ -76,7 +76,7 @@ public class DefaultResultInvocationProviderTest {
     assertNull(invocation.resultCode());
     assertEquals("/foo/bar", invocation.uri());
     assertNull(((Forward) invocation.annotation()).code());
-    assertEquals("/WEB-INF/content/foo/bar.ftl", ((Forward) invocation.annotation()).page());
+    assertEquals("/WEB-INF/templates/foo/bar.ftl", ((Forward) invocation.annotation()).page());
 
     verify(context);
   }
@@ -84,10 +84,10 @@ public class DefaultResultInvocationProviderTest {
   @Test
   public void actionLessRedirectForIndexPage() throws MalformedURLException {
     ServletContext context = createStrictMock(ServletContext.class);
-    expect(context.getResource("/WEB-INF/content/foo/bar.jsp")).andReturn(null);
-    expect(context.getResource("/WEB-INF/content/foo/bar.ftl")).andReturn(null);
-    expect(context.getResource("/WEB-INF/content/foo/bar/index.jsp")).andReturn(null);
-    expect(context.getResource("/WEB-INF/content/foo/bar/index.ftl")).andReturn(new URL("http://google.com"));
+    expect(context.getResource("/WEB-INF/templates/foo/bar.jsp")).andReturn(null);
+    expect(context.getResource("/WEB-INF/templates/foo/bar.ftl")).andReturn(null);
+    expect(context.getResource("/WEB-INF/templates/foo/bar/index.jsp")).andReturn(null);
+    expect(context.getResource("/WEB-INF/templates/foo/bar/index.ftl")).andReturn(new URL("http://google.com"));
     replay(context);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
@@ -108,12 +108,12 @@ public class DefaultResultInvocationProviderTest {
   @Test
   public void actionLessRedirectForIndexPageWithExtension() throws MalformedURLException {
     ServletContext context = createStrictMock(ServletContext.class);
-    expect(context.getResource("/WEB-INF/content/foo/bar-ajax.jsp")).andReturn(null);
-    expect(context.getResource("/WEB-INF/content/foo/bar-ajax.ftl")).andReturn(null);
-    expect(context.getResource("/WEB-INF/content/foo/bar.jsp")).andReturn(null);
-    expect(context.getResource("/WEB-INF/content/foo/bar.ftl")).andReturn(null);
-    expect(context.getResource("/WEB-INF/content/foo/bar/index.jsp")).andReturn(null);
-    expect(context.getResource("/WEB-INF/content/foo/bar/index.ftl")).andReturn(new URL("http://google.com"));
+    expect(context.getResource("/WEB-INF/templates/foo/bar-ajax.jsp")).andReturn(null);
+    expect(context.getResource("/WEB-INF/templates/foo/bar-ajax.ftl")).andReturn(null);
+    expect(context.getResource("/WEB-INF/templates/foo/bar.jsp")).andReturn(null);
+    expect(context.getResource("/WEB-INF/templates/foo/bar.ftl")).andReturn(null);
+    expect(context.getResource("/WEB-INF/templates/foo/bar/index.jsp")).andReturn(null);
+    expect(context.getResource("/WEB-INF/templates/foo/bar/index.ftl")).andReturn(new URL("http://google.com"));
     replay(context);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
@@ -134,8 +134,8 @@ public class DefaultResultInvocationProviderTest {
   @Test
   public void actionLessIndexPage() throws MalformedURLException {
     ServletContext context = createStrictMock(ServletContext.class);
-    expect(context.getResource("/WEB-INF/content/foo/bar/index.jsp")).andReturn(null);
-    expect(context.getResource("/WEB-INF/content/foo/bar/index.ftl")).andReturn(new URL("http://google.com"));
+    expect(context.getResource("/WEB-INF/templates/foo/bar/index.jsp")).andReturn(null);
+    expect(context.getResource("/WEB-INF/templates/foo/bar/index.ftl")).andReturn(new URL("http://google.com"));
     replay(context);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
@@ -148,7 +148,7 @@ public class DefaultResultInvocationProviderTest {
     assertNull(invocation.resultCode());
     assertEquals("/foo/bar/", invocation.uri());
     assertNull(((Forward) invocation.annotation()).code());
-    assertEquals("/WEB-INF/content/foo/bar/index.ftl", ((Forward) invocation.annotation()).page());
+    assertEquals("/WEB-INF/templates/foo/bar/index.ftl", ((Forward) invocation.annotation()).page());
 
     verify(context);
   }
@@ -178,8 +178,8 @@ public class DefaultResultInvocationProviderTest {
   @Test
   public void actionNoAnnotation() throws MalformedURLException {
     ServletContext context = createStrictMock(ServletContext.class);
-    expect(context.getResource("/WEB-INF/content/foo/bar-error.jsp")).andReturn(null);
-    expect(context.getResource("/WEB-INF/content/foo/bar-error.ftl")).andReturn(new URL("http://google.com"));
+    expect(context.getResource("/WEB-INF/templates/foo/bar-error.jsp")).andReturn(null);
+    expect(context.getResource("/WEB-INF/templates/foo/bar-error.ftl")).andReturn(new URL("http://google.com"));
     replay(context);
 
     TestAction action = new TestAction();
@@ -193,7 +193,7 @@ public class DefaultResultInvocationProviderTest {
     assertEquals("error", invocation.resultCode());
     assertEquals("/foo/bar", invocation.uri());
     assertEquals("error", ((Forward) invocation.annotation()).code());
-    assertEquals("/WEB-INF/content/foo/bar-error.ftl", ((Forward) invocation.annotation()).page());
+    assertEquals("/WEB-INF/templates/foo/bar-error.ftl", ((Forward) invocation.annotation()).page());
 
     verify(context);
   }
@@ -201,12 +201,12 @@ public class DefaultResultInvocationProviderTest {
   @Test
   public void actionNoAnnotationWithExtension() throws MalformedURLException {
     ServletContext context = createStrictMock(ServletContext.class);
-    expect(context.getResource("/WEB-INF/content/foo/bar-ajax-error.jsp")).andReturn(null);
-    expect(context.getResource("/WEB-INF/content/foo/bar-ajax-error.ftl")).andReturn(null);
-    expect(context.getResource("/WEB-INF/content/foo/bar-ajax.jsp")).andReturn(null);
-    expect(context.getResource("/WEB-INF/content/foo/bar-ajax.ftl")).andReturn(null);
-    expect(context.getResource("/WEB-INF/content/foo/bar-error.jsp")).andReturn(null);
-    expect(context.getResource("/WEB-INF/content/foo/bar-error.ftl")).andReturn(new URL("http://google.com"));
+    expect(context.getResource("/WEB-INF/templates/foo/bar-ajax-error.jsp")).andReturn(null);
+    expect(context.getResource("/WEB-INF/templates/foo/bar-ajax-error.ftl")).andReturn(null);
+    expect(context.getResource("/WEB-INF/templates/foo/bar-ajax.jsp")).andReturn(null);
+    expect(context.getResource("/WEB-INF/templates/foo/bar-ajax.ftl")).andReturn(null);
+    expect(context.getResource("/WEB-INF/templates/foo/bar-error.jsp")).andReturn(null);
+    expect(context.getResource("/WEB-INF/templates/foo/bar-error.ftl")).andReturn(new URL("http://google.com"));
     replay(context);
 
     TestAction action = new TestAction();
@@ -220,7 +220,7 @@ public class DefaultResultInvocationProviderTest {
     assertEquals("error", invocation.resultCode());
     assertEquals("/foo/bar", invocation.uri());
     assertEquals("error", ((Forward) invocation.annotation()).code());
-    assertEquals("/WEB-INF/content/foo/bar-error.ftl", ((Forward) invocation.annotation()).page());
+    assertEquals("/WEB-INF/templates/foo/bar-error.ftl", ((Forward) invocation.annotation()).page());
 
     verify(context);
   }
@@ -228,8 +228,8 @@ public class DefaultResultInvocationProviderTest {
   @Test
   public void testActionNoAnnotationIndexPage() throws MalformedURLException {
     ServletContext context = createStrictMock(ServletContext.class);
-    expect(context.getResource("/WEB-INF/content/foo/bar/index.jsp")).andReturn(null);
-    expect(context.getResource("/WEB-INF/content/foo/bar/index.ftl")).andReturn(new URL("http://google.com"));
+    expect(context.getResource("/WEB-INF/templates/foo/bar/index.jsp")).andReturn(null);
+    expect(context.getResource("/WEB-INF/templates/foo/bar/index.ftl")).andReturn(new URL("http://google.com"));
     replay(context);
 
     TestAction action = new TestAction();
@@ -243,7 +243,7 @@ public class DefaultResultInvocationProviderTest {
     assertEquals("error", invocation.resultCode());
     assertEquals("/foo/bar/", invocation.uri());
     assertEquals("error", ((Forward) invocation.annotation()).code());
-    assertEquals("/WEB-INF/content/foo/bar/index.ftl", ((Forward) invocation.annotation()).page());
+    assertEquals("/WEB-INF/templates/foo/bar/index.ftl", ((Forward) invocation.annotation()).page());
 
     verify(context);
   }

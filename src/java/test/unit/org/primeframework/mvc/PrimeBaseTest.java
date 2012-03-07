@@ -17,11 +17,12 @@ package org.primeframework.mvc;
 
 import javax.servlet.http.HttpServletRequestWrapper;
 
+import java.io.File;
+
 import org.primeframework.mock.servlet.MockHttpServletRequest;
 import org.primeframework.mock.servlet.MockHttpServletResponse;
 import org.primeframework.mock.servlet.MockHttpSession;
 import org.primeframework.mock.servlet.MockServletContext;
-import org.primeframework.mock.servlet.WebTestHelper;
 import org.primeframework.mvc.config.PrimeMVCConfiguration;
 import org.primeframework.mvc.guice.GuiceBootstrap;
 import org.primeframework.mvc.servlet.ServletObjectsHolder;
@@ -40,16 +41,16 @@ import com.google.inject.Injector;
  */
 public abstract class PrimeBaseTest {
   protected static Injector injector;
-  protected MockServletContext context;
-  protected MockHttpSession session;
+  protected static MockServletContext context;
+  protected static MockHttpSession session;
   protected MockHttpServletRequest request;
   protected MockHttpServletResponse response;
 
   @BeforeSuite
   public static void init() {
-    WebTestHelper.setupContext();
-    WebTestHelper.setupSession();
-    ServletObjectsHolder.setServletContext(WebTestHelper.context);
+    context = new MockServletContext(new File("src/web/test"));
+    session = new MockHttpSession(context);
+    ServletObjectsHolder.setServletContext(context);
 
     injector = GuiceBootstrap.initialize(new TestModule());
   }
@@ -59,10 +60,11 @@ public abstract class PrimeBaseTest {
    */
   @BeforeMethod
   public void setUp() {
-    WebTestHelper.setupRequestResponse();
+    request = new MockHttpServletRequest("/", session);
+    response = new MockHttpServletResponse();
 
-    ServletObjectsHolder.setServletRequest(new HttpServletRequestWrapper(WebTestHelper.request));
-    ServletObjectsHolder.setServletResponse(WebTestHelper.response);
+    ServletObjectsHolder.setServletRequest(new HttpServletRequestWrapper(request));
+    ServletObjectsHolder.setServletResponse(response);
 
     injector.injectMembers(this);
   }

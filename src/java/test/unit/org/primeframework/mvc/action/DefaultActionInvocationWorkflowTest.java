@@ -85,7 +85,7 @@ public class DefaultActionInvocationWorkflowTest {
     replay(chain);
 
     ResultStore resultStore = createStrictMock(ResultStore.class);
-    resultStore.set("sucess");
+    resultStore.set("success");
     replay(resultStore);
     
     DefaultActionInvocationWorkflow workflow = new DefaultActionInvocationWorkflow(ais, resultStore, request);

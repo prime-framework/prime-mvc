@@ -126,13 +126,13 @@
       </library>
     </orderEntry>
     <orderEntry type="module-library">
-      <library name="prime-mock-1.0-IB20120306224341591.jar">
+      <library name="prime-mock-1.0-IB20120307000005508.jar">
         <CLASSES>
-          <root url="jar://$SAVANT_REPOSITORY$/org/primeframework/prime-mock/1.0-{integration}/prime-mock-1.0-IB20120306224341591.jar!/" />
+          <root url="jar://$SAVANT_REPOSITORY$/org/primeframework/prime-mock/1.0-{integration}/prime-mock-1.0-IB20120307000005508.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$SAVANT_REPOSITORY$/org/primeframework/prime-mock/1.0-{integration}/prime-mock-1.0-IB20120306224341591-src.jar!/" />
+          <root url="jar://$SAVANT_REPOSITORY$/org/primeframework/prime-mock/1.0-{integration}/prime-mock-1.0-IB20120307000005508-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>

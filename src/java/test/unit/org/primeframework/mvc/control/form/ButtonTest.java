@@ -36,12 +36,11 @@ public class ButtonTest extends ControlBaseTest {
     new ControlTester(button).
       attr("name", "button").
       attr("value", "test-value").
-      attr("bundle", "/button-bundle").
       go("<input type=\"hidden\" name=\"button@param\" value=\"param-value\"/>\n" +
         "<input type=\"hidden\" name=\"__a_button\" value=\"\"/>\n" +
         "<div class=\"button-button button control\">\n" +
         "<div class=\"label-container\"> </div>\n" +
-        "<div class=\"control-container\"><input type=\"button\" id=\"button\" name=\"button\" value=\"Button-Bundle\"/></div>\n" +
+        "<div class=\"control-container\"><input type=\"button\" id=\"button\" name=\"button\" value=\"Button\"/></div>\n" +
         "</div>\n");
   }
 

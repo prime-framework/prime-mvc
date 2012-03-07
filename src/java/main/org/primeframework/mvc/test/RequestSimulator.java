@@ -29,7 +29,6 @@ import org.primeframework.mock.servlet.MockHttpServletRequest;
 import org.primeframework.mock.servlet.MockHttpServletResponse;
 import org.primeframework.mock.servlet.MockHttpSession;
 import org.primeframework.mock.servlet.MockServletContext;
-import org.primeframework.mock.servlet.WebTestHelper;
 import org.primeframework.mvc.guice.GuiceBootstrap;
 import org.primeframework.mvc.servlet.PrimeFilter;
 import org.primeframework.mvc.servlet.PrimeServletContextListener;
@@ -66,8 +65,8 @@ public class RequestSimulator {
    * @throws ServletException If the initialization of the PrimeServletContextListener failed.
    */
   public RequestSimulator(Module... modules) throws ServletException {
-    this.context = makeContext();
-    this.session = makeSession(this.context);
+    this.context = new MockServletContext();
+    this.session = new MockHttpSession(this.context);
     this.injector = GuiceBootstrap.initialize(modules);
     this.context.setAttribute(PrimeServletContextListener.GUICE_INJECTOR_KEY, this.injector);
     this.filter.init(new FilterConfig() {
@@ -108,12 +107,12 @@ public class RequestSimulator {
    * Resets the session by creating a new session that is empty.
    */
   public void resetSession() {
-    session = makeSession(context);
+    session = new MockHttpSession(this.context);
   }
 
   void run(RequestBuilder builder) throws IOException, ServletException {
     if (!builder.getModules().isEmpty()) {
-      this.injector = GuiceBootstrap.initialize(builder.getModules().toArray(new Module[0]));
+      this.injector = GuiceBootstrap.initialize(builder.getModules().toArray(new Module[builder.getModules().size()]));
       this.context.setAttribute(PrimeServletContextListener.GUICE_INJECTOR_KEY, this.injector);
     }
 
@@ -155,20 +154,5 @@ public class RequestSimulator {
    */
   protected MockHttpServletResponse makeResponse() {
     return new MockHttpServletResponse();
-  }
-
-  /**
-   * @return Makes a MockServletContext
-   */
-  protected MockServletContext makeContext() {
-    return WebTestHelper.makeContext();
-  }
-
-  /**
-   * @param context The mock servlet context.
-   * @return Makes a MockHttpSession.
-   */
-  protected MockHttpSession makeSession(MockServletContext context) {
-    return WebTestHelper.makeSession(context);
   }
 }
