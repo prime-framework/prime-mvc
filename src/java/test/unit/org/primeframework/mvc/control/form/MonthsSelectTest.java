@@ -37,7 +37,6 @@ public class MonthsSelectTest extends ControlBaseTest {
     new ControlTester(monthsSelect).
       attr("name", "test").
       attr("class", "css-class").
-      attr("bundle", "/months-select-bundle").
       go("<input type=\"hidden\" name=\"test@param\" value=\"param-value\"/>\n" +
       "<div class=\"css-class-select css-class-input css-class-control select input control\">\n" +
       "<div class=\"label-container\"><label for=\"test\" class=\"label\">Test</label></div>\n" +

@@ -1,7 +1,7 @@
 [#ftl/]
-[#include "macros.ftl"/]
-[#include "dynamic-attributes.ftl"/]
-<div class="[@class attributes=attributes name="password" input=true/]">
-<div class="label-container">[#include "label.ftl"/]</div>
-<div class="control-container"><input type="password"[@append_attributes attributes=attributes list=[]/]/></div>
+[#import "_macros.ftl" as macros/]
+[@macros.dynamic_attributes attrs=dynamicAttributes name=attributes['name']/]
+<div class="[@macros.class attrs=attributes name="password" input=true/]">
+<div class="label-container">[@macros.label text=label fieldMessages=fieldMessages required=required/]</div>
+<div class="control-container"><input type="password"[@macros.append_attributes attributes=attributes list=[]/]/></div>
 </div>

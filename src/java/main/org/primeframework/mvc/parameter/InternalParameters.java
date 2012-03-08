@@ -18,7 +18,7 @@ package org.primeframework.mvc.parameter;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * This class handles all of the parameters that control the JCatapult MVC internal behavior like validation, result
+ * This class handles all of the parameters that control the Prime MVC internal behavior like validation, result
  * execution, action execution, etc.
  *
  * @author Brian Pontarelli

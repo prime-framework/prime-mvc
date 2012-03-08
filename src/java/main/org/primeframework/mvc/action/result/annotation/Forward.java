@@ -38,7 +38,7 @@ public @interface Forward {
   String code() default "success";
 
   /**
-   * @return The location of the JSP or FreeMarker template (the extension of this attribute determines if JCatapult
+   * @return The location of the JSP or FreeMarker template (the extension of this attribute determines if Prime
    *         forwards to a JSP or renders the FreeMarker template. Any page with .jsp on the end goes to a JSP and .ftl
    *         goes to a FreeMarker template) If this isn't specified, then the default search method is used to find the
    *         correct FTL or JSP page.
@@ -56,7 +56,7 @@ public @interface Forward {
   int status() default 200;
 
   /**
-   * @return Overrides the status parameter. If this is set, JCatapult use the value of this parameter and first expand
+   * @return Overrides the status parameter. If this is set, Prime use the value of this parameter and first expand
    *         it. It uses the <code>${variable}</code> notation that is common for variable expanders. After it has been
    *         expanded, the result is converted into an int. Therefore, you can specify either a number as a String, or a
    *         variable expansion. Here are some examples: <code>"${myStatus}"</code>, <code>"200"</code>,

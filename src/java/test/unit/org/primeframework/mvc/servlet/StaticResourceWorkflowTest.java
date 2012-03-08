@@ -22,12 +22,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import org.easymock.EasyMock;
 import org.primeframework.mvc.config.PrimeMVCConfiguration;
 import org.primeframework.mvc.workflow.StaticResourceWorkflow;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
 
+import static org.easymock.EasyMock.*;
 import static org.testng.Assert.*;
 
 /**
@@ -40,15 +40,15 @@ public class StaticResourceWorkflowTest {
   public void newRequest() throws IOException, ServletException {
     PrimeMVCConfiguration configuration = makeConfiguration();
 
-    ServletContext context = EasyMock.createStrictMock(ServletContext.class);
-    EasyMock.expect(context.getResource("/component/2.1.1/test.jpg")).andReturn(null);
-    EasyMock.replay(context);
+    ServletContext context = createStrictMock(ServletContext.class);
+    expect(context.getResource("/static/2.1.1/test.jpg")).andReturn(null);
+    replay(context);
 
-    HttpServletRequest req = EasyMock.createStrictMock(HttpServletRequest.class);
-    EasyMock.expect(req.getRequestURI()).andReturn("/component/2.1.1/test.jpg");
-    EasyMock.expect(req.getContextPath()).andReturn("");
-    EasyMock.expect(req.getDateHeader("If-Modified-Since")).andReturn(0l);
-    EasyMock.replay(req);
+    HttpServletRequest req = createStrictMock(HttpServletRequest.class);
+    expect(req.getRequestURI()).andReturn("/static/2.1.1/test.jpg");
+    expect(req.getContextPath()).andReturn("");
+    expect(req.getDateHeader("If-Modified-Since")).andReturn(0l);
+    replay(req);
 
     final StringBuilder build = new StringBuilder();
     ServletOutputStream sos = new ServletOutputStream() {
@@ -57,39 +57,39 @@ public class StaticResourceWorkflowTest {
       }
     };
 
-    HttpServletResponse res = EasyMock.createStrictMock(HttpServletResponse.class);
+    HttpServletResponse res = createStrictMock(HttpServletResponse.class);
     res.setContentType("image/jpeg");
-    res.setDateHeader(EasyMock.eq("Date"), EasyMock.geq(System.currentTimeMillis()));
+    res.setDateHeader(eq("Date"), geq(System.currentTimeMillis()));
     res.setDateHeader("Expires", Long.MAX_VALUE);
     res.setDateHeader("Retry-After", Long.MAX_VALUE);
     res.setHeader("Cache-Control", "public");
     res.setDateHeader("Last-Modified", 0);
-    EasyMock.expect(res.getOutputStream()).andReturn(sos);
-    EasyMock.replay(res);
+    expect(res.getOutputStream()).andReturn(sos);
+    replay(res);
 
-    WorkflowChain wc = EasyMock.createStrictMock(WorkflowChain.class);
-    EasyMock.replay(wc);
+    WorkflowChain wc = createStrictMock(WorkflowChain.class);
+    replay(wc);
 
     StaticResourceWorkflow srw = new StaticResourceWorkflow(context, req, res, configuration);
     srw.perform(wc);
-    EasyMock.verify(configuration, req, res, wc);
+    verify(configuration, req, res, wc);
 
-    assertEquals("Test\n", build.toString());
+    assertEquals(build.toString(), "Test\n");
   }
 
   @Test
   public void newRequestContext() throws IOException, ServletException {
     PrimeMVCConfiguration configuration = makeConfiguration();
 
-    ServletContext context = EasyMock.createStrictMock(ServletContext.class);
-    EasyMock.expect(context.getResource("/component/2.1.1/test.jpg")).andReturn(null);
-    EasyMock.replay(context);
+    ServletContext context = createStrictMock(ServletContext.class);
+    expect(context.getResource("/static/2.1.1/test.jpg")).andReturn(null);
+    replay(context);
 
-    HttpServletRequest req = EasyMock.createStrictMock(HttpServletRequest.class);
-    EasyMock.expect(req.getRequestURI()).andReturn("/context-path/component/2.1.1/test.jpg");
-    EasyMock.expect(req.getContextPath()).andReturn("/context-path");
-    EasyMock.expect(req.getDateHeader("If-Modified-Since")).andReturn(0l);
-    EasyMock.replay(req);
+    HttpServletRequest req = createStrictMock(HttpServletRequest.class);
+    expect(req.getRequestURI()).andReturn("/context-path/static/2.1.1/test.jpg");
+    expect(req.getContextPath()).andReturn("/context-path");
+    expect(req.getDateHeader("If-Modified-Since")).andReturn(0l);
+    replay(req);
 
     final StringBuilder build = new StringBuilder();
     ServletOutputStream sos = new ServletOutputStream() {
@@ -98,109 +98,109 @@ public class StaticResourceWorkflowTest {
       }
     };
 
-    HttpServletResponse res = EasyMock.createStrictMock(HttpServletResponse.class);
+    HttpServletResponse res = createStrictMock(HttpServletResponse.class);
     res.setContentType("image/jpeg");
-    res.setDateHeader(EasyMock.eq("Date"), EasyMock.geq(System.currentTimeMillis()));
+    res.setDateHeader(eq("Date"), geq(System.currentTimeMillis()));
     res.setDateHeader("Expires", Long.MAX_VALUE);
     res.setDateHeader("Retry-After", Long.MAX_VALUE);
     res.setHeader("Cache-Control", "public");
     res.setDateHeader("Last-Modified", 0);
-    EasyMock.expect(res.getOutputStream()).andReturn(sos);
-    EasyMock.replay(res);
+    expect(res.getOutputStream()).andReturn(sos);
+    replay(res);
 
-    WorkflowChain wc = EasyMock.createStrictMock(WorkflowChain.class);
-    EasyMock.replay(wc);
+    WorkflowChain wc = createStrictMock(WorkflowChain.class);
+    replay(wc);
 
     StaticResourceWorkflow srw = new StaticResourceWorkflow(context, req, res, configuration);
     srw.perform(wc);
-    EasyMock.verify(configuration, req, res, wc);
+    verify(configuration, req, res, wc);
 
-    assertEquals("Test\n", build.toString());
+    assertEquals(build.toString(), "Test\n");
   }
 
   @Test
   public void cacheRequest() throws IOException, ServletException {
     PrimeMVCConfiguration configuration = makeConfiguration();
 
-    ServletContext context = EasyMock.createStrictMock(ServletContext.class);
-    EasyMock.expect(context.getResource("/component/2.1.1/test.jpg")).andReturn(null);
-    EasyMock.replay(context);
+    ServletContext context = createStrictMock(ServletContext.class);
+    expect(context.getResource("/static/2.1.1/test.jpg")).andReturn(null);
+    replay(context);
 
-    HttpServletRequest req = EasyMock.createStrictMock(HttpServletRequest.class);
-    EasyMock.expect(req.getRequestURI()).andReturn("/component/2.1.1/test.jpg");
-    EasyMock.expect(req.getContextPath()).andReturn("");
-    EasyMock.expect(req.getDateHeader("If-Modified-Since")).andReturn(1l);
-    EasyMock.replay(req);
+    HttpServletRequest req = createStrictMock(HttpServletRequest.class);
+    expect(req.getRequestURI()).andReturn("/static/2.1.1/test.jpg");
+    expect(req.getContextPath()).andReturn("");
+    expect(req.getDateHeader("If-Modified-Since")).andReturn(1l);
+    replay(req);
 
-    HttpServletResponse res = EasyMock.createStrictMock(HttpServletResponse.class);
+    HttpServletResponse res = createStrictMock(HttpServletResponse.class);
     res.setDateHeader("Expires", Long.MAX_VALUE);
     res.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-    EasyMock.replay(res);
+    replay(res);
 
-    WorkflowChain wc = EasyMock.createStrictMock(WorkflowChain.class);
-    EasyMock.replay(wc);
+    WorkflowChain wc = createStrictMock(WorkflowChain.class);
+    replay(wc);
 
     StaticResourceWorkflow srw = new StaticResourceWorkflow(context, req, res, configuration);
     srw.perform(wc);
-    EasyMock.verify(configuration, req, res, wc);
+    verify(configuration, req, res, wc);
   }
 
   @Test
   public void badRequest() throws IOException, ServletException {
     PrimeMVCConfiguration configuration = makeConfiguration();
 
-    ServletContext context = EasyMock.createStrictMock(ServletContext.class);
-    EasyMock.expect(context.getResource("/component/2.1.1/bad.jpg")).andReturn(null);
-    EasyMock.replay(context);
+    ServletContext context = createStrictMock(ServletContext.class);
+    expect(context.getResource("/static/2.1.1/bad.jpg")).andReturn(null);
+    replay(context);
 
-    HttpServletRequest req = EasyMock.createStrictMock(HttpServletRequest.class);
-    EasyMock.expect(req.getRequestURI()).andReturn("/component/2.1.1/bad.jpg");
-    EasyMock.expect(req.getContextPath()).andReturn("");
-    EasyMock.expect(req.getDateHeader("If-Modified-Since")).andReturn(0l);
-    EasyMock.replay(req);
+    HttpServletRequest req = createStrictMock(HttpServletRequest.class);
+    expect(req.getRequestURI()).andReturn("/static/2.1.1/bad.jpg");
+    expect(req.getContextPath()).andReturn("");
+    expect(req.getDateHeader("If-Modified-Since")).andReturn(0l);
+    replay(req);
 
-    HttpServletResponse res = EasyMock.createStrictMock(HttpServletResponse.class);
-    EasyMock.replay(res);
+    HttpServletResponse res = createStrictMock(HttpServletResponse.class);
+    replay(res);
 
-    WorkflowChain wc = EasyMock.createStrictMock(WorkflowChain.class);
+    WorkflowChain wc = createStrictMock(WorkflowChain.class);
     wc.continueWorkflow();
-    EasyMock.replay(wc);
+    replay(wc);
 
     StaticResourceWorkflow srw = new StaticResourceWorkflow(context, req, res, configuration);
     srw.perform(wc);
-    EasyMock.verify(configuration, req, res, wc);
+    verify(configuration, req, res, wc);
   }
 
   @Test
   public void normal() throws IOException, ServletException {
     PrimeMVCConfiguration configuration = makeConfiguration();
 
-    ServletContext context = EasyMock.createStrictMock(ServletContext.class);
-    EasyMock.replay(context);
+    ServletContext context = createStrictMock(ServletContext.class);
+    replay(context);
 
-    HttpServletRequest req = EasyMock.createStrictMock(HttpServletRequest.class);
-    EasyMock.expect(req.getRequestURI()).andReturn("/foo/bar");
-    EasyMock.expect(req.getContextPath()).andReturn("");
-    EasyMock.replay(req);
+    HttpServletRequest req = createStrictMock(HttpServletRequest.class);
+    expect(req.getRequestURI()).andReturn("/foo/bar");
+    expect(req.getContextPath()).andReturn("");
+    replay(req);
 
-    HttpServletResponse res = EasyMock.createStrictMock(HttpServletResponse.class);
-    EasyMock.replay(res);
+    HttpServletResponse res = createStrictMock(HttpServletResponse.class);
+    replay(res);
 
-    WorkflowChain wc = EasyMock.createStrictMock(WorkflowChain.class);
+    WorkflowChain wc = createStrictMock(WorkflowChain.class);
     wc.continueWorkflow();
-    EasyMock.replay(wc);
+    replay(wc);
 
     StaticResourceWorkflow srw = new StaticResourceWorkflow(context, req, res, configuration);
     srw.perform(wc);
-    EasyMock.verify(configuration, req, res, wc);
+    verify(configuration, req, res, wc);
   }
 
   private PrimeMVCConfiguration makeConfiguration() {
-    PrimeMVCConfiguration configuration = EasyMock.createStrictMock(PrimeMVCConfiguration.class);
-    String[] prefixes = new String[]{"/module", "/component", "/static", "/jcatapult"};
-    EasyMock.expect(configuration.staticResourcePrefixes()).andReturn(prefixes);
-    EasyMock.expect(configuration.staticResourcesEnabled()).andReturn(true);
-    EasyMock.replay(configuration);
+    PrimeMVCConfiguration configuration = createStrictMock(PrimeMVCConfiguration.class);
+    String[] prefixes = new String[]{"/static"};
+    expect(configuration.staticResourcePrefixes()).andReturn(prefixes);
+    expect(configuration.staticResourcesEnabled()).andReturn(true);
+    replay(configuration);
     return configuration;
   }
 }

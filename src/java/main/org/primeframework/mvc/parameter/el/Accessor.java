@@ -16,8 +16,8 @@
 package org.primeframework.mvc.parameter.el;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Array;
-import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -65,44 +65,44 @@ public abstract class Accessor {
 
   public abstract boolean isIndexed();
 
-  protected abstract Object get(Context context);
+  protected abstract Object get(Expression expression);
 
-  protected abstract void set(String[] values, Context context);
+  protected abstract void set(String[] values, Expression expression);
 
-  protected abstract void set(Object value, Context context);
+  protected abstract void set(Object value, Expression expression);
 
   protected abstract <T extends Annotation> T getAnnotation(Class<T> type);
 
-  public final Object get(Object object, Context context) {
+  public final Object get(Object object, Expression expression) {
     this.object = object;
-    return get(context);
+    return get(expression);
   }
 
-  public final void set(Object object, String[] values, Context context) {
+  public final void set(Object object, String[] values, Expression expression) {
     this.object = object;
-    set(values, context);
+    set(values, expression);
   }
 
-  public final void set(Object object, Object value, Context context) {
+  public final void set(Object object, Object value, Expression expression) {
     this.object = object;
-    set(value, context);
+    set(value, expression);
   }
 
   /**
    * After the object is originally get or set, this method can be called to update the value. This method should only
-   * work if the {@link #set(Object, String[], Context)} or {@link #get(Object, Context)} method was called first.
+   * work if the {@link #set(Object, String[], Expression)} or {@link #get(Object, Expression)} method was called first.
    * <p/>
    * <strong>NOTE:</strong> Accessors are not thread safe and need not be because a new one is created for each atom.
    *
    * @param value   The value to update the accessor with.
-   * @param context The current context.
+   * @param expression The current expression.
    */
-  public void update(Object value, Context context) {
+  public void update(Object value, Expression expression) {
     if (object == null) {
       throw new IllegalStateException("The object is null, unable to update.");
     }
 
-    set(object, value, context);
+    set(object, value, expression);
   }
 
   /**
@@ -144,7 +144,7 @@ public abstract class Accessor {
       try {
         value = typeClass.newInstance();
       } catch (Exception e) {
-        throw new ErrorException("Unable to instantiate object [" + typeClass.getName() + "]");
+        throw new ErrorException("error", "Unable to instantiate object [" + typeClass.getName() + "]");
       }
     }
 
@@ -156,23 +156,25 @@ public abstract class Accessor {
    * method attempts to convert the value regardless of the value being null. However, this method short circuits and
    * returns the value unchanged if value is runtime assignable to the type of this BaseBeanProperty.
    *
-   * @param context The current context.
-   * @param field   The field that the conversion is occurring for. This is used to look for conversion annotations.
+   * @param expression The current expression.
+   * @param accessibleObject   The field or method that the conversion is occurring for. This is used to look for
+   *                           conversion annotations.
    * @param values  The String values to convert.
    * @return The value parameter converted to the correct type.
    * @throws ConversionException If there was a problem converting the parameter.
    */
-  protected Object convert(Context context, Field field, final String... values) throws ConversionException {
+  @SuppressWarnings("unchecked")
+  protected Object convert(Expression expression, AccessibleObject accessibleObject, final String... values) throws ConversionException {
     Object newValue = values;
 
     // First look for annotations
-    if (field != null) {
-      Annotation[] annotations = field.getAnnotations();
+    if (accessibleObject != null) {
+      Annotation[] annotations = accessibleObject.getAnnotations();
       for (Annotation annotation : annotations) {
         ConverterAnnotation converterAnnotation = annotation.annotationType().getAnnotation(ConverterAnnotation.class);
         if (converterAnnotation != null) {
           AnnotationConverter converter = converterProvider.lookup(annotation);
-          return converter.convertFromStrings(annotation, values, type, context.getAttributes(), context.getExpression());
+          return converter.convertFromStrings(annotation, values, type, expression.getAttributes(), expression.getExpression());
         }
       }
     }
@@ -185,7 +187,7 @@ public abstract class Accessor {
         throw new ConverterStateException("No type converter found for the type [" + typeClass.getName() + "]");
       }
 
-      newValue = converter.convertFromStrings(type, context.getAttributes(), context.getExpression(), values);
+      newValue = converter.convertFromStrings(type, expression.getAttributes(), expression.getExpression(), values);
     }
 
     return newValue;
@@ -232,6 +234,7 @@ public abstract class Accessor {
    * @param index The index.
    * @param value The value.
    */
+  @SuppressWarnings("unchecked")
   protected void setValueIntoCollection(int index, Object value) {
     if (this.object.getClass().isArray()) {
       Array.set(this.object, index, value);
@@ -239,7 +242,7 @@ public abstract class Accessor {
       List l = (List) this.object;
       l.set(index, value);
     } else {
-      throw new ErrorException("You can only set values into arrays and Lists. You are setting a parameter into [" +
+      throw new ErrorException("error", "You can only set values into arrays and Lists. You are setting a parameter into [" +
         getMemberAccessor() + "] which is of type [" + this.object.getClass() + "]");
     }
   }

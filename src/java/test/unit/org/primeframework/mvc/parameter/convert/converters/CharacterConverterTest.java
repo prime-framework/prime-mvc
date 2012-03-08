@@ -36,27 +36,27 @@ public class CharacterConverterTest {
     assertNull(cw);
 
     char c = (Character) converter.convertFromStrings(Character.TYPE, null, "testExpr", ArrayUtils.toArray((String) null));
-    assertEquals('\u0000', c);
+    assertEquals(c, '\u0000');
 
     cw = (Character) converter.convertFromStrings(Character.class, null, "testExpr", ArrayUtils.toArray("c"));
-    assertEquals('c', (char) cw);
+    assertEquals((char) cw, 'c');
 
     c = (Character) converter.convertFromStrings(Character.TYPE, null, "testExpr", ArrayUtils.toArray("c"));
-    assertEquals('c', c);
+    assertEquals(c, 'c');
 
     cw = (Character) converter.convertFromStrings(Character.class, null, "testExpr", ArrayUtils.toArray(" "));
     assertNull(cw);
 
     c = (Character) converter.convertFromStrings(Character.TYPE, null, "testExpr", ArrayUtils.toArray(" "));
-    assertEquals(0, c);
+    assertEquals(c, 0);
 
     Character[] ca = (Character[]) converter.convertFromStrings(Character[].class, null, "testExpr", ArrayUtils.toArray("c", "d"));
-    assertEquals((Character) 'c', ca[0]);
-    assertEquals((Character) 'd', ca[1]);
+    assertEquals(ca[0], (Character) 'c');
+    assertEquals(ca[1], (Character) 'd');
 
     char[] cpa = (char[]) converter.convertFromStrings(char[].class, null, "testExpr", ArrayUtils.toArray("c", "d"));
-    assertEquals('c', cpa[0]);
-    assertEquals('d', cpa[1]);
+    assertEquals(cpa[0], 'c');
+    assertEquals(cpa[1], 'd');
 
     try {
       converter.convertFromStrings(Character.class, null, "testExpr", ArrayUtils.toArray("bad"));
@@ -80,9 +80,9 @@ public class CharacterConverterTest {
     assertNull(str);
 
     str = converter.convertToString(Character.class, null, "testExpr", 'c');
-    assertEquals("c", str);
+    assertEquals(str, "c");
 
     str = converter.convertToString(Character.TYPE, null, "testExpr", 'c');
-    assertEquals("c", str);
+    assertEquals(str, "c");
   }
 }

@@ -46,7 +46,6 @@ public class CheckboxTest extends ControlBaseTest {
       attr("value", "test-value").
       attr("required", true).
       attr("class", "css-class").
-      attr("bundle", "/checkbox-bundle").
       go("<input type=\"hidden\" name=\"test@param\" value=\"param-value\"/>\n" +
       "<div class=\"css-class-checkbox css-class-input css-class-control checkbox input control\">\n" +
       "<div class=\"label-container\"><label for=\"test\" class=\"label\">Test<span class=\"required\">*</span></label></div>\n" +
@@ -165,7 +164,7 @@ public class CheckboxTest extends ControlBaseTest {
       attr("value", "true").
       go("<input type=\"hidden\" name=\"user.male@param\" value=\"param-value\"/>\n" +
       "<div class=\"checkbox input control\">\n" +
-      "<div class=\"label-container\"><label for=\"user_male\" class=\"label\"><span class=\"error\">Male? (Must be male, Check this box dude!)</span></label></div>\n" +
+      "<div class=\"label-container\"><label for=\"user_male\" class=\"label\"><span class=\"error\">Male? (fieldError1, fieldError2)</span></label></div>\n" +
       "<div class=\"control-container\"><input type=\"checkbox\" id=\"user_male\" name=\"user.male\" value=\"true\"/><input type=\"hidden\" name=\"__cb_user.male\" value=\"\"/></div>\n" +
       "</div>\n");
   }

@@ -114,7 +114,7 @@ public class RequestBodyWorkflow implements Workflow {
           }
 
           String contentType = item.getContentType();
-          File file = File.createTempFile("jcatapult", "fileupload");
+          File file = File.createTempFile("prime", "fileupload");
           item.write(file);
 
           // Handle when the user doesn't provide a file at all

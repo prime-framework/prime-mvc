@@ -33,13 +33,12 @@ public class PasswordTest extends ControlBaseTest {
   @Inject public Password password;
 
   @Test
-  public void testActionLess() {
+  public void actionLess() {
     ais.setCurrent(new DefaultActionInvocation(null, "/password", null, null));
     new ControlTester(password).
       attr("name", "test").
       attr("class", "css-class").
       attr("value", "password").
-      attr("bundle", "/password-bundle").
       go("<input type=\"hidden\" name=\"test@param\" value=\"param-value\"/>\n" +
         "<div class=\"css-class-password css-class-input css-class-control password input control\">\n" +
         "<div class=\"label-container\"><label for=\"test\" class=\"label\">Test</label></div>\n" +
@@ -48,7 +47,7 @@ public class PasswordTest extends ControlBaseTest {
   }
 
   @Test
-  public void testAction() {
+  public void action() {
     Edit edit = new Edit();
     edit.user = new User();
     edit.user.setPassword("Test");
@@ -65,7 +64,7 @@ public class PasswordTest extends ControlBaseTest {
   }
 
   @Test
-  public void testFieldErrors() {
+  public void fieldErrors() {
     Edit edit = new Edit();
     edit.user = new User();
     edit.user.setPassword("Test");
@@ -80,7 +79,7 @@ public class PasswordTest extends ControlBaseTest {
       attr("value", "password").
       go("<input type=\"hidden\" name=\"user.password@param\" value=\"param-value\"/>\n" +
         "<div class=\"password input control\">\n" +
-        "<div class=\"label-container\"><label for=\"user_password\" class=\"label\"><span class=\"error\">Password (Password is required, Password must be cool)</span></label></div>\n" +
+        "<div class=\"label-container\"><label for=\"user_password\" class=\"label\"><span class=\"error\">Password (fieldError1, fieldError2)</span></label></div>\n" +
         "<div class=\"control-container\"><input type=\"password\" id=\"user_password\" name=\"user.password\"/></div>\n" +
         "</div>\n");
   }

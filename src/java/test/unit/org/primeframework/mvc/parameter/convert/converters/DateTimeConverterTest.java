@@ -41,19 +41,19 @@ public class DateTimeConverterTest {
     assertNull(value);
 
     value = (DateTime) converter.convertFromStrings(Locale.class, MapBuilder.asMap("dateTimeFormat", "MM-dd-yyyy"), "testExpr", ArrayUtils.toArray("07-08-2008"));
-    assertEquals(7, value.getMonthOfYear());
-    assertEquals(8, value.getDayOfMonth());
-    assertEquals(2008, value.getYear());
+    assertEquals(value.getMonthOfYear(), 7);
+    assertEquals(value.getDayOfMonth(), 8);
+    assertEquals(value.getYear(), 2008);
 
 
     value = (DateTime) converter.convertFromStrings(Locale.class, MapBuilder.asMap("dateTimeFormat", "MM-dd-yyyy hh:mm:ss aa Z"), "testExpr", ArrayUtils.toArray("07-08-2008 10:13:34 AM -0800"));
-    assertEquals(7, value.getMonthOfYear());
-    assertEquals(8, value.getDayOfMonth());
-    assertEquals(2008, value.getYear());
-    assertEquals(10, value.getHourOfDay());
-    assertEquals(13, value.getMinuteOfHour());
-    assertEquals(34, value.getSecondOfMinute());
-    assertEquals(DateTimeZone.forOffsetHours(-8), value.getZone());
+    assertEquals(value.getMonthOfYear(), 7);
+    assertEquals(value.getDayOfMonth(), 8);
+    assertEquals(value.getYear(), 2008);
+    assertEquals(value.getHourOfDay(), 10);
+    assertEquals(value.getMinuteOfHour(), 13);
+    assertEquals(value.getSecondOfMinute(), 34);
+    assertEquals(value.getZone(), DateTimeZone.forOffsetHours(-8));
 
     try {
       converter.convertFromStrings(Locale.class, MapBuilder.asMap("dateTimeFormat", "MM-dd-yyyy"), "testExpr", ArrayUtils.toArray("07/08/2008"));
@@ -69,6 +69,6 @@ public class DateTimeConverterTest {
     assertNull(str);
 
     str = converter.convertToString(DateTime.class, MapBuilder.asMap("dateTimeFormat", "MM-dd-yyyy"), "testExpr", new DateTime(2008, 7, 8, 1, 1, 1, 0));
-    assertEquals("07-08-2008", str);
+    assertEquals(str, "07-08-2008");
   }
 }

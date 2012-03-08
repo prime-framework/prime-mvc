@@ -76,7 +76,7 @@ public class DefaultURIParameterWorkflowTest extends PrimeBaseTest {
     DefaultURIParameterWorkflow workflow = new DefaultURIParameterWorkflow(wrapper, store);
     workflow.perform(chain);
 
-    assertEquals("12", wrapper.getParameter("id"));
+    assertEquals(wrapper.getParameter("id"), "12");
 
     verify(store, chain);
   }
@@ -99,13 +99,13 @@ public class DefaultURIParameterWorkflowTest extends PrimeBaseTest {
     DefaultURIParameterWorkflow workflow = new DefaultURIParameterWorkflow(wrapper, store);
     workflow.perform(chain);
 
-    assertEquals("brian", wrapper.getParameter("firstName"));
-    assertEquals("pontarelli", wrapper.getParameter("lastName"));
-    assertEquals("then", wrapper.getParameterValues("theRest")[0]);
-    assertEquals("a", wrapper.getParameterValues("theRest")[1]);
-    assertEquals("bunch", wrapper.getParameterValues("theRest")[2]);
-    assertEquals("of", wrapper.getParameterValues("theRest")[3]);
-    assertEquals("stuff", wrapper.getParameterValues("theRest")[4]);
+    assertEquals(wrapper.getParameter("firstName"), "brian");
+    assertEquals(wrapper.getParameter("lastName"), "pontarelli");
+    assertEquals(wrapper.getParameterValues("theRest")[0], "then");
+    assertEquals(wrapper.getParameterValues("theRest")[1], "a");
+    assertEquals(wrapper.getParameterValues("theRest")[2], "bunch");
+    assertEquals(wrapper.getParameterValues("theRest")[3], "of");
+    assertEquals(wrapper.getParameterValues("theRest")[4], "stuff");
 
     verify(store, chain);
   }

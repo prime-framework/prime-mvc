@@ -35,6 +35,7 @@ import org.primeframework.mock.servlet.FileInfo;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
+import org.primeframework.mvc.config.AbstractPrimeMVCConfiguration;
 import org.primeframework.mvc.config.PrimeMVCConfiguration;
 import org.primeframework.mvc.message.FieldMessage;
 import org.primeframework.mvc.message.MessageStore;
@@ -88,12 +89,11 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(expressionEvaluator);
 
     ActionInvocation invocation = createStrictMock(ActionInvocation.class);
-    expect(invocation.action()).andReturn(action);
-    expect(invocation.actionURI()).andReturn("/test");
+    expect(invocation.action()).andReturn(action).times(2);
     replay(invocation);
 
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
-    expect(actionInvocationStore.getCurrent()).andReturn(invocation);
+    expect(actionInvocationStore.getCurrent()).andReturn(invocation).times(2);
     replay(actionInvocationStore);
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
@@ -101,14 +101,13 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(chain);
 
     PrimeMVCConfiguration config = createStrictMock(PrimeMVCConfiguration.class);
-    expect(config.fileUploadAllowedTypes()).andReturn(new String[0]);
-    expect(config.fileUploadMaxSize()).andReturn(10l);
     expect(config.ignoreEmptyParameters()).andReturn(false).times(4);
+    expect(config.allowUnknownParameters()).andReturn(false);
     replay(config);
 
     FieldMessage message = new SimpleFieldMessage("foo", "bar");
     MessageProvider provider = createStrictMock(MessageProvider.class);
-    expect(provider.getFieldMessage(eq("user.inches"), eq("user.inches.conversionError"), (Object[]) aryEq(ArrayUtils.toArray("tall")))).andReturn(message);
+    expect(provider.getFieldMessage("user.inches", "user.inches.conversionError", "tall")).andReturn(message);
     replay(provider);
 
     MessageStore messageStore = createStrictMock(MessageStore.class);
@@ -132,6 +131,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     final HttpServletRequest request = createStrictMock(HttpServletRequest.class);
     expect(request.getParameterMap()).andReturn(values);
+    expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(null);
     replay(request);
 
     ExpressionEvaluator expressionEvaluator = createStrictMock(ExpressionEvaluator.class);
@@ -141,11 +141,11 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(expressionEvaluator);
 
     ActionInvocation invocation = createStrictMock(ActionInvocation.class);
-    expect(invocation.action()).andReturn(action);
+    expect(invocation.action()).andReturn(action).times(2);
     replay(invocation);
 
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
-    expect(actionInvocationStore.getCurrent()).andReturn(invocation);
+    expect(actionInvocationStore.getCurrent()).andReturn(invocation).times(2);
     replay(actionInvocationStore);
 
     MessageStore messageStore = createStrictMock(MessageStore.class);
@@ -155,8 +155,6 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(chain);
 
     PrimeMVCConfiguration config = createStrictMock(PrimeMVCConfiguration.class);
-    expect(config.fileUploadAllowedTypes()).andReturn(new String[0]);
-    expect(config.fileUploadMaxSize()).andReturn(10l);
     expect(config.ignoreEmptyParameters()).andReturn(false);
     expect(config.allowUnknownParameters()).andReturn(false);
     replay(config);
@@ -167,8 +165,6 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
       new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
       new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
-    workflow.perform(chain);
-
     try {
       workflow.perform(chain);
       fail("Should have thrown an exception");
@@ -198,11 +194,11 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(expressionEvaluator);
 
     ActionInvocation invocation = createStrictMock(ActionInvocation.class);
-    expect(invocation.action()).andReturn(action);
+    expect(invocation.action()).andReturn(action).times(2);
     replay(invocation);
 
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
-    expect(actionInvocationStore.getCurrent()).andReturn(invocation);
+    expect(actionInvocationStore.getCurrent()).andReturn(invocation).times(2);
     replay(actionInvocationStore);
 
     MessageStore messageStore = createStrictMock(MessageStore.class);
@@ -213,8 +209,6 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(chain);
 
     PrimeMVCConfiguration config = createStrictMock(PrimeMVCConfiguration.class);
-    expect(config.fileUploadAllowedTypes()).andReturn(new String[0]);
-    expect(config.fileUploadMaxSize()).andReturn(10l);
     expect(config.ignoreEmptyParameters()).andReturn(false);
     expect(config.allowUnknownParameters()).andReturn(true);
     replay(config);
@@ -252,11 +246,11 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(expressionEvaluator);
 
     ActionInvocation invocation = createStrictMock(ActionInvocation.class);
-    expect(invocation.action()).andReturn(action);
+    expect(invocation.action()).andReturn(action).times(2);
     replay(invocation);
 
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
-    expect(actionInvocationStore.getCurrent()).andReturn(invocation);
+    expect(actionInvocationStore.getCurrent()).andReturn(invocation).times(2);
     replay(actionInvocationStore);
 
     MessageStore messageStore = createStrictMock(MessageStore.class);
@@ -267,8 +261,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(chain);
 
     PrimeMVCConfiguration config = createStrictMock(PrimeMVCConfiguration.class);
-    expect(config.fileUploadAllowedTypes()).andReturn(new String[0]);
-    expect(config.fileUploadMaxSize()).andReturn(10l);
+    expect(config.allowUnknownParameters()).andReturn(false);
     replay(config);
 
     MessageProvider provider = createStrictMock(MessageProvider.class);
@@ -305,11 +298,11 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(expressionEvaluator);
 
     ActionInvocation invocation = createStrictMock(ActionInvocation.class);
-    expect(invocation.action()).andReturn(action);
+    expect(invocation.action()).andReturn(action).times(2);
     replay(invocation);
 
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
-    expect(actionInvocationStore.getCurrent()).andReturn(invocation);
+    expect(actionInvocationStore.getCurrent()).andReturn(invocation).times(2);
     replay(actionInvocationStore);
 
     MessageStore messageStore = createStrictMock(MessageStore.class);
@@ -320,9 +313,8 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(chain);
 
     PrimeMVCConfiguration config = createStrictMock(PrimeMVCConfiguration.class);
-    expect(config.fileUploadAllowedTypes()).andReturn(new String[0]);
-    expect(config.fileUploadMaxSize()).andReturn(10l);
     expect(config.ignoreEmptyParameters()).andReturn(false).times(2);
+    expect(config.allowUnknownParameters()).andReturn(false);
     replay(config);
 
     MessageProvider provider = createStrictMock(MessageProvider.class);
@@ -354,11 +346,11 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(request);
 
     ActionInvocation invocation = createStrictMock(ActionInvocation.class);
-    expect(invocation.action()).andReturn(action);
+    expect(invocation.action()).andReturn(action).times(2);
     replay(invocation);
 
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
-    expect(actionInvocationStore.getCurrent()).andReturn(invocation);
+    expect(actionInvocationStore.getCurrent()).andReturn(invocation).times(2);
     replay(actionInvocationStore);
 
     MessageStore messageStore = createStrictMock(MessageStore.class);
@@ -369,9 +361,8 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(chain);
 
     PrimeMVCConfiguration config = createStrictMock(PrimeMVCConfiguration.class);
-    expect(config.fileUploadAllowedTypes()).andReturn(new String[0]);
-    expect(config.fileUploadMaxSize()).andReturn(10l);
     expect(config.ignoreEmptyParameters()).andReturn(false).times(3);
+    expect(config.allowUnknownParameters()).andReturn(false);
     replay(config);
 
     MessageProvider provider = createStrictMock(MessageProvider.class);
@@ -399,8 +390,9 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(request);
 
     PrimeMVCConfiguration config = createStrictMock(PrimeMVCConfiguration.class);
-    expect(config.fileUploadAllowedTypes()).andReturn(new String[]{"text/plain"});
+    expect(config.allowUnknownParameters()).andReturn(false);
     expect(config.fileUploadMaxSize()).andReturn(1024000l);
+    expect(config.fileUploadAllowedTypes()).andReturn(new String[]{"text/plain"});
     replay(config);
 
     Object action = new Object();
@@ -448,8 +440,9 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(request);
 
     PrimeMVCConfiguration config = createStrictMock(PrimeMVCConfiguration.class);
-    expect(config.fileUploadAllowedTypes()).andReturn(new String[]{"text/plain"});
+    expect(config.allowUnknownParameters()).andReturn(false);
     expect(config.fileUploadMaxSize()).andReturn(1024000l);
+    expect(config.fileUploadAllowedTypes()).andReturn(new String[]{"text/plain"});
     replay(config);
 
     Object action = new Object();
@@ -495,8 +488,9 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(request);
 
     PrimeMVCConfiguration config = createStrictMock(PrimeMVCConfiguration.class);
-    expect(config.fileUploadAllowedTypes()).andReturn(new String[0]);
+    expect(config.allowUnknownParameters()).andReturn(false);
     expect(config.fileUploadMaxSize()).andReturn(1l);
+    expect(config.fileUploadAllowedTypes()).andReturn(AbstractPrimeMVCConfiguration.ALLOWED_TYPES);
     replay(config);
 
     Object action = new Object();
@@ -506,7 +500,6 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     ActionInvocation invocation = createStrictMock(ActionInvocation.class);
     expect(invocation.action()).andReturn(action);
-    expect(invocation.actionURI()).andReturn("/test");
     replay(invocation);
 
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
@@ -519,7 +512,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     FieldMessage message = new SimpleFieldMessage("foo", "bar");
     MessageProvider provider = createStrictMock(MessageProvider.class);
-    expect(provider.getFieldMessage(eq("userfile"), eq("userfile.fileUploadSizeError"), (Object[]) aryEq(ArrayUtils.toArray("1")))).andReturn(message);
+    expect(provider.getFieldMessage("userfile", "userfile.fileUploadSizeError", 5l, 1l)).andReturn(message);
     replay(provider);
 
     MessageStore messageStore = createStrictMock(MessageStore.class);
@@ -544,9 +537,11 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(files);
     replay(request);
 
+    String[] contentTypes = new String[]{"test/xml"};
     PrimeMVCConfiguration config = createStrictMock(PrimeMVCConfiguration.class);
-    expect(config.fileUploadAllowedTypes()).andReturn(new String[]{"test/xml"});
+    expect(config.allowUnknownParameters()).andReturn(false);
     expect(config.fileUploadMaxSize()).andReturn(10l);
+    expect(config.fileUploadAllowedTypes()).andReturn(contentTypes);
     replay(config);
 
     Object action = new Object();
@@ -556,7 +551,6 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     ActionInvocation invocation = createStrictMock(ActionInvocation.class);
     expect(invocation.action()).andReturn(action);
-    expect(invocation.actionURI()).andReturn("/test");
     replay(invocation);
 
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
@@ -569,7 +563,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     FieldMessage message = new SimpleFieldMessage("foo", "bar");
     MessageProvider provider = createStrictMock(MessageProvider.class);
-    expect(provider.getFieldMessage(eq("userfile"), eq("userfile.fileUploadContentTypeError"), (Object[]) aryEq(ArrayUtils.toArray("text/plain")))).andReturn(message);
+    expect(provider.getFieldMessage("userfile", "userfile.fileUploadContentTypeError", "text/plain", contentTypes)).andReturn(message);
     replay(provider);
 
     MessageStore messageStore = createStrictMock(MessageStore.class);
@@ -595,8 +589,9 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(request);
 
     PrimeMVCConfiguration config = createStrictMock(PrimeMVCConfiguration.class);
-    expect(config.fileUploadAllowedTypes()).andReturn(new String[0]);
-    expect(config.fileUploadMaxSize()).andReturn(1024000l);
+    expect(config.allowUnknownParameters()).andReturn(false);
+    expect(config.fileUploadMaxSize()).andReturn(AbstractPrimeMVCConfiguration.MAX_SIZE);
+    expect(config.fileUploadAllowedTypes()).andReturn(AbstractPrimeMVCConfiguration.ALLOWED_TYPES);
     replay(config);
 
     Object action = new Object();
@@ -618,7 +613,6 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     ActionInvocation invocation = createStrictMock(ActionInvocation.class);
     expect(invocation.action()).andReturn(action);
-    expect(invocation.actionURI()).andReturn("/test");
     replay(invocation);
 
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
@@ -631,7 +625,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     FieldMessage message = new SimpleFieldMessage("foo", "bar");
     MessageProvider provider = createStrictMock(MessageProvider.class);
-    expect(provider.getFieldMessage(eq("userfile"), eq("userfile.fileUploadSizeError"), (Object[]) aryEq(ArrayUtils.toArray("1")))).andReturn(message);
+    expect(provider.getFieldMessage("userfile", "userfile.fileUploadSizeError", 5l, 1l)).andReturn(message);
     replay(provider);
 
     MessageStore messageStore = createStrictMock(MessageStore.class);
@@ -657,10 +651,12 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(request);
 
     PrimeMVCConfiguration config = createStrictMock(PrimeMVCConfiguration.class);
-    expect(config.fileUploadAllowedTypes()).andReturn(new String[0]);
-    expect(config.fileUploadMaxSize()).andReturn(1024000l);
+    expect(config.allowUnknownParameters()).andReturn(false);
+    expect(config.fileUploadMaxSize()).andReturn(AbstractPrimeMVCConfiguration.MAX_SIZE);
+    expect(config.fileUploadAllowedTypes()).andReturn(AbstractPrimeMVCConfiguration.ALLOWED_TYPES);
     replay(config);
 
+    final String[] annotationTypes = new String[]{"text/xml"};
     Object action = new Object();
     ExpressionEvaluator expressionEvaluator = createStrictMock(ExpressionEvaluator.class);
     expect(expressionEvaluator.getAnnotation(FileUpload.class, "userfile", action)).andReturn(new FileUpload() {
@@ -669,7 +665,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
       }
 
       public String[] contentTypes() {
-        return new String[]{"text/xml"};
+        return annotationTypes;
       }
 
       public Class<? extends Annotation> annotationType() {
@@ -680,7 +676,6 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     ActionInvocation invocation = createStrictMock(ActionInvocation.class);
     expect(invocation.action()).andReturn(action);
-    expect(invocation.actionURI()).andReturn("/test");
     replay(invocation);
 
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
@@ -693,7 +688,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     FieldMessage message = new SimpleFieldMessage("foo", "bar");
     MessageProvider provider = createStrictMock(MessageProvider.class);
-    expect(provider.getFieldMessage(eq("userfile"), eq("userfile.fileUploadContentTypeError"), (Object[]) aryEq(ArrayUtils.toArray("text/plain")))).andReturn(message);
+    expect(provider.getFieldMessage("userfile", "userfile.fileUploadContentTypeError", "text/plain", annotationTypes)).andReturn(message);
     replay(provider);
 
     MessageStore messageStore = createStrictMock(MessageStore.class);
@@ -714,12 +709,12 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
       public boolean matches(Object argument) {
         List<FileInfo> list = (List<FileInfo>) argument;
         assertNotNull(list);
-        assertEquals(1, list.size());
+        assertEquals(list.size(), 1);
         assertNotNull(list.get(0));
-        assertEquals("text/plain", list.get(0).contentType);
-        assertEquals("test-file-upload.txt", list.get(0).name);
+        assertEquals(list.get(0).contentType, "text/plain");
+        assertEquals(list.get(0).name, "test-file-upload.txt");
         try {
-          assertEquals("1234\n", FileUtils.readFileToString(list.get(0).file));
+          assertEquals(FileUtils.readFileToString(list.get(0).file), "1234\n");
         } catch (IOException e) {
           throw new RuntimeException(e);
         }
@@ -739,16 +734,16 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
       public boolean matches(Object argument) {
         List<FileInfo> list = (List<FileInfo>) argument;
         assertNotNull(list);
-        assertEquals(2, list.size());
+        assertEquals(list.size(), 2);
         assertNotNull(list.get(0));
         assertNotNull(list.get(1));
-        assertEquals("text/plain", list.get(0).contentType);
-        assertEquals("text/plain", list.get(1).contentType);
-        assertEquals("test-file-upload.txt", list.get(0).name);
-        assertEquals("test-file-upload2.txt", list.get(1).name);
+        assertEquals(list.get(0).contentType, "text/plain");
+        assertEquals(list.get(1).contentType, "text/plain");
+        assertEquals(list.get(0).name, "test-file-upload.txt");
+        assertEquals(list.get(1).name, "test-file-upload2.txt");
         try {
-          assertEquals("1234\n", FileUtils.readFileToString(list.get(0).file));
-          assertEquals("1234\n", FileUtils.readFileToString(list.get(1).file));
+          assertEquals(FileUtils.readFileToString(list.get(0).file), "1234\n");
+          assertEquals(FileUtils.readFileToString(list.get(1).file), "1234\n");
         } catch (IOException e) {
           throw new RuntimeException(e);
         }

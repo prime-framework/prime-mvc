@@ -15,11 +15,15 @@
  */
 package org.primeframework.mvc.validation;
 
+import javax.servlet.ServletException;
+import java.io.IOException;
+
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
 
 import static org.easymock.EasyMock.*;
+import static org.testng.Assert.fail;
 
 /**
  * Test the validation workflow.
@@ -54,7 +58,12 @@ public class DefaultValidationWorkflowTest extends PrimeBaseTest {
     replay(chain);
 
     DefaultValidationWorkflow workflow = new DefaultValidationWorkflow(validationProcessor);
-    workflow.perform(chain);
+    try {
+      workflow.perform(chain);
+      fail("Should have thrown an exception");
+    } catch (ValidationException e) {
+      // Expected
+    }
 
     verify(validationProcessor, chain);
   }

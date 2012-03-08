@@ -30,7 +30,6 @@ public class PropertyInfo {
   private String name;
   private final Map<String, Method> methods = new HashMap<String, Method>();
   private Class<?> klass;
-  private Class<?> type;
   private boolean indexed;
   private Type genericType;
 
@@ -42,20 +41,8 @@ public class PropertyInfo {
     this.name = name;
   }
 
-  public Class<?> getKlass() {
-    return klass;
-  }
-
   public void setKlass(Class<?> klass) {
     this.klass = klass;
-  }
-
-  public Class<?> getType() {
-    return type;
-  }
-
-  public void setType(Class<?> type) {
-    this.type = type;
   }
 
   public boolean isIndexed() {

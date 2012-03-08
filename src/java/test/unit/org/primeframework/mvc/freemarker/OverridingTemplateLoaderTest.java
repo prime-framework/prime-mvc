@@ -40,7 +40,7 @@ public class OverridingTemplateLoaderTest {
     OverridingTemplateLoader loader = new OverridingTemplateLoader(resolver);
     URLTemplateSource source = (URLTemplateSource) loader.findTemplateSource("project.xml");
     File file = new File("project.xml");
-    assertEquals(file.lastModified(), loader.getLastModified(source));
+    assertEquals(loader.getLastModified(source), file.lastModified());
     assertNotNull(loader.getReader(source, "UTF-8"));
     loader.closeTemplateSource(source);
 
@@ -57,7 +57,7 @@ public class OverridingTemplateLoaderTest {
     OverridingTemplateLoader loader = new OverridingTemplateLoader(resolver);
     URLTemplateSource source = (URLTemplateSource) loader.findTemplateSource("project.xml");
     File file = new File("project.xml");
-    assertEquals(file.lastModified(), loader.getLastModified(source));
+    assertEquals(loader.getLastModified(source), file.lastModified());
     assertNotNull(loader.getReader(source, "UTF-8"));
     loader.closeTemplateSource(source);
 

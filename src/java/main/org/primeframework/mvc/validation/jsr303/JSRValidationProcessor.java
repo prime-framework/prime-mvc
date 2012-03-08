@@ -64,7 +64,7 @@ public class JSRValidationProcessor implements ValidationProcessor {
     for (ConstraintViolation<Object> violation : violations) {
       String constraint = violation.getConstraintDescriptor().getAnnotation().annotationType().getSimpleName();
       if (violation.getPropertyPath() == null || StringUtils.isBlank(violation.getPropertyPath().toString())) {
-        throw new ErrorException("Property path undefined for class [" + violation.getLeafBean().getClass().getName() +
+        throw new ErrorException("error", "Property path undefined for class [" + violation.getLeafBean().getClass().getName() +
           "], constraint [" + constraint + "]");
       }
 

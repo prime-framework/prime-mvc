@@ -23,7 +23,7 @@ import com.google.inject.ImplementedBy;
 import freemarker.template.ObjectWrapper;
 
 /**
- * This service provides support for FreeMarker to JCatapult libraries and applications. In most cases callers need not
+ * This service provides support for FreeMarker to Prime libraries and applications. In most cases callers need not
  * know anything about the implementation.
  *
  * @author Brian Pontarelli

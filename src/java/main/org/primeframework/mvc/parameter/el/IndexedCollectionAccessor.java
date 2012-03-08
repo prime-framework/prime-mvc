@@ -53,16 +53,16 @@ public class IndexedCollectionAccessor extends Accessor {
     return false;
   }
 
-  public Object get(Context context) {
+  public Object get(Expression expression) {
     return getValueFromCollection(index);
   }
 
-  public void set(String[] values, Context context) {
-    set(convert(context, memberAccessor.field, values), context);
+  public void set(String[] values, Expression expression) {
+    set(convert(expression, memberAccessor.field, values), expression);
   }
 
-  public void set(Object value, Context context) {
-    object = pad(object, context);
+  public void set(Object value, Expression expression) {
+    object = pad(object, expression);
 
     setValueIntoCollection(index, value);
   }
@@ -83,11 +83,11 @@ public class IndexedCollectionAccessor extends Accessor {
    *
    * @param object  The object to pad. If this isn't a List or an array, this method does nothing and just returns the
    *                Object.
-   * @param context The current context.
+   * @param expression The current expression.
    * @return The padded list or array.
    */
   @SuppressWarnings("unchecked")
-  private Object pad(Object object, Context context) {
+  private Object pad(Object object, Expression expression) {
     if (object instanceof List) {
       List list = ((List) object);
       int length = list.size();
@@ -104,7 +104,7 @@ public class IndexedCollectionAccessor extends Accessor {
         object = newArray;
 
         // Set the new array into the member
-        memberAccessor.update(newArray, context);
+        memberAccessor.update(newArray, expression);
       }
     }
 

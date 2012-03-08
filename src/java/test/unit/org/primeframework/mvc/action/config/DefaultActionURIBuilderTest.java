@@ -32,6 +32,6 @@ public class DefaultActionURIBuilderTest {
   @Test
   public void build() {
     DefaultURIBuilder builder = new DefaultURIBuilder();
-    assertEquals("/config/default-action-uri-builder-test", builder.build(this.getClass()));
+    assertEquals(builder.build(this.getClass()), "/config/default-action-uri-builder-test");
   }
 }

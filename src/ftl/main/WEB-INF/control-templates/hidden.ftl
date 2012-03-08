@@ -1,4 +1,4 @@
 [#ftl/]
-[#include "macros.ftl"/]
-[#include "dynamic-attributes.ftl"/]
-<input type="hidden"[@append_attributes attributes=attributes list=[]/]/>
+[#import "_macros.ftl" as macros/]
+[@macros.dynamic_attributes attrs=dynamicAttributes name=attributes['name']/]
+<input type="hidden"[@macros.append_attributes attributes=attributes list=[]/]/>

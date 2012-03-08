@@ -50,9 +50,9 @@ public class DefaultResultInvocationProviderTest {
     ResultInvocation invocation = provider.lookup();
     assertNotNull(invocation);
     assertNull(invocation.resultCode());
-    assertEquals("/foo/bar", invocation.uri());
+    assertEquals(invocation.uri(), "/foo/bar");
     assertNull(((Forward) invocation.annotation()).code());
-    assertEquals("/WEB-INF/templates/foo/bar.ftl", ((Forward) invocation.annotation()).page());
+    assertEquals(((Forward) invocation.annotation()).page(), "/WEB-INF/templates/foo/bar.ftl");
 
     verify(context);
   }
@@ -74,9 +74,9 @@ public class DefaultResultInvocationProviderTest {
     ResultInvocation invocation = provider.lookup();
     assertNotNull(invocation);
     assertNull(invocation.resultCode());
-    assertEquals("/foo/bar", invocation.uri());
+    assertEquals(invocation.uri(), "/foo/bar");
     assertNull(((Forward) invocation.annotation()).code());
-    assertEquals("/WEB-INF/templates/foo/bar.ftl", ((Forward) invocation.annotation()).page());
+    assertEquals(((Forward) invocation.annotation()).page(), "/WEB-INF/templates/foo/bar.ftl");
 
     verify(context);
   }
@@ -98,9 +98,9 @@ public class DefaultResultInvocationProviderTest {
     ResultInvocation invocation = provider.lookup();
     assertNotNull(invocation);
     assertNull(invocation.resultCode());
-    assertEquals("/foo/bar", invocation.uri());
+    assertEquals(invocation.uri(), "/foo/bar");
     assertNull(((Redirect) invocation.annotation()).code());
-    assertEquals("/foo/bar/", ((Redirect) invocation.annotation()).uri());
+    assertEquals(((Redirect) invocation.annotation()).uri(), "/foo/bar/");
 
     verify(context);
   }
@@ -124,9 +124,9 @@ public class DefaultResultInvocationProviderTest {
     ResultInvocation invocation = provider.lookup();
     assertNotNull(invocation);
     assertNull(invocation.resultCode());
-    assertEquals("/foo/bar", invocation.uri());
+    assertEquals(invocation.uri(), "/foo/bar");
     assertNull(((Redirect) invocation.annotation()).code());
-    assertEquals("/foo/bar/", ((Redirect) invocation.annotation()).uri());
+    assertEquals(((Redirect) invocation.annotation()).uri(), "/foo/bar/");
 
     verify(context);
   }
@@ -146,9 +146,9 @@ public class DefaultResultInvocationProviderTest {
     ResultInvocation invocation = provider.lookup();
     assertNotNull(invocation);
     assertNull(invocation.resultCode());
-    assertEquals("/foo/bar/", invocation.uri());
+    assertEquals(invocation.uri(), "/foo/bar/");
     assertNull(((Forward) invocation.annotation()).code());
-    assertEquals("/WEB-INF/templates/foo/bar/index.ftl", ((Forward) invocation.annotation()).page());
+    assertEquals(((Forward) invocation.annotation()).page(), "/WEB-INF/templates/foo/bar/index.ftl");
 
     verify(context);
   }
@@ -167,10 +167,10 @@ public class DefaultResultInvocationProviderTest {
     DefaultResultInvocationProvider provider = new DefaultResultInvocationProvider(store, new ForwardResult(store, null, null, context, null, null, null, Locale.CANADA));
     ResultInvocation invocation = provider.lookup("success");
     assertNotNull(invocation);
-    assertEquals("success", invocation.resultCode());
-    assertEquals("/foo/bar", invocation.uri());
-    assertEquals("success", ((Forward) invocation.annotation()).code());
-    assertEquals("foo.jsp", ((Forward) invocation.annotation()).page());
+    assertEquals(invocation.resultCode(), "success");
+    assertEquals(invocation.uri(), "/foo/bar");
+    assertEquals(((Forward) invocation.annotation()).code(), "success");
+    assertEquals(((Forward) invocation.annotation()).page(), "foo.jsp");
 
     verify(context);
   }
@@ -190,10 +190,10 @@ public class DefaultResultInvocationProviderTest {
     DefaultResultInvocationProvider provider = new DefaultResultInvocationProvider(store, new ForwardResult(store, null, null, context, null, null, null, Locale.CANADA));
     ResultInvocation invocation = provider.lookup("error");
     assertNotNull(invocation);
-    assertEquals("error", invocation.resultCode());
-    assertEquals("/foo/bar", invocation.uri());
-    assertEquals("error", ((Forward) invocation.annotation()).code());
-    assertEquals("/WEB-INF/templates/foo/bar-error.ftl", ((Forward) invocation.annotation()).page());
+    assertEquals(invocation.resultCode(), "error");
+    assertEquals(invocation.uri(), "/foo/bar");
+    assertEquals(((Forward) invocation.annotation()).code(), "error");
+    assertEquals(((Forward) invocation.annotation()).page(), "/WEB-INF/templates/foo/bar-error.ftl");
 
     verify(context);
   }
@@ -217,10 +217,10 @@ public class DefaultResultInvocationProviderTest {
     DefaultResultInvocationProvider provider = new DefaultResultInvocationProvider(store, new ForwardResult(store, null, null, context, null, null, null, Locale.CANADA));
     ResultInvocation invocation = provider.lookup("error");
     assertNotNull(invocation);
-    assertEquals("error", invocation.resultCode());
-    assertEquals("/foo/bar", invocation.uri());
-    assertEquals("error", ((Forward) invocation.annotation()).code());
-    assertEquals("/WEB-INF/templates/foo/bar-error.ftl", ((Forward) invocation.annotation()).page());
+    assertEquals(invocation.resultCode(), "error");
+    assertEquals(invocation.uri(), "/foo/bar");
+    assertEquals(((Forward) invocation.annotation()).code(), "error");
+    assertEquals(((Forward) invocation.annotation()).page(), "/WEB-INF/templates/foo/bar-error.ftl");
 
     verify(context);
   }
@@ -240,10 +240,10 @@ public class DefaultResultInvocationProviderTest {
     DefaultResultInvocationProvider provider = new DefaultResultInvocationProvider(store, new ForwardResult(store, null, null, context, null, null, null, Locale.CANADA));
     ResultInvocation invocation = provider.lookup("error");
     assertNotNull(invocation);
-    assertEquals("error", invocation.resultCode());
-    assertEquals("/foo/bar/", invocation.uri());
-    assertEquals("error", ((Forward) invocation.annotation()).code());
-    assertEquals("/WEB-INF/templates/foo/bar/index.ftl", ((Forward) invocation.annotation()).page());
+    assertEquals(invocation.resultCode(), "error");
+    assertEquals(invocation.uri(), "/foo/bar/");
+    assertEquals(((Forward) invocation.annotation()).code(), "error");
+    assertEquals(((Forward) invocation.annotation()).page(), "/WEB-INF/templates/foo/bar/index.ftl");
 
     verify(context);
   }

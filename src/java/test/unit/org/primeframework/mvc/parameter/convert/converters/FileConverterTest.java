@@ -45,22 +45,22 @@ public class FileConverterTest {
     assertNull(f);
 
     f = (File) converter.convertFromStrings(File.class, map, "testExpr", ArrayUtils.toArray("/tmp"));
-    assertEquals("/tmp", f.getAbsolutePath());
+    assertEquals(f.getAbsolutePath(), "/tmp");
 
-    f = (File) converter.convertFromStrings(File.class, map, "testExpr", ArrayUtils.toArray("/tmp", "jcatapult"));
-    assertEquals("/tmp/jcatapult", f.getAbsolutePath());
+    f = (File) converter.convertFromStrings(File.class, map, "testExpr", ArrayUtils.toArray("/tmp", "prime"));
+    assertEquals(f.getAbsolutePath(), "/tmp/prime");
 
     f = (File) converter.convertFromStrings(File.class, map, "testExpr", ArrayUtils.toArray("project.xml"));
-    assertEquals(new File("project.xml").getAbsolutePath(), f.getAbsolutePath());
+    assertEquals(f.getAbsolutePath(), new File("project.xml").getAbsolutePath());
 
     File[] fa = (File[]) converter.convertFromStrings(File[].class, map, "testExpr", ArrayUtils.toArray("project.xml", "build.xml"));
-    assertEquals(new File("project.xml").getAbsolutePath(), fa[0].getAbsolutePath());
-    assertEquals(new File("build.xml").getAbsolutePath(), fa[1].getAbsolutePath());
+    assertEquals(fa[0].getAbsolutePath(), new File("project.xml").getAbsolutePath());
+    assertEquals(fa[1].getAbsolutePath(), new File("build.xml").getAbsolutePath());
 
     // Test parentDir
     map.put("parentDir", "/tmp");
     f = (File) converter.convertFromStrings(File.class, map, "testExpr", ArrayUtils.toArray("project.xml"));
-    assertEquals(new File("/tmp/project.xml").getAbsolutePath(), f.getAbsolutePath());
+    assertEquals(f.getAbsolutePath(), new File("/tmp/project.xml").getAbsolutePath());
   }
 
   @Test
@@ -70,6 +70,6 @@ public class FileConverterTest {
     assertNull(str);
 
     str = converter.convertToString(File.class, null, "testExpr", new File("project.xml"));
-    assertEquals(new File("project.xml").getAbsolutePath(), str);
+    assertEquals(str, new File("project.xml").getAbsolutePath());
   }
 }

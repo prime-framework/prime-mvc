@@ -77,7 +77,7 @@ public class ControlBaseTest extends PrimeBaseTest {
       }
 
       control.renderEnd(writer);
-      assertEquals(writer.toString(), result);
+      assertEquals(result, writer.toString());
     }
   }
 }

@@ -130,7 +130,7 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     workflow.perform(chain);
 
     ActionInvocation ai = capture.getValue();
-    assertEquals("/admin/user/rest-edit", ai.actionURI());
+    assertEquals(ai.actionURI(), "/admin/user/rest-edit");
     assertCollections(asList("12"), ai.uriParameters());
     assertNull(ai.extension());
     assertNotNull(ai.configuration());
@@ -178,7 +178,7 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     workflow.perform(chain);
 
     ActionInvocation ai = capture.getValue();
-    assertEquals("/complex-rest", ai.actionURI());
+    assertEquals(ai.actionURI(), "/complex-rest");
     assertCollections(asList("brian", "static", "pontarelli", "then", "a", "bunch", "of", "stuff"), ai.uriParameters());
     assertNull(ai.extension());
     assertNotNull(ai.configuration());
@@ -212,7 +212,7 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     DefaultActionMappingWorkflow workflow = new DefaultActionMappingWorkflow(request, response, store, new DefaultActionMapper(provider, injector));
     workflow.perform(chain);
 
-    assertEquals("/foo/", response.getRedirect());
+    assertEquals(response.getRedirect(), "/foo/");
     EasyMock.verify(provider, store, injector, chain);
   }
 
@@ -239,8 +239,8 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     workflow.perform(chain);
 
     ActionInvocation ai = capture.getValue();
-    assertEquals(uri, ai.actionURI());
-    assertEquals(extension, ai.extension());
+    assertEquals(ai.actionURI(), uri);
+    assertEquals(ai.extension(), extension);
     assertNotNull(ai.configuration());
     assertTrue(ai.executeResult());
 

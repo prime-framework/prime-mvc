@@ -28,8 +28,8 @@ import com.google.inject.Inject;
  */
 @SuppressWarnings("unchecked")
 public class DefaultActionInvocationStore implements ActionInvocationStore {
-  public static final String ACTION_INVOCATION_DEQUE_KEY = "jcatapultActionInvocationDeque";
-  public static final String ACTION_INVOCATION_KEY = "jcatapultActionInvocation";
+  public static final String ACTION_INVOCATION_DEQUE_KEY = "primeActionInvocationDeque";
+  public static final String ACTION_INVOCATION_KEY = "primeActionInvocation";
   private final HttpServletRequest request;
 
   @Inject

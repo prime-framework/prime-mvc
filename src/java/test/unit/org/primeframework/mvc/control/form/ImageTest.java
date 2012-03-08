@@ -37,13 +37,12 @@ public class ImageTest extends ControlBaseTest {
       attr("name", "image").
       attr("value", "test-value").
       attr("class", "css-class").
-      attr("bundle", "/image-bundle").
       attr("src", "foo.gif").
       go("<input type=\"hidden\" name=\"image@param\" value=\"param-value\"/>\n" +
         "<input type=\"hidden\" name=\"__a_image\" value=\"\"/>\n" +
         "<div class=\"css-class-image-button css-class-button css-class-control image-button button control\">\n" +
         "<div class=\"label-container\"> </div>\n" +
-        "<div class=\"control-container\"><input type=\"image\" class=\"css-class\" id=\"image\" name=\"image\" src=\"foo.gif\" value=\"Image-Bundle\"/></div>\n" +
+        "<div class=\"control-container\"><input type=\"image\" class=\"css-class\" id=\"image\" name=\"image\" src=\"foo.gif\" value=\"Image\"/></div>\n" +
         "</div>\n");
   }
 

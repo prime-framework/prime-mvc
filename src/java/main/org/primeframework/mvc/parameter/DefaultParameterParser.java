@@ -72,14 +72,64 @@ public class DefaultParameterParser implements ParameterParser {
   public Parameters parse() {
     Map<String, String[]> parameters = request.getParameterMap();
     Parameters result = new Parameters();
-    if (parameters.isEmpty()) {
-      return result;
-    }
+
+    // Grab the files from the request
+    addFiles(result);
 
     // Pull out the check box, radio button and action parameter
-    Map<String, String[]> checkBoxes = new HashMap<String, String[]>();
-    Map<String, String[]> radioButtons = new HashMap<String, String[]>();
-    Set<String> actions = new HashSet<String>();
+    if (!parameters.isEmpty()) {
+      Map<String, String[]> checkBoxes = new HashMap<String, String[]>();
+      Map<String, String[]> radioButtons = new HashMap<String, String[]>();
+      Set<String> actions = new HashSet<String>();
+
+      separateParameters(parameters, result, checkBoxes, radioButtons, actions);
+
+      preParameters(result);
+
+      // Remove all the existing checkbox, radio and action keys
+      checkBoxes.keySet().removeAll(result.optional.keySet());
+      checkBoxes.keySet().removeAll(result.required.keySet());
+      radioButtons.keySet().removeAll(result.optional.keySet());
+      radioButtons.keySet().removeAll(result.required.keySet());
+
+      // Add back in any left overs
+      addUncheckedValues(checkBoxes, result);
+      addUncheckedValues(radioButtons, result);
+
+      // Remove actions from the parameter as they should be ignored right now
+      result.optional.keySet().removeAll(actions);
+      result.required.keySet().removeAll(actions);
+    }
+
+    return result;
+  }
+
+  private void preParameters(Parameters result) {
+    ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
+    Object action = actionInvocation.action();
+    Set<String> members = expressionEvaluator.getAllMembers(action.getClass());
+    for (String member : members) {
+      PreParameter annotation = null;
+      try {
+        annotation = expressionEvaluator.getAnnotation(PreParameter.class, member, action);
+      } catch (ExpressionException e) {
+        // Ignore
+      }
+
+      if (annotation != null) {
+        Struct struct = result.optional.remove(member);
+        if (struct == null) {
+          struct = result.required.remove(member);
+        }
+
+        if (struct != null) {
+          result.pre.put(member, struct);
+        }
+      }
+    }
+  }
+
+  private void separateParameters(Map<String, String[]> parameters, Parameters result, Map<String, String[]> checkBoxes, Map<String, String[]> radioButtons, Set<String> actions) {
     for (String key : parameters.keySet()) {
       if (InternalParameters.isInternalParameter(key)) {
         continue;
@@ -125,54 +175,13 @@ public class DefaultParameterParser implements ParameterParser {
         }
       }
     }
-
-    ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
-    Object action = actionInvocation.action();
-    Set<String> members = expressionEvaluator.getAllMembers(action.getClass());
-    for (String member : members) {
-      PreParameter annotation = null;
-      try {
-        annotation = expressionEvaluator.getAnnotation(PreParameter.class, member, action);
-      } catch (ExpressionException e) {
-        // Ignore
-      }
-
-      if (annotation != null) {
-        Struct struct = result.optional.remove(member);
-        if (struct == null) {
-          struct = result.required.remove(member);
-        }
-
-        if (struct != null) {
-          result.pre.put(member, struct);
-        }
-      }
-    }
-
-    // Grab the files from the request
-    addFiles(result);
-
-    // Remove all the existing checkbox, radio and action keys
-    checkBoxes.keySet().removeAll(result.optional.keySet());
-    checkBoxes.keySet().removeAll(result.required.keySet());
-    radioButtons.keySet().removeAll(result.optional.keySet());
-    radioButtons.keySet().removeAll(result.required.keySet());
-
-    // Add back in any left overs
-    addUncheckedValues(checkBoxes, result);
-    addUncheckedValues(radioButtons, result);
-
-    // Remove actions from the parameter as they should be ignored right now
-    result.optional.keySet().removeAll(actions);
-    result.required.keySet().removeAll(actions);
-
-    return result;
   }
 
   @SuppressWarnings("unchecked")
   protected void addFiles(Parameters result) {
-    if (request.getAttribute(RequestKeys.FILE_ATTRIBUTE) != null) {
-      result.files.putAll((Map<String, List<FileInfo>>) request.getAttribute(RequestKeys.FILE_ATTRIBUTE));
+    Map<String, List<FileInfo>> fileInfos = (Map<String, List<FileInfo>>) request.getAttribute(RequestKeys.FILE_ATTRIBUTE);
+    if (fileInfos != null) {
+      result.files.putAll(fileInfos);
     }
   }
 

@@ -40,9 +40,9 @@ public class LocalDateConverterTest {
     assertNull(value);
 
     value = (LocalDate) converter.convertFromStrings(Locale.class, MapBuilder.asMap("dateTimeFormat", "MM-dd-yyyy"), "testExpr", ArrayUtils.toArray("07-08-2008"));
-    assertEquals(7, value.getMonthOfYear());
-    assertEquals(8, value.getDayOfMonth());
-    assertEquals(2008, value.getYear());
+    assertEquals(value.getMonthOfYear(), 7);
+    assertEquals(value.getDayOfMonth(), 8);
+    assertEquals(value.getYear(), 2008);
 
     try {
       converter.convertFromStrings(Locale.class, MapBuilder.asMap("dateTimeFormat", "MM-dd-yyyy"), "testExpr", ArrayUtils.toArray("07/08/2008"));
@@ -58,6 +58,6 @@ public class LocalDateConverterTest {
     assertNull(str);
 
     str = converter.convertToString(LocalDate.class, MapBuilder.asMap("dateTimeFormat", "MM-dd-yyyy"), "testExpr", new LocalDate(2008, 7, 8));
-    assertEquals("07-08-2008", str);
+    assertEquals(str, "07-08-2008");
   }
 }

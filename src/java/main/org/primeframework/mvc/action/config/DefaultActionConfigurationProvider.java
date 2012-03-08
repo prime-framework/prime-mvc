@@ -39,7 +39,7 @@ import com.google.inject.Singleton;
 @SuppressWarnings("unchecked")
 public class DefaultActionConfigurationProvider implements ActionConfigurationProvider {
   private static final Logger logger = Logger.getLogger(DefaultActionConfigurationProvider.class.getName());
-  public static final String ACTION_CONFIGURATION_KEY = "jcatapultActionConfiguration";
+  public static final String ACTION_CONFIGURATION_KEY = "primeActionConfiguration";
   private final ServletContext context;
 
   @Inject

@@ -41,7 +41,7 @@ public class ServletToolsTest {
 
     URL url = ServletTools.getBaseUrl(req);
 
-    Assert.assertEquals("http://www.Inversoft Inc./", url.toString());
+    Assert.assertEquals(url.toString(), "http://www.Inversoft Inc./");
   }
 
   @Test
@@ -54,6 +54,6 @@ public class ServletToolsTest {
 
     URL url = ServletTools.getBaseUrl(req);
 
-    Assert.assertEquals("http://www.Inversoft Inc.:8080/", url.toString());
+    Assert.assertEquals(url.toString(), "http://www.Inversoft Inc.:8080/");
   }
 }

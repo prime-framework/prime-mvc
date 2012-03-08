@@ -64,8 +64,12 @@ public class DefaultResultInvocationWorkflowTest {
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
     replay(chain);
+    
+    ResultStore resultStore = createStrictMock(ResultStore.class);
+    resultStore.clear();
+    replay(resultStore);
 
-    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(response, ais, rip, resultProvider, null);
+    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(response, ais, rip, resultProvider, resultStore);
     workflow.perform(chain);
 
     verify(response, ais, rip, result, resultProvider, chain);
@@ -95,7 +99,11 @@ public class DefaultResultInvocationWorkflowTest {
     chain.continueWorkflow();
     replay(chain);
 
-    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(response, ais, rip, resultProvider, null);
+    ResultStore resultStore = createStrictMock(ResultStore.class);
+    resultStore.clear();
+    replay(resultStore);
+
+    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(response, ais, rip, resultProvider, resultStore);
     workflow.perform(chain);
 
     verify(response, ais, rip, result, resultProvider, chain);
@@ -131,6 +139,7 @@ public class DefaultResultInvocationWorkflowTest {
     
     ResultStore resultStore = createStrictMock(ResultStore.class);
     expect(resultStore.get()).andReturn("success");
+    resultStore.clear();
     replay(resultStore);
 
     DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(response, ais, rip, resultProvider, resultStore);
@@ -162,7 +171,11 @@ public class DefaultResultInvocationWorkflowTest {
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
     replay(chain);
 
-    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(response, ais, rip, resultProvider, null);
+    ResultStore resultStore = createStrictMock(ResultStore.class);
+    resultStore.clear();
+    replay(resultStore);
+    
+    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(response, ais, rip, resultProvider, resultStore);
     workflow.perform(chain);
 
     verify(response, ais, rip, result, resultProvider, chain);
@@ -192,6 +205,7 @@ public class DefaultResultInvocationWorkflowTest {
 
     ResultStore resultStore = createStrictMock(ResultStore.class);
     expect(resultStore.get()).andReturn("success");
+    resultStore.clear();
     replay(resultStore);
 
     DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(response, ais, rip, resultProvider, resultStore);
@@ -232,6 +246,7 @@ public class DefaultResultInvocationWorkflowTest {
 
     ResultStore resultStore = createStrictMock(ResultStore.class);
     expect(resultStore.get()).andReturn("success");
+    resultStore.clear();
     replay(resultStore);
 
     DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(response, ais, rip, resultProvider, resultStore);

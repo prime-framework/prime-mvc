@@ -207,7 +207,7 @@ public class RequestBodyWorkflowTest {
       @Override
       public void run() {
         Map<String, List<FileInfo>> files = capture.getValue();
-        assertEquals(1, files.size());
+        assertEquals(files.size(), 1);
         try {
           assertEquals(FileUtils.readFileToString(files.get("userfile").get(0).file), "test");
         } catch (IOException e) {
@@ -247,7 +247,7 @@ public class RequestBodyWorkflowTest {
       @Override
       public void run() {
         Map<String, List<FileInfo>> files = capture.getValue();
-        assertEquals(1, files.size());
+        assertEquals(files.size(), 1);
         try {
           assertEquals(FileUtils.readFileToString(files.get("userfiles").get(0).file), "test");
           assertEquals(FileUtils.readFileToString(files.get("userfiles").get(1).file), "test2");

@@ -17,8 +17,10 @@ package org.primeframework.mvc.parameter.el;
 
 import java.lang.reflect.Method;
 
+import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
-import org.primeframework.mvc.util.MethodTools;
+import org.primeframework.mvc.parameter.convert.GlobalConverter;
+import org.primeframework.mvc.util.ReflectionUtils;
 
 /**
  * This models a indexed property that takes a single parameter for the getter that is the index or key and two
@@ -31,6 +33,7 @@ public class IndexedAccessor extends MemberAccessor {
 
   public IndexedAccessor(ConverterProvider converterProvider, MemberAccessor accessor, String index) {
     super(converterProvider, accessor);
+    
     this.index = index;
   }
 
@@ -42,25 +45,41 @@ public class IndexedAccessor extends MemberAccessor {
     return false;
   }
 
-  public Object get(Context context) {
+  public Object get(Expression expression) {
     Method getter = propertyInfo.getMethods().get("get");
     if (getter.getParameterTypes().length == 0) {
-      return MethodTools.invoke(getter, this.object);
+      return ReflectionUtils.invoke(getter, this.object);
     }
 
-    return MethodTools.invoke(getter, this.object, index);
+    Class<?> indexType = getter.getParameterTypes()[0];
+    GlobalConverter converter = converterProvider.lookup(indexType);
+    if (converter == null) {
+      throw new ConversionException("Error while getting an indexed property in the expression [" + expression.getExpression() +
+        "]. The indexed property uses a key of type [" + indexType + "] but there isn't a converter registered for that type");
+    }
+
+    Object indexObject = converter.convertFromStrings(indexType, null, null, index);
+    return ReflectionUtils.invoke(getter, this.object, indexObject);
   }
 
-  public void set(String[] values, Context context) {
-    set(convert(context, field, values), context);
+  public void set(String[] values, Expression expression) {
+    set(convert(expression, field, values), expression);
   }
 
-  public void set(Object value, Context context) {
+  public void set(Object value, Expression expression) {
     Method setter = propertyInfo.getMethods().get("set");
     if (setter.getParameterTypes().length == 1) {
-      MethodTools.invoke(setter, this.object, value);
+      ReflectionUtils.invoke(setter, this.object, value);
     } else {
-      MethodTools.invoke(setter, this.object, index, value);
+      Class<?> indexType = setter.getParameterTypes()[0];
+      GlobalConverter converter = converterProvider.lookup(indexType);
+      if (converter == null) {
+        throw new ConversionException("Error while setting an indexed property in the expression [" + expression.getExpression() +
+          "]. The indexed property uses a key of type [" + indexType + "] but there isn't a converter registered for that type");
+      }
+
+      Object indexObject = converter.convertFromStrings(indexType, null, null, index);
+      ReflectionUtils.invoke(setter, this.object, indexObject, value);
     }
   }
 }

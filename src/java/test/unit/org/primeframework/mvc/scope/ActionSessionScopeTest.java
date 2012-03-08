@@ -46,7 +46,7 @@ public class ActionSessionScopeTest {
     as.put("test", value);
 
     HttpSession session = EasyMock.createStrictMock(HttpSession.class);
-    EasyMock.expect(session.getAttribute("jcatapultActionSession")).andReturn(map);
+    EasyMock.expect(session.getAttribute("primeActionSession")).andReturn(map);
     EasyMock.replay(session);
 
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
@@ -111,7 +111,7 @@ public class ActionSessionScopeTest {
     as.put("test", value);
 
     HttpSession session = EasyMock.createStrictMock(HttpSession.class);
-    EasyMock.expect(session.getAttribute("jcatapultActionSession")).andReturn(map);
+    EasyMock.expect(session.getAttribute("primeActionSession")).andReturn(map);
     EasyMock.replay(session);
 
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
@@ -148,7 +148,7 @@ public class ActionSessionScopeTest {
     as.put("other", value);
 
     HttpSession session = EasyMock.createStrictMock(HttpSession.class);
-    EasyMock.expect(session.getAttribute("jcatapultActionSession")).andReturn(map);
+    EasyMock.expect(session.getAttribute("primeActionSession")).andReturn(map);
     EasyMock.replay(session);
 
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
@@ -186,7 +186,7 @@ public class ActionSessionScopeTest {
     as.put("other", value);
 
     HttpSession session = EasyMock.createStrictMock(HttpSession.class);
-    EasyMock.expect(session.getAttribute("jcatapultActionSession")).andReturn(map);
+    EasyMock.expect(session.getAttribute("primeActionSession")).andReturn(map);
     EasyMock.replay(session);
 
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
@@ -223,7 +223,7 @@ public class ActionSessionScopeTest {
     as.put("test", value);
 
     HttpSession session = EasyMock.createStrictMock(HttpSession.class);
-    EasyMock.expect(session.getAttribute("jcatapultActionSession")).andReturn(map);
+    EasyMock.expect(session.getAttribute("primeActionSession")).andReturn(map);
     EasyMock.replay(session);
 
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
@@ -263,7 +263,7 @@ public class ActionSessionScopeTest {
     Map<String, Map<String, Object>> map = new HashMap<String, Map<String, Object>>();
 
     HttpSession session = EasyMock.createStrictMock(HttpSession.class);
-    EasyMock.expect(session.getAttribute("jcatapultActionSession")).andReturn(map);
+    EasyMock.expect(session.getAttribute("primeActionSession")).andReturn(map);
     EasyMock.replay(session);
 
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
@@ -300,7 +300,7 @@ public class ActionSessionScopeTest {
     map.get("org.example.action.user.Edit").put("test", "value");
 
     HttpSession session = EasyMock.createStrictMock(HttpSession.class);
-    EasyMock.expect(session.getAttribute("jcatapultActionSession")).andReturn(map);
+    EasyMock.expect(session.getAttribute("primeActionSession")).andReturn(map);
     EasyMock.replay(session);
 
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
@@ -360,7 +360,7 @@ public class ActionSessionScopeTest {
     Map<String, Map<String, Object>> map = new HashMap<String, Map<String, Object>>();
 
     HttpSession session = EasyMock.createStrictMock(HttpSession.class);
-    EasyMock.expect(session.getAttribute("jcatapultActionSession")).andReturn(map);
+    EasyMock.expect(session.getAttribute("primeActionSession")).andReturn(map);
     EasyMock.replay(session);
 
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
@@ -395,7 +395,7 @@ public class ActionSessionScopeTest {
     Map<String, Map<String, Object>> map = new HashMap<String, Map<String, Object>>();
 
     HttpSession session = EasyMock.createStrictMock(HttpSession.class);
-    EasyMock.expect(session.getAttribute("jcatapultActionSession")).andReturn(map);
+    EasyMock.expect(session.getAttribute("primeActionSession")).andReturn(map);
     EasyMock.replay(session);
 
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
@@ -431,7 +431,7 @@ public class ActionSessionScopeTest {
     Map<String, Map<String, Object>> map = new HashMap<String, Map<String, Object>>();
 
     HttpSession session = EasyMock.createStrictMock(HttpSession.class);
-    EasyMock.expect(session.getAttribute("jcatapultActionSession")).andReturn(map);
+    EasyMock.expect(session.getAttribute("primeActionSession")).andReturn(map);
     EasyMock.replay(session);
 
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
@@ -465,7 +465,7 @@ public class ActionSessionScopeTest {
     Map<String, Map<String, Object>> map = new HashMap<String, Map<String, Object>>();
 
     HttpSession session = EasyMock.createStrictMock(HttpSession.class);
-    EasyMock.expect(session.getAttribute("jcatapultActionSession")).andReturn(map);
+    EasyMock.expect(session.getAttribute("primeActionSession")).andReturn(map);
     EasyMock.replay(session);
 
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);

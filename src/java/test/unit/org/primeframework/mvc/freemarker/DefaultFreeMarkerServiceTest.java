@@ -46,7 +46,7 @@ public class DefaultFreeMarkerServiceTest {
 
     DefaultFreeMarkerService service = new DefaultFreeMarkerService(config, new OverridingTemplateLoader(containerResolver));
     String result = service.render("src/java/test/unit/org/primeframework/mvc/freemarker/test.ftl", new HashMap<String, Object>(), Locale.US);
-    assertEquals("It worked!", result);
+    assertEquals(result, "It worked!");
   }
 
   @Test
@@ -72,7 +72,7 @@ public class DefaultFreeMarkerServiceTest {
     Map<String, Object> context = new HashMap<String, Object>();
     context.put("bean", bean);
     String result = service.render("src/java/test/unit/org/primeframework/mvc/freemarker/test-with-bean.ftl", context, Locale.US, ow);
-    assertEquals("Bean 1 test test 42", result);
+    assertEquals(result, "Bean 1 test test 42");
   }
 
   @Test
@@ -94,6 +94,6 @@ public class DefaultFreeMarkerServiceTest {
     Map<String, Object> context = new HashMap<String, Object>();
     context.put("bean", bean);
     String result = service.render("src/java/test/unit/org/primeframework/mvc/freemarker/test-with-bean.ftl", context, Locale.US);
-    assertEquals("Bean 1 test test 42", result);
+    assertEquals(result, "Bean 1 test test 42");
   }
 }

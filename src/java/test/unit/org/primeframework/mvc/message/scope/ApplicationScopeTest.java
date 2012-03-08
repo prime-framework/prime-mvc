@@ -44,7 +44,7 @@ public class ApplicationScopeTest {
     ApplicationScope scope = new ApplicationScope(context);
     List<Message> messages = scope.get();
     assertEquals(messages.size(), 1);
-    assertEquals(messages.get(0), "Test message");
+    assertEquals(messages.get(0).toString(), "Test message");
 
     verify(context);
   }
@@ -60,7 +60,7 @@ public class ApplicationScopeTest {
     ApplicationScope scope = new ApplicationScope(context);
     scope.add(new SimpleMessage("Foo"));
     assertEquals(messages.size(), 1);
-    assertEquals(messages.get(0), "Foo");
+    assertEquals(messages.get(0).toString(), "Foo");
 
     verify(context);
   }
@@ -76,8 +76,8 @@ public class ApplicationScopeTest {
     ApplicationScope scope = new ApplicationScope(context);
     scope.addAll(Arrays.<Message>asList(new SimpleMessage("Foo"), new SimpleMessage("Bar")));
     assertEquals(messages.size(), 2);
-    assertEquals(messages.get(0), "Foo");
-    assertEquals(messages.get(1), "Bar");
+    assertEquals(messages.get(0).toString(), "Foo");
+    assertEquals(messages.get(1).toString(), "Bar");
 
     verify(context);
   }

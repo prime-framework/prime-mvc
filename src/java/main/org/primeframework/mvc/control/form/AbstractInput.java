@@ -15,9 +15,12 @@
  */
 package org.primeframework.mvc.control.form;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.primeframework.mvc.control.AbstractControl;
+import org.primeframework.mvc.message.FieldMessage;
 import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.l10n.MessageProvider;
@@ -105,7 +108,16 @@ public abstract class AbstractInput extends AbstractControl {
       map.put("label", label);
 
       // Add the field messages and errors as a list or null
-      map.put("messages", messageStore.get());
+      List<Message> messages = messageStore.get();
+      List<FieldMessage> fieldMessages = new ArrayList<FieldMessage>();
+      for (Message message : messages) {
+        if (message instanceof FieldMessage) {
+          fieldMessages.add((FieldMessage) message);
+        }
+      }
+
+      map.put("messages", messages);
+      map.put("fieldMessages", fieldMessages);
 
       // Remove the required attribute and move it up
       map.put("required", attributes.remove("required"));

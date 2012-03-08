@@ -21,7 +21,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation is used to mark a class as being a JCatapult MVC action.
+ * This annotation is used to mark a class as being a Prime MVC action.
  *
  * @author Brian Pontarelli
  */

@@ -37,25 +37,25 @@ public class LocaleConverterTest {
     assertNull(locale);
 
     locale = (Locale) converter.convertFromStrings(Locale.class, null, "testExpr", ArrayUtils.toArray("en"));
-    assertEquals("en", locale.getLanguage());
+    assertEquals(locale.getLanguage(), "en");
 
     locale = (Locale) converter.convertFromStrings(Locale.class, null, "testExpr", ArrayUtils.toArray("en_US"));
-    assertEquals("en", locale.getLanguage());
-    assertEquals("US", locale.getCountry());
+    assertEquals(locale.getLanguage(), "en");
+    assertEquals(locale.getCountry(), "US");
 
     locale = (Locale) converter.convertFromStrings(Locale.class, null, "testExpr", ArrayUtils.toArray("en", "US"));
-    assertEquals("en", locale.getLanguage());
-    assertEquals("US", locale.getCountry());
+    assertEquals(locale.getLanguage(), "en");
+    assertEquals(locale.getCountry(), "US");
 
     locale = (Locale) converter.convertFromStrings(Locale.class, null, "testExpr", ArrayUtils.toArray("en_US_UTF8"));
-    assertEquals("en", locale.getLanguage());
-    assertEquals("US", locale.getCountry());
-    assertEquals("UTF8", locale.getVariant());
+    assertEquals(locale.getLanguage(), "en");
+    assertEquals(locale.getCountry(), "US");
+    assertEquals(locale.getVariant(), "UTF8");
 
     locale = (Locale) converter.convertFromStrings(Locale.class, null, "testExpr", ArrayUtils.toArray("en", "US", "UTF8"));
-    assertEquals("en", locale.getLanguage());
-    assertEquals("US", locale.getCountry());
-    assertEquals("UTF8", locale.getVariant());
+    assertEquals(locale.getLanguage(), "en");
+    assertEquals(locale.getCountry(), "US");
+    assertEquals(locale.getVariant(), "UTF8");
   }
 
   @Test
@@ -65,6 +65,6 @@ public class LocaleConverterTest {
     assertNull(str);
 
     str = converter.convertToString(Locale.class, null, "testExpr", Locale.US);
-    assertEquals("en_US", str);
+    assertEquals(str, "en_US");
   }
 }

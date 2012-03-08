@@ -73,7 +73,7 @@ public class DefaultLocaleStoreTest {
     EasyMock.replay(request);
 
     DefaultLocaleProvider provider = new DefaultLocaleProvider(request);
-    assertEquals(Locale.CANADA, provider.get());
+    assertEquals(provider.get(), Locale.CANADA);
 
     EasyMock.verify(session);
   }
@@ -87,7 +87,7 @@ public class DefaultLocaleStoreTest {
     EasyMock.replay(request);
 
     DefaultLocaleProvider provider = new DefaultLocaleProvider(request);
-    assertEquals(Locale.CANADA, provider.get());
+    assertEquals(provider.get(), Locale.CANADA);
 
     EasyMock.verify(request);
   }
@@ -102,7 +102,7 @@ public class DefaultLocaleStoreTest {
     EasyMock.replay(request);
 
     DefaultLocaleProvider provider = new DefaultLocaleProvider(request);
-    assertEquals(Locale.CANADA, provider.get());
+    assertEquals(provider.get(), Locale.CANADA);
 
     EasyMock.verify(request);
   }

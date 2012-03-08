@@ -1,8 +1,8 @@
 [#ftl/]
-[#include "macros.ftl"/]
-[#include "dynamic-attributes.ftl"/]
+[#import "_macros.ftl" as macros/]
+[@macros.dynamic_attributes attrs=dynamicAttributes name=attributes['name']/]
 <input type="hidden" name="__a_${attributes['name']}" value="${(actionURI!'')?html}"/>
-<div class="[@class attributes=attributes name="image-button" input=false/]">
+<div class="[@macros.class attrs=attributes name="image-button" input=false/]">
 <div class="label-container"> </div>
-<div class="control-container"><input type="image"[@append_attributes attributes=attributes list=[]/]/></div>
+<div class="control-container"><input type="image"[@macros.append_attributes attributes=attributes list=[]/]/></div>
 </div>

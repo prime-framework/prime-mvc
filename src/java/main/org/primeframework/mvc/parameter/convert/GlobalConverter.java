@@ -66,7 +66,7 @@ import java.util.Map;
  * In order to write a custom type converter, you need to implement this interface AND also annotate your converter
  * class with the {@link org.primeframework.mvc.parameter.convert.annotation.GlobalConverter} annotation and specify in
  * that annotation the types the Converter supports. Next, you need to define the Converter in a Guice module that will
- * be discovered by JCatapult like this:
+ * be discovered by Prime like this:
  * <p/>
  * <pre>
  * public void bind() {

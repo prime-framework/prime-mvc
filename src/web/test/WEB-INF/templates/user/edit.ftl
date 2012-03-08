@@ -2,19 +2,19 @@
 <html>
 <head><title>Edit a user</title></head>
 <body>
-[@jc.form action="/user/edit" method="POST"]
-  [@jc.text name="user.name"/]
-  [@jc.text name="user.age"/]
-  [@jc.text name="user.addresses['home'].street"/]
-  [@jc.text name="user.addresses['home'].city"/]
-  [@jc.text name="user.addresses['home'].state"/]
-  [@jc.text name="user.addresses['home'].zipcode"/]
-  [@jc.text name="user.addresses['home'].country"/]
-  [@jc.text name="user.addresses['work'].street"/]
-  [@jc.text name="user.addresses['work'].city"/]
-  [@jc.text name="user.addresses['work'].state"/]
-  [@jc.text name="user.addresses['work'].zipcode"/]
-  [@jc.text name="user.addresses['work'].country"/]
-[/@jc.form]
+[@prime.form action="/user/edit" method="POST"]
+  [@prime.text name="user.name"/]
+  [@prime.text name="user.age"/]
+  [@prime.text name="user.addresses['home'].street"/]
+  [@prime.text name="user.addresses['home'].city"/]
+  [@prime.text name="user.addresses['home'].state"/]
+  [@prime.text name="user.addresses['home'].zipcode"/]
+  [@prime.text name="user.addresses['home'].country"/]
+  [@prime.text name="user.addresses['work'].street"/]
+  [@prime.text name="user.addresses['work'].city"/]
+  [@prime.text name="user.addresses['work'].state"/]
+  [@prime.text name="user.addresses['work'].zipcode"/]
+  [@prime.text name="user.addresses['work'].country"/]
+[/@prime.form]
 </body>
 </html>

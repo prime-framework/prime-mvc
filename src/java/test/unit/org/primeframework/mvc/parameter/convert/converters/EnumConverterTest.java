@@ -63,6 +63,6 @@ public class EnumConverterTest {
     assertNull(str);
 
     str = converter.convertToString(TestEnum.class, null, "testExpr", TestEnum.value1);
-    assertEquals("value1", str);
+    assertEquals(str, "value1");
   }
 }

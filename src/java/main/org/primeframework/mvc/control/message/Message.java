@@ -79,7 +79,7 @@ public class Message extends AbstractControl implements TemplateMethodModel {
       };
     }
 
-    if (message == null) {
+    if (message.toString() == null) {
       throw new IllegalStateException("The message for the key [" + key + "] is missing and " +
         "there was no default set using the [default] attribute.");
     }

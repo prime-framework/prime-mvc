@@ -45,7 +45,6 @@ public class CheckboxListTest extends ControlBaseTest {
     new ControlTester(checkboxList).
       attr("name", "test").
       attr("class", "css-class").
-      attr("bundle", "/checkbox-list-bundle").
       attr("items", asList("one", "two", "three")).
       go("<input type=\"hidden\" name=\"test@param\" value=\"param-value\"/>\n" +
         "<div class=\"css-class-checkbox-list css-class-input css-class-control checkbox-list input control\">\n" +
@@ -131,8 +130,8 @@ public class CheckboxListTest extends ControlBaseTest {
 
     new ControlTester(checkboxList).
       attr("name", "user.addresses['work'].country").
-      attr("valueExpr", "first").
-      attr("textExpr", "second").
+      attr("valueExpr", "left").
+      attr("textExpr", "right").
       attr("items", ArrayUtils.toArray(us, de)).
       go("<input type=\"hidden\" name=\"user.addresses['work'].country@param\" value=\"param-value\"/>\n" +
         "<div class=\"checkbox-list input control\">\n" +
@@ -157,8 +156,8 @@ public class CheckboxListTest extends ControlBaseTest {
     action.user.setAddress("work", address);
 
     ais.setCurrent(new DefaultActionInvocation(action, "/checkbox-list", null, null));
-    messageStore.add(new SimpleFieldMessage("user.addresses['work'].country", "fieldError1"));
-    messageStore.add(new SimpleFieldMessage("user.addresses['work'].country", "fieldError2"));
+    messageStore.add(new SimpleFieldMessage("user.addresses['work'].country", "Country is required"));
+    messageStore.add(new SimpleFieldMessage("user.addresses['work'].country", "Country must be cool"));
 
     new ControlTester(checkboxList).
       attr("name", "user.addresses['work'].country").

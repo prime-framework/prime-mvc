@@ -24,7 +24,6 @@ import org.primeframework.mvc.action.ActionMapper;
 import org.primeframework.mvc.control.AbstractControl;
 import org.primeframework.mvc.control.annotation.ControlAttribute;
 import org.primeframework.mvc.control.annotation.ControlAttributes;
-import org.primeframework.mvc.control.form.FormPreparer;
 
 import com.google.inject.Inject;
 
@@ -57,17 +56,6 @@ public class Form extends AbstractControl {
   }
 
   /**
-   * If the user supplied a prepare action URI, that action is inokved.
-   */
-  @Override
-  protected void addAdditionalAttributes() {
-    // Move the bundle attribute into the request
-    if (attributes.containsKey("bundle")) {
-      request.setAttribute("jcatapultControlBundle", attributes.remove("bundle"));
-    }
-  }
-
-  /**
    * Overrides the renderStart in order to change the current ActionInvocation if the action for the form is different
    * than the current invocation action.
    *
@@ -97,8 +85,8 @@ public class Form extends AbstractControl {
 
       ActionInvocation actionInvocation = actionMapper.map(action, false);
       if (actionInvocation == null || actionInvocation.action() == null) {
-        throw new IllegalArgumentException("The form action [" + action + "] is not a valid URI " +
-          "that maps to an action class by the JCatapult MVC.");
+        throw new IllegalArgumentException("The form action [" + action + "] is not a valid URI that maps to an action " +
+          "class by the Prime MVC.");
       } else if (current == null || current.action() == null ||
         !current.action().getClass().equals(actionInvocation.action().getClass())) {
         actionInvocationStore.setCurrent(actionInvocation);

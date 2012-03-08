@@ -16,9 +16,9 @@
 package org.primeframework.mvc.guice;
 
 /**
- * This interface defines a class that is Closable by JCatapult's Guice integration. If you mark a class with this
- * interface, JCatapult will attempt to close the class when the contain is shutdown. It is advised to only mark
- * singletons as Closable. Otherwise, JCatapult will end up creating a new instance and then calling close on it, which
+ * This interface defines a class that is Closable by Prime's Guice integration. If you mark a class with this
+ * interface, Prime will attempt to close the class when the contain is shutdown. It is advised to only mark
+ * singletons as Closable. Otherwise, Prime will end up creating a new instance and then calling close on it, which
  * could fail.
  * <p/>
  * In order to ensure that a class you have marked as Closable will be closed, you must provide a Guice binding for it.
@@ -37,7 +37,7 @@ package org.primeframework.mvc.guice;
  */
 public interface Closable {
   /**
-   * Invoked by JCatapult when the container is shutdown.
+   * Invoked by Prime when the container is shutdown.
    */
   void close();
 }

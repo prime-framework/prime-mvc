@@ -43,7 +43,7 @@ public class StreamResultTest {
     Object action = new Object();
     ExpressionEvaluator ee = EasyMock.createStrictMock(ExpressionEvaluator.class);
     EasyMock.expect(ee.expand("10", action, false)).andReturn("10");
-    EasyMock.expect(ee.expand("foo.zip", action, false)).andReturn("foo.zip");
+    EasyMock.expect(ee.expand("foo.zip", action, true)).andReturn("foo.zip");
     EasyMock.expect(ee.expand("application/octet-stream", action, false)).andReturn("application/octet-stream");
     EasyMock.expect(ee.getValue("stream", action)).andReturn(new ByteArrayInputStream("test".getBytes()));
     EasyMock.replay(ee);
@@ -64,7 +64,7 @@ public class StreamResultTest {
     StreamResult streamResult = new StreamResult(ee, response, store);
     streamResult.execute(stream);
 
-    assertEquals("test", sos.toString());
+    assertEquals(sos.toString(), "test");
 
     EasyMock.verify(ee, response);
   }

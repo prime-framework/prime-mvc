@@ -38,10 +38,10 @@ public class StringConverterTest {
     assertNull(str);
 
     str = (String) converter.convertFromStrings(String.class, null, "testExpr", ArrayUtils.toArray("a"));
-    assertEquals("a", str);
+    assertEquals(str, "a");
 
     str = (String) converter.convertFromStrings(String.class, null, "testExpr", ArrayUtils.toArray("a", "b"));
-    assertEquals("a,b", str);
+    assertEquals(str, "a,b");
   }
 
   /**
@@ -54,6 +54,6 @@ public class StringConverterTest {
     assertNull(str);
 
     str = converter.convertToString(String.class, null, "testExpr", "foo");
-    assertEquals("foo", str);
+    assertEquals(str, "foo");
   }
 }

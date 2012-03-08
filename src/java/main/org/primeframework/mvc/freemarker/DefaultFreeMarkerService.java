@@ -32,7 +32,7 @@ import freemarker.template.TemplateException;
 
 /**
  * This is a simple FreeMarkerService implementation. It uses two configuration parameters and the {@link
- * OverridingTemplateLoader} to provide FreeMarker rendering capabiilities.
+ * OverridingTemplateLoader} to provide FreeMarker rendering capabilities.
  * <p/>
  * <h3>Caching</h3> By default, FreeMarker provides caching for all templates. This class uses that caching by default
  * as well. However, you can also change this class to not cache at all by setting the check seconds to a negative
@@ -41,11 +41,8 @@ import freemarker.template.TemplateException;
  * <strong>NOTE</strong> If you set the check seconds to a negative number, the templates are still cached but just
  * reloaded each time. This will incur memory a penalty.
  * <p/>
- * The configuration parameters are: <dl> <dt>jcatapult.freemarker-service.check-seconds</dt> <dd> An integer that
- * controls the number of seconds that the templates are checked for new versions. If you don't specify this
- * configuration parameter a default is determined. The way that this is determine is based on the environment. If the
- * environment is <strong> production</strong>, this returns Integer.MAX_VALUE. Otherwise it returns <strong>2</strong>.
- * Therefore, the templates are reloaded quite frequently in development but never reloaded in production. </dd> </dl>
+ * The configuration interface defines the caching and reloading strategy for this service via the method
+ * {@link PrimeMVCConfiguration#freemarkerCheckSeconds()}.
  *
  * @author Brian Pontarelli
  */

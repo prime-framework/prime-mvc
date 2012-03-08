@@ -33,7 +33,7 @@ public class URLTemplateSourceTest {
   public void file() throws IOException {
     File file = new File("project.xml");
     URLTemplateSource source = new URLTemplateSource(file.toURI().toURL());
-    assertEquals(source.lastModified(), file.lastModified());
+    assertEquals(file.lastModified(), source.lastModified());
     assertNotNull(source.getInputStream());
     source.close();
   }

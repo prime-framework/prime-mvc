@@ -80,7 +80,7 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
     Set<String> keys = request.getParameterMap().keySet();
     for (String key : keys) {
       if (key.startsWith("__a_")) {
-        String actionParameterName = key.substring(7);
+        String actionParameterName = key.substring(4);
         String actionParameterValue = request.getParameter(key);
         if (request.getParameter(actionParameterName) != null && actionParameterValue.trim().length() > 0) {
           uri = actionParameterValue;

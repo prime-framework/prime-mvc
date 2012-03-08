@@ -45,7 +45,6 @@ public class SelectTest extends ControlBaseTest {
     new ControlTester(select).
       attr("name", "test").
       attr("class", "css-class").
-      attr("bundle", "/select-bundle").
       attr("items", asList("one", "two", "three")).
       go("<input type=\"hidden\" name=\"test@param\" value=\"param-value\"/>\n" +
         "<div class=\"css-class-select css-class-input css-class-control select input control\">\n" +
@@ -65,7 +64,6 @@ public class SelectTest extends ControlBaseTest {
     ais.setCurrent(new DefaultActionInvocation(null, "/select", null, null));
     new ControlTester(select).
       attr("name", "test").
-      attr("bundle", "/select-bundle").
       attr("headerValue", "zero").
       attr("items", asList("one", "two", "three")).
       go("<input type=\"hidden\" name=\"test@param\" value=\"param-value\"/>\n" +
@@ -147,8 +145,8 @@ public class SelectTest extends ControlBaseTest {
 
     new ControlTester(select).
       attr("name", "user.addresses['work'].country").
-      attr("valueExpr", "first").
-      attr("textExpr", "second").
+      attr("valueExpr", "left").
+      attr("textExpr", "right").
       attr("items", ArrayUtils.toArray(us, de)).
       go("<input type=\"hidden\" name=\"user.addresses['work'].country@param\" value=\"param-value\"/>\n" +
         "<div class=\"select input control\">\n" +
@@ -179,7 +177,7 @@ public class SelectTest extends ControlBaseTest {
       attr("items", lmap("US", "United States", "DE", "Germany")).
       go("<input type=\"hidden\" name=\"user.addresses['work'].country@param\" value=\"param-value\"/>\n" +
         "<div class=\"select input control\">\n" +
-        "<div class=\"label-container\"><label for=\"user_addresses['work']_country\" class=\"label\"><span class=\"error\">Country (Country is required, Country must be cool)</span></label></div>\n" +
+        "<div class=\"label-container\"><label for=\"user_addresses['work']_country\" class=\"label\"><span class=\"error\">Country (fieldError1, fieldError2)</span></label></div>\n" +
         "<div class=\"control-container\">\n" +
         "<select id=\"user_addresses['work']_country\" name=\"user.addresses['work'].country\">\n" +
         "<option value=\"US\" selected=\"selected\">United States</option>\n" +

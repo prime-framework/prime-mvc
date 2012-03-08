@@ -48,7 +48,7 @@ public class SessionScopeTest {
     SessionScope scope = new SessionScope(request);
     List<Message> messages = scope.get();
     assertEquals(messages.size(), 1);
-    assertEquals(messages.get(0), "Test message");
+    assertEquals(messages.get(0).toString(), "Test message");
 
     verify(session, request);
   }
@@ -68,7 +68,7 @@ public class SessionScopeTest {
     SessionScope scope = new SessionScope(request);
     scope.add(new SimpleMessage("Foo"));
     assertEquals(messages.size(), 1);
-    assertEquals(messages.get(0), "Foo");
+    assertEquals(messages.get(0).toString(), "Foo");
 
     verify(session, request);
   }
@@ -88,8 +88,8 @@ public class SessionScopeTest {
     SessionScope scope = new SessionScope(request);
     scope.addAll(Arrays.<Message>asList(new SimpleMessage("Foo"), new SimpleMessage("Bar")));
     assertEquals(messages.size(), 2);
-    assertEquals(messages.get(0), "Foo");
-    assertEquals(messages.get(1), "Bar");
+    assertEquals(messages.get(0).toString(), "Foo");
+    assertEquals(messages.get(1).toString(), "Bar");
 
     verify(session, request);
   }

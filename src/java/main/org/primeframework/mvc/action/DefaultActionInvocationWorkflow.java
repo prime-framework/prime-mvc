@@ -21,8 +21,8 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 
 import org.primeframework.mvc.action.result.ResultStore;
+import org.primeframework.mvc.util.ReflectionUtils;
 import org.primeframework.mvc.workflow.WorkflowChain;
-import org.primeframework.mvc.util.MethodTools;
 
 import com.google.inject.Inject;
 
@@ -133,7 +133,7 @@ public class DefaultActionInvocationWorkflow implements ActionInvocationWorkflow
 
     verify(method);
 
-    String result = MethodTools.invoke(method, action);
+    String result = ReflectionUtils.invoke(method, action);
     if (result == null) {
       throw new ServletException("The action class [" + action.getClass() + "] returned " +
         "null for the result code. Execute methods must never return null.");

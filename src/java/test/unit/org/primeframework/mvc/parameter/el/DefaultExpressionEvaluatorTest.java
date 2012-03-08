@@ -45,9 +45,32 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     this.evaluator = evaluator;
   }
 
-  /**
-   * Tests getting of bean properties
-   */
+  @Test(enabled = true)
+  public void charArrayCachePerformance() {
+    // On a MacBook Pro Quad core the cache is slower by 5 milliseconds for 1 million iterations.
+    String expression = "user.address['work'].city";
+    long start = System.currentTimeMillis();
+    char c = 0;
+    for (int i = 0; i < 1000000; i++) {
+      char[] ca = expression.toCharArray();
+      c = ca[2];
+    }
+
+    System.out.println(c);
+    System.out.println("Time for toCharArray: " + (System.currentTimeMillis() - start));
+
+    start = System.currentTimeMillis();
+    c = 0;
+    for (int i = 0; i < 1000000; i++) {
+      // This method has been removed because it was slow
+//      char[] ca = evaluator.toCharArray(expression);
+//      c = ca[2];
+    }
+
+    System.out.println(c);
+    System.out.println("Time for cache: " + (System.currentTimeMillis() - start));
+  }
+
   @Test
   public void propertyGetting() {
     // Test local property null
@@ -64,8 +87,8 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     action.getUser().setName("Brian");
     action.getUser().setActive(true);
 
-    assertEquals(32, evaluator.getValue("user.age", action));
-    assertEquals("Brian", evaluator.getValue("user.name", action));
+    assertEquals(evaluator.getValue("user.age", action), 32);
+    assertEquals(evaluator.getValue("user.name", action), "Brian");
     assertTrue((Boolean) evaluator.getValue("user.active", action));
 
     // Test collection property gets
@@ -76,36 +99,33 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     address.setZipcode("80020");
     action.getUser().getAddresses().put("home", address);
     assertNull(evaluator.getValue("user.addresses['work']", action));
-    assertEquals("Broomfield", evaluator.getValue("user.addresses['home'].city", action));
-    assertEquals("CO", evaluator.getValue("user.addresses['home'].state", action));
-    assertEquals("Test", evaluator.getValue("user.addresses['home'].street", action));
-    assertEquals("80020", evaluator.getValue("user.addresses['home'].zipcode", action));
+    assertEquals(evaluator.getValue("user.addresses['home'].city", action), "Broomfield");
+    assertEquals(evaluator.getValue("user.addresses['home'].state", action), "CO");
+    assertEquals(evaluator.getValue("user.addresses['home'].street", action), "Test");
+    assertEquals(evaluator.getValue("user.addresses['home'].zipcode", action), "80020");
 
     User brother = new User();
     brother.setName("Brett");
     brother.setAge(34);
     user.getSiblings().add(brother);
-    assertEquals(34, evaluator.getValue("user.siblings[0].age", action));
-    assertEquals("Brett", evaluator.getValue("user.siblings[0].name", action));
+    assertEquals(evaluator.getValue("user.siblings[0].age", action), 34);
+    assertEquals(evaluator.getValue("user.siblings[0].name", action), "Brett");
 
     user.setSecurityQuestions(new String[]{"What is your pet's name?", "What is your home town?"});
-    assertEquals("What is your pet's name?", evaluator.getValue("user.securityQuestions[0]", action));
-    assertEquals("What is your home town?", evaluator.getValue("user.securityQuestions[1]", action));
+    assertEquals(evaluator.getValue("user.securityQuestions[0]", action), "What is your pet's name?");
+    assertEquals(evaluator.getValue("user.securityQuestions[1]", action), "What is your home town?");
 
     // Test indexed collection property gets (using the indexed property methoods)
     assertNull(evaluator.getValue("user.address['work']", action));
-    assertEquals("Broomfield", evaluator.getValue("user.address['home'].city", action));
-    assertEquals("CO", evaluator.getValue("user.address['home'].state", action));
-    assertEquals("Test", evaluator.getValue("user.address['home'].street", action));
-    assertEquals("80020", evaluator.getValue("user.address['home'].zipcode", action));
+    assertEquals(evaluator.getValue("user.address['home'].city", action), "Broomfield");
+    assertEquals(evaluator.getValue("user.address['home'].state", action), "CO");
+    assertEquals(evaluator.getValue("user.address['home'].street", action), "Test");
+    assertEquals(evaluator.getValue("user.address['home'].zipcode", action), "80020");
 
-    assertEquals(34, evaluator.getValue("user.sibling[0].age", action));
-    assertEquals("Brett", evaluator.getValue("user.sibling[0].name", action));
+    assertEquals(evaluator.getValue("user.sibling[0].age", action), 34);
+    assertEquals(evaluator.getValue("user.sibling[0].name", action), "Brett");
   }
 
-  /**
-   * Tests getting of fields
-   */
   @Test
   public void fieldGetting() {
     // Test local property null
@@ -122,8 +142,8 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     action.user.name = "Brian";
     action.user.active = true;
 
-    assertEquals(32, evaluator.getValue("user.age", action));
-    assertEquals("Brian", evaluator.getValue("user.name", action));
+    assertEquals(evaluator.getValue("user.age", action), 32);
+    assertEquals(evaluator.getValue("user.name", action), "Brian");
     assertTrue((Boolean) evaluator.getValue("user.active", action));
 
     // Test collection property gets
@@ -134,21 +154,21 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     address.zipcode = "80020";
     action.user.addresses.put("home", address);
     assertNull(evaluator.getValue("user.addresses['work']", action));
-    assertEquals("Broomfield", evaluator.getValue("user.addresses['home'].city", action));
-    assertEquals("CO", evaluator.getValue("user.addresses['home'].state", action));
-    assertEquals("Test", evaluator.getValue("user.addresses['home'].street", action));
-    assertEquals("80020", evaluator.getValue("user.addresses['home'].zipcode", action));
+    assertEquals(evaluator.getValue("user.addresses['home'].city", action), "Broomfield");
+    assertEquals(evaluator.getValue("user.addresses['home'].state", action), "CO");
+    assertEquals(evaluator.getValue("user.addresses['home'].street", action), "Test");
+    assertEquals(evaluator.getValue("user.addresses['home'].zipcode", action), "80020");
 
     UserField brother = new UserField();
     brother.name = "Brett";
     brother.age = 34;
     user.siblings.add(brother);
-    assertEquals(34, evaluator.getValue("user.siblings[0].age", action));
-    assertEquals("Brett", evaluator.getValue("user.siblings[0].name", action));
+    assertEquals(evaluator.getValue("user.siblings[0].age", action), 34);
+    assertEquals(evaluator.getValue("user.siblings[0].name", action), "Brett");
 
     user.securityQuestions = new String[]{"What is your pet's name?", "What is your home town?"};
-    assertEquals("What is your pet's name?", evaluator.getValue("user.securityQuestions[0]", action));
-    assertEquals("What is your home town?", evaluator.getValue("user.securityQuestions[1]", action));
+    assertEquals(evaluator.getValue("user.securityQuestions[0]", action), "What is your pet's name?");
+    assertEquals(evaluator.getValue("user.securityQuestions[1]", action), "What is your home town?");
   }
 
   /**
@@ -164,8 +184,8 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     evaluator.setValue("user.name", action, ArrayUtils.toArray("Brian"), null);
     evaluator.setValue("user.active", action, ArrayUtils.toArray("true"), null);
     evaluator.setValue("user.male", action, null, null);
-    assertEquals((Integer) 32, action.getUser().getAge());
-    assertEquals("Brian", action.getUser().getName());
+    assertEquals(action.getUser().getAge(), (Integer) 32);
+    assertEquals(action.getUser().getName(), "Brian");
     assertTrue(action.getUser().isActive());
     assertFalse(action.getUser().isMale());
 
@@ -175,12 +195,12 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     evaluator.setValue("user.addresses['home'].state", action, ArrayUtils.toArray("CO"), null);
     evaluator.setValue("user.addresses['home'].street", action, ArrayUtils.toArray("Test"), null);
     evaluator.setValue("user.addresses['home'].zipcode", action, ArrayUtils.toArray("80020"), null);
-    assertEquals(1, action.getUser().getAddresses().size());
+    assertEquals(action.getUser().getAddresses().size(), 1);
     assertNull(action.getUser().getAddresses().get("work"));
-    assertEquals("Broomfield", action.getUser().getAddresses().get("home").getCity());
-    assertEquals("CO", action.getUser().getAddresses().get("home").getState());
-    assertEquals("Test", action.getUser().getAddresses().get("home").getStreet());
-    assertEquals("80020", action.getUser().getAddresses().get("home").getZipcode());
+    assertEquals(action.getUser().getAddresses().get("home").getCity(), "Broomfield");
+    assertEquals(action.getUser().getAddresses().get("home").getState(), "CO");
+    assertEquals(action.getUser().getAddresses().get("home").getStreet(), "Test");
+    assertEquals(action.getUser().getAddresses().get("home").getZipcode(), "80020");
 
     // Test empty is null
     evaluator.setValue("user.addresses['home'].zipcode", action, ArrayUtils.toArray(""), null);
@@ -190,20 +210,20 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     evaluator.setValue("user.siblings[0].age", action, ArrayUtils.toArray("34"), null);
     evaluator.setValue("user.siblings[0].name", action, ArrayUtils.toArray("Brett"), null);
     assertTrue(action.getUser().getSiblings() instanceof ArrayList);
-    assertEquals(1, action.getUser().getSiblings().size());
-    assertEquals((Integer) 34, action.getUser().getSiblings().get(0).getAge());
-    assertEquals("Brett", action.getUser().getSiblings().get(0).getName());
+    assertEquals(action.getUser().getSiblings().size(), 1);
+    assertEquals(action.getUser().getSiblings().get(0).getAge(), (Integer) 34);
+    assertEquals(action.getUser().getSiblings().get(0).getName(), "Brett");
 
     evaluator.setValue("user.securityQuestions[0]", action, ArrayUtils.toArray("What is your pet's name?"), null);
     evaluator.setValue("user.securityQuestions[1]", action, ArrayUtils.toArray("What is your home town?"), null);
-    assertEquals(2, action.getUser().getSecurityQuestions().length);
-    assertEquals("What is your pet's name?", action.getUser().getSecurityQuestions()[0]);
-    assertEquals("What is your home town?", action.getUser().getSecurityQuestions()[1]);
+    assertEquals(action.getUser().getSecurityQuestions().length, 2);
+    assertEquals(action.getUser().getSecurityQuestions()[0], "What is your pet's name?");
+    assertEquals(action.getUser().getSecurityQuestions()[1], "What is your home town?");
 
     action.getUser().setSecurityQuestions(null);
     evaluator.setValue("user.securityQuestions", action, new String[]{"What is your pet's name?", "What is your home town?"}, null);
-    assertEquals("What is your pet's name?", action.getUser().getSecurityQuestions()[0]);
-    assertEquals("What is your home town?", action.getUser().getSecurityQuestions()[1]);
+    assertEquals(action.getUser().getSecurityQuestions()[0], "What is your pet's name?");
+    assertEquals(action.getUser().getSecurityQuestions()[1], "What is your home town?");
 
     // Test indexed collection property sets (using the indexed property methoods)
     action.getUser().setAddresses(new HashMap<String, Address>());
@@ -211,38 +231,38 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     evaluator.setValue("user.address['home'].state", action, ArrayUtils.toArray("CO"), null);
     evaluator.setValue("user.address['home'].street", action, ArrayUtils.toArray("Test"), null);
     evaluator.setValue("user.address['home'].zipcode", action, ArrayUtils.toArray("80020"), null);
-    assertEquals(1, action.getUser().getAddresses().size());
+    assertEquals(action.getUser().getAddresses().size(), 1);
     assertNull(action.getUser().getAddresses().get("work"));
-    assertEquals("Broomfield", action.getUser().getAddresses().get("home").getCity());
-    assertEquals("CO", action.getUser().getAddresses().get("home").getState());
-    assertEquals("Test", action.getUser().getAddresses().get("home").getStreet());
-    assertEquals("80020", action.getUser().getAddresses().get("home").getZipcode());
+    assertEquals(action.getUser().getAddresses().get("home").getCity(), "Broomfield");
+    assertEquals(action.getUser().getAddresses().get("home").getState(), "CO");
+    assertEquals(action.getUser().getAddresses().get("home").getStreet(), "Test");
+    assertEquals(action.getUser().getAddresses().get("home").getZipcode(), "80020");
 
     action.getUser().setSiblings(new ArrayList<User>());
     evaluator.setValue("user.sibling[0].age", action, ArrayUtils.toArray("34"), null);
     evaluator.setValue("user.sibling[0].name", action, ArrayUtils.toArray("Brett"), null);
-    assertEquals(1, action.getUser().getSiblings().size());
-    assertEquals((Integer) 34, action.getUser().getSiblings().get(0).getAge());
-    assertEquals("Brett", action.getUser().getSiblings().get(0).getName());
+    assertEquals(action.getUser().getSiblings().size(), 1);
+    assertEquals(action.getUser().getSiblings().get(0).getAge(), (Integer) 34);
+    assertEquals(action.getUser().getSiblings().get(0).getName(), "Brett");
 
     // Test arrays and complex maps
     evaluator.setValue("roleIds", action, ArrayUtils.toArray("1", "2", "3"), null);
     evaluator.setValue("choices['ids']", action, ArrayUtils.toArray("1", "2", "3"), null);
-    assertEquals(3, action.getRoleIds().length);
-    assertEquals(1, action.getRoleIds()[0]);
-    assertEquals(2, action.getRoleIds()[1]);
-    assertEquals(3, action.getRoleIds()[2]);
-    assertEquals(3, action.getChoices().get("ids").size());
-    assertEquals(1, (int) action.getChoices().get("ids").get(0));
-    assertEquals(2, (int) action.getChoices().get("ids").get(1));
-    assertEquals(3, (int) action.getChoices().get("ids").get(2));
+    assertEquals(action.getRoleIds().length, 3);
+    assertEquals(action.getRoleIds()[0], 1);
+    assertEquals(action.getRoleIds()[1], 2);
+    assertEquals(action.getRoleIds()[2], 3);
+    assertEquals(action.getChoices().get("ids").size(), 3);
+    assertEquals((int) action.getChoices().get("ids").get(0), 1);
+    assertEquals((int) action.getChoices().get("ids").get(1), 2);
+    assertEquals((int) action.getChoices().get("ids").get(2), 3);
 
     // Test arrays inside maps
     evaluator.setValue("associations['ids']", action, ArrayUtils.toArray("1", "2", "3"), null);
-    assertEquals(3, action.getAssociations().get("ids").length);
-    assertEquals(1, (int) action.getAssociations().get("ids")[0]);
-    assertEquals(2, (int) action.getAssociations().get("ids")[1]);
-    assertEquals(3, (int) action.getAssociations().get("ids")[2]);
+    assertEquals(action.getAssociations().get("ids").length, 3);
+    assertEquals((int) action.getAssociations().get("ids")[0], 1);
+    assertEquals((int) action.getAssociations().get("ids")[1], 2);
+    assertEquals((int) action.getAssociations().get("ids")[2], 3);
   }
 
   /**
@@ -255,8 +275,8 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     evaluator.setValue("user.age", action, ArrayUtils.toArray("32"), null);
     evaluator.setValue("user.name", action, ArrayUtils.toArray("Brian"), null);
     evaluator.setValue("user.active", action, ArrayUtils.toArray("true"), null);
-    assertEquals((Integer) 32, action.user.age);
-    assertEquals("Brian", action.user.name);
+    assertEquals(action.user.age, (Integer) 32);
+    assertEquals(action.user.name, "Brian");
     assertTrue(action.user.active);
 
     // Test collection property sets
@@ -265,30 +285,30 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     evaluator.setValue("user.addresses['home'].state", action, ArrayUtils.toArray("CO"), null);
     evaluator.setValue("user.addresses['home'].street", action, ArrayUtils.toArray("Test"), null);
     evaluator.setValue("user.addresses['home'].zipcode", action, ArrayUtils.toArray("80020"), null);
-    assertEquals(1, action.user.addresses.size());
+    assertEquals(action.user.addresses.size(), 1);
     assertNull(action.user.addresses.get("work"));
-    assertEquals("Broomfield", action.user.addresses.get("home").city);
-    assertEquals("CO", action.user.addresses.get("home").state);
-    assertEquals("Test", action.user.addresses.get("home").street);
-    assertEquals("80020", action.user.addresses.get("home").zipcode);
+    assertEquals(action.user.addresses.get("home").city, "Broomfield");
+    assertEquals(action.user.addresses.get("home").state, "CO");
+    assertEquals(action.user.addresses.get("home").street, "Test");
+    assertEquals(action.user.addresses.get("home").zipcode, "80020");
 
     evaluator.setValue("user.siblings[0].age", action, ArrayUtils.toArray("34"), null);
     evaluator.setValue("user.siblings[0].name", action, ArrayUtils.toArray("Brett"), null);
-    assertEquals(1, action.user.siblings.size());
-    assertEquals((Integer) 34, action.user.siblings.get(0).age);
-    assertEquals("Brett", action.user.siblings.get(0).name);
+    assertEquals(action.user.siblings.size(), 1);
+    assertEquals(action.user.siblings.get(0).age, (Integer) 34);
+    assertEquals(action.user.siblings.get(0).name, "Brett");
 
     evaluator.setValue("user.securityQuestions[0]", action, ArrayUtils.toArray("What is your pet's name?"), null);
     evaluator.setValue("user.securityQuestions[1]", action, ArrayUtils.toArray("What is your home town?"), null);
-    assertEquals(2, action.user.securityQuestions.length);
-    assertEquals("What is your pet's name?", action.user.securityQuestions[0]);
-    assertEquals("What is your home town?", action.user.securityQuestions[1]);
+    assertEquals(action.user.securityQuestions.length, 2);
+    assertEquals(action.user.securityQuestions[0], "What is your pet's name?");
+    assertEquals(action.user.securityQuestions[1], "What is your home town?");
 
     action.user.securityQuestions = null;
     evaluator.setValue("user.securityQuestions", action, new String[]{"What is your pet's name?", "What is your home town?"}, null);
-    assertEquals(2, action.user.securityQuestions.length);
-    assertEquals("What is your pet's name?", action.user.securityQuestions[0]);
-    assertEquals("What is your home town?", action.user.securityQuestions[1]);
+    assertEquals(action.user.securityQuestions.length, 2);
+    assertEquals(action.user.securityQuestions[0], "What is your pet's name?");
+    assertEquals(action.user.securityQuestions[1], "What is your home town?");
   }
 
   @Test
@@ -316,12 +336,9 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     ActionField action = new ActionField();
     evaluator.setValue("user.name", action, asList("Brian"));
     evaluator.setValue("user.active", action, ArrayUtils.toArray("true"), null);
-    assertEquals("Brian", action.user.name);
+    assertEquals(action.user.name, "Brian");
   }
 
-  /**
-   * Test expansion.
-   */
   @Test
   public void expansion() {
     // Test nested property set and type conversion
@@ -330,7 +347,13 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     action.user.name = "Fred";
 
     String result = evaluator.expand("My name is ${user.name}", action, false);
-    assertEquals("My name is Fred", result);
+    assertEquals(result, "My name is Fred");
+
+    // Test nested property set and type conversion
+    action.user.name = "/Fred";
+
+    result = evaluator.expand("My name is ${user.name}", action, true);
+    assertEquals(result, "My name is %2FFred");
   }
 
   @Test(enabled = false)

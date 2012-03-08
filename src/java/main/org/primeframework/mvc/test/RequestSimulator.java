@@ -38,7 +38,7 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 
 /**
- * This class provides a method for testing a full invocation of JCatapult. This simulates the JEE web objects
+ * This class provides a method for testing a full invocation of Prime. This simulates the JEE web objects
  * (HttpServletRequest, etc.) and an invocation of the PrimeFilter. You can also simulate multiple invocations across a
  * single session by using the same instance of this class multiple times.
  * <p/>
@@ -128,7 +128,7 @@ public class RequestSimulator {
       @Override
       public void doFilter(ServletRequest request, ServletResponse response) {
         throw new UnsupportedOperationException("The RequestSimulator class doesn't support testing " +
-          "URIs that don't map to JCatapult resources");
+          "URIs that don't map to Prime resources");
       }
     });
 

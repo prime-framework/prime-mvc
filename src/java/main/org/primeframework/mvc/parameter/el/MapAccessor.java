@@ -65,16 +65,16 @@ public class MapAccessor extends Accessor {
     return false;
   }
 
-  public Object get(Context context) {
+  public Object get(Expression expression) {
     return ((Map) this.object).get(key);
   }
 
-  public void set(String[] values, Context context) {
-    set(convert(context, memberAccessor.field, values), context);
+  public void set(String[] values, Expression expression) {
+    set(convert(expression, memberAccessor.field, values), expression);
   }
 
   @SuppressWarnings("unchecked")
-  public void set(Object value, Context context) {
+  public void set(Object value, Expression expression) {
     ((Map) this.object).put(key, value);
   }
 

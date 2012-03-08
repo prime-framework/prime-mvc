@@ -38,7 +38,7 @@ import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.parameter.el.ExpressionException;
 import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
-import org.primeframework.mvc.util.MethodTools;
+import org.primeframework.mvc.util.ReflectionUtils;
 
 import com.google.inject.Inject;
 /**
@@ -84,7 +84,7 @@ public class DefaultParameterHandler implements ParameterHandler {
     setValues(parameters.pre, action, true);
 
     // Next, invoke pre methods
-    MethodTools.invokeAllWithAnnotation(action, PreParameterMethod.class);
+    ReflectionUtils.invokeAllWithAnnotation(action, PreParameterMethod.class);
 
     // Next, process the optional
     setValues(parameters.optional, action, true);
@@ -98,7 +98,7 @@ public class DefaultParameterHandler implements ParameterHandler {
     }
 
     // Finally, invoke post methods
-    MethodTools.invokeAllWithAnnotation(action, PostParameterMethod.class);
+    ReflectionUtils.invokeAllWithAnnotation(action, PostParameterMethod.class);
   }
 
   /**
@@ -140,6 +140,9 @@ public class DefaultParameterHandler implements ParameterHandler {
    * @param action The action.
    */
   protected void handleFiles(Map<String, List<FileInfo>> fileInfos, Object action) {
+    long maxSize = configuration.fileUploadMaxSize();
+    String[] allowedContentTypes = configuration.fileUploadAllowedTypes();
+
     // Set the files into the action
     for (String key : fileInfos.keySet()) {
       // Verify file sizes and types
@@ -147,14 +150,27 @@ public class DefaultParameterHandler implements ParameterHandler {
       FileUpload fileUpload = expressionEvaluator.getAnnotation(FileUpload.class, key, action);
       for (Iterator<FileInfo> i = list.iterator(); i.hasNext(); ) {
         FileInfo info = i.next();
-        if ((fileUpload != null && tooBig(info, fileUpload)) ||
-          ((fileUpload == null || fileUpload.maxSize() == -1) && tooBig(info))) {
-          FieldMessage message = messageProvider.getFieldMessage(key, key + ".fileUploadSizeError", info.file.length());
+
+        // Check the size
+        if (fileUpload != null && fileUpload.maxSize() != -1) {
+          maxSize = fileUpload.maxSize();
+        }
+        
+        long fileSize = info.file.length();
+        if (fileSize > maxSize) {
+          FieldMessage message = messageProvider.getFieldMessage(key, key + ".fileUploadSizeError", fileSize, maxSize);
           messageStore.add(message);
           i.remove();
-        } else if ((fileUpload != null && invalidContentType(info, fileUpload)) ||
-          ((fileUpload == null || fileUpload.contentTypes().length == 0) && invalidContentType(info))) {
-          FieldMessage message = messageProvider.getFieldMessage(key, key + ".fileUploadContentTypeError", info.getContentType());
+        }
+
+        // Check the content type
+        if (fileUpload != null && fileUpload.contentTypes().length > 0) {
+          allowedContentTypes = fileUpload.contentTypes();
+        }
+
+        String contentType = info.contentType;
+        if (!ArrayUtils.contains(allowedContentTypes, contentType)) {
+          FieldMessage message = messageProvider.getFieldMessage(key, key + ".fileUploadContentTypeError", contentType, allowedContentTypes);
           messageStore.add(message);
           i.remove();
         }
@@ -165,47 +181,5 @@ public class DefaultParameterHandler implements ParameterHandler {
         expressionEvaluator.setValue(key, action, list);
       }
     }
-  }
-
-  /**
-   * Checks the size of the given file against the annotation.
-   *
-   * @param info       The file info.
-   * @param fileUpload The annotation.
-   * @return False if the file is okay, true if it is too big.
-   */
-  private boolean tooBig(FileInfo info, FileUpload fileUpload) {
-    return fileUpload.maxSize() != -1 && info.file.length() > fileUpload.maxSize();
-  }
-
-  /**
-   * Checks the size of the given file against the global settings.
-   *
-   * @param info The file info.
-   * @return False if the file is okay, true if it is too big.
-   */
-  private boolean tooBig(FileInfo info) {
-    return info.file.length() > configuration.fileUploadMaxSize();
-  }
-
-  /**
-   * Checks the content type of the given file against the annotation.
-   *
-   * @param info       The file info.
-   * @param fileUpload The annotation.
-   * @return False if the file is okay, true if it is an invalid type.
-   */
-  private boolean invalidContentType(FileInfo info, FileUpload fileUpload) {
-    return fileUpload.contentTypes().length != 0 && !ArrayUtils.contains(fileUpload.contentTypes(), info.contentType);
-  }
-
-  /**
-   * Checks the content type of the global settings.
-   *
-   * @param info The file info.
-   * @return False if the file is okay, true if it is an invalid type.
-   */
-  private boolean invalidContentType(FileInfo info) {
-    return !ArrayUtils.contains(configuration.fileUploadAllowedTypes(), info.contentType);
   }
 }

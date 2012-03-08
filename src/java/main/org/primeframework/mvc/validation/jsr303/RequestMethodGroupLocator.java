@@ -58,6 +58,6 @@ public class RequestMethodGroupLocator implements GroupLocator {
       return ArrayUtils.toArray(Delete.class);
     }
     
-    throw new ErrorException("Invalid HTTP method for validation [" + method + "]");
+    throw new ErrorException("error", "Invalid HTTP method for validation [" + method + "]");
   }
 }

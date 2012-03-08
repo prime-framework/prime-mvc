@@ -318,9 +318,6 @@ public class DefaultActionInvocationWorkflowTest {
     ActionInvocation invocation = new DefaultActionInvocation(action, "/foo/bar", null, null);
     ActionInvocationStore ais = createStrictMock(ActionInvocationStore.class);
     expect(ais.getCurrent()).andReturn(invocation);
-    ais.removeCurrent();
-    Capture<ActionInvocation> capture = new Capture<ActionInvocation>();
-    ais.setCurrent(capture(capture));
     replay(ais);
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);

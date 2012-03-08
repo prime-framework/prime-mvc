@@ -49,8 +49,8 @@ public class FlashScopeTest {
     FlashScope scope = new FlashScope(request);
     List<Message> messages = scope.get();
     assertEquals(messages.size(), 2);
-    assertEquals(messages.get(0), "Request");
-    assertEquals(messages.get(1), "Session");
+    assertEquals(messages.get(0).toString(), "Request");
+    assertEquals(messages.get(1).toString(), "Session");
 
     verify(session, request);
   }
@@ -70,7 +70,7 @@ public class FlashScopeTest {
     FlashScope scope = new FlashScope(request);
     scope.add(new SimpleMessage("Foo"));
     assertEquals(messages.size(), 1);
-    assertEquals(messages.get(0), "Foo");
+    assertEquals(messages.get(0).toString(), "Foo");
 
     verify(session, request);
   }
@@ -90,8 +90,8 @@ public class FlashScopeTest {
     FlashScope scope = new FlashScope(request);
     scope.addAll(Arrays.<Message>asList(new SimpleMessage("Foo"), new SimpleMessage("Bar")));
     assertEquals(messages.size(), 2);
-    assertEquals(messages.get(0), "Foo");
-    assertEquals(messages.get(1), "Bar");
+    assertEquals(messages.get(0).toString(), "Foo");
+    assertEquals(messages.get(1).toString(), "Bar");
 
     verify(session, request);
   }
@@ -106,7 +106,7 @@ public class FlashScopeTest {
     replay(session);
 
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    expect(request.getSession(true)).andReturn(session);
+    expect(request.getSession(false)).andReturn(session);
     request.setAttribute(FlashScope.KEY, messages);
     replay(request);
 
@@ -114,5 +114,17 @@ public class FlashScopeTest {
     scope.transferFlash();
 
     verify(session, request);
+  }
+
+  @Test
+  public void transferFlashNoSession() {
+    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
+    expect(request.getSession(false)).andReturn(null);
+    replay(request);
+
+    FlashScope scope = new FlashScope(request);
+    scope.transferFlash();
+
+    verify(request);
   }
 }

@@ -41,7 +41,7 @@ public class DefaultConverterProviderTest extends PrimeBaseTest {
    */
   @Test
   public void lookups() {
-    Injector injector = GuiceBootstrap.initialize();
+    Injector injector = GuiceBootstrap.initialize(new TestModule());
     ConverterProvider provider = new DefaultConverterProvider(injector, injector.getInstance(Key.get(new TypeLiteral<Map<Class<?>, GlobalConverter>>(){})));
     GlobalConverter tc = provider.lookup(Character.class);
     assertSame(CharacterConverter.class, tc.getClass());

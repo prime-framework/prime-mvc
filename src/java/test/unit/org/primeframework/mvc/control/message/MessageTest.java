@@ -42,22 +42,11 @@ public class MessageTest extends ControlBaseTest {
   }
 
   @Test
-  public void messageBundle() {
-    Edit action = new Edit();
-    ais.setCurrent(new DefaultActionInvocation(action, "/user/edit", null, null));
-    new ControlTester(message).
-      attr("key", "key").
-      attr("bundle", "/user/edit-bundle").
-      go("Bundle Message");
-  }
-
-  @Test
   public void messageBundleWithParams() {
     Edit action = new Edit();
     ais.setCurrent(new DefaultActionInvocation(action, "/user/edit", null, null));
     new ControlTester(message).
       attr("key", "params").
-      attr("bundle", "/user/edit-bundle").
       attr("values", asList("Params")).
       go("Params Message");
   }

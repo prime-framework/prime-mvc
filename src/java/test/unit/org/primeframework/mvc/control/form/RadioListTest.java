@@ -45,7 +45,6 @@ public class RadioListTest extends ControlBaseTest {
     new ControlTester(radioList).
       attr("name", "test").
       attr("class", "css-class").
-      attr("bundle", "/radio-list-bundle").
       attr("items", asList("one", "two", "three")).
       go("<input type=\"hidden\" name=\"test@param\" value=\"param-value\"/>\n" +
         "<div class=\"css-class-radio-list css-class-input css-class-control radio-list input control\">\n" +
@@ -134,8 +133,8 @@ public class RadioListTest extends ControlBaseTest {
 
     new ControlTester(radioList).
       attr("name", "user.addresses['work'].country").
-      attr("valueExpr", "first").
-      attr("textExpr", "second").
+      attr("valueExpr", "left").
+      attr("textExpr", "right").
       attr("items", ArrayUtils.toArray(us, de)).
       go("<input type=\"hidden\" name=\"user.addresses['work'].country@param\" value=\"param-value\"/>\n" +
         "<div class=\"radio-list input control\">\n" +
@@ -169,7 +168,7 @@ public class RadioListTest extends ControlBaseTest {
       attr("items", lmap("US", "United States", "DE", "Germany")).
       go("<input type=\"hidden\" name=\"user.addresses['work'].country@param\" value=\"param-value\"/>\n" +
         "<div class=\"radio-list input control\">\n" +
-        "<div class=\"label-container\"><label for=\"user_addresses['work']_country\" class=\"label\"><span class=\"error\">Country (Country is required, Country must be cool)</span></label></div>\n" +
+        "<div class=\"label-container\"><label for=\"user_addresses['work']_country\" class=\"label\"><span class=\"error\">Country (fieldError1, fieldError2)</span></label></div>\n" +
         "<div class=\"control-container\">\n" +
         "<div class=\"control-item-container\">\n" +
         "<input type=\"radio\" checked=\"checked\" value=\"US\" name=\"user.addresses['work'].country\"/><span class=\"radio-text\">United States</span>\n" +
@@ -200,7 +199,7 @@ public class RadioListTest extends ControlBaseTest {
       attr("uncheckedValue", "US").
       go("<input type=\"hidden\" name=\"user.addresses['work'].country@param\" value=\"param-value\"/>\n" +
         "<div class=\"radio-list input control\">\n" +
-        "<div class=\"label-container\"><label for=\"user_addresses['work']_country\" class=\"label\"><span class=\"error\">Country (Country is required, Country must be cool)</span></label></div>\n" +
+        "<div class=\"label-container\"><label for=\"user_addresses['work']_country\" class=\"label\"><span class=\"error\">Country (fieldError1, fieldError2)</span></label></div>\n" +
         "<div class=\"control-container\">\n" +
         "<div class=\"control-item-container\">\n" +
         "<input type=\"radio\" checked=\"checked\" value=\"US\" name=\"user.addresses['work'].country\"/><span class=\"radio-text\">United States</span>\n" +

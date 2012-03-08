@@ -40,7 +40,7 @@ public class FlashScopeTest {
     map.put("test", value);
 
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-    EasyMock.expect(request.getAttribute("jcatapultFlash")).andReturn(map);
+    EasyMock.expect(request.getAttribute("primeFlash")).andReturn(map);
     EasyMock.replay(request);
 
     FlashScope scope = new FlashScope(request);
@@ -64,7 +64,7 @@ public class FlashScopeTest {
     map.put("other", value);
 
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-    EasyMock.expect(request.getAttribute("jcatapultFlash")).andReturn(map);
+    EasyMock.expect(request.getAttribute("primeFlash")).andReturn(map);
     EasyMock.replay(request);
 
     FlashScope scope = new FlashScope(request);
@@ -88,11 +88,11 @@ public class FlashScopeTest {
     map.put("test", value);
 
     HttpSession session = EasyMock.createStrictMock(HttpSession.class);
-    EasyMock.expect(session.getAttribute("jcatapultFlash")).andReturn(map);
+    EasyMock.expect(session.getAttribute("primeFlash")).andReturn(map);
     EasyMock.replay(session);
 
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-    EasyMock.expect(request.getAttribute("jcatapultFlash")).andReturn(new HashMap<String, Object>());
+    EasyMock.expect(request.getAttribute("primeFlash")).andReturn(new HashMap<String, Object>());
     EasyMock.expect(request.getSession(false)).andReturn(session);
     EasyMock.replay(request);
 
@@ -113,7 +113,7 @@ public class FlashScopeTest {
   @Test
   public void getFromSessionNoSession() {
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-    EasyMock.expect(request.getAttribute("jcatapultFlash")).andReturn(new HashMap<String, Object>());
+    EasyMock.expect(request.getAttribute("primeFlash")).andReturn(new HashMap<String, Object>());
     EasyMock.expect(request.getSession(false)).andReturn(null);
     EasyMock.replay(request);
 
@@ -138,11 +138,11 @@ public class FlashScopeTest {
     map.put("other", value);
 
     HttpSession session = EasyMock.createStrictMock(HttpSession.class);
-    EasyMock.expect(session.getAttribute("jcatapultFlash")).andReturn(map);
+    EasyMock.expect(session.getAttribute("primeFlash")).andReturn(map);
     EasyMock.replay(session);
 
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-    EasyMock.expect(request.getAttribute("jcatapultFlash")).andReturn(new HashMap<String, Object>());
+    EasyMock.expect(request.getAttribute("primeFlash")).andReturn(new HashMap<String, Object>());
     EasyMock.expect(request.getSession(false)).andReturn(session);
     EasyMock.replay(request);
 
@@ -163,7 +163,7 @@ public class FlashScopeTest {
   @Test
   public void getFromSessionNoSessionDifferentKey() {
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-    EasyMock.expect(request.getAttribute("jcatapultFlash")).andReturn(new HashMap<String, Object>());
+    EasyMock.expect(request.getAttribute("primeFlash")).andReturn(new HashMap<String, Object>());
     EasyMock.expect(request.getSession(false)).andReturn(null);
     EasyMock.replay(request);
 
@@ -187,7 +187,7 @@ public class FlashScopeTest {
     Map<String, Object> map = new HashMap<String, Object>();
 
     HttpSession session = EasyMock.createStrictMock(HttpSession.class);
-    EasyMock.expect(session.getAttribute("jcatapultFlash")).andReturn(map);
+    EasyMock.expect(session.getAttribute("primeFlash")).andReturn(map);
     EasyMock.replay(session);
 
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
@@ -215,7 +215,7 @@ public class FlashScopeTest {
     map.put("test", "value");
 
     HttpSession session = EasyMock.createStrictMock(HttpSession.class);
-    EasyMock.expect(session.getAttribute("jcatapultFlash")).andReturn(map);
+    EasyMock.expect(session.getAttribute("primeFlash")).andReturn(map);
     EasyMock.replay(session);
 
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
@@ -263,7 +263,7 @@ public class FlashScopeTest {
     Map<String, Object> map = new HashMap<String, Object>();
 
     HttpSession session = EasyMock.createStrictMock(HttpSession.class);
-    EasyMock.expect(session.getAttribute("jcatapultFlash")).andReturn(map);
+    EasyMock.expect(session.getAttribute("primeFlash")).andReturn(map);
     EasyMock.replay(session);
 
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);

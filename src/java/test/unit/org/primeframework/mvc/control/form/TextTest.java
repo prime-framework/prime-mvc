@@ -38,7 +38,6 @@ public class TextTest extends ControlBaseTest {
     new ControlTester(text).
       attr("name", "test").
       attr("class", "css-class").
-      attr("bundle", "/text-bundle").
       go("<input type=\"hidden\" name=\"test@param\" value=\"param-value\"/>\n" +
       "<div class=\"css-class-text css-class-input css-class-control text input control\">\n" +
       "<div class=\"label-container\"><label for=\"test\" class=\"label\">Test</label></div>\n" +
@@ -93,7 +92,7 @@ public class TextTest extends ControlBaseTest {
       attr("name", "user.name").
       go("<input type=\"hidden\" name=\"user.name@param\" value=\"param-value\"/>\n" +
       "<div class=\"text input control\">\n" +
-      "<div class=\"label-container\"><label for=\"user_name\" class=\"label\"><span class=\"error\">Your name (Name is required, Name must be cool)</span></label></div>\n" +
+      "<div class=\"label-container\"><label for=\"user_name\" class=\"label\"><span class=\"error\">Your name (fieldError1, fieldError2)</span></label></div>\n" +
       "<div class=\"control-container\"><input type=\"text\" id=\"user_name\" name=\"user.name\" value=\"Barry\"/></div>\n" +
       "</div>\n");
   }

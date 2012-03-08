@@ -125,9 +125,9 @@ public abstract class AbstractControl implements Control {
   protected Map<String, Object> makeParameters() {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("attributes", attributes);
-    parameters.put("dynamic_attributes", dynamicAttributes);
+    parameters.put("dynamicAttributes", dynamicAttributes);
 //        parameters.put("append_attributes", new AppendAttributesMethod());
-    parameters.put("make_class", new JoinMethod());
+    parameters.put("join", new JoinMethod());
     return parameters;
   }
 

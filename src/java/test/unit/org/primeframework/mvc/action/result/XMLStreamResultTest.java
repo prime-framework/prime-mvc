@@ -51,7 +51,7 @@ public class XMLStreamResultTest {
     XMLStreamResult streamResult = new XMLStreamResult(ee, response, store);
     streamResult.execute(xmlStream);
 
-    assertEquals("<xml/>", sos.toString());
+    assertEquals(sos.toString(), "<xml/>");
 
     verify(ee, response);
   }

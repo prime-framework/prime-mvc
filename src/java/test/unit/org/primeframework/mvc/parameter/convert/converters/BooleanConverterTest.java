@@ -91,15 +91,15 @@ public class BooleanConverterTest {
     assertNull(str);
 
     str = converter.convertToString(Boolean.class, null, "testExpr", Boolean.TRUE);
-    assertEquals("true", str);
+    assertEquals(str, "true");
 
     str = converter.convertToString(Boolean.TYPE, null, "testExpr", Boolean.TRUE);
-    assertEquals("true", str);
+    assertEquals(str, "true");
 
     str = converter.convertToString(Boolean.class, null, "testExpr", Boolean.FALSE);
-    assertEquals("false", str);
+    assertEquals(str, "false");
 
     str = converter.convertToString(Boolean.TYPE, null, "testExpr", Boolean.FALSE);
-    assertEquals("false", str);
+    assertEquals(str, "false");
   }
 }

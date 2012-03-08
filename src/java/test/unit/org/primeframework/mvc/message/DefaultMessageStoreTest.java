@@ -23,6 +23,7 @@ import org.primeframework.mvc.message.scope.Scope;
 import org.primeframework.mvc.message.scope.ScopeProvider;
 import org.testng.annotations.Test;
 
+import static java.util.Arrays.asList;
 import static org.easymock.EasyMock.*;
 import static org.testng.Assert.*;
 
@@ -104,7 +105,7 @@ public class DefaultMessageStoreTest {
 
     List<Message> applicationMessages = new ArrayList<Message>();
     applicationMessages.add(new SimpleMessage("application1"));
-    applicationMessages.add(new SimpleMessage("applicaiton2"));
+    applicationMessages.add(new SimpleMessage("application2"));
 
     Scope request = createStrictMock(Scope.class);
     expect(request.get()).andReturn(requestMessages);
@@ -123,10 +124,7 @@ public class DefaultMessageStoreTest {
     replay(application);
 
     ScopeProvider sp = createStrictMock(ScopeProvider.class);
-    expect(sp.lookup(MessageScope.REQUEST)).andReturn(request);
-    expect(sp.lookup(MessageScope.FLASH)).andReturn(flash);
-    expect(sp.lookup(MessageScope.SESSION)).andReturn(session);
-    expect(sp.lookup(MessageScope.APPLICATION)).andReturn(application);
+    expect(sp.getAllScopes()).andReturn(asList(request, flash, session, application));
     replay(sp);
 
     DefaultMessageStore store = new DefaultMessageStore(sp);

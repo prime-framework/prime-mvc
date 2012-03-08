@@ -38,7 +38,6 @@ public class FileTest extends ControlBaseTest {
     new ControlTester(file).
       attr("name", "test").
       attr("class", "css-class").
-      attr("bundle", "/file-bundle").
       go("<input type=\"hidden\" name=\"test@param\" value=\"param-value\"/>\n" +
       "<div class=\"css-class-file css-class-input css-class-control file input control\">\n" +
       "<div class=\"label-container\"><label for=\"test\" class=\"label\">Test</label></div>\n" +
@@ -87,7 +86,7 @@ public class FileTest extends ControlBaseTest {
       attr("name", "user.profile").
       go("<input type=\"hidden\" name=\"user.profile@param\" value=\"param-value\"/>\n" +
       "<div class=\"file input control\">\n" +
-      "<div class=\"label-container\"><label for=\"user_profile\" class=\"label\"><span class=\"error\">Your profile (Profile is required, Profile must be cool)</span></label></div>\n" +
+      "<div class=\"label-container\"><label for=\"user_profile\" class=\"label\"><span class=\"error\">Your profile (fieldError1, fieldError2)</span></label></div>\n" +
       "<div class=\"control-container\"><input type=\"file\" id=\"user_profile\" name=\"user.profile\"/></div>\n" +
       "</div>\n");
   }

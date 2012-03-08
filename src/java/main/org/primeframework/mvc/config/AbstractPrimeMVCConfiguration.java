@@ -24,18 +24,22 @@ package org.primeframework.mvc.config;
  * @author Brian Pontarelli
  */
 public abstract class AbstractPrimeMVCConfiguration implements PrimeMVCConfiguration {
+  public static final String[] ALLOWED_TYPES = new String[]{
+    "text/plain", "text/xml", "text/rtf", "text/richtext", "text/html", "text/css",
+    "image/jpeg", "image/gif", "image/png", "image/pjpeg", "image/tiff",
+    "video/dv", "video/h261", "video/h262", "video/h263", "video/h264", "video/jpeg", "video/mp4", "video/mpeg", "video/mpv", "video/ogg", "video/quicktime", "video/x-flv",
+    "application/msword", "application/pdf", "application/msword", "application/msexcel", "application/mspowerpoint"};
+  public static final long MAX_SIZE = 1024000;
+  public static final String[] STATIC_PREFIXES = new String[]{"/static"};
+
   @Override
   public String[] fileUploadAllowedTypes() {
-    return new String[]{
-      "text/plain", "text/xml", "text/rtf", "text/richtext", "text/html", "text/css",
-      "image/jpeg", "image/gif", "image/png", "image/pjpeg", "image/tiff",
-      "video/dv", "video/h261", "video/h262", "video/h263", "video/h264", "video/jpeg", "video/mp4", "video/mpeg", "video/mpv", "video/ogg", "video/quicktime", "video/x-flv",
-      "application/msword", "application/pdf", "application/msword", "application/msexcel", "application/mspowerpoint"};
+    return ALLOWED_TYPES;
   }
 
   @Override
   public long fileUploadMaxSize() {
-    return 1024000;
+    return MAX_SIZE;
   }
 
   @Override
@@ -45,7 +49,7 @@ public abstract class AbstractPrimeMVCConfiguration implements PrimeMVCConfigura
 
   @Override
   public String[] staticResourcePrefixes() {
-    return new String[]{"/static"};
+    return STATIC_PREFIXES;
   }
 
   @Override

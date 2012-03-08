@@ -1,10 +1,10 @@
 [#ftl/]
-[#include "macros.ftl"/]
-[#include "dynamic-attributes.ftl"/]
-<div class="[@class attributes=attributes name="select" input=true/]">
-<div class="label-container">[#include "label.ftl"/]</div>
+[#import "_macros.ftl" as macros/]
+[@macros.dynamic_attributes attrs=dynamicAttributes name=attributes['name']/]
+<div class="[@macros.class attrs=attributes name="select" input=true/]">
+<div class="label-container">[@macros.label text=label fieldMessages=fieldMessages required=required/]</div>
 <div class="control-container">
-<select[@append_attributes attributes=attributes list=[]/]>
+<select[@macros.append_attributes attributes=attributes list=[]/]>
 [#list options?keys as key]
 <option value="${key?html}"[#if options[key].selected] selected="selected"[/#if]>${options[key].text}</option>
 [/#list]
