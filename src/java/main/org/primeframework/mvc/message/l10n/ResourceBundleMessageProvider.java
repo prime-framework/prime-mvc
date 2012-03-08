@@ -39,22 +39,20 @@ import com.google.inject.Inject;
  * uri = /foo/bar
  * locale = en_US
  *
- * /WEB-INF/message/foo/bar_en_US
- * /WEB-INF/message/foo/bar_en
- * /WEB-INF/message/foo/bar
- * /WEB-INF/message/foo/package_en_US
- * /WEB-INF/message/foo/package_en
- * /WEB-INF/message/foo/package
- * /WEB-INF/message/package_en_US
- * /WEB-INF/message/package_en
- * /WEB-INF/message/package
+ * /WEB-INF/messages/foo/bar_en_US
+ * /WEB-INF/messages/foo/bar_en
+ * /WEB-INF/messages/foo/bar
+ * /WEB-INF/messages/foo/package_en_US
+ * /WEB-INF/messages/foo/package_en
+ * /WEB-INF/messages/foo/package
+ * /WEB-INF/messages/package_en_US
+ * /WEB-INF/messages/package_en
+ * /WEB-INF/messages/package
  * </pre>
  * <p/>
- * This stops when /WEB-INF/message is hit.
+ * This stops when /WEB-INF/messages is hit.
  * <p/>
- * Once the message is found, it is formatted using the {@link java.text.MessageFormat} class. The values are passed in
- * order. The attributes Map is also passed to the format as well. The attributes are always after the values and are in
- * alphabetically order based on the keys for each attribute.
+ * Once the message is found, it is formatted using the {@link Formatter} class. The values are passed in order.
  *
  * @author Brian Pontarelli
  */

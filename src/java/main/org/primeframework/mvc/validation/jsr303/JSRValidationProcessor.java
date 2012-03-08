@@ -25,6 +25,7 @@ import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.message.FieldMessage;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.l10n.MessageProvider;
+import org.primeframework.mvc.message.l10n.MissingMessageException;
 import org.primeframework.mvc.validation.ValidationException;
 import org.primeframework.mvc.validation.ValidationProcessor;
 
@@ -70,7 +71,12 @@ public class JSRValidationProcessor implements ValidationProcessor {
 
       String propertyPath = violation.getPropertyPath().toString();
       Object invalidValue = violation.getInvalidValue();
-      FieldMessage message = provider.getFieldMessage(propertyPath, "[" + constraint + "]" + propertyPath, invalidValue);
+      FieldMessage message;
+      try {
+        message = provider.getFieldMessage(propertyPath, "[" + constraint + "]" + propertyPath, invalidValue);
+      } catch (MissingMessageException e) {
+        message = provider.getFieldMessage(propertyPath, "[" + constraint + "]", invalidValue);
+      }
       messageStore.add(message);
     }
     
