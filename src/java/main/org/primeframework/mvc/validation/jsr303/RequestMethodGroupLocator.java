@@ -16,6 +16,7 @@
 package org.primeframework.mvc.validation.jsr303;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.groups.Default;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.primeframework.mvc.ErrorException;
@@ -49,13 +50,13 @@ public class RequestMethodGroupLocator implements GroupLocator {
   public Class<?>[] groups() {
     String method = request.getMethod();
     if (method.equals("GET")) {
-      return ArrayUtils.toArray(Read.class);
+      return ArrayUtils.toArray(Read.class, Default.class);
     } else if (method.equals("POST")) {
-      return ArrayUtils.toArray(Create.class);
+      return ArrayUtils.toArray(Create.class, Default.class);
     } else if (method.equals("PUT")) {
-      return ArrayUtils.toArray(Update.class);
+      return ArrayUtils.toArray(Update.class, Default.class);
     } else if (method.equals("DELETE")) {
-      return ArrayUtils.toArray(Delete.class);
+      return ArrayUtils.toArray(Delete.class, Default.class);
     }
     
     throw new ErrorException("error", "Invalid HTTP method for validation [" + method + "]");

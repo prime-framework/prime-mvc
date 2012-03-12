@@ -15,15 +15,12 @@
  */
 package org.primeframework.mvc.validation;
 
-import javax.servlet.ServletException;
-import java.io.IOException;
-
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
 
 import static org.easymock.EasyMock.*;
-import static org.testng.Assert.fail;
+import static org.testng.Assert.*;
 
 /**
  * Test the validation workflow.

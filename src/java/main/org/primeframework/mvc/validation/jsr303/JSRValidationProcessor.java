@@ -16,6 +16,8 @@
 package org.primeframework.mvc.validation.jsr303;
 
 import javax.validation.ConstraintViolation;
+import javax.validation.Path;
+import javax.validation.Path.Node;
 import javax.validation.Validator;
 import java.util.Set;
 
@@ -69,7 +71,7 @@ public class JSRValidationProcessor implements ValidationProcessor {
           "], constraint [" + constraint + "]");
       }
 
-      String propertyPath = violation.getPropertyPath().toString();
+      String propertyPath = toString(violation.getPropertyPath());
       Object invalidValue = violation.getInvalidValue();
       FieldMessage message;
       try {
@@ -83,5 +85,38 @@ public class JSRValidationProcessor implements ValidationProcessor {
     if (violations.size() > 0) {
       throw new ValidationException();
     }
+  }
+
+  private String toString(Path propertyPath) {
+    StringBuilder build = new StringBuilder();
+    boolean first = true;
+    for (Node node : propertyPath) {
+      if (node.isInIterable()) {
+        addIndex(build, node);
+      }
+
+      if (!first) {
+        build.append(".");
+      }
+
+      build.append(node.getName());
+
+      first = false;
+    }
+
+    return build.toString();
+  }
+
+  private void addIndex(StringBuilder build, Node node) {
+    Integer index = node.getIndex();
+    Object key = node.getKey();
+
+    build.append("[");
+    if (index != null) {
+      build.append(index);
+    } else if (key != null) {
+      build.append("'").append(key).append("'");
+    }
+    build.append("]");
   }
 }

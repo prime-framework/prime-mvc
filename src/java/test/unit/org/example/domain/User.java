@@ -34,7 +34,7 @@ import org.hibernate.validator.constraints.NotBlank;
 public class User {
   @NotBlank
   private String name;
-  @NotBlank
+  @NotNull
   private Integer age;
   private boolean male;
   @Valid
@@ -126,7 +126,7 @@ public class User {
     return securityQuestions;
   }
 
-  public void setSecurityQuestions(String[] securityQuestions) {
+  public void setSecurityQuestions(String... securityQuestions) {
     this.securityQuestions = securityQuestions;
   }
 

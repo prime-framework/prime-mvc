@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.l10n;
+package org.primeframework.mvc.message.l10n;
 
 import java.io.File;
 import java.util.Locale;
@@ -23,9 +23,6 @@ import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.DefaultActionInvocation;
 import org.primeframework.mvc.config.PrimeMVCConfiguration;
 import org.primeframework.mvc.container.ServletContainerResolver;
-import org.primeframework.mvc.message.l10n.MissingMessageException;
-import org.primeframework.mvc.message.l10n.ResourceBundleMessageProvider;
-import org.primeframework.mvc.message.l10n.WebControl;
 import org.testng.annotations.Test;
 
 import static org.easymock.EasyMock.*;

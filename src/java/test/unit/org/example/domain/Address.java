@@ -27,9 +27,9 @@ public class Address {
   private String street;
   @NotBlank
   private String city;
-  @State
+  @NotBlank
   private String state;
-  @Zipcode
+  @NotBlank
   private String zipcode;
   @NotBlank
   private String country;
