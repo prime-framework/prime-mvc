@@ -26,7 +26,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.primeframework.mock.servlet.FileInfo;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
-import org.primeframework.mvc.config.PrimeMVCConfiguration;
+import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.message.FieldMessage;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.l10n.MessageProvider;
@@ -58,14 +58,14 @@ import com.google.inject.Inject;
  */
 public class DefaultParameterHandler implements ParameterHandler {
   private final static Logger logger = Logger.getLogger(DefaultParameterHandler.class.getName());
-  private final PrimeMVCConfiguration configuration;
+  private final MVCConfiguration configuration;
   private final ActionInvocationStore actionInvocationStore;
   private final ExpressionEvaluator expressionEvaluator;
   private final MessageProvider messageProvider;
   private final MessageStore messageStore;
 
   @Inject
-  public DefaultParameterHandler(PrimeMVCConfiguration configuration, ActionInvocationStore actionInvocationStore,
+  public DefaultParameterHandler(MVCConfiguration configuration, ActionInvocationStore actionInvocationStore,
                                  ExpressionEvaluator expressionEvaluator, MessageProvider messageProvider,
                                  MessageStore messageStore) {
     this.configuration = configuration;

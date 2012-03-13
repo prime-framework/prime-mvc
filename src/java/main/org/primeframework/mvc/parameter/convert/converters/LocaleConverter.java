@@ -20,7 +20,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.primeframework.mvc.config.PrimeMVCConfiguration;
+import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.parameter.convert.AbstractGlobalConverter;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.convert.annotation.GlobalConverter;
@@ -37,7 +37,7 @@ public class LocaleConverter extends AbstractGlobalConverter {
   private final boolean emptyIsNull;
 
   @Inject
-  public LocaleConverter(PrimeMVCConfiguration configuration) {
+  public LocaleConverter(MVCConfiguration configuration) {
     this.emptyIsNull = configuration.emptyParametersAreNull();
   }
 

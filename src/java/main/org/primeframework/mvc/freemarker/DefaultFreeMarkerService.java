@@ -22,11 +22,11 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Locale;
 
-import org.primeframework.mvc.config.PrimeMVCConfiguration;
+import org.primeframework.mvc.config.MVCConfiguration;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import freemarker.template.ObjectWrapper;
+import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
@@ -42,60 +42,36 @@ import freemarker.template.TemplateException;
  * reloaded each time. This will incur memory a penalty.
  * <p/>
  * The configuration interface defines the caching and reloading strategy for this service via the method
- * {@link PrimeMVCConfiguration#freemarkerCheckSeconds()}.
+ * {@link MVCConfiguration#templateCheckSeconds}.
  *
  * @author Brian Pontarelli
  */
 @Singleton
 public class DefaultFreeMarkerService implements FreeMarkerService {
-  private final freemarker.template.Configuration freeMarkerConfiguration = new freemarker.template.Configuration();
+  private final Configuration configuration;
 
   @Inject
-  public DefaultFreeMarkerService(PrimeMVCConfiguration configuration, OverridingTemplateLoader loader) {
-    int checkSeconds = configuration.freemarkerCheckSeconds();
-    this.freeMarkerConfiguration.setTemplateUpdateDelay(checkSeconds);
-    this.freeMarkerConfiguration.setTemplateLoader(loader);
-    this.freeMarkerConfiguration.setDefaultEncoding("UTF-8");
+  public DefaultFreeMarkerService(Configuration configuration) {
+    this.configuration = configuration;
   }
 
   /**
    * {@inheritDoc}
    */
-  public String render(String templateName, Object root, Locale locale)
-    throws FreeMarkerRenderException, MissingTemplateException {
+  @Override
+  public String render(String templateName, Object root, Locale locale) throws FreeMarkerRenderException, MissingTemplateException {
     StringWriter writer = new StringWriter();
-    render(writer, templateName, root, locale, null);
+    render(writer, templateName, root, locale);
     return writer.toString();
   }
 
   /**
    * {@inheritDoc}
    */
-  public void render(Writer writer, String templateName, Object root, Locale locale)
-    throws FreeMarkerRenderException, MissingTemplateException {
-    render(writer, templateName, root, locale, null);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public String render(String templateName, Object root, Locale locale, ObjectWrapper objectWrapper)
-    throws FreeMarkerRenderException, MissingTemplateException {
-    StringWriter writer = new StringWriter();
-    render(writer, templateName, root, locale, objectWrapper);
-    return writer.toString();
-  }
-
-  public void render(Writer writer, String templateName, Object root, Locale locale, ObjectWrapper objectWrapper)
-    throws FreeMarkerRenderException, MissingTemplateException {
+  @Override
+  public void render(Writer writer, String templateName, Object root, Locale locale) throws FreeMarkerRenderException, MissingTemplateException {
     try {
-      Template template = freeMarkerConfiguration.getTemplate(templateName, locale);
-      if (objectWrapper != null) {
-        template.setObjectWrapper(objectWrapper);
-      } else {
-        template.setObjectWrapper(FieldSupportBeansWrapper.INSTANCE);
-      }
-
+      Template template = configuration.getTemplate(templateName, locale);
       template.process(root, writer);
     } catch (FileNotFoundException fnfe) {
       throw new MissingTemplateException(fnfe);

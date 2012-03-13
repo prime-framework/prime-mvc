@@ -26,7 +26,7 @@ import java.net.URLDecoder;
 import java.util.Calendar;
 import java.util.logging.Logger;
 
-import org.primeframework.mvc.config.PrimeMVCConfiguration;
+import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.servlet.ServletTools;
 
 import com.google.inject.Inject;
@@ -55,7 +55,7 @@ public class StaticResourceWorkflow implements Workflow {
 
   @Inject
   public StaticResourceWorkflow(ServletContext context, HttpServletRequest request,
-                                HttpServletResponse response, PrimeMVCConfiguration configuration) {
+                                HttpServletResponse response, MVCConfiguration configuration) {
     this.context = context;
     this.request = request;
     this.response = response;

@@ -30,7 +30,6 @@ import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.annotation.Forward;
 import org.primeframework.mvc.freemarker.FreeMarkerMap;
 import org.primeframework.mvc.freemarker.FreeMarkerService;
-import org.primeframework.mvc.locale.annotation.CurrentLocale;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.util.ResourceTools;
 
@@ -55,7 +54,7 @@ public class ForwardResult extends AbstractResult<Forward> {
   @Inject
   public ForwardResult(ActionInvocationStore actionInvocationStore, ExpressionEvaluator expressionEvaluator,
                        FreeMarkerService freeMarkerService, ServletContext servletContext, HttpServletRequest request,
-                       HttpServletResponse response, FreeMarkerMap freeMarkerMap, @CurrentLocale Locale locale) {
+                       HttpServletResponse response, FreeMarkerMap freeMarkerMap, Locale locale) {
     super(expressionEvaluator);
     this.locale = locale;
     this.servletContext = servletContext;

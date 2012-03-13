@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import org.primeframework.mvc.config.PrimeMVCConfiguration;
+import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.workflow.StaticResourceWorkflow;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
@@ -38,7 +38,7 @@ import static org.testng.Assert.*;
 public class StaticResourceWorkflowTest {
   @Test
   public void newRequest() throws IOException, ServletException {
-    PrimeMVCConfiguration configuration = makeConfiguration();
+    MVCConfiguration configuration = makeConfiguration();
 
     ServletContext context = createStrictMock(ServletContext.class);
     expect(context.getResource("/static/2.1.1/test.jpg")).andReturn(null);
@@ -79,7 +79,7 @@ public class StaticResourceWorkflowTest {
 
   @Test
   public void newRequestContext() throws IOException, ServletException {
-    PrimeMVCConfiguration configuration = makeConfiguration();
+    MVCConfiguration configuration = makeConfiguration();
 
     ServletContext context = createStrictMock(ServletContext.class);
     expect(context.getResource("/static/2.1.1/test.jpg")).andReturn(null);
@@ -120,7 +120,7 @@ public class StaticResourceWorkflowTest {
 
   @Test
   public void cacheRequest() throws IOException, ServletException {
-    PrimeMVCConfiguration configuration = makeConfiguration();
+    MVCConfiguration configuration = makeConfiguration();
 
     ServletContext context = createStrictMock(ServletContext.class);
     expect(context.getResource("/static/2.1.1/test.jpg")).andReturn(null);
@@ -147,7 +147,7 @@ public class StaticResourceWorkflowTest {
 
   @Test
   public void badRequest() throws IOException, ServletException {
-    PrimeMVCConfiguration configuration = makeConfiguration();
+    MVCConfiguration configuration = makeConfiguration();
 
     ServletContext context = createStrictMock(ServletContext.class);
     expect(context.getResource("/static/2.1.1/bad.jpg")).andReturn(null);
@@ -173,7 +173,7 @@ public class StaticResourceWorkflowTest {
 
   @Test
   public void normal() throws IOException, ServletException {
-    PrimeMVCConfiguration configuration = makeConfiguration();
+    MVCConfiguration configuration = makeConfiguration();
 
     ServletContext context = createStrictMock(ServletContext.class);
     replay(context);
@@ -195,8 +195,8 @@ public class StaticResourceWorkflowTest {
     verify(configuration, req, res, wc);
   }
 
-  private PrimeMVCConfiguration makeConfiguration() {
-    PrimeMVCConfiguration configuration = createStrictMock(PrimeMVCConfiguration.class);
+  private MVCConfiguration makeConfiguration() {
+    MVCConfiguration configuration = createStrictMock(MVCConfiguration.class);
     String[] prefixes = new String[]{"/static"};
     expect(configuration.staticResourcePrefixes()).andReturn(prefixes);
     expect(configuration.staticResourcesEnabled()).andReturn(true);

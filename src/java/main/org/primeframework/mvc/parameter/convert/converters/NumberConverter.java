@@ -19,7 +19,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Map;
 
-import org.primeframework.mvc.config.PrimeMVCConfiguration;
+import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.convert.annotation.GlobalConverter;
@@ -35,7 +35,7 @@ import com.google.inject.Inject;
   Number.class, BigDecimal.class, BigInteger.class})
 public class NumberConverter extends AbstractPrimitiveConverter {
   @Inject
-  public NumberConverter(PrimeMVCConfiguration configuration) {
+  public NumberConverter(MVCConfiguration configuration) {
     super(configuration);
   }
 

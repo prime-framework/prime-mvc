@@ -15,15 +15,15 @@
  */
 package org.primeframework.mvc;
 
-import org.primeframework.mvc.config.AbstractPrimeMVCConfiguration;
+import org.primeframework.mvc.config.AbstractMVCConfiguration;
 
 /**
- * This is a mock configuration object that delegates to another PrimeMVCConfiguration instance, but also allows
+ * This is a mock configuration object that delegates to another MVCConfiguration instance, but also allows
  * specific properties to be mocked out.
  *
  * @author Brian Pontarelli
  */
-public class MockConfiguration extends AbstractPrimeMVCConfiguration {
+public class MockConfiguration extends AbstractMVCConfiguration {
   private int freemarkerCheckSeconds;
   private int l10nReloadSeconds;
   private boolean allowUnknownParameters;
@@ -38,7 +38,7 @@ public class MockConfiguration extends AbstractPrimeMVCConfiguration {
   }
 
   @Override
-  public int freemarkerCheckSeconds() {
+  public int templateCheckSeconds() {
     return freemarkerCheckSeconds;
   }
 

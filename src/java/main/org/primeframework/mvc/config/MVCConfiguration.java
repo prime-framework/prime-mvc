@@ -21,12 +21,12 @@ package org.primeframework.mvc.config;
  *
  * @author Brian Pontarelli
  */
-public interface PrimeMVCConfiguration {
+public interface MVCConfiguration {
   /**
    * @return The number of seconds to check for Freemarker template updates (max integer means never and 0 means
    *         always).
    */
-  int freemarkerCheckSeconds();
+  int templateCheckSeconds();
 
   /**
    * @return The number of seconds to check for message bundles updates (max integer means never and 0 means always).

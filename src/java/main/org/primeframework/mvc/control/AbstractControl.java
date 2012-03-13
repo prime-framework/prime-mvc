@@ -29,7 +29,6 @@ import org.primeframework.mvc.control.annotation.ControlAttributes;
 import org.primeframework.mvc.control.form.AppendAttributesMethod;
 import org.primeframework.mvc.control.form.JoinMethod;
 import org.primeframework.mvc.freemarker.FreeMarkerService;
-import org.primeframework.mvc.locale.annotation.CurrentLocale;
 import org.primeframework.mvc.util.ErrorList;
 
 import com.google.inject.Inject;
@@ -51,8 +50,8 @@ public abstract class AbstractControl implements Control {
   protected Object root;
 
   @Inject
-  public void setServices(@CurrentLocale Locale locale, HttpServletRequest request,
-                          ActionInvocationStore actionInvocationStore, FreeMarkerService freeMarkerService) {
+  public void setServices(Locale locale, HttpServletRequest request, ActionInvocationStore actionInvocationStore,
+                          FreeMarkerService freeMarkerService) {
     this.locale = locale;
     this.request = request;
     this.freeMarkerService = freeMarkerService;

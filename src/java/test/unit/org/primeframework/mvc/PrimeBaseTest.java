@@ -23,7 +23,7 @@ import org.primeframework.mock.servlet.MockHttpServletRequest;
 import org.primeframework.mock.servlet.MockHttpServletResponse;
 import org.primeframework.mock.servlet.MockHttpSession;
 import org.primeframework.mock.servlet.MockServletContext;
-import org.primeframework.mvc.config.PrimeMVCConfiguration;
+import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.guice.GuiceBootstrap;
 import org.primeframework.mvc.servlet.ServletObjectsHolder;
 import org.testng.annotations.AfterMethod;
@@ -78,7 +78,7 @@ public abstract class PrimeBaseTest {
   public static class TestModule extends AbstractModule {
     @Override
     protected void configure() {
-      bind(PrimeMVCConfiguration.class).toInstance(new MockConfiguration());
+      bind(MVCConfiguration.class).toInstance(new MockConfiguration());
     }
   }
 }

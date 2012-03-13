@@ -22,7 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.ReadableInstant;
 import org.joda.time.format.DateTimeFormat;
-import org.primeframework.mvc.config.PrimeMVCConfiguration;
+import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.parameter.convert.AbstractGlobalConverter;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
@@ -40,7 +40,7 @@ public class DateTimeConverter extends AbstractGlobalConverter {
   private final boolean emptyIsNull;
 
   @Inject
-  public DateTimeConverter(PrimeMVCConfiguration configuration) {
+  public DateTimeConverter(MVCConfiguration configuration) {
     this.emptyIsNull = configuration.emptyParametersAreNull();
   }
 

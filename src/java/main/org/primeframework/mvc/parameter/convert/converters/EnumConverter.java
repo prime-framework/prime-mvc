@@ -19,7 +19,7 @@ import java.lang.reflect.Type;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.primeframework.mvc.config.PrimeMVCConfiguration;
+import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.parameter.convert.AbstractGlobalConverter;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
@@ -38,7 +38,7 @@ public class EnumConverter extends AbstractGlobalConverter {
   private final boolean emptyIsNull;
 
   @Inject
-  public EnumConverter(PrimeMVCConfiguration configuration) {
+  public EnumConverter(MVCConfiguration configuration) {
     this.emptyIsNull = configuration.emptyParametersAreNull();
   }
 

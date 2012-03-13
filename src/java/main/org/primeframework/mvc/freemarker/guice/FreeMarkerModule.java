@@ -13,22 +13,24 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.locale.guice;
+package org.primeframework.mvc.freemarker.guice;
 
-import java.util.Locale;
-
-import org.primeframework.mvc.locale.DefaultLocaleProvider;
+import org.primeframework.mvc.freemarker.OverridingTemplateLoader;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Singleton;
+import freemarker.cache.TemplateLoader;
+import freemarker.template.Configuration;
 
 /**
- * This class is a Guice module for the Prime MVC Locale handling.
+ * FreeMarker module that provides the {@link Configuration} instance (as a singleton).
  *
  * @author Brian Pontarelli
  */
-public class LocaleModule extends AbstractModule {
+public class FreeMarkerModule extends AbstractModule {
   @Override
   protected void configure() {
-    bind(Locale.class).toProvider(DefaultLocaleProvider.class);
+    bind(TemplateLoader.class).to(OverridingTemplateLoader.class);
+    bind(Configuration.class).toProvider(FreeMarkerConfigurationProvider.class).in(Singleton.class);
   }
 }

@@ -17,7 +17,7 @@ package org.primeframework.mvc.parameter.convert.converters;
 
 import java.util.Map;
 
-import org.primeframework.mvc.config.PrimeMVCConfiguration;
+import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.convert.annotation.GlobalConverter;
@@ -32,7 +32,7 @@ import com.google.inject.Inject;
 @GlobalConverter(forTypes = {Boolean.class, boolean.class})
 public class BooleanConverter extends AbstractPrimitiveConverter {
   @Inject
-  public BooleanConverter(PrimeMVCConfiguration configuration) {
+  public BooleanConverter(MVCConfiguration configuration) {
     super(configuration);
   }
 

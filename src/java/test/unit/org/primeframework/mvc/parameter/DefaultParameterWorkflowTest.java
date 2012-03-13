@@ -35,8 +35,8 @@ import org.primeframework.mock.servlet.FileInfo;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
-import org.primeframework.mvc.config.AbstractPrimeMVCConfiguration;
-import org.primeframework.mvc.config.PrimeMVCConfiguration;
+import org.primeframework.mvc.config.AbstractMVCConfiguration;
+import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.message.FieldMessage;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.SimpleFieldMessage;
@@ -100,7 +100,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     chain.continueWorkflow();
     replay(chain);
 
-    PrimeMVCConfiguration config = createStrictMock(PrimeMVCConfiguration.class);
+    MVCConfiguration config = createStrictMock(MVCConfiguration.class);
     expect(config.ignoreEmptyParameters()).andReturn(false).times(4);
     expect(config.allowUnknownParameters()).andReturn(false);
     replay(config);
@@ -154,7 +154,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
     replay(chain);
 
-    PrimeMVCConfiguration config = createStrictMock(PrimeMVCConfiguration.class);
+    MVCConfiguration config = createStrictMock(MVCConfiguration.class);
     expect(config.ignoreEmptyParameters()).andReturn(false);
     expect(config.allowUnknownParameters()).andReturn(false);
     replay(config);
@@ -208,7 +208,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     chain.continueWorkflow();
     replay(chain);
 
-    PrimeMVCConfiguration config = createStrictMock(PrimeMVCConfiguration.class);
+    MVCConfiguration config = createStrictMock(MVCConfiguration.class);
     expect(config.ignoreEmptyParameters()).andReturn(false);
     expect(config.allowUnknownParameters()).andReturn(true);
     replay(config);
@@ -260,7 +260,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     chain.continueWorkflow();
     replay(chain);
 
-    PrimeMVCConfiguration config = createStrictMock(PrimeMVCConfiguration.class);
+    MVCConfiguration config = createStrictMock(MVCConfiguration.class);
     expect(config.allowUnknownParameters()).andReturn(false);
     replay(config);
 
@@ -312,7 +312,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     chain.continueWorkflow();
     replay(chain);
 
-    PrimeMVCConfiguration config = createStrictMock(PrimeMVCConfiguration.class);
+    MVCConfiguration config = createStrictMock(MVCConfiguration.class);
     expect(config.ignoreEmptyParameters()).andReturn(false).times(2);
     expect(config.allowUnknownParameters()).andReturn(false);
     replay(config);
@@ -360,7 +360,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     chain.continueWorkflow();
     replay(chain);
 
-    PrimeMVCConfiguration config = createStrictMock(PrimeMVCConfiguration.class);
+    MVCConfiguration config = createStrictMock(MVCConfiguration.class);
     expect(config.ignoreEmptyParameters()).andReturn(false).times(3);
     expect(config.allowUnknownParameters()).andReturn(false);
     replay(config);
@@ -389,7 +389,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(files);
     replay(request);
 
-    PrimeMVCConfiguration config = createStrictMock(PrimeMVCConfiguration.class);
+    MVCConfiguration config = createStrictMock(MVCConfiguration.class);
     expect(config.allowUnknownParameters()).andReturn(false);
     expect(config.fileUploadMaxSize()).andReturn(1024000l);
     expect(config.fileUploadAllowedTypes()).andReturn(new String[]{"text/plain"});
@@ -439,7 +439,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(files);
     replay(request);
 
-    PrimeMVCConfiguration config = createStrictMock(PrimeMVCConfiguration.class);
+    MVCConfiguration config = createStrictMock(MVCConfiguration.class);
     expect(config.allowUnknownParameters()).andReturn(false);
     expect(config.fileUploadMaxSize()).andReturn(1024000l);
     expect(config.fileUploadAllowedTypes()).andReturn(new String[]{"text/plain"});
@@ -487,10 +487,10 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(files);
     replay(request);
 
-    PrimeMVCConfiguration config = createStrictMock(PrimeMVCConfiguration.class);
+    MVCConfiguration config = createStrictMock(MVCConfiguration.class);
     expect(config.allowUnknownParameters()).andReturn(false);
     expect(config.fileUploadMaxSize()).andReturn(1l);
-    expect(config.fileUploadAllowedTypes()).andReturn(AbstractPrimeMVCConfiguration.ALLOWED_TYPES);
+    expect(config.fileUploadAllowedTypes()).andReturn(AbstractMVCConfiguration.ALLOWED_TYPES);
     replay(config);
 
     Object action = new Object();
@@ -538,7 +538,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(request);
 
     String[] contentTypes = new String[]{"test/xml"};
-    PrimeMVCConfiguration config = createStrictMock(PrimeMVCConfiguration.class);
+    MVCConfiguration config = createStrictMock(MVCConfiguration.class);
     expect(config.allowUnknownParameters()).andReturn(false);
     expect(config.fileUploadMaxSize()).andReturn(10l);
     expect(config.fileUploadAllowedTypes()).andReturn(contentTypes);
@@ -588,10 +588,10 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(files);
     replay(request);
 
-    PrimeMVCConfiguration config = createStrictMock(PrimeMVCConfiguration.class);
+    MVCConfiguration config = createStrictMock(MVCConfiguration.class);
     expect(config.allowUnknownParameters()).andReturn(false);
-    expect(config.fileUploadMaxSize()).andReturn(AbstractPrimeMVCConfiguration.MAX_SIZE);
-    expect(config.fileUploadAllowedTypes()).andReturn(AbstractPrimeMVCConfiguration.ALLOWED_TYPES);
+    expect(config.fileUploadMaxSize()).andReturn(AbstractMVCConfiguration.MAX_SIZE);
+    expect(config.fileUploadAllowedTypes()).andReturn(AbstractMVCConfiguration.ALLOWED_TYPES);
     replay(config);
 
     Object action = new Object();
@@ -650,10 +650,10 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(files);
     replay(request);
 
-    PrimeMVCConfiguration config = createStrictMock(PrimeMVCConfiguration.class);
+    MVCConfiguration config = createStrictMock(MVCConfiguration.class);
     expect(config.allowUnknownParameters()).andReturn(false);
-    expect(config.fileUploadMaxSize()).andReturn(AbstractPrimeMVCConfiguration.MAX_SIZE);
-    expect(config.fileUploadAllowedTypes()).andReturn(AbstractPrimeMVCConfiguration.ALLOWED_TYPES);
+    expect(config.fileUploadMaxSize()).andReturn(AbstractMVCConfiguration.MAX_SIZE);
+    expect(config.fileUploadAllowedTypes()).andReturn(AbstractMVCConfiguration.ALLOWED_TYPES);
     replay(config);
 
     final String[] annotationTypes = new String[]{"text/xml"};

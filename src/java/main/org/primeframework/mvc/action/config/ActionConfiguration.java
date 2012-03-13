@@ -32,7 +32,7 @@ public interface ActionConfiguration {
   String uri();
 
   /**
-   * Determines if this configuration can handle the given URI. PrimeMVCConfiguration objects provide additional
+   * Determines if this configuration can handle the given URI. MVCConfiguration objects provide additional
    * handling for URI parameters and other cases and this method uses the full incoming URI to determine if the
    * configuration can handle it.
    *

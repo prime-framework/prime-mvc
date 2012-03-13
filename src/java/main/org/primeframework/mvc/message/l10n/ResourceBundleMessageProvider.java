@@ -25,7 +25,6 @@ import java.util.ResourceBundle.Control;
 
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
-import org.primeframework.mvc.locale.annotation.CurrentLocale;
 import org.primeframework.mvc.message.FieldMessage;
 import org.primeframework.mvc.message.Message;
 
@@ -62,7 +61,7 @@ public class ResourceBundleMessageProvider implements MessageProvider {
   private final ActionInvocationStore invocationStore;
 
   @Inject
-  public ResourceBundleMessageProvider(@CurrentLocale Locale locale, Control control, ActionInvocationStore invocationStore) {
+  public ResourceBundleMessageProvider(Locale locale, Control control, ActionInvocationStore invocationStore) {
     this.locale = locale;
     this.control = control;
     this.invocationStore = invocationStore;

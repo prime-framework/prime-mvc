@@ -29,7 +29,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.primeframework.mvc.config.PrimeMVCConfiguration;
+import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.workflow.MVCWorkflow;
 
 import com.google.inject.Injector;
@@ -76,7 +76,7 @@ public class PrimeFilter implements Filter {
 
     HttpServletRequest httpServletRequest = (HttpServletRequest) request;
     HttpServletResponse httpServletResponse = (HttpServletResponse) response;
-    PrimeMVCConfiguration configuration = injector.getInstance(PrimeMVCConfiguration.class);
+    MVCConfiguration configuration = injector.getInstance(MVCConfiguration.class);
     ServletObjectsHolder.setServletRequest(new HttpServletRequestWrapper(httpServletRequest));
     ServletObjectsHolder.setServletResponse(httpServletResponse);
 

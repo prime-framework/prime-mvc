@@ -25,7 +25,7 @@ import java.util.Locale;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 
-import org.primeframework.mvc.config.PrimeMVCConfiguration;
+import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.container.ContainerResolver;
 
 import com.google.inject.Inject;
@@ -34,7 +34,7 @@ import static java.util.Arrays.*;
 /**
  * This class handles loading of resource bundles using the servlet context from the directory WEB-INF/messages.
  * <p/>
- * This reloads based on the setting in the {@link PrimeMVCConfiguration} interface.
+ * This reloads based on the setting in the {@link MVCConfiguration} interface.
  *
  * @author Brian Pontarelli
  */
@@ -43,7 +43,7 @@ public class WebControl extends ResourceBundle.Control {
   private final long reloadCheckSeconds;
 
   @Inject
-  public WebControl(ContainerResolver containerResolver, PrimeMVCConfiguration configuration) {
+  public WebControl(ContainerResolver containerResolver, MVCConfiguration configuration) {
     this.containerResolver = containerResolver;
     this.reloadCheckSeconds = configuration.l10nReloadSeconds();
   }

@@ -20,8 +20,8 @@ import javax.servlet.ServletContext;
 import org.easymock.EasyMock;
 import org.primeframework.mvc.ClosableModule;
 import org.primeframework.mvc.PrimeBaseTest;
-import org.primeframework.mvc.config.AbstractPrimeMVCConfiguration;
-import org.primeframework.mvc.config.PrimeMVCConfiguration;
+import org.primeframework.mvc.config.AbstractMVCConfiguration;
+import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.servlet.ServletObjectsHolder;
 import org.testng.annotations.Test;
 
@@ -40,9 +40,9 @@ public class GuiceBootstrapTest extends PrimeBaseTest {
     Injector injector = GuiceBootstrap.initialize(new AbstractModule() {
       @Override
       protected void configure() {
-        bind(PrimeMVCConfiguration.class).toInstance(new AbstractPrimeMVCConfiguration() {
+        bind(MVCConfiguration.class).toInstance(new AbstractMVCConfiguration() {
           @Override
-          public int freemarkerCheckSeconds() {
+          public int templateCheckSeconds() {
             return 2;
           }
 
@@ -74,9 +74,9 @@ public class GuiceBootstrapTest extends PrimeBaseTest {
     Injector injector = GuiceBootstrap.initialize(new AbstractModule() {
       @Override
       protected void configure() {
-        bind(PrimeMVCConfiguration.class).toInstance(new AbstractPrimeMVCConfiguration() {
+        bind(MVCConfiguration.class).toInstance(new AbstractMVCConfiguration() {
           @Override
-          public int freemarkerCheckSeconds() {
+          public int templateCheckSeconds() {
             return 2;
           }
 

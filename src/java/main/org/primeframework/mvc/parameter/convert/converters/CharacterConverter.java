@@ -17,7 +17,7 @@ package org.primeframework.mvc.parameter.convert.converters;
 
 import java.util.Map;
 
-import org.primeframework.mvc.config.PrimeMVCConfiguration;
+import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.convert.annotation.GlobalConverter;
@@ -32,7 +32,7 @@ import com.google.inject.Inject;
 @GlobalConverter(forTypes = {Character.class, char.class})
 public class CharacterConverter extends AbstractPrimitiveConverter {
   @Inject
-  public CharacterConverter(PrimeMVCConfiguration configuration) {
+  public CharacterConverter(MVCConfiguration configuration) {
     super(configuration);
   }
 

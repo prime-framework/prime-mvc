@@ -25,7 +25,7 @@ import java.util.Set;
 import org.primeframework.mock.servlet.FileInfo;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
-import org.primeframework.mvc.config.PrimeMVCConfiguration;
+import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.parameter.ParameterParser.Parameters.Struct;
 import org.primeframework.mvc.parameter.annotation.PreParameter;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
@@ -53,13 +53,13 @@ public class DefaultParameterParser implements ParameterParser {
   public static final String RADIOBUTTON_PREFIX = "__rb_";
   public static final String ACTION_PREFIX = "__a_";
 
-  private final PrimeMVCConfiguration configuration;
+  private final MVCConfiguration configuration;
   private final ExpressionEvaluator expressionEvaluator;
   private final ActionInvocationStore actionInvocationStore;
   private final HttpServletRequest request;
 
   @Inject
-  public DefaultParameterParser(PrimeMVCConfiguration configuration, ExpressionEvaluator expressionEvaluator,
+  public DefaultParameterParser(MVCConfiguration configuration, ExpressionEvaluator expressionEvaluator,
                                 ActionInvocationStore actionInvocationStore, HttpServletRequest request) {
     this.configuration = configuration;
     this.expressionEvaluator = expressionEvaluator;

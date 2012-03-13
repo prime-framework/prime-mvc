@@ -21,7 +21,7 @@ import java.util.Locale;
 import org.primeframework.mock.servlet.MockServletContext;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.DefaultActionInvocation;
-import org.primeframework.mvc.config.PrimeMVCConfiguration;
+import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.container.ServletContainerResolver;
 import org.testng.annotations.Test;
 
@@ -36,7 +36,7 @@ import static org.testng.Assert.*;
 public class ResourceBundleMessageProviderTest {
   @Test
   public void search() {
-    PrimeMVCConfiguration config = createStrictMock(PrimeMVCConfiguration.class);
+    MVCConfiguration config = createStrictMock(MVCConfiguration.class);
     expect(config.l10nReloadSeconds()).andReturn(1).times(2);
     replay(config);
 
@@ -60,7 +60,7 @@ public class ResourceBundleMessageProviderTest {
 
   @Test
   public void format() {
-    PrimeMVCConfiguration config = createStrictMock(PrimeMVCConfiguration.class);
+    MVCConfiguration config = createStrictMock(MVCConfiguration.class);
     expect(config.l10nReloadSeconds()).andReturn(1).times(2);
     replay(config);
 
@@ -84,7 +84,7 @@ public class ResourceBundleMessageProviderTest {
 
   @Test
   public void missing() {
-    PrimeMVCConfiguration config = createStrictMock(PrimeMVCConfiguration.class);
+    MVCConfiguration config = createStrictMock(MVCConfiguration.class);
     expect(config.l10nReloadSeconds()).andReturn(1);
     replay(config);
 
