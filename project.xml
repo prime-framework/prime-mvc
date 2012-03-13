@@ -22,7 +22,6 @@
   <plugin group="plugins.savant.inversoft.org" name="clean" version="1.1.1"/>
   <plugin group="plugins.savant.inversoft.org" name="java" version="1.2"/>
   <plugin group="plugins.savant.inversoft.org" name="testng" version="1.1.2"/>
-  <plugin group="plugins.savant.inversoft.org" name="database" version="1.1.1"/>
   <plugin group="plugins.savant.inversoft.org" name="release-git" version="1.2"/>
 
   <!-- compile properties -->
@@ -31,9 +30,7 @@
   <dependencies>
     <artifact-group type="compile-only">
       <artifact group="inject.javax" name="inject-api" version="1.0"/>
-      <artifact group="persistence.javax" name="persistence-api" version="2.0.1"/>
       <artifact group="servlet.javax" name="servlet-api" version="2.5"/>
-      <artifact group="jsp.servlet.javax" name="jsp-api" version="2.0"/>
     </artifact-group>
     <artifact-group type="compile">
       <artifact group="asm.objectweb.org" name="asm" version="3.1"/>
