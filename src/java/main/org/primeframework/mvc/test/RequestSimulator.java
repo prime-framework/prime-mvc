@@ -61,11 +61,12 @@ public class RequestSimulator {
   /**
    * Creates a new request simulator that can be used to simulate requests to a Prime application.
    *
+   * @param context The servlet context to use for this simulator.
    * @param modules A list of modules that contain mocks and other guice injections for the test.
    * @throws ServletException If the initialization of the PrimeServletContextListener failed.
    */
-  public RequestSimulator(Module... modules) throws ServletException {
-    this.context = new MockServletContext();
+  public RequestSimulator(final MockServletContext context, Module... modules) throws ServletException {
+    this.context = context;
     this.session = new MockHttpSession(this.context);
     this.injector = GuiceBootstrap.initialize(modules);
     this.context.setAttribute(PrimeServletContextListener.GUICE_INJECTOR_KEY, this.injector);

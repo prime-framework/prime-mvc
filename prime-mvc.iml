@@ -10,7 +10,6 @@
       <sourceFolder url="file://$MODULE_DIR$/src/java/test/unit" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/conf/test/unit" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/ftl/main" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/web/test" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />
@@ -27,28 +26,6 @@
       </library>
     </orderEntry>
     <orderEntry type="module-library">
-      <library name="persistence-api-2.0.1.jar">
-        <CLASSES>
-          <root url="jar://$SAVANT_REPOSITORY$/javax/persistence/persistence-api/2.0.1/persistence-api-2.0.1.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$SAVANT_REPOSITORY$/javax/persistence/persistence-api/2.0.1/persistence-api-2.0.1-src.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library name="jsp-api-2.0.jar">
-        <CLASSES>
-          <root url="jar://$SAVANT_REPOSITORY$/javax/servlet/jsp/jsp-api/2.0/jsp-api-2.0.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$SAVANT_REPOSITORY$/javax/servlet/jsp/jsp-api/2.0/jsp-api-2.0-src.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
       <library name="servlet-api-2.5.jar">
         <CLASSES>
           <root url="jar://$SAVANT_REPOSITORY$/javax/servlet/servlet-api/2.5/servlet-api-2.5.jar!/" />
@@ -56,17 +33,6 @@
         <JAVADOC />
         <SOURCES>
           <root url="jar://$SAVANT_REPOSITORY$/javax/servlet/servlet-api/2.5/servlet-api-2.5-src.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library name="commons-io-1.3.2.jar">
-        <CLASSES>
-          <root url="jar://$SAVANT_REPOSITORY$/org/apache/commons/commons-io/1.3.2/commons-io-1.3.2.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$SAVANT_REPOSITORY$/org/apache/commons/commons-io/1.3.2/commons-io-1.3.2-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -126,13 +92,13 @@
       </library>
     </orderEntry>
     <orderEntry type="module-library">
-      <library name="prime-mock-1.0-IB20120307000005508.jar">
+      <library name="prime-mock-1.0-IB20120315222834985.jar">
         <CLASSES>
-          <root url="jar://$SAVANT_REPOSITORY$/org/primeframework/prime-mock/1.0-{integration}/prime-mock-1.0-IB20120307000005508.jar!/" />
+          <root url="jar://$SAVANT_REPOSITORY$/org/primeframework/prime-mock/1.0-{integration}/prime-mock-1.0-IB20120315222834985.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$SAVANT_REPOSITORY$/org/primeframework/prime-mock/1.0-{integration}/prime-mock-1.0-IB20120307000005508-src.jar!/" />
+          <root url="jar://$SAVANT_REPOSITORY$/org/primeframework/prime-mock/1.0-{integration}/prime-mock-1.0-IB20120315222834985-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -144,6 +110,17 @@
         <JAVADOC />
         <SOURCES>
           <root url="jar://$SAVANT_REPOSITORY$/org/apache/commons/commons-fileupload/1.2.1/commons-fileupload-1.2.1-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-io-1.3.2.jar">
+        <CLASSES>
+          <root url="jar://$SAVANT_REPOSITORY$/org/apache/commons/commons-io/1.3.2/commons-io-1.3.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$SAVANT_REPOSITORY$/org/apache/commons/commons-io/1.3.2/commons-io-1.3.2-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>

@@ -33,17 +33,17 @@ import static org.testng.Assert.*;
 public class GlobalTest extends PrimeBaseTest {
   @Test
   public void renderFTL() throws IOException, ServletException {
-    RequestSimulator simulator = new RequestSimulator(new TestModule());
+    RequestSimulator simulator = new RequestSimulator(context, new TestModule());
     simulator.test("/user/edit").get();
-    assertEquals(FileUtils.readFileToString(new File("src/java/test/unit/org/primeframework/mvc/edit-output.txt")),
-      simulator.response.getStream().toString());
+    String result = simulator.response.getOutputStream().toString();
+    assertEquals(FileUtils.readFileToString(new File("src/java/test/unit/org/primeframework/mvc/edit-output.txt")), result);
   }
 
   @Test
   public void nonFormFields() throws IOException, ServletException {
-    RequestSimulator simulator = new RequestSimulator(new TestModule());
+    RequestSimulator simulator = new RequestSimulator(context, new TestModule());
     simulator.test("/user/details-fields").get();
     assertEquals(FileUtils.readFileToString(new File("src/java/test/unit/org/primeframework/mvc/details-fields-output.txt")),
-      simulator.response.getStream().toString());
+      simulator.response.getOutputStream().toString());
   }
 }
