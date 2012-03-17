@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Set;
 
+import org.primeframework.mvc.parameter.DefaultParameterParser;
 import org.primeframework.mvc.parameter.InternalParameters;
 import org.primeframework.mvc.servlet.ServletTools;
 import org.primeframework.mvc.workflow.WorkflowChain;
@@ -79,7 +80,7 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
     String uri = null;
     Set<String> keys = request.getParameterMap().keySet();
     for (String key : keys) {
-      if (key.startsWith("__a_")) {
+      if (key.startsWith(DefaultParameterParser.ACTION_PREFIX)) {
         String actionParameterName = key.substring(4);
         String actionParameterValue = request.getParameter(key);
         if (request.getParameter(actionParameterName) != null && actionParameterValue.trim().length() > 0) {

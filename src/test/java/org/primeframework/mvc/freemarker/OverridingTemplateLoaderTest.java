@@ -34,12 +34,12 @@ public class OverridingTemplateLoaderTest {
   @Test
   public void realPath() throws IOException {
     ContainerResolver resolver = EasyMock.createStrictMock(ContainerResolver.class);
-    EasyMock.expect(resolver.getRealPath("project.xml")).andReturn("project.xml");
+    EasyMock.expect(resolver.getRealPath("build.gradle")).andReturn("build.gradle");
     EasyMock.replay(resolver);
 
     OverridingTemplateLoader loader = new OverridingTemplateLoader(resolver);
-    URLTemplateSource source = (URLTemplateSource) loader.findTemplateSource("project.xml");
-    File file = new File("project.xml");
+    URLTemplateSource source = (URLTemplateSource) loader.findTemplateSource("build.gradle");
+    File file = new File("build.gradle");
     assertEquals(loader.getLastModified(source), file.lastModified());
     assertNotNull(loader.getReader(source, "UTF-8"));
     loader.closeTemplateSource(source);
@@ -50,13 +50,13 @@ public class OverridingTemplateLoaderTest {
   @Test
   public void resource() throws IOException {
     ContainerResolver resolver = EasyMock.createStrictMock(ContainerResolver.class);
-    EasyMock.expect(resolver.getRealPath("project.xml")).andReturn(null);
-    EasyMock.expect(resolver.getResource("project.xml")).andReturn(new File("project.xml").toURI().toURL());
+    EasyMock.expect(resolver.getRealPath("build.gradle")).andReturn(null);
+    EasyMock.expect(resolver.getResource("build.gradle")).andReturn(new File("build.gradle").toURI().toURL());
     EasyMock.replay(resolver);
 
     OverridingTemplateLoader loader = new OverridingTemplateLoader(resolver);
-    URLTemplateSource source = (URLTemplateSource) loader.findTemplateSource("project.xml");
-    File file = new File("project.xml");
+    URLTemplateSource source = (URLTemplateSource) loader.findTemplateSource("build.gradle");
+    File file = new File("build.gradle");
     assertEquals(loader.getLastModified(source), file.lastModified());
     assertNotNull(loader.getReader(source, "UTF-8"));
     loader.closeTemplateSource(source);

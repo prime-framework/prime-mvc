@@ -280,7 +280,6 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     Action action = new Action();
 
     Map<String, String[]> values = new HashMap<String, String[]>();
-    values.put("__a_submit", ArrayUtils.toArray(""));
     values.put("submit.x", ArrayUtils.toArray("1"));
     values.put("submit.y", ArrayUtils.toArray("2"));
 

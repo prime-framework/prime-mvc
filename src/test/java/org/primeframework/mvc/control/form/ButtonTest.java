@@ -37,7 +37,6 @@ public class ButtonTest extends ControlBaseTest {
       attr("name", "button").
       attr("value", "test-value").
       go("<input type=\"hidden\" name=\"button@param\" value=\"param-value\"/>\n" +
-        "<input type=\"hidden\" name=\"__a_button\" value=\"\"/>\n" +
         "<div class=\"button-button button control\">\n" +
         "<div class=\"label-container\"> </div>\n" +
         "<div class=\"control-container\"><input type=\"button\" id=\"button\" name=\"button\" value=\"Button\"/></div>\n" +
@@ -52,7 +51,6 @@ public class ButtonTest extends ControlBaseTest {
       attr("value", "test-value").
       attr("class", "css-class").
       go("<input type=\"hidden\" name=\"button@param\" value=\"param-value\"/>\n" +
-        "<input type=\"hidden\" name=\"__a_button\" value=\"\"/>\n" +
         "<div class=\"css-class-button-button css-class-button css-class-control button-button button control\">\n" +
         "<div class=\"label-container\"> </div>\n" +
         "<div class=\"control-container\"><input type=\"button\" class=\"css-class\" id=\"button\" name=\"button\" value=\"Button\"/></div>\n" +

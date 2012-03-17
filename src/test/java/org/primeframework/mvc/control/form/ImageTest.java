@@ -39,7 +39,6 @@ public class ImageTest extends ControlBaseTest {
       attr("class", "css-class").
       attr("src", "foo.gif").
       go("<input type=\"hidden\" name=\"image@param\" value=\"param-value\"/>\n" +
-        "<input type=\"hidden\" name=\"__a_image\" value=\"\"/>\n" +
         "<div class=\"css-class-image-button css-class-button css-class-control image-button button control\">\n" +
         "<div class=\"label-container\"> </div>\n" +
         "<div class=\"control-container\"><input type=\"image\" class=\"css-class\" id=\"image\" name=\"image\" src=\"foo.gif\" value=\"Image\"/></div>\n" +
@@ -54,7 +53,6 @@ public class ImageTest extends ControlBaseTest {
       attr("value", "test-value").
       attr("src", "foo.gif").
       go("<input type=\"hidden\" name=\"image@param\" value=\"param-value\"/>\n" +
-        "<input type=\"hidden\" name=\"__a_image\" value=\"\"/>\n" +
         "<div class=\"image-button button control\">\n" +
         "<div class=\"label-container\"> </div>\n" +
         "<div class=\"control-container\"><input type=\"image\" id=\"image\" name=\"image\" src=\"foo.gif\" value=\"Image\"/></div>\n" +
@@ -69,7 +67,6 @@ public class ImageTest extends ControlBaseTest {
       attr("value", "test-value").
       attr("src", "foo.gif").
       go("<input type=\"hidden\" name=\"html@param\" value=\"param-value\"/>\n" +
-        "<input type=\"hidden\" name=\"__a_html\" value=\"\"/>\n" +
         "<div class=\"image-button button control\">\n" +
         "<div class=\"label-container\"> </div>\n" +
         "<div class=\"control-container\"><input type=\"image\" id=\"html\" name=\"html\" src=\"foo.gif\" value=\"&lt;Image&gt;\"/></div>\n" +
@@ -101,7 +98,6 @@ public class ImageTest extends ControlBaseTest {
       attr("ismap", true).
       attr("src", "foo.gif").
       go("<input type=\"hidden\" name=\"image@param\" value=\"param-value\"/>\n" +
-        "<input type=\"hidden\" name=\"__a_image\" value=\"\"/>\n" +
         "<div class=\"image-button button control\">\n" +
         "<div class=\"label-container\"> </div>\n" +
         "<div class=\"control-container\"><input type=\"image\" id=\"image\" ismap=\"ismap\" name=\"image\" src=\"foo.gif\" value=\"Image\"/></div>\n" +

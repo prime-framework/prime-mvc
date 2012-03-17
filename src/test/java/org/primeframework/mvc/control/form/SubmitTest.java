@@ -38,7 +38,6 @@ public class SubmitTest extends ControlBaseTest {
       attr("value", "test-value").
       attr("class", "css-class").
       go("<input type=\"hidden\" name=\"button@param\" value=\"param-value\"/>\n" +
-        "<input type=\"hidden\" name=\"__a_button\" value=\"\"/>\n" +
         "<div class=\"css-class-submit-button css-class-button css-class-control submit-button button control\">\n" +
         "<div class=\"label-container\"> </div>\n" +
         "<div class=\"control-container\"><input type=\"submit\" class=\"css-class\" id=\"button\" name=\"button\" value=\"Button\"/></div>\n" +
@@ -52,7 +51,6 @@ public class SubmitTest extends ControlBaseTest {
       attr("name", "button").
       attr("value", "test-value").
       go("<input type=\"hidden\" name=\"button@param\" value=\"param-value\"/>\n" +
-        "<input type=\"hidden\" name=\"__a_button\" value=\"\"/>\n" +
         "<div class=\"submit-button button control\">\n" +
         "<div class=\"label-container\"> </div>\n" +
         "<div class=\"control-container\"><input type=\"submit\" id=\"button\" name=\"button\" value=\"Button\"/></div>\n" +
@@ -66,7 +64,6 @@ public class SubmitTest extends ControlBaseTest {
       attr("name", "html").
       attr("value", "test-value").
       go("<input type=\"hidden\" name=\"html@param\" value=\"param-value\"/>\n" +
-        "<input type=\"hidden\" name=\"__a_html\" value=\"\"/>\n" +
         "<div class=\"submit-button button control\">\n" +
         "<div class=\"label-container\"> </div>\n" +
         "<div class=\"control-container\"><input type=\"submit\" id=\"html\" name=\"html\" value=\"&lt;Button&gt;\"/></div>\n" +

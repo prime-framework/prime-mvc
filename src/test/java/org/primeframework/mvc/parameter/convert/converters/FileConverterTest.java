@@ -50,17 +50,17 @@ public class FileConverterTest {
     f = (File) converter.convertFromStrings(File.class, map, "testExpr", ArrayUtils.toArray("/tmp", "prime"));
     assertEquals(f.getAbsolutePath(), "/tmp/prime");
 
-    f = (File) converter.convertFromStrings(File.class, map, "testExpr", ArrayUtils.toArray("project.xml"));
-    assertEquals(f.getAbsolutePath(), new File("project.xml").getAbsolutePath());
+    f = (File) converter.convertFromStrings(File.class, map, "testExpr", ArrayUtils.toArray("build.gradle"));
+    assertEquals(f.getAbsolutePath(), new File("build.gradle").getAbsolutePath());
 
-    File[] fa = (File[]) converter.convertFromStrings(File[].class, map, "testExpr", ArrayUtils.toArray("project.xml", "build.xml"));
-    assertEquals(fa[0].getAbsolutePath(), new File("project.xml").getAbsolutePath());
+    File[] fa = (File[]) converter.convertFromStrings(File[].class, map, "testExpr", ArrayUtils.toArray("build.gradle", "build.xml"));
+    assertEquals(fa[0].getAbsolutePath(), new File("build.gradle").getAbsolutePath());
     assertEquals(fa[1].getAbsolutePath(), new File("build.xml").getAbsolutePath());
 
     // Test parentDir
     map.put("parentDir", "/tmp");
-    f = (File) converter.convertFromStrings(File.class, map, "testExpr", ArrayUtils.toArray("project.xml"));
-    assertEquals(f.getAbsolutePath(), new File("/tmp/project.xml").getAbsolutePath());
+    f = (File) converter.convertFromStrings(File.class, map, "testExpr", ArrayUtils.toArray("build.gradle"));
+    assertEquals(f.getAbsolutePath(), new File("/tmp/build.gradle").getAbsolutePath());
   }
 
   @Test
@@ -69,7 +69,7 @@ public class FileConverterTest {
     String str = converter.convertToString(File.class, null, "testExpr", null);
     assertNull(str);
 
-    str = converter.convertToString(File.class, null, "testExpr", new File("project.xml"));
-    assertEquals(str, new File("project.xml").getAbsolutePath());
+    str = converter.convertToString(File.class, null, "testExpr", new File("build.gradle"));
+    assertEquals(str, new File("build.gradle").getAbsolutePath());
   }
 }
