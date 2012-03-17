@@ -48,7 +48,7 @@ public abstract class PrimeBaseTest {
 
   @BeforeSuite
   public static void init() {
-    context = new MockServletContext(new File("src/web/test"));
+    context = new MockServletContext(new File("src/test/web"));
     session = new MockHttpSession(context);
     ServletObjectsHolder.setServletContext(context);
 

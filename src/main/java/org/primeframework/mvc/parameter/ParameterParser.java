@@ -19,7 +19,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.primeframework.mock.servlet.FileInfo;
+import org.primeframework.mvc.parameter.fileupload.FileInfo;
 
 import com.google.inject.ImplementedBy;
 

@@ -31,7 +31,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.easymock.IArgumentMatcher;
 import org.example.domain.Action;
 import org.example.domain.PreAndPostAction;
-import org.primeframework.mock.servlet.FileInfo;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
@@ -44,6 +43,7 @@ import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.parameter.el.ExpressionException;
+import org.primeframework.mvc.parameter.fileupload.FileInfo;
 import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
 import org.primeframework.mvc.util.MapBuilder;
 import org.primeframework.mvc.util.RequestKeys;
@@ -382,7 +382,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
   @Test
   public void filesNoAnnotation() throws IOException, ServletException {
     Map<String, List<FileInfo>> files = new HashMap<String, List<FileInfo>>();
-    files.put("userfile", asList(new FileInfo(new java.io.File("src/java/test/unit/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain")));
+    files.put("userfile", asList(new FileInfo(new java.io.File("src/test/java/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain")));
 
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
     expect(request.getParameterMap()).andReturn(new HashMap());
@@ -431,8 +431,8 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
   public void multipleFilesNoAnnotation() throws IOException, ServletException {
     Map<String, List<FileInfo>> files = new HashMap<String, List<FileInfo>>();
     files.put("userfiles", asList(
-      new FileInfo(new java.io.File("src/java/test/unit/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain"),
-      new FileInfo(new java.io.File("src/java/test/unit/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload2.txt", "text/plain")));
+      new FileInfo(new java.io.File("src/test/java/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain"),
+      new FileInfo(new java.io.File("src/test/java/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload2.txt", "text/plain")));
 
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
     expect(request.getParameterMap()).andReturn(new HashMap());
@@ -480,7 +480,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
   @Test
   public void filesNoAnnotationSizeError() throws IOException, ServletException {
     Map<String, List<FileInfo>> files = new HashMap<String, List<FileInfo>>();
-    files.put("userfile", new ArrayList<FileInfo>(asList(new FileInfo(new java.io.File("src/java/test/unit/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain"))));
+    files.put("userfile", new ArrayList<FileInfo>(asList(new FileInfo(new java.io.File("src/test/java/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain"))));
 
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
     expect(request.getParameterMap()).andReturn(new HashMap());
@@ -530,7 +530,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
   @Test
   public void filesNoAnnotationContentTypeError() throws IOException, ServletException {
     Map<String, List<FileInfo>> files = new HashMap<String, List<FileInfo>>();
-    files.put("userfile", new ArrayList<FileInfo>(asList(new FileInfo(new java.io.File("src/java/test/unit/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain"))));
+    files.put("userfile", new ArrayList<FileInfo>(asList(new FileInfo(new java.io.File("src/test/java/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain"))));
 
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
     expect(request.getParameterMap()).andReturn(new HashMap());
@@ -581,7 +581,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
   @Test
   public void filesAnnotationSizeError() throws IOException, ServletException {
     Map<String, List<FileInfo>> files = new HashMap<String, List<FileInfo>>();
-    files.put("userfile", new ArrayList<FileInfo>(asList(new FileInfo(new java.io.File("src/java/test/unit/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain"))));
+    files.put("userfile", new ArrayList<FileInfo>(asList(new FileInfo(new java.io.File("src/test/java/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain"))));
 
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
     expect(request.getParameterMap()).andReturn(new HashMap());
@@ -643,7 +643,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
   @Test
   public void filesAnnotationContentTypeError() throws IOException, ServletException {
     Map<String, List<FileInfo>> files = new HashMap<String, List<FileInfo>>();
-    files.put("userfile", new ArrayList<FileInfo>(asList(new FileInfo(new java.io.File("src/java/test/unit/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain"))));
+    files.put("userfile", new ArrayList<FileInfo>(asList(new FileInfo(new java.io.File("src/test/java/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain"))));
 
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
     expect(request.getParameterMap()).andReturn(new HashMap());

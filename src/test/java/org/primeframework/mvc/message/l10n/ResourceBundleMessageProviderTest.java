@@ -40,7 +40,7 @@ public class ResourceBundleMessageProviderTest {
     expect(config.l10nReloadSeconds()).andReturn(1).times(2);
     replay(config);
 
-    MockServletContext context = new MockServletContext(new File("src/java/test/unit"));
+    MockServletContext context = new MockServletContext(new File("src/test/java"));
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, "/l10n/Test", null, null));
@@ -64,7 +64,7 @@ public class ResourceBundleMessageProviderTest {
     expect(config.l10nReloadSeconds()).andReturn(1).times(2);
     replay(config);
 
-    MockServletContext context = new MockServletContext(new File("src/java/test/unit"));
+    MockServletContext context = new MockServletContext(new File("src/test/java"));
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, "/l10n/Test", null, null));
@@ -88,7 +88,7 @@ public class ResourceBundleMessageProviderTest {
     expect(config.l10nReloadSeconds()).andReturn(1);
     replay(config);
 
-    MockServletContext context = new MockServletContext(new File("src/java/test/unit"));
+    MockServletContext context = new MockServletContext(new File("src/test/java"));
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, "/l10n/Test", null, null));

@@ -28,8 +28,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.io.FileUtils;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.primeframework.mock.servlet.FileInfo;
 import org.primeframework.mock.servlet.MockServletInputStream;
+import org.primeframework.mvc.parameter.fileupload.FileInfo;
 import org.primeframework.mvc.util.RequestKeys;
 import org.primeframework.mvc.workflow.RequestBodyWorkflow;
 import org.primeframework.mvc.workflow.WorkflowChain;
@@ -190,7 +190,7 @@ public class RequestBodyWorkflowTest {
 
   @Test
   public void singleFiles() throws IOException, ServletException {
-    String body = FileUtils.readFileToString(new File("src/java/test/unit/org/primeframework/mvc/servlet/http-test-body-single-file.txt"));
+    String body = FileUtils.readFileToString(new File("src/test/java/org/primeframework/mvc/servlet/http-test-body-single-file.txt"));
 
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
     EasyMock.expect(request.getParameterMap()).andReturn(new HashMap());
@@ -230,7 +230,7 @@ public class RequestBodyWorkflowTest {
 
   @Test
   public void multipleFiles() throws IOException, ServletException {
-    String body = FileUtils.readFileToString(new File("src/java/test/unit/org/primeframework/mvc/servlet/http-test-body-multiple-files.txt"));
+    String body = FileUtils.readFileToString(new File("src/test/java/org/primeframework/mvc/servlet/http-test-body-multiple-files.txt"));
 
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
     EasyMock.expect(request.getParameterMap()).andReturn(new HashMap());

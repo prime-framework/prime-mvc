@@ -41,11 +41,11 @@ public class DefaultFreeMarkerServiceTest {
     EasyMock.replay(config);
 
     ContainerResolver containerResolver = EasyMock.createStrictMock(ContainerResolver.class);
-    EasyMock.expect(containerResolver.getRealPath("src/java/test/unit/org/primeframework/mvc/freemarker/test_en_US.ftl")).andReturn("src/java/test/unit/org/primeframework/mvc/freemarker/test.ftl");
+    EasyMock.expect(containerResolver.getRealPath("src/test/java/org/primeframework/mvc/freemarker/test_en_US.ftl")).andReturn("src/test/java/org/primeframework/mvc/freemarker/test.ftl");
     EasyMock.replay(containerResolver);
 
     DefaultFreeMarkerService service = new DefaultFreeMarkerService(new FreeMarkerConfigurationProvider(config, new OverridingTemplateLoader(containerResolver)).get());
-    String result = service.render("src/java/test/unit/org/primeframework/mvc/freemarker/test.ftl", new HashMap<String, Object>(), Locale.US);
+    String result = service.render("src/test/java/org/primeframework/mvc/freemarker/test.ftl", new HashMap<String, Object>(), Locale.US);
     assertEquals(result, "It worked!");
   }
 
@@ -56,7 +56,7 @@ public class DefaultFreeMarkerServiceTest {
     EasyMock.replay(config);
 
     ContainerResolver containerResolver = EasyMock.createStrictMock(ContainerResolver.class);
-    EasyMock.expect(containerResolver.getRealPath("src/java/test/unit/org/primeframework/mvc/freemarker/test-with-bean_en_US.ftl")).andReturn("src/java/test/unit/org/primeframework/mvc/freemarker/test-with-bean.ftl");
+    EasyMock.expect(containerResolver.getRealPath("src/test/java/org/primeframework/mvc/freemarker/test-with-bean_en_US.ftl")).andReturn("src/test/java/org/primeframework/mvc/freemarker/test-with-bean.ftl");
     EasyMock.replay(containerResolver);
 
     DefaultFreeMarkerService service = new DefaultFreeMarkerService(new FreeMarkerConfigurationProvider(config, new OverridingTemplateLoader(containerResolver)).get());
@@ -67,7 +67,7 @@ public class DefaultFreeMarkerServiceTest {
 
     Map<String, Object> context = new HashMap<String, Object>();
     context.put("bean", bean);
-    String result = service.render("src/java/test/unit/org/primeframework/mvc/freemarker/test-with-bean.ftl", context, Locale.US);
+    String result = service.render("src/test/java/org/primeframework/mvc/freemarker/test-with-bean.ftl", context, Locale.US);
     assertEquals(result, "Bean 1 test test 42");
   }
 
@@ -78,7 +78,7 @@ public class DefaultFreeMarkerServiceTest {
     EasyMock.replay(config);
 
     ContainerResolver containerResolver = EasyMock.createStrictMock(ContainerResolver.class);
-    EasyMock.expect(containerResolver.getRealPath("src/java/test/unit/org/primeframework/mvc/freemarker/test-with-bean_en_US.ftl")).andReturn("src/java/test/unit/org/primeframework/mvc/freemarker/test-with-bean.ftl");
+    EasyMock.expect(containerResolver.getRealPath("src/test/java/org/primeframework/mvc/freemarker/test-with-bean_en_US.ftl")).andReturn("src/test/java/org/primeframework/mvc/freemarker/test-with-bean.ftl");
     EasyMock.replay(containerResolver);
 
     DefaultFreeMarkerService service = new DefaultFreeMarkerService(new FreeMarkerConfigurationProvider(config, new OverridingTemplateLoader(containerResolver)).get());
@@ -89,7 +89,7 @@ public class DefaultFreeMarkerServiceTest {
 
     Map<String, Object> context = new HashMap<String, Object>();
     context.put("bean", bean);
-    String result = service.render("src/java/test/unit/org/primeframework/mvc/freemarker/test-with-bean.ftl", context, Locale.US);
+    String result = service.render("src/test/java/org/primeframework/mvc/freemarker/test-with-bean.ftl", context, Locale.US);
     assertEquals(result, "Bean 1 test test 42");
   }
 }

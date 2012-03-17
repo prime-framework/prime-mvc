@@ -111,7 +111,7 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     assertEquals(evaluator.getValue("user.siblings[0].age", action), 34);
     assertEquals(evaluator.getValue("user.siblings[0].name", action), "Brett");
 
-    user.setSecurityQuestions(new String[]{"What is your pet's name?", "What is your home town?"});
+    user.setSecurityQuestions("What is your pet's name?", "What is your home town?");
     assertEquals(evaluator.getValue("user.securityQuestions[0]", action), "What is your pet's name?");
     assertEquals(evaluator.getValue("user.securityQuestions[1]", action), "What is your home town?");
 
@@ -220,7 +220,7 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     assertEquals(action.getUser().getSecurityQuestions()[0], "What is your pet's name?");
     assertEquals(action.getUser().getSecurityQuestions()[1], "What is your home town?");
 
-    action.getUser().setSecurityQuestions(null);
+    action.getUser().setSecurityQuestions();
     evaluator.setValue("user.securityQuestions", action, new String[]{"What is your pet's name?", "What is your home town?"}, null);
     assertEquals(action.getUser().getSecurityQuestions()[0], "What is your pet's name?");
     assertEquals(action.getUser().getSecurityQuestions()[1], "What is your home town?");

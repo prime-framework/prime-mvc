@@ -33,7 +33,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.primeframework.mock.servlet.FileInfo;
+import org.primeframework.mvc.parameter.fileupload.FileInfo;
 import org.primeframework.mvc.util.IteratorEnumeration;
 import org.primeframework.mvc.util.RequestKeys;
 

@@ -36,14 +36,14 @@ public class GlobalTest extends PrimeBaseTest {
     RequestSimulator simulator = new RequestSimulator(context, new TestModule());
     simulator.test("/user/edit").get();
     String result = simulator.response.getOutputStream().toString();
-    assertEquals(FileUtils.readFileToString(new File("src/java/test/unit/org/primeframework/mvc/edit-output.txt")), result);
+    assertEquals(FileUtils.readFileToString(new File("src/test/java/org/primeframework/mvc/edit-output.txt")), result);
   }
 
   @Test
   public void nonFormFields() throws IOException, ServletException {
     RequestSimulator simulator = new RequestSimulator(context, new TestModule());
     simulator.test("/user/details-fields").get();
-    assertEquals(FileUtils.readFileToString(new File("src/java/test/unit/org/primeframework/mvc/details-fields-output.txt")),
+    assertEquals(FileUtils.readFileToString(new File("src/test/java/org/primeframework/mvc/details-fields-output.txt")),
       simulator.response.getOutputStream().toString());
   }
 }
