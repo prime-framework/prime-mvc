@@ -1,0 +1,71 @@
+apply plugin: 'java'
+
+group = "org.primeframework"
+version = "1.0"
+description = "Prime MVC Framework"
+sourceCompatibility = 1.6
+
+configurations {
+  compileOnly {
+    visible = false
+  }
+  testCompile.extendsFrom compileOnly
+}
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  compileOnly(
+    "javax.servlet:servlet-api:2.4",
+    "javax.inject:inject-api:1.0"
+  )
+
+  compile(
+    "javax.validation:validation-api:1.0.0",
+    "commons-fileupload:commons-fileupload:1.2.1",
+    "commons-io:commons-io:1.3.2",
+    "commons-lang:commons-lang3:3.0.1",
+    "com.google.inject:guice:3.0",
+    "com.google.inject.extensions:guice-multibindings:3.0",
+    "org.freemarker:freemarker:2.3.16",
+    "org.joda:joda-time:2.0",
+    "org.primeframework:prime-mock:1.0-{integration}"
+  )
+
+  testCompile(
+    "org.easymock:easymock:3.1",
+    "org.hibernate:hibernate-validator:4.2.0",
+    "org.primeframework:prime-mock:1.0-{integration}",
+    "org.testng:testng:6.3.1"
+  )
+}
+
+// gradle doesn't provide the capability to define 'compile only'
+// dependencies (e.g maven 'provided') so this script-block below adds it
+sourceSets {
+  main {
+    compileClasspath += configurations.compileOnly
+  }
+}
+
+task srcJar(type: Jar) {
+  from sourceSets.main.java
+  classifier = "sources"
+}
+
+artifacts {
+  archives srcJar
+}
+
+test {
+  useTestNG()
+}
+
+compile.doLast {
+  copy {
+    from "src/main/ftl"
+    to "build/classes/main"
+  }
+}
