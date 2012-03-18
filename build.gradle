@@ -12,10 +12,6 @@ configurations {
   testCompile.extendsFrom compileOnly
 }
 
-repositories {
-  mavenCentral()
-}
-
 dependencies {
   compileOnly(
     "javax.servlet:servlet-api:2.4"
@@ -41,6 +37,7 @@ dependencies {
 }
 
 repositories {
+  mavenCentral()
   ivy {
     name = "ivyLocal"
     url "${project.gradle.gradleUserHomeDir}/integration-cache"
