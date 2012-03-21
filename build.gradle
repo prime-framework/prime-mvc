@@ -1,22 +1,36 @@
-apply plugin: 'java'
-
+// Project info
 group = "org.primeframework"
-version = "1.0-SNAPSHOT"
+version = "1.0"
 description = "Prime MVC Framework"
-sourceCompatibility = 1.6
 
-configurations {
-  compileOnly {
-    visible = false
+// Plugins
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'integration'
+
+// Build script config
+buildscript {
+  repositories {
+    ivy {
+      url "${project.gradle.gradleUserHomeDir}/integration-cache"
+    }
   }
-  testCompile.extendsFrom compileOnly
+  dependencies {
+    classpath(
+      "org.primeframework.gradle:gradle-integration-plugin:0.1"
+    )
+  }
+}
+
+// Dependencies
+repositories {
+  mavenCentral()
 }
 
 dependencies {
   compileOnly(
     "javax.servlet:servlet-api:2.4"
   )
-
   compile(
     "com.google.inject:guice:3.0",
     "com.google.inject.extensions:guice-multibindings:3.0",
@@ -28,7 +42,6 @@ dependencies {
     "org.freemarker:freemarker:2.3.16",
     "org.primeframework:prime-mock:1.0-SNAPSHOT"
   )
-
   testCompile(
     "org.easymock:easymock:3.1",
     "org.hibernate:hibernate-validator:4.2.0.Final",
@@ -36,41 +49,11 @@ dependencies {
   )
 }
 
-repositories {
-  mavenCentral()
-  ivy {
-    name = "ivyLocal"
-    url "${project.gradle.gradleUserHomeDir}/integration-cache"
-  }
-}
-
-uploadArchives {
-  repositories {
-    add project.repositories.ivyLocal
-  }
-}
-
-// gradle doesn't provide the capability to define 'compile only'
-// dependencies (e.g maven 'provided') so this script-block below adds it
-sourceSets {
-  main {
-    compileClasspath += configurations.compileOnly
-  }
-}
-
-task srcJar(type: Jar) {
-  from sourceSets.main.java
-  classifier = "sources"
-}
-
-artifacts {
-  archives srcJar
-}
-
+// Java config
+sourceCompatibility = 1.6
 test {
   useTestNG()
 }
-
 compileJava.doLast {
   copy {
     from "src/main/ftl"
