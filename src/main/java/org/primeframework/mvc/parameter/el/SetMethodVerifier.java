@@ -45,24 +45,21 @@ public class SetMethodVerifier implements MethodVerifier {
     Method write = info.getMethods().get("set");
     if (isValidSetter(method)) {
       if (info.isIndexed()) {
-        return "Invalid property named [" + info.getName() + "]. It mixes indexed and " +
-          "normal JavaBean methods.";
+        return "Invalid property named [" + info.getName() + "]. It mixes indexed and normal JavaBean methods.";
       }
     } else if (isValidIndexedSetter(method)) {
       if (!info.isIndexed() && read != null) {
-        return "Invalid property named [" + info.getName() + "]. It mixes indexed and " +
-          "normal JavaBean methods.";
+        return "Invalid property named [" + info.getName() + "]. It mixes indexed and normal JavaBean methods.";
       }
     } else {
       return "Invalid setter method for property named [" + info.getName() + "]";
     }
 
     if (read != null && write != null &&
-      ((info.isIndexed() && read.getReturnType() != write.getParameterTypes()[1]) ||
+        ((info.isIndexed() && read.getReturnType() != write.getParameterTypes()[1]) ||
         (!info.isIndexed() && read.getReturnType() != write.getParameterTypes()[0]))) {
-      return "Invalid getter/setter pair for JavaBean property named [" + info.getName() +
-        "] in class [" + method.getClass() + "]. The return type and parameter types must be " +
-        "identical";
+      return "Invalid getter/setter pair for JavaBean property named [" + info.getName() + "] in class [" +
+        method.getClass() + "]. The return type and parameter types must be identical";
     }
 
     return null;
@@ -92,23 +89,23 @@ public class SetMethodVerifier implements MethodVerifier {
 
   /**
    * Check if the method is a proper java bean setter-property method. This means that it starts with set, has the form
-   * setFoo or setFOO, takes a single parameter and returns void
+   * setFoo or setFOO, takes a single parameter.
    *
    * @param method The method to check.
    * @return True if valid, false otherwise.
    */
   public static boolean isValidSetter(Method method) {
-    return (method.getParameterTypes().length == 1 && method.getReturnType() == Void.TYPE);
+    return (method.getParameterTypes().length == 1);
   }
 
   /**
    * Check if the method is a proper java bean indexed setter method. This means that it starts with set, has the form
-   * setFoo or setFOO, takes a two parameters, an indices and a value and returns void.
+   * setFoo or setFOO, takes a two parameters, an indices and a value.
    *
    * @param method The method to check.
    * @return True if valid, false otherwise.
    */
   public static boolean isValidIndexedSetter(Method method) {
-    return (method.getParameterTypes().length == 2 && method.getReturnType() == Void.TYPE);
+    return (method.getParameterTypes().length == 2);
   }
 }
