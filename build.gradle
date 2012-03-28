@@ -1,23 +1,29 @@
 // Project info
 group = "org.primeframework"
-version = "1.0"
+version = "0.1"
 description = "Prime MVC Framework"
 
 // Plugins
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'integration'
+apply plugin: "release"
 
 // Build script config
 buildscript {
   repositories {
+    ivy {
+      name "inversoftPublic"
+      ivyPattern "http://hawking.inversoft.com/repository/public/[organisation]/[module]/[revision]/ivy.xml"
+      artifactPattern "http://hawking.inversoft.com/repository/public/[organisation]/[module]/[revision]/[type]s/[artifact]-[revision].[ext]"
+    }
     ivy {
       url "${project.gradle.gradleUserHomeDir}/integration-cache"
     }
   }
   dependencies {
     classpath(
-      "org.primeframework.gradle:gradle-integration-plugin:0.1"
+      "org.primeframework.gradle:gradle-integration-plugin:0.1", "org.primeframework.gradle:gradle-release-plugin:0.1"
     )
   }
 }
@@ -25,6 +31,16 @@ buildscript {
 // Dependencies
 repositories {
   mavenCentral()
+  ivy {
+    name "inversoftPublic"
+    ivyPattern "http://hawking.inversoft.com/repository/public/[organisation]/[module]/[revision]/ivy.xml"
+    artifactPattern "http://hawking.inversoft.com/repository/public/[organisation]/[module]/[revision]/[type]s/[artifact]-[revision].[ext]"
+  }
+  ivy {
+    name "releaseRepository"
+    ivyPattern "file:///$releasePlugin.inversoftIvyGitRepo/repository/public/[organisation]/[module]/[revision]/ivy.xml"
+    artifactPattern "file:///$releasePlugin.inversoftIvyGitRepo/repository/public/[organisation]/[module]/[revision]/[type]s/[artifact]-[revision].[ext]"
+  }
 }
 
 dependencies {
@@ -40,7 +56,7 @@ dependencies {
     "joda-time:joda-time:2.1",
     "org.apache.commons:commons-lang3:3.0.1",
     "org.freemarker:freemarker:2.3.16",
-    "org.primeframework:prime-mock:1.0-SNAPSHOT"
+    "org.primeframework:prime-mock:0.1"
   )
   testCompile(
     "org.easymock:easymock:3.1",
