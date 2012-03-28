@@ -29,7 +29,7 @@ import static org.testng.Assert.*;
  *
  * @author Brian Pontarelli
  */
-public class DefaultLocaleStoreTest {
+public class DefaultLocaleProviderTest {
   @Test
   public void storeSession() {
     HttpSession session = EasyMock.createStrictMock(HttpSession.class);
@@ -41,8 +41,7 @@ public class DefaultLocaleStoreTest {
     request.setAttribute("javax.servlet.jsp.jstl.fmt.locale", Locale.GERMANY);
     EasyMock.replay(request);
 
-    DefaultLocaleProvider provider = new DefaultLocaleProvider();
-    provider.setRequest(request);
+    DefaultLocaleProvider provider = new DefaultLocaleProvider(request);
     provider.set(Locale.GERMANY);
 
     EasyMock.verify(request, session);
@@ -56,8 +55,7 @@ public class DefaultLocaleStoreTest {
     request.setAttribute("javax.servlet.jsp.jstl.fmt.locale", Locale.GERMANY);
     EasyMock.replay(request);
 
-    DefaultLocaleProvider provider = new DefaultLocaleProvider();
-    provider.setRequest(request);
+    DefaultLocaleProvider provider = new DefaultLocaleProvider(request);
     provider.set(Locale.GERMANY);
 
     EasyMock.verify(request);
@@ -74,8 +72,7 @@ public class DefaultLocaleStoreTest {
     request.setAttribute("javax.servlet.jsp.jstl.fmt.locale", Locale.CANADA);
     EasyMock.replay(request);
 
-    DefaultLocaleProvider provider = new DefaultLocaleProvider();
-    provider.setRequest(request);
+    DefaultLocaleProvider provider = new DefaultLocaleProvider(request);
     assertEquals(provider.get(), Locale.CANADA);
 
     EasyMock.verify(session);
@@ -89,8 +86,7 @@ public class DefaultLocaleStoreTest {
     request.setAttribute("javax.servlet.jsp.jstl.fmt.locale", Locale.CANADA);
     EasyMock.replay(request);
 
-    DefaultLocaleProvider provider = new DefaultLocaleProvider();
-    provider.setRequest(request);
+    DefaultLocaleProvider provider = new DefaultLocaleProvider(request);
     assertEquals(provider.get(), Locale.CANADA);
 
     EasyMock.verify(request);
@@ -105,8 +101,7 @@ public class DefaultLocaleStoreTest {
     request.setAttribute("javax.servlet.jsp.jstl.fmt.locale", Locale.CANADA);
     EasyMock.replay(request);
 
-    DefaultLocaleProvider provider = new DefaultLocaleProvider();
-    provider.setRequest(request);
+    DefaultLocaleProvider provider = new DefaultLocaleProvider(request);
     assertEquals(provider.get(), Locale.CANADA);
 
     EasyMock.verify(request);

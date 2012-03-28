@@ -19,6 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.Locale;
 
+import org.primeframework.mvc.guice.Nullable;
+
 import com.google.inject.Inject;
 
 /**
@@ -28,15 +30,15 @@ import com.google.inject.Inject;
  */
 public class DefaultLocaleProvider implements LocaleProvider {
   public static final String LOCALE_KEY = "primeLocale";
-  private HttpServletRequest request;
+  private final HttpServletRequest request;
 
   /**
    * Optionally inject the request.
    *
    * @param request The request.
    */
-  @Inject(optional = true)
-  public void setRequest(HttpServletRequest request) {
+  @Inject
+  public DefaultLocaleProvider(@Nullable HttpServletRequest request) {
     this.request = request;
   }
 
