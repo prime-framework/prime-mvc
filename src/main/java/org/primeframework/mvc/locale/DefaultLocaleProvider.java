@@ -28,10 +28,15 @@ import com.google.inject.Inject;
  */
 public class DefaultLocaleProvider implements LocaleProvider {
   public static final String LOCALE_KEY = "primeLocale";
-  private final HttpServletRequest request;
+  private HttpServletRequest request;
 
-  @Inject
-  public DefaultLocaleProvider(HttpServletRequest request) {
+  /**
+   * Optionally inject the request.
+   *
+   * @param request The request.
+   */
+  @Inject(optional = true)
+  public void setRequest(HttpServletRequest request) {
     this.request = request;
   }
 
@@ -46,7 +51,12 @@ public class DefaultLocaleProvider implements LocaleProvider {
    *
    * @return The Locale and never null.
    */
+  @Override
   public Locale get() {
+    if (request == null) {
+      return Locale.getDefault();
+    }
+
     HttpSession session = request.getSession(false);
     Locale locale;
     if (session == null) {
@@ -73,7 +83,13 @@ public class DefaultLocaleProvider implements LocaleProvider {
    *
    * @param locale The Locale to store.
    */
+  @Override
   public void set(Locale locale) {
+    if (request == null) {
+      Locale.setDefault(locale);
+      return;
+    }
+
     HttpSession session = request.getSession(false);
     if (session == null) {
       request.setAttribute(LOCALE_KEY, locale);
