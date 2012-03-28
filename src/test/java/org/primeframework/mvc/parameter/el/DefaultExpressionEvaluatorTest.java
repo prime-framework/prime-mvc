@@ -23,6 +23,7 @@ import org.example.domain.Action;
 import org.example.domain.ActionField;
 import org.example.domain.Address;
 import org.example.domain.AddressField;
+import org.example.domain.Covariant;
 import org.example.domain.User;
 import org.example.domain.UserField;
 import org.primeframework.mvc.PrimeBaseTest;
@@ -354,6 +355,23 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
 
     result = evaluator.expand("My name is ${user.name}", action, true);
     assertEquals(result, "My name is %2FFred");
+  }
+
+  @Test
+  public void covariantTypes() {
+    Covariant bean = new Covariant();
+    bean.value = "value";
+    bean.override = "base";
+
+    assertEquals(evaluator.getValue("abstract", bean), "value");
+    assertEquals(evaluator.getValue("override", bean), "value");
+
+    evaluator.setValue("abstractNesting.name", bean, "Brian Pontarelli");
+    assertEquals(bean.user.getName(), "Brian Pontarelli");
+    assertEquals(evaluator.getValue("abstractNesting.name", bean), "Brian Pontarelli");
+
+    evaluator.setValue("interface.name", bean, "Brian Pontarelli");
+    assertEquals(evaluator.getValue("interface.name", bean), "Brian Pontarelli");
   }
 
   @Test(enabled = false)

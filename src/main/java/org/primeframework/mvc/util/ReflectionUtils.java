@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
@@ -222,9 +221,9 @@ public class ReflectionUtils {
     try {
       return (T) method.invoke(obj, params);
     } catch (IllegalAccessException e) {
-      throw new ErrorException("Unable to call method [" + method + "] because it isn't accessible", e);
+      throw new ErrorException("error", "Unable to call method [" + method + "] because it isn't accessible", e);
     } catch (IllegalArgumentException e) {
-      throw new ErrorException("Unable to call method [" + method + "] because the incorrect parameters were passed to it", e);
+      throw new ErrorException("error", "Unable to call method [" + method + "] because the incorrect parameters were passed to it", e);
     } catch (InvocationTargetException e) {
       Throwable target = e.getTargetException();
       if (target instanceof RuntimeException) {
@@ -234,7 +233,7 @@ public class ReflectionUtils {
         throw (Error) target;
       }
 
-      throw new ErrorException("Unable to call method [" + method + "]", e);
+      throw new ErrorException("error", "Unable to call method [" + method + "]", e);
     }
   }
 
@@ -256,9 +255,14 @@ public class ReflectionUtils {
         return propMap;
       }
 
-      boolean errorMethods = false;
+      Set<String> errors = new HashSet<String>();
       Method[] methods = beanClass.getMethods();
       for (Method method : methods) {
+        // Skip bridge methods (covariant or generics) because the non-bridge method is the one that should be correct
+        if (method.isBridge()) {
+          continue;
+        }
+
         PropertyName name = getPropertyNames(method);
         if (name == null) {
           continue;
@@ -281,8 +285,7 @@ public class ReflectionUtils {
 
         Method existingMethod = info.getMethods().get(prefix);
         if (existingMethod != null) {
-          info.getMethods().put(prefix, ERROR);
-          errorMethods = true;
+          errors.add("Two or more [" + prefix + "] methods exist in the class [" + beanClass + "] and Prime can't determine which to call");
           continue;
         }
 
@@ -290,6 +293,7 @@ public class ReflectionUtils {
         if (verifier != null) {
           String error = verifier.isValid(method, info);
           if (error != null) {
+            errors.add(error);
             continue;
           }
         } else {
@@ -305,23 +309,8 @@ public class ReflectionUtils {
         }
       }
 
-      if (errorMethods) {
-        Set keys = propMap.keySet();
-        for (Iterator i = keys.iterator(); i.hasNext(); ) {
-          String s = (String) i.next();
-          PropertyInfo info = propMap.get(s);
-          Set entries = info.getMethods().entrySet();
-          for (Iterator i2 = entries.iterator(); i2.hasNext(); ) {
-            Map.Entry entry = (Map.Entry) i2.next();
-            if (entry.getValue() == ERROR) {
-              i2.remove();
-            }
-          }
-
-          if (info.getMethods().size() == 0) {
-            i.remove();
-          }
-        }
+      if (errors.size() > 0) {
+        throw new ErrorException("error", "Invalid JavaBean class [" + beanClass + "]. Errors are: \n" + errors);
       }
 
       cache.put(beanClass, Collections.unmodifiableMap(propMap));

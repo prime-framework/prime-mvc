@@ -60,25 +60,21 @@ public class GetMethodVerifier implements MethodVerifier {
     Method write = info.getMethods().get("set");
     if (isValidGetter(method)) {
       if (info.isIndexed()) {
-        return "Invalid property named [" + info.getName() + "]. It mixes indexed and " +
-          "normal JavaBean methods.";
+        return "Invalid property named [" + info.getName() + "]. It mixes indexed and normal JavaBean methods.";
       }
     } else if (isValidIndexedGetter(method)) {
       if (!info.isIndexed() && write != null) {
-        return "Invalid property named [" + info.getName() + "]. It mixes indexed and " +
-          "normal JavaBean methods.";
+        return "Invalid property named [" + info.getName() + "]. It mixes indexed and normal JavaBean methods.";
       }
     } else {
       return "Invalid getter method for property named [" + info.getName() + "]";
     }
 
-    Method read = info.getMethods().get("get");
-    if (read != null && write != null &&
-      ((info.isIndexed() && read.getReturnType() != write.getParameterTypes()[1]) ||
-        (!info.isIndexed() && read.getReturnType() != write.getParameterTypes()[0]))) {
-      return "Invalid getter/setter pair for JavaBean property named [" + info.getName() +
-        "] in class [" + method.getClass() + "]. The return type and parameter types must be " +
-        "identical";
+    if (write != null &&
+        ((info.isIndexed() && method.getReturnType() != write.getParameterTypes()[1]) ||
+        (!info.isIndexed() && method.getReturnType() != write.getParameterTypes()[0]))) {
+      return "Invalid getter/setter pair for JavaBean property named [" + info.getName() + "] in class [" +
+        method.getDeclaringClass() + "]. The return type and parameter types must be identical";
     }
 
     return null;
