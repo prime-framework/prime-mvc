@@ -35,7 +35,7 @@ import com.google.inject.Inject;
  *
  * @author Brian Pontarelli
  */
-@GlobalConverter(forTypes = {LocalDate.class})
+@GlobalConverter
 public class LocalDateConverter extends AbstractGlobalConverter {
   private final boolean emptyIsNull;
 

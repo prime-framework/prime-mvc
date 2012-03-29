@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.parameter.convert.annotation;
+package org.primeframework.mvc.action.result.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -21,12 +21,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation must be placed on all implementations of the {@link org.primeframework.mvc.parameter.convert.GlobalConverter}
- * interface.
+ * This annotation is a container for no-ops.
  *
  * @author Brian Pontarelli
  */
+@ResultContainerAnnotation()
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface GlobalConverter {
+public @interface NoOps {
+  /**
+   * @return The no-ops.
+   */
+  NoOp[] value();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,20 +13,26 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.parameter.convert.annotation;
+package org.primeframework.mvc.action.result.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.primeframework.mvc.action.result.NoOpResult;
+
 /**
- * This annotation must be placed on all implementations of the {@link org.primeframework.mvc.parameter.convert.GlobalConverter}
- * interface.
+ * This annotation marks a result from an action as a Streaming XML result using a xml string from the action.
  *
- * @author Brian Pontarelli
+ * @author jhumphrey
  */
+@ResultAnnotation(NoOpResult.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface GlobalConverter {
+public @interface NoOp {
+  /**
+   * @return The result code from the action's execute method that this Result is associated with.
+   */
+  String code() default "success";
 }

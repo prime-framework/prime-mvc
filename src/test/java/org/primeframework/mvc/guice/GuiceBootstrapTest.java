@@ -18,7 +18,7 @@ package org.primeframework.mvc.guice;
 import javax.servlet.ServletContext;
 
 import org.easymock.EasyMock;
-import org.primeframework.mvc.ClosableModule;
+import org.primeframework.mvc.CloseableModule;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.config.AbstractMVCConfiguration;
 import org.primeframework.mvc.config.MVCConfiguration;
@@ -57,7 +57,7 @@ public class GuiceBootstrapTest extends PrimeBaseTest {
           }
         });
       }
-    }, new ClosableModule());
+    }, new CloseableModule());
     assertNotNull(injector.getInstance(TestClosable.class));
     assertTrue(injector.getInstance(TestClosable.class).open);
 

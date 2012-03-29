@@ -23,7 +23,7 @@ import java.util.Locale;
 
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
-import org.primeframework.mvc.parameter.convert.GlobalConverter;
+import org.primeframework.mvc.guice.AbstractPrimeModule;
 import org.primeframework.mvc.parameter.convert.converters.BooleanConverter;
 import org.primeframework.mvc.parameter.convert.converters.CharacterConverter;
 import org.primeframework.mvc.parameter.convert.converters.CollectionConverter;
@@ -35,38 +35,23 @@ import org.primeframework.mvc.parameter.convert.converters.LocaleConverter;
 import org.primeframework.mvc.parameter.convert.converters.NumberConverter;
 import org.primeframework.mvc.parameter.convert.converters.StringConverter;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.TypeLiteral;
-import com.google.inject.multibindings.MapBinder;
-
 /**
  * This class is a guice module for the Prime MVC converters.
  *
  * @author Brian Pontarelli
  */
-public class ConverterModule extends AbstractModule {
+public class ConverterModule extends AbstractPrimeModule {
   @Override
   protected void configure() {
-    MapBinder<Class<?>, GlobalConverter> binder = MapBinder.newMapBinder(binder(), new TypeLiteral<Class<?>>(){}, TypeLiteral.get(GlobalConverter.class));
-    binder.addBinding(Boolean.class).to(BooleanConverter.class).asEagerSingleton();
-    binder.addBinding(boolean.class).to(BooleanConverter.class).asEagerSingleton();
-    binder.addBinding(Character.class).to(CharacterConverter.class).asEagerSingleton();
-    binder.addBinding(char.class).to(CharacterConverter.class).asEagerSingleton();
-    binder.addBinding(Collection.class).to(CollectionConverter.class).asEagerSingleton();
-    binder.addBinding(DateTime.class).to(DateTimeConverter.class).asEagerSingleton();
-    binder.addBinding(Enum.class).to(EnumConverter.class).asEagerSingleton();
-    binder.addBinding(File.class).to(FileConverter.class).asEagerSingleton();
-    binder.addBinding(LocalDate.class).to(LocalDateConverter.class).asEagerSingleton();
-    binder.addBinding(Locale.class).to(LocaleConverter.class).asEagerSingleton();
-    binder.addBinding(Number.class).to(NumberConverter.class).asEagerSingleton();
-    binder.addBinding(byte.class).to(NumberConverter.class).asEagerSingleton();
-    binder.addBinding(short.class).to(NumberConverter.class).asEagerSingleton();
-    binder.addBinding(int.class).to(NumberConverter.class).asEagerSingleton();
-    binder.addBinding(long.class).to(NumberConverter.class).asEagerSingleton();
-    binder.addBinding(float.class).to(NumberConverter.class).asEagerSingleton();
-    binder.addBinding(double.class).to(NumberConverter.class).asEagerSingleton();
-    binder.addBinding(BigDecimal.class).to(NumberConverter.class).asEagerSingleton();
-    binder.addBinding(BigInteger.class).to(NumberConverter.class).asEagerSingleton();
-    binder.addBinding(String.class).to(StringConverter.class).asEagerSingleton();
+    addGlobalConverter(BooleanConverter.class, Boolean.class, boolean.class);
+    addGlobalConverter(CharacterConverter.class, Character.class, char.class);
+    addGlobalConverter(CollectionConverter.class, Collection.class);
+    addGlobalConverter(DateTimeConverter.class, DateTime.class);
+    addGlobalConverter(EnumConverter.class, Enum.class);
+    addGlobalConverter(FileConverter.class, File.class);
+    addGlobalConverter(LocalDateConverter.class, LocalDate.class);
+    addGlobalConverter(LocaleConverter.class, Locale.class);
+    addGlobalConverter(NumberConverter.class, Number.class, byte.class, short.class, int.class, long.class, float.class, double.class, BigDecimal.class, BigInteger.class);
+    addGlobalConverter(StringConverter.class, String.class);
   }
 }

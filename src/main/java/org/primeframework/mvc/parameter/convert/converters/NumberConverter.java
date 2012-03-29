@@ -31,8 +31,7 @@ import com.google.inject.Inject;
  *
  * @author Brian Pontarelli
  */
-@GlobalConverter(forTypes = {byte.class, short.class, int.class, long.class, float.class, double.class,
-  Number.class, BigDecimal.class, BigInteger.class})
+@GlobalConverter
 public class NumberConverter extends AbstractPrimitiveConverter {
   @Inject
   public NumberConverter(MVCConfiguration configuration) {

@@ -29,7 +29,7 @@ import com.google.inject.Inject;
  *
  * @author Brian Pontarelli
  */
-@GlobalConverter(forTypes = {Boolean.class, boolean.class})
+@GlobalConverter
 public class BooleanConverter extends AbstractPrimitiveConverter {
   @Inject
   public BooleanConverter(MVCConfiguration configuration) {

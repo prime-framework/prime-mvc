@@ -25,7 +25,7 @@ import com.google.inject.Module;
  *
  * @author Brian Pontarelli
  */
-public class ClosableModule implements Module {
+public class CloseableModule implements Module {
   public void configure(Binder binder) {
     binder.bind(TestClosable.class);
     binder.requestStaticInjection(TestClosable.class);

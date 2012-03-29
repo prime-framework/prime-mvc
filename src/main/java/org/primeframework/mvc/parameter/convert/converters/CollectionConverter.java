@@ -45,7 +45,7 @@ import static java.util.Arrays.*;
  *
  * @author Brian Pontarelli
  */
-@org.primeframework.mvc.parameter.convert.annotation.GlobalConverter(forTypes = {Collection.class})
+@org.primeframework.mvc.parameter.convert.annotation.GlobalConverter
 @SuppressWarnings("unchecked")
 public class CollectionConverter extends AbstractGlobalConverter {
   private final ConverterProvider provider;

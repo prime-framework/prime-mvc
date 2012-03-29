@@ -20,6 +20,7 @@ import java.util.Deque;
 
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.config.ActionConfigurationProvider;
+import org.primeframework.mvc.util.URITools;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
@@ -44,7 +45,7 @@ public class DefaultActionMapper implements ActionMapper {
    */
   public ActionInvocation map(String uri, boolean executeResult) {
     // Handle extensions
-    String extension = determineExtension(uri);
+    String extension = URITools.determineExtension(uri);
     if (extension != null) {
       uri = uri.substring(0, uri.length() - extension.length() - 1);
     }
@@ -99,28 +100,5 @@ public class DefaultActionMapper implements ActionMapper {
     }
 
     return new DefaultActionInvocation(action, uri, extension, uriParameters, actionConfiguration, executeResult);
-  }
-
-  private String determineExtension(String uri) {
-    String extension = null;
-    int index = uri.lastIndexOf('.');
-    if (index >= 0) {
-      extension = uri.substring(index + 1);
-
-      // Sanity check the extension to ensure it is NOT part of a version number like /foo-1.0
-      boolean good = false;
-      for (int i = 0; i < extension.length(); i++) {
-        good = Character.isLetter(extension.charAt(i));
-        if (!good) {
-          break;
-        }
-      }
-
-      if (!good || extension.contains("/")) {
-        extension = null;
-      }
-    }
-
-    return extension;
   }
 }

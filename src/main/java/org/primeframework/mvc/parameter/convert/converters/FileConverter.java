@@ -30,7 +30,7 @@ import org.primeframework.mvc.parameter.convert.annotation.GlobalConverter;
  *
  * @author Brian Pontarelli
  */
-@GlobalConverter(forTypes = {File.class})
+@GlobalConverter
 public class FileConverter extends AbstractGlobalConverter {
   /**
    * Returns null if the value is null, otherwise this returns a new File of the value.

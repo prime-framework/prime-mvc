@@ -32,7 +32,7 @@ import com.google.inject.Inject;
  *
  * @author Brian Pontarelli
  */
-@GlobalConverter(forTypes = {Enum.class})
+@GlobalConverter
 @SuppressWarnings("unchecked")
 public class EnumConverter extends AbstractGlobalConverter {
   private final boolean emptyIsNull;

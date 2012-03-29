@@ -35,7 +35,7 @@ import com.google.inject.Inject;
  *
  * @author Brian Pontarelli
  */
-@GlobalConverter(forTypes = {DateTime.class})
+@GlobalConverter
 public class DateTimeConverter extends AbstractGlobalConverter {
   private final boolean emptyIsNull;
 

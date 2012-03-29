@@ -31,7 +31,7 @@ import com.google.inject.Inject;
  *
  * @author Brian Pontarelli
  */
-@GlobalConverter(forTypes = {String.class})
+@GlobalConverter
 public class StringConverter extends AbstractGlobalConverter {
   private final boolean emptyIsNull;
 

@@ -32,7 +32,7 @@ import com.google.inject.Inject;
  *
  * @author Brian Pontarelli
  */
-@GlobalConverter(forTypes = {Locale.class})
+@GlobalConverter
 public class LocaleConverter extends AbstractGlobalConverter {
   private final boolean emptyIsNull;
 

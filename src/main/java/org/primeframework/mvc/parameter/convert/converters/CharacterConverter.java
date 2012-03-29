@@ -29,7 +29,7 @@ import com.google.inject.Inject;
  *
  * @author Brian Pontarelli
  */
-@GlobalConverter(forTypes = {Character.class, char.class})
+@GlobalConverter
 public class CharacterConverter extends AbstractPrimitiveConverter {
   @Inject
   public CharacterConverter(MVCConfiguration configuration) {
