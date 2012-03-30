@@ -70,6 +70,7 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
       return;
     }
 
+    // Keep the current action in the store if an exception is thrown so that it can be used from the error workflow
     actionInvocationStore.setCurrent(invocation);
     chain.continueWorkflow();
     actionInvocationStore.removeCurrent();

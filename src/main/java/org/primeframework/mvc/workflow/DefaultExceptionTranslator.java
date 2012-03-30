@@ -15,7 +15,11 @@
  */
 package org.primeframework.mvc.workflow;
 
+import java.util.Set;
+
 import org.primeframework.mvc.ErrorException;
+
+import com.google.inject.Inject;
 
 /**
  * Translates exceptions.
@@ -23,14 +27,25 @@ import org.primeframework.mvc.ErrorException;
  * @author Brian Pontarelli
  */
 public class DefaultExceptionTranslator implements ExceptionTranslator {
+  private final Set<Class<? extends RuntimeException>> handlableExceptions;
+
+  @Inject
+  public DefaultExceptionTranslator(Set<Class<? extends RuntimeException>> handlableExceptions) {
+    this.handlableExceptions = handlableExceptions;
+  }
+
   /**
-   * If the throwable is an {@link ErrorException} this returns the result code. Otherwise, it returns "error".
+   * If the exception is an {@link ErrorException} this returns the result code. Otherwise, it returns "error".
    *
-   * @param t The throwable.
+   * @param e The exceptions.
    * @return The result code.
    */
   @Override
-  public String translate(Throwable t) {
-    return (t instanceof ErrorException) ? ((ErrorException) t).resultCode : "error";
+  public String translate(RuntimeException e) {
+    if (handlableExceptions.contains(e.getClass())) {
+      return (e instanceof ErrorException) ? ((ErrorException) e).resultCode : "error";
+    }
+
+    return null;
   }
 }

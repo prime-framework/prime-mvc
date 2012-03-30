@@ -69,6 +69,8 @@ dependencies {
 }
 
 // Java config
+compileJava.options.debugOptions.debugLevel = "source,lines,vars"
+compileTestJava.options.debugOptions.debugLevel = "source,lines,vars"
 sourceCompatibility = 1.6
 test {
   useTestNG()

@@ -80,8 +80,13 @@ public class DefaultMVCWorkflow implements MVCWorkflow {
     try {
       SubWorkflowChain subChain = new SubWorkflowChain(workflows, chain);
       subChain.continueWorkflow();
-    } catch (Throwable t) {
-      resultStore.set(exceptionTranslator.translate(t));
+    } catch (RuntimeException e) {
+      String result = exceptionTranslator.translate(e);
+      if (result == null) {
+        throw e;
+      }
+
+      resultStore.set(result);
       SubWorkflowChain errorChain = new SubWorkflowChain(errorWorkflows, chain);
       errorChain.continueWorkflow();
     }

@@ -46,4 +46,15 @@ public class GlobalTest extends PrimeBaseTest {
     assertEquals(FileUtils.readFileToString(new File("src/test/java/org/primeframework/mvc/details-fields-output.txt")),
       simulator.response.getOutputStream().toString());
   }
+
+  @Test
+  public void postRender() throws IOException, ServletException {
+    RequestSimulator simulator = new RequestSimulator(context, new TestModule());
+    simulator.test("/post").post();
+    String result = simulator.response.getOutputStream().toString();
+    assertTrue(result.contains("Brian Pontarelli"));
+    assertTrue(result.contains("35"));
+    assertTrue(result.contains("Broomfield"));
+    assertTrue(result.contains("CO"));
+  }
 }

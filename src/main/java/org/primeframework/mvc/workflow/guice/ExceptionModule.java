@@ -13,22 +13,19 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.workflow;
+package org.primeframework.mvc.workflow.guice;
 
-import com.google.inject.ImplementedBy;
+import org.primeframework.mvc.ErrorException;
+
+import com.google.inject.AbstractModule;
 
 /**
- * Translates exceptions thrown while executing the MVC workflows and the application code to result codes.
- *
  * @author Brian Pontarelli
  */
-@ImplementedBy(DefaultExceptionTranslator.class)
-public interface ExceptionTranslator {
-  /**
-   * Translate the given exception to a result code.
-   *
-   * @param e The exception
-   * @return The result code or null if the exception can't be handled by Prime.
-   */
-  String translate(RuntimeException e);
+public class ExceptionModule extends AbstractModule {
+  @Override
+  protected void configure() {
+    ExceptionBinder.init(binder());
+    ExceptionBinder.add(ErrorException.class);
+  }
 }

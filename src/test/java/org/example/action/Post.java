@@ -15,6 +15,8 @@
  */
 package org.example.action;
 
+import org.example.domain.AddressField;
+import org.example.domain.UserField;
 import org.primeframework.mvc.action.annotation.Action;
 
 /**
@@ -24,10 +26,17 @@ import org.primeframework.mvc.action.annotation.Action;
  */
 @Action
 public class Post {
+  public UserField user;
   public boolean invoked = false;
 
   public String post() {
     invoked = true;
+    user = new UserField();
+    user.age = 35;
+    user.name = "Brian Pontarelli";
+    user.addresses.put("home", new AddressField());
+    user.addresses.get("home").city = "Broomfield";
+    user.addresses.get("home").state = "CO";
     return "success";
   }
 }
