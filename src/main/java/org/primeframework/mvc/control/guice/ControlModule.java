@@ -46,24 +46,24 @@ public class ControlModule extends AbstractModule {
   @Override
   protected void configure() {
     ControlBinder controlBinder = ControlBinder.newControlBinder(binder());
-    controlBinder.add(Button.class).withPrefix("prime");
-    controlBinder.add(Checkbox.class).withPrefix("prime");
-    controlBinder.add(CheckboxList.class).withPrefix("prime");
-    controlBinder.add(CountriesSelect.class).withPrefix("prime");
-    controlBinder.add(File.class).withPrefix("prime");
-    controlBinder.add(Form.class).withPrefix("prime");
-    controlBinder.add(Hidden.class).withPrefix("prime");
-    controlBinder.add(Image.class).withPrefix("prime");
-    controlBinder.add(MonthsSelect.class).withPrefix("prime");
-    controlBinder.add(Password.class).withPrefix("prime");
-    controlBinder.add(RadioList.class).withPrefix("prime");
-    controlBinder.add(Reset.class).withPrefix("prime");
-    controlBinder.add(Select.class).withPrefix("prime");
-    controlBinder.add(StatesSelect.class).withPrefix("prime");
-    controlBinder.add(Submit.class).withPrefix("prime");
-    controlBinder.add(Text.class).withPrefix("prime");
-    controlBinder.add(Textarea.class).withPrefix("prime");
-    controlBinder.add(YearsSelect.class).withPrefix("prime");
-    controlBinder.add(Message.class).withPrefix("prime");
+    controlBinder.add(Button.class).withPrefix("control");
+    controlBinder.add(Checkbox.class).withPrefix("control");
+    controlBinder.add(CheckboxList.class).withPrefix("control");
+    controlBinder.add(CountriesSelect.class).withPrefix("control");
+    controlBinder.add(File.class).withPrefix("control");
+    controlBinder.add(Form.class).withPrefix("control");
+    controlBinder.add(Hidden.class).withPrefix("control");
+    controlBinder.add(Image.class).withPrefix("control");
+    controlBinder.add(MonthsSelect.class).withPrefix("control");
+    controlBinder.add(Password.class).withPrefix("control");
+    controlBinder.add(RadioList.class).withPrefix("control");
+    controlBinder.add(Reset.class).withPrefix("control");
+    controlBinder.add(Select.class).withPrefix("control");
+    controlBinder.add(StatesSelect.class).withPrefix("control");
+    controlBinder.add(Submit.class).withPrefix("control");
+    controlBinder.add(Text.class).withPrefix("control");
+    controlBinder.add(Textarea.class).withPrefix("control");
+    controlBinder.add(YearsSelect.class).withPrefix("control");
+    controlBinder.add(Message.class).withPrefix("control");
   }
 }

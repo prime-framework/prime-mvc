@@ -15,9 +15,10 @@
  */
 package org.primeframework.mvc.freemarker.guice;
 
+import org.primeframework.mvc.freemarker.NamedTemplateModel;
+
 import com.google.inject.Binder;
 import com.google.inject.multibindings.MapBinder;
-import freemarker.template.TemplateModel;
 
 /**
  * A binder DSL for adding FreeMarker TemplateModel objects to Prime.
@@ -45,30 +46,31 @@ public class TemplateModelBinder {
    * Adds a binding for the given TemplateModel.
    *
    * @param modelType The TemplateModel type.
-   * @return The name binder that is used to specify the name the TemplateModel is place under. You must call a method
+   * @return The prefix binder that is used to specify the prefix the TemplateModel is place under. You must call a method
    *         on the returned obejct otherwise the binding won't be setup.
    */
-  public TemplateModelNameBinder add(Class<? extends TemplateModel> modelType) {
-    return new TemplateModelNameBinder(binder, modelType);
+  public TemplateModelPrefixBinder add(Class<? extends NamedTemplateModel> modelType) {
+    return new TemplateModelPrefixBinder(binder, modelType);
   }
 
-  public class TemplateModelNameBinder {
+  public class TemplateModelPrefixBinder {
     private final Binder binder;
-    private final Class<? extends TemplateModel> modelType;
+    private final Class<? extends NamedTemplateModel> modelType;
 
-    private TemplateModelNameBinder(Binder binder, Class<? extends TemplateModel> modelType) {
+    private TemplateModelPrefixBinder(Binder binder, Class<? extends NamedTemplateModel> modelType) {
       this.binder = binder;
       this.modelType = modelType;
     }
 
     /**
-     * Specifies the name that the TemplateModel is available under in the FreeMarker template.
+     * Specifies the prefix for the TemplateModel in the FreeMarker template.
      *
-     * @param name The name.
+     * @param prefix The prefix.
      */
-    public void withName(String name) {
-      MapBinder<String, TemplateModel> mapBinder = MapBinder.newMapBinder(binder, String.class, TemplateModel.class);
-      mapBinder.addBinding(name).to(modelType);
+    public void withPrefix(String prefix) {
+      MapBinder<String, NamedTemplateModel> mapBinder = MapBinder.newMapBinder(binder, String.class, NamedTemplateModel.class);
+      mapBinder.permitDuplicates();
+      mapBinder.addBinding(prefix).to(modelType);
     }
   }
 }

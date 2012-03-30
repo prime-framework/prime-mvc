@@ -35,6 +35,7 @@ import java.util.Set;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.ControlsHashModel;
+import org.primeframework.mvc.action.result.ModelsHashModel;
 import org.primeframework.mvc.control.Control;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
@@ -77,7 +78,8 @@ public class FreeMarkerMap implements TemplateHashModelEx {
   @Inject
   public FreeMarkerMap(ServletContext context, HttpServletRequest request, HttpServletResponse response,
                        ExpressionEvaluator expressionEvaluator, ActionInvocationStore actionInvocationStore,
-                       MessageStore messageStore, Map<String, Set<Control>> controlSets) {
+                       MessageStore messageStore, Map<String, Set<Control>> controlSets,
+                       Map<String, Set<NamedTemplateModel>> models) {
     this.context = context;
     this.taglibFactory = new TaglibFactory(context);
     this.request = request;
@@ -115,6 +117,11 @@ public class FreeMarkerMap implements TemplateHashModelEx {
     // Add the controls
     for (String prefix : controlSets.keySet()) {
       objects.put(prefix, new ControlsHashModel(controlSets.get(prefix)));
+    }
+
+    // Add the models
+    for (String prefix : models.keySet()) {
+      objects.put(prefix, new ModelsHashModel(models.get(prefix)));
     }
 
     // TODO add debugging for figuring out what scope an object is in
