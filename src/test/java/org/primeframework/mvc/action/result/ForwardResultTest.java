@@ -35,6 +35,7 @@ import org.primeframework.mvc.action.result.annotation.Forward;
 import org.primeframework.mvc.control.Control;
 import org.primeframework.mvc.freemarker.FreeMarkerMap;
 import org.primeframework.mvc.freemarker.FreeMarkerService;
+import org.primeframework.mvc.freemarker.NamedTemplateModel;
 import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
@@ -238,7 +239,7 @@ public class ForwardResultTest {
 
     Forward forward = new ForwardResult.ForwardImpl("", "failure");
     ForwardResult forwardResult = new ForwardResult(store, null, service, context, request, response, 
-      new FreeMarkerMap(context, request, response, null, store, messageStore, new HashMap<String, Set<Control>>()),
+      new FreeMarkerMap(context, request, response, null, store, messageStore, new HashMap<String, Set<Control>>(), new HashMap<String, Set<NamedTemplateModel>>()),
       Locale.GERMAN);
     forwardResult.execute(forward);
 
