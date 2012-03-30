@@ -30,7 +30,7 @@ import static java.lang.annotation.RetentionPolicy.*;
 
  * @author jhumphrey
  */
-@Target({FIELD, METHOD})
+@Target(TYPE)
 @Retention(RUNTIME)
 @Constraint(validatedBy = FieldsMatchValidator.class)
 @Documented
