@@ -34,34 +34,36 @@ import org.primeframework.mvc.control.form.Text;
 import org.primeframework.mvc.control.form.Textarea;
 import org.primeframework.mvc.control.form.YearsSelect;
 import org.primeframework.mvc.control.message.Message;
-import org.primeframework.mvc.guice.AbstractPrimeModule;
+
+import com.google.inject.AbstractModule;
 
 /**
  * This class is a Guice module that configures the Prime MVC controls.
  *
  * @author Brian Pontarelli
  */
-public class ControlModule extends AbstractPrimeModule {
+public class ControlModule extends AbstractModule {
   @Override
   protected void configure() {
-    addControl("prime", Button.class);
-    addControl("prime", Checkbox.class);
-    addControl("prime", CheckboxList.class);
-    addControl("prime", CountriesSelect.class);
-    addControl("prime", File.class);
-    addControl("prime", Form.class);
-    addControl("prime", Hidden.class);
-    addControl("prime", Image.class);
-    addControl("prime", MonthsSelect.class);
-    addControl("prime", Password.class);
-    addControl("prime", RadioList.class);
-    addControl("prime", Reset.class);
-    addControl("prime", Select.class);
-    addControl("prime", StatesSelect.class);
-    addControl("prime", Submit.class);
-    addControl("prime", Text.class);
-    addControl("prime", Textarea.class);
-    addControl("prime", YearsSelect.class);
-    addControl("prime", Message.class);
+    ControlBinder controlBinder = ControlBinder.newControlBinder(binder());
+    controlBinder.add(Button.class).withPrefix("prime");
+    controlBinder.add(Checkbox.class).withPrefix("prime");
+    controlBinder.add(CheckboxList.class).withPrefix("prime");
+    controlBinder.add(CountriesSelect.class).withPrefix("prime");
+    controlBinder.add(File.class).withPrefix("prime");
+    controlBinder.add(Form.class).withPrefix("prime");
+    controlBinder.add(Hidden.class).withPrefix("prime");
+    controlBinder.add(Image.class).withPrefix("prime");
+    controlBinder.add(MonthsSelect.class).withPrefix("prime");
+    controlBinder.add(Password.class).withPrefix("prime");
+    controlBinder.add(RadioList.class).withPrefix("prime");
+    controlBinder.add(Reset.class).withPrefix("prime");
+    controlBinder.add(Select.class).withPrefix("prime");
+    controlBinder.add(StatesSelect.class).withPrefix("prime");
+    controlBinder.add(Submit.class).withPrefix("prime");
+    controlBinder.add(Text.class).withPrefix("prime");
+    controlBinder.add(Textarea.class).withPrefix("prime");
+    controlBinder.add(YearsSelect.class).withPrefix("prime");
+    controlBinder.add(Message.class).withPrefix("prime");
   }
 }

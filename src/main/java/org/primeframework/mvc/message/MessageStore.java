@@ -30,7 +30,7 @@ import com.google.inject.ImplementedBy;
 @ImplementedBy(DefaultMessageStore.class)
 public interface MessageStore {
   /**
-   * Adds the given message.
+   * Adds the given message to the request scope.
    *
    * @param message The message.
    */

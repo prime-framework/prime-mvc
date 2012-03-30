@@ -17,8 +17,8 @@ package org.primeframework.mvc.freemarker.guice;
 
 import org.primeframework.mvc.freemarker.OverridingTemplateLoader;
 import org.primeframework.mvc.freemarker.methods.JSONEscape;
-import org.primeframework.mvc.guice.AbstractPrimeModule;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
 import freemarker.cache.TemplateLoader;
 import freemarker.template.Configuration;
@@ -28,11 +28,13 @@ import freemarker.template.Configuration;
  *
  * @author Brian Pontarelli
  */
-public class FreeMarkerModule extends AbstractPrimeModule {
+public class FreeMarkerModule extends AbstractModule {
   @Override
   protected void configure() {
     bind(TemplateLoader.class).to(OverridingTemplateLoader.class);
     bind(Configuration.class).toProvider(FreeMarkerConfigurationProvider.class).in(Singleton.class);
-    addFreemarkerModel("jsonescape", JSONEscape.class);
+
+    TemplateModelBinder templateModelBinder = TemplateModelBinder.newTemplateModelBinder(binder());
+    templateModelBinder.add(JSONEscape.class).withName("jsonescape");
   }
 }

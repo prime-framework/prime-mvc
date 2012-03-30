@@ -23,7 +23,6 @@ import java.util.Locale;
 
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
-import org.primeframework.mvc.guice.AbstractPrimeModule;
 import org.primeframework.mvc.parameter.convert.converters.BooleanConverter;
 import org.primeframework.mvc.parameter.convert.converters.CharacterConverter;
 import org.primeframework.mvc.parameter.convert.converters.CollectionConverter;
@@ -34,24 +33,28 @@ import org.primeframework.mvc.parameter.convert.converters.LocalDateConverter;
 import org.primeframework.mvc.parameter.convert.converters.LocaleConverter;
 import org.primeframework.mvc.parameter.convert.converters.NumberConverter;
 import org.primeframework.mvc.parameter.convert.converters.StringConverter;
+import org.primeframework.mvc.parameter.guice.GlobalConverterBinder;
+
+import com.google.inject.AbstractModule;
 
 /**
  * This class is a guice module for the Prime MVC converters.
  *
  * @author Brian Pontarelli
  */
-public class ConverterModule extends AbstractPrimeModule {
+public class ConverterModule extends AbstractModule {
   @Override
   protected void configure() {
-    addGlobalConverter(BooleanConverter.class, Boolean.class, boolean.class);
-    addGlobalConverter(CharacterConverter.class, Character.class, char.class);
-    addGlobalConverter(CollectionConverter.class, Collection.class);
-    addGlobalConverter(DateTimeConverter.class, DateTime.class);
-    addGlobalConverter(EnumConverter.class, Enum.class);
-    addGlobalConverter(FileConverter.class, File.class);
-    addGlobalConverter(LocalDateConverter.class, LocalDate.class);
-    addGlobalConverter(LocaleConverter.class, Locale.class);
-    addGlobalConverter(NumberConverter.class, Number.class, byte.class, short.class, int.class, long.class, float.class, double.class, BigDecimal.class, BigInteger.class);
-    addGlobalConverter(StringConverter.class, String.class);
+    GlobalConverterBinder binder = GlobalConverterBinder.newGlobalConverterBinder(binder());
+    binder.add(BooleanConverter.class).forTypes(Boolean.class, boolean.class);
+    binder.add(CharacterConverter.class).forTypes(Character.class, char.class);
+    binder.add(CollectionConverter.class).forTypes(Collection.class);
+    binder.add(DateTimeConverter.class).forTypes(DateTime.class);
+    binder.add(EnumConverter.class).forTypes(Enum.class);
+    binder.add(FileConverter.class).forTypes(File.class);
+    binder.add(LocalDateConverter.class).forTypes(LocalDate.class);
+    binder.add(LocaleConverter.class).forTypes(Locale.class);
+    binder.add(NumberConverter.class).forTypes(Number.class, byte.class, short.class, int.class, long.class, float.class, double.class, BigDecimal.class, BigInteger.class);
+    binder.add(StringConverter.class).forTypes(String.class);
   }
 }
