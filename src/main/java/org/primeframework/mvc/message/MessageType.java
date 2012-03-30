@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,29 +13,24 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.message.scope;
-
-import java.util.List;
-
-import com.google.inject.ImplementedBy;
+package org.primeframework.mvc.message;
 
 /**
- * This is the provider for scopes.
+ * Defines a message type.
  *
  * @author Brian Pontarelli
  */
-@ImplementedBy(DefaultScopeProvider.class)
-public interface ScopeProvider {
+public interface MessageType {
   /**
-   * Looks up the scope for the given annotation.
-   *
-   * @param scope The scope enum value.
-   * @return The Scope and never null.
+   * Prime error messages.
    */
-  Scope lookup(MessageScope scope);
+  MessageType ERROR = new PrimeErrorMessageType();
 
   /**
-   * @return All of the registered scopes.
+   * Internal implementation for the Prime error message.
    */
-  List<Scope> getAllScopes();
+  class PrimeErrorMessageType implements MessageType {
+    private PrimeErrorMessageType() {
+    }
+  }
 }

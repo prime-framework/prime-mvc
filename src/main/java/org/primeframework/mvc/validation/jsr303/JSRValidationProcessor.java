@@ -24,8 +24,9 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.primeframework.mvc.ErrorException;
 import org.primeframework.mvc.action.ActionInvocationStore;
-import org.primeframework.mvc.message.FieldMessage;
 import org.primeframework.mvc.message.MessageStore;
+import org.primeframework.mvc.message.MessageType;
+import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.message.l10n.MissingMessageException;
 import org.primeframework.mvc.validation.ValidationException;
@@ -73,13 +74,14 @@ public class JSRValidationProcessor implements ValidationProcessor {
 
       String propertyPath = toString(violation.getPropertyPath());
       Object invalidValue = violation.getInvalidValue();
-      FieldMessage message;
+      String message;
       try {
-        message = provider.getFieldMessage(propertyPath, "[" + constraint + "]" + propertyPath, invalidValue);
+        message = provider.getMessage("[" + constraint + "]" + propertyPath, invalidValue);
       } catch (MissingMessageException e) {
-        message = provider.getFieldMessage(propertyPath, "[" + constraint + "]", invalidValue);
+        message = provider.getMessage("[" + constraint + "]", invalidValue);
       }
-      messageStore.add(message);
+
+      messageStore.add(new SimpleFieldMessage(MessageType.ERROR, propertyPath, message));
     }
     
     if (violations.size() > 0) {

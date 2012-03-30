@@ -24,6 +24,7 @@ import org.example.action.user.Edit;
 import org.example.domain.User;
 import org.primeframework.mvc.action.DefaultActionInvocation;
 import org.primeframework.mvc.control.ControlBaseTest;
+import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.testng.annotations.Test;
 
@@ -156,8 +157,8 @@ public class CheckboxTest extends ControlBaseTest {
     Edit action = new Edit();
     ais.setCurrent(new DefaultActionInvocation(action, "/checkbox", null, null));
 
-    messageStore.add(new SimpleFieldMessage("user.male", "fieldError1"));
-    messageStore.add(new SimpleFieldMessage("user.male", "fieldError2"));
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.male", "fieldError1"));
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.male", "fieldError2"));
 
     new ControlTester(checkbox).
       attr("name", "user.male").

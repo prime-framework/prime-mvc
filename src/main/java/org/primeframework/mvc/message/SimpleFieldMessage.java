@@ -21,17 +21,41 @@ package org.primeframework.mvc.message;
  * @author Brian Pontarelli
  */
 public class SimpleFieldMessage implements FieldMessage {
+  public final MessageType type;
   public final String field;
   public final String message;
 
-  public SimpleFieldMessage(String field, String message) {
+  public SimpleFieldMessage(MessageType type, String field, String message) {
+    this.type = type;
     this.field = field;
     this.message = message;
   }
 
   @Override
+  public MessageType getType() {
+    return type;
+  }
+
+  @Override
   public String getField() {
     return field;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    final SimpleFieldMessage that = (SimpleFieldMessage) o;
+    return field.equals(that.field) && message.equals(that.message) && type.equals(that.type);
+  }
+
+  @Override
+  public int hashCode() {
+    int result = type.hashCode();
+    result = 31 * result + field.hashCode();
+    result = 31 * result + message.hashCode();
+    return result;
   }
 
   @Override

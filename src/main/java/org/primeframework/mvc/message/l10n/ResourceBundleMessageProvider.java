@@ -25,8 +25,6 @@ import java.util.ResourceBundle.Control;
 
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
-import org.primeframework.mvc.message.FieldMessage;
-import org.primeframework.mvc.message.Message;
 
 import com.google.inject.Inject;
 
@@ -68,38 +66,12 @@ public class ResourceBundleMessageProvider implements MessageProvider {
   }
 
   @Override
-  public Message getMessage(String key, Object... values) throws MissingMessageException {
+  public String getMessage(String key, Object... values) throws MissingMessageException {
     ActionInvocation actionInvocation = invocationStore.getCurrent();
     String template = findMessage(actionInvocation.actionURI(), key);
     Formatter f = new Formatter();
     f.format(locale, template, values);
-    final String message = f.out().toString();
-    return new Message() {
-      @Override
-      public String toString() {
-        return message;
-      }
-    };
-  }
-
-  @Override
-  public FieldMessage getFieldMessage(final String field, String key, Object... values) throws MissingMessageException {
-    ActionInvocation actionInvocation = invocationStore.getCurrent();
-    String template = findMessage(actionInvocation.actionURI(), key);
-    Formatter f = new Formatter();
-    f.format(locale, template, values);
-    final String message = f.out().toString();
-    return new FieldMessage() {
-      @Override
-      public String getField() {
-        return field;
-      }
-
-      @Override
-      public String toString() {
-        return message;
-      }
-    };
+    return f.out().toString();
   }
 
   /**

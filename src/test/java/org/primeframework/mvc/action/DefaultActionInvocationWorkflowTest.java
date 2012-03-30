@@ -20,7 +20,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
-import org.easymock.Capture;
 import org.example.action.ExecuteMethodThrowsCheckedException;
 import org.example.action.ExecuteMethodThrowsException;
 import org.example.action.ExtensionInheritance;

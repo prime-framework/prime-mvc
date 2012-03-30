@@ -17,11 +17,12 @@ package org.primeframework.mvc.message;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.primeframework.mvc.message.scope.MessageScope;
 import org.primeframework.mvc.message.scope.Scope;
-import org.primeframework.mvc.message.scope.ScopeProvider;
 
 import com.google.inject.Inject;
 
@@ -32,36 +33,35 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 public class DefaultMessageStore implements MessageStore {
-  private final ScopeProvider scopeProvider;
+  private final Map<MessageScope, Scope> scopes;
 
   @Inject
-  public DefaultMessageStore(ScopeProvider scopeProvider) {
-    this.scopeProvider = scopeProvider;
+  public DefaultMessageStore(Map<MessageScope, Scope> scopes) {
+    this.scopes = scopes;
   }
 
   @Override
   public void add(Message message) {
-    Scope scope = scopeProvider.lookup(MessageScope.REQUEST);
+    Scope scope = scopes.get(MessageScope.REQUEST);
     scope.add(message);
   }
 
   @Override
   public void add(MessageScope scope, Message message) {
-    Scope s = scopeProvider.lookup(scope);
+    Scope s = scopes.get(scope);
     s.add(message);
   }
 
   @Override
   public void addAll(MessageScope scope, Collection<Message> messages) {
-    Scope s = scopeProvider.lookup(scope);
+    Scope s = scopes.get(scope);
     s.addAll(messages);
   }
 
   @Override
   public List<Message> get() {
     List<Message> messages = new ArrayList<Message>();
-    List<Scope> scopes = scopeProvider.getAllScopes();
-    for (Scope scope : scopes) {
+    for (Scope scope : scopes.values()) {
       messages.addAll(scope.get());
     }
     return messages;
@@ -70,8 +70,48 @@ public class DefaultMessageStore implements MessageStore {
   @Override
   public List<Message> get(MessageScope scope) {
     List<Message> messages = new ArrayList<Message>();
-    Scope s = scopeProvider.lookup(scope);
+    Scope s = scopes.get(scope);
     messages.addAll(s.get());
     return messages;
+  }
+
+  @Override
+  public Map<String, List<FieldMessage>> getFieldMessages() {
+    List<Message> messages = get();
+    Map<String, List<FieldMessage>> map = new HashMap<String, List<FieldMessage>>();
+    for (Message message : messages) {
+      if (message instanceof FieldMessage) {
+        FieldMessage fm = (FieldMessage) message;
+        List<FieldMessage> list = map.get(fm.getField());
+        if (list == null) {
+          list = new ArrayList<FieldMessage>();
+          map.put(fm.getField(), list);
+        }
+
+        list.add(fm);
+      }
+    }
+
+    return map;
+  }
+
+  @Override
+  public Map<String, List<FieldMessage>> getFieldMessages(MessageScope scope) {
+    List<Message> messages = get(scope);
+    Map<String, List<FieldMessage>> map = new HashMap<String, List<FieldMessage>>();
+    for (Message message : messages) {
+      if (message instanceof FieldMessage) {
+        FieldMessage fm = (FieldMessage) message;
+        List<FieldMessage> list = map.get(fm.getField());
+        if (list == null) {
+          list = new ArrayList<FieldMessage>();
+          map.put(fm.getField(), list);
+        }
+
+        list.add(fm);
+      }
+    }
+
+    return map;
   }
 }

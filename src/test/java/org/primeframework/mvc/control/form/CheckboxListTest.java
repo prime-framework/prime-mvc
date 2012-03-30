@@ -25,6 +25,7 @@ import org.example.domain.Address;
 import org.example.domain.User;
 import org.primeframework.mvc.action.DefaultActionInvocation;
 import org.primeframework.mvc.control.ControlBaseTest;
+import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.testng.annotations.Test;
 
@@ -156,8 +157,8 @@ public class CheckboxListTest extends ControlBaseTest {
     action.user.setAddress("work", address);
 
     ais.setCurrent(new DefaultActionInvocation(action, "/checkbox-list", null, null));
-    messageStore.add(new SimpleFieldMessage("user.addresses['work'].country", "Country is required"));
-    messageStore.add(new SimpleFieldMessage("user.addresses['work'].country", "Country must be cool"));
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "Country is required"));
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "Country must be cool"));
 
     new ControlTester(checkboxList).
       attr("name", "user.addresses['work'].country").

@@ -21,10 +21,33 @@ package org.primeframework.mvc.message;
  * @author Brian Pontarelli
  */
 public class SimpleMessage implements Message {
+  public final MessageType type;
   public final String message;
 
-  public SimpleMessage(String message) {
+  public SimpleMessage(MessageType type, String message) {
+    this.type = type;
     this.message = message;
+  }
+
+  @Override
+  public MessageType getType() {
+    return type;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    final SimpleMessage that = (SimpleMessage) o;
+    return message.equals(that.message) && type.equals(that.type);
+  }
+
+  @Override
+  public int hashCode() {
+    int result = type.hashCode();
+    result = 31 * result + message.hashCode();
+    return result;
   }
 
   @Override

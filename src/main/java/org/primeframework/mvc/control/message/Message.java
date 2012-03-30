@@ -68,18 +68,14 @@ public class Message extends AbstractControl implements TemplateMethodModel {
       values = new ArrayList();
     }
 
-    org.primeframework.mvc.message.Message message;
+    String message;
     try {
       message = messageProvider.getMessage(key, values.toArray());
     } catch (MissingMessageException e) {
-      message = new org.primeframework.mvc.message.Message() {
-        public String toString() {
-          return defaultMesg;
-        }
-      };
+      message = defaultMesg;
     }
 
-    if (message.toString() == null) {
+    if (message == null) {
       throw new IllegalStateException("The message for the key [" + key + "] is missing and " +
         "there was no default set using the [default] attribute.");
     }
@@ -103,8 +99,7 @@ public class Message extends AbstractControl implements TemplateMethodModel {
     }
 
     String key = (String) arguments.get(0);
-    org.primeframework.mvc.message.Message message = messageProvider.getMessage(key, arguments.subList(1, arguments.size()).toArray());
-    return message.toString();
+    return messageProvider.getMessage(key, arguments.subList(1, arguments.size()).toArray());
   }
 
   @Override

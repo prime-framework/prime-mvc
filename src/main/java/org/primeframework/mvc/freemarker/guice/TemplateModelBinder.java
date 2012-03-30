@@ -56,7 +56,7 @@ public class TemplateModelBinder {
     private final Binder binder;
     private final Class<? extends TemplateModel> modelType;
 
-    public TemplateModelNameBinder(Binder binder, Class<? extends TemplateModel> modelType) {
+    private TemplateModelNameBinder(Binder binder, Class<? extends TemplateModel> modelType) {
       this.binder = binder;
       this.modelType = modelType;
     }

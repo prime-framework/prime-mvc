@@ -16,6 +16,7 @@
 package org.primeframework.mvc.util;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -24,8 +25,12 @@ import java.util.Map;
  * @author Brian Pontarelli
  */
 public class MapBuilder<T,U> {
-  public final Map<T,U> map = new HashMap<T, U>();
+  public final Map<T,U> map = new LinkedHashMap<T, U>();
   
+  public static <T,U> MapBuilder<T,U> map() {
+    return new MapBuilder<T, U>();
+  }
+
   public static <T,U> MapBuilder<T,U> map(T key, U value) {
     return new MapBuilder<T, U>(key, value);
   }
@@ -43,10 +48,13 @@ public class MapBuilder<T,U> {
     return map;
   }
 
+  public MapBuilder() {
+  }
+
   public MapBuilder(T key, U value) {
     map.put(key, value);
   }
-  
+
   public MapBuilder<T,U> put(T key, U value) {
     map.put(key, value);
     return this;

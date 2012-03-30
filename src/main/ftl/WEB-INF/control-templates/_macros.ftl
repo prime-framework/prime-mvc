@@ -19,7 +19,7 @@
 [/#macro]
 
 [#macro label text fieldMessages required=false]
-  [#assign hasFieldErrors = fieldMessages?? && fieldMessages?size > 0/]
+  [#assign hasFieldErrors = fieldMessages?size > 0/]
   <label for="${attributes['id']}" class="label">[#t/]
     [#if hasFieldErrors]<span class="error">[/#if][#t/]
     ${text}[#t/]

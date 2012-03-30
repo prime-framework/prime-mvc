@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.parameter.guice;
+package org.primeframework.mvc.parameter.convert.guice;
 
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
 
@@ -51,7 +51,7 @@ public class GlobalConverterBinder {
     private final Binder binder;
     private final Class<? extends GlobalConverter> converterType;
 
-    public GlobalConverterTypeBinder(Binder binder, Class<? extends GlobalConverter> converterType) {
+    private GlobalConverterTypeBinder(Binder binder, Class<? extends GlobalConverter> converterType) {
       this.binder = binder;
       this.converterType = converterType;
     }

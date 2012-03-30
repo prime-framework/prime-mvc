@@ -21,4 +21,8 @@ package org.primeframework.mvc.message;
  * @author Brian Pontarelli
  */
 public interface Message {
+  /**
+   * @return The type of the message.
+   */
+  MessageType getType();
 }

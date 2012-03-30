@@ -16,39 +16,38 @@
 package org.primeframework.mvc.message.scope;
 
 /**
- * This class contains the various scopes that messages can be stored in the MessageStore.
+ * Defines a message scope that a message can be stored in the MessageStore under. This interface also defines the
+ * implementation of the {@link Scope} that handles the storing and retrieving.
  *
  * @author Brian Pontarelli
  */
-public enum MessageScope {
+public interface MessageScope {
   /**
    * The request scope, when messages are stored in the request.
    */
-  REQUEST(RequestScope.class),
+  MessageScope REQUEST = new PrimeMessageScope(){};
 
   /**
    * The flash scope, when messages are stored in the session, but are only available on the next request.
    */
-  FLASH(FlashScope.class),
+  MessageScope FLASH = new PrimeMessageScope(){};
 
   /**
    * The session scope, when messages are stored in the session.
    */
-  SESSION(SessionScope.class),
+  MessageScope SESSION = new PrimeMessageScope(){};
 
   /**
    * The servlet context (application) scope, when messages are stored in the servlet context. Useful for messages that
    * should be displayed to all users.
    */
-  APPLICATION(ApplicationScope.class);
+  MessageScope APPLICATION = new PrimeMessageScope(){};
 
-  private final Class<? extends Scope> type;
-
-  private MessageScope(Class<? extends Scope> type) {
-    this.type = type;
-  }
-
-  public Class<? extends Scope> getType() {
-    return type;
+  /**
+   * Internal implementation for the Prime scopes.
+   */
+  class PrimeMessageScope implements MessageScope {
+    private PrimeMessageScope() {
+    }
   }
 }

@@ -19,6 +19,7 @@ import org.example.action.user.Edit;
 import org.example.domain.User;
 import org.primeframework.mvc.action.DefaultActionInvocation;
 import org.primeframework.mvc.control.ControlBaseTest;
+import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.testng.annotations.Test;
 
@@ -71,8 +72,8 @@ public class PasswordTest extends ControlBaseTest {
 
     ais.setCurrent(new DefaultActionInvocation(edit, "/password", null, null));
 
-    messageStore.add(new SimpleFieldMessage("user.password", "fieldError1"));
-    messageStore.add(new SimpleFieldMessage("user.password", "fieldError2"));
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.password", "fieldError1"));
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.password", "fieldError2"));
 
     new ControlTester(password).
       attr("name", "user.password").

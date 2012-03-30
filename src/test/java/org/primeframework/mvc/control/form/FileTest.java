@@ -18,6 +18,7 @@ package org.primeframework.mvc.control.form;
 import org.example.action.user.Edit;
 import org.primeframework.mvc.action.DefaultActionInvocation;
 import org.primeframework.mvc.control.ControlBaseTest;
+import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.testng.annotations.Test;
 
@@ -79,8 +80,8 @@ public class FileTest extends ControlBaseTest {
     Edit action = new Edit();
     ais.setCurrent(new DefaultActionInvocation(action, "/file", null, null));
 
-    messageStore.add(new SimpleFieldMessage("user.profile", "fieldError1"));
-    messageStore.add(new SimpleFieldMessage("user.profile", "fieldError2"));
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.profile", "fieldError1"));
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.profile", "fieldError2"));
 
     new ControlTester(file).
       attr("name", "user.profile").

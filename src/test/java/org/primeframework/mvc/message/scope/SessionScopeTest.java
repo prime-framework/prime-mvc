@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.primeframework.mvc.message.Message;
+import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleMessage;
 import org.testng.annotations.Test;
 
@@ -38,7 +39,7 @@ public class SessionScopeTest {
   @Test
   public void get() {
     HttpSession session = createStrictMock(HttpSession.class);
-    expect(session.getAttribute(SessionScope.KEY)).andReturn(asList(new SimpleMessage("Test message")));
+    expect(session.getAttribute(SessionScope.KEY)).andReturn(asList(new SimpleMessage(MessageType.ERROR, "Test message")));
     replay(session);
 
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
@@ -66,7 +67,7 @@ public class SessionScopeTest {
     replay(request);
 
     SessionScope scope = new SessionScope(request);
-    scope.add(new SimpleMessage("Foo"));
+    scope.add(new SimpleMessage(MessageType.ERROR, "Foo"));
     assertEquals(messages.size(), 1);
     assertEquals(messages.get(0).toString(), "Foo");
 
@@ -86,7 +87,7 @@ public class SessionScopeTest {
     replay(request);
 
     SessionScope scope = new SessionScope(request);
-    scope.addAll(Arrays.<Message>asList(new SimpleMessage("Foo"), new SimpleMessage("Bar")));
+    scope.addAll(Arrays.<Message>asList(new SimpleMessage(MessageType.ERROR, "Foo"), new SimpleMessage(MessageType.ERROR, "Bar")));
     assertEquals(messages.size(), 2);
     assertEquals(messages.get(0).toString(), "Foo");
     assertEquals(messages.get(1).toString(), "Bar");

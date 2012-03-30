@@ -26,8 +26,9 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.config.MVCConfiguration;
-import org.primeframework.mvc.message.FieldMessage;
 import org.primeframework.mvc.message.MessageStore;
+import org.primeframework.mvc.message.MessageType;
+import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.parameter.ParameterParser.Parameters;
 import org.primeframework.mvc.parameter.ParameterParser.Parameters.Struct;
@@ -121,8 +122,8 @@ public class DefaultParameterHandler implements ParameterHandler {
       try {
         expressionEvaluator.setValue(key, action, struct.values, struct.attributes);
       } catch (ConversionException ce) {
-        FieldMessage message = messageProvider.getFieldMessage(key, key + ".conversionError", (Object[]) struct.values);
-        messageStore.add(message);
+        String message = messageProvider.getMessage(key + ".conversionError", (Object[]) struct.values);
+        messageStore.add(new SimpleFieldMessage(MessageType.ERROR, key, message));
       } catch (ExpressionException ee) {
         if (!allowUnknownParameters) {
           throw ee;
@@ -158,8 +159,8 @@ public class DefaultParameterHandler implements ParameterHandler {
         
         long fileSize = info.file.length();
         if (fileSize > maxSize) {
-          FieldMessage message = messageProvider.getFieldMessage(key, key + ".fileUploadSizeError", fileSize, maxSize);
-          messageStore.add(message);
+          String message = messageProvider.getMessage(key + ".fileUploadSizeError", fileSize, maxSize);
+          messageStore.add(new SimpleFieldMessage(MessageType.ERROR, key, message));
           i.remove();
         }
 
@@ -170,8 +171,8 @@ public class DefaultParameterHandler implements ParameterHandler {
 
         String contentType = info.contentType;
         if (!ArrayUtils.contains(allowedContentTypes, contentType)) {
-          FieldMessage message = messageProvider.getFieldMessage(key, key + ".fileUploadContentTypeError", contentType, allowedContentTypes);
-          messageStore.add(message);
+          String message = messageProvider.getMessage(key + ".fileUploadContentTypeError", contentType, allowedContentTypes);
+          messageStore.add(new SimpleFieldMessage(MessageType.ERROR, key, message));
           i.remove();
         }
       }

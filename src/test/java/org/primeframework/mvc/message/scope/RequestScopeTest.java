@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.primeframework.mvc.message.Message;
+import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleMessage;
 import org.testng.annotations.Test;
 
@@ -37,7 +38,7 @@ public class RequestScopeTest {
   @Test
   public void get() {
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    expect(request.getAttribute(RequestScope.KEY)).andReturn(asList(new SimpleMessage("Test message")));
+    expect(request.getAttribute(RequestScope.KEY)).andReturn(asList(new SimpleMessage(MessageType.ERROR, "Test message")));
     replay(request);
 
     RequestScope scope = new RequestScope(request);
@@ -57,7 +58,7 @@ public class RequestScopeTest {
     replay(request);
 
     RequestScope scope = new RequestScope(request);
-    scope.add(new SimpleMessage("Foo"));
+    scope.add(new SimpleMessage(MessageType.ERROR, "Foo"));
     assertEquals(messages.size(), 1);
     assertEquals(messages.get(0).toString(), "Foo");
 
@@ -73,7 +74,7 @@ public class RequestScopeTest {
     replay(request);
 
     RequestScope scope = new RequestScope(request);
-    scope.addAll(Arrays.<Message>asList(new SimpleMessage("Foo"), new SimpleMessage("Bar")));
+    scope.addAll(Arrays.<Message>asList(new SimpleMessage(MessageType.ERROR, "Foo"), new SimpleMessage(MessageType.ERROR, "Bar")));
     assertEquals(messages.size(), 2);
     assertEquals(messages.get(0).toString(), "Foo");
     assertEquals(messages.get(1).toString(), "Bar");

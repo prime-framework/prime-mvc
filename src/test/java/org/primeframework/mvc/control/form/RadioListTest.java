@@ -25,6 +25,7 @@ import org.example.domain.Address;
 import org.example.domain.User;
 import org.primeframework.mvc.action.DefaultActionInvocation;
 import org.primeframework.mvc.control.ControlBaseTest;
+import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.testng.annotations.Test;
 
@@ -160,8 +161,8 @@ public class RadioListTest extends ControlBaseTest {
     action.user.setAddress("work", address);
 
     ais.setCurrent(new DefaultActionInvocation(action, "/radio-list", null, null));
-    messageStore.add(new SimpleFieldMessage("user.addresses['work'].country", "fieldError1"));
-    messageStore.add(new SimpleFieldMessage("user.addresses['work'].country", "fieldError2"));
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "fieldError1"));
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "fieldError2"));
 
     new ControlTester(radioList).
       attr("name", "user.addresses['work'].country").
@@ -190,8 +191,8 @@ public class RadioListTest extends ControlBaseTest {
     action.user.setAddress("work", address);
 
     ais.setCurrent(new DefaultActionInvocation(action, "/radio-list", null, null));
-    messageStore.add(new SimpleFieldMessage("user.addresses['work'].country", "fieldError1"));
-    messageStore.add(new SimpleFieldMessage("user.addresses['work'].country", "fieldError2"));
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "fieldError1"));
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "fieldError2"));
 
     new ControlTester(radioList).
       attr("name", "user.addresses['work'].country").

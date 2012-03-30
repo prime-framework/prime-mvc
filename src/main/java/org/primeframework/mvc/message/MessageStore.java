@@ -17,6 +17,7 @@ package org.primeframework.mvc.message;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.primeframework.mvc.message.scope.MessageScope;
 
@@ -30,7 +31,7 @@ import com.google.inject.ImplementedBy;
 @ImplementedBy(DefaultMessageStore.class)
 public interface MessageStore {
   /**
-   * Adds the given message to the request scope.
+   * Adds the given message to the request scope as an error message.
    *
    * @param message The message.
    */
@@ -62,4 +63,15 @@ public interface MessageStore {
    * @return All of the messages in the scope.
    */
   List<Message> get(MessageScope scope);
+
+  /**
+   * @return All of the fields messages in all the scopes. This Map is not live.
+   */
+  Map<String, List<FieldMessage>> getFieldMessages();
+
+  /**
+   * @param scope The scope.
+   * @return All of the fields messages in the given scope. This Map is not live.
+   */
+  Map<String, List<FieldMessage>> getFieldMessages(MessageScope scope);
 }

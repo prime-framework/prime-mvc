@@ -20,8 +20,6 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.primeframework.mvc.message.EmptyMessage;
-import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 
@@ -69,12 +67,12 @@ public abstract class AbstractListInput extends AbstractInput {
     String headerValue = (String) attributes.remove("headerValue");
     String headerL10n = (String) attributes.remove("headerL10n");
     if (headerValue != null) {
-      Message message = new EmptyMessage();
+      String message = "";
       if (headerL10n != null) {
         message = messageProvider.getMessage(headerL10n);
       }
 
-      options.put(headerValue, new Option(message.toString(), false));
+      options.put(headerValue, new Option(message, false));
     }
 
     // Grab the value
@@ -139,9 +137,9 @@ public abstract class AbstractListInput extends AbstractInput {
     if (l10nExpr != null) {
       Object l10nKey = expressionEvaluator.getValue(l10nExpr, itemsValue);
       if (l10nKey != null) {
-        Message message = messageProvider.getMessage(l10nKey.toString());
+        String message = messageProvider.getMessage(l10nKey.toString());
         if (message != null) {
-          text = message.toString();
+          text = message;
         }
       }
     }

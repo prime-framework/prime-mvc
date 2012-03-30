@@ -15,9 +15,6 @@
  */
 package org.primeframework.mvc.message.l10n;
 
-import org.primeframework.mvc.message.FieldMessage;
-import org.primeframework.mvc.message.Message;
-
 import com.google.inject.ImplementedBy;
 
 /**
@@ -29,25 +26,13 @@ import com.google.inject.ImplementedBy;
 @ImplementedBy(ResourceBundleMessageProvider.class)
 public interface MessageProvider {
   /**
-   * Finds a message with the given key and for the given locale. This should then process the message using the
-   * attributes and values given in order to token replace and format the message correctly.
+   * Finds an untyped message with the given key and for the current locale. This should then process the message using
+   * the attributes and values given in order to token replace and format the message correctly.
    *
    * @param key    The key of the message.
    * @param values Any additional values for the message.
    * @return The message.
    * @throws MissingMessageException If the message is missing.
    */
-  Message getMessage(String key, Object... values) throws MissingMessageException;
-
-  /**
-   * Finds a field message with the given key and for the given locale. This should then process the message using the
-   * attributes and values given in order to token replace and format the message correctly.
-   *
-   * @param field  The name of the field.
-   * @param key    The key of the message.
-   * @param values Any additional values for the message.
-   * @return The message.
-   * @throws MissingMessageException If the message is missing.
-   */
-  FieldMessage getFieldMessage(String field, String key, Object... values) throws MissingMessageException;
+  String getMessage(String key, Object... values) throws MissingMessageException;
 }

@@ -33,7 +33,6 @@ import org.primeframework.mvc.parameter.convert.converters.LocalDateConverter;
 import org.primeframework.mvc.parameter.convert.converters.LocaleConverter;
 import org.primeframework.mvc.parameter.convert.converters.NumberConverter;
 import org.primeframework.mvc.parameter.convert.converters.StringConverter;
-import org.primeframework.mvc.parameter.guice.GlobalConverterBinder;
 
 import com.google.inject.AbstractModule;
 
