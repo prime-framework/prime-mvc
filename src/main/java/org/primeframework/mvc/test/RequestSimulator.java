@@ -66,6 +66,7 @@ public class RequestSimulator {
    * @throws ServletException If the initialization of the PrimeServletContextListener failed.
    */
   public RequestSimulator(final MockServletContext context, Module... modules) throws ServletException {
+    ServletObjectsHolder.setServletContext(context);
     this.context = context;
     this.session = new MockHttpSession(this.context);
     this.injector = GuiceBootstrap.initialize(modules);

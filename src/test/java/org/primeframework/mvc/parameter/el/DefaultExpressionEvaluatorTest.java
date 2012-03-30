@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.example.action.ExtensionInheritance;
 import org.example.domain.Action;
 import org.example.domain.ActionField;
 import org.example.domain.Address;
@@ -46,7 +47,7 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     this.evaluator = evaluator;
   }
 
-  @Test(enabled = true)
+  @Test
   public void charArrayCachePerformance() {
     // On a MacBook Pro Quad core the cache is slower by 5 milliseconds for 1 million iterations.
     String expression = "user.address['work'].city";
@@ -372,6 +373,13 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
 
     evaluator.setValue("interface.name", bean, "Brian Pontarelli");
     assertEquals(evaluator.getValue("interface.name", bean), "Brian Pontarelli");
+  }
+
+  @Test
+  public void fieldInheritance() {
+    ExtensionInheritance object = new ExtensionInheritance();
+    object.baseField = "bar";
+    assertEquals(evaluator.getValue("baseField", object), "bar");
   }
 
   @Test(enabled = false)

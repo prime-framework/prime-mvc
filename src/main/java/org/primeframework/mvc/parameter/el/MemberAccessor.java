@@ -46,7 +46,7 @@ public class MemberAccessor extends Accessor {
     if (bpi == null) {
       this.propertyInfo = null;
       try {
-        this.field = declaringClass.getDeclaredField(name);
+        this.field = declaringClass.getField(name);
       } catch (NoSuchFieldException e) {
         // We did our best and now we have to bail on the field
         this.field = null;

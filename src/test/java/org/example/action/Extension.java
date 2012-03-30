@@ -24,6 +24,7 @@ import org.primeframework.mvc.action.annotation.Action;
  */
 @Action
 public abstract class Extension {
+  public String baseField;
   public boolean baseInvoked = false;
 
   public String json() {
