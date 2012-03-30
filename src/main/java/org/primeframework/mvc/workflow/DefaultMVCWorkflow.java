@@ -42,12 +42,13 @@ import static java.util.Arrays.*;
  * @author Brian Pontarelli
  */
 public class DefaultMVCWorkflow implements MVCWorkflow {
+  private final ExceptionTranslator exceptionTranslator;
   private final ResultStore resultStore;
   private final List<Workflow> workflows;
   private final List<Workflow> errorWorkflows;
 
   @Inject
-  public DefaultMVCWorkflow(ResultStore resultStore,
+  public DefaultMVCWorkflow(ResultStore resultStore, ExceptionTranslator exceptionTranslator,
                             RequestBodyWorkflow requestBodyWorkflow,
                             StaticResourceWorkflow staticResourceWorkflow,
                             ActionMappingWorkflow actionMappingWorkflow,
@@ -60,6 +61,7 @@ public class DefaultMVCWorkflow implements MVCWorkflow {
                             ScopeStorageWorkflow scopeStorageWorkflow,
                             ResultInvocationWorkflow resultInvocationWorflow) {
     this.resultStore = resultStore;
+    this.exceptionTranslator = exceptionTranslator;
     workflows = asList(requestBodyWorkflow, staticResourceWorkflow, actionMappingWorkflow, scopeRetrievalWorkflow,
       messageWorkflow, uriParameterWorkflow, parameterWorkflow, validationWorkflow, actionInvocationWorkflow,
       scopeStorageWorkflow, resultInvocationWorflow);
@@ -78,8 +80,8 @@ public class DefaultMVCWorkflow implements MVCWorkflow {
     try {
       SubWorkflowChain subChain = new SubWorkflowChain(workflows, chain);
       subChain.continueWorkflow();
-    } catch (ErrorException e) {
-      resultStore.set(e.resultCode);
+    } catch (Throwable t) {
+      resultStore.set(exceptionTranslator.translate(t));
       SubWorkflowChain errorChain = new SubWorkflowChain(errorWorkflows, chain);
       errorChain.continueWorkflow();
     }
