@@ -122,7 +122,7 @@ public class DefaultParameterHandler implements ParameterHandler {
       try {
         expressionEvaluator.setValue(key, action, struct.values, struct.attributes);
       } catch (ConversionException ce) {
-        String message = messageProvider.getMessage(key + ".conversionError", (Object[]) struct.values);
+        String message = messageProvider.getMessage("[ConversionError]" + key, (Object[]) struct.values);
         messageStore.add(new SimpleFieldMessage(MessageType.ERROR, key, message));
       } catch (ExpressionException ee) {
         if (!allowUnknownParameters) {
@@ -159,7 +159,7 @@ public class DefaultParameterHandler implements ParameterHandler {
         
         long fileSize = info.file.length();
         if (fileSize > maxSize) {
-          String message = messageProvider.getMessage(key + ".fileUploadSizeError", fileSize, maxSize);
+          String message = messageProvider.getMessage("[FileUploadSize]" + key, fileSize, maxSize);
           messageStore.add(new SimpleFieldMessage(MessageType.ERROR, key, message));
           i.remove();
         }
@@ -171,7 +171,7 @@ public class DefaultParameterHandler implements ParameterHandler {
 
         String contentType = info.contentType;
         if (!ArrayUtils.contains(allowedContentTypes, contentType)) {
-          String message = messageProvider.getMessage(key + ".fileUploadContentTypeError", contentType, allowedContentTypes);
+          String message = messageProvider.getMessage("[FileUploadContentType]" + key, contentType, allowedContentTypes);
           messageStore.add(new SimpleFieldMessage(MessageType.ERROR, key, message));
           i.remove();
         }
