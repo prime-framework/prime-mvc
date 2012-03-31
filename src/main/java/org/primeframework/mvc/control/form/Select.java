@@ -45,6 +45,9 @@ public class Select extends AbstractListInput {
     super(true);
   }
 
+  /**
+   * @return select
+   */
   @Override
   public String getName() {
     return "select";

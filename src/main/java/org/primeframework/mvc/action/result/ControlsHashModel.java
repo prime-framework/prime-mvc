@@ -25,6 +25,7 @@ import java.util.Set;
 import org.primeframework.mvc.control.Control;
 import org.primeframework.mvc.control.FreeMarkerControlProxy;
 import org.primeframework.mvc.freemarker.FieldSupportBeansWrapper;
+import org.primeframework.mvc.freemarker.FreeMarkerRenderException;
 
 import freemarker.ext.beans.CollectionModel;
 import freemarker.template.TemplateCollectionModel;
@@ -59,7 +60,12 @@ public class ControlsHashModel implements TemplateHashModelEx {
   }
 
   public TemplateModel get(String key) {
-    return new FreeMarkerControlProxy(controls.get(key));
+    Control control = controls.get(key);
+    if (control == null) {
+      throw new FreeMarkerRenderException("Prime control named [" + key + "] doesn't exist. Currently registered controls are " + controls.keySet());
+    }
+
+    return new FreeMarkerControlProxy(control);
   }
 
   public TemplateCollectionModel values() {

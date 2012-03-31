@@ -45,6 +45,14 @@ import org.primeframework.mvc.control.annotation.ControlAttributes;
 )
 public class YearsSelect extends Select {
   /**
+   * @return years_select
+   */
+  @Override
+  public String getName() {
+    return "years_select";
+  }
+
+  /**
    * Calls super then adds the years Map.
    */
   @Override
