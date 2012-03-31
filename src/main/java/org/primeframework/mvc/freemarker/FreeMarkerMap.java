@@ -29,6 +29,7 @@ import java.util.Deque;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -37,6 +38,8 @@ import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.ControlsHashModel;
 import org.primeframework.mvc.action.result.ModelsHashModel;
 import org.primeframework.mvc.control.Control;
+import org.primeframework.mvc.message.FieldMessage;
+import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.parameter.el.ExpressionException;
@@ -66,7 +69,9 @@ public class FreeMarkerMap implements TemplateHashModelEx {
   public static final String APPLICATION_MODEL = "Application";
   public static final String APPLICATION = "application";
   public static final String JSP_TAGLIBS = "JspTaglibs";
-  public static final String MESSAGES = "messages";
+  public static final String ALL_MESSAGES = "allMessages";
+  public static final String FIELD_MESSAGES = "fieldMessages";
+  public static final String NON_FIELD_MESSAGES = "nonFieldMessages";
 
   private final HttpServletRequest request;
   private final ExpressionEvaluator expressionEvaluator;
@@ -112,7 +117,17 @@ public class FreeMarkerMap implements TemplateHashModelEx {
     }, FieldSupportBeansWrapper.INSTANCE));
     objects.put(APPLICATION, context);
     objects.put(JSP_TAGLIBS, new TaglibFactory(context));
-    objects.put(MESSAGES, messageStore.get());
+
+    List<Message> allMessages = messageStore.get();
+    Map<String, List<FieldMessage>> fieldMessages = messageStore.getFieldMessages();
+    List<Message> nonFieldMessages = new ArrayList<Message>(allMessages);
+    for (List<FieldMessage> messages : fieldMessages.values()) {
+      nonFieldMessages.removeAll(messages);
+    }
+
+    objects.put(ALL_MESSAGES, allMessages);
+    objects.put(FIELD_MESSAGES, fieldMessages);
+    objects.put(NON_FIELD_MESSAGES, nonFieldMessages);
 
     // Add the controls
     for (String prefix : controlSets.keySet()) {
@@ -127,6 +142,7 @@ public class FreeMarkerMap implements TemplateHashModelEx {
     // TODO add debugging for figuring out what scope an object is in
   }
 
+  @Override
   public int size() {
     int size = objects.size() + count(request.getAttributeNames());
 
@@ -149,10 +165,12 @@ public class FreeMarkerMap implements TemplateHashModelEx {
     return size;
   }
 
+  @Override
   public boolean isEmpty() {
     return size() > 0;
   }
 
+  @Override
   public TemplateModel get(String key) {
     // First check the action
     Object value = null;
@@ -203,6 +221,7 @@ public class FreeMarkerMap implements TemplateHashModelEx {
     }
   }
 
+  @Override
   public TemplateCollectionModel keys() {
     Set<String> keys = new HashSet<String>(objects.keySet());
     keys.addAll(enumToSet(request.getAttributeNames()));
@@ -228,6 +247,7 @@ public class FreeMarkerMap implements TemplateHashModelEx {
     return new CollectionModel(keys, FieldSupportBeansWrapper.INSTANCE);
   }
 
+  @Override
   public TemplateCollectionModel values() {
     Collection<Object> values = new ArrayList<Object>(objects.values());
     Deque<ActionInvocation> actionInvocations = actionInvocationStore.getDeque();

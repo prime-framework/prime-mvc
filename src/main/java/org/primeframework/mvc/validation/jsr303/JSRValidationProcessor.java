@@ -83,8 +83,10 @@ public class JSRValidationProcessor implements ValidationProcessor {
 
       messageStore.add(new SimpleFieldMessage(MessageType.ERROR, propertyPath, message));
     }
-    
-    if (violations.size() > 0) {
+
+    // If there are any messages, throw an exception. This will handle the violations that were transferred to the
+    // MessageStore as well as the conversion errors
+    if (messageStore.get().size() > 0) {
       throw new ValidationException();
     }
   }

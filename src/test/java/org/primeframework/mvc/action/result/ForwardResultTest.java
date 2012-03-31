@@ -36,6 +36,7 @@ import org.primeframework.mvc.control.Control;
 import org.primeframework.mvc.freemarker.FreeMarkerMap;
 import org.primeframework.mvc.freemarker.FreeMarkerService;
 import org.primeframework.mvc.freemarker.NamedTemplateModel;
+import org.primeframework.mvc.message.FieldMessage;
 import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
@@ -235,6 +236,7 @@ public class ForwardResultTest {
     List<Message> messages = new ArrayList<Message>();
     MessageStore messageStore = createStrictMock(MessageStore.class);
     expect(messageStore.get()).andReturn(messages);
+    expect(messageStore.getFieldMessages()).andReturn(new HashMap<String, List<FieldMessage>>());
     replay(messageStore);
 
     Forward forward = new ForwardResult.ForwardImpl("", "failure");

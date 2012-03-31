@@ -30,6 +30,8 @@ import org.primeframework.mvc.action.config.DefaultActionConfiguration;
 import org.primeframework.mvc.message.FieldMessage;
 import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;
+import org.primeframework.mvc.message.MessageType;
+import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.primeframework.mvc.validation.ValidationException;
 import org.testng.annotations.Test;
 
@@ -95,6 +97,41 @@ public class JSRValidationProcessorTest extends PrimeBaseTest {
       assertEquals(map.get("user.addresses['home'].state").toString(), "Required");
       assertEquals(map.get("user.addresses['home'].street").toString(), "Required");
       assertEquals(map.get("user.addresses['home'].zipcode").toString(), "Required");
+    }
+  }
+
+  @Test
+  public void failureFromPrevious() {
+    request.setMethod(Method.POST);
+
+    Edit edit = new Edit();
+    edit.user = new User();
+    edit.user.setAge(35);
+    edit.user.setName("Brian Pontarelli");
+    edit.user.setSecurityQuestions("One", "Two");
+    Address address = new Address();
+    address.setCity("Broomfield");
+    address.setCountry("US");
+    address.setState("CO");
+    address.setStreet("7050 W. 120th Suite 202");
+    address.setZipcode("80020");
+    edit.user.setAddress("home", address);
+
+    // Add a previous error
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "test", "failure"));
+
+    store.setCurrent(new DefaultActionInvocation(edit, "/user/edit", "", new DefaultActionConfiguration(Edit.class, "/user/edit")));
+    try {
+      processor.validate();
+      fail("Should have failed");
+    } catch (ValidationException e) {
+      List<Message> messages = messageStore.get();
+      Map<String, FieldMessage> map = new HashMap<String, FieldMessage>();
+      for (Message message : messages) {
+        map.put(((FieldMessage) message).getField(), (FieldMessage) message);
+      }
+      assertEquals(map.size(), 1);
+      assertEquals(map.get("test").toString(), "failure");
     }
   }
 }
