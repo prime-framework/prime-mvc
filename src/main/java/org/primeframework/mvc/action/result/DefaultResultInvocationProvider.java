@@ -106,8 +106,7 @@ public class DefaultResultInvocationProvider implements ResultInvocationProvider
 
     Annotation annotation = forwardResult.defaultResult(invocation, resultCode);
     if (annotation == null) {
-      throw new RuntimeException("Unable to locate result for URI [" + invocation.uri() +
-        "] and result code [" + resultCode + "]");
+      throw new RuntimeException("Unable to locate result for URI [" + invocation.uri() + "] and result code [" + resultCode + "]");
     }
 
     return new DefaultResultInvocation(annotation, uri, resultCode);

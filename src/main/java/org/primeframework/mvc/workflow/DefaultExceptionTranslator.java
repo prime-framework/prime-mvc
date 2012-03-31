@@ -42,9 +42,14 @@ public class DefaultExceptionTranslator implements ExceptionTranslator {
    */
   @Override
   public String translate(RuntimeException e) {
-    if (handlableExceptions.contains(e.getClass())) {
-      return (e instanceof ErrorException) ? ((ErrorException) e).resultCode : "error";
-    }
+    Class<?> type = e.getClass();
+    do  {
+      if (handlableExceptions.contains(type)) {
+        return (e instanceof ErrorException) ? ((ErrorException) e).resultCode : "error";
+      }
+
+      type = type.getSuperclass();
+    } while (type != Exception.class);
 
     return null;
   }

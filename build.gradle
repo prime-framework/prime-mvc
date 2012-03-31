@@ -59,7 +59,7 @@ dependencies {
     "joda-time:joda-time:2.1",
     "org.apache.commons:commons-lang3:3.0.1",
     "org.freemarker:freemarker:2.3.16",
-    "org.primeframework:prime-mock:0.1"
+    "org.primeframework:prime-mock:0.2-SNAPSHOT"
   )
   testCompile(
     "org.easymock:easymock:3.1",
@@ -69,15 +69,15 @@ dependencies {
 }
 
 // Java config
-compileJava.options.debugOptions.debugLevel = "source,lines,vars"
-compileTestJava.options.debugOptions.debugLevel = "source,lines,vars"
 sourceCompatibility = 1.6
 test {
   useTestNG()
 }
+compileJava.options.debugOptions.debugLevel = "source,lines,vars"
 compileJava.doLast {
   copy {
     from "src/main/ftl"
     into "build/classes/main"
   }
 }
+compileTestJava.options.debugOptions.debugLevel = "source,lines,vars"
