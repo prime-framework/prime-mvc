@@ -21,9 +21,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import org.primeframework.mvc.util.ClassClasspathResolver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -37,7 +38,7 @@ import com.google.inject.Module;
  */
 @SuppressWarnings("unchecked")
 public class GuiceBootstrap {
-  private static final Logger logger = Logger.getLogger(GuiceBootstrap.class.getName());
+  private static final Logger logger = LoggerFactory.getLogger(GuiceBootstrap.class);
 
   /**
    * Please do not invoke this method unless you know what you are doing. This initializes Guice and does it once only
@@ -48,7 +49,7 @@ public class GuiceBootstrap {
    * @return The Guice injector.
    */
   public static Injector initialize(Module... modules) {
-    logger.fine("Initializing Guice");
+    logger.debug("Initializing Guice");
 
     Set<Class<? extends Module>> classes = new HashSet<Class<? extends Module>>();
     addFromClasspath(classes);
@@ -114,7 +115,7 @@ public class GuiceBootstrap {
     }
 
     for (Class<Module> match : matches) {
-      logger.fine("Adding module [" + match + "] from classpath to Guice injector.");
+      logger.debug("Adding module [" + match + "] from classpath to Guice injector.");
     }
 
     modules.addAll(matches);

@@ -20,8 +20,9 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Toolkit for Servlet related tasks
@@ -29,7 +30,7 @@ import java.util.logging.Logger;
  * @author James Humphrey
  */
 public class ServletTools {
-  private static final Logger logger = Logger.getLogger(ServletTools.class.getName());
+  private static final Logger logger = LoggerFactory.getLogger(ServletTools.class);
 
   /**
    * Returns the base url in the following format:
@@ -60,7 +61,7 @@ public class ServletTools {
         baseUrl = new URL(scheme, serverName, "/");
       }
     } catch (MalformedURLException e) {
-      logger.log(Level.SEVERE, e.getMessage(), e);
+      logger.error(e.getMessage(), e);
     }
 
     return baseUrl;

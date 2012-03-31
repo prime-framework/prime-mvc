@@ -59,13 +59,27 @@ dependencies {
     "joda-time:joda-time:2.1",
     "org.apache.commons:commons-lang3:3.0.1",
     "org.freemarker:freemarker:2.3.16",
-    "org.primeframework:prime-mock:0.2-SNAPSHOT"
+    "org.primeframework:prime-mock:0.2-SNAPSHOT",
+    "org.slf4j:slf4j-api:1.6.4"
   )
   testCompile(
     "org.easymock:easymock:3.1",
     "org.hibernate:hibernate-validator:4.2.0.Final",
     "org.testng:testng:6.3.1"
   )
+}
+
+// IDEA config
+idea {
+  pathVariables USER_HOME: file(System.getProperty('user.home'))
+  module {
+    scopes.PROVIDED.plus += configurations.compileOnly
+    iml {
+      whenMerged { module ->
+        module.dependencies*.exported = false
+      }
+    }
+  }
 }
 
 // Java config

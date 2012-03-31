@@ -18,9 +18,10 @@ package org.primeframework.mvc.servlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-import java.util.logging.Logger;
 
 import org.primeframework.mvc.guice.GuiceBootstrap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Injector;
 
@@ -30,7 +31,7 @@ import com.google.inject.Injector;
  * @author Brian Pontarelli
  */
 public class PrimeServletContextListener implements ServletContextListener {
-  private static final Logger logger = Logger.getLogger(PrimeServletContextListener.class.getName());
+  private static final Logger logger = LoggerFactory.getLogger(PrimeServletContextListener.class);
   public static final String GUICE_INJECTOR_KEY = "guiceInjector";
 
   /**

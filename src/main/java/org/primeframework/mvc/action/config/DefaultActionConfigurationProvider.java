@@ -20,12 +20,12 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.util.ClassClasspathResolver;
 import org.primeframework.mvc.util.URIBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -38,7 +38,7 @@ import com.google.inject.Singleton;
 @Singleton
 @SuppressWarnings("unchecked")
 public class DefaultActionConfigurationProvider implements ActionConfigurationProvider {
-  private static final Logger logger = Logger.getLogger(DefaultActionConfigurationProvider.class.getName());
+  private static final Logger logger = LoggerFactory.getLogger(DefaultActionConfigurationProvider.class);
   public static final String ACTION_CONFIGURATION_KEY = "primeActionConfiguration";
   private final ServletContext context;
 
@@ -76,8 +76,8 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
         configuration.put(uri, actionConfiguration);
       }
 
-      if (logger.isLoggable(Level.FINE)) {
-        logger.fine("Added action configuration for [" + actionClass + "] and the uri [" + uri + "]");
+      if (logger.isDebugEnabled()) {
+        logger.debug("Added action configuration for [" + actionClass + "] and the uri [" + uri + "]");
       }
     }
 

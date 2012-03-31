@@ -24,7 +24,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.IOException;
 import java.util.Enumeration;
-import java.util.logging.Logger;
 
 import org.primeframework.mock.servlet.MockHttpServletRequest;
 import org.primeframework.mock.servlet.MockHttpServletResponse;
@@ -34,6 +33,8 @@ import org.primeframework.mvc.guice.GuiceBootstrap;
 import org.primeframework.mvc.servlet.PrimeFilter;
 import org.primeframework.mvc.servlet.PrimeServletContextListener;
 import org.primeframework.mvc.servlet.ServletObjectsHolder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Injector;
 import com.google.inject.Module;
@@ -52,7 +53,7 @@ import com.google.inject.Module;
  * @author Brian Pontarelli
  */
 public class RequestSimulator {
-  private final static Logger logger = Logger.getLogger(RequestSimulator.class.getName());
+  private final static Logger logger = LoggerFactory.getLogger(RequestSimulator.class);
   public final PrimeFilter filter = new PrimeFilter();
   public MockHttpServletRequest request;
   public MockHttpServletResponse response;
@@ -68,7 +69,7 @@ public class RequestSimulator {
    * @throws ServletException If the initialization of the PrimeServletContextListener failed.
    */
   public RequestSimulator(final MockServletContext context, Module... modules) throws ServletException {
-    logger.fine("Built RequestSimulator with context webDir " + context.webDir.getAbsolutePath());
+    logger.debug("Built RequestSimulator with context webDir " + context.webDir.getAbsolutePath());
     ServletObjectsHolder.setServletContext(context);
     this.context = context;
     this.session = new MockHttpSession(this.context);

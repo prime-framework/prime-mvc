@@ -19,8 +19,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.primeframework.mvc.action.ActionInvocation;
@@ -40,6 +38,8 @@ import org.primeframework.mvc.parameter.el.ExpressionException;
 import org.primeframework.mvc.parameter.fileupload.FileInfo;
 import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
 import org.primeframework.mvc.util.ReflectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 /**
@@ -58,7 +58,7 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 public class DefaultParameterHandler implements ParameterHandler {
-  private final static Logger logger = Logger.getLogger(DefaultParameterHandler.class.getName());
+  private final static Logger logger = LoggerFactory.getLogger(DefaultParameterHandler.class);
   private final MVCConfiguration configuration;
   private final ActionInvocationStore actionInvocationStore;
   private final ExpressionEvaluator expressionEvaluator;
@@ -129,7 +129,7 @@ public class DefaultParameterHandler implements ParameterHandler {
           throw ee;
         }
 
-        logger.log(Level.FINE, "Invalid parameter to action [" + action.getClass().getName() + "]", ee);
+        logger.debug("Invalid parameter to action [" + action.getClass().getName() + "]", ee);
       }
     }
   }

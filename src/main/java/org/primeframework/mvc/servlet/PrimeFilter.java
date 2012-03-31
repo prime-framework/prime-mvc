@@ -26,11 +26,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.workflow.MVCWorkflow;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Injector;
 
@@ -43,7 +43,7 @@ import com.google.inject.Injector;
  * @author Brian Pontarelli
  */
 public class PrimeFilter implements Filter {
-  private static final Logger logger = Logger.getLogger(PrimeFilter.class.getName());
+  private static final Logger logger = LoggerFactory.getLogger(PrimeFilter.class);
   private ServletContext context;
 
   /**
@@ -91,9 +91,9 @@ public class PrimeFilter implements Filter {
         ((HttpServletResponse) response).setStatus(500);
       }
     } finally {
-      if (logger.isLoggable(Level.FINEST)) {
+      if (logger.isDebugEnabled()) {
         long end = System.currentTimeMillis();
-        logger.finest("Processing time in PrimeFilter [" + (end - start) + "]");
+        logger.debug("Processing time in PrimeFilter [" + (end - start) + "]");
       }
 
       ServletObjectsHolder.clearServletRequest();
@@ -102,11 +102,11 @@ public class PrimeFilter implements Filter {
       // Handle any extra logging for handling issues that might have occurred.
       Throwable t = (Throwable) request.getAttribute("javax.servlet.error.exception");
       if (t != null) {
-        logger.log(Level.FINE, "Exception occurred during the request", t);
+        logger.debug("Exception occurred during the request", t);
       }
       t = (Throwable) request.getAttribute("javax.servlet.jsp.jspException");
       if (t != null) {
-        logger.log(Level.FINE, "Exception occurred during the request", t);
+        logger.debug("Exception occurred during the request", t);
       }
     }
   }

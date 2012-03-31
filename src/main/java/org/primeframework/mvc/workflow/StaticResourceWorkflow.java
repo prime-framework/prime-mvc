@@ -24,10 +24,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
 import java.util.Calendar;
-import java.util.logging.Logger;
 
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.servlet.ServletTools;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 
@@ -46,7 +47,7 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 public class StaticResourceWorkflow implements Workflow {
-  private static final Logger logger = Logger.getLogger(StaticResourceWorkflow.class.getName());
+  private static final Logger logger = LoggerFactory.getLogger(StaticResourceWorkflow.class);
   private final ServletContext context;
   private final HttpServletRequest request;
   private final HttpServletResponse response;
@@ -115,8 +116,7 @@ public class StaticResourceWorkflow implements Workflow {
     try {
       ifModifiedSince = request.getDateHeader("If-Modified-Since");
     } catch (Exception e) {
-      logger.warning("Invalid If-Modified-Since header value [" +
-        request.getHeader("If-Modified-Since") + "], ignoring");
+      logger.warn("Invalid If-Modified-Since header value [" + request.getHeader("If-Modified-Since") + "], ignoring");
     }
 
     if (ifModifiedSince > 0) {
