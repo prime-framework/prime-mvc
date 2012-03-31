@@ -37,6 +37,7 @@ import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.parameter.el.ExpressionException;
 import org.primeframework.mvc.parameter.fileupload.FileInfo;
 import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
+import org.primeframework.mvc.util.ArrayBuilder;
 import org.primeframework.mvc.util.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -122,7 +123,7 @@ public class DefaultParameterHandler implements ParameterHandler {
       try {
         expressionEvaluator.setValue(key, action, struct.values, struct.attributes);
       } catch (ConversionException ce) {
-        String message = messageProvider.getMessage("[ConversionError]" + key, (Object[]) struct.values);
+        String message = messageProvider.getMessage("[ConversionError]" + key, new ArrayBuilder<String>(String.class, key).addAll(struct.values).done());
         messageStore.add(new SimpleFieldMessage(MessageType.ERROR, key, message));
       } catch (ExpressionException ee) {
         if (!allowUnknownParameters) {
@@ -159,7 +160,7 @@ public class DefaultParameterHandler implements ParameterHandler {
         
         long fileSize = info.file.length();
         if (fileSize > maxSize) {
-          String message = messageProvider.getMessage("[FileUploadSize]" + key, fileSize, maxSize);
+          String message = messageProvider.getMessage("[FileUploadSize]" + key, key, fileSize, maxSize);
           messageStore.add(new SimpleFieldMessage(MessageType.ERROR, key, message));
           i.remove();
         }
@@ -171,7 +172,7 @@ public class DefaultParameterHandler implements ParameterHandler {
 
         String contentType = info.contentType;
         if (!ArrayUtils.contains(allowedContentTypes, contentType)) {
-          String message = messageProvider.getMessage("[FileUploadContentType]" + key, contentType, allowedContentTypes);
+          String message = messageProvider.getMessage("[FileUploadContentType]" + key, key, contentType, allowedContentTypes);
           messageStore.add(new SimpleFieldMessage(MessageType.ERROR, key, message));
           i.remove();
         }

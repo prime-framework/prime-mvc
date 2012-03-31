@@ -107,7 +107,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(config);
 
     MessageProvider provider = createStrictMock(MessageProvider.class);
-    expect(provider.getMessage("[ConversionError]user.inches", "tall")).andReturn("bar");
+    expect(provider.getMessage("[ConversionError]user.inches", "user.inches", "tall")).andReturn("bar");
     replay(provider);
 
     FieldMessage message = new SimpleFieldMessage(MessageType.ERROR, "user.inches", "bar");
@@ -511,7 +511,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(chain);
 
     MessageProvider provider = createStrictMock(MessageProvider.class);
-    expect(provider.getMessage("[FileUploadSize]userfile", 5l, 1l)).andReturn("bar");
+    expect(provider.getMessage("[FileUploadSize]userfile", "userfile", 5l, 1l)).andReturn("bar");
     replay(provider);
 
     FieldMessage message = new SimpleFieldMessage(MessageType.ERROR, "userfile", "bar");
@@ -562,7 +562,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(chain);
 
     MessageProvider provider = createStrictMock(MessageProvider.class);
-    expect(provider.getMessage("[FileUploadContentType]userfile", "text/plain", contentTypes)).andReturn("bar");
+    expect(provider.getMessage("[FileUploadContentType]userfile", "userfile", "text/plain", contentTypes)).andReturn("bar");
     replay(provider);
 
     FieldMessage message = new SimpleFieldMessage(MessageType.ERROR, "userfile", "bar");
@@ -624,7 +624,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(chain);
 
     MessageProvider provider = createStrictMock(MessageProvider.class);
-    expect(provider.getMessage("[FileUploadSize]userfile", 5l, 1l)).andReturn("bar");
+    expect(provider.getMessage("[FileUploadSize]userfile", "userfile", 5l, 1l)).andReturn("bar");
     replay(provider);
 
     FieldMessage message = new SimpleFieldMessage(MessageType.ERROR, "userfile", "bar");
@@ -687,7 +687,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(chain);
 
     MessageProvider provider = createStrictMock(MessageProvider.class);
-    expect(provider.getMessage("[FileUploadContentType]userfile", "text/plain", annotationTypes)).andReturn("bar");
+    expect(provider.getMessage("[FileUploadContentType]userfile", "userfile", "text/plain", annotationTypes)).andReturn("bar");
     replay(provider);
 
     FieldMessage message = new SimpleFieldMessage(MessageType.ERROR, "userfile", "bar");

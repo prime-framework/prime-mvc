@@ -76,9 +76,9 @@ public class JSRValidationProcessor implements ValidationProcessor {
       Object invalidValue = violation.getInvalidValue();
       String message;
       try {
-        message = provider.getMessage("[" + constraint + "]" + propertyPath, invalidValue);
+        message = provider.getMessage("[" + constraint + "]" + propertyPath, propertyPath, invalidValue);
       } catch (MissingMessageException e) {
-        message = provider.getMessage("[" + constraint + "]", invalidValue);
+        message = provider.getMessage("[" + constraint + "]", propertyPath, invalidValue);
       }
 
       messageStore.add(new SimpleFieldMessage(MessageType.ERROR, propertyPath, message));

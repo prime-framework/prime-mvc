@@ -93,10 +93,10 @@ public class JSRValidationProcessorTest extends PrimeBaseTest {
       assertEquals(map.get("user.name").toString(), "Name is required");
       assertEquals(map.get("user.securityQuestions").toString(), "Security questions required");
       assertEquals(map.get("user.addresses['home'].city").toString(), "City is required");
-      assertEquals(map.get("user.addresses['home'].country").toString(), "Required");
-      assertEquals(map.get("user.addresses['home'].state").toString(), "Required");
-      assertEquals(map.get("user.addresses['home'].street").toString(), "Required");
-      assertEquals(map.get("user.addresses['home'].zipcode").toString(), "Required");
+      assertEquals(map.get("user.addresses['home'].country").toString(), "user.addresses['home'].country is required");
+      assertEquals(map.get("user.addresses['home'].state").toString(), "user.addresses['home'].state is required");
+      assertEquals(map.get("user.addresses['home'].street").toString(), "user.addresses['home'].street is required");
+      assertEquals(map.get("user.addresses['home'].zipcode").toString(), "user.addresses['home'].zipcode is required");
     }
   }
 
