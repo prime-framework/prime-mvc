@@ -168,7 +168,7 @@ public class RedirectResultTest {
   public void expand() throws IOException, ServletException {
     Object action = new Object();
     ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
-    expect(ee.expand("${foo}", action, true)).andReturn("result");
+    expect(ee.expand("${foo}", action, false)).andReturn("result");
     replay(ee);
 
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
@@ -191,6 +191,39 @@ public class RedirectResultTest {
     replay(messageStore);
 
     Redirect redirect = new RedirectImpl("success", "${foo}", false, false);
+    RedirectResult result = new RedirectResult(messageStore, ee, response, request, store);
+    result.execute(redirect);
+
+    verify(response);
+  }
+
+  @Test
+  public void encode() throws IOException, ServletException {
+    Object action = new Object();
+    ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
+    expect(ee.expand("${foo}", action, true)).andReturn("result");
+    replay(ee);
+
+    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
+    expect(request.getContextPath()).andReturn("");
+    replay(request);
+
+    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
+    response.setStatus(302);
+    response.sendRedirect("result");
+    replay(response);
+
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(action, "foo", "", null));
+    replay(store);
+
+    List<Message> messages = new ArrayList<Message>();
+    MessageStore messageStore = createStrictMock(MessageStore.class);
+    expect(messageStore.get(MessageScope.REQUEST)).andReturn(messages);
+    messageStore.addAll(MessageScope.FLASH, messages);
+    replay(messageStore);
+
+    Redirect redirect = new RedirectImpl("success", "${foo}", false, true);
     RedirectResult result = new RedirectResult(messageStore, ee, response, request, store);
     result.execute(redirect);
 

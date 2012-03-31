@@ -60,7 +60,7 @@ public class RedirectResult extends AbstractResult<Redirect> {
     List<Message> messages = messageStore.get(MessageScope.REQUEST);
     messageStore.addAll(MessageScope.FLASH, messages);
 
-    String uri = expand(redirect.uri(), actionInvocationStore.getCurrent().action(), true);
+    String uri = expand(redirect.uri(), actionInvocationStore.getCurrent().action(), redirect.encodeVariables());
     String context = request.getContextPath();
     if (context.length() > 0 && uri.startsWith("/")) {
       uri = context + uri;
