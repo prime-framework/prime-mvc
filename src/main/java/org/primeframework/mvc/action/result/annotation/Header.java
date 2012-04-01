@@ -54,6 +54,7 @@ public @interface Header {
   /**
    * A list of Header annotations.
    */
+  @ResultContainerAnnotation
   @Retention(RUNTIME)
   @Target(TYPE)
   public static @interface List {

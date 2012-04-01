@@ -85,11 +85,12 @@ public class DefaultResultInvocationProvider implements ResultInvocationProvider
     Object action = invocation.action();
     List<Annotation> annotations = getAllAnnotations(action.getClass());
     for (Annotation annotation : annotations) {
-      if (annotation.annotationType().isAnnotationPresent(ResultAnnotation.class)) {
+      Class<? extends Annotation> type = annotation.annotationType();
+      if (type.isAnnotationPresent(ResultAnnotation.class)) {
         if (matchesCode(resultCode, annotation)) {
           return new DefaultResultInvocation(annotation, uri, resultCode);
         }
-      } else if (annotation.annotationType().isAnnotationPresent(ResultContainerAnnotation.class)) {
+      } else if (type.isAnnotationPresent(ResultContainerAnnotation.class)) {
         // There are multiple annotations inside the value
         try {
           Annotation[] results = (Annotation[]) annotation.getClass().getMethod("value").invoke(annotation);

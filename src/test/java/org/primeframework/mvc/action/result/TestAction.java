@@ -16,6 +16,7 @@
 package org.primeframework.mvc.action.result;
 
 import org.primeframework.mvc.action.result.annotation.Forward;
+import org.primeframework.mvc.action.result.annotation.Redirect;
 
 /**
  * This is a test action with an annotation.
@@ -23,5 +24,9 @@ import org.primeframework.mvc.action.result.annotation.Forward;
  * @author Brian Pontarelli
  */
 @Forward(page = "foo.jsp")
+@Redirect.List({
+  @Redirect(code = "fail", uri = "/fail"),
+  @Redirect(code = "bad", uri = "/bad")
+})
 public class TestAction {
 }

@@ -50,6 +50,7 @@ public @interface XMLStream {
   /**
    * A list of XMLStream annotations.
    */
+  @ResultContainerAnnotation
   @Retention(RUNTIME)
   @Target(TYPE)
   public static @interface List {

@@ -176,6 +176,28 @@ public class DefaultResultInvocationProviderTest {
   }
 
   @Test
+  public void actionAnnotationContainer() {
+    ServletContext context = createStrictMock(ServletContext.class);
+    replay(context);
+
+    TestAction action = new TestAction();
+
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(action, "/foo/bar", null, null));
+    replay(store);
+
+    DefaultResultInvocationProvider provider = new DefaultResultInvocationProvider(store, new ForwardResult(store, null, null, context, null, null, null, Locale.CANADA));
+    ResultInvocation invocation = provider.lookup("fail");
+    assertNotNull(invocation);
+    assertEquals(invocation.resultCode(), "fail");
+    assertEquals(invocation.uri(), "/foo/bar");
+    assertEquals(((Redirect) invocation.annotation()).code(), "fail");
+    assertEquals(((Redirect) invocation.annotation()).uri(), "/fail");
+
+    verify(context);
+  }
+
+  @Test
   public void actionNoAnnotation() throws MalformedURLException {
     ServletContext context = createStrictMock(ServletContext.class);
     expect(context.getResource("/WEB-INF/templates/foo/bar-error.jsp")).andReturn(null);

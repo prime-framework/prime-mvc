@@ -70,6 +70,7 @@ public @interface Stream {
   /**
    * A list of Stream annotations.
    */
+  @ResultContainerAnnotation
   @Retention(RUNTIME)
   @Target(TYPE)
   public static @interface List {

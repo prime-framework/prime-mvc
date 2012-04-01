@@ -59,6 +59,7 @@ public @interface Redirect {
   /**
    * A list of Redirect annotations.
    */
+  @ResultContainerAnnotation
   @Retention(RUNTIME)
   @Target(TYPE)
   public static @interface List {

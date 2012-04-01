@@ -68,6 +68,7 @@ public @interface Forward {
   /**
    * A list of Forward annotations.
    */
+  @ResultContainerAnnotation
   @Retention(RUNTIME)
   @Target(TYPE)
   public static @interface List {
