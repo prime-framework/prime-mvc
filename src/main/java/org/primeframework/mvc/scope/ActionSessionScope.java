@@ -20,6 +20,7 @@ import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.scope.annotation.ActionSession;
@@ -120,8 +121,8 @@ public class ActionSessionScope implements Scope<ActionSession> {
     } else {
       ActionInvocation ai = actionInvocationStore.getCurrent();
       if (ai.action() == null) {
-        throw new IllegalStateException("Attempting to store a value in the action session but " +
-          "the current request URL isn't associated with an action class");
+        throw new PrimeException("Attempting to store a value in the action session but the current request URL isn'" +
+          "t associated with an action class");
       }
       className = ai.action().getClass().getName();
     }

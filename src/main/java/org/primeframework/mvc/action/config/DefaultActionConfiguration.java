@@ -15,6 +15,7 @@
  */
 package org.primeframework.mvc.action.config;
 
+import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.annotation.Action;
 
 /**
@@ -71,7 +72,7 @@ public class DefaultActionConfiguration implements ActionConfiguration {
       if (patternParts[i].startsWith("{*")) {
         // Bad pattern
         if (!patternParts[i].endsWith("}")) {
-          throw new IllegalArgumentException("Action annotation in class [" + actionClass +
+          throw new PrimeException("Action annotation in class [" + actionClass +
             "] contains an invalid URI parameter pattern [" + pattern + "]. A curly " +
             "bracket is unclosed. If you want to include a curly brakcet that is not " +
             "a URI parameter capture, you need to escape it like \\{");
@@ -79,7 +80,7 @@ public class DefaultActionConfiguration implements ActionConfiguration {
 
         // Can't have wildcard capture in the middle
         if (i != patternParts.length - 1) {
-          throw new IllegalArgumentException("Action annotation in class [" + actionClass +
+          throw new PrimeException("Action annotation in class [" + actionClass +
             "] contains an invalid URI parameter pattern [" + pattern + "]. You cannot " +
             "have a wildcard capture (i.e. {*foo}) in the middle of the pattern. It must " +
             "be on the end of the pattern.");
@@ -88,7 +89,7 @@ public class DefaultActionConfiguration implements ActionConfiguration {
         break;
       } else if (patternParts[i].startsWith("{")) {
         if (!patternParts[i].endsWith("}")) {
-          throw new IllegalArgumentException("Action annotation in class [" + actionClass +
+          throw new PrimeException("Action annotation in class [" + actionClass +
             "] contains an invalid URI parameter pattern [" + pattern + "]. A curly " +
             "bracket is unclosed. If you want to include a curly brakcet that is not " +
             "a URI parameter capture, you need to escape it like \\{");

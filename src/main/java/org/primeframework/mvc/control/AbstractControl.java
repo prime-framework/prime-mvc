@@ -22,6 +22,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.control.annotation.ControlAttribute;
@@ -192,7 +193,7 @@ public abstract class AbstractControl implements Control {
     }
 
     if (!errors.isEmpty()) {
-      throw new IllegalArgumentException(errors.toString());
+      throw new PrimeException(errors.toString());
     }
   }
 

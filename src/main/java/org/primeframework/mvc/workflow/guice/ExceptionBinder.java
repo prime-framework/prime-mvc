@@ -18,12 +18,8 @@ package org.primeframework.mvc.workflow.guice;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.primeframework.mvc.control.Control;
-
 import com.google.inject.Binder;
 import com.google.inject.TypeLiteral;
-import com.google.inject.multibindings.MapBinder;
-import com.google.inject.multibindings.Multibinder;
 
 /**
  * A binder DSL for adding exceptions that can be handled by Prime.

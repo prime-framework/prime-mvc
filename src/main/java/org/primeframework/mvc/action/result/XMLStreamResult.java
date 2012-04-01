@@ -22,7 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.primeframework.mvc.action.ActionInvocation;
+import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.annotation.XMLStream;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
@@ -53,7 +53,7 @@ public class XMLStreamResult extends AbstractResult<XMLStream> {
     Object action = actionInvocationStore.getCurrent().action();
     Object object = expressionEvaluator.getValue(xml, action);
     if (object == null || !(object instanceof String)) {
-      throw new IOException("Invalid property [" + xml + "] for XMLStream result. This " +
+      throw new PrimeException("Invalid property [" + xml + "] for XMLStream result. This " +
         "property returned null or an Object that is not a String.");
     }
 

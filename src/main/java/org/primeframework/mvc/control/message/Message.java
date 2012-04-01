@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.control.AbstractControl;
 import org.primeframework.mvc.control.annotation.ControlAttribute;
 import org.primeframework.mvc.control.annotation.ControlAttributes;
@@ -77,8 +78,8 @@ public class Message extends AbstractControl implements NamedTemplateModel, Temp
     }
 
     if (message == null) {
-      throw new IllegalStateException("The message for the key [" + key + "] is missing and " +
-        "there was no default set using the [default] attribute.");
+      throw new PrimeException("The message for the key [" + key + "] is missing and there was no default set using the " +
+        "[default] attribute.");
     }
 
     attributes.put("message", message);

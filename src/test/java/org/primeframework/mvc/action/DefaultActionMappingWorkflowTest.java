@@ -33,7 +33,7 @@ import org.testng.annotations.Test;
 
 import com.google.inject.Injector;
 import static java.util.Arrays.*;
-import static org.easymock.EasyMock.capture;
+import static org.easymock.EasyMock.*;
 import static org.testng.Assert.*;
 
 /**

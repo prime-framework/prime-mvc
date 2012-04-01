@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.groups.Default;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.primeframework.mvc.ErrorException;
+import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.validation.jsr303.group.Create;
 import org.primeframework.mvc.validation.jsr303.group.Delete;
 import org.primeframework.mvc.validation.jsr303.group.Read;
@@ -59,6 +59,6 @@ public class RequestMethodGroupLocator implements GroupLocator {
       return ArrayUtils.toArray(Delete.class, Default.class);
     }
     
-    throw new ErrorException("error", "Invalid HTTP method for validation [" + method + "]");
+    throw new PrimeException("Invalid HTTP method for validation [" + method + "]");
   }
 }

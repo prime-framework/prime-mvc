@@ -25,6 +25,7 @@ import java.util.Locale;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 
+import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.container.ContainerResolver;
 
@@ -107,7 +108,7 @@ public class WebControl extends ResourceBundle.Control {
       return new PropertyResourceBundle(url.openStream());
     }
 
-    throw new IllegalArgumentException("Invalid bundle [" + uri + "]");
+    throw new PrimeException("Invalid bundle [" + uri + "]");
   }
 
   /**

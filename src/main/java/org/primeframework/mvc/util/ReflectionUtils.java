@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 
-import org.primeframework.mvc.ErrorException;
 import org.primeframework.mvc.parameter.el.ExpressionException;
 import org.primeframework.mvc.parameter.el.GetMethodVerifier;
 import org.primeframework.mvc.parameter.el.MethodVerifier;
@@ -194,16 +193,14 @@ public class ReflectionUtils {
         try {
           method.invoke(obj);
         } catch (IllegalAccessException e) {
-          throw new RuntimeException("Unable to call method [" + method + "] with annotation [" +
-            annotation.getSimpleName() + "]", e);
+          throw new ExpressionException("Unable to call method [" + method + "] with annotation [" + annotation.getSimpleName() + "]", e);
         } catch (InvocationTargetException e) {
           Throwable target = e.getTargetException();
           if (target instanceof RuntimeException) {
             throw (RuntimeException) target;
           }
 
-          throw new RuntimeException("Unable to call method [" + method + "] with annotation [" +
-            annotation.getSimpleName() + "]", e);
+          throw new ExpressionException("Unable to call method [" + method + "] with annotation [" + annotation.getSimpleName() + "]", e);
         }
       }
     }
@@ -221,9 +218,9 @@ public class ReflectionUtils {
     try {
       return (T) method.invoke(obj, params);
     } catch (IllegalAccessException e) {
-      throw new ErrorException("error", "Unable to call method [" + method + "] because it isn't accessible", e);
+      throw new ExpressionException("Unable to call method [" + method + "] because it isn't accessible", e);
     } catch (IllegalArgumentException e) {
-      throw new ErrorException("error", "Unable to call method [" + method + "] because the incorrect parameters were passed to it", e);
+      throw new ExpressionException("Unable to call method [" + method + "] because the incorrect parameters were passed to it", e);
     } catch (InvocationTargetException e) {
       Throwable target = e.getTargetException();
       if (target instanceof RuntimeException) {
@@ -233,7 +230,7 @@ public class ReflectionUtils {
         throw (Error) target;
       }
 
-      throw new ErrorException("error", "Unable to call method [" + method + "]", e);
+      throw new ExpressionException("Unable to call method [" + method + "]", e);
     }
   }
 
@@ -310,7 +307,7 @@ public class ReflectionUtils {
       }
 
       if (errors.size() > 0) {
-        throw new ErrorException("error", "Invalid JavaBean class [" + beanClass + "]. Errors are: \n" + errors);
+        throw new ExpressionException("Invalid JavaBean class [" + beanClass + "]. Errors are: \n" + errors);
       }
 
       cache.put(beanClass, Collections.unmodifiableMap(propMap));

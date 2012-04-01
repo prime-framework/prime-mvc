@@ -18,6 +18,7 @@ package org.primeframework.mvc.control.form;
 import java.io.Writer;
 import java.util.Map;
 
+import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.ActionMapper;
@@ -85,7 +86,7 @@ public class Form extends AbstractControl {
 
       ActionInvocation actionInvocation = actionMapper.map(action, false);
       if (actionInvocation == null || actionInvocation.action() == null) {
-        throw new IllegalArgumentException("The form action [" + action + "] is not a valid URI that maps to an action " +
+        throw new PrimeException("The form action [" + action + "] is not a valid URI that maps to an action " +
           "class by the Prime MVC.");
       } else if (current == null || current.action() == null ||
         !current.action().getClass().equals(actionInvocation.action().getClass())) {

@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.util.ClassClasspathResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +60,7 @@ public class GuiceBootstrap {
       try {
         allModules.add(moduleClass.newInstance());
       } catch (Exception e) {
-        throw new RuntimeException(e);
+        throw new PrimeException(e);
       }
     }
 
@@ -93,7 +94,7 @@ public class GuiceBootstrap {
     try {
       moduleClasses = resolver.findByLocators(new ClassClasspathResolver.IsA(Module.class), false, "guice");
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new PrimeException(e);
     }
 
     Set<Class<Module>> matches = new HashSet<Class<Module>>(moduleClasses);

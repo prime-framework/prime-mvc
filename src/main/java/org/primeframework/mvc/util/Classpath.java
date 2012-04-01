@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.primeframework.mvc.PrimeException;
+
 import static java.util.Collections.*;
 
 /**
@@ -155,12 +157,11 @@ public class Classpath {
           try {
             url = f.toURI().toURL();
           } catch (MalformedURLException e1) {
-            throw new IllegalStateException("Cannot create URLClassLoader because classpath entry [" +
-              s + "] could not be converted to a URL from a File.");
+            throw new PrimeException("Cannot create URLClassLoader because classpath entry [" + s + "] could not be " +
+              "converted to a URL from a File.");
           }
         } else {
-          throw new IllegalStateException("Cannot create URLClassLoader because classpath entry [" +
-            s + "] is not a URL or a File.");
+          throw new PrimeException("Cannot create URLClassLoader because classpath entry [" + s + "] is not a URL or a File.");
         }
       }
 

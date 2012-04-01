@@ -19,6 +19,7 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.RedirectResult.RedirectImpl;
@@ -98,7 +99,7 @@ public class DefaultResultInvocationProvider implements ResultInvocationProvider
             }
           }
         } catch (Exception e) {
-          throw new RuntimeException("Custom result annotation containers must have a method " +
+          throw new PrimeException("Custom result annotation containers must have a method " +
             "named [value] that is an array of result annotations.");
         }
       }
@@ -106,7 +107,7 @@ public class DefaultResultInvocationProvider implements ResultInvocationProvider
 
     Annotation annotation = forwardResult.defaultResult(invocation, resultCode);
     if (annotation == null) {
-      throw new RuntimeException("Unable to locate result for URI [" + invocation.uri() + "] and result code [" + resultCode + "]");
+      throw new PrimeException("Unable to locate result for URI [" + invocation.uri() + "] and result code [" + resultCode + "]");
     }
 
     return new DefaultResultInvocation(annotation, uri, resultCode);
@@ -135,8 +136,7 @@ public class DefaultResultInvocationProvider implements ResultInvocationProvider
         return true;
       }
     } catch (Exception e) {
-      throw new RuntimeException("Custom result annotations must have a method named " +
-        "[code] that contains the result code they are associated with.");
+      throw new PrimeException("Custom result annotations must have a method named [code] that contains the result code they are associated with.");
     }
 
     return false;

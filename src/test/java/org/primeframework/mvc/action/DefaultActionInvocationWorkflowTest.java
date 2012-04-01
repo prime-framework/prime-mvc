@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc.action;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -28,6 +27,7 @@ import org.example.action.InvalidExecuteMethod;
 import org.example.action.MissingExecuteMethod;
 import org.example.action.Post;
 import org.example.action.Simple;
+import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.config.DefaultActionConfiguration;
 import org.primeframework.mvc.action.result.ResultStore;
 import org.primeframework.mvc.workflow.WorkflowChain;
@@ -96,7 +96,7 @@ public class DefaultActionInvocationWorkflowTest {
   }
 
   @Test
-  public void actionWithoutExecuteMethod() throws IOException {
+  public void actionWithoutExecuteMethod() throws Exception {
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
     expect(request.getMethod()).andReturn("POST");
     replay(request);
@@ -117,7 +117,7 @@ public class DefaultActionInvocationWorkflowTest {
     try {
       workflow.perform(chain);
       fail("Should have failed");
-    } catch (ServletException e) {
+    } catch (PrimeException e) {
       System.out.println(e);
       // Expected
     }
@@ -147,7 +147,7 @@ public class DefaultActionInvocationWorkflowTest {
     try {
       workflow.perform(chain);
       fail("Should have failed");
-    } catch (ServletException e) {
+    } catch (PrimeException e) {
       System.out.println(e);
       // Expected
     }
@@ -158,7 +158,7 @@ public class DefaultActionInvocationWorkflowTest {
   }
 
   @Test
-  public void actionThatThrowsRuntimeException() throws IOException, ServletException {
+  public void actionThatThrowsRuntimeException() throws Exception {
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
     expect(request.getMethod()).andReturn("GET");
     replay(request);
@@ -189,7 +189,7 @@ public class DefaultActionInvocationWorkflowTest {
   }
 
   @Test
-  public void actionThatThrowsCheckedException() throws IOException, ServletException {
+  public void actionThatThrowsCheckedException() throws Exception {
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
     expect(request.getMethod()).andReturn("GET");
     replay(request);

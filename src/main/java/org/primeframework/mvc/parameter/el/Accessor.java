@@ -34,7 +34,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.primeframework.mvc.ErrorException;
 import org.primeframework.mvc.parameter.convert.AnnotationConverter;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
@@ -99,7 +98,7 @@ public abstract class Accessor {
    */
   public void update(Object value, Expression expression) {
     if (object == null) {
-      throw new IllegalStateException("The object is null, unable to update.");
+      throw new ExpressionException("The object is null, unable to update.");
     }
 
     set(object, value, expression);
@@ -144,7 +143,7 @@ public abstract class Accessor {
       try {
         value = typeClass.newInstance();
       } catch (Exception e) {
-        throw new ErrorException("error", "Unable to instantiate object [" + typeClass.getName() + "]");
+        throw new ExpressionException("Unable to instantiate object [" + typeClass.getName() + "]");
       }
     }
 
@@ -242,7 +241,7 @@ public abstract class Accessor {
       List l = (List) this.object;
       l.set(index, value);
     } else {
-      throw new ErrorException("error", "You can only set values into arrays and Lists. You are setting a parameter into [" +
+      throw new ExpressionException("You can only set values into arrays and Lists. You are setting a parameter into [" +
         getMemberAccessor() + "] which is of type [" + this.object.getClass() + "]");
     }
   }

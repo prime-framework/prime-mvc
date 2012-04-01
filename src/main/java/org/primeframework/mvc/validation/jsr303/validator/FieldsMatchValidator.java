@@ -19,6 +19,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.lang.reflect.Field;
 
+import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.validation.jsr303.constraint.FieldsMatch;
 
 /**
@@ -32,7 +33,7 @@ public class FieldsMatchValidator implements ConstraintValidator<FieldsMatch, Ob
   @Override
   public void initialize(FieldsMatch constraintAnnotation) {
     if (constraintAnnotation.fields().length <= 1) {
-      throw new IllegalArgumentException("The FieldsMatch annotation must contain at least two fields");
+      throw new PrimeException("The FieldsMatch annotation must contain at least two fields");
     }
 
     this.match = constraintAnnotation;
@@ -63,9 +64,9 @@ public class FieldsMatchValidator implements ConstraintValidator<FieldsMatch, Ob
 
       return valid;
     } catch (NoSuchFieldException e) {
-      throw new IllegalArgumentException("You must declare the fields specified in the annotation.");
+      throw new PrimeException("You must declare the fields specified in the annotation.");
     } catch (IllegalAccessException e) {
-      throw new IllegalArgumentException("Unable to access the fields specified in the annotation.");
+      throw new PrimeException("Unable to access the fields specified in the annotation.");
     }
   }
 }

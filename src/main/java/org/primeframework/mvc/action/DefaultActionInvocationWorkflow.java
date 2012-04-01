@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.lang.reflect.Method;
 
+import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.result.ResultStore;
 import org.primeframework.mvc.util.ReflectionUtils;
 import org.primeframework.mvc.workflow.WorkflowChain;
@@ -125,7 +126,7 @@ public class DefaultActionInvocationWorkflow implements ActionInvocationWorkflow
     }
 
     if (method == null) {
-      throw new ServletException("The action class [" + action.getClass() + "] is missing a " +
+      throw new PrimeException("The action class [" + action.getClass() + "] is missing a " +
         "valid execute method. The class can define a method with the same names as the " +
         "HTTP method (which is currently [" + httpMethod.toLowerCase() + "]) or it can define " +
         "a default method named [execute].");
@@ -135,7 +136,7 @@ public class DefaultActionInvocationWorkflow implements ActionInvocationWorkflow
 
     String result = ReflectionUtils.invoke(method, action);
     if (result == null) {
-      throw new ServletException("The action class [" + action.getClass() + "] returned " +
+      throw new PrimeException("The action class [" + action.getClass() + "] returned " +
         "null for the result code. Execute methods must never return null.");
     }
 
@@ -150,7 +151,7 @@ public class DefaultActionInvocationWorkflow implements ActionInvocationWorkflow
    */
   protected void verify(Method method) throws ServletException {
     if (method.getReturnType() != String.class || method.getParameterTypes().length != 0) {
-      throw new ServletException("The action class [" + method.getDeclaringClass().getClass() + "] has defined an " +
+      throw new PrimeException("The action class [" + method.getDeclaringClass().getClass() + "] has defined an " +
         "execute method named [" + method.getName() + "] that is invalid. Execute methods must have zero parameters " +
         "and return a String like this: [public String execute()].");
     }

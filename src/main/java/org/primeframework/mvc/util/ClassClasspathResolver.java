@@ -39,6 +39,7 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
+import org.primeframework.mvc.PrimeException;
 
 import static java.util.Arrays.*;
 
@@ -171,7 +172,7 @@ public class ClassClasspathResolver<U> {
     try {
       jarFile = new JarFile(f);
     } catch (IOException e) {
-      throw new IOException("Error opening JAR file [" + f.getAbsolutePath() + "]");
+      throw new IOException("Error opening JAR file [" + f.getAbsolutePath() + "]", e);
     }
 
     Enumeration<JarEntry> en = jarFile.entries();
@@ -232,7 +233,7 @@ public class ClassClasspathResolver<U> {
     try {
       return new ClassReader(new FileInputStream(file));
     } catch (IOException e) {
-      throw new IOException("Error parsing class file at [" + file.getAbsolutePath() + "]");
+      throw new IOException("Error parsing class file at [" + file.getAbsolutePath() + "]", e);
     }
   }
 
@@ -249,8 +250,7 @@ public class ClassClasspathResolver<U> {
     try {
       return new ClassReader(jarFile.getInputStream(jarEntry));
     } catch (IOException e) {
-      throw new IOException("Error parsing class file at [" + jar.getAbsolutePath() + "!/" +
-        jarEntry.getName() + "]");
+      throw new IOException("Error parsing class file at [" + jar.getAbsolutePath() + "!/" + jarEntry.getName() + "]", e);
     }
   }
 
@@ -298,7 +298,7 @@ public class ClassClasspathResolver<U> {
         try {
           return (Class<U>) Thread.currentThread().getContextClassLoader().loadClass(classReader.getClassName().replace('/', '.'));
         } catch (ClassNotFoundException e) {
-          throw new RuntimeException(e);
+          throw new PrimeException(e);
         }
       }
 
@@ -409,7 +409,7 @@ public class ClassClasspathResolver<U> {
         try {
           return (Class<U>) Thread.currentThread().getContextClassLoader().loadClass(classReader.getClassName().replace('/', '.'));
         } catch (ClassNotFoundException e) {
-          throw new RuntimeException(e);
+          throw new PrimeException(e);
         }
       }
 

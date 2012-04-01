@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.control.AbstractControl;
 import org.primeframework.mvc.message.FieldMessage;
 import org.primeframework.mvc.message.MessageStore;
@@ -96,7 +97,7 @@ public abstract class AbstractInput extends AbstractControl {
       }
 
       if (label == null) {
-        throw new IllegalStateException("Missing localized label for the field named [" +
+        throw new PrimeException("Missing localized label for the field named [" +
           name + "]. You must define the label in the resource bundle under under the " +
           "key [" + name + "], which is the name of the field, or using the [labelKey] " +
           "attribute " + (labelKey != null ? "(which is currently set to [" + labelKey + "] " +

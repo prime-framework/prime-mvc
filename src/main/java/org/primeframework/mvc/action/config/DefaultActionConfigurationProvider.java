@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.util.ClassClasspathResolver;
 import org.primeframework.mvc.util.URIBuilder;
@@ -51,7 +52,7 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
     try {
       actionClassses = resolver.findByLocators(new ClassClasspathResolver.AnnotatedWith(Action.class), true, null, "action");
     } catch (IOException e) {
-      throw new RuntimeException("Error discovering action classes", e);
+      throw new PrimeException("Error discovering action classes", e);
     }
 
     Map<String, ActionConfiguration> configuration = new HashMap<String, ActionConfiguration>();
@@ -63,7 +64,7 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
         boolean previousOverrideable = configuration.get(uri).actionClass().getAnnotation(Action.class).overridable();
         boolean thisOverrideable = actionClass.getAnnotation(Action.class).overridable();
         if ((previousOverrideable && thisOverrideable) || (!previousOverrideable && !thisOverrideable)) {
-          throw new IllegalStateException("Duplicate action found for URI [" + uri + "]. The " +
+          throw new PrimeException("Duplicate action found for URI [" + uri + "]. The " +
             "first action class found was [" + configuration.get(uri).actionClass() + "]. " +
             "The second action class found was [" + actionClass + "]. Either both classes " +
             "are marked as overridable or neither is marked as overridable. You can fix " +

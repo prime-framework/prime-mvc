@@ -22,7 +22,7 @@ import javax.validation.Validator;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.primeframework.mvc.ErrorException;
+import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
@@ -68,7 +68,7 @@ public class JSRValidationProcessor implements ValidationProcessor {
     for (ConstraintViolation<Object> violation : violations) {
       String constraint = violation.getConstraintDescriptor().getAnnotation().annotationType().getSimpleName();
       if (violation.getPropertyPath() == null || StringUtils.isBlank(violation.getPropertyPath().toString())) {
-        throw new ErrorException("error", "Property path undefined for class [" + violation.getLeafBean().getClass().getName() +
+        throw new PrimeException("Property path undefined for class [" + violation.getLeafBean().getClass().getName() +
           "], constraint [" + constraint + "]");
       }
 

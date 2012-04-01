@@ -24,6 +24,7 @@ import java.util.Map;
 import org.easymock.EasyMock;
 import org.example.action.Simple;
 import org.example.action.user.Edit;
+import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.DefaultActionInvocation;
 import org.primeframework.mvc.scope.annotation.ActionSession;
@@ -250,7 +251,7 @@ public class ActionSessionScopeTest {
         }
       });
       fail("Should have failed");
-    } catch (IllegalStateException e) {
+    } catch (PrimeException e) {
       // Expected
     }
 
@@ -492,7 +493,7 @@ public class ActionSessionScopeTest {
         }
       });
       fail("Should have failed");
-    } catch (IllegalStateException e) {
+    } catch (PrimeException e) {
       // Expected
     }
 

@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 import java.lang.annotation.Annotation;
 import java.util.Locale;
 
+import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.annotation.Forward;
@@ -87,7 +88,7 @@ public class ForwardResult extends AbstractResult<Forward> {
     }
 
     if (page == null) {
-      throw new RuntimeException("Unable to locate result for URI [" + invocation.uri() + "] and result code [" + code + "]");
+      throw new PrimeException("Unable to locate result for URI [" + invocation.uri() + "] and result code [" + code + "]");
     }
 
     page = expand(page, action, false);

@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 
+import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.workflow.WorkflowChain;
@@ -93,11 +94,10 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
           if (resultInvocation == null) {
             response.setStatus(404);
             if (invocation.configuration() != null) {
-              throw new ServletException("Missing result for action class [" +
-                invocation.configuration().actionClass() + "] URI [" + invocation.actionURI() +
-                "] and result code [" + resultCode + "]");
+              throw new PrimeException("Missing result for action class [" + invocation.configuration().actionClass() +
+                "] URI [" + invocation.actionURI() + "] and result code [" + resultCode + "]");
             } else {
-              throw new ServletException("Missing result for actionless URI [" + invocation.actionURI() +
+              throw new PrimeException("Missing result for actionless URI [" + invocation.actionURI() +
                 "] and result code [" + resultCode + "]");
             }
           }
@@ -106,9 +106,9 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
         Annotation annotation = resultInvocation.annotation();
         Result result = resultProvider.lookup(annotation.annotationType());
         if (result == null) {
-          throw new ServletException("Unmapped result annotationType [" + annotation.getClass() +
-            "]. You probably need to define a Result implementation that maps to this annotationType " +
-            "and then add that Result implementation to your Guice Module.");
+          throw new PrimeException("Unmapped result annotationType [" + annotation.getClass() + "]. You probably need " +
+            "to define a Result implementation that maps to this annotationType and then add that Result implementation " +
+            "to your Guice Module.");
         }
   
         result.execute(annotation);

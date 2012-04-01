@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.lang3.StringUtils;
+import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.annotation.Stream;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
@@ -57,7 +58,7 @@ public class StreamResult extends AbstractResult<Stream> {
 
     Object object = expressionEvaluator.getValue(property, action);
     if (object == null || !(object instanceof InputStream)) {
-      throw new IOException("Invalid property [" + property + "] for Stream result. This " +
+      throw new PrimeException("Invalid property [" + property + "] for Stream result. This " +
         "property returned null or an Object that is not an InputStream.");
     }
 

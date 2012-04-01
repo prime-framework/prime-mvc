@@ -15,8 +15,6 @@
  */
 package org.primeframework.mvc.action.result;
 
-import org.primeframework.mvc.action.ActionInvocation;
-
 import com.google.inject.ImplementedBy;
 
 /**

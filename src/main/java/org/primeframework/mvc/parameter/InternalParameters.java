@@ -17,6 +17,8 @@ package org.primeframework.mvc.parameter;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.primeframework.mvc.PrimeException;
+
 /**
  * This class handles all of the parameters that control the Prime MVC internal behavior like validation, result
  * execution, action execution, etc.
@@ -48,7 +50,7 @@ public final class InternalParameters {
    */
   public static boolean is(HttpServletRequest request, String key) {
     if (!isInternalParameter(key)) {
-      throw new IllegalArgumentException("Invalid key [" + key + "]");
+      throw new PrimeException("Invalid key [" + key + "]");
     }
 
     Object value = request.getParameter(key);
@@ -58,8 +60,7 @@ public final class InternalParameters {
 
     String str = value == null ? null : value.toString().toLowerCase();
     if (str != null && !isValidBoolean(str)) {
-      throw new IllegalArgumentException("Invalid value [" + str + "] for key [" + key +
-        "]. Must be either the string [true] or [false].");
+      throw new PrimeException("Invalid value [" + str + "] for key [" + key + "]. Must be either the string [true] or [false].");
     }
 
     return str == null || str.equals("true");

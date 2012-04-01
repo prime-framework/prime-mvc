@@ -17,6 +17,8 @@ package org.primeframework.mvc.control;
 
 import java.io.Writer;
 
+import org.primeframework.mvc.PrimeException;
+
 import freemarker.template.TemplateDirectiveBody;
 
 /**
@@ -39,7 +41,7 @@ public class FreeMarkerBodyProxy implements Body {
       try {
         body.render(writer);
       } catch (Exception e) {
-        throw new IllegalStateException(e);
+        throw new PrimeException(e);
       }
     }
   }

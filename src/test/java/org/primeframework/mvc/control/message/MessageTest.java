@@ -16,6 +16,7 @@
 package org.primeframework.mvc.control.message;
 
 import org.example.action.user.Edit;
+import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.DefaultActionInvocation;
 import org.primeframework.mvc.control.ControlBaseTest;
 import org.testng.annotations.Test;
@@ -60,7 +61,7 @@ public class MessageTest extends ControlBaseTest {
         attr("key", "bad").
         go("Bundle message");
       fail("Should have failed");
-    } catch (IllegalStateException e) {
+    } catch (PrimeException e) {
       // Expected
     }
   }

@@ -15,12 +15,11 @@
  */
 package org.primeframework.mvc.action.result;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.lang.annotation.Annotation;
 
 import org.example.action.Simple;
+import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.DefaultActionInvocation;
@@ -39,7 +38,7 @@ import static org.testng.Assert.*;
  */
 public class DefaultResultInvocationWorkflowTest {
   @Test
-  public void actionLessWithDefault() throws IOException, ServletException {
+  public void actionLessWithDefault() throws Exception {
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
     replay(response);
 
@@ -76,7 +75,7 @@ public class DefaultResultInvocationWorkflowTest {
   }
 
   @Test
-  public void actionLessWithoutDefault() throws IOException, ServletException {
+  public void actionLessWithoutDefault() throws Exception {
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
     replay(response);
 
@@ -110,7 +109,7 @@ public class DefaultResultInvocationWorkflowTest {
   }
 
   @Test
-  public void actionWithResult() throws IOException, ServletException {
+  public void actionWithResult() throws Exception {
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
     replay(response);
 
@@ -149,7 +148,7 @@ public class DefaultResultInvocationWorkflowTest {
   }
 
   @Test
-  public void actionSuppressResult() throws IOException, ServletException {
+  public void actionSuppressResult() throws Exception {
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
     replay(response);
 
@@ -182,7 +181,7 @@ public class DefaultResultInvocationWorkflowTest {
   }
 
   @Test
-  public void actionMissingResult() throws IOException, ServletException {
+  public void actionMissingResult() throws Exception {
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
     response.setStatus(404);
     replay(response);
@@ -212,7 +211,7 @@ public class DefaultResultInvocationWorkflowTest {
     try {
       workflow.perform(chain);
       fail("Should have failed with 404");
-    } catch (ServletException e) {
+    } catch (PrimeException e) {
       System.out.println(e);
       // Expected
     }
@@ -221,7 +220,7 @@ public class DefaultResultInvocationWorkflowTest {
   }
 
   @Test
-  public void actionMissingResultType() throws IOException {
+  public void actionMissingResultType() throws Exception {
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
     replay(response);
 
@@ -253,7 +252,7 @@ public class DefaultResultInvocationWorkflowTest {
     try {
       workflow.perform(chain);
       fail("Should have failed");
-    } catch (ServletException e) {
+    } catch (PrimeException e) {
       System.out.println(e);
       // Expected
     }

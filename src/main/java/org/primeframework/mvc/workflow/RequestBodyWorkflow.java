@@ -33,6 +33,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.parameter.fileupload.FileInfo;
 import org.primeframework.mvc.util.IteratorEnumeration;
 import org.primeframework.mvc.util.RequestKeys;
@@ -132,7 +133,7 @@ public class RequestBodyWorkflow implements Workflow {
         }
       }
     } catch (Exception e) {
-      throw new IllegalStateException("Unable to handle file uploads", e);
+      throw new PrimeException("Unable to handle file uploads", e);
     }
 
     return filesAndParameters;

@@ -16,29 +16,22 @@
 package org.primeframework.mvc;
 
 /**
- * Base class for exceptions that cause Prime to invoke the error workflow.
- *
  * @author Brian Pontarelli
  */
-public class ErrorException extends PrimeException {
-  public final String resultCode;
-
-  public ErrorException(String resultCode) {
-    this.resultCode = resultCode;
+public class PrimeException extends RuntimeException {
+  public PrimeException() {
+    super();
   }
 
-  public ErrorException(String resultCode, String message) {
+  public PrimeException(String message) {
     super(message);
-    this.resultCode = resultCode;
   }
 
-  public ErrorException(String resultCode, String message, Throwable cause) {
+  public PrimeException(String message, Throwable cause) {
     super(message, cause);
-    this.resultCode = resultCode;
   }
 
-  public ErrorException(String resultCode, Throwable cause) {
+  public PrimeException(Throwable cause) {
     super(cause);
-    this.resultCode = resultCode;
   }
 }

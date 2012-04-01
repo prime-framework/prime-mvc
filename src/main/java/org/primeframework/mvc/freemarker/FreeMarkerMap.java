@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.ControlsHashModel;
@@ -217,7 +218,7 @@ public class FreeMarkerMap implements TemplateHashModelEx {
     try {
       return FieldSupportBeansWrapper.INSTANCE.wrap(value);
     } catch (TemplateModelException e) {
-      throw new RuntimeException(e);
+      throw new PrimeException(e);
     }
   }
 

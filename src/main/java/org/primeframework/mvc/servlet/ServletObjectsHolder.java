@@ -19,6 +19,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
+import org.primeframework.mvc.PrimeException;
+
 /**
  * This class is a static storage location for the servlet objects so that they can be later injected via providers.
  * <p/>
@@ -65,7 +67,7 @@ public final class ServletObjectsHolder {
    */
   public static void setServletRequest(HttpServletRequestWrapper servletRequest) {
     if (request.get() != null) {
-      throw new IllegalStateException("Request is already set into the ServletObjectsHolder");
+      throw new PrimeException("Request is already set into the ServletObjectsHolder");
     }
 
     request.set(servletRequest);
@@ -94,7 +96,7 @@ public final class ServletObjectsHolder {
    */
   public static void setServletResponse(HttpServletResponse servletResponse) {
     if (response.get() != null) {
-      throw new IllegalStateException("Response is already set into the ServletObjectsHolder");
+      throw new PrimeException("Response is already set into the ServletObjectsHolder");
     }
 
     response.set(servletResponse);
