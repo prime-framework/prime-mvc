@@ -15,12 +15,13 @@
  */
 package org.primeframework.mvc.action.result.annotation;
 
-import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.primeframework.mvc.action.result.HeaderResult;
+
+import static java.lang.annotation.ElementType.*;
+import static java.lang.annotation.RetentionPolicy.*;
 
 /**
  * This annotation marks a result from an action as a header only result.
@@ -28,8 +29,8 @@ import org.primeframework.mvc.action.result.HeaderResult;
  * @author Brian Pontarelli
  */
 @ResultAnnotation(HeaderResult.class)
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
+@Retention(RUNTIME)
+@Target(TYPE)
 public @interface Header {
   /**
    * @return The result code from the action's execute method that this Result is associated with.
@@ -49,4 +50,13 @@ public @interface Header {
    *         <code>"40${someField}"</code>
    */
   String statusStr() default "";
+
+  /**
+   * A list of Header annotations.
+   */
+  @Retention(RUNTIME)
+  @Target(TYPE)
+  public static @interface List {
+    Header[] value();
+  }
 }

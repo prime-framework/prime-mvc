@@ -47,4 +47,11 @@ public @interface FieldsMatch {
    * @return The names of the fields that must have the same value.
    */
   String[] fields();
+
+  /**
+   * A list of FieldMatch annotations.
+   */
+  public static @interface List {
+    FieldsMatch[] value();
+  }
 }

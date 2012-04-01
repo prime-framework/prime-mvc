@@ -16,10 +16,10 @@
 package org.primeframework.mvc.validation.jsr303;
 
 import javax.validation.ConstraintViolation;
-import javax.validation.Path;
-import javax.validation.Path.Node;
 import javax.validation.Validator;
+import javax.validation.metadata.ConstraintDescriptor;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.primeframework.mvc.PrimeException;
@@ -29,8 +29,10 @@ import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.message.l10n.MissingMessageException;
+import org.primeframework.mvc.util.ArrayBuilder;
 import org.primeframework.mvc.validation.ValidationException;
 import org.primeframework.mvc.validation.ValidationProcessor;
+import org.primeframework.mvc.validation.jsr303.util.ValidationUtils;
 
 import com.google.inject.Inject;
 
@@ -66,19 +68,24 @@ public class JSRValidationProcessor implements ValidationProcessor {
     Class<?>[] groups = locator.groups();
     Set<ConstraintViolation<Object>> violations = validator.validate(action, groups);
     for (ConstraintViolation<Object> violation : violations) {
-      String constraint = violation.getConstraintDescriptor().getAnnotation().annotationType().getSimpleName();
+      ConstraintDescriptor<?> descriptor = violation.getConstraintDescriptor();
+      String constraint = descriptor.getAnnotation().annotationType().getSimpleName();
       if (violation.getPropertyPath() == null || StringUtils.isBlank(violation.getPropertyPath().toString())) {
         throw new PrimeException("Property path undefined for class [" + violation.getLeafBean().getClass().getName() +
           "], constraint [" + constraint + "]");
       }
 
-      String propertyPath = toString(violation.getPropertyPath());
+      String propertyPath = ValidationUtils.toString(violation.getPropertyPath());
       Object invalidValue = violation.getInvalidValue();
+      Object[] values = new ArrayBuilder<Object>(Object.class, propertyPath, invalidValue).
+        addAll(new TreeMap<String, Object>(descriptor.getAttributes()).values()).
+        done();
+
       String message;
       try {
-        message = provider.getMessage("[" + constraint + "]" + propertyPath, propertyPath, invalidValue);
+        message = provider.getMessage("[" + constraint + "]" + propertyPath, (Object[]) values);
       } catch (MissingMessageException e) {
-        message = provider.getMessage("[" + constraint + "]", propertyPath, invalidValue);
+        message = provider.getMessage("[" + constraint + "]", (Object[]) values);
       }
 
       messageStore.add(new SimpleFieldMessage(MessageType.ERROR, propertyPath, message));
@@ -89,38 +96,5 @@ public class JSRValidationProcessor implements ValidationProcessor {
     if (messageStore.get().size() > 0) {
       throw new ValidationException();
     }
-  }
-
-  private String toString(Path propertyPath) {
-    StringBuilder build = new StringBuilder();
-    boolean first = true;
-    for (Node node : propertyPath) {
-      if (node.isInIterable()) {
-        addIndex(build, node);
-      }
-
-      if (!first) {
-        build.append(".");
-      }
-
-      build.append(node.getName());
-
-      first = false;
-    }
-
-    return build.toString();
-  }
-
-  private void addIndex(StringBuilder build, Node node) {
-    Integer index = node.getIndex();
-    Object key = node.getKey();
-
-    build.append("[");
-    if (index != null) {
-      build.append(index);
-    } else if (key != null) {
-      build.append("'").append(key).append("'");
-    }
-    build.append("]");
   }
 }

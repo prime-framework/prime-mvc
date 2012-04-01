@@ -15,10 +15,11 @@
  */
 package org.primeframework.mvc.control.annotation;
 
-import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.*;
+import static java.lang.annotation.RetentionPolicy.*;
 
 /**
  * This class defines a single attribute that a control can have passed to it. Since FreeMarker doesn't provide a
@@ -26,8 +27,8 @@ import java.lang.annotation.Target;
  *
  * @author Brian Pontarelli
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
+@Retention(RUNTIME)
+@Target(TYPE)
 public @interface ControlAttribute {
   /**
    * @return The name of the attribute.

@@ -30,8 +30,7 @@ import static java.lang.annotation.RetentionPolicy.*;
  *
  * @author jhumphrey
  */
-
-@Target({FIELD, METHOD})
+@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 @Retention(RUNTIME)
 @Constraint(validatedBy = URLConnectivityValidator.class)
 @Documented
@@ -39,4 +38,11 @@ public @interface URLConnectivity {
   String message() default "";
   Class[] groups() default {};
   Class[] payload() default {};
+
+  /**
+   * A list of URLConnectivity annotations.
+   */
+  public static @interface List {
+    URLConnectivity[] value();
+  }
 }

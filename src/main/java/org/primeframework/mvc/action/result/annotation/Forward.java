@@ -16,12 +16,13 @@
  */
 package org.primeframework.mvc.action.result.annotation;
 
-import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.primeframework.mvc.action.result.ForwardResult;
+
+import static java.lang.annotation.ElementType.*;
+import static java.lang.annotation.RetentionPolicy.*;
 
 /**
  * This annotation marks a result from an action as a forward to a JSP or FreeMarker template.
@@ -29,8 +30,8 @@ import org.primeframework.mvc.action.result.ForwardResult;
  * @author Brian Pontarelli
  */
 @ResultAnnotation(ForwardResult.class)
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
+@Retention(RUNTIME)
+@Target(TYPE)
 public @interface Forward {
   /**
    * @return The result code from the action's execute method that this Result is associated with.
@@ -63,4 +64,13 @@ public @interface Forward {
    *         <code>"40${someField}"</code>
    */
   String statusStr() default "";
+
+  /**
+   * A list of Forward annotations.
+   */
+  @Retention(RUNTIME)
+  @Target(TYPE)
+  public static @interface List {
+    Forward[] value();
+  }
 }

@@ -30,8 +30,7 @@ import static java.lang.annotation.RetentionPolicy.*;
  *
  * @author jhumphrey
  */
-
-@Target({FIELD, METHOD})
+@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 @Retention(RUNTIME)
 @Constraint(validatedBy = UnicodeValidator.class)
 @Documented
@@ -39,4 +38,11 @@ public @interface Unicode {
   String message() default "";
   Class[] groups() default {};
   Class[] payload() default {};
+
+  /**
+   * A list of Unicode annotations.
+   */
+  public static @interface List {
+    Unicode[] value();
+  }
 }

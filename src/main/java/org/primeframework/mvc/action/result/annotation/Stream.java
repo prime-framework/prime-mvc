@@ -15,12 +15,13 @@
  */
 package org.primeframework.mvc.action.result.annotation;
 
-import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.primeframework.mvc.action.result.StreamResult;
+
+import static java.lang.annotation.ElementType.*;
+import static java.lang.annotation.RetentionPolicy.*;
 
 /**
  * This annotation marks a result from an action as a Streaming result using an InputStream from the action.
@@ -28,8 +29,8 @@ import org.primeframework.mvc.action.result.StreamResult;
  * @author Brian Pontarelli
  */
 @ResultAnnotation(StreamResult.class)
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
+@Retention(RUNTIME)
+@Target(TYPE)
 public @interface Stream {
   /**
    * @return The result code from the action's execute method that this Result is associated with.
@@ -65,4 +66,13 @@ public @interface Stream {
    *         getStream method of the action should return the InputStream.
    */
   String property() default "stream";
+
+  /**
+   * A list of Stream annotations.
+   */
+  @Retention(RUNTIME)
+  @Target(TYPE)
+  public static @interface List {
+    Stream[] value();
+  }
 }
