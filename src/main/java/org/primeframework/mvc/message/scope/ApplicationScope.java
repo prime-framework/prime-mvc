@@ -72,4 +72,9 @@ public class ApplicationScope implements Scope {
 
     return Collections.emptyList();
   }
+
+  @Override
+  public void clear() {
+    context.removeAttribute(KEY);
+  }
 }

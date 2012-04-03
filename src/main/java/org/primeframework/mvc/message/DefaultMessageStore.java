@@ -114,4 +114,11 @@ public class DefaultMessageStore implements MessageStore {
 
     return map;
   }
+
+  @Override
+  public void clear() {
+    for (Scope scope : scopes.values()) {
+      scope.clear();
+    }
+  }
 }

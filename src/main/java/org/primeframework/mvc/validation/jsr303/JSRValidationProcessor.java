@@ -31,7 +31,6 @@ import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.message.l10n.MissingMessageException;
 import org.primeframework.mvc.util.ArrayBuilder;
 import org.primeframework.mvc.validation.ValidationException;
-import org.primeframework.mvc.validation.ValidationProcessor;
 import org.primeframework.mvc.validation.jsr303.util.ValidationUtils;
 
 import com.google.inject.Inject;
@@ -59,14 +58,34 @@ public class JSRValidationProcessor implements ValidationProcessor {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public void validate() throws ValidationException {
     Object action = store.getCurrent().action();
     if (action == null) {
       return;
     }
 
-    Class<?>[] groups = locator.groups();
-    Set<ConstraintViolation<Object>> violations = validator.validate(action, groups);
+    Set<ConstraintViolation<Object>> violations;
+    if (action instanceof Validatable) {
+      violations = ((Validatable) action).validate(validator);
+    } else {
+      Class<?>[] groups = locator.groups();
+      violations = validator.validate(action, groups);
+    }
+
+    // If there are any messages, throw an exception. This will handle the violations that were transferred to the
+    // MessageStore as well as the conversion errors
+    if (violations.size() > 0 || messageStore.get().size() > 0) {
+      throw new ValidationException(violations);
+    }
+  }
+
+  @Override
+  public void handle(Set<ConstraintViolation<Object>> violations) {
+    if (violations == null || violations.isEmpty()) {
+      return;
+    }
+
     for (ConstraintViolation<Object> violation : violations) {
       ConstraintDescriptor<?> descriptor = violation.getConstraintDescriptor();
       String constraint = descriptor.getAnnotation().annotationType().getSimpleName();
@@ -85,16 +104,15 @@ public class JSRValidationProcessor implements ValidationProcessor {
       try {
         message = provider.getMessage("[" + constraint + "]" + propertyPath, (Object[]) values);
       } catch (MissingMessageException e) {
-        message = provider.getMessage("[" + constraint + "]", (Object[]) values);
+        try {
+          message = provider.getMessage("[" + constraint + "]", (Object[]) values);
+        } catch (MissingMessageException e1) {
+          throw new MissingMessageException("Message could not be found for the URI [" + store.getCurrent().actionURI() +
+            "] either of the keys {[" + constraint + "]" + propertyPath + "} or {[" + constraint + "]}");
+        }
       }
 
       messageStore.add(new SimpleFieldMessage(MessageType.ERROR, propertyPath, message));
-    }
-
-    // If there are any messages, throw an exception. This will handle the violations that were transferred to the
-    // MessageStore as well as the conversion errors
-    if (messageStore.get().size() > 0) {
-      throw new ValidationException();
     }
   }
 }

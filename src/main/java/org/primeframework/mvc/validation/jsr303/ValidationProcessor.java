@@ -13,9 +13,12 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.validation;
+package org.primeframework.mvc.validation.jsr303;
 
-import org.primeframework.mvc.validation.jsr303.JSRValidationProcessor;
+import javax.validation.ConstraintViolation;
+import java.util.Set;
+
+import org.primeframework.mvc.validation.ValidationException;
 
 import com.google.inject.ImplementedBy;
 
@@ -29,7 +32,14 @@ public interface ValidationProcessor {
   /**
    * Validates the request and if validation fails throws a ValidationException.
    *
-   * @throws ValidationException If validation fails.
+   * @throws ValidationException If the validation failed.
    */
   void validate() throws ValidationException;
+
+  /**
+   * Handles violations that were produced elsewhere.
+   *
+   * @param violations The violations.
+   */
+  void handle(Set<ConstraintViolation<Object>> violations);
 }

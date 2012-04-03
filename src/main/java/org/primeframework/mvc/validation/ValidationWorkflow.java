@@ -15,6 +15,7 @@
  */
 package org.primeframework.mvc.validation;
 
+import org.primeframework.mvc.validation.jsr303.JSRValidationWorkflow;
 import org.primeframework.mvc.workflow.Workflow;
 
 import com.google.inject.ImplementedBy;
@@ -24,6 +25,6 @@ import com.google.inject.ImplementedBy;
  *
  * @author Brian Pontarelli
  */
-@ImplementedBy(DefaultValidationWorkflow.class)
+@ImplementedBy(JSRValidationWorkflow.class)
 public interface ValidationWorkflow extends Workflow {
 }

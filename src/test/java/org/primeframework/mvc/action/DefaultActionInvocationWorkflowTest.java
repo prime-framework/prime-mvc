@@ -166,7 +166,7 @@ public class DefaultActionInvocationWorkflowTest {
   @Test
   public void actionExtensionInheritance() throws Exception {
     ExtensionInheritance action = new ExtensionInheritance();
-    ActionInvocation invocation = new DefaultActionInvocation(action, ExtensionInheritance.class.getMethod("ajax"), "/foo/bar", "json", null);
+    ActionInvocation invocation = new DefaultActionInvocation(action, ExtensionInheritance.class.getMethod("json"), "/foo/bar", "json", null);
     ActionInvocationStore ais = createStrictMock(ActionInvocationStore.class);
     expect(ais.getCurrent()).andReturn(invocation);
     replay(ais);

@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.example.action.user.Edit;
+import org.example.action.user.ValidatableAction;
 import org.example.domain.Address;
 import org.example.domain.User;
 import org.primeframework.mock.servlet.MockHttpServletRequest.Method;
@@ -32,6 +33,7 @@ import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
+import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.validation.ValidationException;
 import org.testng.annotations.Test;
 
@@ -70,23 +72,56 @@ public class JSRValidationProcessorTest extends PrimeBaseTest {
   }
 
   @Test
-  public void annotationGroups() throws NoSuchMethodException {
+  public void validationAnnotationGroups() throws NoSuchMethodException {
     request.setMethod(Method.POST);
 
     Edit edit = new Edit();
+    edit.user = new User();
     edit.user.setMonth(10);
     store.setCurrent(new DefaultActionInvocation(edit, Edit.class.getMethod("post"), "/user/edit", "", new DefaultActionConfiguration(Edit.class, "/user/edit")));
     try {
       processor.validate();
       fail("Should have failed");
     } catch (ValidationException e) {
-      List<Message> messages = messageStore.get();
-      Map<String, FieldMessage> map = new HashMap<String, FieldMessage>();
-      for (Message message : messages) {
-        map.put(((FieldMessage) message).getField(), (FieldMessage) message);
-      }
+      processor.handle(e.violations);
+      Map<String, FieldMessage> map = convertToMap();
       assertEquals(map.size(), 1);
       assertEquals(map.get("user.month").toString(), "Month delete yay!");
+    }
+  }
+
+  @Test
+  public void validatable() throws NoSuchMethodException {
+    request.setMethod(Method.POST);
+
+    ValidatableAction action = new ValidatableAction(HTTPMethod.POST);
+    action.user.setYear(10);
+    action.user.setPassword("123456789012345678901234567890");
+    store.setCurrent(new DefaultActionInvocation(action, ValidatableAction.class.getMethod("post"), "/user/validatable", "", new DefaultActionConfiguration(ValidatableAction.class, "/user/validatable")));
+    try {
+      processor.validate();
+      fail("Should have failed");
+    } catch (ValidationException e) {
+      processor.handle(e.violations);
+      Map<String, FieldMessage> map = convertToMap();
+      assertEquals(map.size(), 1);
+      assertEquals(map.get("user.year").toString(), "Create year");
+    }
+
+    messageStore.clear();
+
+    action = new ValidatableAction(HTTPMethod.PUT);
+    action.user.setYear(10);
+    action.user.setPassword("123456789012345678901234567890");
+    store.setCurrent(new DefaultActionInvocation(action, ValidatableAction.class.getMethod("post"), "/user/validatable", "", new DefaultActionConfiguration(ValidatableAction.class, "/user/validatable")));
+    try {
+      processor.validate();
+      fail("Should have failed");
+    } catch (ValidationException e) {
+      processor.handle(e.violations);
+      Map<String, FieldMessage> map = convertToMap();
+      assertEquals(map.size(), 1);
+      assertEquals(map.get("user.password").toString(), "Update password");
     }
   }
 
@@ -104,11 +139,8 @@ public class JSRValidationProcessorTest extends PrimeBaseTest {
       processor.validate();
       fail("Should have failed");
     } catch (ValidationException e) {
-      List<Message> messages = messageStore.get();
-      Map<String, FieldMessage> map = new HashMap<String, FieldMessage>();
-      for (Message message : messages) {
-        map.put(((FieldMessage) message).getField(), (FieldMessage) message);
-      }
+      processor.handle(e.violations);
+      Map<String, FieldMessage> map = convertToMap();
       assertEquals(map.size(), 8);
       assertEquals(map.get("user.age").toString(), "Age is required");
       assertEquals(map.get("user.name").toString(), "Name is required");
@@ -146,13 +178,19 @@ public class JSRValidationProcessorTest extends PrimeBaseTest {
       processor.validate();
       fail("Should have failed");
     } catch (ValidationException e) {
-      List<Message> messages = messageStore.get();
-      Map<String, FieldMessage> map = new HashMap<String, FieldMessage>();
-      for (Message message : messages) {
-        map.put(((FieldMessage) message).getField(), (FieldMessage) message);
-      }
+      processor.handle(e.violations);
+      Map<String, FieldMessage> map = convertToMap();
       assertEquals(map.size(), 1);
       assertEquals(map.get("test").toString(), "failure");
     }
+  }
+
+  private Map<String, FieldMessage> convertToMap() {
+    List<Message> messages = messageStore.get();
+    Map<String, FieldMessage> map = new HashMap<String, FieldMessage>();
+    for (Message message : messages) {
+      map.put(((FieldMessage) message).getField(), (FieldMessage) message);
+    }
+    return map;
   }
 }

@@ -68,7 +68,7 @@ public class ResourceBundleMessageProvider implements MessageProvider {
   @Override
   public String getMessage(String key, Object... values) throws MissingMessageException {
     ActionInvocation actionInvocation = invocationStore.getCurrent();
-    String template = findMessage(actionInvocation.actionURI(), key);
+    String template = findMessage(actionInvocation, key);
     Formatter f = new Formatter();
     f.format(locale, template, values);
     return f.out().toString();
@@ -77,21 +77,23 @@ public class ResourceBundleMessageProvider implements MessageProvider {
   /**
    * Finds the message in a resource bundle using the search method described in the class comment.
    *
-   * @param bundle The bundle to start the search with.
+   * @param actionInvocation The action invocation.
    * @param key    The key of the message.
    * @return The message or null if it doesn't exist.
    */
-  protected String findMessage(String bundle, String key) {
-    Queue<String> names = determineBundles(bundle);
+  protected String findMessage(ActionInvocation actionInvocation, String key) {
+    String uri = actionInvocation.actionURI();
+    Queue<String> names = determineBundles(uri);
     for (String name : names) {
       try {
         ResourceBundle rb = ResourceBundle.getBundle(name, locale, control);
         return rb.getString(key);
       } catch (MissingResourceException e) {
+        // Ignore and check the next bundle
       }
     }
 
-    throw new MissingMessageException("Message could not be found for bundle name [" + bundle + "] and key [" + key + "]");
+    throw new MissingMessageException("Message could not be found for the URI [" + uri + "] and key [" + key + "]");
   }
 
   protected Queue<String> determineBundles(String bundle) {

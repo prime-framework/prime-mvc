@@ -71,4 +71,9 @@ public class RequestScope implements Scope {
 
     return Collections.emptyList();
   }
+
+  @Override
+  public void clear() {
+    request.removeAttribute(KEY);
+  }
 }

@@ -74,4 +74,9 @@ public interface MessageStore {
    * @return All of the fields messages in the given scope. This Map is not live.
    */
   Map<String, List<FieldMessage>> getFieldMessages(MessageScope scope);
+
+  /**
+   * Clears all messages in all scopes.
+   */
+  void clear();
 }

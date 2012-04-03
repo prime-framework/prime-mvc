@@ -44,4 +44,9 @@ public interface Scope {
    * @return All the messages in the scope.
    */
   List<Message> get();
+
+  /**
+   * Clears the messages in the scope.
+   */
+  void clear();
 }

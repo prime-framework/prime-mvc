@@ -92,6 +92,15 @@ public class FlashScope implements Scope {
     return messages;
   }
 
+  @Override
+  public void clear() {
+    request.removeAttribute(KEY);
+    HttpSession session = request.getSession(false);
+    if (session != null) {
+      session.removeAttribute(KEY);
+    }
+  }
+
   /**
    * Moves the flash from the session to the request.
    */

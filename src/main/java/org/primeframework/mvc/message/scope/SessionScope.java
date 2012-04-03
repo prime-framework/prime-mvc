@@ -83,4 +83,12 @@ public class SessionScope implements Scope {
 
     return Collections.emptyList();
   }
+
+  @Override
+  public void clear() {
+    HttpSession session = request.getSession(false);
+    if (session != null) {
+      session.removeAttribute(KEY);
+    }
+  }
 }

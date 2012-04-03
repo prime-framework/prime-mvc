@@ -13,11 +13,13 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.validation;
+package org.primeframework.mvc.validation.jsr303;
 
 import javax.servlet.ServletException;
 import java.io.IOException;
 
+import org.primeframework.mvc.validation.ValidationException;
+import org.primeframework.mvc.validation.ValidationWorkflow;
 import org.primeframework.mvc.workflow.WorkflowChain;
 
 import com.google.inject.Inject;
@@ -27,11 +29,11 @@ import com.google.inject.Inject;
  *
  * @author Brian Pontarelli
  */
-public class DefaultValidationWorkflow implements ValidationWorkflow {
+public class JSRValidationWorkflow implements ValidationWorkflow {
   private final ValidationProcessor validationProcessor;
 
   @Inject
-  public DefaultValidationWorkflow(ValidationProcessor validationProcessor) {
+  public JSRValidationWorkflow(ValidationProcessor validationProcessor) {
     this.validationProcessor = validationProcessor;
   }
 
@@ -43,7 +45,12 @@ public class DefaultValidationWorkflow implements ValidationWorkflow {
    * @throws ServletException If the chain throws.
    */
   public void perform(WorkflowChain chain) throws IOException, ServletException {
-    validationProcessor.validate();
-    chain.continueWorkflow();
+    try {
+      validationProcessor.validate();
+      chain.continueWorkflow();
+    } catch (ValidationException e) {
+      validationProcessor.handle(e.violations);
+      throw e;
+    }
   }
 }

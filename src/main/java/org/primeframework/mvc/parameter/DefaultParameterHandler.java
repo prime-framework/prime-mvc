@@ -123,7 +123,7 @@ public class DefaultParameterHandler implements ParameterHandler {
       try {
         expressionEvaluator.setValue(key, action, struct.values, struct.attributes);
       } catch (ConversionException ce) {
-        String message = messageProvider.getMessage("[ConversionError]" + key, new ArrayBuilder<String>(String.class, key).addAll(struct.values).done());
+        String message = messageProvider.getMessage("[ConversionError]" + key, (Object[]) new ArrayBuilder<String>(String.class, key).addAll(struct.values).done());
         messageStore.add(new SimpleFieldMessage(MessageType.ERROR, key, message));
       } catch (ExpressionException ee) {
         if (!allowUnknownParameters) {
