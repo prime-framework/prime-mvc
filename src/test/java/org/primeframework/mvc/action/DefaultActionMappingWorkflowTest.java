@@ -29,8 +29,8 @@ import org.example.action.user.Edit;
 import org.example.action.user.RESTEdit;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.PrimeException;
+import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.config.ActionConfigurationProvider;
-import org.primeframework.mvc.action.config.DefaultActionConfiguration;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
@@ -113,7 +113,7 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     ActionConfigurationProvider provider = EasyMock.createStrictMock(ActionConfigurationProvider.class);
     EasyMock.expect(provider.lookup("/admin/user/rest-edit/12")).andReturn(null);
     EasyMock.expect(provider.lookup("/admin/user/rest-edit/12/index")).andReturn(null);
-    EasyMock.expect(provider.lookup("/admin/user/rest-edit")).andReturn(new DefaultActionConfiguration(RESTEdit.class, "/admin/user/rest-edit"));
+    EasyMock.expect(provider.lookup("/admin/user/rest-edit")).andReturn(new ActionConfiguration(RESTEdit.class, null, null, null, "/admin/user/rest-edit"));
     EasyMock.replay(provider);
 
     Capture<ActionInvocation> capture = new Capture<ActionInvocation>();
@@ -134,11 +134,11 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     workflow.perform(chain);
 
     ActionInvocation ai = capture.getValue();
-    assertEquals(ai.actionURI(), "/admin/user/rest-edit");
-    assertCollections(asList("12"), ai.uriParameters());
-    assertNull(ai.extension());
-    assertNotNull(ai.configuration());
-    assertTrue(ai.executeResult());
+    assertEquals(ai.actionURI, "/admin/user/rest-edit");
+    assertCollections(asList("12"), ai.uriParameters);
+    assertNull(ai.extension);
+    assertNotNull(ai.configuration);
+    assertTrue(ai.executeResult);
 
     EasyMock.verify(provider, store, injector, chain);
   }
@@ -161,7 +161,7 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     EasyMock.expect(provider.lookup("/complex-rest/brian/static/pontarelli")).andReturn(null);
     EasyMock.expect(provider.lookup("/complex-rest/brian/static")).andReturn(null);
     EasyMock.expect(provider.lookup("/complex-rest/brian")).andReturn(null);
-    EasyMock.expect(provider.lookup("/complex-rest")).andReturn(new DefaultActionConfiguration(ComplexRest.class, "/complex-rest"));
+    EasyMock.expect(provider.lookup("/complex-rest")).andReturn(new ActionConfiguration(ComplexRest.class, null, null, null, "/complex-rest"));
     EasyMock.replay(provider);
 
     Capture<ActionInvocation> capture = new Capture<ActionInvocation>();
@@ -182,11 +182,11 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     workflow.perform(chain);
 
     ActionInvocation ai = capture.getValue();
-    assertEquals(ai.actionURI(), "/complex-rest");
-    assertCollections(asList("brian", "static", "pontarelli", "then", "a", "bunch", "of", "stuff"), ai.uriParameters());
-    assertNull(ai.extension());
-    assertNotNull(ai.configuration());
-    assertTrue(ai.executeResult());
+    assertEquals(ai.actionURI, "/complex-rest");
+    assertCollections(asList("brian", "static", "pontarelli", "then", "a", "bunch", "of", "stuff"), ai.uriParameters);
+    assertNull(ai.extension);
+    assertNotNull(ai.configuration);
+    assertTrue(ai.executeResult);
 
     EasyMock.verify(provider, store, injector, chain);
   }
@@ -201,7 +201,7 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
 
     ActionConfigurationProvider provider = EasyMock.createStrictMock(ActionConfigurationProvider.class);
     EasyMock.expect(provider.lookup("/foo")).andReturn(null);
-    EasyMock.expect(provider.lookup("/foo/index")).andReturn(new DefaultActionConfiguration(ComplexRest.class, "/foo/index"));
+    EasyMock.expect(provider.lookup("/foo/index")).andReturn(new ActionConfiguration(ComplexRest.class, null, null, null, "/foo/index"));
     EasyMock.replay(provider);
 
     ActionInvocationStore store = EasyMock.createStrictMock(ActionInvocationStore.class);
@@ -222,7 +222,7 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
 
   private void run(String uri, String extension) throws IOException, ServletException {
     ActionConfigurationProvider provider = EasyMock.createStrictMock(ActionConfigurationProvider.class);
-    EasyMock.expect(provider.lookup(uri)).andReturn(new DefaultActionConfiguration(Edit.class, uri));
+    EasyMock.expect(provider.lookup(uri)).andReturn(new ActionConfiguration(Edit.class, null, null, null, uri));
     EasyMock.replay(provider);
 
     Capture<ActionInvocation> capture = new Capture<ActionInvocation>();
@@ -243,10 +243,10 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     workflow.perform(chain);
 
     ActionInvocation ai = capture.getValue();
-    assertEquals(ai.actionURI(), uri);
-    assertEquals(ai.extension(), extension);
-    assertNotNull(ai.configuration());
-    assertTrue(ai.executeResult());
+    assertEquals(ai.actionURI, uri);
+    assertEquals(ai.extension, extension);
+    assertNotNull(ai.configuration);
+    assertTrue(ai.executeResult);
 
     EasyMock.verify(provider, store, injector, chain);
   }
@@ -260,7 +260,7 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     request.setParameter("submit", "Submit");
 
     ActionConfigurationProvider provider = EasyMock.createStrictMock(ActionConfigurationProvider.class);
-    EasyMock.expect(provider.lookup("/foo")).andReturn(new DefaultActionConfiguration(MissingExecuteMethod.class, "/foo"));
+    EasyMock.expect(provider.lookup("/foo")).andReturn(new ActionConfiguration(MissingExecuteMethod.class, null, null, null, "/foo"));
     EasyMock.replay(provider);
 
     ActionInvocationStore store = EasyMock.createStrictMock(ActionInvocationStore.class);
@@ -293,7 +293,7 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     request.setParameter("submit", "Submit");
 
     ActionConfigurationProvider provider = EasyMock.createStrictMock(ActionConfigurationProvider.class);
-    EasyMock.expect(provider.lookup("/foo")).andReturn(new DefaultActionConfiguration(InvalidExecuteMethod.class, "/foo"));
+    EasyMock.expect(provider.lookup("/foo")).andReturn(new ActionConfiguration(InvalidExecuteMethod.class, null, null, null, "/foo"));
     EasyMock.replay(provider);
 
     ActionInvocationStore store = EasyMock.createStrictMock(ActionInvocationStore.class);

@@ -50,7 +50,7 @@ public class StreamResult extends AbstractResult<Stream> {
    * {@inheritDoc}
    */
   public void execute(Stream stream) throws IOException, ServletException {
-    Object action = actionInvocationStore.getCurrent().action();
+    Object action = actionInvocationStore.getCurrent().action;
     String property = stream.property();
     String length = expand(stream.length(), action, false);
     String name = expand(stream.name(), action, true);

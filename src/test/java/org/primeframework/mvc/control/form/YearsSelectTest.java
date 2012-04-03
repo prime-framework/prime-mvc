@@ -17,7 +17,7 @@ package org.primeframework.mvc.control.form;
 
 import org.example.action.user.Edit;
 import org.example.domain.User;
-import org.primeframework.mvc.action.DefaultActionInvocation;
+import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.control.ControlBaseTest;
 import org.testng.annotations.Test;
 
@@ -33,7 +33,7 @@ public class YearsSelectTest extends ControlBaseTest {
 
   @Test
   public void actionLess() {
-    ais.setCurrent(new DefaultActionInvocation(null, null, "/years-select", null, null));
+    ais.setCurrent(new ActionInvocation(null, null, "/years-select", null, null));
     new ControlTester(yearsSelect).
       attr("name", "test").
       attr("class", "css-class").
@@ -63,7 +63,7 @@ public class YearsSelectTest extends ControlBaseTest {
     edit.user = new User();
     edit.user.setYear(2003);
 
-    ais.setCurrent(new DefaultActionInvocation(edit, null, "/years-select", null, null));
+    ais.setCurrent(new ActionInvocation(edit, null, "/years-select", null, null));
     new ControlTester(yearsSelect).
       attr("name", "user.year").
       attr("startYear", 2001).

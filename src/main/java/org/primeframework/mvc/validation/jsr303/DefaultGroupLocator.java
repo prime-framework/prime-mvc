@@ -55,10 +55,9 @@ public class DefaultGroupLocator implements GroupLocator {
   @SuppressWarnings("unchecked")
   public Class<?>[] groups() {
     // See if the execute method is annotated with the groups
-    ActionInvocation ai = store.getCurrent();
-    if (ai.method() != null && ai.method().isAnnotationPresent(Validation.class)) {
-      Validation validation = ai.method().getAnnotation(Validation.class);
-      return validation.groups();
+    ActionInvocation actionInvocation = store.getCurrent();
+    if (actionInvocation.method != null && actionInvocation.method.validation != null) {
+      return actionInvocation.method.validation.groups();
     }
 
     if (method == GET) {
@@ -70,7 +69,7 @@ public class DefaultGroupLocator implements GroupLocator {
     } else if (method == DELETE) {
       return ArrayUtils.toArray(Delete.class, Default.class);
     }
-    
+
     throw new PrimeException("Invalid HTTP method for validation [" + method + "]");
   }
 }

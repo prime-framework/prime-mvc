@@ -23,8 +23,8 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
-import org.primeframework.mvc.action.DefaultActionInvocation;
 import org.primeframework.mvc.action.result.annotation.Redirect;
 import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;
@@ -55,7 +55,7 @@ public class RedirectResultTest {
     replay(response);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, null, "/foo", "", null));
+    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/foo", "", null));
     replay(store);
 
     List<Message> messages = new ArrayList<Message>();
@@ -86,7 +86,7 @@ public class RedirectResultTest {
     replay(response);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, null, "foo", "", null));
+    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "foo", "", null));
     replay(store);
 
     List<Message> messages = new ArrayList<Message>();
@@ -117,7 +117,7 @@ public class RedirectResultTest {
     replay(response);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, null, "foo", "", null));
+    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "foo", "", null));
     replay(store);
 
     List<Message> messages = new ArrayList<Message>();
@@ -148,7 +148,7 @@ public class RedirectResultTest {
     replay(response);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, null, "foo", "", null));
+    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "foo", "", null));
     replay(store);
 
     List<Message> messages = new ArrayList<Message>();
@@ -181,7 +181,7 @@ public class RedirectResultTest {
     replay(response);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(action, null, "foo", "", null));
+    expect(store.getCurrent()).andReturn(new ActionInvocation(action, null, "foo", "", null));
     replay(store);
 
     List<Message> messages = new ArrayList<Message>();
@@ -214,7 +214,7 @@ public class RedirectResultTest {
     replay(response);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(action, null, "foo", "", null));
+    expect(store.getCurrent()).andReturn(new ActionInvocation(action, null, "foo", "", null));
     replay(store);
 
     List<Message> messages = new ArrayList<Message>();

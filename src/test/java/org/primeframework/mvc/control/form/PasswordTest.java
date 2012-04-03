@@ -17,7 +17,7 @@ package org.primeframework.mvc.control.form;
 
 import org.example.action.user.Edit;
 import org.example.domain.User;
-import org.primeframework.mvc.action.DefaultActionInvocation;
+import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.control.ControlBaseTest;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
@@ -35,7 +35,7 @@ public class PasswordTest extends ControlBaseTest {
 
   @Test
   public void actionLess() {
-    ais.setCurrent(new DefaultActionInvocation(null, null, "/password", null, null));
+    ais.setCurrent(new ActionInvocation(null, null, "/password", null, null));
     new ControlTester(password).
       attr("name", "test").
       attr("class", "css-class").
@@ -53,7 +53,7 @@ public class PasswordTest extends ControlBaseTest {
     edit.user = new User();
     edit.user.setPassword("Test");
 
-    ais.setCurrent(new DefaultActionInvocation(edit, null, "/password", null, null));
+    ais.setCurrent(new ActionInvocation(edit, null, "/password", null, null));
     new ControlTester(password).
       attr("name", "user.password").
       attr("value", "password").
@@ -70,7 +70,7 @@ public class PasswordTest extends ControlBaseTest {
     edit.user = new User();
     edit.user.setPassword("Test");
 
-    ais.setCurrent(new DefaultActionInvocation(edit, null, "/password", null, null));
+    ais.setCurrent(new ActionInvocation(edit, null, "/password", null, null));
 
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.password", "fieldError1"));
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.password", "fieldError2"));

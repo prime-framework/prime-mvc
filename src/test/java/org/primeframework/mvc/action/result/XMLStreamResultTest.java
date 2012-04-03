@@ -6,8 +6,8 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 
 import org.primeframework.mock.servlet.MockServletOutputStream;
+import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
-import org.primeframework.mvc.action.DefaultActionInvocation;
 import org.primeframework.mvc.action.result.annotation.XMLStream;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.testng.annotations.Test;
@@ -44,7 +44,7 @@ public class XMLStreamResultTest {
     replay(response);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(action, null, "/foo", "", null));
+    expect(store.getCurrent()).andReturn(new ActionInvocation(action, null, "/foo", "", null));
     replay(store);
 
     XMLStream xmlStream = new XMLStreamResultTest.XMLStreamImpl("success", "xml", 200);

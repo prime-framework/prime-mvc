@@ -86,13 +86,12 @@ public class DefaultURIParameterWorkflow implements URIParameterWorkflow {
    */
   public void perform(WorkflowChain workflowChain) throws IOException, ServletException {
     ActionInvocation invocation = actionInvocationStore.getCurrent();
-    LinkedList<String> parameters = new LinkedList<String>(invocation.uriParameters());
-    ActionConfiguration actionConfiguration = invocation.configuration();
+    LinkedList<String> parameters = new LinkedList<String>(invocation.uriParameters);
+    ActionConfiguration actionConfiguration = invocation.configuration;
 
     if (!parameters.isEmpty() && actionConfiguration != null) {
       Map<String, String[]> uriParameters = new HashMap<String, String[]>();
-      String pattern = actionConfiguration.uriParameterPattern();
-      String[] patternParts = pattern.split("/");
+      String[] patternParts = actionConfiguration.patternParts;
       for (String patternPart : patternParts) {
         // If there are no more URI parameters, we are finished
         if (parameters.isEmpty()) {

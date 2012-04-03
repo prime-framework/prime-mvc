@@ -50,7 +50,7 @@ public class XMLStreamResult extends AbstractResult<XMLStream> {
   public void execute(XMLStream xmlStream) throws IOException, ServletException {
     String xml = xmlStream.property();
 
-    Object action = actionInvocationStore.getCurrent().action();
+    Object action = actionInvocationStore.getCurrent().action;
     Object object = expressionEvaluator.getValue(xml, action);
     if (object == null || !(object instanceof String)) {
       throw new PrimeException("Invalid property [" + xml + "] for XMLStream result. This " +

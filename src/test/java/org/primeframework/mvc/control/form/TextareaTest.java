@@ -17,7 +17,7 @@ package org.primeframework.mvc.control.form;
 
 import org.example.action.user.Edit;
 import org.example.domain.User;
-import org.primeframework.mvc.action.DefaultActionInvocation;
+import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.control.ControlBaseTest;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
@@ -35,7 +35,7 @@ public class TextareaTest extends ControlBaseTest {
 
   @Test
   public void actionLess() {
-    ais.setCurrent(new DefaultActionInvocation(null, null, "/textarea", null, null));
+    ais.setCurrent(new ActionInvocation(null, null, "/textarea", null, null));
     new ControlTester(textarea).
       attr("name", "test").
       attr("class", "css-class").
@@ -52,7 +52,7 @@ public class TextareaTest extends ControlBaseTest {
     action.user = new User();
     action.user.setName("Brian");
 
-    ais.setCurrent(new DefaultActionInvocation(action, null, "/textarea", null, null));
+    ais.setCurrent(new ActionInvocation(action, null, "/textarea", null, null));
     new ControlTester(textarea).
       attr("name", "user.name").
       go("<input type=\"hidden\" name=\"user.name@param\" value=\"param-value\"/>\n" +
@@ -68,7 +68,7 @@ public class TextareaTest extends ControlBaseTest {
     action.user = new User();
     action.user.setName("<b>brian</b>");
 
-    ais.setCurrent(new DefaultActionInvocation(action, null, "/textarea", null, null));
+    ais.setCurrent(new ActionInvocation(action, null, "/textarea", null, null));
     new ControlTester(textarea).
       attr("name", "user.name").
       go("<input type=\"hidden\" name=\"user.name@param\" value=\"param-value\"/>\n" +
@@ -84,7 +84,7 @@ public class TextareaTest extends ControlBaseTest {
     action.user = new User();
     action.user.setName("Barry");
 
-    ais.setCurrent(new DefaultActionInvocation(action, null, "/textarea", null, null));
+    ais.setCurrent(new ActionInvocation(action, null, "/textarea", null, null));
 
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.name", "fieldError1"));
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.name", "fieldError2"));
@@ -102,7 +102,7 @@ public class TextareaTest extends ControlBaseTest {
   public void defaultValue() {
     Edit action = new Edit();
 
-    ais.setCurrent(new DefaultActionInvocation(action, null, "/textarea", null, null));
+    ais.setCurrent(new ActionInvocation(action, null, "/textarea", null, null));
 
     new ControlTester(textarea).
       attr("name", "user.name").
@@ -120,7 +120,7 @@ public class TextareaTest extends ControlBaseTest {
     action.user = new User();
     action.user.setName("Brian");
 
-    ais.setCurrent(new DefaultActionInvocation(action, null, "/textarea", null, null));
+    ais.setCurrent(new ActionInvocation(action, null, "/textarea", null, null));
 
     new ControlTester(textarea).
       attr("name", "user.name").

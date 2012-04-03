@@ -16,7 +16,7 @@
 package org.primeframework.mvc.control.form;
 
 import org.example.action.user.Edit;
-import org.primeframework.mvc.action.DefaultActionInvocation;
+import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.control.ControlBaseTest;
 import org.testng.annotations.Test;
 
@@ -32,7 +32,7 @@ public class ImageTest extends ControlBaseTest {
 
   @Test
   public void actionLess() {
-    ais.setCurrent(new DefaultActionInvocation(null, null, "/image", null, null));
+    ais.setCurrent(new ActionInvocation(null, null, "/image", null, null));
     new ControlTester(image).
       attr("name", "image").
       attr("value", "test-value").
@@ -47,7 +47,7 @@ public class ImageTest extends ControlBaseTest {
 
   @Test
   public void action() {
-    ais.setCurrent(new DefaultActionInvocation(new Edit(), null, "/image", null, null));
+    ais.setCurrent(new ActionInvocation(new Edit(), null, "/image", null, null));
     new ControlTester(image).
       attr("name", "image").
       attr("value", "test-value").
@@ -61,7 +61,7 @@ public class ImageTest extends ControlBaseTest {
 
   @Test
   public void html() {
-    ais.setCurrent(new DefaultActionInvocation(new Edit(), null, "/image", null, null));
+    ais.setCurrent(new ActionInvocation(new Edit(), null, "/image", null, null));
     new ControlTester(image).
       attr("name", "html").
       attr("value", "test-value").
@@ -75,7 +75,7 @@ public class ImageTest extends ControlBaseTest {
 
   @Test
   public void actionAttribute() {
-    ais.setCurrent(new DefaultActionInvocation(new Edit(), null, "/image", null, null));
+    ais.setCurrent(new ActionInvocation(new Edit(), null, "/image", null, null));
     new ControlTester(image).
       attr("name", "image").
       attr("action", "/foo").
@@ -91,7 +91,7 @@ public class ImageTest extends ControlBaseTest {
 
   @Test
   public void ismap() {
-    ais.setCurrent(new DefaultActionInvocation(new Edit(), null, "/image", null, null));
+    ais.setCurrent(new ActionInvocation(new Edit(), null, "/image", null, null));
     new ControlTester(image).
       attr("name", "image").
       attr("value", "test-value").
@@ -107,7 +107,7 @@ public class ImageTest extends ControlBaseTest {
   @Test
   public void actionContext() {
     request.setContextPath("/context");
-    ais.setCurrent(new DefaultActionInvocation(new Edit(), null, "/image", null, null));
+    ais.setCurrent(new ActionInvocation(new Edit(), null, "/image", null, null));
     new ControlTester(image).
       attr("name", "image").
       attr("value", "test-value").
@@ -124,7 +124,7 @@ public class ImageTest extends ControlBaseTest {
   @Test
   public void actionContextRelative() {
     request.setContextPath("/context");
-    ais.setCurrent(new DefaultActionInvocation(new Edit(), null, "/image", null, null));
+    ais.setCurrent(new ActionInvocation(new Edit(), null, "/image", null, null));
     new ControlTester(image).
       attr("name", "image").
       attr("value", "test-value").

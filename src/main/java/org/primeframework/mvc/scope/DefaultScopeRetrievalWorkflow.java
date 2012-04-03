@@ -58,7 +58,7 @@ public class DefaultScopeRetrievalWorkflow implements ScopeRetrievalWorkflow {
     flashScope.transferFlash();
 
     ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
-    Object action = actionInvocation.action();
+    Object action = actionInvocation.action;
 
     // Handle loading scoped members into the action
     if (action != null) {

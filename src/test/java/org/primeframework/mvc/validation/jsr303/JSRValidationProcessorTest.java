@@ -26,8 +26,6 @@ import org.example.domain.User;
 import org.primeframework.mock.servlet.MockHttpServletRequest.Method;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocationStore;
-import org.primeframework.mvc.action.DefaultActionInvocation;
-import org.primeframework.mvc.action.config.DefaultActionConfiguration;
 import org.primeframework.mvc.message.FieldMessage;
 import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;
@@ -51,7 +49,7 @@ public class JSRValidationProcessorTest extends PrimeBaseTest {
   @Inject public MessageStore messageStore;
 
   @Test
-  public void success() throws NoSuchMethodException {
+  public void success() throws Exception {
     request.setMethod(Method.POST);
 
     Edit edit = new Edit();
@@ -67,18 +65,19 @@ public class JSRValidationProcessorTest extends PrimeBaseTest {
     address.setZipcode("80020");
     edit.user.setAddress("home", address);
 
-    store.setCurrent(new DefaultActionInvocation(edit, Edit.class.getMethod("execute"), "/user/edit", "", new DefaultActionConfiguration(Edit.class, "/user/edit")));
+    store.setCurrent(makeActionInvocation(HTTPMethod.POST, edit, "execute", "/user/edit", ""));
     processor.validate();
   }
 
   @Test
-  public void validationAnnotationGroups() throws NoSuchMethodException {
+  public void validationAnnotationGroups() throws Exception {
     request.setMethod(Method.POST);
 
     Edit edit = new Edit();
     edit.user = new User();
     edit.user.setMonth(10);
-    store.setCurrent(new DefaultActionInvocation(edit, Edit.class.getMethod("post"), "/user/edit", "", new DefaultActionConfiguration(Edit.class, "/user/edit")));
+
+    store.setCurrent(makeActionInvocation(HTTPMethod.POST, edit, "execute", "/user/edit", ""));
     try {
       processor.validate();
       fail("Should have failed");
@@ -91,13 +90,14 @@ public class JSRValidationProcessorTest extends PrimeBaseTest {
   }
 
   @Test
-  public void validatable() throws NoSuchMethodException {
+  public void validatable() throws Exception {
     request.setMethod(Method.POST);
 
     ValidatableAction action = new ValidatableAction(HTTPMethod.POST);
     action.user.setYear(10);
     action.user.setPassword("123456789012345678901234567890");
-    store.setCurrent(new DefaultActionInvocation(action, ValidatableAction.class.getMethod("post"), "/user/validatable", "", new DefaultActionConfiguration(ValidatableAction.class, "/user/validatable")));
+
+    store.setCurrent(makeActionInvocation(HTTPMethod.POST, action, "execute", "/user/validatable", ""));
     try {
       processor.validate();
       fail("Should have failed");
@@ -113,7 +113,8 @@ public class JSRValidationProcessorTest extends PrimeBaseTest {
     action = new ValidatableAction(HTTPMethod.PUT);
     action.user.setYear(10);
     action.user.setPassword("123456789012345678901234567890");
-    store.setCurrent(new DefaultActionInvocation(action, ValidatableAction.class.getMethod("post"), "/user/validatable", "", new DefaultActionConfiguration(ValidatableAction.class, "/user/validatable")));
+
+    store.setCurrent(makeActionInvocation(HTTPMethod.POST, action, "execute", "/user/validatable", ""));
     try {
       processor.validate();
       fail("Should have failed");
@@ -126,7 +127,7 @@ public class JSRValidationProcessorTest extends PrimeBaseTest {
   }
 
   @Test
-  public void failure() throws NoSuchMethodException {
+  public void failure() throws Exception {
     request.setMethod(Method.POST);
 
     Edit edit = new Edit();
@@ -134,7 +135,7 @@ public class JSRValidationProcessorTest extends PrimeBaseTest {
     Address address = new Address();
     edit.user.setAddress("home", address);
 
-    store.setCurrent(new DefaultActionInvocation(edit, Edit.class.getMethod("execute"), "/user/edit", "", new DefaultActionConfiguration(Edit.class, "/user/edit")));
+    store.setCurrent(makeActionInvocation(HTTPMethod.POST, edit, "execute", "/user/edit", ""));
     try {
       processor.validate();
       fail("Should have failed");
@@ -154,7 +155,7 @@ public class JSRValidationProcessorTest extends PrimeBaseTest {
   }
 
   @Test
-  public void failureFromPrevious() throws NoSuchMethodException {
+  public void failureFromPrevious() throws Exception {
     request.setMethod(Method.POST);
 
     Edit edit = new Edit();
@@ -173,7 +174,7 @@ public class JSRValidationProcessorTest extends PrimeBaseTest {
     // Add a previous error
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "test", "failure"));
 
-    store.setCurrent(new DefaultActionInvocation(edit, Edit.class.getMethod("execute"), "/user/edit", "", new DefaultActionConfiguration(Edit.class, "/user/edit")));
+    store.setCurrent(makeActionInvocation(HTTPMethod.POST, edit, "execute", "/user/edit", ""));
     try {
       processor.validate();
       fail("Should have failed");

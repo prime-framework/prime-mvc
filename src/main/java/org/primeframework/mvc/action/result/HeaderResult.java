@@ -45,7 +45,7 @@ public class HeaderResult extends AbstractResult<Header> {
    * {@inheritDoc}
    */
   public void execute(Header header) throws IOException, ServletException {
-    Object action = actionInvocationStore.getCurrent().action();
+    Object action = actionInvocationStore.getCurrent().action;
     setStatus(header.status(), header.statusStr(), action, response);
   }
 }

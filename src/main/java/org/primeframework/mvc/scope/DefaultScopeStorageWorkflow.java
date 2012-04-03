@@ -53,7 +53,7 @@ public class DefaultScopeStorageWorkflow implements ScopeStorageWorkflow {
    */
   public void perform(WorkflowChain chain) throws IOException, ServletException {
     ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
-    Object action = actionInvocation.action();
+    Object action = actionInvocation.action;
 
     // Handle storing scoped members from the action
     if (action != null) {

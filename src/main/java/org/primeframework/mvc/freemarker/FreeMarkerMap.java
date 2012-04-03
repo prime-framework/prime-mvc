@@ -157,8 +157,8 @@ public class FreeMarkerMap implements TemplateHashModelEx {
     Deque<ActionInvocation> actionInvocations = actionInvocationStore.getDeque();
     if (actionInvocations != null) {
       for (ActionInvocation actionInvocation : actionInvocations) {
-        if (actionInvocation.action() != null) {
-          size += expressionEvaluator.getAllMembers(actionInvocation.action().getClass()).size();
+        if (actionInvocation.action != null) {
+          size += expressionEvaluator.getAllMembers(actionInvocation.action.getClass()).size();
         }
       }
     }
@@ -179,9 +179,9 @@ public class FreeMarkerMap implements TemplateHashModelEx {
     Deque<ActionInvocation> actionInvocations = actionInvocationStore.getDeque();
     if (actionInvocations != null) {
       for (ActionInvocation actionInvocation : actionInvocations) {
-        if (actionInvocation.action() != null) {
+        if (actionInvocation.action != null) {
           try {
-            value = expressionEvaluator.getValue(key, actionInvocation.action());
+            value = expressionEvaluator.getValue(key, actionInvocation.action);
             if (value != null) {
               break;
             }
@@ -237,8 +237,8 @@ public class FreeMarkerMap implements TemplateHashModelEx {
     Deque<ActionInvocation> actionInvocations = actionInvocationStore.getDeque();
     if (actionInvocations != null) {
       for (ActionInvocation actionInvocation : actionInvocations) {
-        if (actionInvocation.action() != null) {
-          keys.addAll(expressionEvaluator.getAllMembers(actionInvocation.action().getClass()));
+        if (actionInvocation.action != null) {
+          keys.addAll(expressionEvaluator.getAllMembers(actionInvocation.action.getClass()));
         }
       }
     }
@@ -254,8 +254,8 @@ public class FreeMarkerMap implements TemplateHashModelEx {
     Deque<ActionInvocation> actionInvocations = actionInvocationStore.getDeque();
     if (actionInvocations != null) {
       for (ActionInvocation actionInvocation : actionInvocations) {
-        if (actionInvocation.action() != null) {
-          values.addAll(expressionEvaluator.getAllMemberValues(actionInvocation.action()));
+        if (actionInvocation.action != null) {
+          values.addAll(expressionEvaluator.getAllMemberValues(actionInvocation.action));
         }
       }
     }

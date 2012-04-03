@@ -60,7 +60,7 @@ public class JSRValidationProcessor implements ValidationProcessor {
   @Override
   @SuppressWarnings("unchecked")
   public void validate() throws ValidationException {
-    Object action = store.getCurrent().action();
+    Object action = store.getCurrent().action;
     if (action == null) {
       return;
     }
@@ -107,7 +107,7 @@ public class JSRValidationProcessor implements ValidationProcessor {
         try {
           message = provider.getMessage("[" + constraint + "]", (Object[]) values);
         } catch (MissingMessageException e1) {
-          throw new MissingMessageException("Message could not be found for the URI [" + store.getCurrent().actionURI() +
+          throw new MissingMessageException("Message could not be found for the URI [" + store.getCurrent().actionURI +
             "] either of the keys {[" + constraint + "]" + propertyPath + "} or {[" + constraint + "]}");
         }
       }

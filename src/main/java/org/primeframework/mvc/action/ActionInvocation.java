@@ -15,7 +15,7 @@
  */
 package org.primeframework.mvc.action;
 
-import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collection;
 
 import org.primeframework.mvc.action.config.ActionConfiguration;
@@ -25,44 +25,37 @@ import org.primeframework.mvc.action.config.ActionConfiguration;
  *
  * @author Brian Pontarelli
  */
-public interface ActionInvocation {
-  /**
-   * @return The action object.
-   */
-  Object action();
+public class ActionInvocation {
+  public final Object action;
+  public final ExecuteMethod method;
+  public final String actionURI;
+  public final String extension;
+  public final Collection<String> uriParameters;
+  public final ActionConfiguration configuration;
+  public final boolean executeResult;
 
-  /**
-   * @return The action method.
-   */
-  Method method();
+  public ActionInvocation(Object action, ExecuteMethod method, String uri, String extension, ActionConfiguration configuration) {
+    this.action = action;
+    this.method = method;
+    this.actionURI = uri;
+    this.extension = extension;
+    this.uriParameters = new ArrayList<String>();
+    this.configuration = configuration;
+    this.executeResult = true;
+  }
 
-  /**
-   * @return The action URI that maps to the action object. This does not include the extension.
-   */
-  String actionURI();
+  public ActionInvocation(Object action, ExecuteMethod method, String uri, String extension, Collection<String> uriParameters,
+                          ActionConfiguration configuration, boolean executeResult) {
+    this.action = action;
+    this.method = method;
+    this.actionURI = uri;
+    this.extension = extension;
+    this.uriParameters = uriParameters;
+    this.configuration = configuration;
+    this.executeResult = executeResult;
+  }
 
-  /**
-   * @return The URI extension or null if there isn't one.
-   */
-  String extension();
-
-  /**
-   * @return The additional parts of the URI that come after the action URI.
-   */
-  Collection<String> uriParameters();
-
-  /**
-   * @return The action configuration for this invocation or null if there isn't one.
-   */
-  ActionConfiguration configuration();
-
-  /**
-   * @return True if the result should be executed, false otherwise.
-   */
-  boolean executeResult();
-
-  /**
-   * @return The URI, including the extension if there is one.
-   */
-  String uri();
+  public String uri() {
+    return actionURI + (extension != null ? "." + extension : "");
+  }
 }

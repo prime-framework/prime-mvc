@@ -84,7 +84,7 @@ public abstract class AbstractControl implements Control {
 
     if (startTemplateName() != null) {
       String templateName = "/WEB-INF/control-templates/" + startTemplateName();
-      freeMarkerService.render(writer, templateName, root, locale);
+      freeMarkerService.render(writer, templateName, root);
     }
   }
 
@@ -109,7 +109,7 @@ public abstract class AbstractControl implements Control {
   public void renderEnd(Writer writer) {
     if (endTemplateName() != null) {
       String templateName = "/WEB-INF/control-templates/" + endTemplateName();
-      freeMarkerService.render(writer, templateName, root, locale);
+      freeMarkerService.render(writer, templateName, root);
     }
   }
 
@@ -176,7 +176,7 @@ public abstract class AbstractControl implements Control {
    * @return The current action or null.
    */
   protected Object currentAction() {
-    return currentInvocation().action();
+    return currentInvocation().action;
   }
 
   /**

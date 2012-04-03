@@ -21,7 +21,7 @@ import javax.validation.Path.Node;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static java.util.Arrays.asList;
+import static java.util.Arrays.*;
 
 /**
  * JSR validation helpers.

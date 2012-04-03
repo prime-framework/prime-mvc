@@ -16,38 +16,38 @@
 package org.primeframework.mvc.action.result;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
+import org.primeframework.mvc.action.result.ForwardResult.ForwardImpl;
+import org.primeframework.mvc.action.result.RedirectResult.RedirectImpl;
 import org.primeframework.mvc.workflow.WorkflowChain;
 
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 
 /**
- * This class implements the ResultInvocationWorkflow.
+ * Handles invoking the result.
  *
  * @author Brian Pontarelli
  */
 public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow {
-  private final HttpServletResponse response;
   private final ActionInvocationStore actionInvocationStore;
-  private final ResultInvocationProvider resultInvocationProvider;
-  private final ResultProvider resultProvider;
   private final ResultStore resultStore;
+  private final ResourceLocator resourceLocator;
+  private final Injector injector;
 
   @Inject
-  public DefaultResultInvocationWorkflow(HttpServletResponse response, ActionInvocationStore actionInvocationStore,
-                                         ResultInvocationProvider resultInvocationProvider, ResultProvider resultProvider,
-                                         ResultStore resultStore) {
-    this.response = response;
+  public DefaultResultInvocationWorkflow(ActionInvocationStore actionInvocationStore, ResultStore resultStore,
+                                         ResourceLocator resourceLocator, Injector injector) {
     this.actionInvocationStore = actionInvocationStore;
-    this.resultInvocationProvider = resultInvocationProvider;
-    this.resultProvider = resultProvider;
     this.resultStore = resultStore;
+    this.resourceLocator = resourceLocator;
+    this.injector = injector;
   }
 
   /**
@@ -78,43 +78,76 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
   @SuppressWarnings("unchecked")
   public void perform(WorkflowChain chain) throws IOException, ServletException {
     try {
-      ActionInvocation invocation = actionInvocationStore.getCurrent();
-      if (invocation.executeResult()) {
-        ResultInvocation resultInvocation;
-        if (invocation.action() == null) {
-          // Try a default result mapping just for the URI
-          resultInvocation = resultInvocationProvider.lookup();
-          if (resultInvocation == null) {
+      ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
+      if (actionInvocation.executeResult) {
+        Class<?> resultType;
+        Annotation annotation;
+        if (actionInvocation.action == null) {
+          Pair<Annotation, Class<?>> p = defaultResult(actionInvocation);
+          if (p == null) {
             chain.continueWorkflow();
             return;
           }
+
+          annotation = p.getLeft();
+          resultType = p.getRight();
         } else {
           String resultCode = resultStore.get();
-          resultInvocation = resultInvocationProvider.lookup(resultCode);
-          if (resultInvocation == null) {
-            response.setStatus(404);
-            if (invocation.configuration() != null) {
-              throw new PrimeException("Missing result for action class [" + invocation.configuration().actionClass() +
-                "] URI [" + invocation.actionURI() + "] and result code [" + resultCode + "]");
-            } else {
-              throw new PrimeException("Missing result for actionless URI [" + invocation.actionURI() +
-                "] and result code [" + resultCode + "]");
-            }
+          ResultConfiguration resultConfiguration = actionInvocation.configuration.resultConfigurations.get(resultCode);
+          if (resultConfiguration == null) {
+            throw new PrimeException("Missing result for action class [" + actionInvocation.configuration.actionClass +
+              "] URI [" + actionInvocation.actionURI + "] and result code [" + resultCode + "]");
           }
+
+          resultType = resultConfiguration.resultType;
+          annotation = resultConfiguration.annotation;
         }
   
-        Annotation annotation = resultInvocation.annotation();
-        Result result = resultProvider.lookup(annotation.annotationType());
-        if (result == null) {
-          throw new PrimeException("Unmapped result annotationType [" + annotation.getClass() + "]. You probably need " +
-            "to define a Result implementation that maps to this annotationType and then add that Result implementation " +
-            "to your Guice Module.");
-        }
-  
+        Result result = (Result) injector.getInstance(resultType);
         result.execute(annotation);
       }
     } finally {
       resultStore.clear();
     }
+  }
+
+  /**
+   * Locates the default Forward or Redirect result for an action invocation and result code from an action.
+   * <p/>
+   * Checks for results using this search order:
+   * <p/>
+   * <ol>
+   *   <li>/WEB-INF/templates/&lt;uri>-&lt;resultCode>.jsp</li>
+   *   <li>/WEB-INF/templates/&lt;uri>-&lt;resultCode>.ftl</li>
+   *   <li>/WEB-INF/templates/&lt;uri>.jsp</li>
+   *   <li>/WEB-INF/templates/&lt;uri>.ftl</li>
+   *   <li>/WEB-INF/templates/&lt;uri>/index.jsp</li>
+   *   <li>/WEB-INF/templates/&lt;uri>/index.ftl</li>
+   * </ol>
+   * <p/>
+   * If nothing is found this bombs out.
+   *
+   * @param invocation The action invocation.
+   * @return The Forward and never null.
+   * @throws RuntimeException If the default forward could not be found.
+   */
+  protected Pair<Annotation, Class<?>> defaultResult(ActionInvocation invocation) {
+    String uri = resourceLocator.locate(ForwardResult.DIR);
+    if (uri != null) {
+      return Pair.<Annotation, Class<?>>of(new ForwardImpl(uri, "success"), ForwardResult.class);
+    }
+
+    // If the URI ends with a / and the forward result doesn't exist, redirecting won't help.
+    String actionURI = invocation.actionURI;
+    if (actionURI.endsWith("/")) {
+      return null;
+    }
+
+    uri = resourceLocator.locateIndex(ForwardResult.DIR);
+    if (uri != null) {
+      return Pair.<Annotation, Class<?>>of(new RedirectImpl(uri, "success", true, false), RedirectResult.class);
+    }
+
+    return null;
   }
 }

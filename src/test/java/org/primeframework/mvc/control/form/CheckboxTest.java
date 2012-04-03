@@ -22,7 +22,7 @@ import java.util.Set;
 
 import org.example.action.user.Edit;
 import org.example.domain.User;
-import org.primeframework.mvc.action.DefaultActionInvocation;
+import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.control.ControlBaseTest;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
@@ -40,7 +40,7 @@ public class CheckboxTest extends ControlBaseTest {
 
   @Test
   public void actionLess() {
-    ais.setCurrent(new DefaultActionInvocation(null, null, "/checkbox", null, null));
+    ais.setCurrent(new ActionInvocation(null, null, "/checkbox", null, null));
 
     new ControlTester(checkbox).
       attr("name", "test").
@@ -57,7 +57,7 @@ public class CheckboxTest extends ControlBaseTest {
   @Test
   public void action() {
     Edit action = new Edit();
-    ais.setCurrent(new DefaultActionInvocation(action, null, "/checkbox", null, null));
+    ais.setCurrent(new ActionInvocation(action, null, "/checkbox", null, null));
 
     // Test booleans
     action.user = new User();
@@ -123,7 +123,7 @@ public class CheckboxTest extends ControlBaseTest {
   @Test
   public void defaultChecked() {
     Edit action = new Edit();
-    ais.setCurrent(new DefaultActionInvocation(action, null, "/checkbox", null, null));
+    ais.setCurrent(new ActionInvocation(action, null, "/checkbox", null, null));
 
     new ControlTester(checkbox).
       attr("name", "user.maleWrapper").
@@ -139,7 +139,7 @@ public class CheckboxTest extends ControlBaseTest {
   @Test
   public void hardCodedChecked() {
     Edit action = new Edit();
-    ais.setCurrent(new DefaultActionInvocation(action, null, "/checkbox", null, null));
+    ais.setCurrent(new ActionInvocation(action, null, "/checkbox", null, null));
 
     new ControlTester(checkbox).
       attr("name", "user.male").
@@ -155,7 +155,7 @@ public class CheckboxTest extends ControlBaseTest {
   @Test
   public void fieldErrors() {
     Edit action = new Edit();
-    ais.setCurrent(new DefaultActionInvocation(action, null, "/checkbox", null, null));
+    ais.setCurrent(new ActionInvocation(action, null, "/checkbox", null, null));
 
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.male", "fieldError1"));
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.male", "fieldError2"));
@@ -173,7 +173,7 @@ public class CheckboxTest extends ControlBaseTest {
   @Test
   public void uncheckedValue() {
     Edit action = new Edit();
-    ais.setCurrent(new DefaultActionInvocation(action, null, "/checkbox", null, null));
+    ais.setCurrent(new ActionInvocation(action, null, "/checkbox", null, null));
 
     new ControlTester(checkbox).
       attr("name", "user.maleWrapper").

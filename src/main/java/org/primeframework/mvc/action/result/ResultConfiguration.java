@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,20 +17,17 @@ package org.primeframework.mvc.action.result;
 
 import java.lang.annotation.Annotation;
 
-import com.google.inject.ImplementedBy;
-
 /**
- * This interface defines the provider that creates Results.
+ * Stores the configuration for a result including the annotation and Result class.
  *
  * @author Brian Pontarelli
  */
-@ImplementedBy(DefaultResultProvider.class)
-public interface ResultProvider {
-  /**
-   * <p> Returns the result for the given annotation. </p>
-   *
-   * @param annotation The annotation.
-   * @return The Result or null if one was not found
-   */
-  Result lookup(Class<? extends Annotation> annotation);
+public class ResultConfiguration {
+  public final Annotation annotation;
+  public final Class<? extends Result> resultType;
+
+  public ResultConfiguration(Annotation annotation, Class<? extends Result> resultType) {
+    this.annotation = annotation;
+    this.resultType = resultType;
+  }
 }

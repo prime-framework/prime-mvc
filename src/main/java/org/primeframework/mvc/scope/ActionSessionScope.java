@@ -120,11 +120,11 @@ public class ActionSessionScope implements Scope<ActionSession> {
       className = scope.action().getName();
     } else {
       ActionInvocation ai = actionInvocationStore.getCurrent();
-      if (ai.action() == null) {
+      if (ai.action == null) {
         throw new PrimeException("Attempting to store a value in the action session but the current request URL isn'" +
           "t associated with an action class");
       }
-      className = ai.action().getClass().getName();
+      className = ai.action.getClass().getName();
     }
     return className;
   }

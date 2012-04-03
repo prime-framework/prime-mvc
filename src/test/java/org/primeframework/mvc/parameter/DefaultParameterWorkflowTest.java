@@ -90,7 +90,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(expressionEvaluator);
 
     ActionInvocation invocation = createStrictMock(ActionInvocation.class);
-    expect(invocation.action()).andReturn(action).times(2);
+    expect(invocation.action).andReturn(action).times(2);
     replay(invocation);
 
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
@@ -142,7 +142,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(expressionEvaluator);
 
     ActionInvocation invocation = createStrictMock(ActionInvocation.class);
-    expect(invocation.action()).andReturn(action).times(2);
+    expect(invocation.action).andReturn(action).times(2);
     replay(invocation);
 
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
@@ -195,7 +195,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(expressionEvaluator);
 
     ActionInvocation invocation = createStrictMock(ActionInvocation.class);
-    expect(invocation.action()).andReturn(action).times(2);
+    expect(invocation.action).andReturn(action).times(2);
     replay(invocation);
 
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
@@ -247,7 +247,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(expressionEvaluator);
 
     ActionInvocation invocation = createStrictMock(ActionInvocation.class);
-    expect(invocation.action()).andReturn(action).times(2);
+    expect(invocation.action).andReturn(action).times(2);
     replay(invocation);
 
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
@@ -298,7 +298,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(expressionEvaluator);
 
     ActionInvocation invocation = createStrictMock(ActionInvocation.class);
-    expect(invocation.action()).andReturn(action).times(2);
+    expect(invocation.action).andReturn(action).times(2);
     replay(invocation);
 
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
@@ -346,7 +346,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(request);
 
     ActionInvocation invocation = createStrictMock(ActionInvocation.class);
-    expect(invocation.action()).andReturn(action).times(2);
+    expect(invocation.action).andReturn(action).times(2);
     replay(invocation);
 
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
@@ -402,7 +402,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(expressionEvaluator);
 
     ActionInvocation invocation = createStrictMock(ActionInvocation.class);
-    expect(invocation.action()).andReturn(action);
+    expect(invocation.action).andReturn(action);
     replay(invocation);
 
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
@@ -452,7 +452,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(expressionEvaluator);
 
     ActionInvocation invocation = createStrictMock(ActionInvocation.class);
-    expect(invocation.action()).andReturn(action);
+    expect(invocation.action).andReturn(action);
     replay(invocation);
 
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
@@ -499,7 +499,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(expressionEvaluator);
 
     ActionInvocation invocation = createStrictMock(ActionInvocation.class);
-    expect(invocation.action()).andReturn(action);
+    expect(invocation.action).andReturn(action);
     replay(invocation);
 
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
@@ -550,7 +550,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(expressionEvaluator);
 
     ActionInvocation invocation = createStrictMock(ActionInvocation.class);
-    expect(invocation.action()).andReturn(action);
+    expect(invocation.action).andReturn(action);
     replay(invocation);
 
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
@@ -612,7 +612,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(expressionEvaluator);
 
     ActionInvocation invocation = createStrictMock(ActionInvocation.class);
-    expect(invocation.action()).andReturn(action);
+    expect(invocation.action).andReturn(action);
     replay(invocation);
 
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
@@ -675,7 +675,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(expressionEvaluator);
 
     ActionInvocation invocation = createStrictMock(ActionInvocation.class);
-    expect(invocation.action()).andReturn(action);
+    expect(invocation.action).andReturn(action);
     replay(invocation);
 
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);

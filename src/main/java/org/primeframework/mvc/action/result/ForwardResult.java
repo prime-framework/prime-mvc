@@ -15,15 +15,11 @@
  */
 package org.primeframework.mvc.action.result;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.annotation.Annotation;
-import java.util.Locale;
 
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
@@ -32,7 +28,6 @@ import org.primeframework.mvc.action.result.annotation.Forward;
 import org.primeframework.mvc.freemarker.FreeMarkerMap;
 import org.primeframework.mvc.freemarker.FreeMarkerService;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-import org.primeframework.mvc.util.ResourceTools;
 
 import com.google.inject.Inject;
 
@@ -45,21 +40,17 @@ import com.google.inject.Inject;
 public class ForwardResult extends AbstractResult<Forward> {
   public static final String DIR = "/WEB-INF/templates";
   private final ActionInvocationStore actionInvocationStore;
+  private final ResourceLocator resourceLocator;
   private final FreeMarkerService freeMarkerService;
-  private final ServletContext servletContext;
-  private final HttpServletRequest request;
   private final HttpServletResponse response;
   private final FreeMarkerMap freeMarkerMap;
-  private final Locale locale;
 
   @Inject
   public ForwardResult(ActionInvocationStore actionInvocationStore, ExpressionEvaluator expressionEvaluator,
-                       FreeMarkerService freeMarkerService, ServletContext servletContext, HttpServletRequest request,
-                       HttpServletResponse response, FreeMarkerMap freeMarkerMap, Locale locale) {
+                       ResourceLocator resourceLocator, FreeMarkerService freeMarkerService, HttpServletResponse response,
+                       FreeMarkerMap freeMarkerMap) {
     super(expressionEvaluator);
-    this.locale = locale;
-    this.servletContext = servletContext;
-    this.request = request;
+    this.resourceLocator = resourceLocator;
     this.response = response;
     this.freeMarkerMap = freeMarkerMap;
     this.freeMarkerService = freeMarkerService;
@@ -71,7 +62,7 @@ public class ForwardResult extends AbstractResult<Forward> {
    */
   public void execute(Forward forward) throws IOException, ServletException {
     ActionInvocation invocation = actionInvocationStore.getCurrent();
-    Object action = invocation.action();
+    Object action = invocation.action;
 
     // Set the content type for the response
     String contentType = expand(forward.contentType(), action, false);
@@ -84,7 +75,7 @@ public class ForwardResult extends AbstractResult<Forward> {
     String page = forward.page();
     String code = forward.code();
     if (page.equals("")) {
-      page = findResource(invocation, code);
+      page = resourceLocator.locate(DIR);
     }
 
     if (page == null) {
@@ -94,7 +85,7 @@ public class ForwardResult extends AbstractResult<Forward> {
     page = expand(page, action, false);
     if (!page.startsWith("/")) {
       // Strip off the last part of the URI since it is relative
-      String uri = invocation.actionURI();
+      String uri = invocation.actionURI;
       int index = uri.lastIndexOf("/");
       if (index >= 0) {
         uri = uri.substring(0, index);
@@ -103,120 +94,8 @@ public class ForwardResult extends AbstractResult<Forward> {
       page = DIR + uri + "/" + page;
     }
 
-    if (page.endsWith(".jsp")) {
-      RequestDispatcher requestDispatcher = request.getRequestDispatcher(page);
-      requestDispatcher.forward(wrapRequest(invocation, request), response);
-    } else if (page.endsWith(".ftl")) {
-      PrintWriter writer = response.getWriter();
-      freeMarkerService.render(writer, page, freeMarkerMap, locale);
-    }
-  }
-
-  /**
-   * Locates the default Forward for an action invocation and result code from an action.
-   * <p/>
-   * Checks for results using this search order:
-   * <p/>
-   * <ol>
-   *   <li>/WEB-INF/templates/&lt;uri>-&lt;resultCode>.jsp</li>
-   *   <li>/WEB-INF/templates/&lt;uri>-&lt;resultCode>.ftl</li>
-   *   <li>/WEB-INF/templates/&lt;uri>.jsp</li>
-   *   <li>/WEB-INF/templates/&lt;uri>.ftl</li>
-   *   <li>/WEB-INF/templates/&lt;uri>/index.jsp</li>
-   *   <li>/WEB-INF/templates/&lt;uri>/index.ftl</li>
-   * </ol>
-   * <p/>
-   * If nothing is found this bombs out.
-   *
-   * @param invocation The action invocation.
-   * @param resultCode The result code from the action invocation.
-   * @return The Forward and never null.
-   * @throws RuntimeException If the default forward could not be found.
-   */
-  protected Annotation defaultResult(ActionInvocation invocation, String resultCode) {
-    String uri = findResource(invocation, resultCode);
-    if (uri != null) {
-      return new ForwardImpl(uri, resultCode);
-    }
-
-    return null;
-  }
-
-  /**
-   * Determines if there is an index resource available for the given action invocation. For example, if the action URI
-   * is:
-   * <pre>
-   * /foo
-   * </pre>
-   * And there is a resource at:
-   * <pre>
-   * /foo/index.ftl
-   * </pre>
-   * We can redirect the request to that resource.
-   *
-   * @param invocation The action invocation.
-   * @return The redirect URI or null.
-   */
-  protected String redirectURI(ActionInvocation invocation) {
-    String actionURI = invocation.actionURI();
-    if (actionURI.endsWith("/")) {
-      return null;
-    }
-
-    String uri = ResourceTools.findResource(servletContext, DIR + actionURI + "/index.jsp");
-    if (uri == null) {
-      uri = ResourceTools.findResource(servletContext, DIR + actionURI + "/index.ftl");
-    }
-
-    // Return the redirect portion of the URI
-    if (uri != null) {
-      uri = actionURI + "/";
-    }
-
-    return uri;
-  }
-
-  private String findResource(ActionInvocation invocation, String resultCode) {
-    String actionURI = invocation.actionURI();
-    String extension = invocation.extension();
-    String resource = null;
-    if (actionURI.endsWith("/")) {
-      resource = ResourceTools.findResource(servletContext, DIR + actionURI + "index.jsp");
-      if (resource == null) {
-        resource = ResourceTools.findResource(servletContext, DIR + actionURI + "index.ftl");
-      }
-    } else {
-      if (extension != null) {
-        if (resultCode != null) {
-          resource = ResourceTools.findResource(servletContext, DIR + actionURI + "-" + extension + "-" + resultCode + ".jsp");
-        }
-        if (resource == null && resultCode != null) {
-          resource = ResourceTools.findResource(servletContext, DIR + actionURI + "-" + extension + "-" + resultCode + ".ftl");
-        }
-        if (resource == null) {
-          resource = ResourceTools.findResource(servletContext, DIR + actionURI + "-" + extension + ".jsp");
-        }
-        if (resource == null) {
-          resource = ResourceTools.findResource(servletContext, DIR + actionURI + "-" + extension + ".ftl");
-        }
-      }
-
-      // Look for JSP and FTL results to forward to
-      if (resource == null && resultCode != null) {
-        resource = ResourceTools.findResource(servletContext, DIR + actionURI + "-" + resultCode + ".jsp");
-      }
-      if (resource == null && resultCode != null) {
-        resource = ResourceTools.findResource(servletContext, DIR + actionURI + "-" + resultCode + ".ftl");
-      }
-      if (resource == null) {
-        resource = ResourceTools.findResource(servletContext, DIR + actionURI + ".jsp");
-      }
-      if (resource == null) {
-        resource = ResourceTools.findResource(servletContext, DIR + actionURI + ".ftl");
-      }
-    }
-
-    return resource;
+    PrintWriter writer = response.getWriter();
+    freeMarkerService.render(writer, page, freeMarkerMap);
   }
 
   public static class ForwardImpl implements Forward {

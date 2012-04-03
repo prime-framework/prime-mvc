@@ -15,34 +15,48 @@
  */
 package org.primeframework.mvc.action.config;
 
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Map;
+
+import org.primeframework.mvc.action.ExecuteMethod;
+import org.primeframework.mvc.action.annotation.Action;
+import org.primeframework.mvc.action.result.ResultConfiguration;
+import org.primeframework.mvc.servlet.HTTPMethod;
+import org.primeframework.mvc.validation.jsr303.Validatable;
+
 /**
  * This interface defines the public API that describes an action configuration.
  *
  * @author Brian Pontarelli
  */
-public interface ActionConfiguration {
-  /**
-   * @return The action class or null if the configuration is for an class-less action.
-   */
-  Class<?> actionClass();
+public class ActionConfiguration {
+  public final Class<?> actionClass;
+  public final List<Method> validationMethods;
+  public final Map<HTTPMethod, ExecuteMethod> executeMethods;
+  public final Map<String, ResultConfiguration> resultConfigurations;
+  public final boolean validatable;
+  public final String uri;
+  public final Action annotation;
+  public final String pattern;
+  public final String[] patternParts;
 
-  /**
-   * @return The URI that the action is mapped to.
-   */
-  String uri();
+  public ActionConfiguration(Class<?> actionClass, Map<HTTPMethod, ExecuteMethod> executeMethods,
+                             List<Method> validationMethods, Map<String, ResultConfiguration> resultConfigurations,
+                             String uri) {
+    this.actionClass = actionClass;
+    this.validationMethods = validationMethods;
+    this.executeMethods = executeMethods;
+    this.resultConfigurations = resultConfigurations;
+    this.validatable = Validatable.class.isAssignableFrom(actionClass);
+    this.uri = uri;
+    this.annotation = actionClass.getAnnotation(Action.class);
 
-  /**
-   * Determines if this configuration can handle the given URI. MVCConfiguration objects provide additional
-   * handling for URI parameters and other cases and this method uses the full incoming URI to determine if the
-   * configuration can handle it.
-   *
-   * @param uri The full incoming URI.
-   * @return True if this configuration can handle the URI, false if not.
-   */
-  boolean canHandle(String uri);
-
-  /**
-   * @return The URI parameter mapping pattern.
-   */
-  String uriParameterPattern();
+    this.pattern = annotation.value();
+    if (!pattern.equals("")) {
+      this.patternParts = pattern.split("/");
+    } else {
+      this.patternParts = new String[0];
+    }
+  }
 }

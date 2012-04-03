@@ -23,7 +23,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.example.action.user.Edit;
 import org.example.domain.Address;
 import org.example.domain.User;
-import org.primeframework.mvc.action.DefaultActionInvocation;
+import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.control.ControlBaseTest;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
@@ -42,7 +42,7 @@ public class CheckboxListTest extends ControlBaseTest {
 
   @Test
   public void actionLess() {
-    ais.setCurrent(new DefaultActionInvocation(null, null, "/checkbox-list", null, null));
+    ais.setCurrent(new ActionInvocation(null, null, "/checkbox-list", null, null));
     new ControlTester(checkboxList).
       attr("name", "test").
       attr("class", "css-class").
@@ -72,7 +72,7 @@ public class CheckboxListTest extends ControlBaseTest {
     action.user = new User();
     action.user.setAddress("work", address);
 
-    ais.setCurrent(new DefaultActionInvocation(action, null, "/checkbox-list", null, null));
+    ais.setCurrent(new ActionInvocation(action, null, "/checkbox-list", null, null));
     new ControlTester(checkboxList).
       attr("name", "user.addresses['work'].country").
       attr("items", lmap("US", "United States", "DE", "Germany")).
@@ -98,7 +98,7 @@ public class CheckboxListTest extends ControlBaseTest {
     action.user = new User();
     action.user.setAddress("work", address);
 
-    ais.setCurrent(new DefaultActionInvocation(action, null, "/checkbox-list", null, null));
+    ais.setCurrent(new ActionInvocation(action, null, "/checkbox-list", null, null));
     new ControlTester(checkboxList).
       attr("name", "user.addresses['work'].country").
       attr("items", lmap("<US>", "<United States>", "DE", "Germany")).
@@ -124,7 +124,7 @@ public class CheckboxListTest extends ControlBaseTest {
     action.user = new User();
     action.user.setAddress("work", address);
 
-    ais.setCurrent(new DefaultActionInvocation(action, null, "/checkbox-list", null, null));
+    ais.setCurrent(new ActionInvocation(action, null, "/checkbox-list", null, null));
 
     Pair<String, String> us = Pair.of("US", "United States");
     Pair<String, String> de = Pair.of("DE", "Germany");
@@ -156,7 +156,7 @@ public class CheckboxListTest extends ControlBaseTest {
     action.user = new User();
     action.user.setAddress("work", address);
 
-    ais.setCurrent(new DefaultActionInvocation(action, null, "/checkbox-list", null, null));
+    ais.setCurrent(new ActionInvocation(action, null, "/checkbox-list", null, null));
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "Country is required"));
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "Country must be cool"));
 

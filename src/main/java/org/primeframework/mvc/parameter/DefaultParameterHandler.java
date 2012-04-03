@@ -80,7 +80,7 @@ public class DefaultParameterHandler implements ParameterHandler {
   @Override
   public void handle(Parameters parameters) {
     ActionInvocation invocation = actionInvocationStore.getCurrent();
-    Object action = invocation.action();
+    Object action = invocation.action;
 
     // First, process the pre-parameters
     setValues(parameters.pre, action, true);

@@ -59,7 +59,7 @@ public class DefaultActionInvocationWorkflow implements ActionInvocationWorkflow
   @SuppressWarnings("unchecked")
   public void perform(WorkflowChain chain) throws IOException, ServletException {
     ActionInvocation invocation = actionInvocationStore.getCurrent();
-    if (invocation.action() != null) {
+    if (invocation.action != null) {
       String resultCode = execute(invocation);
       resultStore.set(resultCode);
     }
@@ -78,8 +78,8 @@ public class DefaultActionInvocationWorkflow implements ActionInvocationWorkflow
    *                          an exception or returned null.
    */
   protected String execute(ActionInvocation actionInvocation) throws ServletException {
-    Object action = actionInvocation.action();
-    String result = ReflectionUtils.invoke(actionInvocation.method(), action);
+    Object action = actionInvocation.action;
+    String result = ReflectionUtils.invoke(actionInvocation.method.method, action);
     if (result == null) {
       throw new PrimeException("The action class [" + action.getClass() + "] returned " +
         "null for the result code. Execute methods must never return null.");

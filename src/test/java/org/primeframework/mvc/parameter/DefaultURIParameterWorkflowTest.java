@@ -15,23 +15,20 @@
  */
 package org.primeframework.mvc.parameter;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequestWrapper;
-import java.io.IOException;
 
 import org.example.action.ComplexRest;
 import org.example.action.user.Edit;
 import org.example.action.user.RESTEdit;
 import org.primeframework.mvc.PrimeBaseTest;
+import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
-import org.primeframework.mvc.action.DefaultActionInvocation;
-import org.primeframework.mvc.action.config.DefaultActionConfiguration;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
+import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
 
 import com.google.inject.Inject;
-import static java.util.Arrays.*;
 import static org.easymock.EasyMock.*;
 import static org.testng.Assert.*;
 
@@ -44,10 +41,10 @@ public class DefaultURIParameterWorkflowTest extends PrimeBaseTest {
   @Inject public ExpressionEvaluator expressionEvaluator;
 
   @Test
-  public void noParameters() throws IOException, ServletException {
+  public void noParameters() throws Exception {
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(
-      new DefaultActionInvocation(new Edit(), null, "/admin/user/edit", null, new DefaultActionConfiguration(Edit.class, "/admin/user/edit")));
+    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, new Edit(), "post", "/admmin/user/edit", "");
+    expect(store.getCurrent()).andReturn(ai);
     replay(store);
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
@@ -61,11 +58,11 @@ public class DefaultURIParameterWorkflowTest extends PrimeBaseTest {
   }
 
   @Test
-  public void singleIDParameters() throws IOException, ServletException {
+  public void singleIDParameters() throws Exception {
     RESTEdit action = new RESTEdit();
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(
-      new DefaultActionInvocation(action, null, "/admin/user/rest-edit/12", null, asList("12"), new DefaultActionConfiguration(RESTEdit.class, "/admin/user/rest-edit"), true));
+    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, "post", "/admmin/user/rest-edit/12", "", "12");
+    expect(store.getCurrent()).andReturn(ai);
     replay(store);
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
@@ -82,13 +79,11 @@ public class DefaultURIParameterWorkflowTest extends PrimeBaseTest {
   }
 
   @Test
-  public void complexParameters() throws IOException, ServletException {
+  public void complexParameters() throws Exception {
     ComplexRest action = new ComplexRest();
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(
-      new DefaultActionInvocation(action, null, "/complex-rest/brian/static/pontarelli/then/a/bunch/of/stuff", null,
-        asList("brian", "static", "pontarelli", "then", "a", "bunch", "of", "stuff"),
-        new DefaultActionConfiguration(ComplexRest.class, "/complex-rest/brian/static/pontarelli/then/a/bunch/of/stuff"), true));
+    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, "post", "/complex-rest/brian/static/pontarelli/then/a/bunch/of/stuff", "", "brian", "static", "pontarelli", "then", "a", "bunch", "of", "stuff");
+    expect(store.getCurrent()).andReturn(ai);
     replay(store);
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);

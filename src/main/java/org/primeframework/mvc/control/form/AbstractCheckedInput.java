@@ -43,7 +43,7 @@ public abstract class AbstractCheckedInput extends AbstractInput {
   protected void addAdditionalAttributes() {
     super.addAdditionalAttributes();
     String name = (String) attributes.get("name");
-    Object action = currentInvocation().action();
+    Object action = currentInvocation().action;
     if (!attributes.containsKey("checked") && action != null) {
       Object value = expressionEvaluator.getValue(name, action);
       boolean checked = false;

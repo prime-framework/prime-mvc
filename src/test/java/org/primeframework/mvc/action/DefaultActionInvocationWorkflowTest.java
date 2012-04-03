@@ -24,7 +24,9 @@ import org.example.action.ExtensionInheritance;
 import org.example.action.Head;
 import org.example.action.Post;
 import org.example.action.Simple;
+import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.result.ResultStore;
+import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
 
@@ -36,10 +38,10 @@ import static org.testng.Assert.*;
  *
  * @author Brian Pontarelli
  */
-public class DefaultActionInvocationWorkflowTest {
+public class DefaultActionInvocationWorkflowTest extends PrimeBaseTest {
   @Test
   public void actionLess() throws Exception {
-    ActionInvocation ai = new DefaultActionInvocation(null, null, "/foo/bar", null, null);
+    ActionInvocation ai = new ActionInvocation(null, null, "/foo/bar", null, null);
     ActionInvocationStore ais = createStrictMock(ActionInvocationStore.class);
     expect(ais.getCurrent()).andReturn(ai);
     replay(ais);
@@ -60,7 +62,7 @@ public class DefaultActionInvocationWorkflowTest {
   @Test
   public void action() throws Exception {
     Simple simple = new Simple();
-    ActionInvocation invocation = new DefaultActionInvocation(simple, Simple.class.getMethod("execute"), "/foo/bar", null, null);
+    ActionInvocation invocation = makeActionInvocation(HTTPMethod.POST, simple, "execute", "/foo/bar", null);
 
     ActionInvocationStore ais = createStrictMock(ActionInvocationStore.class);
     expect(ais.getCurrent()).andReturn(invocation);
@@ -85,7 +87,7 @@ public class DefaultActionInvocationWorkflowTest {
   @Test
   public void actionThatThrowsRuntimeException() throws Exception {
     ExecuteMethodThrowsException action = new ExecuteMethodThrowsException();
-    ActionInvocation invocation = new DefaultActionInvocation(action, ExecuteMethodThrowsException.class.getMethod("execute"), "/foo/bar", null, null);
+    ActionInvocation invocation = makeActionInvocation(HTTPMethod.POST, action, "execute", "/foo/bar", null);
     ActionInvocationStore ais = createStrictMock(ActionInvocationStore.class);
     expect(ais.getCurrent()).andReturn(invocation);
     replay(ais);
@@ -112,7 +114,7 @@ public class DefaultActionInvocationWorkflowTest {
   @Test
   public void actionThatThrowsCheckedException() throws Exception {
     ExecuteMethodThrowsCheckedException action = new ExecuteMethodThrowsCheckedException();
-    ActionInvocation invocation = new DefaultActionInvocation(action, ExecuteMethodThrowsCheckedException.class.getMethod("execute"), "/foo/bar", null, null);
+    ActionInvocation invocation = makeActionInvocation(HTTPMethod.POST, action, "execute", "/foo/bar", null);
     ActionInvocationStore ais = createStrictMock(ActionInvocationStore.class);
     expect(ais.getCurrent()).andReturn(invocation);
     replay(ais);
@@ -141,7 +143,7 @@ public class DefaultActionInvocationWorkflowTest {
   @Test
   public void actionExtension() throws Exception {
     ExtensionInheritance action = new ExtensionInheritance();
-    ActionInvocation invocation = new DefaultActionInvocation(action, ExtensionInheritance.class.getMethod("ajax"), "/foo/bar", "ajax", null);
+    ActionInvocation invocation = makeActionInvocation(HTTPMethod.POST, action, "ajax", "/foo/bar", "ajax");
     ActionInvocationStore ais = createStrictMock(ActionInvocationStore.class);
     expect(ais.getCurrent()).andReturn(invocation);
     replay(ais);
@@ -166,7 +168,7 @@ public class DefaultActionInvocationWorkflowTest {
   @Test
   public void actionExtensionInheritance() throws Exception {
     ExtensionInheritance action = new ExtensionInheritance();
-    ActionInvocation invocation = new DefaultActionInvocation(action, ExtensionInheritance.class.getMethod("json"), "/foo/bar", "json", null);
+    ActionInvocation invocation = makeActionInvocation(HTTPMethod.POST, action, "json", "/foo/bar", "json");
     ActionInvocationStore ais = createStrictMock(ActionInvocationStore.class);
     expect(ais.getCurrent()).andReturn(invocation);
     replay(ais);
@@ -191,7 +193,7 @@ public class DefaultActionInvocationWorkflowTest {
   @Test
   public void httpMethod() throws Exception {
     Post action = new Post();
-    ActionInvocation invocation = new DefaultActionInvocation(action, Post.class.getMethod("post"), "/foo/bar", null, null);
+    ActionInvocation invocation = makeActionInvocation(HTTPMethod.POST, action, "post", "/foo/bar", null);
     ActionInvocationStore ais = createStrictMock(ActionInvocationStore.class);
     expect(ais.getCurrent()).andReturn(invocation);
     replay(ais);
@@ -215,7 +217,7 @@ public class DefaultActionInvocationWorkflowTest {
   @Test
   public void httpHeadMethod() throws Exception {
     Head action = new Head();
-    ActionInvocation invocation = new DefaultActionInvocation(action, Head.class.getMethod("head"), "/foo/bar", null, null);
+    ActionInvocation invocation = makeActionInvocation(HTTPMethod.POST, action, "head", "/foo/bar", null);
     ActionInvocationStore ais = createStrictMock(ActionInvocationStore.class);
     expect(ais.getCurrent()).andReturn(invocation);
     replay(ais);

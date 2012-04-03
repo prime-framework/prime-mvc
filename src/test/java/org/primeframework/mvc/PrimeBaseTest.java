@@ -17,21 +17,36 @@ package org.primeframework.mvc;
 
 import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.File;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
+import org.example.action.user.Edit;
 import org.primeframework.mock.servlet.MockHttpServletRequest;
 import org.primeframework.mock.servlet.MockHttpServletResponse;
 import org.primeframework.mock.servlet.MockHttpSession;
 import org.primeframework.mock.servlet.MockServletContext;
+import org.primeframework.mvc.action.ActionInvocation;
+import org.primeframework.mvc.action.ExecuteMethod;
+import org.primeframework.mvc.action.config.ActionConfiguration;
+import org.primeframework.mvc.action.result.Result;
+import org.primeframework.mvc.action.result.ResultConfiguration;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.guice.GuiceBootstrap;
+import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.servlet.ServletObjectsHolder;
+import org.primeframework.mvc.validation.jsr303.Validation;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
+import static java.util.Arrays.*;
 
 /**
  * This class is a base test for testing the Prime framework. It isn't recommended to use it outside of the Prime
@@ -74,7 +89,61 @@ public abstract class PrimeBaseTest {
     ServletObjectsHolder.clearServletRequest();
     ServletObjectsHolder.clearServletResponse();
   }
-  
+
+  /**
+   * Makes an action invocation and configuration.
+   *
+   * @param httpMethod The HTTP method.
+   * @param action The action object.
+   * @param methodName The method name to reflect and configure.
+   * @param uri The request URI.
+   * @param extension The extension.
+   * @return The action invocation.
+   * @throws Exception If the construction fails.
+   */
+  protected ActionInvocation makeActionInvocation(HTTPMethod httpMethod, Object action, String methodName, String uri,
+                                                  String extension, String... uriParamateres) throws Exception {
+    Method method = action.getClass().getMethod(methodName);
+    ExecuteMethod executeMethod = new ExecuteMethod(method, method.getAnnotation(Validation.class));
+    Map<HTTPMethod, ExecuteMethod> executeMethods = new HashMap<HTTPMethod, ExecuteMethod>();
+    executeMethods.put(httpMethod, executeMethod);
+
+    List<Method> validationMethods = new ArrayList<Method>();
+
+    Map<String, ResultConfiguration> resultConfigurations = new HashMap<String, ResultConfiguration>();
+
+    return new ActionInvocation(action, executeMethod, uri, extension, asList(uriParamateres),
+      new ActionConfiguration(Edit.class, executeMethods, validationMethods, resultConfigurations, uri), true);
+  }
+
+  /**
+   * Makes an action invocation and configuration.
+   *
+   * @param httpMethod The HTTP method.
+   * @param action The action object.
+   * @param methodName The method name to reflect and configure.
+   * @param uri The request URI.
+   * @param extension The extension.
+   * @return The action invocation.
+   * @throws Exception If the construction fails.
+   */
+  protected ActionInvocation makeActionInvocation(HTTPMethod httpMethod, Object action, String methodName, String uri,
+                                                  String extension, String resultCode, Annotation annotation,
+                                                  Class<? extends Result> resultType) throws Exception {
+    Method method = action.getClass().getMethod(methodName);
+    ExecuteMethod executeMethod = new ExecuteMethod(method, method.getAnnotation(Validation.class));
+    Map<HTTPMethod, ExecuteMethod> executeMethods = new HashMap<HTTPMethod, ExecuteMethod>();
+    executeMethods.put(httpMethod, executeMethod);
+
+    List<Method> validationMethods = new ArrayList<Method>();
+
+    Map<String, ResultConfiguration> resultConfigurations = new HashMap<String, ResultConfiguration>();
+    resultConfigurations.put(resultCode, new ResultConfiguration(annotation, resultType));
+
+    return new ActionInvocation(action, executeMethod, uri, extension,
+      new ActionConfiguration(Edit.class, executeMethods, validationMethods, resultConfigurations, uri));
+  }
+
   public static class TestModule extends AbstractModule {
     @Override
     protected void configure() {

@@ -16,7 +16,7 @@
 package org.primeframework.mvc.control.form;
 
 import org.example.action.user.Edit;
-import org.primeframework.mvc.action.DefaultActionInvocation;
+import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.control.ControlBaseTest;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
@@ -34,7 +34,7 @@ public class FileTest extends ControlBaseTest {
 
   @Test
   public void actionLess() {
-    ais.setCurrent(new DefaultActionInvocation(null, null, "/file", null, null));
+    ais.setCurrent(new ActionInvocation(null, null, "/file", null, null));
 
     new ControlTester(file).
       attr("name", "test").
@@ -49,7 +49,7 @@ public class FileTest extends ControlBaseTest {
   @Test
   public void action() {
     Edit action = new Edit();
-    ais.setCurrent(new DefaultActionInvocation(action, null, "/file", null, null));
+    ais.setCurrent(new ActionInvocation(action, null, "/file", null, null));
 
     new ControlTester(file).
       attr("name", "user.profile").
@@ -63,7 +63,7 @@ public class FileTest extends ControlBaseTest {
   @Test
   public void htmlLabel() {
     Edit action = new Edit();
-    ais.setCurrent(new DefaultActionInvocation(action, null, "/file", null, null));
+    ais.setCurrent(new ActionInvocation(action, null, "/file", null, null));
 
     // This verifies that HTML is left in for labels. That way people can style their labels in the message properties files
     new ControlTester(file).
@@ -78,7 +78,7 @@ public class FileTest extends ControlBaseTest {
   @Test
   public void fieldErrors() {
     Edit action = new Edit();
-    ais.setCurrent(new DefaultActionInvocation(action, null, "/file", null, null));
+    ais.setCurrent(new ActionInvocation(action, null, "/file", null, null));
 
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.profile", "fieldError1"));
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.profile", "fieldError2"));

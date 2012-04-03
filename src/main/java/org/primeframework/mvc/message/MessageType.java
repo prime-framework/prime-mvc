@@ -27,10 +27,36 @@ public interface MessageType {
   MessageType ERROR = new PrimeErrorMessageType();
 
   /**
+   * Prime info messages.
+   */
+  MessageType INFO = new PrimeInfoMessageType();
+
+  /**
+   * Prime warning messages.
+   */
+  MessageType WARNING = new PrimeWarningMessageType();
+
+  /**
    * Internal implementation for the Prime error message.
    */
   class PrimeErrorMessageType implements MessageType {
     private PrimeErrorMessageType() {
+    }
+  }
+
+  /**
+   * Internal implementation for the Prime info message.
+   */
+  class PrimeInfoMessageType implements MessageType {
+    private PrimeInfoMessageType() {
+    }
+  }
+
+  /**
+   * Internal implementation for the Prime warning message.
+   */
+  class PrimeWarningMessageType implements MessageType {
+    private PrimeWarningMessageType() {
     }
   }
 }

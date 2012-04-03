@@ -85,11 +85,11 @@ public class Form extends AbstractControl {
       ActionInvocation current = actionInvocationStore.getCurrent();
 
       ActionInvocation actionInvocation = actionMapper.map(action, false);
-      if (actionInvocation == null || actionInvocation.action() == null) {
+      if (actionInvocation == null || actionInvocation.action == null) {
         throw new PrimeException("The form action [" + action + "] is not a valid URI that maps to an action " +
           "class by the Prime MVC.");
-      } else if (current == null || current.action() == null ||
-        !current.action().getClass().equals(actionInvocation.action().getClass())) {
+      } else if (current == null || current.action == null ||
+        !current.action.getClass().equals(actionInvocation.action.getClass())) {
         actionInvocationStore.setCurrent(actionInvocation);
         differentURI = true;
       }

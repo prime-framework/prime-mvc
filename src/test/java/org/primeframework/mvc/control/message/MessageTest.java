@@ -17,7 +17,7 @@ package org.primeframework.mvc.control.message;
 
 import org.example.action.user.Edit;
 import org.primeframework.mvc.PrimeException;
-import org.primeframework.mvc.action.DefaultActionInvocation;
+import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.control.ControlBaseTest;
 import org.testng.annotations.Test;
 
@@ -36,7 +36,7 @@ public class MessageTest extends ControlBaseTest {
   @Test
   public void messageAction() {
     Edit action = new Edit();
-    ais.setCurrent(new DefaultActionInvocation(action, null, "/user/edit", null, null));
+    ais.setCurrent(new ActionInvocation(action, null, "/user/edit", null, null));
     new ControlTester(message).
       attr("key", "key").
       go("American English Message");
@@ -45,7 +45,7 @@ public class MessageTest extends ControlBaseTest {
   @Test
   public void messageBundleWithParams() {
     Edit action = new Edit();
-    ais.setCurrent(new DefaultActionInvocation(action, null, "/user/edit", null, null));
+    ais.setCurrent(new ActionInvocation(action, null, "/user/edit", null, null));
     new ControlTester(message).
       attr("key", "params").
       attr("values", asList("Params")).
@@ -55,7 +55,7 @@ public class MessageTest extends ControlBaseTest {
   @Test
   public void messageFailure() {
     Edit action = new Edit();
-    ais.setCurrent(new DefaultActionInvocation(action, null, "/user/edit", null, null));
+    ais.setCurrent(new ActionInvocation(action, null, "/user/edit", null, null));
     try {
       new ControlTester(message).
         attr("key", "bad").
@@ -69,7 +69,7 @@ public class MessageTest extends ControlBaseTest {
   @Test
   public void defaultMessage() {
     Edit action = new Edit();
-    ais.setCurrent(new DefaultActionInvocation(action, null, "/user/edit", null, null));
+    ais.setCurrent(new ActionInvocation(action, null, "/user/edit", null, null));
     new ControlTester(message).
       attr("key", "bad").
       attr("default", "Message").

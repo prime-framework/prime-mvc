@@ -65,7 +65,7 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
 
     // This case is a redirect because they URI maps to something new and there isn't an action associated with it. For
     // example, this is how the index handling works.
-    if (!invocation.uri().equals(uri) && invocation.action() == null) {
+    if (!invocation.uri().equals(uri) && invocation.action == null) {
       response.sendRedirect(invocation.uri());
       return;
     }

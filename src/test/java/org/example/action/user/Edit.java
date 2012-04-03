@@ -15,7 +15,6 @@
  */
 package org.example.action.user;
 
-import javax.validation.GroupSequence;
 import javax.validation.Valid;
 
 import org.example.domain.User;

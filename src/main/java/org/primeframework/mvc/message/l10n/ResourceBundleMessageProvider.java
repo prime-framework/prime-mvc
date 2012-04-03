@@ -82,7 +82,7 @@ public class ResourceBundleMessageProvider implements MessageProvider {
    * @return The message or null if it doesn't exist.
    */
   protected String findMessage(ActionInvocation actionInvocation, String key) {
-    String uri = actionInvocation.actionURI();
+    String uri = actionInvocation.actionURI;
     Queue<String> names = determineBundles(uri);
     for (String name : names) {
       try {

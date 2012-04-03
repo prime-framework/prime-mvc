@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc.action;
 
-import java.lang.reflect.Method;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
@@ -65,7 +64,7 @@ public class DefaultActionMapper implements ActionMapper {
       } else {
         actionConfiguration = actionConfigurationProvider.lookup(uri + "/index");
         if (actionConfiguration != null) {
-          return new DefaultActionInvocation(null, null, uri + "/", null, actionConfiguration);
+          return new ActionInvocation(null, null, uri + "/", null, actionConfiguration);
         }
       }
     }
@@ -83,7 +82,7 @@ public class DefaultActionMapper implements ActionMapper {
         // Check if this matches
         localURI = localURI.substring(0, index);
         actionConfiguration = actionConfigurationProvider.lookup(localURI);
-        if (actionConfiguration != null && !actionConfiguration.canHandle(uri)) {
+        if (actionConfiguration != null && !canHandle(actionConfiguration, uri)) {
           actionConfiguration = null;
         }
 
@@ -101,67 +100,92 @@ public class DefaultActionMapper implements ActionMapper {
 
     // Create the action and find the method
     Object action = null;
-    Method method = null;
+    ExecuteMethod method = null;
     if (actionConfiguration != null) {
-      Class<?> actionClass = actionConfiguration.actionClass();
-      if (extension != null) {
-        try {
-          method = actionClass.getMethod(extension);
-        } catch (NoSuchMethodException e) {
-          // Ignore
-        }
-      }
-
+      Class<?> actionClass = actionConfiguration.actionClass;
+      method = actionConfiguration.executeMethods.get(httpMethod);
       if (method == null) {
-        try {
-          method = actionClass.getMethod(httpMethod.name().toLowerCase());
-        } catch (NoSuchMethodException e) {
-          // Ignore
-        }
+        throw new PrimeException("The action class [" + actionClass + "] does not have a valid execute method for the HTTP method [" + httpMethod + "]");
       }
 
-      // Handle HEAD requests using a GET
-      if (method == null && httpMethod == HTTPMethod.HEAD) {
-        try {
-          method = actionClass.getMethod("get");
-        } catch (NoSuchMethodException e) {
-          // Ignore
-        }
-      }
-
-      if (method == null) {
-        try {
-          method = actionClass.getMethod("execute");
-        } catch (NoSuchMethodException e) {
-          // Ignore
-        }
-      }
-
-      if (method == null) {
-        throw new PrimeException("The action class [" + actionClass + "] is missing a valid execute method. The class " +
-          "can define a method with the same names as the HTTP method (which is currently [" +
-          httpMethod.name().toLowerCase() + "]) or it can define a default method named [execute].");
-      }
-
-      verify(method);
-
-      action = injector.getInstance(actionClass);
+      action = injector.getInstance(actionConfiguration.actionClass);
     }
 
-    return new DefaultActionInvocation(action, method, uri, extension, uriParameters, actionConfiguration, executeResult);
+    return new ActionInvocation(action, method, uri, extension, uriParameters, actionConfiguration, executeResult);
   }
 
   /**
-   * Ensures that the method is a correct execute method.
+   * Determines if the action configuration can handle the given URI. MVCConfiguration objects provide additional
+   * handling for URI parameters and other cases and this method uses the full incoming URI to determine if the
+   * configuration can handle it.
    *
-   * @param method The method.
-   * @throws PrimeException If the method is invalid.
+   * @param actionConfiguration The action configuration to check.
+   * @param uri                 The full incoming URI.
+   * @return True if this configuration can handle the URI, false if not.
    */
-  protected void verify(Method method) {
-    if (method.getReturnType() != String.class || method.getParameterTypes().length != 0) {
-      throw new PrimeException("The action class [" + method.getDeclaringClass().getClass() + "] has defined an " +
-        "execute method named [" + method.getName() + "] that is invalid. Execute methods must have zero parameters " +
-        "and return a String like this: [public String execute()].");
+  protected boolean canHandle(ActionConfiguration actionConfiguration, String uri) {
+    // Check if the URIs are equal
+    if (actionConfiguration.uri.equals(uri)) {
+      return true;
     }
+
+    // Verify that the full URI starts with this URI
+    if (!uri.startsWith(actionConfiguration.uri)) {
+      return false;
+    }
+
+    String[] uriParts = uri.substring(actionConfiguration.uri.length() + 1).split("/");
+    for (int i = 0; i < uriParts.length; i++) {
+      String uriPart = uriParts[i];
+
+      // If there are no more pattern parts, bail
+      if (i >= actionConfiguration.patternParts.length) {
+        break;
+      }
+
+      if (actionConfiguration.patternParts[i].startsWith("{*")) {
+        // Bad pattern
+        if (!actionConfiguration.patternParts[i].endsWith("}")) {
+          throw new PrimeException("Action annotation in class [" + actionConfiguration.actionClass +
+            "] contains an invalid URI parameter pattern [" + actionConfiguration.pattern + "]. A curly " +
+            "bracket is unclosed. If you want to include a curly brakcet that is not " +
+            "a URI parameter capture, you need to escape it like \\{");
+        }
+
+        // Can't have wildcard capture in the middle
+        if (i != actionConfiguration.patternParts.length - 1) {
+          throw new PrimeException("Action annotation in class [" + actionConfiguration.actionClass +
+            "] contains an invalid URI parameter pattern [" + actionConfiguration.pattern + "]. You cannot " +
+            "have a wildcard capture (i.e. {*foo}) in the middle of the pattern. It must " +
+            "be on the end of the pattern.");
+        }
+
+        break;
+      } else if (actionConfiguration.patternParts[i].startsWith("{")) {
+        if (!actionConfiguration.patternParts[i].endsWith("}")) {
+          throw new PrimeException("Action annotation in class [" + actionConfiguration.actionClass +
+            "] contains an invalid URI parameter pattern [" + actionConfiguration.pattern + "]. A curly " +
+            "bracket is unclosed. If you want to include a curly brakcet that is not " +
+            "a URI parameter capture, you need to escape it like \\{");
+        }
+      } else {
+        String patternPart = normalize(actionConfiguration.patternParts[i]);
+        if (!uriPart.equals(patternPart)) {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * Replaces \{ with { and \} with }.
+   *
+   * @param pattern The pattern to normalize.
+   * @return The normalized pattern.
+   */
+  protected String normalize(String pattern) {
+    return pattern.replace("\\{", "{").replace("\\}", "}");
   }
 }

@@ -106,7 +106,7 @@ public class DefaultParameterParser implements ParameterParser {
 
   private void preParameters(Parameters result) {
     ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
-    Object action = actionInvocation.action();
+    Object action = actionInvocation.action;
     Set<String> members = expressionEvaluator.getAllMembers(action.getClass());
     for (String member : members) {
       PreParameter annotation = null;

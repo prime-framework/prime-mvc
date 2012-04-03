@@ -45,12 +45,12 @@ public class DefaultActionConfigurationProviderTest {
 
     Map<String, ActionConfiguration> config = c.getValue();
     assertNotNull(config.get("/simple"));
-    assertSame(Simple.class, config.get("/simple").actionClass());
-    assertEquals(config.get("/simple").uri(), "/simple");
+    assertSame(Simple.class, config.get("/simple").actionClass);
+    assertEquals(config.get("/simple").uri, "/simple");
 
     assertNotNull(config.get("/user/index"));
-    assertSame(Index.class, config.get("/user/index").actionClass());
-    assertEquals(config.get("/user/index").uri(), "/user/index");
+    assertSame(Index.class, config.get("/user/index").actionClass);
+    assertEquals(config.get("/user/index").uri, "/user/index");
   }
 
 }

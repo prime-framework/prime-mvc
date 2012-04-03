@@ -18,7 +18,6 @@ package org.primeframework.mvc.freemarker;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Locale;
 
@@ -49,27 +48,19 @@ import freemarker.template.TemplateException;
 @Singleton
 public class DefaultFreeMarkerService implements FreeMarkerService {
   private final Configuration configuration;
+  private final Locale locale;
 
   @Inject
-  public DefaultFreeMarkerService(Configuration configuration) {
+  public DefaultFreeMarkerService(Configuration configuration, Locale locale) {
     this.configuration = configuration;
+    this.locale = locale;
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public String render(String templateName, Object root, Locale locale) throws FreeMarkerRenderException, MissingTemplateException {
-    StringWriter writer = new StringWriter();
-    render(writer, templateName, root, locale);
-    return writer.toString();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void render(Writer writer, String templateName, Object root, Locale locale) throws FreeMarkerRenderException, MissingTemplateException {
+  public void render(Writer writer, String templateName, Object root) throws FreeMarkerRenderException, MissingTemplateException {
     try {
       Template template = configuration.getTemplate(templateName, locale);
       template.process(root, writer);

@@ -25,8 +25,8 @@ import org.easymock.EasyMock;
 import org.example.action.Simple;
 import org.example.action.user.Edit;
 import org.primeframework.mvc.PrimeException;
+import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
-import org.primeframework.mvc.action.DefaultActionInvocation;
 import org.primeframework.mvc.scope.annotation.ActionSession;
 import org.testng.annotations.Test;
 
@@ -55,7 +55,7 @@ public class ActionSessionScopeTest {
     EasyMock.replay(request);
 
     ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
-    EasyMock.expect(ais.getCurrent()).andReturn(new DefaultActionInvocation(new Edit(), null, null, null, null));
+    EasyMock.expect(ais.getCurrent()).andReturn(new ActionInvocation(new Edit(), null, null, null, null));
     EasyMock.replay(ais);
 
     ActionSessionScope scope = new ActionSessionScope(request, ais);
@@ -157,7 +157,7 @@ public class ActionSessionScopeTest {
     EasyMock.replay(request);
 
     ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
-    EasyMock.expect(ais.getCurrent()).andReturn(new DefaultActionInvocation(new Edit(), null, null, null, null));
+    EasyMock.expect(ais.getCurrent()).andReturn(new ActionInvocation(new Edit(), null, null, null, null));
     EasyMock.replay(ais);
 
     ActionSessionScope scope = new ActionSessionScope(request, ais);
@@ -232,7 +232,7 @@ public class ActionSessionScopeTest {
     EasyMock.replay(request);
 
     ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
-    EasyMock.expect(ais.getCurrent()).andReturn(new DefaultActionInvocation(null, null, null, null, null));
+    EasyMock.expect(ais.getCurrent()).andReturn(new ActionInvocation(null, null, null, null, null));
     EasyMock.replay(ais);
 
     ActionSessionScope scope = new ActionSessionScope(request, ais);
@@ -272,7 +272,7 @@ public class ActionSessionScopeTest {
     EasyMock.replay(request);
 
     ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
-    EasyMock.expect(ais.getCurrent()).andReturn(new DefaultActionInvocation(new Edit(), null, null, null, null));
+    EasyMock.expect(ais.getCurrent()).andReturn(new ActionInvocation(new Edit(), null, null, null, null));
     EasyMock.replay(ais);
 
     ActionSessionScope scope = new ActionSessionScope(request, ais);
@@ -309,7 +309,7 @@ public class ActionSessionScopeTest {
     EasyMock.replay(request);
 
     ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
-    EasyMock.expect(ais.getCurrent()).andReturn(new DefaultActionInvocation(new Edit(), null, null, null, null));
+    EasyMock.expect(ais.getCurrent()).andReturn(new ActionInvocation(new Edit(), null, null, null, null));
     EasyMock.replay(ais);
 
     ActionSessionScope scope = new ActionSessionScope(request, ais);
@@ -404,7 +404,7 @@ public class ActionSessionScopeTest {
     EasyMock.replay(request);
 
     ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
-    EasyMock.expect(ais.getCurrent()).andReturn(new DefaultActionInvocation(new Edit(), null, null, null, null));
+    EasyMock.expect(ais.getCurrent()).andReturn(new ActionInvocation(new Edit(), null, null, null, null));
     EasyMock.replay(ais);
 
     ActionSessionScope scope = new ActionSessionScope(request, ais);
@@ -474,7 +474,7 @@ public class ActionSessionScopeTest {
     EasyMock.replay(request);
 
     ActionInvocationStore ais = EasyMock.createStrictMock(ActionInvocationStore.class);
-    EasyMock.expect(ais.getCurrent()).andReturn(new DefaultActionInvocation(null, null, null, null, null));
+    EasyMock.expect(ais.getCurrent()).andReturn(new ActionInvocation(null, null, null, null, null));
     EasyMock.replay(ais);
 
     ActionSessionScope scope = new ActionSessionScope(request, ais);

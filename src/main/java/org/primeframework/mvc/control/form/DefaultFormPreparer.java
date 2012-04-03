@@ -43,7 +43,7 @@ public class DefaultFormPreparer implements FormPreparer {
   public void prepare() {
     // Get the action object
     ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
-    Object action = actionInvocation.action();
+    Object action = actionInvocation.action;
     if (action == null) {
       return;
     }

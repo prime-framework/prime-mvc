@@ -15,19 +15,19 @@
  */
 package org.primeframework.mvc.action.result;
 
-import javax.servlet.http.HttpServletResponse;
-import java.lang.annotation.Annotation;
-
-import org.example.action.Simple;
+import org.example.action.user.Edit;
+import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
-import org.primeframework.mvc.action.DefaultActionInvocation;
-import org.primeframework.mvc.action.config.DefaultActionConfiguration;
+import org.primeframework.mvc.action.result.ForwardResult.ForwardImpl;
 import org.primeframework.mvc.action.result.annotation.Forward;
+import org.primeframework.mvc.action.result.annotation.Redirect;
+import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
 
+import com.google.inject.Injector;
 import static org.easymock.EasyMock.*;
 import static org.testng.Assert.*;
 
@@ -36,227 +36,196 @@ import static org.testng.Assert.*;
  *
  * @author Brian Pontarelli
  */
-public class DefaultResultInvocationWorkflowTest {
+public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
   @Test
-  public void actionLessWithDefault() throws Exception {
-    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    replay(response);
-
-    ActionInvocation ai = new DefaultActionInvocation(null, null, "/foo/bar", null, null);
+  public void actionLessWithDefaultForward() throws Exception {
+    ActionInvocation ai = new ActionInvocation(null, null, "/foo/bar", null, null);
     ActionInvocationStore ais = createStrictMock(ActionInvocationStore.class);
     expect(ais.getCurrent()).andReturn(ai);
     replay(ais);
 
-    Annotation annotation = new ForwardResult.ForwardImpl("/foo/bar", null);
-    ResultInvocation ri = new DefaultResultInvocation(annotation, "/foo/bar", null);
-    ResultInvocationProvider rip = createStrictMock(ResultInvocationProvider.class);
-    expect(rip.lookup()).andReturn(ri);
-    replay(rip);
-
-    Result result = createStrictMock(Result.class);
-    result.execute(annotation);
-    replay(result);
-
-    ResultProvider resultProvider = createStrictMock(ResultProvider.class);
-    expect(resultProvider.lookup(Forward.class)).andReturn(result);
-    replay(resultProvider);
-
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
     replay(chain);
-    
+
     ResultStore resultStore = createStrictMock(ResultStore.class);
     resultStore.clear();
     replay(resultStore);
 
-    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(response, ais, rip, resultProvider, resultStore);
+    ResourceLocator resourceLocator = createStrictMock(ResourceLocator.class);
+    expect(resourceLocator.locate(ForwardResult.DIR)).andReturn("/foo/bar.ftl");
+    replay(resourceLocator);
+
+    ForwardResult result = createStrictMock(ForwardResult.class);
+    result.execute(isA(Forward.class));
+    replay(result);
+
+    Injector injector = createStrictMock(Injector.class);
+    expect(injector.getInstance(ForwardResult.class)).andReturn(result);
+    replay(injector);
+
+    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(ais, resultStore, resourceLocator, injector);
     workflow.perform(chain);
 
-    verify(response, ais, rip, result, resultProvider, chain);
+    verify(ais, resultStore, resourceLocator, injector, chain);
   }
 
   @Test
-  public void actionLessWithoutDefault() throws Exception {
-    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    replay(response);
-
-    ActionInvocation ai = new DefaultActionInvocation(null, null, "/foo/bar", null, null);
+  public void actionLessWithDefaultRedirect() throws Exception {
+    ActionInvocation ai = new ActionInvocation(null, null, "/foo/bar", null, null);
     ActionInvocationStore ais = createStrictMock(ActionInvocationStore.class);
     expect(ais.getCurrent()).andReturn(ai);
     replay(ais);
 
-    ResultInvocationProvider rip = createStrictMock(ResultInvocationProvider.class);
-    expect(rip.lookup()).andReturn(null);
-    replay(rip);
+    ResultStore resultStore = createStrictMock(ResultStore.class);
+    resultStore.clear();
+    replay(resultStore);
 
-    Result result = createStrictMock(Result.class);
-    replay(result);
+    ResourceLocator resourceLocator = createStrictMock(ResourceLocator.class);
+    expect(resourceLocator.locate(ForwardResult.DIR)).andReturn(null);
+    expect(resourceLocator.locateIndex(ForwardResult.DIR)).andReturn("/foo/bar/");
+    replay(resourceLocator);
 
-    ResultProvider resultProvider = createStrictMock(ResultProvider.class);
-    replay(resultProvider);
+    RedirectResult result = createStrictMock(RedirectResult.class);
+    result.execute(isA(Redirect.class));
+    replay(resourceLocator);
+
+    Injector injector = createStrictMock(Injector.class);
+    expect(injector.getInstance(RedirectResult.class)).andReturn(result);
+    replay(injector);
+
+    WorkflowChain chain = createStrictMock(WorkflowChain.class);
+    replay(chain);
+
+    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(ais, resultStore, resourceLocator, injector);
+    workflow.perform(chain);
+
+    verify(ais, resultStore, resourceLocator, injector, chain);
+  }
+
+  @Test
+  public void actionLessWithoutDefault() throws Exception {
+    ActionInvocation ai = new ActionInvocation(null, null, "/foo/bar", null, null);
+    ActionInvocationStore ais = createStrictMock(ActionInvocationStore.class);
+    expect(ais.getCurrent()).andReturn(ai);
+    replay(ais);
+
+    ResultStore resultStore = createStrictMock(ResultStore.class);
+    resultStore.clear();
+    replay(resultStore);
+
+    ResourceLocator resourceLocator = createStrictMock(ResourceLocator.class);
+    expect(resourceLocator.locate(ForwardResult.DIR)).andReturn(null);
+    expect(resourceLocator.locateIndex(ForwardResult.DIR)).andReturn(null);
+    replay(resourceLocator);
+
+    Injector injector = createStrictMock(Injector.class);
+    replay(injector);
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
     chain.continueWorkflow();
     replay(chain);
 
-    ResultStore resultStore = createStrictMock(ResultStore.class);
-    resultStore.clear();
-    replay(resultStore);
-
-    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(response, ais, rip, resultProvider, resultStore);
+    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(ais, resultStore, resourceLocator, injector);
     workflow.perform(chain);
 
-    verify(response, ais, rip, result, resultProvider, chain);
+    verify(ais, resultStore, resourceLocator, injector, chain);
   }
 
   @Test
   public void actionWithResult() throws Exception {
-    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    replay(response);
-
-    Simple simple = new Simple();
-    ActionInvocation invocation = new DefaultActionInvocation(simple, null, "/foo/bar", null, null, new DefaultActionConfiguration(Simple.class, "/foo/bar"), true);
+    ForwardImpl annotation = new ForwardImpl("/user/edit", "success");
+    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, new Edit(), "post", "/user/edit", "", "success", annotation, ForwardResult.class);
     ActionInvocationStore ais = createStrictMock(ActionInvocationStore.class);
-    expect(ais.getCurrent()).andReturn(invocation);
+    expect(ais.getCurrent()).andReturn(ai);
     replay(ais);
-
-    Annotation annotation = new ForwardResult.ForwardImpl("/foo/bar", "success");
-    ResultInvocation ri = new DefaultResultInvocation(annotation, "/foo/bar", "success");
-    ResultInvocationProvider rip = createStrictMock(ResultInvocationProvider.class);
-    expect(rip.lookup("success")).andReturn(ri);
-    replay(rip);
-
-    Result result = createStrictMock(Result.class);
-    result.execute(annotation);
-    replay(result);
-
-    ResultProvider resultProvider = createStrictMock(ResultProvider.class);
-    expect(resultProvider.lookup(annotation.annotationType())).andReturn(result);
-    replay(resultProvider);
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
     replay(chain);
-    
+
     ResultStore resultStore = createStrictMock(ResultStore.class);
     expect(resultStore.get()).andReturn("success");
     resultStore.clear();
     replay(resultStore);
 
-    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(response, ais, rip, resultProvider, resultStore);
+    ResourceLocator resourceLocator = createStrictMock(ResourceLocator.class);
+    replay(resourceLocator);
+
+    ForwardResult result = createStrictMock(ForwardResult.class);
+    result.execute(annotation);
+    replay(result);
+
+    Injector injector = createStrictMock(Injector.class);
+    expect(injector.getInstance(ForwardResult.class)).andReturn(result);
+    replay(injector);
+
+    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(ais, resultStore, resourceLocator, injector);
     workflow.perform(chain);
 
-    verify(response, ais, rip, result, resultProvider, chain);
+    verify(ais, resultStore, resourceLocator, injector, chain);
   }
 
   @Test
   public void actionSuppressResult() throws Exception {
-    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    replay(response);
-
-    Simple simple = new Simple();
-    ActionInvocation invocation = new DefaultActionInvocation(simple, null, "/foo/bar", null, null, new DefaultActionConfiguration(Simple.class, "/foo/bar"), false);
+    ActionInvocation ai = new ActionInvocation(null, null, null, null, null, null, false);
     ActionInvocationStore ais = createStrictMock(ActionInvocationStore.class);
-    expect(ais.getCurrent()).andReturn(invocation);
+    expect(ais.getCurrent()).andReturn(ai);
     replay(ais);
-
-    ResultInvocationProvider rip = createStrictMock(ResultInvocationProvider.class);
-    replay(rip);
-
-    Result result = createStrictMock(Result.class);
-    replay(result);
-
-    ResultProvider resultProvider = createStrictMock(ResultProvider.class);
-    replay(resultProvider);
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
     replay(chain);
 
     ResultStore resultStore = createStrictMock(ResultStore.class);
+    expect(resultStore.get()).andReturn("success");
     resultStore.clear();
     replay(resultStore);
-    
-    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(response, ais, rip, resultProvider, resultStore);
+
+    ResourceLocator resourceLocator = createStrictMock(ResourceLocator.class);
+    replay(resourceLocator);
+
+    Injector injector = createStrictMock(Injector.class);
+    replay(injector);
+
+    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(ais, resultStore, resourceLocator, injector);
     workflow.perform(chain);
 
-    verify(response, ais, rip, result, resultProvider, chain);
+    verify(ais, resultStore, resourceLocator, injector, chain);
   }
 
   @Test
   public void actionMissingResult() throws Exception {
-    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    response.setStatus(404);
-    replay(response);
-
-    Simple simple = new Simple();
-    ActionInvocation invocation = new DefaultActionInvocation(simple, null, "/foo/bar", null, null, new DefaultActionConfiguration(Simple.class, "/foo/bar"), true);
+    ForwardImpl annotation = new ForwardImpl("/user/edit", "success");
+    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, new Edit(), "post", "/user/edit", "", "success", annotation, ForwardResult.class);
     ActionInvocationStore ais = createStrictMock(ActionInvocationStore.class);
-    expect(ais.getCurrent()).andReturn(invocation);
+    expect(ais.getCurrent()).andReturn(ai);
     replay(ais);
-
-    ResultInvocationProvider rip = createStrictMock(ResultInvocationProvider.class);
-    expect(rip.lookup("success")).andReturn(null);
-    replay(rip);
-
-    ResultProvider resultProvider = createStrictMock(ResultProvider.class);
-    replay(resultProvider);
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
     replay(chain);
 
     ResultStore resultStore = createStrictMock(ResultStore.class);
-    expect(resultStore.get()).andReturn("success");
+    expect(resultStore.get()).andReturn("failure");
     resultStore.clear();
     replay(resultStore);
 
-    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(response, ais, rip, resultProvider, resultStore);
+    ResourceLocator resourceLocator = createStrictMock(ResourceLocator.class);
+    replay(resourceLocator);
+
+    ForwardResult result = createStrictMock(ForwardResult.class);
+    result.execute(annotation);
+    replay(result);
+
+    Injector injector = createStrictMock(Injector.class);
+    expect(injector.getInstance(ForwardResult.class)).andReturn(result);
+    replay(injector);
+
+    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(ais, resultStore, resourceLocator, injector);
     try {
       workflow.perform(chain);
-      fail("Should have failed with 404");
+      fail("Should have thrown a PrimeException");
     } catch (PrimeException e) {
-      System.out.println(e);
       // Expected
     }
 
-    verify(response, ais, rip, resultProvider, chain);
-  }
-
-  @Test
-  public void actionMissingResultType() throws Exception {
-    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    replay(response);
-
-    Simple simple = new Simple();
-    ActionInvocation invocation = new DefaultActionInvocation(simple, null, "/foo/bar", null, null, new DefaultActionConfiguration(Simple.class, "/foo/bar"), true);
-    ActionInvocationStore ais = createStrictMock(ActionInvocationStore.class);
-    expect(ais.getCurrent()).andReturn(invocation);
-    replay(ais);
-
-    Annotation annotation = new ForwardResult.ForwardImpl("/foo/bar", "success");
-    ResultInvocation ri = new DefaultResultInvocation(annotation, "/foo/bar", "success");
-    ResultInvocationProvider rip = createStrictMock(ResultInvocationProvider.class);
-    expect(rip.lookup("success")).andReturn(ri);
-    replay(rip);
-
-    ResultProvider resultProvider = createStrictMock(ResultProvider.class);
-    expect(resultProvider.lookup(annotation.annotationType())).andReturn(null);
-    replay(resultProvider);
-
-    WorkflowChain chain = createStrictMock(WorkflowChain.class);
-    replay(chain);
-
-    ResultStore resultStore = createStrictMock(ResultStore.class);
-    expect(resultStore.get()).andReturn("success");
-    resultStore.clear();
-    replay(resultStore);
-
-    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(response, ais, rip, resultProvider, resultStore);
-    try {
-      workflow.perform(chain);
-      fail("Should have failed");
-    } catch (PrimeException e) {
-      System.out.println(e);
-      // Expected
-    }
-
-    verify(response, ais, rip, resultProvider, chain);
+    verify(ais, resultStore, resourceLocator, injector, chain);
   }
 }
