@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.example.action.KitchenSink;
 import org.example.action.user.Edit;
 import org.example.action.user.ValidatableAction;
 import org.example.domain.Address;
@@ -86,6 +87,24 @@ public class JSRValidationProcessorTest extends PrimeBaseTest {
       Map<String, FieldMessage> map = convertToMap();
       assertEquals(map.size(), 1);
       assertEquals(map.get("user.month").toString(), "Month delete yay!");
+    }
+  }
+
+  @Test
+  public void validationMethod() throws Exception {
+    request.setMethod(Method.POST);
+
+    KitchenSink action = new KitchenSink(messageStore);
+
+    store.setCurrent(makeActionInvocation(HTTPMethod.POST, action, "post", "/kitchen-sink", ""));
+    try {
+      processor.validate();
+      fail("Should have failed");
+    } catch (ValidationException e) {
+      processor.handle(e.violations);
+      Map<String, FieldMessage> map = convertToMap();
+      assertEquals(map.size(), 1);
+      assertEquals(map.get("foo").toString(), "ValidationMethod message");
     }
   }
 

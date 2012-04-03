@@ -39,6 +39,7 @@ import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.guice.GuiceBootstrap;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.servlet.ServletObjectsHolder;
+import org.primeframework.mvc.validation.ValidationMethod;
 import org.primeframework.mvc.validation.jsr303.Validation;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -124,6 +125,11 @@ public abstract class PrimeBaseTest {
     }
 
     List<Method> validationMethods = new ArrayList<Method>();
+    for (Method method : action.getClass().getMethods()) {
+      if (method.isAnnotationPresent(ValidationMethod.class)) {
+        validationMethods.add(method);
+      }
+    }
 
     Map<String, ResultConfiguration> resultConfigurations = new HashMap<String, ResultConfiguration>();
 

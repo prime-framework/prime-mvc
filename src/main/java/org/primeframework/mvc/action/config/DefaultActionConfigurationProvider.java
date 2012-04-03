@@ -18,6 +18,7 @@ package org.primeframework.mvc.action.config;
 import javax.servlet.ServletContext;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -229,14 +230,20 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
           for (Annotation result : results) {
             annotationType = result.annotationType();
             resultAnnotation = annotationType.getAnnotation(ResultAnnotation.class);
-            addResultConfiguration(actionClass, resultConfigurations, annotation, annotationType, resultAnnotation);
+            addResultConfiguration(actionClass, resultConfigurations, result, annotationType, resultAnnotation);
           }
-        } catch (Exception e) {
-          throw new PrimeException("The custom result annotation container [" + annotationType + "] must " +
-            "have a method named [value] that is an array of result annotations. For example:\n\n" +
+        } catch (NoSuchMethodException e) {
+          throw new PrimeException("The result annotation container [" + annotationType + "] must have a method named " +
+            "[value] that is an array of result annotations. For example:\n\n" +
             "public @interface MyContainer {\n" +
             "  MyResult[] value();\n" +
-            "}");
+            "}", e);
+        } catch (InvocationTargetException e) {
+          throw new PrimeException("Unable to invoke the value() method on the result annotation container [" +
+            annotationType + "]", e);
+        } catch (IllegalAccessException e) {
+          throw new PrimeException("Unable to invoke the value() method on the result annotation container [" +
+            annotationType + "]", e);
         }
       }
     }
@@ -262,12 +269,18 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
       }
 
       resultConfigurations.put(code, new ResultConfiguration(annotation, resultAnnotation.value()));
-    } catch (Exception e) {
-      throw new PrimeException("The custom result annotation [" + annotationType + "] is missing a method named [code] " +
-        "that returns a String. For example:\n\n" +
+    } catch (NoSuchMethodException e) {
+      throw new PrimeException("The result annotation [" + annotationType + "] is missing a method named [code] that " +
+        "returns a String. For example:\n\n" +
         "public @interface MyResult {\n" +
         "  String code() default \"success\";\n" +
-        "}");
+        "}", e);
+    } catch (InvocationTargetException e) {
+      throw new PrimeException("Unable to invoke the code() method on the result annotation container [" +
+        annotationType + "]", e);
+    } catch (IllegalAccessException e) {
+      throw new PrimeException("Unable to invoke the code() method on the result annotation container [" +
+        annotationType + "]", e);
     }
   }
 }
