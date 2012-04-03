@@ -4,9 +4,9 @@ version = "0.2"
 description = "Prime MVC Framework"
 
 // Plugins
-apply plugin: 'java'
-apply plugin: 'idea'
-apply plugin: 'integration'
+apply plugin: "java"
+apply plugin: "idea"
+apply plugin: "init"
 apply plugin: "release"
 
 // Build script config
@@ -23,8 +23,8 @@ buildscript {
   }
   dependencies {
     classpath(
-      "org.primeframework.gradle:gradle-integration-plugin:0.1",
-      "org.primeframework.gradle:gradle-release-plugin:0.1"
+      "org.primeframework.gradle:gradle-init-plugin:0.3",
+      "org.primeframework.gradle:gradle-release-plugin:0.6"
     )
   }
 }
@@ -32,16 +32,6 @@ buildscript {
 // Dependencies
 repositories {
   mavenCentral()
-  ivy {
-    name "inversoftPublic"
-    ivyPattern "http://hawking.inversoft.com/repository/public/[organisation]/[module]/[revision]/ivy.xml"
-    artifactPattern "http://hawking.inversoft.com/repository/public/[organisation]/[module]/[revision]/[type]s/[artifact]-[revision].[ext]"
-  }
-  ivy {
-    name "releaseRepository"
-    ivyPattern "file:///$releasePlugin.inversoftIvyGitRepo/repository/public/[organisation]/[module]/[revision]/ivy.xml"
-    artifactPattern "file:///$releasePlugin.inversoftIvyGitRepo/repository/public/[organisation]/[module]/[revision]/[type]s/[artifact]-[revision].[ext]"
-  }
 }
 
 dependencies {
@@ -69,29 +59,17 @@ dependencies {
   )
 }
 
-// IDEA config
-idea {
-  pathVariables USER_HOME: file(System.getProperty('user.home'))
-  module {
-    scopes.PROVIDED.plus += configurations.compileOnly
-    iml {
-      whenMerged { module ->
-        module.dependencies*.exported = false
-      }
-    }
-  }
-}
-
 // Java config
 sourceCompatibility = 1.6
+
+// use testng
 test {
   useTestNG()
 }
-compileJava.options.debugOptions.debugLevel = "source,lines,vars"
+
 compileJava.doLast {
   copy {
     from "src/main/ftl"
     into "build/classes/main"
   }
 }
-compileTestJava.options.debugOptions.debugLevel = "source,lines,vars"
