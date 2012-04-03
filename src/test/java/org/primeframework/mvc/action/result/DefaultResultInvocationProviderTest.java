@@ -43,7 +43,7 @@ public class DefaultResultInvocationProviderTest {
     replay(context);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, "/foo/bar", null, null));
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, null, "/foo/bar", null, null));
     replay(store);
 
     DefaultResultInvocationProvider provider = new DefaultResultInvocationProvider(store, new ForwardResult(store, null, null, context, null, null, null, Locale.CANADA));
@@ -67,7 +67,7 @@ public class DefaultResultInvocationProviderTest {
     replay(context);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, "/foo/bar", "ajax", null));
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, null, "/foo/bar", "ajax", null));
     replay(store);
 
     DefaultResultInvocationProvider provider = new DefaultResultInvocationProvider(store, new ForwardResult(store, null, null, context, null, null, null, Locale.CANADA));
@@ -91,7 +91,7 @@ public class DefaultResultInvocationProviderTest {
     replay(context);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, "/foo/bar", null, null));
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, null, "/foo/bar", null, null));
     replay(store);
 
     DefaultResultInvocationProvider provider = new DefaultResultInvocationProvider(store, new ForwardResult(store, null, null, context, null, null, null, Locale.CANADA));
@@ -117,7 +117,7 @@ public class DefaultResultInvocationProviderTest {
     replay(context);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, "/foo/bar", "ajax", null));
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, null, "/foo/bar", "ajax", null));
     replay(store);
 
     DefaultResultInvocationProvider provider = new DefaultResultInvocationProvider(store, new ForwardResult(store, null, null, context, null, null, null, Locale.CANADA));
@@ -139,7 +139,7 @@ public class DefaultResultInvocationProviderTest {
     replay(context);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, "/foo/bar/", null, null));
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, null, "/foo/bar/", null, null));
     replay(store);
 
     DefaultResultInvocationProvider provider = new DefaultResultInvocationProvider(store, new ForwardResult(store, null, null, context, null, null, null, Locale.CANADA));
@@ -161,7 +161,7 @@ public class DefaultResultInvocationProviderTest {
     TestAction action = new TestAction();
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(action, "/foo/bar", null, null));
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(action, null, "/foo/bar", null, null));
     replay(store);
 
     DefaultResultInvocationProvider provider = new DefaultResultInvocationProvider(store, new ForwardResult(store, null, null, context, null, null, null, Locale.CANADA));
@@ -183,7 +183,7 @@ public class DefaultResultInvocationProviderTest {
     TestAction action = new TestAction();
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(action, "/foo/bar", null, null));
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(action, null, "/foo/bar", null, null));
     replay(store);
 
     DefaultResultInvocationProvider provider = new DefaultResultInvocationProvider(store, new ForwardResult(store, null, null, context, null, null, null, Locale.CANADA));
@@ -206,7 +206,7 @@ public class DefaultResultInvocationProviderTest {
 
     TestAction action = new TestAction();
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(action, "/foo/bar", null, null));
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(action, null, "/foo/bar", null, null));
     replay(store);
 
     DefaultResultInvocationProvider provider = new DefaultResultInvocationProvider(store, new ForwardResult(store, null, null, context, null, null, null, Locale.CANADA));
@@ -233,7 +233,7 @@ public class DefaultResultInvocationProviderTest {
 
     TestAction action = new TestAction();
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(action, "/foo/bar", "ajax", null));
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(action, null, "/foo/bar", "ajax", null));
     replay(store);
 
     DefaultResultInvocationProvider provider = new DefaultResultInvocationProvider(store, new ForwardResult(store, null, null, context, null, null, null, Locale.CANADA));
@@ -256,7 +256,7 @@ public class DefaultResultInvocationProviderTest {
 
     TestAction action = new TestAction();
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(action, "/foo/bar/", "", null));
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(action, null, "/foo/bar/", "", null));
     replay(store);
 
     DefaultResultInvocationProvider provider = new DefaultResultInvocationProvider(store, new ForwardResult(store, null, null, context, null, null, null, Locale.CANADA));

@@ -41,7 +41,7 @@ public class FormTest extends ControlBaseTest {
   public void noPrepare() {
     request.setUri("/user/");
     Index index = new Index();
-    ais.setCurrent(new DefaultActionInvocation(index, "/user/", null, null));
+    ais.setCurrent(new DefaultActionInvocation(index, null, "/user/", null, null));
 
     new ControlTester(form).
       attr("action", "/user/").
@@ -56,7 +56,7 @@ public class FormTest extends ControlBaseTest {
   public void noPrepareRelative() {
     request.setUri("/user/");
     Index index = new Index();
-    ais.setCurrent(new DefaultActionInvocation(index, "/user/", null, null));
+    ais.setCurrent(new DefaultActionInvocation(index, null, "/user/", null, null));
 
     new ControlTester(form).
       attr("action", "edit").
@@ -71,7 +71,7 @@ public class FormTest extends ControlBaseTest {
   public void noPrepareFullyQualified() {
     request.setUri("/user/");
     Index index = new Index();
-    ais.setCurrent(new DefaultActionInvocation(index, "/user/", null, null));
+    ais.setCurrent(new DefaultActionInvocation(index, null, "/user/", null, null));
 
     new ControlTester(form).
       attr("action", "https://www.google.com").
@@ -87,7 +87,7 @@ public class FormTest extends ControlBaseTest {
     request.setUri("/context/user/");
     request.setContextPath("/context");
     Index index = new Index();
-    ais.setCurrent(new DefaultActionInvocation(index, "/user/", null, null));
+    ais.setCurrent(new DefaultActionInvocation(index, null, "/user/", null, null));
 
     new ControlTester(form).
       attr("action", "/user/").
@@ -103,7 +103,7 @@ public class FormTest extends ControlBaseTest {
     request.setUri("/context/user/");
     request.setContextPath("/context");
     Index index = new Index();
-    ais.setCurrent(new DefaultActionInvocation(index, "/user/", null, null));
+    ais.setCurrent(new DefaultActionInvocation(index, null, "/user/", null, null));
 
     new ControlTester(form).
       attr("action", "edit").
@@ -119,7 +119,7 @@ public class FormTest extends ControlBaseTest {
     request.setUri("/context/user/");
     request.setContextPath("/context");
     Index index = new Index();
-    ais.setCurrent(new DefaultActionInvocation(index, "/user/", null, null));
+    ais.setCurrent(new DefaultActionInvocation(index, null, "/user/", null, null));
 
     new ControlTester(form).
       attr("action", "https://www.google.com").
@@ -134,7 +134,7 @@ public class FormTest extends ControlBaseTest {
   public void prepare() throws IOException, ServletException {
     request.setUri("/user/edit");
     Edit edit = new Edit();
-    ais.setCurrent(new DefaultActionInvocation(edit, "/user/edit", null, null));
+    ais.setCurrent(new DefaultActionInvocation(edit, null, "/user/edit", null, null));
 
     new ControlTester(form).
       attr("action", "/user/edit").
@@ -150,7 +150,7 @@ public class FormTest extends ControlBaseTest {
   public void actionIsDifferentURI() throws IOException, ServletException {
     request.setUri("/user/");
     Index index = new Index();
-    ais.setCurrent(new DefaultActionInvocation(index, "/user/", null, null));
+    ais.setCurrent(new DefaultActionInvocation(index, null, "/user/", null, null));
 
     StringWriter writer = new StringWriter();
     form.renderStart(writer, MapBuilder.map("action", (Object) "/user/edit").put("method", "POST").done(), MapBuilder.map("param", "param-value").done());

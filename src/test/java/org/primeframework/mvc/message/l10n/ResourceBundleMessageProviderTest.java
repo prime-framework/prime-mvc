@@ -43,10 +43,10 @@ public class ResourceBundleMessageProviderTest {
     MockServletContext context = new MockServletContext(new File("src/test/java"));
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, "/l10n/Test", null, null));
-    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, "/l10n/NonExistent", null, null));
-    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, "/badPackage/Test", null, null));
-    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, "/l10n/Test", null, null));
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, null, "/l10n/Test", null, null));
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, null, "/l10n/NonExistent", null, null));
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, null, "/badPackage/Test", null, null));
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, null, "/l10n/Test", null, null));
     replay(store);
 
     ResourceBundleMessageProvider provider = new ResourceBundleMessageProvider(Locale.US, new WebControl(new ServletContainerResolver(context), config), store);
@@ -67,10 +67,10 @@ public class ResourceBundleMessageProviderTest {
     MockServletContext context = new MockServletContext(new File("src/test/java"));
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, "/l10n/Test", null, null));
-    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, "/l10n/NonExistent", null, null));
-    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, "/badPackage/Test", null, null));
-    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, "/l10n/Test", null, null));
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, null, "/l10n/Test", null, null));
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, null, "/l10n/NonExistent", null, null));
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, null, "/badPackage/Test", null, null));
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, null, "/l10n/Test", null, null));
     replay(store);
 
     ResourceBundleMessageProvider provider = new ResourceBundleMessageProvider(Locale.US, new WebControl(new ServletContainerResolver(context), config), store);
@@ -91,7 +91,7 @@ public class ResourceBundleMessageProviderTest {
     MockServletContext context = new MockServletContext(new File("src/test/java"));
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, "/l10n/Test", null, null));
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, null, "/l10n/Test", null, null));
     replay(store);
 
     ResourceBundleMessageProvider provider = new ResourceBundleMessageProvider(Locale.US, new WebControl(new ServletContainerResolver(context), config), store);

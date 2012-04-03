@@ -15,6 +15,7 @@
  */
 package org.primeframework.mvc.action;
 
+import java.lang.reflect.Method;
 import java.util.Collection;
 
 import org.primeframework.mvc.action.config.ActionConfiguration;
@@ -29,6 +30,11 @@ public interface ActionInvocation {
    * @return The action object.
    */
   Object action();
+
+  /**
+   * @return The action method.
+   */
+  Method method();
 
   /**
    * @return The action URI that maps to the action object. This does not include the extension.

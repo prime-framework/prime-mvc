@@ -34,7 +34,7 @@ public class FileTest extends ControlBaseTest {
 
   @Test
   public void actionLess() {
-    ais.setCurrent(new DefaultActionInvocation(null, "/file", null, null));
+    ais.setCurrent(new DefaultActionInvocation(null, null, "/file", null, null));
 
     new ControlTester(file).
       attr("name", "test").
@@ -49,7 +49,7 @@ public class FileTest extends ControlBaseTest {
   @Test
   public void action() {
     Edit action = new Edit();
-    ais.setCurrent(new DefaultActionInvocation(action, "/file", null, null));
+    ais.setCurrent(new DefaultActionInvocation(action, null, "/file", null, null));
 
     new ControlTester(file).
       attr("name", "user.profile").
@@ -63,7 +63,7 @@ public class FileTest extends ControlBaseTest {
   @Test
   public void htmlLabel() {
     Edit action = new Edit();
-    ais.setCurrent(new DefaultActionInvocation(action, "/file", null, null));
+    ais.setCurrent(new DefaultActionInvocation(action, null, "/file", null, null));
 
     // This verifies that HTML is left in for labels. That way people can style their labels in the message properties files
     new ControlTester(file).
@@ -78,7 +78,7 @@ public class FileTest extends ControlBaseTest {
   @Test
   public void fieldErrors() {
     Edit action = new Edit();
-    ais.setCurrent(new DefaultActionInvocation(action, "/file", null, null));
+    ais.setCurrent(new DefaultActionInvocation(action, null, "/file", null, null));
 
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.profile", "fieldError1"));
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.profile", "fieldError2"));

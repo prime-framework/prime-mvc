@@ -44,7 +44,7 @@ public class XMLStreamResultTest {
     replay(response);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(action, "/foo", "", null));
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(action, null, "/foo", "", null));
     replay(store);
 
     XMLStream xmlStream = new XMLStreamResultTest.XMLStreamImpl("success", "xml", 200);

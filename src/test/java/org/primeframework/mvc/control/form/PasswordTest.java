@@ -35,7 +35,7 @@ public class PasswordTest extends ControlBaseTest {
 
   @Test
   public void actionLess() {
-    ais.setCurrent(new DefaultActionInvocation(null, "/password", null, null));
+    ais.setCurrent(new DefaultActionInvocation(null, null, "/password", null, null));
     new ControlTester(password).
       attr("name", "test").
       attr("class", "css-class").
@@ -53,7 +53,7 @@ public class PasswordTest extends ControlBaseTest {
     edit.user = new User();
     edit.user.setPassword("Test");
 
-    ais.setCurrent(new DefaultActionInvocation(edit, "/password", null, null));
+    ais.setCurrent(new DefaultActionInvocation(edit, null, "/password", null, null));
     new ControlTester(password).
       attr("name", "user.password").
       attr("value", "password").
@@ -70,7 +70,7 @@ public class PasswordTest extends ControlBaseTest {
     edit.user = new User();
     edit.user.setPassword("Test");
 
-    ais.setCurrent(new DefaultActionInvocation(edit, "/password", null, null));
+    ais.setCurrent(new DefaultActionInvocation(edit, null, "/password", null, null));
 
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.password", "fieldError1"));
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.password", "fieldError2"));

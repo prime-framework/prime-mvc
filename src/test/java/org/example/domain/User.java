@@ -16,6 +16,7 @@
 package org.example.domain;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.validator.constraints.NotBlank;
+import org.primeframework.mvc.validation.jsr303.group.Delete;
 
 /**
  * This is a test user.
@@ -43,6 +45,7 @@ public class User {
   @NotNull
   private String[] securityQuestions;
 
+  @Max(value = 1, groups = Delete.class)
   private int month;
   private int year;
   private File profile;

@@ -42,7 +42,7 @@ public class RadioListTest extends ControlBaseTest {
 
   @Test
   public void actionLess() {
-    ais.setCurrent(new DefaultActionInvocation(null, "/radio-list", null, null));
+    ais.setCurrent(new DefaultActionInvocation(null, null, "/radio-list", null, null));
     new ControlTester(radioList).
       attr("name", "test").
       attr("class", "css-class").
@@ -73,7 +73,7 @@ public class RadioListTest extends ControlBaseTest {
     action.user = new User();
     action.user.setAddress("work", address);
 
-    ais.setCurrent(new DefaultActionInvocation(action, "/radio-list", null, null));
+    ais.setCurrent(new DefaultActionInvocation(action, null, "/radio-list", null, null));
     new ControlTester(radioList).
       attr("name", "user.addresses['work'].country").
       attr("items", lmap("US", "United States", "DE", "Germany")).
@@ -100,7 +100,7 @@ public class RadioListTest extends ControlBaseTest {
     action.user = new User();
     action.user.setAddress("work", address);
 
-    ais.setCurrent(new DefaultActionInvocation(action, "/radio-list", null, null));
+    ais.setCurrent(new DefaultActionInvocation(action, null, "/radio-list", null, null));
     new ControlTester(radioList).
       attr("name", "user.addresses['work'].country").
       attr("items", lmap("<US>", "<United States>", "DE", "Germany")).
@@ -127,7 +127,7 @@ public class RadioListTest extends ControlBaseTest {
     action.user = new User();
     action.user.setAddress("work", address);
 
-    ais.setCurrent(new DefaultActionInvocation(action, "/radio-list", null, null));
+    ais.setCurrent(new DefaultActionInvocation(action, null, "/radio-list", null, null));
 
     Pair<String, String> us = Pair.of("US", "United States");
     Pair<String, String> de = Pair.of("DE", "Germany");
@@ -160,7 +160,7 @@ public class RadioListTest extends ControlBaseTest {
     action.user = new User();
     action.user.setAddress("work", address);
 
-    ais.setCurrent(new DefaultActionInvocation(action, "/radio-list", null, null));
+    ais.setCurrent(new DefaultActionInvocation(action, null, "/radio-list", null, null));
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "fieldError1"));
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "fieldError2"));
 
@@ -190,7 +190,7 @@ public class RadioListTest extends ControlBaseTest {
     action.user = new User();
     action.user.setAddress("work", address);
 
-    ais.setCurrent(new DefaultActionInvocation(action, "/radio-list", null, null));
+    ais.setCurrent(new DefaultActionInvocation(action, null, "/radio-list", null, null));
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "fieldError1"));
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "fieldError2"));
 

@@ -15,6 +15,7 @@
  */
 package org.primeframework.mvc.action;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -29,14 +30,16 @@ import org.primeframework.mvc.action.config.ActionConfiguration;
  */
 public class DefaultActionInvocation implements ActionInvocation {
   private final Object action;
+  private final Method method;
   private final String uri;
   private final String extension;
   private final Collection<String> uriParameters;
   private final ActionConfiguration configuration;
   private final boolean executeResult;
 
-  public DefaultActionInvocation(Object action, String uri, String extension, ActionConfiguration configuration) {
+  public DefaultActionInvocation(Object action, Method method, String uri, String extension, ActionConfiguration configuration) {
     this.action = action;
+    this.method = method;
     this.uri = uri;
     this.extension = extension;
     this.uriParameters = new ArrayList<String>();
@@ -44,9 +47,10 @@ public class DefaultActionInvocation implements ActionInvocation {
     this.executeResult = true;
   }
 
-  public DefaultActionInvocation(Object action, String uri, String extension, Collection<String> uriParameters,
+  public DefaultActionInvocation(Object action, Method method, String uri, String extension, Collection<String> uriParameters,
                                  ActionConfiguration configuration, boolean executeResult) {
     this.action = action;
+    this.method = method;
     this.uri = uri;
     this.extension = extension;
     this.uriParameters = uriParameters;
@@ -54,51 +58,42 @@ public class DefaultActionInvocation implements ActionInvocation {
     this.executeResult = executeResult;
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public Object action() {
     return action;
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
+  public Method method() {
+    return method;
+  }
+
+  @Override
   public String actionURI() {
     return uri;
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public String extension() {
     return extension;
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public Collection<String> uriParameters() {
     return Collections.unmodifiableCollection(uriParameters);
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public ActionConfiguration configuration() {
     return configuration;
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public boolean executeResult() {
     return executeResult;
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public String uri() {
     return uri + (extension != null ? "." + extension : "");
   }

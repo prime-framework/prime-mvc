@@ -47,7 +47,7 @@ public class DefaultURIParameterWorkflowTest extends PrimeBaseTest {
   public void noParameters() throws IOException, ServletException {
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(
-      new DefaultActionInvocation(new Edit(), "/admin/user/edit", null, new DefaultActionConfiguration(Edit.class, "/admin/user/edit")));
+      new DefaultActionInvocation(new Edit(), null, "/admin/user/edit", null, new DefaultActionConfiguration(Edit.class, "/admin/user/edit")));
     replay(store);
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
@@ -65,7 +65,7 @@ public class DefaultURIParameterWorkflowTest extends PrimeBaseTest {
     RESTEdit action = new RESTEdit();
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(
-      new DefaultActionInvocation(action, "/admin/user/rest-edit/12", null, asList("12"), new DefaultActionConfiguration(RESTEdit.class, "/admin/user/rest-edit"), true));
+      new DefaultActionInvocation(action, null, "/admin/user/rest-edit/12", null, asList("12"), new DefaultActionConfiguration(RESTEdit.class, "/admin/user/rest-edit"), true));
     replay(store);
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
@@ -86,7 +86,7 @@ public class DefaultURIParameterWorkflowTest extends PrimeBaseTest {
     ComplexRest action = new ComplexRest();
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(
-      new DefaultActionInvocation(action, "/complex-rest/brian/static/pontarelli/then/a/bunch/of/stuff", null,
+      new DefaultActionInvocation(action, null, "/complex-rest/brian/static/pontarelli/then/a/bunch/of/stuff", null,
         asList("brian", "static", "pontarelli", "then", "a", "bunch", "of", "stuff"),
         new DefaultActionConfiguration(ComplexRest.class, "/complex-rest/brian/static/pontarelli/then/a/bunch/of/stuff"), true));
     replay(store);

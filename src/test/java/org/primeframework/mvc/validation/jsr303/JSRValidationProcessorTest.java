@@ -49,7 +49,7 @@ public class JSRValidationProcessorTest extends PrimeBaseTest {
   @Inject public MessageStore messageStore;
 
   @Test
-  public void success() {
+  public void success() throws NoSuchMethodException {
     request.setMethod(Method.POST);
 
     Edit edit = new Edit();
@@ -65,12 +65,33 @@ public class JSRValidationProcessorTest extends PrimeBaseTest {
     address.setZipcode("80020");
     edit.user.setAddress("home", address);
 
-    store.setCurrent(new DefaultActionInvocation(edit, "/user/edit", "", new DefaultActionConfiguration(Edit.class, "/user/edit")));
+    store.setCurrent(new DefaultActionInvocation(edit, Edit.class.getMethod("execute"), "/user/edit", "", new DefaultActionConfiguration(Edit.class, "/user/edit")));
     processor.validate();
   }
-  
+
   @Test
-  public void failure() {
+  public void annotationGroups() throws NoSuchMethodException {
+    request.setMethod(Method.POST);
+
+    Edit edit = new Edit();
+    edit.user.setMonth(10);
+    store.setCurrent(new DefaultActionInvocation(edit, Edit.class.getMethod("post"), "/user/edit", "", new DefaultActionConfiguration(Edit.class, "/user/edit")));
+    try {
+      processor.validate();
+      fail("Should have failed");
+    } catch (ValidationException e) {
+      List<Message> messages = messageStore.get();
+      Map<String, FieldMessage> map = new HashMap<String, FieldMessage>();
+      for (Message message : messages) {
+        map.put(((FieldMessage) message).getField(), (FieldMessage) message);
+      }
+      assertEquals(map.size(), 1);
+      assertEquals(map.get("user.month").toString(), "Month delete yay!");
+    }
+  }
+
+  @Test
+  public void failure() throws NoSuchMethodException {
     request.setMethod(Method.POST);
 
     Edit edit = new Edit();
@@ -78,7 +99,7 @@ public class JSRValidationProcessorTest extends PrimeBaseTest {
     Address address = new Address();
     edit.user.setAddress("home", address);
 
-    store.setCurrent(new DefaultActionInvocation(edit, "/user/edit", "", new DefaultActionConfiguration(Edit.class, "/user/edit")));
+    store.setCurrent(new DefaultActionInvocation(edit, Edit.class.getMethod("execute"), "/user/edit", "", new DefaultActionConfiguration(Edit.class, "/user/edit")));
     try {
       processor.validate();
       fail("Should have failed");
@@ -101,7 +122,7 @@ public class JSRValidationProcessorTest extends PrimeBaseTest {
   }
 
   @Test
-  public void failureFromPrevious() {
+  public void failureFromPrevious() throws NoSuchMethodException {
     request.setMethod(Method.POST);
 
     Edit edit = new Edit();
@@ -120,7 +141,7 @@ public class JSRValidationProcessorTest extends PrimeBaseTest {
     // Add a previous error
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "test", "failure"));
 
-    store.setCurrent(new DefaultActionInvocation(edit, "/user/edit", "", new DefaultActionConfiguration(Edit.class, "/user/edit")));
+    store.setCurrent(new DefaultActionInvocation(edit, Edit.class.getMethod("execute"), "/user/edit", "", new DefaultActionConfiguration(Edit.class, "/user/edit")));
     try {
       processor.validate();
       fail("Should have failed");

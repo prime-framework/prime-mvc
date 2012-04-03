@@ -15,20 +15,23 @@
  */
 package org.primeframework.mvc.validation.jsr303;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.groups.Default;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.primeframework.mvc.PrimeException;
+import org.primeframework.mvc.action.ActionInvocation;
+import org.primeframework.mvc.action.ActionInvocationStore;
+import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.validation.jsr303.group.Create;
 import org.primeframework.mvc.validation.jsr303.group.Delete;
 import org.primeframework.mvc.validation.jsr303.group.Read;
 import org.primeframework.mvc.validation.jsr303.group.Update;
 
 import com.google.inject.Inject;
+import static org.primeframework.mvc.servlet.HTTPMethod.*;
 
 /**
- * Uses the HTTP request method to determine the groups. The mapping is:
+ * Uses the HTTP request method or {@link Validation} annotaiton to determine the groups. The HTTP method mapping is:
  * <p/>
  * <ul>
  *   <li>GET - Read</li>
@@ -38,24 +41,33 @@ import com.google.inject.Inject;
  * </ul>
  * @author Brian Pontarelli
  */
-public class RequestMethodGroupLocator implements GroupLocator {
-  private final HttpServletRequest request;
+public class DefaultGroupLocator implements GroupLocator {
+  private final ActionInvocationStore store;
+  private final HTTPMethod method;
 
   @Inject
-  public RequestMethodGroupLocator(HttpServletRequest request) {
-    this.request = request;
+  public DefaultGroupLocator(ActionInvocationStore store, HTTPMethod method) {
+    this.store = store;
+    this.method = method;
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public Class<?>[] groups() {
-    String method = request.getMethod();
-    if (method.equals("GET")) {
+    // See if the execute method is annotated with the groups
+    ActionInvocation ai = store.getCurrent();
+    if (ai.method() != null && ai.method().isAnnotationPresent(Validation.class)) {
+      Validation validation = ai.method().getAnnotation(Validation.class);
+      return validation.groups();
+    }
+
+    if (method == GET) {
       return ArrayUtils.toArray(Read.class, Default.class);
-    } else if (method.equals("POST")) {
+    } else if (method == POST) {
       return ArrayUtils.toArray(Create.class, Default.class);
-    } else if (method.equals("PUT")) {
+    } else if (method == PUT) {
       return ArrayUtils.toArray(Update.class, Default.class);
-    } else if (method.equals("DELETE")) {
+    } else if (method == DELETE) {
       return ArrayUtils.toArray(Delete.class, Default.class);
     }
     

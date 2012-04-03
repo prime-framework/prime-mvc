@@ -15,11 +15,14 @@
  */
 package org.primeframework.mvc.action;
 
+import java.lang.reflect.Method;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.config.ActionConfigurationProvider;
+import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.util.URITools;
 
 import com.google.inject.Inject;
@@ -33,11 +36,13 @@ import com.google.inject.Injector;
 public class DefaultActionMapper implements ActionMapper {
   private final ActionConfigurationProvider actionConfigurationProvider;
   private final Injector injector;
+  private final HTTPMethod httpMethod;
 
   @Inject
-  public DefaultActionMapper(ActionConfigurationProvider actionConfigurationProvider, Injector injector) {
+  public DefaultActionMapper(ActionConfigurationProvider actionConfigurationProvider, Injector injector, HTTPMethod httpMethod) {
     this.actionConfigurationProvider = actionConfigurationProvider;
     this.injector = injector;
+    this.httpMethod = httpMethod;
   }
 
   /**
@@ -60,7 +65,7 @@ public class DefaultActionMapper implements ActionMapper {
       } else {
         actionConfiguration = actionConfigurationProvider.lookup(uri + "/index");
         if (actionConfiguration != null) {
-          return new DefaultActionInvocation(null, uri + "/", null, actionConfiguration);
+          return new DefaultActionInvocation(null, null, uri + "/", null, actionConfiguration);
         }
       }
     }
@@ -94,11 +99,69 @@ public class DefaultActionMapper implements ActionMapper {
       }
     }
 
+    // Create the action and find the method
     Object action = null;
+    Method method = null;
     if (actionConfiguration != null) {
-      action = injector.getInstance(actionConfiguration.actionClass());
+      Class<?> actionClass = actionConfiguration.actionClass();
+      if (extension != null) {
+        try {
+          method = actionClass.getMethod(extension);
+        } catch (NoSuchMethodException e) {
+          // Ignore
+        }
+      }
+
+      if (method == null) {
+        try {
+          method = actionClass.getMethod(httpMethod.name().toLowerCase());
+        } catch (NoSuchMethodException e) {
+          // Ignore
+        }
+      }
+
+      // Handle HEAD requests using a GET
+      if (method == null && httpMethod == HTTPMethod.HEAD) {
+        try {
+          method = actionClass.getMethod("get");
+        } catch (NoSuchMethodException e) {
+          // Ignore
+        }
+      }
+
+      if (method == null) {
+        try {
+          method = actionClass.getMethod("execute");
+        } catch (NoSuchMethodException e) {
+          // Ignore
+        }
+      }
+
+      if (method == null) {
+        throw new PrimeException("The action class [" + actionClass + "] is missing a valid execute method. The class " +
+          "can define a method with the same names as the HTTP method (which is currently [" +
+          httpMethod.name().toLowerCase() + "]) or it can define a default method named [execute].");
+      }
+
+      verify(method);
+
+      action = injector.getInstance(actionClass);
     }
 
-    return new DefaultActionInvocation(action, uri, extension, uriParameters, actionConfiguration, executeResult);
+    return new DefaultActionInvocation(action, method, uri, extension, uriParameters, actionConfiguration, executeResult);
+  }
+
+  /**
+   * Ensures that the method is a correct execute method.
+   *
+   * @param method The method.
+   * @throws PrimeException If the method is invalid.
+   */
+  protected void verify(Method method) {
+    if (method.getReturnType() != String.class || method.getParameterTypes().length != 0) {
+      throw new PrimeException("The action class [" + method.getDeclaringClass().getClass() + "] has defined an " +
+        "execute method named [" + method.getName() + "] that is invalid. Execute methods must have zero parameters " +
+        "and return a String like this: [public String execute()].");
+    }
   }
 }

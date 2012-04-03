@@ -17,6 +17,7 @@ package org.primeframework.mvc;
 
 import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.File;
+import java.util.Locale;
 
 import org.primeframework.mock.servlet.MockHttpServletRequest;
 import org.primeframework.mock.servlet.MockHttpServletResponse;
@@ -59,7 +60,7 @@ public abstract class PrimeBaseTest {
    */
   @BeforeMethod
   public void setUp() {
-    request = new MockHttpServletRequest("/", session);
+    request = new MockHttpServletRequest("/", Locale.getDefault(), false, "utf-8", session);
     response = new MockHttpServletResponse();
 
     ServletObjectsHolder.setServletRequest(new HttpServletRequestWrapper(request));

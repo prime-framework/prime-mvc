@@ -16,9 +16,7 @@
 package org.primeframework.mvc.action;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.lang.reflect.Method;
 
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.result.ResultStore;
@@ -36,13 +34,10 @@ import com.google.inject.Inject;
 public class DefaultActionInvocationWorkflow implements ActionInvocationWorkflow {
   private final ActionInvocationStore actionInvocationStore;
   private final ResultStore resultStore;
-  private final HttpServletRequest request;
 
   @Inject
-  public DefaultActionInvocationWorkflow(ActionInvocationStore actionInvocationStore, ResultStore resultStore,
-                                         HttpServletRequest request) {
+  public DefaultActionInvocationWorkflow(ActionInvocationStore actionInvocationStore, ResultStore resultStore) {
     this.resultStore = resultStore;
-    this.request = request;
     this.actionInvocationStore = actionInvocationStore;
   }
 
@@ -51,15 +46,11 @@ public class DefaultActionInvocationWorkflow implements ActionInvocationWorkflow
    * <p/>
    * <h3>Action-less request</h3>
    * <p/>
-   * <ul>
-   * <li>Continue down the chain</li>
-   * </ul>
+   * <ul> <li>Continue down the chain</li> </ul>
    * <p/>
    * <h3>Action request</h3>
    * <p/>
-   * <ul>
-   * <li>Invoke the action</li>
-   * </ul>
+   * <ul> <li>Invoke the action</li> </ul>
    *
    * @param chain The chain.
    * @throws IOException      If the chain throws an IOException.
@@ -69,7 +60,7 @@ public class DefaultActionInvocationWorkflow implements ActionInvocationWorkflow
   public void perform(WorkflowChain chain) throws IOException, ServletException {
     ActionInvocation invocation = actionInvocationStore.getCurrent();
     if (invocation.action() != null) {
-      String resultCode = execute(invocation, request.getMethod());
+      String resultCode = execute(invocation);
       resultStore.set(resultCode);
     }
 
@@ -77,83 +68,23 @@ public class DefaultActionInvocationWorkflow implements ActionInvocationWorkflow
   }
 
   /**
-   * Invokes the execute method on the action. This first checks if there is an extension and if there is it looks for
-   * a
+   * Invokes the execute method on the action. This first checks if there is an extension and if there is it looks for a
    * method with the same name. Next, it looks for a method that matches the current method (i.e. get or post) and
    * finally falls back to execute.
    *
    * @param actionInvocation The action invocation.
-   * @param httpMethod       The HTTP method used (get or post).
    * @return The result code from the execute method and never null.
    * @throws ServletException If the execute method doesn't exist, has the wrong signature, couldn't be invoked, threw
    *                          an exception or returned null.
    */
-  protected String execute(ActionInvocation actionInvocation, String httpMethod) throws ServletException {
+  protected String execute(ActionInvocation actionInvocation) throws ServletException {
     Object action = actionInvocation.action();
-    String extension = actionInvocation.extension();
-    Method method = null;
-    if (extension != null) {
-      try {
-        method = action.getClass().getMethod(extension);
-      } catch (NoSuchMethodException e) {
-        // Ignore
-      }
-    }
-
-    if (method == null) {
-      try {
-        method = action.getClass().getMethod(httpMethod.toLowerCase());
-      } catch (NoSuchMethodException e) {
-        // Ignore
-      }
-    }
-
-    // Handle HEAD requests using a GET
-    if (method == null && httpMethod.equals("HEAD")) {
-      try {
-        method = action.getClass().getMethod("get");
-      } catch (NoSuchMethodException e) {
-        // Ignore
-      }
-    }
-
-    if (method == null) {
-      try {
-        method = action.getClass().getMethod("execute");
-      } catch (NoSuchMethodException e) {
-        // Ignore
-      }
-    }
-
-    if (method == null) {
-      throw new PrimeException("The action class [" + action.getClass() + "] is missing a " +
-        "valid execute method. The class can define a method with the same names as the " +
-        "HTTP method (which is currently [" + httpMethod.toLowerCase() + "]) or it can define " +
-        "a default method named [execute].");
-    }
-
-    verify(method);
-
-    String result = ReflectionUtils.invoke(method, action);
+    String result = ReflectionUtils.invoke(actionInvocation.method(), action);
     if (result == null) {
       throw new PrimeException("The action class [" + action.getClass() + "] returned " +
         "null for the result code. Execute methods must never return null.");
     }
 
     return result;
-  }
-
-  /**
-   * Ensures that the method is a correct execute method.
-   *
-   * @param method The method.
-   * @throws ServletException If the method is invalid.
-   */
-  protected void verify(Method method) throws ServletException {
-    if (method.getReturnType() != String.class || method.getParameterTypes().length != 0) {
-      throw new PrimeException("The action class [" + method.getDeclaringClass().getClass() + "] has defined an " +
-        "execute method named [" + method.getName() + "] that is invalid. Execute methods must have zero parameters " +
-        "and return a String like this: [public String execute()].");
-    }
   }
 }

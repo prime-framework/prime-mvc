@@ -69,7 +69,7 @@ public class ForwardResultTest {
     replay(context);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, "/foo/bar", null, null));
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, null, "/foo/bar", null, null));
     replay(store);
 
     Forward forward = new ForwardResult.ForwardImpl("/foo/bar.jsp", null);
@@ -98,7 +98,7 @@ public class ForwardResultTest {
     replay(context);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, "/action", null, null));
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, null, "/action", null, null));
     replay(store);
 
     Forward forward = new ForwardResult.ForwardImpl("bar.jsp", null);
@@ -127,7 +127,7 @@ public class ForwardResultTest {
     replay(context);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, "/action", null, null));
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, null, "/action", null, null));
     replay(store);
 
     Forward forward = new ForwardResult.ForwardImpl("bar.jsp", null, "text/html; charset=UTF-8", 300);
@@ -162,7 +162,7 @@ public class ForwardResultTest {
     replay(ee);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(action, "/action", "", null));
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(action, null, "/action", "", null));
     replay(store);
 
     Forward forward = new ForwardResult.ForwardImpl("${page}", null, "${contentType}", 300);
@@ -191,7 +191,7 @@ public class ForwardResultTest {
     replay(context);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, "/action", null, null));
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, null, "/action", null, null));
     replay(store);
 
     Forward forward = new ForwardResult.ForwardImpl("bar.jsp", null, "text/javascript; charset=UTF-8", 200);
@@ -230,7 +230,7 @@ public class ForwardResultTest {
     replay(context);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, "/action", "js", null));
+    expect(store.getCurrent()).andReturn(new DefaultActionInvocation(null, null, "/action", "js", null));
     replay(store);
 
     List<Message> messages = new ArrayList<Message>();

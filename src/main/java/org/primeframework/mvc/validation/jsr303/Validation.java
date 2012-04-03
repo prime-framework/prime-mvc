@@ -15,19 +15,22 @@
  */
 package org.primeframework.mvc.validation.jsr303;
 
-import com.google.inject.ImplementedBy;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.*;
+import static java.lang.annotation.RetentionPolicy.*;
 
 /**
- * Locates the groups for the current request.
+ * Marks the groups for an execute method.
  *
  * @author Brian Pontarelli
  */
-@ImplementedBy(DefaultGroupLocator.class)
-public interface GroupLocator {
+@Retention(RUNTIME)
+@Target(METHOD)
+public @interface Validation {
   /**
-   * Locates the groups to use for validation. This might use the current request or any other method necessary.
-   *
-   * @return The groups.
+   * @return The groups to validate for this execute method.
    */
   Class<?>[] groups();
 }

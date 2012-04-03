@@ -42,7 +42,7 @@ public class DefaultResultInvocationWorkflowTest {
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
     replay(response);
 
-    ActionInvocation ai = new DefaultActionInvocation(null, "/foo/bar", null, null);
+    ActionInvocation ai = new DefaultActionInvocation(null, null, "/foo/bar", null, null);
     ActionInvocationStore ais = createStrictMock(ActionInvocationStore.class);
     expect(ais.getCurrent()).andReturn(ai);
     replay(ais);
@@ -79,7 +79,7 @@ public class DefaultResultInvocationWorkflowTest {
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
     replay(response);
 
-    ActionInvocation ai = new DefaultActionInvocation(null, "/foo/bar", null, null);
+    ActionInvocation ai = new DefaultActionInvocation(null, null, "/foo/bar", null, null);
     ActionInvocationStore ais = createStrictMock(ActionInvocationStore.class);
     expect(ais.getCurrent()).andReturn(ai);
     replay(ais);
@@ -114,7 +114,7 @@ public class DefaultResultInvocationWorkflowTest {
     replay(response);
 
     Simple simple = new Simple();
-    ActionInvocation invocation = new DefaultActionInvocation(simple, "/foo/bar", null, null, new DefaultActionConfiguration(Simple.class, "/foo/bar"), true);
+    ActionInvocation invocation = new DefaultActionInvocation(simple, null, "/foo/bar", null, null, new DefaultActionConfiguration(Simple.class, "/foo/bar"), true);
     ActionInvocationStore ais = createStrictMock(ActionInvocationStore.class);
     expect(ais.getCurrent()).andReturn(invocation);
     replay(ais);
@@ -153,7 +153,7 @@ public class DefaultResultInvocationWorkflowTest {
     replay(response);
 
     Simple simple = new Simple();
-    ActionInvocation invocation = new DefaultActionInvocation(simple, "/foo/bar", null, null, new DefaultActionConfiguration(Simple.class, "/foo/bar"), false);
+    ActionInvocation invocation = new DefaultActionInvocation(simple, null, "/foo/bar", null, null, new DefaultActionConfiguration(Simple.class, "/foo/bar"), false);
     ActionInvocationStore ais = createStrictMock(ActionInvocationStore.class);
     expect(ais.getCurrent()).andReturn(invocation);
     replay(ais);
@@ -187,7 +187,7 @@ public class DefaultResultInvocationWorkflowTest {
     replay(response);
 
     Simple simple = new Simple();
-    ActionInvocation invocation = new DefaultActionInvocation(simple, "/foo/bar", null, null, new DefaultActionConfiguration(Simple.class, "/foo/bar"), true);
+    ActionInvocation invocation = new DefaultActionInvocation(simple, null, "/foo/bar", null, null, new DefaultActionConfiguration(Simple.class, "/foo/bar"), true);
     ActionInvocationStore ais = createStrictMock(ActionInvocationStore.class);
     expect(ais.getCurrent()).andReturn(invocation);
     replay(ais);
@@ -225,7 +225,7 @@ public class DefaultResultInvocationWorkflowTest {
     replay(response);
 
     Simple simple = new Simple();
-    ActionInvocation invocation = new DefaultActionInvocation(simple, "/foo/bar", null, null, new DefaultActionConfiguration(Simple.class, "/foo/bar"), true);
+    ActionInvocation invocation = new DefaultActionInvocation(simple, null, "/foo/bar", null, null, new DefaultActionConfiguration(Simple.class, "/foo/bar"), true);
     ActionInvocationStore ais = createStrictMock(ActionInvocationStore.class);
     expect(ais.getCurrent()).andReturn(invocation);
     replay(ais);

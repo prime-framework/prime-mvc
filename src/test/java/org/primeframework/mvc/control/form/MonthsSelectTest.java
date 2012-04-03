@@ -33,7 +33,7 @@ public class MonthsSelectTest extends ControlBaseTest {
 
   @Test
   public void actionLess() {
-    ais.setCurrent(new DefaultActionInvocation(null, "/months-select", null, null));
+    ais.setCurrent(new DefaultActionInvocation(null, null, "/months-select", null, null));
     new ControlTester(monthsSelect).
       attr("name", "test").
       attr("class", "css-class").
@@ -65,7 +65,7 @@ public class MonthsSelectTest extends ControlBaseTest {
     edit.user = new User();
     edit.user.setMonth(5);
 
-    ais.setCurrent(new DefaultActionInvocation(edit, "/months-select", null, null));
+    ais.setCurrent(new DefaultActionInvocation(edit, null, "/months-select", null, null));
     new ControlTester(monthsSelect).
       attr("name", "user.month").
       go("<input type=\"hidden\" name=\"user.month@param\" value=\"param-value\"/>\n" +

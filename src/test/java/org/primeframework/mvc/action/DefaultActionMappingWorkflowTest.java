@@ -23,11 +23,15 @@ import java.util.Iterator;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.example.action.ComplexRest;
+import org.example.action.InvalidExecuteMethod;
+import org.example.action.MissingExecuteMethod;
 import org.example.action.user.Edit;
 import org.example.action.user.RESTEdit;
 import org.primeframework.mvc.PrimeBaseTest;
+import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.config.ActionConfigurationProvider;
 import org.primeframework.mvc.action.config.DefaultActionConfiguration;
+import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
 
@@ -126,7 +130,7 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     chain.continueWorkflow();
     EasyMock.replay(chain);
 
-    DefaultActionMappingWorkflow workflow = new DefaultActionMappingWorkflow(request, response, store, new DefaultActionMapper(provider, injector));
+    DefaultActionMappingWorkflow workflow = new DefaultActionMappingWorkflow(request, response, store, new DefaultActionMapper(provider, injector, HTTPMethod.POST));
     workflow.perform(chain);
 
     ActionInvocation ai = capture.getValue();
@@ -174,7 +178,7 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     chain.continueWorkflow();
     EasyMock.replay(chain);
 
-    DefaultActionMappingWorkflow workflow = new DefaultActionMappingWorkflow(request, response, store, new DefaultActionMapper(provider, injector));
+    DefaultActionMappingWorkflow workflow = new DefaultActionMappingWorkflow(request, response, store, new DefaultActionMapper(provider, injector, HTTPMethod.POST));
     workflow.perform(chain);
 
     ActionInvocation ai = capture.getValue();
@@ -209,7 +213,7 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);
     EasyMock.replay(chain);
 
-    DefaultActionMappingWorkflow workflow = new DefaultActionMappingWorkflow(request, response, store, new DefaultActionMapper(provider, injector));
+    DefaultActionMappingWorkflow workflow = new DefaultActionMappingWorkflow(request, response, store, new DefaultActionMapper(provider, injector, HTTPMethod.POST));
     workflow.perform(chain);
 
     assertEquals(response.getRedirect(), "/foo/");
@@ -235,7 +239,7 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     chain.continueWorkflow();
     EasyMock.replay(chain);
 
-    DefaultActionMappingWorkflow workflow = new DefaultActionMappingWorkflow(request, response, store, new DefaultActionMapper(provider, injector));
+    DefaultActionMappingWorkflow workflow = new DefaultActionMappingWorkflow(request, response, store, new DefaultActionMapper(provider, injector, HTTPMethod.POST));
     workflow.perform(chain);
 
     ActionInvocation ai = capture.getValue();
@@ -245,6 +249,72 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     assertTrue(ai.executeResult());
 
     EasyMock.verify(provider, store, injector, chain);
+  }
+
+  @Test
+  public void actionWithoutExecuteMethod() throws Exception {
+    request.setUri("/foo");
+    request.setPost(true);
+    request.setParameter("__a_submit", "");
+    request.setParameter("__a_cancel", "cancel");
+    request.setParameter("submit", "Submit");
+
+    ActionConfigurationProvider provider = EasyMock.createStrictMock(ActionConfigurationProvider.class);
+    EasyMock.expect(provider.lookup("/foo")).andReturn(new DefaultActionConfiguration(MissingExecuteMethod.class, "/foo"));
+    EasyMock.replay(provider);
+
+    ActionInvocationStore store = EasyMock.createStrictMock(ActionInvocationStore.class);
+    EasyMock.replay(store);
+
+    Injector injector = EasyMock.createStrictMock(Injector.class);
+    EasyMock.replay(injector);
+
+    WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);
+    EasyMock.replay(chain);
+
+    try {
+      DefaultActionMappingWorkflow workflow = new DefaultActionMappingWorkflow(request, response, store, new DefaultActionMapper(provider, injector, HTTPMethod.POST));
+      workflow.perform(chain);
+      fail("Should have failed");
+    } catch (PrimeException e) {
+      System.out.println(e);
+      // Expected
+    }
+
+    verify(provider, store, injector, chain);
+  }
+
+  @Test
+  public void actionWithWrongReturnType() throws Exception {
+    request.setUri("/foo");
+    request.setPost(true);
+    request.setParameter("__a_submit", "");
+    request.setParameter("__a_cancel", "cancel");
+    request.setParameter("submit", "Submit");
+
+    ActionConfigurationProvider provider = EasyMock.createStrictMock(ActionConfigurationProvider.class);
+    EasyMock.expect(provider.lookup("/foo")).andReturn(new DefaultActionConfiguration(InvalidExecuteMethod.class, "/foo"));
+    EasyMock.replay(provider);
+
+    ActionInvocationStore store = EasyMock.createStrictMock(ActionInvocationStore.class);
+    EasyMock.replay(store);
+
+    Injector injector = EasyMock.createStrictMock(Injector.class);
+    EasyMock.replay(injector);
+
+    WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);
+    EasyMock.replay(chain);
+
+    try {
+      DefaultActionMappingWorkflow workflow = new DefaultActionMappingWorkflow(request, response, store, new DefaultActionMapper(provider, injector, HTTPMethod.POST));
+      workflow.perform(chain);
+      fail("Should have failed");
+    } catch (PrimeException e) {
+      System.out.println(e);
+      // Expected
+    }
+
+    verify(provider, store, injector, chain);
   }
 
   private void assertCollections(Collection<String> strings, Collection<String> strings1) {

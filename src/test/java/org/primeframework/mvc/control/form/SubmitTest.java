@@ -32,7 +32,7 @@ public class SubmitTest extends ControlBaseTest {
 
   @Test
   public void actionLess() {
-    ais.setCurrent(new DefaultActionInvocation(null, "/button", null, null));
+    ais.setCurrent(new DefaultActionInvocation(null, null, "/button", null, null));
     new ControlTester(submit).
       attr("name", "button").
       attr("value", "test-value").
@@ -46,7 +46,7 @@ public class SubmitTest extends ControlBaseTest {
 
   @Test
   public void action() {
-    ais.setCurrent(new DefaultActionInvocation(new Edit(), "/button", null, null));
+    ais.setCurrent(new DefaultActionInvocation(new Edit(), null, "/button", null, null));
     new ControlTester(submit).
       attr("name", "button").
       attr("value", "test-value").
@@ -59,7 +59,7 @@ public class SubmitTest extends ControlBaseTest {
 
   @Test
   public void html() {
-    ais.setCurrent(new DefaultActionInvocation(new Edit(), "/button", null, null));
+    ais.setCurrent(new DefaultActionInvocation(new Edit(), null, "/button", null, null));
     new ControlTester(submit).
       attr("name", "html").
       attr("value", "test-value").
@@ -72,7 +72,7 @@ public class SubmitTest extends ControlBaseTest {
 
   @Test
   public void actionAttribute() {
-    ais.setCurrent(new DefaultActionInvocation(new Edit(), "/button", null, null));
+    ais.setCurrent(new DefaultActionInvocation(new Edit(), null, "/button", null, null));
     new ControlTester(submit).
       attr("name", "button").
       attr("action", "/foo").
@@ -88,7 +88,7 @@ public class SubmitTest extends ControlBaseTest {
   @Test
   public void actionAttributeContext() {
     request.setContextPath("/context");
-    ais.setCurrent(new DefaultActionInvocation(new Edit(), "/button", null, null));
+    ais.setCurrent(new DefaultActionInvocation(new Edit(), null, "/button", null, null));
     new ControlTester(submit).
       attr("name", "button").
       attr("action", "/foo").
@@ -104,7 +104,7 @@ public class SubmitTest extends ControlBaseTest {
   @Test
   public void actionAttributeContextRelative() {
     request.setContextPath("/context");
-    ais.setCurrent(new DefaultActionInvocation(new Edit(), "/button", null, null));
+    ais.setCurrent(new DefaultActionInvocation(new Edit(), null, "/button", null, null));
     new ControlTester(submit).
       attr("name", "button").
       attr("action", "foo").

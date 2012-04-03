@@ -32,7 +32,7 @@ public class ButtonTest extends ControlBaseTest {
 
   @Test
   public void actionLess() {
-    ais.setCurrent(new DefaultActionInvocation(null, "/button", null, null));
+    ais.setCurrent(new DefaultActionInvocation(null, null, "/button", null, null));
     new ControlTester(button).
       attr("name", "button").
       attr("value", "test-value").
@@ -45,7 +45,7 @@ public class ButtonTest extends ControlBaseTest {
 
   @Test
   public void css() {
-    ais.setCurrent(new DefaultActionInvocation(new Edit(), "/button", null, null));
+    ais.setCurrent(new DefaultActionInvocation(new Edit(), null, "/button", null, null));
     new ControlTester(button).
       attr("name", "button").
       attr("value", "test-value").
@@ -59,7 +59,7 @@ public class ButtonTest extends ControlBaseTest {
 
   @Test
   public void action() {
-    ais.setCurrent(new DefaultActionInvocation(new Edit(), "/button", null, null));
+    ais.setCurrent(new DefaultActionInvocation(new Edit(), null, "/button", null, null));
     new ControlTester(button).
       attr("name", "button").
       attr("action", "/foo").
@@ -74,7 +74,7 @@ public class ButtonTest extends ControlBaseTest {
 
   @Test
   public void html() {
-    ais.setCurrent(new DefaultActionInvocation(new Edit(), "/button", null, null));
+    ais.setCurrent(new DefaultActionInvocation(new Edit(), null, "/button", null, null));
     new ControlTester(button).
       attr("name", "html").
       attr("action", "/foo").
@@ -90,7 +90,7 @@ public class ButtonTest extends ControlBaseTest {
   @Test
   public void actionContext() {
     request.setContextPath("/context");
-    ais.setCurrent(new DefaultActionInvocation(new Edit(), "/button", null, null));
+    ais.setCurrent(new DefaultActionInvocation(new Edit(), null, "/button", null, null));
     new ControlTester(button).
       attr("name", "button").
       attr("action", "/foo").
@@ -106,7 +106,7 @@ public class ButtonTest extends ControlBaseTest {
   @Test
   public void actionContextRelative() {
     request.setContextPath("/context");
-    ais.setCurrent(new DefaultActionInvocation(new Edit(), "/button", null, null));
+    ais.setCurrent(new DefaultActionInvocation(new Edit(), null, "/button", null, null));
     new ControlTester(button).
       attr("name", "button").
       attr("action", "foo").

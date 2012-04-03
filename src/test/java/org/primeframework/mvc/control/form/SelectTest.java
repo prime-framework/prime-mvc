@@ -42,7 +42,7 @@ public class SelectTest extends ControlBaseTest {
 
   @Test
   public void actionLess() {
-    ais.setCurrent(new DefaultActionInvocation(null, "/select", null, null));
+    ais.setCurrent(new DefaultActionInvocation(null, null, "/select", null, null));
     new ControlTester(select).
       attr("name", "test").
       attr("class", "css-class").
@@ -62,7 +62,7 @@ public class SelectTest extends ControlBaseTest {
 
   @Test
   public void headerOption() {
-    ais.setCurrent(new DefaultActionInvocation(null, "/select", null, null));
+    ais.setCurrent(new DefaultActionInvocation(null, null, "/select", null, null));
     new ControlTester(select).
       attr("name", "test").
       attr("headerValue", "zero").
@@ -89,7 +89,7 @@ public class SelectTest extends ControlBaseTest {
     action.user = new User();
     action.user.setAddress("work", address);
 
-    ais.setCurrent(new DefaultActionInvocation(action, "/select", null, null));
+    ais.setCurrent(new DefaultActionInvocation(action, null, "/select", null, null));
 
     new ControlTester(select).
       attr("name", "user.addresses['work'].country").
@@ -114,7 +114,7 @@ public class SelectTest extends ControlBaseTest {
     action.user = new User();
     action.user.setAddress("work", address);
 
-    ais.setCurrent(new DefaultActionInvocation(action, "/select", null, null));
+    ais.setCurrent(new DefaultActionInvocation(action, null, "/select", null, null));
 
     new ControlTester(select).
       attr("name", "user.addresses['work'].country").
@@ -139,7 +139,7 @@ public class SelectTest extends ControlBaseTest {
     action.user = new User();
     action.user.setAddress("work", address);
 
-    ais.setCurrent(new DefaultActionInvocation(action, "/select", null, null));
+    ais.setCurrent(new DefaultActionInvocation(action, null, "/select", null, null));
 
     Pair<String, String> us = Pair.of("US", "United States");
     Pair<String, String> de = Pair.of("DE", "Germany");
@@ -169,7 +169,7 @@ public class SelectTest extends ControlBaseTest {
     action.user = new User();
     action.user.setAddress("work", address);
 
-    ais.setCurrent(new DefaultActionInvocation(action, "/select", null, null));
+    ais.setCurrent(new DefaultActionInvocation(action, null, "/select", null, null));
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "fieldError1"));
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "fieldError2"));
 
