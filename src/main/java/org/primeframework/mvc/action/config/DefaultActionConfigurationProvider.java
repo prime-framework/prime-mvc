@@ -19,6 +19,7 @@ import javax.servlet.ServletContext;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -66,27 +67,32 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
       throw new PrimeException("Error discovering action classes", e);
     }
 
-    Map<String, ActionConfiguration> configuration = new HashMap<String, ActionConfiguration>();
+    Map<String, ActionConfiguration> actionConfigurations = new HashMap<String, ActionConfiguration>();
     for (Class<?> actionClass : actionClassses) {
+      if ((actionClass.getModifiers() & Modifier.ABSTRACT) != 0) {
+        throw new PrimeException("The action class [" + actionClass + "] is annotated with the @Action annotation but is " +
+          "abstract. You can only annotate concrete action classes");
+      }
+
       String uri = uriBuilder.build(actionClass);
       Map<HTTPMethod, ExecuteMethod> executeMethods = findExecuteMethods(actionClass);
       List<Method> validationMethods = findValidationMethods(actionClass);
       Map<String, ResultConfiguration> resultAnnotations = findResultConfigurations(actionClass);
       ActionConfiguration actionConfiguration = new ActionConfiguration(actionClass, executeMethods, validationMethods, resultAnnotations, uri);
 
-      if (configuration.containsKey(uri)) {
-        boolean previousOverrideable = configuration.get(uri).actionClass.getAnnotation(Action.class).overridable();
+      if (actionConfigurations.containsKey(uri)) {
+        boolean previousOverrideable = actionConfigurations.get(uri).actionClass.getAnnotation(Action.class).overridable();
         boolean thisOverrideable = actionClass.getAnnotation(Action.class).overridable();
         if ((previousOverrideable && thisOverrideable) || (!previousOverrideable && !thisOverrideable)) {
           throw new PrimeException("Duplicate action found for URI [" + uri + "]. The first action class found was [" +
-            configuration.get(uri).actionClass + "]. The second action class found was [" + actionClass + "]. Either " +
+            actionConfigurations.get(uri).actionClass + "]. The second action class found was [" + actionClass + "]. Either " +
             "both classes are marked as overridable or neither is marked as overridable. You can fix this by only " +
             "marking one of the classes with the overridable flag on the Action annotation.");
         } else if (previousOverrideable) {
-          configuration.put(uri, actionConfiguration);
+          actionConfigurations.put(uri, actionConfiguration);
         }
       } else {
-        configuration.put(uri, actionConfiguration);
+        actionConfigurations.put(uri, actionConfiguration);
       }
 
       if (logger.isDebugEnabled()) {
@@ -94,12 +100,13 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
       }
     }
 
-    context.setAttribute(ACTION_CONFIGURATION_KEY, configuration);
+    context.setAttribute(ACTION_CONFIGURATION_KEY, actionConfigurations);
   }
 
   /**
    * {@inheritDoc}
    */
+  @Override
   public ActionConfiguration lookup(String uri) {
     Map<String, ActionConfiguration> configuration = (Map<String, ActionConfiguration>) context.getAttribute(ACTION_CONFIGURATION_KEY);
     if (configuration == null) {
@@ -107,13 +114,6 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
     }
 
     return configuration.get(uri);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public Map<String, ActionConfiguration> knownConfiguration() {
-    return (Map<String, ActionConfiguration>) context.getAttribute(ACTION_CONFIGURATION_KEY);
   }
 
   /**
@@ -240,7 +240,8 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
         }
       }
     }
-    return null;
+
+    return resultConfigurations;
   }
 
   /**

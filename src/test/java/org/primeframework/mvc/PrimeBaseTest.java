@@ -91,6 +91,18 @@ public abstract class PrimeBaseTest {
   }
 
   /**
+   * Makes an action invocation.
+   *
+   * @param uri The request URI.
+   * @param extension The extension.
+   * @return The action invocation.
+   * @throws Exception If the construction fails.
+   */
+  protected ActionInvocation makeActionInvocation(String uri, String extension) throws Exception {
+    return new ActionInvocation(null, null, uri, extension, null);
+  }
+
+  /**
    * Makes an action invocation and configuration.
    *
    * @param httpMethod The HTTP method.
@@ -103,17 +115,20 @@ public abstract class PrimeBaseTest {
    */
   protected ActionInvocation makeActionInvocation(HTTPMethod httpMethod, Object action, String methodName, String uri,
                                                   String extension, String... uriParamateres) throws Exception {
-    Method method = action.getClass().getMethod(methodName);
-    ExecuteMethod executeMethod = new ExecuteMethod(method, method.getAnnotation(Validation.class));
     Map<HTTPMethod, ExecuteMethod> executeMethods = new HashMap<HTTPMethod, ExecuteMethod>();
-    executeMethods.put(httpMethod, executeMethod);
+    ExecuteMethod executeMethod = null;
+    if (methodName != null) {
+      Method method = action.getClass().getMethod(methodName);
+      executeMethod = new ExecuteMethod(method, method.getAnnotation(Validation.class));
+      executeMethods.put(httpMethod, executeMethod);
+    }
 
     List<Method> validationMethods = new ArrayList<Method>();
 
     Map<String, ResultConfiguration> resultConfigurations = new HashMap<String, ResultConfiguration>();
 
     return new ActionInvocation(action, executeMethod, uri, extension, asList(uriParamateres),
-      new ActionConfiguration(Edit.class, executeMethods, validationMethods, resultConfigurations, uri), true);
+      new ActionConfiguration(action.getClass(), executeMethods, validationMethods, resultConfigurations, uri), true);
   }
 
   /**

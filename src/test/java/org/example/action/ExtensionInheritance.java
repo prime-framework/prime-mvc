@@ -26,8 +26,8 @@ import org.primeframework.mvc.action.annotation.Action;
 public class ExtensionInheritance extends Extension {
   public boolean invoked = false;
 
-  public String ajax() {
+  public String post() {
     invoked = true;
-    return "ajax";
+    return "child";
   }
 }

@@ -143,7 +143,7 @@ public class DefaultActionInvocationWorkflowTest extends PrimeBaseTest {
   @Test
   public void actionExtension() throws Exception {
     ExtensionInheritance action = new ExtensionInheritance();
-    ActionInvocation invocation = makeActionInvocation(HTTPMethod.POST, action, "ajax", "/foo/bar", "ajax");
+    ActionInvocation invocation = makeActionInvocation(HTTPMethod.POST, action, "post", "/foo/bar", "post");
     ActionInvocationStore ais = createStrictMock(ActionInvocationStore.class);
     expect(ais.getCurrent()).andReturn(invocation);
     replay(ais);
@@ -153,7 +153,7 @@ public class DefaultActionInvocationWorkflowTest extends PrimeBaseTest {
     replay(chain);
 
     ResultStore resultStore = createStrictMock(ResultStore.class);
-    resultStore.set("ajax");
+    resultStore.set("child");
     replay(resultStore);
     
     DefaultActionInvocationWorkflow workflow = new DefaultActionInvocationWorkflow(ais, resultStore);
@@ -168,7 +168,7 @@ public class DefaultActionInvocationWorkflowTest extends PrimeBaseTest {
   @Test
   public void actionExtensionInheritance() throws Exception {
     ExtensionInheritance action = new ExtensionInheritance();
-    ActionInvocation invocation = makeActionInvocation(HTTPMethod.POST, action, "json", "/foo/bar", "json");
+    ActionInvocation invocation = makeActionInvocation(HTTPMethod.POST, action, "get", "/foo/bar", "get");
     ActionInvocationStore ais = createStrictMock(ActionInvocationStore.class);
     expect(ais.getCurrent()).andReturn(invocation);
     replay(ais);
@@ -178,7 +178,7 @@ public class DefaultActionInvocationWorkflowTest extends PrimeBaseTest {
     replay(chain);
 
     ResultStore resultStore = createStrictMock(ResultStore.class);
-    resultStore.set("json");
+    resultStore.set("parent");
     replay(resultStore);
 
     DefaultActionInvocationWorkflow workflow = new DefaultActionInvocationWorkflow(ais, resultStore);

@@ -15,20 +15,17 @@
  */
 package org.primeframework.mvc.action;
 
-import javax.servlet.ServletException;
-import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.example.action.ComplexRest;
-import org.example.action.InvalidExecuteMethod;
-import org.example.action.MissingExecuteMethod;
 import org.example.action.user.Edit;
 import org.example.action.user.RESTEdit;
 import org.primeframework.mvc.PrimeBaseTest;
-import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.config.ActionConfigurationProvider;
 import org.primeframework.mvc.servlet.HTTPMethod;
@@ -47,7 +44,7 @@ import static org.testng.Assert.*;
  */
 public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
   @Test
-  public void differentButtonClick() throws IOException, ServletException {
+  public void differentButtonClick() throws Exception {
     request.setUri("/admin/user/edit");
     request.setPost(true);
     request.setParameter("__a_submit", "");
@@ -58,7 +55,7 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
   }
 
   @Test
-  public void differentButtonClickRelativeURI() throws IOException, ServletException {
+  public void differentButtonClickRelativeURI() throws Exception {
     request.setUri("/admin/user/edit");
     request.setPost(true);
     request.setParameter("__a_submit", "");
@@ -69,7 +66,7 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
   }
 
   @Test
-  public void requestURI() throws IOException, ServletException {
+  public void requestURI() throws Exception {
     request.setUri("/admin/user/edit");
     request.setPost(true);
     request.setParameter("__a_submit", "");
@@ -80,7 +77,7 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
   }
 
   @Test
-  public void requestURIContext() throws IOException, ServletException {
+  public void requestURIContext() throws Exception {
     request.setUri("/context-path/admin/user/edit");
     request.setContextPath("/context-path");
     request.setPost(true);
@@ -92,7 +89,7 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
   }
 
   @Test
-  public void extension() throws IOException, ServletException {
+  public void extension() throws Exception {
     request.setUri("/admin/user/edit.xml");
     request.setPost(true);
     request.setParameter("__a_submit", "");
@@ -103,17 +100,20 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
   }
 
   @Test
-  public void uriParameters() throws IOException, ServletException {
+  public void uriParameters() throws Exception {
     request.setUri("/admin/user/rest-edit/12");
     request.setPost(true);
     request.setParameter("__a_submit", "");
     request.setParameter("__a_cancel", "cancel");
     request.setParameter("submit", "Submit");
 
+    Map<HTTPMethod, ExecuteMethod> executeMethods = new HashMap<HTTPMethod, ExecuteMethod>();
+    executeMethods.put(HTTPMethod.POST, new ExecuteMethod(Edit.class.getMethod("execute"), null));
+
     ActionConfigurationProvider provider = EasyMock.createStrictMock(ActionConfigurationProvider.class);
     EasyMock.expect(provider.lookup("/admin/user/rest-edit/12")).andReturn(null);
     EasyMock.expect(provider.lookup("/admin/user/rest-edit/12/index")).andReturn(null);
-    EasyMock.expect(provider.lookup("/admin/user/rest-edit")).andReturn(new ActionConfiguration(RESTEdit.class, null, null, null, "/admin/user/rest-edit"));
+    EasyMock.expect(provider.lookup("/admin/user/rest-edit")).andReturn(new ActionConfiguration(RESTEdit.class, executeMethods, null, null, "/admin/user/rest-edit"));
     EasyMock.replay(provider);
 
     Capture<ActionInvocation> capture = new Capture<ActionInvocation>();
@@ -144,12 +144,15 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
   }
 
   @Test
-  public void uirParametersComplexWithWildcard() throws IOException, ServletException {
+  public void uirParametersComplexWithWildcard() throws Exception {
     request.setUri("/complex-rest/brian/static/pontarelli/then/a/bunch/of/stuff");
     request.setPost(true);
     request.setParameter("__a_submit", "");
     request.setParameter("__a_cancel", "cancel");
     request.setParameter("submit", "Submit");
+
+    Map<HTTPMethod, ExecuteMethod> executeMethods = new HashMap<HTTPMethod, ExecuteMethod>();
+    executeMethods.put(HTTPMethod.POST, new ExecuteMethod(Edit.class.getMethod("execute"), null));
 
     ActionConfigurationProvider provider = EasyMock.createStrictMock(ActionConfigurationProvider.class);
     EasyMock.expect(provider.lookup("/complex-rest/brian/static/pontarelli/then/a/bunch/of/stuff")).andReturn(null);
@@ -161,7 +164,7 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     EasyMock.expect(provider.lookup("/complex-rest/brian/static/pontarelli")).andReturn(null);
     EasyMock.expect(provider.lookup("/complex-rest/brian/static")).andReturn(null);
     EasyMock.expect(provider.lookup("/complex-rest/brian")).andReturn(null);
-    EasyMock.expect(provider.lookup("/complex-rest")).andReturn(new ActionConfiguration(ComplexRest.class, null, null, null, "/complex-rest"));
+    EasyMock.expect(provider.lookup("/complex-rest")).andReturn(new ActionConfiguration(ComplexRest.class, executeMethods, null, null, "/complex-rest"));
     EasyMock.replay(provider);
 
     Capture<ActionInvocation> capture = new Capture<ActionInvocation>();
@@ -192,7 +195,7 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
   }
 
   @Test
-  public void redirectToIndex() throws IOException, ServletException {
+  public void redirectToIndex() throws Exception {
     request.setUri("/foo");
     request.setPost(true);
     request.setParameter("__a_submit", "");
@@ -220,9 +223,12 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     EasyMock.verify(provider, store, injector, chain);
   }
 
-  private void run(String uri, String extension) throws IOException, ServletException {
+  private void run(String uri, String extension) throws Exception {
+    Map<HTTPMethod, ExecuteMethod> executeMethods = new HashMap<HTTPMethod, ExecuteMethod>();
+    executeMethods.put(HTTPMethod.POST, new ExecuteMethod(Edit.class.getMethod("post"), null));
+
     ActionConfigurationProvider provider = EasyMock.createStrictMock(ActionConfigurationProvider.class);
-    EasyMock.expect(provider.lookup(uri)).andReturn(new ActionConfiguration(Edit.class, null, null, null, uri));
+    EasyMock.expect(provider.lookup(uri)).andReturn(new ActionConfiguration(Edit.class, executeMethods, null, null, uri));
     EasyMock.replay(provider);
 
     Capture<ActionInvocation> capture = new Capture<ActionInvocation>();
@@ -249,72 +255,6 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     assertTrue(ai.executeResult);
 
     EasyMock.verify(provider, store, injector, chain);
-  }
-
-  @Test
-  public void actionWithoutExecuteMethod() throws Exception {
-    request.setUri("/foo");
-    request.setPost(true);
-    request.setParameter("__a_submit", "");
-    request.setParameter("__a_cancel", "cancel");
-    request.setParameter("submit", "Submit");
-
-    ActionConfigurationProvider provider = EasyMock.createStrictMock(ActionConfigurationProvider.class);
-    EasyMock.expect(provider.lookup("/foo")).andReturn(new ActionConfiguration(MissingExecuteMethod.class, null, null, null, "/foo"));
-    EasyMock.replay(provider);
-
-    ActionInvocationStore store = EasyMock.createStrictMock(ActionInvocationStore.class);
-    EasyMock.replay(store);
-
-    Injector injector = EasyMock.createStrictMock(Injector.class);
-    EasyMock.replay(injector);
-
-    WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);
-    EasyMock.replay(chain);
-
-    try {
-      DefaultActionMappingWorkflow workflow = new DefaultActionMappingWorkflow(request, response, store, new DefaultActionMapper(provider, injector, HTTPMethod.POST));
-      workflow.perform(chain);
-      fail("Should have failed");
-    } catch (PrimeException e) {
-      System.out.println(e);
-      // Expected
-    }
-
-    verify(provider, store, injector, chain);
-  }
-
-  @Test
-  public void actionWithWrongReturnType() throws Exception {
-    request.setUri("/foo");
-    request.setPost(true);
-    request.setParameter("__a_submit", "");
-    request.setParameter("__a_cancel", "cancel");
-    request.setParameter("submit", "Submit");
-
-    ActionConfigurationProvider provider = EasyMock.createStrictMock(ActionConfigurationProvider.class);
-    EasyMock.expect(provider.lookup("/foo")).andReturn(new ActionConfiguration(InvalidExecuteMethod.class, null, null, null, "/foo"));
-    EasyMock.replay(provider);
-
-    ActionInvocationStore store = EasyMock.createStrictMock(ActionInvocationStore.class);
-    EasyMock.replay(store);
-
-    Injector injector = EasyMock.createStrictMock(Injector.class);
-    EasyMock.replay(injector);
-
-    WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);
-    EasyMock.replay(chain);
-
-    try {
-      DefaultActionMappingWorkflow workflow = new DefaultActionMappingWorkflow(request, response, store, new DefaultActionMapper(provider, injector, HTTPMethod.POST));
-      workflow.perform(chain);
-      fail("Should have failed");
-    } catch (PrimeException e) {
-      System.out.println(e);
-      // Expected
-    }
-
-    verify(provider, store, injector, chain);
   }
 
   private void assertCollections(Collection<String> strings, Collection<String> strings1) {

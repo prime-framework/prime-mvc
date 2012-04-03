@@ -95,12 +95,18 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
           String resultCode = resultStore.get();
           ResultConfiguration resultConfiguration = actionInvocation.configuration.resultConfigurations.get(resultCode);
           if (resultConfiguration == null) {
-            throw new PrimeException("Missing result for action class [" + actionInvocation.configuration.actionClass +
-              "] URI [" + actionInvocation.actionURI + "] and result code [" + resultCode + "]");
-          }
+            String uri = resourceLocator.locate(ForwardResult.DIR);
+            if (uri == null) {
+              throw new PrimeException("Missing result for action class [" + actionInvocation.configuration.actionClass +
+                "] URI [" + actionInvocation.actionURI + "] and result code [" + resultCode + "]");
+            }
 
-          resultType = resultConfiguration.resultType;
-          annotation = resultConfiguration.annotation;
+            annotation = new ForwardImpl(uri, "success");
+            resultType = ForwardResult.class;
+          } else {
+            resultType = resultConfiguration.resultType;
+            annotation = resultConfiguration.annotation;
+          }
         }
   
         Result result = (Result) injector.getInstance(resultType);

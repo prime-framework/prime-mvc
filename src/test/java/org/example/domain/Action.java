@@ -23,6 +23,7 @@ import java.util.Map;
  *
  * @author Brian Pontarelli
  */
+@org.primeframework.mvc.action.annotation.Action
 public class Action {
   private int[] roleIds;
   private List<Integer> selectionIds;
@@ -69,5 +70,9 @@ public class Action {
 
   public void setAssociations(Map<String, Integer[]> associations) {
     this.associations = associations;
+  }
+
+  public String execute() {
+    return "success";
   }
 }

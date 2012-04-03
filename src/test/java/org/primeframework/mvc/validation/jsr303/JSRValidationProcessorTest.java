@@ -77,7 +77,7 @@ public class JSRValidationProcessorTest extends PrimeBaseTest {
     edit.user = new User();
     edit.user.setMonth(10);
 
-    store.setCurrent(makeActionInvocation(HTTPMethod.POST, edit, "execute", "/user/edit", ""));
+    store.setCurrent(makeActionInvocation(HTTPMethod.POST, edit, "post", "/user/edit", ""));
     try {
       processor.validate();
       fail("Should have failed");
@@ -97,7 +97,7 @@ public class JSRValidationProcessorTest extends PrimeBaseTest {
     action.user.setYear(10);
     action.user.setPassword("123456789012345678901234567890");
 
-    store.setCurrent(makeActionInvocation(HTTPMethod.POST, action, "execute", "/user/validatable", ""));
+    store.setCurrent(makeActionInvocation(HTTPMethod.POST, action, "post", "/user/validatable", ""));
     try {
       processor.validate();
       fail("Should have failed");
@@ -114,7 +114,7 @@ public class JSRValidationProcessorTest extends PrimeBaseTest {
     action.user.setYear(10);
     action.user.setPassword("123456789012345678901234567890");
 
-    store.setCurrent(makeActionInvocation(HTTPMethod.POST, action, "execute", "/user/validatable", ""));
+    store.setCurrent(makeActionInvocation(HTTPMethod.POST, action, "post", "/user/validatable", ""));
     try {
       processor.validate();
       fail("Should have failed");

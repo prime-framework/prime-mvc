@@ -15,29 +15,17 @@
  */
 package org.primeframework.mvc.action.result;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.io.StringWriter;
 
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.annotation.Forward;
-import org.primeframework.mvc.control.Control;
 import org.primeframework.mvc.freemarker.FreeMarkerMap;
 import org.primeframework.mvc.freemarker.FreeMarkerService;
-import org.primeframework.mvc.freemarker.NamedTemplateModel;
-import org.primeframework.mvc.message.FieldMessage;
-import org.primeframework.mvc.message.Message;
-import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.testng.annotations.Test;
 
@@ -51,198 +39,207 @@ import static org.easymock.EasyMock.*;
 public class ForwardResultTest {
   @Test
   public void fullyQualified() throws IOException, ServletException {
-    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    response.setContentType("text/html; charset=UTF-8");
-    response.setStatus(200);
-    replay(response);
+    PrintWriter writer = new PrintWriter(new StringWriter());
 
-    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    RequestDispatcher dispatcher = createStrictMock(RequestDispatcher.class);
-    dispatcher.forward(request, response);
-    replay(dispatcher);
-
-    expect(request.getRequestDispatcher("/foo/bar.jsp")).andReturn(dispatcher);
-    replay(request);
-
-    ServletContext context = createStrictMock(ServletContext.class);
-    replay(context);
-
-    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/foo/bar", null, null));
-    replay(store);
-
-    Forward forward = new ForwardResult.ForwardImpl("/foo/bar.jsp", null);
-    ForwardResult forwardResult = new ForwardResult(store, null, null, null, response, null);
-    forwardResult.execute(forward);
-
-    verify(context, dispatcher, request, response);
-  }
-
-  @Test
-  public void relative() throws IOException, ServletException {
-    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    response.setContentType("text/html; charset=UTF-8");
-    response.setStatus(200);
-    replay(response);
-
-    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    RequestDispatcher dispatcher = createStrictMock(RequestDispatcher.class);
-    dispatcher.forward(request, response);
-    replay(dispatcher);
-
-    expect(request.getRequestDispatcher("/WEB-INF/templates/bar.jsp")).andReturn(dispatcher);
-    replay(request);
-
-    ServletContext context = createStrictMock(ServletContext.class);
-    replay(context);
-
-    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/action", null, null));
-    replay(store);
-
-    Forward forward = new ForwardResult.ForwardImpl("bar.jsp", null);
-    ForwardResult forwardResult = new ForwardResult(store, null, null, null, response, null);
-    forwardResult.execute(forward);
-
-    verify(context, dispatcher, request, response);
-  }
-
-  @Test
-  public void status() throws IOException, ServletException {
-    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    response.setContentType("text/html; charset=UTF-8");
-    response.setStatus(300);
-    replay(response);
-
-    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    RequestDispatcher dispatcher = createStrictMock(RequestDispatcher.class);
-    dispatcher.forward(request, response);
-    replay(dispatcher);
-
-    expect(request.getRequestDispatcher("/WEB-INF/templates/bar.jsp")).andReturn(dispatcher);
-    replay(request);
-
-    ServletContext context = createStrictMock(ServletContext.class);
-    replay(context);
-
-    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/action", null, null));
-    replay(store);
-
-    Forward forward = new ForwardResult.ForwardImpl("bar.jsp", null, "text/html; charset=UTF-8", 300);
-    ForwardResult forwardResult = new ForwardResult(store, null, null, null, response, null);
-    forwardResult.execute(forward);
-
-    verify(context, dispatcher, request);
-  }
-
-  @Test
-  public void expansions() throws IOException, ServletException {
-    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    response.setContentType("text/xml; charset=UTF-8");
-    response.setStatus(300);
-    replay(response);
-
-    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    RequestDispatcher dispatcher = createStrictMock(RequestDispatcher.class);
-    dispatcher.forward(isA(HttpServletRequest.class), same(response));
-    replay(dispatcher);
-
-    expect(request.getRequestDispatcher("/WEB-INF/templates/bar.jsp")).andReturn(dispatcher);
-    replay(request);
-
-    ServletContext context = createStrictMock(ServletContext.class);
-    replay(context);
-
-    Object action = new Object();
-    ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
-    expect(ee.expand("${contentType}", action, false)).andReturn("text/xml; charset=UTF-8");
-    expect(ee.expand("${page}", action, false)).andReturn("bar.jsp");
-    replay(ee);
-
-    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new ActionInvocation(action, null, "/action", "", null));
-    replay(store);
-
-    Forward forward = new ForwardResult.ForwardImpl("${page}", null, "${contentType}", 300);
-    ForwardResult forwardResult = new ForwardResult(store, ee, null, null, response, null);
-    forwardResult.execute(forward);
-
-    verify(context, dispatcher, request);
-  }
-
-  @Test
-  public void contentType() throws IOException, ServletException {
-    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    response.setContentType("text/javascript; charset=UTF-8");
-    response.setStatus(200);
-    replay(response);
-
-    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    RequestDispatcher dispatcher = createStrictMock(RequestDispatcher.class);
-    dispatcher.forward(request, response);
-    replay(dispatcher);
-
-    expect(request.getRequestDispatcher("/WEB-INF/templates/bar.jsp")).andReturn(dispatcher);
-    replay(request);
-
-    ServletContext context = createStrictMock(ServletContext.class);
-    replay(context);
-
-    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/action", null, null));
-    replay(store);
-
-    Forward forward = new ForwardResult.ForwardImpl("bar.jsp", null, "text/javascript; charset=UTF-8", 200);
-    ForwardResult forwardResult = new ForwardResult(store, null, null, null, response, null);
-    forwardResult.execute(forward);
-
-    verify(context, dispatcher, request);
-  }
-
-  @Test
-  public void search() throws IOException, ServletException {
-    PrintWriter writer = new PrintWriter(new PrintWriter(System.out));
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
     response.setContentType("text/html; charset=UTF-8");
     response.setStatus(200);
     expect(response.getWriter()).andReturn(writer);
     replay(response);
 
-    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    expect(request.getSession(false)).andReturn(null);
-    replay(request);
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/foo/bar", null, null));
+    replay(store);
+
+    FreeMarkerMap map = createStrictMock(FreeMarkerMap.class);
+    replay(map);
+
+    FreeMarkerService service = createStrictMock(FreeMarkerService.class);
+    service.render(writer, "/foo/bar.ftl", map);
+    replay(service);
+
+    Forward forward = new ForwardResult.ForwardImpl("/foo/bar.ftl", null);
+    ForwardResult forwardResult = new ForwardResult(store, null, null, service, response, map);
+    forwardResult.execute(forward);
+
+    verify(response, store, map, service);
+  }
+
+  @Test
+  public void relative() throws IOException, ServletException {
+    PrintWriter writer = new PrintWriter(new StringWriter());
+
+    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
+    response.setContentType("text/html; charset=UTF-8");
+    response.setStatus(200);
+    expect(response.getWriter()).andReturn(writer);
+    replay(response);
+
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/action", "", null));
+    replay(store);
+
+    FreeMarkerMap map = createStrictMock(FreeMarkerMap.class);
+    replay(map);
+
+    FreeMarkerService service = createStrictMock(FreeMarkerService.class);
+    service.render(writer, "/WEB-INF/templates/bar.ftl", map);
+    replay(service);
+
+    Forward forward = new ForwardResult.ForwardImpl("bar.ftl", null);
+    ForwardResult forwardResult = new ForwardResult(store, null, null, service, response, map);
+    forwardResult.execute(forward);
+
+    verify(response, store, map, service);
+  }
+
+  @Test
+  public void relativeNested() throws IOException, ServletException {
+    PrintWriter writer = new PrintWriter(new StringWriter());
+
+    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
+    response.setContentType("text/html; charset=UTF-8");
+    response.setStatus(200);
+    expect(response.getWriter()).andReturn(writer);
+    replay(response);
+
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/action/nested", "", null));
+    replay(store);
+
+    FreeMarkerMap map = createStrictMock(FreeMarkerMap.class);
+    replay(map);
+
+    FreeMarkerService service = createStrictMock(FreeMarkerService.class);
+    service.render(writer, "/WEB-INF/templates/action/bar.ftl", map);
+    replay(service);
+
+    Forward forward = new ForwardResult.ForwardImpl("bar.ftl", null);
+    ForwardResult forwardResult = new ForwardResult(store, null, null, service, response, map);
+    forwardResult.execute(forward);
+
+    verify(response, store, map, service);
+  }
+
+  @Test
+  public void status() throws IOException, ServletException {
+    PrintWriter writer = new PrintWriter(new StringWriter());
+
+    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
+    response.setContentType("text/html; charset=UTF-8");
+    response.setStatus(300);
+    expect(response.getWriter()).andReturn(writer);
+    replay(response);
+
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/action", null, null));
+    replay(store);
+
+    FreeMarkerMap map = createStrictMock(FreeMarkerMap.class);
+    replay(map);
+
+    FreeMarkerService service = createStrictMock(FreeMarkerService.class);
+    service.render(writer, "/WEB-INF/templates/bar.ftl", map);
+    replay(service);
+
+    Forward forward = new ForwardResult.ForwardImpl("bar.ftl", null, "text/html; charset=UTF-8", 300);
+    ForwardResult forwardResult = new ForwardResult(store, null, null, service, response, map);
+    forwardResult.execute(forward);
+
+    verify(response, store, map, service);
+  }
+
+  @Test
+  public void expansions() throws IOException, ServletException {
+    PrintWriter writer = new PrintWriter(new StringWriter());
+
+    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
+    response.setContentType("text/xml; charset=UTF-8");
+    response.setStatus(300);
+    expect(response.getWriter()).andReturn(writer);
+    replay(response);
+
+    Object action = new Object();
+    ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
+    expect(ee.expand("${contentType}", action, false)).andReturn("text/xml; charset=UTF-8");
+    expect(ee.expand("${page}", action, false)).andReturn("bar.ftl");
+    replay(ee);
+
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(new ActionInvocation(action, null, "/action", "", null));
+    replay(store);
+
+    FreeMarkerMap map = createStrictMock(FreeMarkerMap.class);
+    replay(map);
+
+    FreeMarkerService service = createStrictMock(FreeMarkerService.class);
+    service.render(writer, "/WEB-INF/templates/bar.ftl", map);
+    replay(service);
+
+    Forward forward = new ForwardResult.ForwardImpl("${page}", null, "${contentType}", 300);
+    ForwardResult forwardResult = new ForwardResult(store, ee, null, service, response, map);
+    forwardResult.execute(forward);
+
+    verify(response, store, map, service);
+  }
+
+  @Test
+  public void contentType() throws IOException, ServletException {
+    PrintWriter writer = new PrintWriter(new StringWriter());
+
+    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
+    response.setContentType("text/javascript; charset=UTF-8");
+    response.setStatus(200);
+    expect(response.getWriter()).andReturn(writer);
+    replay(response);
+
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/action", null, null));
+    replay(store);
+
+    FreeMarkerMap map = createStrictMock(FreeMarkerMap.class);
+    replay(map);
+
+    FreeMarkerService service = createStrictMock(FreeMarkerService.class);
+    service.render(writer, "/WEB-INF/templates/bar.ftl", map);
+    replay(service);
+
+    Forward forward = new ForwardResult.ForwardImpl("bar.ftl", null, "text/javascript; charset=UTF-8", 200);
+    ForwardResult forwardResult = new ForwardResult(store, null, null, service, response, map);
+    forwardResult.execute(forward);
+
+    verify(response, store, map, service);
+  }
+
+  @Test
+  public void search() throws IOException, ServletException {
+    PrintWriter writer = new PrintWriter(new PrintWriter(System.out));
+
+    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
+    response.setContentType("text/html; charset=UTF-8");
+    response.setStatus(200);
+    expect(response.getWriter()).andReturn(writer);
+    replay(response);
 
     FreeMarkerService service = createStrictMock(FreeMarkerService.class);
     service.render(same(writer), eq("/WEB-INF/templates/action.ftl"), isA(FreeMarkerMap.class));
     replay(service);
 
-    ServletContext context = createStrictMock(ServletContext.class);
-    expect(context.getResource("/WEB-INF/templates/action-js-failure.jsp")).andReturn(null);
-    expect(context.getResource("/WEB-INF/templates/action-js-failure.ftl")).andReturn(null);
-    expect(context.getResource("/WEB-INF/templates/action-js.jsp")).andReturn(null);
-    expect(context.getResource("/WEB-INF/templates/action-js.ftl")).andReturn(null);
-    expect(context.getResource("/WEB-INF/templates/action-failure.jsp")).andReturn(null);
-    expect(context.getResource("/WEB-INF/templates/action-failure.ftl")).andReturn(null);
-    expect(context.getResource("/WEB-INF/templates/action.jsp")).andReturn(null);
-    expect(context.getResource("/WEB-INF/templates/action.ftl")).andReturn(new URL("http://localhost"));
-    replay(context);
+    FreeMarkerMap map = createStrictMock(FreeMarkerMap.class);
+    replay(map);
+
+    ResourceLocator locator = createStrictMock(ResourceLocator.class);
+    expect(locator.locate("/WEB-INF/templates")).andReturn("/WEB-INF/templates/action.ftl");
+    replay(locator);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/action", "js", null));
     replay(store);
 
-    List<Message> messages = new ArrayList<Message>();
-    MessageStore messageStore = createStrictMock(MessageStore.class);
-    expect(messageStore.get()).andReturn(messages);
-    expect(messageStore.getFieldMessages()).andReturn(new HashMap<String, List<FieldMessage>>());
-    replay(messageStore);
-
     Forward forward = new ForwardResult.ForwardImpl("", "failure");
-    ForwardResult forwardResult = new ForwardResult(store, null, null, service, response,
-      new FreeMarkerMap(context, request, response, null, store, messageStore, new HashMap<String, Set<Control>>(), new HashMap<String, Set<NamedTemplateModel>>()));
+    ForwardResult forwardResult = new ForwardResult(store, null, locator, service, response, map);
     forwardResult.execute(forward);
 
-    verify(context, service, request);
+    verify(response, service, map, locator, store);
   }
 }

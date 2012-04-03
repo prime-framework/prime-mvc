@@ -15,20 +15,17 @@
  */
 package org.example.action;
 
-import org.primeframework.mvc.action.annotation.Action;
-
 /**
  * This is a simple test action.
  *
  * @author Brian Pontarelli
  */
-@Action
 public abstract class Extension {
   public String baseField;
   public boolean baseInvoked = false;
 
-  public String json() {
+  public String get() {
     baseInvoked = true;
-    return "json";
+    return "parent";
   }
 }

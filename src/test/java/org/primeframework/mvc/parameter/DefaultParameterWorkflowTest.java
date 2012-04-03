@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc.parameter;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -29,6 +28,7 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.easymock.IArgumentMatcher;
+import org.example.action.user.Edit;
 import org.example.domain.Action;
 import org.example.domain.PreAndPostAction;
 import org.primeframework.mvc.PrimeBaseTest;
@@ -46,6 +46,7 @@ import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.parameter.el.ExpressionException;
 import org.primeframework.mvc.parameter.fileupload.FileInfo;
 import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
+import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.util.MapBuilder;
 import org.primeframework.mvc.util.RequestKeys;
 import org.primeframework.mvc.workflow.WorkflowChain;
@@ -65,7 +66,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
   @Inject public ExpressionEvaluator expressionEvaluator;
 
   @Test
-  public void simpleParameters() throws IOException, ServletException {
+  public void simpleParameters() throws Exception {
     Action action = new Action();
 
     Map<String, String[]> values = new LinkedHashMap<String, String[]>();
@@ -89,12 +90,9 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     expressionEvaluator.setValue(eq("user.name"), same(action), aryEq(ArrayUtils.toArray("")), eq(new HashMap<String, String>()));
     replay(expressionEvaluator);
 
-    ActionInvocation invocation = createStrictMock(ActionInvocation.class);
-    expect(invocation.action).andReturn(action).times(2);
-    replay(invocation);
-
+    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, null, "/", "");
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
-    expect(actionInvocationStore.getCurrent()).andReturn(invocation).times(2);
+    expect(actionInvocationStore.getCurrent()).andReturn(ai).times(2);
     replay(actionInvocationStore);
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
@@ -120,11 +118,11 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
       new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 
-    verify(request, expressionEvaluator, invocation, actionInvocationStore, messageStore, config, chain, provider);
+    verify(request, expressionEvaluator, actionInvocationStore, messageStore, config, chain, provider);
   }
 
   @Test
-  public void invalidParametersDev() throws IOException, ServletException {
+  public void invalidParametersDev() throws Exception {
     Action action = new Action();
 
     Map<String, String[]> values = new LinkedHashMap<String, String[]>();
@@ -141,12 +139,9 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     expectLastCall().andThrow(new ExpressionException());
     replay(expressionEvaluator);
 
-    ActionInvocation invocation = createStrictMock(ActionInvocation.class);
-    expect(invocation.action).andReturn(action).times(2);
-    replay(invocation);
-
+    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, null, "/", "");
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
-    expect(actionInvocationStore.getCurrent()).andReturn(invocation).times(2);
+    expect(actionInvocationStore.getCurrent()).andReturn(ai).times(2);
     replay(actionInvocationStore);
 
     MessageStore messageStore = createStrictMock(MessageStore.class);
@@ -173,11 +168,11 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
       // Expected
     }
 
-    verify(request, expressionEvaluator, invocation, actionInvocationStore, messageStore, config, chain, provider);
+    verify(request, expressionEvaluator, actionInvocationStore, messageStore, config, chain, provider);
   }
 
   @Test
-  public void invalidParametersProduction() throws IOException, ServletException {
+  public void invalidParametersProduction() throws Exception {
     Action action = new Action();
 
     Map<String, String[]> values = new LinkedHashMap<String, String[]>();
@@ -194,12 +189,9 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     expectLastCall().andThrow(new ExpressionException());
     replay(expressionEvaluator);
 
-    ActionInvocation invocation = createStrictMock(ActionInvocation.class);
-    expect(invocation.action).andReturn(action).times(2);
-    replay(invocation);
-
+    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, null, "/", "");
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
-    expect(actionInvocationStore.getCurrent()).andReturn(invocation).times(2);
+    expect(actionInvocationStore.getCurrent()).andReturn(ai).times(2);
     replay(actionInvocationStore);
 
     MessageStore messageStore = createStrictMock(MessageStore.class);
@@ -222,11 +214,11 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
       new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 
-    verify(request, expressionEvaluator, invocation, actionInvocationStore, messageStore, config, chain, provider);
+    verify(request, expressionEvaluator, actionInvocationStore, messageStore, config, chain, provider);
   }
 
   @Test
-  public void radioButtonsCheckBoxes() throws IOException, ServletException {
+  public void radioButtonsCheckBoxes() throws Exception {
     Action action = new Action();
 
     Map<String, String[]> values = new HashMap<String, String[]>();
@@ -246,12 +238,9 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     expressionEvaluator.setValue(eq("user.radio['default']"), same(action), aryEq(ArrayUtils.toArray("false")), eq(new HashMap<String, String>()));
     replay(expressionEvaluator);
 
-    ActionInvocation invocation = createStrictMock(ActionInvocation.class);
-    expect(invocation.action).andReturn(action).times(2);
-    replay(invocation);
-
+    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, null, "/", "");
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
-    expect(actionInvocationStore.getCurrent()).andReturn(invocation).times(2);
+    expect(actionInvocationStore.getCurrent()).andReturn(ai).times(2);
     replay(actionInvocationStore);
 
     MessageStore messageStore = createStrictMock(MessageStore.class);
@@ -273,11 +262,11 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
       new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 
-    verify(request, expressionEvaluator, invocation, actionInvocationStore, messageStore, config, chain, provider);
+    verify(request, expressionEvaluator, actionInvocationStore, messageStore, config, chain, provider);
   }
 
   @Test
-  public void imageSubmitButton() throws IOException, ServletException {
+  public void imageSubmitButton() throws Exception {
     Action action = new Action();
 
     Map<String, String[]> values = new HashMap<String, String[]>();
@@ -297,12 +286,9 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     expectLastCall().andThrow(new ExpressionException("Not property y"));
     replay(expressionEvaluator);
 
-    ActionInvocation invocation = createStrictMock(ActionInvocation.class);
-    expect(invocation.action).andReturn(action).times(2);
-    replay(invocation);
-
+    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, null, "/", "");
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
-    expect(actionInvocationStore.getCurrent()).andReturn(invocation).times(2);
+    expect(actionInvocationStore.getCurrent()).andReturn(ai).times(2);
     replay(actionInvocationStore);
 
     MessageStore messageStore = createStrictMock(MessageStore.class);
@@ -325,14 +311,14 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
       new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 
-    verify(request, expressionEvaluator, invocation, actionInvocationStore, messageStore, config, chain, provider);
+    verify(request, expressionEvaluator, actionInvocationStore, messageStore, config, chain, provider);
   }
 
   /*
   * Tests that all of the pre and post handling works correctly.
   */
   @Test
-  public void preAndPost() throws IOException, ServletException {
+  public void preAndPost() throws Exception {
     PreAndPostAction action = new PreAndPostAction();
 
     Map<String, String[]> values = new HashMap<String, String[]>();
@@ -345,12 +331,9 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(null);
     replay(request);
 
-    ActionInvocation invocation = createStrictMock(ActionInvocation.class);
-    expect(invocation.action).andReturn(action).times(2);
-    replay(invocation);
-
+    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, null, "/", "");
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
-    expect(actionInvocationStore.getCurrent()).andReturn(invocation).times(2);
+    expect(actionInvocationStore.getCurrent()).andReturn(ai).times(2);
     replay(actionInvocationStore);
 
     MessageStore messageStore = createStrictMock(MessageStore.class);
@@ -376,11 +359,11 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     assertTrue(action.preCalled);
     assertTrue(action.postCalled);
 
-    verify(request, invocation, actionInvocationStore, messageStore, config, chain, provider);
+    verify(request, actionInvocationStore, messageStore, config, chain, provider);
   }
 
   @Test
-  public void filesNoAnnotation() throws IOException, ServletException {
+  public void filesNoAnnotation() throws Exception {
     Map<String, List<FileInfo>> files = new HashMap<String, List<FileInfo>>();
     files.put("userfile", asList(new FileInfo(new java.io.File("src/test/java/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain")));
 
@@ -395,18 +378,15 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     expect(config.fileUploadAllowedTypes()).andReturn(new String[]{"text/plain"});
     replay(config);
 
-    Object action = new Object();
+    Edit action = new Edit();
     ExpressionEvaluator expressionEvaluator = createStrictMock(ExpressionEvaluator.class);
     expect(expressionEvaluator.getAnnotation(FileUpload.class, "userfile", action)).andReturn(null);
     expressionEvaluator.setValue(eq("userfile"), same(action), assertFile());
     replay(expressionEvaluator);
 
-    ActionInvocation invocation = createStrictMock(ActionInvocation.class);
-    expect(invocation.action).andReturn(action);
-    replay(invocation);
-
+    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, null, "/", "");
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
-    expect(actionInvocationStore.getCurrent()).andReturn(invocation);
+    expect(actionInvocationStore.getCurrent()).andReturn(ai);
     replay(actionInvocationStore);
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
@@ -424,11 +404,11 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
       new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 
-    verify(request, config, chain, actionInvocationStore, invocation, expressionEvaluator, messageStore, provider);
+    verify(request, config, chain, actionInvocationStore, expressionEvaluator, messageStore, provider);
   }
 
   @Test
-  public void multipleFilesNoAnnotation() throws IOException, ServletException {
+  public void multipleFilesNoAnnotation() throws Exception {
     Map<String, List<FileInfo>> files = new HashMap<String, List<FileInfo>>();
     files.put("userfiles", asList(
       new FileInfo(new java.io.File("src/test/java/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain"),
@@ -445,18 +425,15 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     expect(config.fileUploadAllowedTypes()).andReturn(new String[]{"text/plain"});
     replay(config);
 
-    Object action = new Object();
+    Edit action = new Edit();
     ExpressionEvaluator expressionEvaluator = createStrictMock(ExpressionEvaluator.class);
     expect(expressionEvaluator.getAnnotation(FileUpload.class, "userfiles", action)).andReturn(null);
     expressionEvaluator.setValue(eq("userfiles"), same(action), captureMultiple());
     replay(expressionEvaluator);
 
-    ActionInvocation invocation = createStrictMock(ActionInvocation.class);
-    expect(invocation.action).andReturn(action);
-    replay(invocation);
-
+    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, null, "/", "");
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
-    expect(actionInvocationStore.getCurrent()).andReturn(invocation);
+    expect(actionInvocationStore.getCurrent()).andReturn(ai);
     replay(actionInvocationStore);
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
@@ -474,11 +451,11 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
       new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 
-    verify(request, config, chain, actionInvocationStore, invocation, expressionEvaluator, messageStore, provider);
+    verify(request, config, chain, actionInvocationStore, expressionEvaluator, messageStore, provider);
   }
 
   @Test
-  public void filesNoAnnotationSizeError() throws IOException, ServletException {
+  public void filesNoAnnotationSizeError() throws Exception {
     Map<String, List<FileInfo>> files = new HashMap<String, List<FileInfo>>();
     files.put("userfile", new ArrayList<FileInfo>(asList(new FileInfo(new java.io.File("src/test/java/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain"))));
 
@@ -493,17 +470,14 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     expect(config.fileUploadAllowedTypes()).andReturn(AbstractMVCConfiguration.ALLOWED_TYPES);
     replay(config);
 
-    Object action = new Object();
+    Edit action = new Edit();
     ExpressionEvaluator expressionEvaluator = createStrictMock(ExpressionEvaluator.class);
     expect(expressionEvaluator.getAnnotation(FileUpload.class, "userfile", action)).andReturn(null);
     replay(expressionEvaluator);
 
-    ActionInvocation invocation = createStrictMock(ActionInvocation.class);
-    expect(invocation.action).andReturn(action);
-    replay(invocation);
-
+    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, null, "/", "");
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
-    expect(actionInvocationStore.getCurrent()).andReturn(invocation);
+    expect(actionInvocationStore.getCurrent()).andReturn(ai);
     replay(actionInvocationStore);
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
@@ -524,11 +498,11 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
       new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 
-    verify(request, config, chain, actionInvocationStore, invocation, expressionEvaluator, messageStore, provider);
+    verify(request, config, chain, actionInvocationStore, expressionEvaluator, messageStore, provider);
   }
 
   @Test
-  public void filesNoAnnotationContentTypeError() throws IOException, ServletException {
+  public void filesNoAnnotationContentTypeError() throws Exception {
     Map<String, List<FileInfo>> files = new HashMap<String, List<FileInfo>>();
     files.put("userfile", new ArrayList<FileInfo>(asList(new FileInfo(new java.io.File("src/test/java/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain"))));
 
@@ -544,17 +518,14 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     expect(config.fileUploadAllowedTypes()).andReturn(contentTypes);
     replay(config);
 
-    Object action = new Object();
+    Edit action = new Edit();
     ExpressionEvaluator expressionEvaluator = createStrictMock(ExpressionEvaluator.class);
     expect(expressionEvaluator.getAnnotation(FileUpload.class, "userfile", action)).andReturn(null);
     replay(expressionEvaluator);
 
-    ActionInvocation invocation = createStrictMock(ActionInvocation.class);
-    expect(invocation.action).andReturn(action);
-    replay(invocation);
-
+    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, null, "/", "");
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
-    expect(actionInvocationStore.getCurrent()).andReturn(invocation);
+    expect(actionInvocationStore.getCurrent()).andReturn(ai);
     replay(actionInvocationStore);
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
@@ -575,11 +546,11 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
       new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 
-    verify(request, config, chain, actionInvocationStore, invocation, expressionEvaluator, messageStore, provider);
+    verify(request, config, chain, actionInvocationStore, expressionEvaluator, messageStore, provider);
   }
 
   @Test
-  public void filesAnnotationSizeError() throws IOException, ServletException {
+  public void filesAnnotationSizeError() throws Exception {
     Map<String, List<FileInfo>> files = new HashMap<String, List<FileInfo>>();
     files.put("userfile", new ArrayList<FileInfo>(asList(new FileInfo(new java.io.File("src/test/java/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain"))));
 
@@ -594,7 +565,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     expect(config.fileUploadAllowedTypes()).andReturn(AbstractMVCConfiguration.ALLOWED_TYPES);
     replay(config);
 
-    Object action = new Object();
+    Edit action = new Edit();
     ExpressionEvaluator expressionEvaluator = createStrictMock(ExpressionEvaluator.class);
     expect(expressionEvaluator.getAnnotation(FileUpload.class, "userfile", action)).andReturn(new FileUpload() {
       public long maxSize() {
@@ -611,12 +582,9 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     });
     replay(expressionEvaluator);
 
-    ActionInvocation invocation = createStrictMock(ActionInvocation.class);
-    expect(invocation.action).andReturn(action);
-    replay(invocation);
-
+    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, null, "/", "");
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
-    expect(actionInvocationStore.getCurrent()).andReturn(invocation);
+    expect(actionInvocationStore.getCurrent()).andReturn(ai);
     replay(actionInvocationStore);
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
@@ -637,11 +605,11 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
       new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 
-    verify(request, config, chain, actionInvocationStore, invocation, expressionEvaluator, messageStore, provider);
+    verify(request, config, chain, actionInvocationStore, expressionEvaluator, messageStore, provider);
   }
 
   @Test
-  public void filesAnnotationContentTypeError() throws IOException, ServletException {
+  public void filesAnnotationContentTypeError() throws Exception {
     Map<String, List<FileInfo>> files = new HashMap<String, List<FileInfo>>();
     files.put("userfile", new ArrayList<FileInfo>(asList(new FileInfo(new java.io.File("src/test/java/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain"))));
 
@@ -657,7 +625,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(config);
 
     final String[] annotationTypes = new String[]{"text/xml"};
-    Object action = new Object();
+    Edit action = new Edit();
     ExpressionEvaluator expressionEvaluator = createStrictMock(ExpressionEvaluator.class);
     expect(expressionEvaluator.getAnnotation(FileUpload.class, "userfile", action)).andReturn(new FileUpload() {
       public long maxSize() {
@@ -674,12 +642,10 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     });
     replay(expressionEvaluator);
 
-    ActionInvocation invocation = createStrictMock(ActionInvocation.class);
-    expect(invocation.action).andReturn(action);
-    replay(invocation);
+    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, null, "/", "");
 
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
-    expect(actionInvocationStore.getCurrent()).andReturn(invocation);
+    expect(actionInvocationStore.getCurrent()).andReturn(ai);
     replay(actionInvocationStore);
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
@@ -700,7 +666,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
       new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 
-    verify(request, config, chain, actionInvocationStore, invocation, expressionEvaluator, messageStore, provider);
+    verify(request, config, chain, actionInvocationStore, expressionEvaluator, messageStore, provider);
   }
 
   @SuppressWarnings("unchecked")

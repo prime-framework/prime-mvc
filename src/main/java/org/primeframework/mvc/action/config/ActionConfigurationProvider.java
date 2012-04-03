@@ -15,8 +15,6 @@
  */
 package org.primeframework.mvc.action.config;
 
-import java.util.Map;
-
 import com.google.inject.ImplementedBy;
 
 /**
@@ -34,9 +32,4 @@ public interface ActionConfigurationProvider {
    * @return The action configuration for the URI or null if nothing could be found or inferred.
    */
   ActionConfiguration lookup(String uri);
-
-  /**
-   * @return The current set of known configuration.
-   */
-  Map<String, ActionConfiguration> knownConfiguration();
 }

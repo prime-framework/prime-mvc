@@ -87,7 +87,7 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
 
     RedirectResult result = createStrictMock(RedirectResult.class);
     result.execute(isA(Redirect.class));
-    replay(resourceLocator);
+    replay(result);
 
     Injector injector = createStrictMock(Injector.class);
     expect(injector.getInstance(RedirectResult.class)).andReturn(result);
@@ -175,7 +175,6 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
     replay(chain);
 
     ResultStore resultStore = createStrictMock(ResultStore.class);
-    expect(resultStore.get()).andReturn("success");
     resultStore.clear();
     replay(resultStore);
 
@@ -208,14 +207,10 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
     replay(resultStore);
 
     ResourceLocator resourceLocator = createStrictMock(ResourceLocator.class);
+    expect(resourceLocator.locate("/WEB-INF/templates")).andReturn(null);
     replay(resourceLocator);
 
-    ForwardResult result = createStrictMock(ForwardResult.class);
-    result.execute(annotation);
-    replay(result);
-
     Injector injector = createStrictMock(Injector.class);
-    expect(injector.getInstance(ForwardResult.class)).andReturn(result);
     replay(injector);
 
     DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(ais, resultStore, resourceLocator, injector);

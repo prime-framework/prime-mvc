@@ -61,7 +61,7 @@ public class DefaultURIParameterWorkflowTest extends PrimeBaseTest {
   public void singleIDParameters() throws Exception {
     RESTEdit action = new RESTEdit();
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, "post", "/admmin/user/rest-edit/12", "", "12");
+    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, "execute", "/admmin/user/rest-edit/12", "", "12");
     expect(store.getCurrent()).andReturn(ai);
     replay(store);
 
@@ -82,7 +82,7 @@ public class DefaultURIParameterWorkflowTest extends PrimeBaseTest {
   public void complexParameters() throws Exception {
     ComplexRest action = new ComplexRest();
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, "post", "/complex-rest/brian/static/pontarelli/then/a/bunch/of/stuff", "", "brian", "static", "pontarelli", "then", "a", "bunch", "of", "stuff");
+    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, "execute", "/complex-rest/brian/static/pontarelli/then/a/bunch/of/stuff", "", "brian", "static", "pontarelli", "then", "a", "bunch", "of", "stuff");
     expect(store.getCurrent()).andReturn(ai);
     replay(store);
 

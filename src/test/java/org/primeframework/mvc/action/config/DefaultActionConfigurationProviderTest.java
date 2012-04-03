@@ -22,6 +22,7 @@ import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.example.action.Simple;
 import org.example.action.user.Index;
+import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.util.DefaultURIBuilder;
 import org.testng.annotations.Test;
 
@@ -35,7 +36,7 @@ import static org.testng.Assert.*;
  */
 public class DefaultActionConfigurationProviderTest {
   @Test
-  public void configure() {
+  public void configure() throws Exception {
     ServletContext context = EasyMock.createStrictMock(ServletContext.class);
     Capture<Map<String, ActionConfiguration>> c = new Capture<Map<String, ActionConfiguration>>();
     context.setAttribute(eq(DefaultActionConfigurationProvider.ACTION_CONFIGURATION_KEY), capture(c));
@@ -44,13 +45,22 @@ public class DefaultActionConfigurationProviderTest {
     new DefaultActionConfigurationProvider(context, new DefaultURIBuilder());
 
     Map<String, ActionConfiguration> config = c.getValue();
-    assertNotNull(config.get("/simple"));
-    assertSame(Simple.class, config.get("/simple").actionClass);
+    assertSame(config.get("/simple").actionClass, Simple.class);
+    assertNotNull(config.get("/simple").annotation);
+    assertEquals(config.get("/simple").executeMethods.size(), 8);
+    assertEquals(config.get("/simple").executeMethods.get(HTTPMethod.GET).method, Simple.class.getMethod("execute"));
+    assertEquals(config.get("/simple").executeMethods.get(HTTPMethod.POST).method, Simple.class.getMethod("execute"));
+    assertEquals(config.get("/simple").executeMethods.get(HTTPMethod.PUT).method, Simple.class.getMethod("execute"));
+    assertEquals(config.get("/simple").executeMethods.get(HTTPMethod.HEAD).method, Simple.class.getMethod("execute"));
+    assertEquals(config.get("/simple").executeMethods.get(HTTPMethod.DELETE).method, Simple.class.getMethod("execute"));
+    assertEquals(config.get("/simple").resultConfigurations.size(), 0);
+    assertEquals(config.get("/simple").pattern, "");
+    assertEquals(config.get("/simple").patternParts.length, 0);
     assertEquals(config.get("/simple").uri, "/simple");
+    assertEquals(config.get("/simple").validationMethods.size(), 0);
 
     assertNotNull(config.get("/user/index"));
     assertSame(Index.class, config.get("/user/index").actionClass);
     assertEquals(config.get("/user/index").uri, "/user/index");
   }
-
 }

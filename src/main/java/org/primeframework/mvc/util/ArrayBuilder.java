@@ -22,10 +22,11 @@ import java.util.List;
 import static java.util.Arrays.*;
 
 /**
- * A simple map builder.
+ * A simple array builder.
  *
  * @author Brian Pontarelli
  */
+@SuppressWarnings("unchecked")
 public class ArrayBuilder<T> {
   public final List<T> list = new ArrayList<T>();
   public final Class<T> type;

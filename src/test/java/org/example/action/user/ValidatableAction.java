@@ -21,6 +21,7 @@ import javax.validation.Validator;
 import java.util.Set;
 
 import org.example.domain.User;
+import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.validation.jsr303.Validatable;
 import org.primeframework.mvc.validation.jsr303.group.Create;
@@ -31,6 +32,7 @@ import com.google.inject.Inject;
 /**
  * @author Brian Pontarelli
  */
+@Action
 public class ValidatableAction implements Validatable<ValidatableAction> {
   private final HTTPMethod method;
 
