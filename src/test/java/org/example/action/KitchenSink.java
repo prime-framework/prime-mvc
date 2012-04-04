@@ -43,7 +43,7 @@ import com.google.inject.Inject;
   @Redirect(code = "redirect2", uri = "/redirect2", perm = false)
 })
 @Header(code = "header", status = 300)
-public class KitchenSink implements Validatable {
+public class KitchenSink extends KitchenSinkSuperclass implements Validatable {
   private final MessageStore messageStore;
 
   @Inject

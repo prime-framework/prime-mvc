@@ -217,6 +217,21 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
    */
   protected Map<String, ResultConfiguration> findResultConfigurations(Class<?> actionClass) {
     Map<String, ResultConfiguration> resultConfigurations = new HashMap<String, ResultConfiguration>();
+    while (actionClass != Object.class) {
+      addResultsForClass(actionClass, resultConfigurations);
+      actionClass = actionClass.getSuperclass();
+    }
+
+    return resultConfigurations;
+  }
+
+  /**
+   * Adds all the result annotations for the given class.
+   *
+   * @param actionClass The action class.
+   * @param resultConfigurations The Map.
+   */
+  protected void addResultsForClass(Class<?> actionClass, Map<String, ResultConfiguration> resultConfigurations) {
     Annotation[] annotations = actionClass.getAnnotations();
     for (Annotation annotation : annotations) {
       Class<? extends Annotation> annotationType = annotation.annotationType();
@@ -247,8 +262,6 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
         }
       }
     }
-
-    return resultConfigurations;
   }
 
   /**
