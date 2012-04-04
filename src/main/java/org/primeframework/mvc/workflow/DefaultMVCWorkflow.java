@@ -53,27 +53,27 @@ public class DefaultMVCWorkflow implements MVCWorkflow {
                             StaticResourceWorkflow staticResourceWorkflow,
                             ActionMappingWorkflow actionMappingWorkflow,
                             ScopeRetrievalWorkflow scopeRetrievalWorkflow,
-                            MessageWorkflow messageWorkflow,
                             URIParameterWorkflow uriParameterWorkflow,
                             ParameterWorkflow parameterWorkflow,
                             ValidationWorkflow validationWorkflow,
                             ActionInvocationWorkflow actionInvocationWorkflow,
                             ScopeStorageWorkflow scopeStorageWorkflow,
+                            MessageWorkflow messageWorkflow,
                             ResultInvocationWorkflow resultInvocationWorflow) {
     this.resultStore = resultStore;
     this.exceptionTranslator = exceptionTranslator;
     workflows = asList(requestBodyWorkflow, staticResourceWorkflow, actionMappingWorkflow, scopeRetrievalWorkflow,
-      messageWorkflow, uriParameterWorkflow, parameterWorkflow, validationWorkflow, actionInvocationWorkflow,
-      scopeStorageWorkflow, resultInvocationWorflow);
+      uriParameterWorkflow, parameterWorkflow, validationWorkflow, actionInvocationWorkflow,
+      scopeStorageWorkflow, messageWorkflow, resultInvocationWorflow);
 
-    errorWorkflows = asList(scopeStorageWorkflow, resultInvocationWorflow);
+    errorWorkflows = asList(scopeStorageWorkflow, messageWorkflow, resultInvocationWorflow);
   }
 
   /**
    * Creates a sub-chain of the MVC workflows and invokes it.
    *
    * @param chain The chain.
-   * @throws IOException            If the sub-chain throws an IOException
+   * @throws IOException      If the sub-chain throws an IOException
    * @throws ServletException If the sub-chain throws an ServletException
    */
   public void perform(WorkflowChain chain) throws IOException, ServletException {

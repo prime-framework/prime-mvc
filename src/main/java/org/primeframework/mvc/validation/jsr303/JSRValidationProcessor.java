@@ -33,6 +33,7 @@ import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.message.l10n.MissingMessageException;
+import org.primeframework.mvc.message.scope.MessageScope;
 import org.primeframework.mvc.util.ArrayBuilder;
 import org.primeframework.mvc.validation.ValidationException;
 import org.primeframework.mvc.validation.jsr303.util.ValidationUtils;
@@ -98,8 +99,9 @@ public class JSRValidationProcessor implements ValidationProcessor {
     }
 
     // If there are any messages, throw an exception. This will handle the violations that were transferred to the
-    // MessageStore as well as the conversion errors
-    if ((violations != null && violations.size() > 0) || messageStore.get().size() > 0) {
+    // MessageStore as well as the conversion errors since both are placed into the REQUEST scope. The FLASH scope
+    // shouldn't impact this since it is transferred to the REQUEST scope after the validation occurs
+    if ((violations != null && violations.size() > 0) || messageStore.get(MessageScope.REQUEST).size() > 0) {
       throw new ValidationException(violations);
     }
   }
