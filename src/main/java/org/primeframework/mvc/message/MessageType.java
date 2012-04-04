@@ -42,6 +42,11 @@ public interface MessageType {
   class PrimeErrorMessageType implements MessageType {
     private PrimeErrorMessageType() {
     }
+
+    @Override
+    public String toString() {
+      return "ERROR";
+    }
   }
 
   /**
@@ -50,6 +55,11 @@ public interface MessageType {
   class PrimeInfoMessageType implements MessageType {
     private PrimeInfoMessageType() {
     }
+
+    @Override
+    public String toString() {
+      return "INFO";
+    }
   }
 
   /**
@@ -57,6 +67,11 @@ public interface MessageType {
    */
   class PrimeWarningMessageType implements MessageType {
     private PrimeWarningMessageType() {
+    }
+
+    @Override
+    public String toString() {
+      return "WARNING";
     }
   }
 }
