@@ -25,6 +25,7 @@ import org.primeframework.mvc.action.ActionMapper;
 import org.primeframework.mvc.control.AbstractControl;
 import org.primeframework.mvc.control.annotation.ControlAttribute;
 import org.primeframework.mvc.control.annotation.ControlAttributes;
+import org.primeframework.mvc.servlet.HTTPMethod;
 
 import com.google.inject.Inject;
 
@@ -82,9 +83,16 @@ public class Form extends AbstractControl {
     }
 
     if (!fullyQualified) {
-      ActionInvocation current = actionInvocationStore.getCurrent();
+      String method = (String) attributes.get("method");
+      HTTPMethod httpMethod = HTTPMethod.GET;
+      if (method != null && !method.toUpperCase().equals("GET") && !method.toUpperCase().equals("POST")) {
+        throw new PrimeException("Invalid method [" + method + "] for form. Only standard GET and POST methods are allowed.");
+      } else if (method != null) {
+        httpMethod = HTTPMethod.valueOf(method.toUpperCase());
+      }
 
-      ActionInvocation actionInvocation = actionMapper.map(action, false);
+      ActionInvocation current = actionInvocationStore.getCurrent();
+      ActionInvocation actionInvocation = actionMapper.map(httpMethod, action, false);
       if (actionInvocation == null || actionInvocation.action == null) {
         throw new PrimeException("The form action [" + action + "] is not a valid URI that maps to an action " +
           "class by the Prime MVC.");

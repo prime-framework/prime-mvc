@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.primeframework.mvc.parameter.DefaultParameterParser;
 import org.primeframework.mvc.parameter.InternalParameters;
+import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.servlet.ServletTools;
 import org.primeframework.mvc.workflow.WorkflowChain;
 
@@ -39,14 +40,17 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
   private final HttpServletResponse response;
   private final ActionMapper actionMapper;
   private final ActionInvocationStore actionInvocationStore;
+  private final HTTPMethod httpMethod;
 
   @Inject
   public DefaultActionMappingWorkflow(HttpServletRequest request, HttpServletResponse response,
-                                      ActionInvocationStore actionInvocationStore, ActionMapper actionMapper) {
+                                      ActionInvocationStore actionInvocationStore, ActionMapper actionMapper,
+                                      HTTPMethod httpMethod) {
     this.request = request;
     this.response = response;
     this.actionInvocationStore = actionInvocationStore;
     this.actionMapper = actionMapper;
+    this.httpMethod = httpMethod;
   }
 
   /**
@@ -61,7 +65,7 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
     // First, see if they hit a different button
     String uri = determineURI();
     boolean executeResult = InternalParameters.is(request, InternalParameters.EXECUTE_RESULT);
-    ActionInvocation invocation = actionMapper.map(uri, executeResult);
+    ActionInvocation invocation = actionMapper.map(httpMethod, uri, executeResult);
 
     // This case is a redirect because they URI maps to something new and there isn't an action associated with it. For
     // example, this is how the index handling works.

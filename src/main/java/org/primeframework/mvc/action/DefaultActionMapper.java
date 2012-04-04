@@ -35,19 +35,17 @@ import com.google.inject.Injector;
 public class DefaultActionMapper implements ActionMapper {
   private final ActionConfigurationProvider actionConfigurationProvider;
   private final Injector injector;
-  private final HTTPMethod httpMethod;
 
   @Inject
-  public DefaultActionMapper(ActionConfigurationProvider actionConfigurationProvider, Injector injector, HTTPMethod httpMethod) {
+  public DefaultActionMapper(ActionConfigurationProvider actionConfigurationProvider, Injector injector) {
     this.actionConfigurationProvider = actionConfigurationProvider;
     this.injector = injector;
-    this.httpMethod = httpMethod;
   }
 
   /**
    * {@inheritDoc}
    */
-  public ActionInvocation map(String uri, boolean executeResult) {
+  public ActionInvocation map(HTTPMethod httpMethod, String uri, boolean executeResult) {
     // Handle extensions
     String extension = URITools.determineExtension(uri);
     if (extension != null) {
@@ -105,7 +103,8 @@ public class DefaultActionMapper implements ActionMapper {
       Class<?> actionClass = actionConfiguration.actionClass;
       method = actionConfiguration.executeMethods.get(httpMethod);
       if (method == null) {
-        throw new PrimeException("The action class [" + actionClass + "] does not have a valid execute method for the HTTP method [" + httpMethod + "]");
+        throw new PrimeException("The action class [" + actionClass + "] does not have a valid execute method for the " +
+          "HTTP method [" + httpMethod + "]");
       }
 
       action = injector.getInstance(actionConfiguration.actionClass);

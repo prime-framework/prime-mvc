@@ -15,6 +15,8 @@
  */
 package org.primeframework.mvc.action;
 
+import org.primeframework.mvc.servlet.HTTPMethod;
+
 import com.google.inject.ImplementedBy;
 
 /**
@@ -27,10 +29,12 @@ public interface ActionMapper {
   /**
    * Maps the given URI to an action invocation.
    *
+   *
+   * @param httpMethod
    * @param uri           The URI.
    * @param executeResult This flag is set into the ActionInvocation to control whether or not the result is executed
    *                      or not.
    * @return The action invocation and never null. This invocation might be a redirect for index handling.
    */
-  ActionInvocation map(String uri, boolean executeResult);
+  ActionInvocation map(HTTPMethod httpMethod, String uri, boolean executeResult);
 }

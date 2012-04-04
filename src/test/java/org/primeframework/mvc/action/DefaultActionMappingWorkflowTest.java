@@ -130,7 +130,8 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     chain.continueWorkflow();
     EasyMock.replay(chain);
 
-    DefaultActionMappingWorkflow workflow = new DefaultActionMappingWorkflow(request, response, store, new DefaultActionMapper(provider, injector, HTTPMethod.POST));
+    DefaultActionMappingWorkflow workflow = new DefaultActionMappingWorkflow(request, response, store,
+      new DefaultActionMapper(provider, injector), HTTPMethod.POST);
     workflow.perform(chain);
 
     ActionInvocation ai = capture.getValue();
@@ -181,7 +182,8 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     chain.continueWorkflow();
     EasyMock.replay(chain);
 
-    DefaultActionMappingWorkflow workflow = new DefaultActionMappingWorkflow(request, response, store, new DefaultActionMapper(provider, injector, HTTPMethod.POST));
+    DefaultActionMappingWorkflow workflow = new DefaultActionMappingWorkflow(request, response, store,
+      new DefaultActionMapper(provider, injector), HTTPMethod.POST);
     workflow.perform(chain);
 
     ActionInvocation ai = capture.getValue();
@@ -216,7 +218,8 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);
     EasyMock.replay(chain);
 
-    DefaultActionMappingWorkflow workflow = new DefaultActionMappingWorkflow(request, response, store, new DefaultActionMapper(provider, injector, HTTPMethod.POST));
+    DefaultActionMappingWorkflow workflow = new DefaultActionMappingWorkflow(request, response, store,
+      new DefaultActionMapper(provider, injector), HTTPMethod.POST);
     workflow.perform(chain);
 
     assertEquals(response.getRedirect(), "/foo/");
@@ -245,7 +248,8 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     chain.continueWorkflow();
     EasyMock.replay(chain);
 
-    DefaultActionMappingWorkflow workflow = new DefaultActionMappingWorkflow(request, response, store, new DefaultActionMapper(provider, injector, HTTPMethod.POST));
+    DefaultActionMappingWorkflow workflow = new DefaultActionMappingWorkflow(request, response, store,
+      new DefaultActionMapper(provider, injector), HTTPMethod.POST);
     workflow.perform(chain);
 
     ActionInvocation ai = capture.getValue();
