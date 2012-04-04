@@ -54,6 +54,6 @@ public class ServletModule extends AbstractModule {
 
   @Provides
   public HTTPMethod method() {
-    return HTTPMethod.valueOf(ServletObjectsHolder.getServletRequest().getMethod());
+    return HTTPMethod.valueOf(ServletObjectsHolder.getServletRequest().getMethod().toUpperCase());
   }
 }

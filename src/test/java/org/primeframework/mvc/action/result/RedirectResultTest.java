@@ -61,6 +61,7 @@ public class RedirectResultTest {
     List<Message> messages = new ArrayList<Message>();
     MessageStore messageStore = createStrictMock(MessageStore.class);
     expect(messageStore.get(MessageScope.REQUEST)).andReturn(messages);
+    messageStore.clear(MessageScope.REQUEST);
     messageStore.addAll(MessageScope.FLASH, messages);
     replay(messageStore);
 
@@ -92,6 +93,7 @@ public class RedirectResultTest {
     List<Message> messages = new ArrayList<Message>();
     MessageStore messageStore = createStrictMock(MessageStore.class);
     expect(messageStore.get(MessageScope.REQUEST)).andReturn(messages);
+    messageStore.clear(MessageScope.REQUEST);
     messageStore.addAll(MessageScope.FLASH, messages);
     replay(messageStore);
 
@@ -123,6 +125,7 @@ public class RedirectResultTest {
     List<Message> messages = new ArrayList<Message>();
     MessageStore messageStore = createStrictMock(MessageStore.class);
     expect(messageStore.get(MessageScope.REQUEST)).andReturn(messages);
+    messageStore.clear(MessageScope.REQUEST);
     messageStore.addAll(MessageScope.FLASH, messages);
     replay(messageStore);
 
@@ -154,6 +157,7 @@ public class RedirectResultTest {
     List<Message> messages = new ArrayList<Message>();
     MessageStore messageStore = createStrictMock(MessageStore.class);
     expect(messageStore.get(MessageScope.REQUEST)).andReturn(messages);
+    messageStore.clear(MessageScope.REQUEST);
     messageStore.addAll(MessageScope.FLASH, messages);
     replay(messageStore);
 
@@ -187,6 +191,7 @@ public class RedirectResultTest {
     List<Message> messages = new ArrayList<Message>();
     MessageStore messageStore = createStrictMock(MessageStore.class);
     expect(messageStore.get(MessageScope.REQUEST)).andReturn(messages);
+    messageStore.clear(MessageScope.REQUEST);
     messageStore.addAll(MessageScope.FLASH, messages);
     replay(messageStore);
 
@@ -220,6 +225,7 @@ public class RedirectResultTest {
     List<Message> messages = new ArrayList<Message>();
     MessageStore messageStore = createStrictMock(MessageStore.class);
     expect(messageStore.get(MessageScope.REQUEST)).andReturn(messages);
+    messageStore.clear(MessageScope.REQUEST);
     messageStore.addAll(MessageScope.FLASH, messages);
     replay(messageStore);
 

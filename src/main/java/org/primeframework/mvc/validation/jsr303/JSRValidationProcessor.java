@@ -20,6 +20,7 @@ import javax.validation.Validator;
 import javax.validation.metadata.ConstraintDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -34,8 +35,10 @@ import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.message.l10n.MissingMessageException;
 import org.primeframework.mvc.message.scope.MessageScope;
+import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.util.ArrayBuilder;
 import org.primeframework.mvc.validation.ValidationException;
+import org.primeframework.mvc.validation.ValidationMethod;
 import org.primeframework.mvc.validation.jsr303.util.ValidationUtils;
 
 import com.google.inject.Inject;
@@ -51,15 +54,17 @@ public class JSRValidationProcessor implements ValidationProcessor {
   private final MessageStore messageStore;
   private final Validator validator;
   private final GroupLocator locator;
+  private final HTTPMethod httpMethod;
 
   @Inject
   public JSRValidationProcessor(ActionInvocationStore store, MessageProvider provider, MessageStore messageStore,
-                                Validator validator, GroupLocator locator) {
+                                Validator validator, GroupLocator locator, HTTPMethod httpMethod) {
     this.store = store;
     this.provider = provider;
     this.messageStore = messageStore;
     this.validator = validator;
     this.locator = locator;
+    this.httpMethod = httpMethod;
   }
 
   @Override
@@ -82,18 +87,22 @@ public class JSRValidationProcessor implements ValidationProcessor {
     ActionConfiguration actionConfiguration = actionInvocation.configuration;
     if (actionConfiguration.validationMethods.size() > 0) {
       for (Method method : actionConfiguration.validationMethods) {
-        try {
-          method.invoke(action);
-        } catch (IllegalAccessException e) {
-          throw new PrimeException("Unable to invoke @ValidationMethod on the class [" + actionConfiguration.actionClass + "]");
-        } catch (InvocationTargetException e) {
-          Throwable t = e.getTargetException();
-          if (t instanceof RuntimeException) {
-            throw (RuntimeException) t;
-          }
+        ValidationMethod annotation = method.getAnnotation(ValidationMethod.class);
+        HTTPMethod[] httpMethods = annotation.httpMethods();
+        if (Arrays.binarySearch(httpMethods, httpMethod) >= 0) {
+          try {
+            method.invoke(action);
+          } catch (IllegalAccessException e) {
+            throw new PrimeException("Unable to invoke @ValidationMethod on the class [" + actionConfiguration.actionClass + "]");
+          } catch (InvocationTargetException e) {
+            Throwable t = e.getTargetException();
+            if (t instanceof RuntimeException) {
+              throw (RuntimeException) t;
+            }
 
-          throw new PrimeException("@ValidationMethod on the class [" + actionConfiguration.actionClass + "] threw a " +
-            "checked exception", t);
+            throw new PrimeException("@ValidationMethod on the class [" + actionConfiguration.actionClass + "] threw a " +
+              "checked exception", t);
+          }
         }
       }
     }

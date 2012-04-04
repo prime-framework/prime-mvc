@@ -121,4 +121,9 @@ public class DefaultMessageStore implements MessageStore {
       scope.clear();
     }
   }
+
+  @Override
+  public void clear(MessageScope scope) {
+    scopes.get(scope).clear();
+  }
 }

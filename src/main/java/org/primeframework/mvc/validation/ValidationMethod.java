@@ -18,6 +18,8 @@ package org.primeframework.mvc.validation;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import org.primeframework.mvc.servlet.HTTPMethod;
+
 import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.*;
 
@@ -29,4 +31,8 @@ import static java.lang.annotation.RetentionPolicy.*;
 @Retention(RUNTIME)
 @Target(METHOD)
 public @interface ValidationMethod {
+  /**
+   * @return The HTTP methods to execute the validation method for. Defaults to POST.
+   */
+  HTTPMethod[] httpMethods() default {HTTPMethod.POST};
 }

@@ -97,15 +97,28 @@ public class JSRValidationProcessorTest extends PrimeBaseTest {
     KitchenSink action = new KitchenSink(messageStore);
 
     store.setCurrent(makeActionInvocation(HTTPMethod.POST, action, "post", "/kitchen-sink", ""));
+    JSRValidationProcessor localProcessor = injector.getInstance(JSRValidationProcessor.class);
     try {
-      processor.validate();
+      localProcessor.validate();
       fail("Should have failed");
     } catch (ValidationException e) {
-      processor.handle(e.violations);
+      localProcessor.handle(e.violations);
       Map<String, FieldMessage> map = convertToMap();
       assertEquals(map.size(), 1);
       assertEquals(map.get("foo").toString(), "ValidationMethod message");
     }
+  }
+
+  @Test
+  public void validationMethodNotExcutedForGET() throws Exception {
+    request.setMethod(Method.GET);
+
+    KitchenSink action = new KitchenSink(messageStore);
+
+    // Grab a new instance so that it gets injected with the updated request HTTP method
+    store.setCurrent(makeActionInvocation(HTTPMethod.GET, action, "get", "/kitchen-sink", ""));
+    JSRValidationProcessor localProcessor = injector.getInstance(JSRValidationProcessor.class);
+    localProcessor.validate();
   }
 
   @Test

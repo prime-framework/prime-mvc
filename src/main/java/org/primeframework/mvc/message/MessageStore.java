@@ -79,4 +79,11 @@ public interface MessageStore {
    * Clears all messages in all scopes.
    */
   void clear();
+
+  /**
+   * Clears the messages in the given scope.
+   *
+   * @param scope The scope.
+   */
+  void clear(MessageScope scope);
 }

@@ -58,6 +58,7 @@ public class RedirectResult extends AbstractResult<Redirect> {
    */
   public void execute(final Redirect redirect) throws IOException, ServletException {
     List<Message> messages = messageStore.get(MessageScope.REQUEST);
+    messageStore.clear(MessageScope.REQUEST);
     messageStore.addAll(MessageScope.FLASH, messages);
 
     String uri = expand(redirect.uri(), actionInvocationStore.getCurrent().action, redirect.encodeVariables());
