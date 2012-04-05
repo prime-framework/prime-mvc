@@ -42,6 +42,7 @@ import org.primeframework.mvc.control.Control;
 import org.primeframework.mvc.message.FieldMessage;
 import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;
+import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.parameter.el.MissingPropertyExpressionException;
 
@@ -72,7 +73,9 @@ public class FreeMarkerMap implements TemplateHashModelEx {
   public static final String JSP_TAGLIBS = "JspTaglibs";
   public static final String ALL_MESSAGES = "allMessages";
   public static final String FIELD_MESSAGES = "fieldMessages";
-  public static final String NON_FIELD_MESSAGES = "nonFieldMessages";
+  public static final String ERROR_MESSAGES = "errorMessages";
+  public static final String INFO_MESSAGES = "infoMessages";
+  public static final String WARNING_MESSAGES = "warningMessages";
 
   private final HttpServletRequest request;
   private final ExpressionEvaluator expressionEvaluator;
@@ -121,14 +124,27 @@ public class FreeMarkerMap implements TemplateHashModelEx {
 
     List<Message> allMessages = messageStore.get();
     Map<String, List<FieldMessage>> fieldMessages = messageStore.getFieldMessages();
-    List<Message> nonFieldMessages = new ArrayList<Message>(allMessages);
-    for (List<FieldMessage> messages : fieldMessages.values()) {
-      nonFieldMessages.removeAll(messages);
+    List<Message> errorMessages = new ArrayList<Message>();
+    List<Message> infoMessages = new ArrayList<Message>();
+    List<Message> warningMessages = new ArrayList<Message>();
+
+    for (Message message : allMessages) {
+      if (!(message instanceof FieldMessage)) {
+        if (message.getType() == MessageType.ERROR) {
+          errorMessages.add(message);
+        } else if (message.getType() == MessageType.INFO) {
+          infoMessages.add(message);
+        } else if (message.getType() == MessageType.WARNING) {
+          warningMessages.add(message);
+        }
+      }
     }
 
     objects.put(ALL_MESSAGES, allMessages);
     objects.put(FIELD_MESSAGES, fieldMessages);
-    objects.put(NON_FIELD_MESSAGES, nonFieldMessages);
+    objects.put(ERROR_MESSAGES, errorMessages);
+    objects.put(INFO_MESSAGES, infoMessages);
+    objects.put(WARNING_MESSAGES, warningMessages);
 
     // Add the controls
     for (String prefix : controlSets.keySet()) {
