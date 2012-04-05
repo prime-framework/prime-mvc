@@ -42,6 +42,14 @@ import org.primeframework.mvc.control.annotation.ControlAttributes;
 )
 public class StatesSelect extends Select {
   /**
+   * @return states_select
+   */
+  @Override
+  public String getName() {
+    return "states_select";
+  }
+
+  /**
    * Adds the states to a Map and then calls super.
    */
   @Override

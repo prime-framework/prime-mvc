@@ -6,7 +6,7 @@
 <div class="control-container">
 [#list options?keys as key]
 <div class="control-item-container">
-<input type="checkbox"[#if options[key].selected] checked="checked"[/#if] value="${key?html}"[@macros.append_attributes attributes=attributes list=['id']/]/><span class="checkbox-text">${options[key].text}</span>
+<input type="checkbox"[#if options[key].selected] checked="checked"[/#if] value="${key?html}"[@macros.append_attributes attributes=attributes excludes=['id']/]/><span class="checkbox-text">${options[key].text}</span>
 </div>
 [/#list]
 </div>

@@ -92,7 +92,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, null, "/", "");
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
-    expect(actionInvocationStore.getCurrent()).andReturn(ai).times(2);
+    expect(actionInvocationStore.getCurrent()).andReturn(ai).anyTimes();
     replay(actionInvocationStore);
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
@@ -114,7 +114,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(messageStore);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
-      new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request), 
+      actionInvocationStore, new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
       new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 
@@ -141,7 +141,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, null, "/", "");
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
-    expect(actionInvocationStore.getCurrent()).andReturn(ai).times(2);
+    expect(actionInvocationStore.getCurrent()).andReturn(ai).anyTimes();
     replay(actionInvocationStore);
 
     MessageStore messageStore = createStrictMock(MessageStore.class);
@@ -159,7 +159,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(provider);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
-      new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
+      actionInvocationStore, new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
       new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     try {
       workflow.perform(chain);
@@ -191,7 +191,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, null, "/", "");
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
-    expect(actionInvocationStore.getCurrent()).andReturn(ai).times(2);
+    expect(actionInvocationStore.getCurrent()).andReturn(ai).anyTimes();
     replay(actionInvocationStore);
 
     MessageStore messageStore = createStrictMock(MessageStore.class);
@@ -210,7 +210,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(provider);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
-      new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
+      actionInvocationStore, new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
       new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 
@@ -240,7 +240,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, null, "/", "");
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
-    expect(actionInvocationStore.getCurrent()).andReturn(ai).times(2);
+    expect(actionInvocationStore.getCurrent()).andReturn(ai).anyTimes();
     replay(actionInvocationStore);
 
     MessageStore messageStore = createStrictMock(MessageStore.class);
@@ -258,7 +258,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(provider);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
-      new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
+      actionInvocationStore, new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
       new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 
@@ -288,7 +288,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, null, "/", "");
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
-    expect(actionInvocationStore.getCurrent()).andReturn(ai).times(2);
+    expect(actionInvocationStore.getCurrent()).andReturn(ai).anyTimes();
     replay(actionInvocationStore);
 
     MessageStore messageStore = createStrictMock(MessageStore.class);
@@ -307,7 +307,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(provider);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
-      new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
+      actionInvocationStore, new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
       new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 
@@ -333,7 +333,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, null, "/", "");
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
-    expect(actionInvocationStore.getCurrent()).andReturn(ai).times(2);
+    expect(actionInvocationStore.getCurrent()).andReturn(ai).anyTimes();
     replay(actionInvocationStore);
 
     MessageStore messageStore = createStrictMock(MessageStore.class);
@@ -352,7 +352,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(provider);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
-      new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
+      actionInvocationStore, new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
       new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 
@@ -386,7 +386,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, null, "/", "");
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
-    expect(actionInvocationStore.getCurrent()).andReturn(ai);
+    expect(actionInvocationStore.getCurrent()).andReturn(ai).anyTimes();
     replay(actionInvocationStore);
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
@@ -400,7 +400,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(provider);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
-      new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
+      actionInvocationStore, new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
       new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 
@@ -433,7 +433,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, null, "/", "");
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
-    expect(actionInvocationStore.getCurrent()).andReturn(ai);
+    expect(actionInvocationStore.getCurrent()).andReturn(ai).anyTimes();
     replay(actionInvocationStore);
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
@@ -447,7 +447,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(provider);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
-      new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
+      actionInvocationStore, new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
       new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 
@@ -477,7 +477,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, null, "/", "");
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
-    expect(actionInvocationStore.getCurrent()).andReturn(ai);
+    expect(actionInvocationStore.getCurrent()).andReturn(ai).anyTimes();
     replay(actionInvocationStore);
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
@@ -494,7 +494,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(messageStore);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
-      new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
+      actionInvocationStore, new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
       new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 
@@ -525,7 +525,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, null, "/", "");
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
-    expect(actionInvocationStore.getCurrent()).andReturn(ai);
+    expect(actionInvocationStore.getCurrent()).andReturn(ai).anyTimes();
     replay(actionInvocationStore);
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
@@ -542,7 +542,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(messageStore);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
-      new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
+      actionInvocationStore, new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
       new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 
@@ -584,7 +584,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, null, "/", "");
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
-    expect(actionInvocationStore.getCurrent()).andReturn(ai);
+    expect(actionInvocationStore.getCurrent()).andReturn(ai).anyTimes();
     replay(actionInvocationStore);
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
@@ -601,7 +601,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(messageStore);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
-      new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
+      actionInvocationStore, new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
       new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 
@@ -645,7 +645,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, null, "/", "");
 
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
-    expect(actionInvocationStore.getCurrent()).andReturn(ai);
+    expect(actionInvocationStore.getCurrent()).andReturn(ai).anyTimes();
     replay(actionInvocationStore);
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
@@ -662,7 +662,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(messageStore);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
-      new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
+      actionInvocationStore, new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
       new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 

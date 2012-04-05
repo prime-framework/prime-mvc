@@ -18,6 +18,7 @@ package org.primeframework.mvc.parameter;
 import javax.servlet.ServletException;
 import java.io.IOException;
 
+import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.parameter.ParameterParser.Parameters;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.workflow.WorkflowChain;
@@ -31,11 +32,13 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 public class DefaultParameterWorkflow implements ParameterWorkflow {
+  private final ActionInvocationStore actionInvocationStore;
   private final ParameterParser parser;
   private final ParameterHandler handler;
 
   @Inject
-  public DefaultParameterWorkflow(ParameterParser parser, ParameterHandler handler) {
+  public DefaultParameterWorkflow(ActionInvocationStore actionInvocationStore, ParameterParser parser, ParameterHandler handler) {
+    this.actionInvocationStore = actionInvocationStore;
     this.parser = parser;
     this.handler = handler;
   }
@@ -46,8 +49,11 @@ public class DefaultParameterWorkflow implements ParameterWorkflow {
    * @param chain The workflow chain.
    */
   public void perform(WorkflowChain chain) throws IOException, ServletException {
-    Parameters params = parser.parse();
-    handler.handle(params);
+    if (actionInvocationStore.getCurrent().action != null) {
+      Parameters params = parser.parse();
+      handler.handle(params);
+    }
+
     chain.continueWorkflow();
   }
 }

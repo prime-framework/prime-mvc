@@ -4,9 +4,9 @@
   [#if attrs['class']??]${attrs['class']}-${name} ${attrs['class']}-[#if input]input[#else]button[/#if] ${attrs['class']}-control [/#if]${name} [#if input]input[#else]button[/#if] control[#t/]
 [/#macro]
 
-[#macro append_attributes attributes list]
+[#macro append_attributes attributes excludes]
   [#list attributes?keys as key]
-    [#if !list?seq_contains(key)]
+    [#if !excludes?seq_contains(key)]
  ${key?html}="${attributes(key)?string?html}"[#rt/]
     [/#if]
   [/#list]

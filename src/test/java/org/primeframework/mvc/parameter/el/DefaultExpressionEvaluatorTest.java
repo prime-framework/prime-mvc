@@ -351,11 +351,15 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     String result = evaluator.expand("My name is ${user.name}", action, false);
     assertEquals(result, "My name is Fred");
 
-    // Test nested property set and type conversion
+    // Test nested property set
     action.user.name = "/Fred";
-
     result = evaluator.expand("My name is ${user.name}", action, true);
     assertEquals(result, "My name is %2FFred");
+
+    // Test type conversion
+    action.user.age = 35;
+    result = evaluator.expand("My age is ${user.age}", action, true);
+    assertEquals(result, "My age is 35");
   }
 
   @Test

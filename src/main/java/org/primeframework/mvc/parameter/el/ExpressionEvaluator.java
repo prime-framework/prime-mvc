@@ -34,7 +34,8 @@ import com.google.inject.ImplementedBy;
 @ImplementedBy(DefaultExpressionEvaluator.class)
 public interface ExpressionEvaluator {
   /**
-   * Retrieves a value defined by the given expression from the given object.
+   * Retrieves a value defined by the given expression from the given object. No type conversion is performed and you can
+   * get ClassCastExceptions because of the type erasure of the generics.
    *
    * @param expression The expression that defines the value to get from the object.
    * @param object     The object to get the value from.

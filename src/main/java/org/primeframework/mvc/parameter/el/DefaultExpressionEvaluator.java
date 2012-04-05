@@ -20,6 +20,7 @@ import java.lang.annotation.Annotation;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -94,7 +95,7 @@ public class DefaultExpressionEvaluator implements ExpressionEvaluator {
     throws ExpressionException {
     return new StrSubstitutor(new StrLookup<String>() {
       public String lookup(String name) {
-        String value = getValue(name, object);
+        String value = getValue(name, object, Collections.<String, String>emptyMap());
         if (encode) {
           try {
             value = URLEncoder.encode(value, "UTF-8");

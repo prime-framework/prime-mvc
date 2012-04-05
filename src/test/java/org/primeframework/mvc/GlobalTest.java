@@ -95,4 +95,13 @@ public class GlobalTest extends PrimeBaseTest {
 
     assertEquals(simulator.response.getOutputStream().toString(), "baz");
   }
+
+  @Test
+  public void actionlessRequest() throws IOException, ServletException {
+    RequestSimulator simulator = new RequestSimulator(context, new TestModule());
+    simulator.test("/actionless").
+      get();
+
+    assertEquals(simulator.response.getOutputStream().toString(), "Hello Actionless World");
+  }
 }

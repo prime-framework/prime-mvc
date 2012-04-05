@@ -43,6 +43,15 @@ import org.primeframework.mvc.control.annotation.ControlAttributes;
   }
 )
 public class MonthsSelect extends Select {
+
+  /**
+   * @return select
+   */
+  @Override
+  public String getName() {
+    return "months_select";
+  }
+
   /**
    * Calls super then adds the months Map.
    */
