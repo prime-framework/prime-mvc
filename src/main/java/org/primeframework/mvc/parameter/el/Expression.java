@@ -138,7 +138,7 @@ public class Expression {
     // Check if the new accessor is indexed and if there are no more atoms left. In this case, we error out.
     while (skip()) {
       if (!hasNext()) {
-        throw new ExpressionException("Encountered an indexed property without an index in the expression [" + expression + "]");
+        throw new IndexExpressionException("Encountered an indexed property without an index in the expression [" + expression + "]");
       }
 
       // Recurse until we hit a non-indexed atom
@@ -192,18 +192,18 @@ public class Expression {
     for (; index < ca.length; index++) {
       if (ca[index] == '.' && !insideQuote) {
         if (insideBracket || insideQuote) {
-          throw new ExpressionException("The expression string [" + expression + "] contains an invalid indices");
+          throw new InvalidExpressionException("The expression string [" + expression + "] contains an invalid indices");
         }
 
         if (position == 0) {
-          throw new ExpressionException("The expression string [" + expression+ "] is invalid.");
+          throw new InvalidExpressionException("The expression string [" + expression+ "] is invalid.");
         }
 
         list.add(new String(buf, 0, position));
         position = 0;
       } else if (ca[index] == '[' && !insideQuote) {
         if (insideBracket) {
-          throw new ExpressionException("The expression string [" + expression + "] contains an invalid indices");
+          throw new InvalidExpressionException("The expression string [" + expression + "] contains an invalid indices");
         }
 
         list.add(new String(buf, 0, position));
@@ -211,7 +211,7 @@ public class Expression {
         position = 0;
       } else if (ca[index] == ']' && !insideQuote) {
         if (!insideBracket) {
-          throw new ExpressionException("The expression string [" + expression + "] contains an invalid indices");
+          throw new InvalidExpressionException("The expression string [" + expression + "] contains an invalid indices");
         }
 
         // Gobble up the period if there is one
@@ -224,7 +224,7 @@ public class Expression {
         position = 0;
       } else if (ca[index] == '\'' || ca[index] == '\"') {
         if (!insideBracket) {
-          throw new ExpressionException("The expression string [" + expression + "] is invalid.");
+          throw new InvalidExpressionException("The expression string [" + expression + "] is invalid.");
         }
 
         insideQuote = !insideQuote;

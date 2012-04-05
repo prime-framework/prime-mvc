@@ -56,7 +56,7 @@ public class MemberAccessor extends Accessor {
     }
 
     if (this.field == null && this.propertyInfo == null) {
-      throw new ExpressionException("Invalid property or field [" + name + "] for class [" + declaringClass + "]");
+      throw new MissingPropertyExpressionException("Invalid property or field [" + name + "] for class [" + declaringClass + "]");
     }
 
     this.declaringClass = declaringClass;
@@ -71,7 +71,7 @@ public class MemberAccessor extends Accessor {
     if (propertyInfo != null) {
       Method getter = propertyInfo.getMethods().get("get");
       if (getter == null) {
-        throw new ExpressionException("Missing getter for property [" + propertyInfo.getName() +
+        throw new ReadExpressionException("Missing getter for property [" + propertyInfo.getName() +
           "] in class [" + declaringClass + "]");
       }
       return ReflectionUtils.invokeGetter(getter, this.object);
@@ -88,7 +88,7 @@ public class MemberAccessor extends Accessor {
     if (propertyInfo != null) {
       Method setter = propertyInfo.getMethods().get("set");
       if (setter == null) {
-        throw new ExpressionException("Missing setter for property [" + propertyInfo.getName() +
+        throw new UpdateExpressionException("Missing setter for property [" + propertyInfo.getName() +
           "] in class [" + declaringClass + "]");
       }
       ReflectionUtils.invokeSetter(setter, object, value);

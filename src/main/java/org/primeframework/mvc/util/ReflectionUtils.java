@@ -28,12 +28,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 
+import org.primeframework.mvc.parameter.el.BeanExpressionException;
+import org.primeframework.mvc.parameter.el.CollectionExpressionException;
 import org.primeframework.mvc.parameter.el.ExpressionException;
 import org.primeframework.mvc.parameter.el.GetMethodVerifier;
 import org.primeframework.mvc.parameter.el.MethodVerifier;
 import org.primeframework.mvc.parameter.el.PropertyInfo;
 import org.primeframework.mvc.parameter.el.PropertyName;
+import org.primeframework.mvc.parameter.el.ReadExpressionException;
 import org.primeframework.mvc.parameter.el.SetMethodVerifier;
+import org.primeframework.mvc.parameter.el.UpdateExpressionException;
 
 /**
  * Provides support for reflection, bean properties and field access.
@@ -108,7 +112,7 @@ public class ReflectionUtils {
   public static void invokeSetter(Method method, Object object, Object value) throws RuntimeException, Error {
     Class[] types = method.getParameterTypes();
     if (types.length != 1) {
-      throw new ExpressionException("Invalid method [" + method + "] it should take a single parameter");
+      throw new UpdateExpressionException("Invalid method [" + method + "] it should take a single parameter");
     }
 
     Class type = types[0];
@@ -140,9 +144,9 @@ public class ReflectionUtils {
       // I think we have a winner
       return field.get(object);
     } catch (IllegalAccessException iae) {
-      throw new ExpressionException("Illegal access for field [" + field + "]", iae);
+      throw new ReadExpressionException("Illegal access for field [" + field + "]", iae);
     } catch (IllegalArgumentException iare) {
-      throw new ExpressionException("Illegal argument for field [" + field + "]", iare);
+      throw new ReadExpressionException("Illegal argument for field [" + field + "]", iare);
     }
   }
 
@@ -164,7 +168,7 @@ public class ReflectionUtils {
       if (c.size() == 1) {
         value = c.iterator().next();
       } else {
-        throw new ExpressionException("Cannot set a Collection that contains multiple values into the field [" +
+        throw new CollectionExpressionException("Cannot set a Collection that contains multiple values into the field [" +
           field + "] which is not a collection.");
       }
     }
@@ -173,9 +177,9 @@ public class ReflectionUtils {
       // I think we have a winner
       field.set(object, value);
     } catch (IllegalAccessException iae) {
-      throw new ExpressionException("Illegal access for field [" + field + "]", iae);
+      throw new UpdateExpressionException("Illegal access for field [" + field + "]", iae);
     } catch (IllegalArgumentException iare) {
-      throw new ExpressionException("Illegal argument for field [" + field + "]", iare);
+      throw new UpdateExpressionException("Illegal argument for field [" + field + "]", iare);
     }
   }
 
@@ -307,7 +311,7 @@ public class ReflectionUtils {
       }
 
       if (errors.size() > 0) {
-        throw new ExpressionException("Invalid JavaBean class [" + beanClass + "]. Errors are: \n" + errors);
+        throw new BeanExpressionException("Invalid JavaBean class [" + beanClass + "]. Errors are: \n" + errors);
       }
 
       cache.put(beanClass, Collections.unmodifiableMap(propMap));

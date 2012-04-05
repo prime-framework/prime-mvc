@@ -72,7 +72,7 @@ public class DefaultScopeStorageWorkflow implements ScopeStorageWorkflow {
   protected void storeScopedMembers(Object action) {
     Class<?> klass = action.getClass();
     while (klass != Object.class) {
-      Field[] fields = klass.getDeclaredFields();
+      Field[] fields = klass.getFields();
       for (Field field : fields) {
         Annotation[] annotations = field.getAnnotations();
         for (Annotation annotation : annotations) {

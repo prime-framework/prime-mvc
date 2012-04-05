@@ -44,7 +44,7 @@ public class TypeTools {
       } else if (Collection.class.isAssignableFrom(rawType)) {
         return parameterizedType.getActualTypeArguments()[0];
       } else {
-        throw new ExpressionException("Unknown collection type [" + type + "]");
+        throw new CollectionExpressionException("Unknown collection type [" + type + "]");
       }
     } else if (type instanceof GenericArrayType) {
       return ((GenericArrayType) type).getGenericComponentType();
@@ -52,7 +52,7 @@ public class TypeTools {
 
     Class<?> rawType = (Class<?>) type;
     if (Map.class == type || Collection.class == type) {
-      throw new ExpressionException("The method or member [" + path + "] returns a simple " +
+      throw new CollectionExpressionException("The method or member [" + path + "] returns a simple " +
         "Map or Collection. Unable to determine the type of the Map or Collection. " +
         "Please make this method generic so that the correct type can be determined.");
     } else if (rawType.isArray()) {
@@ -78,7 +78,7 @@ public class TypeTools {
       }
     }
 
-    throw new ExpressionException("The method or member [" + path + "] returns a simple Map. Unable to determine the " +
+    throw new CollectionExpressionException("The method or member [" + path + "] returns a simple Map. Unable to determine the " +
       "types of the Map. Please make this method or member generic so that the correct type can be determined.");
   }
 

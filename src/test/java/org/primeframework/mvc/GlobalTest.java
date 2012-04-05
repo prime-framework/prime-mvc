@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
+import org.primeframework.mvc.parameter.el.BeanExpressionException;
 import org.primeframework.mvc.test.RequestSimulator;
 import org.testng.annotations.Test;
 
@@ -56,5 +57,42 @@ public class GlobalTest extends PrimeBaseTest {
     assertTrue(result.contains("35"));
     assertTrue(result.contains("Broomfield"));
     assertTrue(result.contains("CO"));
+  }
+
+  @Test
+  public void invalidJavaBeanSetter() throws IOException, ServletException {
+    // Testing that invalid JavaBean setter cause the whole thing to fail
+    RequestSimulator simulator = new RequestSimulator(context, new TestModule());
+    try {
+      simulator.test("/invalid-java-bean-setter").
+        get();
+      fail("Should have thrown an exception");
+    } catch (BeanExpressionException e) {
+      // Expected
+    }
+  }
+
+  @Test
+  public void invalidJavaBeanGetter() throws IOException, ServletException {
+    // Testing that invalid JavaBean getter cause the whole thing to fail
+    RequestSimulator simulator = new RequestSimulator(context, new TestModule());
+    try {
+      simulator.test("/invalid-java-bean-getter").
+        get();
+      fail("Should have thrown an exception");
+    } catch (BeanExpressionException e) {
+      // Expected
+    }
+  }
+
+  @Test
+  public void expressionEvaluatorSkippedUsesRequest() throws IOException, ServletException {
+    // Tests that the expression evaluator safely gets skipped while looking for values and Prime then checks the
+    // HttpServletRequest and finds the value
+    RequestSimulator simulator = new RequestSimulator(context, new TestModule());
+    simulator.test("/value-in-request").
+      get();
+
+    assertEquals(simulator.response.getOutputStream().toString(), "baz");
   }
 }

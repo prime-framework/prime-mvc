@@ -43,7 +43,7 @@ import org.primeframework.mvc.message.FieldMessage;
 import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-import org.primeframework.mvc.parameter.el.ExpressionException;
+import org.primeframework.mvc.parameter.el.MissingPropertyExpressionException;
 
 import com.google.inject.Inject;
 import freemarker.ext.beans.CollectionModel;
@@ -185,7 +185,7 @@ public class FreeMarkerMap implements TemplateHashModelEx {
             if (value != null) {
               break;
             }
-          } catch (ExpressionException e) {
+          } catch (MissingPropertyExpressionException e) {
             // Smother because the value is probably somewhere else
           }
         }
