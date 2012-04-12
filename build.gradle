@@ -49,7 +49,7 @@ dependencies {
     "joda-time:joda-time:2.1",
     "org.apache.commons:commons-lang3:3.0.1",
     "org.freemarker:freemarker:2.3.16",
-    "org.primeframework:prime-mock:0.2-SNAPSHOT",
+    "org.primeframework:prime-mock:0.2",
     "org.slf4j:slf4j-api:1.6.4"
   )
   testCompile(
