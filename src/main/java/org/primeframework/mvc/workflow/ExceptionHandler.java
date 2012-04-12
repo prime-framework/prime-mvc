@@ -13,19 +13,22 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.workflow.guice;
+package org.primeframework.mvc.workflow;
 
-import org.primeframework.mvc.ErrorException;
-
-import com.google.inject.AbstractModule;
+import com.google.inject.ImplementedBy;
 
 /**
- * @author Brian Pontarelli
+ * Interface for handling runtime exceptions that occur in Prime
+ *
+ * @author James Humphrey
  */
-public class ExceptionModule extends AbstractModule {
-  @Override
-  protected void configure() {
-    ExceptionBinder.init(binder());
-    ExceptionBinder.add(ErrorException.class);
-  }
+@ImplementedBy(DefaultExceptionHandler.class)
+public interface ExceptionHandler {
+
+  /**
+   * Handles exceptions that occur in prime
+   *
+   * @param e the exception
+   */
+  public void handle(RuntimeException e);
 }

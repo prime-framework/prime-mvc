@@ -66,4 +66,9 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
   public boolean emptyParametersAreNull() {
     return true;
   }
+
+  @Override
+  public String exceptionResultCode() {
+    return "error";
+  }
 }

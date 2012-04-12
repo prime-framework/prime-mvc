@@ -23,7 +23,6 @@ import org.primeframework.mvc.ErrorException;
 import org.primeframework.mvc.action.ActionInvocationWorkflow;
 import org.primeframework.mvc.action.ActionMappingWorkflow;
 import org.primeframework.mvc.action.result.ResultInvocationWorkflow;
-import org.primeframework.mvc.action.result.ResultStore;
 import org.primeframework.mvc.message.MessageWorkflow;
 import org.primeframework.mvc.parameter.ParameterWorkflow;
 import org.primeframework.mvc.parameter.URIParameterWorkflow;
@@ -42,14 +41,12 @@ import static java.util.Arrays.*;
  * @author Brian Pontarelli
  */
 public class DefaultMVCWorkflow implements MVCWorkflow {
-  private final ExceptionTranslator exceptionTranslator;
-  private final ResultStore resultStore;
+  private final ExceptionHandler exceptionHandler;
   private final List<Workflow> workflows;
   private final List<Workflow> errorWorkflows;
 
   @Inject
-  public DefaultMVCWorkflow(ResultStore resultStore, ExceptionTranslator exceptionTranslator,
-                            RequestBodyWorkflow requestBodyWorkflow,
+  public DefaultMVCWorkflow(RequestBodyWorkflow requestBodyWorkflow,
                             StaticResourceWorkflow staticResourceWorkflow,
                             ActionMappingWorkflow actionMappingWorkflow,
                             ScopeRetrievalWorkflow scopeRetrievalWorkflow,
@@ -59,9 +56,8 @@ public class DefaultMVCWorkflow implements MVCWorkflow {
                             ActionInvocationWorkflow actionInvocationWorkflow,
                             ScopeStorageWorkflow scopeStorageWorkflow,
                             MessageWorkflow messageWorkflow,
-                            ResultInvocationWorkflow resultInvocationWorflow) {
-    this.resultStore = resultStore;
-    this.exceptionTranslator = exceptionTranslator;
+                            ResultInvocationWorkflow resultInvocationWorflow, ExceptionHandler exceptionHandler) {
+    this.exceptionHandler = exceptionHandler;
     workflows = asList(requestBodyWorkflow, staticResourceWorkflow, actionMappingWorkflow, scopeRetrievalWorkflow,
       uriParameterWorkflow, parameterWorkflow, validationWorkflow, actionInvocationWorkflow,
       scopeStorageWorkflow, messageWorkflow, resultInvocationWorflow);
@@ -81,12 +77,7 @@ public class DefaultMVCWorkflow implements MVCWorkflow {
       SubWorkflowChain subChain = new SubWorkflowChain(workflows, chain);
       subChain.continueWorkflow();
     } catch (RuntimeException e) {
-      String result = exceptionTranslator.translate(e);
-      if (result == null) {
-        throw e;
-      }
-
-      resultStore.set(result);
+      exceptionHandler.handle(e);
       SubWorkflowChain errorChain = new SubWorkflowChain(errorWorkflows, chain);
       errorChain.continueWorkflow();
     }

@@ -18,7 +18,6 @@ package org.primeframework.mvc.validation.jsr303;
 import javax.servlet.ServletException;
 import java.io.IOException;
 
-import org.primeframework.mvc.validation.ValidationException;
 import org.primeframework.mvc.validation.ValidationWorkflow;
 import org.primeframework.mvc.workflow.WorkflowChain;
 
@@ -45,12 +44,7 @@ public class JSRValidationWorkflow implements ValidationWorkflow {
    * @throws ServletException If the chain throws.
    */
   public void perform(WorkflowChain chain) throws IOException, ServletException {
-    try {
       validationProcessor.validate();
       chain.continueWorkflow();
-    } catch (ValidationException e) {
-      validationProcessor.handle(e.violations);
-      throw e;
-    }
   }
 }

@@ -59,7 +59,7 @@ public interface MVCConfiguration {
   boolean propagateRuntimeExceptions();
 
   /**
-   * @return Whether or not unknown pamareters should be allowed or if they should throw an exception.
+   * @return Whether or not unknown parameters should be allowed or if they should throw an exception.
    */
   boolean allowUnknownParameters();
 
@@ -74,4 +74,9 @@ public interface MVCConfiguration {
    * @return True if empty HTTP request parameters should be considered null values by the conversion system.
    */
   boolean emptyParametersAreNull();
+
+  /**
+   * @return the result code to use when exceptions get thrown.  Defaults to 'error'
+   */
+  String exceptionResultCode();
 }

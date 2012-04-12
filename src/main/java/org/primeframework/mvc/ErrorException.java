@@ -21,24 +21,36 @@ package org.primeframework.mvc;
  * @author Brian Pontarelli
  */
 public class ErrorException extends PrimeException {
-  public final String resultCode;
+
+  /**
+   * The prime response result code
+   */
+  public String resultCode;
+
+  /**
+   * The arguments passed to the message template
+   */
+  public Object[] args;
+
+  public ErrorException(Throwable cause, Object... args) {
+    this(null, cause, args);
+  }
+
+  public ErrorException(Object... args) {
+    this(null, null, args);
+  }
 
   public ErrorException(String resultCode) {
-    this.resultCode = resultCode;
+    this(resultCode, null, (Object[])null);
   }
 
-  public ErrorException(String resultCode, String message) {
-    super(message);
-    this.resultCode = resultCode;
+  public ErrorException(String resultCode, Object... args) {
+    this(resultCode, null, args);
   }
 
-  public ErrorException(String resultCode, String message, Throwable cause) {
-    super(message, cause);
-    this.resultCode = resultCode;
-  }
-
-  public ErrorException(String resultCode, Throwable cause) {
+  public ErrorException(String resultCode, Throwable cause, Object... args) {
     super(cause);
     this.resultCode = resultCode;
+    this.args = args;
   }
 }

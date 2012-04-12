@@ -56,7 +56,6 @@ public class JSRValidationWorkflowTest extends PrimeBaseTest {
     ValidationProcessor validationProcessor = createStrictMock(ValidationProcessor.class);
     validationProcessor.validate();
     expectLastCall().andThrow(new ValidationException());
-    validationProcessor.handle(null);
     replay(validationProcessor);
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
@@ -81,7 +80,6 @@ public class JSRValidationWorkflowTest extends PrimeBaseTest {
     ValidationProcessor validationProcessor = createStrictMock(ValidationProcessor.class);
     validationProcessor.validate();
     expectLastCall().andThrow(new ValidationException(violations));
-    validationProcessor.handle(violations);
     replay(validationProcessor);
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
