@@ -17,8 +17,13 @@ package org.primeframework.mvc.validation.jsr303;
 
 import javax.servlet.ServletException;
 import java.io.IOException;
+import java.util.Arrays;
 
+import org.primeframework.mvc.validation.ValidationException;
 import org.primeframework.mvc.validation.ValidationWorkflow;
+import org.primeframework.mvc.workflow.ErrorWorkflow;
+import org.primeframework.mvc.workflow.SubWorkflowChain;
+import org.primeframework.mvc.workflow.Workflow;
 import org.primeframework.mvc.workflow.WorkflowChain;
 
 import com.google.inject.Inject;
@@ -30,21 +35,31 @@ import com.google.inject.Inject;
  */
 public class JSRValidationWorkflow implements ValidationWorkflow {
   private final ValidationProcessor validationProcessor;
+  private final ErrorWorkflow errorWorkflow;
 
   @Inject
-  public JSRValidationWorkflow(ValidationProcessor validationProcessor) {
+  public JSRValidationWorkflow(ValidationProcessor validationProcessor, ErrorWorkflow errorWorkflow) {
     this.validationProcessor = validationProcessor;
+    this.errorWorkflow = errorWorkflow;
   }
 
   /**
-   * Invokes the validationProcessor.
+   * Invokes the validationProcessor and if there is a validation exception, it passes the constraint violations to the
+   * validationProcessor and then invokes the error workflow.
    *
    * @param chain The chain.
    * @throws IOException      If the chain throws.
    * @throws ServletException If the chain throws.
    */
   public void perform(WorkflowChain chain) throws IOException, ServletException {
+    try {
       validationProcessor.validate();
       chain.continueWorkflow();
+    } catch (ValidationException e) {
+      validationProcessor.handle(e.violations);
+
+      SubWorkflowChain errorChain = new SubWorkflowChain(Arrays.<Workflow>asList(errorWorkflow), chain);
+      errorChain.continueWorkflow();
+    }
   }
 }

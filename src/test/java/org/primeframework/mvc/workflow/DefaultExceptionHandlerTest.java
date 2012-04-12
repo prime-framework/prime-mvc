@@ -22,8 +22,6 @@ import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.SimpleMessage;
 import org.primeframework.mvc.message.l10n.MessageProvider;
-import org.primeframework.mvc.validation.ValidationException;
-import org.primeframework.mvc.validation.jsr303.ValidationProcessor;
 import org.testng.annotations.Test;
 
 import static org.easymock.EasyMock.*;
@@ -32,14 +30,12 @@ import static org.testng.Assert.*;
 /**
  * @author James Humphrey
  */
-@Test(groups = "unit")
+@Test
 public class DefaultExceptionHandlerTest {
 
   @Test
-  public void testErrorExceptionWithDefaultResultCode() {
-
+  public void errorExceptionWithDefaultResultCode() {
     ErrorException errorException = new MockErrorException();
-
     MVCConfiguration configuration = new AbstractMVCConfiguration() {
       @Override
       public int templateCheckSeconds() {
@@ -69,16 +65,15 @@ public class DefaultExceptionHandlerTest {
     resultStore.set(configuration.exceptionResultCode());
     replay(resultStore);
 
-    DefaultExceptionHandler handler = new DefaultExceptionHandler(resultStore, configuration, messageStore, messageProvider, null);
+    DefaultExceptionHandler handler = new DefaultExceptionHandler(resultStore, configuration, messageStore, messageProvider);
     handler.handle(errorException);
 
     verify(messageProvider, messageStore, resultStore);
   }
 
   @Test
-  public void testErrorExceptionWithCustomResultCode() {
+  public void errorExceptionWithCustomResultCode() {
     ErrorException errorException = new MockErrorExceptionWithCode();
-
     MVCConfiguration configuration = new AbstractMVCConfiguration() {
       @Override
       public int templateCheckSeconds() {
@@ -108,36 +103,15 @@ public class DefaultExceptionHandlerTest {
     resultStore.set(errorException.resultCode);
     replay(resultStore);
 
-    DefaultExceptionHandler handler = new DefaultExceptionHandler(resultStore, configuration, messageStore, messageProvider, null);
+    DefaultExceptionHandler handler = new DefaultExceptionHandler(resultStore, configuration, messageStore, messageProvider);
     handler.handle(errorException);
 
     verify(messageProvider, messageStore, resultStore);
   }
 
   @Test
-  public void testValidationException() {
-
-    ErrorException errorException = new ValidationException();
-
-    ResultStore resultStore = createStrictMock(ResultStore.class);
-    resultStore.set(errorException.resultCode);
-    replay(resultStore);
-
-    ValidationProcessor validationProcessor = createStrictMock(ValidationProcessor.class);
-    validationProcessor.handle(null);
-    replay(validationProcessor);
-
-    DefaultExceptionHandler handler = new DefaultExceptionHandler(resultStore, null, null, null, validationProcessor);
-    handler.handle(errorException);
-
-    verify(validationProcessor, resultStore);
-  }
-
-  @Test
-  public void testWithRuntimeException() {
-
-
-    DefaultExceptionHandler handler = new DefaultExceptionHandler(null, null, null, null, null);
+  public void runtimeException() {
+    DefaultExceptionHandler handler = new DefaultExceptionHandler(null, null, null, null);
 
     try {
       handler.handle(new RuntimeException());

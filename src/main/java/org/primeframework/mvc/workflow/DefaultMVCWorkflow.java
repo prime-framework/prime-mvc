@@ -17,6 +17,7 @@ package org.primeframework.mvc.workflow;
 
 import javax.servlet.ServletException;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import org.primeframework.mvc.ErrorException;
@@ -43,7 +44,7 @@ import static java.util.Arrays.*;
 public class DefaultMVCWorkflow implements MVCWorkflow {
   private final ExceptionHandler exceptionHandler;
   private final List<Workflow> workflows;
-  private final List<Workflow> errorWorkflows;
+  private final ErrorWorkflow errorWorkflow;
 
   @Inject
   public DefaultMVCWorkflow(RequestBodyWorkflow requestBodyWorkflow,
@@ -56,13 +57,14 @@ public class DefaultMVCWorkflow implements MVCWorkflow {
                             ActionInvocationWorkflow actionInvocationWorkflow,
                             ScopeStorageWorkflow scopeStorageWorkflow,
                             MessageWorkflow messageWorkflow,
-                            ResultInvocationWorkflow resultInvocationWorflow, ExceptionHandler exceptionHandler) {
+                            ResultInvocationWorkflow resultInvocationWorkflow,
+                            ErrorWorkflow errorWorkflow,
+                            ExceptionHandler exceptionHandler) {
     this.exceptionHandler = exceptionHandler;
+    this.errorWorkflow = errorWorkflow;
     workflows = asList(requestBodyWorkflow, staticResourceWorkflow, actionMappingWorkflow, scopeRetrievalWorkflow,
       uriParameterWorkflow, parameterWorkflow, validationWorkflow, actionInvocationWorkflow,
-      scopeStorageWorkflow, messageWorkflow, resultInvocationWorflow);
-
-    errorWorkflows = asList(scopeStorageWorkflow, messageWorkflow, resultInvocationWorflow);
+      scopeStorageWorkflow, messageWorkflow, resultInvocationWorkflow);
   }
 
   /**
@@ -78,7 +80,8 @@ public class DefaultMVCWorkflow implements MVCWorkflow {
       subChain.continueWorkflow();
     } catch (RuntimeException e) {
       exceptionHandler.handle(e);
-      SubWorkflowChain errorChain = new SubWorkflowChain(errorWorkflows, chain);
+
+      SubWorkflowChain errorChain = new SubWorkflowChain(Arrays.<Workflow>asList(errorWorkflow), chain);
       errorChain.continueWorkflow();
     }
   }

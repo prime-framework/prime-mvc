@@ -22,8 +22,7 @@ import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleMessage;
 import org.primeframework.mvc.message.l10n.MessageProvider;
-import org.primeframework.mvc.validation.ValidationException;
-import org.primeframework.mvc.validation.jsr303.ValidationProcessor;
+import org.primeframework.mvc.message.l10n.MissingMessageException;
 
 import com.google.inject.Inject;
 
@@ -31,21 +30,18 @@ import com.google.inject.Inject;
  * @author James Humphrey
  */
 public class DefaultExceptionHandler implements ExceptionHandler {
-
   private final ResultStore resultStore;
   private final MVCConfiguration configuration;
   private final MessageStore messageStore;
   private final MessageProvider messageProvider;
-  private final ValidationProcessor validationProcessor;
 
   @Inject
-  public DefaultExceptionHandler(ResultStore resultStore, MVCConfiguration configuration,
-                                 MessageStore messageStore, MessageProvider messageProvider, ValidationProcessor validationProcessor) {
+  public DefaultExceptionHandler(ResultStore resultStore, MVCConfiguration configuration, MessageStore messageStore,
+                                 MessageProvider messageProvider) {
     this.resultStore = resultStore;
     this.configuration = configuration;
     this.messageStore = messageStore;
     this.messageProvider = messageProvider;
-    this.validationProcessor = validationProcessor;
   }
 
   @Override
@@ -57,16 +53,12 @@ public class DefaultExceptionHandler implements ExceptionHandler {
       String code = errorException.resultCode != null ? errorException.resultCode : configuration.exceptionResultCode();
       resultStore.set(code);
 
-
-      if (errorException instanceof ValidationException) {
-        ValidationException validationException = (ValidationException)errorException;
-        validationProcessor.handle(validationException.violations);
-      } else {
-        // get the message from the message provider.  key = name of the class
+      // get the message from the message provider.  key = name of the class
+      try {
         String message = messageProvider.getMessage(e.getClass().getSimpleName(), errorException.args);
-
-        // add the message to the message store
         messageStore.add(new SimpleMessage(MessageType.ERROR, message));
+      } catch (MissingMessageException mme) {
+        // Ignore because there isn't a message
       }
     } else {
       // anything other than error messages get re-thrown
