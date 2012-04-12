@@ -17,30 +17,24 @@ package org.primeframework.mvc.validation.jsr303;
 
 import javax.servlet.ServletException;
 import java.io.IOException;
-import java.util.Arrays;
 
 import org.primeframework.mvc.validation.ValidationException;
 import org.primeframework.mvc.validation.ValidationWorkflow;
-import org.primeframework.mvc.workflow.ErrorWorkflow;
-import org.primeframework.mvc.workflow.SubWorkflowChain;
-import org.primeframework.mvc.workflow.Workflow;
 import org.primeframework.mvc.workflow.WorkflowChain;
 
 import com.google.inject.Inject;
 
 /**
- * This workflow performs all the validation on the current action.
+ * Performs all the validation on the current action.
  *
  * @author Brian Pontarelli
  */
 public class JSRValidationWorkflow implements ValidationWorkflow {
   private final ValidationProcessor validationProcessor;
-  private final ErrorWorkflow errorWorkflow;
 
   @Inject
-  public JSRValidationWorkflow(ValidationProcessor validationProcessor, ErrorWorkflow errorWorkflow) {
+  public JSRValidationWorkflow(ValidationProcessor validationProcessor) {
     this.validationProcessor = validationProcessor;
-    this.errorWorkflow = errorWorkflow;
   }
 
   /**
@@ -57,9 +51,7 @@ public class JSRValidationWorkflow implements ValidationWorkflow {
       chain.continueWorkflow();
     } catch (ValidationException e) {
       validationProcessor.handle(e.violations);
-
-      SubWorkflowChain errorChain = new SubWorkflowChain(Arrays.<Workflow>asList(errorWorkflow), chain);
-      errorChain.continueWorkflow();
+      throw e;
     }
   }
 }

@@ -22,6 +22,8 @@ import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.SimpleMessage;
 import org.primeframework.mvc.message.l10n.MessageProvider;
+import org.primeframework.mvc.message.l10n.MissingMessageException;
+import org.primeframework.mvc.validation.ValidationException;
 import org.testng.annotations.Test;
 
 import static org.easymock.EasyMock.*;
@@ -105,6 +107,44 @@ public class DefaultExceptionHandlerTest {
 
     DefaultExceptionHandler handler = new DefaultExceptionHandler(resultStore, configuration, messageStore, messageProvider);
     handler.handle(errorException);
+
+    verify(messageProvider, messageStore, resultStore);
+  }
+
+  @Test
+  public void validationExceptionWithoutMessage() {
+    ValidationException e = new ValidationException();
+    MVCConfiguration configuration = new AbstractMVCConfiguration() {
+      @Override
+      public int templateCheckSeconds() {
+        return 0;
+      }
+
+      @Override
+      public int l10nReloadSeconds() {
+        return 0;
+      }
+
+      @Override
+      public boolean allowUnknownParameters() {
+        return false;
+      }
+    };
+
+    MessageProvider messageProvider = createStrictMock(MessageProvider.class);
+    messageProvider.getMessage(e.getClass().getSimpleName(), e.args);
+    expectLastCall().andThrow(new MissingMessageException());
+    replay(messageProvider);
+
+    MessageStore messageStore = createStrictMock(MessageStore.class);
+    replay(messageStore);
+
+    ResultStore resultStore = createStrictMock(ResultStore.class);
+    resultStore.set(e.resultCode);
+    replay(resultStore);
+
+    DefaultExceptionHandler handler = new DefaultExceptionHandler(resultStore, configuration, messageStore, messageProvider);
+    handler.handle(e);
 
     verify(messageProvider, messageStore, resultStore);
   }

@@ -23,11 +23,11 @@ import java.util.Set;
 
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.validation.ValidationException;
-import org.primeframework.mvc.workflow.ErrorWorkflow;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
 
 import static org.easymock.EasyMock.*;
+import static org.testng.Assert.*;
 
 /**
  * Test the validation workflow.
@@ -45,13 +45,10 @@ public class JSRValidationWorkflowTest extends PrimeBaseTest {
     chain.continueWorkflow();
     replay(chain);
 
-    ErrorWorkflow errorWorkflow = createStrictMock(ErrorWorkflow.class);
-    replay(errorWorkflow);
-
-    JSRValidationWorkflow workflow = new JSRValidationWorkflow(validationProcessor, errorWorkflow);
+    JSRValidationWorkflow workflow = new JSRValidationWorkflow(validationProcessor);
     workflow.perform(chain);
     
-    verify(validationProcessor, chain, errorWorkflow);
+    verify(validationProcessor, chain);
   }
 
   @Test
@@ -63,17 +60,17 @@ public class JSRValidationWorkflowTest extends PrimeBaseTest {
     replay(validationProcessor);
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
-    // This doesn't get called because we are mocking out the ErrorWorkflow
     replay(chain);
 
-    ErrorWorkflow errorWorkflow = createStrictMock(ErrorWorkflow.class);
-    errorWorkflow.perform(isA(WorkflowChain.class));
-    replay(errorWorkflow);
+    JSRValidationWorkflow workflow = new JSRValidationWorkflow(validationProcessor);
+    try {
+      workflow.perform(chain);
+      fail("Should have failed");
+    } catch (ValidationException e) {
+      // Expected
+    }
 
-    JSRValidationWorkflow workflow = new JSRValidationWorkflow(validationProcessor, errorWorkflow);
-    workflow.perform(chain);
-
-    verify(validationProcessor, errorWorkflow, chain);
+    verify(validationProcessor, chain);
   }
 
   @Test
@@ -88,17 +85,17 @@ public class JSRValidationWorkflowTest extends PrimeBaseTest {
     replay(validationProcessor);
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
-    // This doesn't get called because we are mocking out the ErrorWorkflow
     replay(chain);
 
-    ErrorWorkflow errorWorkflow = createStrictMock(ErrorWorkflow.class);
-    errorWorkflow.perform(isA(WorkflowChain.class));
-    replay(errorWorkflow);
+    JSRValidationWorkflow workflow = new JSRValidationWorkflow(validationProcessor);
+    try {
+      workflow.perform(chain);
+      fail("Should have failed");
+    } catch (ValidationException e) {
+      // Expected
+    }
 
-    JSRValidationWorkflow workflow = new JSRValidationWorkflow(validationProcessor, errorWorkflow);
-    workflow.perform(chain);
-
-    verify(validationProcessor, chain, errorWorkflow);
+    verify(validationProcessor, chain);
   }
 
   private class TestConstraintViolation implements ConstraintViolation<Object> {
