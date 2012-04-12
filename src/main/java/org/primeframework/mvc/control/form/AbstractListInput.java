@@ -21,6 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.primeframework.mvc.message.l10n.MessageProvider;
+import org.primeframework.mvc.message.l10n.MissingMessageException;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 
 import com.google.inject.Inject;
@@ -120,38 +121,40 @@ public abstract class AbstractListInput extends AbstractInput {
    * text for the option from the object. Otherwise, the object is converted to a String for the text. Also, if the
    * object exists in the given Collection the option is set to selected.
    *
-   *
-   * @param itemsValue The current value from the items collection/array/map.
-   * @param value      The value of the option. This could have been from the items Map or the valueExpr evaluation.
-   * @param beanValue  The value from the bean, used to determine selected state.
-   * @param textExpr   The textExpr attribute.
-   * @param l10nExpr   The l10nExpr attribute.
+   * @param item      The current value from the items collection/array/map.
+   * @param value     The value of the option. This could have been from the items Map or the valueExpr evaluation.
+   * @param beanValue The value from the bean, used to determine selected state.
+   * @param textExpr  The textExpr attribute.
+   * @param l10nExpr  The l10nExpr attribute.
    * @return The option and never null.
    */
-  private Option makeOption(Object itemsValue, Object value, Object beanValue, String textExpr, String l10nExpr) {
-    if (itemsValue == null) {
+  private Option makeOption(Object item, Object value, Object beanValue, String textExpr, String l10nExpr) {
+    if (item == null) {
       return new Option("", false);
     }
 
     String text = null;
     if (l10nExpr != null) {
-      Object l10nKey = expressionEvaluator.getValue(l10nExpr, itemsValue);
+      Object l10nKey = expressionEvaluator.getValue(l10nExpr, item);
       if (l10nKey != null) {
-        String message = messageProvider.getMessage(l10nKey.toString());
-        if (message != null) {
-          text = message;
-        }
+        text = messageProvider.getMessage(l10nKey.toString());
+      }
+    }
+
+    if (text == null && textExpr != null) {
+      text = expressionEvaluator.getValue(textExpr, item).toString();
+    }
+
+    if (text == null && item instanceof Enum) {
+      try {
+        text = messageProvider.getMessage(item.toString());
+      } catch (MissingMessageException e) {
+        // Smother this and continue to use the toString() for the text
       }
     }
 
     if (text == null) {
-      if (textExpr != null) {
-        text = expressionEvaluator.getValue(textExpr, itemsValue).toString();
-      }
-    }
-
-    if (text == null) {
-      text = itemsValue.toString();
+      text = item.toString();
     }
 
     if (beanValue == null) {
@@ -184,10 +187,10 @@ public abstract class AbstractListInput extends AbstractInput {
         equal = beanValue.toString().equals(value.toString());
       }
     } else {
-      if (beanValue.getClass().isInstance(itemsValue)) {
-        equal = beanValue.equals(itemsValue);
+      if (beanValue.getClass().isInstance(item)) {
+        equal = beanValue.equals(item);
       } else {
-        equal = beanValue.toString().equals(itemsValue.toString());
+        equal = beanValue.toString().equals(item.toString());
       }
     }
 

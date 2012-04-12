@@ -31,6 +31,10 @@ import org.primeframework.mvc.validation.jsr303.group.Delete;
  */
 @Action
 public class Edit {
+  public static final SomeEnum[] values = SomeEnum.values();
+
+  public SomeEnum enumValue = SomeEnum.VALUE1;
+
   @Valid
   public User user;
 

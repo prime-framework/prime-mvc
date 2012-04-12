@@ -21,6 +21,7 @@ import java.util.Map;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.example.action.user.Edit;
+import org.example.action.user.SomeEnum;
 import org.example.domain.Address;
 import org.example.domain.User;
 import org.primeframework.mvc.action.ActionInvocation;
@@ -101,6 +102,28 @@ public class SelectTest extends ControlBaseTest {
         "<select id=\"user_addresses['work']_country\" name=\"user.addresses['work'].country\">\n" +
         "<option value=\"US\" selected=\"selected\">United States</option>\n" +
         "<option value=\"DE\">Germany</option>\n" +
+        "</select>\n" +
+        "</div>\n" +
+        "</div>\n");
+  }
+
+  @Test
+  public void enums() {
+    Edit action = new Edit();
+
+    ais.setCurrent(new ActionInvocation(action, null, "/select", null, null));
+
+    new ControlTester(select).
+      attr("name", "enumValue").
+      attr("items", SomeEnum.values()).
+      go("<input type=\"hidden\" name=\"enumValue@param\" value=\"param-value\"/>\n" +
+        "<div class=\"select input control\">\n" +
+        "<div class=\"label-container\"><label for=\"enumValue\" class=\"label\">Enum</label></div>\n" +
+        "<div class=\"control-container\">\n" +
+        "<select id=\"enumValue\" name=\"enumValue\">\n" +
+        "<option value=\"VALUE1\" selected=\"selected\">Value 1</option>\n" +
+        "<option value=\"VALUE2\">Value 2</option>\n" +
+        "<option value=\"VALUE3\">VALUE3</option>\n" +
         "</select>\n" +
         "</div>\n" +
         "</div>\n");
