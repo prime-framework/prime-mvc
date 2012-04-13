@@ -60,7 +60,7 @@ public class DefaultExpressionEvaluator implements ExpressionEvaluator {
    * {@inheritDoc}
    */
   public String getValue(String expression, Object object, Map<String, String> attributes) throws ExpressionException {
-    Expression expr = new Expression(converterProvider, expression, object, null);
+    Expression expr = new Expression(converterProvider, expression, object, attributes);
     Object value = expr.traverseToEndForGet();
     if (value == null) {
       return null;

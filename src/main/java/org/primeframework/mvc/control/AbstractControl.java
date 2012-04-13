@@ -197,8 +197,8 @@ public abstract class AbstractControl implements Control {
     }
   }
 
-  private void verifyAttributes(Map<String, Object> attributes, ControlAttribute[] controlAttributes,
-                                boolean required, ErrorList errors) {
+  private void verifyAttributes(Map<String, Object> attributes, ControlAttribute[] controlAttributes, boolean required,
+                                ErrorList errors) {
     for (ControlAttribute controlAttribute : controlAttributes) {
       Object value = attributes.get(controlAttribute.name());
       if (value == null && required) {

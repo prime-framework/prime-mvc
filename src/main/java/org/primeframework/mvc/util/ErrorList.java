@@ -33,4 +33,9 @@ public class ErrorList {
   public boolean isEmpty() {
     return errors.isEmpty();
   }
+
+  @Override
+  public String toString() {
+    return errors.toString();
+  }
 }
