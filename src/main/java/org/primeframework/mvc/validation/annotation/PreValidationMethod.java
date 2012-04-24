@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.validation.jsr303.annotation;
+package org.primeframework.mvc.validation.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

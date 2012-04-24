@@ -16,8 +16,8 @@
 package org.example.action;
 
 import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.validation.jsr303.annotation.PostValidationMethod;
-import org.primeframework.mvc.validation.jsr303.annotation.PreValidationMethod;
+import org.primeframework.mvc.validation.annotation.PostValidationMethod;
+import org.primeframework.mvc.validation.annotation.PreValidationMethod;
 
 /**
  * Action for testing the PreValidtionMethod and PostValidationMethod annotations

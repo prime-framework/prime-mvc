@@ -40,8 +40,8 @@ import org.primeframework.mvc.util.ArrayBuilder;
 import org.primeframework.mvc.util.ReflectionUtils;
 import org.primeframework.mvc.validation.ValidationException;
 import org.primeframework.mvc.validation.ValidationMethod;
-import org.primeframework.mvc.validation.jsr303.annotation.PostValidationMethod;
-import org.primeframework.mvc.validation.jsr303.annotation.PreValidationMethod;
+import org.primeframework.mvc.validation.annotation.PostValidationMethod;
+import org.primeframework.mvc.validation.annotation.PreValidationMethod;
 import org.primeframework.mvc.validation.jsr303.util.ValidationUtils;
 
 import com.google.inject.Inject;
