@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.example.action.KitchenSink;
+import org.example.action.ValidationMethods;
 import org.example.action.user.Edit;
 import org.example.action.user.ValidatableAction;
 import org.example.domain.Address;
@@ -216,6 +217,21 @@ public class JSRValidationProcessorTest extends PrimeBaseTest {
       assertEquals(map.size(), 1);
       assertEquals(map.get("test").toString(), "failure");
     }
+  }
+
+  @Test
+  public void validationMethods() throws Exception {
+    request.setMethod(Method.GET);
+
+    ValidationMethods action = new ValidationMethods();
+    assertFalse(action.preValidation);
+    assertFalse(action.postValidation);
+
+    store.setCurrent(makeActionInvocation(HTTPMethod.GET, action, "get", "/validation/methods", ""));
+
+    processor.validate();
+    assertTrue(action.preValidation);
+    assertTrue(action.postValidation);
   }
 
   private Map<String, FieldMessage> convertToMap() {

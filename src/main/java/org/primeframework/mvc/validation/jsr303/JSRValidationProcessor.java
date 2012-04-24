@@ -37,8 +37,11 @@ import org.primeframework.mvc.message.l10n.MissingMessageException;
 import org.primeframework.mvc.message.scope.MessageScope;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.util.ArrayBuilder;
+import org.primeframework.mvc.util.ReflectionUtils;
 import org.primeframework.mvc.validation.ValidationException;
 import org.primeframework.mvc.validation.ValidationMethod;
+import org.primeframework.mvc.validation.jsr303.annotation.PostValidationMethod;
+import org.primeframework.mvc.validation.jsr303.annotation.PreValidationMethod;
 import org.primeframework.mvc.validation.jsr303.util.ValidationUtils;
 
 import com.google.inject.Inject;
@@ -75,6 +78,9 @@ public class JSRValidationProcessor implements ValidationProcessor {
     if (action == null) {
       return;
     }
+
+    // Next, invoke pre methods
+    ReflectionUtils.invokeAllWithAnnotation(action, PreValidationMethod.class);
 
     Set<ConstraintViolation<Object>> violations;
     if (action instanceof Validatable) {
@@ -113,6 +119,9 @@ public class JSRValidationProcessor implements ValidationProcessor {
     if ((violations != null && violations.size() > 0) || messageStore.get(MessageScope.REQUEST).size() > 0) {
       throw new ValidationException(violations);
     }
+
+    // Finally, invoke post methods
+    ReflectionUtils.invokeAllWithAnnotation(action, PostValidationMethod.class);
   }
 
   @Override
