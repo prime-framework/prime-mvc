@@ -37,9 +37,14 @@ import org.primeframework.mvc.action.result.Result;
 import org.primeframework.mvc.action.result.ResultConfiguration;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.guice.GuiceBootstrap;
+import org.primeframework.mvc.parameter.annotation.PostParameterMethod;
+import org.primeframework.mvc.parameter.annotation.PreParameterMethod;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.servlet.ServletObjectsHolder;
+import org.primeframework.mvc.util.ReflectionUtils;
 import org.primeframework.mvc.validation.ValidationMethod;
+import org.primeframework.mvc.validation.annotation.PostValidationMethod;
+import org.primeframework.mvc.validation.annotation.PreValidationMethod;
 import org.primeframework.mvc.validation.jsr303.Validation;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -124,17 +129,16 @@ public abstract class PrimeBaseTest {
       executeMethods.put(httpMethod, executeMethod);
     }
 
-    List<Method> validationMethods = new ArrayList<Method>();
-    for (Method method : action.getClass().getMethods()) {
-      if (method.isAnnotationPresent(ValidationMethod.class)) {
-        validationMethods.add(method);
-      }
-    }
+    List<Method> validationMethods = ReflectionUtils.findAllWithAnnotation(action.getClass(), ValidationMethod.class);
+    List<Method> preValidationMethods = ReflectionUtils.findAllWithAnnotation(action.getClass(), PreValidationMethod.class);
+    List<Method> postValidationMethods = ReflectionUtils.findAllWithAnnotation(action.getClass(), PostValidationMethod.class);
+    List<Method> preParameterMethods = ReflectionUtils.findAllWithAnnotation(action.getClass(), PreParameterMethod.class);
+    List<Method> postParameterMethods = ReflectionUtils.findAllWithAnnotation(action.getClass(), PostParameterMethod.class);
 
     Map<String, ResultConfiguration> resultConfigurations = new HashMap<String, ResultConfiguration>();
 
     return new ActionInvocation(action, executeMethod, uri, extension, asList(uriParamateres),
-      new ActionConfiguration(action.getClass(), executeMethods, validationMethods, resultConfigurations, uri), true);
+      new ActionConfiguration(action.getClass(), preValidationMethods, postValidationMethods, preParameterMethods, postParameterMethods, executeMethods, validationMethods, resultConfigurations, uri), true);
   }
 
   /**
@@ -162,7 +166,7 @@ public abstract class PrimeBaseTest {
     resultConfigurations.put(resultCode, new ResultConfiguration(annotation, resultType));
 
     return new ActionInvocation(action, executeMethod, uri, extension,
-      new ActionConfiguration(Edit.class, executeMethods, validationMethods, resultConfigurations, uri));
+      new ActionConfiguration(Edit.class, new ArrayList<Method>(), new ArrayList<Method>(), new ArrayList<Method>(), new ArrayList<Method>(), executeMethods, validationMethods, resultConfigurations, uri));
   }
 
   public static class TestModule extends AbstractModule {

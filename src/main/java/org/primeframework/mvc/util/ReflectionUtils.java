@@ -20,10 +20,12 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
@@ -211,6 +213,23 @@ public class ReflectionUtils {
   }
 
   /**
+   * Finds  all of the methods that have the given annotation on the given Object.
+   *
+   * @param klass        The class to find methods from
+   * @param annotation The annotation.
+   */
+  public static List<Method> findAllWithAnnotation(Class klass, Class<? extends Annotation> annotation) {
+    Method[] methods = klass.getMethods();
+    List<Method> methodList = new ArrayList<Method>();
+    for (Method method : methods) {
+      if (method.isAnnotationPresent(annotation)) {
+        methodList.add(method);
+      }
+    }
+    return methodList;
+  }
+
+  /**
    * Invokes the given method on the given class and handles propagation of runtime exceptions.
    *
    * @param method The method to invoke.
@@ -356,5 +375,23 @@ public class ReflectionUtils {
     String propertyName = Introspector.decapitalize(name.substring(startIndex));
     String prefix = name.substring(0, startIndex);
     return new PropertyName(prefix, propertyName);
+  }
+
+  public static void invokeAll(Object obj, List<Method> methods) {
+    for (Method method : methods) {
+      try {
+        method.invoke(obj);
+      } catch (IllegalAccessException e) {
+        throw new ExpressionException("Unable to call method [" + method + "]", e);
+      } catch (InvocationTargetException e) {
+        Throwable target = e.getTargetException();
+        if (target instanceof RuntimeException) {
+          throw (RuntimeException) target;
+        }
+
+        throw new ExpressionException("Unable to call method [" + method + "]", e);
+      }
+
+    }
   }
 }

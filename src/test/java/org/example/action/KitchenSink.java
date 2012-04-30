@@ -25,7 +25,11 @@ import org.primeframework.mvc.action.result.annotation.Redirect;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
+import org.primeframework.mvc.parameter.annotation.PostParameterMethod;
+import org.primeframework.mvc.parameter.annotation.PreParameterMethod;
 import org.primeframework.mvc.validation.ValidationMethod;
+import org.primeframework.mvc.validation.annotation.PostValidationMethod;
+import org.primeframework.mvc.validation.annotation.PreValidationMethod;
 import org.primeframework.mvc.validation.jsr303.Validatable;
 
 import com.google.inject.Inject;
@@ -68,4 +72,16 @@ public class KitchenSink extends KitchenSinkSuperclass implements Validatable {
   public String post() {
     return "success";
   }
+
+  @PreParameterMethod
+  public void preParameter() {}
+
+  @PostParameterMethod
+  public void postParameter() {}
+
+  @PreValidationMethod
+  public void preValidation() {}
+
+  @PostValidationMethod
+  public void postValidation() {}
 }

@@ -40,8 +40,6 @@ import org.primeframework.mvc.util.ArrayBuilder;
 import org.primeframework.mvc.util.ReflectionUtils;
 import org.primeframework.mvc.validation.ValidationException;
 import org.primeframework.mvc.validation.ValidationMethod;
-import org.primeframework.mvc.validation.annotation.PostValidationMethod;
-import org.primeframework.mvc.validation.annotation.PreValidationMethod;
 import org.primeframework.mvc.validation.jsr303.util.ValidationUtils;
 
 import com.google.inject.Inject;
@@ -75,12 +73,13 @@ public class JSRValidationProcessor implements ValidationProcessor {
   public void validate() throws ValidationException {
     ActionInvocation actionInvocation = store.getCurrent();
     Object action = actionInvocation.action;
+    ActionConfiguration actionConfiguration = actionInvocation.configuration;
     if (action == null) {
       return;
     }
 
     // Next, invoke pre methods
-    ReflectionUtils.invokeAllWithAnnotation(action, PreValidationMethod.class);
+    ReflectionUtils.invokeAll(action, actionConfiguration.preValidationMethods);
 
     Set<ConstraintViolation<Object>> violations;
     if (action instanceof Validatable) {
@@ -90,7 +89,6 @@ public class JSRValidationProcessor implements ValidationProcessor {
       violations = validator.validate(action, groups);
     }
 
-    ActionConfiguration actionConfiguration = actionInvocation.configuration;
     if (actionConfiguration.validationMethods.size() > 0) {
       for (Method method : actionConfiguration.validationMethods) {
         ValidationMethod annotation = method.getAnnotation(ValidationMethod.class);
@@ -121,7 +119,7 @@ public class JSRValidationProcessor implements ValidationProcessor {
     }
 
     // Finally, invoke post methods
-    ReflectionUtils.invokeAllWithAnnotation(action, PostValidationMethod.class);
+    ReflectionUtils.invokeAll(action, actionConfiguration.postValidationMethods);
   }
 
   @Override

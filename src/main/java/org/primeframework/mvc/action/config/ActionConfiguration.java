@@ -33,6 +33,10 @@ import org.primeframework.mvc.validation.jsr303.Validatable;
 public class ActionConfiguration {
   public final Class<?> actionClass;
   public final List<Method> validationMethods;
+  public final List<Method> preValidationMethods;
+  public final List<Method> postValidationMethods;
+  public final List<Method> preParameterMethods;
+  public final List<Method> postParameterMethods;
   public final Map<HTTPMethod, ExecuteMethod> executeMethods;
   public final Map<String, ResultConfiguration> resultConfigurations;
   public final boolean validatable;
@@ -41,10 +45,15 @@ public class ActionConfiguration {
   public final String pattern;
   public final String[] patternParts;
 
-  public ActionConfiguration(Class<?> actionClass, Map<HTTPMethod, ExecuteMethod> executeMethods,
+  public ActionConfiguration(Class<?> actionClass, List<Method> preValidationMethods, List<Method> postValidationMethods,
+                             List<Method> preParameterMethods, List<Method> postParameterMethods, Map<HTTPMethod, ExecuteMethod> executeMethods,
                              List<Method> validationMethods, Map<String, ResultConfiguration> resultConfigurations,
                              String uri) {
     this.actionClass = actionClass;
+    this.preValidationMethods = preValidationMethods;
+    this.postValidationMethods = postValidationMethods;
+    this.preParameterMethods = preParameterMethods;
+    this.postParameterMethods = postParameterMethods;
     this.validationMethods = validationMethods;
     this.executeMethods = executeMethods;
     this.resultConfigurations = resultConfigurations;

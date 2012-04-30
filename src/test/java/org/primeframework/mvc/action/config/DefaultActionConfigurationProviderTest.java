@@ -106,6 +106,10 @@ public class DefaultActionConfigurationProviderTest {
     assertEquals(config.get("/kitchen-sink").pattern, "{name}/{value}/static/{foo}");
     assertEquals(config.get("/kitchen-sink").patternParts.length, 4);
     assertEquals(config.get("/kitchen-sink").uri, "/kitchen-sink");
+    assertEquals(config.get("/kitchen-sink").preParameterMethods.size(), 1);
+    assertEquals(config.get("/kitchen-sink").postParameterMethods.size(), 1);
+    assertEquals(config.get("/kitchen-sink").preValidationMethods.size(), 1);
+    assertEquals(config.get("/kitchen-sink").postValidationMethods.size(), 1);
     assertEquals(config.get("/kitchen-sink").validationMethods.size(), 1);
     assertEquals(config.get("/kitchen-sink").validationMethods.get(0), KitchenSink.class.getMethod("validate"));
   }

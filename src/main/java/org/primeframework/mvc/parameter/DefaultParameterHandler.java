@@ -23,6 +23,7 @@ import java.util.Map;
 import org.apache.commons.lang3.ArrayUtils;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
+import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
@@ -30,8 +31,6 @@ import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.parameter.ParameterParser.Parameters;
 import org.primeframework.mvc.parameter.ParameterParser.Parameters.Struct;
-import org.primeframework.mvc.parameter.annotation.PostParameterMethod;
-import org.primeframework.mvc.parameter.annotation.PreParameterMethod;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.parameter.el.ExpressionException;
@@ -86,7 +85,8 @@ public class DefaultParameterHandler implements ParameterHandler {
     setValues(parameters.pre, action, true);
 
     // Next, invoke pre methods
-    ReflectionUtils.invokeAllWithAnnotation(action, PreParameterMethod.class);
+    ActionConfiguration actionConfiguration = invocation.configuration;
+    ReflectionUtils.invokeAll(action, actionConfiguration.preParameterMethods);
 
     // Next, process the optional
     setValues(parameters.optional, action, true);
@@ -100,7 +100,7 @@ public class DefaultParameterHandler implements ParameterHandler {
     }
 
     // Finally, invoke post methods
-    ReflectionUtils.invokeAllWithAnnotation(action, PostParameterMethod.class);
+    ReflectionUtils.invokeAll(action, actionConfiguration.postParameterMethods);
   }
 
   /**

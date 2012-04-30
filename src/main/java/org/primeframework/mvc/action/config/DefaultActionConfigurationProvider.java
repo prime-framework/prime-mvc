@@ -33,10 +33,15 @@ import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.ResultConfiguration;
 import org.primeframework.mvc.action.result.annotation.ResultAnnotation;
 import org.primeframework.mvc.action.result.annotation.ResultContainerAnnotation;
+import org.primeframework.mvc.parameter.annotation.PostParameterMethod;
+import org.primeframework.mvc.parameter.annotation.PreParameterMethod;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.util.ClassClasspathResolver;
+import org.primeframework.mvc.util.ReflectionUtils;
 import org.primeframework.mvc.util.URIBuilder;
 import org.primeframework.mvc.validation.ValidationMethod;
+import org.primeframework.mvc.validation.annotation.PostValidationMethod;
+import org.primeframework.mvc.validation.annotation.PreValidationMethod;
 import org.primeframework.mvc.validation.jsr303.Validation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,9 +82,15 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
 
       String uri = uriBuilder.build(actionClass);
       Map<HTTPMethod, ExecuteMethod> executeMethods = findExecuteMethods(actionClass);
-      List<Method> validationMethods = findValidationMethods(actionClass);
+      List<Method> validationMethods = ReflectionUtils.findAllWithAnnotation(actionClass, ValidationMethod.class);
       Map<String, ResultConfiguration> resultAnnotations = findResultConfigurations(actionClass);
-      ActionConfiguration actionConfiguration = new ActionConfiguration(actionClass, executeMethods, validationMethods, resultAnnotations, uri);
+
+      List<Method> preParameterMethods = ReflectionUtils.findAllWithAnnotation(actionClass, PreParameterMethod.class);
+      List<Method> postParameterMethods = ReflectionUtils.findAllWithAnnotation(actionClass, PostParameterMethod.class);
+      List<Method> preValidationrMethods = ReflectionUtils.findAllWithAnnotation(actionClass, PreValidationMethod.class);
+      List<Method> postValidationMethods = ReflectionUtils.findAllWithAnnotation(actionClass, PostValidationMethod.class);
+
+      ActionConfiguration actionConfiguration = new ActionConfiguration(actionClass, preValidationrMethods, postValidationMethods, preParameterMethods, postParameterMethods, executeMethods, validationMethods, resultAnnotations, uri);
 
       if (actionConfigurations.containsKey(uri)) {
         boolean previousOverrideable = actionConfigurations.get(uri).actionClass.getAnnotation(Action.class).overridable();
