@@ -19,6 +19,7 @@ package org.primeframework.mvc.message.l10n;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.List;
 import java.util.Locale;
@@ -105,7 +106,7 @@ public class WebControl extends ResourceBundle.Control {
     }
 
     if (url != null) {
-      return new PropertyResourceBundle(url.openStream());
+      return new PropertyResourceBundle(new InputStreamReader(url.openStream(), "UTF-8"));
     }
 
     throw new PrimeException("Invalid bundle [" + uri + "]");
