@@ -16,14 +16,29 @@
 package org.primeframework.mvc;
 
 import javax.servlet.ServletException;
+import javax.validation.Validator;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Collection;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 import org.apache.commons.io.FileUtils;
+import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
+import org.primeframework.mvc.action.config.DefaultActionConfigurationProvider;
+import org.primeframework.mvc.freemarker.DefaultFreeMarkerService;
+import org.primeframework.mvc.parameter.convert.GlobalConverter;
 import org.primeframework.mvc.parameter.el.BeanExpressionException;
 import org.primeframework.mvc.test.RequestSimulator;
 import org.testng.annotations.Test;
 
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
+import freemarker.template.Configuration;
 import static org.testng.Assert.*;
 
 /**
@@ -115,5 +130,43 @@ public class GlobalTest extends PrimeBaseTest {
       get();
 
     assertEquals(simulator.response.getOutputStream().toString(), "Hello Actionless World");
+  }
+
+  @Test
+  public void singletons() throws IOException, ServletException {
+    RequestSimulator simulator = new RequestSimulator(context, new TestModule());
+    assertSingleton(simulator, DefaultActionConfigurationProvider.class);
+    assertSingleton(simulator, DefaultFreeMarkerService.class);
+    assertSingleton(simulator, Configuration.class);
+    assertSingleton(simulator, ResourceBundle.Control.class);
+    assertSingleton(simulator, ResourceBundle.Control.class);
+    assertSingleton(simulator, Validator.class);
+    assertSingletonConverter(simulator, Boolean.class);
+    assertSingletonConverter(simulator, boolean.class);
+    assertSingletonConverter(simulator, Character.class);
+    assertSingletonConverter(simulator, char.class);
+    assertSingletonConverter(simulator, Number.class);
+    assertSingletonConverter(simulator, int.class);
+    assertSingletonConverter(simulator, long.class);
+    assertSingletonConverter(simulator, double.class);
+    assertSingletonConverter(simulator, float.class);
+    assertSingletonConverter(simulator, BigDecimal.class);
+    assertSingletonConverter(simulator, BigInteger.class);
+    assertSingletonConverter(simulator, Collection.class);
+    assertSingletonConverter(simulator, DateTime.class);
+    assertSingletonConverter(simulator, Enum.class);
+    assertSingletonConverter(simulator, File.class);
+    assertSingletonConverter(simulator, LocalDate.class);
+    assertSingletonConverter(simulator, Locale.class);
+    assertSingletonConverter(simulator, String.class);
+  }
+
+  private void assertSingleton(RequestSimulator simulator, Class<?> type) {
+    assertSame(simulator.injector.getInstance(type), simulator.injector.getInstance(type));
+  }
+
+  private void assertSingletonConverter(RequestSimulator simulator, Class<?> type) {
+    Map<Class<?>, GlobalConverter> converters = simulator.injector.getInstance(Key.get(new TypeLiteral<Map<Class<?>, GlobalConverter>>(){}));
+    assertSame(converters.get(type), converters.get(type));
   }
 }
