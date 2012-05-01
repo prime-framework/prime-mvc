@@ -19,6 +19,7 @@ import javax.validation.Valid;
 
 import org.example.domain.User;
 import org.primeframework.mvc.action.annotation.Action;
+import org.primeframework.mvc.action.result.annotation.Forward;
 import org.primeframework.mvc.control.form.annotation.FormPrepareMethod;
 import org.primeframework.mvc.parameter.annotation.PreParameterMethod;
 import org.primeframework.mvc.validation.jsr303.Validation;
@@ -30,6 +31,7 @@ import org.primeframework.mvc.validation.jsr303.group.Delete;
  * @author Brian Pontarelli
  */
 @Action
+@Forward(page = "")
 public class Edit {
   public static final SomeEnum[] values = SomeEnum.values();
 

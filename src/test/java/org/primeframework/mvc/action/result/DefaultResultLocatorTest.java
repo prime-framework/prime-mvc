@@ -34,7 +34,7 @@ import static org.testng.Assert.assertEquals;
 public class DefaultResultLocatorTest extends PrimeBaseTest {
   @Test
   public void locate() throws Exception {
-    ActionInvocation ai = makeActionInvocation("/action", "js");
+    ActionInvocation ai = new ActionInvocation(null, null, "/action", "js", null);
 
     ActionInvocationStore ais = createStrictMock(ActionInvocationStore.class);
     expect(ais.getCurrent()).andReturn(ai);

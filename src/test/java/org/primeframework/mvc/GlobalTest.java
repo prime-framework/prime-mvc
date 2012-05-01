@@ -86,6 +86,17 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void scopeStorage() throws IOException, ServletException {
+    // Tests that the expression evaluator safely gets skipped while looking for values and Prime then checks the
+    // HttpServletRequest and finds the value
+    RequestSimulator simulator = new RequestSimulator(context, new TestModule());
+    simulator.test("/scope-storage").
+      post();
+
+    assertNotNull(simulator.session.getAttribute("sessionObject"));
+  }
+
+  @Test
   public void expressionEvaluatorSkippedUsesRequest() throws IOException, ServletException {
     // Tests that the expression evaluator safely gets skipped while looking for values and Prime then checks the
     // HttpServletRequest and finds the value
@@ -94,6 +105,7 @@ public class GlobalTest extends PrimeBaseTest {
       get();
 
     assertEquals(simulator.response.getOutputStream().toString(), "baz");
+    assertEquals(simulator.request.getAttribute("bar"), "baz");
   }
 
   @Test

@@ -33,18 +33,14 @@ import org.primeframework.mock.servlet.MockServletContext;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ExecuteMethod;
 import org.primeframework.mvc.action.config.ActionConfiguration;
+import org.primeframework.mvc.action.config.DefaultActionConfigurationBuilder;
 import org.primeframework.mvc.action.result.Result;
 import org.primeframework.mvc.action.result.ResultConfiguration;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.guice.GuiceBootstrap;
-import org.primeframework.mvc.parameter.annotation.PostParameterMethod;
-import org.primeframework.mvc.parameter.annotation.PreParameterMethod;
+import org.primeframework.mvc.scope.ScopeField;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.servlet.ServletObjectsHolder;
-import org.primeframework.mvc.util.ReflectionUtils;
-import org.primeframework.mvc.validation.ValidationMethod;
-import org.primeframework.mvc.validation.annotation.PostValidationMethod;
-import org.primeframework.mvc.validation.annotation.PreValidationMethod;
 import org.primeframework.mvc.validation.jsr303.Validation;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -97,48 +93,19 @@ public abstract class PrimeBaseTest {
   }
 
   /**
-   * Makes an action invocation.
-   *
-   * @param uri The request URI.
-   * @param extension The extension.
-   * @return The action invocation.
-   * @throws Exception If the construction fails.
-   */
-  protected ActionInvocation makeActionInvocation(String uri, String extension) throws Exception {
-    return new ActionInvocation(null, null, uri, extension, null);
-  }
-
-  /**
    * Makes an action invocation and configuration.
    *
-   * @param httpMethod The HTTP method.
    * @param action The action object.
-   * @param methodName The method name to reflect and configure.
-   * @param uri The request URI.
+   * @param httpMethod The HTTP method.
    * @param extension The extension.
    * @return The action invocation.
    * @throws Exception If the construction fails.
    */
-  protected ActionInvocation makeActionInvocation(HTTPMethod httpMethod, Object action, String methodName, String uri,
-                                                  String extension, String... uriParamateres) throws Exception {
-    Map<HTTPMethod, ExecuteMethod> executeMethods = new HashMap<HTTPMethod, ExecuteMethod>();
-    ExecuteMethod executeMethod = null;
-    if (methodName != null) {
-      Method method = action.getClass().getMethod(methodName);
-      executeMethod = new ExecuteMethod(method, method.getAnnotation(Validation.class));
-      executeMethods.put(httpMethod, executeMethod);
-    }
-
-    List<Method> validationMethods = ReflectionUtils.findAllWithAnnotation(action.getClass(), ValidationMethod.class);
-    List<Method> preValidationMethods = ReflectionUtils.findAllWithAnnotation(action.getClass(), PreValidationMethod.class);
-    List<Method> postValidationMethods = ReflectionUtils.findAllWithAnnotation(action.getClass(), PostValidationMethod.class);
-    List<Method> preParameterMethods = ReflectionUtils.findAllWithAnnotation(action.getClass(), PreParameterMethod.class);
-    List<Method> postParameterMethods = ReflectionUtils.findAllWithAnnotation(action.getClass(), PostParameterMethod.class);
-
-    Map<String, ResultConfiguration> resultConfigurations = new HashMap<String, ResultConfiguration>();
-
-    return new ActionInvocation(action, executeMethod, uri, extension, asList(uriParamateres),
-      new ActionConfiguration(action.getClass(), preValidationMethods, postValidationMethods, preParameterMethods, postParameterMethods, executeMethods, validationMethods, resultConfigurations, uri), true);
+  protected ActionInvocation makeActionInvocation(Object action, HTTPMethod httpMethod, String extension, String... uriParameters) throws Exception {
+    DefaultActionConfigurationBuilder builder = injector.getInstance(DefaultActionConfigurationBuilder.class);
+    ActionConfiguration actionConfiguration = builder.build(action.getClass());
+    return new ActionInvocation(action, actionConfiguration.executeMethods.get(httpMethod), actionConfiguration.uri,
+      extension, asList(uriParameters), actionConfiguration, true);
   }
 
   /**
@@ -166,7 +133,8 @@ public abstract class PrimeBaseTest {
     resultConfigurations.put(resultCode, new ResultConfiguration(annotation, resultType));
 
     return new ActionInvocation(action, executeMethod, uri, extension,
-      new ActionConfiguration(Edit.class, new ArrayList<Method>(), new ArrayList<Method>(), new ArrayList<Method>(), new ArrayList<Method>(), executeMethods, validationMethods, resultConfigurations, uri));
+      new ActionConfiguration(Edit.class, executeMethods, validationMethods, resultConfigurations, new ArrayList<Method>(),
+        new ArrayList<Method>(), new ArrayList<Method>(), new ArrayList<Method>(), new ArrayList<ScopeField>(), uri));
   }
 
   public static class TestModule extends AbstractModule {

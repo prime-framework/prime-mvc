@@ -17,13 +17,12 @@ package org.primeframework.mvc.scope;
 
 import javax.servlet.ServletException;
 import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
+import java.util.List;
 
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
-import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-import org.primeframework.mvc.scope.annotation.ScopeAnnotation;
+import org.primeframework.mvc.action.config.ActionConfiguration;
+import org.primeframework.mvc.util.ReflectionUtils;
 import org.primeframework.mvc.workflow.WorkflowChain;
 
 import com.google.inject.Inject;
@@ -36,15 +35,12 @@ import com.google.inject.Inject;
  */
 public class DefaultScopeRetrievalWorkflow implements ScopeRetrievalWorkflow {
   private final ActionInvocationStore actionInvocationStore;
-  private final ExpressionEvaluator expressionEvaluator;
   private final FlashScope flashScope;
   private final ScopeProvider scopeProvider;
 
   @Inject
-  public DefaultScopeRetrievalWorkflow(ActionInvocationStore actionInvocationStore, ExpressionEvaluator expressionEvaluator,
-                                       FlashScope flashScope, ScopeProvider scopeProvider) {
+  public DefaultScopeRetrievalWorkflow(ActionInvocationStore actionInvocationStore, FlashScope flashScope, ScopeProvider scopeProvider) {
     this.actionInvocationStore = actionInvocationStore;
-    this.expressionEvaluator = expressionEvaluator;
     this.flashScope = flashScope;
     this.scopeProvider = scopeProvider;
   }
@@ -61,8 +57,10 @@ public class DefaultScopeRetrievalWorkflow implements ScopeRetrievalWorkflow {
     Object action = actionInvocation.action;
 
     // Handle loading scoped members into the action
-    if (action != null) {
-      loadScopedMembers(action);
+    ActionConfiguration actionConfiguration = actionInvocation.configuration;
+    List<ScopeField> scopeFields = (actionConfiguration != null) ? actionConfiguration.scopeFields : null;
+    if (action != null && scopeFields != null && scopeFields.size() > 0) {
+      loadScopedMembers(action, scopeFields);
     }
 
     chain.continueWorkflow();
@@ -72,29 +70,16 @@ public class DefaultScopeRetrievalWorkflow implements ScopeRetrievalWorkflow {
    * Loads all of the values into the action from the scopes.
    *
    * @param action The action to sets the values from scopes into.
+   * @param scopeFields The scope fields.
    */
   @SuppressWarnings("unchecked")
-  protected void loadScopedMembers(Object action) {
-    Class<?> klass = action.getClass();
-    while (klass != Object.class) {
-      Field[] fields = klass.getDeclaredFields();
-      for (Field field : fields) {
-        Annotation[] annotations = field.getAnnotations();
-        for (Annotation annotation : annotations) {
-          Class<? extends Annotation> type = annotation.annotationType();
-          String fieldName = field.getName();
-
-          if (type.isAnnotationPresent(ScopeAnnotation.class)) {
-            Scope scope = scopeProvider.lookup(type);
-            Object value = scope.get(fieldName, annotation);
-            if (value != null) {
-              expressionEvaluator.setValue(fieldName, action, value);
-            }
-          }
-        }
+  protected void loadScopedMembers(Object action, List<ScopeField> scopeFields) {
+    for (ScopeField scopeField : scopeFields) {
+      Scope scope = scopeProvider.lookup(scopeField.annotationType);
+      Object value = scope.get(scopeField.field.getName(), scopeField.annotation);
+      if (value != null) {
+        ReflectionUtils.setField(scopeField.field, action, value);
       }
-
-      klass = klass.getSuperclass();
     }
   }
 }

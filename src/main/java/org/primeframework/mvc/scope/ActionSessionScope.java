@@ -108,7 +108,7 @@ public class ActionSessionScope implements Scope<ActionSession> {
   }
 
   /**
-   * Using the annotation or the current action invocation, this detremines the name of the action used to get the
+   * Using the annotation or the current action invocation, this determines the name of the action used to get the
    * action session.
    *
    * @param scope The scope annotation.

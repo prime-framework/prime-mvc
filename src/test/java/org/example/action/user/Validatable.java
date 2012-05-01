@@ -23,7 +23,6 @@ import java.util.Set;
 import org.example.domain.User;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.servlet.HTTPMethod;
-import org.primeframework.mvc.validation.jsr303.Validatable;
 import org.primeframework.mvc.validation.jsr303.group.Create;
 import org.primeframework.mvc.validation.jsr303.group.Update;
 
@@ -33,19 +32,19 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 @Action
-public class ValidatableAction implements Validatable<ValidatableAction> {
+public class Validatable implements org.primeframework.mvc.validation.jsr303.Validatable {
   private final HTTPMethod method;
 
   @Valid
   public User user = new User();
 
   @Inject
-  public ValidatableAction(HTTPMethod method) {
+  public Validatable(HTTPMethod method) {
     this.method = method;
   }
 
   @Override
-  public Set<ConstraintViolation<ValidatableAction>> validate(Validator validator) {
+  public Set<ConstraintViolation<Validatable>> validate(Validator validator) {
     if (method == HTTPMethod.POST) {
       return validator.validate(this, Create.class);
     }

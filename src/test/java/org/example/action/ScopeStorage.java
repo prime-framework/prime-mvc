@@ -38,54 +38,13 @@ import com.google.inject.Inject;
 /**
  * @author Brian Pontarelli
  */
-@Action("{name}/{value}/static/{foo}")
-@Forward.List({
-  @Forward(code = "forward1", page = "/WEB-INF/forward1.ftl", contentType = "text"),
-  @Forward(code = "forward2", page = "/WEB-INF/forward2.ftl", contentType = "bin", status = 300, statusStr = "foo")
-})
-@Redirect.List({
-  @Redirect(code = "redirect1", uri = "/redirect1", perm = true),
-  @Redirect(code = "redirect2", uri = "/redirect2", perm = false)
-})
-@Header(code = "header", status = 300)
-public class KitchenSink extends KitchenSinkSuperclass implements Validatable {
-  private final MessageStore messageStore;
-
+@Action
+public class ScopeStorage {
   @Session
   public Object sessionObject;
 
-  @Inject
-  public KitchenSink(MessageStore messageStore) {
-    this.messageStore = messageStore;
-  }
-
-  @ValidationMethod
-  public void validate() {
-    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "foo", "ValidationMethod message"));
-  }
-
-  @Override
-  public Set validate(Validator validator) {
-    return null;
-  }
-
-  public String get() {
-    return "success";
-  }
-
   public String post() {
+    sessionObject = new Object();
     return "success";
   }
-
-  @PreParameterMethod
-  public void preParameter() {}
-
-  @PostParameterMethod
-  public void postParameter() {}
-
-  @PreValidationMethod
-  public void preValidation() {}
-
-  @PostValidationMethod
-  public void postValidation() {}
 }

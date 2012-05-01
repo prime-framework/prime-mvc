@@ -90,7 +90,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     expressionEvaluator.setValue(eq("user.name"), same(action), aryEq(ArrayUtils.toArray("")), eq(new HashMap<String, String>()));
     replay(expressionEvaluator);
 
-    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, null, "/", "");
+    ActionInvocation ai = makeActionInvocation(action, HTTPMethod.POST, "");
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
     expect(actionInvocationStore.getCurrent()).andReturn(ai).anyTimes();
     replay(actionInvocationStore);
@@ -139,7 +139,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     expectLastCall().andThrow(new ExpressionException());
     replay(expressionEvaluator);
 
-    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, null, "/", "");
+    ActionInvocation ai = makeActionInvocation(action, HTTPMethod.POST, "");
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
     expect(actionInvocationStore.getCurrent()).andReturn(ai).anyTimes();
     replay(actionInvocationStore);
@@ -189,7 +189,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     expectLastCall().andThrow(new ExpressionException());
     replay(expressionEvaluator);
 
-    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, null, "/", "");
+    ActionInvocation ai = makeActionInvocation(action, HTTPMethod.POST, "");
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
     expect(actionInvocationStore.getCurrent()).andReturn(ai).anyTimes();
     replay(actionInvocationStore);
@@ -238,7 +238,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     expressionEvaluator.setValue(eq("user.radio['default']"), same(action), aryEq(ArrayUtils.toArray("false")), eq(new HashMap<String, String>()));
     replay(expressionEvaluator);
 
-    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, null, "/", "");
+    ActionInvocation ai = makeActionInvocation(action, HTTPMethod.POST, "");
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
     expect(actionInvocationStore.getCurrent()).andReturn(ai).anyTimes();
     replay(actionInvocationStore);
@@ -286,7 +286,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     expectLastCall().andThrow(new ExpressionException("Not property y"));
     replay(expressionEvaluator);
 
-    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, null, "/", "");
+    ActionInvocation ai = makeActionInvocation(action, HTTPMethod.POST, "");
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
     expect(actionInvocationStore.getCurrent()).andReturn(ai).anyTimes();
     replay(actionInvocationStore);
@@ -331,7 +331,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(null);
     replay(request);
 
-    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, null, "/", "");
+    ActionInvocation ai = makeActionInvocation(action, HTTPMethod.POST, "");
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
     expect(actionInvocationStore.getCurrent()).andReturn(ai).anyTimes();
     replay(actionInvocationStore);
@@ -384,7 +384,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     expressionEvaluator.setValue(eq("userfile"), same(action), assertFile());
     replay(expressionEvaluator);
 
-    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, null, "/", "");
+    ActionInvocation ai = makeActionInvocation(action, HTTPMethod.POST, "");
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
     expect(actionInvocationStore.getCurrent()).andReturn(ai).anyTimes();
     replay(actionInvocationStore);
@@ -431,7 +431,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     expressionEvaluator.setValue(eq("userfiles"), same(action), captureMultiple());
     replay(expressionEvaluator);
 
-    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, null, "/", "");
+    ActionInvocation ai = makeActionInvocation(action, HTTPMethod.POST, "");
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
     expect(actionInvocationStore.getCurrent()).andReturn(ai).anyTimes();
     replay(actionInvocationStore);
@@ -475,7 +475,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     expect(expressionEvaluator.getAnnotation(FileUpload.class, "userfile", action)).andReturn(null);
     replay(expressionEvaluator);
 
-    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, null, "/", "");
+    ActionInvocation ai = makeActionInvocation(action, HTTPMethod.POST, "");
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
     expect(actionInvocationStore.getCurrent()).andReturn(ai).anyTimes();
     replay(actionInvocationStore);
@@ -523,7 +523,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     expect(expressionEvaluator.getAnnotation(FileUpload.class, "userfile", action)).andReturn(null);
     replay(expressionEvaluator);
 
-    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, null, "/", "");
+    ActionInvocation ai = makeActionInvocation(action, HTTPMethod.POST, "");
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
     expect(actionInvocationStore.getCurrent()).andReturn(ai).anyTimes();
     replay(actionInvocationStore);
@@ -582,7 +582,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     });
     replay(expressionEvaluator);
 
-    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, null, "/", "");
+    ActionInvocation ai = makeActionInvocation(action, HTTPMethod.POST, "");
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
     expect(actionInvocationStore.getCurrent()).andReturn(ai).anyTimes();
     replay(actionInvocationStore);
@@ -642,7 +642,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     });
     replay(expressionEvaluator);
 
-    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, action, null, "/", "");
+    ActionInvocation ai = makeActionInvocation(action, HTTPMethod.POST, "");
 
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
     expect(actionInvocationStore.getCurrent()).andReturn(ai).anyTimes();

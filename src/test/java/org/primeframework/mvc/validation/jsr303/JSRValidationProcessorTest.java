@@ -21,8 +21,8 @@ import java.util.Map;
 
 import org.example.action.KitchenSink;
 import org.example.action.ValidationMethods;
-import org.example.action.user.Edit;
-import org.example.action.user.ValidatableAction;
+import org.example.action.user.*;
+import org.example.action.user.Validatable;
 import org.example.domain.Address;
 import org.example.domain.User;
 import org.primeframework.mock.servlet.MockHttpServletRequest.Method;
@@ -67,7 +67,7 @@ public class JSRValidationProcessorTest extends PrimeBaseTest {
     address.setZipcode("80020");
     edit.user.setAddress("home", address);
 
-    store.setCurrent(makeActionInvocation(HTTPMethod.POST, edit, "execute", "/user/edit", ""));
+    store.setCurrent(makeActionInvocation(edit, HTTPMethod.POST, ""));
     processor.validate();
   }
 
@@ -79,7 +79,7 @@ public class JSRValidationProcessorTest extends PrimeBaseTest {
     edit.user = new User();
     edit.user.setMonth(10);
 
-    store.setCurrent(makeActionInvocation(HTTPMethod.POST, edit, "post", "/user/edit", ""));
+    store.setCurrent(makeActionInvocation(edit, HTTPMethod.POST, ""));
     try {
       processor.validate();
       fail("Should have failed");
@@ -97,7 +97,7 @@ public class JSRValidationProcessorTest extends PrimeBaseTest {
 
     KitchenSink action = new KitchenSink(messageStore);
 
-    store.setCurrent(makeActionInvocation(HTTPMethod.POST, action, "post", "/kitchen-sink", ""));
+    store.setCurrent(makeActionInvocation(action, HTTPMethod.POST, ""));
     JSRValidationProcessor localProcessor = injector.getInstance(JSRValidationProcessor.class);
     try {
       localProcessor.validate();
@@ -117,7 +117,7 @@ public class JSRValidationProcessorTest extends PrimeBaseTest {
     KitchenSink action = new KitchenSink(messageStore);
 
     // Grab a new instance so that it gets injected with the updated request HTTP method
-    store.setCurrent(makeActionInvocation(HTTPMethod.GET, action, "get", "/kitchen-sink", ""));
+    store.setCurrent(makeActionInvocation(action, HTTPMethod.GET, ""));
     JSRValidationProcessor localProcessor = injector.getInstance(JSRValidationProcessor.class);
     localProcessor.validate();
   }
@@ -126,11 +126,11 @@ public class JSRValidationProcessorTest extends PrimeBaseTest {
   public void validatable() throws Exception {
     request.setMethod(Method.POST);
 
-    ValidatableAction action = new ValidatableAction(HTTPMethod.POST);
+    Validatable action = new Validatable(HTTPMethod.POST);
     action.user.setYear(10);
     action.user.setPassword("123456789012345678901234567890");
 
-    store.setCurrent(makeActionInvocation(HTTPMethod.POST, action, "post", "/user/validatable", ""));
+    store.setCurrent(makeActionInvocation(action, HTTPMethod.POST, ""));
     try {
       processor.validate();
       fail("Should have failed");
@@ -143,11 +143,11 @@ public class JSRValidationProcessorTest extends PrimeBaseTest {
 
     messageStore.clear();
 
-    action = new ValidatableAction(HTTPMethod.PUT);
+    action = new org.example.action.user.Validatable(HTTPMethod.PUT);
     action.user.setYear(10);
     action.user.setPassword("123456789012345678901234567890");
 
-    store.setCurrent(makeActionInvocation(HTTPMethod.POST, action, "post", "/user/validatable", ""));
+    store.setCurrent(makeActionInvocation(action, HTTPMethod.POST, ""));
     try {
       processor.validate();
       fail("Should have failed");
@@ -168,7 +168,7 @@ public class JSRValidationProcessorTest extends PrimeBaseTest {
     Address address = new Address();
     edit.user.setAddress("home", address);
 
-    store.setCurrent(makeActionInvocation(HTTPMethod.POST, edit, "execute", "/user/edit", ""));
+    store.setCurrent(makeActionInvocation(edit, HTTPMethod.GET, ""));
     try {
       processor.validate();
       fail("Should have failed");
@@ -207,7 +207,7 @@ public class JSRValidationProcessorTest extends PrimeBaseTest {
     // Add a previous error
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "test", "failure"));
 
-    store.setCurrent(makeActionInvocation(HTTPMethod.POST, edit, "execute", "/user/edit", ""));
+    store.setCurrent(makeActionInvocation(edit, HTTPMethod.POST, ""));
     try {
       processor.validate();
       fail("Should have failed");
@@ -227,7 +227,7 @@ public class JSRValidationProcessorTest extends PrimeBaseTest {
     assertFalse(action.preValidation);
     assertFalse(action.postValidation);
 
-    store.setCurrent(makeActionInvocation(HTTPMethod.GET, action, "get", "/validation/methods", ""));
+    store.setCurrent(makeActionInvocation(action, HTTPMethod.GET, ""));
 
     processor.validate();
     assertTrue(action.preValidation);
@@ -242,7 +242,7 @@ public class JSRValidationProcessorTest extends PrimeBaseTest {
     assertFalse(action.preValidation);
     assertFalse(action.postValidation);
 
-    store.setCurrent(makeActionInvocation(HTTPMethod.POST, action, "post", "/validation/methods", ""));
+    store.setCurrent(makeActionInvocation(action, HTTPMethod.POST, ""));
 
     processor.validate();
     assertFalse(action.preValidation);

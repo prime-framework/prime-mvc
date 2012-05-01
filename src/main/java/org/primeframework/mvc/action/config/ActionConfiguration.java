@@ -22,6 +22,7 @@ import java.util.Map;
 import org.primeframework.mvc.action.ExecuteMethod;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.ResultConfiguration;
+import org.primeframework.mvc.scope.ScopeField;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.validation.jsr303.Validatable;
 
@@ -38,6 +39,7 @@ public class ActionConfiguration {
   public final List<Method> preParameterMethods;
   public final List<Method> postParameterMethods;
   public final Map<HTTPMethod, ExecuteMethod> executeMethods;
+  public final List<ScopeField> scopeFields;
   public final Map<String, ResultConfiguration> resultConfigurations;
   public final boolean validatable;
   public final String uri;
@@ -45,10 +47,10 @@ public class ActionConfiguration {
   public final String pattern;
   public final String[] patternParts;
 
-  public ActionConfiguration(Class<?> actionClass, List<Method> preValidationMethods, List<Method> postValidationMethods,
-                             List<Method> preParameterMethods, List<Method> postParameterMethods, Map<HTTPMethod, ExecuteMethod> executeMethods,
-                             List<Method> validationMethods, Map<String, ResultConfiguration> resultConfigurations,
-                             String uri) {
+  public ActionConfiguration(Class<?> actionClass, Map<HTTPMethod, ExecuteMethod> executeMethods, List<Method> validationMethods,
+                             Map<String, ResultConfiguration> resultConfigurations, List<Method> preValidationMethods,
+                             List<Method> postValidationMethods, List<Method> preParameterMethods, List<Method> postParameterMethods,
+                             List<ScopeField> scopeFields, String uri) {
     this.actionClass = actionClass;
     this.preValidationMethods = preValidationMethods;
     this.postValidationMethods = postValidationMethods;
@@ -57,6 +59,7 @@ public class ActionConfiguration {
     this.validationMethods = validationMethods;
     this.executeMethods = executeMethods;
     this.resultConfigurations = resultConfigurations;
+    this.scopeFields = scopeFields;
     this.validatable = Validatable.class.isAssignableFrom(actionClass);
     this.uri = uri;
     this.annotation = actionClass.getAnnotation(Action.class);

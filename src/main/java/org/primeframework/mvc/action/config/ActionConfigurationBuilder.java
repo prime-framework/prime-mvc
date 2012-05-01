@@ -13,25 +13,22 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.example.action;
+package org.primeframework.mvc.action.config;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.scope.annotation.Request;
-
-import com.google.inject.Inject;
+import com.google.inject.ImplementedBy;
 
 /**
+ * Action configuration builder that parses an action class and builds a configuration for it.
+ *
  * @author Brian Pontarelli
  */
-@Action
-public class ValueInRequest {
-  @Inject public HttpServletRequest request;
-  private String bar;
-
-  public String get() {
-    request.setAttribute("bar", "baz");
-    return "success";
-  }
+@ImplementedBy(DefaultActionConfigurationBuilder.class)
+public interface ActionConfigurationBuilder {
+  /**
+   * Builds the action configuration for the given class.
+   *
+   * @param actionClass The action class.
+   * @return The action configuration and never null.
+   */
+  ActionConfiguration build(Class<?> actionClass);
 }

@@ -63,14 +63,17 @@ public class RequestBodyWorkflow implements Workflow {
     // x-www-form-urlencoded the InputStream will be empty
     Map<String, String[]> parameters = request.getParameterMap();
 
-    String contentType = request.getContentType();
     Map<String, List<String>> parsedParameters = null;
-    if (contentType != null && contentType.toLowerCase().startsWith("multipart/")) {
-      FilesAndParameters filesAndParameters = handleFiles();
-      request.setAttribute(RequestKeys.FILE_ATTRIBUTE, filesAndParameters.files);
-      parsedParameters = filesAndParameters.parameters;
-    } else if (contentType != null && contentType.toLowerCase().startsWith("application/x-www-form-urlencoded")) {
-      parsedParameters = parse(request.getInputStream(), request.getCharacterEncoding());
+    String contentType = request.getContentType();
+    if (contentType != null) {
+      contentType = contentType.toLowerCase();
+      if (contentType.startsWith("multipart/")) {
+        FilesAndParameters filesAndParameters = handleFiles();
+        request.setAttribute(RequestKeys.FILE_ATTRIBUTE, filesAndParameters.files);
+        parsedParameters = filesAndParameters.parameters;
+      } else if (contentType.startsWith("application/x-www-form-urlencoded")) {
+        parsedParameters = parse(request.getInputStream(), request.getCharacterEncoding());
+      }
     }
 
     if (parsedParameters != null && parsedParameters.size() > 0) {

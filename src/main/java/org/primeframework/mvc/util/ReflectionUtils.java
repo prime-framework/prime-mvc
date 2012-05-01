@@ -50,15 +50,8 @@ import org.primeframework.mvc.parameter.el.UpdateExpressionException;
 public class ReflectionUtils {
   private static final Map<String, MethodVerifier> verifiers = new HashMap<String, MethodVerifier>();
   private static final Map<Class, Map<String, PropertyInfo>> cache = new WeakHashMap<Class, Map<String, PropertyInfo>>();
-  private static final Method ERROR;
 
   static {
-    try {
-      ERROR = Object.class.getMethod("hashCode");
-    } catch (NoSuchMethodException e) {
-      throw new AssertionError("Bad, bad!");
-    }
-
     verifiers.put("is", new GetMethodVerifier());
     verifiers.put("get", new GetMethodVerifier());
     verifiers.put("set", new SetMethodVerifier());
@@ -186,40 +179,13 @@ public class ReflectionUtils {
   }
 
   /**
-   * Invokes all of the methods that have the given annotation on the given Object.
-   *
-   * @param obj        The object to invoke the methods on.
-   * @param annotation The annotation.
-   */
-  public static void invokeAllWithAnnotation(Object obj, Class<? extends Annotation> annotation) {
-    Class<?> actionClass = obj.getClass();
-    Method[] methods = actionClass.getMethods();
-    for (Method method : methods) {
-      if (method.getAnnotation(annotation) != null) {
-        try {
-          method.invoke(obj);
-        } catch (IllegalAccessException e) {
-          throw new ExpressionException("Unable to call method [" + method + "] with annotation [" + annotation.getSimpleName() + "]", e);
-        } catch (InvocationTargetException e) {
-          Throwable target = e.getTargetException();
-          if (target instanceof RuntimeException) {
-            throw (RuntimeException) target;
-          }
-
-          throw new ExpressionException("Unable to call method [" + method + "] with annotation [" + annotation.getSimpleName() + "]", e);
-        }
-      }
-    }
-  }
-
-  /**
    * Finds  all of the methods that have the given annotation on the given Object.
    *
-   * @param klass        The class to find methods from
+   * @param type       The class to find methods from
    * @param annotation The annotation.
    */
-  public static List<Method> findAllWithAnnotation(Class klass, Class<? extends Annotation> annotation) {
-    Method[] methods = klass.getMethods();
+  public static List<Method> findAllWithAnnotation(Class<?> type, Class<? extends Annotation> annotation) {
+    Method[] methods = type.getMethods();
     List<Method> methodList = new ArrayList<Method>();
     for (Method method : methods) {
       if (method.isAnnotationPresent(annotation)) {

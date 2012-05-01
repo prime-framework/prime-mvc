@@ -17,13 +17,12 @@ package org.primeframework.mvc.scope;
 
 import javax.servlet.ServletException;
 import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
+import java.util.List;
 
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
-import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-import org.primeframework.mvc.scope.annotation.ScopeAnnotation;
+import org.primeframework.mvc.action.config.ActionConfiguration;
+import org.primeframework.mvc.util.ReflectionUtils;
 import org.primeframework.mvc.workflow.WorkflowChain;
 
 import com.google.inject.Inject;
@@ -35,14 +34,11 @@ import com.google.inject.Inject;
  */
 public class DefaultScopeStorageWorkflow implements ScopeStorageWorkflow {
   private final ActionInvocationStore actionInvocationStore;
-  private final ExpressionEvaluator expressionEvaluator;
   private final ScopeProvider scopeProvider;
 
   @Inject
-  public DefaultScopeStorageWorkflow(ActionInvocationStore actionInvocationStore, ExpressionEvaluator expressionEvaluator,
-                                     ScopeProvider scopeProvider) {
+  public DefaultScopeStorageWorkflow(ActionInvocationStore actionInvocationStore, ScopeProvider scopeProvider) {
     this.actionInvocationStore = actionInvocationStore;
-    this.expressionEvaluator = expressionEvaluator;
     this.scopeProvider = scopeProvider;
   }
 
@@ -56,8 +52,10 @@ public class DefaultScopeStorageWorkflow implements ScopeStorageWorkflow {
     Object action = actionInvocation.action;
 
     // Handle storing scoped members from the action
-    if (action != null) {
-      storeScopedMembers(action);
+    ActionConfiguration actionConfiguration = actionInvocation.configuration;
+    List<ScopeField> scopeFields = (actionConfiguration != null) ? actionConfiguration.scopeFields : null;
+    if (action != null && scopeFields != null && scopeFields.size() > 0) {
+      storeScopedMembers(action, scopeFields);
     }
 
     chain.continueWorkflow();
@@ -67,27 +65,14 @@ public class DefaultScopeStorageWorkflow implements ScopeStorageWorkflow {
    * Stores all of the values from the action from into the scopes.
    *
    * @param action The action to get the values from.
+   * @param scopeFields The scope fields.
    */
   @SuppressWarnings("unchecked")
-  protected void storeScopedMembers(Object action) {
-    Class<?> klass = action.getClass();
-    while (klass != Object.class) {
-      Field[] fields = klass.getFields();
-      for (Field field : fields) {
-        Annotation[] annotations = field.getAnnotations();
-        for (Annotation annotation : annotations) {
-          Class<? extends Annotation> type = annotation.annotationType();
-          String fieldName = field.getName();
-
-          if (type.isAnnotationPresent(ScopeAnnotation.class)) {
-            Scope scope = scopeProvider.lookup(type);
-            Object value = expressionEvaluator.getValue(fieldName, action);
-            scope.set(fieldName, value, annotation);
-          }
-        }
-      }
-
-      klass = klass.getSuperclass();
+  protected void storeScopedMembers(Object action, List<ScopeField> scopeFields) {
+    for (ScopeField scopeField : scopeFields) {
+      Scope scope = scopeProvider.lookup(scopeField.annotationType);
+      Object value = ReflectionUtils.getField(scopeField.field, action);
+      scope.set(scopeField.field.getName(), value, scopeField.annotation);
     }
   }
 }

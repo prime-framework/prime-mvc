@@ -48,7 +48,7 @@ public class PreAndPostAction {
   }
 
   @PreParameterMethod
-  public void pre() {
+  public void preParameter() {
     preCalled = true;
     assertNotNull(preField);
     assertNotNull(preProperty);
@@ -56,10 +56,14 @@ public class PreAndPostAction {
   }
 
   @PostParameterMethod
-  public void post() {
+  public void postParameter() {
     postCalled = true;
     assertNotNull(preField);
     assertNotNull(preProperty);
     assertNotNull(notPre);
+  }
+
+  public String post() {
+    return null;
   }
 }

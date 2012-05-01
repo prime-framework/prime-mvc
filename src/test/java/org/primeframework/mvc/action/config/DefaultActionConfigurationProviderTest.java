@@ -47,7 +47,7 @@ public class DefaultActionConfigurationProviderTest {
     context.setAttribute(eq(DefaultActionConfigurationProvider.ACTION_CONFIGURATION_KEY), capture(c));
     EasyMock.replay(context);
 
-    new DefaultActionConfigurationProvider(context, new DefaultURIBuilder());
+    new DefaultActionConfigurationProvider(context, new DefaultActionConfigurationBuilder(new DefaultURIBuilder()));
 
     Map<String, ActionConfiguration> config = c.getValue();
     assertSame(config.get("/simple").actionClass, Simple.class);

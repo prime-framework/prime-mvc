@@ -13,25 +13,24 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.example.action;
+package org.primeframework.mvc.scope;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.scope.annotation.Request;
-
-import com.google.inject.Inject;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 
 /**
+ * Fields and their scope annotation.
+ *
  * @author Brian Pontarelli
  */
-@Action
-public class ValueInRequest {
-  @Inject public HttpServletRequest request;
-  private String bar;
+public class ScopeField {
+  public final Field field;
+  public final Annotation annotation;
+  public final Class<? extends Annotation> annotationType;
 
-  public String get() {
-    request.setAttribute("bar", "baz");
-    return "success";
+  public ScopeField(Field field, Annotation annotation) {
+    this.annotation = annotation;
+    this.field = field;
+    this.annotationType = annotation.annotationType();
   }
 }
