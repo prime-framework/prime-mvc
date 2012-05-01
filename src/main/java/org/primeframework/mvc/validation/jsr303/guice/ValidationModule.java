@@ -31,7 +31,7 @@ import com.google.inject.AbstractModule;
 public class ValidationModule extends AbstractModule {
   @Override
   protected void configure() {
-    bind(Validator.class).toProvider(ValidatorProvider.class);
+    bind(Validator.class).toProvider(ValidatorProvider.class).asEagerSingleton();
     bind(ConstraintValidatorFactory.class).to(DefaultConstraintValidatorFactory.class);
   }
 }
