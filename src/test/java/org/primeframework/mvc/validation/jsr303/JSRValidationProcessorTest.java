@@ -234,6 +234,21 @@ public class JSRValidationProcessorTest extends PrimeBaseTest {
     assertTrue(action.postValidation);
   }
 
+  @Test
+  public void disabled() throws Exception {
+    request.setMethod(Method.POST);
+
+    ValidationMethods action = new ValidationMethods();
+    assertFalse(action.preValidation);
+    assertFalse(action.postValidation);
+
+    store.setCurrent(makeActionInvocation(HTTPMethod.POST, action, "post", "/validation/methods", ""));
+
+    processor.validate();
+    assertFalse(action.preValidation);
+    assertFalse(action.postValidation);
+  }
+
   private Map<String, FieldMessage> convertToMap() {
     List<Message> messages = messageStore.get();
     Map<String, FieldMessage> map = new HashMap<String, FieldMessage>();

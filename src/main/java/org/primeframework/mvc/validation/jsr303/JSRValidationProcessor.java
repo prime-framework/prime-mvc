@@ -74,7 +74,7 @@ public class JSRValidationProcessor implements ValidationProcessor {
     ActionInvocation actionInvocation = store.getCurrent();
     Object action = actionInvocation.action;
     ActionConfiguration actionConfiguration = actionInvocation.configuration;
-    if (action == null) {
+    if (action == null || (actionInvocation.method.validation != null && !actionInvocation.method.validation.enabled())) {
       return;
     }
 

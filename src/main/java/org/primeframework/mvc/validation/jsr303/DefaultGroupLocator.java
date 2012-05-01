@@ -31,7 +31,7 @@ import com.google.inject.Inject;
 import static org.primeframework.mvc.servlet.HTTPMethod.*;
 
 /**
- * Uses the HTTP request method or {@link Validation} annotaiton to determine the groups. The HTTP method mapping is:
+ * Uses the HTTP request method or {@link Validation} annotation to determine the groups. The HTTP method mapping is:
  * <p/>
  * <ul>
  *   <li>GET - Read</li>

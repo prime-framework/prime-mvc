@@ -18,6 +18,7 @@ package org.example.action;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.validation.annotation.PostValidationMethod;
 import org.primeframework.mvc.validation.annotation.PreValidationMethod;
+import org.primeframework.mvc.validation.jsr303.Validation;
 
 /**
  * Action for testing the PreValidtionMethod and PostValidationMethod annotations
@@ -30,10 +31,6 @@ public class ValidationMethods {
   public boolean preValidation = false;
   public boolean postValidation = false;
 
-  public String get() {
-    return "success";
-  }
-
   @PreValidationMethod
   public void toggleOn() {
     this.preValidation = true;
@@ -44,4 +41,12 @@ public class ValidationMethods {
     this.postValidation = true;
   }
 
+  public String get() {
+    return "success";
+  }
+
+  @Validation(enabled = false)
+  public String post() {
+    return null;
+  }
 }

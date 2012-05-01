@@ -32,5 +32,10 @@ public @interface Validation {
   /**
    * @return The groups to validate for this execute method.
    */
-  Class<?>[] groups();
+  Class<?>[] groups() default {};
+
+  /**
+   * @return Whether or not validation is enabled for the execute method.
+   */
+  boolean enabled() default true;
 }
