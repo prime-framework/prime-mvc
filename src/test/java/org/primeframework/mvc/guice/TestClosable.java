@@ -15,6 +15,8 @@
  */
 package org.primeframework.mvc.guice;
 
+import java.io.Closeable;
+
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -24,7 +26,7 @@ import com.google.inject.Singleton;
  * @author Brian Pontarelli
  */
 @Singleton
-public class TestClosable implements Closable {
+public class TestClosable implements Closeable {
   public boolean open = false;
 
   @Inject

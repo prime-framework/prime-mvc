@@ -15,6 +15,7 @@
  */
 package org.primeframework.mvc.guice;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -76,15 +77,19 @@ public class GuiceBootstrap {
   }
 
   /**
-   * Shuts down the Guice injector by locating all of the {@link Closable} classes and calling Close on each of them.
+   * Shuts down the Guice injector by locating all of the {@link Closeable} classes and calling Close on each of them.
    *
    * @param injector The Injector to shutdown.
    */
   public static void shutdown(Injector injector) {
-    List<Key<? extends Closable>> keys = GuiceTools.getKeys(injector, Closable.class);
-    for (Key<? extends Closable> key : keys) {
-      Closable closable = injector.getInstance(key);
-      closable.close();
+    List<Key<? extends Closeable>> keys = GuiceTools.getKeys(injector, Closeable.class);
+    for (Key<? extends Closeable> key : keys) {
+      Closeable closable = injector.getInstance(key);
+      try {
+        closable.close();
+      } catch (IOException e) {
+        logger.error("Unable to shutdown Closeable [" + key + "]", e);
+      }
     }
   }
 
