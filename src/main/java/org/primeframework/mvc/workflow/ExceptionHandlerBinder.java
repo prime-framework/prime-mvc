@@ -20,9 +20,9 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 
 /**
- * A binder DSL for adding GlobalConverters to Prime.
+ * A binder DSL for adding TypedExceptionHandler to Prime.
  *
- * @author Brian Pontarelli
+ * @author James Humphrey
  */
 public class ExceptionHandlerBinder {
 
