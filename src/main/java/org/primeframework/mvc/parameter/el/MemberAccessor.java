@@ -39,7 +39,7 @@ public class MemberAccessor extends Accessor {
     this.propertyInfo = accessor.propertyInfo;
   }
 
-  public MemberAccessor(ConverterProvider converterProvider, Class<?> declaringClass, String name) {
+  public MemberAccessor(ConverterProvider converterProvider, Class<?> declaringClass, String name, String expression) {
     super(converterProvider);
     Map<String, PropertyInfo> map = ReflectionUtils.getPropMap(declaringClass);
     PropertyInfo bpi = map.get(name);
@@ -56,7 +56,7 @@ public class MemberAccessor extends Accessor {
     }
 
     if (this.field == null && this.propertyInfo == null) {
-      throw new MissingPropertyExpressionException("Invalid property or field [" + name + "] for class [" + declaringClass + "]");
+      throw new MissingPropertyExpressionException("While evaluating the expression [" + expression +  "] the property/field [" + name + "] in the class [" + declaringClass + "]", name, declaringClass, expression);
     }
 
     this.declaringClass = declaringClass;

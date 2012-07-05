@@ -15,20 +15,17 @@
  */
 package org.primeframework.mvc.workflow;
 
-import com.google.inject.ImplementedBy;
-
 /**
- * Interface for handling runtime exceptions that occur in Prime
+ * Interface for handling runtime exceptions in prime
  *
  * @author James Humphrey
  */
-@ImplementedBy(DefaultExceptionHandler.class)
-public interface ExceptionHandler {
+public interface TypedExceptionHandler<T extends RuntimeException> {
 
   /**
-   * Handles exceptions that occur in prime
+   * Called to handle an exception of a specific type
    *
-   * @param e the exception
+   * @param exception the exception type
    */
-  public <T extends RuntimeException> void handle(T e);
+  void handle(T exception);
 }

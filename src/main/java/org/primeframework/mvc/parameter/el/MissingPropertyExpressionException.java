@@ -19,12 +19,19 @@ package org.primeframework.mvc.parameter.el;
  * @author Brian Pontarelli
  */
 public class MissingPropertyExpressionException extends ExpressionException {
+  public String expression;
+  public String property;
+  public Class klass;
+
   public MissingPropertyExpressionException() {
     super();
   }
 
-  public MissingPropertyExpressionException(String message) {
+  public MissingPropertyExpressionException(String message, String property, Class klass, String expression) {
     super(message);
+    this.property = property;
+    this.klass = klass;
+    this.expression = expression;
   }
 
   public MissingPropertyExpressionException(String message, Throwable cause) {

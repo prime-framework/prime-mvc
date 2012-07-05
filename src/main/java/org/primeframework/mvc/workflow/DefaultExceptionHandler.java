@@ -15,14 +15,7 @@
  */
 package org.primeframework.mvc.workflow;
 
-import org.primeframework.mvc.ErrorException;
-import org.primeframework.mvc.action.result.ResultStore;
-import org.primeframework.mvc.config.MVCConfiguration;
-import org.primeframework.mvc.message.MessageStore;
-import org.primeframework.mvc.message.MessageType;
-import org.primeframework.mvc.message.SimpleMessage;
-import org.primeframework.mvc.message.l10n.MessageProvider;
-import org.primeframework.mvc.message.l10n.MissingMessageException;
+import java.util.Map;
 
 import com.google.inject.Inject;
 
@@ -30,39 +23,32 @@ import com.google.inject.Inject;
  * @author James Humphrey
  */
 public class DefaultExceptionHandler implements ExceptionHandler {
-  private final ResultStore resultStore;
-  private final MVCConfiguration configuration;
-  private final MessageStore messageStore;
-  private final MessageProvider messageProvider;
+
+  private final Map<Class<?>, TypedExceptionHandler<?>> handlers;
 
   @Inject
-  public DefaultExceptionHandler(ResultStore resultStore, MVCConfiguration configuration, MessageStore messageStore,
-                                 MessageProvider messageProvider) {
-    this.resultStore = resultStore;
-    this.configuration = configuration;
-    this.messageStore = messageStore;
-    this.messageProvider = messageProvider;
+  public DefaultExceptionHandler(Map<Class<?>, TypedExceptionHandler<?>> handlers) {
+    this.handlers = handlers;
   }
 
   @Override
-  public void handle(RuntimeException e) {
-    if (e instanceof ErrorException) {
-      ErrorException errorException = (ErrorException) e;
-
-      // set the result code.  if null, grab from mvc configuration
-      String code = errorException.resultCode != null ? errorException.resultCode : configuration.exceptionResultCode();
-      resultStore.set(code);
-
-      // get the message from the message provider.  key = name of the class
-      try {
-        String message = messageProvider.getMessage(e.getClass().getSimpleName(), errorException.args);
-        messageStore.add(new SimpleMessage(MessageType.ERROR, message));
-      } catch (MissingMessageException mme) {
-        // Ignore because there isn't a message
+  @SuppressWarnings(value = "unchecked")
+  public <T extends RuntimeException> void handle(T exception) {
+    Class<? extends RuntimeException> klass = exception.getClass();
+    boolean handled = false;
+    while (klass != RuntimeException.class) {
+      TypedExceptionHandler handler = handlers.get(klass);
+      if (handler != null) {
+        handler.handle(exception);
+        handled = true;
+        break;
+      } else {
+        klass = (Class<? extends RuntimeException>) klass.getSuperclass();
       }
-    } else {
-      // anything other than error messages get re-thrown
-      throw e;
+    }
+
+    if (!handled) {
+      throw exception;
     }
   }
 }

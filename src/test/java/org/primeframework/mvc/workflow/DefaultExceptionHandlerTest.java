@@ -15,15 +15,10 @@
  */
 package org.primeframework.mvc.workflow;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.primeframework.mvc.ErrorException;
-import org.primeframework.mvc.action.result.ResultStore;
-import org.primeframework.mvc.config.AbstractMVCConfiguration;
-import org.primeframework.mvc.config.MVCConfiguration;
-import org.primeframework.mvc.message.MessageStore;
-import org.primeframework.mvc.message.SimpleMessage;
-import org.primeframework.mvc.message.l10n.MessageProvider;
-import org.primeframework.mvc.message.l10n.MissingMessageException;
-import org.primeframework.mvc.validation.ValidationException;
 import org.testng.annotations.Test;
 
 import static org.easymock.EasyMock.*;
@@ -32,152 +27,184 @@ import static org.testng.Assert.*;
 /**
  * @author James Humphrey
  */
-@Test
 public class DefaultExceptionHandlerTest {
 
   @Test
-  public void errorExceptionWithDefaultResultCode() {
-    ErrorException errorException = new MockErrorException();
-    MVCConfiguration configuration = new AbstractMVCConfiguration() {
-      @Override
-      public int templateCheckSeconds() {
-        return 0;
-      }
-
-      @Override
-      public int l10nReloadSeconds() {
-        return 0;
-      }
-
-      @Override
-      public boolean allowUnknownParameters() {
-        return false;
-      }
-    };
-
-    MessageProvider messageProvider = createStrictMock(MessageProvider.class);
-    expect(messageProvider.getMessage(errorException.getClass().getSimpleName(), errorException.args)).andReturn("foo");
-    replay(messageProvider);
-
-    MessageStore messageStore = createStrictMock(MessageStore.class);
-    messageStore.add(isA(SimpleMessage.class));
-    replay(messageStore);
-
-    ResultStore resultStore = createStrictMock(ResultStore.class);
-    resultStore.set(configuration.exceptionResultCode());
-    replay(resultStore);
-
-    DefaultExceptionHandler handler = new DefaultExceptionHandler(resultStore, configuration, messageStore, messageProvider);
-    handler.handle(errorException);
-
-    verify(messageProvider, messageStore, resultStore);
-  }
-
-  @Test
-  public void errorExceptionWithCustomResultCode() {
-    ErrorException errorException = new MockErrorExceptionWithCode();
-    MVCConfiguration configuration = new AbstractMVCConfiguration() {
-      @Override
-      public int templateCheckSeconds() {
-        return 0;
-      }
-
-      @Override
-      public int l10nReloadSeconds() {
-        return 0;
-      }
-
-      @Override
-      public boolean allowUnknownParameters() {
-        return false;
-      }
-    };
-
-    MessageProvider messageProvider = createStrictMock(MessageProvider.class);
-    expect(messageProvider.getMessage(errorException.getClass().getSimpleName(), errorException.args)).andReturn("foo");
-    replay(messageProvider);
-
-    MessageStore messageStore = createStrictMock(MessageStore.class);
-    messageStore.add(isA(SimpleMessage.class));
-    replay(messageStore);
-
-    ResultStore resultStore = createStrictMock(ResultStore.class);
-    resultStore.set(errorException.resultCode);
-    replay(resultStore);
-
-    DefaultExceptionHandler handler = new DefaultExceptionHandler(resultStore, configuration, messageStore, messageProvider);
-    handler.handle(errorException);
-
-    verify(messageProvider, messageStore, resultStore);
-  }
-
-  @Test
-  public void validationExceptionWithoutMessage() {
-    ValidationException e = new ValidationException();
-    MVCConfiguration configuration = new AbstractMVCConfiguration() {
-      @Override
-      public int templateCheckSeconds() {
-        return 0;
-      }
-
-      @Override
-      public int l10nReloadSeconds() {
-        return 0;
-      }
-
-      @Override
-      public boolean allowUnknownParameters() {
-        return false;
-      }
-    };
-
-    MessageProvider messageProvider = createStrictMock(MessageProvider.class);
-    messageProvider.getMessage(e.getClass().getSimpleName(), e.args);
-    expectLastCall().andThrow(new MissingMessageException());
-    replay(messageProvider);
-
-    MessageStore messageStore = createStrictMock(MessageStore.class);
-    replay(messageStore);
-
-    ResultStore resultStore = createStrictMock(ResultStore.class);
-    resultStore.set(e.resultCode);
-    replay(resultStore);
-
-    DefaultExceptionHandler handler = new DefaultExceptionHandler(resultStore, configuration, messageStore, messageProvider);
-    handler.handle(e);
-
-    verify(messageProvider, messageStore, resultStore);
-  }
-
-  @Test
-  public void runtimeException() {
-    DefaultExceptionHandler handler = new DefaultExceptionHandler(null, null, null, null);
+  public void handleRuntimeException() {
+    DefaultExceptionHandler handler = new DefaultExceptionHandler(null);
 
     try {
       handler.handle(new RuntimeException());
-      fail("RuntimeException should have rethrown in the handle method");
+      fail("Should have thrown a RuntimeException");
     } catch (RuntimeException e) {
-      // no-op, test successful
+      // no op, test successful
+    }
+  }
+
+  @Test
+  @SuppressWarnings(value = "unchecked")
+  public void testErrorException() {
+
+    ErrorExceptionHandler errorExceptionHandler = createStrictMock(ErrorExceptionHandler.class);
+    errorExceptionHandler.handle(isA(ErrorException.class));
+    replay(errorExceptionHandler);
+
+    Map<Class<?>, TypedExceptionHandler<?>> handlers = new HashMap<Class<?>, TypedExceptionHandler<?>>();
+    handlers.put(ErrorException.class, errorExceptionHandler);
+    DefaultExceptionHandler handler = new DefaultExceptionHandler(handlers);
+
+    try {
+      handler.handle(new ErrorException());
+    } catch (RuntimeException e) {
+      fail("Should have handled it");
+    }
+  }
+
+  @Test
+  @SuppressWarnings(value = "unchecked")
+  public void testFooException() {
+
+    ErrorExceptionHandler errorExceptionHandler = createStrictMock(ErrorExceptionHandler.class);
+    errorExceptionHandler.handle(isA(FooException.class));
+    replay(errorExceptionHandler);
+
+    Map<Class<?>, TypedExceptionHandler<?>> handlers = new HashMap<Class<?>, TypedExceptionHandler<?>>();
+    handlers.put(FooException.class, errorExceptionHandler);
+    DefaultExceptionHandler handler = new DefaultExceptionHandler(handlers);
+
+    try {
+      handler.handle(new FooException());
+    } catch (RuntimeException e) {
+      fail("Should have handled it");
+    }
+  }
+
+  @Test
+  @SuppressWarnings(value = "unchecked")
+  public void testBarException() {
+
+    BarExceptionHandler<BarException> errorExceptionHandler = createStrictMock(BarExceptionHandler.class);
+    errorExceptionHandler.handle(isA(BarException.class));
+    replay(errorExceptionHandler);
+
+    Map<Class<?>, TypedExceptionHandler<?>> handlers = new HashMap<Class<?>, TypedExceptionHandler<?>>();
+    handlers.put(BarException.class, errorExceptionHandler);
+    DefaultExceptionHandler handler = new DefaultExceptionHandler(handlers);
+
+    try {
+      handler.handle(new BarException());
+    } catch (RuntimeException e) {
+      fail("Should have handled it");
+    }
+  }
+
+  @Test
+  @SuppressWarnings(value = "unchecked")
+  public void testBazException() {
+
+    BarExceptionHandler<BazException> errorExceptionHandler = createStrictMock(BarExceptionHandler.class);
+    errorExceptionHandler.handle(isA(BazException.class));
+    replay(errorExceptionHandler);
+
+    Map<Class<?>, TypedExceptionHandler<?>> handlers = new HashMap<Class<?>, TypedExceptionHandler<?>>();
+    handlers.put(BazException.class, errorExceptionHandler);
+    DefaultExceptionHandler handler = new DefaultExceptionHandler(handlers);
+
+    try {
+      handler.handle(new BazException());
+    } catch (RuntimeException e) {
+      fail("Should have handled it");
+    }
+  }
+
+  @Test
+  @SuppressWarnings(value = "unchecked")
+  public void testMultipleExceptions() {
+
+    ErrorExceptionHandler defaultHandler = createStrictMock(ErrorExceptionHandler.class);
+    defaultHandler.handle(isA(ErrorException.class));
+    replay(defaultHandler);
+
+    ErrorExceptionHandler fooHandler = createStrictMock(ErrorExceptionHandler.class);
+    fooHandler.handle(isA(FooException.class));
+    replay(fooHandler);
+
+    BarExceptionHandler<BarException> barHandler = createStrictMock(BarExceptionHandler.class);
+    barHandler.handle(isA(BarException.class));
+    replay(barHandler);
+
+    BarExceptionHandler<BazException> bazHandler = createStrictMock(BarExceptionHandler.class);
+    bazHandler.handle(isA(BazException.class));
+    replay(bazHandler);
+
+    Map<Class<?>, TypedExceptionHandler<?>> handlers = new HashMap<Class<?>, TypedExceptionHandler<?>>();
+    handlers.put(ErrorException.class, defaultHandler);
+    handlers.put(FooException.class, fooHandler);
+    handlers.put(BarException.class, barHandler);
+    handlers.put(BazException.class, bazHandler);
+    DefaultExceptionHandler handler = new DefaultExceptionHandler(handlers);
+
+    try {
+      handler.handle(new ErrorException());
+    } catch (RuntimeException e) {
+      fail("Should have handled it");
+    }
+    try {
+      handler.handle(new FooException());
+    } catch (RuntimeException e) {
+      fail("Should have handled it");
+    }
+    try {
+      handler.handle(new BarException());
+    } catch (RuntimeException e) {
+      fail("Should have handled it");
+    }
+    try {
+      handler.handle(new BazException());
+    } catch (RuntimeException e) {
+      fail("Should have handled it");
+    }
+    try {
+      handler.handle(new RuntimeException());
+      fail("Should not have handled it");
+    } catch (RuntimeException e) {
+      // success
     }
   }
 
   /**
-   * Mock error exception with no custom result code
+   * For testing.  Foo does not have its own exception handler.  Consequently, it should default to use
+   * the ErrorExceptionHandler
    */
-  public static class MockErrorException extends ErrorException {
-    public MockErrorException() {
-      super();
-    }
+  public class FooException extends ErrorException {
+
   }
 
   /**
-   * Mock error exception with custom result code
+   * extends Foo but has it's own exception handler and, as a result, should use it.
    */
-  public static class MockErrorExceptionWithCode extends ErrorException {
-    public static final String resultCode = "result.code";
+  public class BarException extends FooException {
 
-    public MockErrorExceptionWithCode() {
-      super(resultCode);
+  }
+
+  /**
+   * Extends bar but doesn't have its own handler.  However, because bar has one, it should use bar's exception
+   * handler
+   */
+  public class BazException extends BarException {
+
+  }
+
+  /**
+   * Exception handler for Foo
+   *
+   * @param <T> a bar exception
+   */
+  public class BarExceptionHandler<T extends BarException> implements TypedExceptionHandler<T> {
+
+    @Override
+    public void handle(T exception) {
+
     }
   }
 }

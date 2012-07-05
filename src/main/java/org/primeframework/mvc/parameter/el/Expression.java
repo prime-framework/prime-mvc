@@ -132,7 +132,7 @@ public class Expression {
     } else if (Map.class.isAssignableFrom(type)) {
       accessor = new MapAccessor(converterProvider, accessor, atom, accessor.getMemberAccessor());
     } else {
-      accessor = new MemberAccessor(converterProvider, type, atom);
+      accessor = new MemberAccessor(converterProvider, type, atom, expression);
     }
 
     // Check if the new accessor is indexed and if there are no more atoms left. In this case, we error out.
