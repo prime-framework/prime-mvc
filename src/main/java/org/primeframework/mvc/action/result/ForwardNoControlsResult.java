@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,8 @@ import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.annotation.Forward;
-import org.primeframework.mvc.freemarker.FreeMarkerMap;
+import org.primeframework.mvc.action.result.annotation.ForwardNoControls;
+import org.primeframework.mvc.freemarker.ControllessFreeMarkerMap;
 import org.primeframework.mvc.freemarker.FreeMarkerService;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 
@@ -36,18 +37,18 @@ import com.google.inject.Inject;
  *
  * @author Brian Pontarelli
  */
-public class ForwardResult extends AbstractResult<Forward> {
+public class ForwardNoControlsResult extends AbstractResult<ForwardNoControls> {
   public static final String DIR = "/WEB-INF/templates";
   private final ActionInvocationStore actionInvocationStore;
   private final ResourceLocator resourceLocator;
   private final FreeMarkerService freeMarkerService;
   private final HttpServletResponse response;
-  private final FreeMarkerMap freeMarkerMap;
+  private final ControllessFreeMarkerMap freeMarkerMap;
 
   @Inject
-  public ForwardResult(ActionInvocationStore actionInvocationStore, ExpressionEvaluator expressionEvaluator,
-                       ResourceLocator resourceLocator, FreeMarkerService freeMarkerService, HttpServletResponse response,
-                       FreeMarkerMap freeMarkerMap) {
+  public ForwardNoControlsResult(ActionInvocationStore actionInvocationStore, ExpressionEvaluator expressionEvaluator,
+                                 ResourceLocator resourceLocator, FreeMarkerService freeMarkerService, HttpServletResponse response,
+                                 ControllessFreeMarkerMap freeMarkerMap) {
     super(expressionEvaluator);
     this.resourceLocator = resourceLocator;
     this.response = response;
@@ -59,7 +60,7 @@ public class ForwardResult extends AbstractResult<Forward> {
   /**
    * {@inheritDoc}
    */
-  public void execute(Forward forward) throws IOException, ServletException {
+  public void execute(ForwardNoControls forward) throws IOException, ServletException {
     ActionInvocation invocation = actionInvocationStore.getCurrent();
     Object action = invocation.action;
 
@@ -97,14 +98,14 @@ public class ForwardResult extends AbstractResult<Forward> {
     freeMarkerService.render(writer, page, freeMarkerMap);
   }
 
-  public static class ForwardImpl implements Forward {
+  public static class ForwardNoControlsImpl implements ForwardNoControls {
     private final String uri;
     private final String code;
     private final String contentType;
     private final int status;
     private final String statusStr;
 
-    public ForwardImpl(String uri, String code) {
+    public ForwardNoControlsImpl(String uri, String code) {
       this.uri = uri;
       this.code = code;
       this.contentType = "text/html; charset=UTF-8";
@@ -112,7 +113,7 @@ public class ForwardResult extends AbstractResult<Forward> {
       this.statusStr = "";
     }
 
-    public ForwardImpl(String uri, String code, String contentType, int status) {
+    public ForwardNoControlsImpl(String uri, String code, String contentType, int status) {
       this.uri = uri;
       this.code = code;
       this.contentType = contentType;

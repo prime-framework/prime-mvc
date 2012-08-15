@@ -58,9 +58,9 @@ public class GlobalConverterBinder {
 
     public void forTypes(Class<?> firstType, Class<?>... additionalTypes) {
       MapBinder<Class<?>, GlobalConverter> mapBinder = MapBinder.newMapBinder(binder, new TypeLiteral<Class<?>>() {}, TypeLiteral.get(GlobalConverter.class));
-      mapBinder.addBinding(firstType).to(converterType).asEagerSingleton();
+      mapBinder.addBinding(firstType).to(converterType);
       for (Class<?> type : additionalTypes) {
-        mapBinder.addBinding(type).to(converterType).asEagerSingleton();
+        mapBinder.addBinding(type).to(converterType);
       }
     }
   }

@@ -24,6 +24,7 @@ import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 
 import com.google.inject.ImplementedBy;
+import com.google.inject.Singleton;
 
 /**
  * This interface defines the mechanism by which expressions are evaluated in order to get values from Objects and set

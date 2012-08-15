@@ -24,6 +24,7 @@ import org.primeframework.mvc.parameter.convert.annotation.ConverterAnnotation;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.google.inject.Singleton;
 import static java.util.Arrays.*;
 
 /**
@@ -39,6 +40,7 @@ import static java.util.Arrays.*;
  *
  * @author Brian Pontarelli
  */
+@Singleton
 public class DefaultConverterProvider implements ConverterProvider {
   private final Injector injector;
   private final Map<Class<?>, GlobalConverter> converters;

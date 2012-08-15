@@ -32,6 +32,7 @@ import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.util.ReflectionUtils;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 /**
  * This class is the default implementation of the ExpressionEvaluator service. This provides a robust expression
@@ -40,6 +41,7 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 @SuppressWarnings("unchecked")
+@Singleton
 public class DefaultExpressionEvaluator implements ExpressionEvaluator {
   private final ConverterProvider converterProvider;
 
