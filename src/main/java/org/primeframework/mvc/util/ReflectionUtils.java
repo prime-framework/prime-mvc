@@ -49,7 +49,8 @@ import org.primeframework.mvc.parameter.el.UpdateExpressionException;
 @SuppressWarnings("unchecked")
 public class ReflectionUtils {
   private static final Map<String, MethodVerifier> verifiers = new HashMap<String, MethodVerifier>();
-  private static final Map<Class, Map<String, PropertyInfo>> cache = new WeakHashMap<Class, Map<String, PropertyInfo>>();
+  private static final Map<Class, Map<String, PropertyInfo>> propertyCache = new WeakHashMap<Class, Map<String, PropertyInfo>>();
+  private static final Map<Class, Map<String, Field>> fieldCache = new WeakHashMap<Class, Map<String, Field>>();
 
   static {
     verifiers.put("is", new GetMethodVerifier());
@@ -65,7 +66,7 @@ public class ReflectionUtils {
    */
   public static Set<String> getAllMembers(Class<?> type) {
     Field[] fields = type.getFields();
-    Map<String, PropertyInfo> map = getPropMap(type);
+    Map<String, PropertyInfo> map = getPropertyInfoMap(type);
 
     // Favor properties
     Set<String> names = new HashSet<String>();
@@ -227,22 +228,21 @@ public class ReflectionUtils {
    * Loads or fetches from the cache a Map of {@link PropertyInfo} objects keyed into the Map by the property name they
    * correspond to.
    *
-   * @param beanClass The bean class to grab the property map from.
-   * @return The Map or null if there were no properties.
+   * @param type The class to grab the property map from.
+   * @return The Map, which could be empty if the class has no properties.
    */
-  public static Map<String, PropertyInfo> getPropMap(Class<?> beanClass) {
+  public static Map<String, PropertyInfo> getPropertyInfoMap(Class<?> type) {
     Map<String, PropertyInfo> propMap;
-    synchronized (cache) {
+    synchronized (propertyCache) {
       // Otherwise look for the property Map or create and store
-      propMap = cache.get(beanClass);
-      if (propMap == null) {
-        propMap = new HashMap<String, PropertyInfo>();
-      } else {
+      propMap = propertyCache.get(type);
+      if (propMap != null) {
         return propMap;
       }
 
+      propMap = new HashMap<String, PropertyInfo>();
       Set<String> errors = new HashSet<String>();
-      Method[] methods = beanClass.getMethods();
+      Method[] methods = type.getMethods();
       for (Method method : methods) {
         // Skip bridge methods (covariant or generics) because the non-bridge method is the one that should be correct
         if (method.isBridge()) {
@@ -259,7 +259,7 @@ public class ReflectionUtils {
         if (info == null) {
           info = new PropertyInfo();
           info.setName(name.getName());
-          info.setKlass(beanClass);
+          info.setKlass(type);
           constructed = true;
         }
 
@@ -271,7 +271,7 @@ public class ReflectionUtils {
 
         Method existingMethod = info.getMethods().get(prefix);
         if (existingMethod != null) {
-          errors.add("Two or more [" + prefix + "] methods exist in the class [" + beanClass + "] and Prime can't determine which to call");
+          errors.add("Two or more [" + prefix + "] methods exist in the class [" + type + "] and Prime can't determine which to call");
           continue;
         }
 
@@ -296,13 +296,41 @@ public class ReflectionUtils {
       }
 
       if (errors.size() > 0) {
-        throw new BeanExpressionException("Invalid JavaBean class [" + beanClass + "]. Errors are: \n" + errors);
+        throw new BeanExpressionException("Invalid JavaBean class [" + type + "]. Errors are: \n" + errors);
       }
 
-      cache.put(beanClass, Collections.unmodifiableMap(propMap));
+      propertyCache.put(type, Collections.unmodifiableMap(propMap));
     }
 
     return propMap;
+  }
+
+  /**
+   * Loads or fetches from the cache a Map of {@link Field} objects keyed into the Map by the field name they correspond
+   * to.
+   *
+   * @param type The class to grab the fields from.
+   * @return The Map, which could be null if the class has no fields.
+   */
+  public static Map<String, Field> getFieldMap(Class<?> type) {
+    Map<String, Field> fieldMap;
+    synchronized (fieldCache) {
+      // Otherwise look for the property Map or create and store
+      fieldMap = fieldCache.get(type);
+      if (fieldMap != null) {
+        return fieldMap;
+      }
+
+      fieldMap = new HashMap<String, Field>();
+      Field[] fields = type.getFields();
+      for (Field field : fields) {
+        fieldMap.put(field.getName(), field);
+      }
+
+      fieldCache.put(type, Collections.unmodifiableMap(fieldMap));
+    }
+
+    return fieldMap;
   }
 
   /**

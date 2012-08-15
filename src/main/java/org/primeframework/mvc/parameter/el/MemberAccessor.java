@@ -29,8 +29,7 @@ import org.primeframework.mvc.util.ReflectionUtils;
  * @author Brian Pontarelli
  */
 public class MemberAccessor extends Accessor {
-
-  Field field;
+  final Field field;
   final PropertyInfo propertyInfo;
 
   public MemberAccessor(ConverterProvider converterProvider, MemberAccessor accessor) {
@@ -41,26 +40,25 @@ public class MemberAccessor extends Accessor {
 
   public MemberAccessor(ConverterProvider converterProvider, Class<?> declaringClass, String name, String expression) {
     super(converterProvider);
-    Map<String, PropertyInfo> map = ReflectionUtils.getPropMap(declaringClass);
-    PropertyInfo bpi = map.get(name);
+
+    Map<String, PropertyInfo> properties = ReflectionUtils.getPropertyInfoMap(declaringClass);
+    PropertyInfo bpi = properties.get(name);
     if (bpi == null) {
+      Map<String, Field> fields = ReflectionUtils.getFieldMap(declaringClass);
       this.propertyInfo = null;
-      try {
-        this.field = declaringClass.getField(name);
-      } catch (NoSuchFieldException e) {
-        // We did our best and now we have to bail on the field
-        this.field = null;
-      }
+      this.field = fields.get(name);
     } else {
       this.propertyInfo = bpi;
+      this.field = null;
     }
 
     if (this.field == null && this.propertyInfo == null) {
-      throw new MissingPropertyExpressionException("While evaluating the expression [" + expression +  "] the property/field [" + name + "] in the class [" + declaringClass + "]", name, declaringClass, expression);
+      throw new MissingPropertyExpressionException("While evaluating the expression [" + expression +  "] the property/field [" +
+        name + "] in the class [" + declaringClass + "]", name, declaringClass, expression);
     }
 
     this.declaringClass = declaringClass;
-    super.type = (bpi != null) ? bpi.getGenericType() : field.getGenericType();
+    super.type = (bpi != null) ? bpi.getGenericType() : this.field.getGenericType();
   }
 
   public boolean isIndexed() {
