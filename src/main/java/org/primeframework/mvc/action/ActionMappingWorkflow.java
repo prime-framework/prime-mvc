@@ -17,14 +17,11 @@ package org.primeframework.mvc.action;
 
 import org.primeframework.mvc.workflow.Workflow;
 
-import com.google.inject.ImplementedBy;
-
 /**
  * This class defines the workflow process that uses the incoming request URI to determine the action to invoke.
  * This locates the {@link ActionInvocation} and ensures that it can be accessed during the current request.
  *
  * @author Brian Pontarelli
  */
-@ImplementedBy(DefaultActionMappingWorkflow.class)
 public interface ActionMappingWorkflow extends Workflow {
 }

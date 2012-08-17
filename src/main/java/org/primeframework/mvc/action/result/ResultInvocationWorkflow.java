@@ -17,13 +17,10 @@ package org.primeframework.mvc.action.result;
 
 import org.primeframework.mvc.workflow.Workflow;
 
-import com.google.inject.ImplementedBy;
-
 /**
  * This interface defines how results are invoked based on the result from the Actions or the URI.
  *
  * @author Brian Pontarelli
  */
-@ImplementedBy(DefaultResultInvocationWorkflow.class)
 public interface ResultInvocationWorkflow extends Workflow {
 }

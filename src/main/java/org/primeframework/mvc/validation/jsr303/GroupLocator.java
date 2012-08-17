@@ -15,14 +15,11 @@
  */
 package org.primeframework.mvc.validation.jsr303;
 
-import com.google.inject.ImplementedBy;
-
 /**
  * Locates the groups for the current request.
  *
  * @author Brian Pontarelli
  */
-@ImplementedBy(DefaultGroupLocator.class)
 public interface GroupLocator {
   /**
    * Locates the groups to use for validation. This might use the current request or any other method necessary.

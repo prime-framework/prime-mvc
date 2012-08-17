@@ -16,8 +16,14 @@
 package org.primeframework.mvc.workflow.guice;
 
 import org.primeframework.mvc.ErrorException;
+import org.primeframework.mvc.workflow.DefaultErrorWorkflow;
+import org.primeframework.mvc.workflow.DefaultExceptionHandler;
+import org.primeframework.mvc.workflow.DefaultMVCWorkflow;
 import org.primeframework.mvc.workflow.ErrorExceptionHandler;
+import org.primeframework.mvc.workflow.ErrorWorkflow;
+import org.primeframework.mvc.workflow.ExceptionHandler;
 import org.primeframework.mvc.workflow.ExceptionHandlerBinder;
+import org.primeframework.mvc.workflow.MVCWorkflow;
 
 import com.google.inject.AbstractModule;
 
@@ -26,10 +32,25 @@ import com.google.inject.AbstractModule;
  *
  * @author James Humphrey
  */
-public class ExceptionHandlerModule extends AbstractModule {
-
+public class WorkflowModule extends AbstractModule {
   @Override
   protected void configure() {
     ExceptionHandlerBinder.newBinder(binder()).exception(ErrorException.class).toHandler(ErrorExceptionHandler.class);
+
+    bindErrorWorkflow();
+    bindExceptionHandler();
+    bindMVCWorkflow();
+  }
+
+  protected void bindErrorWorkflow() {
+    bind(ErrorWorkflow.class).to(DefaultErrorWorkflow.class);
+  }
+
+  protected void bindExceptionHandler() {
+    bind(ExceptionHandler.class).to(DefaultExceptionHandler.class);
+  }
+
+  protected void bindMVCWorkflow() {
+    bind(MVCWorkflow.class).to(DefaultMVCWorkflow.class);
   }
 }

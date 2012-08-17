@@ -24,23 +24,21 @@ import org.primeframework.mvc.parameter.convert.annotation.ConverterAnnotation;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
-import com.google.inject.Singleton;
 import static java.util.Arrays.*;
 
 /**
  * This class is the manager for all the Converters. It loads the global type converters from Guice. Therefore, if you
- * want to supply a global custom type converter, just add it to a Guice module and place it in your classpath.
- * Prime will discover the module and load it up.
+ * want to supply a global custom type converter, just add it to a Guice module and place it in your classpath. Prime
+ * will discover the module and load it up.
  * <p/>
  * A converter for a given type will be retrieved when the manager is queried for that type and all sub class of that
  * type, unless another converter is registered for a sub class of the type. For example, registering a convert for the
  * type Number would ensure that Integer, Double, Float, etc. used that converter for conversions. If a converter was
- * registered for Number and another converter for Double, the converter for Number would handle all sub-class of
- * Number (Integer, etc.) except Double.
+ * registered for Number and another converter for Double, the converter for Number would handle all sub-class of Number
+ * (Integer, etc.) except Double.
  *
  * @author Brian Pontarelli
  */
-@Singleton
 public class DefaultConverterProvider implements ConverterProvider {
   private final Injector injector;
   private final Map<Class<?>, GlobalConverter> converters;

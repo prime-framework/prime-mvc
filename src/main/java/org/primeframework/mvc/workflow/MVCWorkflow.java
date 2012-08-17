@@ -15,13 +15,10 @@
  */
 package org.primeframework.mvc.workflow;
 
-import com.google.inject.ImplementedBy;
-
 /**
  * This interface defines the main entry point for the Prime MVC.
  *
  * @author Brian Pontarelli
  */
-@ImplementedBy(DefaultMVCWorkflow.class)
 public interface MVCWorkflow extends Workflow {
 }

@@ -15,14 +15,11 @@
  */
 package org.primeframework.mvc.workflow;
 
-import com.google.inject.ImplementedBy;
-
 /**
  * An error workflow that handles rendering error responses and any other activities that need to be performed when an
  * error occurs.
  *
  * @author Brian Pontarelli
  */
-@ImplementedBy(DefaultErrorWorkflow.class)
 public interface ErrorWorkflow extends Workflow {
 }

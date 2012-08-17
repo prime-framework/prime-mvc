@@ -23,20 +23,16 @@ import java.util.Set;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 
-import com.google.inject.ImplementedBy;
-import com.google.inject.Singleton;
-
 /**
  * This interface defines the mechanism by which expressions are evaluated in order to get values from Objects and set
  * values from the HTTP request parameters into Objects.
  *
  * @author Brian Pontarelli
  */
-@ImplementedBy(DefaultExpressionEvaluator.class)
 public interface ExpressionEvaluator {
   /**
-   * Retrieves a value defined by the given expression from the given object. No type conversion is performed and you can
-   * get ClassCastExceptions because of the type erasure of the generics.
+   * Retrieves a value defined by the given expression from the given object. No type conversion is performed and you
+   * can get ClassCastExceptions because of the type erasure of the generics.
    *
    * @param expression The expression that defines the value to get from the object.
    * @param object     The object to get the value from.
@@ -93,7 +89,6 @@ public interface ExpressionEvaluator {
 
   /**
    * Expands variables in the given String. The variables must be in the form <code>${foo}</code>.
-   *
    *
    * @param str    The String to expand.
    * @param object The Root object where the variables are expanded from.

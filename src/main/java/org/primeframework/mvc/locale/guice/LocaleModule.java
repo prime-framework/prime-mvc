@@ -18,6 +18,7 @@ package org.primeframework.mvc.locale.guice;
 import java.util.Locale;
 
 import org.primeframework.mvc.locale.DefaultLocaleProvider;
+import org.primeframework.mvc.locale.LocaleProvider;
 
 import com.google.inject.AbstractModule;
 
@@ -30,5 +31,6 @@ public class LocaleModule extends AbstractModule {
   @Override
   protected void configure() {
     bind(Locale.class).toProvider(DefaultLocaleProvider.class);
+    bind(LocaleProvider.class).to(DefaultLocaleProvider.class);
   }
 }

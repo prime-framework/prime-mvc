@@ -21,14 +21,11 @@ import java.util.Map;
 
 import org.primeframework.mvc.message.scope.MessageScope;
 
-import com.google.inject.ImplementedBy;
-
 /**
  * This interface defines the mechanism by which messages are added and fetched.
  *
  * @author Brian Pontarelli
  */
-@ImplementedBy(DefaultMessageStore.class)
 public interface MessageStore {
   /**
    * Adds the given message to the request scope as an error message.

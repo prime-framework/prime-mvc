@@ -15,16 +15,12 @@
  */
 package org.primeframework.mvc.validation;
 
-import org.primeframework.mvc.validation.jsr303.JSRValidationWorkflow;
 import org.primeframework.mvc.workflow.Workflow;
-
-import com.google.inject.ImplementedBy;
 
 /**
  * This is the validation workflow that performs validation on the action and its fields.
  *
  * @author Brian Pontarelli
  */
-@ImplementedBy(JSRValidationWorkflow.class)
 public interface ValidationWorkflow extends Workflow {
 }

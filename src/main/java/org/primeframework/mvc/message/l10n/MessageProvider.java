@@ -15,15 +15,12 @@
  */
 package org.primeframework.mvc.message.l10n;
 
-import com.google.inject.ImplementedBy;
-
 /**
  * This interface defines how localized messages can be found and processed. A common implementation will use
  * ResourceBundles and TextFormatter or something similar.
  *
  * @author Brian Pontarelli
  */
-@ImplementedBy(ResourceBundleMessageProvider.class)
 public interface MessageProvider {
   /**
    * Finds an untyped message with the given key and for the current locale. This should then process the message using

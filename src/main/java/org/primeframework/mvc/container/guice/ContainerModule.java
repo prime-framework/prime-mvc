@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,23 +13,20 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.locale;
+package org.primeframework.mvc.container.guice;
 
-import java.util.Locale;
+import org.primeframework.mvc.container.ContainerResolver;
+import org.primeframework.mvc.container.ServletContainerResolver;
 
-import com.google.inject.Provider;
+import com.google.inject.AbstractModule;
+import com.google.inject.Singleton;
 
 /**
- * This is a provider that handles Locale information. The user might select a new Locale from the browser, the
- * application might change the Locale, or the Locale might already be persisted in the users session.
- *
  * @author Brian Pontarelli
  */
-public interface LocaleProvider extends Provider<Locale> {
-  /**
-   * Stores a new Locale.
-   *
-   * @param locale The new Locale.
-   */
-  void set(Locale locale);
+public class ContainerModule extends AbstractModule {
+  @Override
+  protected void configure() {
+    bind(ContainerResolver.class).to(ServletContainerResolver.class).in(Singleton.class);
+  }
 }

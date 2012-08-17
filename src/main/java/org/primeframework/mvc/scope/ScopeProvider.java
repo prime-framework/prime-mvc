@@ -17,14 +17,11 @@ package org.primeframework.mvc.scope;
 
 import java.lang.annotation.Annotation;
 
-import com.google.inject.ImplementedBy;
-
 /**
  * This is the provider for scopes.
  *
  * @author Brian Pontarelli
  */
-@ImplementedBy(DefaultScopeProvider.class)
 public interface ScopeProvider {
   /**
    * Looks up the scope for the given annotation.

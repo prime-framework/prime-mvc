@@ -21,8 +21,6 @@ import java.util.Map;
 
 import org.primeframework.mvc.parameter.fileupload.FileInfo;
 
-import com.google.inject.ImplementedBy;
-
 /**
  * This interface defines how parameters are retrieved from the request (usually) and separated into Required, Optional
  * PreParameter, and File groups. Each parameter key can also have attributes from the request that are used for things
@@ -30,7 +28,6 @@ import com.google.inject.ImplementedBy;
  *
  * @author Brian Pontarelli
  */
-@ImplementedBy(DefaultParameterParser.class)
 public interface ParameterParser {
 
   /**

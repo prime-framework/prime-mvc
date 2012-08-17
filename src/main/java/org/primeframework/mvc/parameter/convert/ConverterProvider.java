@@ -17,15 +17,11 @@ package org.primeframework.mvc.parameter.convert;
 
 import java.lang.annotation.Annotation;
 
-import com.google.inject.ImplementedBy;
-import com.google.inject.Singleton;
-
 /**
  * This interface defines the method of getting Converters.
  *
  * @author Brian Pontarelli
  */
-@ImplementedBy(DefaultConverterProvider.class)
 public interface ConverterProvider {
   /**
    * Returns the type converter for the given type. This converter is either the converter associated with the given

@@ -17,8 +17,6 @@ package org.primeframework.mvc.container;
 
 import java.net.URL;
 
-import com.google.inject.ImplementedBy;
-
 /**
  * This interface determines path locations within the bounds of a container. The container might be a J2EE container or
  * a scheduler or just a simple stand-alone JVM. This abstraction allows the application to find paths without depending
@@ -26,7 +24,6 @@ import com.google.inject.ImplementedBy;
  *
  * @author Brian Pontarelli
  */
-@ImplementedBy(ServletContainerResolver.class)
 public interface ContainerResolver {
   /**
    * Returns the location on the file system of the container based path.

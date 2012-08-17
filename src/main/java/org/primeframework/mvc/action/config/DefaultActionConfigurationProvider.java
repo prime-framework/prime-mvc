@@ -28,14 +28,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
 
 /**
  * This class loads the configuration by scanning the classpath for packages and action classes.
  *
  * @author Brian Pontarelli
  */
-@Singleton
 @SuppressWarnings("unchecked")
 public class DefaultActionConfigurationProvider implements ActionConfigurationProvider {
   private static final Logger logger = LoggerFactory.getLogger(DefaultActionConfigurationProvider.class);

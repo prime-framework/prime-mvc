@@ -17,6 +17,12 @@ package org.primeframework.mvc.message.guice;
 
 import java.util.ResourceBundle;
 
+import org.primeframework.mvc.message.DefaultMessageStore;
+import org.primeframework.mvc.message.DefaultMessageWorkflow;
+import org.primeframework.mvc.message.MessageStore;
+import org.primeframework.mvc.message.MessageWorkflow;
+import org.primeframework.mvc.message.l10n.MessageProvider;
+import org.primeframework.mvc.message.l10n.ResourceBundleMessageProvider;
 import org.primeframework.mvc.message.l10n.WebControl;
 
 import com.google.inject.AbstractModule;
@@ -31,5 +37,21 @@ public class MessageModule extends AbstractModule {
   @Override
   protected void configure() {
     bind(ResourceBundle.Control.class).to(WebControl.class).in(Singleton.class);
+
+    bindMessageStore();
+    bindMessageWorkflow();
+    bindMessageProvider();
+  }
+
+  protected void bindMessageStore() {
+    bind(MessageStore.class).to(DefaultMessageStore.class);
+  }
+
+  protected void bindMessageWorkflow() {
+    bind(MessageWorkflow.class).to(DefaultMessageWorkflow.class);
+  }
+
+  protected void bindMessageProvider() {
+    bind(MessageProvider.class).to(ResourceBundleMessageProvider.class);
   }
 }

@@ -15,14 +15,11 @@
  */
 package org.primeframework.mvc.action.config;
 
-import com.google.inject.ImplementedBy;
-
 /**
  * Action configuration builder that parses an action class and builds a configuration for it.
  *
  * @author Brian Pontarelli
  */
-@ImplementedBy(DefaultActionConfigurationBuilder.class)
 public interface ActionConfigurationBuilder {
   /**
    * Builds the action configuration for the given class.

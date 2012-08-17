@@ -24,7 +24,6 @@ import java.util.Locale;
 import org.primeframework.mvc.config.MVCConfiguration;
 
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -40,12 +39,11 @@ import freemarker.template.TemplateException;
  * <strong>NOTE</strong> If you set the check seconds to a negative number, the templates are still cached but just
  * reloaded each time. This will incur memory a penalty.
  * <p/>
- * The configuration interface defines the caching and reloading strategy for this service via the method
- * {@link MVCConfiguration#templateCheckSeconds}.
+ * The configuration interface defines the caching and reloading strategy for this service via the method {@link
+ * MVCConfiguration#templateCheckSeconds}.
  *
  * @author Brian Pontarelli
  */
-@Singleton
 public class DefaultFreeMarkerService implements FreeMarkerService {
   private final Configuration configuration;
   private final Locale locale;

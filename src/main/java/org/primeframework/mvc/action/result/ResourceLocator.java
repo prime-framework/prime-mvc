@@ -15,14 +15,11 @@
  */
 package org.primeframework.mvc.action.result;
 
-import com.google.inject.ImplementedBy;
-
 /**
  * Locates resources based on the current action invocation.
  *
  * @author Brian Pontarelli
  */
-@ImplementedBy(DefaultResourceLocator.class)
 public interface ResourceLocator {
   /**
    * Locates a resource in the web application under the given root directory.

@@ -17,8 +17,6 @@ package org.primeframework.mvc.action;
 
 import java.util.Deque;
 
-import com.google.inject.ImplementedBy;
-
 /**
  * This class defines the mechanism used to locate action invocation objects. During a request, the invocation is set
  * using the {@link #setCurrent(ActionInvocation)} method and then can be retrieved any number of times using the {@link
@@ -29,7 +27,6 @@ import com.google.inject.ImplementedBy;
  *
  * @author Brian Pontarelli
  */
-@ImplementedBy(DefaultActionInvocationStore.class)
 public interface ActionInvocationStore {
   /**
    * Gets the current action invocation. Once the action invocation is set using the {@link

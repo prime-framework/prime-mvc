@@ -17,14 +17,11 @@ package org.primeframework.mvc.message;
 
 import org.primeframework.mvc.workflow.Workflow;
 
-import com.google.inject.ImplementedBy;
-
 /**
  * This interface defines the workflow process that handles messages. The most common processing is for the flash scope.
  * Messages in the flash scope usually need to be transferred into the request during request processing.
  *
  * @author Brian Pontarelli
  */
-@ImplementedBy(DefaultMessageWorkflow.class)
 public interface MessageWorkflow extends Workflow {
 }

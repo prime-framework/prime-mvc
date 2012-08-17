@@ -15,15 +15,12 @@
  */
 package org.primeframework.mvc.action.config;
 
-import com.google.inject.ImplementedBy;
-
 /**
  * This interface defines the mechanism used to load and cache action configuration. This should be flexible enough to
  * support new actions being added, actions being updated and actions being removed during development.
  *
  * @author Brian Pontarelli
  */
-@ImplementedBy(DefaultActionConfigurationProvider.class)
 public interface ActionConfigurationProvider {
   /**
    * Locates the action configuration for the given URI.

@@ -18,15 +18,12 @@ package org.primeframework.mvc.freemarker;
 
 import java.io.Writer;
 
-import com.google.inject.ImplementedBy;
-
 /**
- * This service provides support for FreeMarker to Prime libraries and applications. In most cases callers need not
- * know anything about the implementation.
+ * This service provides support for FreeMarker to Prime libraries and applications. In most cases callers need not know
+ * anything about the implementation.
  *
  * @author Brian Pontarelli
  */
-@ImplementedBy(DefaultFreeMarkerService.class)
 public interface FreeMarkerService {
   /**
    * Renders the given template. This method renders the template into the given Writer.

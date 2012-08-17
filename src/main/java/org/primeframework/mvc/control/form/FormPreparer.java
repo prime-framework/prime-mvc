@@ -15,8 +15,6 @@
  */
 package org.primeframework.mvc.control.form;
 
-import com.google.inject.ImplementedBy;
-
 /**
  * This interface defines the method that forms can be prepared. Form preparation is generally handled by invoking any
  * no-argument methods in the action class that have been annotated with the {@link
@@ -24,7 +22,6 @@ import com.google.inject.ImplementedBy;
  *
  * @author Brian Pontarelli
  */
-@ImplementedBy(DefaultFormPreparer.class)
 public interface FormPreparer {
   /**
    * Prepare the form using all of the FormPrepareMethod from the action class and super classes.

@@ -15,14 +15,11 @@
  */
 package org.primeframework.mvc.action.result;
 
-import com.google.inject.ImplementedBy;
-
 /**
  * Stores the result code of the current request.
  *
  * @author Brian Pontarelli
  */
-@ImplementedBy(ThreadLocalResultStore.class)
 public interface ResultStore {
   /**
    * @return The current result code.

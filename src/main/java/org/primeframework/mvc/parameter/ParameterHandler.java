@@ -17,14 +17,11 @@ package org.primeframework.mvc.parameter;
 
 import org.primeframework.mvc.parameter.ParameterParser.Parameters;
 
-import com.google.inject.ImplementedBy;
-
 /**
  * This interface handles setting parameters into an object.
  *
  * @author Brian Pontarelli
  */
-@ImplementedBy(DefaultParameterHandler.class)
 public interface ParameterHandler {
   /**
    * Handles the parameters.

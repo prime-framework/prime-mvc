@@ -19,8 +19,10 @@ import org.primeframework.mvc.control.form.Button;
 import org.primeframework.mvc.control.form.Checkbox;
 import org.primeframework.mvc.control.form.CheckboxList;
 import org.primeframework.mvc.control.form.CountriesSelect;
+import org.primeframework.mvc.control.form.DefaultFormPreparer;
 import org.primeframework.mvc.control.form.File;
 import org.primeframework.mvc.control.form.Form;
+import org.primeframework.mvc.control.form.FormPreparer;
 import org.primeframework.mvc.control.form.Hidden;
 import org.primeframework.mvc.control.form.Image;
 import org.primeframework.mvc.control.form.MonthsSelect;
@@ -65,5 +67,11 @@ public class ControlModule extends AbstractModule {
     controlBinder.add(Textarea.class).withPrefix("control");
     controlBinder.add(YearsSelect.class).withPrefix("control");
     controlBinder.add(Message.class).withPrefix("control");
+
+    bindFormPreparer();
+  }
+
+  protected void bindFormPreparer() {
+    bind(FormPreparer.class).to(DefaultFormPreparer.class);
   }
 }

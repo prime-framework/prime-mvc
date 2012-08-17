@@ -17,13 +17,10 @@ package org.primeframework.mvc.action;
 
 import org.primeframework.mvc.workflow.Workflow;
 
-import com.google.inject.ImplementedBy;
-
 /**
  * This interface defines how actions are invoked by the MVC.
  *
  * @author Brian Pontarelli
  */
-@ImplementedBy(DefaultActionInvocationWorkflow.class)
 public interface ActionInvocationWorkflow extends Workflow {
 }

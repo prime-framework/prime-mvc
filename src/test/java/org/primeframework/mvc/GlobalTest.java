@@ -29,11 +29,15 @@ import java.util.ResourceBundle;
 import org.apache.commons.io.FileUtils;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
-import org.primeframework.mvc.action.config.DefaultActionConfigurationProvider;
-import org.primeframework.mvc.freemarker.DefaultFreeMarkerService;
+import org.primeframework.mvc.action.config.ActionConfigurationProvider;
+import org.primeframework.mvc.container.ContainerResolver;
+import org.primeframework.mvc.freemarker.FreeMarkerService;
+import org.primeframework.mvc.parameter.convert.ConverterProvider;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
 import org.primeframework.mvc.parameter.el.BeanExpressionException;
+import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.test.RequestSimulator;
+import org.primeframework.mvc.util.URIBuilder;
 import org.testng.annotations.Test;
 
 import com.google.inject.Key;
@@ -135,12 +139,16 @@ public class GlobalTest extends PrimeBaseTest {
   @Test
   public void singletons() throws IOException, ServletException {
     RequestSimulator simulator = new RequestSimulator(context, new TestModule());
-    assertSingleton(simulator, DefaultActionConfigurationProvider.class);
-    assertSingleton(simulator, DefaultFreeMarkerService.class);
+    assertSingleton(simulator, ActionConfigurationProvider.class);
+    assertSingleton(simulator, FreeMarkerService.class);
     assertSingleton(simulator, Configuration.class);
     assertSingleton(simulator, ResourceBundle.Control.class);
     assertSingleton(simulator, ResourceBundle.Control.class);
     assertSingleton(simulator, Validator.class);
+    assertSingleton(simulator, ContainerResolver.class);
+    assertSingleton(simulator, ConverterProvider.class);
+    assertSingleton(simulator, ExpressionEvaluator.class);
+    assertSingleton(simulator, URIBuilder.class);
     assertSingletonConverter(simulator, Boolean.class);
     assertSingletonConverter(simulator, boolean.class);
     assertSingletonConverter(simulator, Character.class);

@@ -20,14 +20,11 @@ import java.util.Set;
 
 import org.primeframework.mvc.validation.ValidationException;
 
-import com.google.inject.ImplementedBy;
-
 /**
  * This interface defines how Prime handles validation.
  *
  * @author Brian Pontarelli
  */
-@ImplementedBy(JSRValidationProcessor.class)
 public interface ValidationProcessor {
   /**
    * Validates the request and if validation fails throws a ValidationException.

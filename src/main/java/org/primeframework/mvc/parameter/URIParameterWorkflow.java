@@ -17,13 +17,10 @@ package org.primeframework.mvc.parameter;
 
 import org.primeframework.mvc.workflow.Workflow;
 
-import com.google.inject.ImplementedBy;
-
 /**
  * This class handles additional URI parameters that are parts of the URI that come after the action part of the URI.
  *
  * @author Brian Pontarelli
  */
-@ImplementedBy(DefaultURIParameterWorkflow.class)
 public interface URIParameterWorkflow extends Workflow {
 }
