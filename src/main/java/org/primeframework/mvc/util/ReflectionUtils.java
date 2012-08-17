@@ -49,6 +49,7 @@ import org.primeframework.mvc.parameter.el.UpdateExpressionException;
 @SuppressWarnings("unchecked")
 public class ReflectionUtils {
   private static final Map<String, MethodVerifier> verifiers = new HashMap<String, MethodVerifier>();
+  private static final Map<Class, Method[]> methods = new WeakHashMap<Class, Method[]>();
   private static final Map<Class, Map<String, PropertyInfo>> propertyCache = new WeakHashMap<Class, Map<String, PropertyInfo>>();
   private static final Map<Class, Map<String, Field>> fieldCache = new WeakHashMap<Class, Map<String, Field>>();
 
@@ -56,26 +57,6 @@ public class ReflectionUtils {
     verifiers.put("is", new GetMethodVerifier());
     verifiers.put("get", new GetMethodVerifier());
     verifiers.put("set", new SetMethodVerifier());
-  }
-
-  /**
-   * Pulls all of the fields and java bean properties from the given Class and returns the names.
-   *
-   * @param type The Class to pull the names from.
-   * @return The names of all the fields and java bean properties.
-   */
-  public static Set<String> getAllMembers(Class<?> type) {
-    Field[] fields = type.getFields();
-    Map<String, PropertyInfo> map = getPropertyInfoMap(type);
-
-    // Favor properties
-    Set<String> names = new HashSet<String>();
-    for (Field field : fields) {
-      names.add(field.getName());
-    }
-
-    names.addAll(map.keySet());
-    return names;
   }
 
   /**
@@ -180,23 +161,6 @@ public class ReflectionUtils {
   }
 
   /**
-   * Finds  all of the methods that have the given annotation on the given Object.
-   *
-   * @param type       The class to find methods from
-   * @param annotation The annotation.
-   */
-  public static List<Method> findAllWithAnnotation(Class<?> type, Class<? extends Annotation> annotation) {
-    Method[] methods = type.getMethods();
-    List<Method> methodList = new ArrayList<Method>();
-    for (Method method : methods) {
-      if (method.isAnnotationPresent(annotation)) {
-        methodList.add(method);
-      }
-    }
-    return methodList;
-  }
-
-  /**
    * Invokes the given method on the given class and handles propagation of runtime exceptions.
    *
    * @param method The method to invoke.
@@ -225,13 +189,134 @@ public class ReflectionUtils {
   }
 
   /**
+   * Invokes all the given methods on the given object.
+   *
+   * @param obj     The object to invoke the methods on.
+   * @param methods The methods to invoke.
+   */
+  public static void invokeAll(Object obj, List<Method> methods) {
+    for (Method method : methods) {
+      try {
+        method.invoke(obj);
+      } catch (IllegalAccessException e) {
+        throw new ExpressionException("Unable to call method [" + method + "]", e);
+      } catch (InvocationTargetException e) {
+        Throwable target = e.getTargetException();
+        if (target instanceof RuntimeException) {
+          throw (RuntimeException) target;
+        }
+
+        throw new ExpressionException("Unable to call method [" + method + "]", e);
+      }
+
+    }
+  }
+
+  /**
+   * Pulls all of the fields and java bean properties from the given Class and returns the names.
+   *
+   * @param type The Class to pull the names from.
+   * @return The names of all the fields and java bean properties.
+   */
+  public static Set<String> findAllMembers(Class<?> type) {
+    Map<String, Field> fields = findFields(type);
+    Map<String, PropertyInfo> map = findPropertyInfo(type);
+
+    // Favor properties by adding fields first
+    Set<String> names = new HashSet<String>(fields.keySet());
+    names.addAll(map.keySet());
+    return names;
+  }
+
+  /**
+   * Locates all of the members (fields and JavaBean properties) that have the given annotation and returns the name of
+   * the member and the annotation itself.
+   *
+   * @param type       The class to find the member annotations from.
+   * @param annotation The annotation type.
+   * @param <T>        The annotation type.
+   * @return A map of members to annotations.
+   */
+  public static <T extends Annotation> Map<String, T> findAllMembersWithAnnotation(Class<?> type, Class<T> annotation) {
+    Map<String, T> annotations = new HashMap<String, T>();
+    List<Field> fields = findAllFieldsWithAnnotation(type, annotation);
+    for (Field field : fields) {
+      annotations.put(field.getName(), field.getAnnotation(annotation));
+    }
+
+    Map<String, PropertyInfo> properties = findPropertyInfo(type);
+    for (String property : properties.keySet()) {
+      Map<String, Method> methods = properties.get(property).getMethods();
+      for (Method method : methods.values()) {
+        if (method.isAnnotationPresent(annotation)) {
+          annotations.put(property, method.getAnnotation(annotation));
+          break;
+        }
+      }
+    }
+
+    return annotations;
+  }
+
+  /**
+   * Finds all of the methods that have the given annotation on the given Object.
+   *
+   * @param type       The class to find methods from.
+   * @param annotation The annotation.
+   */
+  public static List<Method> findAllMethodsWithAnnotation(Class<?> type, Class<? extends Annotation> annotation) {
+    Method[] methods = findMethods(type);
+    List<Method> methodList = new ArrayList<Method>();
+    for (Method method : methods) {
+      if (method.isAnnotationPresent(annotation)) {
+        methodList.add(method);
+      }
+    }
+    return methodList;
+  }
+
+  /**
+   * Finds all of the fields that have the given annotation on the given Object.
+   *
+   * @param type       The class to find fields from.
+   * @param annotation The annotation.
+   */
+  public static List<Field> findAllFieldsWithAnnotation(Class<?> type, Class<? extends Annotation> annotation) {
+    Map<String, Field> fields = findFields(type);
+    List<Field> fieldList = new ArrayList<Field>();
+    for (Field field : fields.values()) {
+      if (field.isAnnotationPresent(annotation)) {
+        fieldList.add(field);
+      }
+    }
+    return fieldList;
+  }
+
+  /**
+   * Loads and caches the methods of the given Class.
+   *
+   * @param type The class.
+   * @return The methods.
+   */
+  public static Method[] findMethods(Class<?> type) {
+    synchronized (methods) {
+      Method[] methodArray = methods.get(type);
+      if (methodArray == null) {
+        methodArray = type.getMethods();
+        methods.put(type, methodArray);
+      }
+      return methodArray;
+    }
+  }
+
+  /**
    * Loads or fetches from the cache a Map of {@link PropertyInfo} objects keyed into the Map by the property name they
    * correspond to.
    *
    * @param type The class to grab the property map from.
    * @return The Map, which could be empty if the class has no properties.
    */
-  public static Map<String, PropertyInfo> getPropertyInfoMap(Class<?> type) {
+  public static Map<String, PropertyInfo> findPropertyInfo(Class<?> type) {
     Map<String, PropertyInfo> propMap;
     synchronized (propertyCache) {
       // Otherwise look for the property Map or create and store
@@ -242,7 +327,7 @@ public class ReflectionUtils {
 
       propMap = new HashMap<String, PropertyInfo>();
       Set<String> errors = new HashSet<String>();
-      Method[] methods = type.getMethods();
+      Method[] methods = findMethods(type);
       for (Method method : methods) {
         // Skip bridge methods (covariant or generics) because the non-bridge method is the one that should be correct
         if (method.isBridge()) {
@@ -312,7 +397,7 @@ public class ReflectionUtils {
    * @param type The class to grab the fields from.
    * @return The Map, which could be null if the class has no fields.
    */
-  public static Map<String, Field> getFieldMap(Class<?> type) {
+  public static Map<String, Field> findFields(Class<?> type) {
     Map<String, Field> fieldMap;
     synchronized (fieldCache) {
       // Otherwise look for the property Map or create and store
@@ -369,23 +454,5 @@ public class ReflectionUtils {
     String propertyName = Introspector.decapitalize(name.substring(startIndex));
     String prefix = name.substring(0, startIndex);
     return new PropertyName(prefix, propertyName);
-  }
-
-  public static void invokeAll(Object obj, List<Method> methods) {
-    for (Method method : methods) {
-      try {
-        method.invoke(obj);
-      } catch (IllegalAccessException e) {
-        throw new ExpressionException("Unable to call method [" + method + "]", e);
-      } catch (InvocationTargetException e) {
-        Throwable target = e.getTargetException();
-        if (target instanceof RuntimeException) {
-          throw (RuntimeException) target;
-        }
-
-        throw new ExpressionException("Unable to call method [" + method + "]", e);
-      }
-
-    }
   }
 }

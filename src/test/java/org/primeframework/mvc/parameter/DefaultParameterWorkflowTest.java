@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -82,7 +81,6 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(request);
 
     ExpressionEvaluator expressionEvaluator = createStrictMock(ExpressionEvaluator.class);
-    expect(expressionEvaluator.getAllMembers(action.getClass())).andReturn(new HashSet<String>());
     expressionEvaluator.setValue(eq("user.addresses['home'].city"), same(action), aryEq(ArrayUtils.toArray("Boulder")), eq(new HashMap<String, String>()));
     expressionEvaluator.setValue(eq("user.age"), same(action), aryEq(ArrayUtils.toArray("32")), eq(MapBuilder.asMap("dateFormat", "MM/dd/yyyy")));
     expressionEvaluator.setValue(eq("user.inches"), same(action), aryEq(ArrayUtils.toArray("tall")), eq(new HashMap<String, String>()));
@@ -114,7 +112,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(messageStore);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
-      actionInvocationStore, new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
+      actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
       new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 
@@ -134,7 +132,6 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(request);
 
     ExpressionEvaluator expressionEvaluator = createStrictMock(ExpressionEvaluator.class);
-    expect(expressionEvaluator.getAllMembers(action.getClass())).andReturn(new HashSet<String>());
     expressionEvaluator.setValue(eq("user.age"), same(action), aryEq(ArrayUtils.toArray("32")), eq(new HashMap<String, String>()));
     expectLastCall().andThrow(new ExpressionException());
     replay(expressionEvaluator);
@@ -159,7 +156,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(provider);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
-      actionInvocationStore, new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
+      actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
       new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     try {
       workflow.perform(chain);
@@ -184,7 +181,6 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(request);
 
     ExpressionEvaluator expressionEvaluator = createStrictMock(ExpressionEvaluator.class);
-    expect(expressionEvaluator.getAllMembers(action.getClass())).andReturn(new HashSet<String>());
     expressionEvaluator.setValue(eq("user.age"), same(action), aryEq(ArrayUtils.toArray("32")), eq(new HashMap<String, String>()));
     expectLastCall().andThrow(new ExpressionException());
     replay(expressionEvaluator);
@@ -210,7 +206,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(provider);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
-      actionInvocationStore, new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
+      actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
       new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 
@@ -233,7 +229,6 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(request);
 
     ExpressionEvaluator expressionEvaluator = createNiceMock(ExpressionEvaluator.class);
-    expect(expressionEvaluator.getAllMembers(action.getClass())).andReturn(new HashSet<String>());
     expressionEvaluator.setValue(eq("user.checkbox['default']"), same(action), aryEq(ArrayUtils.toArray("false")), eq(new HashMap<String, String>()));
     expressionEvaluator.setValue(eq("user.radio['default']"), same(action), aryEq(ArrayUtils.toArray("false")), eq(new HashMap<String, String>()));
     replay(expressionEvaluator);
@@ -258,7 +253,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(provider);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
-      actionInvocationStore, new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
+      actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
       new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 
@@ -279,7 +274,6 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(request);
 
     ExpressionEvaluator expressionEvaluator = createNiceMock(ExpressionEvaluator.class);
-    expect(expressionEvaluator.getAllMembers(action.getClass())).andReturn(new HashSet<String>());
     expressionEvaluator.setValue(eq("submit.x"), same(action), aryEq(ArrayUtils.toArray("1")), eq(new HashMap<String, String>()));
     expectLastCall().andThrow(new ExpressionException("Not property x"));
     expressionEvaluator.setValue(eq("submit.y"), same(action), aryEq(ArrayUtils.toArray("2")), eq(new HashMap<String, String>()));
@@ -307,7 +301,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(provider);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
-      actionInvocationStore, new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
+      actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
       new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 
@@ -352,7 +346,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(provider);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
-      actionInvocationStore, new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
+      actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
       new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 
@@ -380,7 +374,6 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     Edit action = new Edit();
     ExpressionEvaluator expressionEvaluator = createStrictMock(ExpressionEvaluator.class);
-    expect(expressionEvaluator.getAnnotation(FileUpload.class, "userfile", action)).andReturn(null);
     expressionEvaluator.setValue(eq("userfile"), same(action), assertFile());
     replay(expressionEvaluator);
 
@@ -400,7 +393,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(provider);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
-      actionInvocationStore, new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
+      actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
       new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 
@@ -427,7 +420,6 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     Edit action = new Edit();
     ExpressionEvaluator expressionEvaluator = createStrictMock(ExpressionEvaluator.class);
-    expect(expressionEvaluator.getAnnotation(FileUpload.class, "userfiles", action)).andReturn(null);
     expressionEvaluator.setValue(eq("userfiles"), same(action), captureMultiple());
     replay(expressionEvaluator);
 
@@ -447,7 +439,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(provider);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
-      actionInvocationStore, new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
+      actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
       new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 
@@ -472,7 +464,6 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     Edit action = new Edit();
     ExpressionEvaluator expressionEvaluator = createStrictMock(ExpressionEvaluator.class);
-    expect(expressionEvaluator.getAnnotation(FileUpload.class, "userfile", action)).andReturn(null);
     replay(expressionEvaluator);
 
     ActionInvocation ai = makeActionInvocation(action, HTTPMethod.POST, "");
@@ -494,7 +485,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(messageStore);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
-      actionInvocationStore, new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
+      actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
       new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 
@@ -520,7 +511,6 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     Edit action = new Edit();
     ExpressionEvaluator expressionEvaluator = createStrictMock(ExpressionEvaluator.class);
-    expect(expressionEvaluator.getAnnotation(FileUpload.class, "userfile", action)).andReturn(null);
     replay(expressionEvaluator);
 
     ActionInvocation ai = makeActionInvocation(action, HTTPMethod.POST, "");
@@ -542,7 +532,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(messageStore);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
-      actionInvocationStore, new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
+      actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
       new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 
@@ -567,7 +557,10 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     Edit action = new Edit();
     ExpressionEvaluator expressionEvaluator = createStrictMock(ExpressionEvaluator.class);
-    expect(expressionEvaluator.getAnnotation(FileUpload.class, "userfile", action)).andReturn(new FileUpload() {
+    replay(expressionEvaluator);
+
+    ActionInvocation ai = makeActionInvocation(action, HTTPMethod.POST, "");
+    ai.configuration.fileUploadMembers.put("userfile", new FileUpload() {
       public long maxSize() {
         return 1;
       }
@@ -580,9 +573,6 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
         return FileUpload.class;
       }
     });
-    replay(expressionEvaluator);
-
-    ActionInvocation ai = makeActionInvocation(action, HTTPMethod.POST, "");
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
     expect(actionInvocationStore.getCurrent()).andReturn(ai).anyTimes();
     replay(actionInvocationStore);
@@ -601,7 +591,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(messageStore);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
-      actionInvocationStore, new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
+      actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
       new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 
@@ -627,7 +617,10 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     final String[] annotationTypes = new String[]{"text/xml"};
     Edit action = new Edit();
     ExpressionEvaluator expressionEvaluator = createStrictMock(ExpressionEvaluator.class);
-    expect(expressionEvaluator.getAnnotation(FileUpload.class, "userfile", action)).andReturn(new FileUpload() {
+    replay(expressionEvaluator);
+
+    ActionInvocation ai = makeActionInvocation(action, HTTPMethod.POST, "");
+    ai.configuration.fileUploadMembers.put("userfile", new FileUpload() {
       public long maxSize() {
         return 10;
       }
@@ -640,10 +633,6 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
         return FileUpload.class;
       }
     });
-    replay(expressionEvaluator);
-
-    ActionInvocation ai = makeActionInvocation(action, HTTPMethod.POST, "");
-
     ActionInvocationStore actionInvocationStore = createStrictMock(ActionInvocationStore.class);
     expect(actionInvocationStore.getCurrent()).andReturn(ai).anyTimes();
     replay(actionInvocationStore);
@@ -662,7 +651,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(messageStore);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
-      actionInvocationStore, new DefaultParameterParser(config, expressionEvaluator, actionInvocationStore, request),
+      actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
       new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
     workflow.perform(chain);
 

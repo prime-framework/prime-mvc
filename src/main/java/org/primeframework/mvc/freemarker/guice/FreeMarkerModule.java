@@ -34,7 +34,7 @@ import freemarker.template.Configuration;
 public class FreeMarkerModule extends AbstractModule {
   @Override
   protected void configure() {
-    bind(TemplateLoader.class).to(OverridingTemplateLoader.class);
+    bind(TemplateLoader.class).to(OverridingTemplateLoader.class).in(Singleton.class);
     bind(Configuration.class).toProvider(FreeMarkerConfigurationProvider.class).in(Singleton.class);
     bind(FreeMarkerService.class).to(DefaultFreeMarkerService.class).in(Singleton.class);
 

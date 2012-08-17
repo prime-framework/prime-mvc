@@ -40,6 +40,7 @@ dependencies {
   )
   compile(
     "asm:asm:3.1",
+//    "cglib:cglib:2.2",
     "com.google.inject:guice:3.0",
     "com.google.inject.extensions:guice-multibindings:3.0",
     "commons-fileupload:commons-fileupload:1.2.1",

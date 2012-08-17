@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc.parameter.el;
 
-import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -99,28 +98,11 @@ public interface ExpressionEvaluator {
   String expand(String str, Object object, boolean encode) throws ExpressionException;
 
   /**
-   * Retrieves all of the names of the members from the given class that can be accessed by the expression evaluator.
-   *
-   * @param type The class to retrieve the members from.
-   * @return The list of member names.
-   */
-  Set<String> getAllMembers(Class<?> type);
-
-  /**
    * Retrieves all of the values of the members from the given Object that can be accessed by the expression evaluator.
    *
    * @param obj The Object to retrieve the values from.
+   * @param memberNames The names of the members to retrieve the value for.
    * @return The list of member values.
    */
-  Collection<Object> getAllMemberValues(Object obj);
-
-  /**
-   * Returns the annotation on the given expression end-point. The end point might be a method or a field.
-   *
-   * @param type       The type of the annotation.
-   * @param expression The expression.
-   * @param action     The action.
-   * @return The annotation or null.
-   */
-  <T extends Annotation> T getAnnotation(Class<T> type, String expression, Object action);
+  Collection<Object> getAllMemberValues(Object obj, Set<String> memberNames);
 }

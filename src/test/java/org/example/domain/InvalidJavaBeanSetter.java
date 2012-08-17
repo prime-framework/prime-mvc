@@ -13,14 +13,11 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.example.action;
-
-import org.primeframework.mvc.action.annotation.Action;
+package org.example.domain;
 
 /**
  * @author Brian Pontarelli
  */
-@Action
 public class InvalidJavaBeanSetter {
   public String foo;
 

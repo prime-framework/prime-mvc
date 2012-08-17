@@ -96,7 +96,7 @@ public class DefaultParameterHandler implements ParameterHandler {
 
     // Next, process the files
     if (parameters.files.size() > 0) {
-      handleFiles(parameters.files, action);
+      handleFiles(parameters.files, actionConfiguration, action);
     }
 
     // Finally, invoke post methods
@@ -141,7 +141,7 @@ public class DefaultParameterHandler implements ParameterHandler {
    * @param fileInfos The file info.
    * @param action The action.
    */
-  protected void handleFiles(Map<String, List<FileInfo>> fileInfos, Object action) {
+  protected void handleFiles(Map<String, List<FileInfo>> fileInfos, ActionConfiguration actionConfiguration, Object action) {
     long maxSize = configuration.fileUploadMaxSize();
     String[] allowedContentTypes = configuration.fileUploadAllowedTypes();
 
@@ -149,7 +149,7 @@ public class DefaultParameterHandler implements ParameterHandler {
     for (String key : fileInfos.keySet()) {
       // Verify file sizes and types
       List<FileInfo> list = new ArrayList<FileInfo>(fileInfos.get(key));
-      FileUpload fileUpload = expressionEvaluator.getAnnotation(FileUpload.class, key, action);
+      FileUpload fileUpload = actionConfiguration.fileUploadMembers.get(key);
       for (Iterator<FileInfo> i = list.iterator(); i.hasNext(); ) {
         FileInfo info = i.next();
 

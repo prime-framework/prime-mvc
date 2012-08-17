@@ -34,7 +34,6 @@ import org.primeframework.mvc.container.ContainerResolver;
 import org.primeframework.mvc.freemarker.FreeMarkerService;
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
-import org.primeframework.mvc.parameter.el.BeanExpressionException;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.test.RequestSimulator;
 import org.primeframework.mvc.util.URIBuilder;
@@ -76,32 +75,6 @@ public class GlobalTest extends PrimeBaseTest {
     assertTrue(result.contains("35"));
     assertTrue(result.contains("Broomfield"));
     assertTrue(result.contains("CO"));
-  }
-
-  @Test
-  public void invalidJavaBeanSetter() throws IOException, ServletException {
-    // Testing that invalid JavaBean setter cause the whole thing to fail
-    RequestSimulator simulator = new RequestSimulator(context, new TestModule());
-    try {
-      simulator.test("/invalid-java-bean-setter").
-        get();
-      fail("Should have thrown an exception");
-    } catch (BeanExpressionException e) {
-      // Expected
-    }
-  }
-
-  @Test
-  public void invalidJavaBeanGetter() throws IOException, ServletException {
-    // Testing that invalid JavaBean getter cause the whole thing to fail
-    RequestSimulator simulator = new RequestSimulator(context, new TestModule());
-    try {
-      simulator.test("/invalid-java-bean-getter").
-        get();
-      fail("Should have thrown an exception");
-    } catch (BeanExpressionException e) {
-      // Expected
-    }
   }
 
   @Test

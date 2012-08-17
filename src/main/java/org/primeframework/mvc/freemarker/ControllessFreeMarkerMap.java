@@ -166,7 +166,7 @@ public class ControllessFreeMarkerMap implements TemplateHashModelEx {
     if (actionInvocations != null) {
       for (ActionInvocation actionInvocation : actionInvocations) {
         if (actionInvocation.action != null) {
-          size += expressionEvaluator.getAllMembers(actionInvocation.action.getClass()).size();
+          size += actionInvocation.configuration.memberNames.size();
         }
       }
     }
@@ -246,7 +246,7 @@ public class ControllessFreeMarkerMap implements TemplateHashModelEx {
     if (actionInvocations != null) {
       for (ActionInvocation actionInvocation : actionInvocations) {
         if (actionInvocation.action != null) {
-          keys.addAll(expressionEvaluator.getAllMembers(actionInvocation.action.getClass()));
+          keys.addAll(actionInvocation.configuration.memberNames);
         }
       }
     }
@@ -263,7 +263,7 @@ public class ControllessFreeMarkerMap implements TemplateHashModelEx {
     if (actionInvocations != null) {
       for (ActionInvocation actionInvocation : actionInvocations) {
         if (actionInvocation.action != null) {
-          values.addAll(expressionEvaluator.getAllMemberValues(actionInvocation.action));
+          values.addAll(expressionEvaluator.getAllMemberValues(actionInvocation.action, actionInvocation.configuration.memberNames));
         }
       }
     }

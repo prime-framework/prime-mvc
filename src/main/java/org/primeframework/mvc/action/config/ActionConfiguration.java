@@ -18,10 +18,13 @@ package org.primeframework.mvc.action.config;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.primeframework.mvc.action.ExecuteMethod;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.ResultConfiguration;
+import org.primeframework.mvc.parameter.annotation.PreParameter;
+import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
 import org.primeframework.mvc.scope.ScopeField;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.validation.jsr303.Validatable;
@@ -38,6 +41,9 @@ public class ActionConfiguration {
   public final List<Method> postValidationMethods;
   public final List<Method> preParameterMethods;
   public final List<Method> postParameterMethods;
+  public final Map<String, PreParameter> preParameterMembers;
+  public final Map<String, FileUpload> fileUploadMembers;
+  public final Set<String> memberNames;
   public final Map<HTTPMethod, ExecuteMethod> executeMethods;
   public final List<ScopeField> scopeFields;
   public final Map<String, ResultConfiguration> resultConfigurations;
@@ -50,15 +56,19 @@ public class ActionConfiguration {
   public ActionConfiguration(Class<?> actionClass, Map<HTTPMethod, ExecuteMethod> executeMethods, List<Method> validationMethods,
                              Map<String, ResultConfiguration> resultConfigurations, List<Method> preValidationMethods,
                              List<Method> postValidationMethods, List<Method> preParameterMethods, List<Method> postParameterMethods,
-                             List<ScopeField> scopeFields, String uri) {
+                             Map<String, PreParameter> preParameterMembers, Map<String, FileUpload> fileUploadMembers,
+                             Set<String> memberNames, List<ScopeField> scopeFields, String uri) {
     this.actionClass = actionClass;
     this.preValidationMethods = preValidationMethods;
     this.postValidationMethods = postValidationMethods;
     this.preParameterMethods = preParameterMethods;
     this.postParameterMethods = postParameterMethods;
+    this.preParameterMembers = preParameterMembers;
+    this.fileUploadMembers = fileUploadMembers;
     this.validationMethods = validationMethods;
     this.executeMethods = executeMethods;
     this.resultConfigurations = resultConfigurations;
+    this.memberNames = memberNames;
     this.scopeFields = scopeFields;
     this.validatable = Validatable.class.isAssignableFrom(actionClass);
     this.uri = uri;

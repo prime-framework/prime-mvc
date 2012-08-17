@@ -41,10 +41,10 @@ public class MemberAccessor extends Accessor {
   public MemberAccessor(ConverterProvider converterProvider, Class<?> declaringClass, String name, String expression) {
     super(converterProvider);
 
-    Map<String, PropertyInfo> properties = ReflectionUtils.getPropertyInfoMap(declaringClass);
+    Map<String, PropertyInfo> properties = ReflectionUtils.findPropertyInfo(declaringClass);
     PropertyInfo bpi = properties.get(name);
     if (bpi == null) {
-      Map<String, Field> fields = ReflectionUtils.getFieldMap(declaringClass);
+      Map<String, Field> fields = ReflectionUtils.findFields(declaringClass);
       this.propertyInfo = null;
       this.field = fields.get(name);
     } else {

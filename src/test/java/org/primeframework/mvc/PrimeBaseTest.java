@@ -21,6 +21,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -38,6 +39,8 @@ import org.primeframework.mvc.action.result.Result;
 import org.primeframework.mvc.action.result.ResultConfiguration;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.guice.GuiceBootstrap;
+import org.primeframework.mvc.parameter.annotation.PreParameter;
+import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
 import org.primeframework.mvc.scope.ScopeField;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.servlet.ServletObjectsHolder;
@@ -134,7 +137,8 @@ public abstract class PrimeBaseTest {
 
     return new ActionInvocation(action, executeMethod, uri, extension,
       new ActionConfiguration(Edit.class, executeMethods, validationMethods, resultConfigurations, new ArrayList<Method>(),
-        new ArrayList<Method>(), new ArrayList<Method>(), new ArrayList<Method>(), new ArrayList<ScopeField>(), uri));
+        new ArrayList<Method>(), new ArrayList<Method>(), new ArrayList<Method>(), new HashMap<String, PreParameter>(),
+        new HashMap<String, FileUpload>(), new HashSet<String>(), new ArrayList<ScopeField>(), uri));
   }
 
   public static class TestModule extends AbstractModule {

@@ -26,9 +26,6 @@ import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.parameter.ParameterParser.Parameters.Struct;
-import org.primeframework.mvc.parameter.annotation.PreParameter;
-import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-import org.primeframework.mvc.parameter.el.ExpressionException;
 import org.primeframework.mvc.parameter.fileupload.FileInfo;
 import org.primeframework.mvc.util.RequestKeys;
 
@@ -54,15 +51,13 @@ public class DefaultParameterParser implements ParameterParser {
   public static final String ACTION_PREFIX = "__a_";
 
   private final MVCConfiguration configuration;
-  private final ExpressionEvaluator expressionEvaluator;
   private final ActionInvocationStore actionInvocationStore;
   private final HttpServletRequest request;
 
   @Inject
-  public DefaultParameterParser(MVCConfiguration configuration, ExpressionEvaluator expressionEvaluator,
-                                ActionInvocationStore actionInvocationStore, HttpServletRequest request) {
+  public DefaultParameterParser(MVCConfiguration configuration, ActionInvocationStore actionInvocationStore,
+                                HttpServletRequest request) {
     this.configuration = configuration;
-    this.expressionEvaluator = expressionEvaluator;
     this.actionInvocationStore = actionInvocationStore;
     this.request = request;
   }
@@ -106,25 +101,14 @@ public class DefaultParameterParser implements ParameterParser {
 
   private void preParameters(Parameters result) {
     ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
-    Object action = actionInvocation.action;
-    Set<String> members = expressionEvaluator.getAllMembers(action.getClass());
-    for (String member : members) {
-      PreParameter annotation = null;
-      try {
-        annotation = expressionEvaluator.getAnnotation(PreParameter.class, member, action);
-      } catch (ExpressionException e) {
-        // Ignore
+    for (String name : actionInvocation.configuration.preParameterMembers.keySet()) {
+      Struct struct = result.optional.remove(name);
+      if (struct == null) {
+        struct = result.required.remove(name);
       }
 
-      if (annotation != null) {
-        Struct struct = result.optional.remove(member);
-        if (struct == null) {
-          struct = result.required.remove(member);
-        }
-
-        if (struct != null) {
-          result.pre.put(member, struct);
-        }
+      if (struct != null) {
+        result.pre.put(name, struct);
       }
     }
   }

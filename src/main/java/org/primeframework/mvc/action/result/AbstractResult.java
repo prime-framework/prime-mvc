@@ -15,11 +15,9 @@
  */
 package org.primeframework.mvc.action.result;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.annotation.Annotation;
 
-import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 
 /**
@@ -33,21 +31,6 @@ public abstract class AbstractResult<U extends Annotation> implements Result<U> 
 
   protected AbstractResult(ExpressionEvaluator expressionEvaluator) {
     this.expressionEvaluator = expressionEvaluator;
-  }
-
-  /**
-   * If the action invocation isn't null, this returns an instance of the {@link ResultHttpServletRequest} class.
-   *
-   * @param invocation The action invocation.
-   * @param request    The request.
-   * @return The wrapped request or the request passed in, depending.
-   */
-  protected HttpServletRequest wrapRequest(ActionInvocation invocation, HttpServletRequest request) {
-    if (invocation.action != null) {
-      return new ResultHttpServletRequest(request, invocation.action, expressionEvaluator);
-    }
-
-    return request;
   }
 
   /**

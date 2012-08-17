@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ExecuteMethod;
@@ -31,7 +32,9 @@ import org.primeframework.mvc.action.result.ResultConfiguration;
 import org.primeframework.mvc.action.result.annotation.ResultAnnotation;
 import org.primeframework.mvc.action.result.annotation.ResultContainerAnnotation;
 import org.primeframework.mvc.parameter.annotation.PostParameterMethod;
+import org.primeframework.mvc.parameter.annotation.PreParameter;
 import org.primeframework.mvc.parameter.annotation.PreParameterMethod;
+import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
 import org.primeframework.mvc.scope.ScopeField;
 import org.primeframework.mvc.scope.annotation.ScopeAnnotation;
 import org.primeframework.mvc.servlet.HTTPMethod;
@@ -72,18 +75,23 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
 
     String uri = uriBuilder.build(actionClass);
     Map<HTTPMethod, ExecuteMethod> executeMethods = findExecuteMethods(actionClass);
-    List<Method> validationMethods = ReflectionUtils.findAllWithAnnotation(actionClass, ValidationMethod.class);
+    List<Method> validationMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, ValidationMethod.class);
     Map<String, ResultConfiguration> resultAnnotations = findResultConfigurations(actionClass);
 
-    List<Method> preParameterMethods = ReflectionUtils.findAllWithAnnotation(actionClass, PreParameterMethod.class);
-    List<Method> postParameterMethods = ReflectionUtils.findAllWithAnnotation(actionClass, PostParameterMethod.class);
-    List<Method> preValidationrMethods = ReflectionUtils.findAllWithAnnotation(actionClass, PreValidationMethod.class);
-    List<Method> postValidationMethods = ReflectionUtils.findAllWithAnnotation(actionClass, PostValidationMethod.class);
+    List<Method> preParameterMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, PreParameterMethod.class);
+    List<Method> postParameterMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, PostParameterMethod.class);
+    List<Method> preValidationrMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, PreValidationMethod.class);
+    List<Method> postValidationMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, PostValidationMethod.class);
+
+    Map<String, PreParameter> preParameterMembers = ReflectionUtils.findAllMembersWithAnnotation(actionClass, PreParameter.class);
+    Map<String, FileUpload> fileUploadMembers = ReflectionUtils.findAllMembersWithAnnotation(actionClass, FileUpload.class);
+    Set<String> memberNames = ReflectionUtils.findAllMembers(actionClass);
 
     List<ScopeField> scopeFields = findScopeFields(actionClass);
 
     return new ActionConfiguration(actionClass, executeMethods, validationMethods, resultAnnotations, preValidationrMethods,
-      postValidationMethods, preParameterMethods, postParameterMethods, scopeFields, uri);
+      postValidationMethods, preParameterMethods, postParameterMethods, preParameterMembers, fileUploadMembers, memberNames,
+      scopeFields, uri);
   }
 
   /**
