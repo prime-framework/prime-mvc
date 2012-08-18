@@ -18,9 +18,11 @@ package org.primeframework.mvc.message;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.primeframework.mvc.message.scope.ApplicationScope;
+import org.primeframework.mvc.message.scope.FlashScope;
 import org.primeframework.mvc.message.scope.MessageScope;
-import org.primeframework.mvc.message.scope.Scope;
-import org.primeframework.mvc.util.MapBuilder;
+import org.primeframework.mvc.message.scope.RequestScope;
+import org.primeframework.mvc.message.scope.SessionScope;
 import org.testng.annotations.Test;
 
 import static org.easymock.EasyMock.*;
@@ -36,11 +38,11 @@ public class DefaultMessageStoreTest {
   public void request() {
     Message message = new SimpleFieldMessage(MessageType.ERROR, "foo.bar", "message");
 
-    Scope scope = createStrictMock(Scope.class);
+    RequestScope scope = createStrictMock(RequestScope.class);
     scope.add(message);
     replay(scope);
 
-    DefaultMessageStore store = new DefaultMessageStore(MapBuilder.map(MessageScope.REQUEST, scope).done());
+    DefaultMessageStore store = new DefaultMessageStore(null, null, null, scope);
     store.add(message);
 
     verify(scope);
@@ -50,11 +52,11 @@ public class DefaultMessageStoreTest {
   public void scoped() {
     Message message = new SimpleFieldMessage(MessageType.ERROR, "foo.bar", "message");
 
-    Scope scope = createStrictMock(Scope.class);
+    FlashScope scope = createStrictMock(FlashScope.class);
     scope.add(message);
     replay(scope);
 
-    DefaultMessageStore store = new DefaultMessageStore(MapBuilder.map(MessageScope.FLASH, scope).done());
+    DefaultMessageStore store = new DefaultMessageStore(null, null, scope, null);
     store.add(MessageScope.FLASH, message);
 
     verify(scope);
@@ -66,11 +68,11 @@ public class DefaultMessageStoreTest {
     messages.add(new SimpleFieldMessage(MessageType.ERROR, "foo.bar", "message"));
     messages.add(new SimpleFieldMessage(MessageType.ERROR, "foo.baz", "message"));
 
-    Scope scope = createStrictMock(Scope.class);
+    SessionScope scope = createStrictMock(SessionScope.class);
     scope.addAll(messages);
     replay(scope);
 
-    DefaultMessageStore store = new DefaultMessageStore(MapBuilder.map(MessageScope.SESSION, scope).done());
+    DefaultMessageStore store = new DefaultMessageStore(null, scope, null, null);
     store.addAll(MessageScope.SESSION, messages);
 
     verify(scope);
@@ -94,29 +96,23 @@ public class DefaultMessageStoreTest {
     applicationMessages.add(new SimpleMessage(MessageType.ERROR, "application1"));
     applicationMessages.add(new SimpleMessage(MessageType.ERROR, "application2"));
 
-    Scope request = createStrictMock(Scope.class);
+    RequestScope request = createStrictMock(RequestScope.class);
     expect(request.get()).andReturn(requestMessages);
     replay(request);
 
-    Scope flash = createStrictMock(Scope.class);
+    FlashScope flash = createStrictMock(FlashScope.class);
     expect(flash.get()).andReturn(flashMessages);
     replay(flash);
 
-    Scope session = createStrictMock(Scope.class);
+    SessionScope session = createStrictMock(SessionScope.class);
     expect(session.get()).andReturn(sessionMessages);
     replay(session);
 
-    Scope application = createStrictMock(Scope.class);
+    ApplicationScope application = createStrictMock(ApplicationScope.class);
     expect(application.get()).andReturn(applicationMessages);
     replay(application);
 
-    DefaultMessageStore store = new DefaultMessageStore(
-      new MapBuilder<MessageScope, Scope>().
-      put(MessageScope.REQUEST, request).
-      put(MessageScope.FLASH, flash).
-      put(MessageScope.SESSION, session).
-      put(MessageScope.APPLICATION, application).
-      done());
+    DefaultMessageStore store = new DefaultMessageStore(application, session, flash, request);
     List<Message> messages = store.get();
     assertEquals(messages.size(), 8);
     
@@ -139,11 +135,11 @@ public class DefaultMessageStoreTest {
     requestMessages.add(new SimpleMessage(MessageType.ERROR, "request1"));
     requestMessages.add(new SimpleMessage(MessageType.ERROR, "request2"));
 
-    Scope request = createStrictMock(Scope.class);
+    RequestScope request = createStrictMock(RequestScope.class);
     expect(request.get()).andReturn(requestMessages);
     replay(request);
 
-    DefaultMessageStore store = new DefaultMessageStore(MapBuilder.map(MessageScope.REQUEST, request).done());
+    DefaultMessageStore store = new DefaultMessageStore(null, null, null, request);
     List<Message> messages = store.get(MessageScope.REQUEST);
     assertEquals(messages.size(), 2);
 

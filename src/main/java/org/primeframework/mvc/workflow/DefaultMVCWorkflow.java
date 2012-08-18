@@ -83,6 +83,11 @@ public class DefaultMVCWorkflow implements MVCWorkflow {
 
       SubWorkflowChain errorChain = new SubWorkflowChain(Arrays.<Workflow>asList(errorWorkflow), chain);
       errorChain.continueWorkflow();
+    } catch (Error e) {
+      exceptionHandler.handle(e);
+
+      SubWorkflowChain errorChain = new SubWorkflowChain(Arrays.<Workflow>asList(errorWorkflow), chain);
+      errorChain.continueWorkflow();
     }
   }
 }

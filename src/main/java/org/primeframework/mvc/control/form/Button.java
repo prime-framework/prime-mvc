@@ -44,11 +44,6 @@ public class Button extends AbstractButtonInput {
     super(request);
   }
 
-  @Override
-  public String getName() {
-    return "button";
-  }
-
   /**
    * @return button.ftl
    */

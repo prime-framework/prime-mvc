@@ -22,8 +22,8 @@ import org.primeframework.mvc.workflow.DefaultMVCWorkflow;
 import org.primeframework.mvc.workflow.ErrorExceptionHandler;
 import org.primeframework.mvc.workflow.ErrorWorkflow;
 import org.primeframework.mvc.workflow.ExceptionHandler;
-import org.primeframework.mvc.workflow.ExceptionHandlerBinder;
 import org.primeframework.mvc.workflow.MVCWorkflow;
+import org.primeframework.mvc.workflow.TypedExceptionHandlerFactory;
 
 import com.google.inject.AbstractModule;
 
@@ -35,7 +35,8 @@ import com.google.inject.AbstractModule;
 public class WorkflowModule extends AbstractModule {
   @Override
   protected void configure() {
-    ExceptionHandlerBinder.newBinder(binder()).exception(ErrorException.class).toHandler(ErrorExceptionHandler.class);
+    bind(TypedExceptionHandlerFactory.class);
+    TypedExceptionHandlerFactory.addExceptionHandler(binder(), ErrorException.class, ErrorExceptionHandler.class);
 
     bindErrorWorkflow();
     bindExceptionHandler();

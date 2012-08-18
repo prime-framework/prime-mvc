@@ -20,8 +20,7 @@ package org.primeframework.mvc.workflow;
  *
  * @author James Humphrey
  */
-public interface TypedExceptionHandler<T extends RuntimeException> {
-
+public interface TypedExceptionHandler<T extends Throwable> {
   /**
    * Called to handle an exception of a specific type
    *

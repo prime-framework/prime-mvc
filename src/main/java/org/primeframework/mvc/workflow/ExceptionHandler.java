@@ -16,16 +16,16 @@
 package org.primeframework.mvc.workflow;
 
 /**
- * Interface for handling runtime exceptions that occur in Prime
+ * Interface for handling {@link Throwable}s that occur in Prime. This allows us to handle both RuntimeExceptions and
+ * Errors (or any other type of unchecked exceptions).
  *
  * @author James Humphrey
  */
 public interface ExceptionHandler {
-
   /**
-   * Handles exceptions that occur in prime
+   * Handles exceptions that occur in prime.
    *
    * @param e the exception
    */
-  public <T extends RuntimeException> void handle(T e);
+  public void handle(Throwable e);
 }

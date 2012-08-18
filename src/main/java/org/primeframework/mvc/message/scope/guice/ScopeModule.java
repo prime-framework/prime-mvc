@@ -17,7 +17,6 @@ package org.primeframework.mvc.message.scope.guice;
 
 import org.primeframework.mvc.message.scope.ApplicationScope;
 import org.primeframework.mvc.message.scope.FlashScope;
-import org.primeframework.mvc.message.scope.MessageScope;
 import org.primeframework.mvc.message.scope.RequestScope;
 import org.primeframework.mvc.message.scope.SessionScope;
 
@@ -31,10 +30,9 @@ import com.google.inject.AbstractModule;
 public class ScopeModule extends AbstractModule {
   @Override
   protected void configure() {
-    ScopeBinder scopeBinder = ScopeBinder.newScopeBinder(binder());
-    scopeBinder.bind(RequestScope.class).forScope(MessageScope.REQUEST);
-    scopeBinder.bind(FlashScope.class).forScope(MessageScope.FLASH);
-    scopeBinder.bind(SessionScope.class).forScope(MessageScope.SESSION);
-    scopeBinder.bind(ApplicationScope.class).forScope(MessageScope.APPLICATION);
+    bind(ApplicationScope.class).asEagerSingleton();
+    bind(SessionScope.class);
+    bind(FlashScope.class);
+    bind(RequestScope.class);
   }
 }

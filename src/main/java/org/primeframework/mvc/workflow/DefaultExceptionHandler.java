@@ -15,40 +15,41 @@
  */
 package org.primeframework.mvc.workflow;
 
-import java.util.Map;
-
 import com.google.inject.Inject;
 
 /**
  * @author James Humphrey
  */
 public class DefaultExceptionHandler implements ExceptionHandler {
-
-  private final Map<Class<?>, TypedExceptionHandler<?>> handlers;
+  private final TypedExceptionHandlerFactory factory;
 
   @Inject
-  public DefaultExceptionHandler(Map<Class<?>, TypedExceptionHandler<?>> handlers) {
-    this.handlers = handlers;
+  public DefaultExceptionHandler(TypedExceptionHandlerFactory factory) {
+    this.factory = factory;
   }
 
   @Override
   @SuppressWarnings(value = "unchecked")
-  public <T extends RuntimeException> void handle(T exception) {
-    Class<? extends RuntimeException> klass = exception.getClass();
+  public void handle(Throwable exception) {
+    Class<? extends Throwable> klass = exception.getClass();
     boolean handled = false;
-    while (klass != RuntimeException.class) {
-      TypedExceptionHandler handler = handlers.get(klass);
+    while (klass != Throwable.class) {
+      TypedExceptionHandler handler = factory.build(klass);
       if (handler != null) {
         handler.handle(exception);
         handled = true;
         break;
       } else {
-        klass = (Class<? extends RuntimeException>) klass.getSuperclass();
+        klass = (Class<? extends Throwable>) klass.getSuperclass();
       }
     }
 
     if (!handled) {
-      throw exception;
+      if (exception instanceof RuntimeException) {
+        throw (RuntimeException) exception;
+      } else {
+        throw (Error) exception;
+      }
     }
   }
 }

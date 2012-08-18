@@ -15,6 +15,7 @@
  */
 package org.primeframework.mvc.parameter.convert.guice;
 
+import org.primeframework.mvc.parameter.convert.ConverterProvider;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
 
 import com.google.inject.Binder;
@@ -22,7 +23,9 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 
 /**
- * A binder DSL for adding GlobalConverters to Prime.
+ * A binder DSL for adding GlobalConverters to Prime. Generally speaking, using MultiBindings is horrifically slow and
+ * generates a lot of objects. This uses MultiBindings because the {@link ConverterProvider} is a singleton and that is
+ * the only place this gets injected. Therefore, this should have very little overhead.
  *
  * @author Brian Pontarelli
  */

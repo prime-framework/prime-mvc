@@ -17,13 +17,10 @@ package org.primeframework.mvc.action.result;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.primeframework.mvc.freemarker.FieldSupportBeansWrapper;
-import org.primeframework.mvc.freemarker.NamedTemplateModel;
+import org.primeframework.mvc.freemarker.guice.TemplateModelFactory;
 
 import freemarker.ext.beans.CollectionModel;
 import freemarker.template.TemplateCollectionModel;
@@ -37,38 +34,38 @@ import freemarker.template.TemplateModelException;
  * @author Brian Pontarelli
  */
 public class ModelsHashModel implements TemplateHashModelEx {
-  private final Map<String, NamedTemplateModel> models = new HashMap<String, NamedTemplateModel>();
+  private final String prefix;
+  private final TemplateModelFactory factory;
 
-  public ModelsHashModel(Set<NamedTemplateModel> models) {
-    for (NamedTemplateModel model : models) {
-      this.models.put(model.getName(), model);
-    }
+  public ModelsHashModel(String prefix, TemplateModelFactory factory) {
+    this.prefix = prefix;
+    this.factory = factory;
   }
 
   public TemplateCollectionModel keys() throws TemplateModelException {
-    return new CollectionModel(models.keySet(), FieldSupportBeansWrapper.INSTANCE);
+    return new CollectionModel(factory.controlNames(prefix), FieldSupportBeansWrapper.INSTANCE);
   }
 
   public int size() {
-    return models.size();
+    return factory.controlNames(prefix).size();
   }
 
   public boolean isEmpty() {
-    return models.isEmpty();
+    return factory.controlNames(prefix).isEmpty();
   }
 
   public TemplateModel get(String key) {
-    return models.get(key);
+    return factory.build(prefix, key);
   }
 
   public TemplateCollectionModel values() {
     return new CollectionModel(valueCollection(), FieldSupportBeansWrapper.INSTANCE);
   }
 
-  private Collection<NamedTemplateModel> valueCollection() {
-    List<NamedTemplateModel> all = new ArrayList<NamedTemplateModel>();
-    for (NamedTemplateModel model : models.values()) {
-      all.add(model);
+  private Collection<TemplateModel> valueCollection() {
+    List<TemplateModel> all = new ArrayList<TemplateModel>();
+    for (String name : factory.controlNames(prefix)) {
+      all.add(get(name));
     }
     return all;
   }

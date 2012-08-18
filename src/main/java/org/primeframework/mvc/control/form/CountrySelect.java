@@ -45,12 +45,7 @@ import org.primeframework.mvc.control.annotation.ControlAttributes;
     @ControlAttribute(name = "includeBlank", types = {boolean.class, Boolean.class})
   }
 )
-public class CountriesSelect extends Select {
-  @Override
-  public String getName() {
-    return "countries_select";
-  }
-
+public class CountrySelect extends Select {
   /**
    * Adds the countries Map and then calls super.
    */

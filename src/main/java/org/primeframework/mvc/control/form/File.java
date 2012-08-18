@@ -39,11 +39,6 @@ public class File extends AbstractInput {
     super(true);
   }
 
-  @Override
-  public String getName() {
-    return "file";
-  }
-
   /**
    * @return file.ftl
    */

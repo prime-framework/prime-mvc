@@ -20,17 +20,16 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.primeframework.mvc.control.Control;
 import org.primeframework.mvc.control.FreeMarkerControlProxy;
+import org.primeframework.mvc.control.guice.ControlFactory;
 import org.primeframework.mvc.freemarker.FieldSupportBeansWrapper;
 import org.primeframework.mvc.freemarker.FreeMarkerRenderException;
 
 import freemarker.ext.beans.CollectionModel;
 import freemarker.template.TemplateCollectionModel;
 import freemarker.template.TemplateHashModelEx;
-import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
 
 /**
@@ -39,33 +38,40 @@ import freemarker.template.TemplateModelException;
  * @author Brian Pontarelli
  */
 public class ControlsHashModel implements TemplateHashModelEx {
-  private final Map<String, Control> controls = new HashMap<String, Control>();
+  private final Map<String, FreeMarkerControlProxy> controls = new HashMap<String, FreeMarkerControlProxy>();
+  private final String prefix;
+  private final ControlFactory controlFactory;
 
-  public ControlsHashModel(Set<Control> controls) {
-    for (Control control : controls) {
-      this.controls.put(control.getName(), control);
-    }
+  public ControlsHashModel(String prefix, ControlFactory controlFactory) {
+    this.prefix = prefix;
+    this.controlFactory = controlFactory;
   }
 
   public TemplateCollectionModel keys() throws TemplateModelException {
-    return new CollectionModel(controls.keySet(), FieldSupportBeansWrapper.INSTANCE);
+    return new CollectionModel(controlFactory.controlNames(prefix), FieldSupportBeansWrapper.INSTANCE);
   }
 
   public int size() {
-    return controls.size();
+    return controlFactory.controlNames(prefix).size();
   }
 
   public boolean isEmpty() {
-    return controls.isEmpty();
+    return controlFactory.controlNames(prefix).isEmpty();
   }
 
-  public TemplateModel get(String key) {
-    Control control = controls.get(key);
-    if (control == null) {
-      throw new FreeMarkerRenderException("Prime control named [" + key + "] doesn't exist. Currently registered controls are " + controls.keySet());
+  public FreeMarkerControlProxy get(String key) {
+    FreeMarkerControlProxy proxy = controls.get(key);
+    if (proxy == null) {
+      Control control = controlFactory.build(prefix, key);
+      if (control == null) {
+        throw new FreeMarkerRenderException("Prime control named [" + key + "] doesn't exist. Currently registered controls are " + controls.keySet());
+      }
+
+      proxy = new FreeMarkerControlProxy(control);
+      controls.put(key, proxy);
     }
 
-    return new FreeMarkerControlProxy(control);
+    return proxy;
   }
 
   public TemplateCollectionModel values() {
@@ -74,8 +80,8 @@ public class ControlsHashModel implements TemplateHashModelEx {
 
   private Collection<FreeMarkerControlProxy> valueCollection() {
     List<FreeMarkerControlProxy> all = new ArrayList<FreeMarkerControlProxy>();
-    for (Control control : controls.values()) {
-      all.add(new FreeMarkerControlProxy(control));
+    for (String name : controlFactory.controlNames(prefix)) {
+      all.add(get(name));
     }
     return all;
   }

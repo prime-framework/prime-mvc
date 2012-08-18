@@ -24,7 +24,6 @@ import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.control.AbstractControl;
 import org.primeframework.mvc.control.annotation.ControlAttribute;
 import org.primeframework.mvc.control.annotation.ControlAttributes;
-import org.primeframework.mvc.freemarker.NamedTemplateModel;
 import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.message.l10n.MissingMessageException;
 
@@ -45,17 +44,12 @@ import freemarker.template.TemplateModelException;
     @ControlAttribute(name = "values", types = List.class)
   }
 )
-public class Message extends AbstractControl implements NamedTemplateModel, TemplateMethodModel {
+public class Message extends AbstractControl implements TemplateMethodModel {
   private final MessageProvider messageProvider;
 
   @Inject
   public Message(MessageProvider messageProvider) {
     this.messageProvider = messageProvider;
-  }
-
-  @Override
-  public String getName() {
-    return "message";
   }
 
   /**

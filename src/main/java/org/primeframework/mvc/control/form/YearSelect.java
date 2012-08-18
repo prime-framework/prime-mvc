@@ -15,17 +15,15 @@
  */
 package org.primeframework.mvc.control.form;
 
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.joda.time.LocalDate;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.primeframework.mvc.control.annotation.ControlAttribute;
 import org.primeframework.mvc.control.annotation.ControlAttributes;
 
 /**
- * This class is the control for a select box that contains months.
+ * This class is the control for a select box that contains years.
  *
  * @author Brian Pontarelli
  */
@@ -39,33 +37,40 @@ import org.primeframework.mvc.control.annotation.ControlAttributes;
     @ControlAttribute(name = "readonly", types = {boolean.class, Boolean.class}),
     @ControlAttribute(name = "required", types = {boolean.class, Boolean.class}),
     @ControlAttribute(name = "size", types = {int.class, Integer.class}),
-    @ControlAttribute(name = "tabindex", types = {int.class, Integer.class})
+    @ControlAttribute(name = "tabindex", types = {int.class, Integer.class}),
+    @ControlAttribute(name = "startYear", types = {int.class, Integer.class}),
+    @ControlAttribute(name = "endYear", types = {int.class, Integer.class}),
+    @ControlAttribute(name = "numberOfYear", types = {int.class, Integer.class})
   }
 )
-public class MonthsSelect extends Select {
-
+public class YearSelect extends Select {
   /**
-   * @return select
-   */
-  @Override
-  public String getName() {
-    return "months_select";
-  }
-
-  /**
-   * Calls super then adds the months Map.
+   * Calls super then adds the years Map.
    */
   @Override
   protected void addAdditionalAttributes() {
     super.addAdditionalAttributes();
 
-    Map<Integer, String> months = new TreeMap<Integer, String>();
-    DateTimeFormatter formatter = DateTimeFormat.forPattern("MMMM").withLocale(locale);
-    for (int i = 1; i <= 12; i++) {
-      LocalDate date = new LocalDate(2008, i, 1);
-      months.put(i, formatter.print(date));
+    Integer start = (Integer) attributes.remove("startYear");
+    Integer end = (Integer) attributes.remove("endYear");
+    Integer numberOfYears = (Integer) attributes.remove("numberOfYears");
+    if (start == null) {
+      start = new LocalDate().getYear();
     }
 
-    attributes.put("items", months);
+    if (numberOfYears != null) {
+      end = start + numberOfYears;
+    } else if (end == null) {
+      end = start + 10;
+    } else {
+      end = end + 1;
+    }
+
+    List<Integer> years = new ArrayList<Integer>();
+    for (int i = start; i < end; i++) {
+      years.add(i);
+    }
+
+    attributes.put("items", years);
   }
 }

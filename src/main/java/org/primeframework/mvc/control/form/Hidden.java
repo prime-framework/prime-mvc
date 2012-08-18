@@ -37,11 +37,6 @@ public class Hidden extends AbstractValueInput {
     super(expressionEvaluator, false);
   }
 
-  @Override
-  public String getName() {
-    return "hidden";
-  }
-
   /**
    * @return hidden.ftl
    */

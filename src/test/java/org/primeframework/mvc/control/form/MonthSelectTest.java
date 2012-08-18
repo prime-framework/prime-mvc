@@ -28,13 +28,13 @@ import com.google.inject.Inject;
  *
  * @author Brian Pontarelli
  */
-public class MonthsSelectTest extends ControlBaseTest {
-  @Inject public MonthsSelect monthsSelect;
+public class MonthSelectTest extends ControlBaseTest {
+  @Inject public MonthSelect monthSelect;
 
   @Test
   public void actionLess() {
     ais.setCurrent(new ActionInvocation(null, null, "/months-select", null, null));
-    new ControlTester(monthsSelect).
+    new ControlTester(monthSelect).
       attr("name", "test").
       attr("class", "css-class").
       go("<input type=\"hidden\" name=\"test@param\" value=\"param-value\"/>\n" +
@@ -66,7 +66,7 @@ public class MonthsSelectTest extends ControlBaseTest {
     edit.user.setMonth(5);
 
     ais.setCurrent(new ActionInvocation(edit, null, "/months-select", null, null));
-    new ControlTester(monthsSelect).
+    new ControlTester(monthSelect).
       attr("name", "user.month").
       go("<input type=\"hidden\" name=\"user.month@param\" value=\"param-value\"/>\n" +
       "<div class=\"select input control\">\n" +

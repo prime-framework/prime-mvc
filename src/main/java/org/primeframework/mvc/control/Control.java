@@ -50,9 +50,4 @@ public interface Control {
    * @param writer The writer to write the output to.
    */
   void renderEnd(Writer writer);
-
-  /**
-   * @return The name of the control as it will exist in the FTL control hash.
-   */
-  String getName();
 }

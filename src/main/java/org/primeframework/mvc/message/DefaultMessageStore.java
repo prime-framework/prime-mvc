@@ -18,11 +18,16 @@ package org.primeframework.mvc.message;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.primeframework.mvc.message.scope.ApplicationScope;
+import org.primeframework.mvc.message.scope.FlashScope;
 import org.primeframework.mvc.message.scope.MessageScope;
+import org.primeframework.mvc.message.scope.RequestScope;
 import org.primeframework.mvc.message.scope.Scope;
+import org.primeframework.mvc.message.scope.SessionScope;
 
 import com.google.inject.Inject;
 
@@ -33,17 +38,21 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 public class DefaultMessageStore implements MessageStore {
-  private final Map<MessageScope, Scope> scopes;
+  private final Map<MessageScope, Scope> scopes = new LinkedHashMap<MessageScope, Scope>();
+  private final RequestScope requestScope;
 
   @Inject
-  public DefaultMessageStore(Map<MessageScope, Scope> scopes) {
-    this.scopes = scopes;
+  public DefaultMessageStore(ApplicationScope applicationScope, SessionScope sessionScope, FlashScope flashScope, RequestScope requestScope) {
+    scopes.put(MessageScope.REQUEST, requestScope);
+    scopes.put(MessageScope.FLASH, flashScope);
+    scopes.put(MessageScope.SESSION, sessionScope);
+    scopes.put(MessageScope.APPLICATION, applicationScope);
+    this.requestScope = requestScope;
   }
 
   @Override
   public void add(Message message) {
-    Scope scope = scopes.get(MessageScope.REQUEST);
-    scope.add(message);
+    requestScope.add(message);
   }
 
   @Override

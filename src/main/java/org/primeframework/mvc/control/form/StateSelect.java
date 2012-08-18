@@ -40,15 +40,7 @@ import org.primeframework.mvc.control.annotation.ControlAttributes;
     @ControlAttribute(name = "includeBlank", types = {boolean.class, Boolean.class})
   }
 )
-public class StatesSelect extends Select {
-  /**
-   * @return states_select
-   */
-  @Override
-  public String getName() {
-    return "states_select";
-  }
-
+public class StateSelect extends Select {
   /**
    * Adds the states to a Map and then calls super.
    */

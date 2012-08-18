@@ -15,12 +15,11 @@
  */
 package org.primeframework.mvc.workflow;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.primeframework.mvc.ErrorException;
 import org.testng.annotations.Test;
 
+import com.google.inject.Binder;
+import com.google.inject.Injector;
 import static org.easymock.EasyMock.*;
 import static org.testng.Assert.*;
 
@@ -31,7 +30,8 @@ public class DefaultExceptionHandlerTest {
 
   @Test
   public void handleRuntimeException() {
-    DefaultExceptionHandler handler = new DefaultExceptionHandler(null);
+    TypedExceptionHandlerFactory factory = new TypedExceptionHandlerFactory(null);
+    DefaultExceptionHandler handler = new DefaultExceptionHandler(factory);
 
     try {
       handler.handle(new RuntimeException());
@@ -43,106 +43,117 @@ public class DefaultExceptionHandlerTest {
 
   @Test
   @SuppressWarnings(value = "unchecked")
-  public void testErrorException() {
-
+  public void errorException() {
     ErrorExceptionHandler errorExceptionHandler = createStrictMock(ErrorExceptionHandler.class);
     errorExceptionHandler.handle(isA(ErrorException.class));
     replay(errorExceptionHandler);
 
-    Map<Class<?>, TypedExceptionHandler<?>> handlers = new HashMap<Class<?>, TypedExceptionHandler<?>>();
-    handlers.put(ErrorException.class, errorExceptionHandler);
-    DefaultExceptionHandler handler = new DefaultExceptionHandler(handlers);
+    Injector injector = createStrictMock(Injector.class);
+    expect(injector.getInstance(ErrorExceptionHandler.class)).andReturn(errorExceptionHandler);
+    replay(injector);
+
+    Binder binder = createStrictMock(Binder.class);
+    expect(binder.bind(ErrorExceptionHandler.class)).andReturn(null);
+    replay(binder);
+
+    TypedExceptionHandlerFactory factory = new TypedExceptionHandlerFactory(injector);
+    TypedExceptionHandlerFactory.addExceptionHandler(binder, ErrorException.class, ErrorExceptionHandler.class);
+    DefaultExceptionHandler handler = new DefaultExceptionHandler(factory);
 
     try {
       handler.handle(new ErrorException());
     } catch (RuntimeException e) {
       fail("Should have handled it");
     }
+
+    verify(errorExceptionHandler, injector, binder);
   }
 
   @Test
   @SuppressWarnings(value = "unchecked")
-  public void testFooException() {
-
+  public void fooException() {
     ErrorExceptionHandler errorExceptionHandler = createStrictMock(ErrorExceptionHandler.class);
     errorExceptionHandler.handle(isA(FooException.class));
     replay(errorExceptionHandler);
 
-    Map<Class<?>, TypedExceptionHandler<?>> handlers = new HashMap<Class<?>, TypedExceptionHandler<?>>();
-    handlers.put(FooException.class, errorExceptionHandler);
-    DefaultExceptionHandler handler = new DefaultExceptionHandler(handlers);
+    Injector injector = createStrictMock(Injector.class);
+    expect(injector.getInstance(ErrorExceptionHandler.class)).andReturn(errorExceptionHandler);
+    replay(injector);
+
+    Binder binder = createStrictMock(Binder.class);
+    expect(binder.bind(ErrorExceptionHandler.class)).andReturn(null);
+    replay(binder);
+
+    TypedExceptionHandlerFactory factory = new TypedExceptionHandlerFactory(injector);
+    TypedExceptionHandlerFactory.addExceptionHandler(binder, ErrorException.class, ErrorExceptionHandler.class);
+    DefaultExceptionHandler handler = new DefaultExceptionHandler(factory);
 
     try {
       handler.handle(new FooException());
     } catch (RuntimeException e) {
       fail("Should have handled it");
     }
+
+    verify(errorExceptionHandler, injector, binder);
   }
 
   @Test
   @SuppressWarnings(value = "unchecked")
-  public void testBarException() {
-
+  public void barException() {
     BarExceptionHandler<BarException> errorExceptionHandler = createStrictMock(BarExceptionHandler.class);
     errorExceptionHandler.handle(isA(BarException.class));
     replay(errorExceptionHandler);
 
-    Map<Class<?>, TypedExceptionHandler<?>> handlers = new HashMap<Class<?>, TypedExceptionHandler<?>>();
-    handlers.put(BarException.class, errorExceptionHandler);
-    DefaultExceptionHandler handler = new DefaultExceptionHandler(handlers);
+    Injector injector = createStrictMock(Injector.class);
+    expect(injector.getInstance(BarExceptionHandler.class)).andReturn(errorExceptionHandler);
+    replay(injector);
+
+    Binder binder = createStrictMock(Binder.class);
+    expect(binder.bind(BarExceptionHandler.class)).andReturn(null);
+    replay(binder);
+
+    TypedExceptionHandlerFactory factory = new TypedExceptionHandlerFactory(injector);
+    TypedExceptionHandlerFactory.addExceptionHandler(binder, BarException.class, BarExceptionHandler.class);
+    DefaultExceptionHandler handler = new DefaultExceptionHandler(factory);
 
     try {
       handler.handle(new BarException());
     } catch (RuntimeException e) {
       fail("Should have handled it");
     }
-  }
 
-  @Test
-  @SuppressWarnings(value = "unchecked")
-  public void testBazException() {
-
-    BarExceptionHandler<BazException> errorExceptionHandler = createStrictMock(BarExceptionHandler.class);
-    errorExceptionHandler.handle(isA(BazException.class));
-    replay(errorExceptionHandler);
-
-    Map<Class<?>, TypedExceptionHandler<?>> handlers = new HashMap<Class<?>, TypedExceptionHandler<?>>();
-    handlers.put(BazException.class, errorExceptionHandler);
-    DefaultExceptionHandler handler = new DefaultExceptionHandler(handlers);
-
-    try {
-      handler.handle(new BazException());
-    } catch (RuntimeException e) {
-      fail("Should have handled it");
-    }
+    verify(errorExceptionHandler, injector, binder);
   }
 
   @Test
   @SuppressWarnings(value = "unchecked")
   public void testMultipleExceptions() {
-
     ErrorExceptionHandler defaultHandler = createStrictMock(ErrorExceptionHandler.class);
     defaultHandler.handle(isA(ErrorException.class));
+    defaultHandler.handle(isA(FooException.class));
     replay(defaultHandler);
-
-    ErrorExceptionHandler fooHandler = createStrictMock(ErrorExceptionHandler.class);
-    fooHandler.handle(isA(FooException.class));
-    replay(fooHandler);
 
     BarExceptionHandler<BarException> barHandler = createStrictMock(BarExceptionHandler.class);
     barHandler.handle(isA(BarException.class));
+    barHandler.handle(isA(BazException.class));
     replay(barHandler);
 
-    BarExceptionHandler<BazException> bazHandler = createStrictMock(BarExceptionHandler.class);
-    bazHandler.handle(isA(BazException.class));
-    replay(bazHandler);
+    Injector injector = createStrictMock(Injector.class);
+    expect(injector.getInstance(ErrorExceptionHandler.class)).andReturn(defaultHandler);
+    expect(injector.getInstance(ErrorExceptionHandler.class)).andReturn(defaultHandler);
+    expect(injector.getInstance(BarExceptionHandler.class)).andReturn(barHandler);
+    expect(injector.getInstance(BarExceptionHandler.class)).andReturn(barHandler);
+    replay(injector);
 
-    Map<Class<?>, TypedExceptionHandler<?>> handlers = new HashMap<Class<?>, TypedExceptionHandler<?>>();
-    handlers.put(ErrorException.class, defaultHandler);
-    handlers.put(FooException.class, fooHandler);
-    handlers.put(BarException.class, barHandler);
-    handlers.put(BazException.class, bazHandler);
-    DefaultExceptionHandler handler = new DefaultExceptionHandler(handlers);
+    Binder binder = createStrictMock(Binder.class);
+    expect(binder.bind(ErrorExceptionHandler.class)).andReturn(null);
+    expect(binder.bind(BarExceptionHandler.class)).andReturn(null);
+    replay(binder);
+
+    TypedExceptionHandlerFactory factory = new TypedExceptionHandlerFactory(injector);
+    TypedExceptionHandlerFactory.addExceptionHandler(binder, ErrorException.class, ErrorExceptionHandler.class);
+    TypedExceptionHandlerFactory.addExceptionHandler(binder, BarException.class, BarExceptionHandler.class);
+    DefaultExceptionHandler handler = new DefaultExceptionHandler(factory);
 
     try {
       handler.handle(new ErrorException());
@@ -170,6 +181,8 @@ public class DefaultExceptionHandlerTest {
     } catch (RuntimeException e) {
       // success
     }
+
+    verify(defaultHandler, barHandler, injector, binder);
   }
 
   /**
@@ -177,14 +190,12 @@ public class DefaultExceptionHandlerTest {
    * the ErrorExceptionHandler
    */
   public class FooException extends ErrorException {
-
   }
 
   /**
    * extends Foo but has it's own exception handler and, as a result, should use it.
    */
   public class BarException extends FooException {
-
   }
 
   /**
@@ -192,7 +203,6 @@ public class DefaultExceptionHandlerTest {
    * handler
    */
   public class BazException extends BarException {
-
   }
 
   /**
@@ -201,10 +211,8 @@ public class DefaultExceptionHandlerTest {
    * @param <T> a bar exception
    */
   public class BarExceptionHandler<T extends BarException> implements TypedExceptionHandler<T> {
-
     @Override
     public void handle(T exception) {
-
     }
   }
 }

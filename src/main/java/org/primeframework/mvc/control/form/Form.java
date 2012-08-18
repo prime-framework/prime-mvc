@@ -52,11 +52,6 @@ public class Form extends AbstractControl {
     this.actionMapper = actionMapper;
   }
 
-  @Override
-  public String getName() {
-    return "form";
-  }
-
   /**
    * Overrides the renderStart in order to change the current ActionInvocation if the action for the form is different
    * than the current invocation action.

@@ -38,8 +38,8 @@ public class FreeMarkerModule extends AbstractModule {
     bind(Configuration.class).toProvider(FreeMarkerConfigurationProvider.class).in(Singleton.class);
     bind(FreeMarkerService.class).to(DefaultFreeMarkerService.class).in(Singleton.class);
 
-    TemplateModelBinder templateModelBinder = TemplateModelBinder.newTemplateModelBinder(binder());
-    templateModelBinder.add(JSONEscape.class).withPrefix("function");
-    templateModelBinder.add(Message.class).withPrefix("function");
+    bind(TemplateModelFactory.class);
+    TemplateModelFactory.addSingletonModel(binder(), "function", "json_escape", JSONEscape.class);
+    TemplateModelFactory.addModel(binder(), "function", "message", Message.class);
   }
 }

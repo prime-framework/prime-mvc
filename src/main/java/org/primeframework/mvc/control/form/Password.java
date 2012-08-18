@@ -41,11 +41,6 @@ public class Password extends AbstractInput {
     super(true);
   }
 
-  @Override
-  public String getName() {
-    return "password";
-  }
-
   /**
    * Removes the value attribute for security.
    */

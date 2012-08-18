@@ -28,13 +28,13 @@ import com.google.inject.Inject;
  *
  * @author Brian Pontarelli
  */
-public class YearsSelectTest extends ControlBaseTest {
-  @Inject public YearsSelect yearsSelect;
+public class YearSelectTest extends ControlBaseTest {
+  @Inject public YearSelect yearSelect;
 
   @Test
   public void actionLess() {
     ais.setCurrent(new ActionInvocation(null, null, "/years-select", null, null));
-    new ControlTester(yearsSelect).
+    new ControlTester(yearSelect).
       attr("name", "test").
       attr("class", "css-class").
       go("<input type=\"hidden\" name=\"test@param\" value=\"param-value\"/>\n" +
@@ -64,7 +64,7 @@ public class YearsSelectTest extends ControlBaseTest {
     edit.user.setYear(2003);
 
     ais.setCurrent(new ActionInvocation(edit, null, "/years-select", null, null));
-    new ControlTester(yearsSelect).
+    new ControlTester(yearSelect).
       attr("name", "user.year").
       attr("startYear", 2001).
       attr("endYear", 2006).

@@ -46,14 +46,6 @@ public class Select extends AbstractListInput {
   }
 
   /**
-   * @return select
-   */
-  @Override
-  public String getName() {
-    return "select";
-  }
-
-  /**
    * @return select.ftl
    */
   protected String endTemplateName() {

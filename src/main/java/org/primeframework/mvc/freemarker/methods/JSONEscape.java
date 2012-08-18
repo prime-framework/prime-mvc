@@ -17,7 +17,6 @@ package org.primeframework.mvc.freemarker.methods;
 
 import java.util.List;
 
-import org.primeframework.mvc.freemarker.NamedTemplateModel;
 import org.primeframework.mvc.json.JSONBuilder;
 
 import freemarker.template.TemplateMethodModelEx;
@@ -28,12 +27,7 @@ import freemarker.template.TemplateModelException;
  *
  * @author Brian Pontarelli
  */
-public class JSONEscape implements NamedTemplateModel, TemplateMethodModelEx {
-  @Override
-  public String getName() {
-    return "jsonescape";
-  }
-
+public class JSONEscape implements TemplateMethodModelEx {
   @Override
   public Object exec(List arguments) throws TemplateModelException {
     if (arguments.size() != 1) {

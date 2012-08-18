@@ -84,6 +84,7 @@ public class RequestBodyWorkflowTest {
     expect(request.getParameterMap()).andReturn(new HashMap());
     expect(request.getContentType()).andReturn("application/x-www-form-urlencoded");
     expect(request.getInputStream()).andReturn(new MockServletInputStream(new byte[0]));
+    expect(request.getContentLength()).andReturn(0);
     expect(request.getCharacterEncoding()).andReturn("UTF-8");
     replay(request);
 
@@ -133,10 +134,12 @@ public class RequestBodyWorkflowTest {
 
   @Test
   public void parseMultiple() throws IOException, ServletException {
+    String body = "param1=value1&param1=value2&param2=value3";
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
     expect(request.getParameterMap()).andReturn(new HashMap());
     expect(request.getContentType()).andReturn("application/x-www-form-urlencoded");
-    expect(request.getInputStream()).andReturn(new MockServletInputStream("param1=value1&param1=value2&param2=value3".getBytes()));
+    expect(request.getInputStream()).andReturn(new MockServletInputStream(body.getBytes()));
+    expect(request.getContentLength()).andReturn(body.getBytes().length);
     expect(request.getCharacterEncoding()).andReturn("UTF-8");
     replay(request);
 
@@ -165,10 +168,12 @@ public class RequestBodyWorkflowTest {
     oldParams.put("param1", new String[]{"oldvalue1", "oldvalue2"});
     oldParams.put("param2", new String[]{"oldvalue3"});
 
+    String body = "param1=value1&param1=value2&param2=value3";
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
     expect(request.getParameterMap()).andReturn(oldParams);
     expect(request.getContentType()).andReturn("application/x-www-form-urlencoded");
-    expect(request.getInputStream()).andReturn(new MockServletInputStream("param1=value1&param1=value2&param2=value3".getBytes()));
+    expect(request.getInputStream()).andReturn(new MockServletInputStream(body.getBytes()));
+    expect(request.getContentLength()).andReturn(body.getBytes().length);
     expect(request.getCharacterEncoding()).andReturn("UTF-8");
     replay(request);
 

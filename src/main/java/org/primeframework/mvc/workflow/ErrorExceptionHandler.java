@@ -27,9 +27,9 @@ import org.primeframework.mvc.message.l10n.MissingMessageException;
 import com.google.inject.Inject;
 
 /**
- * Handles {@link ErrorException} when thrown.  The handle method is called by the {@link ExceptionHandler} implementation
- * which, by default, is the {@link DefaultExceptionHandler}.
- *
+ * Handles {@link ErrorException} when thrown.  The handle method is called by the {@link ExceptionHandler}
+ * implementation which, by default, is the {@link DefaultExceptionHandler}.
+ * <p/>
  * This handler is just one of many different mechanisms by which you can handle exceptions in Prime.  You can configure
  * additional handlers by using Guice's multi-binding mechanism as follows:
  *

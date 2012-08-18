@@ -44,11 +44,6 @@ public class Submit extends AbstractButtonInput {
     super(request);
   }
 
-  @Override
-  public String getName() {
-    return "submit";
-  }
-
   /**
    * @return submit.ftl
    */
