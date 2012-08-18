@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -72,7 +73,7 @@ public class RequestBodyWorkflow implements Workflow {
         request.setAttribute(RequestKeys.FILE_ATTRIBUTE, filesAndParameters.files);
         parsedParameters = filesAndParameters.parameters;
       } else if (contentType.startsWith("application/x-www-form-urlencoded")) {
-        parsedParameters = parse(request.getInputStream(), request.getCharacterEncoding());
+        parsedParameters = parse(request.getInputStream(), request.getContentLength(), request.getCharacterEncoding());
       }
     }
 
@@ -145,64 +146,78 @@ public class RequestBodyWorkflow implements Workflow {
   /**
    * Parses the HTTP request body for URL encoded parameters.
    *
-   * @param inputStream The input stream to read from.
-   * @param encoding    The encoding header.
+   * @param inputStream   The input stream to read from.
+   * @param contentLength The estimated length of the content.
+   * @param encoding      The encoding header.
    * @return The parameter map.
    * @throws IOException If the read failed.
    */
-  private Map<String, List<String>> parse(InputStream inputStream, String encoding) throws IOException {
+  private Map<String, List<String>> parse(InputStream inputStream, int contentLength, String encoding) throws IOException {
+    if (contentLength == 0) {
+      return null;
+    }
+
     if (encoding == null) {
       encoding = "UTF-8";
     }
 
-    Map<String, List<String>> parsedParameters = new HashMap<String, List<String>>();
-    byte[] str = new byte[1024];
-    int length = 0;
-    int c;
-    String key = null;
-    while ((c = inputStream.read()) != -1) {
-      if (c == '=') {
-        if (length == 0 || key != null) {
-          throw new IOException("Invalid HTTP URLEncoded request body");
-        }
+    if (contentLength < 0) {
+      contentLength = 1024;
+    }
 
-        key = URLDecoder.decode(new String(str, 0, length, encoding), "UTF-8");
-        length = 0;
-      } else if (c == '&') {
-        addParam(parsedParameters, key, str, length, encoding);
-        key = null;
-        length = 0;
-      } else {
-        str[length++] = (byte) c;
-        if (length == str.length) {
-          byte[] newStr = new byte[str.length * 2];
-          System.arraycopy(str, 0, newStr, 0, str.length);
-          str = newStr;
-        }
+    byte[] readBuffer = new byte[contentLength];
+
+    int read;
+    int length = 0;
+    while ((read = inputStream.read(readBuffer, length, readBuffer.length - length)) >= 0) {
+      length += read;
+      if (length == readBuffer.length) {
+        byte[] expandedBuffer = new byte[readBuffer.length + 1024];
+        System.arraycopy(readBuffer, 0, expandedBuffer, 0, length);
+        readBuffer = expandedBuffer;
       }
     }
 
-    // If the key is null, the input stream was empty
-    if (key != null) {
-      addParam(parsedParameters, key, str, length, encoding);
+    if (length == 0) {
+      return null;
     }
 
+    Map<String, List<String>> parsedParameters = new HashMap<String, List<String>>();
+    int start = 0;
+    int index = 0;
+    String key = null;
+    boolean decode = false;
+    for (; index < length; index++) {
+      byte c = readBuffer[index];
+      switch (c) {
+        case '=':
+          key = toParameterString(encoding, readBuffer, start, index - start, decode);
+          start = index + 1;
+          decode = false;
+          break;
+        case '&':
+          addParam(parsedParameters, key, readBuffer, start, index - start, encoding, decode);
+          key = null;
+          start = index + 1;
+          decode = false;
+          break;
+        case '+':
+        case '%':
+          decode = true;
+      }
+    }
+
+    addParam(parsedParameters, key, readBuffer, start, index - start, encoding, decode);
     return parsedParameters;
   }
 
-  private void addParam(Map<String, List<String>> parsedParameters, String key, byte[] str, int length, String encoding)
+  private void addParam(Map<String, List<String>> parsedParameters, String key, byte[] str, int start, int length, String encoding, boolean decode)
     throws IOException {
     if (key == null) {
       throw new IOException("Invalid HTTP URLEncoded request body");
     }
 
-    String value;
-    if (length == 0) {
-      value = "";
-    } else {
-      value = URLDecoder.decode(new String(str, 0, length, encoding), "UTF-8");
-    }
-
+    String value = toParameterString(encoding, str, start, length, decode);
     List<String> list = parsedParameters.get(key);
     if (list == null) {
       list = new ArrayList<String>();
@@ -210,6 +225,18 @@ public class RequestBodyWorkflow implements Workflow {
     }
 
     list.add(value);
+  }
+
+  private String toParameterString(String encoding, byte[] readBuffer, int start, int length, boolean decode) throws UnsupportedEncodingException {
+    if (length == 0) {
+      return "";
+    }
+
+    String key = new String(readBuffer, start, length, encoding);
+    if (decode) {
+      key = URLDecoder.decode(key, encoding);
+    }
+    return key;
   }
 
   private Map<String, String[]> combine(Map<String, String[]> original, Map<String, List<String>> parsed) {

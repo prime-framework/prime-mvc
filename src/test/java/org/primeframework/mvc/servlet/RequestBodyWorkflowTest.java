@@ -103,7 +103,9 @@ public class RequestBodyWorkflowTest {
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
     expect(request.getParameterMap()).andReturn(new HashMap());
     expect(request.getContentType()).andReturn("application/x-www-form-urlencoded");
-    expect(request.getInputStream()).andReturn(new MockServletInputStream("param1=value1&param2=value2".getBytes()));
+    String body = "param1=value1&param2=value2&param+space+key=param+space+value&param%2Bencoded%2Bkey=param%2Bencoded%2Bvalue";
+    expect(request.getInputStream()).andReturn(new MockServletInputStream(body.getBytes()));
+    expect(request.getContentLength()).andReturn(body.getBytes().length);
     expect(request.getCharacterEncoding()).andReturn("UTF-8");
     replay(request);
 
@@ -116,11 +118,15 @@ public class RequestBodyWorkflowTest {
     workflow.perform(chain);
 
     Map<String, String[]> params = wrapper.getParameterMap();
-    assertEquals(params.size(), 2);
+    assertEquals(params.size(), 4);
     assertEquals(params.get("param1").length, 1);
     assertEquals(params.get("param1")[0], "value1");
     assertEquals(params.get("param2").length, 1);
     assertEquals(params.get("param2")[0], "value2");
+    assertEquals(params.get("param space key").length, 1);
+    assertEquals(params.get("param space key")[0], "param space value");
+    assertEquals(params.get("param+encoded+key").length, 1);
+    assertEquals(params.get("param+encoded+key")[0], "param+encoded+value");
 
     verify(request, chain);
   }
