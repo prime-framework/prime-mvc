@@ -104,6 +104,6 @@ public class DefaultActionConfigurationProviderTest {
     assertEquals(config.get("/kitchen-sink").preValidationMethods.size(), 1);
     assertEquals(config.get("/kitchen-sink").postValidationMethods.size(), 1);
     assertEquals(config.get("/kitchen-sink").validationMethods.size(), 1);
-    assertEquals(config.get("/kitchen-sink").validationMethods.get(0), KitchenSink.class.getMethod("validate"));
+    assertEquals(config.get("/kitchen-sink").validationMethods.get(0).method, KitchenSink.class.getMethod("validate"));
   }
 }

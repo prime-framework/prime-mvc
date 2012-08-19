@@ -18,8 +18,6 @@ package org.primeframework.mvc.validation.jsr303;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import javax.validation.metadata.ConstraintDescriptor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeMap;
@@ -28,6 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
+import org.primeframework.mvc.action.ValidationMethodConfiguration;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
@@ -35,11 +34,11 @@ import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.message.l10n.MissingMessageException;
 import org.primeframework.mvc.message.scope.MessageScope;
+import org.primeframework.mvc.parameter.el.ExpressionException;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.util.ArrayBuilder;
 import org.primeframework.mvc.util.ReflectionUtils;
 import org.primeframework.mvc.validation.ValidationException;
-import org.primeframework.mvc.validation.ValidationMethod;
 import org.primeframework.mvc.validation.jsr303.util.ValidationUtils;
 
 import com.google.inject.Inject;
@@ -90,22 +89,13 @@ public class JSRValidationProcessor implements ValidationProcessor {
     }
 
     if (actionConfiguration.validationMethods.size() > 0) {
-      for (Method method : actionConfiguration.validationMethods) {
-        ValidationMethod annotation = method.getAnnotation(ValidationMethod.class);
-        HTTPMethod[] httpMethods = annotation.httpMethods();
+      for (ValidationMethodConfiguration configuration : actionConfiguration.validationMethods) {
+        HTTPMethod[] httpMethods = configuration.annotation.httpMethods();
         if (Arrays.binarySearch(httpMethods, httpMethod) >= 0) {
           try {
-            method.invoke(action);
-          } catch (IllegalAccessException e) {
-            throw new PrimeException("Unable to invoke @ValidationMethod on the class [" + actionConfiguration.actionClass + "]");
-          } catch (InvocationTargetException e) {
-            Throwable t = e.getTargetException();
-            if (t instanceof RuntimeException) {
-              throw (RuntimeException) t;
-            }
-
-            throw new PrimeException("@ValidationMethod on the class [" + actionConfiguration.actionClass + "] threw a " +
-              "checked exception", t);
+            ReflectionUtils.invoke(configuration.method, action);
+          } catch (ExpressionException e) {
+            throw new PrimeException("Unable to invoke @ValidationMethod on the class [" + actionConfiguration.actionClass + "]", e);
           }
         }
       }

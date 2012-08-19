@@ -27,7 +27,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.primeframework.mvc.PrimeException;
-import org.primeframework.mvc.action.ExecuteMethod;
+import org.primeframework.mvc.action.ExecuteMethodConfiguration;
+import org.primeframework.mvc.action.ValidationMethodConfiguration;
 import org.primeframework.mvc.action.result.annotation.ResultAnnotation;
 import org.primeframework.mvc.action.result.annotation.ResultContainerAnnotation;
 import org.primeframework.mvc.control.form.annotation.FormPrepareMethod;
@@ -45,9 +46,6 @@ import org.primeframework.mvc.validation.annotation.PostValidationMethod;
 import org.primeframework.mvc.validation.annotation.PreValidationMethod;
 import org.primeframework.mvc.validation.jsr303.Validation;
 
-import net.sf.cglib.reflect.FastClass;
-import net.sf.cglib.reflect.FastMethod;
-
 import com.google.inject.Inject;
 
 /**
@@ -56,7 +54,6 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 public class DefaultActionConfigurationBuilder implements ActionConfigurationBuilder {
-  public static final Class[] ACTION_METHOD_PARAMETER_TYPES = new Class[0];
   private final URIBuilder uriBuilder;
 
   @Inject
@@ -77,26 +74,24 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
         "abstract. You can only annotate concrete action classes");
     }
 
-    FastClass fastClass = FastClass.create(actionClass);
     String uri = uriBuilder.build(actionClass);
-    Map<HTTPMethod, ExecuteMethod> executeMethods = findExecuteMethods(fastClass);
-    Map<String, Annotation> resultAnnotations = findResultConfigurations(actionClass);
+    Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods = findExecuteMethods(actionClass);
+    List<ValidationMethodConfiguration> validationMethods = findValidationMethods(actionClass);
     List<Method> formPrepareMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, FormPrepareMethod.class);
-    List<Method> validationMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, ValidationMethod.class);
     List<Method> preParameterMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, PreParameterMethod.class);
     List<Method> postParameterMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, PostParameterMethod.class);
     List<Method> preValidationrMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, PreValidationMethod.class);
     List<Method> postValidationMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, PostValidationMethod.class);
-
+    Map<String, Annotation> resultAnnotations = findResultConfigurations(actionClass);
     Map<String, PreParameter> preParameterMembers = ReflectionUtils.findAllMembersWithAnnotation(actionClass, PreParameter.class);
     Map<String, FileUpload> fileUploadMembers = ReflectionUtils.findAllMembersWithAnnotation(actionClass, FileUpload.class);
     Set<String> memberNames = ReflectionUtils.findAllMembers(actionClass);
 
     List<ScopeField> scopeFields = findScopeFields(actionClass);
 
-    return new ActionConfiguration(actionClass, executeMethods, validationMethods, resultAnnotations, preValidationrMethods,
-      postValidationMethods, preParameterMethods, postParameterMethods, preParameterMembers, fileUploadMembers, memberNames,
-      scopeFields, uri);
+    return new ActionConfiguration(actionClass, executeMethods, validationMethods, formPrepareMethods, preValidationrMethods,
+      postValidationMethods, preParameterMethods, postParameterMethods, resultAnnotations, preParameterMembers,
+      fileUploadMembers, memberNames, scopeFields, uri);
   }
 
   /**
@@ -105,28 +100,28 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
    * @param actionClass The action class.
    * @return The execute methods Map.
    */
-  protected Map<HTTPMethod, ExecuteMethod> findExecuteMethods(FastClass actionClass) {
-    FastMethod defaultMethod = null;
+  protected Map<HTTPMethod, ExecuteMethodConfiguration> findExecuteMethods(Class<?> actionClass) {
+    Method defaultMethod = null;
     try {
-      defaultMethod = actionClass.getMethod("execute", ACTION_METHOD_PARAMETER_TYPES);
-    } catch (NoSuchMethodError e) {
+      defaultMethod = actionClass.getMethod("execute");
+    } catch (NoSuchMethodException e) {
       // Ignore
     }
 
-    Map<HTTPMethod, ExecuteMethod> executeMethods = new HashMap<HTTPMethod, ExecuteMethod>();
+    Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods = new HashMap<HTTPMethod, ExecuteMethodConfiguration>();
     for (HTTPMethod httpMethod : HTTPMethod.values()) {
-      FastMethod method = null;
+      Method method = null;
       try {
-        method = actionClass.getMethod(httpMethod.name().toLowerCase(), ACTION_METHOD_PARAMETER_TYPES);
-      } catch (NoSuchMethodError e) {
+        method = actionClass.getMethod(httpMethod.name().toLowerCase());
+      } catch (NoSuchMethodException e) {
         // Ignore
       }
 
       // Handle HEAD requests using a GET
       if (method == null && httpMethod == HTTPMethod.HEAD) {
         try {
-          method = actionClass.getMethod("get", ACTION_METHOD_PARAMETER_TYPES);
-        } catch (NoSuchMethodError e) {
+          method = actionClass.getMethod("get");
+        } catch (NoSuchMethodException e) {
           // Ignore
         }
       }
@@ -137,7 +132,7 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
 
       if (method != null) {
         verify(method);
-        executeMethods.put(httpMethod, new ExecuteMethod(method, method.getJavaMethod().getAnnotation(Validation.class)));
+        executeMethods.put(httpMethod, new ExecuteMethodConfiguration(method, method.getAnnotation(Validation.class)));
       }
     }
 
@@ -158,12 +153,28 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
   }
 
   /**
+   * Locates all of the validation methods.
+   *
+   * @param actionClass The action class.
+   * @return The validation method configurations.
+   */
+  protected List<ValidationMethodConfiguration> findValidationMethods(Class<?> actionClass) {
+    List<Method> methods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, ValidationMethod.class);
+    List<ValidationMethodConfiguration> configs = new ArrayList<ValidationMethodConfiguration>();
+    for (Method method : methods) {
+      configs.add(new ValidationMethodConfiguration(method, method.getAnnotation(ValidationMethod.class)));
+    }
+
+    return configs;
+  }
+
+  /**
    * Ensures that the method is a correct execute method.
    *
    * @param method The method.
    * @throws PrimeException If the method is invalid.
    */
-  protected void verify(FastMethod method) {
+  protected void verify(Method method) {
     if (method.getReturnType() != String.class || method.getParameterTypes().length != 0) {
       throw new PrimeException("The action class [" + method.getDeclaringClass().getClass() + "] has defined an " +
         "execute method named [" + method.getName() + "] that is invalid. Execute methods must have zero parameters " +

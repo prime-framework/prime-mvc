@@ -86,7 +86,9 @@ public class DefaultParameterHandler implements ParameterHandler {
 
     // Next, invoke pre methods
     ActionConfiguration actionConfiguration = invocation.configuration;
-    ReflectionUtils.invokeAll(action, actionConfiguration.preParameterMethods);
+    if (actionConfiguration.preParameterMethods.size() > 0) {
+      ReflectionUtils.invokeAll(action, actionConfiguration.preParameterMethods);
+    }
 
     // Next, process the optional
     setValues(parameters.optional, action, true);
@@ -100,7 +102,9 @@ public class DefaultParameterHandler implements ParameterHandler {
     }
 
     // Finally, invoke post methods
-    ReflectionUtils.invokeAll(action, actionConfiguration.postParameterMethods);
+    if (actionConfiguration.postParameterMethods.size() > 0) {
+      ReflectionUtils.invokeAll(action, actionConfiguration.postParameterMethods);
+    }
   }
 
   /**

@@ -32,10 +32,10 @@ import org.primeframework.mock.servlet.MockHttpServletResponse;
 import org.primeframework.mock.servlet.MockHttpSession;
 import org.primeframework.mock.servlet.MockServletContext;
 import org.primeframework.mvc.action.ActionInvocation;
-import org.primeframework.mvc.action.ExecuteMethod;
+import org.primeframework.mvc.action.ExecuteMethodConfiguration;
+import org.primeframework.mvc.action.ValidationMethodConfiguration;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.config.DefaultActionConfigurationBuilder;
-import org.primeframework.mvc.action.result.Result;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.guice.GuiceBootstrap;
 import org.primeframework.mvc.parameter.annotation.PreParameter;
@@ -122,22 +122,22 @@ public abstract class PrimeBaseTest {
    * @throws Exception If the construction fails.
    */
   protected ActionInvocation makeActionInvocation(HTTPMethod httpMethod, Object action, String methodName, String uri,
-                                                  String extension, String resultCode, Annotation annotation,
-                                                  Class<? extends Result> resultType) throws Exception {
+                                                  String extension, String resultCode, Annotation annotation) throws Exception {
     Method method = action.getClass().getMethod(methodName);
-    ExecuteMethod executeMethod = new ExecuteMethod(method, method.getAnnotation(Validation.class));
-    Map<HTTPMethod, ExecuteMethod> executeMethods = new HashMap<HTTPMethod, ExecuteMethod>();
+    ExecuteMethodConfiguration executeMethod = new ExecuteMethodConfiguration(method, method.getAnnotation(Validation.class));
+    Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods = new HashMap<HTTPMethod, ExecuteMethodConfiguration>();
     executeMethods.put(httpMethod, executeMethod);
 
-    List<Method> validationMethods = new ArrayList<Method>();
+    List<ValidationMethodConfiguration> validationMethods = new ArrayList<ValidationMethodConfiguration>();
 
     Map<String, Annotation> resultConfigurations = new HashMap<String, Annotation>();
     resultConfigurations.put(resultCode, annotation);
 
     return new ActionInvocation(action, executeMethod, uri, extension,
-      new ActionConfiguration(Edit.class, executeMethods, validationMethods, resultConfigurations, new ArrayList<Method>(),
-        new ArrayList<Method>(), new ArrayList<Method>(), new ArrayList<Method>(), new HashMap<String, PreParameter>(),
-        new HashMap<String, FileUpload>(), new HashSet<String>(), new ArrayList<ScopeField>(), uri));
+      new ActionConfiguration(Edit.class, executeMethods, validationMethods, new ArrayList<Method>(), new ArrayList<Method>(),
+        new ArrayList<Method>(), new ArrayList<Method>(), new ArrayList<Method>(), resultConfigurations,
+        new HashMap<String, PreParameter>(), new HashMap<String, FileUpload>(), new HashSet<String>(),
+        new ArrayList<ScopeField>(), uri));
   }
 
   public static class TestModule extends AbstractModule {

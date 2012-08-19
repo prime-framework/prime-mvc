@@ -89,11 +89,12 @@ public abstract class Accessor {
 
   /**
    * After the object is originally get or set, this method can be called to update the value. This method should only
-   * work if the {@link #set(Object, String[], Expression)} or {@link #get(Object, Expression)} method was called first.
+   * work if the {@link #set(Object, String[], Expression)} or {@link #get(Object, Expression)} method was called
+   * first.
    * <p/>
    * <strong>NOTE:</strong> Accessors are not thread safe and need not be because a new one is created for each atom.
    *
-   * @param value   The value to update the accessor with.
+   * @param value      The value to update the accessor with.
    * @param expression The current expression.
    */
   public void update(Object value, Expression expression) {
@@ -155,10 +156,10 @@ public abstract class Accessor {
    * method attempts to convert the value regardless of the value being null. However, this method short circuits and
    * returns the value unchanged if value is runtime assignable to the type of this BaseBeanProperty.
    *
-   * @param expression The current expression.
-   * @param accessibleObject   The field or method that the conversion is occurring for. This is used to look for
-   *                           conversion annotations.
-   * @param values  The String values to convert.
+   * @param expression       The current expression.
+   * @param accessibleObject The field or method that the conversion is occurring for. This is used to look for
+   *                         conversion annotations.
+   * @param values           The String values to convert.
    * @return The value parameter converted to the correct type.
    * @throws ConversionException If there was a problem converting the parameter.
    */

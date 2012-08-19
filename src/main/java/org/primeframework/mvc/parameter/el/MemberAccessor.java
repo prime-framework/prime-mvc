@@ -41,10 +41,12 @@ public class MemberAccessor extends Accessor {
   public MemberAccessor(ConverterProvider converterProvider, Class<?> declaringClass, String name, String expression) {
     super(converterProvider);
 
-    Map<String, PropertyInfo> properties = ReflectionUtils.findPropertyInfo(declaringClass);
+    this.declaringClass = declaringClass;
+
+    Map<String, PropertyInfo> properties = ReflectionUtils.findPropertyInfo(this.declaringClass);
     PropertyInfo bpi = properties.get(name);
     if (bpi == null) {
-      Map<String, Field> fields = ReflectionUtils.findFields(declaringClass);
+      Map<String, Field> fields = ReflectionUtils.findFields(this.declaringClass);
       this.propertyInfo = null;
       this.field = fields.get(name);
     } else {
@@ -53,11 +55,10 @@ public class MemberAccessor extends Accessor {
     }
 
     if (this.field == null && this.propertyInfo == null) {
-      throw new MissingPropertyExpressionException("While evaluating the expression [" + expression +  "] the property/field [" +
+      throw new MissingPropertyExpressionException("While evaluating the expression [" + expression + "] the property/field [" +
         name + "] in the class [" + declaringClass + "]", name, declaringClass, expression);
     }
 
-    this.declaringClass = declaringClass;
     super.type = (bpi != null) ? bpi.getGenericType() : this.field.getGenericType();
   }
 
@@ -114,13 +115,9 @@ public class MemberAccessor extends Accessor {
 
       // Get the field for the property
       String name = propertyInfo.getName();
-      try {
-        Field field = declaringClass.getField(name);
-        if (field.isAnnotationPresent(type)) {
-          return field.getAnnotation(type);
-        }
-      } catch (NoSuchFieldException nsfe) {
-        // Smother
+      Field field = ReflectionUtils.findFields(declaringClass).get(name);
+      if (field != null && field.isAnnotationPresent(type)) {
+        return field.getAnnotation(type);
       }
     }
 

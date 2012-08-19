@@ -71,7 +71,7 @@ public class GetMethodVerifier implements MethodVerifier {
     }
 
     if (write != null &&
-        ((info.isIndexed() && method.getReturnType() != write.getParameterTypes()[1]) ||
+      ((info.isIndexed() && method.getReturnType() != write.getParameterTypes()[1]) ||
         (!info.isIndexed() && method.getReturnType() != write.getParameterTypes()[0]))) {
       return "Invalid getter/setter pair for JavaBean property named [" + info.getName() + "] in class [" +
         method.getDeclaringClass() + "]. The return type and parameter types must be identical";

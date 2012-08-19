@@ -124,15 +124,17 @@ public class Expression {
     // This is the indexed case, so the next atom is the index
     if (accessor != null && accessor.isIndexed()) {
       accessor = new IndexedAccessor(converterProvider, (MemberAccessor) accessor, atom);
-    } else if (Collection.class.isAssignableFrom(type) || current.getClass().isArray()) {
-      GlobalConverter converter = converterProvider.lookup(Integer.class);
-      Integer index = (Integer) converter.convertFromStrings(Integer.class, null, null, atom);
-
-      accessor = new IndexedCollectionAccessor(converterProvider, accessor, index, accessor.getMemberAccessor());
-    } else if (Map.class.isAssignableFrom(type)) {
-      accessor = new MapAccessor(converterProvider, accessor, atom, accessor.getMemberAccessor());
     } else {
-      accessor = new MemberAccessor(converterProvider, type, atom, expression);
+      if (Collection.class.isAssignableFrom(type) || current.getClass().isArray()) {
+        GlobalConverter converter = converterProvider.lookup(Integer.class);
+        Integer index = (Integer) converter.convertFromStrings(Integer.class, null, null, atom);
+
+        accessor = new IndexedCollectionAccessor(converterProvider, accessor, index, accessor.getMemberAccessor());
+      } else if (Map.class.isAssignableFrom(type)) {
+        accessor = new MapAccessor(converterProvider, accessor, atom, accessor.getMemberAccessor());
+      } else {
+        accessor = new MemberAccessor(converterProvider, type, atom, expression);
+      }
     }
 
     // Check if the new accessor is indexed and if there are no more atoms left. In this case, we error out.
@@ -196,7 +198,7 @@ public class Expression {
         }
 
         if (position == 0) {
-          throw new InvalidExpressionException("The expression string [" + expression+ "] is invalid.");
+          throw new InvalidExpressionException("The expression string [" + expression + "] is invalid.");
         }
 
         list.add(new String(buf, 0, position));

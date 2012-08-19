@@ -15,11 +15,8 @@
  */
 package org.primeframework.mvc.control.form;
 
-import java.lang.reflect.Method;
-
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
-import org.primeframework.mvc.control.form.annotation.FormPrepareMethod;
 import org.primeframework.mvc.util.ReflectionUtils;
 
 import com.google.inject.Inject;
@@ -48,12 +45,8 @@ public class DefaultFormPreparer implements FormPreparer {
       return;
     }
 
-    Class<?> actionClass = action.getClass();
-    Method[] methods = actionClass.getMethods();
-    for (Method method : methods) {
-      if (method.getAnnotation(FormPrepareMethod.class) != null) {
-        ReflectionUtils.invoke(method, action);
-      }
+    if (actionInvocation.configuration.formPrepareMethods.size() > 0) {
+      ReflectionUtils.invokeAll(action, actionInvocation.configuration.formPrepareMethods);
     }
   }
 }

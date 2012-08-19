@@ -27,14 +27,14 @@ import org.primeframework.mvc.action.config.ActionConfiguration;
  */
 public class ActionInvocation {
   public final Object action;
-  public final ExecuteMethod method;
+  public final ExecuteMethodConfiguration method;
   public final String actionURI;
   public final String extension;
   public final Collection<String> uriParameters;
   public final ActionConfiguration configuration;
   public final boolean executeResult;
 
-  public ActionInvocation(Object action, ExecuteMethod method, String uri, String extension, ActionConfiguration configuration) {
+  public ActionInvocation(Object action, ExecuteMethodConfiguration method, String uri, String extension, ActionConfiguration configuration) {
     this.action = action;
     this.method = method;
     this.actionURI = uri;
@@ -44,7 +44,7 @@ public class ActionInvocation {
     this.executeResult = true;
   }
 
-  public ActionInvocation(Object action, ExecuteMethod method, String uri, String extension, Collection<String> uriParameters,
+  public ActionInvocation(Object action, ExecuteMethodConfiguration method, String uri, String extension, Collection<String> uriParameters,
                           ActionConfiguration configuration, boolean executeResult) {
     this.action = action;
     this.method = method;

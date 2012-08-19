@@ -41,8 +41,6 @@ import org.primeframework.mvc.parameter.el.ReadExpressionException;
 import org.primeframework.mvc.parameter.el.SetMethodVerifier;
 import org.primeframework.mvc.parameter.el.UpdateExpressionException;
 
-import net.sf.cglib.reflect.FastMethod;
-
 /**
  * Provides support for reflection, bean properties and field access.
  *
@@ -51,9 +49,9 @@ import net.sf.cglib.reflect.FastMethod;
 @SuppressWarnings("unchecked")
 public class ReflectionUtils {
   private static final Map<String, MethodVerifier> verifiers = new HashMap<String, MethodVerifier>();
-  private static final Map<Class, Method[]> methods = new WeakHashMap<Class, Method[]>();
-  private static final Map<Class, Map<String, PropertyInfo>> propertyCache = new WeakHashMap<Class, Map<String, PropertyInfo>>();
-  private static final Map<Class, Map<String, Field>> fieldCache = new WeakHashMap<Class, Map<String, Field>>();
+  private static final Map<Class<?>, Method[]> methods = new WeakHashMap<Class<?>, Method[]>();
+  private static final Map<Class<?>, Map<String, PropertyInfo>> propertyCache = new WeakHashMap<Class<?>, Map<String, PropertyInfo>>();
+  private static final Map<Class<?>, Map<String, Field>> fieldCache = new WeakHashMap<Class<?>, Map<String, Field>>();
 
   static {
     verifiers.put("is", new GetMethodVerifier());
@@ -170,9 +168,11 @@ public class ReflectionUtils {
    * @param params The parameters passed to the method.
    * @return The return from the method invocation.
    */
-  public static <T> T invoke(FastMethod method, Object obj, Object... params) {
+  public static <T> T invoke(Method method, Object obj, Object... params) {
     try {
       return (T) method.invoke(obj, params);
+    } catch (IllegalAccessException e) {
+      throw new ExpressionException("Unable to call method [" + method + "] because it isn't accessible", e);
     } catch (IllegalArgumentException e) {
       throw new ExpressionException("Unable to call method [" + method + "] because the incorrect parameters were passed to it", e);
     } catch (InvocationTargetException e) {
@@ -199,7 +199,7 @@ public class ReflectionUtils {
       try {
         method.invoke(obj);
       } catch (IllegalAccessException e) {
-        throw new ExpressionException("Unable to call method [" + method + "]", e);
+        throw new ExpressionException("Unable to call method [" + method + "] because it isn't accessible", e);
       } catch (InvocationTargetException e) {
         Throwable target = e.getTargetException();
         if (target instanceof RuntimeException) {
@@ -300,12 +300,12 @@ public class ReflectionUtils {
    */
   public static Method[] findMethods(Class<?> type) {
     synchronized (methods) {
-      Method[] methodArray = methods.get(type);
-      if (methodArray == null) {
-        methodArray = type.getMethods();
-        methods.put(type, methodArray);
+      Method[] array = methods.get(type);
+      if (array == null) {
+        array = type.getMethods();
+        methods.put(type, array);
       }
-      return methodArray;
+      return array;
     }
   }
 

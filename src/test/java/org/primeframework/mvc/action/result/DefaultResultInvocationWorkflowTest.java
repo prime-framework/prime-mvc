@@ -156,7 +156,7 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
   @Test
   public void actionWithResult() throws Exception {
     ForwardImpl annotation = new ForwardImpl("/user/edit", "success");
-    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, new Edit(), "post", "/user/edit", "", "success", annotation, ForwardResult.class);
+    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, new Edit(), "post", "/user/edit", "", "success", annotation);
     ActionInvocationStore ais = createStrictMock(ActionInvocationStore.class);
     expect(ais.getCurrent()).andReturn(ai);
     replay(ais);
@@ -229,7 +229,7 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
   @Test
   public void actionMissingResult() throws Exception {
     ForwardImpl annotation = new ForwardImpl("/user/edit", "success");
-    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, new Edit(), "post", "/user/edit", "", "success", annotation, ForwardResult.class);
+    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, new Edit(), "post", "/user/edit", "", "success", annotation);
     ActionInvocationStore ais = createStrictMock(ActionInvocationStore.class);
     expect(ais.getCurrent()).andReturn(ai);
     replay(ais);

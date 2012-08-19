@@ -98,7 +98,7 @@ public class DefaultActionMapper implements ActionMapper {
 
     // Create the action and find the method
     Object action = null;
-    ExecuteMethod method = null;
+    ExecuteMethodConfiguration method = null;
     if (actionConfiguration != null) {
       Class<?> actionClass = actionConfiguration.actionClass;
       method = actionConfiguration.executeMethods.get(httpMethod);

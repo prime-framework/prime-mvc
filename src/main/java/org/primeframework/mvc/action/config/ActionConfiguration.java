@@ -21,7 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.primeframework.mvc.action.ExecuteMethod;
+import org.primeframework.mvc.action.ExecuteMethodConfiguration;
+import org.primeframework.mvc.action.ValidationMethodConfiguration;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.parameter.annotation.PreParameter;
 import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
@@ -36,7 +37,9 @@ import org.primeframework.mvc.validation.jsr303.Validatable;
  */
 public class ActionConfiguration {
   public final Class<?> actionClass;
-  public final List<Method> validationMethods;
+  public final Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods;
+  public final List<ValidationMethodConfiguration> validationMethods;
+  public final List<Method> formPrepareMethods;
   public final List<Method> preValidationMethods;
   public final List<Method> postValidationMethods;
   public final List<Method> preParameterMethods;
@@ -44,7 +47,6 @@ public class ActionConfiguration {
   public final Map<String, PreParameter> preParameterMembers;
   public final Map<String, FileUpload> fileUploadMembers;
   public final Set<String> memberNames;
-  public final Map<HTTPMethod, ExecuteMethod> executeMethods;
   public final List<ScopeField> scopeFields;
   public final Map<String, Annotation> resultConfigurations;
   public final boolean validatable;
@@ -53,12 +55,15 @@ public class ActionConfiguration {
   public final String pattern;
   public final String[] patternParts;
 
-  public ActionConfiguration(Class<?> actionClass, Map<HTTPMethod, ExecuteMethod> executeMethods, List<Method> validationMethods,
-                             Map<String, Annotation> resultConfigurations, List<Method> preValidationMethods,
-                             List<Method> postValidationMethods, List<Method> preParameterMethods, List<Method> postParameterMethods,
-                             Map<String, PreParameter> preParameterMembers, Map<String, FileUpload> fileUploadMembers,
-                             Set<String> memberNames, List<ScopeField> scopeFields, String uri) {
+  public ActionConfiguration(Class<?> actionClass, Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods,
+                             List<ValidationMethodConfiguration> validationMethods, List<Method> formPrepareMethods,
+                             List<Method> preValidationMethods, List<Method> postValidationMethods,
+                             List<Method> preParameterMethods, List<Method> postParameterMethods,
+                             Map<String, Annotation> resultConfigurations, Map<String, PreParameter> preParameterMembers,
+                             Map<String, FileUpload> fileUploadMembers, Set<String> memberNames,
+                             List<ScopeField> scopeFields, String uri) {
     this.actionClass = actionClass;
+    this.formPrepareMethods = formPrepareMethods;
     this.preValidationMethods = preValidationMethods;
     this.postValidationMethods = postValidationMethods;
     this.preParameterMethods = preParameterMethods;
