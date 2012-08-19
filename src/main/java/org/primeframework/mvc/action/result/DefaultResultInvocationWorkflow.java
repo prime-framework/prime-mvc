@@ -28,7 +28,6 @@ import org.primeframework.mvc.action.result.RedirectResult.RedirectImpl;
 import org.primeframework.mvc.workflow.WorkflowChain;
 
 import com.google.inject.Inject;
-import com.google.inject.Injector;
 
 /**
  * Handles invoking the result.
@@ -39,15 +38,15 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
   private final ActionInvocationStore actionInvocationStore;
   private final ResultStore resultStore;
   private final ResourceLocator resourceLocator;
-  private final Injector injector;
+  private final ResultFactory factory;
 
   @Inject
   public DefaultResultInvocationWorkflow(ActionInvocationStore actionInvocationStore, ResultStore resultStore,
-                                         ResourceLocator resourceLocator, Injector injector) {
+                                         ResourceLocator resourceLocator, ResultFactory factory) {
     this.actionInvocationStore = actionInvocationStore;
     this.resultStore = resultStore;
     this.resourceLocator = resourceLocator;
-    this.injector = injector;
+    this.factory = factory;
   }
 
   /**
@@ -55,21 +54,14 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
    * <p/>
    * <h3>Action-less request</h3>
    * <p/>
-   * <ul>
-   *   <li>Lookup an action-less result invocation</li>
-   *   <li>If it doesn't exist, continue down the chain</li>
-   *   <li>If it does exist, call the ResultRegistry to find the Result</li>
-   *   <li>Invoke the Result</li>
-   * </ul>
+   * <ul> <li>Lookup an action-less result invocation</li> <li>If it doesn't exist, continue down the chain</li> <li>If
+   * it does exist, call the ResultRegistry to find the Result</li> <li>Invoke the Result</li> </ul>
    * <p/>
    * <h3>Action request</h3>
    * <p/>
-   * <ul>
-   *   <li>Lookup an result invocation using the action invocation, action URI and result code from the action</li>
-   *   <li>If it doesn't exist, error out</li>
-   *   <li>If it does exist, call the ResultRegistry to find the Result</li>
-   *   <li>Invoke the Result</li>
-   * </ul>
+   * <ul> <li>Lookup an result invocation using the action invocation, action URI and result code from the action</li>
+   * <li>If it doesn't exist, error out</li> <li>If it does exist, call the ResultRegistry to find the Result</li>
+   * <li>Invoke the Result</li> </ul>
    *
    * @param chain The chain.
    * @throws IOException      If the chain throws an IOException.
@@ -80,7 +72,6 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
     try {
       ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
       if (actionInvocation.executeResult) {
-        Class<?> resultType;
         Annotation annotation;
         if (actionInvocation.action == null) {
           Pair<Annotation, Class<?>> p = defaultResult(actionInvocation);
@@ -90,11 +81,10 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
           }
 
           annotation = p.getLeft();
-          resultType = p.getRight();
         } else {
           String resultCode = resultStore.get();
-          ResultConfiguration resultConfiguration = actionInvocation.configuration.resultConfigurations.get(resultCode);
-          if (resultConfiguration == null) {
+          annotation  = actionInvocation.configuration.resultConfigurations.get(resultCode);
+          if (annotation == null) {
             String uri = resourceLocator.locate(ForwardResult.DIR);
             if (uri == null) {
               throw new PrimeException("Missing result for action class [" + actionInvocation.configuration.actionClass +
@@ -102,14 +92,10 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
             }
 
             annotation = new ForwardImpl(uri, "success");
-            resultType = ForwardResult.class;
-          } else {
-            resultType = resultConfiguration.resultType;
-            annotation = resultConfiguration.annotation;
           }
         }
-  
-        Result result = (Result) injector.getInstance(resultType);
+
+        Result result = factory.build(annotation.annotationType());
         result.execute(annotation);
       }
     } finally {
@@ -122,14 +108,9 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
    * <p/>
    * Checks for results using this search order:
    * <p/>
-   * <ol>
-   *   <li>/WEB-INF/templates/&lt;uri>-&lt;resultCode>.jsp</li>
-   *   <li>/WEB-INF/templates/&lt;uri>-&lt;resultCode>.ftl</li>
-   *   <li>/WEB-INF/templates/&lt;uri>.jsp</li>
-   *   <li>/WEB-INF/templates/&lt;uri>.ftl</li>
-   *   <li>/WEB-INF/templates/&lt;uri>/index.jsp</li>
-   *   <li>/WEB-INF/templates/&lt;uri>/index.ftl</li>
-   * </ol>
+   * <ol> <li>/WEB-INF/templates/&lt;uri>-&lt;resultCode>.jsp</li> <li>/WEB-INF/templates/&lt;uri>-&lt;resultCode>.ftl</li>
+   * <li>/WEB-INF/templates/&lt;uri>.jsp</li> <li>/WEB-INF/templates/&lt;uri>.ftl</li>
+   * <li>/WEB-INF/templates/&lt;uri>/index.jsp</li> <li>/WEB-INF/templates/&lt;uri>/index.ftl</li> </ol>
    * <p/>
    * If nothing is found this bombs out.
    *

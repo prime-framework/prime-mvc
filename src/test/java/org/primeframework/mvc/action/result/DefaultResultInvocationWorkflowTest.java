@@ -27,6 +27,7 @@ import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
 
+import com.google.inject.Binder;
 import com.google.inject.Injector;
 import static org.easymock.EasyMock.*;
 import static org.testng.Assert.*;
@@ -63,10 +64,17 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
     expect(injector.getInstance(ForwardResult.class)).andReturn(result);
     replay(injector);
 
-    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(ais, resultStore, resourceLocator, injector);
+    Binder binder = createStrictMock(Binder.class);
+    expect(binder.bind(ForwardResult.class)).andReturn(null);
+    replay(binder);
+
+    ResultFactory.addResult(binder, Forward.class, ForwardResult.class);
+    ResultFactory factory = new ResultFactory(injector);
+
+    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(ais, resultStore, resourceLocator, factory);
     workflow.perform(chain);
 
-    verify(ais, resultStore, resourceLocator, injector, chain);
+    verify(ais, resultStore, resourceLocator, injector, chain, binder);
   }
 
   @Test
@@ -96,10 +104,17 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
     replay(chain);
 
-    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(ais, resultStore, resourceLocator, injector);
+    Binder binder = createStrictMock(Binder.class);
+    expect(binder.bind(RedirectResult.class)).andReturn(null);
+    replay(binder);
+
+    ResultFactory.addResult(binder, Redirect.class, RedirectResult.class);
+    ResultFactory factory = new ResultFactory(injector);
+
+    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(ais, resultStore, resourceLocator, factory);
     workflow.perform(chain);
 
-    verify(ais, resultStore, resourceLocator, injector, chain);
+    verify(ais, resultStore, resourceLocator, injector, chain, binder);
   }
 
   @Test
@@ -125,10 +140,17 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
     chain.continueWorkflow();
     replay(chain);
 
-    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(ais, resultStore, resourceLocator, injector);
+    Binder binder = createStrictMock(Binder.class);
+    expect(binder.bind(ForwardResult.class)).andReturn(null);
+    replay(binder);
+
+    ResultFactory.addResult(binder, Forward.class, ForwardResult.class);
+    ResultFactory factory = new ResultFactory(injector);
+
+    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(ais, resultStore, resourceLocator, factory);
     workflow.perform(chain);
 
-    verify(ais, resultStore, resourceLocator, injector, chain);
+    verify(ais, resultStore, resourceLocator, injector, chain, binder);
   }
 
   @Test
@@ -158,10 +180,17 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
     expect(injector.getInstance(ForwardResult.class)).andReturn(result);
     replay(injector);
 
-    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(ais, resultStore, resourceLocator, injector);
+    Binder binder = createStrictMock(Binder.class);
+    expect(binder.bind(ForwardResult.class)).andReturn(null);
+    replay(binder);
+
+    ResultFactory.addResult(binder, Forward.class, ForwardResult.class);
+    ResultFactory factory = new ResultFactory(injector);
+
+    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(ais, resultStore, resourceLocator, factory);
     workflow.perform(chain);
 
-    verify(ais, resultStore, resourceLocator, injector, chain);
+    verify(ais, resultStore, resourceLocator, injector, chain, binder);
   }
 
   @Test
@@ -184,10 +213,17 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
     Injector injector = createStrictMock(Injector.class);
     replay(injector);
 
-    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(ais, resultStore, resourceLocator, injector);
+    Binder binder = createStrictMock(Binder.class);
+    expect(binder.bind(ForwardResult.class)).andReturn(null);
+    replay(binder);
+
+    ResultFactory.addResult(binder, Forward.class, ForwardResult.class);
+    ResultFactory factory = new ResultFactory(injector);
+
+    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(ais, resultStore, resourceLocator, factory);
     workflow.perform(chain);
 
-    verify(ais, resultStore, resourceLocator, injector, chain);
+    verify(ais, resultStore, resourceLocator, injector, chain, binder);
   }
 
   @Test
@@ -213,7 +249,14 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
     Injector injector = createStrictMock(Injector.class);
     replay(injector);
 
-    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(ais, resultStore, resourceLocator, injector);
+    Binder binder = createStrictMock(Binder.class);
+    expect(binder.bind(ForwardResult.class)).andReturn(null);
+    replay(binder);
+
+    ResultFactory.addResult(binder, Forward.class, ForwardResult.class);
+    ResultFactory factory = new ResultFactory(injector);
+
+    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(ais, resultStore, resourceLocator, factory);
     try {
       workflow.perform(chain);
       fail("Should have thrown a PrimeException");
@@ -221,6 +264,6 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
       // Expected
     }
 
-    verify(ais, resultStore, resourceLocator, injector, chain);
+    verify(ais, resultStore, resourceLocator, injector, chain, binder);
   }
 }

@@ -18,8 +18,6 @@ package org.primeframework.mvc.action.result.annotation;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import org.primeframework.mvc.action.result.NoOpResult;
-
 import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.*;
 
@@ -28,7 +26,7 @@ import static java.lang.annotation.RetentionPolicy.*;
  *
  * @author jhumphrey
  */
-@ResultAnnotation(NoOpResult.class)
+@ResultAnnotation
 @Retention(RUNTIME)
 @Target(TYPE)
 public @interface NoOp {

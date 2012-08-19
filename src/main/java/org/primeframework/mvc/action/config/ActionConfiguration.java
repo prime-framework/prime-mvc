@@ -15,6 +15,7 @@
  */
 package org.primeframework.mvc.action.config;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +23,6 @@ import java.util.Set;
 
 import org.primeframework.mvc.action.ExecuteMethod;
 import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.action.result.ResultConfiguration;
 import org.primeframework.mvc.parameter.annotation.PreParameter;
 import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
 import org.primeframework.mvc.scope.ScopeField;
@@ -46,7 +46,7 @@ public class ActionConfiguration {
   public final Set<String> memberNames;
   public final Map<HTTPMethod, ExecuteMethod> executeMethods;
   public final List<ScopeField> scopeFields;
-  public final Map<String, ResultConfiguration> resultConfigurations;
+  public final Map<String, Annotation> resultConfigurations;
   public final boolean validatable;
   public final String uri;
   public final Action annotation;
@@ -54,7 +54,7 @@ public class ActionConfiguration {
   public final String[] patternParts;
 
   public ActionConfiguration(Class<?> actionClass, Map<HTTPMethod, ExecuteMethod> executeMethods, List<Method> validationMethods,
-                             Map<String, ResultConfiguration> resultConfigurations, List<Method> preValidationMethods,
+                             Map<String, Annotation> resultConfigurations, List<Method> preValidationMethods,
                              List<Method> postValidationMethods, List<Method> preParameterMethods, List<Method> postParameterMethods,
                              Map<String, PreParameter> preParameterMembers, Map<String, FileUpload> fileUploadMembers,
                              Set<String> memberNames, List<ScopeField> scopeFields, String uri) {

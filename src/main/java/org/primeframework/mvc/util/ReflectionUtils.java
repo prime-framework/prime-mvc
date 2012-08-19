@@ -41,6 +41,8 @@ import org.primeframework.mvc.parameter.el.ReadExpressionException;
 import org.primeframework.mvc.parameter.el.SetMethodVerifier;
 import org.primeframework.mvc.parameter.el.UpdateExpressionException;
 
+import net.sf.cglib.reflect.FastMethod;
+
 /**
  * Provides support for reflection, bean properties and field access.
  *
@@ -168,11 +170,9 @@ public class ReflectionUtils {
    * @param params The parameters passed to the method.
    * @return The return from the method invocation.
    */
-  public static <T> T invoke(Method method, Object obj, Object... params) {
+  public static <T> T invoke(FastMethod method, Object obj, Object... params) {
     try {
       return (T) method.invoke(obj, params);
-    } catch (IllegalAccessException e) {
-      throw new ExpressionException("Unable to call method [" + method + "] because it isn't accessible", e);
     } catch (IllegalArgumentException e) {
       throw new ExpressionException("Unable to call method [" + method + "] because the incorrect parameters were passed to it", e);
     } catch (InvocationTargetException e) {

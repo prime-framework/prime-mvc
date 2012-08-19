@@ -36,7 +36,6 @@ import org.primeframework.mvc.action.ExecuteMethod;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.config.DefaultActionConfigurationBuilder;
 import org.primeframework.mvc.action.result.Result;
-import org.primeframework.mvc.action.result.ResultConfiguration;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.guice.GuiceBootstrap;
 import org.primeframework.mvc.parameter.annotation.PreParameter;
@@ -74,7 +73,7 @@ public abstract class PrimeBaseTest {
 
     injector = GuiceBootstrap.initialize(new TestModule());
   }
-  
+
   /**
    * Sets up the servlet objects and injects the test.
    */
@@ -88,7 +87,7 @@ public abstract class PrimeBaseTest {
 
     injector.injectMembers(this);
   }
-  
+
   @AfterMethod
   public void tearDown() {
     ServletObjectsHolder.clearServletRequest();
@@ -98,9 +97,9 @@ public abstract class PrimeBaseTest {
   /**
    * Makes an action invocation and configuration.
    *
-   * @param action The action object.
+   * @param action     The action object.
    * @param httpMethod The HTTP method.
-   * @param extension The extension.
+   * @param extension  The extension.
    * @return The action invocation.
    * @throws Exception If the construction fails.
    */
@@ -115,10 +114,10 @@ public abstract class PrimeBaseTest {
    * Makes an action invocation and configuration.
    *
    * @param httpMethod The HTTP method.
-   * @param action The action object.
+   * @param action     The action object.
    * @param methodName The method name to reflect and configure.
-   * @param uri The request URI.
-   * @param extension The extension.
+   * @param uri        The request URI.
+   * @param extension  The extension.
    * @return The action invocation.
    * @throws Exception If the construction fails.
    */
@@ -132,8 +131,8 @@ public abstract class PrimeBaseTest {
 
     List<Method> validationMethods = new ArrayList<Method>();
 
-    Map<String, ResultConfiguration> resultConfigurations = new HashMap<String, ResultConfiguration>();
-    resultConfigurations.put(resultCode, new ResultConfiguration(annotation, resultType));
+    Map<String, Annotation> resultConfigurations = new HashMap<String, Annotation>();
+    resultConfigurations.put(resultCode, annotation);
 
     return new ActionInvocation(action, executeMethod, uri, extension,
       new ActionConfiguration(Edit.class, executeMethods, validationMethods, resultConfigurations, new ArrayList<Method>(),

@@ -19,8 +19,6 @@ package org.primeframework.mvc.action.result.annotation;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import org.primeframework.mvc.action.result.ForwardResult;
-
 import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.*;
 
@@ -29,7 +27,7 @@ import static java.lang.annotation.RetentionPolicy.*;
  *
  * @author Brian Pontarelli
  */
-@ResultAnnotation(ForwardResult.class)
+@ResultAnnotation
 @Retention(RUNTIME)
 @Target(TYPE)
 public @interface Forward {
@@ -57,8 +55,8 @@ public @interface Forward {
   int status() default 200;
 
   /**
-   * @return Overrides the status parameter. If this is set, Prime use the value of this parameter and first expand
-   *         it. It uses the <code>${variable}</code> notation that is common for variable expanders. After it has been
+   * @return Overrides the status parameter. If this is set, Prime use the value of this parameter and first expand it.
+   *         It uses the <code>${variable}</code> notation that is common for variable expanders. After it has been
    *         expanded, the result is converted into an int. Therefore, you can specify either a number as a String, or a
    *         variable expansion. Here are some examples: <code>"${myStatus}"</code>, <code>"200"</code>,
    *         <code>"40${someField}"</code>

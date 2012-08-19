@@ -20,8 +20,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.primeframework.mvc.action.result.Result;
-
 /**
  * This annotation is a marker that is used to mark custom result annotations so that Prime can determine which
  * annotations on an action class are results annotations.
@@ -31,8 +29,4 @@ import org.primeframework.mvc.action.result.Result;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.ANNOTATION_TYPE)
 public @interface ResultAnnotation {
-  /**
-   * @return The class that implements the result annotation's processing.
-   */
-  Class<? extends Result> value();
 }

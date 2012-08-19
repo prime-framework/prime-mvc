@@ -15,9 +15,9 @@
  */
 package org.primeframework.mvc.action;
 
-import java.lang.reflect.Method;
-
 import org.primeframework.mvc.validation.jsr303.Validation;
+
+import net.sf.cglib.reflect.FastMethod;
 
 /**
  * Stores the Method and annotations for all execute methods on an action.
@@ -25,10 +25,10 @@ import org.primeframework.mvc.validation.jsr303.Validation;
  * @author Brian Pontarelli
  */
 public class ExecuteMethod {
-  public final Method method;
+  public final FastMethod method;
   public final Validation validation;
 
-  public ExecuteMethod(Method method, Validation validation) {
+  public ExecuteMethod(FastMethod method, Validation validation) {
     this.method = method;
     this.validation = validation;
   }

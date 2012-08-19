@@ -28,9 +28,9 @@ import java.util.Set;
 
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ExecuteMethod;
-import org.primeframework.mvc.action.result.ResultConfiguration;
 import org.primeframework.mvc.action.result.annotation.ResultAnnotation;
 import org.primeframework.mvc.action.result.annotation.ResultContainerAnnotation;
+import org.primeframework.mvc.control.form.annotation.FormPrepareMethod;
 import org.primeframework.mvc.parameter.annotation.PostParameterMethod;
 import org.primeframework.mvc.parameter.annotation.PreParameter;
 import org.primeframework.mvc.parameter.annotation.PreParameterMethod;
@@ -45,6 +45,9 @@ import org.primeframework.mvc.validation.annotation.PostValidationMethod;
 import org.primeframework.mvc.validation.annotation.PreValidationMethod;
 import org.primeframework.mvc.validation.jsr303.Validation;
 
+import net.sf.cglib.reflect.FastClass;
+import net.sf.cglib.reflect.FastMethod;
+
 import com.google.inject.Inject;
 
 /**
@@ -53,6 +56,7 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 public class DefaultActionConfigurationBuilder implements ActionConfigurationBuilder {
+  public static final Class[] ACTION_METHOD_PARAMETER_TYPES = new Class[0];
   private final URIBuilder uriBuilder;
 
   @Inject
@@ -73,11 +77,12 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
         "abstract. You can only annotate concrete action classes");
     }
 
+    FastClass fastClass = FastClass.create(actionClass);
     String uri = uriBuilder.build(actionClass);
-    Map<HTTPMethod, ExecuteMethod> executeMethods = findExecuteMethods(actionClass);
+    Map<HTTPMethod, ExecuteMethod> executeMethods = findExecuteMethods(fastClass);
+    Map<String, Annotation> resultAnnotations = findResultConfigurations(actionClass);
+    List<Method> formPrepareMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, FormPrepareMethod.class);
     List<Method> validationMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, ValidationMethod.class);
-    Map<String, ResultConfiguration> resultAnnotations = findResultConfigurations(actionClass);
-
     List<Method> preParameterMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, PreParameterMethod.class);
     List<Method> postParameterMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, PostParameterMethod.class);
     List<Method> preValidationrMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, PreValidationMethod.class);
@@ -100,28 +105,28 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
    * @param actionClass The action class.
    * @return The execute methods Map.
    */
-  protected Map<HTTPMethod, ExecuteMethod> findExecuteMethods(Class<?> actionClass) {
-    Method defaultMethod = null;
+  protected Map<HTTPMethod, ExecuteMethod> findExecuteMethods(FastClass actionClass) {
+    FastMethod defaultMethod = null;
     try {
-      defaultMethod = actionClass.getMethod("execute");
-    } catch (NoSuchMethodException e) {
+      defaultMethod = actionClass.getMethod("execute", ACTION_METHOD_PARAMETER_TYPES);
+    } catch (NoSuchMethodError e) {
       // Ignore
     }
 
     Map<HTTPMethod, ExecuteMethod> executeMethods = new HashMap<HTTPMethod, ExecuteMethod>();
     for (HTTPMethod httpMethod : HTTPMethod.values()) {
-      Method method = null;
+      FastMethod method = null;
       try {
-        method = actionClass.getMethod(httpMethod.name().toLowerCase());
-      } catch (NoSuchMethodException e) {
+        method = actionClass.getMethod(httpMethod.name().toLowerCase(), ACTION_METHOD_PARAMETER_TYPES);
+      } catch (NoSuchMethodError e) {
         // Ignore
       }
 
       // Handle HEAD requests using a GET
       if (method == null && httpMethod == HTTPMethod.HEAD) {
         try {
-          method = actionClass.getMethod("get");
-        } catch (NoSuchMethodException e) {
+          method = actionClass.getMethod("get", ACTION_METHOD_PARAMETER_TYPES);
+        } catch (NoSuchMethodError e) {
           // Ignore
         }
       }
@@ -132,7 +137,7 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
 
       if (method != null) {
         verify(method);
-        executeMethods.put(httpMethod, new ExecuteMethod(method, method.getAnnotation(Validation.class)));
+        executeMethods.put(httpMethod, new ExecuteMethod(method, method.getJavaMethod().getAnnotation(Validation.class)));
       }
     }
 
@@ -158,7 +163,7 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
    * @param method The method.
    * @throws PrimeException If the method is invalid.
    */
-  protected void verify(Method method) {
+  protected void verify(FastMethod method) {
     if (method.getReturnType() != String.class || method.getParameterTypes().length != 0) {
       throw new PrimeException("The action class [" + method.getDeclaringClass().getClass() + "] has defined an " +
         "execute method named [" + method.getName() + "] that is invalid. Execute methods must have zero parameters " +
@@ -175,8 +180,8 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
    * @param actionClass The action class.
    * @return The map of all the result configurations.
    */
-  protected Map<String, ResultConfiguration> findResultConfigurations(Class<?> actionClass) {
-    Map<String, ResultConfiguration> resultConfigurations = new HashMap<String, ResultConfiguration>();
+  protected Map<String, Annotation> findResultConfigurations(Class<?> actionClass) {
+    Map<String, Annotation> resultConfigurations = new HashMap<String, Annotation>();
     while (actionClass != Object.class) {
       addResultsForClass(actionClass, resultConfigurations);
       actionClass = actionClass.getSuperclass();
@@ -188,24 +193,23 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
   /**
    * Adds all the result annotations for the given class.
    *
-   * @param actionClass The action class.
+   * @param actionClass          The action class.
    * @param resultConfigurations The Map.
    */
-  protected void addResultsForClass(Class<?> actionClass, Map<String, ResultConfiguration> resultConfigurations) {
+  protected void addResultsForClass(Class<?> actionClass, Map<String, Annotation> resultConfigurations) {
     Annotation[] annotations = actionClass.getAnnotations();
     for (Annotation annotation : annotations) {
       Class<? extends Annotation> annotationType = annotation.annotationType();
       ResultAnnotation resultAnnotation = annotationType.getAnnotation(ResultAnnotation.class);
       if (resultAnnotation != null) {
-        addResultConfiguration(actionClass, resultConfigurations, annotation, annotationType, resultAnnotation);
+        addResultConfiguration(actionClass, resultConfigurations, annotation, annotationType);
       } else if (annotationType.isAnnotationPresent(ResultContainerAnnotation.class)) {
         // There are multiple annotations inside the value
         try {
           Annotation[] results = (Annotation[]) annotation.getClass().getMethod("value").invoke(annotation);
           for (Annotation result : results) {
             annotationType = result.annotationType();
-            resultAnnotation = annotationType.getAnnotation(ResultAnnotation.class);
-            addResultConfiguration(actionClass, resultConfigurations, result, annotationType, resultAnnotation);
+            addResultConfiguration(actionClass, resultConfigurations, result, annotationType);
           }
         } catch (NoSuchMethodException e) {
           throw new PrimeException("The result annotation container [" + annotationType + "] must have a method named " +
@@ -227,13 +231,12 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
   /**
    * Adds the result annotation to the map and handles throwing an exception if there are duplicates.
    *
-   * @param actionClass The action class.
+   * @param actionClass          The action class.
    * @param resultConfigurations The result configurations Map.
-   * @param annotation The annotation to check and add.
+   * @param annotation           The annotation to check and add.
    */
-  protected void addResultConfiguration(Class<?> actionClass, Map<String, ResultConfiguration> resultConfigurations,
-                                        Annotation annotation, Class<? extends Annotation> annotationType,
-                                        ResultAnnotation resultAnnotation) {
+  protected void addResultConfiguration(Class<?> actionClass, Map<String, Annotation> resultConfigurations,
+                                        Annotation annotation, Class<? extends Annotation> annotationType) {
     try {
       String code = (String) annotation.getClass().getMethod("code").invoke(annotation);
       if (resultConfigurations.containsKey(code)) {
@@ -241,7 +244,7 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
           "the code [" + code + "]");
       }
 
-      resultConfigurations.put(code, new ResultConfiguration(annotation, resultAnnotation.value()));
+      resultConfigurations.put(code, annotation);
     } catch (NoSuchMethodException e) {
       throw new PrimeException("The result annotation [" + annotationType + "] is missing a method named [code] that " +
         "returns a String. For example:\n\n" +
