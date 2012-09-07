@@ -20,22 +20,23 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 import org.primeframework.mvc.action.ActionInvocationStore;
-import org.primeframework.mvc.action.result.annotation.Header;
+import org.primeframework.mvc.action.result.annotation.Status;
+import org.primeframework.mvc.action.result.annotation.Status.Header;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 
 import com.google.inject.Inject;
 
 /**
- * This result returns a header only response.
+ * This result returns a status response.
  *
  * @author Brian Pontarelli
  */
-public class HeaderResult extends AbstractResult<Header> {
+public class StatusResult extends AbstractResult<Status> {
   private final HttpServletResponse response;
   private final ActionInvocationStore actionInvocationStore;
 
   @Inject
-  public HeaderResult(ExpressionEvaluator expressionEvaluator, HttpServletResponse response, ActionInvocationStore actionInvocationStore) {
+  public StatusResult(ExpressionEvaluator expressionEvaluator, HttpServletResponse response, ActionInvocationStore actionInvocationStore) {
     super(expressionEvaluator);
     this.response = response;
     this.actionInvocationStore = actionInvocationStore;
@@ -44,8 +45,12 @@ public class HeaderResult extends AbstractResult<Header> {
   /**
    * {@inheritDoc}
    */
-  public void execute(Header header) throws IOException, ServletException {
+  public void execute(Status status) throws IOException, ServletException {
     Object action = actionInvocationStore.getCurrent().action;
-    setStatus(header.status(), header.statusStr(), action, response);
+    setStatus(status.status(), status.statusStr(), action, response);
+
+    for (Header header : status.headers()) {
+      response.setHeader(header.name(), header.value());
+    }
   }
 }

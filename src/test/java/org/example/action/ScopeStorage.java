@@ -15,25 +15,8 @@
  */
 package org.example.action;
 
-import javax.validation.Validator;
-import java.util.Set;
-
 import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.action.result.annotation.Forward;
-import org.primeframework.mvc.action.result.annotation.Header;
-import org.primeframework.mvc.action.result.annotation.Redirect;
-import org.primeframework.mvc.message.MessageStore;
-import org.primeframework.mvc.message.MessageType;
-import org.primeframework.mvc.message.SimpleFieldMessage;
-import org.primeframework.mvc.parameter.annotation.PostParameterMethod;
-import org.primeframework.mvc.parameter.annotation.PreParameterMethod;
 import org.primeframework.mvc.scope.annotation.Session;
-import org.primeframework.mvc.validation.ValidationMethod;
-import org.primeframework.mvc.validation.annotation.PostValidationMethod;
-import org.primeframework.mvc.validation.annotation.PreValidationMethod;
-import org.primeframework.mvc.validation.jsr303.Validatable;
-
-import com.google.inject.Inject;
 
 /**
  * @author Brian Pontarelli

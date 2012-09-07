@@ -20,8 +20,9 @@ import java.util.Set;
 
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.annotation.Forward;
-import org.primeframework.mvc.action.result.annotation.Header;
+import org.primeframework.mvc.action.result.annotation.Status;
 import org.primeframework.mvc.action.result.annotation.Redirect;
+import org.primeframework.mvc.action.result.annotation.Status.Header;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
@@ -47,7 +48,7 @@ import com.google.inject.Inject;
   @Redirect(code = "redirect1", uri = "/redirect1", perm = true),
   @Redirect(code = "redirect2", uri = "/redirect2", perm = false)
 })
-@Header(code = "header", status = 300)
+@Status(code = "status", status = 300, statusStr = "hello world", headers = {@Header(name = "foo", value = "bar"), @Header(name = "baz", value = "fred")})
 public class KitchenSink extends KitchenSinkSuperclass implements Validatable {
   private final MessageStore messageStore;
 

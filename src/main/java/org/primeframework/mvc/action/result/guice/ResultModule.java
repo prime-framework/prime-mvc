@@ -16,14 +16,14 @@
 package org.primeframework.mvc.action.result.guice;
 
 import org.primeframework.mvc.action.result.ForwardResult;
-import org.primeframework.mvc.action.result.HeaderResult;
+import org.primeframework.mvc.action.result.StatusResult;
 import org.primeframework.mvc.action.result.NoOpResult;
 import org.primeframework.mvc.action.result.RedirectResult;
 import org.primeframework.mvc.action.result.ResultFactory;
 import org.primeframework.mvc.action.result.StreamResult;
 import org.primeframework.mvc.action.result.XMLStreamResult;
 import org.primeframework.mvc.action.result.annotation.Forward;
-import org.primeframework.mvc.action.result.annotation.Header;
+import org.primeframework.mvc.action.result.annotation.Status;
 import org.primeframework.mvc.action.result.annotation.NoOp;
 import org.primeframework.mvc.action.result.annotation.Redirect;
 import org.primeframework.mvc.action.result.annotation.Stream;
@@ -41,7 +41,7 @@ public class ResultModule extends AbstractModule {
   protected void configure() {
     bind(ResultFactory.class);
     ResultFactory.addResult(binder(), Forward.class, ForwardResult.class);
-    ResultFactory.addResult(binder(), Header.class, HeaderResult.class);
+    ResultFactory.addResult(binder(), Status.class, StatusResult.class);
     ResultFactory.addResult(binder(), NoOp.class, NoOpResult.class);
     ResultFactory.addResult(binder(), Redirect.class, RedirectResult.class);
     ResultFactory.addResult(binder(), Stream.class, StreamResult.class);

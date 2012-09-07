@@ -22,14 +22,15 @@ import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.*;
 
 /**
- * This annotation marks a result from an action as a header only result.
+ * This annotation marks a result from an action as a Status result. Status results can have a status code, status
+ * string, and a set of additional headers to return. This result never returns a body.
  *
  * @author Brian Pontarelli
  */
 @ResultAnnotation
 @Retention(RUNTIME)
 @Target(TYPE)
-public @interface Header {
+public @interface Status {
   /**
    * @return The result code from the action's execute method that this Result is associated with.
    */
@@ -50,12 +51,33 @@ public @interface Header {
   String statusStr() default "";
 
   /**
-   * A list of Header annotations.
+   * @return A list of headers to return as part of the HTTP response. See the W3 HTTP 1.1 specification for a list of
+   *         headers.
+   */
+  Header[] headers() default {};
+
+  /**
+   * A list of Status annotations.
    */
   @ResultContainerAnnotation
   @Retention(RUNTIME)
   @Target(TYPE)
   public static @interface List {
-    Header[] value();
+    Status[] value();
+  }
+
+  /**
+   * A header that has a name and value.
+   */
+  public static @interface Header {
+    /**
+     * @return The name of the header.
+     */
+    String name();
+
+    /**
+     * @return The value of the header.
+     */
+    String value();
   }
 }
