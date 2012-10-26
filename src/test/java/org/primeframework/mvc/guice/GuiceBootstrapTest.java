@@ -16,17 +16,24 @@
 package org.primeframework.mvc.guice;
 
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+
+import java.io.IOException;
 
 import org.easymock.EasyMock;
 import org.primeframework.mvc.CloseableModule;
+import org.primeframework.mvc.MockConfiguration;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.config.AbstractMVCConfiguration;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.servlet.ServletObjectsHolder;
+import org.primeframework.mvc.workflow.MVCWorkflow;
+import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
+import com.google.inject.util.Modules;
 import static org.testng.Assert.*;
 
 /**
@@ -37,9 +44,11 @@ import static org.testng.Assert.*;
 public class GuiceBootstrapTest extends PrimeBaseTest {
   @Test
   public void shutdownAndExplicitModules() {
-    Injector injector = GuiceBootstrap.initialize(new AbstractModule() {
+    Injector injector = GuiceBootstrap.initialize(new PrimeModule() {
       @Override
       protected void configure() {
+        super.configure();
+
         bind(MVCConfiguration.class).toInstance(new AbstractMVCConfiguration() {
           @Override
           public int templateCheckSeconds() {
@@ -56,8 +65,10 @@ public class GuiceBootstrapTest extends PrimeBaseTest {
             return false;
           }
         });
+
+        install(new CloseableModule());
       }
-    }, new CloseableModule());
+    });
     assertNotNull(injector.getInstance(TestClosable.class));
     assertTrue(injector.getInstance(TestClosable.class).open);
 
@@ -66,52 +77,25 @@ public class GuiceBootstrapTest extends PrimeBaseTest {
   }
 
   @Test
-  public void implicitModules() {
+  public void overrideModules() {
     ServletContext context = EasyMock.createStrictMock(ServletContext.class);
     EasyMock.replay(context);
     ServletObjectsHolder.setServletContext(context);
 
-    Injector injector = GuiceBootstrap.initialize(new AbstractModule() {
+    Injector injector = GuiceBootstrap.initialize(Modules.override(new PrimeModule()).with(new AbstractModule() {
       @Override
       protected void configure() {
-        bind(MVCConfiguration.class).toInstance(new AbstractMVCConfiguration() {
-          @Override
-          public int templateCheckSeconds() {
-            return 2;
-          }
-
-          @Override
-          public int l10nReloadSeconds() {
-            return 1;
-          }
-
-          @Override
-          public boolean allowUnknownParameters() {
-            return false;
-          }
-        });
+        bind(MVCWorkflow.class).to(TestMVCWorkflow.class);
+        bind(MVCConfiguration.class).to(MockConfiguration.class);
       }
-    });
-    assertNotNull(injector.getInstance(TestClass1.class));
-    assertNotNull(injector.getInstance(TestInterface1.class));
-    assertNotNull(injector.getInstance(TestClass2.class));
-    assertNotNull(injector.getInstance(TestInterface2.class));
-    assertNotNull(injector.getInstance(TestClass4.class));
-    assertNotNull(injector.getInstance(TestInterface4.class));
-    assertNotNull(injector.getInstance(ServletContext.class));
+    }));
 
-    try {
-      injector.getInstance(TestInterface3.class);
-      fail("Should have failed");
-    } catch (Exception e) {
-      // Expected since Guice throws exceptions for missing bindings
-    }
+    assertSame(injector.getInstance(MVCWorkflow.class).getClass(), TestMVCWorkflow.class);
+  }
 
-    try {
-      injector.getInstance(TestInterface3.class);
-      fail("Should have failed");
-    } catch (Exception e) {
-      // Expected since Guice throws exceptions for missing bindings
+  public static class TestMVCWorkflow implements MVCWorkflow {
+    @Override
+    public void perform(WorkflowChain workflowChain) throws IOException, ServletException {
     }
   }
 }

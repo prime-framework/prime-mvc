@@ -32,6 +32,7 @@ import org.joda.time.LocalDate;
 import org.primeframework.mvc.action.config.ActionConfigurationProvider;
 import org.primeframework.mvc.container.ContainerResolver;
 import org.primeframework.mvc.freemarker.FreeMarkerService;
+import org.primeframework.mvc.guice.PrimeModule;
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
@@ -52,7 +53,13 @@ import static org.testng.Assert.*;
 public class GlobalTest extends PrimeBaseTest {
   @Test
   public void renderFTL() throws IOException, ServletException {
-    RequestSimulator simulator = new RequestSimulator(context, new TestModule());
+    RequestSimulator simulator = new RequestSimulator(context, new PrimeModule() {
+      @Override
+      protected void configure() {
+        super.configure();
+        install(new TestModule());
+      }
+    });
     simulator.test("/user/edit").get();
     String result = simulator.response.getOutputStream().toString();
     assertEquals(FileUtils.readFileToString(new File("src/test/java/org/primeframework/mvc/edit-output.txt")), result);
@@ -60,7 +67,13 @@ public class GlobalTest extends PrimeBaseTest {
 
   @Test
   public void nonFormFields() throws IOException, ServletException {
-    RequestSimulator simulator = new RequestSimulator(context, new TestModule());
+    RequestSimulator simulator = new RequestSimulator(context, new PrimeModule() {
+      @Override
+      protected void configure() {
+        super.configure();
+        install(new TestModule());
+      }
+    });
     simulator.test("/user/details-fields").get();
     assertEquals(FileUtils.readFileToString(new File("src/test/java/org/primeframework/mvc/details-fields-output.txt")),
       simulator.response.getOutputStream().toString());
@@ -68,7 +81,13 @@ public class GlobalTest extends PrimeBaseTest {
 
   @Test
   public void postRender() throws IOException, ServletException {
-    RequestSimulator simulator = new RequestSimulator(context, new TestModule());
+    RequestSimulator simulator = new RequestSimulator(context, new PrimeModule() {
+      @Override
+      protected void configure() {
+        super.configure();
+        install(new TestModule());
+      }
+    });
     simulator.test("/post").post();
     String result = simulator.response.getOutputStream().toString();
     assertTrue(result.contains("Brian Pontarelli"));
@@ -81,7 +100,13 @@ public class GlobalTest extends PrimeBaseTest {
   public void scopeStorage() throws IOException, ServletException {
     // Tests that the expression evaluator safely gets skipped while looking for values and Prime then checks the
     // HttpServletRequest and finds the value
-    RequestSimulator simulator = new RequestSimulator(context, new TestModule());
+    RequestSimulator simulator = new RequestSimulator(context, new PrimeModule() {
+      @Override
+      protected void configure() {
+        super.configure();
+        install(new TestModule());
+      }
+    });
     simulator.test("/scope-storage").
       post();
 
@@ -92,7 +117,13 @@ public class GlobalTest extends PrimeBaseTest {
   public void expressionEvaluatorSkippedUsesRequest() throws IOException, ServletException {
     // Tests that the expression evaluator safely gets skipped while looking for values and Prime then checks the
     // HttpServletRequest and finds the value
-    RequestSimulator simulator = new RequestSimulator(context, new TestModule());
+    RequestSimulator simulator = new RequestSimulator(context, new PrimeModule() {
+      @Override
+      protected void configure() {
+        super.configure();
+        install(new TestModule());
+      }
+    });
     simulator.test("/value-in-request").
       get();
 
@@ -102,7 +133,13 @@ public class GlobalTest extends PrimeBaseTest {
 
   @Test
   public void actionlessRequest() throws IOException, ServletException {
-    RequestSimulator simulator = new RequestSimulator(context, new TestModule());
+    RequestSimulator simulator = new RequestSimulator(context, new PrimeModule() {
+      @Override
+      protected void configure() {
+        super.configure();
+        install(new TestModule());
+      }
+    });
     simulator.test("/actionless").
       get();
 
@@ -111,7 +148,13 @@ public class GlobalTest extends PrimeBaseTest {
 
   @Test
   public void singletons() throws IOException, ServletException {
-    RequestSimulator simulator = new RequestSimulator(context, new TestModule());
+    RequestSimulator simulator = new RequestSimulator(context, new PrimeModule() {
+      @Override
+      protected void configure() {
+        super.configure();
+        install(new TestModule());
+      }
+    });
     assertSingleton(simulator, ActionConfigurationProvider.class);
     assertSingleton(simulator, FreeMarkerService.class);
     assertSingleton(simulator, Configuration.class);

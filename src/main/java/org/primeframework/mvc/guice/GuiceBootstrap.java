@@ -17,14 +17,8 @@ package org.primeframework.mvc.guice;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import org.primeframework.mvc.PrimeException;
-import org.primeframework.mvc.util.ClassClasspathResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +32,6 @@ import com.google.inject.Module;
  *
  * @author Brian Pontarelli
  */
-@SuppressWarnings("unchecked")
 public class GuiceBootstrap {
   private static final Logger logger = LoggerFactory.getLogger(GuiceBootstrap.class);
 
@@ -47,33 +40,12 @@ public class GuiceBootstrap {
    * so that synchronization is not used. This is called by the PrimeServletContextListener when the context is created
    * and should cover all cases.
    *
-   * @param modules The modules to initialize Guice with.
+   * @param mainModule The main module for the application.
    * @return The Guice injector.
    */
-  public static Injector initialize(Module... modules) {
+  public static Injector initialize(Module mainModule) {
     logger.debug("Initializing Guice");
-
-    Set<Class<? extends Module>> classes = new HashSet<Class<? extends Module>>();
-    addFromClasspath(classes);
-
-    List<Module> allModules = new ArrayList<Module>();
-    for (Class<? extends Module> moduleClass : classes) {
-      try {
-        allModules.add(moduleClass.newInstance());
-      } catch (Exception e) {
-        throw new PrimeException(e);
-      }
-    }
-
-    for (Module module : modules) {
-      if (classes.contains(module.getClass())) {
-        continue;
-      }
-
-      allModules.add(module);
-    }
-
-    return Guice.createInjector(allModules);
+    return Guice.createInjector(mainModule);
   }
 
   /**
@@ -91,39 +63,5 @@ public class GuiceBootstrap {
         logger.error("Unable to shutdown Closeable [" + key + "]", e);
       }
     }
-  }
-
-  private static void addFromClasspath(Set<Class<? extends Module>> modules) {
-    ClassClasspathResolver<Module> resolver = new ClassClasspathResolver<Module>();
-    Set<Class<Module>> moduleClasses;
-    try {
-      moduleClasses = resolver.findByLocators(new ClassClasspathResolver.IsA(Module.class), false, "guice");
-    } catch (IOException e) {
-      throw new PrimeException(e);
-    }
-
-    Set<Class<Module>> matches = new HashSet<Class<Module>>(moduleClasses);
-
-    for (Class<Module> moduleClass : moduleClasses) {
-      // Ensure the class is not abstract
-      if ((moduleClass.getModifiers() & Modifier.ABSTRACT) != 0 ||
-        moduleClass.isAnonymousClass() || moduleClass.isLocalClass()) {
-        matches.remove(moduleClass);
-        continue;
-      }
-
-      // Remove any instances of this classes parents from the matches
-      Class<? super Module> parent = moduleClass.getSuperclass();
-      while (Module.class.isAssignableFrom(parent)) {
-        matches.remove(parent);
-        parent = parent.getSuperclass();
-      }
-    }
-
-    for (Class<Module> match : matches) {
-      logger.debug("Adding module [" + match + "] from classpath to Guice injector.");
-    }
-
-    modules.addAll(matches);
   }
 }

@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.guice.GuiceBootstrap;
+import org.primeframework.mvc.guice.PrimeModule;
 import org.primeframework.mvc.parameter.convert.converters.BooleanConverter;
 import org.primeframework.mvc.parameter.convert.converters.CharacterConverter;
 import org.primeframework.mvc.parameter.convert.converters.NumberConverter;
@@ -41,7 +42,13 @@ public class DefaultConverterProviderTest extends PrimeBaseTest {
    */
   @Test
   public void lookups() {
-    Injector injector = GuiceBootstrap.initialize(new TestModule());
+    Injector injector = GuiceBootstrap.initialize(new PrimeModule() {
+      @Override
+      protected void configure() {
+        super.configure();
+        install(new TestModule());
+      }
+    });
     ConverterProvider provider = new DefaultConverterProvider(injector, injector.getInstance(Key.get(new TypeLiteral<Map<Class<?>, GlobalConverter>>(){})));
     GlobalConverter tc = provider.lookup(Character.class);
     assertSame(CharacterConverter.class, tc.getClass());

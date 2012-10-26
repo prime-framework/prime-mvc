@@ -24,13 +24,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.inject.Injector;
+import com.google.inject.Module;
 
 /**
  * This class bootstraps the Prime by creating a Guice injector and putting it in the ServletContext.
  *
  * @author Brian Pontarelli
  */
-public class PrimeServletContextListener implements ServletContextListener {
+public abstract class PrimeServletContextListener implements ServletContextListener {
   private static final Logger logger = LoggerFactory.getLogger(PrimeServletContextListener.class);
   public static final String GUICE_INJECTOR_KEY = "guiceInjector";
 
@@ -45,7 +46,7 @@ public class PrimeServletContextListener implements ServletContextListener {
     ServletObjectsHolder.setServletContext(context);
 
     // Start guice and set it into the servlet context
-    context.setAttribute(GUICE_INJECTOR_KEY, GuiceBootstrap.initialize());
+    context.setAttribute(GUICE_INJECTOR_KEY, GuiceBootstrap.initialize(mainModule()));
   }
 
   /**
@@ -58,4 +59,11 @@ public class PrimeServletContextListener implements ServletContextListener {
     Injector injector = (Injector) context.getAttribute(GUICE_INJECTOR_KEY);
     GuiceBootstrap.shutdown(injector);
   }
+
+  /**
+   * Implemented by applications to install the primary module for the application.
+   *
+   * @return The main module for the application.
+   */
+  protected abstract Module mainModule();
 }

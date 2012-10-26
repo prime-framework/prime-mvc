@@ -64,16 +64,16 @@ public class RequestSimulator {
   /**
    * Creates a new request simulator that can be used to simulate requests to a Prime application.
    *
-   * @param context The servlet context to use for this simulator.
-   * @param modules A list of modules that contain mocks and other guice injections for the test.
+   * @param context    The servlet context to use for this simulator.
+   * @param mainModule The main module.
    * @throws ServletException If the initialization of the PrimeServletContextListener failed.
    */
-  public RequestSimulator(final MockServletContext context, Module... modules) throws ServletException {
+  public RequestSimulator(final MockServletContext context, Module mainModule) throws ServletException {
     logger.debug("Built RequestSimulator with context webDir " + context.webDir.getAbsolutePath());
     ServletObjectsHolder.setServletContext(context);
     this.context = context;
     this.session = new MockHttpSession(this.context);
-    this.injector = GuiceBootstrap.initialize(modules);
+    this.injector = GuiceBootstrap.initialize(mainModule);
     this.context.setAttribute(PrimeServletContextListener.GUICE_INJECTOR_KEY, this.injector);
     this.filter.init(new FilterConfig() {
       @Override
@@ -117,11 +117,6 @@ public class RequestSimulator {
   }
 
   void run(RequestBuilder builder) throws IOException, ServletException {
-    if (!builder.getModules().isEmpty()) {
-      this.injector = GuiceBootstrap.initialize(builder.getModules().toArray(new Module[builder.getModules().size()]));
-      this.context.setAttribute(PrimeServletContextListener.GUICE_INJECTOR_KEY, this.injector);
-    }
-
     // Remove the web objects if this instance is being used across multiple invocations
     ServletObjectsHolder.clearServletRequest();
     ServletObjectsHolder.clearServletResponse();
