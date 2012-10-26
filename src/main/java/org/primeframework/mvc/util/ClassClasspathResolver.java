@@ -201,6 +201,8 @@ public class ClassClasspathResolver<U> {
       }
     }
 
+    jarFile.close();
+
     return matches;
   }
 
@@ -217,8 +219,14 @@ public class ClassClasspathResolver<U> {
    * This is the testing interface that is used to accept or reject resources.
    */
   public static interface Testable<T> {
+    /**
+     * @return True if the testable passes, false if it doesn't.
+     */
     boolean passes();
 
+    /**
+     * @return The test result.
+     */
     T result();
   }
 
