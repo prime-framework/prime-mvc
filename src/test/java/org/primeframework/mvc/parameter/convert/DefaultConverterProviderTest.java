@@ -19,7 +19,7 @@ import java.util.Map;
 
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.guice.GuiceBootstrap;
-import org.primeframework.mvc.guice.PrimeModule;
+import org.primeframework.mvc.guice.MVCModule;
 import org.primeframework.mvc.parameter.convert.converters.BooleanConverter;
 import org.primeframework.mvc.parameter.convert.converters.CharacterConverter;
 import org.primeframework.mvc.parameter.convert.converters.NumberConverter;
@@ -42,7 +42,7 @@ public class DefaultConverterProviderTest extends PrimeBaseTest {
    */
   @Test
   public void lookups() {
-    Injector injector = GuiceBootstrap.initialize(new PrimeModule() {
+    Injector injector = GuiceBootstrap.initialize(new MVCModule() {
       @Override
       protected void configure() {
         super.configure();

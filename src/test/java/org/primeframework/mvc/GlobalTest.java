@@ -32,7 +32,7 @@ import org.joda.time.LocalDate;
 import org.primeframework.mvc.action.config.ActionConfigurationProvider;
 import org.primeframework.mvc.container.ContainerResolver;
 import org.primeframework.mvc.freemarker.FreeMarkerService;
-import org.primeframework.mvc.guice.PrimeModule;
+import org.primeframework.mvc.guice.MVCModule;
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
@@ -53,7 +53,7 @@ import static org.testng.Assert.*;
 public class GlobalTest extends PrimeBaseTest {
   @Test
   public void renderFTL() throws IOException, ServletException {
-    RequestSimulator simulator = new RequestSimulator(context, new PrimeModule() {
+    RequestSimulator simulator = new RequestSimulator(context, new MVCModule() {
       @Override
       protected void configure() {
         super.configure();
@@ -67,7 +67,7 @@ public class GlobalTest extends PrimeBaseTest {
 
   @Test
   public void nonFormFields() throws IOException, ServletException {
-    RequestSimulator simulator = new RequestSimulator(context, new PrimeModule() {
+    RequestSimulator simulator = new RequestSimulator(context, new MVCModule() {
       @Override
       protected void configure() {
         super.configure();
@@ -81,7 +81,7 @@ public class GlobalTest extends PrimeBaseTest {
 
   @Test
   public void postRender() throws IOException, ServletException {
-    RequestSimulator simulator = new RequestSimulator(context, new PrimeModule() {
+    RequestSimulator simulator = new RequestSimulator(context, new MVCModule() {
       @Override
       protected void configure() {
         super.configure();
@@ -100,7 +100,7 @@ public class GlobalTest extends PrimeBaseTest {
   public void scopeStorage() throws IOException, ServletException {
     // Tests that the expression evaluator safely gets skipped while looking for values and Prime then checks the
     // HttpServletRequest and finds the value
-    RequestSimulator simulator = new RequestSimulator(context, new PrimeModule() {
+    RequestSimulator simulator = new RequestSimulator(context, new MVCModule() {
       @Override
       protected void configure() {
         super.configure();
@@ -117,7 +117,7 @@ public class GlobalTest extends PrimeBaseTest {
   public void expressionEvaluatorSkippedUsesRequest() throws IOException, ServletException {
     // Tests that the expression evaluator safely gets skipped while looking for values and Prime then checks the
     // HttpServletRequest and finds the value
-    RequestSimulator simulator = new RequestSimulator(context, new PrimeModule() {
+    RequestSimulator simulator = new RequestSimulator(context, new MVCModule() {
       @Override
       protected void configure() {
         super.configure();
@@ -133,7 +133,7 @@ public class GlobalTest extends PrimeBaseTest {
 
   @Test
   public void actionlessRequest() throws IOException, ServletException {
-    RequestSimulator simulator = new RequestSimulator(context, new PrimeModule() {
+    RequestSimulator simulator = new RequestSimulator(context, new MVCModule() {
       @Override
       protected void configure() {
         super.configure();
@@ -148,7 +148,7 @@ public class GlobalTest extends PrimeBaseTest {
 
   @Test
   public void singletons() throws IOException, ServletException {
-    RequestSimulator simulator = new RequestSimulator(context, new PrimeModule() {
+    RequestSimulator simulator = new RequestSimulator(context, new MVCModule() {
       @Override
       protected void configure() {
         super.configure();

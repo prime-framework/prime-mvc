@@ -38,7 +38,7 @@ import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.config.DefaultActionConfigurationBuilder;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.guice.GuiceBootstrap;
-import org.primeframework.mvc.guice.PrimeModule;
+import org.primeframework.mvc.guice.MVCModule;
 import org.primeframework.mvc.parameter.annotation.PreParameter;
 import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
 import org.primeframework.mvc.scope.ScopeField;
@@ -72,7 +72,7 @@ public abstract class PrimeBaseTest {
     session = new MockHttpSession(context);
     ServletObjectsHolder.setServletContext(context);
 
-    injector = GuiceBootstrap.initialize(new PrimeModule() {
+    injector = GuiceBootstrap.initialize(new MVCModule() {
       @Override
       protected void configure() {
         super.configure();

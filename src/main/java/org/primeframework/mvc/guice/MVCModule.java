@@ -37,7 +37,7 @@ import com.google.inject.AbstractModule;
  *
  * @author Brian Pontarelli
  */
-public class PrimeModule extends AbstractModule {
+public class MVCModule extends AbstractModule {
   @Override
   protected void configure() {
     install(new ActionModule());

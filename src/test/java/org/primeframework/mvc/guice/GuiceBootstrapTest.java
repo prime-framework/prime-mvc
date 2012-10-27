@@ -44,7 +44,7 @@ import static org.testng.Assert.*;
 public class GuiceBootstrapTest extends PrimeBaseTest {
   @Test
   public void shutdownAndExplicitModules() {
-    Injector injector = GuiceBootstrap.initialize(new PrimeModule() {
+    Injector injector = GuiceBootstrap.initialize(new MVCModule() {
       @Override
       protected void configure() {
         super.configure();
@@ -82,7 +82,7 @@ public class GuiceBootstrapTest extends PrimeBaseTest {
     EasyMock.replay(context);
     ServletObjectsHolder.setServletContext(context);
 
-    Injector injector = GuiceBootstrap.initialize(Modules.override(new PrimeModule()).with(new AbstractModule() {
+    Injector injector = GuiceBootstrap.initialize(Modules.override(new MVCModule()).with(new AbstractModule() {
       @Override
       protected void configure() {
         bind(MVCWorkflow.class).to(TestMVCWorkflow.class);
