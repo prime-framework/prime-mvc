@@ -55,7 +55,7 @@ dependencies {
   testCompile(
     "org.easymock:easymock:3.1",
     "org.hibernate:hibernate-validator:4.2.0.Final",
-    "org.testng:testng:6.3.1"
+    "org.testng:testng:6.4"
   )
 }
 
