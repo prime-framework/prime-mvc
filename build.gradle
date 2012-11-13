@@ -1,6 +1,6 @@
 // Project info
 group = "org.primeframework"
-version = "0.13"
+version = "0.14"
 description = "Prime MVC Framework"
 
 // Plugins
@@ -43,7 +43,7 @@ dependencies {
     "com.google.inject:guice:3.0",
     "com.google.inject.extensions:guice-multibindings:3.0",
     "commons-fileupload:commons-fileupload:1.2.1",
-    "commons-io:commons-io:4",
+    "commons-io:commons-io:1.4",
     "javax.inject:javax.inject:1",
     "javax.validation:validation-api:1.0.0.GA",
     "joda-time:joda-time:2.1",
