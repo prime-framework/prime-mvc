@@ -17,6 +17,7 @@ package org.primeframework.mvc.control.form;
 
 import org.example.action.user.Edit;
 import org.example.domain.User;
+import org.joda.time.DateTime;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.control.ControlBaseTest;
 import org.testng.annotations.Test;
@@ -33,6 +34,7 @@ public class YearSelectTest extends ControlBaseTest {
 
   @Test
   public void actionLess() {
+    int year = DateTime.now().getYear();
     ais.setCurrent(new ActionInvocation(null, null, "/years-select", null, null));
     new ControlTester(yearSelect).
       attr("name", "test").
@@ -42,16 +44,16 @@ public class YearSelectTest extends ControlBaseTest {
       "<div class=\"label-container\"><label for=\"test\" class=\"label\">Test</label></div>\n" +
       "<div class=\"control-container\">\n" +
       "<select class=\"css-class\" id=\"test\" name=\"test\">\n" +
-      "<option value=\"2012\">2012</option>\n" +
-      "<option value=\"2013\">2013</option>\n" +
-      "<option value=\"2014\">2014</option>\n" +
-      "<option value=\"2015\">2015</option>\n" +
-      "<option value=\"2016\">2016</option>\n" +
-      "<option value=\"2017\">2017</option>\n" +
-      "<option value=\"2018\">2018</option>\n" +
-      "<option value=\"2019\">2019</option>\n" +
-      "<option value=\"2020\">2020</option>\n" +
-      "<option value=\"2021\">2021</option>\n" +
+      "<option value=\"" + year + "\">" + year++ + "</option>\n" +
+      "<option value=\"" + year + "\">" + year++ + "</option>\n" +
+      "<option value=\"" + year + "\">" + year++ + "</option>\n" +
+      "<option value=\"" + year + "\">" + year++ + "</option>\n" +
+      "<option value=\"" + year + "\">" + year++ + "</option>\n" +
+      "<option value=\"" + year + "\">" + year++ + "</option>\n" +
+      "<option value=\"" + year + "\">" + year++ + "</option>\n" +
+      "<option value=\"" + year + "\">" + year++ + "</option>\n" +
+      "<option value=\"" + year + "\">" + year++ + "</option>\n" +
+      "<option value=\"" + year + "\">" + year + "</option>\n" +
       "</select>\n" +
       "</div>\n" +
       "</div>\n");
