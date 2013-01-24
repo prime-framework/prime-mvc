@@ -42,6 +42,7 @@ public class FreeMarkerConfigurationProvider implements Provider<Configuration> 
   public Configuration get() {
     int checkSeconds = configuration.templateCheckSeconds();
     Configuration config = new Configuration();
+    config.setTagSyntax(Configuration.SQUARE_BRACKET_TAG_SYNTAX);
     config.setTemplateUpdateDelay(checkSeconds);
     config.setTemplateLoader(loader);
     config.setDefaultEncoding("UTF-8");

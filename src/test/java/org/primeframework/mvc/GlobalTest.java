@@ -31,7 +31,6 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.primeframework.mvc.action.config.ActionConfigurationProvider;
 import org.primeframework.mvc.container.ContainerResolver;
-import org.primeframework.mvc.freemarker.FreeMarkerService;
 import org.primeframework.mvc.guice.MVCModule;
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
@@ -156,7 +155,6 @@ public class GlobalTest extends PrimeBaseTest {
       }
     });
     assertSingleton(simulator, ActionConfigurationProvider.class);
-    assertSingleton(simulator, FreeMarkerService.class);
     assertSingleton(simulator, Configuration.class);
     assertSingleton(simulator, ResourceBundle.Control.class);
     assertSingleton(simulator, ResourceBundle.Control.class);

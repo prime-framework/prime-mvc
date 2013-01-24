@@ -20,6 +20,8 @@ import javax.servlet.http.HttpSession;
 import java.util.Locale;
 
 import org.easymock.EasyMock;
+import org.primeframework.mock.servlet.MockHttpServletRequest;
+import org.primeframework.mock.servlet.MockServletContext;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.*;
@@ -30,6 +32,27 @@ import static org.testng.Assert.*;
  * @author Brian Pontarelli
  */
 public class DefaultLocaleProviderTest {
+  @Test
+  public void system() {
+    Locale.setDefault(Locale.FRENCH);
+
+    DefaultLocaleProvider provider = new DefaultLocaleProvider(null);
+    assertEquals(provider.get(), Locale.FRENCH);
+
+    Locale.setDefault(Locale.US);
+  }
+
+  @Test
+  public void fallBackViaMock() {
+    Locale.setDefault(Locale.FRENCH);
+
+    MockHttpServletRequest request = new MockHttpServletRequest("/", (MockServletContext) null);
+    DefaultLocaleProvider provider = new DefaultLocaleProvider(request);
+    assertEquals(provider.get(), Locale.FRENCH);
+
+    Locale.setDefault(Locale.US);
+  }
+
   @Test
   public void storeSession() {
     HttpSession session = EasyMock.createStrictMock(HttpSession.class);

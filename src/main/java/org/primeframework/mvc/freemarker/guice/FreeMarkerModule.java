@@ -36,7 +36,9 @@ public class FreeMarkerModule extends AbstractModule {
   protected void configure() {
     bind(TemplateLoader.class).to(OverridingTemplateLoader.class).in(Singleton.class);
     bind(Configuration.class).toProvider(FreeMarkerConfigurationProvider.class).in(Singleton.class);
-    bind(FreeMarkerService.class).to(DefaultFreeMarkerService.class).in(Singleton.class);
+
+    // Can't be a singleton because the Locale can change per request
+    bind(FreeMarkerService.class).to(DefaultFreeMarkerService.class);
 
     bind(TemplateModelFactory.class);
     TemplateModelFactory.addSingletonModel(binder(), "function", "json_escape", JSONEscape.class);

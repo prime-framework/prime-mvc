@@ -96,4 +96,22 @@ public class DefaultFreeMarkerServiceTest {
     service.render(writer, "src/test/java/org/primeframework/mvc/freemarker/test-with-bean.ftl", context);
     assertEquals(writer.toString(), "Bean 1 test test 42");
   }
+
+  @Test
+  public void locale() {
+    MVCConfiguration config = EasyMock.createStrictMock(MVCConfiguration.class);
+    EasyMock.expect(config.templateCheckSeconds()).andReturn(2);
+    EasyMock.replay(config);
+
+    ContainerResolver containerResolver = EasyMock.createStrictMock(ContainerResolver.class);
+    EasyMock.expect(containerResolver.getRealPath("src/test/java/org/primeframework/mvc/freemarker/test-locale_fr.ftl")).andReturn("src/test/java/org/primeframework/mvc/freemarker/test-locale.ftl");
+    EasyMock.replay(containerResolver);
+
+    DefaultFreeMarkerService service = new DefaultFreeMarkerService(new FreeMarkerConfigurationProvider(config, new OverridingTemplateLoader(containerResolver)).get(), Locale.FRENCH);
+
+    Map<String, Object> context = new HashMap<String, Object>();
+    StringWriter writer = new StringWriter();
+    service.render(writer, "src/test/java/org/primeframework/mvc/freemarker/test-locale.ftl", context);
+    assertEquals(writer.toString(), "3,14");
+  }
 }
