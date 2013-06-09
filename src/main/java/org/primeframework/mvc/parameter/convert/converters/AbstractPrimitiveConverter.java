@@ -23,7 +23,7 @@ import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.parameter.convert.AbstractGlobalConverter;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
-import org.primeframework.mvc.parameter.el.TypeTools;
+import org.primeframework.mvc.util.TypeTools;
 
 /**
  * Overrides the abstract type converter to add abstract methods for handling primitives.

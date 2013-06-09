@@ -30,7 +30,7 @@ import org.primeframework.mvc.util.ReflectionUtils;
  */
 public class MemberAccessor extends Accessor {
   final Field field;
-  final PropertyInfo propertyInfo;
+  final ReflectionUtils.PropertyInfo propertyInfo;
 
   public MemberAccessor(ConverterProvider converterProvider, MemberAccessor accessor) {
     super(converterProvider, accessor);
@@ -43,8 +43,8 @@ public class MemberAccessor extends Accessor {
 
     this.declaringClass = declaringClass;
 
-    Map<String, PropertyInfo> properties = ReflectionUtils.findPropertyInfo(this.declaringClass);
-    PropertyInfo bpi = properties.get(name);
+    Map<String, ReflectionUtils.PropertyInfo> properties = ReflectionUtils.findPropertyInfo(this.declaringClass);
+    ReflectionUtils.PropertyInfo bpi = properties.get(name);
     if (bpi == null) {
       Map<String, Field> fields = ReflectionUtils.findFields(this.declaringClass);
       this.propertyInfo = null;

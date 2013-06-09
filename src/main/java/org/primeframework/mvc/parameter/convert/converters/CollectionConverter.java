@@ -33,7 +33,7 @@ import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
-import org.primeframework.mvc.parameter.el.TypeTools;
+import org.primeframework.mvc.util.TypeTools;
 
 import com.google.inject.Inject;
 import static java.util.Arrays.*;

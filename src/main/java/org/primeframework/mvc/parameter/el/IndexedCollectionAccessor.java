@@ -20,6 +20,7 @@ import java.lang.reflect.Array;
 import java.util.List;
 
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
+import org.primeframework.mvc.util.TypeTools;
 
 /**
  * This class models a collection accessor during expression evaluation.

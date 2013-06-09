@@ -40,6 +40,7 @@ import org.primeframework.mvc.parameter.convert.ConverterProvider;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
 import org.primeframework.mvc.parameter.convert.annotation.ConverterAnnotation;
+import org.primeframework.mvc.util.TypeTools;
 
 /**
  * This class provides the base accessor support.

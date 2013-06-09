@@ -21,7 +21,7 @@ import java.lang.reflect.Type;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.primeframework.mvc.parameter.el.TypeTools;
+import org.primeframework.mvc.util.TypeTools;
 
 /**
  * This class is the base type converter for all the type converters that handle Object types. If you are writing a

@@ -20,6 +20,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -33,12 +34,7 @@ import java.util.WeakHashMap;
 import org.primeframework.mvc.parameter.el.BeanExpressionException;
 import org.primeframework.mvc.parameter.el.CollectionExpressionException;
 import org.primeframework.mvc.parameter.el.ExpressionException;
-import org.primeframework.mvc.parameter.el.GetMethodVerifier;
-import org.primeframework.mvc.parameter.el.MethodVerifier;
-import org.primeframework.mvc.parameter.el.PropertyInfo;
-import org.primeframework.mvc.parameter.el.PropertyName;
 import org.primeframework.mvc.parameter.el.ReadExpressionException;
-import org.primeframework.mvc.parameter.el.SetMethodVerifier;
 import org.primeframework.mvc.parameter.el.UpdateExpressionException;
 
 /**
@@ -48,15 +44,15 @@ import org.primeframework.mvc.parameter.el.UpdateExpressionException;
  */
 @SuppressWarnings("unchecked")
 public class ReflectionUtils {
-  private static final Map<String, MethodVerifier> verifiers = new HashMap<String, MethodVerifier>();
+  private static final Map<String, MethodInformationExtractor> verifiers = new HashMap<String, MethodInformationExtractor>();
   private static final Map<Class<?>, Method[]> methods = new WeakHashMap<Class<?>, Method[]>();
   private static final Map<Class<?>, Map<String, PropertyInfo>> propertyCache = new WeakHashMap<Class<?>, Map<String, PropertyInfo>>();
   private static final Map<Class<?>, Map<String, Field>> fieldCache = new WeakHashMap<Class<?>, Map<String, Field>>();
 
   static {
-    verifiers.put("is", new GetMethodVerifier());
-    verifiers.put("get", new GetMethodVerifier());
-    verifiers.put("set", new SetMethodVerifier());
+    verifiers.put("is", new GetMethodInformationExtractor());
+    verifiers.put("get", new GetMethodInformationExtractor());
+    verifiers.put("set", new SetMethodInformationExtractor());
   }
 
   /**
@@ -360,14 +356,8 @@ public class ReflectionUtils {
           continue;
         }
 
-        MethodVerifier verifier = verifiers.get(prefix);
-        if (verifier != null) {
-          String error = verifier.isValid(method, info);
-          if (error != null) {
-            errors.add(error);
-            continue;
-          }
-        } else {
+        MethodInformationExtractor verifier = verifiers.get(prefix);
+        if (verifier == null) {
           continue;
         }
 
@@ -377,6 +367,42 @@ public class ReflectionUtils {
 
         if (constructed) {
           propMap.put(name.getName(), info);
+        }
+      }
+
+      // Check for property errors
+      for (PropertyInfo info : propMap.values()) {
+        Method read = info.getMethods().get("get");
+        Method write = info.getMethods().get("set");
+        if (read != null && isValidGetter(read)) {
+          if (info.isIndexed()) {
+            errors.add("Invalid property named [" + info.getName() + "]. It mixes indexed and normal JavaBean methods.");
+          }
+        } else if (read != null && isValidIndexedGetter(read)) {
+          if (!info.isIndexed() && write != null) {
+            errors.add("Invalid property named [" + info.getName() + "]. It mixes indexed and normal JavaBean methods.");
+          }
+        } else if (read != null) {
+          errors.add("Invalid getter method for property named [" + info.getName() + "]");
+        }
+
+        if (write != null && isValidSetter(write)) {
+          if (info.isIndexed()) {
+            errors.add("Invalid property named [" + info.getName() + "]. It mixes indexed and normal JavaBean methods.");
+          }
+        } else if (write != null && isValidIndexedSetter(write)) {
+          if (!info.isIndexed() && read != null) {
+            errors.add("Invalid property named [" + info.getName() + "]. It mixes indexed and normal JavaBean methods.");
+          }
+        } else if (write != null) {
+          errors.add("Invalid setter method for property named [" + info.getName() + "]");
+        }
+
+        if (read != null && write != null &&
+            ((info.isIndexed() && read.getReturnType() != write.getParameterTypes()[1]) ||
+                (!info.isIndexed() && read.getReturnType() != write.getParameterTypes()[0]))) {
+          errors.add("Invalid getter/setter pair for JavaBean property named [" + info.getName() + "] in class [" +
+              write.getDeclaringClass() + "]. The return type and parameter types must be identical");
         }
       }
 
@@ -419,6 +445,50 @@ public class ReflectionUtils {
   }
 
   /**
+   * Check if the method is a proper java bean getter-property method. This means that it starts with get, has the form
+   * getFoo or getFOO, has no parameters and returns a non-void value.
+   *
+   * @param method The method to check.
+   * @return True if valid, false otherwise.
+   */
+  public static boolean isValidGetter(Method method) {
+    return (method.getParameterTypes().length == 0 && method.getReturnType() != Void.TYPE);
+  }
+
+  /**
+   * Check if the method is a proper java bean indexed getter method. This means that it starts with get, has the form
+   * getFoo or getFOO, has one parameter, an indices, and returns a non-void value.
+   *
+   * @param method The method to check.
+   * @return True if valid, false otherwise.
+   */
+  public static boolean isValidIndexedGetter(Method method) {
+    return (method.getParameterTypes().length == 1 && method.getReturnType() != Void.TYPE);
+  }
+
+  /**
+   * Check if the method is a proper java bean setter-property method. This means that it starts with set, has the form
+   * setFoo or setFOO, takes a single parameter.
+   *
+   * @param method The method to check.
+   * @return True if valid, false otherwise.
+   */
+  public static boolean isValidSetter(Method method) {
+    return (method.getParameterTypes().length == 1);
+  }
+
+  /**
+   * Check if the method is a proper java bean indexed setter method. This means that it starts with set, has the form
+   * setFoo or setFOO, takes a two parameters, an indices and a value.
+   *
+   * @param method The method to check.
+   * @return True if valid, false otherwise.
+   */
+  public static boolean isValidIndexedSetter(Method method) {
+    return (method.getParameterTypes().length == 2);
+  }
+
+  /**
    * Using the given Method, it returns the name of the java bean property and the prefix of the method.
    * <p/>
    * <h3>Examples:</h3>
@@ -454,5 +524,181 @@ public class ReflectionUtils {
     String propertyName = Introspector.decapitalize(name.substring(startIndex));
     String prefix = name.substring(0, startIndex);
     return new PropertyName(prefix, propertyName);
+  }
+
+
+  /**
+   * This interface defines a mechanism to extract information from JavaBean properties.
+   *
+   * @author Brian Pontarelli
+   */
+  public static interface MethodInformationExtractor {
+    /**
+     * Whether or not this property is an indexed property.
+     *
+     * @param method The method to determine if it is indexed.
+     * @return True if indexed or false otherwise.
+     */
+    boolean isIndexed(Method method);
+
+    /**
+     * Determines the generic type of the property.
+     *
+     * @param method The method to pull the generic type from.
+     * @return The generic type.
+     */
+    Type determineGenericType(Method method);
+  }
+
+  /**
+   * This class extracts information from JavaBean standard setter methods. The forms of the methods are as follows:
+   * <p/>
+   * <h3>Indexed methods</h3>
+   * <p/>
+   * <h4>Store</h4>
+   * <p/>
+   * <pre>
+   * public void setFoo(int index, Object obj)
+   * public void setBool(int index, boolean bool)
+   * </pre>
+   * <h3>Normal methods</h3>
+   * <p/>
+   * <h4>Storage</h4>
+   * <p/>
+   * <pre>
+   * public void setFoo(Object o)
+   * </pre>
+   *
+   * @author Brian Pontarelli
+   */
+  public static class SetMethodInformationExtractor implements MethodInformationExtractor {
+    @Override
+    public Type determineGenericType(Method method) {
+      Type[] types = method.getGenericParameterTypes();
+      if (types.length == 1) {
+        return types[0];
+      }
+
+      return types[1];
+    }
+
+    @Override
+    public boolean isIndexed(Method method) {
+      return isValidIndexedSetter(method);
+    }
+  }
+
+  /**
+   * This class extracts information about JavaBean standard getter methods. The forms of the methods are as follows:
+   * <p/>
+   * <h3>Indexed methods</h3>
+   * <p/>
+   * <h4>Retrieval</h4>
+   * <p/>
+   * <pre>
+   * public Object getFoo(int index)
+   * public boolean isFoo(int index)
+   * </pre>
+   * <p/>
+   * <h3>Normal methods</h3>
+   * <p/>
+   * <h4>Retrieval</h4>
+   * <p/>
+   * <pre>
+   * public Object getFoo()
+   * public boolean isFoo()
+   * </pre>
+   * <p/>
+   * All <b>is</b> methods must have a return type of boolean regardless of being indexed or not.
+   *
+   * @author Brian Pontarelli
+   */
+  public static class GetMethodInformationExtractor implements MethodInformationExtractor {
+    /**
+     * @param method The method to get the generic type from.
+     * @return Returns the return type of the method.
+     */
+    @Override
+    public Type determineGenericType(Method method) {
+      return method.getGenericReturnType();
+    }
+
+    @Override
+    public boolean isIndexed(Method method) {
+      return isValidIndexedGetter(method);
+    }
+  }
+
+  /**
+   * This class is a small helper class that is used to store the read and write methods of a bean property as well as a
+   * flag that determines if it is indexed.
+   *
+   * @author Brian Pontarelli
+   */
+  public static class PropertyInfo {
+    private String name;
+    private final Map<String, Method> methods = new HashMap<String, Method>();
+    private Class<?> klass;
+    private boolean indexed;
+    private Type genericType;
+
+    public String getName() {
+      return name;
+    }
+
+    public void setName(String name) {
+      this.name = name;
+    }
+
+    public void setKlass(Class<?> klass) {
+      this.klass = klass;
+    }
+
+    public boolean isIndexed() {
+      return indexed;
+    }
+
+    public void setIndexed(boolean indexed) {
+      this.indexed = indexed;
+    }
+
+    public Type getGenericType() {
+      return genericType;
+    }
+
+    public void setGenericType(Type genericType) {
+      this.genericType = genericType;
+    }
+
+    public Map<String, Method> getMethods() {
+      return methods;
+    }
+
+    public String toString() {
+      return "Property named [" + name + "] in class [" + klass + "]";
+    }
+  }
+
+  /**
+   * This class stores the information about JavaBean methods including the prefix and propertyName.
+   *
+   * @author Brian Pontarelli
+   */
+  public static class PropertyName {
+    private final String prefix;
+    private final String name;
+
+    public PropertyName(String prefix, String name) {
+      this.prefix = prefix;
+      this.name = name;
+    }
+
+    public String getPrefix() {
+      return prefix;
+    }
+
+    public String getName() {
+      return name;
+    }
   }
 }

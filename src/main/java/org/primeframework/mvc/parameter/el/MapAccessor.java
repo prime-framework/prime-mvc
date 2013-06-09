@@ -22,6 +22,7 @@ import java.util.Map;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
+import org.primeframework.mvc.util.TypeTools;
 
 /**
  * This class models a Map accessor during expression evaluation.

@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.parameter.el;
+package org.primeframework.mvc.util;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
@@ -21,6 +21,8 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Map;
+
+import org.primeframework.mvc.parameter.el.CollectionExpressionException;
 
 /**
  * This is a toolkit that assists with generics.
