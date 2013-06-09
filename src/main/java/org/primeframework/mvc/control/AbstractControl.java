@@ -189,7 +189,9 @@ public abstract class AbstractControl implements Control {
     if (ca != null) {
       ControlAttribute[] requiredAttributes = ca.required();
       verifyAttributes(attributes, requiredAttributes, true, errors);
-      verifyAttributes(attributes, requiredAttributes, false, errors);
+
+      ControlAttribute[] optionalAttributes = ca.optional();
+      verifyAttributes(attributes, optionalAttributes, false, errors);
     }
 
     if (!errors.isEmpty()) {
