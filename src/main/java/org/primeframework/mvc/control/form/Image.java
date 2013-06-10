@@ -34,9 +34,7 @@ import com.google.inject.Inject;
   optional = {
     @ControlAttribute(name = "disabled", types = {boolean.class, Boolean.class}),
     @ControlAttribute(name = "ismap", types = {boolean.class, Boolean.class}),
-    @ControlAttribute(name = "required", types = {boolean.class, Boolean.class}),
-    @ControlAttribute(name = "size", types = {int.class, Integer.class}),
-    @ControlAttribute(name = "tabindex", types = {int.class, Integer.class})
+    @ControlAttribute(name = "tabindex", types = {int.class, Number.class})
   }
 )
 public class Image extends AbstractButtonInput {

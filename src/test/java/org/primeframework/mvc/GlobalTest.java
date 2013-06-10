@@ -60,8 +60,10 @@ public class GlobalTest extends PrimeBaseTest {
       }
     });
     simulator.test("/user/edit").get();
+
+
     String result = simulator.response.getOutputStream().toString();
-    assertEquals(FileUtils.readFileToString(new File("src/test/java/org/primeframework/mvc/edit-output.txt")), result);
+    assertEquals(result, FileUtils.readFileToString(new File("src/test/java/org/primeframework/mvc/edit-output.txt")));
   }
 
   @Test
@@ -73,9 +75,27 @@ public class GlobalTest extends PrimeBaseTest {
         install(new TestModule());
       }
     });
+
     simulator.test("/user/details-fields").get();
-    assertEquals(FileUtils.readFileToString(new File("src/test/java/org/primeframework/mvc/details-fields-output.txt")),
-      simulator.response.getOutputStream().toString());
+
+    String result = simulator.response.getOutputStream().toString();
+    assertEquals(result, FileUtils.readFileToString(new File("src/test/java/org/primeframework/mvc/details-fields-output.txt")));
+  }
+
+  @Test
+  public void fullFormWithAllAttributes() throws IOException, ServletException {
+    RequestSimulator simulator = new RequestSimulator(context, new MVCModule() {
+      @Override
+      protected void configure() {
+        super.configure();
+        install(new TestModule());
+      }
+    });
+
+    simulator.test("/user/full-form").get();
+
+    String result = simulator.response.getOutputStream().toString();
+    assertEquals(result, FileUtils.readFileToString(new File("src/test/java/org/primeframework/mvc/full-form-output.txt")));
   }
 
   @Test

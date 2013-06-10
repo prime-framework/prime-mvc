@@ -28,20 +28,20 @@ import org.primeframework.mvc.control.annotation.ControlAttributes;
  * @author Brian Pontarelli
  */
 @ControlAttributes(
-  required = {
-    @ControlAttribute(name = "name")
-  },
-  optional = {
-    @ControlAttribute(name = "disabled", types = {boolean.class, Boolean.class}),
-    @ControlAttribute(name = "multiple", types = {boolean.class, Boolean.class}),
-    @ControlAttribute(name = "readonly", types = {boolean.class, Boolean.class}),
-    @ControlAttribute(name = "required", types = {boolean.class, Boolean.class}),
-    @ControlAttribute(name = "size", types = {int.class, Integer.class}),
-    @ControlAttribute(name = "tabindex", types = {int.class, Integer.class}),
-    @ControlAttribute(name = "startYear", types = {int.class, Integer.class}),
-    @ControlAttribute(name = "endYear", types = {int.class, Integer.class}),
-    @ControlAttribute(name = "numberOfYear", types = {int.class, Integer.class})
-  }
+    required = {
+        @ControlAttribute(name = "name")
+    },
+    optional = {
+        @ControlAttribute(name = "disabled", types = {boolean.class, Boolean.class}),
+        @ControlAttribute(name = "endYear", types = {int.class, Number.class}),
+        @ControlAttribute(name = "multiple", types = {boolean.class, Boolean.class}),
+        @ControlAttribute(name = "numberOfYear", types = {int.class, Number.class}),
+        @ControlAttribute(name = "readonly", types = {boolean.class, Boolean.class}),
+        @ControlAttribute(name = "required", types = {boolean.class, Boolean.class}),
+        @ControlAttribute(name = "size", types = {int.class, Number.class}),
+        @ControlAttribute(name = "startYear", types = {int.class, Number.class}),
+        @ControlAttribute(name = "tabindex", types = {int.class, Number.class})
+    }
 )
 public class YearSelect extends Select {
   /**
@@ -51,23 +51,23 @@ public class YearSelect extends Select {
   protected void addAdditionalAttributes() {
     super.addAdditionalAttributes();
 
-    Integer start = (Integer) attributes.remove("startYear");
-    Integer end = (Integer) attributes.remove("endYear");
-    Integer numberOfYears = (Integer) attributes.remove("numberOfYears");
+    Number start = (Number) attributes.remove("startYear");
+    Number end = (Number) attributes.remove("endYear");
+    Number numberOfYears = (Number) attributes.remove("numberOfYears");
     if (start == null) {
       start = new LocalDate().getYear();
     }
 
     if (numberOfYears != null) {
-      end = start + numberOfYears;
+      end = start.intValue() + numberOfYears.intValue();
     } else if (end == null) {
-      end = start + 10;
+      end = start.intValue() + 10;
     } else {
-      end = end + 1;
+      end = end.intValue() + 1;
     }
 
     List<Integer> years = new ArrayList<Integer>();
-    for (int i = start; i < end; i++) {
+    for (int i = start.intValue(); i < end.intValue(); i++) {
       years.add(i);
     }
 

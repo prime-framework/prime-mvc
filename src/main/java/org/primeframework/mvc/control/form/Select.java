@@ -27,18 +27,23 @@ import org.primeframework.mvc.control.annotation.ControlAttributes;
  * @author Brian Pontarelli
  */
 @ControlAttributes(
-  required = {
-    @ControlAttribute(name = "name"),
-    @ControlAttribute(name = "items", types = {Collection.class, Map.class, Object[].class})
-  },
-  optional = {
-    @ControlAttribute(name = "disabled", types = {boolean.class, Boolean.class}),
-    @ControlAttribute(name = "multiple", types = {boolean.class, Boolean.class}),
-    @ControlAttribute(name = "readonly", types = {boolean.class, Boolean.class}),
-    @ControlAttribute(name = "required", types = {boolean.class, Boolean.class}),
-    @ControlAttribute(name = "size", types = {int.class, Integer.class}),
-    @ControlAttribute(name = "tabindex", types = {int.class, Integer.class})
-  }
+    required = {
+        @ControlAttribute(name = "name"),
+        @ControlAttribute(name = "items", types = {Collection.class, Map.class, Object[].class})
+    },
+    optional = {
+        @ControlAttribute(name = "disabled", types = {boolean.class, Boolean.class}),
+        @ControlAttribute(name = "headerL10n", types = {String.class}),
+        @ControlAttribute(name = "headerValue", types = {String.class}),
+        @ControlAttribute(name = "l10nExpr", types = {String.class}),
+        @ControlAttribute(name = "multiple", types = {boolean.class, Boolean.class}),
+        @ControlAttribute(name = "readonly", types = {boolean.class, Boolean.class}),
+        @ControlAttribute(name = "required", types = {boolean.class, Boolean.class}),
+        @ControlAttribute(name = "size", types = {int.class, Number.class}),
+        @ControlAttribute(name = "tabindex", types = {int.class, Number.class}),
+        @ControlAttribute(name = "textExpr", types = {String.class}),
+        @ControlAttribute(name = "valueExpr", types = {String.class})
+    }
 )
 public class Select extends AbstractListInput {
   public Select() {

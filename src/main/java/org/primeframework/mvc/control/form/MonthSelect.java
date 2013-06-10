@@ -38,8 +38,8 @@ import org.primeframework.mvc.control.annotation.ControlAttributes;
     @ControlAttribute(name = "multiple", types = {boolean.class, Boolean.class}),
     @ControlAttribute(name = "readonly", types = {boolean.class, Boolean.class}),
     @ControlAttribute(name = "required", types = {boolean.class, Boolean.class}),
-    @ControlAttribute(name = "size", types = {int.class, Integer.class}),
-    @ControlAttribute(name = "tabindex", types = {int.class, Integer.class})
+    @ControlAttribute(name = "size", types = {int.class, Number.class}),
+    @ControlAttribute(name = "tabindex", types = {int.class, Number.class})
   }
 )
 public class MonthSelect extends Select {

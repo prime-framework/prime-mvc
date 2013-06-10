@@ -26,11 +26,17 @@ import java.util.Map;
  * @author Brian Pontarelli
  */
 public class UserField {
-  public String name;
-  public Integer age;
-  public Map<String, AddressField> addresses = new HashMap<String, AddressField>();
-  public List<UserField> siblings = new ArrayList<UserField>();
-  public String[] securityQuestions;
   public boolean active;
+  public Map<String, AddressField> addresses = new HashMap<String, AddressField>();
+  public Integer age;
+  public Integer favoriteMonth;
+  public Integer favoriteYear;
+  public Integer id;
   public Map<Integer, Integer> ids = new HashMap<Integer, Integer>();
+  public String lifeStory;
+  public String name;
+  public String password;
+  public String[] securityQuestions;
+  public List<UserField> siblings = new ArrayList<UserField>();
+  public UserType type;
 }

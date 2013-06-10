@@ -31,13 +31,12 @@ import com.google.inject.Inject;
     @ControlAttribute(name = "name")
   },
   optional = {
-    @ControlAttribute(name = "cols", types = {int.class, Integer.class}),
+    @ControlAttribute(name = "cols", types = {int.class, Number.class}),
     @ControlAttribute(name = "disabled", types = {boolean.class, Boolean.class}),
-    @ControlAttribute(name = "size", types = {int.class, Integer.class}),
     @ControlAttribute(name = "readonly", types = {boolean.class, Boolean.class}),
     @ControlAttribute(name = "required", types = {boolean.class, Boolean.class}),
-    @ControlAttribute(name = "rows", types = {int.class, Integer.class}),
-    @ControlAttribute(name = "tabindex", types = {int.class, Integer.class})
+    @ControlAttribute(name = "rows", types = {int.class, Number.class}),
+    @ControlAttribute(name = "tabindex", types = {int.class, Number.class})
   }
 )
 public class Textarea extends AbstractInput {

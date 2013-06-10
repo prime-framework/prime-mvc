@@ -217,9 +217,8 @@ public abstract class AbstractControl implements Control {
         }
 
         if (!found) {
-          errors.addError("The control [" + controlName() + "] has an invalid attribute [" +
-            controlAttribute.name() + "]. It must be an instance of [" +
-            toTypeListString(attributeTypes) + "]");
+          errors.addError("The control [" + controlName() + "] has an invalid attribute [" + controlAttribute.name() +
+              "] of type [" + value.getClass() + "]. It must be an instance of [" + toTypeListString(attributeTypes) + "]");
         }
       }
     }
