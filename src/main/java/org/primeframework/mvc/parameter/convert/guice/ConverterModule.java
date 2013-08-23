@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Locale;
+import java.util.UUID;
 
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -33,6 +34,7 @@ import org.primeframework.mvc.parameter.convert.converters.LocalDateConverter;
 import org.primeframework.mvc.parameter.convert.converters.LocaleConverter;
 import org.primeframework.mvc.parameter.convert.converters.NumberConverter;
 import org.primeframework.mvc.parameter.convert.converters.StringConverter;
+import org.primeframework.mvc.parameter.convert.converters.UUIDConverter;
 
 import com.google.inject.AbstractModule;
 
@@ -55,5 +57,6 @@ public class ConverterModule extends AbstractModule {
     binder.add(LocaleConverter.class).forTypes(Locale.class);
     binder.add(NumberConverter.class).forTypes(Number.class, byte.class, short.class, int.class, long.class, float.class, double.class, BigDecimal.class, BigInteger.class);
     binder.add(StringConverter.class).forTypes(String.class);
+    binder.add(UUIDConverter.class).forTypes(UUID.class);
   }
 }

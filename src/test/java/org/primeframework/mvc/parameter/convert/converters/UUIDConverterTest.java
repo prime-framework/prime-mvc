@@ -1,0 +1,57 @@
+/*
+ * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific
+ * language governing permissions and limitations under the License.
+ */
+package org.primeframework.mvc.parameter.convert.converters;
+
+import java.util.UUID;
+
+import org.primeframework.mvc.MockConfiguration;
+import org.primeframework.mvc.parameter.convert.GlobalConverter;
+import org.testng.annotations.Test;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNull;
+
+/**
+ * This tests the locale converter.
+ *
+ * @author Brian Pontarelli
+ */
+public class UUIDConverterTest {
+  @Test
+  public void fromStrings() {
+    GlobalConverter converter = new UUIDConverter(new MockConfiguration());
+    UUID uuid = (UUID) converter.convertFromStrings(UUID.class, null, "testExpr", (String) null);
+    assertNull(uuid);
+
+    uuid = (UUID) converter.convertFromStrings(UUID.class, null, "testExpr", "   ");
+    assertNull(uuid);
+
+    UUID expected = UUID.randomUUID();
+    uuid = (UUID) converter.convertFromStrings(UUID.class, null, "testExpr", expected.toString());
+    assertEquals(uuid, expected);
+  }
+
+  @Test
+  public void toStrings() {
+    GlobalConverter converter = new UUIDConverter(new MockConfiguration());
+    String str = converter.convertToString(UUID.class, null, "testExpr", null);
+    assertNull(str);
+
+    UUID expected = UUID.randomUUID();
+    str = converter.convertToString(UUID.class, null, "testExpr", expected);
+    assertEquals(str, expected.toString());
+  }
+}
