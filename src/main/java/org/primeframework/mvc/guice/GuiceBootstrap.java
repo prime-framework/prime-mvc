@@ -16,7 +16,6 @@
 package org.primeframework.mvc.guice;
 
 import java.io.Closeable;
-import java.io.IOException;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -59,8 +58,8 @@ public class GuiceBootstrap {
       Closeable closable = injector.getInstance(key);
       try {
         closable.close();
-      } catch (IOException e) {
-        logger.error("Unable to shutdown Closeable [" + key + "]", e);
+      } catch (Throwable t) {
+        logger.error("Unable to shutdown Closeable [" + key + "]", t);
       }
     }
   }
