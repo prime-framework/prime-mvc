@@ -15,17 +15,8 @@
  */
 package org.primeframework.mvc;
 
-import javax.servlet.ServletException;
-import javax.validation.Validator;
-import java.io.File;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Collection;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
 import org.apache.commons.io.FileUtils;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -39,10 +30,22 @@ import org.primeframework.mvc.test.RequestSimulator;
 import org.primeframework.mvc.util.URIBuilder;
 import org.testng.annotations.Test;
 
-import com.google.inject.Key;
-import com.google.inject.TypeLiteral;
+import javax.servlet.ServletException;
+import javax.validation.Validator;
+import java.io.File;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Collection;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+
 import freemarker.template.Configuration;
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertSame;
+import static org.testng.Assert.assertTrue;
 
 /**
  * This class tests the MVC from a high level perspective.
@@ -51,7 +54,7 @@ import static org.testng.Assert.*;
  */
 public class GlobalTest extends PrimeBaseTest {
   @Test
-  public void renderFTL() throws IOException, ServletException {
+  public void actionlessRequest() throws IOException, ServletException {
     RequestSimulator simulator = new RequestSimulator(context, new MVCModule() {
       @Override
       protected void configure() {
@@ -59,15 +62,14 @@ public class GlobalTest extends PrimeBaseTest {
         install(new TestModule());
       }
     });
-    simulator.test("/user/edit").get();
+    simulator.test("/actionless").
+        get();
 
-
-    String result = simulator.response.getOutputStream().toString();
-    assertEquals(result, FileUtils.readFileToString(new File("src/test/java/org/primeframework/mvc/edit-output.txt")));
+    assertEquals(simulator.response.getOutputStream().toString(), "Hello Actionless World");
   }
 
   @Test
-  public void nonFormFields() throws IOException, ServletException {
+  public void apiJSONBothWays() throws IOException, ServletException {
     RequestSimulator simulator = new RequestSimulator(context, new MVCModule() {
       @Override
       protected void configure() {
@@ -76,10 +78,66 @@ public class GlobalTest extends PrimeBaseTest {
       }
     });
 
-    simulator.test("/user/details-fields").get();
+    String json = "{\n" +
+        "  \"user\": {\n" +
+        "    \"active\": true,\n" +
+        "    \"age\": 37,\n" +
+        "    \"addresses\": {\n" +
+        "      \"home\": {\n" +
+        "        \"city\": \"Broomfield\",\n" +
+        "        \"state\": \"Colorado\",\n" +
+        "        \"zipcode\": \"80023\"\n" +
+        "      },\n" +
+        "      \"work\": {\n" +
+        "        \"city\": \"Denver\",\n" +
+        "        \"state\": \"Colorado\",\n" +
+        "        \"zipcode\": \"80202\"\n" +
+        "      }\n" +
+        "    },\n" +
+        "    \"favoriteMonth\": 5,\n" +
+        "    \"favoriteYear\": 1976,\n" +
+        "    \"ids\": {\n" +
+        "      \"0\": 1,\n" +
+        "      \"1\": 2\n" +
+        "    },\n" +
+        "    \"lifeStory\": \"Hello world\",\n" +
+        "    \"securityQuestions\": [\"one\", \"two\", \"three\", \"four\"],\n" +
+        "    \"siblings\": [\n" +
+        "      {\n" +
+        "        \"name\": \"Brett\"\n" +
+        "      },\n" +
+        "      {\n" +
+        "        \"name\": \"Beth\"\n" +
+        "      }\n" +
+        "    ],\n" +
+        "    \"type\": \"COOL\"\n" +
+        "  },\n" +
+        "  \"action\": \"ADD\"\n" +
+        "}";
+    simulator.test("/api")
+             .withContentType("application/json")
+             .withBody(json.getBytes())
+             .post();
 
-    String result = simulator.response.getOutputStream().toString();
-    assertEquals(result, FileUtils.readFileToString(new File("src/test/java/org/primeframework/mvc/details-fields-output.txt")));
+    assertEquals(simulator.response.getOutputStream().toString(), json);
+  }
+
+  @Test
+  public void expressionEvaluatorSkippedUsesRequest() throws IOException, ServletException {
+    // Tests that the expression evaluator safely gets skipped while looking for values and Prime then checks the
+    // HttpServletRequest and finds the value
+    RequestSimulator simulator = new RequestSimulator(context, new MVCModule() {
+      @Override
+      protected void configure() {
+        super.configure();
+        install(new TestModule());
+      }
+    });
+    simulator.test("/value-in-request").
+        get();
+
+    assertEquals(simulator.response.getOutputStream().toString(), "baz");
+    assertEquals(simulator.request.getAttribute("bar"), "baz");
   }
 
   @Test
@@ -96,6 +154,22 @@ public class GlobalTest extends PrimeBaseTest {
 
     String result = simulator.response.getOutputStream().toString();
     assertEquals(result, FileUtils.readFileToString(new File("src/test/java/org/primeframework/mvc/full-form-output.txt")));
+  }
+
+  @Test
+  public void nonFormFields() throws IOException, ServletException {
+    RequestSimulator simulator = new RequestSimulator(context, new MVCModule() {
+      @Override
+      protected void configure() {
+        super.configure();
+        install(new TestModule());
+      }
+    });
+
+    simulator.test("/user/details-fields").get();
+
+    String result = simulator.response.getOutputStream().toString();
+    assertEquals(result, FileUtils.readFileToString(new File("src/test/java/org/primeframework/mvc/details-fields-output.txt")));
   }
 
   @Test
@@ -116,6 +190,22 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void renderFTL() throws IOException, ServletException {
+    RequestSimulator simulator = new RequestSimulator(context, new MVCModule() {
+      @Override
+      protected void configure() {
+        super.configure();
+        install(new TestModule());
+      }
+    });
+    simulator.test("/user/edit").get();
+
+
+    String result = simulator.response.getOutputStream().toString();
+    assertEquals(result, FileUtils.readFileToString(new File("src/test/java/org/primeframework/mvc/edit-output.txt")));
+  }
+
+  @Test
   public void scopeStorage() throws IOException, ServletException {
     // Tests that the expression evaluator safely gets skipped while looking for values and Prime then checks the
     // HttpServletRequest and finds the value
@@ -127,42 +217,9 @@ public class GlobalTest extends PrimeBaseTest {
       }
     });
     simulator.test("/scope-storage").
-      post();
+        post();
 
     assertNotNull(simulator.session.getAttribute("sessionObject"));
-  }
-
-  @Test
-  public void expressionEvaluatorSkippedUsesRequest() throws IOException, ServletException {
-    // Tests that the expression evaluator safely gets skipped while looking for values and Prime then checks the
-    // HttpServletRequest and finds the value
-    RequestSimulator simulator = new RequestSimulator(context, new MVCModule() {
-      @Override
-      protected void configure() {
-        super.configure();
-        install(new TestModule());
-      }
-    });
-    simulator.test("/value-in-request").
-      get();
-
-    assertEquals(simulator.response.getOutputStream().toString(), "baz");
-    assertEquals(simulator.request.getAttribute("bar"), "baz");
-  }
-
-  @Test
-  public void actionlessRequest() throws IOException, ServletException {
-    RequestSimulator simulator = new RequestSimulator(context, new MVCModule() {
-      @Override
-      protected void configure() {
-        super.configure();
-        install(new TestModule());
-      }
-    });
-    simulator.test("/actionless").
-      get();
-
-    assertEquals(simulator.response.getOutputStream().toString(), "Hello Actionless World");
   }
 
   @Test
@@ -208,7 +265,8 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   private void assertSingletonConverter(RequestSimulator simulator, Class<?> type) {
-    Map<Class<?>, GlobalConverter> converters = simulator.injector.getInstance(Key.get(new TypeLiteral<Map<Class<?>, GlobalConverter>>(){}));
+    Map<Class<?>, GlobalConverter> converters = simulator.injector.getInstance(Key.get(new TypeLiteral<Map<Class<?>, GlobalConverter>>() {
+    }));
     assertSame(converters.get(type), converters.get(type));
   }
 }

@@ -15,9 +15,7 @@
  */
 package org.primeframework.mvc.parameter.el;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
+import com.google.inject.Inject;
 import org.apache.commons.lang3.ArrayUtils;
 import org.example.action.ExtensionInheritance;
 import org.example.domain.Action;
@@ -30,9 +28,15 @@ import org.example.domain.UserField;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.testng.annotations.Test;
 
-import com.google.inject.Inject;
-import static java.util.Arrays.*;
-import static org.testng.Assert.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import static java.util.Arrays.asList;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertSame;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Tests the expression evaluator.
@@ -197,6 +201,19 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     evaluator.setValue("user.addresses['home'].state", action, ArrayUtils.toArray("CO"), null);
     evaluator.setValue("user.addresses['home'].street", action, ArrayUtils.toArray("Test"), null);
     evaluator.setValue("user.addresses['home'].zipcode", action, ArrayUtils.toArray("80020"), null);
+    assertEquals(action.getUser().getAddresses().size(), 1);
+    assertNull(action.getUser().getAddresses().get("work"));
+    assertEquals(action.getUser().getAddresses().get("home").getCity(), "Broomfield");
+    assertEquals(action.getUser().getAddresses().get("home").getState(), "CO");
+    assertEquals(action.getUser().getAddresses().get("home").getStreet(), "Test");
+    assertEquals(action.getUser().getAddresses().get("home").getZipcode(), "80020");
+
+    // Test collection property sets with flat names (i.e. JSON conversions)
+    action.getUser().setAddresses(null);
+    evaluator.setValue("user.addresses.home.city", action, ArrayUtils.toArray("Broomfield"), null);
+    evaluator.setValue("user.addresses.home.state", action, ArrayUtils.toArray("CO"), null);
+    evaluator.setValue("user.addresses.home.street", action, ArrayUtils.toArray("Test"), null);
+    evaluator.setValue("user.addresses.home.zipcode", action, ArrayUtils.toArray("80020"), null);
     assertEquals(action.getUser().getAddresses().size(), 1);
     assertNull(action.getUser().getAddresses().get("work"));
     assertEquals(action.getUser().getAddresses().get("home").getCity(), "Broomfield");

@@ -60,6 +60,17 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
+          <root url="jar://$USER_HOME$/.gradle/caches/artifacts-14/filestore/com.googlecode.json-simple/json-simple/1.1/jar/5e303a03d04e6788dddfa3655272580ae0fc13bb/json-simple-1.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.gradle/caches/artifacts-14/filestore/com.googlecode.json-simple/json-simple/1.1/source/19c6d8dee6803c520d855ff7e8a8c3d97f1271ec/json-simple-1.1-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
           <root url="jar://$USER_HOME$/.gradle/caches/artifacts-14/filestore/commons-fileupload/commons-fileupload/1.2.1/jar/384faa82e193d4e4b0546059ca09572654bc3970/commons-fileupload-1.2.1.jar!/" />
         </CLASSES>
         <JAVADOC />

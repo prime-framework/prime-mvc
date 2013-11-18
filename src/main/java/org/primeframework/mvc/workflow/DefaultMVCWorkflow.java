@@ -26,6 +26,7 @@ import org.primeframework.mvc.action.ActionMappingWorkflow;
 import org.primeframework.mvc.action.result.ResultInvocationWorkflow;
 import org.primeframework.mvc.message.MessageWorkflow;
 import org.primeframework.mvc.parameter.ParameterWorkflow;
+import org.primeframework.mvc.parameter.RequestBodyWorkflow;
 import org.primeframework.mvc.parameter.URIParameterWorkflow;
 import org.primeframework.mvc.scope.ScopeRetrievalWorkflow;
 import org.primeframework.mvc.scope.ScopeStorageWorkflow;
