@@ -79,40 +79,37 @@ public class GlobalTest extends PrimeBaseTest {
     });
 
     String json = "{\n" +
-        "  \"user\": {\n" +
-        "    \"active\": true,\n" +
-        "    \"age\": 37,\n" +
-        "    \"addresses\": {\n" +
-        "      \"home\": {\n" +
-        "        \"city\": \"Broomfield\",\n" +
-        "        \"state\": \"Colorado\",\n" +
-        "        \"zipcode\": \"80023\"\n" +
-        "      },\n" +
-        "      \"work\": {\n" +
-        "        \"city\": \"Denver\",\n" +
-        "        \"state\": \"Colorado\",\n" +
-        "        \"zipcode\": \"80202\"\n" +
-        "      }\n" +
+        "  \"active\": true,\n" +
+        "  \"age\": 37,\n" +
+        "  \"addresses\": {\n" +
+        "    \"home\": {\n" +
+        "      \"city\": \"Broomfield\",\n" +
+        "      \"state\": \"Colorado\",\n" +
+        "      \"zipcode\": \"80023\"\n" +
         "    },\n" +
-        "    \"favoriteMonth\": 5,\n" +
-        "    \"favoriteYear\": 1976,\n" +
-        "    \"ids\": {\n" +
-        "      \"0\": 1,\n" +
-        "      \"1\": 2\n" +
-        "    },\n" +
-        "    \"lifeStory\": \"Hello world\",\n" +
-        "    \"securityQuestions\": [\"one\", \"two\", \"three\", \"four\"],\n" +
-        "    \"siblings\": [\n" +
-        "      {\n" +
-        "        \"name\": \"Brett\"\n" +
-        "      },\n" +
-        "      {\n" +
-        "        \"name\": \"Beth\"\n" +
-        "      }\n" +
-        "    ],\n" +
-        "    \"type\": \"COOL\"\n" +
+        "    \"work\": {\n" +
+        "      \"city\": \"Denver\",\n" +
+        "      \"state\": \"Colorado\",\n" +
+        "      \"zipcode\": \"80202\"\n" +
+        "    }\n" +
         "  },\n" +
-        "  \"action\": \"ADD\"\n" +
+        "  \"favoriteMonth\": 5,\n" +
+        "  \"favoriteYear\": 1976,\n" +
+        "  \"ids\": {\n" +
+        "    \"0\": 1,\n" +
+        "    \"1\": 2\n" +
+        "  },\n" +
+        "  \"lifeStory\": \"Hello world\",\n" +
+        "  \"securityQuestions\": [\"one\", \"two\", \"three\", \"four\"],\n" +
+        "  \"siblings\": [\n" +
+        "    {\n" +
+        "      \"name\": \"Brett\"\n" +
+        "    },\n" +
+        "    {\n" +
+        "      \"name\": \"Beth\"\n" +
+        "    }\n" +
+        "  ],\n" +
+        "  \"type\": \"COOL\"\n" +
         "}";
     simulator.test("/api")
              .withContentType("application/json")

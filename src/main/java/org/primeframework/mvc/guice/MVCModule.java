@@ -15,9 +15,11 @@
  */
 package org.primeframework.mvc.guice;
 
+import com.google.inject.AbstractModule;
 import org.primeframework.mvc.action.guice.ActionModule;
 import org.primeframework.mvc.action.result.guice.ResultModule;
 import org.primeframework.mvc.container.guice.ContainerModule;
+import org.primeframework.mvc.content.guice.ContentModule;
 import org.primeframework.mvc.control.guice.ControlModule;
 import org.primeframework.mvc.freemarker.guice.FreeMarkerModule;
 import org.primeframework.mvc.locale.guice.LocaleModule;
@@ -30,8 +32,6 @@ import org.primeframework.mvc.util.guice.UtilModule;
 import org.primeframework.mvc.validation.guice.ValidationModule;
 import org.primeframework.mvc.workflow.guice.WorkflowModule;
 
-import com.google.inject.AbstractModule;
-
 /**
  * A virtual module that installs all of the Prime MVC modules.
  *
@@ -42,6 +42,7 @@ public class MVCModule extends AbstractModule {
   protected void configure() {
     install(new ActionModule());
     install(new ContainerModule());
+    install(new ContentModule());
     install(new ControlModule());
     install(new ConverterModule());
     install(new FreeMarkerModule());

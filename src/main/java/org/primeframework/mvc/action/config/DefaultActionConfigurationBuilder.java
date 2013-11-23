@@ -15,17 +15,7 @@
  */
 package org.primeframework.mvc.action.config;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.inject.Inject;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ExecuteMethodConfiguration;
 import org.primeframework.mvc.action.ValidationMethodConfiguration;
@@ -46,7 +36,16 @@ import org.primeframework.mvc.validation.annotation.PostValidationMethod;
 import org.primeframework.mvc.validation.annotation.PreValidationMethod;
 import org.primeframework.mvc.validation.jsr303.Validation;
 
-import com.google.inject.Inject;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Default action configuration builder.
@@ -54,11 +53,14 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 public class DefaultActionConfigurationBuilder implements ActionConfigurationBuilder {
+  private final Set<ActionConfigurator> configurators;
+
   private final URIBuilder uriBuilder;
 
   @Inject
-  public DefaultActionConfigurationBuilder(URIBuilder uriBuilder) {
+  public DefaultActionConfigurationBuilder(URIBuilder uriBuilder, Set<ActionConfigurator> configurators) {
     this.uriBuilder = uriBuilder;
+    this.configurators = configurators;
   }
 
   /**
@@ -71,7 +73,7 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
   public ActionConfiguration build(Class<?> actionClass) {
     if ((actionClass.getModifiers() & Modifier.ABSTRACT) != 0) {
       throw new PrimeException("The action class [" + actionClass + "] is annotated with the @Action annotation but is " +
-        "abstract. You can only annotate concrete action classes");
+          "abstract. You can only annotate concrete action classes");
     }
 
     String uri = uriBuilder.build(actionClass);
@@ -80,7 +82,7 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
     List<Method> formPrepareMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, FormPrepareMethod.class);
     List<Method> preParameterMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, PreParameterMethod.class);
     List<Method> postParameterMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, PostParameterMethod.class);
-    List<Method> preValidationrMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, PreValidationMethod.class);
+    List<Method> preValidationMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, PreValidationMethod.class);
     List<Method> postValidationMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, PostValidationMethod.class);
     Map<String, Annotation> resultAnnotations = findResultConfigurations(actionClass);
     Map<String, PreParameter> preParameterMembers = ReflectionUtils.findAllMembersWithAnnotation(actionClass, PreParameter.class);
@@ -89,9 +91,81 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
 
     List<ScopeField> scopeFields = findScopeFields(actionClass);
 
-    return new ActionConfiguration(actionClass, executeMethods, validationMethods, formPrepareMethods, preValidationrMethods,
-      postValidationMethods, preParameterMethods, postParameterMethods, resultAnnotations, preParameterMembers,
-      fileUploadMembers, memberNames, scopeFields, uri);
+    Map<Class<?>, Object> additionalConfiguration = getAdditionalConfiguration(actionClass);
+
+    return new ActionConfiguration(actionClass, executeMethods, validationMethods, formPrepareMethods, preValidationMethods,
+        postValidationMethods, preParameterMethods, postParameterMethods, resultAnnotations, preParameterMembers,
+        fileUploadMembers, memberNames, scopeFields, additionalConfiguration, uri);
+  }
+
+  /**
+   * Adds the result annotation to the map and handles throwing an exception if there are duplicates.
+   *
+   * @param actionClass          The action class.
+   * @param resultConfigurations The result configurations Map.
+   * @param annotation           The annotation to check and add.
+   */
+  protected void addResultConfiguration(Class<?> actionClass, Map<String, Annotation> resultConfigurations,
+                                        Annotation annotation, Class<? extends Annotation> annotationType) {
+    try {
+      String code = (String) annotation.getClass().getMethod("code").invoke(annotation);
+      if (resultConfigurations.containsKey(code)) {
+        throw new PrimeException("The action class [" + actionClass + "] contains two or more result annotations for " +
+            "the code [" + code + "]");
+      }
+
+      resultConfigurations.put(code, annotation);
+    } catch (NoSuchMethodException e) {
+      throw new PrimeException("The result annotation [" + annotationType + "] is missing a method named [code] that " +
+          "returns a String. For example:\n\n" +
+          "public @interface MyResult {\n" +
+          "  String code() default \"success\";\n" +
+          "}", e);
+    } catch (InvocationTargetException e) {
+      throw new PrimeException("Unable to invoke the code() method on the result annotation container [" +
+          annotationType + "]", e);
+    } catch (IllegalAccessException e) {
+      throw new PrimeException("Unable to invoke the code() method on the result annotation container [" +
+          annotationType + "]", e);
+    }
+  }
+
+  /**
+   * Adds all the result annotations for the given class.
+   *
+   * @param actionClass          The action class.
+   * @param resultConfigurations The Map.
+   */
+  protected void addResultsForClass(Class<?> actionClass, Map<String, Annotation> resultConfigurations) {
+    Annotation[] annotations = actionClass.getAnnotations();
+    for (Annotation annotation : annotations) {
+      Class<? extends Annotation> annotationType = annotation.annotationType();
+      ResultAnnotation resultAnnotation = annotationType.getAnnotation(ResultAnnotation.class);
+      if (resultAnnotation != null) {
+        addResultConfiguration(actionClass, resultConfigurations, annotation, annotationType);
+      } else if (annotationType.isAnnotationPresent(ResultContainerAnnotation.class)) {
+        // There are multiple annotations inside the value
+        try {
+          Annotation[] results = (Annotation[]) annotation.getClass().getMethod("value").invoke(annotation);
+          for (Annotation result : results) {
+            annotationType = result.annotationType();
+            addResultConfiguration(actionClass, resultConfigurations, result, annotationType);
+          }
+        } catch (NoSuchMethodException e) {
+          throw new PrimeException("The result annotation container [" + annotationType + "] must have a method named " +
+              "[value] that is an array of result annotations. For example:\n\n" +
+              "public @interface MyContainer {\n" +
+              "  MyResult[] value();\n" +
+              "}", e);
+        } catch (InvocationTargetException e) {
+          throw new PrimeException("Unable to invoke the value() method on the result annotation container [" +
+              annotationType + "]", e);
+        } catch (IllegalAccessException e) {
+          throw new PrimeException("Unable to invoke the value() method on the result annotation container [" +
+              annotationType + "]", e);
+        }
+      }
+    }
   }
 
   /**
@@ -138,18 +212,60 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
 
     if (executeMethods.isEmpty()) {
       throw new PrimeException("The action class [" + actionClass + "] is missing at least one valid execute method. " +
-        "The class can define execute methods with the same names as the HTTP methods (lowercased) or a default execute " +
-        "method named [execute]. For example:\n\n" +
-        "public String execute() {\n" +
-        "  return \"success\"\n" +
-        "}\n\n" +
-        "or\n\n" +
-        "public String post() {\n" +
-        "  return \"success\"\n" +
-        "}");
+          "The class can define execute methods with the same names as the HTTP methods (lowercased) or a default execute " +
+          "method named [execute]. For example:\n\n" +
+          "public String execute() {\n" +
+          "  return \"success\"\n" +
+          "}\n\n" +
+          "or\n\n" +
+          "public String post() {\n" +
+          "  return \"success\"\n" +
+          "}");
     }
 
     return executeMethods;
+  }
+
+  /**
+   * Finds all of the result configurations for the action class.
+   *
+   * @param actionClass The action class.
+   * @return The map of all the result configurations.
+   */
+  protected Map<String, Annotation> findResultConfigurations(Class<?> actionClass) {
+    Map<String, Annotation> resultConfigurations = new HashMap<String, Annotation>();
+    while (actionClass != Object.class) {
+      addResultsForClass(actionClass, resultConfigurations);
+      actionClass = actionClass.getSuperclass();
+    }
+
+    return resultConfigurations;
+  }
+
+  /**
+   * Locates all the fields in the action class that have a scope annotation on them.
+   *
+   * @param actionClass The action class.
+   * @return The scope fields.
+   */
+  protected List<ScopeField> findScopeFields(Class<?> actionClass) {
+    List<ScopeField> scopeFields = new ArrayList<ScopeField>();
+    while (actionClass != Object.class) {
+      Field[] fields = actionClass.getDeclaredFields();
+      for (Field field : fields) {
+        Annotation[] annotations = field.getAnnotations();
+        for (Annotation annotation : annotations) {
+          Class<? extends Annotation> type = annotation.annotationType();
+          if (type.isAnnotationPresent(ScopeAnnotation.class)) {
+            scopeFields.add(new ScopeField(field, annotation));
+          }
+        }
+      }
+
+      actionClass = actionClass.getSuperclass();
+    }
+
+    return scopeFields;
   }
 
   /**
@@ -177,123 +293,22 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
   protected void verify(Method method) {
     if (method.getReturnType() != String.class || method.getParameterTypes().length != 0) {
       throw new PrimeException("The action class [" + method.getDeclaringClass().getClass() + "] has defined an " +
-        "execute method named [" + method.getName() + "] that is invalid. Execute methods must have zero parameters " +
-        "and return a String like this:\n\n" +
-        "public String execute() {\n" +
-        "  return \"success\"\n" +
-        "}");
+          "execute method named [" + method.getName() + "] that is invalid. Execute methods must have zero parameters " +
+          "and return a String like this:\n\n" +
+          "public String execute() {\n" +
+          "  return \"success\"\n" +
+          "}");
     }
   }
 
-  /**
-   * Finds all of the result configurations for the action class.
-   *
-   * @param actionClass The action class.
-   * @return The map of all the result configurations.
-   */
-  protected Map<String, Annotation> findResultConfigurations(Class<?> actionClass) {
-    Map<String, Annotation> resultConfigurations = new HashMap<String, Annotation>();
-    while (actionClass != Object.class) {
-      addResultsForClass(actionClass, resultConfigurations);
-      actionClass = actionClass.getSuperclass();
-    }
-
-    return resultConfigurations;
-  }
-
-  /**
-   * Adds all the result annotations for the given class.
-   *
-   * @param actionClass          The action class.
-   * @param resultConfigurations The Map.
-   */
-  protected void addResultsForClass(Class<?> actionClass, Map<String, Annotation> resultConfigurations) {
-    Annotation[] annotations = actionClass.getAnnotations();
-    for (Annotation annotation : annotations) {
-      Class<? extends Annotation> annotationType = annotation.annotationType();
-      ResultAnnotation resultAnnotation = annotationType.getAnnotation(ResultAnnotation.class);
-      if (resultAnnotation != null) {
-        addResultConfiguration(actionClass, resultConfigurations, annotation, annotationType);
-      } else if (annotationType.isAnnotationPresent(ResultContainerAnnotation.class)) {
-        // There are multiple annotations inside the value
-        try {
-          Annotation[] results = (Annotation[]) annotation.getClass().getMethod("value").invoke(annotation);
-          for (Annotation result : results) {
-            annotationType = result.annotationType();
-            addResultConfiguration(actionClass, resultConfigurations, result, annotationType);
-          }
-        } catch (NoSuchMethodException e) {
-          throw new PrimeException("The result annotation container [" + annotationType + "] must have a method named " +
-            "[value] that is an array of result annotations. For example:\n\n" +
-            "public @interface MyContainer {\n" +
-            "  MyResult[] value();\n" +
-            "}", e);
-        } catch (InvocationTargetException e) {
-          throw new PrimeException("Unable to invoke the value() method on the result annotation container [" +
-            annotationType + "]", e);
-        } catch (IllegalAccessException e) {
-          throw new PrimeException("Unable to invoke the value() method on the result annotation container [" +
-            annotationType + "]", e);
-        }
+  private Map<Class<?>, Object> getAdditionalConfiguration(Class<?> actionClass) {
+    Map<Class<?>, Object> additionalConfiguration = new HashMap<Class<?>, Object>();
+    for (ActionConfigurator configurator : configurators) {
+      Object config = configurator.configure(actionClass);
+      if (config != null) {
+        additionalConfiguration.put(config.getClass(), config);
       }
     }
-  }
-
-  /**
-   * Adds the result annotation to the map and handles throwing an exception if there are duplicates.
-   *
-   * @param actionClass          The action class.
-   * @param resultConfigurations The result configurations Map.
-   * @param annotation           The annotation to check and add.
-   */
-  protected void addResultConfiguration(Class<?> actionClass, Map<String, Annotation> resultConfigurations,
-                                        Annotation annotation, Class<? extends Annotation> annotationType) {
-    try {
-      String code = (String) annotation.getClass().getMethod("code").invoke(annotation);
-      if (resultConfigurations.containsKey(code)) {
-        throw new PrimeException("The action class [" + actionClass + "] contains two or more result annotations for " +
-          "the code [" + code + "]");
-      }
-
-      resultConfigurations.put(code, annotation);
-    } catch (NoSuchMethodException e) {
-      throw new PrimeException("The result annotation [" + annotationType + "] is missing a method named [code] that " +
-        "returns a String. For example:\n\n" +
-        "public @interface MyResult {\n" +
-        "  String code() default \"success\";\n" +
-        "}", e);
-    } catch (InvocationTargetException e) {
-      throw new PrimeException("Unable to invoke the code() method on the result annotation container [" +
-        annotationType + "]", e);
-    } catch (IllegalAccessException e) {
-      throw new PrimeException("Unable to invoke the code() method on the result annotation container [" +
-        annotationType + "]", e);
-    }
-  }
-
-  /**
-   * Locates all the fields in the action class that have a scope annotation on them.
-   *
-   * @param actionClass The action class.
-   * @return The scope fields.
-   */
-  protected List<ScopeField> findScopeFields(Class<?> actionClass) {
-    List<ScopeField> scopeFields = new ArrayList<ScopeField>();
-    while (actionClass != Object.class) {
-      Field[] fields = actionClass.getDeclaredFields();
-      for (Field field : fields) {
-        Annotation[] annotations = field.getAnnotations();
-        for (Annotation annotation : annotations) {
-          Class<? extends Annotation> type = annotation.annotationType();
-          if (type.isAnnotationPresent(ScopeAnnotation.class)) {
-            scopeFields.add(new ScopeField(field, annotation));
-          }
-        }
-      }
-
-      actionClass = actionClass.getSuperclass();
-    }
-
-    return scopeFields;
+    return additionalConfiguration;
   }
 }

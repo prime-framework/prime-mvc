@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2013, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,32 +13,14 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.example.action;
+package org.primeframework.mvc.content;
 
-import org.example.domain.UserField;
-import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.action.result.annotation.Forward;
-import org.primeframework.mvc.content.json.annotation.JSONRequest;
+import org.primeframework.mvc.workflow.Workflow;
 
 /**
- * This is a simple test action.
+ * Defines the content workflow that handles content types and request bodies other than GET/POST parameters.
  *
  * @author Brian Pontarelli
  */
-@Action
-@Forward(contentType = "application/json")
-public class Api {
-  public ActionType action;
-
-  @JSONRequest
-  public UserField user;
-
-  public String post() {
-    return "success";
-  }
-
-  public static enum ActionType {
-    ADD,
-    EDIT
-  }
+public interface ContentWorkflow extends Workflow {
 }

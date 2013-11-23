@@ -15,6 +15,12 @@
  */
 package org.primeframework.mvc.util;
 
+import org.primeframework.mvc.parameter.el.BeanExpressionException;
+import org.primeframework.mvc.parameter.el.CollectionExpressionException;
+import org.primeframework.mvc.parameter.el.ExpressionException;
+import org.primeframework.mvc.parameter.el.ReadExpressionException;
+import org.primeframework.mvc.parameter.el.UpdateExpressionException;
+
 import java.beans.Introspector;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -30,12 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
-
-import org.primeframework.mvc.parameter.el.BeanExpressionException;
-import org.primeframework.mvc.parameter.el.CollectionExpressionException;
-import org.primeframework.mvc.parameter.el.ExpressionException;
-import org.primeframework.mvc.parameter.el.ReadExpressionException;
-import org.primeframework.mvc.parameter.el.UpdateExpressionException;
 
 /**
  * Provides support for reflection, bean properties and field access.
@@ -340,7 +340,7 @@ public class ReflectionUtils {
         if (info == null) {
           info = new PropertyInfo();
           info.setName(name.getName());
-          info.setKlass(type);
+          info.setDefiningClass(type);
           constructed = true;
         }
 
@@ -363,6 +363,7 @@ public class ReflectionUtils {
 
         info.getMethods().put(prefix, method);
         info.setGenericType(verifier.determineGenericType(method));
+        info.setType(verifier.determineType(method));
         info.setIndexed(verifier.isIndexed(method));
 
         if (constructed) {
@@ -526,6 +527,25 @@ public class ReflectionUtils {
     return new PropertyName(prefix, propertyName);
   }
 
+  /**
+   * Determines the type of the given member (field or proprty).
+   *
+   * @param type   The class.
+   * @param member The member name.
+   * @return The type.
+   */
+  public static Class<?> getMemberType(Class<?> type, String member) {
+    Field field = findFields(type).get(member);
+    if (field != null) {
+      return field.getType();
+    }
+
+    PropertyInfo propertyInfo = findPropertyInfo(type).get(member);
+    if (propertyInfo != null) {
+      return propertyInfo.getType();
+    }
+    return null;
+  }
 
   /**
    * This interface defines a mechanism to extract information from JavaBean properties.
@@ -533,6 +553,13 @@ public class ReflectionUtils {
    * @author Brian Pontarelli
    */
   public static interface MethodInformationExtractor {
+    /**
+     * Determines the type of the method. For getters this is the return type. For setters this is the parameter.
+     *
+     * @param method The method.
+     */
+    Class<?> determineType(Method method);
+
     /**
      * Whether or not this property is an indexed property.
      *
@@ -583,6 +610,11 @@ public class ReflectionUtils {
     }
 
     @Override
+    public Class<?> determineType(Method method) {
+      return isIndexed(method) ? method.getParameterTypes()[1] : method.getParameterTypes()[0];
+    }
+
+    @Override
     public boolean isIndexed(Method method) {
       return isValidIndexedSetter(method);
     }
@@ -624,6 +656,11 @@ public class ReflectionUtils {
     }
 
     @Override
+    public Class<?> determineType(Method method) {
+      return method.getReturnType();
+    }
+
+    @Override
     public boolean isIndexed(Method method) {
       return isValidIndexedGetter(method);
     }
@@ -638,20 +675,26 @@ public class ReflectionUtils {
   public static class PropertyInfo {
     private String name;
     private final Map<String, Method> methods = new HashMap<String, Method>();
-    private Class<?> klass;
+    private Class<?> definingClass;
     private boolean indexed;
     private Type genericType;
 
+    private Class<?> type;
+
     public String getName() {
       return name;
+    }
+
+    public Class<?> getType() {
+      return type;
     }
 
     public void setName(String name) {
       this.name = name;
     }
 
-    public void setKlass(Class<?> klass) {
-      this.klass = klass;
+    public void setDefiningClass(Class<?> definingClass) {
+      this.definingClass = definingClass;
     }
 
     public boolean isIndexed() {
@@ -674,8 +717,12 @@ public class ReflectionUtils {
       return methods;
     }
 
+    public void setType(Class<?> type) {
+      this.type = type;
+    }
+
     public String toString() {
-      return "Property named [" + name + "] in class [" + klass + "]";
+      return "Property named [" + name + "] in class [" + definingClass + "]";
     }
   }
 

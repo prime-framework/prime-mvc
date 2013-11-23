@@ -15,12 +15,6 @@
  */
 package org.primeframework.mvc.action.config;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.primeframework.mvc.action.ExecuteMethodConfiguration;
 import org.primeframework.mvc.action.ValidationMethodConfiguration;
 import org.primeframework.mvc.action.annotation.Action;
@@ -29,6 +23,12 @@ import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
 import org.primeframework.mvc.scope.ScopeField;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.validation.jsr303.Validatable;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This interface defines the public API that describes an action configuration.
@@ -48,6 +48,7 @@ public class ActionConfiguration {
   public final Map<String, FileUpload> fileUploadMembers;
   public final Set<String> memberNames;
   public final List<ScopeField> scopeFields;
+  public final Map<Class<?>, Object> additionalConfiguration;
   public final Map<String, Annotation> resultConfigurations;
   public final boolean validatable;
   public final String uri;
@@ -61,7 +62,7 @@ public class ActionConfiguration {
                              List<Method> preParameterMethods, List<Method> postParameterMethods,
                              Map<String, Annotation> resultConfigurations, Map<String, PreParameter> preParameterMembers,
                              Map<String, FileUpload> fileUploadMembers, Set<String> memberNames,
-                             List<ScopeField> scopeFields, String uri) {
+                             List<ScopeField> scopeFields, Map<Class<?>, Object> additionalConfiguration, String uri) {
     this.actionClass = actionClass;
     this.formPrepareMethods = formPrepareMethods;
     this.preValidationMethods = preValidationMethods;
@@ -75,6 +76,7 @@ public class ActionConfiguration {
     this.resultConfigurations = resultConfigurations;
     this.memberNames = memberNames;
     this.scopeFields = scopeFields;
+    this.additionalConfiguration = additionalConfiguration;
     this.validatable = Validatable.class.isAssignableFrom(actionClass);
     this.uri = uri;
     this.annotation = actionClass.getAnnotation(Action.class);

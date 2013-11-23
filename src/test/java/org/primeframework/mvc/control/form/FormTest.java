@@ -15,12 +15,7 @@
  */
 package org.primeframework.mvc.control.form;
 
-import javax.servlet.ServletException;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-
+import com.google.inject.Inject;
 import org.example.action.user.Edit;
 import org.example.action.user.Index;
 import org.primeframework.mvc.action.ActionInvocation;
@@ -29,9 +24,16 @@ import org.primeframework.mvc.control.ControlBaseTest;
 import org.primeframework.mvc.util.MapBuilder;
 import org.testng.annotations.Test;
 
-import com.google.inject.Inject;
+import javax.servlet.ServletException;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+
 import static java.util.Arrays.asList;
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertSame;
+import static org.testng.Assert.assertTrue;
 
 /**
  * This tests the form control.
@@ -46,7 +48,7 @@ public class FormTest extends ControlBaseTest {
     request.setUri("/user/");
     Index index = new Index();
     ais.setCurrent(new ActionInvocation(index, null, "/user/", null,
-      new ActionConfiguration(Index.class, null, null, new ArrayList<Method>(), null, null, null, null, null, null, null, null, null, "/user/")));
+      new ActionConfiguration(Index.class, null, null, new ArrayList<Method>(), null, null, null, null, null, null, null, null, null, null, "/user/")));
 
     new ControlTester(form).
       attr("action", "/user/").
@@ -77,7 +79,7 @@ public class FormTest extends ControlBaseTest {
     request.setUri("/user/");
     Index index = new Index();
     ais.setCurrent(new ActionInvocation(index, null, "/user/", null,
-      new ActionConfiguration(Index.class, null, null, new ArrayList<Method>(), null, null, null, null, null, null, null, null, null, "/user/")));
+      new ActionConfiguration(Index.class, null, null, new ArrayList<Method>(), null, null, null, null, null, null, null, null, null, null, "/user/")));
 
     new ControlTester(form).
       attr("action", "https://www.google.com").
@@ -94,7 +96,7 @@ public class FormTest extends ControlBaseTest {
     request.setContextPath("/context");
     Index index = new Index();
     ais.setCurrent(new ActionInvocation(index, null, "/user/", null,
-      new ActionConfiguration(Index.class, null, null, new ArrayList<Method>(), null, null, null, null, null, null, null, null, null, "/user/")));
+      new ActionConfiguration(Index.class, null, null, new ArrayList<Method>(), null, null, null, null, null, null, null, null, null, null, "/user/")));
 
     new ControlTester(form).
       attr("action", "/user/").
@@ -127,7 +129,7 @@ public class FormTest extends ControlBaseTest {
     request.setContextPath("/context");
     Index index = new Index();
     ais.setCurrent(new ActionInvocation(index, null, "/user/", null,
-      new ActionConfiguration(Index.class, null, null, new ArrayList<Method>(), null, null, null, null, null, null, null, null, null, "/user/")));
+      new ActionConfiguration(Index.class, null, null, new ArrayList<Method>(), null, null, null, null, null, null, null, null, null, null, "/user/")));
 
     new ControlTester(form).
       attr("action", "https://www.google.com").
@@ -143,7 +145,7 @@ public class FormTest extends ControlBaseTest {
     request.setUri("/user/edit");
     Edit edit = new Edit();
     ais.setCurrent(new ActionInvocation(edit, null, "/user/edit", null,
-      new ActionConfiguration(Index.class, null, null, asList(Edit.class.getMethod("formPrepare")), null, null, null, null, null, null, null, null, null, "/user/")));
+      new ActionConfiguration(Index.class, null, null, asList(Edit.class.getMethod("formPrepare")), null, null, null, null, null, null, null, null, null, null, "/user/")));
 
     new ControlTester(form).
       attr("action", "/user/edit").

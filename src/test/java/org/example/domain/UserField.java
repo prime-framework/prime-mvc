@@ -39,4 +39,11 @@ public class UserField {
   public String[] securityQuestions;
   public List<UserField> siblings = new ArrayList<UserField>();
   public UserType type;
+
+  public UserField() {
+  }
+
+  public UserField(String name) {
+    this.name = name;
+  }
 }

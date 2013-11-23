@@ -78,7 +78,9 @@
       <option name="myName" value="Inversoft Apache" />
       <option name="myLocal" value="true" />
     </copyright>
-    <module2copyright />
+    <module2copyright>
+      <element module="All" copyright="Inversoft Apache" />
+    </module2copyright>
     <LanguageOptions name="__TEMPLATE__">
       <option name="addBlankAfter" value="false" />
     </LanguageOptions>

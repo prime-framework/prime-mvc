@@ -15,23 +15,36 @@
  */
 package org.primeframework.mvc.action.config;
 
-import javax.servlet.ServletContext;
-import java.util.Map;
-
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.example.action.KitchenSink;
 import org.example.action.Simple;
 import org.example.action.user.Index;
+import org.example.domain.User;
+import org.example.domain.UserField;
 import org.primeframework.mvc.action.result.annotation.Forward;
+import org.primeframework.mvc.action.result.annotation.JSON;
 import org.primeframework.mvc.action.result.annotation.Redirect;
 import org.primeframework.mvc.action.result.annotation.Status;
+import org.primeframework.mvc.content.json.JacksonActionConfiguration;
+import org.primeframework.mvc.content.json.JacksonActionConfigurator;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.util.DefaultURIBuilder;
 import org.testng.annotations.Test;
 
-import static org.easymock.EasyMock.*;
-import static org.testng.Assert.*;
+import javax.servlet.ServletContext;
+import java.util.HashSet;
+import java.util.Map;
+
+import static java.util.Arrays.asList;
+import static org.easymock.EasyMock.capture;
+import static org.easymock.EasyMock.eq;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertSame;
+import static org.testng.Assert.assertTrue;
 
 /**
  * This class tests the default action configuration provider.
@@ -46,7 +59,7 @@ public class DefaultActionConfigurationProviderTest {
     context.setAttribute(eq(DefaultActionConfigurationProvider.ACTION_CONFIGURATION_KEY), capture(c));
     EasyMock.replay(context);
 
-    new DefaultActionConfigurationProvider(context, new DefaultActionConfigurationBuilder(new DefaultURIBuilder()));
+    new DefaultActionConfigurationProvider(context, new DefaultActionConfigurationBuilder(new DefaultURIBuilder(), new HashSet<ActionConfigurator>(asList(new JacksonActionConfigurator()))));
 
     Map<String, ActionConfiguration> config = c.getValue();
     assertSame(config.get("/simple").actionClass, Simple.class);
@@ -75,7 +88,7 @@ public class DefaultActionConfigurationProviderTest {
     assertEquals(config.get("/kitchen-sink").executeMethods.get(HTTPMethod.POST).method, KitchenSink.class.getMethod("post"));
     assertNull(config.get("/kitchen-sink").executeMethods.get(HTTPMethod.PUT));
     assertNull(config.get("/kitchen-sink").executeMethods.get(HTTPMethod.DELETE));
-    assertEquals(config.get("/kitchen-sink").resultConfigurations.size(), 6);
+    assertEquals(config.get("/kitchen-sink").resultConfigurations.size(), 7);
     assertEquals(((Forward) config.get("/kitchen-sink").resultConfigurations.get("forward1")).code(), "forward1");
     assertEquals(((Forward) config.get("/kitchen-sink").resultConfigurations.get("forward1")).contentType(), "text");
     assertEquals(((Forward) config.get("/kitchen-sink").resultConfigurations.get("forward1")).page(), "/WEB-INF/forward1.ftl");
@@ -104,6 +117,8 @@ public class DefaultActionConfigurationProviderTest {
     assertEquals(((Status) config.get("/kitchen-sink").resultConfigurations.get("status")).headers()[0].value(), "bar");
     assertEquals(((Status) config.get("/kitchen-sink").resultConfigurations.get("status")).headers()[1].name(), "baz");
     assertEquals(((Status) config.get("/kitchen-sink").resultConfigurations.get("status")).headers()[1].value(), "fred");
+    assertEquals(((JSON) config.get("/kitchen-sink").resultConfigurations.get("json")).code(), "json");
+    assertEquals(((JSON) config.get("/kitchen-sink").resultConfigurations.get("json")).status(), 201);
     assertEquals(config.get("/kitchen-sink").pattern, "{name}/{value}/static/{foo}");
     assertEquals(config.get("/kitchen-sink").patternParts.length, 4);
     assertEquals(config.get("/kitchen-sink").uri, "/kitchen-sink");
@@ -113,5 +128,9 @@ public class DefaultActionConfigurationProviderTest {
     assertEquals(config.get("/kitchen-sink").postValidationMethods.size(), 1);
     assertEquals(config.get("/kitchen-sink").validationMethods.size(), 1);
     assertEquals(config.get("/kitchen-sink").validationMethods.get(0).method, KitchenSink.class.getMethod("validate"));
+    assertEquals(((JacksonActionConfiguration) config.get("/kitchen-sink").additionalConfiguration.get(JacksonActionConfiguration.class)).requestMember, "jsonRequest");
+    assertEquals(((JacksonActionConfiguration) config.get("/kitchen-sink").additionalConfiguration.get(JacksonActionConfiguration.class)).requestMemberType, UserField.class);
+    assertEquals(((JacksonActionConfiguration) config.get("/kitchen-sink").additionalConfiguration.get(JacksonActionConfiguration.class)).responseMember, "jsonResponse");
+    assertEquals(((JacksonActionConfiguration) config.get("/kitchen-sink").additionalConfiguration.get(JacksonActionConfiguration.class)).responseMemberType, User.class);
   }
 }

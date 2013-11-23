@@ -40,9 +40,11 @@ dependencies {
   )
   compile(
       "asm:asm:3.1",
+      "com.fasterxml.jackson.core:jackson-annotation:2.3.0",
+      "com.fasterxml.jackson.core:jackson-core:2.3.0",
+      "com.fasterxml.jackson.core:jackson-databind:2.3.0",
       "com.google.inject:guice:3.0",
       "com.google.inject.extensions:guice-multibindings:3.0",
-      "com.googlecode.json-simple:json-simple:1.1",
       "commons-fileupload:commons-fileupload:1.2.1",
       "commons-io:commons-io:1.4",
       "javax.inject:javax.inject:1",

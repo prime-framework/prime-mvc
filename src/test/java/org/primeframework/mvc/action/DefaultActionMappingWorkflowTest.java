@@ -15,15 +15,7 @@
  */
 package org.primeframework.mvc.action;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-
+import com.google.inject.Injector;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.example.action.ComplexRest;
@@ -39,10 +31,22 @@ import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
 
-import com.google.inject.Injector;
-import static java.util.Arrays.*;
-import static org.easymock.EasyMock.*;
-import static org.testng.Assert.*;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+
+import static java.util.Arrays.asList;
+import static org.easymock.EasyMock.capture;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 /**
  * This class tests the default action mapping workflow.
@@ -124,7 +128,7 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
       new ArrayList<ValidationMethodConfiguration>(), new ArrayList<Method>(), new ArrayList<Method>(),
       new ArrayList<Method>(), new ArrayList<Method>(), new ArrayList<Method>(),
       new HashMap<String, Annotation>(), new HashMap<String, PreParameter>(), new HashMap<String, FileUpload>(),
-      new HashSet<String>(), new ArrayList<ScopeField>(), "/admin/user/rest-edit"));
+      new HashSet<String>(), new ArrayList<ScopeField>(), new HashMap<Class<?>, Object>(), "/admin/user/rest-edit"));
     EasyMock.replay(provider);
 
     Capture<ActionInvocation> capture = new Capture<ActionInvocation>();
@@ -181,7 +185,7 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
         new ArrayList<ValidationMethodConfiguration>(), new ArrayList<Method>(), new ArrayList<Method>(),
         new ArrayList<Method>(), new ArrayList<Method>(), new ArrayList<Method>(),
         new HashMap<String, Annotation>(), new HashMap<String, PreParameter>(), new HashMap<String, FileUpload>(),
-        new HashSet<String>(), new ArrayList<ScopeField>(), "/complex-rest"));
+        new HashSet<String>(), new ArrayList<ScopeField>(), new HashMap<Class<?>, Object>(), "/complex-rest"));
     EasyMock.replay(provider);
 
     Capture<ActionInvocation> capture = new Capture<ActionInvocation>();
@@ -227,7 +231,7 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
         new ArrayList<ValidationMethodConfiguration>(), new ArrayList<Method>(), new ArrayList<Method>(),
         new ArrayList<Method>(), new ArrayList<Method>(), new ArrayList<Method>(),
         new HashMap<String, Annotation>(), new HashMap<String, PreParameter>(), new HashMap<String, FileUpload>(),
-        new HashSet<String>(), new ArrayList<ScopeField>(), "/foo/index"));
+        new HashSet<String>(), new ArrayList<ScopeField>(), new HashMap<Class<?>, Object>(), "/foo/index"));
     EasyMock.replay(provider);
 
     ActionInvocationStore store = EasyMock.createStrictMock(ActionInvocationStore.class);
@@ -257,7 +261,7 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
         new ArrayList<ValidationMethodConfiguration>(), new ArrayList<Method>(), new ArrayList<Method>(),
         new ArrayList<Method>(), new ArrayList<Method>(), new ArrayList<Method>(),
         new HashMap<String, Annotation>(), new HashMap<String, PreParameter>(), new HashMap<String, FileUpload>(),
-        new HashSet<String>(), new ArrayList<ScopeField>(), uri));
+        new HashSet<String>(), new ArrayList<ScopeField>(), new HashMap<Class<?>, Object>(), uri));
     EasyMock.replay(provider);
 
     Capture<ActionInvocation> capture = new Capture<ActionInvocation>();

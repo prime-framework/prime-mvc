@@ -15,14 +15,17 @@
  */
 package org.example.action;
 
-import javax.validation.Validator;
-import java.util.Set;
-
+import com.google.inject.Inject;
+import org.example.domain.User;
+import org.example.domain.UserField;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.annotation.Forward;
-import org.primeframework.mvc.action.result.annotation.Status;
+import org.primeframework.mvc.action.result.annotation.JSON;
 import org.primeframework.mvc.action.result.annotation.Redirect;
+import org.primeframework.mvc.action.result.annotation.Status;
 import org.primeframework.mvc.action.result.annotation.Status.Header;
+import org.primeframework.mvc.content.json.annotation.JSONRequest;
+import org.primeframework.mvc.content.json.annotation.JSONResponse;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
@@ -34,7 +37,8 @@ import org.primeframework.mvc.validation.annotation.PostValidationMethod;
 import org.primeframework.mvc.validation.annotation.PreValidationMethod;
 import org.primeframework.mvc.validation.jsr303.Validatable;
 
-import com.google.inject.Inject;
+import javax.validation.Validator;
+import java.util.Set;
 
 /**
  * @author Brian Pontarelli
@@ -49,11 +53,18 @@ import com.google.inject.Inject;
   @Redirect(code = "redirect2", uri = "/redirect2", perm = false)
 })
 @Status(code = "status", status = 300, statusStr = "hello world", headers = {@Header(name = "foo", value = "bar"), @Header(name = "baz", value = "fred")})
+@JSON(code = "json", status = 201)
 public class KitchenSink extends KitchenSinkSuperclass implements Validatable {
   private final MessageStore messageStore;
 
   @Session
   public Object sessionObject;
+
+  @JSONRequest
+  public UserField jsonRequest;
+
+  @JSONResponse
+  public User jsonResponse;
 
   @Inject
   public KitchenSink(MessageStore messageStore) {

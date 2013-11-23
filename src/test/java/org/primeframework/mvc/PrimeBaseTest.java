@@ -15,17 +15,8 @@
  */
 package org.primeframework.mvc;
 
-import javax.servlet.http.HttpServletRequestWrapper;
-import java.io.File;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
+import com.google.inject.AbstractModule;
+import com.google.inject.Injector;
 import org.example.action.user.Edit;
 import org.primeframework.mock.servlet.MockHttpServletRequest;
 import org.primeframework.mock.servlet.MockHttpServletResponse;
@@ -49,9 +40,18 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Injector;
-import static java.util.Arrays.*;
+import javax.servlet.http.HttpServletRequestWrapper;
+import java.io.File;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import static java.util.Arrays.asList;
 
 /**
  * This class is a base test for testing the Prime framework. It isn't recommended to use it outside of the Prime
@@ -144,7 +144,7 @@ public abstract class PrimeBaseTest {
       new ActionConfiguration(Edit.class, executeMethods, validationMethods, new ArrayList<Method>(), new ArrayList<Method>(),
         new ArrayList<Method>(), new ArrayList<Method>(), new ArrayList<Method>(), resultConfigurations,
         new HashMap<String, PreParameter>(), new HashMap<String, FileUpload>(), new HashSet<String>(),
-        new ArrayList<ScopeField>(), uri));
+        new ArrayList<ScopeField>(), new HashMap<Class<?>, Object>(), uri));
   }
 
   public static class TestModule extends AbstractModule {

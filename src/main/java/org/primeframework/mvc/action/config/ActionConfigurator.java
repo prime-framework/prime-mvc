@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2013, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,32 +13,20 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.example.action;
-
-import org.example.domain.UserField;
-import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.action.result.annotation.Forward;
-import org.primeframework.mvc.content.json.annotation.JSONRequest;
+package org.primeframework.mvc.action.config;
 
 /**
- * This is a simple test action.
+ * An class can implement this interface to provide additional configuration to an action.
  *
  * @author Brian Pontarelli
  */
-@Action
-@Forward(contentType = "application/json")
-public class Api {
-  public ActionType action;
-
-  @JSONRequest
-  public UserField user;
-
-  public String post() {
-    return "success";
-  }
-
-  public static enum ActionType {
-    ADD,
-    EDIT
-  }
+public interface ActionConfigurator {
+  /**
+   * Takes the action class and returns a configuration object. This object is stored in a Map where the key is the
+   * object's class the value is the object.
+   *
+   * @param actionClass The action class.
+   * @return The configuration or null.
+   */
+  Object configure(Class<?> actionClass);
 }

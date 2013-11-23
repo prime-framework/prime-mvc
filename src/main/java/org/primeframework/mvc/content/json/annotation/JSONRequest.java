@@ -13,32 +13,21 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.example.action;
+package org.primeframework.mvc.content.json.annotation;
 
-import org.example.domain.UserField;
-import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.action.result.annotation.Forward;
-import org.primeframework.mvc.content.json.annotation.JSONRequest;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * This is a simple test action.
+ * Marks a member as the recipient of a JSON data object that has been bound by Jackson from the request.
  *
  * @author Brian Pontarelli
  */
-@Action
-@Forward(contentType = "application/json")
-public class Api {
-  public ActionType action;
-
-  @JSONRequest
-  public UserField user;
-
-  public String post() {
-    return "success";
-  }
-
-  public static enum ActionType {
-    ADD,
-    EDIT
-  }
+@Retention(RUNTIME)
+@Target({FIELD, METHOD})
+public @interface JSONRequest {
 }

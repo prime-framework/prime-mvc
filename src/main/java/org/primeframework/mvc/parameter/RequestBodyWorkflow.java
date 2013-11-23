@@ -20,12 +20,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.lang3.StringUtils;
-import org.json.simple.parser.ContentHandler;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.primeframework.mvc.PrimeException;
-import org.primeframework.mvc.parameter.RequestBodyWorkflow.JSONHandler.Names.Name;
 import org.primeframework.mvc.parameter.fileupload.FileInfo;
 import org.primeframework.mvc.util.IteratorEnumeration;
 import org.primeframework.mvc.util.RequestKeys;
@@ -38,19 +33,14 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Deque;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import static java.util.Arrays.asList;
 
 /**
  * This workflow handles providing access to parameters inside the request body when the container doesn't parse them.
@@ -85,8 +75,6 @@ public class RequestBodyWorkflow implements Workflow {
         parsedParameters = filesAndParameters.parameters;
       } else if (contentType.startsWith("application/x-www-form-urlencoded")) {
         parsedParameters = parse(request.getInputStream(), request.getContentLength(), request.getCharacterEncoding());
-      } else if (contentType.startsWith("application/json")) {
-        parsedParameters = parseJSON(request.getInputStream(), request.getContentLength(), request.getCharacterEncoding());
       }
     }
 
@@ -269,27 +257,6 @@ public class RequestBodyWorkflow implements Workflow {
     return parsedParameters;
   }
 
-  private Map<String, List<String>> parseJSON(InputStream inputStream, int contentLength, String characterEncoding)
-  throws IOException {
-    if (contentLength == 0) {
-      return null;
-    }
-
-    if (characterEncoding == null) {
-      characterEncoding = "UTF-8";
-    }
-
-    JSONHandler handler = new JSONHandler();
-    JSONParser parser = new JSONParser();
-    try {
-      parser.parse(new InputStreamReader(inputStream, characterEncoding), handler);
-    } catch (ParseException e) {
-      throw new IOException(e);
-    }
-
-    return handler.parameters;
-  }
-
   private String toParameterString(String encoding, byte[] readBuffer, int start, int length, boolean decode)
   throws UnsupportedEncodingException {
     if (length == 0) {
@@ -335,165 +302,6 @@ public class RequestBodyWorkflow implements Workflow {
     @Override
     public String[] getParameterValues(String s) {
       return parameters.get(s);
-    }
-  }
-
-  public class JSONHandler implements ContentHandler {
-    public final Names names = new Names();
-
-    public final Map<String, List<String>> parameters = new HashMap<String, List<String>>();
-
-    public List<String> simpleArray;
-
-    public String currentKey;
-
-    @Override
-    public boolean endArray() throws ParseException, IOException {
-      if (names.current().isSimpleArray()) {
-        parameters.put(currentKey, simpleArray);
-        simpleArray = null;
-      }
-
-      return true;
-    }
-
-    @Override
-    public void endJSON() throws ParseException, IOException {
-    }
-
-    @Override
-    public boolean endObject() throws ParseException, IOException {
-      Name current = names.current();
-      if (current != null) {
-        current.incrementIndexIfApplicable();
-      }
-
-      return true;
-    }
-
-    @Override
-    public boolean endObjectEntry() throws ParseException, IOException {
-      names.pop();
-      currentKey = names.toString();
-      return true;
-    }
-
-    @Override
-    public boolean primitive(Object value) throws ParseException, IOException {
-      if (names.current().isStartOfArray()) {
-        if (simpleArray == null) {
-          names.current().markAsSimpleArray();
-          simpleArray = new ArrayList<String>();
-        }
-
-        simpleArray.add(value.toString());
-      } else {
-        String key = names.toString();
-        parameters.put(key, asList(value.toString()));
-        names.current().incrementIndexIfApplicable();
-      }
-
-      return true;
-    }
-
-    @Override
-    public boolean startArray() throws ParseException, IOException {
-      if (names.current().isSimpleArray() || names.current().isArray()) {
-        throw new IOException("Embedded JSON arrays inside a primitive array are not allowed (i.e. [\"foo\", [1, 2], \"bar\"] or [[1, 2], [3, 4]])");
-      }
-
-      names.current().startArray();
-      return true;
-    }
-
-    @Override
-    public void startJSON() throws ParseException, IOException {
-    }
-
-    @Override
-    public boolean startObject() throws ParseException, IOException {
-      return true;
-    }
-
-    @Override
-    public boolean startObjectEntry(String key) throws ParseException, IOException {
-      if (names.current() != null && names.current().isSimpleArray()) {
-        throw new IOException("Embedded JSON objects inside a primitive array is not allowed (i.e. [\"foo\", {\"age\": 1}, \"bar\"])");
-      }
-
-      names.push(key);
-      currentKey = names.toString();
-      return true;
-    }
-
-    public class Names {
-      public final Deque<Name> names = new LinkedList<Name>();
-
-      public Name current() {
-        return names.peekLast();
-      }
-
-      public Name pop() {
-        return names.removeLast();
-      }
-
-      public void push(String name) {
-        names.addLast(new Name(name));
-      }
-
-      public String toString() {
-        return StringUtils.join(names, '.');
-      }
-
-      public class Name {
-        public final String name;
-
-        public Index index;
-
-        public boolean simpleArray;
-
-        public Name(String name) {
-          this.name = name;
-        }
-
-        public void incrementIndexIfApplicable() {
-          if (index != null) {
-            index.value++;
-          }
-        }
-
-        public boolean isArray() {
-          return index != null;
-        }
-
-        public boolean isSimpleArray() {
-          return simpleArray;
-        }
-
-        public boolean isStartOfArray() {
-          return index != null && index.value == 0;
-        }
-
-        public void markAsSimpleArray() {
-          simpleArray = true;
-        }
-
-        public void startArray() {
-          index = new Index();
-        }
-
-        public String toString() {
-          if (index == null) {
-            return name;
-          }
-
-          return name + "[" + index.value + "]";
-        }
-
-        public class Index {
-          public int value;
-        }
-      }
     }
   }
 }

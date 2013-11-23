@@ -15,15 +15,12 @@
  */
 package org.primeframework.mvc.workflow;
 
-import javax.servlet.ServletException;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-
+import com.google.inject.Inject;
 import org.primeframework.mvc.ErrorException;
 import org.primeframework.mvc.action.ActionInvocationWorkflow;
 import org.primeframework.mvc.action.ActionMappingWorkflow;
 import org.primeframework.mvc.action.result.ResultInvocationWorkflow;
+import org.primeframework.mvc.content.ContentWorkflow;
 import org.primeframework.mvc.message.MessageWorkflow;
 import org.primeframework.mvc.parameter.ParameterWorkflow;
 import org.primeframework.mvc.parameter.RequestBodyWorkflow;
@@ -32,8 +29,12 @@ import org.primeframework.mvc.scope.ScopeRetrievalWorkflow;
 import org.primeframework.mvc.scope.ScopeStorageWorkflow;
 import org.primeframework.mvc.validation.ValidationWorkflow;
 
-import com.google.inject.Inject;
-import static java.util.Arrays.*;
+import javax.servlet.ServletException;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+
+import static java.util.Arrays.asList;
 
 /**
  * This class is the main entry point for the Prime MVC. It uses the workflows passed into the constructor in the order
@@ -54,6 +55,7 @@ public class DefaultMVCWorkflow implements MVCWorkflow {
                             ScopeRetrievalWorkflow scopeRetrievalWorkflow,
                             URIParameterWorkflow uriParameterWorkflow,
                             ParameterWorkflow parameterWorkflow,
+                            ContentWorkflow contentWorkflow,
                             ValidationWorkflow validationWorkflow,
                             ActionInvocationWorkflow actionInvocationWorkflow,
                             ScopeStorageWorkflow scopeStorageWorkflow,
@@ -63,8 +65,8 @@ public class DefaultMVCWorkflow implements MVCWorkflow {
                             ExceptionHandler exceptionHandler) {
     this.exceptionHandler = exceptionHandler;
     this.errorWorkflow = errorWorkflow;
-    workflows = asList(requestBodyWorkflow, staticResourceWorkflow, actionMappingWorkflow, scopeRetrievalWorkflow,
-      uriParameterWorkflow, parameterWorkflow, validationWorkflow, actionInvocationWorkflow,
+    this.workflows = asList(requestBodyWorkflow, staticResourceWorkflow, actionMappingWorkflow, scopeRetrievalWorkflow,
+      uriParameterWorkflow, parameterWorkflow, contentWorkflow, validationWorkflow, actionInvocationWorkflow,
       scopeStorageWorkflow, messageWorkflow, resultInvocationWorkflow);
   }
 
