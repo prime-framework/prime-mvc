@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import static org.easymock.EasyMock.createStrictMock;
@@ -56,6 +57,7 @@ public class JSONResultTest extends PrimeBaseTest {
     userField.ids.put(0, 1);
     userField.ids.put(1, 2);
     userField.lifeStory = "Hello world";
+    userField.locale = Locale.US;
     userField.securityQuestions = new String[]{"one", "two", "three", "four"};
     userField.siblings.add(new UserField("Brett"));
     userField.siblings.add(new UserField("Beth"));
@@ -71,7 +73,7 @@ public class JSONResultTest extends PrimeBaseTest {
     response.setStatus(200);
     response.setCharacterEncoding("UTF-8");
     response.setContentType("application/json");
-    response.setContentLength(389);
+    response.setContentLength(406);
     expect(response.getOutputStream()).andReturn(sos);
     replay(response);
 
@@ -108,6 +110,7 @@ public class JSONResultTest extends PrimeBaseTest {
         "    \"1\":2" +
         "  }," +
         "  \"lifeStory\":\"Hello world\"," +
+        "  \"locale\":\"en_US\"," +
         "  \"securityQuestions\":[\"one\",\"two\",\"three\",\"four\"]," +
         "  \"siblings\":[{" +
         "    \"active\":false," +

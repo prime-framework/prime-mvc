@@ -15,10 +15,9 @@
  */
 package org.primeframework.mvc.content.guice;
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 import org.primeframework.mvc.action.config.ActionConfigurator;
@@ -26,6 +25,7 @@ import org.primeframework.mvc.content.ContentWorkflow;
 import org.primeframework.mvc.content.DefaultContentWorkflow;
 import org.primeframework.mvc.content.json.JacksonActionConfigurator;
 import org.primeframework.mvc.content.json.JacksonContentHandler;
+import org.primeframework.mvc.content.json.converter.PrimeJacksonModule;
 
 /**
  * This class is a Guice module that configures the ContentHandlerFactory and the default ContentHandlers.
@@ -37,11 +37,13 @@ public class ContentModule extends AbstractModule {
     // Bind the Jackson objects and content handler
     ContentHandlerFactory.addContentHandler(binder(), "application/json", JacksonContentHandler.class);
     Multibinder.newSetBinder(binder(), ActionConfigurator.class).addBinding().to(JacksonActionConfigurator.class);
-    bind(ObjectMapper.class).toInstance(new ObjectMapper().setSerializationInclusion(Include.NON_NULL)
-                                                          .configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true)
-                                                          .configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true)
-                                                          .configure(SerializationFeature.WRITE_EMPTY_JSON_ARRAYS, false)
-                                                          .configure(SerializationFeature.WRITE_NULL_MAP_VALUES, false));
+
+    // Setup the Jackson Module bindings and the provider for the ObjectMapper
+    Multibinder<Module> moduleBinder = Multibinder.newSetBinder(binder(), Module.class);
+    moduleBinder.addBinding().to(JodaModule.class);
+    moduleBinder.addBinding().to(PrimeJacksonModule.class);
+
+    bind(ObjectMapper.class).toProvider(ObjectMapperProvider.class).asEagerSingleton();
   }
 
   @Override

@@ -78,45 +78,48 @@ public class GlobalTest extends PrimeBaseTest {
       }
     });
 
-    String json = "{\n" +
-        "  \"active\": true,\n" +
-        "  \"age\": 37,\n" +
-        "  \"addresses\": {\n" +
-        "    \"home\": {\n" +
-        "      \"city\": \"Broomfield\",\n" +
-        "      \"state\": \"Colorado\",\n" +
-        "      \"zipcode\": \"80023\"\n" +
-        "    },\n" +
-        "    \"work\": {\n" +
-        "      \"city\": \"Denver\",\n" +
-        "      \"state\": \"Colorado\",\n" +
-        "      \"zipcode\": \"80202\"\n" +
-        "    }\n" +
-        "  },\n" +
-        "  \"favoriteMonth\": 5,\n" +
-        "  \"favoriteYear\": 1976,\n" +
-        "  \"ids\": {\n" +
-        "    \"0\": 1,\n" +
-        "    \"1\": 2\n" +
-        "  },\n" +
-        "  \"lifeStory\": \"Hello world\",\n" +
-        "  \"securityQuestions\": [\"one\", \"two\", \"three\", \"four\"],\n" +
-        "  \"siblings\": [\n" +
-        "    {\n" +
-        "      \"name\": \"Brett\"\n" +
-        "    },\n" +
-        "    {\n" +
-        "      \"name\": \"Beth\"\n" +
-        "    }\n" +
-        "  ],\n" +
-        "  \"type\": \"COOL\"\n" +
+    String json = "{" +
+        "  \"active\":true," +
+        "  \"addresses\":{" +
+        "    \"home\":{" +
+        "      \"city\":\"Broomfield\"," +
+        "      \"state\":\"Colorado\"," +
+        "      \"zipcode\":\"80023\"" +
+        "    }," +
+        "    \"work\":{" +
+        "      \"city\":\"Denver\"," +
+        "      \"state\":\"Colorado\"," +
+        "      \"zipcode\":\"80202\"" +
+        "    }" +
+        "  }," +
+        "  \"age\":37," +
+        "  \"favoriteMonth\":5," +
+        "  \"favoriteYear\":1976," +
+        "  \"ids\":{" +
+        "    \"0\":1," +
+        "    \"1\":2" +
+        "  }," +
+        "  \"lifeStory\":\"Hello world\"," +
+        "  \"locale\":\"en_US\"," +
+        "  \"securityQuestions\":[\"one\",\"two\",\"three\",\"four\"]," +
+        "  \"siblings\":[" +
+        "    {" +
+        "      \"active\":false," +
+        "      \"name\":\"Brett\"" +
+        "    }," +
+        "    {" +
+        "      \"active\":false," +
+        "      \"name\":\"Beth\"" +
+        "    }" +
+        "  ]," +
+        "  \"type\":\"COOL\"" +
         "}";
     simulator.test("/api")
              .withContentType("application/json")
              .withBody(json.getBytes())
              .post();
 
-    assertEquals(simulator.response.getOutputStream().toString(), json);
+    assertEquals(simulator.response.getOutputStream().toString(), json.replace("  ", ""));
   }
 
   @Test

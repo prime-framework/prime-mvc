@@ -17,8 +17,9 @@ package org.example.action;
 
 import org.example.domain.UserField;
 import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.action.result.annotation.Forward;
+import org.primeframework.mvc.action.result.annotation.JSON;
 import org.primeframework.mvc.content.json.annotation.JSONRequest;
+import org.primeframework.mvc.content.json.annotation.JSONResponse;
 
 /**
  * This is a simple test action.
@@ -26,11 +27,12 @@ import org.primeframework.mvc.content.json.annotation.JSONRequest;
  * @author Brian Pontarelli
  */
 @Action
-@Forward(contentType = "application/json")
+@JSON
 public class Api {
   public ActionType action;
 
   @JSONRequest
+  @JSONResponse
   public UserField user;
 
   public String post() {

@@ -38,6 +38,15 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
+          <root url="jar://$USER_HOME$/.gradle/caches/artifacts-14/filestore/com.fasterxml.jackson.core/jackson-annotations/2.3.0/bundle/f5e853a20b60758922453d56f9ae1e64af5cb3da/jackson-annotations-2.3.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
           <root url="jar://$USER_HOME$/.gradle/caches/artifacts-14/filestore/com.fasterxml.jackson.core/jackson-core/2.3.0/bundle/5e19d8381e01aa64c9dd47ff453e39abc441775c/jackson-core-2.3.0.jar!/" />
         </CLASSES>
         <JAVADOC />
@@ -52,6 +61,17 @@
         <JAVADOC />
         <SOURCES>
           <root url="jar://$USER_HOME$/.gradle/caches/artifacts-14/filestore/com.fasterxml.jackson.core/jackson-databind/2.3.0/source/6e8684b28e0a998550799163a49b5772132c2071/jackson-databind-2.3.0-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.gradle/caches/artifacts-14/filestore/com.fasterxml.jackson.datatype/jackson-datatype-joda/2.3.0/jar/bbf92c440af3909466867033218f4f27248648a4/jackson-datatype-joda-2.3.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.gradle/caches/artifacts-14/filestore/com.fasterxml.jackson.datatype/jackson-datatype-joda/2.3.0/source/c57239c5007336cfdbbb26c5191b7b2d531e0209/jackson-datatype-joda-2.3.0-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -161,15 +181,6 @@
       <library>
         <CLASSES>
           <root url="jar://$USER_HOME$/.gradle/caches/artifacts-14/filestore/org.slf4j/slf4j-api/1.6.6/jar/ce53b0a0e2cfbb27e8a59d38f79a18a5c6a8d2b0/slf4j-api-1.6.6.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$USER_HOME$/.gradle/caches/artifacts-14/filestore/com.fasterxml.jackson.core/jackson-annotations/2.3.0/bundle/f5e853a20b60758922453d56f9ae1e64af5cb3da/jackson-annotations-2.3.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

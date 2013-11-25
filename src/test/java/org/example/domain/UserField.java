@@ -18,6 +18,7 @@ package org.example.domain;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -34,6 +35,7 @@ public class UserField {
   public Integer id;
   public Map<Integer, Integer> ids = new HashMap<Integer, Integer>();
   public String lifeStory;
+  public Locale locale;
   public String name;
   public String password;
   public String[] securityQuestions;

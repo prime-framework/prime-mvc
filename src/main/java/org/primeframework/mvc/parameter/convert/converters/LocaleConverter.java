@@ -15,17 +15,15 @@
  */
 package org.primeframework.mvc.parameter.convert.converters;
 
-import java.lang.reflect.Type;
-import java.util.Locale;
-import java.util.Map;
-
+import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.parameter.convert.AbstractGlobalConverter;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.convert.annotation.GlobalConverter;
 
-import com.google.inject.Inject;
+import java.lang.reflect.Type;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * This converts to and from Locales.
@@ -34,21 +32,13 @@ import com.google.inject.Inject;
  */
 @GlobalConverter
 public class LocaleConverter extends AbstractGlobalConverter {
-  private final boolean emptyIsNull;
-
-  @Inject
-  public LocaleConverter(MVCConfiguration configuration) {
-    this.emptyIsNull = configuration.emptyParametersAreNull();
-  }
-
   protected Object stringToObject(String value, Type convertTo, Map<String, String> attributes, String expression)
     throws org.primeframework.mvc.parameter.convert.ConversionException, ConverterStateException {
-    if (emptyIsNull && StringUtils.isBlank(value)) {
+    if (StringUtils.isBlank(value)) {
       return null;
     }
 
-    String[] parts = value.split("_");
-    return toLocale(parts);
+    return LocaleUtils.toLocale(value);
   }
 
   protected Object stringsToObject(String[] values, Type convertTo, Map<String, String> attributes, String expression)

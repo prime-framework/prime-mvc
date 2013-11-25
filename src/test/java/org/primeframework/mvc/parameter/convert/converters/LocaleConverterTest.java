@@ -18,7 +18,6 @@ package org.primeframework.mvc.parameter.convert.converters;
 import java.util.Locale;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.primeframework.mvc.MockConfiguration;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
 import org.testng.annotations.Test;
 
@@ -32,7 +31,7 @@ import static org.testng.Assert.*;
 public class LocaleConverterTest {
   @Test
   public void fromStrings() {
-    GlobalConverter converter = new LocaleConverter(new MockConfiguration());
+    GlobalConverter converter = new LocaleConverter();
     Locale locale = (Locale) converter.convertFromStrings(Locale.class, null, "testExpr", ArrayUtils.toArray((String) null));
     assertNull(locale);
 
@@ -60,7 +59,7 @@ public class LocaleConverterTest {
 
   @Test
   public void toStrings() {
-    GlobalConverter converter = new LocaleConverter(new MockConfiguration());
+    GlobalConverter converter = new LocaleConverter();
     String str = converter.convertToString(Locale.class, null, "testExpr", null);
     assertNull(str);
 
