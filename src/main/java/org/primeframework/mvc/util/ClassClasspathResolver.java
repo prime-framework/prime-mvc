@@ -15,6 +15,13 @@
  */
 package org.primeframework.mvc.util;
 
+import org.apache.commons.io.filefilter.DirectoryFileFilter;
+import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.Opcodes;
+import org.primeframework.mvc.PrimeException;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
@@ -32,16 +39,7 @@ import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import org.apache.commons.io.filefilter.DirectoryFileFilter;
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Attribute;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.MethodVisitor;
-import org.primeframework.mvc.PrimeException;
-
-import static java.util.Arrays.*;
+import static java.util.Arrays.asList;
 
 /**
  * Locates classes within the current ClassLoader/ClassPath. This class begins from a directory and locates all the
@@ -310,11 +308,12 @@ public class ClassClasspathResolver<U> {
         }
       }
 
-      private static class IsAClassVisitor<U> extends AbstractClassVisitor {
+      private static class IsAClassVisitor<U> extends ClassVisitor {
         private final Class<U> parent;
         private boolean passes;
 
         private IsAClassVisitor(Class<U> parent) {
+          super(Opcodes.ASM4);
           this.parent = parent;
         }
 
@@ -421,11 +420,12 @@ public class ClassClasspathResolver<U> {
         }
       }
 
-      private static class AnnotatedWithClassVisitor<T extends Annotation> extends AbstractClassVisitor {
+      private static class AnnotatedWithClassVisitor<T extends Annotation> extends ClassVisitor {
         private final Class<T> annotation;
         private boolean passes;
 
         private AnnotatedWithClassVisitor(Class<T> annotation) {
+          super(Opcodes.ASM4);
           this.annotation = annotation;
         }
 
@@ -442,38 +442,6 @@ public class ClassClasspathResolver<U> {
           return passes;
         }
       }
-    }
-  }
-
-  public static class AbstractClassVisitor implements ClassVisitor {
-    public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
-    }
-
-    public void visitSource(String source, String debug) {
-    }
-
-    public void visitOuterClass(String owner, String name, String desc) {
-    }
-
-    public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
-      return null;
-    }
-
-    public void visitAttribute(Attribute attr) {
-    }
-
-    public void visitInnerClass(String name, String outerName, String innerName, int access) {
-    }
-
-    public FieldVisitor visitField(int access, String name, String desc, String signature, Object value) {
-      return null;
-    }
-
-    public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
-      return null;
-    }
-
-    public void visitEnd() {
     }
   }
 }
