@@ -24,12 +24,10 @@ public class JacksonActionConfiguration {
   public final String requestMember;
   public final Class<?> requestMemberType;
   public final String responseMember;
-  public final Class<?> responseMemberType;
 
-  public JacksonActionConfiguration(String requestMember, Class<?> requestMemberType, String responseMember, Class<?> responseMemberType) {
+  public JacksonActionConfiguration(String requestMember, Class<?> requestMemberType, String responseMember) {
     this.requestMember = requestMember;
     this.requestMemberType = requestMemberType;
     this.responseMember = responseMember;
-    this.responseMemberType = responseMemberType;
   }
 }

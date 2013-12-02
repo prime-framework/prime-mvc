@@ -20,7 +20,6 @@ import org.easymock.EasyMock;
 import org.example.action.KitchenSink;
 import org.example.action.Simple;
 import org.example.action.user.Index;
-import org.example.domain.User;
 import org.example.domain.UserField;
 import org.primeframework.mvc.action.result.annotation.Forward;
 import org.primeframework.mvc.action.result.annotation.JSON;
@@ -131,6 +130,5 @@ public class DefaultActionConfigurationProviderTest {
     assertEquals(((JacksonActionConfiguration) config.get("/kitchen-sink").additionalConfiguration.get(JacksonActionConfiguration.class)).requestMember, "jsonRequest");
     assertEquals(((JacksonActionConfiguration) config.get("/kitchen-sink").additionalConfiguration.get(JacksonActionConfiguration.class)).requestMemberType, UserField.class);
     assertEquals(((JacksonActionConfiguration) config.get("/kitchen-sink").additionalConfiguration.get(JacksonActionConfiguration.class)).responseMember, "jsonResponse");
-    assertEquals(((JacksonActionConfiguration) config.get("/kitchen-sink").additionalConfiguration.get(JacksonActionConfiguration.class)).responseMemberType, User.class);
   }
 }

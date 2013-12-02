@@ -78,7 +78,7 @@ public class JSONResultTest extends PrimeBaseTest {
     replay(response);
 
     Map<Class<?>, Object> additionalConfiguration = new HashMap<Class<?>, Object>();
-    additionalConfiguration.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(null, null, "user", UserField.class));
+    additionalConfiguration.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(null, null, "user"));
     ActionConfiguration config = new ActionConfiguration(Post.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfiguration, null);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(action, null, "/foo", "", config));

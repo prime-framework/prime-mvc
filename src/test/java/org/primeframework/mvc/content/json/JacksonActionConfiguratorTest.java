@@ -16,7 +16,6 @@
 package org.primeframework.mvc.content.json;
 
 import org.example.action.KitchenSink;
-import org.example.domain.User;
 import org.example.domain.UserField;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.testng.annotations.Test;
@@ -35,6 +34,5 @@ public class JacksonActionConfiguratorTest extends PrimeBaseTest {
     assertEquals(config.requestMember, "jsonRequest");
     assertEquals(config.requestMemberType, UserField.class);
     assertEquals(config.responseMember, "jsonResponse");
-    assertEquals(config.responseMemberType, User.class);
   }
 }

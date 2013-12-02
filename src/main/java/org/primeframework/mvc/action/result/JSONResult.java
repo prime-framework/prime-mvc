@@ -75,7 +75,7 @@ public class JSONResult extends AbstractResult<JSON> {
 
 
     ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
-    objectMapper.writerWithType(jacksonActionConfiguration.responseMemberType).writeValue(baos, jacksonObject);
+    objectMapper.writerWithType(jacksonObject.getClass()).writeValue(baos, jacksonObject);
 
     byte[] result = baos.toByteArray();
     response.setStatus(json.status());

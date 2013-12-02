@@ -51,7 +51,7 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
   @Test
   public void handle() throws IOException {
     Map<Class<?>, Object> additionalConfig = new HashMap<Class<?>, Object>();
-    additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration("jsonRequest", UserField.class, null, null));
+    additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration("jsonRequest", UserField.class, null));
 
     KitchenSink action = new KitchenSink(null);
     ActionConfiguration config = new ActionConfiguration(KitchenSink.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null);
