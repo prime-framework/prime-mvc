@@ -92,9 +92,6 @@
   <component name="EntryPointsManager">
     <entry_points version="2.0" />
   </component>
-  <component name="GradleSettings">
-    <option name="gradleHome" value="ff" />
-  </component>
   <component name="IdProvider" IDEtalkID="FAFCC8F55516B0FC710A9E287F066E00" />
   <component name="InspectionProjectProfileManager">
     <profiles>
