@@ -15,13 +15,12 @@
  */
 package org.primeframework.mvc.freemarker.guice;
 
-import org.primeframework.mvc.config.MVCConfiguration;
-import org.primeframework.mvc.freemarker.FieldSupportBeansWrapper;
-
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import freemarker.cache.TemplateLoader;
 import freemarker.template.Configuration;
+import org.primeframework.mvc.config.MVCConfiguration;
+import org.primeframework.mvc.freemarker.FieldSupportBeansWrapper;
 
 /**
  * Provides the FreeMarker {@link Configuration} instance.
@@ -47,6 +46,7 @@ public class FreeMarkerConfigurationProvider implements Provider<Configuration> 
     config.setTemplateLoader(loader);
     config.setDefaultEncoding("UTF-8");
     config.setObjectWrapper(FieldSupportBeansWrapper.INSTANCE);
+    config.setNumberFormat("computer");
     return config;
   }
 }
