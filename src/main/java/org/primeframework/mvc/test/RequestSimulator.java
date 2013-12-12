@@ -15,18 +15,8 @@
  */
 package org.primeframework.mvc.test;
 
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequestWrapper;
-import java.io.IOException;
-import java.util.Enumeration;
-
-import org.primeframework.mock.servlet.MockHttpServletRequest;
-import org.primeframework.mock.servlet.MockHttpServletResponse;
+import com.google.inject.Injector;
+import com.google.inject.Module;
 import org.primeframework.mock.servlet.MockHttpSession;
 import org.primeframework.mock.servlet.MockServletContext;
 import org.primeframework.mvc.guice.GuiceBootstrap;
@@ -36,8 +26,10 @@ import org.primeframework.mvc.servlet.ServletObjectsHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.inject.Injector;
-import com.google.inject.Module;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import java.util.Enumeration;
 
 /**
  * This class provides a method for testing a full invocation of Prime. This simulates the JEE web objects
@@ -55,8 +47,6 @@ import com.google.inject.Module;
 public class RequestSimulator {
   private final static Logger logger = LoggerFactory.getLogger(RequestSimulator.class);
   public final PrimeFilter filter = new PrimeFilter();
-  public MockHttpServletRequest request;
-  public MockHttpServletResponse response;
   public MockServletContext context;
   public MockHttpSession session;
   public Injector injector;
@@ -106,7 +96,7 @@ public class RequestSimulator {
    * @return The RequestBuilder.
    */
   public RequestBuilder test(String uri) {
-    return new RequestBuilder(uri, this);
+    return new RequestBuilder(uri, session, filter, injector);
   }
 
   /**
@@ -114,46 +104,5 @@ public class RequestSimulator {
    */
   public void resetSession() {
     session = new MockHttpSession(this.context);
-  }
-
-  void run(RequestBuilder builder) throws IOException, ServletException {
-    // Remove the web objects if this instance is being used across multiple invocations
-    ServletObjectsHolder.clearServletRequest();
-    ServletObjectsHolder.clearServletResponse();
-
-    // Build the request and response for this pass
-    this.request = builder.getRequest();
-    this.response = makeResponse();
-
-    filter.doFilter(this.request, this.response, new FilterChain() {
-      @Override
-      public void doFilter(ServletRequest request, ServletResponse response) {
-        throw new UnsupportedOperationException("The RequestSimulator class doesn't support testing " +
-          "URIs that don't map to Prime resources");
-      }
-    });
-
-    // Add these back so that anything that needs them can be retrieved from the Injector after
-    // the run has completed (i.e. MessageStore for the MVC and such)
-    ServletObjectsHolder.setServletRequest(new HttpServletRequestWrapper(this.request));
-    ServletObjectsHolder.setServletResponse(this.response);
-  }
-
-  /**
-   * Retrieves the instance of the given type from the Guice Injector.
-   *
-   * @param type The type.
-   * @param <T>  The type.
-   * @return The instance.
-   */
-  public <T> T get(Class<T> type) {
-    return injector.getInstance(type);
-  }
-
-  /**
-   * @return Makes a HttpServletResponse as a nice mock. Sub-classes can override this
-   */
-  protected MockHttpServletResponse makeResponse() {
-    return new MockHttpServletResponse();
   }
 }

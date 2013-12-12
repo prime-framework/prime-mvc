@@ -17,6 +17,7 @@ package org.primeframework.mvc;
 
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
+import freemarker.template.Configuration;
 import org.apache.commons.io.FileUtils;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -26,6 +27,7 @@ import org.primeframework.mvc.guice.MVCModule;
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
+import org.primeframework.mvc.test.RequestResult;
 import org.primeframework.mvc.test.RequestSimulator;
 import org.primeframework.mvc.util.URIBuilder;
 import org.testng.annotations.Test;
@@ -41,11 +43,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-import freemarker.template.Configuration;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertSame;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.*;
 
 /**
  * This class tests the MVC from a high level perspective.
@@ -62,10 +60,9 @@ public class GlobalTest extends PrimeBaseTest {
         install(new TestModule());
       }
     });
-    simulator.test("/actionless").
-        get();
 
-    assertEquals(simulator.response.getOutputStream().toString(), "Hello Actionless World");
+    RequestResult result = simulator.test("/actionless").get();
+    assertEquals(result.response.getOutputStream().toString(), "Hello Actionless World");
   }
 
   @Test
@@ -114,12 +111,13 @@ public class GlobalTest extends PrimeBaseTest {
         "  ]," +
         "  \"type\":\"COOL\"" +
         "}";
-    simulator.test("/api")
-             .withContentType("application/json")
-             .withBody(json.getBytes())
-             .post();
 
-    assertEquals(simulator.response.getOutputStream().toString(), json.replace("  ", ""));
+    RequestResult result = simulator.test("/api")
+        .withContentType("application/json")
+        .withBody(json.getBytes())
+        .post();
+
+    assertEquals(result.body, json.replace("  ", ""));
   }
 
   @Test
@@ -133,11 +131,10 @@ public class GlobalTest extends PrimeBaseTest {
         install(new TestModule());
       }
     });
-    simulator.test("/value-in-request").
-        get();
 
-    assertEquals(simulator.response.getOutputStream().toString(), "baz");
-    assertEquals(simulator.request.getAttribute("bar"), "baz");
+    RequestResult result = simulator.test("/value-in-request").get();
+    assertEquals(result.body, "baz");
+    assertEquals(result.request.getAttribute("bar"), "baz");
   }
 
   @Test
@@ -150,10 +147,8 @@ public class GlobalTest extends PrimeBaseTest {
       }
     });
 
-    simulator.test("/user/full-form").get();
-
-    String result = simulator.response.getOutputStream().toString();
-    assertEquals(result, FileUtils.readFileToString(new File("src/test/java/org/primeframework/mvc/full-form-output.txt")));
+    RequestResult result = simulator.test("/user/full-form").get();
+    assertEquals(result.body, FileUtils.readFileToString(new File("src/test/java/org/primeframework/mvc/full-form-output.txt")));
   }
 
   @Test
@@ -166,10 +161,8 @@ public class GlobalTest extends PrimeBaseTest {
       }
     });
 
-    simulator.test("/user/details-fields").get();
-
-    String result = simulator.response.getOutputStream().toString();
-    assertEquals(result, FileUtils.readFileToString(new File("src/test/java/org/primeframework/mvc/details-fields-output.txt")));
+    RequestResult result = simulator.test("/user/details-fields").get();
+    assertEquals(result.body, FileUtils.readFileToString(new File("src/test/java/org/primeframework/mvc/details-fields-output.txt")));
   }
 
   @Test
@@ -181,12 +174,13 @@ public class GlobalTest extends PrimeBaseTest {
         install(new TestModule());
       }
     });
-    simulator.test("/post").post();
-    String result = simulator.response.getOutputStream().toString();
-    assertTrue(result.contains("Brian Pontarelli"));
-    assertTrue(result.contains("35"));
-    assertTrue(result.contains("Broomfield"));
-    assertTrue(result.contains("CO"));
+
+    RequestResult result = simulator.test("/post").post();
+    String html = result.response.getOutputStream().toString();
+    assertTrue(html.contains("Brian Pontarelli"));
+    assertTrue(html.contains("35"));
+    assertTrue(html.contains("Broomfield"));
+    assertTrue(html.contains("CO"));
   }
 
   @Test
@@ -198,11 +192,9 @@ public class GlobalTest extends PrimeBaseTest {
         install(new TestModule());
       }
     });
-    simulator.test("/user/edit").get();
 
-
-    String result = simulator.response.getOutputStream().toString();
-    assertEquals(result, FileUtils.readFileToString(new File("src/test/java/org/primeframework/mvc/edit-output.txt")));
+    RequestResult result = simulator.test("/user/edit").get();
+    assertEquals(result.body, FileUtils.readFileToString(new File("src/test/java/org/primeframework/mvc/edit-output.txt")));
   }
 
   @Test
@@ -216,6 +208,7 @@ public class GlobalTest extends PrimeBaseTest {
         install(new TestModule());
       }
     });
+
     simulator.test("/scope-storage").
         post();
 

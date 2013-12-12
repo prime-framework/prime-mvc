@@ -15,19 +15,24 @@
  */
 package org.primeframework.mvc.test;
 
-import javax.servlet.ServletException;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
+import com.google.inject.Injector;
 import org.primeframework.mock.servlet.MockHttpServletRequest;
 import org.primeframework.mock.servlet.MockHttpServletRequest.Method;
+import org.primeframework.mock.servlet.MockHttpServletResponse;
+import org.primeframework.mock.servlet.MockHttpSession;
 import org.primeframework.mock.servlet.MockServletInputStream;
+import org.primeframework.mvc.parameter.DefaultParameterParser;
+import org.primeframework.mvc.servlet.PrimeFilter;
+import org.primeframework.mvc.servlet.ServletObjectsHolder;
 
-import com.google.inject.Binder;
-import com.google.inject.Module;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequestWrapper;
+import java.io.File;
+import java.io.IOException;
+import java.util.Locale;
 
 /**
  * This class is a builder that helps create a test HTTP request that is sent to the MVC.
@@ -35,13 +40,16 @@ import com.google.inject.Module;
  * @author Brian Pontarelli
  */
 public class RequestBuilder {
-  private final MockHttpServletRequest request;
-  private final RequestSimulator test;
-  private final List<Module> modules = new ArrayList<Module>();
+  public final MockHttpServletRequest request;
+  public final MockHttpServletResponse response;
+  public final PrimeFilter filter;
+  public final Injector injector;
 
-  public RequestBuilder(String uri, RequestSimulator test) {
-    request = new MockHttpServletRequest(uri, Locale.getDefault(), false, "UTF-8", test.session);
-    this.test = test;
+  public RequestBuilder(String uri, MockHttpSession session, PrimeFilter filter, Injector injector) {
+    this.request = new MockHttpServletRequest(uri, Locale.getDefault(), false, "UTF-8", session);
+    this.response = new MockHttpServletResponse();
+    this.filter = filter;
+    this.injector = injector;
   }
 
   /**
@@ -54,6 +62,44 @@ public class RequestBuilder {
    */
   public RequestBuilder withParameter(String name, String value) {
     request.setParameter(name, value);
+    return this;
+  }
+
+  /**
+   * Sets an HTTP request parameter as a Prime MVC checkbox widget. This can be called multiple times with the same name
+   * it it will create a list of values for the HTTP parameter.
+   *
+   * @param name           The name of the parameter.
+   * @param checkedValue   The checked value of the checkbox.
+   * @param uncheckedValue The checked value of the checkbox.
+   * @param checked        If the checkbox is checked.
+   * @return This.
+   */
+  public RequestBuilder withCheckbox(String name, String checkedValue, String uncheckedValue, boolean checked) {
+    if (checked) {
+      request.setParameter(name, checkedValue);
+    }
+
+    request.setParameter(DefaultParameterParser.CHECKBOX_PREFIX + name, uncheckedValue);
+    return this;
+  }
+
+  /**
+   * Sets an HTTP request parameter as a Prime MVC radio button widget. This can be called multiple times with the same
+   * name it it will create a list of values for the HTTP parameter.
+   *
+   * @param name           The name of the parameter.
+   * @param checkedValue   The checked value of the checkbox.
+   * @param uncheckedValue The checked value of the checkbox.
+   * @param checked        If the checkbox is checked.
+   * @return This.
+   */
+  public RequestBuilder withRadio(String name, String checkedValue, String uncheckedValue, boolean checked) {
+    if (checked) {
+      request.setParameter(name, checkedValue);
+    }
+
+    request.setParameter(DefaultParameterParser.RADIOBUTTON_PREFIX + name, uncheckedValue);
     return this;
   }
 
@@ -149,116 +195,131 @@ public class RequestBuilder {
   }
 
   /**
-   * Adds a mocked out service, action, etc to this request. This helps if the action needs to be tested with different
-   * configuration or for error handling.
-   *
-   * @param iface The interface to mock out.
-   * @param impl  The mocked out implementation of the interface.
-   * @return This.
-   */
-  public <T> RequestBuilder withMock(final Class<T> iface, final T impl) {
-    modules.add(new Module() {
-      public void configure(Binder binder) {
-        binder.bind(iface).toInstance(impl);
-      }
-    });
-
-    return this;
-  }
-
-  /**
    * Sends the HTTP request to the MVC as a POST.
    *
+   * @return The response.
    * @throws IOException      If the MVC throws an exception.
    * @throws ServletException If the MVC throws an exception.
    */
-  public void post() throws IOException, ServletException {
+  public RequestResult post() throws IOException, ServletException {
     request.setPost(true);
-    test.run(this);
+    run();
+    return new RequestResult(request, response, injector);
   }
 
   /**
    * Sends the HTTP request to the MVC as a GET.
    *
+   * @return The response.
    * @throws IOException      If the MVC throws an exception.
    * @throws ServletException If the MVC throws an exception.
    */
-  public void get() throws IOException, ServletException {
+  public RequestResult get() throws IOException, ServletException {
     request.setPost(false);
-    test.run(this);
+    run();
+    return new RequestResult(request, response, injector);
   }
 
   /**
    * Sends the HTTP request to the MVC as a HEAD.
    *
+   * @return The response.
    * @throws IOException      If the MVC throws an exception.
    * @throws ServletException If the MVC throws an exception.
    */
-  public void head() throws IOException, ServletException {
+  public RequestResult head() throws IOException, ServletException {
     request.setMethod(Method.HEAD);
-    test.run(this);
+    run();
+    return new RequestResult(request, response, injector);
   }
 
   /**
    * Sends the HTTP request to the MVC as a PUT.
    *
+   * @return The response.
    * @throws IOException      If the MVC throws an exception.
    * @throws ServletException If the MVC throws an exception.
    */
-  public void put() throws IOException, ServletException {
+  public RequestResult put() throws IOException, ServletException {
     request.setMethod(Method.PUT);
-    test.run(this);
+    run();
+    return new RequestResult(request, response, injector);
   }
 
   /**
    * Sends the HTTP request to the MVC as a DELETE.
    *
+   * @return The response.
    * @throws IOException      If the MVC throws an exception.
    * @throws ServletException If the MVC throws an exception.
    */
-  public void delete() throws IOException, ServletException {
+  public RequestResult delete() throws IOException, ServletException {
     request.setMethod(Method.DELETE);
-    test.run(this);
+    run();
+    return new RequestResult(request, response, injector);
   }
 
   /**
    * Sends the HTTP request to the MVC as a OPTIONS.
    *
+   * @return The response.
    * @throws IOException      If the MVC throws an exception.
    * @throws ServletException If the MVC throws an exception.
    */
-  public void options() throws IOException, ServletException {
+  public RequestResult options() throws IOException, ServletException {
     request.setMethod(Method.OPTIONS);
-    test.run(this);
+    run();
+    return new RequestResult(request, response, injector);
   }
 
   /**
    * Sends the HTTP request to the MVC as a TRACE.
    *
+   * @return The response.
    * @throws IOException      If the MVC throws an exception.
    * @throws ServletException If the MVC throws an exception.
    */
-  public void trace() throws IOException, ServletException {
+  public RequestResult trace() throws IOException, ServletException {
     request.setMethod(Method.TRACE);
-    test.run(this);
+    run();
+    return new RequestResult(request, response, injector);
   }
 
   /**
    * Sends the HTTP request to the MVC as a CONNECT.
    *
+   * @return The response.
    * @throws IOException      If the MVC throws an exception.
    * @throws ServletException If the MVC throws an exception.
    */
-  public void connect() throws IOException, ServletException {
+  public RequestResult connect() throws IOException, ServletException {
     request.setMethod(Method.CONNECT);
-    test.run(this);
+    run();
+    return new RequestResult(request, response, injector);
   }
 
   public MockHttpServletRequest getRequest() {
     return request;
   }
 
-  public List<Module> getModules() {
-    return modules;
+  void run() throws IOException, ServletException {
+    // Remove the web objects if this instance is being used across multiple invocations
+    ServletObjectsHolder.clearServletRequest();
+    ServletObjectsHolder.clearServletResponse();
+
+    // Build the request and response for this pass
+    filter.doFilter(this.request, this.response, new FilterChain() {
+      @Override
+      public void doFilter(ServletRequest request, ServletResponse response) {
+        throw new UnsupportedOperationException("The RequestSimulator class doesn't support testing " +
+            "URIs that don't map to Prime resources");
+      }
+    });
+
+    // Add these back so that anything that needs them can be retrieved from the Injector after
+    // the run has completed (i.e. MessageStore for the MVC and such)
+    ServletObjectsHolder.setServletRequest(new HttpServletRequestWrapper(this.request));
+    ServletObjectsHolder.setServletResponse(this.response);
   }
+
 }
