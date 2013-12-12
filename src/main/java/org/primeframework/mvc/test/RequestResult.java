@@ -29,12 +29,14 @@ public class RequestResult {
   public final MockHttpServletResponse response;
   public final Injector injector;
   public final String body;
+  public final String redirect;
 
   public RequestResult(MockHttpServletRequest request, MockHttpServletResponse response, Injector injector) {
     this.request = request;
     this.response = response;
     this.injector = injector;
     this.body = response.getStream().toString();
+    this.redirect = response.getRedirect();
   }
 
   /**
