@@ -17,6 +17,7 @@ package org.primeframework.mvc.action.result;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
+import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.config.ActionConfiguration;
@@ -55,24 +56,23 @@ public class JSONResult extends AbstractResult<JSON> {
     ActionInvocation current = actionInvocationStore.getCurrent();
     Object action = current.action;
     if (action == null) {
-      return;
+      throw new PrimeException("There is no action class and somehow we got into the JSONResult code. Bad mojo!");
     }
 
     ActionConfiguration configuration = current.configuration;
     if (configuration == null) {
-      return;
+      throw new PrimeException("The action [" + action.getClass() + "] has no configuration. This should be impossible!");
     }
 
     JacksonActionConfiguration jacksonActionConfiguration = (JacksonActionConfiguration) configuration.additionalConfiguration.get(JacksonActionConfiguration.class);
     if (jacksonActionConfiguration == null || jacksonActionConfiguration.responseMember == null) {
-      return;
+      throw new PrimeException("The action [" + action.getClass() + "] is missing a field annotated with @JSONResponse. This is used to figure out what to send back in the response.");
     }
 
     Object jacksonObject = expressionEvaluator.getValue(jacksonActionConfiguration.responseMember, action);
     if (jacksonObject == null) {
-      return;
+      throw new PrimeException("The @JSONResponse field [" + jacksonActionConfiguration.responseMember + "] in the action [" + action.getClass() + "] is null. It cannot be null!");
     }
-
 
     ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
     objectMapper.writerWithType(jacksonObject.getClass()).writeValue(baos, jacksonObject);
