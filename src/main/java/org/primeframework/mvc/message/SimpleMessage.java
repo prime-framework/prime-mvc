@@ -47,13 +47,14 @@ public class SimpleMessage implements Message {
     if (o == null || getClass() != o.getClass()) return false;
 
     final SimpleMessage that = (SimpleMessage) o;
-    return message.equals(that.message) && type.equals(that.type);
+    return message.equals(that.message) && code.equals(that.code) && type.equals(that.type);
   }
 
   @Override
   public int hashCode() {
     int result = type.hashCode();
     result = 31 * result + message.hashCode();
+    result = 31 * result + code.hashCode();
     return result;
   }
 

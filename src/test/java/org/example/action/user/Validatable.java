@@ -15,27 +15,18 @@
  */
 package org.example.action.user;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Valid;
-import javax.validation.Validator;
-import java.util.Set;
-
+import com.google.inject.Inject;
 import org.example.domain.User;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.servlet.HTTPMethod;
-import org.primeframework.mvc.validation.jsr303.group.Create;
-import org.primeframework.mvc.validation.jsr303.group.Update;
-
-import com.google.inject.Inject;
 
 /**
  * @author Brian Pontarelli
  */
 @Action
-public class Validatable implements org.primeframework.mvc.validation.jsr303.Validatable {
+public class Validatable implements org.primeframework.mvc.validation.Validatable {
   private final HTTPMethod method;
 
-  @Valid
   public User user = new User();
 
   @Inject
@@ -44,12 +35,9 @@ public class Validatable implements org.primeframework.mvc.validation.jsr303.Val
   }
 
   @Override
-  public Set<ConstraintViolation<Validatable>> validate(Validator validator) {
+  public void validate() {
     if (method == HTTPMethod.POST) {
-      return validator.validate(this, Create.class);
     }
-
-    return validator.validate(this, Update.class);
   }
 
   public String post() {

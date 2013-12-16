@@ -24,7 +24,7 @@ import java.lang.annotation.Target;
  * This annotation defines a method that is invoked prior to validating parameters set into the action. This is useful if
  * you need to setup objects so that validation can run on them.
  *
- * @author Troy Hill
+ * @author Brian Pontarelli
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

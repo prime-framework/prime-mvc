@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,18 +13,20 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.validation.jsr303;
+package org.primeframework.mvc.validation;
+
+import org.primeframework.mvc.validation.ValidationException;
 
 /**
- * Locates the groups for the current request.
+ * This interface defines how Prime handles validation.
  *
  * @author Brian Pontarelli
  */
-public interface GroupLocator {
+public interface ValidationProcessor {
   /**
-   * Locates the groups to use for validation. This might use the current request or any other method necessary.
+   * Validates the request and if validation fails throws a ValidationException.
    *
-   * @return The groups.
+   * @throws ValidationException If the validation failed.
    */
-  Class<?>[] groups();
+  void validate() throws ValidationException;
 }

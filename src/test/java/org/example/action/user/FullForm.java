@@ -15,15 +15,14 @@
  */
 package org.example.action.user;
 
-import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.example.domain.Role;
 import org.example.domain.UserField;
 import org.example.domain.UserType;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.parameter.fileupload.FileInfo;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static java.util.Arrays.asList;
 
@@ -38,7 +37,6 @@ public class FullForm {
   public UserType[] userTypes = UserType.values();
   public List<Integer> ages = new ArrayList<Integer>();
 
-  @Valid
   public UserField user;
 
   public List<Integer> roleIds;

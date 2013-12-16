@@ -15,19 +15,11 @@
  */
 package org.primeframework.mvc.validation.guice;
 
-import javax.validation.ConstraintValidatorFactory;
-import javax.validation.Validator;
-
-import org.primeframework.mvc.validation.ValidationWorkflow;
-import org.primeframework.mvc.validation.jsr303.DefaultConstraintValidatorFactory;
-import org.primeframework.mvc.validation.jsr303.DefaultGroupLocator;
-import org.primeframework.mvc.validation.jsr303.GroupLocator;
-import org.primeframework.mvc.validation.jsr303.JSRValidationProcessor;
-import org.primeframework.mvc.validation.jsr303.JSRValidationWorkflow;
-import org.primeframework.mvc.validation.jsr303.ValidationProcessor;
-import org.primeframework.mvc.validation.jsr303.ValidatorProvider;
-
 import com.google.inject.AbstractModule;
+import org.primeframework.mvc.validation.DefaultValidationProcessor;
+import org.primeframework.mvc.validation.ValidationProcessor;
+import org.primeframework.mvc.validation.ValidationWorkflow;
+import org.primeframework.mvc.validation.DefaultValidationWorkflow;
 
 /**
  * Validation module for Guice.
@@ -37,30 +29,7 @@ import com.google.inject.AbstractModule;
 public class ValidationModule extends AbstractModule {
   @Override
   protected void configure() {
-    bindValidator();
-    bindConstraintValidatorFactory();
-    bindValidationWorkflow();
-    bindGroupLocator();
-    bindValidationProcessor();
-  }
-
-  protected void bindValidator() {
-    bind(Validator.class).toProvider(ValidatorProvider.class).asEagerSingleton();
-  }
-
-  protected void bindConstraintValidatorFactory() {
-    bind(ConstraintValidatorFactory.class).to(DefaultConstraintValidatorFactory.class);
-  }
-
-  protected void bindValidationWorkflow() {
-    bind(ValidationWorkflow.class).to(JSRValidationWorkflow.class);
-  }
-
-  protected void bindGroupLocator() {
-    bind(GroupLocator.class).to(DefaultGroupLocator.class);
-  }
-
-  protected void bindValidationProcessor() {
-    bind(ValidationProcessor.class).to(JSRValidationProcessor.class);
+    bind(ValidationWorkflow.class).to(DefaultValidationWorkflow.class);
+    bind(ValidationProcessor.class).to(DefaultValidationProcessor.class);
   }
 }

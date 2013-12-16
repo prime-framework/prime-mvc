@@ -15,8 +15,6 @@
  */
 package org.example.action.user;
 
-import javax.validation.Valid;
-
 import org.example.domain.AddressField;
 import org.example.domain.UserField;
 import org.primeframework.mvc.action.annotation.Action;
@@ -28,7 +26,6 @@ import org.primeframework.mvc.action.annotation.Action;
  */
 @Action
 public class DetailsFields {
-  @Valid
   public UserField user;
 
   public String execute() {

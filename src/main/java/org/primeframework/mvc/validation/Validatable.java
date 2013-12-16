@@ -13,12 +13,18 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.validation.jsr303.group;
+package org.primeframework.mvc.validation;
 
 /**
- * Group used for create operations
+ * Marks an action as handling its own validation.
  *
- * @author James Humphrey
+ * @author Brian Pontarelli
  */
-public interface Create {
+public interface Validatable {
+  /**
+   * Called by Prime instead of using the default handling and group determination. This allows an action to handle
+   * validation however it wants. Validation errors should be put into the {@link org.primeframework.mvc.message.MessageStore}
+   * by implementers.
+   */
+  void validate();
 }

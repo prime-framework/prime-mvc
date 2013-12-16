@@ -15,23 +15,16 @@
  */
 package org.example.domain;
 
-import org.hibernate.validator.constraints.NotBlank;
-
 /**
  * This is a test address.
  *
  * @author Brian Pontarelli
  */
 public class Address {
-  @NotBlank
   private String street;
-  @NotBlank
   private String city;
-  @NotBlank
   private String state;
-  @NotBlank
   private String zipcode;
-  @NotBlank
   private String country;
 
   public String getStreet() {

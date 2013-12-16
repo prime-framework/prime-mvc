@@ -33,7 +33,6 @@ import org.primeframework.mvc.test.RequestSimulator;
 import org.primeframework.mvc.util.URIBuilder;
 import org.testng.annotations.Test;
 
-import javax.validation.Validator;
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -254,7 +253,6 @@ public class GlobalTest extends PrimeBaseTest {
     assertSingleton(simulator, Configuration.class);
     assertSingleton(simulator, ResourceBundle.Control.class);
     assertSingleton(simulator, ResourceBundle.Control.class);
-    assertSingleton(simulator, Validator.class);
     assertSingleton(simulator, ContainerResolver.class);
     assertSingleton(simulator, ConverterProvider.class);
     assertSingleton(simulator, ExpressionEvaluator.class);

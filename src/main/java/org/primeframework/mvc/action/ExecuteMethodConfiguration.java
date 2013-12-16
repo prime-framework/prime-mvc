@@ -17,7 +17,7 @@ package org.primeframework.mvc.action;
 
 import java.lang.reflect.Method;
 
-import org.primeframework.mvc.validation.jsr303.Validation;
+import org.primeframework.mvc.validation.Validation;
 
 /**
  * Stores the Method and annotations for all execute methods on an action.

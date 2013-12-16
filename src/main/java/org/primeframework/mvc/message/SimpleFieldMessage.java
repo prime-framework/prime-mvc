@@ -54,7 +54,7 @@ public class SimpleFieldMessage implements FieldMessage {
     if (o == null || getClass() != o.getClass()) return false;
 
     final SimpleFieldMessage that = (SimpleFieldMessage) o;
-    return field.equals(that.field) && message.equals(that.message) && type.equals(that.type);
+    return field.equals(that.field) && message.equals(that.message) && code.equals(that.code) && type.equals(that.type);
   }
 
   @Override
@@ -62,6 +62,7 @@ public class SimpleFieldMessage implements FieldMessage {
     int result = type.hashCode();
     result = 31 * result + field.hashCode();
     result = 31 * result + message.hashCode();
+    result = 31 * result + code.hashCode();
     return result;
   }
 

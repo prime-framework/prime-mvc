@@ -34,7 +34,7 @@ import org.primeframework.mvc.util.URIBuilder;
 import org.primeframework.mvc.validation.ValidationMethod;
 import org.primeframework.mvc.validation.annotation.PostValidationMethod;
 import org.primeframework.mvc.validation.annotation.PreValidationMethod;
-import org.primeframework.mvc.validation.jsr303.Validation;
+import org.primeframework.mvc.validation.Validation;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;

@@ -32,13 +32,10 @@ import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.primeframework.mvc.parameter.annotation.PostParameterMethod;
 import org.primeframework.mvc.parameter.annotation.PreParameterMethod;
 import org.primeframework.mvc.scope.annotation.Session;
+import org.primeframework.mvc.validation.Validatable;
 import org.primeframework.mvc.validation.ValidationMethod;
 import org.primeframework.mvc.validation.annotation.PostValidationMethod;
 import org.primeframework.mvc.validation.annotation.PreValidationMethod;
-import org.primeframework.mvc.validation.jsr303.Validatable;
-
-import javax.validation.Validator;
-import java.util.Set;
 
 /**
  * @author Brian Pontarelli
@@ -71,14 +68,10 @@ public class KitchenSink extends KitchenSinkSuperclass implements Validatable {
     this.messageStore = messageStore;
   }
 
+  @Override
   @ValidationMethod
   public void validate() {
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "foo", "code", "ValidationMethod message"));
-  }
-
-  @Override
-  public Set validate(Validator validator) {
-    return null;
   }
 
   public String get() {

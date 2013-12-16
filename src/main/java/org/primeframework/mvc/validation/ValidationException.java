@@ -15,9 +15,6 @@
  */
 package org.primeframework.mvc.validation;
 
-import javax.validation.ConstraintViolation;
-import java.util.Set;
-
 import org.primeframework.mvc.ErrorException;
 
 /**
@@ -26,41 +23,7 @@ import org.primeframework.mvc.ErrorException;
  * @author Brian Pontarelli
  */
 public class ValidationException extends ErrorException {
-  public Set<ConstraintViolation<Object>> violations;
-
   public ValidationException() {
-    this((Set<ConstraintViolation<Object>>) null);
-  }
-
-  public ValidationException(String message) {
-    this(null, message);
-  }
-
-  public ValidationException(String message, Throwable cause) {
-    this(null, message, cause);
-  }
-
-  public ValidationException(Throwable cause) {
-    this((Set<ConstraintViolation<Object>>) null, cause);
-  }
-
-  public ValidationException(Set<ConstraintViolation<Object>> violations) {
     super("input");
-    this.violations = violations;
-  }
-
-  public ValidationException(Set<ConstraintViolation<Object>> violations, String message) {
-    super("input", message);
-    this.violations = violations;
-  }
-
-  public ValidationException(Set<ConstraintViolation<Object>> violations, String message, Throwable cause) {
-    super("input", message, cause);
-    this.violations = violations;
-  }
-
-  public ValidationException(Set<ConstraintViolation<Object>> violations, Throwable cause) {
-    super("input", cause);
-    this.violations = violations;
   }
 }

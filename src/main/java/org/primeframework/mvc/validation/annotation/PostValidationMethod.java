@@ -21,11 +21,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation defines a method that is invoked after the parameter validation has occurred.  It is safe to assume
- * at this point that parameters have been set and are valid, so useful for doing any steps that require parameters that
- * are required to be not null, for instance.
+ * This annotation defines a method that is invoked after the parameter validation has occurred. This method is called
+ * regardless of whether or not there are errors.
  *
- * @author Troy Hill
+ * @author Brian Pontarelli
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

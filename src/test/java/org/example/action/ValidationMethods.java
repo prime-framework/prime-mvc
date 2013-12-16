@@ -15,21 +15,40 @@
  */
 package org.example.action;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.action.annotation.Action;
+import org.primeframework.mvc.message.MessageStore;
+import org.primeframework.mvc.message.MessageType;
+import org.primeframework.mvc.message.SimpleFieldMessage;
+import org.primeframework.mvc.message.SimpleMessage;
+import org.primeframework.mvc.servlet.HTTPMethod;
+import org.primeframework.mvc.validation.Validatable;
+import org.primeframework.mvc.validation.ValidationMethod;
 import org.primeframework.mvc.validation.annotation.PostValidationMethod;
 import org.primeframework.mvc.validation.annotation.PreValidationMethod;
-import org.primeframework.mvc.validation.jsr303.Validation;
+import org.primeframework.mvc.validation.Validation;
 
 /**
- * Action for testing the PreValidtionMethod and PostValidationMethod annotations
+ * Action for testing the PreValidationMethod and PostValidationMethod annotations
  *
- * @author Troy Hill
+ * @author Brian Pontarelli
  */
 @Action
-public class ValidationMethods {
+public class ValidationMethods implements Validatable {
+  private final MessageStore messageStore;
+
+  public boolean addInterfaceErrors = false;
+
+  public boolean addMethodErrors = false;
 
   public boolean preValidation = false;
+
   public boolean postValidation = false;
+
+  @Inject
+  public ValidationMethods(MessageStore messageStore) {
+    this.messageStore = messageStore;
+  }
 
   @PreValidationMethod
   public void toggleOn() {
@@ -41,12 +60,32 @@ public class ValidationMethods {
     this.postValidation = true;
   }
 
+  @Override
+  public void validate() {
+    if (addInterfaceErrors) {
+      messageStore.add(new SimpleMessage(MessageType.ERROR, "interface-general-code", "interface-general-message"));
+      messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "interface-field", "interface-field-code", "interface-field-message"));
+    }
+  }
+
+  @ValidationMethod(httpMethods = HTTPMethod.PUT)
+  public void validateMethod() {
+    if (addMethodErrors) {
+      messageStore.add(new SimpleMessage(MessageType.ERROR, "method-general-code", "method-general-message"));
+      messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "method-field", "method-field-code", "method-field-message"));
+    }
+  }
+
   public String get() {
     return "success";
   }
 
   @Validation(enabled = false)
   public String post() {
+    return null;
+  }
+
+  public String put() {
     return null;
   }
 }

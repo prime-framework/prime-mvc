@@ -15,21 +15,8 @@
  */
 package org.example.domain;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.hibernate.validator.constraints.NotBlank;
-import org.primeframework.mvc.validation.jsr303.group.Create;
-import org.primeframework.mvc.validation.jsr303.group.Delete;
-import org.primeframework.mvc.validation.jsr303.group.Update;
+import java.util.*;
 
 /**
  * This is a test user.
@@ -37,26 +24,20 @@ import org.primeframework.mvc.validation.jsr303.group.Update;
  * @author Brian Pontarelli
  */
 public class User {
-  @NotBlank
   private String name;
-  @NotNull
+
   private Integer age;
   private boolean male;
-  @Valid
   private Map<String, Address> addresses = new HashMap<String, Address>();
   private List<User> siblings = new ArrayList<User>();
-  @NotNull
   private String[] securityQuestions;
 
-  @Max(value = 1, groups = Delete.class)
   private int month;
 
-  @Max(value = 1, groups = Create.class)
   private int year;
 
   private File profile;
 
-  @Size(max = 20, groups = Update.class)
   private String password;
 
   private int[] intIDs;

@@ -22,7 +22,7 @@ import org.primeframework.mvc.parameter.annotation.PreParameter;
 import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
 import org.primeframework.mvc.scope.ScopeField;
 import org.primeframework.mvc.servlet.HTTPMethod;
-import org.primeframework.mvc.validation.jsr303.Validatable;
+import org.primeframework.mvc.validation.Validatable;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
