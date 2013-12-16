@@ -15,13 +15,7 @@
  */
 package org.primeframework.mvc.validation.jsr303;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
-import javax.validation.metadata.ConstraintDescriptor;
-import java.util.Arrays;
-import java.util.Set;
-import java.util.TreeMap;
-
+import com.google.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
@@ -41,7 +35,12 @@ import org.primeframework.mvc.util.ReflectionUtils;
 import org.primeframework.mvc.validation.ValidationException;
 import org.primeframework.mvc.validation.jsr303.util.ValidationUtils;
 
-import com.google.inject.Inject;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+import javax.validation.metadata.ConstraintDescriptor;
+import java.util.Arrays;
+import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * A validator that uses the JSR 303 validation API.
@@ -133,18 +132,20 @@ public class JSRValidationProcessor implements ValidationProcessor {
         done();
 
       String message;
+      String code = "[" + constraint + "]" + propertyPath;
       try {
-        message = provider.getMessage("[" + constraint + "]" + propertyPath, (Object[]) values);
+        message = provider.getMessage(code, (Object[]) values);
       } catch (MissingMessageException e) {
         try {
-          message = provider.getMessage("[" + constraint + "]", (Object[]) values);
+          code = "[" + constraint + "]";
+          message = provider.getMessage(code, (Object[]) values);
         } catch (MissingMessageException e1) {
           throw new MissingMessageException("Message could not be found for the URI [" + store.getCurrent().actionURI +
             "] either of the keys {[" + constraint + "]" + propertyPath + "} or {[" + constraint + "]}");
         }
       }
 
-      messageStore.add(new SimpleFieldMessage(MessageType.ERROR, propertyPath, message));
+      messageStore.add(new SimpleFieldMessage(MessageType.ERROR, propertyPath, code, message));
     }
   }
 }

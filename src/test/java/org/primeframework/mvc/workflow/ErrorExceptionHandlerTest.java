@@ -55,7 +55,7 @@ public class ErrorExceptionHandlerTest {
     };
 
     MessageProvider messageProvider = createStrictMock(MessageProvider.class);
-    expect(messageProvider.getMessage(errorException.getClass().getSimpleName(), errorException.args)).andReturn("foo");
+    expect(messageProvider.getMessage("[" + errorException.getClass().getSimpleName() + "]", errorException.args)).andReturn("foo");
     replay(messageProvider);
 
     MessageStore messageStore = createStrictMock(MessageStore.class);
@@ -93,7 +93,7 @@ public class ErrorExceptionHandlerTest {
     };
 
     MessageProvider messageProvider = createStrictMock(MessageProvider.class);
-    expect(messageProvider.getMessage(errorException.getClass().getSimpleName(), errorException.args)).andReturn("foo");
+    expect(messageProvider.getMessage("[" + errorException.getClass().getSimpleName() + "]", errorException.args)).andReturn("foo");
     replay(messageProvider);
 
     MessageStore messageStore = createStrictMock(MessageStore.class);
@@ -131,7 +131,7 @@ public class ErrorExceptionHandlerTest {
     };
 
     MessageProvider messageProvider = createStrictMock(MessageProvider.class);
-    messageProvider.getMessage(e.getClass().getSimpleName(), e.args);
+    messageProvider.getMessage("[" + e.getClass().getSimpleName() + "]", e.args);
     expectLastCall().andThrow(new MissingMessageException());
     replay(messageProvider);
 

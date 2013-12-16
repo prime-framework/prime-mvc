@@ -73,7 +73,7 @@ public class KitchenSink extends KitchenSinkSuperclass implements Validatable {
 
   @ValidationMethod
   public void validate() {
-    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "foo", "ValidationMethod message"));
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "foo", "code", "ValidationMethod message"));
   }
 
   @Override

@@ -27,15 +27,14 @@ import org.primeframework.mvc.guice.MVCModule;
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
+import org.primeframework.mvc.parameter.el.MissingPropertyExpressionException;
 import org.primeframework.mvc.test.RequestResult;
 import org.primeframework.mvc.test.RequestSimulator;
 import org.primeframework.mvc.util.URIBuilder;
 import org.testng.annotations.Test;
 
-import javax.servlet.ServletException;
 import javax.validation.Validator;
 import java.io.File;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collection;
@@ -52,7 +51,7 @@ import static org.testng.Assert.*;
  */
 public class GlobalTest extends PrimeBaseTest {
   @Test
-  public void actionlessRequest() throws IOException, ServletException {
+  public void actionlessRequest() throws Exception {
     RequestSimulator simulator = new RequestSimulator(context, new MVCModule() {
       @Override
       protected void configure() {
@@ -66,7 +65,7 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
-  public void apiJSONBothWays() throws IOException, ServletException {
+  public void apiJSONBothWays() throws Exception {
     RequestSimulator simulator = new RequestSimulator(context, new MVCModule() {
       @Override
       protected void configure() {
@@ -121,7 +120,34 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
-  public void expressionEvaluatorSkippedUsesRequest() throws IOException, ServletException {
+  public void developmentExceptions() throws Exception {
+    RequestSimulator simulator = new RequestSimulator(context, new MVCModule() {
+      @Override
+      protected void configure() {
+        super.configure();
+        install(new TestModule());
+      }
+    });
+
+    // Bad annotation @Action("{id}") it should be @Action("{uuid}")
+    try {
+      simulator.test("/invalid-api/42").get();
+      fail("Should have thrown");
+    } catch (MissingPropertyExpressionException e) {
+      // Should throw
+    }
+
+    // Bad parameter (i.e. /invalid-api?bad-param=42
+    try {
+      simulator.test("/invalid-api").withParameter("bad-param", "42").get();
+      fail("Should have thrown");
+    } catch (MissingPropertyExpressionException e) {
+      // Should throw
+    }
+  }
+
+  @Test
+  public void expressionEvaluatorSkippedUsesRequest() throws Exception {
     // Tests that the expression evaluator safely gets skipped while looking for values and Prime then checks the
     // HttpServletRequest and finds the value
     RequestSimulator simulator = new RequestSimulator(context, new MVCModule() {
@@ -138,7 +164,7 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
-  public void fullFormWithAllAttributes() throws IOException, ServletException {
+  public void fullFormWithAllAttributes() throws Exception {
     RequestSimulator simulator = new RequestSimulator(context, new MVCModule() {
       @Override
       protected void configure() {
@@ -152,7 +178,7 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
-  public void nonFormFields() throws IOException, ServletException {
+  public void nonFormFields() throws Exception {
     RequestSimulator simulator = new RequestSimulator(context, new MVCModule() {
       @Override
       protected void configure() {
@@ -166,7 +192,7 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
-  public void postRender() throws IOException, ServletException {
+  public void postRender() throws Exception {
     RequestSimulator simulator = new RequestSimulator(context, new MVCModule() {
       @Override
       protected void configure() {
@@ -184,7 +210,7 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
-  public void renderFTL() throws IOException, ServletException {
+  public void renderFTL() throws Exception {
     RequestSimulator simulator = new RequestSimulator(context, new MVCModule() {
       @Override
       protected void configure() {
@@ -198,7 +224,7 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
-  public void scopeStorage() throws IOException, ServletException {
+  public void scopeStorage() throws Exception {
     // Tests that the expression evaluator safely gets skipped while looking for values and Prime then checks the
     // HttpServletRequest and finds the value
     RequestSimulator simulator = new RequestSimulator(context, new MVCModule() {
@@ -216,7 +242,7 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
-  public void singletons() throws IOException, ServletException {
+  public void singletons() throws Exception {
     RequestSimulator simulator = new RequestSimulator(context, new MVCModule() {
       @Override
       protected void configure() {

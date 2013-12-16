@@ -15,19 +15,19 @@
  */
 package org.primeframework.mvc.message.scope;
 
-import javax.servlet.ServletContext;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleMessage;
 import org.testng.annotations.Test;
 
-import static java.util.Arrays.*;
+import javax.servlet.ServletContext;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static java.util.Arrays.asList;
 import static org.easymock.EasyMock.*;
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
 
 /**
  * This tests the application scope.
@@ -39,7 +39,7 @@ public class ApplicationScopeTest {
   @Test
   public void get() {
     ServletContext context = createStrictMock(ServletContext.class);
-    expect(context.getAttribute(ApplicationScope.KEY)).andReturn(asList(new SimpleMessage(MessageType.ERROR, "Test message")));
+    expect(context.getAttribute(ApplicationScope.KEY)).andReturn(asList(new SimpleMessage(MessageType.ERROR, "code", "Test message")));
     replay(context);
 
     ApplicationScope scope = new ApplicationScope(context);
@@ -59,7 +59,7 @@ public class ApplicationScopeTest {
     replay(context);
 
     ApplicationScope scope = new ApplicationScope(context);
-    scope.add(new SimpleMessage(MessageType.ERROR, "Foo"));
+    scope.add(new SimpleMessage(MessageType.ERROR, "code", "Foo"));
     assertEquals(messages.size(), 1);
     assertEquals(messages.get(0).toString(), "Foo");
 
@@ -75,7 +75,7 @@ public class ApplicationScopeTest {
     replay(context);
 
     ApplicationScope scope = new ApplicationScope(context);
-    scope.addAll(Arrays.<Message>asList(new SimpleMessage(MessageType.ERROR, "Foo"), new SimpleMessage(MessageType.ERROR, "Bar")));
+    scope.addAll(Arrays.<Message>asList(new SimpleMessage(MessageType.ERROR, "code1", "Foo"), new SimpleMessage(MessageType.ERROR, "code2", "Bar")));
     assertEquals(messages.size(), 2);
     assertEquals(messages.get(0).toString(), "Foo");
     assertEquals(messages.get(1).toString(), "Bar");

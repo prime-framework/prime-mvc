@@ -15,29 +15,25 @@
  */
 package org.primeframework.mvc.validation.jsr303;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.google.inject.Inject;
 import org.example.action.KitchenSink;
 import org.example.action.ValidationMethods;
-import org.example.action.user.*;
+import org.example.action.user.Edit;
 import org.example.action.user.Validatable;
 import org.example.domain.Address;
 import org.example.domain.User;
 import org.primeframework.mock.servlet.MockHttpServletRequest.Method;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocationStore;
-import org.primeframework.mvc.message.FieldMessage;
-import org.primeframework.mvc.message.Message;
-import org.primeframework.mvc.message.MessageStore;
-import org.primeframework.mvc.message.MessageType;
-import org.primeframework.mvc.message.SimpleFieldMessage;
+import org.primeframework.mvc.message.*;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.validation.ValidationException;
 import org.testng.annotations.Test;
 
-import com.google.inject.Inject;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import static org.testng.Assert.*;
 
 /**
@@ -205,7 +201,7 @@ public class JSRValidationProcessorTest extends PrimeBaseTest {
     edit.user.setAddress("home", address);
 
     // Add a previous error
-    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "test", "failure"));
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "test", "code", "failure"));
 
     store.setCurrent(makeActionInvocation(edit, HTTPMethod.POST, ""));
     try {

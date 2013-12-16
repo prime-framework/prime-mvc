@@ -15,11 +15,11 @@
  */
 package org.primeframework.mvc.message;
 
+import org.primeframework.mvc.message.scope.MessageScope;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
-import org.primeframework.mvc.message.scope.MessageScope;
 
 /**
  * This interface defines the mechanism by which messages are added and fetched.
@@ -60,6 +60,11 @@ public interface MessageStore {
    * @return All of the messages in the scope.
    */
   List<Message> get(MessageScope scope);
+
+  /**
+   * @return The general messages (non-field messages).
+   */
+  List<Message> getGeneralMessages();
 
   /**
    * @return All of the fields messages in all the scopes. This Map is not live.

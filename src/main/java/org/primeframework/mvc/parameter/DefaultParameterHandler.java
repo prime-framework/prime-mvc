@@ -15,11 +15,7 @@
  */
 package org.primeframework.mvc.parameter;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
+import com.google.inject.Inject;
 import org.apache.commons.lang3.ArrayUtils;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
@@ -41,7 +37,10 @@ import org.primeframework.mvc.util.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.inject.Inject;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 /**
  * This class is the default parameter handler. It sets all of the parameters into the action in the following order
  * (while invoking the correct methods in the order):
@@ -127,8 +126,9 @@ public class DefaultParameterHandler implements ParameterHandler {
       try {
         expressionEvaluator.setValue(key, action, struct.values, struct.attributes);
       } catch (ConversionException ce) {
-        String message = messageProvider.getMessage("[ConversionError]" + key, (Object[]) new ArrayBuilder<String>(String.class, key).addAll(struct.values).done());
-        messageStore.add(new SimpleFieldMessage(MessageType.ERROR, key, message));
+        String code = "[couldNotConvert]" + key;
+        String message = messageProvider.getMessage(code, (Object[]) new ArrayBuilder<String>(String.class, key).addAll(struct.values).done());
+        messageStore.add(new SimpleFieldMessage(MessageType.ERROR, key, code, message));
       } catch (ExpressionException ee) {
         if (!allowUnknownParameters) {
           throw ee;
@@ -164,8 +164,9 @@ public class DefaultParameterHandler implements ParameterHandler {
         
         long fileSize = info.file.length();
         if (fileSize > maxSize) {
-          String message = messageProvider.getMessage("[FileUploadSize]" + key, key, fileSize, maxSize);
-          messageStore.add(new SimpleFieldMessage(MessageType.ERROR, key, message));
+          String code = "[fileUploadTooBig]" + key;
+          String message = messageProvider.getMessage(code, key, fileSize, maxSize);
+          messageStore.add(new SimpleFieldMessage(MessageType.ERROR, key, code, message));
           i.remove();
         }
 
@@ -176,8 +177,9 @@ public class DefaultParameterHandler implements ParameterHandler {
 
         String contentType = info.contentType;
         if (!ArrayUtils.contains(allowedContentTypes, contentType)) {
-          String message = messageProvider.getMessage("[FileUploadContentType]" + key, key, contentType, allowedContentTypes);
-          messageStore.add(new SimpleFieldMessage(MessageType.ERROR, key, message));
+          String code = "[fileUploadBadContentType]" + key;
+          String message = messageProvider.getMessage(code, key, contentType, allowedContentTypes);
+          messageStore.add(new SimpleFieldMessage(MessageType.ERROR, key, code, message));
           i.remove();
         }
       }

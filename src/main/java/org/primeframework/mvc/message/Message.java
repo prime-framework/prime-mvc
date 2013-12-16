@@ -22,6 +22,11 @@ package org.primeframework.mvc.message;
  */
 public interface Message {
   /**
+   * @return The code of the message (this is the code that was used to lookup the message in the MessageStore).
+   */
+  String getCode();
+
+  /**
    * @return The type of the message.
    */
   MessageType getType();

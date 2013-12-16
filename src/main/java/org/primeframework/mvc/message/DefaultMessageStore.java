@@ -15,21 +15,10 @@
  */
 package org.primeframework.mvc.message;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.primeframework.mvc.message.scope.ApplicationScope;
-import org.primeframework.mvc.message.scope.FlashScope;
-import org.primeframework.mvc.message.scope.MessageScope;
-import org.primeframework.mvc.message.scope.RequestScope;
-import org.primeframework.mvc.message.scope.Scope;
-import org.primeframework.mvc.message.scope.SessionScope;
-
 import com.google.inject.Inject;
+import org.primeframework.mvc.message.scope.*;
+
+import java.util.*;
 
 /**
  * This is the default message workflow implementation. It removes all flash messages from the session and places them
@@ -82,6 +71,19 @@ public class DefaultMessageStore implements MessageStore {
     Scope s = scopes.get(scope);
     messages.addAll(s.get());
     return messages;
+  }
+
+  @Override
+  public List<Message> getGeneralMessages() {
+    List<Message> messages = get();
+    List<Message> list = new ArrayList<Message>();
+    for (Message message : messages) {
+      if (!(message instanceof FieldMessage)) {
+        list.add(message);
+      }
+    }
+
+    return list;
   }
 
   @Override

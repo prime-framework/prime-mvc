@@ -15,13 +15,20 @@
  */
 package org.primeframework.mvc.content.json;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.content.ContentHandler;
+import org.primeframework.mvc.message.MessageStore;
+import org.primeframework.mvc.message.MessageType;
+import org.primeframework.mvc.message.SimpleMessage;
+import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -32,7 +39,13 @@ import java.io.IOException;
  * @author Brian Pontarelli
  */
 public class JacksonContentHandler implements ContentHandler {
+  private static final Logger logger = LoggerFactory.getLogger(JacksonContentHandler.class);
+
   private final ExpressionEvaluator expressionEvaluator;
+
+  private final MessageProvider messageProvider;
+
+  private final MessageStore messageStore;
 
   private final ObjectMapper objectMapper;
 
@@ -42,11 +55,13 @@ public class JacksonContentHandler implements ContentHandler {
 
   @Inject
   public JacksonContentHandler(HttpServletRequest request, ActionInvocationStore store, ObjectMapper objectMapper,
-                               ExpressionEvaluator expressionEvaluator) {
+                               ExpressionEvaluator expressionEvaluator, MessageProvider messageProvider, MessageStore messageStore) {
     this.request = request;
     this.store = store;
     this.objectMapper = objectMapper;
     this.expressionEvaluator = expressionEvaluator;
+    this.messageProvider = messageProvider;
+    this.messageStore = messageStore;
   }
 
   @Override
@@ -65,7 +80,14 @@ public class JacksonContentHandler implements ContentHandler {
     // Process JSON and set into the object
     JacksonActionConfiguration jacksonConfiguration = (JacksonActionConfiguration) config.additionalConfiguration.get(JacksonActionConfiguration.class);
     if (jacksonConfiguration.requestMember != null) {
-      Object jsonObject = objectMapper.reader(jacksonConfiguration.requestMemberType).readValue(request.getInputStream());
+      Object jsonObject = null;
+      try {
+        jsonObject = objectMapper.reader(jacksonConfiguration.requestMemberType).readValue(request.getInputStream());
+      } catch (JsonProcessingException e) {
+        logger.debug("Error parsing JSON request", e);
+        messageStore.add(new SimpleMessage(MessageType.ERROR, "[couldNotParseJSON]", messageProvider.getMessage("[couldNotParseJSON]", e.getMessage())));
+      }
+
       expressionEvaluator.setValue(jacksonConfiguration.requestMember, action, jsonObject);
     }
   }

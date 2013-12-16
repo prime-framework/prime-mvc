@@ -15,11 +15,7 @@
  */
 package org.primeframework.mvc.control.form;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import com.google.inject.Inject;
 import org.example.action.user.Edit;
 import org.example.domain.User;
 import org.primeframework.mvc.action.ActionInvocation;
@@ -28,7 +24,10 @@ import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.testng.annotations.Test;
 
-import com.google.inject.Inject;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * This tests the checkbox control.
@@ -157,8 +156,8 @@ public class CheckboxTest extends ControlBaseTest {
     Edit action = new Edit();
     ais.setCurrent(new ActionInvocation(action, null, "/checkbox", null, null));
 
-    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.male", "fieldError1"));
-    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.male", "fieldError2"));
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.male", "code1", "fieldError1"));
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.male", "code2", "fieldError2"));
 
     new ControlTester(checkbox).
       attr("name", "user.male").

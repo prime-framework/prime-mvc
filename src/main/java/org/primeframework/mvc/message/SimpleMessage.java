@@ -22,16 +22,23 @@ package org.primeframework.mvc.message;
  */
 public class SimpleMessage implements Message {
   public final MessageType type;
+  public final String code;
   public final String message;
 
-  public SimpleMessage(MessageType type, String message) {
+  public SimpleMessage(MessageType type, String code, String message) {
     this.type = type;
+    this.code = code;
     this.message = message;
   }
 
   @Override
   public MessageType getType() {
     return type;
+  }
+
+  @Override
+  public String getCode() {
+    return code;
   }
 
   @Override

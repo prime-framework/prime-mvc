@@ -86,8 +86,8 @@ public class TextTest extends ControlBaseTest {
 
     ais.setCurrent(new ActionInvocation(action, null, "/text", null, null));
 
-    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.name", "fieldError1"));
-    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.name", "fieldError2"));
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.name", "code1", "fieldError1"));
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.name", "code2", "fieldError2"));
 
     new ControlTester(text).
       attr("name", "user.name").

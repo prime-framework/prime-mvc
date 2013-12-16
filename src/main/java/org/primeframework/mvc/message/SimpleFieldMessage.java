@@ -23,11 +23,13 @@ package org.primeframework.mvc.message;
 public class SimpleFieldMessage implements FieldMessage {
   public final MessageType type;
   public final String field;
+  public final String code;
   public final String message;
 
-  public SimpleFieldMessage(MessageType type, String field, String message) {
+  public SimpleFieldMessage(MessageType type, String field, String code, String message) {
     this.type = type;
     this.field = field;
+    this.code = code;
     this.message = message;
   }
 
@@ -39,6 +41,11 @@ public class SimpleFieldMessage implements FieldMessage {
   @Override
   public String getField() {
     return field;
+  }
+
+  @Override
+  public String getCode() {
+    return code;
   }
 
   @Override

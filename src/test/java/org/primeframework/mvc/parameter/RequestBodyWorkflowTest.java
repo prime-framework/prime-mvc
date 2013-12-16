@@ -153,6 +153,7 @@ public class RequestBodyWorkflowTest {
     RequestBodyWorkflow workflow = new RequestBodyWorkflow(wrapper);
     workflow.perform(chain);
 
+    @SuppressWarnings("unchecked")
     Map<String, String[]> actual = wrapper.getParameterMap();
     Map<String, String[]> expected =
         MapBuilder.<String, String[]>map()
@@ -189,6 +190,7 @@ public class RequestBodyWorkflowTest {
     RequestBodyWorkflow workflow = new RequestBodyWorkflow(wrapper);
     workflow.perform(chain);
 
+    @SuppressWarnings("unchecked")
     Map<String, String[]> actual = wrapper.getParameterMap();
     Map<String, String[]> expected =
         MapBuilder.<String, String[]>map()
@@ -219,6 +221,7 @@ public class RequestBodyWorkflowTest {
     RequestBodyWorkflow workflow = new RequestBodyWorkflow(wrapper);
     workflow.perform(chain);
 
+    @SuppressWarnings("unchecked")
     Map<String, String[]> actual = wrapper.getParameterMap();
     Map<String, String[]> expected =
         MapBuilder.<String, String[]>map()

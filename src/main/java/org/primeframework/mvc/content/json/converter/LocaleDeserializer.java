@@ -46,6 +46,6 @@ public class LocaleDeserializer extends StdScalarDeserializer<Locale> {
       return LocaleUtils.toLocale(str);
     }
 
-    throw ctxt.mappingException(getValueClass());
+    throw ctxt.mappingException(handledType());
   }
 }

@@ -15,9 +15,7 @@
  */
 package org.primeframework.mvc.control.form;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
+import com.google.inject.Inject;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.example.action.user.Edit;
@@ -31,7 +29,9 @@ import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.testng.annotations.Test;
 
-import com.google.inject.Inject;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
@@ -122,6 +122,7 @@ public class SelectTest extends ControlBaseTest {
             "</div>\n");
   }
 
+  @SuppressWarnings("unchecked")
   @Test
   public void expressions() {
     Address address = new Address();
@@ -161,8 +162,8 @@ public class SelectTest extends ControlBaseTest {
     action.user.setAddress("work", address);
 
     ais.setCurrent(new ActionInvocation(action, null, "/select", null, null));
-    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "fieldError1"));
-    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "fieldError2"));
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "code1", "fieldError1"));
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "code2", "fieldError2"));
 
     new ControlTester(select).
         attr("name", "user.addresses['work'].country").
@@ -234,8 +235,8 @@ public class SelectTest extends ControlBaseTest {
     action.user.setAddress("work", address);
 
     ais.setCurrent(new ActionInvocation(action, null, "/select", null, null));
-    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "fieldError1"));
-    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "fieldError2"));
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "code1", "fieldError1"));
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "code2", "fieldError2"));
 
     try {
       new ControlTester(select).

@@ -80,8 +80,8 @@ public class FileTest extends ControlBaseTest {
     Edit action = new Edit();
     ais.setCurrent(new ActionInvocation(action, null, "/file", null, null));
 
-    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.profile", "fieldError1"));
-    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.profile", "fieldError2"));
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.profile", "code1", "fieldError1"));
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.profile", "code2", "fieldError2"));
 
     new ControlTester(file).
       attr("name", "user.profile").

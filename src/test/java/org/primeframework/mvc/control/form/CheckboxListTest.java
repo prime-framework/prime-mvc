@@ -15,9 +15,7 @@
  */
 package org.primeframework.mvc.control.form;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
+import com.google.inject.Inject;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.example.action.user.Edit;
@@ -29,8 +27,10 @@ import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.testng.annotations.Test;
 
-import com.google.inject.Inject;
-import static java.util.Arrays.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import static java.util.Arrays.asList;
 
 /**
  * This tests the checkboxlist control.
@@ -116,6 +116,7 @@ public class CheckboxListTest extends ControlBaseTest {
         "</div>\n");
   }
 
+  @SuppressWarnings("unchecked")
   @Test
   public void expressions() {
     Address address = new Address();
@@ -157,8 +158,8 @@ public class CheckboxListTest extends ControlBaseTest {
     action.user.setAddress("work", address);
 
     ais.setCurrent(new ActionInvocation(action, null, "/checkbox-list", null, null));
-    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "Country is required"));
-    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "Country must be cool"));
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "code1", "Country is required"));
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "code2", "Country must be cool"));
 
     new ControlTester(checkboxList).
       attr("name", "user.addresses['work'].country").

@@ -15,18 +15,14 @@
  */
 package org.primeframework.mvc.message;
 
+import org.primeframework.mvc.message.scope.*;
+import org.testng.annotations.Test;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import org.primeframework.mvc.message.scope.ApplicationScope;
-import org.primeframework.mvc.message.scope.FlashScope;
-import org.primeframework.mvc.message.scope.MessageScope;
-import org.primeframework.mvc.message.scope.RequestScope;
-import org.primeframework.mvc.message.scope.SessionScope;
-import org.testng.annotations.Test;
-
 import static org.easymock.EasyMock.*;
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
 
 /**
  * This tests the default message store.
@@ -36,7 +32,7 @@ import static org.testng.Assert.*;
 public class DefaultMessageStoreTest {
   @Test
   public void request() {
-    Message message = new SimpleFieldMessage(MessageType.ERROR, "foo.bar", "message");
+    Message message = new SimpleFieldMessage(MessageType.ERROR, "foo.bar", "code", "message");
 
     RequestScope scope = createStrictMock(RequestScope.class);
     scope.add(message);
@@ -50,7 +46,7 @@ public class DefaultMessageStoreTest {
 
   @Test
   public void scoped() {
-    Message message = new SimpleFieldMessage(MessageType.ERROR, "foo.bar", "message");
+    Message message = new SimpleFieldMessage(MessageType.ERROR, "foo.bar", "code", "message");
 
     FlashScope scope = createStrictMock(FlashScope.class);
     scope.add(message);
@@ -65,8 +61,8 @@ public class DefaultMessageStoreTest {
   @Test
   public void bulk() {
     List<Message> messages = new ArrayList<Message>();
-    messages.add(new SimpleFieldMessage(MessageType.ERROR, "foo.bar", "message"));
-    messages.add(new SimpleFieldMessage(MessageType.ERROR, "foo.baz", "message"));
+    messages.add(new SimpleFieldMessage(MessageType.ERROR, "foo.bar", "code", "message"));
+    messages.add(new SimpleFieldMessage(MessageType.ERROR, "foo.baz", "code", "message"));
 
     SessionScope scope = createStrictMock(SessionScope.class);
     scope.addAll(messages);
@@ -81,20 +77,20 @@ public class DefaultMessageStoreTest {
   @Test
   public void get() {
     List<Message> requestMessages = new ArrayList<Message>();
-    requestMessages.add(new SimpleMessage(MessageType.ERROR, "request1"));
-    requestMessages.add(new SimpleMessage(MessageType.ERROR, "request2"));
+    requestMessages.add(new SimpleMessage(MessageType.ERROR, "code1", "request1"));
+    requestMessages.add(new SimpleMessage(MessageType.ERROR, "code2", "request2"));
 
     List<Message> flashMessages = new ArrayList<Message>();
-    flashMessages.add(new SimpleMessage(MessageType.ERROR, "flash1"));
-    flashMessages.add(new SimpleMessage(MessageType.ERROR, "flash2"));
+    flashMessages.add(new SimpleMessage(MessageType.ERROR, "code3", "flash1"));
+    flashMessages.add(new SimpleMessage(MessageType.ERROR, "code4", "flash2"));
 
     List<Message> sessionMessages = new ArrayList<Message>();
-    sessionMessages.add(new SimpleMessage(MessageType.ERROR, "session1"));
-    sessionMessages.add(new SimpleMessage(MessageType.ERROR, "session2"));
+    sessionMessages.add(new SimpleMessage(MessageType.ERROR, "code5", "session1"));
+    sessionMessages.add(new SimpleMessage(MessageType.ERROR, "code6", "session2"));
 
     List<Message> applicationMessages = new ArrayList<Message>();
-    applicationMessages.add(new SimpleMessage(MessageType.ERROR, "application1"));
-    applicationMessages.add(new SimpleMessage(MessageType.ERROR, "application2"));
+    applicationMessages.add(new SimpleMessage(MessageType.ERROR, "code7", "application1"));
+    applicationMessages.add(new SimpleMessage(MessageType.ERROR, "code8", "application2"));
 
     RequestScope request = createStrictMock(RequestScope.class);
     expect(request.get()).andReturn(requestMessages);
@@ -132,8 +128,8 @@ public class DefaultMessageStoreTest {
   @Test
   public void getScope() {
     List<Message> requestMessages = new ArrayList<Message>();
-    requestMessages.add(new SimpleMessage(MessageType.ERROR, "request1"));
-    requestMessages.add(new SimpleMessage(MessageType.ERROR, "request2"));
+    requestMessages.add(new SimpleMessage(MessageType.ERROR, "code1", "request1"));
+    requestMessages.add(new SimpleMessage(MessageType.ERROR, "code2", "request2"));
 
     RequestScope request = createStrictMock(RequestScope.class);
     expect(request.get()).andReturn(requestMessages);

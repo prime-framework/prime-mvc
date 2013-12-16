@@ -25,6 +25,10 @@ import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.config.ActionConfiguration;
+import org.primeframework.mvc.message.MessageStore;
+import org.primeframework.mvc.message.MessageType;
+import org.primeframework.mvc.message.SimpleMessage;
+import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.testng.annotations.Test;
 
@@ -32,10 +36,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.easymock.EasyMock.createStrictMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.easymock.EasyMock.*;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
@@ -94,7 +95,13 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
 
     request.setInputStream(new MockServletInputStream(expected.getBytes()));
 
-    JacksonContentHandler handler = new JacksonContentHandler(request, store, new ObjectMapper(), expressionEvaluator);
+    MessageProvider messageProvider = createStrictMock(MessageProvider.class);
+    replay(messageProvider);
+
+    MessageStore messageStore = createStrictMock(MessageStore.class);
+    replay(messageStore);
+
+    JacksonContentHandler handler = new JacksonContentHandler(request, store, new ObjectMapper(), expressionEvaluator, messageProvider, messageStore);
     handler.handle();
 
     assertEquals(action.jsonRequest.addresses.get("work").city, "Denver");
@@ -115,7 +122,69 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
     assertEquals(action.jsonRequest.siblings.get(1).name, "Beth");
     assertEquals(action.jsonRequest.type, UserType.COOL);
 
-    verify(store);
+    verify(store, messageProvider, messageStore);
+  }
+
+  @Test
+  public void handleBadJSON() throws IOException {
+    Map<Class<?>, Object> additionalConfig = new HashMap<Class<?>, Object>();
+    additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration("jsonRequest", UserField.class, null));
+
+    KitchenSink action = new KitchenSink(null);
+    ActionConfiguration config = new ActionConfiguration(KitchenSink.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null);
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(new ActionInvocation(action, null, "/action", null, config));
+    replay(store);
+
+    String expected = "{" +
+        "  \"bad-active\":true," +
+        "  \"bad-addresses\":{" +
+        "    \"home\":{" +
+        "      \"city\":\"Broomfield\"," +
+        "      \"state\":\"Colorado\"," +
+        "      \"zipcode\":\"80023\"" +
+        "    }," +
+        "    \"work\":{" +
+        "      \"city\":\"Denver\"," +
+        "      \"state\":\"Colorado\"," +
+        "      \"zipcode\":\"80202\"" +
+        "    }" +
+        "  }," +
+        "  \"bad-age\":37," +
+        "  \"bad-favoriteMonth\":5," +
+        "  \"bad-favoriteYear\":1976," +
+        "  \"bad-ids\":{" +
+        "    \"0\":1," +
+        "    \"1\":2" +
+        "  }," +
+        "  \"bad-lifeStory\":\"Hello world\"," +
+        "  \"bad-securityQuestions\":[\"one\",\"two\",\"three\",\"four\"]," +
+        "  \"bad-siblings\":[{" +
+        "    \"active\":false," +
+        "    \"name\":\"Brett\"" +
+        "  },{" +
+        "    \"active\":false," +
+        "    \"name\":\"Beth\"" +
+        "  }]," +
+        "  \"bad-type\":\"COOL\"" +
+        "}";
+
+    request.setInputStream(new MockServletInputStream(expected.getBytes()));
+
+    MessageProvider messageProvider = createStrictMock(MessageProvider.class);
+    expect(messageProvider.getMessage(eq("[couldNotParseJSON]"), isA(String.class))).andReturn("foo");
+    replay(messageProvider);
+
+    MessageStore messageStore = createStrictMock(MessageStore.class);
+    messageStore.add(new SimpleMessage(MessageType.ERROR, "[couldNotParseJSON]", "foo"));
+    replay(messageStore);
+
+    JacksonContentHandler handler = new JacksonContentHandler(request, store, new ObjectMapper(), expressionEvaluator, messageProvider, messageStore);
+    handler.handle();
+
+    assertNull(action.jsonRequest);
+
+    verify(store, messageProvider, messageStore);
   }
 
   @Test
@@ -159,10 +228,16 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
 
     request.setInputStream(new MockServletInputStream(expected.getBytes()));
 
-    JacksonContentHandler handler = new JacksonContentHandler(request, store, new ObjectMapper(), expressionEvaluator);
+    MessageProvider messageProvider = createStrictMock(MessageProvider.class);
+    replay(messageProvider);
+
+    MessageStore messageStore = createStrictMock(MessageStore.class);
+    replay(messageStore);
+
+    JacksonContentHandler handler = new JacksonContentHandler(request, store, new ObjectMapper(), expressionEvaluator, messageProvider, messageStore);
     handler.handle();
 
-    verify(store);
+    verify(store, messageProvider, messageStore);
   }
 
   @Test
@@ -210,11 +285,17 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
 
     request.setInputStream(new MockServletInputStream(expected.getBytes()));
 
-    JacksonContentHandler handler = new JacksonContentHandler(request, store, new ObjectMapper(), expressionEvaluator);
+    MessageProvider messageProvider = createStrictMock(MessageProvider.class);
+    replay(messageProvider);
+
+    MessageStore messageStore = createStrictMock(MessageStore.class);
+    replay(messageStore);
+
+    JacksonContentHandler handler = new JacksonContentHandler(request, store, new ObjectMapper(), expressionEvaluator, messageProvider, messageStore);
     handler.handle();
 
     assertNull(action.jsonRequest);
 
-    verify(store);
+    verify(store, messageProvider, messageStore);
   }
 }

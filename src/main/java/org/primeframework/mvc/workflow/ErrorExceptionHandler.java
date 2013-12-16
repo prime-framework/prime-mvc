@@ -59,8 +59,9 @@ public class ErrorExceptionHandler implements TypedExceptionHandler<ErrorExcepti
 
     // get the message from the message provider.  key = name of the class
     try {
-      String message = messageProvider.getMessage(exception.getClass().getSimpleName(), exception.args);
-      messageStore.add(new SimpleMessage(MessageType.ERROR, message));
+      String messageCode = "[" + exception.getClass().getSimpleName() + "]";
+      String message = messageProvider.getMessage(messageCode, exception.args);
+      messageStore.add(new SimpleMessage(MessageType.ERROR, messageCode, message));
     } catch (MissingMessageException mme) {
       // Ignore because there isn't a message
     }

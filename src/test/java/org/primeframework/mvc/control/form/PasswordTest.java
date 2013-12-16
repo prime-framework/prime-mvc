@@ -72,8 +72,8 @@ public class PasswordTest extends ControlBaseTest {
 
     ais.setCurrent(new ActionInvocation(edit, null, "/password", null, null));
 
-    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.password", "fieldError1"));
-    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.password", "fieldError2"));
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.password", "code1", "fieldError1"));
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.password", "code2", "fieldError2"));
 
     new ControlTester(password).
       attr("name", "user.password").

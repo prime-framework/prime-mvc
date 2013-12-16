@@ -15,13 +15,13 @@
  */
 package org.primeframework.mvc.parameter.el;
 
+import org.primeframework.mvc.parameter.convert.ConverterProvider;
+import org.primeframework.mvc.util.ReflectionUtils;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
-
-import org.primeframework.mvc.parameter.convert.ConverterProvider;
-import org.primeframework.mvc.util.ReflectionUtils;
 
 /**
  * This class provides member access.
@@ -55,8 +55,8 @@ public class MemberAccessor extends Accessor {
     }
 
     if (this.field == null && this.propertyInfo == null) {
-      throw new MissingPropertyExpressionException("While evaluating the expression [" + expression + "] the property/field [" +
-        name + "] in the class [" + declaringClass + "]", name, declaringClass, expression);
+      throw new MissingPropertyExpressionException("While evaluating the expression [" + expression + "]. The property/field [" +
+        name + "] does not exist in the class [" + declaringClass + "]", name, declaringClass, expression);
     }
 
     super.type = (bpi != null) ? bpi.getGenericType() : this.field.getGenericType();

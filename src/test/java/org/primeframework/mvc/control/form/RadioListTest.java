@@ -15,9 +15,7 @@
  */
 package org.primeframework.mvc.control.form;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
+import com.google.inject.Inject;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.example.action.user.Edit;
@@ -29,8 +27,10 @@ import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.testng.annotations.Test;
 
-import com.google.inject.Inject;
-import static java.util.Arrays.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import static java.util.Arrays.asList;
 
 /**
  * This tests the radio control.
@@ -119,6 +119,7 @@ public class RadioListTest extends ControlBaseTest {
         "<input type=\"hidden\" name=\"__rb_user.addresses['work'].country\" value=\"\"/>\n");
   }
 
+  @SuppressWarnings("unchecked")
   @Test
   public void expressions() {
     Address address = new Address();
@@ -161,8 +162,8 @@ public class RadioListTest extends ControlBaseTest {
     action.user.setAddress("work", address);
 
     ais.setCurrent(new ActionInvocation(action, null, "/radio-list", null, null));
-    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "fieldError1"));
-    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "fieldError2"));
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "code1", "fieldError1"));
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "code2", "fieldError2"));
 
     new ControlTester(radioList).
       attr("name", "user.addresses['work'].country").
@@ -191,8 +192,8 @@ public class RadioListTest extends ControlBaseTest {
     action.user.setAddress("work", address);
 
     ais.setCurrent(new ActionInvocation(action, null, "/radio-list", null, null));
-    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "fieldError1"));
-    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "fieldError2"));
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "code1", "fieldError1"));
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "code2", "fieldError2"));
 
     new ControlTester(radioList).
       attr("name", "user.addresses['work'].country").

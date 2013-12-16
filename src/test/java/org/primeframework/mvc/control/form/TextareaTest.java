@@ -86,8 +86,8 @@ public class TextareaTest extends ControlBaseTest {
 
     ais.setCurrent(new ActionInvocation(action, null, "/textarea", null, null));
 
-    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.name", "fieldError1"));
-    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.name", "fieldError2"));
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.name", "code1", "fieldError1"));
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.name", "code2", "fieldError2"));
 
     new ControlTester(textarea).
       attr("name", "user.name").

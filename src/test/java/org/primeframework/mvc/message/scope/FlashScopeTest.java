@@ -15,20 +15,20 @@
  */
 package org.primeframework.mvc.message.scope;
 
+import org.primeframework.mvc.message.Message;
+import org.primeframework.mvc.message.MessageType;
+import org.primeframework.mvc.message.SimpleMessage;
+import org.testng.annotations.Test;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.primeframework.mvc.message.Message;
-import org.primeframework.mvc.message.MessageType;
-import org.primeframework.mvc.message.SimpleMessage;
-import org.testng.annotations.Test;
-
-import static java.util.Arrays.*;
+import static java.util.Arrays.asList;
 import static org.easymock.EasyMock.*;
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
 
 /**
  * This tests the flash scope.
@@ -39,11 +39,11 @@ public class FlashScopeTest {
   @Test
   public void get() {
     HttpSession session = createStrictMock(HttpSession.class);
-    expect(session.getAttribute(FlashScope.KEY)).andReturn(asList(new SimpleMessage(MessageType.ERROR, "Session")));
+    expect(session.getAttribute(FlashScope.KEY)).andReturn(asList(new SimpleMessage(MessageType.ERROR, "code1", "Session")));
     replay(session);
 
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    expect(request.getAttribute(FlashScope.KEY)).andReturn(asList(new SimpleMessage(MessageType.ERROR, "Request")));
+    expect(request.getAttribute(FlashScope.KEY)).andReturn(asList(new SimpleMessage(MessageType.ERROR, "code2", "Request")));
     expect(request.getSession(false)).andReturn(session);
     replay(request);
 
@@ -69,7 +69,7 @@ public class FlashScopeTest {
     replay(request);
 
     FlashScope scope = new FlashScope(request);
-    scope.add(new SimpleMessage(MessageType.ERROR, "Foo"));
+    scope.add(new SimpleMessage(MessageType.ERROR, "code", "Foo"));
     assertEquals(messages.size(), 1);
     assertEquals(messages.get(0).toString(), "Foo");
 
@@ -89,7 +89,7 @@ public class FlashScopeTest {
     replay(request);
 
     FlashScope scope = new FlashScope(request);
-    scope.addAll(Arrays.<Message>asList(new SimpleMessage(MessageType.ERROR, "Foo"), new SimpleMessage(MessageType.ERROR, "Bar")));
+    scope.addAll(Arrays.<Message>asList(new SimpleMessage(MessageType.ERROR, "code1", "Foo"), new SimpleMessage(MessageType.ERROR, "code2", "Bar")));
     assertEquals(messages.size(), 2);
     assertEquals(messages.get(0).toString(), "Foo");
     assertEquals(messages.get(1).toString(), "Bar");

@@ -15,15 +15,7 @@
  */
 package org.primeframework.mvc.parameter;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.google.inject.Inject;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.easymock.IArgumentMatcher;
@@ -51,8 +43,12 @@ import org.primeframework.mvc.util.RequestKeys;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
 
-import com.google.inject.Inject;
-import static java.util.Arrays.*;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.util.*;
+
+import static java.util.Arrays.asList;
 import static org.easymock.EasyMock.*;
 import static org.testng.Assert.*;
 
@@ -103,10 +99,10 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(config);
 
     MessageProvider provider = createStrictMock(MessageProvider.class);
-    expect(provider.getMessage("[ConversionError]user.inches", "user.inches", "tall")).andReturn("bar");
+    expect(provider.getMessage("[couldNotConvert]user.inches", "user.inches", "tall")).andReturn("bar");
     replay(provider);
 
-    FieldMessage message = new SimpleFieldMessage(MessageType.ERROR, "user.inches", "bar");
+    FieldMessage message = new SimpleFieldMessage(MessageType.ERROR, "user.inches", "[couldNotConvert]user.inches", "bar");
     MessageStore messageStore = createStrictMock(MessageStore.class);
     messageStore.add(message);
     replay(messageStore);
@@ -476,10 +472,10 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(chain);
 
     MessageProvider provider = createStrictMock(MessageProvider.class);
-    expect(provider.getMessage("[FileUploadSize]userfile", "userfile", 5l, 1l)).andReturn("bar");
+    expect(provider.getMessage("[fileUploadTooBig]userfile", "userfile", 5l, 1l)).andReturn("bar");
     replay(provider);
 
-    FieldMessage message = new SimpleFieldMessage(MessageType.ERROR, "userfile", "bar");
+    FieldMessage message = new SimpleFieldMessage(MessageType.ERROR, "userfile", "[fileUploadTooBig]userfile", "bar");
     MessageStore messageStore = createStrictMock(MessageStore.class);
     messageStore.add(message);
     replay(messageStore);
@@ -523,10 +519,10 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(chain);
 
     MessageProvider provider = createStrictMock(MessageProvider.class);
-    expect(provider.getMessage("[FileUploadContentType]userfile", "userfile", "text/plain", contentTypes)).andReturn("bar");
+    expect(provider.getMessage("[fileUploadBadContentType]userfile", "userfile", "text/plain", contentTypes)).andReturn("bar");
     replay(provider);
 
-    FieldMessage message = new SimpleFieldMessage(MessageType.ERROR, "userfile", "bar");
+    FieldMessage message = new SimpleFieldMessage(MessageType.ERROR, "userfile", "[fileUploadBadContentType]userfile", "bar");
     MessageStore messageStore = createStrictMock(MessageStore.class);
     messageStore.add(message);
     replay(messageStore);
@@ -582,10 +578,10 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(chain);
 
     MessageProvider provider = createStrictMock(MessageProvider.class);
-    expect(provider.getMessage("[FileUploadSize]userfile", "userfile", 5l, 1l)).andReturn("bar");
+    expect(provider.getMessage("[fileUploadTooBig]userfile", "userfile", 5l, 1l)).andReturn("bar");
     replay(provider);
 
-    FieldMessage message = new SimpleFieldMessage(MessageType.ERROR, "userfile", "bar");
+    FieldMessage message = new SimpleFieldMessage(MessageType.ERROR, "userfile", "[fileUploadTooBig]userfile", "bar");
     MessageStore messageStore = createStrictMock(MessageStore.class);
     messageStore.add(message);
     replay(messageStore);
@@ -642,10 +638,10 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(chain);
 
     MessageProvider provider = createStrictMock(MessageProvider.class);
-    expect(provider.getMessage("[FileUploadContentType]userfile", "userfile", "text/plain", annotationTypes)).andReturn("bar");
+    expect(provider.getMessage("[fileUploadBadContentType]userfile", "userfile", "text/plain", annotationTypes)).andReturn("bar");
     replay(provider);
 
-    FieldMessage message = new SimpleFieldMessage(MessageType.ERROR, "userfile", "bar");
+    FieldMessage message = new SimpleFieldMessage(MessageType.ERROR, "userfile", "[fileUploadBadContentType]userfile", "bar");
     MessageStore messageStore = createStrictMock(MessageStore.class);
     messageStore.add(message);
     replay(messageStore);
