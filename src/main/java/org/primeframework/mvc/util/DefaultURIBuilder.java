@@ -35,6 +35,10 @@ public class DefaultURIBuilder implements URIBuilder {
   public String build(Class<?> type) {
     // Determine the URI
     String fullName = type.getName();
+    if (fullName.endsWith("Action")) {
+      fullName = fullName.substring(0, fullName.length() - 6);
+    }
+
     int index = fullName.indexOf("action");
     String lessPackage = fullName.substring(index + 6).replace('.', '/');
 

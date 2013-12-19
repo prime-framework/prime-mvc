@@ -25,13 +25,18 @@ import static org.testng.Assert.*;
  *
  * @author Brian Pontarelli
  */
-public class DefaultActionURIBuilderTest {
+public class DefaultURIBuilderTest {
   /**
    * Tests the URI builder.
    */
   @Test
   public void build() {
     DefaultURIBuilder builder = new DefaultURIBuilder();
-    assertEquals(builder.build(this.getClass()), "/config/default-action-uri-builder-test");
+    assertEquals(builder.build(DefaultURIBuilderTest.class), "/config/default-uri-builder-test");
+    assertEquals(builder.build(MyCustomAction.class), "/config/my-custom");
   }
+}
+
+class MyCustomAction {
+
 }
