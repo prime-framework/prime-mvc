@@ -15,10 +15,7 @@
  */
 package org.primeframework.mvc.parameter.convert.converters;
 
-import java.lang.reflect.Type;
-import java.util.Map;
-import java.util.UUID;
-
+import com.google.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.parameter.convert.AbstractGlobalConverter;
@@ -26,7 +23,9 @@ import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.convert.annotation.GlobalConverter;
 
-import com.google.inject.Inject;
+import java.lang.reflect.Type;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * This converts to and from UUID.
@@ -48,7 +47,12 @@ public class UUIDConverter extends AbstractGlobalConverter {
       return null;
     }
 
+    try {
     return UUID.fromString(value);
+    }
+    catch (IllegalArgumentException iae) {
+      throw new ConversionException();
+    }
   }
 
   protected Object stringsToObject(String[] values, Type convertTo, Map<String, String> attributes, String expression)
