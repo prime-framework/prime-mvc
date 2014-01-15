@@ -15,14 +15,16 @@
  */
 package org.primeframework.mvc.parameter.convert.converters;
 
-import java.util.UUID;
-
 import org.primeframework.mvc.MockConfiguration;
+import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
 import org.testng.annotations.Test;
 
+import java.util.UUID;
+
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNull;
+import static org.testng.Assert.fail;
 
 /**
  * This tests the locale converter.
@@ -42,6 +44,17 @@ public class UUIDConverterTest {
     UUID expected = UUID.randomUUID();
     uuid = (UUID) converter.convertFromStrings(UUID.class, null, "testExpr", expected.toString());
     assertEquals(uuid, expected);
+
+    try {
+      converter.convertFromStrings(UUID.class, null, "testExpr", "NotAUUID");
+      fail("Should throw an exception");
+    }
+    catch(ConversionException ce) {
+
+    }
+    catch(Throwable t) {
+      fail("Should have thrown a ConversionException");
+    }
   }
 
   @Test
