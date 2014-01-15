@@ -39,6 +39,7 @@ public class RequestResult {
   public final Injector injector;
   public final String body;
   public final String redirect;
+  public final int statusCode;
 
   public RequestResult(MockHttpServletRequest request, MockHttpServletResponse response, Injector injector) {
     this.request = request;
@@ -46,6 +47,7 @@ public class RequestResult {
     this.injector = injector;
     this.body = response.getStream().toString();
     this.redirect = response.getRedirect();
+    this.statusCode = response.getCode();
   }
 
   /**
@@ -68,7 +70,23 @@ public class RequestResult {
   public RequestResult assertBodyContains(String... strings) {
     for (String string : strings) {
       if (!body.contains(string)) {
-        throw new AssertionError("Body didn't contain [" + string + "]");
+        throw new AssertionError("Body didn't contain [" + string + "]\nRedirect: [" + redirect + "]\nBody:\n" + body);
+      }
+    }
+
+    return this;
+  }
+
+  /**
+   * Verifies that the body does not contain any of the given Strings.
+   *
+   * @param strings The strings to check.
+   * @return This.
+   */
+  public RequestResult assertBodyDoesNotContain(String... strings) {
+    for (String string : strings) {
+      if (body.contains(string)) {
+        throw new AssertionError("Body shouldn't contain [" + string + "]\nRedirect: [" + redirect + "]\nBody:\n" + body);
       }
     }
 
@@ -140,8 +158,22 @@ public class RequestResult {
    * @return This.
    */
   public RequestResult assertRedirect(String uri) {
-    if (!redirect.equals(uri)) {
+    if (redirect == null || !redirect.equals(uri)) {
       throw new AssertionError("Redirect [" + redirect + "] was not equal to [" + uri + "]");
+    }
+
+    return this;
+  }
+
+  /**
+   * Verifies that the response status code is equal to the given code.
+   *
+   * @param statusCode The status code.
+   * @return This.
+   */
+  public RequestResult assertStatusCode(int statusCode) {
+    if (this.statusCode != statusCode) {
+      throw new AssertionError("Status code [" + this.statusCode+ "] was not equal to [" + statusCode + "]");
     }
 
     return this;
