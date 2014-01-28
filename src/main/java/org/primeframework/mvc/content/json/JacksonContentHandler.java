@@ -18,6 +18,7 @@ package org.primeframework.mvc.content.json;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
+import org.apache.commons.io.IOUtils;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.config.ActionConfiguration;
@@ -82,7 +83,14 @@ public class JacksonContentHandler implements ContentHandler {
     if (jacksonConfiguration.requestMember != null) {
       Object jsonObject = null;
       try {
-        jsonObject = objectMapper.reader(jacksonConfiguration.requestMemberType).readValue(request.getInputStream());
+        if(logger.isDebugEnabled()) {
+          final String req = IOUtils.toString(request.getInputStream(), "UTF-8");
+          logger.debug("Request: " + req);
+          jsonObject = objectMapper.reader(jacksonConfiguration.requestMemberType).readValue(req);
+        }
+        else {
+          jsonObject = objectMapper.reader(jacksonConfiguration.requestMemberType).readValue(request.getInputStream());
+        }
       } catch (JsonProcessingException e) {
         logger.debug("Error parsing JSON request", e);
         messageStore.add(new SimpleMessage(MessageType.ERROR, "[couldNotParseJSON]", messageProvider.getMessage("[couldNotParseJSON]", e.getMessage())));
