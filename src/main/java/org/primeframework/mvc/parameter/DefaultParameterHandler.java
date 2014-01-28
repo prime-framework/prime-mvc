@@ -77,6 +77,10 @@ public class DefaultParameterHandler implements ParameterHandler {
 
   @Override
   public void handle(Parameters parameters) {
+    if (logger.isDebugEnabled()) {
+      logger.debug("Parameters found: " + parameters);
+    }
+
     ActionInvocation invocation = actionInvocationStore.getCurrent();
     Object action = invocation.action;
 

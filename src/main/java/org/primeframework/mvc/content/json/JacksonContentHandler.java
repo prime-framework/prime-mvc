@@ -85,7 +85,7 @@ public class JacksonContentHandler implements ContentHandler {
       try {
         if(logger.isDebugEnabled()) {
           final String req = IOUtils.toString(request.getInputStream(), "UTF-8");
-          logger.debug("Request: " + req);
+          logger.debug("Request: (" + request.getMethod() + " " + request.getRequestURI() + ") " + req);
           jsonObject = objectMapper.reader(jacksonConfiguration.requestMemberType).readValue(req);
         }
         else {

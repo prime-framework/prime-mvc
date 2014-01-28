@@ -15,19 +15,20 @@
  */
 package org.primeframework.mvc.action;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Set;
-
+import com.google.inject.Inject;
 import org.primeframework.mvc.parameter.DefaultParameterParser;
 import org.primeframework.mvc.parameter.InternalParameters;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.servlet.ServletTools;
 import org.primeframework.mvc.workflow.WorkflowChain;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.google.inject.Inject;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Set;
 
 /**
  * This class is the default implementation of the ActionMappingWorkflow. During the perform method, this class
@@ -36,6 +37,8 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
+  private final static Logger logger = LoggerFactory.getLogger(DefaultActionMappingWorkflow.class);
+
   private final HttpServletRequest request;
   private final HttpServletResponse response;
   private final ActionMapper actionMapper;
@@ -64,6 +67,9 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
   public void perform(WorkflowChain chain) throws IOException, ServletException {
     // First, see if they hit a different button
     String uri = determineURI();
+    if (logger.isDebugEnabled()) {
+      logger.debug("METHOD: " + request.getMethod() + "; URI: " + uri);
+    }
     boolean executeResult = InternalParameters.is(request, InternalParameters.EXECUTE_RESULT);
     ActionInvocation invocation = actionMapper.map(httpMethod, uri, executeResult);
 

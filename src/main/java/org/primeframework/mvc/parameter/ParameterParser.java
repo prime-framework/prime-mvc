@@ -15,11 +15,12 @@
  */
 package org.primeframework.mvc.parameter;
 
+import org.primeframework.mvc.parameter.fileupload.FileInfo;
+
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.primeframework.mvc.parameter.fileupload.FileInfo;
 
 /**
  * This interface defines how parameters are retrieved from the request (usually) and separated into Required, Optional
@@ -53,6 +54,24 @@ public interface ParameterParser {
       public Struct(String[] values) {
         this.values = values;
       }
+
+      @Override
+      public String toString() {
+        return "Struct{" +
+            "attributes=" + attributes +
+            ", values=" + Arrays.toString(values) +
+            '}';
+      }
+    }
+
+    @Override
+    public String toString() {
+      return "Parameters{" +
+          "required=" + required +
+          ", optional=" + optional +
+          ", pre=" + pre +
+          ", files=" + files +
+          '}';
     }
   }
 }
