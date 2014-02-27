@@ -17,6 +17,7 @@ package org.primeframework.mvc.test;
 
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import org.primeframework.mock.servlet.MockHttpServletResponse;
 import org.primeframework.mock.servlet.MockHttpSession;
 import org.primeframework.mock.servlet.MockServletContext;
 import org.primeframework.mvc.guice.GuiceBootstrap;
@@ -50,6 +51,8 @@ public class RequestSimulator {
   public MockServletContext context;
   public MockHttpSession session;
   public Injector injector;
+  // the response of the last request, deprecated, Do Not use, only added for CS
+  public MockHttpServletResponse response;
 
   /**
    * Creates a new request simulator that can be used to simulate requests to a Prime application.
@@ -96,7 +99,21 @@ public class RequestSimulator {
    * @return The RequestBuilder.
    */
   public RequestBuilder test(String uri) {
-    return new RequestBuilder(uri, session, filter, injector);
+    // cache the response of the last request
+    RequestBuilder rb = new RequestBuilder(uri, session, filter, injector);
+    response = rb.response;
+    return rb;
+  }
+
+  /**
+   * Retrieves the instance of the given type from the Guice Injector.
+   * @deprecated   to allow cleanspeak to compile....
+   * @param type The type.
+   * @param <T>  The type.
+   * @return The instance.
+   */
+  public <T> T get(Class<T> type) {
+    return injector.getInstance(type);
   }
 
   /**
