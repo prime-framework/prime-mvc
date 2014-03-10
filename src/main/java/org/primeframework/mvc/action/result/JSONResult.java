@@ -23,6 +23,8 @@ import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.result.annotation.JSON;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration;
+import org.primeframework.mvc.message.*;
+import org.primeframework.mvc.message.scope.MessageScope;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 
 import javax.servlet.ServletException;
@@ -30,6 +32,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.*;
 
 /**
  * This result writes out Java objects to JSON using Jackson. The content type is set to 'application/json'.
@@ -39,14 +42,17 @@ import java.io.IOException;
 public class JSONResult extends AbstractResult<JSON> {
   private final ActionInvocationStore actionInvocationStore;
 
+  private final MessageStore messageStore;
+
   private final ObjectMapper objectMapper;
 
   private final HttpServletResponse response;
 
   @Inject
-  public JSONResult(ExpressionEvaluator expressionEvaluator, HttpServletResponse response,
-                    ActionInvocationStore actionInvocationStore, ObjectMapper objectMapper) {
+  public JSONResult(ExpressionEvaluator expressionEvaluator, ActionInvocationStore actionInvocationStore, MessageStore messageStore,
+                    ObjectMapper objectMapper, HttpServletResponse response) {
     super(expressionEvaluator);
+    this.messageStore = messageStore;
     this.response = response;
     this.actionInvocationStore = actionInvocationStore;
     this.objectMapper = objectMapper;
@@ -64,18 +70,26 @@ public class JSONResult extends AbstractResult<JSON> {
       throw new PrimeException("The action [" + action.getClass() + "] has no configuration. This should be impossible!");
     }
 
-    JacksonActionConfiguration jacksonActionConfiguration = (JacksonActionConfiguration) configuration.additionalConfiguration.get(JacksonActionConfiguration.class);
-    if (jacksonActionConfiguration == null || jacksonActionConfiguration.responseMember == null) {
-      throw new PrimeException("The action [" + action.getClass() + "] is missing a field annotated with @JSONResponse. This is used to figure out what to send back in the response.");
-    }
+    // If there are error messages, put them in a well known container and render that instead of looking for the
+    // @JSONResponse annotation
+    Object jacksonObject;
+    List<Message> messages = messageStore.get(MessageScope.REQUEST);
+    if (messages.size() > 0) {
+      jacksonObject = convertErrors(messages);
+    } else {
+      JacksonActionConfiguration jacksonActionConfiguration = (JacksonActionConfiguration) configuration.additionalConfiguration.get(JacksonActionConfiguration.class);
+      if (jacksonActionConfiguration == null || jacksonActionConfiguration.responseMember == null) {
+        throw new PrimeException("The action [" + action.getClass() + "] is missing a field annotated with @JSONResponse. This is used to figure out what to send back in the response.");
+      }
 
-    Object jacksonObject = expressionEvaluator.getValue(jacksonActionConfiguration.responseMember, action);
-    if (jacksonObject == null) {
-      throw new PrimeException("The @JSONResponse field [" + jacksonActionConfiguration.responseMember + "] in the action [" + action.getClass() + "] is null. It cannot be null!");
+      jacksonObject = expressionEvaluator.getValue(jacksonActionConfiguration.responseMember, action);
+      if (jacksonObject == null) {
+        throw new PrimeException("The @JSONResponse field [" + jacksonActionConfiguration.responseMember + "] in the action [" + action.getClass() + "] is null. It cannot be null!");
+      }
     }
 
     ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
-    objectMapper.writerWithType(jacksonObject.getClass()).writeValue(baos, jacksonObject);
+    objectMapper.writeValue(baos, jacksonObject);
 
     byte[] result = baos.toByteArray();
     response.setStatus(json.status());
@@ -87,4 +101,19 @@ public class JSONResult extends AbstractResult<JSON> {
     outputStream.write(result);
     outputStream.flush();
   }
+
+  private ErrorMessages convertErrors(List<Message> messages) {
+    ErrorMessages errorMessages = new ErrorMessages();
+    for (Message message : messages) {
+      if (message instanceof FieldMessage) {
+        FieldMessage fieldMessage = (FieldMessage) message;
+        errorMessages.addFieldError(fieldMessage.getField(), fieldMessage.getCode(), fieldMessage.toString());
+      } else {
+        errorMessages.generalErrors.add(new ErrorMessage(message.getCode(), message.toString()));
+      }
+    }
+
+    return errorMessages;
+  }
+
 }

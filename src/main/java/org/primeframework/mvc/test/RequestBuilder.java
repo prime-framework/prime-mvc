@@ -206,7 +206,7 @@ public class RequestBuilder {
   public RequestBuilder withJSON(Object object) throws JsonProcessingException {
     ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
     byte[] json = objectMapper.writeValueAsBytes(object);
-    return withBody(json);
+    return withContentType("application/json").withBody(json);
   }
 
   /**
