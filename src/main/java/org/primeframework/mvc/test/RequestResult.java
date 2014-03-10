@@ -20,12 +20,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Injector;
 import org.primeframework.mock.servlet.MockHttpServletRequest;
 import org.primeframework.mock.servlet.MockHttpServletResponse;
+import org.primeframework.mvc.message.FieldMessage;
 import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static java.util.Arrays.asList;
@@ -104,6 +106,35 @@ public class RequestResult {
    */
   public RequestResult assertContainsErrors(String... messages) {
     return assertContainsMessages(MessageType.ERROR, messages);
+  }
+
+  /**
+   * Verifies that the system has errors for the given fields. This doesn't assert the error itself, just that the field
+   * contains an error.
+   *
+   * @param fields The name of the fields.
+   * @return This.
+   */
+  public RequestResult assertContainsFieldErrors(String... fields) {
+    MessageStore messageStore = get(MessageStore.class);
+    Map<String, List<FieldMessage>> msgs = messageStore.getFieldMessages();
+    for (String field : fields) {
+      List<FieldMessage> fieldMessages = msgs.get(field);
+      if (fieldMessages == null) {
+        throw new AssertionError("The MessageStore does not contain a error for the field [" + field + "]");
+      }
+
+      boolean found = false;
+      for (FieldMessage fieldMessage : fieldMessages) {
+        found |= fieldMessage.getType() == MessageType.ERROR;
+      }
+
+      if (!found) {
+        throw new AssertionError("The MessageStore contains messages but no errors for the field [" + field + "]");
+      }
+    }
+
+    return this;
   }
 
   /**
@@ -192,7 +223,7 @@ public class RequestResult {
    */
   public RequestResult assertStatusCode(int statusCode) {
     if (this.statusCode != statusCode) {
-      throw new AssertionError("Status code [" + this.statusCode+ "] was not equal to [" + statusCode + "]");
+      throw new AssertionError("Status code [" + this.statusCode + "] was not equal to [" + statusCode + "]");
     }
 
     return this;
