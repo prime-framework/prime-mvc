@@ -57,11 +57,11 @@ public class RequestBuilder {
    * values for the HTTP parameter.
    *
    * @param name  The name of the parameter.
-   * @param value The parameter value.
+   * @param value The parameter value. This is an object so toString is called on it to convert it to a String.
    * @return This.
    */
-  public RequestBuilder withParameter(String name, String value) {
-    request.setParameter(name, value);
+  public RequestBuilder withParameter(String name, Object value) {
+    request.setParameter(name, value.toString());
     return this;
   }
 
