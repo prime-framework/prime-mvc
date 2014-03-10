@@ -15,6 +15,8 @@
  */
 package org.primeframework.mvc.test;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Injector;
 import org.primeframework.mock.servlet.MockHttpServletRequest;
 import org.primeframework.mock.servlet.MockHttpServletResponse;
@@ -148,6 +150,23 @@ public class RequestResult {
       throw new AssertionError("The MessageStore does not contain the [" + type + "] message " + asList(messages) + "");
     }
 
+    return this;
+  }
+
+  /**
+   * Verifies that the response body is equal to the JSON created from the given object. The object is marshalled using
+   * Jackson.
+   *
+   * @param object The object.
+   * @return This.
+   * @throws JsonProcessingException If the JSON marshalling failed.
+   */
+  public RequestResult assertJSON(Object object) throws JsonProcessingException {
+    ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
+    String json = objectMapper.writeValueAsString(object);
+    if (!body.equals(json)) {
+      throw new AssertionError("The body doesn't match the expected JSON output. Actual [" + body + "] expected [" + json + "]");
+    }
     return this;
   }
 

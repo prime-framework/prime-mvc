@@ -15,6 +15,8 @@
  */
 package org.primeframework.mvc.test;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Injector;
 import org.primeframework.mock.servlet.MockHttpServletRequest;
 import org.primeframework.mock.servlet.MockHttpServletRequest.Method;
@@ -192,6 +194,19 @@ public class RequestBuilder {
     request.setScheme("HTTPS");
     request.setServerPort(443);
     return this;
+  }
+
+  /**
+   * Uses the given object as the JSON body for the request. This object is converted into JSON using Jackson.
+   *
+   * @param object The object to send in the request.
+   * @return This.
+   * @throws JsonProcessingException If the Jackson marshalling failed.
+   */
+  public RequestBuilder withJSON(Object object) throws JsonProcessingException {
+    ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
+    byte[] json = objectMapper.writeValueAsBytes(object);
+    return withBody(json);
   }
 
   /**

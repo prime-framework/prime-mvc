@@ -1,0 +1,94 @@
+/*
+ * Copyright (c) 2014, Inversoft Inc., All Rights Reserved
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific
+ * language governing permissions and limitations under the License.
+ */
+project(group: "org.primeframework", name: "prime-mvc", version: "0.23", license: "Apachev2") {
+  workflow {
+    standard()
+  }
+
+  publications {
+    standard()
+  }
+
+  dependencies {
+    group(type: "provided") {
+      dependency(id: "javax.servlet:servlet-api:2.4.0")
+    }
+    group(type: "compile") {
+      dependency(id: "org.ow2.asm:asm:5.0.0-BETA")
+      dependency(id: "com.fasterxml.jackson.core:jackson-annotations:2.3.0")
+      dependency(id: "com.fasterxml.jackson.core:jackson-core:2.3.0")
+      dependency(id: "com.fasterxml.jackson.core:jackson-databind:2.3.0")
+      dependency(id: "com.fasterxml.jackson.datatype:jackson-datatype-joda:2.3.0")
+      dependency(id: "com.google.inject:guice:3.0.0")
+      dependency(id: "com.google.inject.extensions:guice-multibindings:3.0.0")
+      dependency(id: "commons-fileupload:commons-fileupload:1.2.1")
+      dependency(id: "commons-io:commons-io:1.4.0")
+      dependency(id: "javax.inject:javax.inject:1.0.0")
+      dependency(id: "joda-time:joda-time:2.1.0")
+      dependency(id: "org.apache.commons:commons-lang3:3.1.0")
+      dependency(id: "org.freemarker:freemarker:2.3.19")
+      dependency(id: "org.primeframework:prime-mock:0.2.0")
+      dependency(id: "org.slf4j:slf4j-api:1.6.6")
+    }
+    group(type: "test-compile") {
+      dependency(id: "org.easymock:easymock:3.1.0")
+      dependency(id: "org.testng:testng:6.8.7")
+    }
+  }
+}
+
+// Plugins
+dependency = loadPlugin(id: "org.savantbuild.plugin:dependency:0.1.1")
+java = loadPlugin(id: "org.savantbuild.plugin:java:0.1.2")
+javaTestNG = loadPlugin(id: "org.savantbuild.plugin:java-testng:0.1.2")
+idea = loadPlugin(id: "org.savantbuild.plugin:idea:0.1.1")
+release = loadPlugin(id: "org.savantbuild.plugin:release-git:0.1.1")
+
+// Plugin settings
+java.settings.javaVersion = "1.6"
+javaTestNG.settings.javaVersion = "1.6"
+
+target(name: "clean", description: "Cleans the project") {
+  java.clean()
+}
+
+target(name: "compile", description: "Compiles the project") {
+  java.compile()
+}
+
+target(name: "jar", description: "JARs the project", dependsOn: ["compile"]) {
+  java.jar()
+}
+
+target(name: "test", description: "Runs the project's tests", dependsOn: ["jar"]) {
+  javaTestNG.test()
+}
+
+target(name: "doc", description: "Generate the project's JavaDoc", dependsOn: ["jar"]) {
+  java.document()
+}
+
+target(name: "int", description: "Releases a local integration build of the project", dependsOn: ["test"]) {
+  dependency.integrate()
+}
+
+target(name: "release", description: "Releases a full version of the project", dependsOn: ["test"]) {
+  release.release()
+}
+
+target(name: "idea", description: "Updates the IntelliJ IDEA module file") {
+  idea.iml()
+}
