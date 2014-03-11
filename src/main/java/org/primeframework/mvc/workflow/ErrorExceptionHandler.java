@@ -15,6 +15,7 @@
  */
 package org.primeframework.mvc.workflow;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.ErrorException;
 import org.primeframework.mvc.action.result.ResultStore;
 import org.primeframework.mvc.config.MVCConfiguration;
@@ -23,8 +24,6 @@ import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleMessage;
 import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.message.l10n.MissingMessageException;
-
-import com.google.inject.Inject;
 
 /**
  * Handles {@link ErrorException} when thrown.  The handle method is called by the {@link ExceptionHandler}
@@ -53,14 +52,15 @@ public class ErrorExceptionHandler implements TypedExceptionHandler<ErrorExcepti
   @Override
   public void handle(ErrorException exception) {
 
-    // set the result code.  if null, grab from mvc configuration
+    // Set the result code.  if null, grab from mvc configuration
     String code = exception.resultCode != null ? exception.resultCode : configuration.exceptionResultCode();
     resultStore.set(code);
 
-    // get the message from the message provider.  key = name of the class
+    // Get the message from the message provider.  key = name of the class
     try {
       String messageCode = "[" + exception.getClass().getSimpleName() + "]";
-      String message = messageProvider.getMessage(messageCode, exception.args);
+      Object[] args = exception.args != null ? exception.args : new Object[]{exception.getMessage()};
+      String message = messageProvider.getMessage(messageCode, args);
       messageStore.add(new SimpleMessage(MessageType.ERROR, messageCode, message));
     } catch (MissingMessageException mme) {
       // Ignore because there isn't a message
