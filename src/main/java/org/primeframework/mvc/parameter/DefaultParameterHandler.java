@@ -25,6 +25,7 @@ import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.primeframework.mvc.message.l10n.MessageProvider;
+import org.primeframework.mvc.message.l10n.MissingMessageException;
 import org.primeframework.mvc.parameter.ParameterParser.Parameters;
 import org.primeframework.mvc.parameter.ParameterParser.Parameters.Struct;
 import org.primeframework.mvc.parameter.convert.ConversionException;
@@ -41,17 +42,18 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 /**
  * This class is the default parameter handler. It sets all of the parameters into the action in the following order
  * (while invoking the correct methods in the order):
- *
+ * <p/>
  * <ol>
- *   <li>Set pre-parameters</li>
- *   <li>Invoke pre-parameters methods</li>
- *   <li>Set optional parameters</li>
- *   <li>Set required parameters</li>
- *   <li>Set files</li>
- *   <li>Invoke post-parameter methods</li>
+ * <li>Set pre-parameters</li>
+ * <li>Invoke pre-parameters methods</li>
+ * <li>Set optional parameters</li>
+ * <li>Set required parameters</li>
+ * <li>Set files</li>
+ * <li>Invoke post-parameter methods</li>
  * </ol>
  *
  * @author Brian Pontarelli
@@ -113,8 +115,8 @@ public class DefaultParameterHandler implements ParameterHandler {
   /**
    * Sets the given values into the action.
    *
-   * @param values The value mapping.
-   * @param action The action.
+   * @param values                 The value mapping.
+   * @param action                 The action.
    * @param allowUnknownParameters Whether or not invalid parameters should throw an exception or just be ignored and
    *                               log a fine message.
    */
@@ -131,8 +133,12 @@ public class DefaultParameterHandler implements ParameterHandler {
         expressionEvaluator.setValue(key, action, struct.values, struct.attributes);
       } catch (ConversionException ce) {
         String code = "[couldNotConvert]" + key;
-        String message = messageProvider.getMessage(code, (Object[]) new ArrayBuilder<String>(String.class, key).addAll(struct.values).done());
-        messageStore.add(new SimpleFieldMessage(MessageType.ERROR, key, code, message));
+        try {
+          String message = messageProvider.getMessage(code, (Object[]) new ArrayBuilder<String>(String.class, key).addAll(struct.values).done());
+          messageStore.add(new SimpleFieldMessage(MessageType.ERROR, key, code, message));
+        } catch (MissingMessageException mme) {
+          messageStore.add(new SimpleFieldMessage(MessageType.ERROR, key, code, "Detailed message not found"));
+        }
       } catch (ExpressionException ee) {
         if (!allowUnknownParameters) {
           throw ee;
@@ -147,7 +153,7 @@ public class DefaultParameterHandler implements ParameterHandler {
    * Sets the files into the action.
    *
    * @param fileInfos The file info.
-   * @param action The action.
+   * @param action    The action.
    */
   protected void handleFiles(Map<String, List<FileInfo>> fileInfos, ActionConfiguration actionConfiguration, Object action) {
     long maxSize = configuration.fileUploadMaxSize();
@@ -165,7 +171,7 @@ public class DefaultParameterHandler implements ParameterHandler {
         if (fileUpload != null && fileUpload.maxSize() != -1) {
           maxSize = fileUpload.maxSize();
         }
-        
+
         long fileSize = info.file.length();
         if (fileSize > maxSize) {
           String code = "[fileUploadTooBig]" + key;

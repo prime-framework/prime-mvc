@@ -15,18 +15,14 @@
  */
 package org.primeframework.mvc.message.l10n;
 
-import java.util.Formatter;
-import java.util.LinkedList;
-import java.util.Locale;
-import java.util.MissingResourceException;
-import java.util.Queue;
-import java.util.ResourceBundle;
-import java.util.ResourceBundle.Control;
-
+import com.google.inject.Inject;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.google.inject.Inject;
+import java.util.*;
+import java.util.ResourceBundle.Control;
 
 /**
  * This implements the MessageProvider using ResourceBundles inside the web context. It also adds the additional step of
@@ -54,6 +50,8 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 public class ResourceBundleMessageProvider implements MessageProvider {
+  private final static Logger logger = LoggerFactory.getLogger(ResourceBundleMessageProvider.class);
+
   private final Locale locale;
   private final ResourceBundle.Control control;
   private final ActionInvocationStore invocationStore;
@@ -78,7 +76,7 @@ public class ResourceBundleMessageProvider implements MessageProvider {
    * Finds the message in a resource bundle using the search method described in the class comment.
    *
    * @param actionInvocation The action invocation.
-   * @param key    The key of the message.
+   * @param key              The key of the message.
    * @return The message or null if it doesn't exist.
    */
   protected String findMessage(ActionInvocation actionInvocation, String key) {
@@ -92,7 +90,7 @@ public class ResourceBundleMessageProvider implements MessageProvider {
         // Ignore and check the next bundle
       }
     }
-
+    logger.error("Message could not be found for the URI [" + uri + "] and key [" + key + "]");
     throw new MissingMessageException("Message could not be found for the URI [" + uri + "] and key [" + key + "]");
   }
 
