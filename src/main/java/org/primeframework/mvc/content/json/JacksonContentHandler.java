@@ -15,8 +15,12 @@
  */
 package org.primeframework.mvc.content.json;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import com.google.inject.Inject;
 import org.apache.commons.io.IOUtils;
 import org.primeframework.mvc.action.ActionInvocation;
@@ -25,6 +29,7 @@ import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.content.ContentHandler;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
+import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.primeframework.mvc.message.SimpleMessage;
 import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
@@ -33,6 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Uses the Jackson JSON processor to marshall JSON into Java objects and set them into the action.
@@ -91,6 +97,21 @@ public class JacksonContentHandler implements ContentHandler {
         else {
           jsonObject = objectMapper.reader(jacksonConfiguration.requestMemberType).readValue(request.getInputStream());
         }
+      } catch (InvalidFormatException e) {
+        logger.debug("Error parsing JSON request", e);
+        addFieldError(e);
+      } catch (UnrecognizedPropertyException e) {
+        logger.debug("Error parsing JSON request", e);
+        String field = buildField(e);
+        messageStore.add(new SimpleMessage(MessageType.ERROR, "[unrecognizedProperty]", messageProvider.getMessage("[unrecognizedProperty]", field, e.getMessage())));
+      } catch (JsonMappingException e) {
+        logger.debug("Error parsing JSON request", e);
+
+        if (!(e.getCause() instanceof JsonParseException)) {
+          addFieldError(e);
+        } else {
+          messageStore.add(new SimpleMessage(MessageType.ERROR, "[couldNotParseJSON]", messageProvider.getMessage("[couldNotParseJSON]", e.getMessage())));
+        }
       } catch (JsonProcessingException e) {
         logger.debug("Error parsing JSON request", e);
         messageStore.add(new SimpleMessage(MessageType.ERROR, "[couldNotParseJSON]", messageProvider.getMessage("[couldNotParseJSON]", e.getMessage())));
@@ -98,5 +119,31 @@ public class JacksonContentHandler implements ContentHandler {
 
       expressionEvaluator.setValue(jacksonConfiguration.requestMember, action, jsonObject);
     }
+  }
+
+  /**
+   * Adds a field error using the information stored in the JsonMappingException.
+   *
+   * @param e The exception.
+   */
+  private void addFieldError(JsonMappingException e) {
+    // Build the path so we can make the error
+    String field = buildField(e);
+    String code = "[couldNotConvert]" + field;
+
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, field, code, messageProvider.getMessage(code, e.getMessage())));
+  }
+
+  private String buildField(JsonMappingException e) {
+    StringBuilder fieldBuilder = new StringBuilder();
+    List<JsonMappingException.Reference> references = e.getPath();
+    for (JsonMappingException.Reference reference : references) {
+      if (fieldBuilder.length() > 0) {
+        fieldBuilder.append(".");
+      }
+      fieldBuilder.append(reference.getFieldName());
+    }
+
+    return fieldBuilder.toString();
   }
 }

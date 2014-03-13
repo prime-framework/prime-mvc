@@ -27,6 +27,7 @@ import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
+import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.primeframework.mvc.message.SimpleMessage;
 import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
@@ -37,9 +38,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.easymock.EasyMock.*;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNull;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.*;
 
 /**
  * Tests the jackson configurator test.
@@ -137,46 +136,122 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
     replay(store);
 
     String expected = "{" +
-        "  \"bad-active\":true," +
-        "  \"bad-addresses\":{" +
-        "    \"home\":{" +
-        "      \"city\":\"Broomfield\"," +
-        "      \"state\":\"Colorado\"," +
-        "      \"zipcode\":\"80023\"" +
-        "    }," +
-        "    \"work\":{" +
-        "      \"city\":\"Denver\"," +
-        "      \"state\":\"Colorado\"," +
-        "      \"zipcode\":\"80202\"" +
-        "    }" +
-        "  }," +
-        "  \"bad-age\":37," +
-        "  \"bad-favoriteMonth\":5," +
-        "  \"bad-favoriteYear\":1976," +
-        "  \"bad-ids\":{" +
-        "    \"0\":1," +
-        "    \"1\":2" +
-        "  }," +
-        "  \"bad-lifeStory\":\"Hello world\"," +
-        "  \"bad-securityQuestions\":[\"one\",\"two\",\"three\",\"four\"]," +
-        "  \"bad-siblings\":[{" +
-        "    \"active\":false," +
-        "    \"name\":\"Brett\"" +
-        "  },{" +
-        "    \"active\":false," +
-        "    \"name\":\"Beth\"" +
-        "  }]," +
-        "  \"bad-type\":\"COOL\"" +
+        "  \"bad-active\":true" +
         "}";
 
     request.setInputStream(new MockServletInputStream(expected.getBytes()));
 
     MessageProvider messageProvider = createStrictMock(MessageProvider.class);
-    expect(messageProvider.getMessage(eq("[couldNotParseJSON]"), isA(String.class))).andReturn("foo");
+    expect(messageProvider.getMessage(eq("[unrecognizedProperty]"), eq("bad-active"), isA(String.class))).andReturn("foo");
     replay(messageProvider);
 
     MessageStore messageStore = createStrictMock(MessageStore.class);
-    messageStore.add(new SimpleMessage(MessageType.ERROR, "[couldNotParseJSON]", "foo"));
+    messageStore.add(new SimpleMessage(MessageType.ERROR, "[unrecognizedProperty]", "foo"));
+    replay(messageStore);
+
+    JacksonContentHandler handler = new JacksonContentHandler(request, store, new ObjectMapper(), expressionEvaluator, messageProvider, messageStore);
+    handler.handle();
+
+    assertNull(action.jsonRequest);
+
+    verify(store, messageProvider, messageStore);
+  }
+
+  @Test
+  public void handleBadRoot() throws IOException {
+    Map<Class<?>, Object> additionalConfig = new HashMap<Class<?>, Object>();
+    additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration("jsonRequest", UserField.class, null));
+
+    KitchenSink action = new KitchenSink(null);
+    ActionConfiguration config = new ActionConfiguration(KitchenSink.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null);
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(new ActionInvocation(action, null, "/action", null, config));
+    replay(store);
+
+    String expected = "{" +
+        "  \"active\":\"bad\"" +
+        "}";
+
+    request.setInputStream(new MockServletInputStream(expected.getBytes()));
+
+    MessageProvider messageProvider = createStrictMock(MessageProvider.class);
+    expect(messageProvider.getMessage(eq("[couldNotConvert]active"), isA(String.class))).andReturn("Bad active");
+    replay(messageProvider);
+
+    MessageStore messageStore = createStrictMock(MessageStore.class);
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "active", "[couldNotConvert]active", "Bad active"));
+    replay(messageStore);
+
+    JacksonContentHandler handler = new JacksonContentHandler(request, store, new ObjectMapper(), expressionEvaluator, messageProvider, messageStore);
+    handler.handle();
+
+    assertNull(action.jsonRequest);
+
+    verify(store, messageProvider, messageStore);
+  }
+
+  @Test
+  public void handleBadInMap() throws IOException {
+    Map<Class<?>, Object> additionalConfig = new HashMap<Class<?>, Object>();
+    additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration("jsonRequest", UserField.class, null));
+
+    KitchenSink action = new KitchenSink(null);
+    ActionConfiguration config = new ActionConfiguration(KitchenSink.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null);
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(new ActionInvocation(action, null, "/action", null, config));
+    replay(store);
+
+    String expected = "{" +
+        "  \"addresses\":{" +
+        "    \"home\":{" +
+        "      \"age\":\"old\"" +
+        "    }" +
+        "  }" +
+        "}";
+
+    request.setInputStream(new MockServletInputStream(expected.getBytes()));
+
+    MessageProvider messageProvider = createNiceMock(MessageProvider.class);
+    expect(messageProvider.getMessage(eq("[couldNotConvert]addresses.age"), isA(String.class))).andReturn("Bad age");
+    replay(messageProvider);
+
+    MessageStore messageStore = createNiceMock(MessageStore.class);
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "addresses.age", "[couldNotConvert]addresses.age", "Bad age"));
+    replay(messageStore);
+
+    JacksonContentHandler handler = new JacksonContentHandler(request, store, new ObjectMapper(), expressionEvaluator, messageProvider, messageStore);
+    handler.handle();
+
+    assertNull(action.jsonRequest);
+
+    verify(store, messageProvider, messageStore);
+  }
+
+  @Test
+  public void handleBadInArray() throws IOException {
+    Map<Class<?>, Object> additionalConfig = new HashMap<Class<?>, Object>();
+    additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration("jsonRequest", UserField.class, null));
+
+    KitchenSink action = new KitchenSink(null);
+    ActionConfiguration config = new ActionConfiguration(KitchenSink.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null);
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(new ActionInvocation(action, null, "/action", null, config));
+    replay(store);
+
+    String expected = "{" +
+        "  \"siblings\":[{" +
+        "    \"age\":\"old\"" +
+        "  }]" +
+        "}";
+
+    request.setInputStream(new MockServletInputStream(expected.getBytes()));
+
+    MessageProvider messageProvider = createStrictMock(MessageProvider.class);
+    expect(messageProvider.getMessage(eq("[couldNotConvert]siblings.age"), isA(String.class))).andReturn("Bad sibling age");
+    replay(messageProvider);
+
+    MessageStore messageStore = createStrictMock(MessageStore.class);
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "siblings.age", "[couldNotConvert]siblings.age", "Bad sibling age"));
     replay(messageStore);
 
     JacksonContentHandler handler = new JacksonContentHandler(request, store, new ObjectMapper(), expressionEvaluator, messageProvider, messageStore);

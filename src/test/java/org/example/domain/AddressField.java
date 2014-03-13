@@ -25,4 +25,5 @@ public class AddressField {
   public String city;
   public String state;
   public String zipcode;
+  public int age;
 }

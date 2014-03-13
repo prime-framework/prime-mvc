@@ -196,7 +196,7 @@ public class RequestResult {
     ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
     String json = objectMapper.writeValueAsString(object);
     if (!body.equals(json)) {
-      throw new AssertionError("The body doesn't match the expected JSON output. Actual [" + body + "] expected [" + json + "]");
+      throw new AssertionError("The body doesn't match the expected JSON output. expected [" + json + "] but found [" + body + "]");
     }
     return this;
   }

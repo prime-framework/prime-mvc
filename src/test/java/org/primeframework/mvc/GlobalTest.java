@@ -77,11 +77,13 @@ public class GlobalTest extends PrimeBaseTest {
         "  \"active\":true," +
         "  \"addresses\":{" +
         "    \"home\":{" +
+        "      \"age\":100," +
         "      \"city\":\"Broomfield\"," +
         "      \"state\":\"Colorado\"," +
         "      \"zipcode\":\"80023\"" +
         "    }," +
         "    \"work\":{" +
+        "      \"age\":100," +
         "      \"city\":\"Denver\"," +
         "      \"state\":\"Colorado\"," +
         "      \"zipcode\":\"80202\"" +

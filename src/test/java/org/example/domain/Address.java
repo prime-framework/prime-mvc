@@ -26,6 +26,7 @@ public class Address {
   private String state;
   private String zipcode;
   private String country;
+  private int age;
 
   public String getStreet() {
     return street;
@@ -65,5 +66,13 @@ public class Address {
 
   public void setCountry(String country) {
     this.country = country;
+  }
+
+  public int getAge() {
+    return age;
+  }
+
+  public void setAge(int age) {
+    this.age = age;
   }
 }

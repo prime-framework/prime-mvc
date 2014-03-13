@@ -47,10 +47,12 @@ public class JSONResultTest extends PrimeBaseTest {
   public void all() throws IOException, ServletException {
     UserField userField = new UserField();
     userField.addresses.put("work", new AddressField());
+    userField.addresses.get("work").age = 100;
     userField.addresses.get("work").city = "Denver";
     userField.addresses.get("work").state = "Colorado";
     userField.addresses.get("work").zipcode = "80202";
     userField.addresses.put("home", new AddressField());
+    userField.addresses.get("home").age = 100;
     userField.addresses.get("home").city = "Broomfield";
     userField.addresses.get("home").state = "Colorado";
     userField.addresses.get("home").zipcode = "80023";
@@ -77,7 +79,7 @@ public class JSONResultTest extends PrimeBaseTest {
     response.setStatus(200);
     response.setCharacterEncoding("UTF-8");
     response.setContentType("application/json");
-    response.setContentLength(406);
+    response.setContentLength(426);
     expect(response.getOutputStream()).andReturn(sos);
     replay(response);
 
@@ -100,11 +102,13 @@ public class JSONResultTest extends PrimeBaseTest {
         "  \"active\":true," +
         "  \"addresses\":{" +
         "    \"home\":{" +
+        "      \"age\":100," +
         "      \"city\":\"Broomfield\"," +
         "      \"state\":\"Colorado\"," +
         "      \"zipcode\":\"80023\"" +
         "    }," +
         "    \"work\":{" +
+        "      \"age\":100," +
         "      \"city\":\"Denver\"," +
         "      \"state\":\"Colorado\"," +
         "      \"zipcode\":\"80202\"" +

@@ -137,7 +137,7 @@ public class DefaultParameterHandler implements ParameterHandler {
           String message = messageProvider.getMessage(code, (Object[]) new ArrayBuilder<String>(String.class, key).addAll(struct.values).done());
           messageStore.add(new SimpleFieldMessage(MessageType.ERROR, key, code, message));
         } catch (MissingMessageException mme) {
-          messageStore.add(new SimpleFieldMessage(MessageType.ERROR, key, code, "Detailed message not found"));
+          messageStore.add(new SimpleFieldMessage(MessageType.ERROR, key, code, ce.getMessage()));
         }
       } catch (ExpressionException ee) {
         if (!allowUnknownParameters) {
