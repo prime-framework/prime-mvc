@@ -33,6 +33,7 @@ import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.primeframework.mvc.message.SimpleMessage;
 import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
+import org.primeframework.mvc.validation.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,23 +88,26 @@ public class JacksonContentHandler implements ContentHandler {
     // Process JSON and set into the object
     JacksonActionConfiguration jacksonConfiguration = (JacksonActionConfiguration) config.additionalConfiguration.get(JacksonActionConfiguration.class);
     if (jacksonConfiguration.requestMember != null) {
-      Object jsonObject = null;
       try {
-        if(logger.isDebugEnabled()) {
+        Object jsonObject;
+        if (logger.isDebugEnabled()) {
           final String req = IOUtils.toString(request.getInputStream(), "UTF-8");
           logger.debug("Request: (" + request.getMethod() + " " + request.getRequestURI() + ") " + req);
           jsonObject = objectMapper.reader(jacksonConfiguration.requestMemberType).readValue(req);
-        }
-        else {
+        } else {
           jsonObject = objectMapper.reader(jacksonConfiguration.requestMemberType).readValue(request.getInputStream());
         }
+
+        expressionEvaluator.setValue(jacksonConfiguration.requestMember, action, jsonObject);
       } catch (InvalidFormatException e) {
         logger.debug("Error parsing JSON request", e);
         addFieldError(e);
+        throw new ValidationException(e);
       } catch (UnrecognizedPropertyException e) {
         logger.debug("Error parsing JSON request", e);
         String field = buildField(e);
         messageStore.add(new SimpleMessage(MessageType.ERROR, "[unrecognizedProperty]", messageProvider.getMessage("[unrecognizedProperty]", field, e.getMessage())));
+        throw new ValidationException(e);
       } catch (JsonMappingException e) {
         logger.debug("Error parsing JSON request", e);
 
@@ -112,12 +116,12 @@ public class JacksonContentHandler implements ContentHandler {
         } else {
           messageStore.add(new SimpleMessage(MessageType.ERROR, "[couldNotParseJSON]", messageProvider.getMessage("[couldNotParseJSON]", e.getMessage())));
         }
+        throw new ValidationException(e);
       } catch (JsonProcessingException e) {
         logger.debug("Error parsing JSON request", e);
         messageStore.add(new SimpleMessage(MessageType.ERROR, "[couldNotParseJSON]", messageProvider.getMessage("[couldNotParseJSON]", e.getMessage())));
+        throw new ValidationException(e);
       }
-
-      expressionEvaluator.setValue(jacksonConfiguration.requestMember, action, jsonObject);
     }
   }
 

@@ -26,4 +26,8 @@ public class ValidationException extends ErrorException {
   public ValidationException() {
     super("input");
   }
+
+  public ValidationException(Throwable cause, Object... args) {
+    super("input", cause, args);
+  }
 }
