@@ -16,6 +16,7 @@
 package org.example.action;
 
 import org.primeframework.mvc.action.annotation.Action;
+import org.primeframework.mvc.parameter.annotation.PostParameterMethod;
 
 /**
  * This is a simple test action.
@@ -29,5 +30,15 @@ public class ExtensionInheritance extends Extension {
   public String post() {
     invoked = true;
     return "child";
+  }
+
+  @PostParameterMethod
+  public void method2() {
+
+  }
+
+  @PostParameterMethod
+  public void method3() {
+
   }
 }

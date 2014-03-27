@@ -23,19 +23,8 @@ import org.primeframework.mvc.parameter.el.UpdateExpressionException;
 
 import java.beans.Introspector;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.WeakHashMap;
+import java.lang.reflect.*;
+import java.util.*;
 
 /**
  * Provides support for reflection, bean properties and field access.
@@ -289,17 +278,42 @@ public class ReflectionUtils {
   }
 
   /**
-   * Loads and caches the methods of the given Class.
+   * Loads and caches the methods of the given Class in an order array. The order of this array is that methods defined
+   * in superclasses are in the array first, followed by methods in the given type. The deeper the superclass, the
+   * earlier the methods are in the array.
    *
    * @param type The class.
    * @return The methods.
    */
-  public static Method[] findMethods(Class<?> type) {
+  public static Method[] findMethods(final Class<?> type) {
     synchronized (methods) {
       Method[] array = methods.get(type);
       if (array == null) {
         array = type.getMethods();
         methods.put(type, array);
+
+        Arrays.sort(array, new Comparator<Method>() {
+          @Override
+          public int compare(Method method1, Method method2) {
+            int depth1 = depth(method1, type);
+            int depth2 = depth(method2, type);
+            if (depth1 == depth2) {
+              return method1.getName().compareTo(method2.getName());
+            }
+
+            return depth2 - depth1;
+          }
+
+          public int depth(Method method, Class<?> type) {
+            int depth = 0;
+            Class<?> declaringType = method.getDeclaringClass();
+            while (declaringType != type && type != null) {
+              type = type.getSuperclass();
+              depth++;
+            }
+            return depth;
+          }
+        });
       }
       return array;
     }

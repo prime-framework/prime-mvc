@@ -15,6 +15,8 @@
  */
 package org.example.action;
 
+import org.primeframework.mvc.parameter.annotation.PostParameterMethod;
+
 /**
  * This is a simple test action.
  *
@@ -27,5 +29,15 @@ public abstract class Extension {
   public String get() {
     baseInvoked = true;
     return "parent";
+  }
+
+  @PostParameterMethod
+  public void method() {
+
+  }
+
+  @PostParameterMethod
+  public void method1() {
+
   }
 }

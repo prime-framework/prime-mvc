@@ -31,6 +31,7 @@ import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.primeframework.mvc.message.SimpleMessage;
 import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
+import org.primeframework.mvc.validation.ValidationException;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -150,7 +151,12 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
     replay(messageStore);
 
     JacksonContentHandler handler = new JacksonContentHandler(request, store, new ObjectMapper(), expressionEvaluator, messageProvider, messageStore);
-    handler.handle();
+    try {
+      handler.handle();
+      fail("Should have thrown");
+    } catch (ValidationException e) {
+      // Expected
+    }
 
     assertNull(action.jsonRequest);
 
@@ -183,7 +189,12 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
     replay(messageStore);
 
     JacksonContentHandler handler = new JacksonContentHandler(request, store, new ObjectMapper(), expressionEvaluator, messageProvider, messageStore);
-    handler.handle();
+    try {
+      handler.handle();
+      fail("Should have thrown");
+    } catch (ValidationException e) {
+      // Expected
+    }
 
     assertNull(action.jsonRequest);
 
@@ -220,7 +231,12 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
     replay(messageStore);
 
     JacksonContentHandler handler = new JacksonContentHandler(request, store, new ObjectMapper(), expressionEvaluator, messageProvider, messageStore);
-    handler.handle();
+    try {
+      handler.handle();
+      fail("Should have thrown");
+    } catch (ValidationException e) {
+      // Expected
+    }
 
     assertNull(action.jsonRequest);
 
@@ -255,7 +271,12 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
     replay(messageStore);
 
     JacksonContentHandler handler = new JacksonContentHandler(request, store, new ObjectMapper(), expressionEvaluator, messageProvider, messageStore);
-    handler.handle();
+    try {
+      handler.handle();
+      fail("Should have thrown");
+    } catch (ValidationException e) {
+      // Expected
+    }
 
     assertNull(action.jsonRequest);
 
