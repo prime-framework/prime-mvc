@@ -27,6 +27,7 @@ import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.content.guice.ContentHandlerFactory;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration;
 import org.primeframework.mvc.workflow.WorkflowChain;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import javax.servlet.ServletException;
@@ -48,6 +49,15 @@ import static org.testng.Assert.assertTrue;
 public class DefaultContentWorkflowTest extends PrimeBaseTest {
   @Inject public ActionInvocationStore store;
 
+  @DataProvider(name = "contentTypes")
+  public Object[][] contentTypes() {
+    return new Object[][] {
+        {"application/json"},
+        {"application/json; charset=UTF-8"},
+        {"application/json; charset=utf-8"}
+    };
+  }
+
   @Test
   public void missing() throws IOException, ServletException {
     request.setContentType("application/missing");
@@ -61,8 +71,8 @@ public class DefaultContentWorkflowTest extends PrimeBaseTest {
     verify(chain);
   }
 
-  @Test
-  public void callJSON() throws IOException, ServletException {
+  @Test(dataProvider = "contentTypes")
+  public void callJSON(String contentType) throws IOException, ServletException {
     String expected = "{" +
         "  \"active\":true," +
         "  \"addresses\":{" +
@@ -97,7 +107,7 @@ public class DefaultContentWorkflowTest extends PrimeBaseTest {
         "}";
 
     request.setInputStream(new MockServletInputStream(expected.getBytes()));
-    request.setContentType("application/json");
+    request.setContentType(contentType);
 
     Map<Class<?>, Object> additionalConfig = new HashMap<Class<?>, Object>();
     additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration("jsonRequest", UserField.class, null));
