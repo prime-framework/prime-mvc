@@ -1,6 +1,6 @@
 // Project info
 group = "org.primeframework"
-version = "0.25"
+version = "0.26"
 description = "Prime MVC Framework"
 
 // Plugins
@@ -39,13 +39,13 @@ dependencies {
       "javax.servlet:servlet-api:2.4"
   )
   compile(
-      "org.ow2.asm:asm:5.0_BETA",
+      "org.ow2.asm:asm:5.0",
       "com.fasterxml.jackson.core:jackson-annotations:2.3.0",
       "com.fasterxml.jackson.core:jackson-core:2.3.0",
       "com.fasterxml.jackson.core:jackson-databind:2.3.0",
       "com.fasterxml.jackson.datatype:jackson-datatype-joda:2.3.0",
-      "com.google.inject:guice:3.0",
-      "com.google.inject.extensions:guice-multibindings:3.0",
+      "com.google.inject:guice:4.0-beta4",
+      "com.google.inject.extensions:guice-multibindings:4.0-beta4",
       "commons-fileupload:commons-fileupload:1.2.1",
       "commons-io:commons-io:1.4",
       "javax.inject:javax.inject:1",
