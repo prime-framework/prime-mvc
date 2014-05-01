@@ -16,15 +16,15 @@
 package org.primeframework.mvc.guice;
 
 import java.io.Closeable;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import com.google.inject.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Key;
-import com.google.inject.Module;
 
 /**
  * This class bootstraps Guice.
@@ -48,18 +48,29 @@ public class GuiceBootstrap {
   }
 
   /**
-   * Shuts down the Guice injector by locating all of the {@link Closeable} classes and calling Close on each of them.
+   * Shuts down the Guice injector by locating all of the {@link Closeable} singletons classes and calling Close on each
+   * of them.
    *
    * @param injector The Injector to shutdown.
    */
   public static void shutdown(Injector injector) {
-    List<Key<? extends Closeable>> keys = GuiceTools.getKeys(injector, Closeable.class);
-    for (Key<? extends Closeable> key : keys) {
-      Closeable closable = injector.getInstance(key);
-      try {
-        closable.close();
-      } catch (Throwable t) {
-        logger.error("Unable to shutdown Closeable [" + key + "]", t);
+    Map<Key<?>, Binding<?>> bindings = injector.getBindings();
+    for (Key<?> key : bindings.keySet()) {
+      Type type = key.getTypeLiteral().getType();
+      if (type instanceof ParameterizedType) {
+        type = ((ParameterizedType) type).getRawType();
+      }
+
+      if (type instanceof Class) {
+        Class<?> bindingType = (Class<?>) type;
+        if (Closeable.class.isAssignableFrom(bindingType) && Scopes.isSingleton(bindings.get(key))) {
+          Closeable closable = (Closeable) injector.getInstance(key);
+          try {
+            closable.close();
+          } catch (Throwable t) {
+            logger.error("Unable to shutdown Closeable [" + key + "]", t);
+          }
+        }
       }
     }
   }
