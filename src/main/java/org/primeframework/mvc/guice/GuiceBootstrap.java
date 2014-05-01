@@ -68,7 +68,7 @@ public class GuiceBootstrap {
           try {
             closable.close();
           } catch (Throwable t) {
-            logger.error("Unable to shutdown Closeable [" + key + "]", t);
+            logger.error("Unable to shutdown Closeable [" + key + "]");
           }
         }
       }
