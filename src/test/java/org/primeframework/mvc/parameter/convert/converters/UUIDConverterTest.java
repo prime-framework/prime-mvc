@@ -22,9 +22,7 @@ import org.testng.annotations.Test;
 
 import java.util.UUID;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNull;
-import static org.testng.Assert.fail;
+import static org.testng.Assert.*;
 
 /**
  * This tests the locale converter.
@@ -48,11 +46,9 @@ public class UUIDConverterTest {
     try {
       converter.convertFromStrings(UUID.class, null, "testExpr", "NotAUUID");
       fail("Should throw an exception");
-    }
-    catch(ConversionException ce) {
-
-    }
-    catch(Throwable t) {
+    } catch(ConversionException ce) {
+      // Expected and therefore we ignore it
+    } catch(Throwable t) {
       fail("Should have thrown a ConversionException");
     }
   }

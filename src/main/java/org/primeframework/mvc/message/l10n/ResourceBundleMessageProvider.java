@@ -90,9 +90,11 @@ public class ResourceBundleMessageProvider implements MessageProvider {
         // Ignore and check the next bundle
       }
     }
-    if (!"ValidationException".equals(key)) {
+
+    if (!"[ValidationException]".equals(key)) {
       logger.warn("Message could not be found for the URI [" + uri + "] and key [" + key + "]");
     }
+
     throw new MissingMessageException("Message could not be found for the URI [" + uri + "] and key [" + key + "]");
   }
 

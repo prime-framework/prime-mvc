@@ -42,28 +42,27 @@ public class UUIDConverter extends AbstractGlobalConverter {
   }
 
   protected Object stringToObject(String value, Type convertTo, Map<String, String> attributes, String expression)
-    throws ConversionException, ConverterStateException {
+      throws ConversionException, ConverterStateException {
     if (emptyIsNull && StringUtils.isBlank(value)) {
       return null;
     }
 
     try {
-    return UUID.fromString(value);
-    }
-    catch (IllegalArgumentException iae) {
+      return UUID.fromString(value);
+    } catch (IllegalArgumentException iae) {
       throw new ConversionException();
     }
   }
 
   protected Object stringsToObject(String[] values, Type convertTo, Map<String, String> attributes, String expression)
-    throws ConversionException, ConverterStateException {
+      throws ConversionException, ConverterStateException {
     throw new UnsupportedOperationException("You are attempting to map a form field that contains " +
-      "multiple parameters to a property on the action class that is of type UUID. This isn't " +
-      "allowed.");
+        "multiple parameters to a property on the action class that is of type UUID. This isn't " +
+        "allowed.");
   }
 
   protected String objectToString(Object value, Type convertFrom, Map<String, String> attributes, String expression)
-    throws ConversionException, ConverterStateException {
+      throws ConversionException, ConverterStateException {
     return value.toString();
   }
 }
