@@ -15,19 +15,18 @@
  */
 package org.primeframework.mvc.action.config;
 
-import javax.servlet.ServletContext;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.inject.Inject;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.util.ClassClasspathResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.inject.Inject;
+import javax.servlet.ServletContext;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This class loads the configuration by scanning the classpath for packages and action classes.
@@ -54,6 +53,14 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
 
     Map<String, ActionConfiguration> actionConfigurations = new HashMap<String, ActionConfiguration>();
     for (Class<?> actionClass : actionClassses) {
+      // Only accept classes loaded by the ClassLoader for Prime. This prevents classes loaded by parent loader from
+      // being included as available Actions. One situation that this can occur: A jar with Actions (Prime) is in the classpath
+      // of a Java program, and that program starts up an embedded web server that includes prime-mvc. When the embedded web server
+      // initializes prime-mvc it will locate the actions in the jar outside the war file.
+      if (!Action.class.getClassLoader().equals(actionClass.getClassLoader())) {
+        continue;
+      }
+      
       ActionConfiguration actionConfiguration = builder.build(actionClass);
       String uri = actionConfiguration.uri;
 
