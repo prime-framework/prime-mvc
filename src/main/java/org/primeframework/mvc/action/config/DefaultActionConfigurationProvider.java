@@ -57,10 +57,10 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
       // being included as available Actions. One situation that this can occur: A jar with Actions (Prime) is in the classpath
       // of a Java program, and that program starts up an embedded web server that includes prime-mvc. When the embedded web server
       // initializes prime-mvc it will locate the actions in the jar outside the war file.
-      if (!Action.class.getClassLoader().equals(actionClass.getClassLoader())) {
+      if ( ! inClassLoaderOrParentClassLoader(Action.class.getClassLoader(), actionClass)) {
         continue;
       }
-      
+
       ActionConfiguration actionConfiguration = builder.build(actionClass);
       String uri = actionConfiguration.uri;
 
@@ -98,5 +98,23 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
     }
 
     return configuration.get(uri);
+  }
+
+  /**
+   * Return true if the {@code actionClass} is loaded by {@code classLoader} or one of it's descendant {@link ClassLoader}
+   *
+   * @param classLoader the ClassLoader
+   * @param actionClass the Class to test
+   * @return true if actionClass was loaded by classLoader or one one of its children
+   */
+  private boolean inClassLoaderOrParentClassLoader(ClassLoader classLoader, Class<?> actionClass) {
+    ClassLoader actionClassClassLoader = actionClass.getClassLoader();
+    while (actionClassClassLoader != null) {
+      if (classLoader.equals(actionClassClassLoader)) {
+        return true;
+      }
+      actionClassClassLoader = actionClassClassLoader.getParent();
+    }
+    return false;
   }
 }
