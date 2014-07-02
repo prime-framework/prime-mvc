@@ -15,11 +15,12 @@
  */
 package org.primeframework.mvc.parameter.convert.converters;
 
-import java.util.Locale;
-
 import org.apache.commons.lang3.ArrayUtils;
+import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
 import org.testng.annotations.Test;
+
+import java.util.Locale;
 
 import static org.testng.Assert.*;
 
@@ -55,6 +56,17 @@ public class LocaleConverterTest {
     assertEquals(locale.getLanguage(), "en");
     assertEquals(locale.getCountry(), "US");
     assertEquals(locale.getVariant(), "UTF8");
+  }
+
+  @Test
+  public void errorFromStrings() {
+    GlobalConverter converter = new LocaleConverter();
+    try {
+      converter.convertFromStrings(Locale.class, null, "testExpr", ArrayUtils.toArray("enabc"));
+      fail("Should have thrown a ConversionException");
+    } catch (ConversionException e) {
+      // Expected
+    }
   }
 
   @Test
