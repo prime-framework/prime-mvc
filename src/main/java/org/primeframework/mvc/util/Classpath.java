@@ -15,6 +15,8 @@
  */
 package org.primeframework.mvc.util;
 
+import org.primeframework.mvc.PrimeException;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -22,16 +24,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 
-import org.primeframework.mvc.PrimeException;
-
-import static java.util.Collections.*;
+import static java.util.Collections.list;
 
 /**
  * This class models a ClassPath that contains a list of files that are directories or JAR/ZIP files in the path.
@@ -240,7 +236,7 @@ public class Classpath {
      * @throws IOException If the classloader throws an exception.
      */
     public Classpath build() throws IOException {
-      List<String> list = new ArrayList<String>();
+      Set<String> list = new HashSet<String>();
       List<URL> urls = list(classLoader.getResources("META-INF"));
 
       for (URL url : urls) {
@@ -259,7 +255,14 @@ public class Classpath {
         }
       }
 
-      return new Classpath(list);
+      String[] parts = System.getProperty("java.class.path").split(File.pathSeparator);
+      for (String part : parts) {
+        if (part != null && !exclude(part)) {
+          list.add(part);
+        }
+      }
+
+      return new Classpath(new ArrayList<String>(list));
     }
 
     private String clean(String externalForm) throws UnsupportedEncodingException {

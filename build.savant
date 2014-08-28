@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-project(group: "org.primeframework", name: "prime-mvc", version: "0.23", license: "Apachev2") {
+project(group: "org.primeframework", name: "prime-mvc", version: "0.31", license: "Apachev2") {
   workflow {
     standard()
   }
@@ -27,35 +27,36 @@ project(group: "org.primeframework", name: "prime-mvc", version: "0.23", license
       dependency(id: "javax.servlet:servlet-api:2.4.0")
     }
     group(type: "compile") {
-      dependency(id: "org.ow2.asm:asm:5.0.0-BETA")
+      dependency(id: "org.ow2.asm:asm:5.0.3")
       dependency(id: "com.fasterxml.jackson.core:jackson-annotations:2.3.0")
       dependency(id: "com.fasterxml.jackson.core:jackson-core:2.3.0")
       dependency(id: "com.fasterxml.jackson.core:jackson-databind:2.3.0")
       dependency(id: "com.fasterxml.jackson.datatype:jackson-datatype-joda:2.3.0")
-      dependency(id: "com.google.inject:guice:3.0.0")
-      dependency(id: "com.google.inject.extensions:guice-multibindings:3.0.0")
-      dependency(id: "commons-fileupload:commons-fileupload:1.2.1")
-      dependency(id: "commons-io:commons-io:1.4.0")
+      dependency(id: "com.google.inject:guice:4.0.0-beta.4")
+      dependency(id: "com.google.inject.extensions:guice-multibindings:4.0-beta.4")
       dependency(id: "javax.inject:javax.inject:1.0.0")
-      dependency(id: "joda-time:joda-time:2.1.0")
+      dependency(id: "org.joda:joda-time:2.1.0")
+      dependency(id: "org.apache.commons:commons-fileupload:1.2.1")
+      dependency(id: "org.apache.commons:commons-io:1.4.0")
       dependency(id: "org.apache.commons:commons-lang3:3.1.0")
       dependency(id: "org.freemarker:freemarker:2.3.19")
-      dependency(id: "org.primeframework:prime-mock:0.2.0")
-      dependency(id: "org.slf4j:slf4j-api:1.6.6")
+      dependency(id: "org.primeframework:prime-mock:0.2.0-{integration}")
+      dependency(id: "org.slf4j:slf4j-api:1.7.7")
     }
     group(type: "test-compile") {
-      dependency(id: "org.easymock:easymock:3.1.0")
+      dependency(id: "org.easymock:easymock:3.2.0")
       dependency(id: "org.testng:testng:6.8.7")
     }
   }
 }
 
 // Plugins
-dependency = loadPlugin(id: "org.savantbuild.plugin:dependency:0.1.1")
-java = loadPlugin(id: "org.savantbuild.plugin:java:0.1.2")
-javaTestNG = loadPlugin(id: "org.savantbuild.plugin:java-testng:0.1.2")
-idea = loadPlugin(id: "org.savantbuild.plugin:idea:0.1.1")
-release = loadPlugin(id: "org.savantbuild.plugin:release-git:0.1.1")
+file = loadPlugin(id: "org.savantbuild.plugin:file:0.2.0-{integration}")
+dependency = loadPlugin(id: "org.savantbuild.plugin:dependency:0.2.0-{integration}")
+java = loadPlugin(id: "org.savantbuild.plugin:java:0.2.0-{integration}")
+javaTestNG = loadPlugin(id: "org.savantbuild.plugin:java-testng:0.2.0-{integration}")
+idea = loadPlugin(id: "org.savantbuild.plugin:idea:0.2.0-{integration}")
+release = loadPlugin(id: "org.savantbuild.plugin:release-git:0.2.0-{integration}")
 
 // Plugin settings
 java.settings.javaVersion = "1.6"
@@ -67,6 +68,10 @@ target(name: "clean", description: "Cleans the project") {
 
 target(name: "compile", description: "Compiles the project") {
   java.compile()
+
+  file.copy(to: "build/classes/main") {
+    fileSet(dir: "src/main/ftl")
+  }
 }
 
 target(name: "jar", description: "JARs the project", dependsOn: ["compile"]) {

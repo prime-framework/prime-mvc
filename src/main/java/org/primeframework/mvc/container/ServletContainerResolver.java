@@ -15,11 +15,11 @@
  */
 package org.primeframework.mvc.container;
 
+import com.google.inject.Inject;
+
 import javax.servlet.ServletContext;
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import com.google.inject.Inject;
 
 /**
  * This class implements the path resolver using the ServletContext and calling the getRealPath method on that.
