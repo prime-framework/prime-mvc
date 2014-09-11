@@ -16,12 +16,12 @@
  */
 package org.primeframework.mvc.freemarker;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.easymock.EasyMock;
 import org.primeframework.mvc.container.ContainerResolver;
 import org.testng.annotations.Test;
+
+import java.io.File;
+import java.io.IOException;
 
 import static org.testng.Assert.*;
 
@@ -67,7 +67,7 @@ public class OverridingTemplateLoaderTest {
   @Test
   public void classPath() throws IOException {
     ContainerResolver resolver = EasyMock.createStrictMock(ContainerResolver.class);
-    EasyMock.expect(resolver.getRealPath("logging.properties")).andReturn("build/resources/test/logging.properties");
+    EasyMock.expect(resolver.getRealPath("logging.properties")).andReturn("build/classes/test/logging.properties");
     EasyMock.replay(resolver);
 
     OverridingTemplateLoader loader = new OverridingTemplateLoader(resolver);
