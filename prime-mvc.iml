@@ -18,11 +18,11 @@
     <orderEntry type="module-library" scope="PROVIDED">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/javax/servlet/servlet-api/2.4.0/servlet-api-2.4.0.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/javax/servlet/servlet-api/2.5.0/servlet-api-2.5.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/javax/servlet/servlet-api/2.4.0/servlet-api-2.4.0-src.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/javax/servlet/servlet-api/2.5.0/servlet-api-2.5.0-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>

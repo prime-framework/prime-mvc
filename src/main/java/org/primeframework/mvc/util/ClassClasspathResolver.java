@@ -15,13 +15,6 @@
  */
 package org.primeframework.mvc.util;
 
-import org.apache.commons.io.filefilter.DirectoryFileFilter;
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.Opcodes;
-import org.primeframework.mvc.PrimeException;
-
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
@@ -38,6 +31,13 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+
+import org.apache.commons.io.filefilter.DirectoryFileFilter;
+import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.Opcodes;
+import org.primeframework.mvc.PrimeException;
 
 import static java.util.Arrays.asList;
 
@@ -98,7 +98,7 @@ public class ClassClasspathResolver<U> {
             matches.addAll(loadFromDirectory(dir, test, recursive));
           }
         }
-      } else {
+      } else if (f.isFile()) {
         matches.addAll(loadFromJar(f, test, recursive, asList(locators), true));
       }
     }

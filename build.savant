@@ -23,10 +23,10 @@ project(group: "org.primeframework", name: "prime-mvc", version: "0.31", license
   }
 
   dependencies {
-    group(type: "provided") {
-      dependency(id: "javax.servlet:servlet-api:2.4.0")
+    group(name: "provided") {
+      dependency(id: "javax.servlet:servlet-api:2.5.0")
     }
-    group(type: "compile") {
+    group(name: "compile") {
       dependency(id: "org.ow2.asm:asm:5.0.3")
       dependency(id: "com.fasterxml.jackson.core:jackson-annotations:2.3.0")
       dependency(id: "com.fasterxml.jackson.core:jackson-core:2.3.0")
@@ -43,7 +43,7 @@ project(group: "org.primeframework", name: "prime-mvc", version: "0.31", license
       dependency(id: "org.primeframework:prime-mock:0.2.0-{integration}")
       dependency(id: "org.slf4j:slf4j-api:1.7.7")
     }
-    group(type: "test-compile") {
+    group(name: "test-compile", export: false) {
       dependency(id: "org.easymock:easymock:3.2.0")
       dependency(id: "org.testng:testng:6.8.7")
     }
