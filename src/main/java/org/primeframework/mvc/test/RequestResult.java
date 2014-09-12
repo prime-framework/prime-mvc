@@ -192,8 +192,8 @@ public class RequestResult {
    * @return
    */
   public RequestResult assertHeaderContains(String header, String value) {
-    String actual = request.getHeader(header);
-    if ((actual == null && value != null) || (actual != null && !actual.equals(value))) {
+    Object actual = response.getHeaders().get(header);
+    if ((actual == null && value != null) || (actual != null && !actual.toString().equals(value))) {
       throw new AssertionError("Header [" + header + "] with value [" + actual + "] was not equal to the expected value [" + value + "]");
     }
     return this;
