@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2014, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -181,6 +181,21 @@ public class RequestResult {
       throw new AssertionError("The MessageStore does not contain the [" + type + "] message " + asList(messages) + "");
     }
 
+    return this;
+  }
+
+  /**
+   * Verifies that the HTTP response contains the specified header.
+   *
+   * @param header the name of the HTTP response header
+   * @param value  the value of the header
+   * @return
+   */
+  public RequestResult assertHeader(String header, String value) {
+    String actual = request.getHeader(header);
+    if ((actual == null && value != null) || (actual != null && !actual.equals(value))) {
+      throw new AssertionError("Header [" + header + "] with value [" + actual + "] was not equal to the expected value [" + value + "]");
+    }
     return this;
   }
 

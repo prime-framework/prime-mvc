@@ -1,6 +1,6 @@
 // Project info
 group = "org.primeframework"
-version = "0.30"
+version = "0.31"
 description = "Prime MVC Framework"
 
 // Plugins
