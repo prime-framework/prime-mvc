@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2014, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,11 @@
  */
 package org.primeframework.mvc.parameter;
 
-import com.google.inject.Inject;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
@@ -29,6 +33,7 @@ import org.primeframework.mvc.message.l10n.MissingMessageException;
 import org.primeframework.mvc.parameter.ParameterParser.Parameters;
 import org.primeframework.mvc.parameter.ParameterParser.Parameters.Struct;
 import org.primeframework.mvc.parameter.convert.ConversionException;
+import org.primeframework.mvc.parameter.el.BeanExpressionException;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.parameter.el.ExpressionException;
 import org.primeframework.mvc.parameter.fileupload.FileInfo;
@@ -38,10 +43,7 @@ import org.primeframework.mvc.util.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import com.google.inject.Inject;
 
 /**
  * This class is the default parameter handler. It sets all of the parameters into the action in the following order
@@ -139,6 +141,8 @@ public class DefaultParameterHandler implements ParameterHandler {
         } catch (MissingMessageException mme) {
           messageStore.add(new SimpleFieldMessage(MessageType.ERROR, key, code, ce.getMessage()));
         }
+      } catch (BeanExpressionException ee) {
+        throw ee;
       } catch (ExpressionException ee) {
         if (!allowUnknownParameters) {
           throw ee;
