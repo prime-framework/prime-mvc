@@ -13,12 +13,8 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-project(group: "org.primeframework", name: "prime-mvc", version: "0.31", license: "Apachev2") {
+project(group: "org.primeframework", name: "prime-mvc", version: "0.31", licenses: ["ApacheV2_0"]) {
   workflow {
-    standard()
-  }
-
-  publications {
     standard()
   }
 
@@ -37,7 +33,7 @@ project(group: "org.primeframework", name: "prime-mvc", version: "0.31", license
       dependency(id: "javax.inject:javax.inject:1.0.0")
       dependency(id: "org.joda:joda-time:2.1.0")
       dependency(id: "org.apache.commons:commons-fileupload:1.2.1")
-      dependency(id: "org.apache.commons:commons-io:1.4.0")
+      dependency(id: "org.apache.commons:commons-io:2.1.0")
       dependency(id: "org.apache.commons:commons-lang3:3.1.0")
       dependency(id: "org.freemarker:freemarker:2.3.19")
       dependency(id: "org.primeframework:prime-mock:0.2.0-{integration}")
@@ -47,6 +43,10 @@ project(group: "org.primeframework", name: "prime-mvc", version: "0.31", license
       dependency(id: "org.easymock:easymock:3.2.0")
       dependency(id: "org.testng:testng:6.8.7")
     }
+  }
+
+  publications {
+    standard()
   }
 }
 

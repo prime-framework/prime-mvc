@@ -74,4 +74,8 @@ compileJava.doLast {
     from "src/main/ftl"
     into "build/classes/main"
   }
+  copy {
+    from "src/test/resources"
+    into "build/classes/test"
+  }
 }

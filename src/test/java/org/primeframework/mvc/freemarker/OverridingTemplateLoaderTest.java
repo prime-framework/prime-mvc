@@ -69,7 +69,7 @@ public class OverridingTemplateLoaderTest {
   @Test
   public void classPath() throws IOException {
     ContainerResolver resolver = EasyMock.createStrictMock(ContainerResolver.class);
-    EasyMock.expect(resolver.getRealPath("logging.properties")).andReturn("build/resources/test/logging.properties");
+    EasyMock.expect(resolver.getRealPath("logging.properties")).andReturn("build/classes/test/logging.properties");
     EasyMock.replay(resolver);
 
     OverridingTemplateLoader loader = new OverridingTemplateLoader(resolver);
