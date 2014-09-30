@@ -18,6 +18,7 @@ package org.primeframework.mvc.servlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -52,6 +53,15 @@ public class StaticResourceWorkflowTest {
 
     final StringBuilder build = new StringBuilder();
     ServletOutputStream sos = new ServletOutputStream() {
+      @Override
+      public boolean isReady() {
+        return true;
+      }
+
+      @Override
+      public void setWriteListener(WriteListener writeListener) {
+      }
+
       public void write(int b) throws IOException {
         build.appendCodePoint(b);
       }
@@ -93,6 +103,15 @@ public class StaticResourceWorkflowTest {
 
     final StringBuilder build = new StringBuilder();
     ServletOutputStream sos = new ServletOutputStream() {
+      @Override
+      public boolean isReady() {
+        return true;
+      }
+
+      @Override
+      public void setWriteListener(WriteListener writeListener) {
+      }
+
       public void write(int b) throws IOException {
         build.appendCodePoint(b);
       }

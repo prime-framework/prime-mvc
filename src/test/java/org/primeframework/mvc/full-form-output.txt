@@ -47,6 +47,7 @@
 <option value="CO">Colombia</option>
 <option value="CR">Costa Rica</option>
 <option value="HR">Croatia</option>
+<option value="CU">Cuba</option>
 <option value="CY">Cyprus</option>
 <option value="CZ">Czech Republic</option>
 <option value="DK">Denmark</option>

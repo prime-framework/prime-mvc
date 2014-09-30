@@ -15,7 +15,9 @@
  */
 package org.primeframework.mvc.parameter.el;
 
-import com.google.inject.Inject;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.example.action.ExtensionInheritance;
 import org.example.domain.Action;
@@ -28,9 +30,7 @@ import org.example.domain.UserField;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.testng.annotations.Test;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
+import com.google.inject.Inject;
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -93,9 +93,9 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     action.getUser().setName("Brian");
     action.getUser().setActive(true);
 
-    assertEquals(evaluator.getValue("user.age", action), 32);
+    assertEquals(evaluator.getValue("user.age", action), (Integer) 32);
     assertEquals(evaluator.getValue("user.name", action), "Brian");
-    assertTrue((Boolean) evaluator.getValue("user.active", action));
+    assertTrue(evaluator.getValue("user.active", action));
 
     // Test collection property gets
     Address address = new Address();
@@ -114,7 +114,7 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     brother.setName("Brett");
     brother.setAge(34);
     user.getSiblings().add(brother);
-    assertEquals(evaluator.getValue("user.siblings[0].age", action), 34);
+    assertEquals(evaluator.getValue("user.siblings[0].age", action), (Integer) 34);
     assertEquals(evaluator.getValue("user.siblings[0].name", action), "Brett");
 
     user.setSecurityQuestions("What is your pet's name?", "What is your home town?");
@@ -128,7 +128,7 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     assertEquals(evaluator.getValue("user.address['home'].street", action), "Test");
     assertEquals(evaluator.getValue("user.address['home'].zipcode", action), "80020");
 
-    assertEquals(evaluator.getValue("user.sibling[0].age", action), 34);
+    assertEquals(evaluator.getValue("user.sibling[0].age", action), (Integer) 34);
     assertEquals(evaluator.getValue("user.sibling[0].name", action), "Brett");
   }
 
@@ -148,9 +148,9 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     action.user.name = "Brian";
     action.user.active = true;
 
-    assertEquals(evaluator.getValue("user.age", action), 32);
+    assertEquals(evaluator.getValue("user.age", action), (Integer) 32);
     assertEquals(evaluator.getValue("user.name", action), "Brian");
-    assertTrue((Boolean) evaluator.getValue("user.active", action));
+    assertTrue(evaluator.getValue("user.active", action));
 
     // Test collection property gets
     AddressField address = new AddressField();
@@ -169,7 +169,7 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     brother.name = "Brett";
     brother.age = 34;
     user.siblings.add(brother);
-    assertEquals(evaluator.getValue("user.siblings[0].age", action), 34);
+    assertEquals(evaluator.getValue("user.siblings[0].age", action), (Integer) 34);
     assertEquals(evaluator.getValue("user.siblings[0].name", action), "Brett");
 
     user.securityQuestions = new String[]{"What is your pet's name?", "What is your home town?"};
@@ -245,7 +245,7 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     assertEquals(action.getUser().getSecurityQuestions()[1], "What is your home town?");
 
     // Test indexed collection property sets (using the indexed property methoods)
-    action.getUser().setAddresses(new HashMap<String, Address>());
+    action.getUser().setAddresses(new HashMap<>());
     evaluator.setValue("user.address['home'].city", action, ArrayUtils.toArray("Broomfield"), null);
     evaluator.setValue("user.address['home'].state", action, ArrayUtils.toArray("CO"), null);
     evaluator.setValue("user.address['home'].street", action, ArrayUtils.toArray("Test"), null);
@@ -257,7 +257,7 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     assertEquals(action.getUser().getAddresses().get("home").getStreet(), "Test");
     assertEquals(action.getUser().getAddresses().get("home").getZipcode(), "80020");
 
-    action.getUser().setSiblings(new ArrayList<User>());
+    action.getUser().setSiblings(new ArrayList<>());
     evaluator.setValue("user.sibling[0].age", action, ArrayUtils.toArray("34"), null);
     evaluator.setValue("user.sibling[0].name", action, ArrayUtils.toArray("Brett"), null);
     assertEquals(action.getUser().getSiblings().size(), 1);
