@@ -31,7 +31,7 @@ import static org.testng.Assert.*;
 public class URLTemplateSourceTest {
   @Test
   public void file() throws IOException {
-    File file = new File("build.gradle");
+    File file = new File("build.savant");
     URLTemplateSource source = new URLTemplateSource(file.toURI().toURL());
     assertEquals(file.lastModified(), source.lastModified());
     assertNotNull(source.getInputStream());

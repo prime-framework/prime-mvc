@@ -50,17 +50,17 @@ public class FileConverterTest {
     f = (File) converter.convertFromStrings(File.class, map, "testExpr", ArrayUtils.toArray("/tmp", "prime"));
     assertEquals(f.getAbsolutePath(), "/tmp/prime");
 
-    f = (File) converter.convertFromStrings(File.class, map, "testExpr", ArrayUtils.toArray("build.gradle"));
-    assertEquals(f.getAbsolutePath(), new File("build.gradle").getAbsolutePath());
+    f = (File) converter.convertFromStrings(File.class, map, "testExpr", ArrayUtils.toArray("build.savant"));
+    assertEquals(f.getAbsolutePath(), new File("build.savant").getAbsolutePath());
 
-    File[] fa = (File[]) converter.convertFromStrings(File[].class, map, "testExpr", ArrayUtils.toArray("build.gradle", "build.xml"));
-    assertEquals(fa[0].getAbsolutePath(), new File("build.gradle").getAbsolutePath());
+    File[] fa = (File[]) converter.convertFromStrings(File[].class, map, "testExpr", ArrayUtils.toArray("build.savant", "build.xml"));
+    assertEquals(fa[0].getAbsolutePath(), new File("build.savant").getAbsolutePath());
     assertEquals(fa[1].getAbsolutePath(), new File("build.xml").getAbsolutePath());
 
     // Test parentDir
     map.put("parentDir", "/tmp");
-    f = (File) converter.convertFromStrings(File.class, map, "testExpr", ArrayUtils.toArray("build.gradle"));
-    assertEquals(f.getAbsolutePath(), new File("/tmp/build.gradle").getAbsolutePath());
+    f = (File) converter.convertFromStrings(File.class, map, "testExpr", ArrayUtils.toArray("build.savant"));
+    assertEquals(f.getAbsolutePath(), new File("/tmp/build.savant").getAbsolutePath());
   }
 
   @Test
@@ -69,7 +69,7 @@ public class FileConverterTest {
     String str = converter.convertToString(File.class, null, "testExpr", null);
     assertNull(str);
 
-    str = converter.convertToString(File.class, null, "testExpr", new File("build.gradle"));
-    assertEquals(str, new File("build.gradle").getAbsolutePath());
+    str = converter.convertToString(File.class, null, "testExpr", new File("build.savant"));
+    assertEquals(str, new File("build.savant").getAbsolutePath());
   }
 }

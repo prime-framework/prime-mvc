@@ -36,12 +36,12 @@ public class OverridingTemplateLoaderTest {
   @Test
   public void realPath() throws IOException {
     ContainerResolver resolver = EasyMock.createStrictMock(ContainerResolver.class);
-    EasyMock.expect(resolver.getRealPath("build.gradle")).andReturn("build.gradle");
+    EasyMock.expect(resolver.getRealPath("build.savant")).andReturn("build.savant");
     EasyMock.replay(resolver);
 
     OverridingTemplateLoader loader = new OverridingTemplateLoader(resolver);
-    URLTemplateSource source = (URLTemplateSource) loader.findTemplateSource("build.gradle");
-    File file = new File("build.gradle");
+    URLTemplateSource source = (URLTemplateSource) loader.findTemplateSource("build.savant");
+    File file = new File("build.savant");
     assertEquals(loader.getLastModified(source), file.lastModified());
     assertNotNull(loader.getReader(source, "UTF-8"));
     loader.closeTemplateSource(source);
@@ -52,13 +52,13 @@ public class OverridingTemplateLoaderTest {
   @Test
   public void resource() throws IOException {
     ContainerResolver resolver = EasyMock.createStrictMock(ContainerResolver.class);
-    EasyMock.expect(resolver.getRealPath("build.gradle")).andReturn(null);
-    EasyMock.expect(resolver.getResource("build.gradle")).andReturn(new File("build.gradle").toURI().toURL());
+    EasyMock.expect(resolver.getRealPath("build.savant")).andReturn(null);
+    EasyMock.expect(resolver.getResource("build.savant")).andReturn(new File("build.savant").toURI().toURL());
     EasyMock.replay(resolver);
 
     OverridingTemplateLoader loader = new OverridingTemplateLoader(resolver);
-    URLTemplateSource source = (URLTemplateSource) loader.findTemplateSource("build.gradle");
-    File file = new File("build.gradle");
+    URLTemplateSource source = (URLTemplateSource) loader.findTemplateSource("build.savant");
+    File file = new File("build.savant");
     assertEquals(loader.getLastModified(source), file.lastModified());
     assertNotNull(loader.getReader(source, "UTF-8"));
     loader.closeTemplateSource(source);
