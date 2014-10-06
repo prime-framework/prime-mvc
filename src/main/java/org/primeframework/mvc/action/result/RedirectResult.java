@@ -28,6 +28,7 @@ import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.scope.MessageScope;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
+import org.primeframework.mvc.servlet.ServletTools;
 
 import com.google.inject.Inject;
 
@@ -66,6 +67,8 @@ public class RedirectResult extends AbstractResult<Redirect> {
     if (context.length() > 0 && uri.startsWith("/")) {
       uri = context + uri;
     }
+
+    uri += ServletTools.getSessionId(request);
 
     boolean perm = redirect.perm();
 

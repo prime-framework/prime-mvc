@@ -128,6 +128,28 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
+          <root url="jar://$USER_HOME$/.savant/cache/org/apache/commons/commons-fileupload/1.2.1/commons-fileupload-1.2.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.savant/cache/org/apache/commons/commons-fileupload/1.2.1/commons-fileupload-1.2.1-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.savant/cache/org/apache/commons/commons-io/2.1.0/commons-io-2.1.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.savant/cache/org/apache/commons/commons-io/2.1.0/commons-io-2.1.0-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
           <root url="jar://$USER_HOME$/.savant/cache/org/apache/commons/commons-lang3/3.1.0/commons-lang3-3.1.0.jar!/" />
         </CLASSES>
         <JAVADOC />
@@ -150,33 +172,11 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/primeframework/prime-mock/0.2.0-{integration}/prime-mock-0.2.0-{integration}.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/org/primeframework/prime-mock/0.5.0/prime-mock-0.5.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/primeframework/prime-mock/0.2.0-{integration}/prime-mock-0.2.0-{integration}-src.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/apache/commons/commons-fileupload/1.2.1/commons-fileupload-1.2.1.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/apache/commons/commons-fileupload/1.2.1/commons-fileupload-1.2.1-src.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/apache/commons/commons-io/2.1.0/commons-io-2.1.0.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/apache/commons/commons-io/2.1.0/commons-io-2.1.0-src.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/org/primeframework/prime-mock/0.5.0/prime-mock-0.5.0-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>

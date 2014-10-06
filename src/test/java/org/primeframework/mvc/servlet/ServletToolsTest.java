@@ -19,10 +19,15 @@ package org.primeframework.mvc.servlet;
 import javax.servlet.http.HttpServletRequest;
 import java.net.URL;
 
-import org.testng.Assert;
+import org.primeframework.mock.servlet.MockHttpServletRequest;
+import org.primeframework.mock.servlet.MockHttpSession;
+import org.primeframework.mock.servlet.MockServletContext;
 import org.testng.annotations.Test;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.createStrictMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.testng.Assert.assertEquals;
 
 /**
  * ServletTools test.
@@ -32,7 +37,7 @@ import static org.easymock.EasyMock.*;
 public class ServletToolsTest {
 
   @Test
-  public void testBuildBaseUrlWithPortZero() {
+  public void buildBaseUrlWithPortZero() {
     HttpServletRequest req = createStrictMock(HttpServletRequest.class);
     expect(req.getScheme()).andReturn("http");
     expect(req.getServerName()).andReturn("www.Inversoft Inc.");
@@ -41,11 +46,11 @@ public class ServletToolsTest {
 
     URL url = ServletTools.getBaseUrl(req);
 
-    Assert.assertEquals(url.toString(), "http://www.Inversoft Inc./");
+    assertEquals(url.toString(), "http://www.Inversoft Inc./");
   }
 
   @Test
-  public void testBuildBaseUrlWithPort() {
+  public void buildBaseUrlWithPort() {
     HttpServletRequest req = createStrictMock(HttpServletRequest.class);
     expect(req.getScheme()).andReturn("http");
     expect(req.getServerName()).andReturn("www.Inversoft Inc.");
@@ -54,6 +59,24 @@ public class ServletToolsTest {
 
     URL url = ServletTools.getBaseUrl(req);
 
-    Assert.assertEquals(url.toString(), "http://www.Inversoft Inc.:8080/");
+    assertEquals(url.toString(), "http://www.Inversoft Inc.:8080/");
+  }
+
+  @Test
+  public void requestURI() {
+    MockHttpServletRequest request = new MockHttpServletRequest("/login;jsessionid=C35A2D9557C051F2854845305B1AB911", new MockHttpSession(new MockServletContext()));
+    assertEquals(ServletTools.getRequestURI(request), "/login");
+
+    request = new MockHttpServletRequest("/;jsessionid=C35A2D9557C051F2854845305B1AB911", new MockHttpSession(new MockServletContext()));
+    assertEquals(ServletTools.getRequestURI(request), "/");
+  }
+
+  @Test
+  public void SessionId() {
+    MockHttpServletRequest request = new MockHttpServletRequest("/login;jsessionid=C35A2D9557C051F2854845305B1AB911", new MockHttpSession(new MockServletContext()));
+    assertEquals(ServletTools.getSessionId(request), ";jsessionid=C35A2D9557C051F2854845305B1AB911");
+
+    request = new MockHttpServletRequest("/;jsessionid=C35A2D9557C051F2854845305B1AB911", new MockHttpSession(new MockServletContext()));
+    assertEquals(ServletTools.getSessionId(request), ";jsessionid=C35A2D9557C051F2854845305B1AB911");
   }
 }

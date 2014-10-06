@@ -47,6 +47,7 @@ public class RedirectResultTest {
 
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
     expect(request.getContextPath()).andReturn("");
+    expect(request.getRequestURI()).andReturn("/");
     replay(request);
 
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
@@ -79,6 +80,7 @@ public class RedirectResultTest {
 
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
     expect(request.getContextPath()).andReturn("");
+    expect(request.getRequestURI()).andReturn("/");
     replay(request);
 
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
@@ -111,6 +113,7 @@ public class RedirectResultTest {
 
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
     expect(request.getContextPath()).andReturn("/context-path");
+    expect(request.getRequestURI()).andReturn("/");
     replay(request);
 
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
@@ -143,6 +146,7 @@ public class RedirectResultTest {
 
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
     expect(request.getContextPath()).andReturn("/context-path");
+    expect(request.getRequestURI()).andReturn("/");
     replay(request);
 
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
@@ -177,6 +181,7 @@ public class RedirectResultTest {
 
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
     expect(request.getContextPath()).andReturn("");
+    expect(request.getRequestURI()).andReturn("/");
     replay(request);
 
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
@@ -211,6 +216,7 @@ public class RedirectResultTest {
 
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
     expect(request.getContextPath()).andReturn("");
+    expect(request.getRequestURI()).andReturn("/");
     replay(request);
 
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);

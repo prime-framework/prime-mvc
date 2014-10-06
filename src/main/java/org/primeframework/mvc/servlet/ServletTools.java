@@ -16,13 +16,13 @@
  */
 package org.primeframework.mvc.servlet;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Toolkit for Servlet related tasks
@@ -75,11 +75,32 @@ public class ServletTools {
    */
   public static String getRequestURI(HttpServletRequest request) {
     String uri = request.getRequestURI();
+    int semicolon = uri.indexOf(';');
+    if (semicolon >= 0) {
+      uri = uri.substring(0, semicolon);
+    }
+
     String context = request.getContextPath();
     if (context.length() > 0) {
       return uri.substring(context.length());
     }
 
     return uri;
+  }
+
+  /**
+   * Returns the jsessionid part of the URI if it exists.
+   *
+   * @param request The request.
+   * @return The jsessionid part or empty string.
+   */
+  public static String getSessionId(HttpServletRequest request) {
+    String uri = request.getRequestURI();
+    int semicolon = uri.indexOf(';');
+    if (semicolon >= 0) {
+      return uri.substring(semicolon);
+    }
+
+    return "";
   }
 }

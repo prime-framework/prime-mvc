@@ -26,6 +26,7 @@ import org.primeframework.mvc.control.AbstractControl;
 import org.primeframework.mvc.control.annotation.ControlAttribute;
 import org.primeframework.mvc.control.annotation.ControlAttributes;
 import org.primeframework.mvc.servlet.HTTPMethod;
+import org.primeframework.mvc.servlet.ServletTools;
 
 import com.google.inject.Inject;
 
@@ -99,11 +100,14 @@ public class Form extends AbstractControl {
 
     formPreparer.prepare();
 
-    // Fix the action URI to include the context path
+    // Fix the action URI to include the context path and jsessionid (if one exists)
     String contextPath = request.getContextPath();
     if (contextPath.length() > 0 && !fullyQualified) {
-      attributes.put("action", contextPath + action);
+      action = contextPath + action;
     }
+
+    action += ServletTools.getSessionId(request);
+    attributes.put("action", action);
 
     // Render
     super.renderStart(writer, attributes, dynamicAttributes);
