@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2006, Inversoft, All Rights Reserved
+ * Copyright (c) 2001-2014, Inversoft, All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,20 @@
  */
 package org.primeframework.mvc.util;
 
-import org.primeframework.mvc.PrimeException;
-
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.net.URLDecoder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
+
+import org.primeframework.mvc.PrimeException;
 
 import static java.util.Collections.list;
 
@@ -68,7 +71,7 @@ public class Classpath {
   /**
    * @return The current classpath.
    * @throws IOException If there was any problems retrieving the classpath from the current thread's context
-   *                     classloader.
+   * classloader.
    */
   public static Classpath getCurrentClassPath() throws IOException {
     ClasspathBuilder builder = new ClasspathBuilder(Thread.currentThread().getContextClassLoader());
@@ -138,7 +141,7 @@ public class Classpath {
    * @param parent The parent classloader of the URLClassLoader being created.
    * @return The URLClassLoader and never null.
    * @throws IllegalStateException If the creation of the URLClassLoader failed because a URL could not be created for
-   *                               each entry in the classpath.
+   * each entry in the classpath.
    */
   public URLClassLoader toURLClassLoader(ClassLoader parent) throws IllegalStateException {
     List<URL> urls = new ArrayList<URL>();
@@ -154,7 +157,7 @@ public class Classpath {
             url = f.toURI().toURL();
           } catch (MalformedURLException e1) {
             throw new PrimeException("Cannot create URLClassLoader because classpath entry [" + s + "] could not be " +
-              "converted to a URL from a File.");
+                "converted to a URL from a File.");
           }
         } else {
           throw new PrimeException("Cannot create URLClassLoader because classpath entry [" + s + "] is not a URL or a File.");
@@ -240,18 +243,18 @@ public class Classpath {
       List<URL> urls = list(classLoader.getResources("META-INF"));
 
       for (URL url : urls) {
-        String externalForm = clean(url.toExternalForm());
-        if (externalForm != null && !exclude(externalForm)) {
-          list.add(externalForm);
+        String path = clean(url);
+        if (path != null && !exclude(path)) {
+          list.add(path);
         }
       }
 
       urls = list(classLoader.getResources(""));
 
       for (URL url : urls) {
-        String externalForm = clean(url.toExternalForm());
-        if (externalForm != null && !exclude(externalForm)) {
-          list.add(externalForm);
+        String path = clean(url);
+        if (path != null && !exclude(path)) {
+          list.add(path);
         }
       }
 
@@ -265,43 +268,58 @@ public class Classpath {
       return new Classpath(new ArrayList<String>(list));
     }
 
-    private String clean(String externalForm) throws UnsupportedEncodingException {
+    /**
+     * Return a {@link String} representation of the path. <p> The {@link URL} object provided ias assumed to have been returned from
+     * {@link ClassLoader#getResources(String)}. Calling {@link URL#toURI()} is never expected to throw a {@link
+     * URISyntaxException}, if it does we are catching it and wrapping in an {@link IOException}. </p>
+     *
+     * @param url
+     * @return
+     * @throws IOException
+     */
+    private String clean(URL url) throws IOException {
+
       // JBoss scheme that is not supported
-      if (externalForm.contains("vfsmemory:")) {
+      if (url.getProtocol().equals("vfsmemory")) {
         return null;
       }
 
-      externalForm = URLDecoder.decode(externalForm, "UTF-8");
-      if (externalForm.endsWith("META-INF")) {
-        externalForm = externalForm.substring(0, externalForm.length() - 8);
-      } else if (externalForm.endsWith("META-INF/")) { /* JBoss work-around */
-        externalForm = externalForm.substring(0, externalForm.length() - 9);
+      try {
+        String externalForm = url.toURI().toString();
+        if (externalForm.endsWith("META-INF")) {
+          externalForm = externalForm.substring(0, externalForm.length() - 8);
+        } else if (externalForm.endsWith("META-INF/")) { /* JBoss work-around */
+          externalForm = externalForm.substring(0, externalForm.length() - 9);
+        }
+
+        if (externalForm.endsWith("!/")) {
+          externalForm = externalForm.substring(0, externalForm.length() - 2);
+        }
+
+        if (externalForm.startsWith("file:")) {
+          externalForm = externalForm.substring(5);
+        }
+
+        if (externalForm.startsWith("jar:file:")) {
+          externalForm = externalForm.substring(9);
+        }
+
+        // JBoss schemes
+        int index = externalForm.indexOf("vfszip:");
+        if (index >= 0) {
+          externalForm = externalForm.substring(index + 7);
+        }
+
+        index = externalForm.indexOf("vfsfile:");
+        if (index >= 0) {
+          externalForm = externalForm.substring(index + 8);
+        }
+
+        return new File(externalForm).toURI().getPath();
+      } catch (URISyntaxException e) {
+        throw new IOException(e);
       }
 
-      if (externalForm.endsWith("!/")) {
-        externalForm = externalForm.substring(0, externalForm.length() - 2);
-      }
-
-      if (externalForm.startsWith("file:")) {
-        externalForm = externalForm.substring(5);
-      }
-
-      if (externalForm.startsWith("jar:file:")) {
-        externalForm = externalForm.substring(9);
-      }
-
-      // JBoss schemes
-      int index = externalForm.indexOf("vfszip:");
-      if (index >= 0) {
-        externalForm = externalForm.substring(index + 7);
-      }
-
-      index = externalForm.indexOf("vfsfile:");
-      if (index >= 0) {
-        externalForm = externalForm.substring(index + 8);
-      }
-
-      return externalForm;
     }
 
     private boolean exclude(String externalForm) {
