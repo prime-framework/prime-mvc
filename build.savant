@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-savantVersion = "0.2.0"
+savantVersion = "0.3.0"
 
 project(group: "org.primeframework", name: "prime-mvc", version: "0.32.1", licenses: ["ApacheV2_0"]) {
   workflow {
@@ -62,7 +62,7 @@ dependency = loadPlugin(id: "org.savantbuild.plugin:dependency:${savantVersion}"
 java = loadPlugin(id: "org.savantbuild.plugin:java:${savantVersion}")
 javaTestNG = loadPlugin(id: "org.savantbuild.plugin:java-testng:${savantVersion}")
 idea = loadPlugin(id: "org.savantbuild.plugin:idea:${savantVersion}")
-release = loadPlugin(id: "org.savantbuild.plugin:release-git:${savantVersion}")
+release = loadPlugin(id: "org.savantbuild.plugin:release-git:0.3.3")
 
 // Plugin settings
 java.settings.javaVersion = "1.8"
