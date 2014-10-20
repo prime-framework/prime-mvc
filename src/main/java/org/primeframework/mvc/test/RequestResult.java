@@ -15,9 +15,11 @@
  */
 package org.primeframework.mvc.test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.inject.Injector;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.primeframework.mock.servlet.MockHttpServletRequest;
 import org.primeframework.mock.servlet.MockHttpServletResponse;
 import org.primeframework.mvc.message.FieldMessage;
@@ -25,11 +27,9 @@ import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.Injector;
 import static java.util.Arrays.asList;
 
 /**
@@ -192,8 +192,8 @@ public class RequestResult {
    * @return
    */
   public RequestResult assertHeaderContains(String header, String value) {
-    Object actual = response.getHeaders().get(header);
-    if ((actual == null && value != null) || (actual != null && !actual.toString().equals(value))) {
+    List<String> actual = response.getHeaders().get(header);
+    if ((actual == null && value != null) || (actual != null && !actual.contains((value)))) {
       throw new AssertionError("Header [" + header + "] with value [" + actual + "] was not equal to the expected value [" + value + "]");
     }
     return this;
