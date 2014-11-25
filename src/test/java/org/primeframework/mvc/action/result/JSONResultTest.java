@@ -1,7 +1,14 @@
 package org.primeframework.mvc.action.result;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.inject.Inject;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
 import org.example.action.Post;
 import org.example.domain.AddressField;
 import org.example.domain.UserField;
@@ -14,20 +21,17 @@ import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.result.annotation.JSON;
 import org.primeframework.mvc.action.result.annotation.XMLStream;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration;
-import org.primeframework.mvc.message.*;
+import org.primeframework.mvc.message.Message;
+import org.primeframework.mvc.message.MessageStore;
+import org.primeframework.mvc.message.MessageType;
+import org.primeframework.mvc.message.SimpleFieldMessage;
+import org.primeframework.mvc.message.SimpleMessage;
 import org.primeframework.mvc.message.scope.MessageScope;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.testng.annotations.Test;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.Inject;
 import static java.util.Arrays.asList;
 import static org.easymock.EasyMock.createStrictMock;
 import static org.easymock.EasyMock.expect;
@@ -79,7 +83,7 @@ public class JSONResultTest extends PrimeBaseTest {
     response.setStatus(200);
     response.setCharacterEncoding("UTF-8");
     response.setContentType("application/json");
-    response.setContentLength(426);
+    response.setContentLength(462);
     expect(response.getOutputStream()).andReturn(sos);
     replay(response);
 
@@ -115,6 +119,7 @@ public class JSONResultTest extends PrimeBaseTest {
         "    }" +
         "  }," +
         "  \"age\":37," +
+        "  \"bar\":false," +
         "  \"favoriteMonth\":5," +
         "  \"favoriteYear\":1976," +
         "  \"ids\":{" +
@@ -126,9 +131,11 @@ public class JSONResultTest extends PrimeBaseTest {
         "  \"securityQuestions\":[\"one\",\"two\",\"three\",\"four\"]," +
         "  \"siblings\":[{" +
         "    \"active\":false," +
+        "    \"bar\":false," +
         "    \"name\":\"Brett\"" +
         "  },{" +
         "    \"active\":false," +
+        "    \"bar\":false," +
         "    \"name\":\"Beth\"" +
         "  }]," +
         "  \"type\":\"COOL\"" +

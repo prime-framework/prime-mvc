@@ -15,9 +15,14 @@
  */
 package org.primeframework.mvc;
 
-import com.google.inject.Key;
-import com.google.inject.TypeLiteral;
-import freemarker.template.Configuration;
+import java.io.File;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Collection;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+
 import org.apache.commons.io.FileUtils;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -33,15 +38,14 @@ import org.primeframework.mvc.test.RequestSimulator;
 import org.primeframework.mvc.util.URIBuilder;
 import org.testng.annotations.Test;
 
-import java.io.File;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Collection;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-
-import static org.testng.Assert.*;
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
+import freemarker.template.Configuration;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertSame;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 /**
  * This class tests the MVC from a high level perspective.
@@ -90,6 +94,7 @@ public class GlobalTest extends PrimeBaseTest {
         "    }" +
         "  }," +
         "  \"age\":37," +
+        "  \"bar\":false," +
         "  \"favoriteMonth\":5," +
         "  \"favoriteYear\":1976," +
         "  \"ids\":{" +
@@ -102,10 +107,12 @@ public class GlobalTest extends PrimeBaseTest {
         "  \"siblings\":[" +
         "    {" +
         "      \"active\":false," +
+        "      \"bar\":false," +
         "      \"name\":\"Brett\"" +
         "    }," +
         "    {" +
         "      \"active\":false," +
+        "      \"bar\":false," +
         "      \"name\":\"Beth\"" +
         "    }" +
         "  ]," +

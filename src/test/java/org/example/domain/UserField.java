@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2014, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import java.util.Map;
  */
 public class UserField {
   public boolean active;
+  public boolean bar;
   public Map<String, AddressField> addresses = new HashMap<String, AddressField>();
   public Integer age;
   public Integer favoriteMonth;
