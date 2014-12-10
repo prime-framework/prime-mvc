@@ -55,8 +55,8 @@ public class TypeTools {
     Class<?> rawType = (Class<?>) type;
     if (Map.class == type || Collection.class == type) {
       throw new CollectionExpressionException("The method or member [" + path + "] returns a simple " +
-        "Map or Collection. Unable to determine the type of the Map or Collection. " +
-        "Please make this method generic so that the correct type can be determined.");
+          "Map or Collection. Unable to determine the type of the Map or Collection. " +
+          "Please make this method generic so that the correct type can be determined.");
     } else if (rawType.isArray()) {
       return rawType.getComponentType();
     }
@@ -71,17 +71,43 @@ public class TypeTools {
    * @param path The path to the type, used in exception message.
    * @return The key type.
    */
-  public static Type keyType(Type type, String path) {
+  public static Type[] mapTypes(Type type, String path) {
+    if (type instanceof Class) {
+      Class c = (Class) type;
+      type = c.getGenericSuperclass();
+      if (!(isGenericMap(type))) {
+        Type[] types = c.getGenericInterfaces();
+        if (types != null && types.length > 0) {
+          for (Type t : types) {
+            if (isGenericMap(t)) {
+              type = t;
+              break;
+            }
+          }
+        }
+      }
+    }
+
     if (type instanceof ParameterizedType) {
       ParameterizedType parameterizedType = (ParameterizedType) type;
       Class<?> rawType = (Class<?>) parameterizedType.getRawType();
       if (Map.class.isAssignableFrom(rawType)) {
-        return parameterizedType.getActualTypeArguments()[0];
+        return parameterizedType.getActualTypeArguments();
       }
     }
 
     throw new CollectionExpressionException("The method or member [" + path + "] returns a simple Map. Unable to determine the " +
-      "types of the Map. Please make this method or member generic so that the correct type can be determined.");
+        "types of the Map. Please make this method or member generic so that the correct type can be determined.");
+  }
+
+  /**
+   * Returns true if the given type is a Parameterized type with a raw type of Map.
+   *
+   * @param t The type.
+   * @return True or false.
+   */
+  public static boolean isGenericMap(Type t) {
+    return t instanceof ParameterizedType && Map.class.isAssignableFrom((Class) ((ParameterizedType) t).getRawType());
   }
 
   /**
@@ -116,5 +142,4 @@ public class TypeTools {
 
     return (Class<?>) type;
   }
-
 }

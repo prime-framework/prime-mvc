@@ -30,24 +30,25 @@ import org.primeframework.mvc.util.TypeTools;
  * @author Brian Pontarelli
  */
 public class MapAccessor extends Accessor {
-  Object key;
-  MemberAccessor memberAccessor;
+  final Object key;
+  final MemberAccessor memberAccessor;
 
   public MapAccessor(ConverterProvider converterProvider, Accessor accessor, String index, MemberAccessor memberAccessor) {
     super(converterProvider, accessor);
 
     String path = memberAccessor.toString();
     Type objectType = super.type;
-    super.type = TypeTools.componentType(objectType, path);
     this.memberAccessor = memberAccessor;
 
-    Class<?> keyType = TypeTools.rawType(TypeTools.keyType(objectType, path));
+    Type[] types = TypeTools.mapTypes(objectType, path);
+    super.type = types[1]; // Value type
+
+    Class<?> keyType = TypeTools.rawType(types[0]); // Key type
     GlobalConverter converter = converterProvider.lookup(keyType);
     if (converter == null) {
       throw new ConversionException("No type converter is registered for the type [" + keyType + "], which is the " +
         "type for the key of the map at [" + path + "]");
     }
-
     this.key = converter.convertFromStrings(keyType, null, path, index);
   }
 

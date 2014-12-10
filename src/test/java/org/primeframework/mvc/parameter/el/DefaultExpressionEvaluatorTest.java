@@ -16,6 +16,7 @@
 package org.primeframework.mvc.parameter.el;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -25,6 +26,7 @@ import org.example.domain.ActionField;
 import org.example.domain.Address;
 import org.example.domain.AddressField;
 import org.example.domain.Covariant;
+import org.example.domain.GenericBean;
 import org.example.domain.User;
 import org.example.domain.UserField;
 import org.primeframework.mvc.PrimeBaseTest;
@@ -401,6 +403,22 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     ExtensionInheritance object = new ExtensionInheritance();
     object.baseField = "bar";
     assertEquals(evaluator.getValue("baseField", object), "bar");
+  }
+
+  @Test
+  public void genericInheritanceImplements() {
+    GenericBean bean = new GenericBean();
+    evaluator.setValue("mapSubclass['foo']", bean, "value");
+    assertEquals(bean.mapSubclass.get("foo"), "value");
+
+    evaluator.setValue("mapSubclass['foo']", bean, new String[]{"value"}, Collections.emptyMap());
+    assertEquals(bean.mapSubclass.get("foo"), "value");
+
+    evaluator.setValue("mapImplements['foo']", bean, "value");
+    assertEquals(bean.mapImplements.get("foo"), "value");
+
+    evaluator.setValue("mapImplements['foo']", bean, new String[]{"value"}, Collections.emptyMap());
+    assertEquals(bean.mapImplements.get("foo"), "value");
   }
 
   @Test(enabled = false)

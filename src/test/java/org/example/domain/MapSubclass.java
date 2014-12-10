@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2014, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2014, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +15,11 @@
  */
 package org.example.domain;
 
+import java.util.HashMap;
+
 /**
- * This is a test action with fields.
- *
- * @author Brian Pontarelli
+ * Sub-class of generic map.
  */
-@org.primeframework.mvc.action.annotation.Action
-public class ActionField extends ParentField {
-  public UserField user;
+public class MapSubclass extends HashMap<String, String> {
 
-  public boolean foo;
-  public boolean bar;
-
-
-
-  public String post() {
-    return null;
-  }
 }
