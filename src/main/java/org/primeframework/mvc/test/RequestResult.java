@@ -238,7 +238,7 @@ public class RequestResult {
    */
   public RequestResult assertStatusCode(int statusCode) {
     if (this.statusCode != statusCode) {
-      throw new AssertionError("Status code [" + this.statusCode + "] was not equal to [" + statusCode + "]");
+      throw new AssertionError("Status code [" + this.statusCode + "] was not equal to [" + statusCode + "]\nResponse body: [" + body + "]\nRedirect: [" + redirect + "]");
     }
 
     return this;
