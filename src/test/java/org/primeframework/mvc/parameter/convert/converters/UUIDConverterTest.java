@@ -43,6 +43,12 @@ public class UUIDConverterTest {
     uuid = (UUID) converter.convertFromStrings(UUID.class, null, "testExpr", expected.toString());
     assertEquals(uuid, expected);
 
+    uuid = (UUID) converter.convertFromStrings(UUID.class, null, "testExpr", "1");
+    assertEquals(uuid, new UUID(0, 1));
+
+    uuid = (UUID) converter.convertFromStrings(UUID.class, null, "testExpr", "4242");
+    assertEquals(uuid, new UUID(0, 4242));
+
     try {
       converter.convertFromStrings(UUID.class, null, "testExpr", "NotAUUID");
       fail("Should throw an exception");
@@ -62,5 +68,11 @@ public class UUIDConverterTest {
     UUID expected = UUID.randomUUID();
     str = converter.convertToString(UUID.class, null, "testExpr", expected);
     assertEquals(str, expected.toString());
+
+    str = converter.convertToString(UUID.class, null, "testExpr", new UUID(0, 1));
+    assertEquals(str, "1");
+
+    str = converter.convertToString(UUID.class, null, "testExpr", new UUID(0, 4242));
+    assertEquals(str, "4242");
   }
 }

@@ -50,7 +50,13 @@ public class UUIDConverter extends AbstractGlobalConverter {
     try {
       return UUID.fromString(value);
     } catch (IllegalArgumentException iae) {
-      throw new ConversionException();
+      // Try as an integer
+      try {
+        long l = Long.parseLong(value);
+        return new UUID(0, l);
+      } catch (NumberFormatException e) {
+        throw new ConversionException();
+      }
     }
   }
 
@@ -63,6 +69,10 @@ public class UUIDConverter extends AbstractGlobalConverter {
 
   protected String objectToString(Object value, Type convertFrom, Map<String, String> attributes, String expression)
       throws ConversionException, ConverterStateException {
+    UUID uuid = (UUID) value;
+    if (uuid.getMostSignificantBits() == 0) {
+      return Long.toString(uuid.getLeastSignificantBits());
+    }
     return value.toString();
   }
 }
