@@ -104,6 +104,9 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
 
     try {
       chain.continueWorkflow();
+
+      // We need to leave the action in the store because it might be used by the Error Workflow
+      actionInvocationStore.removeCurrent();
     } catch (ServletException | IOException | RuntimeException | Error e) {
       if (errorMeter != null) {
         errorMeter.mark();
@@ -114,8 +117,6 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
       if (timer != null) {
         timer.stop();
       }
-
-      actionInvocationStore.removeCurrent();
     }
   }
 

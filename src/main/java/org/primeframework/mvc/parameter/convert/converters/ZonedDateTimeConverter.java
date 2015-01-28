@@ -16,6 +16,8 @@
 package org.primeframework.mvc.parameter.convert.converters;
 
 import java.lang.reflect.Type;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -52,10 +54,16 @@ public class ZonedDateTimeConverter extends AbstractGlobalConverter {
 
     String format = attributes.get("dateTimeFormat");
     if (format == null) {
-      throw new ConverterStateException("You must provide the dateTimeFormat dynamic attribute for " +
-          "the form fields [" + expression + "] that maps to DateTime properties in the action. " +
-          "If you are using a text field it will look like this: [@jc.text _dateTimeFormat=\"MM/dd/yyyy hh:mm:ss aa Z\"]\n\n" +
-          "NOTE: The format must include the time and a timezone. Otherwise, it will be unparseable");
+      // Try checking if this is an instant
+      try {
+        long instant = Long.parseLong(value);
+        return ZonedDateTime.ofInstant(Instant.ofEpochMilli(instant), ZoneOffset.UTC);
+      } catch (NumberFormatException e) {
+        throw new ConverterStateException("You must provide the dateTimeFormat dynamic attribute for " +
+            "the form fields [" + expression + "] that maps to DateTime properties in the action. " +
+            "If you are using a text field it will look like this: [@jc.text _dateTimeFormat=\"MM/dd/yyyy hh:mm:ss aa Z\"]\n\n" +
+            "NOTE: The format must include the time and a timezone. Otherwise, it will be unparseable");
+      }
     }
 
     return toDateTime(value, format);
