@@ -57,7 +57,7 @@ public class RequestBodyWorkflowTest {
   @Test
   public void containerDrainedBody() throws IOException, ServletException {
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    expect(request.getParameterMap()).andReturn(new HashMap());
+    expect(request.getParameterMap()).andReturn(new HashMap<>());
     expect(request.getContentType()).andReturn("application/x-www-form-urlencoded");
     expect(request.getInputStream()).andReturn(new MockServletInputStream(new byte[0]));
     expect(request.getContentLength()).andReturn(0);
@@ -80,30 +80,27 @@ public class RequestBodyWorkflowTest {
     String body = FileUtils.readFileToString(new File("src/test/java/org/primeframework/mvc/servlet/http-test-body-multiple-files.txt"));
 
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-    EasyMock.expect(request.getParameterMap()).andReturn(new HashMap());
+    EasyMock.expect(request.getParameterMap()).andReturn(new HashMap<>());
     EasyMock.expect(request.getContentType()).andReturn("multipart/form-data, boundary=AaB03x").times(2);
     EasyMock.expect(request.getInputStream()).andReturn(new MockServletInputStream(body.getBytes()));
     EasyMock.expect(request.getCharacterEncoding()).andReturn("UTF-8");
     EasyMock.expect(request.getContentLength()).andReturn(body.length());
-    final Capture<Map<String, List<FileInfo>>> capture = new Capture<Map<String, List<FileInfo>>>();
+    final Capture<Map<String, List<FileInfo>>> capture = new Capture<>();
     request.setAttribute(eq(RequestKeys.FILE_ATTRIBUTE), capture(capture));
     EasyMock.replay(request);
 
     final AtomicBoolean run = new AtomicBoolean(false);
-    MockWorkflowChain chain = new MockWorkflowChain(new Runnable() {
-      @Override
-      public void run() {
-        Map<String, List<FileInfo>> files = capture.getValue();
-        assertEquals(files.size(), 1);
-        try {
-          assertEquals(FileUtils.readFileToString(files.get("userfiles").get(0).file), "test");
-          assertEquals(FileUtils.readFileToString(files.get("userfiles").get(1).file), "test2");
-        } catch (IOException e) {
-          throw new RuntimeException(e);
-        }
-
-        run.set(true);
+    MockWorkflowChain chain = new MockWorkflowChain(() -> {
+      Map<String, List<FileInfo>> files = capture.getValue();
+      assertEquals(files.size(), 1);
+      try {
+        assertEquals(FileUtils.readFileToString(files.get("userfiles").get(0).file), "test");
+        assertEquals(FileUtils.readFileToString(files.get("userfiles").get(1).file), "test2");
+      } catch (IOException e) {
+        throw new RuntimeException(e);
       }
+
+      run.set(true);
     });
 
     HttpServletRequestWrapper wrapper = new HttpServletRequestWrapper(request);
@@ -137,7 +134,7 @@ public class RequestBodyWorkflowTest {
   @Test
   public void parse() throws IOException, ServletException {
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    expect(request.getParameterMap()).andReturn(new HashMap());
+    expect(request.getParameterMap()).andReturn(new HashMap<>());
     expect(request.getContentType()).andReturn("application/x-www-form-urlencoded");
     String body = "param1=value1&param2=value2&param+space+key=param+space+value&param%2Bencoded%2Bkey=param%2Bencoded%2Bvalue";
     expect(request.getInputStream()).andReturn(new MockServletInputStream(body.getBytes()));
@@ -169,7 +166,7 @@ public class RequestBodyWorkflowTest {
 
   @Test
   public void parseCombine() throws IOException, ServletException {
-    Map<String, String[]> oldParams = new HashMap<String, String[]>();
+    Map<String, String[]> oldParams = new HashMap<>();
     oldParams.put("param1", new String[]{"oldvalue1", "oldvalue2"});
     oldParams.put("param2", new String[]{"oldvalue3"});
 
@@ -206,7 +203,7 @@ public class RequestBodyWorkflowTest {
   public void parseMultiple() throws IOException, ServletException {
     String body = "param1=value1&param1=value2&param2=value3";
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    expect(request.getParameterMap()).andReturn(new HashMap());
+    expect(request.getParameterMap()).andReturn(new HashMap<>());
     expect(request.getContentType()).andReturn("application/x-www-form-urlencoded");
     expect(request.getInputStream()).andReturn(new MockServletInputStream(body.getBytes()));
     expect(request.getContentLength()).andReturn(body.getBytes().length);
@@ -238,28 +235,25 @@ public class RequestBodyWorkflowTest {
     String body = FileUtils.readFileToString(new File("src/test/java/org/primeframework/mvc/servlet/http-test-body-single-file.txt"));
 
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
-    EasyMock.expect(request.getParameterMap()).andReturn(new HashMap());
+    EasyMock.expect(request.getParameterMap()).andReturn(new HashMap<>());
     EasyMock.expect(request.getContentType()).andReturn("multipart/form-data, boundary=AaB03x").times(2);
     EasyMock.expect(request.getInputStream()).andReturn(new MockServletInputStream(body.getBytes()));
     EasyMock.expect(request.getCharacterEncoding()).andReturn("UTF-8");
     EasyMock.expect(request.getContentLength()).andReturn(body.length());
-    final Capture<Map<String, List<FileInfo>>> capture = new Capture<Map<String, List<FileInfo>>>();
+    final Capture<Map<String, List<FileInfo>>> capture = new Capture<>();
     request.setAttribute(eq(RequestKeys.FILE_ATTRIBUTE), capture(capture));
     EasyMock.replay(request);
 
     final AtomicBoolean run = new AtomicBoolean(false);
-    MockWorkflowChain chain = new MockWorkflowChain(new Runnable() {
-      @Override
-      public void run() {
-        Map<String, List<FileInfo>> files = capture.getValue();
-        assertEquals(files.size(), 1);
-        try {
-          assertEquals(FileUtils.readFileToString(files.get("userfile").get(0).file), "test");
-        } catch (IOException e) {
-          throw new RuntimeException(e);
-        }
-        run.set(true);
+    MockWorkflowChain chain = new MockWorkflowChain(() -> {
+      Map<String, List<FileInfo>> files = capture.getValue();
+      assertEquals(files.size(), 1);
+      try {
+        assertEquals(FileUtils.readFileToString(files.get("userfile").get(0).file), "test");
+      } catch (IOException e) {
+        throw new RuntimeException(e);
       }
+      run.set(true);
     });
 
     HttpServletRequestWrapper wrapper = new HttpServletRequestWrapper(request);
@@ -299,7 +293,7 @@ public class RequestBodyWorkflowTest {
   }
 
   private String keyDiff(Map<String, String[]> actual, Map<String, String[]> expected) {
-    Set<String> finalSet = new HashSet<String>();
+    Set<String> finalSet = new HashSet<>();
     finalSet.addAll(actual.keySet());
     finalSet.removeAll(expected.keySet());
     finalSet.addAll(expected.keySet());

@@ -53,7 +53,7 @@ public abstract class AbstractCheckedInput extends AbstractInput {
         // Collection or array. Iterate and toString each item and compare to value
         String valueAttr = (String) attributes.get("value");
         if (value instanceof Iterable) {
-          Iterable iterable = (Iterable) value;
+          Iterable<?> iterable = (Iterable<?>) value;
           for (Object o : iterable) {
             if (o.toString().equals(valueAttr)) {
               checked = true;

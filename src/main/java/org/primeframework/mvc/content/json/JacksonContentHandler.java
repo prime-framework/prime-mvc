@@ -142,10 +142,15 @@ public class JacksonContentHandler implements ContentHandler {
     StringBuilder fieldBuilder = new StringBuilder();
     List<JsonMappingException.Reference> references = e.getPath();
     for (JsonMappingException.Reference reference : references) {
+      String fieldName = reference.getFieldName();
+      if (fieldName == null) {
+        continue;
+      }
+
       if (fieldBuilder.length() > 0) {
         fieldBuilder.append(".");
       }
-      fieldBuilder.append(reference.getFieldName());
+      fieldBuilder.append(fieldName);
     }
 
     return fieldBuilder.toString();

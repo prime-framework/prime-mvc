@@ -31,6 +31,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static java.util.Arrays.asList;
+import static org.primeframework.mvc.util.MapBuilder.lmap;
 
 /**
  * This tests the checkboxlist control.
@@ -176,16 +177,5 @@ public class CheckboxListTest extends ControlBaseTest {
         "</div>\n" +
         "</div>\n" +
         "</div>\n");
-  }
-
-  public static <T> Map<T, T> lmap(T... values) {
-    LinkedHashMap<T, T> map = new LinkedHashMap<T, T>();
-    for (int i = 0; i < values.length; i = i + 2) {
-      T key = values[i];
-      T value = values[i + 1];
-      map.put(key, value);
-    }
-
-    return map;
   }
 }

@@ -18,14 +18,14 @@ package org.primeframework.mvc;
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
 import org.apache.commons.io.FileUtils;
-import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
 import org.primeframework.mvc.action.config.ActionConfigurationProvider;
 import org.primeframework.mvc.container.ContainerResolver;
 import org.primeframework.mvc.guice.MVCModule;
@@ -36,8 +36,12 @@ import org.primeframework.mvc.parameter.el.MissingPropertyExpressionException;
 import org.primeframework.mvc.test.RequestResult;
 import org.primeframework.mvc.test.RequestSimulator;
 import org.primeframework.mvc.util.URIBuilder;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import freemarker.template.Configuration;
@@ -53,6 +57,8 @@ import static org.testng.Assert.fail;
  * @author Brian Pontarelli
  */
 public class GlobalTest extends PrimeBaseTest {
+  private MetricRegistry metricRegistry;
+
   @Test
   public void actionlessRequest() throws Exception {
     RequestSimulator simulator = new RequestSimulator(context, new MVCModule() {
@@ -120,11 +126,16 @@ public class GlobalTest extends PrimeBaseTest {
         "}";
 
     RequestResult result = simulator.test("/api")
-        .withContentType("application/json")
-        .withBody(json.getBytes())
-        .post();
+                                    .withContentType("application/json")
+                                    .withBody(json.getBytes())
+                                    .post();
 
     assertEquals(result.body, json.replace("  ", ""));
+  }
+
+  @BeforeMethod
+  public void clearMetrics() {
+    metricRegistry = new MetricRegistry();
   }
 
   @Test
@@ -183,6 +194,47 @@ public class GlobalTest extends PrimeBaseTest {
 
     RequestResult result = simulator.test("/user/full-form").get();
     assertEquals(result.body, FileUtils.readFileToString(new File("src/test/java/org/primeframework/mvc/full-form-output.txt")));
+  }
+
+  @Test
+  public void metrics() throws Exception {
+    RequestSimulator simulator = new RequestSimulator(context, new MVCModule() {
+      @Override
+      protected void configure() {
+        super.configure();
+        install(new TestModule());
+        bind(MetricRegistry.class).toInstance(metricRegistry);
+      }
+    });
+
+    RequestResult result = simulator.test("/user/full-form").get();
+    assertEquals(result.body, FileUtils.readFileToString(new File("src/test/java/org/primeframework/mvc/full-form-output.txt")));
+    Map<String, Timer> timers = metricRegistry.getTimers();
+    assertEquals(timers.get("prime-mvc.[/user/full-form].requests").getCount(), 1);
+  }
+
+  @Test
+  public void metricsErrors() throws Exception {
+    RequestSimulator simulator = new RequestSimulator(context, new MVCModule() {
+      @Override
+      protected void configure() {
+        super.configure();
+        install(new TestModule());
+        bind(MetricRegistry.class).toInstance(metricRegistry);
+      }
+    });
+
+    try {
+      simulator.test("/execute-method-throws-exception").get();
+    } catch (Exception e) {
+      // Expected
+    }
+
+    Map<String, Timer> timers = metricRegistry.getTimers();
+    assertEquals(timers.get("prime-mvc.[/execute-method-throws-exception].requests").getCount(), 1);
+
+    Map<String, Meter> meters = metricRegistry.getMeters();
+    assertEquals(meters.get("prime-mvc.[/execute-method-throws-exception].errors").getCount(), 1);
   }
 
   @Test
@@ -278,7 +330,7 @@ public class GlobalTest extends PrimeBaseTest {
     assertSingletonConverter(simulator, BigDecimal.class);
     assertSingletonConverter(simulator, BigInteger.class);
     assertSingletonConverter(simulator, Collection.class);
-    assertSingletonConverter(simulator, DateTime.class);
+    assertSingletonConverter(simulator, ZonedDateTime.class);
     assertSingletonConverter(simulator, Enum.class);
     assertSingletonConverter(simulator, File.class);
     assertSingletonConverter(simulator, LocalDate.class);

@@ -15,12 +15,11 @@
  */
 package org.primeframework.mvc.control.form;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.joda.time.LocalDate;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.primeframework.mvc.control.annotation.ControlAttribute;
 import org.primeframework.mvc.control.annotation.ControlAttributes;
 
@@ -30,17 +29,17 @@ import org.primeframework.mvc.control.annotation.ControlAttributes;
  * @author Brian Pontarelli
  */
 @ControlAttributes(
-  required = {
-    @ControlAttribute(name = "name")
-  },
-  optional = {
-    @ControlAttribute(name = "disabled", types = {boolean.class, Boolean.class}),
-    @ControlAttribute(name = "multiple", types = {boolean.class, Boolean.class}),
-    @ControlAttribute(name = "readonly", types = {boolean.class, Boolean.class}),
-    @ControlAttribute(name = "required", types = {boolean.class, Boolean.class}),
-    @ControlAttribute(name = "size", types = {int.class, Number.class}),
-    @ControlAttribute(name = "tabindex", types = {int.class, Number.class})
-  }
+    required = {
+        @ControlAttribute(name = "name")
+    },
+    optional = {
+        @ControlAttribute(name = "disabled", types = {boolean.class, Boolean.class}),
+        @ControlAttribute(name = "multiple", types = {boolean.class, Boolean.class}),
+        @ControlAttribute(name = "readonly", types = {boolean.class, Boolean.class}),
+        @ControlAttribute(name = "required", types = {boolean.class, Boolean.class}),
+        @ControlAttribute(name = "size", types = {int.class, Number.class}),
+        @ControlAttribute(name = "tabindex", types = {int.class, Number.class})
+    }
 )
 public class MonthSelect extends Select {
 
@@ -51,11 +50,11 @@ public class MonthSelect extends Select {
   protected void addAdditionalAttributes() {
     super.addAdditionalAttributes();
 
-    Map<Integer, String> months = new TreeMap<Integer, String>();
-    DateTimeFormatter formatter = DateTimeFormat.forPattern("MMMM").withLocale(locale);
+    Map<Integer, String> months = new TreeMap<>();
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM").withLocale(locale);
     for (int i = 1; i <= 12; i++) {
-      LocalDate date = new LocalDate(2008, i, 1);
-      months.put(i, formatter.print(date));
+      LocalDate date = LocalDate.of(2008, i, 1);
+      months.put(i, date.format(formatter));
     }
 
     attributes.put("items", months);

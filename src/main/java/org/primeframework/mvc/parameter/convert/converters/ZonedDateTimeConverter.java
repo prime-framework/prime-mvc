@@ -16,12 +16,12 @@
 package org.primeframework.mvc.parameter.convert.converters;
 
 import java.lang.reflect.Type;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
-import org.joda.time.ReadableInstant;
-import org.joda.time.format.DateTimeFormat;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.parameter.convert.AbstractGlobalConverter;
 import org.primeframework.mvc.parameter.convert.ConversionException;
@@ -31,21 +31,21 @@ import org.primeframework.mvc.parameter.convert.annotation.GlobalConverter;
 import com.google.inject.Inject;
 
 /**
- * This converts to and from DateTime.
+ * This converts to and from ZonedDateTime.
  *
  * @author Brian Pontarelli
  */
 @GlobalConverter
-public class DateTimeConverter extends AbstractGlobalConverter {
+public class ZonedDateTimeConverter extends AbstractGlobalConverter {
   private final boolean emptyIsNull;
 
   @Inject
-  public DateTimeConverter(MVCConfiguration configuration) {
+  public ZonedDateTimeConverter(MVCConfiguration configuration) {
     this.emptyIsNull = configuration.emptyParametersAreNull();
   }
 
   protected Object stringToObject(String value, Type convertTo, Map<String, String> attributes, String expression)
-    throws ConversionException, ConverterStateException {
+      throws ConversionException, ConverterStateException {
     if (emptyIsNull && StringUtils.isBlank(value)) {
       return null;
     }
@@ -53,36 +53,38 @@ public class DateTimeConverter extends AbstractGlobalConverter {
     String format = attributes.get("dateTimeFormat");
     if (format == null) {
       throw new ConverterStateException("You must provide the dateTimeFormat dynamic attribute for " +
-        "the form fields [" + expression + "] that maps to DateTime properties in the action. " +
-        "If you are using a text field it will look like this: [@jc.text _dateTimeFormat=\"MM/dd/yyyy\"]");
+          "the form fields [" + expression + "] that maps to DateTime properties in the action. " +
+          "If you are using a text field it will look like this: [@jc.text _dateTimeFormat=\"MM/dd/yyyy hh:mm:ss aa Z\"]\n\n" +
+          "NOTE: The format must include the time and a timezone. Otherwise, it will be unparseable");
     }
 
     return toDateTime(value, format);
   }
 
   protected Object stringsToObject(String[] values, Type convertTo, Map<String, String> attributes, String expression)
-    throws ConversionException, ConverterStateException {
+      throws ConversionException, ConverterStateException {
     throw new UnsupportedOperationException("You are attempting to map a form field that contains " +
-      "multiple parameters to a property on the action class that is of type DateTime. This isn't " +
-      "allowed.");
+        "multiple parameters to a property on the action class that is of type DateTime. This isn't " +
+        "allowed.");
   }
 
   protected String objectToString(Object value, Type convertFrom, Map<String, String> attributes, String expression)
-    throws ConversionException, ConverterStateException {
+      throws ConversionException, ConverterStateException {
     String format = attributes.get("dateTimeFormat");
     if (format == null) {
       throw new ConverterStateException("You must provide the dateTimeFormat dynamic attribute for " +
-        "the form fields [" + expression + "] that maps to DateTime properties in the action. " +
-        "If you are using a text field it will look like this: [@jc.text _dateTimeFormat=\"MM/dd/yyyy\"]");
+          "the form fields [" + expression + "] that maps to DateTime properties in the action. " +
+          "If you are using a text field it will look like this: [@jc.text _dateTimeFormat=\"MM/dd/yyyy hh:mm:ss aa Z\"]\n\n" +
+          "NOTE: The format must include the time and a timezone. Otherwise, it will be unparseable");
     }
 
-    return DateTimeFormat.forPattern(format).print((ReadableInstant) value);
+    return ((ZonedDateTime) value).format(DateTimeFormatter.ofPattern(format));
   }
 
-  private DateTime toDateTime(String value, String format) {
+  private ZonedDateTime toDateTime(String value, String format) {
     try {
-      return DateTimeFormat.forPattern(format).withOffsetParsed().parseDateTime(value);
-    } catch (IllegalArgumentException e) {
+      return ZonedDateTime.parse(value, DateTimeFormatter.ofPattern(format));
+    } catch (DateTimeParseException e) {
       throw new ConversionException("Invalid date [" + value + "] for format [" + format + "]", e);
     }
   }

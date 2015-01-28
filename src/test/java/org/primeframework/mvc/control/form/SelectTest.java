@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc.control.form;
 
-import com.google.inject.Inject;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.example.action.user.Edit;
@@ -29,10 +28,9 @@ import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.testng.annotations.Test;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
+import com.google.inject.Inject;
 import static java.util.Arrays.asList;
+import static org.primeframework.mvc.util.MapBuilder.lmap;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
@@ -44,17 +42,6 @@ import static org.testng.Assert.fail;
 public class SelectTest extends ControlBaseTest {
   @Inject public Select select;
 
-  public static <T> Map<T, T> lmap(T... values) {
-    LinkedHashMap<T, T> map = new LinkedHashMap<T, T>();
-    for (int i = 0; i < values.length; i = i + 2) {
-      T key = values[i];
-      T value = values[i + 1];
-      map.put(key, value);
-    }
-
-    return map;
-  }
-
   @Test
   public void action() {
     Address address = new Address();
@@ -65,10 +52,10 @@ public class SelectTest extends ControlBaseTest {
 
     ais.setCurrent(new ActionInvocation(action, null, "/select", null, null));
 
-    new ControlTester(select).
-        attr("name", "user.addresses['work'].country").
-        attr("items", lmap("US", "United States", "DE", "Germany")).
-        go("<input type=\"hidden\" name=\"user.addresses['work'].country@param\" value=\"param-value\"/>\n" +
+    new ControlTester(select)
+        .attr("name", "user.addresses['work'].country")
+        .attr("items", lmap("US", "United States", "DE", "Germany"))
+        .go("<input type=\"hidden\" name=\"user.addresses['work'].country@param\" value=\"param-value\"/>\n" +
             "<div class=\"select input control\">\n" +
             "<div class=\"label-container\"><label for=\"user_addresses['work']_country\" class=\"label\">Country</label></div>\n" +
             "<div class=\"control-container\">\n" +
@@ -83,11 +70,11 @@ public class SelectTest extends ControlBaseTest {
   @Test
   public void actionLess() {
     ais.setCurrent(new ActionInvocation(null, null, "/select", null, null));
-    new ControlTester(select).
-        attr("name", "test").
-        attr("class", "css-class").
-        attr("items", asList("one", "two", "three")).
-        go("<input type=\"hidden\" name=\"test@param\" value=\"param-value\"/>\n" +
+    new ControlTester(select)
+        .attr("name", "test")
+        .attr("class", "css-class")
+        .attr("items", asList("one", "two", "three"))
+        .go("<input type=\"hidden\" name=\"test@param\" value=\"param-value\"/>\n" +
             "<div class=\"css-class-select css-class-input css-class-control select input control\">\n" +
             "<div class=\"label-container\"><label for=\"test\" class=\"label\">Test</label></div>\n" +
             "<div class=\"control-container\">\n" +
@@ -106,10 +93,10 @@ public class SelectTest extends ControlBaseTest {
 
     ais.setCurrent(new ActionInvocation(action, null, "/select", null, null));
 
-    new ControlTester(select).
-        attr("name", "enumValue").
-        attr("items", SomeEnum.values()).
-        go("<input type=\"hidden\" name=\"enumValue@param\" value=\"param-value\"/>\n" +
+    new ControlTester(select)
+        .attr("name", "enumValue")
+        .attr("items", SomeEnum.values())
+        .go("<input type=\"hidden\" name=\"enumValue@param\" value=\"param-value\"/>\n" +
             "<div class=\"select input control\">\n" +
             "<div class=\"label-container\"><label for=\"enumValue\" class=\"label\">Enum</label></div>\n" +
             "<div class=\"control-container\">\n" +
@@ -136,12 +123,12 @@ public class SelectTest extends ControlBaseTest {
     Pair<String, String> us = Pair.of("US", "United States");
     Pair<String, String> de = Pair.of("DE", "Germany");
 
-    new ControlTester(select).
-        attr("name", "user.addresses['work'].country").
-        attr("valueExpr", "left").
-        attr("textExpr", "right").
-        attr("items", ArrayUtils.toArray(us, de)).
-        go("<input type=\"hidden\" name=\"user.addresses['work'].country@param\" value=\"param-value\"/>\n" +
+    new ControlTester(select)
+        .attr("name", "user.addresses['work'].country")
+        .attr("valueExpr", "left")
+        .attr("textExpr", "right")
+        .attr("items", ArrayUtils.toArray(us, de))
+        .go("<input type=\"hidden\" name=\"user.addresses['work'].country@param\" value=\"param-value\"/>\n" +
             "<div class=\"select input control\">\n" +
             "<div class=\"label-container\"><label for=\"user_addresses['work']_country\" class=\"label\">Country</label></div>\n" +
             "<div class=\"control-container\">\n" +
@@ -165,10 +152,10 @@ public class SelectTest extends ControlBaseTest {
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "code1", "fieldError1"));
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "code2", "fieldError2"));
 
-    new ControlTester(select).
-        attr("name", "user.addresses['work'].country").
-        attr("items", lmap("US", "United States", "DE", "Germany")).
-        go("<input type=\"hidden\" name=\"user.addresses['work'].country@param\" value=\"param-value\"/>\n" +
+    new ControlTester(select)
+        .attr("name", "user.addresses['work'].country")
+        .attr("items", lmap("US", "United States", "DE", "Germany"))
+        .go("<input type=\"hidden\" name=\"user.addresses['work'].country@param\" value=\"param-value\"/>\n" +
             "<div class=\"select input control\">\n" +
             "<div class=\"label-container\"><label for=\"user_addresses['work']_country\" class=\"label\"><span class=\"error\">Country (fieldError1, fieldError2)</span></label></div>\n" +
             "<div class=\"control-container\">\n" +
@@ -183,11 +170,11 @@ public class SelectTest extends ControlBaseTest {
   @Test
   public void headerOption() {
     ais.setCurrent(new ActionInvocation(null, null, "/select", null, null));
-    new ControlTester(select).
-        attr("name", "test").
-        attr("headerValue", "zero").
-        attr("items", asList("one", "two", "three")).
-        go("<input type=\"hidden\" name=\"test@param\" value=\"param-value\"/>\n" +
+    new ControlTester(select)
+        .attr("name", "test")
+        .attr("headerValue", "zero")
+        .attr("items", asList("one", "two", "three"))
+        .go("<input type=\"hidden\" name=\"test@param\" value=\"param-value\"/>\n" +
             "<div class=\"select input control\">\n" +
             "<div class=\"label-container\"><label for=\"test\" class=\"label\">Test</label></div>\n" +
             "<div class=\"control-container\">\n" +
@@ -211,10 +198,10 @@ public class SelectTest extends ControlBaseTest {
 
     ais.setCurrent(new ActionInvocation(action, null, "/select", null, null));
 
-    new ControlTester(select).
-        attr("name", "user.addresses['work'].country").
-        attr("items", lmap("<US>", "<United States>", "DE", "Germany")).
-        go("<input type=\"hidden\" name=\"user.addresses['work'].country@param\" value=\"param-value\"/>\n" +
+    new ControlTester(select)
+        .attr("name", "user.addresses['work'].country")
+        .attr("items", lmap("<US>", "<United States>", "DE", "Germany"))
+        .go("<input type=\"hidden\" name=\"user.addresses['work'].country@param\" value=\"param-value\"/>\n" +
             "<div class=\"select input control\">\n" +
             "<div class=\"label-container\"><label for=\"user_addresses['work']_country\" class=\"label\">Country</label></div>\n" +
             "<div class=\"control-container\">\n" +
@@ -239,11 +226,11 @@ public class SelectTest extends ControlBaseTest {
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "code2", "fieldError2"));
 
     try {
-      new ControlTester(select).
-          attr("name", "user.addresses['work'].country").
-          attr("items", lmap("US", "United States", "DE", "Germany")).
-          attr("multiple", "multiple").
-          go(null);
+      new ControlTester(select)
+          .attr("name", "user.addresses['work'].country")
+          .attr("items", lmap("US", "United States", "DE", "Germany"))
+          .attr("multiple", "multiple")
+          .go(null);
 
       fail("Should have failed because the multiple attribute should be a boolean");
     } catch (PrimeException e) {

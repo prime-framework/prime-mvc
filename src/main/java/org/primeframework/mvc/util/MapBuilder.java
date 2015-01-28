@@ -24,29 +24,8 @@ import java.util.Map;
  *
  * @author Brian Pontarelli
  */
-public class MapBuilder<T,U> {
-  public final Map<T,U> map = new LinkedHashMap<T, U>();
-  
-  public static <T,U> MapBuilder<T,U> map() {
-    return new MapBuilder<T, U>();
-  }
-
-  public static <T,U> MapBuilder<T,U> map(T key, U value) {
-    return new MapBuilder<T, U>(key, value);
-  }
-
-  public static <T> Map<T,T> asMap(T... values) {
-    if (values.length % 2 != 0) {
-      throw new IllegalArgumentException("Invalid mapping values. Must have a multiple of 2");
-    }
-    
-    Map<T,T> map = new HashMap<T, T>();
-    for (int i = 0; i < values.length; i = i + 2) {
-      map.put(values[i], values[i + 1]);
-    }
-    
-    return map;
-  }
+public class MapBuilder<T, U> {
+  public final Map<T, U> map = new LinkedHashMap<>();
 
   public MapBuilder() {
   }
@@ -55,12 +34,46 @@ public class MapBuilder<T,U> {
     map.put(key, value);
   }
 
-  public MapBuilder<T,U> put(T key, U value) {
+  @SuppressWarnings("unchecked")
+  public static <T> Map<T, T> asMap(T... values) {
+    if (values.length % 2 != 0) {
+      throw new IllegalArgumentException("Invalid mapping values. Must have a multiple of 2");
+    }
+
+    Map<T, T> map = new HashMap<>();
+    for (int i = 0; i < values.length; i = i + 2) {
+      map.put(values[i], values[i + 1]);
+    }
+
+    return map;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T> Map<T, T> lmap(T... values) {
+    LinkedHashMap<T, T> map = new LinkedHashMap<>();
+    for (int i = 0; i < values.length; i = i + 2) {
+      T key = values[i];
+      T value = values[i + 1];
+      map.put(key, value);
+    }
+
+    return map;
+  }
+
+  public static <T, U> MapBuilder<T, U> map(T key, U value) {
+    return new MapBuilder<>(key, value);
+  }
+
+  public static <T, U> MapBuilder<T, U> map() {
+    return new MapBuilder<>();
+  }
+
+  public Map<T, U> done() {
+    return map;
+  }
+
+  public MapBuilder<T, U> put(T key, U value) {
     map.put(key, value);
     return this;
-  }
-  
-  public Map<T,U> done() {
-    return map;
   }
 }

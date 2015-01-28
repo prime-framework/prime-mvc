@@ -65,24 +65,40 @@ import freemarker.template.TemplateModelException;
  * @author Brian Pontarelli
  */
 public class FreeMarkerMap implements TemplateHashModelEx {
-  public static final String REQUEST_MODEL = "Request";
-  public static final String REQUEST = "request";
-  public static final String SESSION_MODEL = "Session";
-  public static final String SESSION = "session";
-  public static final String APPLICATION_MODEL = "Application";
-  public static final String APPLICATION = "application";
-  public static final String JSP_TAGLIBS = "JspTaglibs";
   public static final String ALL_MESSAGES = "allMessages";
-  public static final String FIELD_MESSAGES = "fieldMessages";
+
+  public static final String APPLICATION = "application";
+
+  public static final String APPLICATION_MODEL = "Application";
+
   public static final String ERROR_MESSAGES = "errorMessages";
+
+  public static final String FIELD_MESSAGES = "fieldMessages";
+
   public static final String INFO_MESSAGES = "infoMessages";
+
+  public static final String JSP_TAGLIBS = "JspTaglibs";
+
+  public static final String REQUEST = "request";
+
+  public static final String REQUEST_MODEL = "Request";
+
+  public static final String SESSION = "session";
+
+  public static final String SESSION_MODEL = "Session";
+
   public static final String WARNING_MESSAGES = "warningMessages";
 
-  protected final HttpServletRequest request;
-  protected final ExpressionEvaluator expressionEvaluator;
   protected final ActionInvocationStore actionInvocationStore;
-  protected final Map<String, Object> objects = new HashMap<String, Object>();
+
   protected final ServletContext context;
+
+  protected final ExpressionEvaluator expressionEvaluator;
+
+  protected final Map<String, Object> objects = new HashMap<>();
+
+  protected final HttpServletRequest request;
+
   protected final TaglibFactory taglibFactory;
 
   @Inject
@@ -104,9 +120,6 @@ public class FreeMarkerMap implements TemplateHashModelEx {
     }
 
     objects.put(APPLICATION_MODEL, new ServletContextHashModel(new GenericServlet() {
-      public void service(ServletRequest servletRequest, ServletResponse servletResponse) {
-      }
-
       @Override
       public ServletConfig getServletConfig() {
         return this;
@@ -117,6 +130,9 @@ public class FreeMarkerMap implements TemplateHashModelEx {
         return FreeMarkerMap.this.context;
       }
 
+      public void service(ServletRequest servletRequest, ServletResponse servletResponse) {
+      }
+
 
     }, FieldSupportBeansWrapper.INSTANCE));
     objects.put(APPLICATION, context);
@@ -124,9 +140,9 @@ public class FreeMarkerMap implements TemplateHashModelEx {
 
     List<Message> allMessages = messageStore.get();
     Map<String, List<FieldMessage>> fieldMessages = messageStore.getFieldMessages();
-    List<Message> errorMessages = new ArrayList<Message>();
-    List<Message> infoMessages = new ArrayList<Message>();
-    List<Message> warningMessages = new ArrayList<Message>();
+    List<Message> errorMessages = new ArrayList<>();
+    List<Message> infoMessages = new ArrayList<>();
+    List<Message> warningMessages = new ArrayList<>();
 
     for (Message message : allMessages) {
       if (!(message instanceof FieldMessage)) {
@@ -157,34 +173,6 @@ public class FreeMarkerMap implements TemplateHashModelEx {
     }
 
     // TODO add debugging for figuring out what scope an object is in
-  }
-
-  @Override
-  public int size() {
-    int size = objects.size() + count(request.getAttributeNames());
-
-    HttpSession session = request.getSession(false);
-    if (session != null) {
-      size += count(session.getAttributeNames());
-    }
-
-    size += count(context.getAttributeNames());
-
-    Deque<ActionInvocation> actionInvocations = actionInvocationStore.getDeque();
-    if (actionInvocations != null) {
-      for (ActionInvocation actionInvocation : actionInvocations) {
-        if (actionInvocation.action != null) {
-          size += actionInvocation.configuration.memberNames.size();
-        }
-      }
-    }
-
-    return size;
-  }
-
-  @Override
-  public boolean isEmpty() {
-    return size() > 0;
   }
 
   @Override
@@ -239,8 +227,13 @@ public class FreeMarkerMap implements TemplateHashModelEx {
   }
 
   @Override
+  public boolean isEmpty() {
+    return size() > 0;
+  }
+
+  @Override
   public TemplateCollectionModel keys() {
-    Set<String> keys = new HashSet<String>(objects.keySet());
+    Set<String> keys = new HashSet<>(objects.keySet());
     keys.addAll(enumToSet(request.getAttributeNames()));
 
     HttpSession session = request.getSession(false);
@@ -265,8 +258,31 @@ public class FreeMarkerMap implements TemplateHashModelEx {
   }
 
   @Override
+  public int size() {
+    int size = objects.size() + count(request.getAttributeNames());
+
+    HttpSession session = request.getSession(false);
+    if (session != null) {
+      size += count(session.getAttributeNames());
+    }
+
+    size += count(context.getAttributeNames());
+
+    Deque<ActionInvocation> actionInvocations = actionInvocationStore.getDeque();
+    if (actionInvocations != null) {
+      for (ActionInvocation actionInvocation : actionInvocations) {
+        if (actionInvocation.action != null) {
+          size += actionInvocation.configuration.memberNames.size();
+        }
+      }
+    }
+
+    return size;
+  }
+
+  @Override
   public TemplateCollectionModel values() {
-    Collection<Object> values = new ArrayList<Object>(objects.values());
+    Collection<Object> values = new ArrayList<>(objects.values());
     Deque<ActionInvocation> actionInvocations = actionInvocationStore.getDeque();
     if (actionInvocations != null) {
       for (ActionInvocation actionInvocation : actionInvocations) {
@@ -276,9 +292,9 @@ public class FreeMarkerMap implements TemplateHashModelEx {
       }
     }
 
-    Enumeration en = request.getAttributeNames();
+    Enumeration<String> en = request.getAttributeNames();
     while (en.hasMoreElements()) {
-      String name = (String) en.nextElement();
+      String name = en.nextElement();
       values.add(request.getAttribute(name));
     }
 
@@ -286,14 +302,14 @@ public class FreeMarkerMap implements TemplateHashModelEx {
     if (session != null) {
       en = session.getAttributeNames();
       while (en.hasMoreElements()) {
-        String name = (String) en.nextElement();
+        String name = en.nextElement();
         values.add(session.getAttribute(name));
       }
     }
 
     en = context.getAttributeNames();
     while (en.hasMoreElements()) {
-      String name = (String) en.nextElement();
+      String name = en.nextElement();
       values.add(context.getAttribute(name));
     }
 
@@ -302,7 +318,7 @@ public class FreeMarkerMap implements TemplateHashModelEx {
     return new CollectionModel(values, FieldSupportBeansWrapper.INSTANCE);
   }
 
-  private int count(Enumeration enumeration) {
+  private int count(Enumeration<String> enumeration) {
     int count = 0;
     while (enumeration.hasMoreElements()) {
       count++;
@@ -312,10 +328,10 @@ public class FreeMarkerMap implements TemplateHashModelEx {
     return count;
   }
 
-  private Set<String> enumToSet(Enumeration enumeration) {
-    Set<String> set = new HashSet<String>();
+  private Set<String> enumToSet(Enumeration<String> enumeration) {
+    Set<String> set = new HashSet<>();
     while (enumeration.hasMoreElements()) {
-      set.add((String) enumeration.nextElement());
+      set.add(enumeration.nextElement());
     }
 
     return set;

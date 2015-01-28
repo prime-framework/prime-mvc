@@ -62,7 +62,7 @@ public abstract class AbstractListInput extends AbstractInput {
   @Override
   protected Map<String, Object> makeParameters() {
     Map<String, Object> parameters = super.makeParameters();
-    Map<String, Option> options = new LinkedHashMap<String, Option>();
+    Map<String, Option> options = new LinkedHashMap<>();
 
     // Handle the header option
     String headerValue = (String) attributes.remove("headerValue");
@@ -88,7 +88,7 @@ public abstract class AbstractListInput extends AbstractInput {
     Object items = attributes.remove("items");
     if (items != null) {
       if (items instanceof Collection) {
-        Collection c = (Collection) items;
+        Collection<?> c = (Collection<?>) items;
         for (Object o : c) {
           Object value = makeValue(o, null, valueExpr);
           options.put(value.toString(), makeOption(o, value, beanValue, textExpr, l10nExpr));
@@ -162,7 +162,7 @@ public abstract class AbstractListInput extends AbstractInput {
     }
 
     if (beanValue instanceof Collection) {
-      return new Option(text, ((Collection) beanValue).contains(value));
+      return new Option(text, ((Collection<?>) beanValue).contains(value));
     }
 
     if (beanValue.getClass().isArray()) {

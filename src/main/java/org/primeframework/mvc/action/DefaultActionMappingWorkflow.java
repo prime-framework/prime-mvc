@@ -15,7 +15,12 @@
  */
 package org.primeframework.mvc.action;
 
-import com.google.inject.Inject;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Set;
+
 import org.primeframework.mvc.parameter.DefaultParameterParser;
 import org.primeframework.mvc.parameter.InternalParameters;
 import org.primeframework.mvc.servlet.HTTPMethod;
@@ -24,11 +29,11 @@ import org.primeframework.mvc.workflow.WorkflowChain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Set;
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
+import com.google.inject.Inject;
+import static java.lang.String.join;
 
 /**
  * This class is the default implementation of the ActionMappingWorkflow. During the perform method, this class
@@ -39,11 +44,17 @@ import java.util.Set;
 public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
   private final static Logger logger = LoggerFactory.getLogger(DefaultActionMappingWorkflow.class);
 
-  private final HttpServletRequest request;
-  private final HttpServletResponse response;
-  private final ActionMapper actionMapper;
   private final ActionInvocationStore actionInvocationStore;
+
+  private final ActionMapper actionMapper;
+
   private final HTTPMethod httpMethod;
+
+  private final HttpServletRequest request;
+
+  private final HttpServletResponse response;
+
+  @Inject(optional = true) private MetricRegistry metricRegistry;
 
   @Inject
   public DefaultActionMappingWorkflow(HttpServletRequest request, HttpServletResponse response,
@@ -61,7 +72,7 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
    * request.
    *
    * @param chain The workflow chain.
-   * @throws IOException      If the chain throws an exception.
+   * @throws IOException If the chain throws an exception.
    * @throws ServletException If the chain throws an exception.
    */
   public void perform(WorkflowChain chain) throws IOException, ServletException {
@@ -82,8 +93,30 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
 
     // Keep the current action in the store if an exception is thrown so that it can be used from the error workflow
     actionInvocationStore.setCurrent(invocation);
-    chain.continueWorkflow();
-    actionInvocationStore.removeCurrent();
+
+    // Start the timer and grab a meter for errors
+    Timer.Context timer = null;
+    Meter errorMeter = null;
+    if (metricRegistry != null && invocation.action != null) {
+      timer = metricRegistry.timer("prime-mvc.[" + invocation.uri() + "].requests").time();
+      errorMeter = metricRegistry.meter("prime-mvc.[" + invocation.uri() + "].errors");
+    }
+
+    try {
+      chain.continueWorkflow();
+    } catch (ServletException | IOException | RuntimeException | Error e) {
+      if (errorMeter != null) {
+        errorMeter.mark();
+      }
+
+      throw e;
+    } finally {
+      if (timer != null) {
+        timer.stop();
+      }
+
+      actionInvocationStore.removeCurrent();
+    }
   }
 
   @SuppressWarnings("unchecked")

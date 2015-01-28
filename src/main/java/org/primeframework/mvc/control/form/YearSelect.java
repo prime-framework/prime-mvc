@@ -15,10 +15,10 @@
  */
 package org.primeframework.mvc.control.form;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.joda.time.LocalDate;
 import org.primeframework.mvc.control.annotation.ControlAttribute;
 import org.primeframework.mvc.control.annotation.ControlAttributes;
 
@@ -55,7 +55,7 @@ public class YearSelect extends Select {
     Number end = (Number) attributes.remove("endYear");
     Number numberOfYears = (Number) attributes.remove("numberOfYears");
     if (start == null) {
-      start = new LocalDate().getYear();
+      start = LocalDate.now().getYear();
     }
 
     if (numberOfYears != null) {
@@ -66,7 +66,7 @@ public class YearSelect extends Select {
       end = end.intValue() + 1;
     }
 
-    List<Integer> years = new ArrayList<Integer>();
+    List<Integer> years = new ArrayList<>();
     for (int i = start.intValue(); i < end.intValue(); i++) {
       years.add(i);
     }

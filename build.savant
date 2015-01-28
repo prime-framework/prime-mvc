@@ -15,7 +15,7 @@
  */
 savantVersion = "0.3.0"
 
-project(group: "org.primeframework", name: "prime-mvc", version: "0.33.2", licenses: ["ApacheV2_0"]) {
+project(group: "org.primeframework", name: "prime-mvc", version: "0.34.0", licenses: ["ApacheV2_0"]) {
   workflow {
     standard()
   }
@@ -30,14 +30,13 @@ project(group: "org.primeframework", name: "prime-mvc", version: "0.33.2", licen
     }
     group(name: "compile") {
       dependency(id: "org.ow2.asm:asm:5.0.3")
-      dependency(id: "com.fasterxml.jackson.core:jackson-annotations:2.3.0")
-      dependency(id: "com.fasterxml.jackson.core:jackson-core:2.3.0")
-      dependency(id: "com.fasterxml.jackson.core:jackson-databind:2.3.0")
-      dependency(id: "com.fasterxml.jackson.datatype:jackson-datatype-joda:2.3.0")
+      dependency(id: "com.fasterxml.jackson.core:jackson-annotations:2.4.2")
+      dependency(id: "com.fasterxml.jackson.core:jackson-core:2.4.2")
+      dependency(id: "com.fasterxml.jackson.core:jackson-databind:2.4.2")
       dependency(id: "com.google.inject:guice:4.0.0-beta.4")
       dependency(id: "com.google.inject.extensions:guice-multibindings:4.0-beta.4")
+      dependency(id: "io.dropwizard.metrics:metrics-core:3.1.0")
       dependency(id: "javax.inject:javax.inject:1.0.0")
-      dependency(id: "org.joda:joda-time:2.1.0")
       dependency(id: "org.apache.commons:commons-fileupload:1.2.1")
       dependency(id: "org.apache.commons:commons-io:2.1.0")
       dependency(id: "org.apache.commons:commons-lang3:3.1.0")
@@ -60,7 +59,7 @@ project(group: "org.primeframework", name: "prime-mvc", version: "0.33.2", licen
 file = loadPlugin(id: "org.savantbuild.plugin:file:0.3.1")
 dependency = loadPlugin(id: "org.savantbuild.plugin:dependency:0.3.1")
 java = loadPlugin(id: "org.savantbuild.plugin:java:0.3.1")
-javaTestNG = loadPlugin(id: "org.savantbuild.plugin:java-testng:0.3.1")
+javaTestNG = loadPlugin(id: "org.savantbuild.plugin:java-testng:0.3.2")
 idea = loadPlugin(id: "org.savantbuild.plugin:idea:0.3.2")
 release = loadPlugin(id: "org.savantbuild.plugin:release-git:0.3.4")
 

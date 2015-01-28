@@ -43,7 +43,7 @@ import freemarker.template.TemplateModelException;
 @SuppressWarnings("unchecked")
 public class AppendAttributesMethod implements TemplateMethodModelEx {
   public Object exec(List arguments) throws TemplateModelException {
-    Set<String> ignore = new HashSet<String>();
+    Set<String> ignore = new HashSet<>();
     if (arguments.size() == 2) {
       Collection<String> collection = (Collection<String>) FieldSupportBeansWrapper.INSTANCE.unwrap((TemplateModel) arguments.get(1));
       ignore.addAll(collection);
@@ -51,7 +51,7 @@ public class AppendAttributesMethod implements TemplateMethodModelEx {
 
     StringBuilder build = new StringBuilder();
     Map<String, Object> map = (Map<String, Object>) FieldSupportBeansWrapper.INSTANCE.unwrap((TemplateModel) arguments.get(0));
-    SortedSet<String> sortedKeys = new TreeSet<String>(map.keySet());
+    SortedSet<String> sortedKeys = new TreeSet<>(map.keySet());
     for (String key : sortedKeys) {
       if (!ignore.contains(key) && map.get(key) != null) {
         build.append(" ").append(key).append("=\"").append(map.get(key)).append("\"");

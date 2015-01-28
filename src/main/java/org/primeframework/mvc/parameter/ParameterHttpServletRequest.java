@@ -46,9 +46,8 @@ public class ParameterHttpServletRequest extends HttpServletRequestWrapper {
     return super.getParameter(key);
   }
 
-  @SuppressWarnings("unchecked")
-  public Map getParameterMap() {
-    Map<String, String[]> complete = new HashMap<String, String[]>();
+  public Map<String, String[]> getParameterMap() {
+    Map<String, String[]> complete = new HashMap<>();
     if (parameters != null) {
       complete.putAll(parameters);
     }
@@ -60,14 +59,14 @@ public class ParameterHttpServletRequest extends HttpServletRequestWrapper {
 
   @SuppressWarnings("unchecked")
   public Enumeration<String> getParameterNames() {
-    Set<String> names = new HashSet<String>();
+    Set<String> names = new HashSet<>();
     if (parameters != null) {
       names.addAll(parameters.keySet());
     }
 
     names.addAll(super.getParameterMap().keySet());
 
-    return new IteratorEnumeration<String>(names.iterator());
+    return new IteratorEnumeration<>(names.iterator());
   }
 
   public String[] getParameterValues(String key) {

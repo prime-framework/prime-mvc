@@ -18,16 +18,16 @@ package org.primeframework.mvc.parameter.convert.guice;
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.UUID;
 
-import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
 import org.primeframework.mvc.parameter.convert.converters.BooleanConverter;
 import org.primeframework.mvc.parameter.convert.converters.CharacterConverter;
 import org.primeframework.mvc.parameter.convert.converters.CollectionConverter;
-import org.primeframework.mvc.parameter.convert.converters.DateTimeConverter;
+import org.primeframework.mvc.parameter.convert.converters.ZonedDateTimeConverter;
 import org.primeframework.mvc.parameter.convert.converters.EnumConverter;
 import org.primeframework.mvc.parameter.convert.converters.FileConverter;
 import org.primeframework.mvc.parameter.convert.converters.LocalDateConverter;
@@ -50,7 +50,7 @@ public class ConverterModule extends AbstractModule {
     binder.add(BooleanConverter.class).forTypes(Boolean.class, boolean.class);
     binder.add(CharacterConverter.class).forTypes(Character.class, char.class);
     binder.add(CollectionConverter.class).forTypes(Collection.class);
-    binder.add(DateTimeConverter.class).forTypes(DateTime.class);
+    binder.add(ZonedDateTimeConverter.class).forTypes(ZonedDateTime.class);
     binder.add(EnumConverter.class).forTypes(Enum.class);
     binder.add(FileConverter.class).forTypes(File.class);
     binder.add(LocalDateConverter.class).forTypes(LocalDate.class);

@@ -15,17 +15,19 @@
  */
 package org.primeframework.mvc.parameter.convert.converters;
 
+import java.time.LocalDate;
 import java.util.Locale;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.joda.time.LocalDate;
 import org.primeframework.mvc.MockConfiguration;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
 import org.primeframework.mvc.util.MapBuilder;
 import org.testng.annotations.Test;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.fail;
 
 /**
  * This tests the local date converter.
@@ -40,7 +42,7 @@ public class LocalDateConverterTest {
     assertNull(value);
 
     value = (LocalDate) converter.convertFromStrings(Locale.class, MapBuilder.asMap("dateTimeFormat", "MM-dd-yyyy"), "testExpr", ArrayUtils.toArray("07-08-2008"));
-    assertEquals(value.getMonthOfYear(), 7);
+    assertEquals(value.getMonthValue(), 7);
     assertEquals(value.getDayOfMonth(), 8);
     assertEquals(value.getYear(), 2008);
 
@@ -48,6 +50,7 @@ public class LocalDateConverterTest {
       converter.convertFromStrings(Locale.class, MapBuilder.asMap("dateTimeFormat", "MM-dd-yyyy"), "testExpr", ArrayUtils.toArray("07/08/2008"));
       fail("Should have failed");
     } catch (ConversionException e) {
+      // Expected
     }
   }
 
@@ -57,7 +60,7 @@ public class LocalDateConverterTest {
     String str = converter.convertToString(LocalDate.class, null, "testExpr", null);
     assertNull(str);
 
-    str = converter.convertToString(LocalDate.class, MapBuilder.asMap("dateTimeFormat", "MM-dd-yyyy"), "testExpr", new LocalDate(2008, 7, 8));
+    str = converter.convertToString(LocalDate.class, MapBuilder.asMap("dateTimeFormat", "MM-dd-yyyy"), "testExpr", LocalDate.of(2008, 7, 8));
     assertEquals(str, "07-08-2008");
   }
 }

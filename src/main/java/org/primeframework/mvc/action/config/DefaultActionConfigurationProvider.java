@@ -43,15 +43,15 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
   public DefaultActionConfigurationProvider(ServletContext context, ActionConfigurationBuilder builder) {
     this.context = context;
 
-    ClassClasspathResolver resolver = new ClassClasspathResolver();
-    Set<Class<?>> actionClassses;
+    ClassClasspathResolver<?> resolver = new ClassClasspathResolver<>();
+    Set<? extends Class<?>> actionClassses;
     try {
       actionClassses = resolver.findByLocators(new ClassClasspathResolver.AnnotatedWith(Action.class), true, null, "action");
     } catch (IOException e) {
       throw new PrimeException("Error discovering action classes", e);
     }
 
-    Map<String, ActionConfiguration> actionConfigurations = new HashMap<String, ActionConfiguration>();
+    Map<String, ActionConfiguration> actionConfigurations = new HashMap<>();
     for (Class<?> actionClass : actionClassses) {
       // Only accept classes loaded by the ClassLoader for Prime. This prevents classes loaded by parent loader from
       // being included as available Actions. One situation that this can occur: A jar with Actions (Prime) is in the classpath

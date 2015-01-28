@@ -85,7 +85,7 @@ public class RequestSimulator {
       }
 
       @Override
-      public Enumeration getInitParameterNames() {
+      public Enumeration<String> getInitParameterNames() {
         return null;
       }
     });

@@ -41,21 +41,21 @@ public class DefaultActionInvocationStore implements ActionInvocationStore {
    * {@inheritDoc}
    */
   public ActionInvocation getCurrent() {
-    Deque deque = (Deque) request.getAttribute(ACTION_INVOCATION_DEQUE_KEY);
+    Deque<ActionInvocation> deque = (Deque<ActionInvocation>) request.getAttribute(ACTION_INVOCATION_DEQUE_KEY);
     if (deque == null) {
       return null;
     }
 
-    return (ActionInvocation) deque.peek();
+    return deque.peek();
   }
 
   /**
    * {@inheritDoc}
    */
   public void setCurrent(ActionInvocation invocation) {
-    Deque deque = (Deque) request.getAttribute(ACTION_INVOCATION_DEQUE_KEY);
+    Deque<ActionInvocation> deque = (Deque<ActionInvocation>) request.getAttribute(ACTION_INVOCATION_DEQUE_KEY);
     if (deque == null) {
-      deque = new ArrayDeque();
+      deque = new ArrayDeque<>();
       request.setAttribute(ACTION_INVOCATION_DEQUE_KEY, deque);
     }
 
@@ -67,7 +67,7 @@ public class DefaultActionInvocationStore implements ActionInvocationStore {
    * {@inheritDoc}
    */
   public void removeCurrent() {
-    Deque deque = (Deque) request.getAttribute(ACTION_INVOCATION_DEQUE_KEY);
+    Deque<ActionInvocation> deque = (Deque<ActionInvocation>) request.getAttribute(ACTION_INVOCATION_DEQUE_KEY);
     if (deque == null) {
       return;
     }

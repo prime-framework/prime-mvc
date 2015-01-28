@@ -17,7 +17,6 @@ package org.primeframework.mvc.content.guice;
 
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 import org.primeframework.mvc.action.config.ActionConfigurator;
@@ -40,7 +39,6 @@ public class ContentModule extends AbstractModule {
 
     // Setup the Jackson Module bindings and the provider for the ObjectMapper
     Multibinder<Module> moduleBinder = Multibinder.newSetBinder(binder(), Module.class);
-    moduleBinder.addBinding().to(JodaModule.class);
     moduleBinder.addBinding().to(PrimeJacksonModule.class);
 
     bind(ObjectMapper.class).toProvider(ObjectMapperProvider.class).asEagerSingleton();
