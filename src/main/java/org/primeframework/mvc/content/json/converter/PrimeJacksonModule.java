@@ -19,6 +19,8 @@ import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.core.util.VersionUtil;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.Locale;
 
 /**
@@ -34,8 +36,12 @@ public class PrimeJacksonModule extends SimpleModule {
 
     // Deserializers
     addDeserializer(Locale.class, new LocaleDeserializer());
+    addDeserializer(ZonedDateTime.class, new ZonedDateTimeDeserializer());
+    addDeserializer(LocalDate.class, new LocalDateDeserializer());
 
     // Serializers
     addSerializer(Locale.class, new LocaleSerializer());
+    addSerializer(ZonedDateTime.class, new ZonedDateTimeSerializer());
+    addSerializer(LocalDate.class, new LocalDateSerializer());
   }
 }
