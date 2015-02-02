@@ -15,16 +15,16 @@
  */
 package org.primeframework.mvc.content.guice;
 
-import com.fasterxml.jackson.databind.Module;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.inject.AbstractModule;
-import com.google.inject.multibindings.Multibinder;
 import org.primeframework.mvc.action.config.ActionConfigurator;
 import org.primeframework.mvc.content.ContentWorkflow;
 import org.primeframework.mvc.content.DefaultContentWorkflow;
 import org.primeframework.mvc.content.json.JacksonActionConfigurator;
 import org.primeframework.mvc.content.json.JacksonContentHandler;
-import org.primeframework.mvc.content.json.converter.PrimeJacksonModule;
+
+import com.fasterxml.jackson.databind.Module;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.AbstractModule;
+import com.google.inject.multibindings.Multibinder;
 
 /**
  * This class is a Guice module that configures the ContentHandlerFactory and the default ContentHandlers.
@@ -39,7 +39,6 @@ public class ContentModule extends AbstractModule {
 
     // Setup the Jackson Module bindings and the provider for the ObjectMapper
     Multibinder<Module> moduleBinder = Multibinder.newSetBinder(binder(), Module.class);
-    moduleBinder.addBinding().to(PrimeJacksonModule.class);
 
     bind(ObjectMapper.class).toProvider(ObjectMapperProvider.class).asEagerSingleton();
   }
