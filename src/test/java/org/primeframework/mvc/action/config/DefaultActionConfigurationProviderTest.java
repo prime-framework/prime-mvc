@@ -54,11 +54,11 @@ public class DefaultActionConfigurationProviderTest {
   @Test
   public void configure() throws Exception {
     ServletContext context = EasyMock.createStrictMock(ServletContext.class);
-    Capture<Map<String, ActionConfiguration>> c = new Capture<Map<String, ActionConfiguration>>();
+    Capture<Map<String, ActionConfiguration>> c = new Capture<>();
     context.setAttribute(eq(DefaultActionConfigurationProvider.ACTION_CONFIGURATION_KEY), capture(c));
     EasyMock.replay(context);
 
-    new DefaultActionConfigurationProvider(context, new DefaultActionConfigurationBuilder(new DefaultURIBuilder(), new HashSet<ActionConfigurator>(asList(new JacksonActionConfigurator()))));
+    new DefaultActionConfigurationProvider(context, new DefaultActionConfigurationBuilder(new DefaultURIBuilder(), new HashSet<>(asList(new JacksonActionConfigurator()))));
 
     Map<String, ActionConfiguration> config = c.getValue();
     assertSame(config.get("/simple").actionClass, Simple.class);
@@ -130,5 +130,8 @@ public class DefaultActionConfigurationProviderTest {
     assertEquals(((JacksonActionConfiguration) config.get("/kitchen-sink").additionalConfiguration.get(JacksonActionConfiguration.class)).requestMember, "jsonRequest");
     assertEquals(((JacksonActionConfiguration) config.get("/kitchen-sink").additionalConfiguration.get(JacksonActionConfiguration.class)).requestMemberType, UserField.class);
     assertEquals(((JacksonActionConfiguration) config.get("/kitchen-sink").additionalConfiguration.get(JacksonActionConfiguration.class)).responseMember, "jsonResponse");
+
+    // Verify inheritance results
+    assertSame(config.get("/extension-inheritance").resultConfigurations.get("success").annotationType(), Forward.class);
   }
 }

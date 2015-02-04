@@ -15,7 +15,18 @@
  */
 package org.primeframework.mvc.action.config;
 
-import com.google.inject.Inject;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ExecuteMethodConfiguration;
 import org.primeframework.mvc.action.ValidationMethodConfiguration;
@@ -31,21 +42,12 @@ import org.primeframework.mvc.scope.annotation.ScopeAnnotation;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.util.ReflectionUtils;
 import org.primeframework.mvc.util.URIBuilder;
+import org.primeframework.mvc.validation.Validation;
 import org.primeframework.mvc.validation.ValidationMethod;
 import org.primeframework.mvc.validation.annotation.PostValidationMethod;
 import org.primeframework.mvc.validation.annotation.PreValidationMethod;
-import org.primeframework.mvc.validation.Validation;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.google.inject.Inject;
 
 /**
  * Default action configuration builder.
@@ -121,10 +123,7 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
           "public @interface MyResult {\n" +
           "  String code() default \"success\";\n" +
           "}", e);
-    } catch (InvocationTargetException e) {
-      throw new PrimeException("Unable to invoke the code() method on the result annotation container [" +
-          annotationType + "]", e);
-    } catch (IllegalAccessException e) {
+    } catch (InvocationTargetException | IllegalAccessException e) {
       throw new PrimeException("Unable to invoke the code() method on the result annotation container [" +
           annotationType + "]", e);
     }
@@ -133,10 +132,10 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
   /**
    * Adds all the result annotations for the given class.
    *
-   * @param actionClass          The action class.
-   * @param resultConfigurations The Map.
+   * @param actionClass The action class.
    */
-  protected void addResultsForClass(Class<?> actionClass, Map<String, Annotation> resultConfigurations) {
+  protected Map<String, Annotation> addResultsForClass(Class<?> actionClass) {
+    Map<String, Annotation> resultConfigurations = new HashMap<>();
     Annotation[] annotations = actionClass.getAnnotations();
     for (Annotation annotation : annotations) {
       Class<? extends Annotation> annotationType = annotation.annotationType();
@@ -157,15 +156,14 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
               "public @interface MyContainer {\n" +
               "  MyResult[] value();\n" +
               "}", e);
-        } catch (InvocationTargetException e) {
-          throw new PrimeException("Unable to invoke the value() method on the result annotation container [" +
-              annotationType + "]", e);
-        } catch (IllegalAccessException e) {
+        } catch (InvocationTargetException | IllegalAccessException e) {
           throw new PrimeException("Unable to invoke the value() method on the result annotation container [" +
               annotationType + "]", e);
         }
       }
     }
+
+    return resultConfigurations;
   }
 
   /**
@@ -182,7 +180,7 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
       // Ignore
     }
 
-    Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods = new HashMap<HTTPMethod, ExecuteMethodConfiguration>();
+    Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods = new HashMap<>();
     for (HTTPMethod httpMethod : HTTPMethod.values()) {
       Method method = null;
       try {
@@ -233,9 +231,10 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
    * @return The map of all the result configurations.
    */
   protected Map<String, Annotation> findResultConfigurations(Class<?> actionClass) {
-    Map<String, Annotation> resultConfigurations = new HashMap<String, Annotation>();
+    Map<String, Annotation> resultConfigurations = new HashMap<>();
     while (actionClass != Object.class) {
-      addResultsForClass(actionClass, resultConfigurations);
+      Map<String, Annotation> resultsForClass = addResultsForClass(actionClass);
+      resultsForClass.forEach(resultConfigurations::putIfAbsent);
       actionClass = actionClass.getSuperclass();
     }
 
@@ -249,7 +248,7 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
    * @return The scope fields.
    */
   protected List<ScopeField> findScopeFields(Class<?> actionClass) {
-    List<ScopeField> scopeFields = new ArrayList<ScopeField>();
+    List<ScopeField> scopeFields = new ArrayList<>();
     while (actionClass != Object.class) {
       Field[] fields = actionClass.getDeclaredFields();
       for (Field field : fields) {
@@ -276,12 +275,9 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
    */
   protected List<ValidationMethodConfiguration> findValidationMethods(Class<?> actionClass) {
     List<Method> methods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, ValidationMethod.class);
-    List<ValidationMethodConfiguration> configs = new ArrayList<ValidationMethodConfiguration>();
-    for (Method method : methods) {
-      configs.add(new ValidationMethodConfiguration(method, method.getAnnotation(ValidationMethod.class)));
-    }
-
-    return configs;
+    return methods.stream()
+                  .map(method -> new ValidationMethodConfiguration(method, method.getAnnotation(ValidationMethod.class)))
+                  .collect(Collectors.toList());
   }
 
   /**
@@ -302,7 +298,7 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
   }
 
   private Map<Class<?>, Object> getAdditionalConfiguration(Class<?> actionClass) {
-    Map<Class<?>, Object> additionalConfiguration = new HashMap<Class<?>, Object>();
+    Map<Class<?>, Object> additionalConfiguration = new HashMap<>();
     for (ActionConfigurator configurator : configurators) {
       Object config = configurator.configure(actionClass);
       if (config != null) {

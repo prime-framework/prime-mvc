@@ -16,6 +16,7 @@
 package org.example.action;
 
 import org.primeframework.mvc.action.annotation.Action;
+import org.primeframework.mvc.action.result.annotation.Forward;
 import org.primeframework.mvc.parameter.annotation.PostParameterMethod;
 
 /**
@@ -24,6 +25,7 @@ import org.primeframework.mvc.parameter.annotation.PostParameterMethod;
  * @author Brian Pontarelli
  */
 @Action
+@Forward(code = "success")
 public class ExtensionInheritance extends Extension {
   public boolean invoked = false;
 

@@ -15,6 +15,7 @@
  */
 package org.example.action;
 
+import org.primeframework.mvc.action.result.annotation.Redirect;
 import org.primeframework.mvc.parameter.annotation.PostParameterMethod;
 
 /**
@@ -22,6 +23,7 @@ import org.primeframework.mvc.parameter.annotation.PostParameterMethod;
  *
  * @author Brian Pontarelli
  */
+@Redirect(code = "success", uri = "/")
 public abstract class Extension {
   public String baseField;
   public boolean baseInvoked = false;
