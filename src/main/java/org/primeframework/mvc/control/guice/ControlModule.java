@@ -25,6 +25,7 @@ import org.primeframework.mvc.control.form.Form;
 import org.primeframework.mvc.control.form.FormPreparer;
 import org.primeframework.mvc.control.form.Hidden;
 import org.primeframework.mvc.control.form.Image;
+import org.primeframework.mvc.control.form.LocaleSelect;
 import org.primeframework.mvc.control.form.MonthSelect;
 import org.primeframework.mvc.control.form.Password;
 import org.primeframework.mvc.control.form.RadioList;
@@ -56,6 +57,7 @@ public class ControlModule extends AbstractModule {
     ControlFactory.addControl(binder(), "control", "form", Form.class);
     ControlFactory.addControl(binder(), "control", "hidden", Hidden.class);
     ControlFactory.addControl(binder(), "control", "image", Image.class);
+    ControlFactory.addControl(binder(), "control", "locale_select", LocaleSelect.class);
     ControlFactory.addControl(binder(), "control", "month_select", MonthSelect.class);
     ControlFactory.addControl(binder(), "control", "password", Password.class);
     ControlFactory.addControl(binder(), "control", "radio_list", RadioList.class);
