@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2013-2015, Inversoft Inc., All Rights Reserved
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific
+ * language governing permissions and limitations under the License.
+ */
 package org.primeframework.mvc.action.result;
 
 import javax.servlet.ServletException;
@@ -17,6 +32,7 @@ import org.primeframework.mock.servlet.MockServletOutputStream;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
+import org.primeframework.mvc.action.ExecuteMethodConfiguration;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.result.annotation.JSON;
 import org.primeframework.mvc.action.result.annotation.XMLStream;
@@ -91,7 +107,8 @@ public class JSONResultTest extends PrimeBaseTest {
     additionalConfiguration.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(null, null, "user"));
     ActionConfiguration config = new ActionConfiguration(Post.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfiguration, null);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new ActionInvocation(action, null, "/foo", "", config));
+    ExecuteMethodConfiguration methodConfiguration = createStrictMock(ExecuteMethodConfiguration.class);
+    expect(store.getCurrent()).andReturn(new ActionInvocation(action, methodConfiguration, "/foo", "", config));
     replay(store);
 
     MessageStore messageStore = createStrictMock(MessageStore.class);
@@ -164,7 +181,9 @@ public class JSONResultTest extends PrimeBaseTest {
     additionalConfiguration.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(null, null, "user"));
     ActionConfiguration config = new ActionConfiguration(Post.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfiguration, null);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new ActionInvocation(action, null, "/foo", "", config));
+
+    ExecuteMethodConfiguration methodConfiguration = createStrictMock(ExecuteMethodConfiguration.class);
+    expect(store.getCurrent()).andReturn(new ActionInvocation(action, methodConfiguration, "/foo", "", config));
     replay(store);
 
     MessageStore messageStore = createStrictMock(MessageStore.class);

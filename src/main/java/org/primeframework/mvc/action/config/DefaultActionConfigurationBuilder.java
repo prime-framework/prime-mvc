@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2015, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -204,7 +204,7 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
 
       if (method != null) {
         verify(method);
-        executeMethods.put(httpMethod, new ExecuteMethodConfiguration(method, method.getAnnotation(Validation.class)));
+        executeMethods.put(httpMethod, new ExecuteMethodConfiguration(httpMethod, method, method.getAnnotation(Validation.class)));
       }
     }
 

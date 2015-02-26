@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2015, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,9 +97,11 @@ public class JSONResult extends AbstractResult<JSON> {
     response.setContentType("application/json");
     response.setContentLength(result.length);
 
-    ServletOutputStream outputStream = response.getOutputStream();
-    outputStream.write(result);
-    outputStream.flush();
+    if (!isCurrentActionHeadRequest(current)) {
+      ServletOutputStream outputStream = response.getOutputStream();
+      outputStream.write(result);
+      outputStream.flush();
+    }
   }
 
   private ErrorMessages convertErrors(List<Message> messages) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2015, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -119,7 +119,7 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     request.setParameter("submit", "Submit");
 
     Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods = new HashMap<HTTPMethod, ExecuteMethodConfiguration>();
-    executeMethods.put(HTTPMethod.POST, new ExecuteMethodConfiguration(Edit.class.getMethod("execute"), null));
+    executeMethods.put(HTTPMethod.POST, new ExecuteMethodConfiguration(HTTPMethod.POST, Edit.class.getMethod("execute"), null));
 
     ActionConfigurationProvider provider = EasyMock.createStrictMock(ActionConfigurationProvider.class);
     EasyMock.expect(provider.lookup("/admin/user/rest-edit/12")).andReturn(null);
@@ -168,7 +168,7 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     request.setParameter("submit", "Submit");
 
     Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods = new HashMap<HTTPMethod, ExecuteMethodConfiguration>();
-    executeMethods.put(HTTPMethod.POST, new ExecuteMethodConfiguration(Edit.class.getMethod("execute"), null));
+    executeMethods.put(HTTPMethod.POST, new ExecuteMethodConfiguration(HTTPMethod.POST, Edit.class.getMethod("execute"), null));
 
     ActionConfigurationProvider provider = EasyMock.createStrictMock(ActionConfigurationProvider.class);
     EasyMock.expect(provider.lookup("/complex-rest/brian/static/pontarelli/then/a/bunch/of/stuff")).andReturn(null);
@@ -253,7 +253,7 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
 
   private void run(String uri, String extension) throws Exception {
     Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods = new HashMap<HTTPMethod, ExecuteMethodConfiguration>();
-    executeMethods.put(HTTPMethod.POST, new ExecuteMethodConfiguration(Edit.class.getMethod("post"), null));
+    executeMethods.put(HTTPMethod.POST, new ExecuteMethodConfiguration(HTTPMethod.POST, Edit.class.getMethod("post"), null));
 
     ActionConfigurationProvider provider = EasyMock.createStrictMock(ActionConfigurationProvider.class);
     EasyMock.expect(provider.lookup(uri)).andReturn(

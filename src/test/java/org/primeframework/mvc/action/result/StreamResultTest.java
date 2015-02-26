@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2015, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.easymock.EasyMock;
 import org.primeframework.mock.servlet.MockServletOutputStream;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
+import org.primeframework.mvc.action.ExecuteMethodConfiguration;
 import org.primeframework.mvc.action.result.annotation.Stream;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.testng.annotations.Test;
@@ -57,7 +58,8 @@ public class StreamResultTest {
     EasyMock.replay(response);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new ActionInvocation(action, null, "/foo", "", null));
+    ExecuteMethodConfiguration methodConfiguration = createStrictMock(ExecuteMethodConfiguration.class);
+    expect(store.getCurrent()).andReturn(new ActionInvocation(action, methodConfiguration, "/foo", "", null));
     replay(store);
 
     Stream stream = new StreamImpl("success", "foo.zip", "10", "application/octet-stream", "stream");

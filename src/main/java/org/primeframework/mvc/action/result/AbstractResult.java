@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2015, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,9 @@ package org.primeframework.mvc.action.result;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.annotation.Annotation;
 
+import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
+import org.primeframework.mvc.servlet.HTTPMethod;
 
 /**
  * This result performs a servlet forward to a JSP or renders a FreeMarker template depending on the extension of the
@@ -64,5 +66,15 @@ public abstract class AbstractResult<U extends Annotation> implements Result<U> 
     }
 
     response.setStatus(code);
+  }
+
+  /**
+   * Return true if the current invocation is for an HTTP HEAD request.
+   *
+   * @param actionInvocation
+   * @return
+   */
+  protected boolean isCurrentActionHeadRequest(ActionInvocation actionInvocation) {
+    return actionInvocation.method != null && actionInvocation.method.httpMethod == HTTPMethod.HEAD;
   }
 }

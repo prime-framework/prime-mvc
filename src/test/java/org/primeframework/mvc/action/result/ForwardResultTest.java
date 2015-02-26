@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2015, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import java.io.StringWriter;
 
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
+import org.primeframework.mvc.action.ExecuteMethodConfiguration;
 import org.primeframework.mvc.action.result.annotation.Forward;
 import org.primeframework.mvc.freemarker.FreeMarkerMap;
 import org.primeframework.mvc.freemarker.FreeMarkerService;
@@ -48,7 +49,8 @@ public class ForwardResultTest {
     replay(response);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/foo/bar", null, null));
+    ExecuteMethodConfiguration methodConfiguration = createStrictMock(ExecuteMethodConfiguration.class);
+    expect(store.getCurrent()).andReturn(new ActionInvocation(null, methodConfiguration, "/foo/bar", null, null));
     replay(store);
 
     FreeMarkerMap map = createStrictMock(FreeMarkerMap.class);
@@ -76,7 +78,8 @@ public class ForwardResultTest {
     replay(response);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/action", "", null));
+    ExecuteMethodConfiguration methodConfiguration = createStrictMock(ExecuteMethodConfiguration.class);
+    expect(store.getCurrent()).andReturn(new ActionInvocation(null, methodConfiguration, "/action", "", null));
     replay(store);
 
     FreeMarkerMap map = createStrictMock(FreeMarkerMap.class);
@@ -104,7 +107,8 @@ public class ForwardResultTest {
     replay(response);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/action/nested", "", null));
+    ExecuteMethodConfiguration methodConfiguration = createStrictMock(ExecuteMethodConfiguration.class);
+    expect(store.getCurrent()).andReturn(new ActionInvocation(null, methodConfiguration, "/action/nested", "", null));
     replay(store);
 
     FreeMarkerMap map = createStrictMock(FreeMarkerMap.class);
@@ -132,7 +136,8 @@ public class ForwardResultTest {
     replay(response);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/action", null, null));
+    ExecuteMethodConfiguration methodConfiguration = createStrictMock(ExecuteMethodConfiguration.class);
+    expect(store.getCurrent()).andReturn(new ActionInvocation(null, methodConfiguration, "/action", null, null));
     replay(store);
 
     FreeMarkerMap map = createStrictMock(FreeMarkerMap.class);
@@ -166,7 +171,8 @@ public class ForwardResultTest {
     replay(ee);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new ActionInvocation(action, null, "/action", "", null));
+    ExecuteMethodConfiguration methodConfiguration = createStrictMock(ExecuteMethodConfiguration.class);
+    expect(store.getCurrent()).andReturn(new ActionInvocation(action, methodConfiguration, "/action", "", null));
     replay(store);
 
     FreeMarkerMap map = createStrictMock(FreeMarkerMap.class);
@@ -194,7 +200,8 @@ public class ForwardResultTest {
     replay(response);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/action", null, null));
+    ExecuteMethodConfiguration methodConfiguration = createStrictMock(ExecuteMethodConfiguration.class);
+    expect(store.getCurrent()).andReturn(new ActionInvocation(null, methodConfiguration, "/action", null, null));
     replay(store);
 
     FreeMarkerMap map = createStrictMock(FreeMarkerMap.class);
@@ -233,7 +240,8 @@ public class ForwardResultTest {
     replay(locator);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/action", "js", null));
+    ExecuteMethodConfiguration methodConfiguration = createStrictMock(ExecuteMethodConfiguration.class);
+    expect(store.getCurrent()).andReturn(new ActionInvocation(null, methodConfiguration, "/action", "js", null));
     replay(store);
 
     Forward forward = new ForwardResult.ForwardImpl("", "failure");

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2015, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import java.io.InputStream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.primeframework.mvc.PrimeException;
+import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.annotation.Stream;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
@@ -50,7 +51,8 @@ public class StreamResult extends AbstractResult<Stream> {
    * {@inheritDoc}
    */
   public void execute(Stream stream) throws IOException, ServletException {
-    Object action = actionInvocationStore.getCurrent().action;
+    ActionInvocation current = actionInvocationStore.getCurrent();
+    Object action = current.action;
     String property = stream.property();
     String length = expand(stream.length(), action, false);
     String name = expand(stream.name(), action, true);
@@ -72,18 +74,20 @@ public class StreamResult extends AbstractResult<Stream> {
       response.setHeader("Content-Disposition", "attachment; filename=\"" + name + "\"");
     }
 
-    InputStream is = (InputStream) object;
-    ServletOutputStream sos = response.getOutputStream();
-    try {
-      // Then output the file
-      byte[] b = new byte[8192];
-      int len;
-      while ((len = is.read(b)) != -1) {
-        sos.write(b, 0, len);
+    if (!isCurrentActionHeadRequest(current)) {
+      InputStream is = (InputStream) object;
+      ServletOutputStream sos = response.getOutputStream();
+      try {
+        // Then output the file
+        byte[] b = new byte[8192];
+        int len;
+        while ((len = is.read(b)) != -1) {
+          sos.write(b, 0, len);
+        }
+      } finally {
+        sos.flush();
+        sos.close();
       }
-    } finally {
-      sos.flush();
-      sos.close();
     }
   }
 }
