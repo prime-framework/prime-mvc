@@ -37,13 +37,14 @@ import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.result.annotation.JSON;
 import org.primeframework.mvc.action.result.annotation.XMLStream;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration;
-import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.primeframework.mvc.message.SimpleMessage;
 import org.primeframework.mvc.message.scope.MessageScope;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
+import org.primeframework.mvc.servlet.HTTPMethod;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -63,8 +64,13 @@ import static org.testng.Assert.assertEquals;
 public class JSONResultTest extends PrimeBaseTest {
   @Inject public ObjectMapper objectMapper;
 
-  @Test
-  public void all() throws IOException, ServletException {
+  @DataProvider(name= "httMethod")
+  public Object[][] httpMethod() {
+    return new Object[][] {{HTTPMethod.GET}, {HTTPMethod.HEAD}};
+  }
+
+  @Test(dataProvider = "httpMethod")
+  public void all(HTTPMethod httpMethod) throws IOException, ServletException {
     UserField userField = new UserField();
     userField.addresses.put("work", new AddressField());
     userField.addresses.get("work").age = 100;
@@ -100,19 +106,20 @@ public class JSONResultTest extends PrimeBaseTest {
     response.setCharacterEncoding("UTF-8");
     response.setContentType("application/json");
     response.setContentLength(462);
-    expect(response.getOutputStream()).andReturn(sos);
+    if (httpMethod == HTTPMethod.GET) {
+      expect(response.getOutputStream()).andReturn(sos);
+    }
     replay(response);
 
-    Map<Class<?>, Object> additionalConfiguration = new HashMap<Class<?>, Object>();
+    Map<Class<?>, Object> additionalConfiguration = new HashMap<>();
     additionalConfiguration.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(null, null, "user"));
     ActionConfiguration config = new ActionConfiguration(Post.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfiguration, null);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    ExecuteMethodConfiguration methodConfiguration = createStrictMock(ExecuteMethodConfiguration.class);
-    expect(store.getCurrent()).andReturn(new ActionInvocation(action, methodConfiguration, "/foo", "", config));
+    expect(store.getCurrent()).andReturn(new ActionInvocation(action, new ExecuteMethodConfiguration(httpMethod, null, null), "/foo", "", config));
     replay(store);
 
     MessageStore messageStore = createStrictMock(MessageStore.class);
-    expect(messageStore.get(MessageScope.REQUEST)).andReturn(new ArrayList<Message>());
+    expect(messageStore.get(MessageScope.REQUEST)).andReturn(new ArrayList<>());
     replay(messageStore);
 
     JSON annotation = new JSONResultTest.JSONImpl("success", 200);
@@ -157,13 +164,13 @@ public class JSONResultTest extends PrimeBaseTest {
         "  }]," +
         "  \"type\":\"COOL\"" +
         "}";
-    assertEquals(sos.toString(), expected.replace("  ", "")); // Un-indent
+    assertEquals(sos.toString(), httpMethod == HTTPMethod.GET ? expected.replace("  ", "") : ""); // Un-indent
 
     verify(ee, messageStore, response);
   }
 
-  @Test
-  public void errors() throws IOException, ServletException {
+  @Test(dataProvider = "httpMethod")
+  public void errors(HTTPMethod httpMethod) throws IOException, ServletException {
     Post action = new Post();
     ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
     replay(ee);
@@ -174,16 +181,17 @@ public class JSONResultTest extends PrimeBaseTest {
     response.setCharacterEncoding("UTF-8");
     response.setContentType("application/json");
     response.setContentLength(359);
-    expect(response.getOutputStream()).andReturn(sos);
+    if (httpMethod == HTTPMethod.GET) {
+      expect(response.getOutputStream()).andReturn(sos);
+    }
     replay(response);
 
-    Map<Class<?>, Object> additionalConfiguration = new HashMap<Class<?>, Object>();
+    Map<Class<?>, Object> additionalConfiguration = new HashMap<>();
     additionalConfiguration.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(null, null, "user"));
     ActionConfiguration config = new ActionConfiguration(Post.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfiguration, null);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
 
-    ExecuteMethodConfiguration methodConfiguration = createStrictMock(ExecuteMethodConfiguration.class);
-    expect(store.getCurrent()).andReturn(new ActionInvocation(action, methodConfiguration, "/foo", "", config));
+    expect(store.getCurrent()).andReturn(new ActionInvocation(action, new ExecuteMethodConfiguration(httpMethod, null, null), "/foo", "", config));
     replay(store);
 
     MessageStore messageStore = createStrictMock(MessageStore.class);
@@ -209,7 +217,7 @@ public class JSONResultTest extends PrimeBaseTest {
         "    {\"code\":\"[invalid]\",\"message\":\"Invalid request\"},{\"code\":\"[bad]\",\"message\":\"Bad request\"}" +
         "  ]" +
         "}";
-    assertEquals(sos.toString(), expected.replace("  ", "")); // Un-indent
+    assertEquals(sos.toString(), httpMethod == HTTPMethod.GET ? expected.replace("  ", "") : ""); // Un-indent
 
     verify(ee, messageStore, response);
   }

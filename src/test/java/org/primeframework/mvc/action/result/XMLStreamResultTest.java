@@ -26,6 +26,8 @@ import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.ExecuteMethodConfiguration;
 import org.primeframework.mvc.action.result.annotation.XMLStream;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
+import org.primeframework.mvc.servlet.HTTPMethod;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import static org.easymock.EasyMock.*;
@@ -37,8 +39,13 @@ import static org.testng.Assert.*;
  * @author jhumphrey
  */
 public class XMLStreamResultTest {
-  @Test
-  public void explicit() throws IOException, ServletException {
+  @DataProvider(name= "httMethod")
+  public Object[][] httpMethod() {
+    return new Object[][] {{HTTPMethod.GET}, {HTTPMethod.HEAD}};
+  }
+
+  @Test(dataProvider = "httpMethod")
+  public void explicit(HTTPMethod httpMethod) throws IOException, ServletException {
     String property = "xml";
     String propertyValue = "<xml/>";
     byte[] propertyBytes = propertyValue.getBytes();
@@ -56,19 +63,20 @@ public class XMLStreamResultTest {
     response.setCharacterEncoding("UTF-8");
     response.setContentType(contentType);
     response.setContentLength(propertyBytesLen);
-    expect(response.getOutputStream()).andReturn(sos);
+    if (httpMethod == HTTPMethod.GET) {
+      expect(response.getOutputStream()).andReturn(sos);
+    }
     replay(response);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    ExecuteMethodConfiguration methodConfiguration = createStrictMock(ExecuteMethodConfiguration.class);
-    expect(store.getCurrent()).andReturn(new ActionInvocation(action, methodConfiguration, "/foo", "", null));
+    expect(store.getCurrent()).andReturn(new ActionInvocation(action, new ExecuteMethodConfiguration(httpMethod, null, null), "/foo", "", null));
     replay(store);
 
     XMLStream xmlStream = new XMLStreamResultTest.XMLStreamImpl("success", "xml", 200);
     XMLStreamResult streamResult = new XMLStreamResult(ee, response, store);
     streamResult.execute(xmlStream);
 
-    assertEquals(sos.toString(), "<xml/>");
+    assertEquals(sos.toString(), httpMethod == HTTPMethod.GET ? "<xml/>" : "");
 
     verify(ee, response);
   }

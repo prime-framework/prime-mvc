@@ -28,6 +28,8 @@ import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.ExecuteMethodConfiguration;
 import org.primeframework.mvc.action.result.annotation.Stream;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
+import org.primeframework.mvc.servlet.HTTPMethod;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import static org.easymock.EasyMock.*;
@@ -39,8 +41,13 @@ import static org.testng.Assert.*;
  * @author Brian Pontarelli
  */
 public class StreamResultTest {
-  @Test
-  public void explicit() throws IOException, ServletException {
+  @DataProvider(name= "httMethod")
+  public Object[][] httpMethod() {
+    return new Object[][] {{HTTPMethod.GET}, {HTTPMethod.HEAD}};
+  }
+
+  @Test(dataProvider = "httpMethod")
+  public void explicit(HTTPMethod httpMethod) throws IOException, ServletException {
     Object action = new Object();
     ExpressionEvaluator ee = EasyMock.createStrictMock(ExpressionEvaluator.class);
     EasyMock.expect(ee.expand("10", action, false)).andReturn("10");
@@ -58,17 +65,20 @@ public class StreamResultTest {
     EasyMock.replay(response);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    ExecuteMethodConfiguration methodConfiguration = createStrictMock(ExecuteMethodConfiguration.class);
-    expect(store.getCurrent()).andReturn(new ActionInvocation(action, methodConfiguration, "/foo", "", null));
+    expect(store.getCurrent()).andReturn(new ActionInvocation(action, new ExecuteMethodConfiguration(httpMethod, null, null), "/foo", "", null));
     replay(store);
 
     Stream stream = new StreamImpl("success", "foo.zip", "10", "application/octet-stream", "stream");
     StreamResult streamResult = new StreamResult(ee, response, store);
     streamResult.execute(stream);
 
-    assertEquals(sos.toString(), "test");
+    if (httpMethod == HTTPMethod.GET) {
+      assertEquals(sos.toString(), "test");
+      EasyMock.verify(ee, response);
+    } else {
+      assertEquals(sos.toString(), "");
+    }
 
-    EasyMock.verify(ee, response);
   }
 
   public class StreamImpl implements Stream {
