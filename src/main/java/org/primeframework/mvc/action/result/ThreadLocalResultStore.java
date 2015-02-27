@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2015, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ package org.primeframework.mvc.action.result;
  * @author Brian Pontarelli
  */
 public class ThreadLocalResultStore implements ResultStore {
-  private final static ThreadLocal<String> store = new ThreadLocal<String>();
+  private final static ThreadLocal<String> store = new ThreadLocal<>();
   
   @Override
   public String get() {

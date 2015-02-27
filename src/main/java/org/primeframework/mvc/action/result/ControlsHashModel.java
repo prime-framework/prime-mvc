@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2015, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,10 @@
  */
 package org.primeframework.mvc.action.result;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.primeframework.mvc.control.Control;
 import org.primeframework.mvc.control.FreeMarkerControlProxy;
@@ -38,7 +37,7 @@ import freemarker.template.TemplateModelException;
  * @author Brian Pontarelli
  */
 public class ControlsHashModel implements TemplateHashModelEx {
-  private final Map<String, FreeMarkerControlProxy> controls = new HashMap<String, FreeMarkerControlProxy>();
+  private final Map<String, FreeMarkerControlProxy> controls = new HashMap<>();
   private final String prefix;
   private final ControlFactory controlFactory;
 
@@ -79,10 +78,6 @@ public class ControlsHashModel implements TemplateHashModelEx {
   }
 
   private Collection<FreeMarkerControlProxy> valueCollection() {
-    List<FreeMarkerControlProxy> all = new ArrayList<FreeMarkerControlProxy>();
-    for (String name : controlFactory.controlNames(prefix)) {
-      all.add(get(name));
-    }
-    return all;
+    return controlFactory.controlNames(prefix).stream().map(this::get).collect(Collectors.toList());
   }
 }

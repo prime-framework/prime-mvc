@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2015, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,22 +23,19 @@ import org.example.action.user.RESTEdit;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
-import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
 
-import com.google.inject.Inject;
 import static org.easymock.EasyMock.*;
 import static org.testng.Assert.*;
 
 /**
- * This class tests the default URI parmaeter workflow.
+ * This class tests the default URI parameter workflow.
  *
  * @author Brian Pontarelli
  */
 public class DefaultURIParameterWorkflowTest extends PrimeBaseTest {
-  @Inject public ExpressionEvaluator expressionEvaluator;
 
   @Test
   public void noParameters() throws Exception {

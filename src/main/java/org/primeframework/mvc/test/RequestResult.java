@@ -181,7 +181,7 @@ public class RequestResult {
    * @return This.
    */
   public RequestResult assertContainsMessages(MessageType type, String... messages) {
-    Set<String> inMessageStore = new HashSet<String>();
+    Set<String> inMessageStore = new HashSet<>();
     MessageStore messageStore = get(MessageStore.class);
     List<Message> msgs = messageStore.getGeneralMessages();
     for (Message msg : msgs) {
@@ -202,7 +202,7 @@ public class RequestResult {
    *
    * @param header the name of the HTTP response header
    * @param value  the value of the header
-   * @return
+   * @return This.
    */
   public RequestResult assertHeaderContains(String header, String value) {
     List<String> actual = response.getHeaders().get(header);

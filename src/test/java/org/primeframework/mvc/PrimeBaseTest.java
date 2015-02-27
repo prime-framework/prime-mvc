@@ -30,9 +30,6 @@ import org.primeframework.mvc.action.config.DefaultActionConfigurationBuilder;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.guice.GuiceBootstrap;
 import org.primeframework.mvc.guice.MVCModule;
-import org.primeframework.mvc.parameter.annotation.PreParameter;
-import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
-import org.primeframework.mvc.scope.ScopeField;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.servlet.ServletObjectsHolder;
 import org.primeframework.mvc.validation.Validation;
@@ -132,19 +129,19 @@ public abstract class PrimeBaseTest {
                                                   String extension, String resultCode, Annotation annotation) throws Exception {
     Method method = action.getClass().getMethod(methodName);
     ExecuteMethodConfiguration executeMethod = new ExecuteMethodConfiguration(httpMethod, method, method.getAnnotation(Validation.class));
-    Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods = new HashMap<HTTPMethod, ExecuteMethodConfiguration>();
+    Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods = new HashMap<>();
     executeMethods.put(httpMethod, executeMethod);
 
-    List<ValidationMethodConfiguration> validationMethods = new ArrayList<ValidationMethodConfiguration>();
+    List<ValidationMethodConfiguration> validationMethods = new ArrayList<>();
 
-    Map<String, Annotation> resultConfigurations = new HashMap<String, Annotation>();
+    Map<String, Annotation> resultConfigurations = new HashMap<>();
     resultConfigurations.put(resultCode, annotation);
 
     return new ActionInvocation(action, executeMethod, uri, extension,
-      new ActionConfiguration(Edit.class, executeMethods, validationMethods, new ArrayList<Method>(), new ArrayList<Method>(),
-        new ArrayList<Method>(), new ArrayList<Method>(), new ArrayList<Method>(), resultConfigurations,
-        new HashMap<String, PreParameter>(), new HashMap<String, FileUpload>(), new HashSet<String>(),
-        new ArrayList<ScopeField>(), new HashMap<Class<?>, Object>(), uri));
+      new ActionConfiguration(Edit.class, executeMethods, validationMethods, new ArrayList<>(), new ArrayList<>(),
+        new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), resultConfigurations,
+        new HashMap<>(), new HashMap<>(), new HashSet<>(),
+        new ArrayList<>(), new HashMap<>(), uri));
   }
 
   public static class TestModule extends AbstractModule {

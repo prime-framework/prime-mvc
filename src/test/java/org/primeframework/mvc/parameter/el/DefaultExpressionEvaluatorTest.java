@@ -69,11 +69,11 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
 
     start = System.currentTimeMillis();
     c = 0;
-    for (int i = 0; i < 1000000; i++) {
+//    for (int i = 0; i < 1000000; i++) {
       // This method has been removed because it was slow
 //      char[] ca = evaluator.toCharArray(expression);
 //      c = ca[2];
-    }
+//    }
 
     System.out.println(c);
     System.out.println("Time for cache: " + (System.currentTimeMillis() - start));

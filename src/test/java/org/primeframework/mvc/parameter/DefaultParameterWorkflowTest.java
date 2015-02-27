@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2014-2015, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -95,11 +95,11 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(request);
 
     ExpressionEvaluator expressionEvaluator = createStrictMock(ExpressionEvaluator.class);
-    expressionEvaluator.setValue(eq("user.addresses['home'].city"), same(action), aryEq(ArrayUtils.toArray("Boulder")), eq(new HashMap<String, String>()));
+    expressionEvaluator.setValue(eq("user.addresses['home'].city"), same(action), aryEq(ArrayUtils.toArray("Boulder")), eq(new HashMap<>()));
     expressionEvaluator.setValue(eq("user.age"), same(action), aryEq(ArrayUtils.toArray("32")), eq(MapBuilder.asMap("dateFormat", "MM/dd/yyyy")));
-    expressionEvaluator.setValue(eq("user.inches"), same(action), aryEq(ArrayUtils.toArray("tall")), eq(new HashMap<String, String>()));
+    expressionEvaluator.setValue(eq("user.inches"), same(action), aryEq(ArrayUtils.toArray("tall")), eq(new HashMap<>()));
     expectLastCall().andThrow(new ConversionException());
-    expressionEvaluator.setValue(eq("user.name"), same(action), aryEq(ArrayUtils.toArray("")), eq(new HashMap<String, String>()));
+    expressionEvaluator.setValue(eq("user.name"), same(action), aryEq(ArrayUtils.toArray("")), eq(new HashMap<>()));
     replay(expressionEvaluator);
 
     ActionInvocation ai = makeActionInvocation(action, HTTPMethod.POST, "");
@@ -137,7 +137,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
   public void simpleParameter_boolean_in_baseClass() throws Exception {
     ActionField action = new ActionField();
 
-    Map<String, String[]> values = new LinkedHashMap<String, String[]>();
+    Map<String, String[]> values = new LinkedHashMap<>();
     values.put("superFoo", ArrayUtils.toArray("true"));
     values.put("superBar", ArrayUtils.toArray("false"));
 
@@ -180,7 +180,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
   public void simpleParameter_boolean() throws Exception {
     ActionField action = new ActionField();
 
-    Map<String, String[]> values = new LinkedHashMap<String, String[]>();
+    Map<String, String[]> values = new LinkedHashMap<>();
     values.put("foo", ArrayUtils.toArray("true"));
     values.put("bar", ArrayUtils.toArray("false"));
 
@@ -224,7 +224,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
   public void simpleParameter_boolean_model_object() throws Exception {
     ActionField action = new ActionField();
 
-    Map<String, String[]> values = new LinkedHashMap<String, String[]>();
+    Map<String, String[]> values = new LinkedHashMap<>();
     values.put("user.active", ArrayUtils.toArray("true"));
     values.put("user.bar", ArrayUtils.toArray("false"));
 
@@ -269,7 +269,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
   public void simpleParameter_boolean_default() throws Exception {
     ActionField action = new ActionField();
 
-    Map<String, String[]> values = new LinkedHashMap<String, String[]>();
+    Map<String, String[]> values = new LinkedHashMap<>();
 
     final HttpServletRequest request = createStrictMock(HttpServletRequest.class);
     expect(request.getParameterMap()).andReturn(values);
@@ -309,7 +309,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
   public void invalidParametersDev() throws Exception {
     Action action = new Action();
 
-    Map<String, String[]> values = new LinkedHashMap<String, String[]>();
+    Map<String, String[]> values = new LinkedHashMap<>();
     values.put("user.age", ArrayUtils.toArray("32"));
 
     final HttpServletRequest request = createStrictMock(HttpServletRequest.class);
@@ -318,7 +318,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(request);
 
     ExpressionEvaluator expressionEvaluator = createStrictMock(ExpressionEvaluator.class);
-    expressionEvaluator.setValue(eq("user.age"), same(action), aryEq(ArrayUtils.toArray("32")), eq(new HashMap<String, String>()));
+    expressionEvaluator.setValue(eq("user.age"), same(action), aryEq(ArrayUtils.toArray("32")), eq(new HashMap<>()));
     expectLastCall().andThrow(new ExpressionException());
     replay(expressionEvaluator);
 
@@ -358,7 +358,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
   public void invalidParametersProduction() throws Exception {
     Action action = new Action();
 
-    Map<String, String[]> values = new LinkedHashMap<String, String[]>();
+    Map<String, String[]> values = new LinkedHashMap<>();
     values.put("user.age", ArrayUtils.toArray("32"));
 
     final HttpServletRequest request = createStrictMock(HttpServletRequest.class);
@@ -367,7 +367,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(request);
 
     ExpressionEvaluator expressionEvaluator = createStrictMock(ExpressionEvaluator.class);
-    expressionEvaluator.setValue(eq("user.age"), same(action), aryEq(ArrayUtils.toArray("32")), eq(new HashMap<String, String>()));
+    expressionEvaluator.setValue(eq("user.age"), same(action), aryEq(ArrayUtils.toArray("32")), eq(new HashMap<>()));
     expectLastCall().andThrow(new ExpressionException());
     replay(expressionEvaluator);
 
@@ -403,7 +403,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
   public void radioButtonsCheckBoxes() throws Exception {
     Action action = new Action();
 
-    Map<String, String[]> values = new HashMap<String, String[]>();
+    Map<String, String[]> values = new HashMap<>();
     values.put("__cb_user.checkbox['null']", ArrayUtils.toArray(""));
     values.put("__cb_user.checkbox['default']", ArrayUtils.toArray("false"));
     values.put("__rb_user.radio['null']", ArrayUtils.toArray(""));
@@ -415,8 +415,8 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(request);
 
     ExpressionEvaluator expressionEvaluator = createNiceMock(ExpressionEvaluator.class);
-    expressionEvaluator.setValue(eq("user.checkbox['default']"), same(action), aryEq(ArrayUtils.toArray("false")), eq(new HashMap<String, String>()));
-    expressionEvaluator.setValue(eq("user.radio['default']"), same(action), aryEq(ArrayUtils.toArray("false")), eq(new HashMap<String, String>()));
+    expressionEvaluator.setValue(eq("user.checkbox['default']"), same(action), aryEq(ArrayUtils.toArray("false")), eq(new HashMap<>()));
+    expressionEvaluator.setValue(eq("user.radio['default']"), same(action), aryEq(ArrayUtils.toArray("false")), eq(new HashMap<>()));
     replay(expressionEvaluator);
 
     ActionInvocation ai = makeActionInvocation(action, HTTPMethod.POST, "");
@@ -450,7 +450,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
   public void imageSubmitButton() throws Exception {
     Action action = new Action();
 
-    Map<String, String[]> values = new HashMap<String, String[]>();
+    Map<String, String[]> values = new HashMap<>();
     values.put("submit.x", ArrayUtils.toArray("1"));
     values.put("submit.y", ArrayUtils.toArray("2"));
 
@@ -460,9 +460,9 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(request);
 
     ExpressionEvaluator expressionEvaluator = createNiceMock(ExpressionEvaluator.class);
-    expressionEvaluator.setValue(eq("submit.x"), same(action), aryEq(ArrayUtils.toArray("1")), eq(new HashMap<String, String>()));
+    expressionEvaluator.setValue(eq("submit.x"), same(action), aryEq(ArrayUtils.toArray("1")), eq(new HashMap<>()));
     expectLastCall().andThrow(new ExpressionException("Not property x"));
-    expressionEvaluator.setValue(eq("submit.y"), same(action), aryEq(ArrayUtils.toArray("2")), eq(new HashMap<String, String>()));
+    expressionEvaluator.setValue(eq("submit.y"), same(action), aryEq(ArrayUtils.toArray("2")), eq(new HashMap<>()));
     expectLastCall().andThrow(new ExpressionException("Not property y"));
     replay(expressionEvaluator);
 
@@ -501,7 +501,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
   public void preAndPost() throws Exception {
     PreAndPostAction action = new PreAndPostAction();
 
-    Map<String, String[]> values = new HashMap<String, String[]>();
+    Map<String, String[]> values = new HashMap<>();
     values.put("preField", ArrayUtils.toArray("1"));
     values.put("preProperty", ArrayUtils.toArray("Pre property"));
     values.put("notPre", ArrayUtils.toArray("Not pre"));
@@ -544,7 +544,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
   @Test
   public void filesNoAnnotation() throws Exception {
-    Map<String, List<FileInfo>> files = new HashMap<String, List<FileInfo>>();
+    Map<String, List<FileInfo>> files = new HashMap<>();
     files.put("userfile", asList(new FileInfo(new java.io.File("src/test/java/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain")));
 
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);

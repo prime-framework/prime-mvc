@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2015, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 public class DefaultResourceLocator implements ResourceLocator {
-  private static final Map<String, String> resourceCache = new WeakHashMap<String, String>();
+  private static final Map<String, String> resourceCache = new WeakHashMap<>();
   private final ActionInvocationStore actionInvocationStore;
   private final ResultStore resultStore;
   private final ServletContext servletContext;
