@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2015, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,8 +60,8 @@ public class ForwardResult extends AbstractResult<Forward> {
    * {@inheritDoc}
    */
   public void execute(Forward forward) throws IOException, ServletException {
-    ActionInvocation invocation = actionInvocationStore.getCurrent();
-    Object action = invocation.action;
+    ActionInvocation current = actionInvocationStore.getCurrent();
+    Object action = current.action;
 
     // Set the content type for the response
     String contentType = expand(forward.contentType(), action, false);
@@ -78,23 +78,24 @@ public class ForwardResult extends AbstractResult<Forward> {
     }
 
     if (page == null) {
-      throw new PrimeException("Unable to locate result for URI [" + invocation.uri() + "] and result code [" + code + "]");
+      throw new PrimeException("Unable to locate result for URI [" + current.uri() + "] and result code [" + code + "]");
     }
 
-    page = expand(page, action, false);
-    if (!page.startsWith("/")) {
-      // Strip off the last part of the URI since it is relative
-      String uri = invocation.actionURI;
-      int index = uri.lastIndexOf("/");
-      if (index >= 0) {
-        uri = uri.substring(0, index);
+    if (!isCurrentActionHeadRequest(current)) {
+      page = expand(page, action, false);
+      if (!page.startsWith("/")) {
+        // Strip off the last part of the URI since it is relative
+        String uri = current.actionURI;
+        int index = uri.lastIndexOf("/");
+        if (index >= 0) {
+          uri = uri.substring(0, index);
+        }
+
+        page = DIR + uri + "/" + page;
       }
-
-      page = DIR + uri + "/" + page;
+      PrintWriter writer = response.getWriter();
+      freeMarkerService.render(writer, page, freeMarkerMap);
     }
-
-    PrintWriter writer = response.getWriter();
-    freeMarkerService.render(writer, page, freeMarkerMap);
   }
 
   public static class ForwardImpl implements Forward {

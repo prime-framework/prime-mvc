@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2015, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -131,7 +131,7 @@ public abstract class PrimeBaseTest {
   protected ActionInvocation makeActionInvocation(HTTPMethod httpMethod, Object action, String methodName, String uri,
                                                   String extension, String resultCode, Annotation annotation) throws Exception {
     Method method = action.getClass().getMethod(methodName);
-    ExecuteMethodConfiguration executeMethod = new ExecuteMethodConfiguration(method, method.getAnnotation(Validation.class));
+    ExecuteMethodConfiguration executeMethod = new ExecuteMethodConfiguration(httpMethod, method, method.getAnnotation(Validation.class));
     Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods = new HashMap<HTTPMethod, ExecuteMethodConfiguration>();
     executeMethods.put(httpMethod, executeMethod);
 

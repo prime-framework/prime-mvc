@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2015, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package org.primeframework.mvc.action;
 
 import java.lang.reflect.Method;
 
+import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.validation.Validation;
 
 /**
@@ -25,10 +26,12 @@ import org.primeframework.mvc.validation.Validation;
  * @author Brian Pontarelli
  */
 public class ExecuteMethodConfiguration {
+  public final HTTPMethod httpMethod;
   public final Method method;
   public final Validation validation;
 
-  public ExecuteMethodConfiguration(Method method, Validation validation) {
+  public ExecuteMethodConfiguration(HTTPMethod httpMethod, Method method, Validation validation) {
+    this.httpMethod = httpMethod;
     this.method = method;
     this.validation = validation;
   }

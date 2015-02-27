@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2015, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.primeframework.mvc.PrimeException;
+import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.annotation.XMLStream;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
@@ -50,8 +51,8 @@ public class XMLStreamResult extends AbstractResult<XMLStream> {
   public void execute(XMLStream xmlStream) throws IOException, ServletException {
     String xml = xmlStream.property();
 
-    Object action = actionInvocationStore.getCurrent().action;
-    Object object = expressionEvaluator.getValue(xml, action);
+    ActionInvocation current = actionInvocationStore.getCurrent();
+    Object object = expressionEvaluator.getValue(xml, current.action);
     if (object == null || !(object instanceof String)) {
       throw new PrimeException("Invalid property [" + xml + "] for XMLStream result. This " +
         "property returned null or an Object that is not a String.");
@@ -64,18 +65,20 @@ public class XMLStreamResult extends AbstractResult<XMLStream> {
     response.setContentType("application/xhtml+xml");
     response.setContentLength(xmlBytes.length);
 
-    InputStream is = new ByteArrayInputStream(xmlBytes);
-    ServletOutputStream sos = response.getOutputStream();
-    try {
-      // Then output the file
-      byte[] b = new byte[8192];
-      int len;
-      while ((len = is.read(b)) != -1) {
-        sos.write(b, 0, len);
+    if (!isCurrentActionHeadRequest(current)) {
+      InputStream is = new ByteArrayInputStream(xmlBytes);
+      ServletOutputStream sos = response.getOutputStream();
+      try {
+        // Then output the file
+        byte[] b = new byte[8192];
+        int len;
+        while ((len = is.read(b)) != -1) {
+          sos.write(b, 0, len);
+        }
+      } finally {
+        sos.flush();
+        sos.close();
       }
-    } finally {
-      sos.flush();
-      sos.close();
     }
   }
 }

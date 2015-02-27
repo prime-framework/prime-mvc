@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2014-2015, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,6 +92,19 @@ public class RequestResult {
       if (body.contains(string)) {
         throw new AssertionError("Body shouldn't contain [" + string + "]\nRedirect: [" + redirect + "]\nBody:\n" + body);
       }
+    }
+
+    return this;
+  }
+
+  /**
+   *  Verifies that the body is empty.
+   *
+   * @return This
+   */
+  public RequestResult assertBodyIsEmpty() {
+    if (!body.isEmpty()) {
+      throw new AssertionError("Body is not empty.\nBody:\n" + body);
     }
 
     return this;
