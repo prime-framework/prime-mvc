@@ -15,6 +15,9 @@
  */
 package org.primeframework.mvc.test;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -225,6 +228,24 @@ public class RequestResult {
     String json = objectMapper.writeValueAsString(object);
     if (!body.equals(json)) {
       throw new AssertionError("The body doesn't match the expected JSON output. expected [" + json + "] but found [" + body + "]");
+    }
+    return this;
+  }
+
+  /**
+   * Verifies that the response body is equal to the given JSON text file.
+   *
+   * @param jsonFile The JSON file to load and compare to the JSON response.
+   * @return This.
+   * @throws IOException If the JSON marshalling failed.
+   */
+  public RequestResult assertJSON(Path jsonFile) throws IOException {
+    String fileContents = new String(Files.readAllBytes(jsonFile), "UTF-8");
+    ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
+    Object response = objectMapper.readValue(body, Object.class);
+    Object file = objectMapper.readValue(fileContents, Object.class);
+    if (!response.equals(file)) {
+      throw new AssertionError("The body doesn't match the expected JSON output. expected [" + fileContents + "] but found [" + body + "]");
     }
     return this;
   }
