@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import org.primeframework.mock.servlet.MockHttpServletRequest;
 import org.primeframework.mock.servlet.MockHttpServletResponse;
@@ -67,6 +68,17 @@ public class RequestResult {
    */
   public <T> T get(Class<T> type) {
     return injector.getInstance(type);
+  }
+
+  /**
+   * Can be called to setup objects for assertions.
+   *
+   * @param consumer A consumer that accepts this RequestResult.
+   * @return This.
+   */
+  public RequestResult setup(Consumer<RequestResult> consumer) {
+    consumer.accept(this);
+    return this;
   }
 
   /**
