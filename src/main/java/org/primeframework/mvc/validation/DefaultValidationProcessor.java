@@ -15,7 +15,7 @@
  */
 package org.primeframework.mvc.validation;
 
-import com.google.inject.Inject;
+import org.apache.commons.lang3.ArrayUtils;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
@@ -27,7 +27,7 @@ import org.primeframework.mvc.parameter.el.ExpressionException;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.util.ReflectionUtils;
 
-import java.util.Arrays;
+import com.google.inject.Inject;
 
 /**
  * A validator that uses annotations and methods to perform validation.
@@ -35,9 +35,11 @@ import java.util.Arrays;
  * @author Brian Pontarelli
  */
 public class DefaultValidationProcessor implements ValidationProcessor {
-  private final ActionInvocationStore store;
-  private final MessageStore messageStore;
   private final HTTPMethod httpMethod;
+
+  private final MessageStore messageStore;
+
+  private final ActionInvocationStore store;
 
   @Inject
   public DefaultValidationProcessor(ActionInvocationStore store, MessageStore messageStore, HTTPMethod httpMethod) {
@@ -66,7 +68,7 @@ public class DefaultValidationProcessor implements ValidationProcessor {
     if (actionConfiguration.validationMethods.size() > 0) {
       for (ValidationMethodConfiguration configuration : actionConfiguration.validationMethods) {
         HTTPMethod[] httpMethods = configuration.annotation.httpMethods();
-        if (Arrays.binarySearch(httpMethods, httpMethod) >= 0) {
+        if (ArrayUtils.contains(httpMethods, httpMethod)) {
           try {
             ReflectionUtils.invoke(configuration.method, action);
           } catch (ExpressionException e) {

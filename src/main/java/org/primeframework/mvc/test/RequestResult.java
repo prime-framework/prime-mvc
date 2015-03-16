@@ -32,6 +32,7 @@ import org.primeframework.mvc.message.MessageType;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.inject.Injector;
 import static java.util.Arrays.asList;
 
@@ -245,7 +246,10 @@ public class RequestResult {
     Object response = objectMapper.readValue(body, Object.class);
     Object file = objectMapper.readValue(fileContents, Object.class);
     if (!response.equals(file)) {
-      throw new AssertionError("The body doesn't match the expected JSON output. expected [" + fileContents + "] but found [" + body + "]");
+      objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+      String bodyString = objectMapper.writeValueAsString(response);
+      String fileString = objectMapper.writeValueAsString(file);
+      throw new AssertionError("The body doesn't match the expected JSON output. expected [" + fileString  + "] but found [" + bodyString + "]");
     }
     return this;
   }
