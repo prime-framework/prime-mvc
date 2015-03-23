@@ -34,6 +34,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Locale;
 
 /**
@@ -125,6 +126,20 @@ public class RequestBuilder {
   public RequestBuilder withBody(byte[] bytes) {
     request.setInputStream(new MockServletInputStream(bytes));
     return this;
+  }
+
+  /**
+   * Sets the body content.
+   *
+   * @param body The body as a String.
+   * @return This.
+   */
+  public RequestBuilder withBody(String body) {
+    try {
+      return withBody(body.getBytes("UTF-8"));
+    } catch (UnsupportedEncodingException e) {
+      throw new IllegalStateException(e);
+    }
   }
 
   /**

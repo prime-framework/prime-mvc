@@ -31,7 +31,6 @@ import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.inject.Injector;
@@ -43,11 +42,16 @@ import static java.util.Arrays.asList;
  * @author Brian Pontarelli
  */
 public class RequestResult {
-  public final MockHttpServletRequest request;
-  public final MockHttpServletResponse response;
-  public final Injector injector;
   public final String body;
+
+  public final Injector injector;
+
   public final String redirect;
+
+  public final MockHttpServletRequest request;
+
+  public final MockHttpServletResponse response;
+
   public final int statusCode;
 
   public RequestResult(MockHttpServletRequest request, MockHttpServletResponse response, Injector injector) {
@@ -57,28 +61,6 @@ public class RequestResult {
     this.body = response.getStream().toString();
     this.redirect = response.getRedirect();
     this.statusCode = response.getCode();
-  }
-
-  /**
-   * Retrieves the instance of the given type from the Guice Injector.
-   *
-   * @param type The type.
-   * @param <T>  The type.
-   * @return The instance.
-   */
-  public <T> T get(Class<T> type) {
-    return injector.getInstance(type);
-  }
-
-  /**
-   * Can be called to setup objects for assertions.
-   *
-   * @param consumer A consumer that accepts this RequestResult.
-   * @return This.
-   */
-  public RequestResult setup(Consumer<RequestResult> consumer) {
-    consumer.accept(this);
-    return this;
   }
 
   /**
@@ -114,7 +96,7 @@ public class RequestResult {
   }
 
   /**
-   *  Verifies that the body is empty.
+   * Verifies that the body is empty.
    *
    * @return This
    */
@@ -127,8 +109,8 @@ public class RequestResult {
   }
 
   /**
-   * Verifies that the system contains the given error message(s). The message(s) might be in the request, flash, session or
-   * application scopes.
+   * Verifies that the system contains the given error message(s). The message(s) might be in the request, flash,
+   * session or application scopes.
    *
    * @param messages The fully rendered error message(s) (not the code).
    * @return This.
@@ -167,25 +149,14 @@ public class RequestResult {
   }
 
   /**
-   * Verifies that the system contains the given info message(s). The message(s) might be in the request, flash, session or
-   * application scopes.
+   * Verifies that the system contains the given info message(s). The message(s) might be in the request, flash, session
+   * or application scopes.
    *
    * @param messages The fully rendered info message(s) (not the code).
    * @return This.
    */
   public RequestResult assertContainsInfos(String... messages) {
     return assertContainsMessages(MessageType.INFO, messages);
-  }
-
-  /**
-   * Verifies that the system contains the given warning message(s). The message(s) might be in the request, flash, session or
-   * application scopes.
-   *
-   * @param messages The fully rendered warning message(s) (not the code).
-   * @return This.
-   */
-  public RequestResult assertContainsWarnings(String... messages) {
-    return assertContainsMessages(MessageType.WARNING, messages);
   }
 
   /**
@@ -214,6 +185,17 @@ public class RequestResult {
   }
 
   /**
+   * Verifies that the system contains the given warning message(s). The message(s) might be in the request, flash,
+   * session or application scopes.
+   *
+   * @param messages The fully rendered warning message(s) (not the code).
+   * @return This.
+   */
+  public RequestResult assertContainsWarnings(String... messages) {
+    return assertContainsMessages(MessageType.WARNING, messages);
+  }
+
+  /**
    * Verifies that the HTTP response contains the specified header.
    *
    * @param header the name of the HTTP response header
@@ -234,15 +216,12 @@ public class RequestResult {
    *
    * @param object The object.
    * @return This.
-   * @throws JsonProcessingException If the JSON marshalling failed.
+   * @throws IOException If the JSON marshalling failed.
    */
-  public RequestResult assertJSON(Object object) throws JsonProcessingException {
+  public RequestResult assertJSON(Object object) throws IOException {
     ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
     String json = objectMapper.writeValueAsString(object);
-    if (!body.equals(json)) {
-      throw new AssertionError("The body doesn't match the expected JSON output. expected [" + json + "] but found [" + body + "]");
-    }
-    return this;
+    return assertJSON(json);
   }
 
   /**
@@ -254,14 +233,25 @@ public class RequestResult {
    */
   public RequestResult assertJSON(Path jsonFile) throws IOException {
     String fileContents = new String(Files.readAllBytes(jsonFile), "UTF-8");
+    return assertJSON(fileContents);
+  }
+
+  /**
+   * Verifies that the response body is equal to the given JSON text.
+   *
+   * @param json The JSON text.
+   * @return This.
+   * @throws IOException If the JSON marshalling failed.
+   */
+  public RequestResult assertJSON(String json) throws IOException {
     ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
     Object response = objectMapper.readValue(body, Object.class);
-    Object file = objectMapper.readValue(fileContents, Object.class);
+    Object file = objectMapper.readValue(json, Object.class);
     if (!response.equals(file)) {
       objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
       String bodyString = objectMapper.writeValueAsString(response);
       String fileString = objectMapper.writeValueAsString(file);
-      throw new AssertionError("The body doesn't match the expected JSON output. expected [" + fileString  + "] but found [" + bodyString + "]");
+      throw new AssertionError("The body doesn't match the expected JSON output. expected [" + fileString + "] but found [" + bodyString + "]");
     }
     return this;
   }
@@ -291,6 +281,28 @@ public class RequestResult {
       throw new AssertionError("Status code [" + this.statusCode + "] was not equal to [" + statusCode + "]\nResponse body: [" + body + "]\nRedirect: [" + redirect + "]");
     }
 
+    return this;
+  }
+
+  /**
+   * Retrieves the instance of the given type from the Guice Injector.
+   *
+   * @param type The type.
+   * @param <T>  The type.
+   * @return The instance.
+   */
+  public <T> T get(Class<T> type) {
+    return injector.getInstance(type);
+  }
+
+  /**
+   * Can be called to setup objects for assertions.
+   *
+   * @param consumer A consumer that accepts this RequestResult.
+   * @return This.
+   */
+  public RequestResult setup(Consumer<RequestResult> consumer) {
+    consumer.accept(this);
     return this;
   }
 }
