@@ -15,8 +15,10 @@
  */
 package org.primeframework.mvc.content.json;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.inject.Inject;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.example.action.KitchenSink;
 import org.example.domain.UserField;
 import org.example.domain.UserType;
@@ -34,12 +36,19 @@ import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.validation.ValidationException;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.easymock.EasyMock.*;
-import static org.testng.Assert.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.Inject;
+import static org.easymock.EasyMock.createNiceMock;
+import static org.easymock.EasyMock.createStrictMock;
+import static org.easymock.EasyMock.eq;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.isA;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 /**
  * Tests the jackson configurator test.
@@ -51,7 +60,7 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
 
   @Test
   public void handle() throws IOException {
-    Map<Class<?>, Object> additionalConfig = new HashMap<Class<?>, Object>();
+    Map<Class<?>, Object> additionalConfig = new HashMap<>();
     additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration("jsonRequest", UserField.class, null));
 
     KitchenSink action = new KitchenSink(null);
@@ -127,7 +136,7 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
 
   @Test
   public void handleBadJSON() throws IOException {
-    Map<Class<?>, Object> additionalConfig = new HashMap<Class<?>, Object>();
+    Map<Class<?>, Object> additionalConfig = new HashMap<>();
     additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration("jsonRequest", UserField.class, null));
 
     KitchenSink action = new KitchenSink(null);
@@ -165,7 +174,7 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
 
   @Test
   public void handleBadRoot() throws IOException {
-    Map<Class<?>, Object> additionalConfig = new HashMap<Class<?>, Object>();
+    Map<Class<?>, Object> additionalConfig = new HashMap<>();
     additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration("jsonRequest", UserField.class, null));
 
     KitchenSink action = new KitchenSink(null);
@@ -203,7 +212,7 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
 
   @Test
   public void handleBadInMap() throws IOException {
-    Map<Class<?>, Object> additionalConfig = new HashMap<Class<?>, Object>();
+    Map<Class<?>, Object> additionalConfig = new HashMap<>();
     additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration("jsonRequest", UserField.class, null));
 
     KitchenSink action = new KitchenSink(null);
@@ -245,7 +254,7 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
 
   @Test
   public void handleBadInArray() throws IOException {
-    Map<Class<?>, Object> additionalConfig = new HashMap<Class<?>, Object>();
+    Map<Class<?>, Object> additionalConfig = new HashMap<>();
     additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration("jsonRequest", UserField.class, null));
 
     KitchenSink action = new KitchenSink(null);
@@ -338,7 +347,7 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
 
   @Test
   public void handleNoConfig() throws IOException {
-    Map<Class<?>, Object> additionalConfig = new HashMap<Class<?>, Object>();
+    Map<Class<?>, Object> additionalConfig = new HashMap<>();
 
     KitchenSink action = new KitchenSink(null);
     ActionConfiguration config = new ActionConfiguration(KitchenSink.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null);

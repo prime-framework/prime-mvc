@@ -15,13 +15,10 @@
  */
 package org.primeframework.mvc.content.json;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
-import com.google.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.util.List;
+
 import org.apache.commons.io.IOUtils;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
@@ -37,9 +34,13 @@ import org.primeframework.mvc.validation.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.util.List;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
+import com.google.inject.Inject;
 
 /**
  * Uses the Jackson JSON processor to marshall JSON into Java objects and set them into the action.
@@ -82,6 +83,11 @@ public class JacksonContentHandler implements ContentHandler {
 
     ActionConfiguration config = current.configuration;
     if (!config.additionalConfiguration.containsKey(JacksonActionConfiguration.class)) {
+      return;
+    }
+
+    int contentLength = request.getContentLength();
+    if (contentLength == 0) {
       return;
     }
 
