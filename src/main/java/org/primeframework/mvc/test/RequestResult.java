@@ -228,12 +228,15 @@ public class RequestResult {
    * Verifies that the response body is equal to the given JSON text file.
    *
    * @param jsonFile The JSON file to load and compare to the JSON response.
+   * @param values   key value pairs of replacement values for use in the JSON file.
    * @return This.
    * @throws IOException If the JSON marshalling failed.
    */
-  public RequestResult assertJSON(Path jsonFile) throws IOException {
-    String fileContents = new String(Files.readAllBytes(jsonFile), "UTF-8");
-    return assertJSON(fileContents);
+  public RequestResult assertJSON(Path jsonFile, Object... values) throws IOException {
+    if (values.length == 0) {
+      return assertJSON(new String(Files.readAllBytes(jsonFile), "UTF-8"));
+    }
+    return assertJSON(BodyTools.processTemplate(jsonFile, values));
   }
 
   /**

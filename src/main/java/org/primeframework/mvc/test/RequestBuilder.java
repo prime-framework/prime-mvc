@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2015, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,18 @@
  */
 package org.primeframework.mvc.test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.inject.Injector;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequestWrapper;
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Locale;
+
 import org.primeframework.mock.servlet.MockHttpServletRequest;
 import org.primeframework.mock.servlet.MockHttpServletRequest.Method;
 import org.primeframework.mock.servlet.MockHttpServletResponse;
@@ -27,15 +36,9 @@ import org.primeframework.mvc.parameter.DefaultParameterParser;
 import org.primeframework.mvc.servlet.PrimeFilter;
 import org.primeframework.mvc.servlet.ServletObjectsHolder;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequestWrapper;
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.Locale;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.Injector;
 
 /**
  * This class is a builder that helps create a test HTTP request that is sent to the MVC.
@@ -44,8 +47,11 @@ import java.util.Locale;
  */
 public class RequestBuilder {
   public final MockHttpServletRequest request;
+
   public final MockHttpServletResponse response;
+
   public final PrimeFilter filter;
+
   public final Injector injector;
 
   public RequestBuilder(String uri, MockHttpSession session, PrimeFilter filter, Injector injector) {
@@ -143,6 +149,21 @@ public class RequestBuilder {
   }
 
   /**
+   * Sets the body content.
+   *
+   * @param body   The body as a {@link Path} to the JSON file.
+   * @param values key value pairs of replacement values for use in the JSON file.
+   * @return
+   * @throws IOException
+   */
+  public RequestBuilder withBody(Path body, Object... values) throws IOException {
+    if (values.length == 0) {
+      return withBody(Files.readAllBytes(body));
+    }
+    return withBody(BodyTools.processTemplate(body, values));
+  }
+
+  /**
    * Sets the content type.
    *
    * @param contentType The content type.
@@ -225,10 +246,32 @@ public class RequestBuilder {
   }
 
   /**
+   * Uses the given string as the JSON body for the request.
+   *
+   * @param json The string representation of the JSON to send in the request.
+   * @return This.
+   */
+  public RequestBuilder withJSON(String json) throws JsonProcessingException {
+    return withContentType("application/json").withBody(json);
+  }
+
+  /**
+   * Uses the given {@Path} object to a JSON file as the JSON body for the request.
+   *
+   * @param jsonFile The string representation of the JSON to send in the request.
+   * @param values   key value pairs of replacement values for use in the JSON file.
+   * @return This.
+   * @throws IOException
+   */
+  public RequestBuilder withJSON(Path jsonFile, Object... values) throws IOException {
+    return withContentType("application/json").withBody(jsonFile, values);
+  }
+
+  /**
    * Sends the HTTP request to the MVC as a POST.
    *
    * @return The response.
-   * @throws IOException      If the MVC throws an exception.
+   * @throws IOException If the MVC throws an exception.
    * @throws ServletException If the MVC throws an exception.
    */
   public RequestResult post() throws IOException, ServletException {
@@ -241,7 +284,7 @@ public class RequestBuilder {
    * Sends the HTTP request to the MVC as a GET.
    *
    * @return The response.
-   * @throws IOException      If the MVC throws an exception.
+   * @throws IOException If the MVC throws an exception.
    * @throws ServletException If the MVC throws an exception.
    */
   public RequestResult get() throws IOException, ServletException {
@@ -254,7 +297,7 @@ public class RequestBuilder {
    * Sends the HTTP request to the MVC as a HEAD.
    *
    * @return The response.
-   * @throws IOException      If the MVC throws an exception.
+   * @throws IOException If the MVC throws an exception.
    * @throws ServletException If the MVC throws an exception.
    */
   public RequestResult head() throws IOException, ServletException {
@@ -267,7 +310,7 @@ public class RequestBuilder {
    * Sends the HTTP request to the MVC as a PUT.
    *
    * @return The response.
-   * @throws IOException      If the MVC throws an exception.
+   * @throws IOException If the MVC throws an exception.
    * @throws ServletException If the MVC throws an exception.
    */
   public RequestResult put() throws IOException, ServletException {
@@ -280,7 +323,7 @@ public class RequestBuilder {
    * Sends the HTTP request to the MVC as a DELETE.
    *
    * @return The response.
-   * @throws IOException      If the MVC throws an exception.
+   * @throws IOException If the MVC throws an exception.
    * @throws ServletException If the MVC throws an exception.
    */
   public RequestResult delete() throws IOException, ServletException {
@@ -293,7 +336,7 @@ public class RequestBuilder {
    * Sends the HTTP request to the MVC as a OPTIONS.
    *
    * @return The response.
-   * @throws IOException      If the MVC throws an exception.
+   * @throws IOException If the MVC throws an exception.
    * @throws ServletException If the MVC throws an exception.
    */
   public RequestResult options() throws IOException, ServletException {
@@ -306,7 +349,7 @@ public class RequestBuilder {
    * Sends the HTTP request to the MVC as a TRACE.
    *
    * @return The response.
-   * @throws IOException      If the MVC throws an exception.
+   * @throws IOException If the MVC throws an exception.
    * @throws ServletException If the MVC throws an exception.
    */
   public RequestResult trace() throws IOException, ServletException {
@@ -319,7 +362,7 @@ public class RequestBuilder {
    * Sends the HTTP request to the MVC as a CONNECT.
    *
    * @return The response.
-   * @throws IOException      If the MVC throws an exception.
+   * @throws IOException If the MVC throws an exception.
    * @throws ServletException If the MVC throws an exception.
    */
   public RequestResult connect() throws IOException, ServletException {
