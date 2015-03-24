@@ -36,6 +36,8 @@ public final class BodyTools {
 
   static {
     configuration = new Configuration();
+    configuration.setDefaultEncoding("UTF-8");
+    configuration.setNumberFormat("computer");
     configuration.setTagSyntax(Configuration.SQUARE_BRACKET_TAG_SYNTAX);
     try {
       configuration.setTemplateLoader(new FileTemplateLoader(new File("/")));
