@@ -232,23 +232,11 @@ public class RequestResult {
    * @return This.
    * @throws IOException If the JSON marshalling failed.
    */
-  public RequestResult assertJSON(Path jsonFile, Object... values) throws IOException {
+  public RequestResult assertJSONFile(Path jsonFile, Object... values) throws IOException {
     if (values.length == 0) {
       return assertJSON(new String(Files.readAllBytes(jsonFile), "UTF-8"));
     }
     return assertJSON(BodyTools.processTemplate(jsonFile, values));
-  }
-
-  /**
-   * Verifies that the response body is equal to the given JSON text file.
-   *
-   * @param jsonFile The JSON file to load and compare to the JSON response.
-   * @param values   Map of replacement values for use in the JSON file.
-   * @return This.
-   * @throws IOException If the JSON marshalling failed.
-   */
-  public RequestResult assertJSONWithReplacementValues(Path jsonFile, Map<String, Object> values) throws IOException {
-    return assertJSON(BodyTools.processTemplateWithMap(jsonFile, values));
   }
 
   /**

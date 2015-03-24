@@ -26,7 +26,6 @@ import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Locale;
-import java.util.Map;
 
 import org.primeframework.mock.servlet.MockHttpServletRequest;
 import org.primeframework.mock.servlet.MockHttpServletRequest.Method;
@@ -157,26 +156,11 @@ public class RequestBuilder {
    * @return
    * @throws IOException
    */
-  public RequestBuilder withBody(Path body, Object... values) throws IOException {
+  public RequestBuilder withBodyFile(Path body, Object... values) throws IOException {
     if (values.length == 0) {
       return withBody(Files.readAllBytes(body));
     }
     return withBody(BodyTools.processTemplate(body, values));
-  }
-
-  /**
-   * Sets the body content.
-   *
-   * @param body   The body as a {@link Path} to the JSON file.
-   * @param values Map of replacement values for use in the JSON file.
-   * @return
-   * @throws IOException
-   */
-  public RequestBuilder withBodyAndReplacementValues(Path body, Map<String, Object> values) throws IOException {
-    if (values.isEmpty()) {
-      return withBody(Files.readAllBytes(body));
-    }
-    return withBody(BodyTools.processTemplateWithMap(body, values));
   }
 
   /**
@@ -279,20 +263,8 @@ public class RequestBuilder {
    * @return This.
    * @throws IOException
    */
-  public RequestBuilder withJSON(Path jsonFile, Object... values) throws IOException {
-    return withContentType("application/json").withBody(jsonFile, values);
-  }
-
-  /**
-   * Uses the given {@Path} object to a JSON file as the JSON body for the request.
-   *
-   * @param jsonFile The string representation of the JSON to send in the request.
-   * @param values   Map of replacement values for use in the JSON file.
-   * @return This.
-   * @throws IOException
-   */
-  public RequestBuilder withJSONAndReplacementValues(Path jsonFile, Map<String, Object> values) throws IOException {
-    return withContentType("application/json").withBodyAndReplacementValues(jsonFile, values);
+  public RequestBuilder withJSONFile(Path jsonFile, Object... values) throws IOException {
+    return withContentType("application/json").withBodyFile(jsonFile, values);
   }
 
   /**
