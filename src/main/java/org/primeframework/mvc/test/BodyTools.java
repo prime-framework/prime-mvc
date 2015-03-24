@@ -28,6 +28,8 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
 /**
+ * Helper methods for processing JSON files that contain replacement variables.
+ *
  * @author Daniel DeGroff
  */
 public final class BodyTools {
@@ -46,23 +48,65 @@ public final class BodyTools {
     }
   }
 
+  /**
+   * Process the FreeMarker template (JSON) and return the rendered string. <p>Example usage when a single replacement
+   * value exists in the json named ${id} :</p>
+   * <pre>
+   *   BodyTools.processTemplate(Paths.get("/foo.json"), "id", "ffffffff-1e16-4b1d-88f3-ec68ad1200e2");
+   * </pre>
+   *
+   * @param path   {@Path} to the FreeMarker template.
+   * @param values Key value pairs of replacement values.
+   * @return
+   * @throws IOException
+   */
   public static String processTemplate(Path path, Object... values) throws IOException {
+    return processTemplateWithMap(path, rootMap(values));
+  }
+
+  /**
+   * Process the FreeMarker template (JSON) and return the rendered string. <p>Example usage when a single replacement
+   * value exists in the json named ${id} :</p>
+   * <pre>
+   *   BodyTools.processTemplateWithMap(Paths.get("/foo.json"), MapBuilder.&lt;String, Object&gt;map()
+   *     .put("id", "ffffffff-1e16-4b1d-88f3-ec68ad1200e2")
+   *     .done());
+   * </pre>
+   *
+   * @param path   {@Path} to the FreeMarker template.
+   * @param values Map of key value pairs of replacement values.
+   * @return
+   * @throws IOException
+   */
+  public static String processTemplateWithMap(Path path, Map<String, Object> values) throws IOException {
     StringWriter writer = new StringWriter();
     Template template = configuration.getTemplate(path.toAbsolutePath().toString());
-    Map<String, Object> map = new HashMap<>(values.length / 2);
-    if (values.length % 2 != 0) {
-      String key = values[values.length - 1].toString();
-      throw new RuntimeException("Missing value for key [" + key + "]");
-    }
-    for (int i = 0; i < values.length; i += 2) {
-      map.put(values[i].toString(), values[i + 1]);
-    }
     try {
-      template.process(map, writer);
+      template.process(values, writer);
       return writer.toString();
     } catch (TemplateException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  /**
+   * Take array of objects assumed to be in pairs of String, Object and build and return a map.
+   *
+   * @param values
+   * @return
+   */
+  private static Map<String, Object> rootMap(Object... values) {
+    if (values.length % 2 != 0) {
+      String key = values[values.length - 1].toString();
+      throw new IllegalArgumentException("Invalid mapping values. Must have a multiple of 2. Missing value for key [" + key + "]");
+    }
+
+    Map<String, Object> map = new HashMap<>();
+    for (int i = 0; i < values.length; i = i + 2) {
+      map.put(values[i].toString(), values[i + 1]);
+    }
+
+    return map;
   }
 
 }

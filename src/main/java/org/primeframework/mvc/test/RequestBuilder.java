@@ -26,6 +26,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Locale;
+import java.util.Map;
 
 import org.primeframework.mock.servlet.MockHttpServletRequest;
 import org.primeframework.mock.servlet.MockHttpServletRequest.Method;
@@ -164,6 +165,21 @@ public class RequestBuilder {
   }
 
   /**
+   * Sets the body content.
+   *
+   * @param body   The body as a {@link Path} to the JSON file.
+   * @param values Map of replacement values for use in the JSON file.
+   * @return
+   * @throws IOException
+   */
+  public RequestBuilder withBodyAndReplacementValues(Path body, Map<String, Object> values) throws IOException {
+    if (values.isEmpty()) {
+      return withBody(Files.readAllBytes(body));
+    }
+    return withBody(BodyTools.processTemplateWithMap(body, values));
+  }
+
+  /**
    * Sets the content type.
    *
    * @param contentType The content type.
@@ -265,6 +281,18 @@ public class RequestBuilder {
    */
   public RequestBuilder withJSON(Path jsonFile, Object... values) throws IOException {
     return withContentType("application/json").withBody(jsonFile, values);
+  }
+
+  /**
+   * Uses the given {@Path} object to a JSON file as the JSON body for the request.
+   *
+   * @param jsonFile The string representation of the JSON to send in the request.
+   * @param values   Map of replacement values for use in the JSON file.
+   * @return This.
+   * @throws IOException
+   */
+  public RequestBuilder withJSONAndReplacementValues(Path jsonFile, Map<String, Object> values) throws IOException {
+    return withContentType("application/json").withBodyAndReplacementValues(jsonFile, values);
   }
 
   /**
