@@ -30,6 +30,7 @@ import org.primeframework.mvc.parameter.RequestBodyWorkflow;
 import org.primeframework.mvc.parameter.URIParameterWorkflow;
 import org.primeframework.mvc.scope.ScopeRetrievalWorkflow;
 import org.primeframework.mvc.scope.ScopeStorageWorkflow;
+import org.primeframework.mvc.security.SecurityWorkflow;
 import org.primeframework.mvc.validation.ValidationWorkflow;
 
 import com.codahale.metrics.Meter;
@@ -55,6 +56,7 @@ public class DefaultMVCWorkflow implements MVCWorkflow {
   public DefaultMVCWorkflow(RequestBodyWorkflow requestBodyWorkflow,
                             StaticResourceWorkflow staticResourceWorkflow,
                             ActionMappingWorkflow actionMappingWorkflow,
+                            SecurityWorkflow securityWorkflow,
                             MessageWorkflow messageWorkflow,
                             ScopeRetrievalWorkflow scopeRetrievalWorkflow,
                             URIParameterWorkflow uriParameterWorkflow,
@@ -68,9 +70,9 @@ public class DefaultMVCWorkflow implements MVCWorkflow {
                             ExceptionHandler exceptionHandler) {
     this.exceptionHandler = exceptionHandler;
     this.errorWorkflow = errorWorkflow;
-    this.workflows = asList(requestBodyWorkflow, staticResourceWorkflow, actionMappingWorkflow, messageWorkflow,
-        scopeRetrievalWorkflow, uriParameterWorkflow, parameterWorkflow, contentWorkflow, validationWorkflow,
-        actionInvocationWorkflow, scopeStorageWorkflow, resultInvocationWorkflow);
+    this.workflows = asList(requestBodyWorkflow, staticResourceWorkflow, actionMappingWorkflow, securityWorkflow,
+        messageWorkflow, scopeRetrievalWorkflow, uriParameterWorkflow, parameterWorkflow, contentWorkflow,
+        validationWorkflow, actionInvocationWorkflow, scopeStorageWorkflow, resultInvocationWorkflow);
   }
 
   /**

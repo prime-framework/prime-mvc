@@ -56,4 +56,14 @@ public @interface Action {
    * @return True of false.
    */
   boolean overridable() default false;
+
+  /**
+   * @return If this action requires authentication.
+   */
+  boolean requiresAuthentication() default false;
+
+  /**
+   * @return the required roles for this action to be executed.
+   */
+  String[] roles() default {};
 }

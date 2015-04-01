@@ -83,6 +83,8 @@ public abstract class PrimeBaseTest {
    */
   @BeforeMethod
   public void setUp() {
+    session.clear();
+
     request = new MockHttpServletRequest("/", Locale.getDefault(), false, "utf-8", session);
     response = new MockHttpServletResponse();
 

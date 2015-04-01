@@ -283,9 +283,6 @@
         <JSCodeStyleSettings>
           <option name="SPACE_BEFORE_FUNCTION_LEFT_PARENTH" value="false" />
         </JSCodeStyleSettings>
-        <JavaCodeStyleSettings>
-          <option name="CLASS_NAMES_IN_JAVADOC" value="3" />
-        </JavaCodeStyleSettings>
         <XML>
           <option name="XML_ATTRIBUTE_WRAP" value="0" />
           <option name="XML_LEGACY_SETTINGS_IMPORTED" value="true" />

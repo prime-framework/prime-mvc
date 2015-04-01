@@ -56,12 +56,12 @@ project(group: "org.primeframework", name: "prime-mvc", version: "0.35.0", licen
 }
 
 // Plugins
-file = loadPlugin(id: "org.savantbuild.plugin:file:0.3.1")
-dependency = loadPlugin(id: "org.savantbuild.plugin:dependency:0.3.1")
-java = loadPlugin(id: "org.savantbuild.plugin:java:0.3.1")
-javaTestNG = loadPlugin(id: "org.savantbuild.plugin:java-testng:0.3.2")
-idea = loadPlugin(id: "org.savantbuild.plugin:idea:0.3.2")
-release = loadPlugin(id: "org.savantbuild.plugin:release-git:0.3.4")
+file = loadPlugin(id: "org.savantbuild.plugin:file:0.4.1")
+dependency = loadPlugin(id: "org.savantbuild.plugin:dependency:0.4.1")
+java = loadPlugin(id: "org.savantbuild.plugin:java:0.4.1")
+javaTestNG = loadPlugin(id: "org.savantbuild.plugin:java-testng:0.4.1")
+idea = loadPlugin(id: "org.savantbuild.plugin:idea:0.4.1")
+release = loadPlugin(id: "org.savantbuild.plugin:release-git:0.4.1")
 
 // Plugin settings
 java.settings.javaVersion = "1.8"

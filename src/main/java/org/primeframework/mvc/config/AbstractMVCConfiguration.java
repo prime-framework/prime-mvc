@@ -29,8 +29,15 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
     "image/jpeg", "image/gif", "image/png", "image/pjpeg", "image/tiff",
     "video/dv", "video/h261", "video/h262", "video/h263", "video/h264", "video/jpeg", "video/mp4", "video/mpeg", "video/mpv", "video/ogg", "video/quicktime", "video/x-flv",
     "application/msword", "application/pdf", "application/msword", "application/msexcel", "application/mspowerpoint"};
+
   public static final long MAX_SIZE = 1024000;
+
   public static final String[] STATIC_PREFIXES = new String[]{"/static"};
+
+  @Override
+  public String loginURI() {
+    return "/login";
+  }
 
   @Override
   public String[] fileUploadAllowedTypes() {

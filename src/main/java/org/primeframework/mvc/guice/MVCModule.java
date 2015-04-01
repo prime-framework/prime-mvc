@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc.guice;
 
-import com.google.inject.AbstractModule;
 import org.primeframework.mvc.action.guice.ActionModule;
 import org.primeframework.mvc.action.result.guice.ResultModule;
 import org.primeframework.mvc.container.guice.ContainerModule;
@@ -27,10 +26,13 @@ import org.primeframework.mvc.message.guice.MessageModule;
 import org.primeframework.mvc.message.scope.guice.ScopeModule;
 import org.primeframework.mvc.parameter.convert.guice.ConverterModule;
 import org.primeframework.mvc.parameter.guice.ParameterModule;
+import org.primeframework.mvc.security.guice.SecurityModule;
 import org.primeframework.mvc.servlet.guice.ServletModule;
 import org.primeframework.mvc.util.guice.UtilModule;
 import org.primeframework.mvc.validation.guice.ValidationModule;
 import org.primeframework.mvc.workflow.guice.WorkflowModule;
+
+import com.google.inject.AbstractModule;
 
 /**
  * A virtual module that installs all of the Prime MVC modules.
@@ -50,6 +52,7 @@ public class MVCModule extends AbstractModule {
     install(new MessageModule());
     install(new ParameterModule());
     install(new ResultModule());
+    install(new SecurityModule());
     install(new ScopeModule());
     install(new org.primeframework.mvc.scope.guice.ScopeModule());
     install(new ServletModule());
