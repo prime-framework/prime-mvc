@@ -30,13 +30,13 @@ import org.primeframework.mvc.parameter.RequestBodyWorkflow;
 import org.primeframework.mvc.parameter.URIParameterWorkflow;
 import org.primeframework.mvc.scope.ScopeRetrievalWorkflow;
 import org.primeframework.mvc.scope.ScopeStorageWorkflow;
+import org.primeframework.mvc.security.SavedRequestWorkflow;
 import org.primeframework.mvc.security.SecurityWorkflow;
 import org.primeframework.mvc.validation.ValidationWorkflow;
 
-import com.codahale.metrics.Meter;
-import com.codahale.metrics.MetricRegistry;
 import com.google.inject.Inject;
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 
 /**
  * This class is the main entry point for the Prime MVC. It uses the workflows passed into the constructor in the order
@@ -53,7 +53,8 @@ public class DefaultMVCWorkflow implements MVCWorkflow {
   private final List<Workflow> workflows;
 
   @Inject
-  public DefaultMVCWorkflow(RequestBodyWorkflow requestBodyWorkflow,
+  public DefaultMVCWorkflow(SavedRequestWorkflow savedRequestWorkflow,
+                            RequestBodyWorkflow requestBodyWorkflow,
                             StaticResourceWorkflow staticResourceWorkflow,
                             ActionMappingWorkflow actionMappingWorkflow,
                             SecurityWorkflow securityWorkflow,
@@ -70,9 +71,9 @@ public class DefaultMVCWorkflow implements MVCWorkflow {
                             ExceptionHandler exceptionHandler) {
     this.exceptionHandler = exceptionHandler;
     this.errorWorkflow = errorWorkflow;
-    this.workflows = asList(requestBodyWorkflow, staticResourceWorkflow, actionMappingWorkflow, securityWorkflow,
-        messageWorkflow, scopeRetrievalWorkflow, uriParameterWorkflow, parameterWorkflow, contentWorkflow,
-        validationWorkflow, actionInvocationWorkflow, scopeStorageWorkflow, resultInvocationWorkflow);
+    this.workflows = asList(savedRequestWorkflow, requestBodyWorkflow, staticResourceWorkflow, actionMappingWorkflow,
+        securityWorkflow, messageWorkflow, scopeRetrievalWorkflow, uriParameterWorkflow, parameterWorkflow,
+        contentWorkflow, validationWorkflow, actionInvocationWorkflow, scopeStorageWorkflow, resultInvocationWorkflow);
   }
 
   /**
@@ -89,7 +90,7 @@ public class DefaultMVCWorkflow implements MVCWorkflow {
     } catch (RuntimeException | Error e) {
       exceptionHandler.handle(e);
 
-      SubWorkflowChain errorChain = new SubWorkflowChain(asList(errorWorkflow), chain);
+      SubWorkflowChain errorChain = new SubWorkflowChain(singletonList(errorWorkflow), chain);
       errorChain.continueWorkflow();
     }
   }

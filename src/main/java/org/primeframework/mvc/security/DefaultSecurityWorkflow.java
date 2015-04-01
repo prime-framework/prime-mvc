@@ -16,15 +16,21 @@
 package org.primeframework.mvc.security;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Set;
 
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.config.MVCConfiguration;
+import org.primeframework.mvc.security.saved.SavedHttpRequest;
 import org.primeframework.mvc.workflow.WorkflowChain;
 
 import com.google.inject.Inject;
@@ -36,7 +42,10 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 public class DefaultSecurityWorkflow implements SecurityWorkflow {
+
   private final ActionInvocationStore actionInvocationStore;
+
+  private final HttpServletRequest httpServletRequest;
 
   private final HttpServletResponse httpServletResponse;
 
@@ -45,9 +54,10 @@ public class DefaultSecurityWorkflow implements SecurityWorkflow {
   private SecurityContext securityContext;
 
   @Inject
-  public DefaultSecurityWorkflow(ActionInvocationStore actionInvocationStore, HttpServletResponse httpServletResponse,
-                                 MVCConfiguration mvcConfiguration) {
+  public DefaultSecurityWorkflow(ActionInvocationStore actionInvocationStore, HttpServletRequest httpServletRequest,
+                                 HttpServletResponse httpServletResponse, MVCConfiguration mvcConfiguration) {
     this.actionInvocationStore = actionInvocationStore;
+    this.httpServletRequest = httpServletRequest;
     this.httpServletResponse = httpServletResponse;
     this.mvcConfiguration = mvcConfiguration;
   }
@@ -65,6 +75,8 @@ public class DefaultSecurityWorkflow implements SecurityWorkflow {
       if (actionAnnotation.requiresAuthentication()) {
         // Check if user is signed in
         if (!securityContext.isLoggedIn()) {
+          saveRequest();
+
           String loginURI = mvcConfiguration.loginURI();
           httpServletResponse.sendRedirect(loginURI);
           return;
@@ -87,5 +99,45 @@ public class DefaultSecurityWorkflow implements SecurityWorkflow {
   @Inject(optional = true)
   public void setSecurityContext(SecurityContext securityContext) {
     this.securityContext = securityContext;
+  }
+
+  private String makeQueryString(Map<String, String[]> parameters) {
+    if (parameters.size() == 0) {
+      return "";
+    }
+
+    StringBuilder build = new StringBuilder();
+    for (Map.Entry<String, String[]> entry : parameters.entrySet()) {
+      for (String value : entry.getValue()) {
+        if (build.length() > 0) {
+          build.append("&");
+        }
+
+        try {
+          build.append(URLEncoder.encode(entry.getKey(), "UTF-8")).append("=").append(URLEncoder.encode(value, "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+          throw new RuntimeException(e);
+        }
+      }
+    }
+
+    return "?" + build.toString();
+  }
+
+  private void saveRequest() {
+    Map<String, String[]> requestParameters = null;
+    String redirectURI;
+    if (httpServletRequest.getMethod().equals("GET")) {
+      Map<String, String[]> params = httpServletRequest.getParameterMap();
+      redirectURI = httpServletRequest.getRequestURI() + makeQueryString(params);
+    } else {
+      requestParameters = httpServletRequest.getParameterMap();
+      redirectURI = httpServletRequest.getRequestURI();
+    }
+
+    // Save the request
+    SavedHttpRequest saved = new SavedHttpRequest(redirectURI, requestParameters);
+    HttpSession session = httpServletRequest.getSession(true);
+    session.setAttribute(SavedHttpRequest.SESSION_KEY, saved);
   }
 }

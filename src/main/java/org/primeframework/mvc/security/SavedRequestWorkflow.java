@@ -13,24 +13,14 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.security.guice;
+package org.primeframework.mvc.security;
 
-import org.primeframework.mvc.security.DefaultSavedRequestWorkflow;
-import org.primeframework.mvc.security.DefaultSecurityWorkflow;
-import org.primeframework.mvc.security.SavedRequestWorkflow;
-import org.primeframework.mvc.security.SecurityWorkflow;
-
-import com.google.inject.AbstractModule;
+import org.primeframework.mvc.workflow.Workflow;
 
 /**
- * A Guice modules for the Security classes.
+ * The saved request workflow interface that handles saved requests and swapping out the request.
  *
  * @author Brian Pontarelli
  */
-public class SecurityModule extends AbstractModule {
-  @Override
-  protected void configure() {
-    bind(SecurityWorkflow.class).to(DefaultSecurityWorkflow.class);
-    bind(SavedRequestWorkflow.class).to(DefaultSavedRequestWorkflow.class);
-  }
+public interface SavedRequestWorkflow extends Workflow {
 }
