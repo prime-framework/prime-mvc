@@ -112,7 +112,7 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
     verify(workflowChain);
 
     assertEquals(response.getRedirect(), "/login");
-    assertEquals(session.getAttribute(SavedHttpRequest.SESSION_KEY), new SavedHttpRequest("/secure?test=value&test2=value2", null));
+    assertEquals(session.getAttribute(SavedHttpRequest.INITIAL_SESSION_KEY), new SavedHttpRequest("/secure?test=value&test2=value2", null));
   }
 
   @Test
@@ -138,7 +138,7 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
     verify(workflowChain);
 
     assertEquals(response.getRedirect(), "/login");
-    assertEquals(session.getAttribute(SavedHttpRequest.SESSION_KEY), new SavedHttpRequest("/secure", request.getParameterMap()));
+    assertEquals(session.getAttribute(SavedHttpRequest.INITIAL_SESSION_KEY), new SavedHttpRequest("/secure", request.getParameterMap()));
   }
 
   @Test

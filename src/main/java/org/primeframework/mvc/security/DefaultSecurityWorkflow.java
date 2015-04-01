@@ -138,6 +138,6 @@ public class DefaultSecurityWorkflow implements SecurityWorkflow {
     // Save the request
     SavedHttpRequest saved = new SavedHttpRequest(redirectURI, requestParameters);
     HttpSession session = httpServletRequest.getSession(true);
-    session.setAttribute(SavedHttpRequest.SESSION_KEY, saved);
+    session.setAttribute(SavedHttpRequest.INITIAL_SESSION_KEY, saved);
   }
 }

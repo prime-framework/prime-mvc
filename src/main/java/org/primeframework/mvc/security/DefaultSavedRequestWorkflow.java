@@ -44,9 +44,9 @@ public class DefaultSavedRequestWorkflow implements SavedRequestWorkflow {
   public void perform(WorkflowChain workflowChain) throws IOException, ServletException {
     HttpSession httpSession = httpServletRequest.getSession(false);
     if (httpSession != null) {
-      SavedHttpRequest savedHttpRequest = (SavedHttpRequest) httpSession.getAttribute(SavedHttpRequest.SESSION_KEY);
+      SavedHttpRequest savedHttpRequest = (SavedHttpRequest) httpSession.getAttribute(SavedHttpRequest.LOGGED_IN_SESSION_KEY);
       if (savedHttpRequest != null) {
-        httpSession.removeAttribute(SavedHttpRequest.SESSION_KEY);
+        httpSession.removeAttribute(SavedHttpRequest.LOGGED_IN_SESSION_KEY);
 
         HttpServletRequestWrapper wrapper = (HttpServletRequestWrapper) httpServletRequest;
         HttpServletRequest previous = (HttpServletRequest) wrapper.getRequest();

@@ -84,8 +84,11 @@ public class SavedRequestResultTest {
     ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
     replay(ee);
 
+    SavedHttpRequest savedHttpRequest = new SavedHttpRequest("/secure?test=value1&test2=value2", null);
     HttpSession session = createStrictMock(HttpSession.class);
-    expect(session.getAttribute(SavedHttpRequest.SESSION_KEY)).andReturn(new SavedHttpRequest("/secure?test=value1&test2=value2", null));
+    expect(session.getAttribute(SavedHttpRequest.INITIAL_SESSION_KEY)).andReturn(savedHttpRequest);
+    session.removeAttribute(SavedHttpRequest.INITIAL_SESSION_KEY);
+    session.setAttribute(SavedHttpRequest.LOGGED_IN_SESSION_KEY, savedHttpRequest);
     replay(session);
 
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);

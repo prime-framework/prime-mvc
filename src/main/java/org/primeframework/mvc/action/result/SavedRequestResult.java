@@ -70,8 +70,10 @@ public class SavedRequestResult extends AbstractResult<SavedRequest> {
     String uri = null;
     HttpSession session = request.getSession(false);
     if (session != null) {
-      SavedHttpRequest savedHttpRequest = (SavedHttpRequest) session.getAttribute(SavedHttpRequest.SESSION_KEY);
+      SavedHttpRequest savedHttpRequest = (SavedHttpRequest) session.getAttribute(SavedHttpRequest.INITIAL_SESSION_KEY);
       if (savedHttpRequest != null) {
+        session.removeAttribute(SavedHttpRequest.INITIAL_SESSION_KEY);
+        session.setAttribute(SavedHttpRequest.LOGGED_IN_SESSION_KEY, savedHttpRequest);
         uri = savedHttpRequest.uri;
       }
     }

@@ -26,7 +26,9 @@ import java.util.Map;
  * @author Brian Pontarelli
  */
 public class SavedHttpRequest {
-  public static final String SESSION_KEY = "prime-mvc-security-saved-request";
+  public static final String INITIAL_SESSION_KEY = "prime-mvc-security-saved-request-initial";
+
+  public static final String LOGGED_IN_SESSION_KEY = "prime-mvc-security-saved-request-logged-in";
 
   public final Map<String, String[]> parameters;
 

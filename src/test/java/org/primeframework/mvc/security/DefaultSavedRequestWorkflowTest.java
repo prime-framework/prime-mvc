@@ -39,6 +39,8 @@ import static org.testng.Assert.assertTrue;
 public class DefaultSavedRequestWorkflowTest extends PrimeBaseTest {
   @Test
   public void performNoSavedRequest() throws Exception {
+    session.setAttribute(SavedHttpRequest.INITIAL_SESSION_KEY, new SavedHttpRequest("/secure?test=value&test2=value2", null));
+
     HttpServletRequestWrapper wrapper = new HttpServletRequestWrapper(request);
     DefaultSavedRequestWorkflow workflow = new DefaultSavedRequestWorkflow(wrapper);
 
@@ -55,7 +57,7 @@ public class DefaultSavedRequestWorkflowTest extends PrimeBaseTest {
 
   @Test
   public void performSavedRequestGET() throws Exception {
-    session.setAttribute(SavedHttpRequest.SESSION_KEY, new SavedHttpRequest("/secure?test=value&test2=value2", null));
+    session.setAttribute(SavedHttpRequest.LOGGED_IN_SESSION_KEY, new SavedHttpRequest("/secure?test=value&test2=value2", null));
     request.setUri("/secure");
 
     HttpServletRequestWrapper wrapper = new HttpServletRequestWrapper(request);
@@ -80,7 +82,7 @@ public class DefaultSavedRequestWorkflowTest extends PrimeBaseTest {
     parameters.put("test", new String[]{"value"});
     parameters.put("test2", new String[]{"value2"});
 
-    session.setAttribute(SavedHttpRequest.SESSION_KEY, new SavedHttpRequest("/secure", parameters));
+    session.setAttribute(SavedHttpRequest.LOGGED_IN_SESSION_KEY, new SavedHttpRequest("/secure", parameters));
     request.setUri("/secure");
 
     HttpServletRequestWrapper wrapper = new HttpServletRequestWrapper(request);
