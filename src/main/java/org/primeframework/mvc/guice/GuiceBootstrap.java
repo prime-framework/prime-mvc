@@ -18,13 +18,23 @@ package org.primeframework.mvc.guice;
 import java.io.Closeable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
-import com.google.inject.*;
+import org.primeframework.mvc.PrimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.inject.Binding;
+import com.google.inject.CreationException;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.Module;
+import com.google.inject.Scopes;
+import com.google.inject.spi.Message;
 
 /**
  * This class bootstraps Guice.
@@ -44,7 +54,22 @@ public class GuiceBootstrap {
    */
   public static Injector initialize(Module mainModule) {
     logger.debug("Initializing Guice");
-    return Guice.createInjector(mainModule);
+    try {
+      return Guice.createInjector(mainModule);
+    } catch (CreationException e) {
+      logger.debug("Unable to create Guice injector", e);
+
+      Collection<Message> messages = e.getErrorMessages();
+      Set<String> errorMessages = new HashSet<>();
+      messages.forEach((message) -> errorMessages.add(message.getCause().getMessage()));
+      logger.error(
+          "\n\n===================================================================================================\n\n" +
+          "***Unable to start the server. Here's why:***\n\n\n" + String.join("\n", errorMessages) +
+          "\n\n===================================================================================================\n\n"
+      );
+
+      throw new PrimeException();
+    }
   }
 
   /**
