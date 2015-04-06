@@ -48,4 +48,9 @@ public interface SecurityContext {
    * @param user The user object.
    */
   void login(Object user);
+
+  /**
+   * Logs the user out.
+   */
+  void logout();
 }

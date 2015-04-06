@@ -59,4 +59,14 @@ public abstract class BaseHttpSessionSecurityContext implements SecurityContext 
 
     session.setAttribute(USER_SESSION_KEY, user);
   }
+
+  @Override
+  public void logout() {
+    HttpSession session = request.getSession(false);
+    if (session == null) {
+      return;
+    }
+
+    session.removeAttribute(USER_SESSION_KEY);
+  }
 }
