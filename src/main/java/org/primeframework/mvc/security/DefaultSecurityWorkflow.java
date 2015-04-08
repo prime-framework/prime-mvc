@@ -87,7 +87,7 @@ public class DefaultSecurityWorkflow implements SecurityWorkflow {
         if (requiredRoles.length > 0) {
           Set<String> userRoles = securityContext.getCurrentUsersRoles();
           if (Arrays.stream(requiredRoles).noneMatch(userRoles::contains)) {
-            throw new NotAuthorizedException();
+            throw new UnauthorizedException();
           }
         }
       }

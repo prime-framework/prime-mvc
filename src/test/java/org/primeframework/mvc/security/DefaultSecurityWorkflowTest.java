@@ -178,7 +178,7 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
     try {
       workflow.perform(workflowChain);
       fail("Should have thrown");
-    } catch (NotAuthorizedException e) {
+    } catch (UnauthorizedException e) {
       // Expected
     }
 

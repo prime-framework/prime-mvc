@@ -22,8 +22,8 @@ import org.primeframework.mvc.ErrorException;
  *
  * @author Brian Pontarelli
  */
-public class NotAuthorizedException extends ErrorException {
-  public NotAuthorizedException() {
-    super("not-authorized");
+public class UnauthorizedException extends ErrorException {
+  public UnauthorizedException() {
+    super("unauthorized");
   }
 }
