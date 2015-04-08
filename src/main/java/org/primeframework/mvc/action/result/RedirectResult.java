@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2015, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,8 @@ import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.servlet.ServletTools;
 
 import com.google.inject.Inject;
+import static javax.servlet.http.HttpServletResponse.SC_FOUND;
+import static javax.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
 
 /**
  * This result performs a HTTP redirect to a URL. This also transfers all messages from the request to the flash. If we
@@ -72,8 +74,9 @@ public class RedirectResult extends AbstractResult<Redirect> {
 
     boolean perm = redirect.perm();
 
-    response.setStatus(perm ? 301 : 302);
     response.sendRedirect(uri);
+    // sendRedirect may implicitly set the status code to 302, set status after calling sendRedirect
+    response.setStatus(perm ? SC_MOVED_PERMANENTLY : SC_FOUND);
   }
 
   public static class RedirectImpl implements Redirect {

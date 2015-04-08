@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2015, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,8 +51,8 @@ public class RedirectResultTest {
     replay(request);
 
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    response.setStatus(301);
     response.sendRedirect("http://www.google.com");
+    response.setStatus(301);
     replay(response);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
@@ -84,8 +84,8 @@ public class RedirectResultTest {
     replay(request);
 
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    response.setStatus(302);
     response.sendRedirect("/foo/bar.jsp");
+    response.setStatus(302);
     replay(response);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
@@ -117,8 +117,8 @@ public class RedirectResultTest {
     replay(request);
 
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    response.setStatus(302);
     response.sendRedirect("/context-path/foo/bar.jsp");
+    response.setStatus(302);
     replay(response);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
@@ -150,8 +150,8 @@ public class RedirectResultTest {
     replay(request);
 
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    response.setStatus(302);
     response.sendRedirect("foo/bar.jsp");
+    response.setStatus(302);
     replay(response);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
@@ -185,8 +185,8 @@ public class RedirectResultTest {
     replay(request);
 
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    response.setStatus(302);
     response.sendRedirect("result");
+    response.setStatus(302);
     replay(response);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
@@ -220,8 +220,8 @@ public class RedirectResultTest {
     replay(request);
 
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    response.setStatus(302);
     response.sendRedirect("result");
+    response.setStatus(302);
     replay(response);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
