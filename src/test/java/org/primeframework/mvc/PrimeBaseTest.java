@@ -15,8 +15,17 @@
  */
 package org.primeframework.mvc;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Injector;
+import javax.servlet.http.HttpServletRequestWrapper;
+import java.io.File;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
 import org.example.action.user.Edit;
 import org.primeframework.mock.servlet.MockHttpServletRequest;
 import org.primeframework.mock.servlet.MockHttpServletResponse;
@@ -37,17 +46,8 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 
-import javax.servlet.http.HttpServletRequestWrapper;
-import java.io.File;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
+import com.google.inject.AbstractModule;
+import com.google.inject.Injector;
 import static java.util.Arrays.asList;
 
 /**
@@ -57,10 +57,14 @@ import static java.util.Arrays.asList;
  * @author Brian Pontarelli and James Humphrey
  */
 public abstract class PrimeBaseTest {
-  protected static Injector injector;
   protected static MockServletContext context;
+
+  protected static Injector injector;
+
   protected static MockHttpSession session;
+
   protected MockHttpServletRequest request;
+
   protected MockHttpServletResponse response;
 
   @BeforeSuite
@@ -113,7 +117,7 @@ public abstract class PrimeBaseTest {
     DefaultActionConfigurationBuilder builder = injector.getInstance(DefaultActionConfigurationBuilder.class);
     ActionConfiguration actionConfiguration = builder.build(action.getClass());
     return new ActionInvocation(action, actionConfiguration.executeMethods.get(httpMethod), actionConfiguration.uri,
-      extension, asList(uriParameters), actionConfiguration, true);
+        extension, asList(uriParameters), actionConfiguration, true);
   }
 
   /**
@@ -140,10 +144,10 @@ public abstract class PrimeBaseTest {
     resultConfigurations.put(resultCode, annotation);
 
     return new ActionInvocation(action, executeMethod, uri, extension,
-      new ActionConfiguration(Edit.class, executeMethods, validationMethods, new ArrayList<>(), new ArrayList<>(),
-        new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), resultConfigurations,
-        new HashMap<>(), new HashMap<>(), new HashSet<>(),
-        new ArrayList<>(), new HashMap<>(), uri));
+        new ActionConfiguration(Edit.class, executeMethods, validationMethods, new ArrayList<>(), new ArrayList<>(),
+            new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), resultConfigurations,
+            new HashMap<>(), new HashMap<>(), new HashSet<>(),
+            new ArrayList<>(), new HashMap<>(), uri));
   }
 
   public static class TestModule extends AbstractModule {

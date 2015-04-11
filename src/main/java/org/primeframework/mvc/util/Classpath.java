@@ -21,6 +21,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -314,6 +315,8 @@ public class Classpath {
         if (index >= 0) {
           externalForm = externalForm.substring(index + 8);
         }
+
+        externalForm = URLDecoder.decode(externalForm, "UTF-8");
 
         return new File(externalForm).toURI().getPath();
       } catch (URISyntaxException e) {

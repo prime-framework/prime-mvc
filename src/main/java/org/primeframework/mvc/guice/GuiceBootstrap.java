@@ -61,7 +61,13 @@ public class GuiceBootstrap {
 
       Collection<Message> messages = e.getErrorMessages();
       Set<String> errorMessages = new HashSet<>();
-      messages.forEach((message) -> errorMessages.add(message.getCause().getMessage()));
+      messages.forEach((message) -> {
+        if (message.getCause() != null) {
+          errorMessages.add(message.getCause().getMessage());
+        } else {
+          errorMessages.add(message.getMessage());
+        }
+      });
       logger.error(
           "\n\n===================================================================================================\n\n" +
           "***Unable to start the server. Here's why:***\n\n\n" + String.join("\n", errorMessages) +
