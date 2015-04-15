@@ -39,7 +39,7 @@ public class ActionInvocation {
     this.method = method;
     this.actionURI = uri;
     this.extension = extension;
-    this.uriParameters = new ArrayList<String>();
+    this.uriParameters = new ArrayList<>();
     this.configuration = configuration;
     this.executeResult = true;
   }

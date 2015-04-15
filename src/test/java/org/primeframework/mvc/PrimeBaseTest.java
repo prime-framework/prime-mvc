@@ -39,8 +39,6 @@ import org.primeframework.mvc.action.config.DefaultActionConfigurationBuilder;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.guice.GuiceBootstrap;
 import org.primeframework.mvc.guice.MVCModule;
-import org.primeframework.mvc.security.DefaultSecurityWorkflowTest.TestUserLoginSecurityContext;
-import org.primeframework.mvc.security.UserLoginSecurityContext;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.servlet.ServletObjectsHolder;
 import org.primeframework.mvc.validation.Validation;

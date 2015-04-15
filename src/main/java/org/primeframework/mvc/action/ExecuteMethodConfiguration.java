@@ -15,7 +15,10 @@
  */
 package org.primeframework.mvc.action;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.validation.Validation;
@@ -26,6 +29,7 @@ import org.primeframework.mvc.validation.Validation;
  * @author Brian Pontarelli
  */
 public class ExecuteMethodConfiguration {
+  public final Map<Class<? extends Annotation>, Annotation> annotations = new HashMap<>();
   public final HTTPMethod httpMethod;
   public final Method method;
   public final Validation validation;
@@ -34,5 +38,13 @@ public class ExecuteMethodConfiguration {
     this.httpMethod = httpMethod;
     this.method = method;
     this.validation = validation;
+
+    // Load the annotations on the method
+    if (method != null) {
+      Annotation[] annotations = method.getAnnotations();
+      for (Annotation annotation : annotations) {
+        this.annotations.put(annotation.annotationType(), annotation);
+      }
+    }
   }
 }

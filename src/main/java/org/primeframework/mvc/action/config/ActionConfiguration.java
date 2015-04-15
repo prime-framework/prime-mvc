@@ -26,6 +26,7 @@ import org.primeframework.mvc.validation.Validatable;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -55,6 +56,7 @@ public class ActionConfiguration {
   public final Action annotation;
   public final String pattern;
   public final String[] patternParts;
+  public final Map<Class<? extends Annotation>, Annotation> annotations = new HashMap<>();
 
   public ActionConfiguration(Class<?> actionClass, Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods,
                              List<ValidationMethodConfiguration> validationMethods, List<Method> formPrepareMethods,
@@ -80,6 +82,14 @@ public class ActionConfiguration {
     this.validatable = Validatable.class.isAssignableFrom(actionClass);
     this.uri = uri;
     this.annotation = actionClass.getAnnotation(Action.class);
+
+    // Load the annotations on the class
+    if (actionClass != null) {
+      Annotation[] annotations = actionClass.getAnnotations();
+      for (Annotation annotation : annotations) {
+        this.annotations.put(annotation.annotationType(), annotation);
+      }
+    }
 
     this.pattern = annotation.value();
     if (!pattern.equals("")) {

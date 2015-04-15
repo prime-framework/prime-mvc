@@ -321,7 +321,6 @@
           </indentOptions>
         </codeStyleSettings>
         <codeStyleSettings language="JAVA">
-          <option name="BLANK_LINES_AROUND_FIELD" value="1" />
           <option name="ALIGN_MULTILINE_CHAINED_METHODS" value="true" />
           <option name="FIELD_ANNOTATION_WRAP" value="0" />
           <option name="PARENT_SETTINGS_INSTALLED" value="true" />

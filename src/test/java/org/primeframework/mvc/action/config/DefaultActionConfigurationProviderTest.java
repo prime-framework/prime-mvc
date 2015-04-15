@@ -15,10 +15,15 @@
  */
 package org.primeframework.mvc.action.config;
 
+import javax.servlet.ServletContext;
+import java.util.HashSet;
+import java.util.Map;
+
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.example.action.KitchenSink;
 import org.example.action.Simple;
+import org.example.action.TestAnnotation;
 import org.example.action.user.Index;
 import org.example.domain.UserField;
 import org.primeframework.mvc.action.result.annotation.Forward;
@@ -31,11 +36,7 @@ import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.util.DefaultURIBuilder;
 import org.testng.annotations.Test;
 
-import javax.servlet.ServletContext;
-import java.util.HashSet;
-import java.util.Map;
-
-import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.easymock.EasyMock.capture;
 import static org.easymock.EasyMock.eq;
 import static org.testng.Assert.assertEquals;
@@ -58,7 +59,7 @@ public class DefaultActionConfigurationProviderTest {
     context.setAttribute(eq(DefaultActionConfigurationProvider.ACTION_CONFIGURATION_KEY), capture(c));
     EasyMock.replay(context);
 
-    new DefaultActionConfigurationProvider(context, new DefaultActionConfigurationBuilder(new DefaultURIBuilder(), new HashSet<>(asList(new JacksonActionConfigurator()))));
+    new DefaultActionConfigurationProvider(context, new DefaultActionConfigurationBuilder(new DefaultURIBuilder(), new HashSet<>(singletonList(new JacksonActionConfigurator()))));
 
     Map<String, ActionConfiguration> config = c.getValue();
     assertSame(config.get("/simple").actionClass, Simple.class);
@@ -81,8 +82,10 @@ public class DefaultActionConfigurationProviderTest {
 
     assertSame(config.get("/kitchen-sink").actionClass, KitchenSink.class);
     assertNotNull(config.get("/kitchen-sink").annotation);
+    assertNotNull(config.get("/kitchen-sink").annotations.get(TestAnnotation.class));
     assertEquals(config.get("/kitchen-sink").executeMethods.size(), 3);
     assertEquals(config.get("/kitchen-sink").executeMethods.get(HTTPMethod.GET).method, KitchenSink.class.getMethod("get"));
+    assertNotNull(config.get("/kitchen-sink").executeMethods.get(HTTPMethod.GET).annotations.get(TestAnnotation.class));
     assertEquals(config.get("/kitchen-sink").executeMethods.get(HTTPMethod.HEAD).method, KitchenSink.class.getMethod("get"));
     assertEquals(config.get("/kitchen-sink").executeMethods.get(HTTPMethod.POST).method, KitchenSink.class.getMethod("post"));
     assertNull(config.get("/kitchen-sink").executeMethods.get(HTTPMethod.PUT));

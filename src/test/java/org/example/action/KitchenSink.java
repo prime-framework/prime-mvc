@@ -51,6 +51,7 @@ import org.primeframework.mvc.validation.annotation.PreValidationMethod;
 })
 @Status(code = "status", status = 300, statusStr = "hello world", headers = {@Header(name = "foo", value = "bar"), @Header(name = "baz", value = "fred")})
 @JSON(code = "json", status = 201)
+@TestAnnotation
 public class KitchenSink extends KitchenSinkSuperclass implements Validatable {
   private final MessageStore messageStore;
 
@@ -74,6 +75,7 @@ public class KitchenSink extends KitchenSinkSuperclass implements Validatable {
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "foo", "code", "ValidationMethod message"));
   }
 
+  @TestAnnotation
   public String get() {
     return "success";
   }
