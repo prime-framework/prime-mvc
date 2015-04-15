@@ -225,21 +225,6 @@ public class RequestResult {
   }
 
   /**
-   * Verifies that the response body is equal to the given JSON text file.
-   *
-   * @param jsonFile The JSON file to load and compare to the JSON response.
-   * @param values   key value pairs of replacement values for use in the JSON file.
-   * @return This.
-   * @throws IOException If the JSON marshalling failed.
-   */
-  public RequestResult assertJSONFile(Path jsonFile, Object... values) throws IOException {
-    if (values.length == 0) {
-      return assertJSON(new String(Files.readAllBytes(jsonFile), "UTF-8"));
-    }
-    return assertJSON(BodyTools.processTemplate(jsonFile, values));
-  }
-
-  /**
    * Verifies that the response body is equal to the given JSON text.
    *
    * @param json The JSON text.
@@ -257,6 +242,21 @@ public class RequestResult {
       throw new AssertionError("The body doesn't match the expected JSON output. expected [" + fileString + "] but found [" + bodyString + "]");
     }
     return this;
+  }
+
+  /**
+   * Verifies that the response body is equal to the given JSON text file.
+   *
+   * @param jsonFile The JSON file to load and compare to the JSON response.
+   * @param values   key value pairs of replacement values for use in the JSON file.
+   * @return This.
+   * @throws IOException If the JSON marshalling failed.
+   */
+  public RequestResult assertJSONFile(Path jsonFile, Object... values) throws IOException {
+    if (values.length == 0) {
+      return assertJSON(new String(Files.readAllBytes(jsonFile), "UTF-8"));
+    }
+    return assertJSON(BodyTools.processTemplate(jsonFile, values));
   }
 
   /**
@@ -296,6 +296,41 @@ public class RequestResult {
    */
   public <T> T get(Class<T> type) {
     return injector.getInstance(type);
+  }
+
+  /**
+   * If the test is false, apply the consumer.
+   * <p>
+   * <pre>
+   *   .ifFalse(foo.isBar(), (requestResult) -> requestResult.assertBodyDoesNotContain("bar"))
+   * </pre>
+   *
+   * @param test
+   * @param consumer
+   * @return
+   */
+  public RequestResult ifFalse(boolean test, Consumer<RequestResult> consumer) {
+    if (!test) {
+      consumer.accept(this);
+    }
+    return this;
+  }
+
+  /**
+   * If the test is true, apply the consumer. Example:
+   * <pre>
+   *   .ifTrue(foo.isBar(), (requestResult) -> requestResult.assertBodyContains("bar"))
+   * </pre>
+   *
+   * @param test
+   * @param consumer
+   * @return
+   */
+  public RequestResult ifTrue(boolean test, Consumer<RequestResult> consumer) {
+    if (test) {
+      consumer.accept(this);
+    }
+    return this;
   }
 
   /**
