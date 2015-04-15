@@ -31,8 +31,14 @@ import com.google.inject.Injector;
  * @author Brian Pontarelli
  */
 public class ControlFactory {
-  private static final Map<String, Map<String, Class<? extends Control>>> bindings = new HashMap<String, Map<String, Class<? extends Control>>>();
+  private static final Map<String, Map<String, Class<? extends Control>>> bindings = new HashMap<>();
+
   private final Injector injector;
+
+  @Inject
+  public ControlFactory(Injector injector) {
+    this.injector = injector;
+  }
 
   /**
    * Adds a binding to a control so that it can be accessed in FreeMarker like [prefix.name/]
@@ -46,31 +52,11 @@ public class ControlFactory {
     binder.bind(controlType);
     Map<String, Class<? extends Control>> controls = bindings.get(prefix);
     if (controls == null) {
-      controls = new HashMap<String, Class<? extends Control>>();
+      controls = new HashMap<>();
       bindings.put(prefix, controls);
     }
 
     controls.put(name, controlType);
-  }
-
-  @Inject
-  public ControlFactory(Injector injector) {
-    this.injector = injector;
-  }
-
-  /**
-   * @return The prefixes of the controls that have been registered.
-   */
-  public Set<String> prefixes() {
-    return bindings.keySet();
-  }
-
-  /**
-   * @param prefix The prefix of the control names to grab.
-   * @return The names of the controls registered under the given prefix.
-   */
-  public Set<String> controlNames(String prefix) {
-    return bindings.get(prefix).keySet();
   }
 
   /**
@@ -92,5 +78,20 @@ public class ControlFactory {
     }
 
     return injector.getInstance(controlType);
+  }
+
+  /**
+   * @param prefix The prefix of the control names to grab.
+   * @return The names of the controls registered under the given prefix.
+   */
+  public Set<String> controlNames(String prefix) {
+    return bindings.get(prefix).keySet();
+  }
+
+  /**
+   * @return The prefixes of the controls that have been registered.
+   */
+  public Set<String> prefixes() {
+    return bindings.keySet();
   }
 }

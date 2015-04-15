@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2015, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,25 +18,25 @@ package org.primeframework.mvc.action.result.annotation;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import static java.lang.annotation.ElementType.*;
-import static java.lang.annotation.RetentionPolicy.*;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * This annotation marks a result from an action as a redirect.
+ * This annotation stores the current request if the user is being redirected to a login screen.
  *
  * @author Brian Pontarelli
  */
 @ResultAnnotation
 @Retention(RUNTIME)
 @Target(TYPE)
-public @interface Redirect {
+public @interface SaveRequest {
   /**
    * @return The result code from the action's execute method that this Result is associated with.
    */
-  String code() default "success";
+  String code() default "unauthenticated";
 
   /**
-   * @return The redirect URI.
+   * @return The redirect URI to take the user to after the request has been saved.
    */
   String uri();
 
@@ -53,14 +53,4 @@ public @interface Redirect {
    *         defaults to false to maintain backwards compatibility.
    */
   boolean encodeVariables() default false;
-
-  /**
-   * A list of Redirect annotations.
-   */
-  @ResultContainerAnnotation
-  @Retention(RUNTIME)
-  @Target(TYPE)
-  @interface List {
-    Redirect[] value();
-  }
 }

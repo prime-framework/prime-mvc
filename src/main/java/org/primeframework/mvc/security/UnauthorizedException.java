@@ -18,7 +18,7 @@ package org.primeframework.mvc.security;
 import org.primeframework.mvc.ErrorException;
 
 /**
- * Thrown whenever a user accesses a resource they don't have access to.
+ * Thrown whenever a user or external entity accesses a resource they don't have access to.
  *
  * @author Brian Pontarelli
  */

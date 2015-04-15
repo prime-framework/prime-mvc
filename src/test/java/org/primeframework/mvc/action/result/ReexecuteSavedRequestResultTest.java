@@ -25,8 +25,8 @@ import java.util.List;
 
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
-import org.primeframework.mvc.action.result.SavedRequestResult.SavedRequestImpl;
-import org.primeframework.mvc.action.result.annotation.SavedRequest;
+import org.primeframework.mvc.action.result.ReexecuteSavedRequestResult.ReexecuteSavedRequestImpl;
+import org.primeframework.mvc.action.result.annotation.ReexecuteSavedRequest;
 import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.scope.MessageScope;
@@ -44,7 +44,7 @@ import static org.easymock.EasyMock.verify;
  *
  * @author Brian Pontarelli
  */
-public class SavedRequestResultTest {
+public class ReexecuteSavedRequestResultTest {
   @Test
   public void noSavedRequest() throws IOException, ServletException {
     ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
@@ -57,8 +57,8 @@ public class SavedRequestResultTest {
     replay(request);
 
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    response.setStatus(301);
     response.sendRedirect("/");
+    response.setStatus(301);
     replay(response);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
@@ -72,8 +72,8 @@ public class SavedRequestResultTest {
     messageStore.addAll(MessageScope.FLASH, messages);
     replay(messageStore);
 
-    SavedRequest redirect = new SavedRequestImpl("/", "success", true, false);
-    SavedRequestResult result = new SavedRequestResult(messageStore, ee, response, request, store);
+    ReexecuteSavedRequest redirect = new ReexecuteSavedRequestImpl("/", "success", true, false);
+    ReexecuteSavedRequestResult result = new ReexecuteSavedRequestResult(messageStore, ee, response, request, store);
     result.execute(redirect);
 
     verify(response, request, ee, store, messageStore);
@@ -98,8 +98,8 @@ public class SavedRequestResultTest {
     replay(request);
 
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    response.setStatus(301);
     response.sendRedirect("/secure?test=value1&test2=value2");
+    response.setStatus(301);
     replay(response);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
@@ -112,8 +112,8 @@ public class SavedRequestResultTest {
     messageStore.addAll(MessageScope.FLASH, messages);
     replay(messageStore);
 
-    SavedRequest redirect = new SavedRequestImpl("/", "success", true, false);
-    SavedRequestResult result = new SavedRequestResult(messageStore, ee, response, request, store);
+    ReexecuteSavedRequest redirect = new ReexecuteSavedRequestImpl("/", "success", true, false);
+    ReexecuteSavedRequestResult result = new ReexecuteSavedRequestResult(messageStore, ee, response, request, store);
     result.execute(redirect);
 
     verify(response, request, ee, store, messageStore, session);

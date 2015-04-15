@@ -13,18 +13,18 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.example.action;
-
-import org.primeframework.mvc.action.annotation.Action;
+package org.primeframework.mvc.security;
 
 /**
- * Secure action.
+ * Security scheme that handles the security for an action. This includes the authentication and authorization.
  *
  * @author Brian Pontarelli
  */
-@Action(requiresAuthentication = true, constraints = {"admin", "user"})
-public class Secure {
-  public String get() {
-    return "success";
-  }
+public interface SecurityScheme {
+  /**
+   * Handles the authentication and authorization for the action.
+   *
+   * @param constraints The constraints defined on the @Action annotation.
+   */
+  void handle(String[] constraints);
 }

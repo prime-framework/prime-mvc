@@ -22,18 +22,18 @@ import java.util.Set;
  *
  * @author Brian Pontarelli
  */
-public interface SecurityContext {
+public interface UserLoginSecurityContext {
+  /**
+   * @return The currently logged in user or null.
+   */
+  Object getCurrentUser();
+
   /**
    * Loads the roles for the current user.
    *
    * @return The roles for the current user or an empty set if the user isn't logged in or has no roles.
    */
   Set<String> getCurrentUsersRoles();
-
-  /**
-   * @return The currently logged in user or null.
-   */
-  Object getCurrentUser();
 
   /**
    * Determines if the user is currently logged in.

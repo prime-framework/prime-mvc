@@ -16,8 +16,8 @@
 package org.primeframework.mvc.config;
 
 /**
- * This class is an abstract implementation of the {@link MVCConfiguration} interface. It provides good default
- * values for most of the methods on that interface but leaves a few methods to be implemented by your application. To
+ * This class is an abstract implementation of the {@link MVCConfiguration} interface. It provides good default values
+ * for most of the methods on that interface but leaves a few methods to be implemented by your application. To
  * accomplish this, sub-class this class and implement the missing methods. Then bind your implementation into the Guice
  * injector using a Module.
  *
@@ -25,18 +25,23 @@ package org.primeframework.mvc.config;
  */
 public abstract class AbstractMVCConfiguration implements MVCConfiguration {
   public static final String[] ALLOWED_TYPES = new String[]{
-    "text/plain", "text/xml", "text/rtf", "text/richtext", "text/html", "text/css",
-    "image/jpeg", "image/gif", "image/png", "image/pjpeg", "image/tiff",
-    "video/dv", "video/h261", "video/h262", "video/h263", "video/h264", "video/jpeg", "video/mp4", "video/mpeg", "video/mpv", "video/ogg", "video/quicktime", "video/x-flv",
-    "application/msword", "application/pdf", "application/msword", "application/msexcel", "application/mspowerpoint"};
+      "text/plain", "text/xml", "text/rtf", "text/richtext", "text/html", "text/css",
+      "image/jpeg", "image/gif", "image/png", "image/pjpeg", "image/tiff",
+      "video/dv", "video/h261", "video/h262", "video/h263", "video/h264", "video/jpeg", "video/mp4", "video/mpeg", "video/mpv", "video/ogg", "video/quicktime", "video/x-flv",
+      "application/msword", "application/pdf", "application/msword", "application/msexcel", "application/mspowerpoint"};
 
   public static final long MAX_SIZE = 1024000;
 
   public static final String[] STATIC_PREFIXES = new String[]{"/static"};
 
   @Override
-  public String loginURI() {
-    return "/login";
+  public boolean emptyParametersAreNull() {
+    return true;
+  }
+
+  @Override
+  public String exceptionResultCode() {
+    return "error";
   }
 
   @Override
@@ -50,7 +55,12 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
   }
 
   @Override
-  public boolean staticResourcesEnabled() {
+  public boolean ignoreEmptyParameters() {
+    return false;
+  }
+
+  @Override
+  public boolean propagateRuntimeExceptions() {
     return true;
   }
 
@@ -60,22 +70,7 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
   }
 
   @Override
-  public boolean propagateRuntimeExceptions() {
+  public boolean staticResourcesEnabled() {
     return true;
-  }
-
-  @Override
-  public boolean ignoreEmptyParameters() {
-    return false;
-  }
-
-  @Override
-  public boolean emptyParametersAreNull() {
-    return true;
-  }
-
-  @Override
-  public String exceptionResultCode() {
-    return "error";
   }
 }

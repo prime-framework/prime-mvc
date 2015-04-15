@@ -29,7 +29,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @ResultAnnotation
 @Retention(RUNTIME)
 @Target(TYPE)
-public @interface SavedRequest {
+public @interface ReexecuteSavedRequest {
   /**
    * @return The result code from the action's execute method that this Result is associated with.
    */

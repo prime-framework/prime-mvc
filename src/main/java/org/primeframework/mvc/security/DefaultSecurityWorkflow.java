@@ -16,21 +16,15 @@
 package org.primeframework.mvc.security;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.Arrays;
 import java.util.Map;
-import java.util.Set;
 
+import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.config.MVCConfiguration;
-import org.primeframework.mvc.security.saved.SavedHttpRequest;
+import org.primeframework.mvc.security.guice.SecuritySchemeFactory;
 import org.primeframework.mvc.workflow.WorkflowChain;
 
 import com.google.inject.Inject;
@@ -42,102 +36,37 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 public class DefaultSecurityWorkflow implements SecurityWorkflow {
-
   private final ActionInvocationStore actionInvocationStore;
 
-  private final HttpServletRequest httpServletRequest;
-
-  private final HttpServletResponse httpServletResponse;
-
-  private final MVCConfiguration mvcConfiguration;
-
-  private SecurityContext securityContext;
+  private final SecuritySchemeFactory factory;
 
   @Inject
-  public DefaultSecurityWorkflow(ActionInvocationStore actionInvocationStore, HttpServletRequest httpServletRequest,
-                                 HttpServletResponse httpServletResponse, MVCConfiguration mvcConfiguration) {
+  public DefaultSecurityWorkflow(ActionInvocationStore actionInvocationStore, SecuritySchemeFactory factory) {
     this.actionInvocationStore = actionInvocationStore;
-    this.httpServletRequest = httpServletRequest;
-    this.httpServletResponse = httpServletResponse;
-    this.mvcConfiguration = mvcConfiguration;
+    this.factory = factory;
   }
 
   @Override
   public void perform(WorkflowChain workflowChain) throws IOException, ServletException {
-    if (securityContext == null) {
+    ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
+    if (actionInvocation == null || actionInvocation.configuration == null) {
       workflowChain.continueWorkflow();
       return;
     }
 
-    ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
-    if (actionInvocation != null) {
-      Action actionAnnotation = actionInvocation.configuration.annotation;
-      if (actionAnnotation.requiresAuthentication()) {
-        // Check if user is signed in
-        if (!securityContext.isLoggedIn()) {
-          saveRequest();
-
-          String loginURI = mvcConfiguration.loginURI();
-          httpServletResponse.sendRedirect(loginURI);
-          return;
-        }
-
-        // Check roles
-        String[] requiredRoles = actionAnnotation.roles();
-        if (requiredRoles.length > 0) {
-          Set<String> userRoles = securityContext.getCurrentUsersRoles();
-          if (Arrays.stream(requiredRoles).noneMatch(userRoles::contains)) {
-            throw new UnauthorizedException();
-          }
-        }
-      }
+    Action actionAnnotation = actionInvocation.configuration.annotation;
+    if (!actionAnnotation.requiresAuthentication()) {
+      workflowChain.continueWorkflow();
+      return;
     }
 
+    String scheme = actionAnnotation.scheme();
+    SecurityScheme securityScheme = factory.build(scheme);
+    if (securityScheme == null) {
+      throw new PrimeException("You have specified an invalid security scheme named [" + scheme + "]");
+    }
+
+    securityScheme.handle(actionAnnotation.constraints());
     workflowChain.continueWorkflow();
-  }
-
-  @Inject(optional = true)
-  public void setSecurityContext(SecurityContext securityContext) {
-    this.securityContext = securityContext;
-  }
-
-  private String makeQueryString(Map<String, String[]> parameters) {
-    if (parameters.size() == 0) {
-      return "";
-    }
-
-    StringBuilder build = new StringBuilder();
-    for (Map.Entry<String, String[]> entry : parameters.entrySet()) {
-      for (String value : entry.getValue()) {
-        if (build.length() > 0) {
-          build.append("&");
-        }
-
-        try {
-          build.append(URLEncoder.encode(entry.getKey(), "UTF-8")).append("=").append(URLEncoder.encode(value, "UTF-8"));
-        } catch (UnsupportedEncodingException e) {
-          throw new RuntimeException(e);
-        }
-      }
-    }
-
-    return "?" + build.toString();
-  }
-
-  private void saveRequest() {
-    Map<String, String[]> requestParameters = null;
-    String redirectURI;
-    if (httpServletRequest.getMethod().equals("GET")) {
-      Map<String, String[]> params = httpServletRequest.getParameterMap();
-      redirectURI = httpServletRequest.getRequestURI() + makeQueryString(params);
-    } else {
-      requestParameters = httpServletRequest.getParameterMap();
-      redirectURI = httpServletRequest.getRequestURI();
-    }
-
-    // Save the request
-    SavedHttpRequest saved = new SavedHttpRequest(redirectURI, requestParameters);
-    HttpSession session = httpServletRequest.getSession(true);
-    session.setAttribute(SavedHttpRequest.INITIAL_SESSION_KEY, saved);
   }
 }

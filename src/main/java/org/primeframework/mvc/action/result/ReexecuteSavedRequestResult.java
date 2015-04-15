@@ -21,16 +21,12 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
-import java.util.List;
 
 import org.primeframework.mvc.action.ActionInvocationStore;
-import org.primeframework.mvc.action.result.annotation.SavedRequest;
-import org.primeframework.mvc.message.Message;
+import org.primeframework.mvc.action.result.annotation.ReexecuteSavedRequest;
 import org.primeframework.mvc.message.MessageStore;
-import org.primeframework.mvc.message.scope.MessageScope;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.security.saved.SavedHttpRequest;
-import org.primeframework.mvc.servlet.ServletTools;
 
 import com.google.inject.Inject;
 
@@ -40,32 +36,18 @@ import com.google.inject.Inject;
  *
  * @author Brian Pontarelli
  */
-public class SavedRequestResult extends AbstractResult<SavedRequest> {
-  private final ActionInvocationStore actionInvocationStore;
-
-  private final MessageStore messageStore;
-
-  private final HttpServletRequest request;
-
-  private final HttpServletResponse response;
-
+public class ReexecuteSavedRequestResult extends AbstractRedirectResult<ReexecuteSavedRequest> {
   @Inject
-  public SavedRequestResult(MessageStore messageStore, ExpressionEvaluator expressionEvaluator, HttpServletResponse response,
-                            HttpServletRequest request, ActionInvocationStore actionInvocationStore) {
-    super(expressionEvaluator);
-    this.messageStore = messageStore;
-    this.response = response;
-    this.request = request;
-    this.actionInvocationStore = actionInvocationStore;
+  public ReexecuteSavedRequestResult(MessageStore messageStore, ExpressionEvaluator expressionEvaluator, HttpServletResponse response,
+                                     HttpServletRequest request, ActionInvocationStore actionInvocationStore) {
+    super(expressionEvaluator, actionInvocationStore, messageStore, request, response);
   }
 
   /**
    * {@inheritDoc}
    */
-  public void execute(final SavedRequest savedRequest) throws IOException, ServletException {
-    List<Message> messages = messageStore.get(MessageScope.REQUEST);
-    messageStore.clear(MessageScope.REQUEST);
-    messageStore.addAll(MessageScope.FLASH, messages);
+  public void execute(final ReexecuteSavedRequest reexecuteSavedRequest) throws IOException, ServletException {
+    moveMessagesToFlash();
 
     String uri = null;
     HttpSession session = request.getSession(false);
@@ -78,24 +60,10 @@ public class SavedRequestResult extends AbstractResult<SavedRequest> {
       }
     }
 
-    if (uri == null) {
-      uri = expand(savedRequest.uri(), actionInvocationStore.getCurrent().action, savedRequest.encodeVariables());
-    }
-
-    String context = request.getContextPath();
-    if (context.length() > 0 && uri.startsWith("/")) {
-      uri = context + uri;
-    }
-
-    uri += ServletTools.getSessionId(request);
-
-    boolean perm = savedRequest.perm();
-
-    response.setStatus(perm ? 301 : 302);
-    response.sendRedirect(uri);
+    sendRedirect(uri, reexecuteSavedRequest.uri(), reexecuteSavedRequest.encodeVariables(), reexecuteSavedRequest.perm());
   }
 
-  public static class SavedRequestImpl implements SavedRequest {
+  public static class ReexecuteSavedRequestImpl implements ReexecuteSavedRequest {
     private final String code;
 
     private final boolean encode;
@@ -104,7 +72,7 @@ public class SavedRequestResult extends AbstractResult<SavedRequest> {
 
     private final String uri;
 
-    public SavedRequestImpl(String uri, String code, boolean perm, boolean encode) {
+    public ReexecuteSavedRequestImpl(String uri, String code, boolean perm, boolean encode) {
       this.uri = uri;
       this.code = code;
       this.perm = perm;
@@ -112,7 +80,7 @@ public class SavedRequestResult extends AbstractResult<SavedRequest> {
     }
 
     public Class<? extends Annotation> annotationType() {
-      return SavedRequest.class;
+      return ReexecuteSavedRequest.class;
     }
 
     public String code() {

@@ -19,6 +19,7 @@ import org.primeframework.mvc.security.DefaultSavedRequestWorkflow;
 import org.primeframework.mvc.security.DefaultSecurityWorkflow;
 import org.primeframework.mvc.security.SavedRequestWorkflow;
 import org.primeframework.mvc.security.SecurityWorkflow;
+import org.primeframework.mvc.security.UserLoginSecurityScheme;
 
 import com.google.inject.AbstractModule;
 
@@ -32,5 +33,8 @@ public class SecurityModule extends AbstractModule {
   protected void configure() {
     bind(SecurityWorkflow.class).to(DefaultSecurityWorkflow.class);
     bind(SavedRequestWorkflow.class).to(DefaultSavedRequestWorkflow.class);
+
+    // Binds the user login scheme
+    SecuritySchemeFactory.addSecurityScheme(binder(), "user", UserLoginSecurityScheme.class);
   }
 }

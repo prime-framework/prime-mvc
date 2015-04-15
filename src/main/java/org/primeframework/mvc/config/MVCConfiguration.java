@@ -23,11 +23,6 @@ package org.primeframework.mvc.config;
  */
 public interface MVCConfiguration {
   /**
-   * @return The login URI that is used for the Prime MVC security handling. Defaults to {@code /login}
-   */
-  String loginURI();
-
-  /**
    * @return The number of seconds to check for Freemarker template updates (max integer means never and 0 means
    *         always).
    */

@@ -25,13 +25,13 @@ import com.google.inject.Inject;
  *
  * @author Brian Pontarelli
  */
-public abstract class BaseHttpSessionSecurityContext implements SecurityContext {
+public abstract class BaseHttpSessionUserLoginSecurityContext implements UserLoginSecurityContext {
   public static final String USER_SESSION_KEY = "prime-mvc-security-user";
 
   private final HttpServletRequest request;
 
   @Inject
-  public BaseHttpSessionSecurityContext(HttpServletRequest request) {
+  public BaseHttpSessionUserLoginSecurityContext(HttpServletRequest request) {
     this.request = request;
   }
 

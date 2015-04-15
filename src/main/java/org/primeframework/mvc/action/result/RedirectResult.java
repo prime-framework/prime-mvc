@@ -20,19 +20,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
-import java.util.List;
 
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.annotation.Redirect;
-import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;
-import org.primeframework.mvc.message.scope.MessageScope;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-import org.primeframework.mvc.servlet.ServletTools;
 
 import com.google.inject.Inject;
-import static javax.servlet.http.HttpServletResponse.SC_FOUND;
-import static javax.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
 
 /**
  * This result performs a HTTP redirect to a URL. This also transfers all messages from the request to the flash. If we
@@ -40,50 +34,29 @@ import static javax.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
  *
  * @author Brian Pontarelli
  */
-public class RedirectResult extends AbstractResult<Redirect> {
-  private final MessageStore messageStore;
-  private final HttpServletRequest request;
-  private final HttpServletResponse response;
-  private final ActionInvocationStore actionInvocationStore;
-
+public class RedirectResult extends AbstractRedirectResult<Redirect> {
   @Inject
   public RedirectResult(MessageStore messageStore, ExpressionEvaluator expressionEvaluator, HttpServletResponse response,
                         HttpServletRequest request, ActionInvocationStore actionInvocationStore) {
-    super(expressionEvaluator);
-    this.messageStore = messageStore;
-    this.response = response;
-    this.request = request;
-    this.actionInvocationStore = actionInvocationStore;
+    super(expressionEvaluator, actionInvocationStore, messageStore, request, response);
   }
 
   /**
    * {@inheritDoc}
    */
-  public void execute(final Redirect redirect) throws IOException, ServletException {
-    List<Message> messages = messageStore.get(MessageScope.REQUEST);
-    messageStore.clear(MessageScope.REQUEST);
-    messageStore.addAll(MessageScope.FLASH, messages);
-
-    String uri = expand(redirect.uri(), actionInvocationStore.getCurrent().action, redirect.encodeVariables());
-    String context = request.getContextPath();
-    if (context.length() > 0 && uri.startsWith("/")) {
-      uri = context + uri;
-    }
-
-    uri += ServletTools.getSessionId(request);
-
-    boolean perm = redirect.perm();
-
-    response.sendRedirect(uri);
-    // sendRedirect may implicitly set the status code to 302, set status after calling sendRedirect
-    response.setStatus(perm ? SC_MOVED_PERMANENTLY : SC_FOUND);
+  public void execute(Redirect redirect) throws IOException, ServletException {
+    moveMessagesToFlash();
+    sendRedirect(null, redirect.uri(), redirect.encodeVariables(), redirect.perm());
   }
 
   public static class RedirectImpl implements Redirect {
     private final String code;
-    private final String uri;
-    private final boolean perm;
+
     private final boolean encode;
+
+    private final boolean perm;
+
+    private final String uri;
 
     public RedirectImpl(String uri, String code, boolean perm, boolean encode) {
       this.uri = uri;
@@ -92,24 +65,24 @@ public class RedirectResult extends AbstractResult<Redirect> {
       this.encode = encode;
     }
 
+    public Class<? extends Annotation> annotationType() {
+      return Redirect.class;
+    }
+
     public String code() {
       return code;
-    }
-
-    public String uri() {
-      return uri;
-    }
-
-    public boolean perm() {
-      return perm;
     }
 
     public boolean encodeVariables() {
       return encode;
     }
 
-    public Class<? extends Annotation> annotationType() {
-      return Redirect.class;
+    public boolean perm() {
+      return perm;
+    }
+
+    public String uri() {
+      return uri;
     }
   }
 }

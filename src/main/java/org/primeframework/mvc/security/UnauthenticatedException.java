@@ -13,18 +13,17 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.example.action;
+package org.primeframework.mvc.security;
 
-import org.primeframework.mvc.action.annotation.Action;
+import org.primeframework.mvc.ErrorException;
 
 /**
- * Secure action.
+ * Thrown whenever an anonymous request is made to a secured resource.
  *
  * @author Brian Pontarelli
  */
-@Action(requiresAuthentication = true, constraints = {"admin", "user"})
-public class Secure {
-  public String get() {
-    return "success";
+public class UnauthenticatedException extends ErrorException {
+  public UnauthenticatedException() {
+    super("unauthenticated");
   }
 }

@@ -40,7 +40,7 @@ import org.primeframework.mvc.validation.annotation.PreValidationMethod;
 /**
  * @author Brian Pontarelli
  */
-@Action("{name}/{value}/static/{foo}")
+@Action(value = "{name}/{value}/static/{foo}")
 @Forward.List({
   @Forward(code = "forward1", page = "/WEB-INF/forward1.ftl", contentType = "text"),
   @Forward(code = "forward2", page = "/WEB-INF/forward2.ftl", contentType = "bin", status = 300, statusStr = "foo")
