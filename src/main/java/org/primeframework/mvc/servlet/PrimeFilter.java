@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,24 +37,22 @@ import com.google.inject.Injector;
 /**
  * This is the main Servlet filter for the Prime MVC. This will setup the {@link ServletObjectsHolder} so that the
  * request, response and session can be injected.
- * <p>
- * Next, this filter will use the {@link FilterWorkflowChain} in conjunction with the {@link MVCWorkflow} to invoke
- * Prime.
+ * <p/>
+ * Next, this filter will use the {@link FilterWorkflowChain} in conjunction with the {@link MVCWorkflow} to invoke Prime.
  *
  * @author Brian Pontarelli
  */
 public class PrimeFilter implements Filter {
   private static final Logger logger = LoggerFactory.getLogger(PrimeFilter.class);
-
-  protected FilterConfig filterConfig;
-
   private ServletContext context;
 
   /**
-   * Closes the Workflow instances
+   * Does nothing.
+   *
+   * @param filterConfig Not used.
    */
-  @Override
-  public void destroy() {
+  public void init(FilterConfig filterConfig) throws ServletException {
+    this.context = filterConfig.getServletContext();
   }
 
   /**
@@ -63,18 +61,17 @@ public class PrimeFilter implements Filter {
    * @param request  Passed down chain.
    * @param response Passed down chain.
    * @param chain    The chain.
-   * @throws IOException If the chain throws an exception.
+   * @throws IOException      If the chain throws an exception.
    * @throws ServletException If the chain throws an exception.
    */
-  @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-      throws IOException, ServletException {
+  throws IOException, ServletException {
     long start = System.currentTimeMillis();
 
     Injector injector = (Injector) context.getAttribute(PrimeServletContextListener.GUICE_INJECTOR_KEY);
     if (injector == null) {
       throw new ServletException("Guice was not initialized. You must define a ServletContext listener to setup Guice or " +
-          "use the PrimeServletContextListener");
+        "use the PrimeServletContextListener");
     }
 
     HttpServletRequest httpServletRequest = (HttpServletRequest) request;
@@ -115,13 +112,8 @@ public class PrimeFilter implements Filter {
   }
 
   /**
-   * Set the reference to the {@link ServletContext} and the provided {@link FilterConfig} object.
-   *
-   * @param filterConfig
+   * Closes the Workflow instances
    */
-  @Override
-  public void init(FilterConfig filterConfig) throws ServletException {
-    this.context = filterConfig.getServletContext();
-    this.filterConfig = filterConfig;
+  public void destroy() {
   }
 }
