@@ -26,4 +26,8 @@ public class UnauthorizedException extends ErrorException {
   public UnauthorizedException() {
     super("unauthorized");
   }
+
+  public UnauthorizedException(Throwable cause) {
+    super("unauthorized", cause);
+  }
 }
