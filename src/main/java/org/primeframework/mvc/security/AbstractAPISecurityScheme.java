@@ -20,6 +20,7 @@ import java.util.Set;
 
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
+import org.primeframework.mvc.security.annotation.AnonymousAccess;
 
 /**
  * Abstract class for managing API authentication and authorization using an authentication key and the HTTP methods
@@ -40,6 +41,10 @@ public abstract class AbstractAPISecurityScheme implements SecurityScheme {
   @Override
   public void handle(String[] constraints) {
     ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
+    if (actionInvocation.method.annotations.containsKey(AnonymousAccess.class)) {
+      return;
+    }
+
     String actionURI = actionInvocation.actionURI;
     String authenticationKey = authenticationKey();
     if (authenticationKey == null) {
