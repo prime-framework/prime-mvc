@@ -63,17 +63,17 @@ public class GuiceBootstrap {
       Set<String> errorMessages = new HashSet<>();
       messages.forEach((message) -> {
         if (message.getCause() != null) {
-          errorMessages.add(message.getCause().getMessage());
+          errorMessages.add("[" + message.getMessage() + "] \n\t-> [" + message.getCause().getClass() + "] " + message.getCause().getMessage());
         } else {
-          errorMessages.add(message.getMessage());
+          errorMessages.add("[" + message.getMessage() + "]");
         }
       });
       logger.error(
           "\n\n===================================================================================================\n\n" +
-          "***Unable to start the server. Here's why:***\n\n\n" + String.join("\n", errorMessages) +
-          "\n\n===================================================================================================\n\n"
+              "  Unable to start the server. Here's why: \n\n\n" + String.join("\n", errorMessages) +
+              "\n\n===================================================================================================\n\n"
       );
-
+      logger.debug("Unable to start the server. Exception: \n", e);
       throw new PrimeException();
     }
   }
