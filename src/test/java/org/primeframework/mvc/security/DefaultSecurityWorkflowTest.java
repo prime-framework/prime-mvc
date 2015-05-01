@@ -15,9 +15,7 @@
  */
 package org.primeframework.mvc.security;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -31,7 +29,6 @@ import org.primeframework.mvc.action.DefaultActionInvocationStore;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.config.DefaultActionConfigurationBuilder;
 import org.primeframework.mvc.security.guice.SecuritySchemeFactory;
-import org.primeframework.mvc.security.saved.SavedHttpRequest;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
 
@@ -41,7 +38,6 @@ import static java.util.Collections.singletonList;
 import static org.easymock.EasyMock.createStrictMock;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
-import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
 /**
@@ -219,6 +215,7 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
     public SecurityScheme build(String scheme) {
       UserLoginSecurityScheme s = new UserLoginSecurityScheme();
       s.setUserLoginSecurityContext(securityContext);
+      s.setActionInvocationStore(null);
       return s;
     }
   }

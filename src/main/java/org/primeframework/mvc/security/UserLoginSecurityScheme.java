@@ -18,6 +18,10 @@ package org.primeframework.mvc.security;
 import java.util.Arrays;
 import java.util.Set;
 
+import org.primeframework.mvc.action.ActionInvocation;
+import org.primeframework.mvc.action.ActionInvocationStore;
+import org.primeframework.mvc.security.annotation.AnonymousAccess;
+
 import com.google.inject.Inject;
 
 /**
@@ -26,17 +30,22 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 public class UserLoginSecurityScheme implements SecurityScheme {
-  private UserLoginSecurityContext userLoginSecurityContext;
+  private ActionInvocationStore actionInvocationStore;
 
-  @Inject(optional = true)
-  public void setUserLoginSecurityContext(UserLoginSecurityContext userLoginSecurityContext) {
-    this.userLoginSecurityContext = userLoginSecurityContext;
-  }
+  private UserLoginSecurityContext userLoginSecurityContext;
 
   @Override
   public void handle(String[] constraints) {
     if (userLoginSecurityContext == null) {
       return;
+    }
+
+    // Bypass security for methods annotated with AnonymousAccess
+    if (actionInvocationStore != null) {
+      ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
+      if (actionInvocation.method.annotations.containsKey(AnonymousAccess.class)) {
+        return;
+      }
     }
 
     // Check if user is signed in
@@ -51,5 +60,15 @@ public class UserLoginSecurityScheme implements SecurityScheme {
         throw new UnauthorizedException();
       }
     }
+  }
+
+  @Inject
+  public void setActionInvocationStore(ActionInvocationStore actionInvocationStore) {
+    this.actionInvocationStore = actionInvocationStore;
+  }
+
+  @Inject(optional = true)
+  public void setUserLoginSecurityContext(UserLoginSecurityContext userLoginSecurityContext) {
+    this.userLoginSecurityContext = userLoginSecurityContext;
   }
 }
