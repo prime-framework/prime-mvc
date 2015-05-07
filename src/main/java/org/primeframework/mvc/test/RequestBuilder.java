@@ -19,6 +19,7 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.File;
 import java.io.IOException;
@@ -26,6 +27,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Locale;
+import java.util.function.Consumer;
 
 import org.primeframework.mock.servlet.MockHttpServletRequest;
 import org.primeframework.mock.servlet.MockHttpServletRequest.Method;
@@ -46,13 +48,13 @@ import com.google.inject.Injector;
  * @author Brian Pontarelli
  */
 public class RequestBuilder {
-  public final MockHttpServletRequest request;
-
-  public final MockHttpServletResponse response;
-
   public final PrimeFilter filter;
 
   public final Injector injector;
+
+  public final MockHttpServletRequest request;
+
+  public final MockHttpServletResponse response;
 
   public RequestBuilder(String uri, MockHttpSession session, PrimeFilter filter, Injector injector) {
     this.request = new MockHttpServletRequest(uri, Locale.getDefault(), false, "UTF-8", session);
@@ -62,64 +64,132 @@ public class RequestBuilder {
   }
 
   /**
-   * Sets an HTTP request parameter. This can be called multiple times with the same name it it will create a list of
-   * values for the HTTP parameter.
+   * Sends the HTTP request to the MVC as a CONNECT.
    *
-   * @param name  The name of the parameter.
-   * @param value The parameter value. This is an object so toString is called on it to convert it to a String.
+   * @return The response.
+   * @throws IOException If the MVC throws an exception.
+   * @throws ServletException If the MVC throws an exception.
+   */
+  public RequestResult connect() throws IOException, ServletException {
+    request.setMethod(Method.CONNECT);
+    run();
+    return new RequestResult(request, response, injector);
+  }
+
+  /**
+   * Sends the HTTP request to the MVC as a DELETE.
+   *
+   * @return The response.
+   * @throws IOException If the MVC throws an exception.
+   * @throws ServletException If the MVC throws an exception.
+   */
+  public RequestResult delete() throws IOException, ServletException {
+    request.setMethod(Method.DELETE);
+    run();
+    return new RequestResult(request, response, injector);
+  }
+
+  /**
+   * Sends the HTTP request to the MVC as a GET.
+   *
+   * @return The response.
+   * @throws IOException If the MVC throws an exception.
+   * @throws ServletException If the MVC throws an exception.
+   */
+  public RequestResult get() throws IOException, ServletException {
+    request.setPost(false);
+    run();
+    return new RequestResult(request, response, injector);
+  }
+
+  public MockHttpServletRequest getRequest() {
+    return request;
+  }
+
+  /**
+   * Sends the HTTP request to the MVC as a HEAD.
+   *
+   * @return The response.
+   * @throws IOException If the MVC throws an exception.
+   * @throws ServletException If the MVC throws an exception.
+   */
+  public RequestResult head() throws IOException, ServletException {
+    request.setMethod(Method.HEAD);
+    run();
+    return new RequestResult(request, response, injector);
+  }
+
+  /**
+   * Sends the HTTP request to the MVC as a OPTIONS.
+   *
+   * @return The response.
+   * @throws IOException If the MVC throws an exception.
+   * @throws ServletException If the MVC throws an exception.
+   */
+  public RequestResult options() throws IOException, ServletException {
+    request.setMethod(Method.OPTIONS);
+    run();
+    return new RequestResult(request, response, injector);
+  }
+
+  /**
+   * Sends the HTTP request to the MVC as a POST.
+   *
+   * @return The response.
+   * @throws IOException If the MVC throws an exception.
+   * @throws ServletException If the MVC throws an exception.
+   */
+  public RequestResult post() throws IOException, ServletException {
+    request.setPost(true);
+    run();
+    return new RequestResult(request, response, injector);
+  }
+
+  /**
+   * Sends the HTTP request to the MVC as a PUT.
+   *
+   * @return The response.
+   * @throws IOException If the MVC throws an exception.
+   * @throws ServletException If the MVC throws an exception.
+   */
+  public RequestResult put() throws IOException, ServletException {
+    request.setMethod(Method.PUT);
+    run();
+    return new RequestResult(request, response, injector);
+  }
+
+  /**
+   * Provides the ability to setup the MockHttpServletRequest object before making the request.
+   *
+   * @param consumer A consumer that takes the MockHttpServletRequest.
    * @return This.
    */
-  public RequestBuilder withParameter(String name, Object value) {
-    request.setParameter(name, value.toString());
+  public RequestBuilder setup(Consumer<MockHttpServletRequest> consumer) {
+    consumer.accept(request);
     return this;
   }
 
   /**
-   * Sets an HTTP request parameter as a Prime MVC checkbox widget. This can be called multiple times with the same name
-   * it it will create a list of values for the HTTP parameter.
+   * Sends the HTTP request to the MVC as a TRACE.
    *
-   * @param name           The name of the parameter.
-   * @param checkedValue   The checked value of the checkbox.
-   * @param uncheckedValue The checked value of the checkbox.
-   * @param checked        If the checkbox is checked.
-   * @return This.
+   * @return The response.
+   * @throws IOException If the MVC throws an exception.
+   * @throws ServletException If the MVC throws an exception.
    */
-  public RequestBuilder withCheckbox(String name, String checkedValue, String uncheckedValue, boolean checked) {
-    if (checked) {
-      request.setParameter(name, checkedValue);
-    }
-
-    request.setParameter(DefaultParameterParser.CHECKBOX_PREFIX + name, uncheckedValue);
-    return this;
+  public RequestResult trace() throws IOException, ServletException {
+    request.setMethod(Method.TRACE);
+    run();
+    return new RequestResult(request, response, injector);
   }
 
   /**
-   * Sets an HTTP request parameter as a Prime MVC radio button widget. This can be called multiple times with the same
-   * name it it will create a list of values for the HTTP parameter.
+   * Sets the method as HTTPS and server port as 443.
    *
-   * @param name           The name of the parameter.
-   * @param checkedValue   The checked value of the checkbox.
-   * @param uncheckedValue The checked value of the checkbox.
-   * @param checked        If the checkbox is checked.
    * @return This.
    */
-  public RequestBuilder withRadio(String name, String checkedValue, String uncheckedValue, boolean checked) {
-    if (checked) {
-      request.setParameter(name, checkedValue);
-    }
-
-    request.setParameter(DefaultParameterParser.RADIOBUTTON_PREFIX + name, uncheckedValue);
-    return this;
-  }
-
-  /**
-   * Sets the locale that will be used.
-   *
-   * @param locale The locale.
-   * @return This.
-   */
-  public RequestBuilder withLocale(Locale locale) {
-    request.addLocale(locale);
+  public RequestBuilder usingHTTPS() {
+    request.setScheme("HTTPS");
+    request.setServerPort(443);
     return this;
   }
 
@@ -164,6 +234,25 @@ public class RequestBuilder {
   }
 
   /**
+   * Sets an HTTP request parameter as a Prime MVC checkbox widget. This can be called multiple times with the same name
+   * it it will create a list of values for the HTTP parameter.
+   *
+   * @param name           The name of the parameter.
+   * @param checkedValue   The checked value of the checkbox.
+   * @param uncheckedValue The checked value of the checkbox.
+   * @param checked        If the checkbox is checked.
+   * @return This.
+   */
+  public RequestBuilder withCheckbox(String name, String checkedValue, String uncheckedValue, boolean checked) {
+    if (checked) {
+      request.setParameter(name, checkedValue);
+    }
+
+    request.setParameter(DefaultParameterParser.CHECKBOX_PREFIX + name, uncheckedValue);
+    return this;
+  }
+
+  /**
    * Sets the content type.
    *
    * @param contentType The content type.
@@ -171,18 +260,6 @@ public class RequestBuilder {
    */
   public RequestBuilder withContentType(String contentType) {
     request.setContentType(contentType);
-    return this;
-  }
-
-  /**
-   * Adds a header to the request.
-   *
-   * @param name  The name of the header.
-   * @param value The value of the header.
-   * @return This.
-   */
-  public RequestBuilder withHeader(String name, String value) {
-    request.addHeader(name, value);
     return this;
   }
 
@@ -222,13 +299,14 @@ public class RequestBuilder {
   }
 
   /**
-   * Sets the method as HTTPS and server port as 443.
+   * Adds a header to the request.
    *
+   * @param name  The name of the header.
+   * @param value The value of the header.
    * @return This.
    */
-  public RequestBuilder usingHTTPS() {
-    request.setScheme("HTTPS");
-    request.setServerPort(443);
+  public RequestBuilder withHeader(String name, String value) {
+    request.addHeader(name, value);
     return this;
   }
 
@@ -268,111 +346,46 @@ public class RequestBuilder {
   }
 
   /**
-   * Sends the HTTP request to the MVC as a POST.
+   * Sets the locale that will be used.
    *
-   * @return The response.
-   * @throws IOException If the MVC throws an exception.
-   * @throws ServletException If the MVC throws an exception.
+   * @param locale The locale.
+   * @return This.
    */
-  public RequestResult post() throws IOException, ServletException {
-    request.setPost(true);
-    run();
-    return new RequestResult(request, response, injector);
+  public RequestBuilder withLocale(Locale locale) {
+    request.addLocale(locale);
+    return this;
   }
 
   /**
-   * Sends the HTTP request to the MVC as a GET.
+   * Sets an HTTP request parameter. This can be called multiple times with the same name it it will create a list of
+   * values for the HTTP parameter.
    *
-   * @return The response.
-   * @throws IOException If the MVC throws an exception.
-   * @throws ServletException If the MVC throws an exception.
+   * @param name  The name of the parameter.
+   * @param value The parameter value. This is an object so toString is called on it to convert it to a String.
+   * @return This.
    */
-  public RequestResult get() throws IOException, ServletException {
-    request.setPost(false);
-    run();
-    return new RequestResult(request, response, injector);
+  public RequestBuilder withParameter(String name, Object value) {
+    request.setParameter(name, value.toString());
+    return this;
   }
 
   /**
-   * Sends the HTTP request to the MVC as a HEAD.
+   * Sets an HTTP request parameter as a Prime MVC radio button widget. This can be called multiple times with the same
+   * name it it will create a list of values for the HTTP parameter.
    *
-   * @return The response.
-   * @throws IOException If the MVC throws an exception.
-   * @throws ServletException If the MVC throws an exception.
+   * @param name           The name of the parameter.
+   * @param checkedValue   The checked value of the checkbox.
+   * @param uncheckedValue The checked value of the checkbox.
+   * @param checked        If the checkbox is checked.
+   * @return This.
    */
-  public RequestResult head() throws IOException, ServletException {
-    request.setMethod(Method.HEAD);
-    run();
-    return new RequestResult(request, response, injector);
-  }
+  public RequestBuilder withRadio(String name, String checkedValue, String uncheckedValue, boolean checked) {
+    if (checked) {
+      request.setParameter(name, checkedValue);
+    }
 
-  /**
-   * Sends the HTTP request to the MVC as a PUT.
-   *
-   * @return The response.
-   * @throws IOException If the MVC throws an exception.
-   * @throws ServletException If the MVC throws an exception.
-   */
-  public RequestResult put() throws IOException, ServletException {
-    request.setMethod(Method.PUT);
-    run();
-    return new RequestResult(request, response, injector);
-  }
-
-  /**
-   * Sends the HTTP request to the MVC as a DELETE.
-   *
-   * @return The response.
-   * @throws IOException If the MVC throws an exception.
-   * @throws ServletException If the MVC throws an exception.
-   */
-  public RequestResult delete() throws IOException, ServletException {
-    request.setMethod(Method.DELETE);
-    run();
-    return new RequestResult(request, response, injector);
-  }
-
-  /**
-   * Sends the HTTP request to the MVC as a OPTIONS.
-   *
-   * @return The response.
-   * @throws IOException If the MVC throws an exception.
-   * @throws ServletException If the MVC throws an exception.
-   */
-  public RequestResult options() throws IOException, ServletException {
-    request.setMethod(Method.OPTIONS);
-    run();
-    return new RequestResult(request, response, injector);
-  }
-
-  /**
-   * Sends the HTTP request to the MVC as a TRACE.
-   *
-   * @return The response.
-   * @throws IOException If the MVC throws an exception.
-   * @throws ServletException If the MVC throws an exception.
-   */
-  public RequestResult trace() throws IOException, ServletException {
-    request.setMethod(Method.TRACE);
-    run();
-    return new RequestResult(request, response, injector);
-  }
-
-  /**
-   * Sends the HTTP request to the MVC as a CONNECT.
-   *
-   * @return The response.
-   * @throws IOException If the MVC throws an exception.
-   * @throws ServletException If the MVC throws an exception.
-   */
-  public RequestResult connect() throws IOException, ServletException {
-    request.setMethod(Method.CONNECT);
-    run();
-    return new RequestResult(request, response, injector);
-  }
-
-  public MockHttpServletRequest getRequest() {
-    return request;
+    request.setParameter(DefaultParameterParser.RADIOBUTTON_PREFIX + name, uncheckedValue);
+    return this;
   }
 
   void run() throws IOException, ServletException {
