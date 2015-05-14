@@ -275,6 +275,7 @@
           </value>
         </option>
         <option name="JD_ALIGN_EXCEPTION_COMMENTS" value="false" />
+        <option name="JD_PRESERVE_LINE_FEEDS" value="true" />
         <option name="HTML_KEEP_WHITESPACES" value="true" />
         <option name="HTML_ATTRIBUTE_WRAP" value="0" />
         <option name="HTML_TEXT_WRAP" value="0" />

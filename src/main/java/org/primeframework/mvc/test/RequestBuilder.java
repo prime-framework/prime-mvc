@@ -193,6 +193,21 @@ public class RequestBuilder {
   }
 
   /**
+   * Adds an Authorization header to the request using the specified value.
+   * <p>Shorthand for calling
+   * <pre>
+   *   withHeader("Authorization", value)
+   * </pre>
+   *
+   * @param value The value of the <code>Authorization</code> header
+   * @return This.
+   */
+  public RequestBuilder withAuthorizationHeader(String value) {
+    request.addHeader("Authorization", value);
+    return this;
+  }
+
+  /**
    * Sets the body content.
    *
    * @param bytes The bytes.
@@ -233,8 +248,8 @@ public class RequestBuilder {
   }
 
   /**
-   * Sets an HTTP request parameter as a Prime MVC checkbox widget. This can be called multiple times with the same name
-   * it it will create a list of values for the HTTP parameter.
+   * Sets an HTTP request parameter as a Prime MVC checkbox widget. This can be called multiple times with the same
+   * name it it will create a list of values for the HTTP parameter.
    *
    * @param name           The name of the parameter.
    * @param checkedValue   The checked value of the checkbox.
