@@ -143,7 +143,9 @@ public class RequestResult {
       }
 
       if (!found) {
-        throw new AssertionError("The MessageStore contains messages but no errors for the field [" + field + "]");
+        StringBuilder sb = new StringBuilder("\n\tMessageStore contains:\n");
+        fieldMessages.stream().forEach((f) -> sb.append("\t\t[" + f.getType() + "]\n"));
+        throw new AssertionError("The MessageStore contains messages but no errors for the field [" + field + "]" + sb);
       }
     }
 
@@ -180,7 +182,9 @@ public class RequestResult {
     }
 
     if (!inMessageStore.containsAll(asList(messages))) {
-      throw new AssertionError("The MessageStore does not contain the [" + type + "] message " + asList(messages) + "");
+      StringBuilder sb = new StringBuilder("\n\tMessageStore contains:\n");
+      msgs.stream().forEach((f) -> sb.append("\t\t[" + f + "]\n"));
+      throw new AssertionError("The MessageStore does not contain the [" + type + "] message " + asList(messages) + sb);
     }
 
     return this;
