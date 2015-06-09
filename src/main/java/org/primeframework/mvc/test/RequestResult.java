@@ -132,7 +132,9 @@ public class RequestResult {
     for (String field : fields) {
       List<FieldMessage> fieldMessages = msgs.get(field);
       if (fieldMessages == null) {
-        throw new AssertionError("The MessageStore does not contain a error for the field [" + field + "]");
+        StringBuilder sb = new StringBuilder("\n\tMessageStore contains:\n");
+        msgs.keySet().stream().forEach((f) -> sb.append("\t\t" + f + "\n"));
+        throw new AssertionError("The MessageStore does not contain a error for the field [" + field + "]" + sb);
       }
 
       boolean found = false;
