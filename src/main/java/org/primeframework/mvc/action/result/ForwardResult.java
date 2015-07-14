@@ -25,6 +25,7 @@ import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.annotation.Forward;
+import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.freemarker.FreeMarkerMap;
 import org.primeframework.mvc.freemarker.FreeMarkerService;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
@@ -37,23 +38,24 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 public class ForwardResult extends AbstractResult<Forward> {
-  public static final String DIR = "/WEB-INF/templates";
   private final ActionInvocationStore actionInvocationStore;
-  private final ResourceLocator resourceLocator;
-  private final FreeMarkerService freeMarkerService;
-  private final HttpServletResponse response;
+  private final MVCConfiguration configuration;
   private final FreeMarkerMap freeMarkerMap;
+  private final FreeMarkerService freeMarkerService;
+  private final ResourceLocator resourceLocator;
+  private final HttpServletResponse response;
 
   @Inject
   public ForwardResult(ActionInvocationStore actionInvocationStore, ExpressionEvaluator expressionEvaluator,
                        ResourceLocator resourceLocator, FreeMarkerService freeMarkerService, HttpServletResponse response,
-                       FreeMarkerMap freeMarkerMap) {
+                       FreeMarkerMap freeMarkerMap, MVCConfiguration configuration) {
     super(expressionEvaluator);
     this.resourceLocator = resourceLocator;
     this.response = response;
     this.freeMarkerMap = freeMarkerMap;
     this.freeMarkerService = freeMarkerService;
     this.actionInvocationStore = actionInvocationStore;
+    this.configuration = configuration;
   }
 
   /**
@@ -74,7 +76,7 @@ public class ForwardResult extends AbstractResult<Forward> {
     String page = forward.page();
     String code = forward.code();
     if (page.equals("")) {
-      page = resourceLocator.locate(DIR);
+      page = resourceLocator.locate(configuration.resourceDirectory() + "/templates");
     }
 
     if (page == null) {
@@ -91,7 +93,7 @@ public class ForwardResult extends AbstractResult<Forward> {
           uri = uri.substring(0, index);
         }
 
-        page = DIR + uri + "/" + page;
+        page = configuration.resourceDirectory() + "/templates" + uri + "/" + page;
       }
       PrintWriter writer = response.getWriter();
       freeMarkerService.render(writer, page, freeMarkerMap);
@@ -99,11 +101,11 @@ public class ForwardResult extends AbstractResult<Forward> {
   }
 
   public static class ForwardImpl implements Forward {
-    private final String uri;
     private final String code;
     private final String contentType;
     private final int status;
     private final String statusStr;
+    private final String uri;
 
     public ForwardImpl(String uri, String code) {
       this.uri = uri;
@@ -121,19 +123,23 @@ public class ForwardResult extends AbstractResult<Forward> {
       this.statusStr = "";
     }
 
+    public Class<? extends Annotation> annotationType() {
+      return Forward.class;
+    }
+
     @Override
     public String code() {
       return code;
     }
 
     @Override
-    public String page() {
-      return uri;
+    public String contentType() {
+      return contentType;
     }
 
     @Override
-    public String contentType() {
-      return contentType;
+    public String page() {
+      return uri;
     }
 
     @Override
@@ -144,10 +150,6 @@ public class ForwardResult extends AbstractResult<Forward> {
     @Override
     public String statusStr() {
       return statusStr;
-    }
-
-    public Class<? extends Annotation> annotationType() {
-      return Forward.class;
     }
   }
 }

@@ -15,36 +15,43 @@
  */
 package org.primeframework.mvc.message.l10n;
 
-import com.google.inject.Inject;
+import java.util.Formatter;
+import java.util.LinkedList;
+import java.util.Locale;
+import java.util.MissingResourceException;
+import java.util.Queue;
+import java.util.ResourceBundle;
+import java.util.ResourceBundle.Control;
+
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
-import java.util.ResourceBundle.Control;
+import com.google.inject.Inject;
 
 /**
- * This implements the MessageProvider using ResourceBundles inside the web context. It also adds the additional step of
+ * This implements the MessageProvider using ResourceBundles inside the web context. It also adds the additional step
+ * of
  * looking for multiple bundles if the message isn't initially found. The search method is:
- * <p/>
+ * <p>
  * <pre>
  * uri = /foo/bar
  * locale = en_US
  *
- * /WEB-INF/messages/foo/bar_en_US
- * /WEB-INF/messages/foo/bar_en
- * /WEB-INF/messages/foo/bar
- * /WEB-INF/messages/foo/package_en_US
- * /WEB-INF/messages/foo/package_en
- * /WEB-INF/messages/foo/package
- * /WEB-INF/messages/package_en_US
- * /WEB-INF/messages/package_en
- * /WEB-INF/messages/package
+ * ${configuration.resourceDirectory}/messages/foo/bar_en_US
+ * ${configuration.resourceDirectory}/messages/foo/bar_en
+ * ${configuration.resourceDirectory}/messages/foo/bar
+ * ${configuration.resourceDirectory}/messages/foo/package_en_US
+ * ${configuration.resourceDirectory}/messages/foo/package_en
+ * ${configuration.resourceDirectory}/messages/foo/package
+ * ${configuration.resourceDirectory}/messages/package_en_US
+ * ${configuration.resourceDirectory}/messages/package_en
+ * ${configuration.resourceDirectory}/messages/package
  * </pre>
- * <p/>
- * This stops when /WEB-INF/messages is hit.
- * <p/>
+ * <p>
+ * This stops when ${configuration.resourceDirectory}/messages is hit.
+ * <p>
  * Once the message is found, it is formatted using the {@link Formatter} class. The values are passed in order.
  *
  * @author Brian Pontarelli
@@ -52,9 +59,11 @@ import java.util.ResourceBundle.Control;
 public class ResourceBundleMessageProvider implements MessageProvider {
   private final static Logger logger = LoggerFactory.getLogger(ResourceBundleMessageProvider.class);
 
-  private final Locale locale;
   private final ResourceBundle.Control control;
+
   private final ActionInvocationStore invocationStore;
+
+  private final Locale locale;
 
   @Inject
   public ResourceBundleMessageProvider(Locale locale, Control control, ActionInvocationStore invocationStore) {
@@ -70,6 +79,20 @@ public class ResourceBundleMessageProvider implements MessageProvider {
     Formatter f = new Formatter();
     f.format(locale, template, values);
     return f.out().toString();
+  }
+
+  protected Queue<String> determineBundles(String bundle) {
+    Queue<String> names = new LinkedList<String>();
+    names.offer(bundle);
+
+    int index = bundle.lastIndexOf('/');
+    while (index != -1) {
+      bundle = bundle.substring(0, index);
+      names.offer(bundle + "/package");
+      index = bundle.lastIndexOf('/');
+    }
+
+    return names;
   }
 
   /**
@@ -96,19 +119,5 @@ public class ResourceBundleMessageProvider implements MessageProvider {
     }
 
     throw new MissingMessageException("Message could not be found for the URI [" + uri + "] and key [" + key + "]");
-  }
-
-  protected Queue<String> determineBundles(String bundle) {
-    Queue<String> names = new LinkedList<String>();
-    names.offer(bundle);
-
-    int index = bundle.lastIndexOf('/');
-    while (index != -1) {
-      bundle = bundle.substring(0, index);
-      names.offer(bundle + "/package");
-      index = bundle.lastIndexOf('/');
-    }
-
-    return names;
   }
 }

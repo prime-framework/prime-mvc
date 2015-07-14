@@ -18,8 +18,8 @@ package org.primeframework.mvc.config;
 /**
  * This class is an abstract implementation of the {@link MVCConfiguration} interface. It provides good default values
  * for most of the methods on that interface but leaves a few methods to be implemented by your application. To
- * accomplish this, sub-class this class and implement the missing methods. Then bind your implementation into the Guice
- * injector using a Module.
+ * accomplish this, sub-class this class and implement the missing methods. Then bind your implementation into the
+ * Guice injector using a Module.
  *
  * @author Brian Pontarelli
  */
@@ -34,43 +34,66 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
 
   public static final String[] STATIC_PREFIXES = new String[]{"/static"};
 
+  public boolean emptyParametersAreNull = true;
+
+  public String exceptionResultCode = "error";
+
+  public String[] fileUploadAllowedTypes = ALLOWED_TYPES;
+
+  public long fileUploadMaxSize = MAX_SIZE;
+
+  public boolean ignoreEmptyParameters = false;
+
+  public boolean propogateRuntimeException = true;
+
+  public String resourceDirectory = "/WEB-INF";
+
+  public String[] staticResourcePrefixes = STATIC_PREFIXES;
+
+  public boolean staticResourcesEnabled = true;
+
   @Override
   public boolean emptyParametersAreNull() {
-    return true;
+    return emptyParametersAreNull;
   }
 
   @Override
   public String exceptionResultCode() {
-    return "error";
+    return exceptionResultCode;
   }
 
   @Override
   public String[] fileUploadAllowedTypes() {
-    return ALLOWED_TYPES;
+    return fileUploadAllowedTypes;
   }
 
   @Override
   public long fileUploadMaxSize() {
-    return MAX_SIZE;
+    return fileUploadMaxSize;
   }
 
   @Override
   public boolean ignoreEmptyParameters() {
-    return false;
+    return ignoreEmptyParameters;
   }
 
   @Override
   public boolean propagateRuntimeExceptions() {
-    return true;
+    return propogateRuntimeException;
+  }
+
+  @Override
+  public String resourceDirectory() {
+    return resourceDirectory;
   }
 
   @Override
   public String[] staticResourcePrefixes() {
-    return STATIC_PREFIXES;
+    return staticResourcePrefixes;
   }
 
   @Override
   public boolean staticResourcesEnabled() {
-    return true;
+    return staticResourcesEnabled;
   }
 }

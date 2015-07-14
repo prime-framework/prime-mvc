@@ -23,15 +23,19 @@ package org.primeframework.mvc.config;
  */
 public interface MVCConfiguration {
   /**
-   * @return The number of seconds to check for Freemarker template updates (max integer means never and 0 means
-   *         always).
+   * @return Whether or not unknown parameters should be allowed or if they should throw an exception.
    */
-  int templateCheckSeconds();
+  boolean allowUnknownParameters();
 
   /**
-   * @return The number of seconds to check for message bundles updates (max integer means never and 0 means always).
+   * @return True if empty HTTP request parameters should be considered null values by the conversion system.
    */
-  int l10nReloadSeconds();
+  boolean emptyParametersAreNull();
+
+  /**
+   * @return the result code to use when exceptions get thrown.  Defaults to 'error'
+   */
+  String exceptionResultCode();
 
   /**
    * @return The types of files that are allowed to be uploaded.
@@ -44,26 +48,6 @@ public interface MVCConfiguration {
   long fileUploadMaxSize();
 
   /**
-   * @return Whether or not static resource loading is enabled.
-   */
-  boolean staticResourcesEnabled();
-
-  /**
-   * @return The static resource prefixes.
-   */
-  String[] staticResourcePrefixes();
-
-  /**
-   * @return Whether or not runtime exceptions should be re-thrown out of Prime MVC.
-   */
-  boolean propagateRuntimeExceptions();
-
-  /**
-   * @return Whether or not unknown parameters should be allowed or if they should throw an exception.
-   */
-  boolean allowUnknownParameters();
-
-  /**
    * Set to true if actions should ignore empty parameters.  Defaults to false
    *
    * @return true or false
@@ -71,12 +55,34 @@ public interface MVCConfiguration {
   boolean ignoreEmptyParameters();
 
   /**
-   * @return True if empty HTTP request parameters should be considered null values by the conversion system.
+   * @return The number of seconds to check for message bundles updates (max integer means never and 0 means always).
    */
-  boolean emptyParametersAreNull();
+  int l10nReloadSeconds();
 
   /**
-   * @return the result code to use when exceptions get thrown.  Defaults to 'error'
+   * @return Whether or not runtime exceptions should be re-thrown out of Prime MVC.
    */
-  String exceptionResultCode();
+  boolean propagateRuntimeExceptions();
+
+  /**
+   * @return The resource directory where the templates, message bundles, emails, control templates, etc are loaded
+   * from.
+   */
+  String resourceDirectory();
+
+  /**
+   * @return The static resource prefixes.
+   */
+  String[] staticResourcePrefixes();
+
+  /**
+   * @return Whether or not static resource loading is enabled.
+   */
+  boolean staticResourcesEnabled();
+
+  /**
+   * @return The number of seconds to check for Freemarker template updates (max integer means never and 0 means
+   * always).
+   */
+  int templateCheckSeconds();
 }

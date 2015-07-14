@@ -47,6 +47,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Inject;
 import com.google.inject.Injector;
 import static java.util.Arrays.asList;
 
@@ -62,6 +63,8 @@ public abstract class PrimeBaseTest {
   protected static Injector injector;
 
   protected static MockHttpSession session;
+
+  @Inject public MVCConfiguration configuration;
 
   protected MockHttpServletRequest request;
 

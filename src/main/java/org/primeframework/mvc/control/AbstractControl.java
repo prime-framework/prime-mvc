@@ -25,6 +25,7 @@ import java.util.TreeMap;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
+import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.control.annotation.ControlAttribute;
 import org.primeframework.mvc.control.annotation.ControlAttributes;
 import org.primeframework.mvc.control.form.AppendAttributesMethod;
@@ -41,22 +42,48 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 public abstract class AbstractControl implements Control {
-  protected final Map<String, Object> attributes = new TreeMap<String, Object>();
-  protected final Map<String, String> dynamicAttributes = new TreeMap<String, String>();
-  protected final Map<String, Object> parameters = new TreeMap<String, Object>();
-  protected Locale locale;
-  protected FreeMarkerService freeMarkerService;
-  protected HttpServletRequest request;
+  protected final Map<String, Object> attributes = new TreeMap<>();
+
+  protected final Map<String, String> dynamicAttributes = new TreeMap<>();
+
+  protected final Map<String, Object> parameters = new TreeMap<>();
+
   protected ActionInvocationStore actionInvocationStore;
+
+  protected MVCConfiguration configuration;
+
+  protected FreeMarkerService freeMarkerService;
+
+  protected Locale locale;
+
+  protected HttpServletRequest request;
+
   protected Object root;
 
-  @Inject
-  public void setServices(Locale locale, HttpServletRequest request, ActionInvocationStore actionInvocationStore,
-                          FreeMarkerService freeMarkerService) {
-    this.locale = locale;
-    this.request = request;
-    this.freeMarkerService = freeMarkerService;
-    this.actionInvocationStore = actionInvocationStore;
+  /**
+   * This implementation just calls the Body implementation to render the body.
+   *
+   * @param writer The writer to write the body to.
+   * @param body   The body.
+   */
+  public void renderBody(Writer writer, Body body) {
+    body.render(writer);
+  }
+
+  /**
+   * Implements the controls renderEnd method that is called directly by the JSP taglibs. This method is the main
+   * render
+   * point for the control and it uses the {@link FreeMarkerService} to render the control. Sub-classes need to
+   * implement a number of methods in order to setup the Map that is passed to FreeMarker as well as determine the name
+   * of the template
+   *
+   * @param writer The writer to output to.
+   */
+  public void renderEnd(Writer writer) {
+    if (endTemplateName() != null) {
+      String templateName = configuration.resourceDirectory() + "/control-templates/" + endTemplateName();
+      freeMarkerService.render(writer, templateName, root);
+    }
   }
 
   /**
@@ -83,62 +110,19 @@ public abstract class AbstractControl implements Control {
     this.root = makeRoot();
 
     if (startTemplateName() != null) {
-      String templateName = "/WEB-INF/control-templates/" + startTemplateName();
+      String templateName = configuration.resourceDirectory() + "/control-templates/" + startTemplateName();
       freeMarkerService.render(writer, templateName, root);
     }
   }
 
-  /**
-   * This implementation just calls the Body implementation to render the body.
-   *
-   * @param writer The writer to write the body to.
-   * @param body   The body.
-   */
-  public void renderBody(Writer writer, Body body) {
-    body.render(writer);
-  }
-
-  /**
-   * Implements the controls renderEnd method that is called directly by the JSP taglibs. This method is the main render
-   * point for the control and it uses the {@link FreeMarkerService} to render the control. Sub-classes need to
-   * implement a number of methods in order to setup the Map that is passed to FreeMarker as well as determine the name
-   * of the template
-   *
-   * @param writer The writer to output to.
-   */
-  public void renderEnd(Writer writer) {
-    if (endTemplateName() != null) {
-      String templateName = "/WEB-INF/control-templates/" + endTemplateName();
-      freeMarkerService.render(writer, templateName, root);
-    }
-  }
-
-  /**
-   * Creates the parameters Map that is the root node used by the FreeMarker template when rendering. This places these
-   * values in the root map:
-   * <p/>
-   * <ul> <li>attributes - The attributes</li> <li>dynamic_attributes - The dynamic attributes</li>
-   * <li>append_attributes - A FreeMarker method that appends attributes ({@link AppendAttributesMethod})</li> </ul>
-   *
-   * @return The Parameters Map.
-   */
-  protected Map<String, Object> makeParameters() {
-    Map<String, Object> parameters = new HashMap<String, Object>();
-    parameters.put("attributes", attributes);
-    parameters.put("dynamicAttributes", dynamicAttributes);
-//        parameters.put("append_attributes", new AppendAttributesMethod());
-    parameters.put("join", new JoinMethod());
-    return parameters;
-  }
-
-  /**
-   * Converts the given parameters into a FreeMarker root node. This can be overridden by sub-classes to convert the Map
-   * or wrap it. This method simply returns the given Map.
-   *
-   * @return The root.
-   */
-  protected Object makeRoot() {
-    return parameters;
+  @Inject
+  public void setServices(Locale locale, HttpServletRequest request, ActionInvocationStore actionInvocationStore,
+                          FreeMarkerService freeMarkerService, MVCConfiguration configuration) {
+    this.locale = locale;
+    this.request = request;
+    this.freeMarkerService = freeMarkerService;
+    this.actionInvocationStore = actionInvocationStore;
+    this.configuration = configuration;
   }
 
   /**
@@ -149,20 +133,17 @@ public abstract class AbstractControl implements Control {
   }
 
   /**
-   * @return The name of the FreeMarker template that this control renders when it starts.
-   */
-  protected abstract String startTemplateName();
-
-  /**
-   * @return The name of the FreeMarker template that this control renders when it ends.
-   */
-  protected abstract String endTemplateName();
-
-  /**
    * @return The control name, which is usually the simple class name all lowercased.
    */
   protected String controlName() {
     return getClass().getSimpleName().toLowerCase();
+  }
+
+  /**
+   * @return The current action or null.
+   */
+  protected Object currentAction() {
+    return currentInvocation().action;
   }
 
   /**
@@ -173,10 +154,82 @@ public abstract class AbstractControl implements Control {
   }
 
   /**
-   * @return The current action or null.
+   * @return The name of the FreeMarker template that this control renders when it ends.
    */
-  protected Object currentAction() {
-    return currentInvocation().action;
+  protected abstract String endTemplateName();
+
+  /**
+   * Creates the parameters Map that is the root node used by the FreeMarker template when rendering. This places these
+   * values in the root map:
+   * <p>
+   * <ul> <li>attributes - The attributes</li> <li>dynamic_attributes - The dynamic attributes</li>
+   * <li>append_attributes - A FreeMarker method that appends attributes ({@link AppendAttributesMethod})</li> </ul>
+   *
+   * @return The Parameters Map.
+   */
+  protected Map<String, Object> makeParameters() {
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("attributes", attributes);
+    parameters.put("dynamicAttributes", dynamicAttributes);
+//        parameters.put("append_attributes", new AppendAttributesMethod());
+    parameters.put("join", new JoinMethod());
+    return parameters;
+  }
+
+  /**
+   * Converts the given parameters into a FreeMarker root node. This can be overridden by sub-classes to convert the
+   * Map
+   * or wrap it. This method simply returns the given Map.
+   *
+   * @return The root.
+   */
+  protected Object makeRoot() {
+    return parameters;
+  }
+
+  /**
+   * @return The name of the FreeMarker template that this control renders when it starts.
+   */
+  protected abstract String startTemplateName();
+
+  private String toTypeListString(Class<?>[] attributeTypes) {
+    StringBuilder build = new StringBuilder();
+    for (int i = 0; i < attributeTypes.length; i++) {
+      Class<?> attributeType = attributeTypes[i];
+      build.append(attributeType.toString());
+      if (i == attributeTypes.length - 2) {
+        build.append(", or ");
+      } else if (i > 0) {
+        build.append(", ");
+      }
+    }
+
+    return build.toString();
+  }
+
+  private void verifyAttributes(Map<String, Object> attributes, ControlAttribute[] controlAttributes, boolean required,
+                                ErrorList errors) {
+    for (ControlAttribute controlAttribute : controlAttributes) {
+      Object value = attributes.get(controlAttribute.name());
+      if (value == null && required) {
+        errors.addError("The control [" + controlName() + "] is missing the required attribute [" +
+            controlAttribute.name() + "]");
+      } else if (value != null) {
+        Class<?>[] attributeTypes = controlAttribute.types();
+        boolean found = false;
+        for (Class<?> attributeType : attributeTypes) {
+          found = attributeType.isInstance(value);
+          if (found) {
+            break;
+          }
+        }
+
+        if (!found) {
+          errors.addError("The control [" + controlName() + "] has an invalid attribute [" + controlAttribute.name() +
+              "] of type [" + value.getClass() + "]. It must be an instance of [" + toTypeListString(attributeTypes) + "]");
+        }
+      }
+    }
   }
 
   /**
@@ -197,45 +250,5 @@ public abstract class AbstractControl implements Control {
     if (!errors.isEmpty()) {
       throw new PrimeException(errors.toString());
     }
-  }
-
-  private void verifyAttributes(Map<String, Object> attributes, ControlAttribute[] controlAttributes, boolean required,
-                                ErrorList errors) {
-    for (ControlAttribute controlAttribute : controlAttributes) {
-      Object value = attributes.get(controlAttribute.name());
-      if (value == null && required) {
-        errors.addError("The control [" + controlName() + "] is missing the required attribute [" +
-          controlAttribute.name() + "]");
-      } else if (value != null) {
-        Class<?>[] attributeTypes = controlAttribute.types();
-        boolean found = false;
-        for (Class<?> attributeType : attributeTypes) {
-          found = attributeType.isInstance(value);
-          if (found) {
-            break;
-          }
-        }
-
-        if (!found) {
-          errors.addError("The control [" + controlName() + "] has an invalid attribute [" + controlAttribute.name() +
-              "] of type [" + value.getClass() + "]. It must be an instance of [" + toTypeListString(attributeTypes) + "]");
-        }
-      }
-    }
-  }
-
-  private String toTypeListString(Class<?>[] attributeTypes) {
-    StringBuilder build = new StringBuilder();
-    for (int i = 0; i < attributeTypes.length; i++) {
-      Class<?> attributeType = attributeTypes[i];
-      build.append(attributeType.toString());
-      if (i == attributeTypes.length - 2) {
-        build.append(", or ");
-      } else if (i > 0) {
-        build.append(", ");
-      }
-    }
-
-    return build.toString();
   }
 }

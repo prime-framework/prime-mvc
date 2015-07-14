@@ -31,34 +31,27 @@ import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.container.ContainerResolver;
 
 import com.google.inject.Inject;
-import static java.util.Arrays.*;
+import static java.util.Collections.singletonList;
 
 /**
  * This class handles loading of resource bundles using the servlet context from the directory WEB-INF/messages.
- * <p/>
+ * <p>
  * This reloads based on the setting in the {@link MVCConfiguration} interface.
  *
  * @author Brian Pontarelli
  */
 public class WebControl extends ResourceBundle.Control {
+  private final MVCConfiguration configuration;
+
   private final ContainerResolver containerResolver;
+
   private final long reloadCheckSeconds;
 
   @Inject
   public WebControl(ContainerResolver containerResolver, MVCConfiguration configuration) {
+    this.configuration = configuration;
     this.containerResolver = containerResolver;
     this.reloadCheckSeconds = configuration.l10nReloadSeconds();
-  }
-
-  /**
-   * Only properties.
-   *
-   * @param uri Not used.
-   * @return An array containing only "java.properties".
-   */
-  @Override
-  public List<String> getFormats(String uri) {
-    return asList("java.properties");
   }
 
   /**
@@ -74,42 +67,14 @@ public class WebControl extends ResourceBundle.Control {
   }
 
   /**
-   * First tries to load the bundle using the getRealPath method on the ServletContext. If that doesn't work because
-   * the application is a WAR, this uses the getResourceAsStream method on the ServletContext.
+   * Only properties.
    *
-   * @param uri    The current URI.
-   * @param locale The locale used to find the properties file.
-   * @param format Not used.
-   * @param loader Used to lookup the resource if the ContainerResolver can't find it.
-   * @param reload Not used.
-   * @return The property resource bundle and never null.
-   * @throws IOException              If the file couldn't be read.
-   * @throws IllegalArgumentException If the bundle doesn't exist.
+   * @param uri Not used.
+   * @return An array containing only "java.properties".
    */
   @Override
-  public ResourceBundle newBundle(String uri, Locale locale, String format, ClassLoader loader, boolean reload)
-    throws IOException {
-    // Create the bundle from the WEB-INF/messages folder. basename is the uri
-    String name = name(uri, locale);
-    String realPath = containerResolver.getRealPath(name);
-    if (realPath != null) {
-      File file = new File(realPath);
-      if (file.isFile()) {
-        return new PropertyResourceBundle(new FileInputStream(file));
-      }
-    }
-
-    URL url = containerResolver.getResource(name);
-    if (url == null) {
-      // Otherwise, check the classpath
-      url = loader.getResource(name.substring(1));
-    }
-
-    if (url != null) {
-      return new PropertyResourceBundle(new InputStreamReader(url.openStream(), "UTF-8"));
-    }
-
-    throw new PrimeException("Invalid bundle [" + uri + "]");
+  public List<String> getFormats(String uri) {
+    return singletonList("java.properties");
   }
 
   /**
@@ -151,6 +116,45 @@ public class WebControl extends ResourceBundle.Control {
   }
 
   /**
+   * First tries to load the bundle using the getRealPath method on the ServletContext. If that doesn't work because
+   * the application is a WAR, this uses the getResourceAsStream method on the ServletContext.
+   *
+   * @param uri    The current URI.
+   * @param locale The locale used to find the properties file.
+   * @param format Not used.
+   * @param loader Used to lookup the resource if the ContainerResolver can't find it.
+   * @param reload Not used.
+   * @return The property resource bundle and never null.
+   * @throws IOException If the file couldn't be read.
+   * @throws IllegalArgumentException If the bundle doesn't exist.
+   */
+  @Override
+  public ResourceBundle newBundle(String uri, Locale locale, String format, ClassLoader loader, boolean reload)
+      throws IOException {
+    // Create the bundle from the ${configuration.resourceDirectory}/messages folder. basename is the uri
+    String name = name(uri, locale);
+    String realPath = containerResolver.getRealPath(name);
+    if (realPath != null) {
+      File file = new File(realPath);
+      if (file.isFile()) {
+        return new PropertyResourceBundle(new FileInputStream(file));
+      }
+    }
+
+    URL url = containerResolver.getResource(name);
+    if (url == null) {
+      // Otherwise, check the classpath
+      url = loader.getResource(name.substring(1));
+    }
+
+    if (url != null) {
+      return new PropertyResourceBundle(new InputStreamReader(url.openStream(), "UTF-8"));
+    }
+
+    throw new PrimeException("Invalid bundle [" + uri + "]");
+  }
+
+  /**
    * Makes the file name.
    *
    * @param uri    The current URI.
@@ -163,6 +167,6 @@ public class WebControl extends ResourceBundle.Control {
       uri = uri + "index";
     }
 
-    return "/WEB-INF/messages" + toBundleName(uri, locale) + ".properties";
+    return configuration.resourceDirectory() + "/messages" + toBundleName(uri, locale) + ".properties";
   }
 }

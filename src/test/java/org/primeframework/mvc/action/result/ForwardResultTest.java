@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.ExecuteMethodConfiguration;
@@ -39,7 +40,7 @@ import static org.easymock.EasyMock.*;
  *
  * @author Brian Pontarelli
  */
-public class ForwardResultTest {
+public class ForwardResultTest extends PrimeBaseTest {
   @DataProvider(name= "httMethod")
   public Object[][] httpMethod() {
     return new Object[][] {{HTTPMethod.GET}, {HTTPMethod.HEAD}};
@@ -69,7 +70,7 @@ public class ForwardResultTest {
     replay(service);
 
     Forward forward = new ForwardResult.ForwardImpl("/foo/bar.ftl", null);
-    ForwardResult forwardResult = new ForwardResult(store, null, null, service, response, map);
+    ForwardResult forwardResult = new ForwardResult(store, null, null, service, response, map, configuration);
     forwardResult.execute(forward);
 
     if (httpMethod == HTTPMethod.GET) {
@@ -99,7 +100,7 @@ public class ForwardResultTest {
     replay(service);
 
     Forward forward = new ForwardResult.ForwardImpl("bar.ftl", null);
-    ForwardResult forwardResult = new ForwardResult(store, null, null, service, response, map);
+    ForwardResult forwardResult = new ForwardResult(store, null, null, service, response, map, configuration);
     forwardResult.execute(forward);
 
     verify(response, store, map, service);
@@ -127,7 +128,7 @@ public class ForwardResultTest {
     replay(service);
 
     Forward forward = new ForwardResult.ForwardImpl("bar.ftl", null);
-    ForwardResult forwardResult = new ForwardResult(store, null, null, service, response, map);
+    ForwardResult forwardResult = new ForwardResult(store, null, null, service, response, map, configuration);
     forwardResult.execute(forward);
 
     verify(response, store, map, service);
@@ -155,7 +156,7 @@ public class ForwardResultTest {
     replay(service);
 
     Forward forward = new ForwardResult.ForwardImpl("bar.ftl", null, "text/html; charset=UTF-8", 300);
-    ForwardResult forwardResult = new ForwardResult(store, null, null, service, response, map);
+    ForwardResult forwardResult = new ForwardResult(store, null, null, service, response, map, configuration);
     forwardResult.execute(forward);
 
     verify(response, store, map, service);
@@ -189,7 +190,7 @@ public class ForwardResultTest {
     replay(service);
 
     Forward forward = new ForwardResult.ForwardImpl("${page}", null, "${contentType}", 300);
-    ForwardResult forwardResult = new ForwardResult(store, ee, null, service, response, map);
+    ForwardResult forwardResult = new ForwardResult(store, ee, null, service, response, map, configuration);
     forwardResult.execute(forward);
 
     verify(response, store, map, service);
@@ -217,7 +218,7 @@ public class ForwardResultTest {
     replay(service);
 
     Forward forward = new ForwardResult.ForwardImpl("bar.ftl", null, "text/javascript; charset=UTF-8", 200);
-    ForwardResult forwardResult = new ForwardResult(store, null, null, service, response, map);
+    ForwardResult forwardResult = new ForwardResult(store, null, null, service, response, map, configuration);
     forwardResult.execute(forward);
 
     verify(response, store, map, service);
@@ -249,7 +250,7 @@ public class ForwardResultTest {
     replay(store);
 
     Forward forward = new ForwardResult.ForwardImpl("", "failure");
-    ForwardResult forwardResult = new ForwardResult(store, null, locator, service, response, map);
+    ForwardResult forwardResult = new ForwardResult(store, null, locator, service, response, map, configuration);
     forwardResult.execute(forward);
 
     verify(response, service, map, locator, store);

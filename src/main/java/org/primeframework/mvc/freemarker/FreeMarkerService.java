@@ -30,7 +30,7 @@ public interface FreeMarkerService {
    *
    * @param writer       The writer to output the render to.
    * @param templateName The name of the template. Since this service is generic, this is the full path to the template.
-   *                     For example, it would be <strong>/WEB-INF/emails/foo-html.ftl</strong>.
+   *                     For example, it would be <strong>${configuration.resourceDirectory}/emails/foo-html.ftl</strong>.
    * @param root         This can be a Map or a FreeMarker model type that provides the values to the template.
    * @throws FreeMarkerRenderException If the render fails.
    * @throws MissingTemplateException  If the template is missing.

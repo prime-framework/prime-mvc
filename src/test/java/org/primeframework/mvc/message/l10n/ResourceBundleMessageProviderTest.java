@@ -19,51 +19,28 @@ import java.io.File;
 import java.util.Locale;
 
 import org.primeframework.mock.servlet.MockServletContext;
+import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.container.ServletContainerResolver;
 import org.testng.annotations.Test;
 
-import static org.easymock.EasyMock.*;
-import static org.testng.Assert.*;
+import static org.easymock.EasyMock.createStrictMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.fail;
 
 /**
  * This class tests the resource bundle message provider.
  *
  * @author Brian Pontarelli
  */
-public class ResourceBundleMessageProviderTest {
-  @Test
-  public void search() {
-    MVCConfiguration config = createStrictMock(MVCConfiguration.class);
-    expect(config.l10nReloadSeconds()).andReturn(1).times(2);
-    replay(config);
-
-    MockServletContext context = new MockServletContext(new File("src/test/java"));
-
-    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/l10n/Test", null, null));
-    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/l10n/NonExistent", null, null));
-    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/badPackage/Test", null, null));
-    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/l10n/Test", null, null));
-    replay(store);
-
-    ResourceBundleMessageProvider provider = new ResourceBundleMessageProvider(Locale.US, new WebControl(new ServletContainerResolver(context), config), store);
-    assertEquals(provider.getMessage("key").toString(), "American English Message");
-    assertEquals(provider.getMessage("key").toString(), "Package Message");
-    assertEquals(provider.getMessage("key").toString(), "Super Package Message");
-
-    provider = new ResourceBundleMessageProvider(Locale.GERMAN, new WebControl(new ServletContainerResolver(context), config), store);
-    assertEquals(provider.getMessage("key").toString(), "Default Message");
-  }
-
+public class ResourceBundleMessageProviderTest extends PrimeBaseTest {
   @Test
   public void format() {
-    MVCConfiguration config = createStrictMock(MVCConfiguration.class);
-    expect(config.l10nReloadSeconds()).andReturn(1).times(2);
-    replay(config);
-
     MockServletContext context = new MockServletContext(new File("src/test/java"));
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
@@ -73,33 +50,55 @@ public class ResourceBundleMessageProviderTest {
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/l10n/Test", null, null));
     replay(store);
 
-    ResourceBundleMessageProvider provider = new ResourceBundleMessageProvider(Locale.US, new WebControl(new ServletContainerResolver(context), config), store);
-    assertEquals(provider.getMessage("format_key", "b", "a", "c").toString(), "American English Message b a c");
-    assertEquals(provider.getMessage("format_key", "b", "a", "c").toString(), "Package Message b a c");
-    assertEquals(provider.getMessage("format_key", "b", "a", "c").toString(), "Super Package Message b a c");
+    ResourceBundleMessageProvider provider = new ResourceBundleMessageProvider(Locale.US, new WebControl(new ServletContainerResolver(context), configuration), store);
+    assertEquals(provider.getMessage("format_key", "b", "a", "c"), "American English Message b a c");
+    assertEquals(provider.getMessage("format_key", "b", "a", "c"), "Package Message b a c");
+    assertEquals(provider.getMessage("format_key", "b", "a", "c"), "Super Package Message b a c");
 
-    provider = new ResourceBundleMessageProvider(Locale.GERMAN, new WebControl(new ServletContainerResolver(context), config), store);
-    assertEquals(provider.getMessage("format_key", "b", "a", "c").toString(), "Default Message b a c");
+    provider = new ResourceBundleMessageProvider(Locale.GERMAN, new WebControl(new ServletContainerResolver(context), configuration), store);
+    assertEquals(provider.getMessage("format_key", "b", "a", "c"), "Default Message b a c");
+
+    verify(store);
   }
 
   @Test
   public void missing() {
-    MVCConfiguration config = createStrictMock(MVCConfiguration.class);
-    expect(config.l10nReloadSeconds()).andReturn(1);
-    replay(config);
-
     MockServletContext context = new MockServletContext(new File("src/test/java"));
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/l10n/Test", null, null));
     replay(store);
 
-    ResourceBundleMessageProvider provider = new ResourceBundleMessageProvider(Locale.US, new WebControl(new ServletContainerResolver(context), config), store);
+    ResourceBundleMessageProvider provider = new ResourceBundleMessageProvider(Locale.US, new WebControl(new ServletContainerResolver(context), configuration), store);
     try {
       provider.getMessage("bad_key");
       fail("Should have failed");
     } catch (MissingMessageException e) {
       // Expected
     }
+
+    verify(store);
+  }
+
+  @Test
+  public void search() {
+    MockServletContext context = new MockServletContext(new File("src/test/java"));
+
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/l10n/Test", null, null));
+    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/l10n/NonExistent", null, null));
+    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/badPackage/Test", null, null));
+    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/l10n/Test", null, null));
+    replay(store);
+
+    ResourceBundleMessageProvider provider = new ResourceBundleMessageProvider(Locale.US, new WebControl(new ServletContainerResolver(context), configuration), store);
+    assertEquals(provider.getMessage("key"), "American English Message");
+    assertEquals(provider.getMessage("key"), "Package Message");
+    assertEquals(provider.getMessage("key"), "Super Package Message");
+
+    provider = new ResourceBundleMessageProvider(Locale.GERMAN, new WebControl(new ServletContainerResolver(context), configuration), store);
+    assertEquals(provider.getMessage("key"), "Default Message");
+
+    verify(store);
   }
 }
