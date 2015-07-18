@@ -26,6 +26,7 @@ import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.ExecuteMethodConfiguration;
 import org.primeframework.mvc.action.result.annotation.Forward;
+import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.freemarker.FreeMarkerMap;
 import org.primeframework.mvc.freemarker.FreeMarkerService;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
@@ -68,6 +69,10 @@ public class ForwardResultTest extends PrimeBaseTest {
     FreeMarkerService service = createStrictMock(FreeMarkerService.class);
     service.render(writer, "/foo/bar.ftl", map);
     replay(service);
+
+    configuration = createStrictMock(MVCConfiguration.class);
+    expect(configuration.resourceDirectory()).andReturn("");
+    replay(configuration);
 
     Forward forward = new ForwardResult.ForwardImpl("/foo/bar.ftl", null);
     ForwardResult forwardResult = new ForwardResult(store, null, null, service, response, map, configuration);

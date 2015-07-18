@@ -86,10 +86,9 @@ public class ForwardResult extends AbstractResult<Forward> {
     if (!isCurrentActionHeadRequest(current)) {
       page = expand(page, action, false);
       if (page.startsWith("/")) {
-          // This seems like a hack. If this isn't a ForwardImpl it is a proxy and needs to be adjusted yet
-          if (!(forward instanceof ForwardImpl)) {
-            page = configuration.resourceDirectory() + page;
-          }
+        if (!page.startsWith(configuration.resourceDirectory())) {
+          page = configuration.resourceDirectory() + page;
+        }
       } else {
         // Strip off the last part of the URI since it is relative
         String uri = current.actionURI;
@@ -97,7 +96,6 @@ public class ForwardResult extends AbstractResult<Forward> {
         if (index >= 0) {
           uri = uri.substring(0, index);
         }
-
         page = configuration.resourceDirectory() + "/templates" + uri + "/" + page;
       }
       PrintWriter writer = response.getWriter();
