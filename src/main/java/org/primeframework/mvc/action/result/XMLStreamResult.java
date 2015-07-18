@@ -65,7 +65,7 @@ public class XMLStreamResult extends AbstractResult<XMLStream> {
     response.setContentType("application/xhtml+xml");
     response.setContentLength(xmlBytes.length);
 
-    if (!isCurrentActionHeadRequest(current)) {
+    if (!isHeadRequest(current)) {
       InputStream is = new ByteArrayInputStream(xmlBytes);
       ServletOutputStream sos = response.getOutputStream();
       try {

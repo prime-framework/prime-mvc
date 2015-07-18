@@ -71,10 +71,10 @@ public abstract class AbstractResult<U extends Annotation> implements Result<U> 
   /**
    * Return true if the current invocation is for an HTTP HEAD request.
    *
-   * @param actionInvocation the current ActionInvocation
+   * @param actionInvocation the ActionInvocation
    * @return true if the current action invocation is a HTTP HEAD request
    */
-  protected boolean isCurrentActionHeadRequest(ActionInvocation actionInvocation) {
+  protected boolean isHeadRequest(ActionInvocation actionInvocation) {
     return actionInvocation.method != null && actionInvocation.method.httpMethod == HTTPMethod.HEAD;
   }
 }

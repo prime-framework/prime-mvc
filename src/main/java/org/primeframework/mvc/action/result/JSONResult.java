@@ -97,7 +97,7 @@ public class JSONResult extends AbstractResult<JSON> {
     response.setContentType("application/json");
     response.setContentLength(result.length);
 
-    if (!isCurrentActionHeadRequest(current)) {
+    if (!isHeadRequest(current)) {
       ServletOutputStream outputStream = response.getOutputStream();
       outputStream.write(result);
       outputStream.flush();

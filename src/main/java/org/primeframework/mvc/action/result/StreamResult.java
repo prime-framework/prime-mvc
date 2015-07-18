@@ -74,7 +74,7 @@ public class StreamResult extends AbstractResult<Stream> {
       response.setHeader("Content-Disposition", "attachment; filename=\"" + name + "\"");
     }
 
-    if (!isCurrentActionHeadRequest(current)) {
+    if (!isHeadRequest(current)) {
       InputStream is = (InputStream) object;
       ServletOutputStream sos = response.getOutputStream();
       try {

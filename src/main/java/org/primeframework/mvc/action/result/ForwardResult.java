@@ -72,35 +72,40 @@ public class ForwardResult extends AbstractResult<Forward> {
     // Set the status code
     setStatus(forward.status(), forward.statusStr(), action, response);
 
+    if (isHeadRequest(current)) {
+      return;
+    }
+
+    String page = locateAndExpand(current, forward);
+    if (page.startsWith("/")) {
+      // If this URI hasn't already been fully qualified, do so now.  This may not be the best idea...
+      if (!page.startsWith(configuration.resourceDirectory())) {
+        page = configuration.resourceDirectory() + page;
+      }
+    } else {
+      // Strip off the last part of the URI since it is relative
+      String uri = current.actionURI;
+      int index = uri.lastIndexOf("/");
+      if (index >= 0) {
+        uri = uri.substring(0, index);
+      }
+      page = configuration.resourceDirectory() + "/templates" + uri + "/" + page;
+    }
+    PrintWriter writer = response.getWriter();
+    freeMarkerService.render(writer, page, freeMarkerMap);
+  }
+
+
+  private String locateAndExpand(ActionInvocation current, Forward forward) {
     // Determine if the default search should be used
     String page = forward.page();
-    String code = forward.code();
     if (page.equals("")) {
       page = resourceLocator.locate(configuration.resourceDirectory() + "/templates");
-    }
-
-    if (page == null) {
-      throw new PrimeException("Unable to locate result for URI [" + current.uri() + "] and result code [" + code + "]");
-    }
-
-    if (!isCurrentActionHeadRequest(current)) {
-      page = expand(page, action, false);
-      if (page.startsWith("/")) {
-        if (!page.startsWith(configuration.resourceDirectory())) {
-          page = configuration.resourceDirectory() + page;
-        }
-      } else {
-        // Strip off the last part of the URI since it is relative
-        String uri = current.actionURI;
-        int index = uri.lastIndexOf("/");
-        if (index >= 0) {
-          uri = uri.substring(0, index);
-        }
-        page = configuration.resourceDirectory() + "/templates" + uri + "/" + page;
+      if (page == null) {
+        throw new PrimeException("Unable to locate result for URI [" + current.uri() + "] and result code [" + forward.code() + "]");
       }
-      PrintWriter writer = response.getWriter();
-      freeMarkerService.render(writer, page, freeMarkerMap);
     }
+    return expand(page, current.action, false);
   }
 
   public static class ForwardImpl implements Forward {
