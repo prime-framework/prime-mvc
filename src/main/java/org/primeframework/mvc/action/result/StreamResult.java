@@ -74,20 +74,22 @@ public class StreamResult extends AbstractResult<Stream> {
       response.setHeader("Content-Disposition", "attachment; filename=\"" + name + "\"");
     }
 
-    if (!isHeadRequest(current)) {
-      InputStream is = (InputStream) object;
-      ServletOutputStream sos = response.getOutputStream();
-      try {
-        // Then output the file
-        byte[] b = new byte[8192];
-        int len;
-        while ((len = is.read(b)) != -1) {
-          sos.write(b, 0, len);
-        }
-      } finally {
-        sos.flush();
-        sos.close();
+    if (isHeadRequest(current)) {
+      return;
+    }
+
+    InputStream is = (InputStream) object;
+    ServletOutputStream sos = response.getOutputStream();
+    try {
+      // Then output the file
+      byte[] b = new byte[8192];
+      int len;
+      while ((len = is.read(b)) != -1) {
+        sos.write(b, 0, len);
       }
+    } finally {
+      sos.flush();
+      sos.close();
     }
   }
 }

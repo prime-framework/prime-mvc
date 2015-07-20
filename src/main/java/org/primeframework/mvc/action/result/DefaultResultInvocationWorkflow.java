@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2010, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2015, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.ForwardResult.ForwardImpl;
+import org.primeframework.mvc.action.result.ForwardResult.LocatedResource;
 import org.primeframework.mvc.action.result.RedirectResult.RedirectImpl;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.workflow.WorkflowChain;
@@ -99,7 +100,7 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
                   "] URI [" + actionInvocation.actionURI + "] and result code [" + resultCode + "]");
             }
 
-            annotation = new ForwardImpl(uri, "success");
+            annotation = new ForwardImpl(new LocatedResource(uri, true), "success");
           }
         }
 
@@ -134,7 +135,7 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
   protected Pair<Annotation, Class<?>> defaultResult(ActionInvocation invocation) {
     String uri = resourceLocator.locate(configuration.resourceDirectory() + "/templates");
     if (uri != null) {
-      return Pair.<Annotation, Class<?>>of(new ForwardImpl(uri, "success"), ForwardResult.class);
+      return Pair.<Annotation, Class<?>>of(new ForwardImpl(new LocatedResource(uri, true), "success"), ForwardResult.class);
     }
 
     // If the URI ends with a / and the forward result doesn't exist, redirecting won't help.

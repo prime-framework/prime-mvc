@@ -39,10 +39,15 @@ import com.google.inject.Inject;
  */
 public class ForwardResult extends AbstractResult<Forward> {
   private final ActionInvocationStore actionInvocationStore;
+
   private final MVCConfiguration configuration;
+
   private final FreeMarkerMap freeMarkerMap;
+
   private final FreeMarkerService freeMarkerService;
+
   private final ResourceLocator resourceLocator;
+
   private final HttpServletResponse response;
 
   @Inject
@@ -71,15 +76,15 @@ public class ForwardResult extends AbstractResult<Forward> {
 
     // Set the status code
     setStatus(forward.status(), forward.statusStr(), action, response);
+    String page = locateAndExpand(current, forward);
 
     if (isHeadRequest(current)) {
       return;
     }
 
-    String page = locateAndExpand(current, forward);
     if (page.startsWith("/")) {
-      // If this URI hasn't already been fully qualified, do so now.  This may not be the best idea...
-      if (!page.startsWith(configuration.resourceDirectory())) {
+      // If this resource has not yet been located, do so now.
+      if (forward instanceof ForwardImpl && !((ForwardImpl) forward).locatedResource().located) {
         page = configuration.resourceDirectory() + page;
       }
     } else {
@@ -95,7 +100,6 @@ public class ForwardResult extends AbstractResult<Forward> {
     freeMarkerService.render(writer, page, freeMarkerMap);
   }
 
-
   private String locateAndExpand(ActionInvocation current, Forward forward) {
     // Determine if the default search should be used
     String page = forward.page();
@@ -104,27 +108,42 @@ public class ForwardResult extends AbstractResult<Forward> {
       if (page == null) {
         throw new PrimeException("Unable to locate result for URI [" + current.uri() + "] and result code [" + forward.code() + "]");
       }
+      if (forward instanceof ForwardImpl) {
+        ((ForwardImpl) forward).locatedResource().located = true;
+      }
     }
     return expand(page, current.action, false);
   }
 
   public static class ForwardImpl implements Forward {
     private final String code;
-    private final String contentType;
-    private final int status;
-    private final String statusStr;
-    private final String uri;
 
-    public ForwardImpl(String uri, String code) {
-      this.uri = uri;
+    private final String contentType;
+
+    private final LocatedResource resource;
+
+    private final int status;
+
+    private final String statusStr;
+
+    public ForwardImpl(LocatedResource resource, String code) {
+      this.resource = resource;
       this.code = code;
       this.contentType = "text/html; charset=UTF-8";
       this.status = 200;
       this.statusStr = "";
     }
 
+    public ForwardImpl(String uri, String code) {
+      this(new LocatedResource(uri, false), code);
+    }
+
     public ForwardImpl(String uri, String code, String contentType, int status) {
-      this.uri = uri;
+      this(new LocatedResource(uri, false), code, contentType, status);
+    }
+
+    public ForwardImpl(LocatedResource resource, String code, String contentType, int status) {
+      this.resource = resource;
       this.code = code;
       this.contentType = contentType;
       this.status = status;
@@ -145,9 +164,13 @@ public class ForwardResult extends AbstractResult<Forward> {
       return contentType;
     }
 
+    public LocatedResource locatedResource() {
+      return resource;
+    }
+
     @Override
     public String page() {
-      return uri;
+      return resource.uri;
     }
 
     @Override
@@ -158,6 +181,21 @@ public class ForwardResult extends AbstractResult<Forward> {
     @Override
     public String statusStr() {
       return statusStr;
+    }
+  }
+
+  /**
+   * Wrapper for the page (uri) to identify if the resources has yet been located by calling {@link
+   * ResourceLocator#locate(String)}.
+   */
+  public static class LocatedResource {
+    boolean located;
+
+    String uri;
+
+    public LocatedResource(String uri, boolean located) {
+      this.uri = uri;
+      this.located = located;
     }
   }
 }

@@ -65,20 +65,22 @@ public class XMLStreamResult extends AbstractResult<XMLStream> {
     response.setContentType("application/xhtml+xml");
     response.setContentLength(xmlBytes.length);
 
-    if (!isHeadRequest(current)) {
-      InputStream is = new ByteArrayInputStream(xmlBytes);
-      ServletOutputStream sos = response.getOutputStream();
-      try {
-        // Then output the file
-        byte[] b = new byte[8192];
-        int len;
-        while ((len = is.read(b)) != -1) {
-          sos.write(b, 0, len);
-        }
-      } finally {
-        sos.flush();
-        sos.close();
+    if (isHeadRequest(current)) {
+      return;
+    }
+
+    InputStream is = new ByteArrayInputStream(xmlBytes);
+    ServletOutputStream sos = response.getOutputStream();
+    try {
+      // Then output the file
+      byte[] b = new byte[8192];
+      int len;
+      while ((len = is.read(b)) != -1) {
+        sos.write(b, 0, len);
       }
+    } finally {
+      sos.flush();
+      sos.close();
     }
   }
 }

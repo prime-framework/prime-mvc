@@ -97,11 +97,13 @@ public class JSONResult extends AbstractResult<JSON> {
     response.setContentType("application/json");
     response.setContentLength(result.length);
 
-    if (!isHeadRequest(current)) {
-      ServletOutputStream outputStream = response.getOutputStream();
-      outputStream.write(result);
-      outputStream.flush();
+    if (isHeadRequest(current)) {
+      return;
     }
+
+    ServletOutputStream outputStream = response.getOutputStream();
+    outputStream.write(result);
+    outputStream.flush();
   }
 
   private ErrorMessages convertErrors(List<Message> messages) {
