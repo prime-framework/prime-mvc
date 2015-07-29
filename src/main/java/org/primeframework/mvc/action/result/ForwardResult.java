@@ -76,17 +76,14 @@ public class ForwardResult extends AbstractResult<Forward> {
 
     // Set the status code
     setStatus(forward.status(), forward.statusStr(), action, response);
-    String page = locateAndExpand(current, forward);
+    LocatedResource page = locateAndExpand(current, forward);
 
     if (isHeadRequest(current)) {
       return;
     }
 
-    if (page.startsWith("/")) {
-      // If this resource has not yet been located, do so now.
-      if (forward instanceof ForwardImpl && !((ForwardImpl) forward).locatedResource().located) {
-        page = configuration.resourceDirectory() + page;
-      }
+    if (page.uri.startsWith("/")) {
+      page = adjustExplicitPage(forward, page);
     } else {
       // Strip off the last part of the URI since it is relative
       String uri = current.actionURI;
@@ -94,25 +91,45 @@ public class ForwardResult extends AbstractResult<Forward> {
       if (index >= 0) {
         uri = uri.substring(0, index);
       }
-      page = configuration.resourceDirectory() + "/templates" + uri + "/" + page;
+      page.uri = configuration.resourceDirectory() + "/templates" + uri + "/" + page.uri;
     }
     PrintWriter writer = response.getWriter();
-    freeMarkerService.render(writer, page, freeMarkerMap);
+    freeMarkerService.render(writer, page.uri, freeMarkerMap);
   }
 
-  private String locateAndExpand(ActionInvocation current, Forward forward) {
+  /**
+   * Adjust an explicit path unless it has already been done for us.
+   * @param forward
+   * @param page
+   * @return
+   */
+  private LocatedResource adjustExplicitPage(Forward forward, LocatedResource page) {
+    if (page.located) {
+      return page;
+    }
+
+    if (forward instanceof ForwardImpl) {
+      if (!((ForwardImpl) forward).locatedResource().located) {
+        page.uri = configuration.resourceDirectory() + page.uri;
+      }
+    } else {
+      page.uri = configuration.resourceDirectory() + page.uri;
+    }
+    return page;
+  }
+
+  private LocatedResource locateAndExpand(ActionInvocation current, Forward forward) {
     // Determine if the default search should be used
-    String page = forward.page();
-    if (page.equals("")) {
-      page = resourceLocator.locate(configuration.resourceDirectory() + "/templates");
-      if (page == null) {
+    LocatedResource page = new LocatedResource(forward.page(), false);
+    if (page.uri.equals("")) {
+      page.uri = resourceLocator.locate(configuration.resourceDirectory() + "/templates");
+      if (page.uri == null) {
         throw new PrimeException("Unable to locate result for URI [" + current.uri() + "] and result code [" + forward.code() + "]");
       }
-      if (forward instanceof ForwardImpl) {
-        ((ForwardImpl) forward).locatedResource().located = true;
-      }
+      page.located = true;
     }
-    return expand(page, current.action, false);
+    page.uri = expand(page.uri, current.action, false);
+    return page;
   }
 
   public static class ForwardImpl implements Forward {
