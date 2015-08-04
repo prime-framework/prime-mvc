@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2015, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,9 @@ import com.google.inject.Inject;
 @SuppressWarnings("unchecked")
 public class DefaultActionInvocationStore implements ActionInvocationStore {
   public static final String ACTION_INVOCATION_DEQUE_KEY = "primeActionInvocationDeque";
+
   public static final String ACTION_INVOCATION_KEY = "primeActionInvocation";
+
   private final HttpServletRequest request;
 
   @Inject
@@ -52,15 +54,22 @@ public class DefaultActionInvocationStore implements ActionInvocationStore {
   /**
    * {@inheritDoc}
    */
-  public void setCurrent(ActionInvocation invocation) {
+  public void setCurrent(ActionInvocation actionInvocation) {
     Deque<ActionInvocation> deque = (Deque<ActionInvocation>) request.getAttribute(ACTION_INVOCATION_DEQUE_KEY);
     if (deque == null) {
       deque = new ArrayDeque<>();
       request.setAttribute(ACTION_INVOCATION_DEQUE_KEY, deque);
     }
 
-    deque.push(invocation);
-    request.setAttribute(ACTION_INVOCATION_KEY, invocation);
+    deque.push(actionInvocation);
+    request.setAttribute(ACTION_INVOCATION_KEY, actionInvocation);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public Deque<ActionInvocation> getDeque() {
+    return (Deque<ActionInvocation>) request.getAttribute(ACTION_INVOCATION_DEQUE_KEY);
   }
 
   /**
@@ -74,12 +83,5 @@ public class DefaultActionInvocationStore implements ActionInvocationStore {
 
     deque.poll();
     request.removeAttribute(ACTION_INVOCATION_KEY);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public Deque<ActionInvocation> getDeque() {
-    return (Deque<ActionInvocation>) request.getAttribute(ACTION_INVOCATION_DEQUE_KEY);
   }
 }

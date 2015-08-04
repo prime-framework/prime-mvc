@@ -51,8 +51,8 @@ public class XMLStreamResult extends AbstractResult<XMLStream> {
   public void execute(XMLStream xmlStream) throws IOException, ServletException {
     String xml = xmlStream.property();
 
-    ActionInvocation current = actionInvocationStore.getCurrent();
-    Object object = expressionEvaluator.getValue(xml, current.action);
+    ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
+    Object object = expressionEvaluator.getValue(xml, actionInvocation.action);
     if (object == null || !(object instanceof String)) {
       throw new PrimeException("Invalid property [" + xml + "] for XMLStream result. This " +
         "property returned null or an Object that is not a String.");
@@ -65,7 +65,7 @@ public class XMLStreamResult extends AbstractResult<XMLStream> {
     response.setContentType("application/xhtml+xml");
     response.setContentLength(xmlBytes.length);
 
-    if (isHeadRequest(current)) {
+    if (isHeadRequest(actionInvocation)) {
       return;
     }
 

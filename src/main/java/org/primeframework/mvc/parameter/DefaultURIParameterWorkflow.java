@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2015, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,31 +32,31 @@ import com.google.inject.Inject;
 
 /**
  * This class implements the URIParameterWorkflow using patterns derived from the WADL specification.
- * <p/>
+ * <p>
  * The base URI for the action is fixed based on the package and class name. However, everything after the base can be
  * set into properties or fields of the action class using the WADL pattern here. The pattern is like this:
- * <p/>
+ * <p>
  * <pre>
  * {id}
  * </pre>
- * <p/>
+ * <p>
  * If the classes base URI is /admin/user/edit, the full specification for the URI that action can handle would be:
- * <p/>
+ * <p>
  * <pre>
  * /admin/user/edit/{id}
  * </pre>
- * <p/>
+ * <p>
  * If the URI is <strong>/admin/user/edit/42</strong>, the value of 42 would be set into the action's
  * <strong>id</strong> property or field.
- * <p/>
+ * <p>
  * The difference between the standard WADL specification pattern and Prime is that Prime allows you to capture all of
  * the URI parameters or just what is left over after everything else has been handled using a special notation. This
  * notation is:
- * <p/>
+ * <p>
  * <pre>
  * {id}/{*theRest}
  * </pre>
- * <p/>
+ * <p>
  * If the URI is <strong>/admin/user/edit/42/foo/bar</strong>, the value of 42 would be set into the action's
  * <strong>id</strong> property or field and a List of Strings will be set into the property or field named
  * <strong>theRest</strong>. The property that handles the all or the remaining parameters must be of type
@@ -65,8 +65,9 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 public class DefaultURIParameterWorkflow implements URIParameterWorkflow {
-  private final HttpServletRequest request;
   private final ActionInvocationStore actionInvocationStore;
+
+  private final HttpServletRequest request;
 
   @Inject
   public DefaultURIParameterWorkflow(HttpServletRequest request, ActionInvocationStore actionInvocationStore) {
@@ -81,13 +82,13 @@ public class DefaultURIParameterWorkflow implements URIParameterWorkflow {
    * class properties or fields using the ExpressionEvaluator.
    *
    * @param workflowChain Called after processing.
-   * @throws IOException      If the WorkflowChain throws this exception.
+   * @throws IOException If the WorkflowChain throws this exception.
    * @throws ServletException If the WorkflowChain throws this exception.
    */
   public void perform(WorkflowChain workflowChain) throws IOException, ServletException {
-    ActionInvocation invocation = actionInvocationStore.getCurrent();
-    LinkedList<String> parameters = new LinkedList<String>(invocation.uriParameters);
-    ActionConfiguration actionConfiguration = invocation.configuration;
+    ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
+    LinkedList<String> parameters = new LinkedList<String>(actionInvocation.uriParameters);
+    ActionConfiguration actionConfiguration = actionInvocation.configuration;
 
     if (!parameters.isEmpty() && actionConfiguration != null) {
       Map<String, String[]> uriParameters = new HashMap<String, String[]>();

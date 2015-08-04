@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2015, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,10 @@ import java.util.Deque;
 
 /**
  * This class defines the mechanism used to locate action invocation objects. During a request, the invocation is set
- * using the {@link #setCurrent(ActionInvocation)} method and then can be retrieved any number of times using the {@link
+ * using the {@link #setCurrent(ActionInvocation)} method and then can be retrieved any number of times using the
+ * {@link
  * #getCurrent()} method.
- * <p/>
+ * <p>
  * Action invocations are always stored in a stack in order to allow different actions to be invoked on top of each
  * other. This is useful for invoking actions from FTL files and JSP tags.
  *
@@ -40,17 +41,17 @@ public interface ActionInvocationStore {
   /**
    * Sets the invocation into the provider so that it can be fetched later.
    *
-   * @param invocation The invocation to set.
+   * @param actionInvocation The invocation to set.
    */
-  void setCurrent(ActionInvocation invocation);
-
-  /**
-   * Pops the current action from the stack.
-   */
-  void removeCurrent();
+  void setCurrent(ActionInvocation actionInvocation);
 
   /**
    * @return The deque that contains the action invocations.
    */
   Deque<ActionInvocation> getDeque();
+
+  /**
+   * Pops the current action from the stack.
+   */
+  void removeCurrent();
 }

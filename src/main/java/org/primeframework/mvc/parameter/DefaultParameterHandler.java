@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2014-2015, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ import com.google.inject.Inject;
 /**
  * This class is the default parameter handler. It sets all of the parameters into the action in the following order
  * (while invoking the correct methods in the order):
- * <p/>
+ * <p>
  * <ol>
  * <li>Set pre-parameters</li>
  * <li>Invoke pre-parameters methods</li>
@@ -62,10 +62,15 @@ import com.google.inject.Inject;
  */
 public class DefaultParameterHandler implements ParameterHandler {
   private final static Logger logger = LoggerFactory.getLogger(DefaultParameterHandler.class);
-  private final MVCConfiguration configuration;
+
   private final ActionInvocationStore actionInvocationStore;
+
+  private final MVCConfiguration configuration;
+
   private final ExpressionEvaluator expressionEvaluator;
+
   private final MessageProvider messageProvider;
+
   private final MessageStore messageStore;
 
   @Inject
@@ -85,14 +90,14 @@ public class DefaultParameterHandler implements ParameterHandler {
       logger.debug("Parameters found: " + parameters);
     }
 
-    ActionInvocation invocation = actionInvocationStore.getCurrent();
-    Object action = invocation.action;
+    ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
+    Object action = actionInvocation.action;
 
     // First, process the pre-parameters
     setValues(parameters.pre, action, true);
 
     // Next, invoke pre methods
-    ActionConfiguration actionConfiguration = invocation.configuration;
+    ActionConfiguration actionConfiguration = actionInvocation.configuration;
     if (actionConfiguration.preParameterMethods.size() > 0) {
       ReflectionUtils.invokeAll(action, actionConfiguration.preParameterMethods);
     }
@@ -111,45 +116,6 @@ public class DefaultParameterHandler implements ParameterHandler {
     // Finally, invoke post methods
     if (actionConfiguration.postParameterMethods.size() > 0) {
       ReflectionUtils.invokeAll(action, actionConfiguration.postParameterMethods);
-    }
-  }
-
-  /**
-   * Sets the given values into the action.
-   *
-   * @param values                 The value mapping.
-   * @param action                 The action.
-   * @param allowUnknownParameters Whether or not invalid parameters should throw an exception or just be ignored and
-   *                               log a fine message.
-   */
-  protected void setValues(Map<String, Struct> values, Object action, boolean allowUnknownParameters) {
-    for (String key : values.keySet()) {
-      Struct struct = values.get(key);
-
-      // If there are no values to set, skip it
-      if (struct.values == null) {
-        continue;
-      }
-
-      try {
-        expressionEvaluator.setValue(key, action, struct.values, struct.attributes);
-      } catch (ConversionException ce) {
-        String code = "[couldNotConvert]" + key;
-        try {
-          String message = messageProvider.getMessage(code, (Object[]) new ArrayBuilder<String>(String.class, key).addAll(struct.values).done());
-          messageStore.add(new SimpleFieldMessage(MessageType.ERROR, key, code, message));
-        } catch (MissingMessageException mme) {
-          messageStore.add(new SimpleFieldMessage(MessageType.ERROR, key, code, ce.getMessage()));
-        }
-      } catch (BeanExpressionException ee) {
-        throw ee;
-      } catch (ExpressionException ee) {
-        if (!allowUnknownParameters) {
-          throw ee;
-        }
-
-        logger.debug("Invalid parameter to action [" + action.getClass().getName() + "]", ee);
-      }
     }
   }
 
@@ -202,6 +168,49 @@ public class DefaultParameterHandler implements ParameterHandler {
         // Set the files into the property
         expressionEvaluator.setValue(key, action, list);
       }
+    }
+  }
+
+  /**
+   * Sets the given values into the action.
+   *
+   * @param values                 The value mapping.
+   * @param action                 The action.
+   * @param allowUnknownParameters Whether or not invalid parameters should throw an exception or just be ignored and
+   *                               log a fine message.
+   */
+  protected void setValues(Map<String, Struct> values, Object action, boolean allowUnknownParameters) {
+    for (String key : values.keySet()) {
+      Struct struct = values.get(key);
+
+      // If there are no values to set, skip it
+      if (struct.values == null) {
+        continue;
+      }
+
+      try {
+        expressionEvaluator.setValue(key, action, struct.values, struct.attributes);
+      } catch (ConversionException ce) {
+        addCouldNotConvertMessage(key, struct, ce);
+      } catch (BeanExpressionException ee) {
+        throw ee;
+      } catch (ExpressionException ee) {
+        if (!allowUnknownParameters) {
+          throw ee;
+        }
+
+        logger.debug("Invalid parameter to action [" + action.getClass().getName() + "]", ee);
+      }
+    }
+  }
+
+  private void addCouldNotConvertMessage(String key, Struct struct, ConversionException ce) {
+    String code = "[couldNotConvert]" + key;
+    try {
+      String message = messageProvider.getMessage(code, (Object[]) new ArrayBuilder<>(String.class, key).addAll(struct.values).done());
+      messageStore.add(new SimpleFieldMessage(MessageType.ERROR, key, code, message));
+    } catch (MissingMessageException mme) {
+      messageStore.add(new SimpleFieldMessage(MessageType.ERROR, key, code, ce.getMessage()));
     }
   }
 }

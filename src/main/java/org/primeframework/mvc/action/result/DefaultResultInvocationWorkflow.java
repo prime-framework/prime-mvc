@@ -20,11 +20,9 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.ForwardResult.ForwardImpl;
-import org.primeframework.mvc.action.result.ForwardResult.LocatedResource;
 import org.primeframework.mvc.action.result.RedirectResult.RedirectImpl;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.workflow.WorkflowChain;
@@ -94,13 +92,8 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
           String resultCode = resultStore.get();
           annotation = actionInvocation.configuration.resultConfigurations.get(resultCode);
           if (annotation == null) {
-            String uri = resourceLocator.locate(configuration.resourceDirectory() + "/templates");
-            if (uri == null) {
-              throw new PrimeException("Missing result for action class [" + actionInvocation.configuration.actionClass +
-                  "] URI [" + actionInvocation.actionURI + "] and result code [" + resultCode + "]");
-            }
-
-            annotation = new ForwardImpl(new LocatedResource(uri, true), "success");
+            // use the default and allow the ForwardResult to locate the page.
+            annotation = new ForwardImpl("", "success");
           }
         }
 
@@ -118,28 +111,28 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
    * Checks for results using this search order:
    * <p>
    * <ol>
-   * <li>${configuration.resourceDirectory}/templates/&lt;uri>-&lt;resultCode>.jsp</li>
-   * <li>${configuration.resourceDirectory}/templates/&lt;uri>-&lt;resultCode>.ftl</li>
-   * <li>${configuration.resourceDirectory}/templates/&lt;uri>.jsp</li>
-   * <li>${configuration.resourceDirectory}/templates/&lt;uri>.ftl</li>
-   * <li>${configuration.resourceDirectory}/templates/&lt;uri>/index.jsp</li>
-   * <li>${configuration.resourceDirectory}/templates/&lt;uri>/index.ftl</li>
+   * <li>${configuration.resourceDirectory}/templates/&lt;uri&gt;-&lt;resultCode&gt;.jsp</li>
+   * <li>${configuration.resourceDirectory}/templates/&lt;uri&gt;-&lt;resultCode&gt;.ftl</li>
+   * <li>${configuration.resourceDirectory}/templates/&lt;uri&gt;.jsp</li>
+   * <li>${configuration.resourceDirectory}/templates/&lt;uri&gt;.ftl</li>
+   * <li>${configuration.resourceDirectory}/templates/&lt;uri&gt;/index.jsp</li>
+   * <li>${configuration.resourceDirectory}/templates/&lt;uri&gt;/index.ftl</li>
    * </ol>
    * <p>
    * If nothing is found this bombs out.
    *
-   * @param invocation The action invocation.
+   * @param actionInvocation The action invocation.
    * @return The Forward and never null.
    * @throws RuntimeException If the default forward could not be found.
    */
-  protected Pair<Annotation, Class<?>> defaultResult(ActionInvocation invocation) {
+  protected Pair<Annotation, Class<?>> defaultResult(ActionInvocation actionInvocation) {
     String uri = resourceLocator.locate(configuration.resourceDirectory() + "/templates");
     if (uri != null) {
-      return Pair.<Annotation, Class<?>>of(new ForwardImpl(new LocatedResource(uri, true), "success"), ForwardResult.class);
+      return Pair.<Annotation, Class<?>>of(new ForwardImpl(uri, "success"), ForwardResult.class);
     }
 
     // If the URI ends with a / and the forward result doesn't exist, redirecting won't help.
-    String actionURI = invocation.actionURI;
+    String actionURI = actionInvocation.actionURI;
     if (actionURI.endsWith("/")) {
       return null;
     }

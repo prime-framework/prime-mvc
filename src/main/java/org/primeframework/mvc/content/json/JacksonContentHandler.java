@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2013-2015, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,13 +75,13 @@ public class JacksonContentHandler implements ContentHandler {
 
   @Override
   public void handle() throws IOException {
-    ActionInvocation current = store.getCurrent();
-    Object action = current.action;
+    ActionInvocation actionInvocation = store.getCurrent();
+    Object action = actionInvocation.action;
     if (action == null) {
       return;
     }
 
-    ActionConfiguration config = current.configuration;
+    ActionConfiguration config = actionInvocation.configuration;
     if (!config.additionalConfiguration.containsKey(JacksonActionConfiguration.class)) {
       return;
     }

@@ -36,8 +36,9 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 public class StreamResult extends AbstractResult<Stream> {
-  private final HttpServletResponse response;
   private final ActionInvocationStore actionInvocationStore;
+
+  private final HttpServletResponse response;
 
   @Inject
   public StreamResult(ExpressionEvaluator expressionEvaluator, HttpServletResponse response,
@@ -51,8 +52,8 @@ public class StreamResult extends AbstractResult<Stream> {
    * {@inheritDoc}
    */
   public void execute(Stream stream) throws IOException, ServletException {
-    ActionInvocation current = actionInvocationStore.getCurrent();
-    Object action = current.action;
+    ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
+    Object action = actionInvocation.action;
     String property = stream.property();
     String length = expand(stream.length(), action, false);
     String name = expand(stream.name(), action, true);
@@ -61,7 +62,7 @@ public class StreamResult extends AbstractResult<Stream> {
     Object object = expressionEvaluator.getValue(property, action);
     if (object == null || !(object instanceof InputStream)) {
       throw new PrimeException("Invalid property [" + property + "] for Stream result. This " +
-        "property returned null or an Object that is not an InputStream.");
+          "property returned null or an Object that is not an InputStream.");
     }
 
     response.setContentType(type);
@@ -74,7 +75,7 @@ public class StreamResult extends AbstractResult<Stream> {
       response.setHeader("Content-Disposition", "attachment; filename=\"" + name + "\"");
     }
 
-    if (isHeadRequest(current)) {
+    if (isHeadRequest(actionInvocation)) {
       return;
     }
 

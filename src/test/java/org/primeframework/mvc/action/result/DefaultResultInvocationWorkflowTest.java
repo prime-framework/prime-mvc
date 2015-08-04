@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2010, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2015, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,8 +29,12 @@ import org.testng.annotations.Test;
 
 import com.google.inject.Binder;
 import com.google.inject.Injector;
-import static org.easymock.EasyMock.*;
-import static org.testng.Assert.*;
+import static org.easymock.EasyMock.createStrictMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.isA;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.testng.Assert.fail;
 
 /**
  * This class tests the default action invocation workflow.
@@ -154,7 +158,7 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
   }
 
   @Test
-  public void actionWithResult() throws Exception {
+  public void actionMissingResult() throws Exception {
     ForwardImpl annotation = new ForwardImpl("/user/edit", "success");
     ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, new Edit(), "post", "/user/edit", "", "success", annotation);
     ActionInvocationStore ais = createStrictMock(ActionInvocationStore.class);
@@ -165,7 +169,7 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
     replay(chain);
 
     ResultStore resultStore = createStrictMock(ResultStore.class);
-    expect(resultStore.get()).andReturn("success");
+    expect(resultStore.get()).andReturn("failure");
     resultStore.clear();
     replay(resultStore);
 
@@ -173,7 +177,7 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
     replay(resourceLocator);
 
     ForwardResult result = createStrictMock(ForwardResult.class);
-    result.execute(annotation);
+    result.execute(isA(Forward.class));
     replay(result);
 
     Injector injector = createStrictMock(Injector.class);
@@ -188,7 +192,11 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
     ResultFactory factory = new ResultFactory(injector);
 
     DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(ais, configuration, resultStore, resourceLocator, factory);
-    workflow.perform(chain);
+    try {
+      workflow.perform(chain);
+    } catch (PrimeException e) {
+      fail("Should not have thrown a PrimeException");
+    }
 
     verify(ais, resultStore, resourceLocator, injector, chain, binder);
   }
@@ -227,7 +235,7 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
   }
 
   @Test
-  public void actionMissingResult() throws Exception {
+  public void actionWithResult() throws Exception {
     ForwardImpl annotation = new ForwardImpl("/user/edit", "success");
     ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, new Edit(), "post", "/user/edit", "", "success", annotation);
     ActionInvocationStore ais = createStrictMock(ActionInvocationStore.class);
@@ -238,15 +246,19 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
     replay(chain);
 
     ResultStore resultStore = createStrictMock(ResultStore.class);
-    expect(resultStore.get()).andReturn("failure");
+    expect(resultStore.get()).andReturn("success");
     resultStore.clear();
     replay(resultStore);
 
     ResourceLocator resourceLocator = createStrictMock(ResourceLocator.class);
-    expect(resourceLocator.locate("/WEB-INF/templates")).andReturn(null);
     replay(resourceLocator);
 
+    ForwardResult result = createStrictMock(ForwardResult.class);
+    result.execute(annotation);
+    replay(result);
+
     Injector injector = createStrictMock(Injector.class);
+    expect(injector.getInstance(ForwardResult.class)).andReturn(result);
     replay(injector);
 
     Binder binder = createStrictMock(Binder.class);
@@ -257,12 +269,7 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
     ResultFactory factory = new ResultFactory(injector);
 
     DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(ais, configuration, resultStore, resourceLocator, factory);
-    try {
-      workflow.perform(chain);
-      fail("Should have thrown a PrimeException");
-    } catch (PrimeException e) {
-      // Expected
-    }
+    workflow.perform(chain);
 
     verify(ais, resultStore, resourceLocator, injector, chain, binder);
   }

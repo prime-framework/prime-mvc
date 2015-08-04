@@ -81,24 +81,24 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
       logger.debug("METHOD: " + request.getMethod() + "; URI: " + uri);
     }
     boolean executeResult = InternalParameters.is(request, InternalParameters.EXECUTE_RESULT);
-    ActionInvocation invocation = actionMapper.map(httpMethod, uri, executeResult);
+    ActionInvocation actionInvocation = actionMapper.map(httpMethod, uri, executeResult);
 
     // This case is a redirect because they URI maps to something new and there isn't an action associated with it. For
     // example, this is how the index handling works.
-    if (!invocation.uri().equals(uri) && invocation.action == null) {
-      response.sendRedirect(invocation.uri());
+    if (!actionInvocation.uri().equals(uri) && actionInvocation.action == null) {
+      response.sendRedirect(actionInvocation.uri());
       return;
     }
 
     // Keep the current action in the store if an exception is thrown so that it can be used from the error workflow
-    actionInvocationStore.setCurrent(invocation);
+    actionInvocationStore.setCurrent(actionInvocation);
 
     // Start the timer and grab a meter for errors
     Timer.Context timer = null;
     Meter errorMeter = null;
-    if (metricRegistry != null && invocation.action != null) {
-      timer = metricRegistry.timer("prime-mvc.[" + invocation.uri() + "].requests").time();
-      errorMeter = metricRegistry.meter("prime-mvc.[" + invocation.uri() + "].errors");
+    if (metricRegistry != null && actionInvocation.action != null) {
+      timer = metricRegistry.timer("prime-mvc.[" + actionInvocation.uri() + "].requests").time();
+      errorMeter = metricRegistry.meter("prime-mvc.[" + actionInvocation.uri() + "].errors");
     }
 
     try {

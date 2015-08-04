@@ -67,8 +67,8 @@ public class ForwardResult extends AbstractResult<Forward> {
    * {@inheritDoc}
    */
   public void execute(Forward forward) throws IOException, ServletException {
-    ActionInvocation current = actionInvocationStore.getCurrent();
-    Object action = current.action;
+    ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
+    Object action = actionInvocation.action;
 
     // Set the content type for the response
     String contentType = expand(forward.contentType(), action, false);
@@ -76,59 +76,48 @@ public class ForwardResult extends AbstractResult<Forward> {
 
     // Set the status code
     setStatus(forward.status(), forward.statusStr(), action, response);
-    LocatedResource page = locateAndExpand(current, forward);
 
-    if (isHeadRequest(current)) {
+    // Locate page if default
+    String page = forward.page();
+    boolean defaultPage = page.equals("");
+    if (defaultPage) {
+      page = locateDefault(actionInvocation, forward);
+    }
+
+    // Expand variables in the URI
+    page = expand(page, actionInvocation.action, false);
+
+    if (isHeadRequest(actionInvocation)) {
       return;
     }
 
-    if (page.uri.startsWith("/")) {
-      page = adjustExplicitPage(forward, page);
+    if (page.startsWith("/")) {
+      // adjust URI if this isn't the default page or the default result (i.e. action == null)
+      if (!defaultPage && actionInvocation.action != null) {
+        page = configuration.resourceDirectory() + page;
+      }
     } else {
       // Strip off the last part of the URI since it is relative
-      String uri = current.actionURI;
+      String uri = actionInvocation.actionURI;
       int index = uri.lastIndexOf("/");
       if (index >= 0) {
         uri = uri.substring(0, index);
       }
-      page.uri = configuration.resourceDirectory() + "/templates" + uri + "/" + page.uri;
+      page = configuration.resourceDirectory() + "/templates" + uri + "/" + page;
     }
     PrintWriter writer = response.getWriter();
-    freeMarkerService.render(writer, page.uri, freeMarkerMap);
+    freeMarkerService.render(writer, page, freeMarkerMap);
   }
 
-  /**
-   * Adjust an explicit path unless it has already been done for us.
-   * @param forward
-   * @param page
-   * @return
-   */
-  private LocatedResource adjustExplicitPage(Forward forward, LocatedResource page) {
-    if (page.located) {
-      return page;
-    }
-
-    if (forward instanceof ForwardImpl) {
-      if (!((ForwardImpl) forward).locatedResource().located) {
-        page.uri = configuration.resourceDirectory() + page.uri;
+  private String locateDefault(ActionInvocation actionInvocation, Forward forward) {
+    String page = resourceLocator.locate(configuration.resourceDirectory() + "/templates");
+    if (page == null) {
+      if (actionInvocation.action == null) {
+        throw new PrimeException("Unable to locate result for URI [" + actionInvocation.uri() + "] and result code [" + forward.code() + "]");
+      } else {
+        throw new PrimeException("Missing result for action class [" + actionInvocation.configuration.actionClass + "] URI [" + actionInvocation.uri() + "] and result code [" + forward.code() + "]");
       }
-    } else {
-      page.uri = configuration.resourceDirectory() + page.uri;
     }
-    return page;
-  }
-
-  private LocatedResource locateAndExpand(ActionInvocation current, Forward forward) {
-    // Determine if the default search should be used
-    LocatedResource page = new LocatedResource(forward.page(), false);
-    if (page.uri.equals("")) {
-      page.uri = resourceLocator.locate(configuration.resourceDirectory() + "/templates");
-      if (page.uri == null) {
-        throw new PrimeException("Unable to locate result for URI [" + current.uri() + "] and result code [" + forward.code() + "]");
-      }
-      page.located = true;
-    }
-    page.uri = expand(page.uri, current.action, false);
     return page;
   }
 
@@ -137,30 +126,22 @@ public class ForwardResult extends AbstractResult<Forward> {
 
     private final String contentType;
 
-    private final LocatedResource resource;
-
     private final int status;
 
     private final String statusStr;
 
-    public ForwardImpl(LocatedResource resource, String code) {
-      this.resource = resource;
+    private final String uri;
+
+    public ForwardImpl(String uri, String code) {
+      this.uri = uri;
       this.code = code;
       this.contentType = "text/html; charset=UTF-8";
       this.status = 200;
       this.statusStr = "";
     }
 
-    public ForwardImpl(String uri, String code) {
-      this(new LocatedResource(uri, false), code);
-    }
-
     public ForwardImpl(String uri, String code, String contentType, int status) {
-      this(new LocatedResource(uri, false), code, contentType, status);
-    }
-
-    public ForwardImpl(LocatedResource resource, String code, String contentType, int status) {
-      this.resource = resource;
+      this.uri = uri;
       this.code = code;
       this.contentType = contentType;
       this.status = status;
@@ -181,13 +162,10 @@ public class ForwardResult extends AbstractResult<Forward> {
       return contentType;
     }
 
-    public LocatedResource locatedResource() {
-      return resource;
-    }
 
     @Override
     public String page() {
-      return resource.uri;
+      return uri;
     }
 
     @Override
@@ -198,21 +176,6 @@ public class ForwardResult extends AbstractResult<Forward> {
     @Override
     public String statusStr() {
       return statusStr;
-    }
-  }
-
-  /**
-   * Wrapper for the page (uri) to identify if the resources has yet been located by calling {@link
-   * ResourceLocator#locate(String)}.
-   */
-  public static class LocatedResource {
-    boolean located;
-
-    String uri;
-
-    public LocatedResource(String uri, boolean located) {
-      this.uri = uri;
-      this.located = located;
     }
   }
 }

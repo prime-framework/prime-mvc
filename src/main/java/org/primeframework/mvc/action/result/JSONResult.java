@@ -59,13 +59,13 @@ public class JSONResult extends AbstractResult<JSON> {
   }
 
   public void execute(JSON json) throws IOException, ServletException {
-    ActionInvocation current = actionInvocationStore.getCurrent();
-    Object action = current.action;
+    ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
+    Object action = actionInvocation.action;
     if (action == null) {
       throw new PrimeException("There is no action class and somehow we got into the JSONResult code. Bad mojo!");
     }
 
-    ActionConfiguration configuration = current.configuration;
+    ActionConfiguration configuration = actionInvocation.configuration;
     if (configuration == null) {
       throw new PrimeException("The action [" + action.getClass() + "] has no configuration. This should be impossible!");
     }
@@ -97,7 +97,7 @@ public class JSONResult extends AbstractResult<JSON> {
     response.setContentType("application/json");
     response.setContentLength(result.length);
 
-    if (isHeadRequest(current)) {
+    if (isHeadRequest(actionInvocation)) {
       return;
     }
 
