@@ -224,7 +224,7 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
     public final Set<String> roles = new HashSet<>();
 
     public TestUserLoginSecurityContext(HttpServletRequest request, Set<String> roles) {
-      super(request);
+      setRequest(request);
       this.roles.addAll(roles);
     }
 

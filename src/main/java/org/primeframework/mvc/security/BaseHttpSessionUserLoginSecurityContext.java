@@ -18,6 +18,8 @@ package org.primeframework.mvc.security;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.primeframework.mvc.guice.Nullable;
+
 import com.google.inject.Inject;
 
 /**
@@ -28,15 +30,19 @@ import com.google.inject.Inject;
 public abstract class BaseHttpSessionUserLoginSecurityContext implements UserLoginSecurityContext {
   public static final String USER_SESSION_KEY = "prime-mvc-security-user";
 
-  private final HttpServletRequest request;
+  private HttpServletRequest request;
 
-  @Inject
-  public BaseHttpSessionUserLoginSecurityContext(HttpServletRequest request) {
+  @Inject(optional = true)
+  public void setRequest(@Nullable HttpServletRequest request) {
     this.request = request;
   }
 
   @Override
   public Object getCurrentUser() {
+    if (request == null) {
+      return null;
+    }
+
     HttpSession session = request.getSession(false);
     if (session == null) {
       return null;
@@ -52,6 +58,10 @@ public abstract class BaseHttpSessionUserLoginSecurityContext implements UserLog
 
   @Override
   public void login(Object user) {
+    if (request == null) {
+      throw new IllegalStateException("Unable to create session because the HttpServletRequest is null");
+    }
+
     HttpSession session = request.getSession();
     if (session == null) {
       throw new IllegalStateException("Unable to create session");
@@ -62,6 +72,10 @@ public abstract class BaseHttpSessionUserLoginSecurityContext implements UserLog
 
   @Override
   public void logout() {
+    if (request == null) {
+      throw new IllegalStateException("Unable to logout user because the HttpServletRequest is null");
+    }
+
     HttpSession session = request.getSession(false);
     if (session == null) {
       return;
