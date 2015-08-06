@@ -64,6 +64,20 @@ public class RequestResult {
   }
 
   /**
+   * Verifies that the body equals the given string.
+   *
+   * @param string The string to compare against the body.
+   * @return This.
+   */
+  public RequestResult assertBody(String string) {
+    if (!body.equals(string)) {
+      throw new AssertionError("Body didn't match [" + string + "]\nRedirect: [" + redirect + "]\nBody:\n" + body);
+    }
+
+    return this;
+  }
+
+  /**
    * Verifies that the body contains all of the given Strings.
    *
    * @param strings The strings to check.
@@ -96,6 +110,20 @@ public class RequestResult {
   }
 
   /**
+   * Verifies that the body equals the content of the given File.
+   *
+   * @param path   The file to load and compare to the response.
+   * @param values key value pairs of replacement values for use in the file.
+   * @return This.
+   */
+  public RequestResult assertBodyFile(Path path, Object... values) throws IOException {
+    if (values.length == 0) {
+      return assertBody(new String(Files.readAllBytes(path), "UTF-8"));
+    }
+    return assertBody(BodyTools.processTemplate(path, values));
+  }
+
+  /**
    * Verifies that the body is empty.
    *
    * @return This
@@ -120,7 +148,8 @@ public class RequestResult {
   }
 
   /**
-   * Verifies that the system has errors for the given fields. This doesn't assert the error itself, just that the field
+   * Verifies that the system has errors for the given fields. This doesn't assert the error itself, just that the
+   * field
    * contains an error.
    *
    * @param fields The name of the fields.
@@ -153,7 +182,8 @@ public class RequestResult {
   }
 
   /**
-   * Verifies that the system contains the given info message(s). The message(s) might be in the request, flash, session
+   * Verifies that the system contains the given info message(s). The message(s) might be in the request, flash,
+   * session
    * or application scopes.
    *
    * @param messages The fully rendered info message(s) (not the code).
@@ -274,6 +304,25 @@ public class RequestResult {
   public RequestResult assertRedirect(String uri) {
     if (redirect == null || !redirect.equals(uri)) {
       throw new AssertionError("Redirect [" + redirect + "] was not equal to [" + uri + "]");
+    }
+
+    return this;
+  }
+
+  /**
+   * Verifies that the request contains the attribute and the value is equal.
+   *
+   * @param name  the attribute name.
+   * @param value the attribute value.
+   * @return This.
+   */
+  public RequestResult assertRequestContainsAttribute(String name, Object value) {
+    if (request.getAttribute(name) == null) {
+      throw new AssertionError("Attribute [" + name + "] was not found in the request.");
+    }
+
+    if (!request.getAttribute(name).equals(value)) {
+      throw new AssertionError("Attribute [" + name + "] was not equal to the expected value.\n\tActual: " + value + "\n\tExpected: " + request.getAttribute(name) + "\n");
     }
 
     return this;

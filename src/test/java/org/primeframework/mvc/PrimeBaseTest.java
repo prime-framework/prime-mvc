@@ -15,6 +15,7 @@
  */
 package org.primeframework.mvc;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.File;
 import java.lang.annotation.Annotation;
@@ -41,14 +42,17 @@ import org.primeframework.mvc.guice.GuiceBootstrap;
 import org.primeframework.mvc.guice.MVCModule;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.servlet.ServletObjectsHolder;
+import org.primeframework.mvc.test.RequestSimulator;
 import org.primeframework.mvc.validation.Validation;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 
+import com.codahale.metrics.MetricRegistry;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.google.inject.Module;
 import static java.util.Arrays.asList;
 
 /**
@@ -66,32 +70,39 @@ public abstract class PrimeBaseTest {
 
   @Inject public MVCConfiguration configuration;
 
+  protected static MetricRegistry metricRegistry = new MetricRegistry();
+
   protected MockHttpServletRequest request;
 
   protected MockHttpServletResponse response;
 
+  protected static RequestSimulator simulator;
+
   @BeforeSuite
-  public static void init() {
+  public static void init() throws ServletException {
     context = new MockServletContext(new File("src/test/web"));
     session = new MockHttpSession(context);
     ServletObjectsHolder.setServletContext(context);
 
-    injector = GuiceBootstrap.initialize(new MVCModule() {
+
+    Module module = new MVCModule() {
       @Override
       protected void configure() {
         super.configure();
         install(new TestModule());
+        bind(MetricRegistry.class).toInstance(metricRegistry);
       }
-    });
+    };
+    injector = GuiceBootstrap.initialize(module);
+    simulator = new RequestSimulator(context, module);
   }
 
   /**
    * Sets up the servlet objects and injects the test.
    */
   @BeforeMethod
-  public void setUp() {
+  public void setUp(Method method) {
     session.clear();
-
     request = new MockHttpServletRequest("/", Locale.getDefault(), false, "utf-8", session);
     response = new MockHttpServletResponse();
 
@@ -99,6 +110,10 @@ public abstract class PrimeBaseTest {
     ServletObjectsHolder.setServletResponse(response);
 
     injector.injectMembers(this);
+
+    metricRegistry = injector.getInstance(MetricRegistry.class);
+    // clear the metric registry before each test
+    metricRegistry.getNames().forEach(metricRegistry::remove);
   }
 
   @AfterMethod

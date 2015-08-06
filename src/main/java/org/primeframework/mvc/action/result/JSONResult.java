@@ -58,7 +58,7 @@ public class JSONResult extends AbstractResult<JSON> {
     this.objectMapper = objectMapper;
   }
 
-  public void execute(JSON json) throws IOException, ServletException {
+  public boolean execute(JSON json) throws IOException, ServletException {
     ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
     Object action = actionInvocation.action;
     if (action == null) {
@@ -98,12 +98,13 @@ public class JSONResult extends AbstractResult<JSON> {
     response.setContentLength(result.length);
 
     if (isHeadRequest(actionInvocation)) {
-      return;
+      return true;
     }
 
     ServletOutputStream outputStream = response.getOutputStream();
     outputStream.write(result);
     outputStream.flush();
+    return true;
   }
 
   private ErrorMessages convertErrors(List<Message> messages) {

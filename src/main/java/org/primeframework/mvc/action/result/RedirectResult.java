@@ -44,9 +44,10 @@ public class RedirectResult extends AbstractRedirectResult<Redirect> {
   /**
    * {@inheritDoc}
    */
-  public void execute(Redirect redirect) throws IOException, ServletException {
+  public boolean execute(Redirect redirect) throws IOException, ServletException {
     moveMessagesToFlash();
     sendRedirect(null, redirect.uri(), redirect.encodeVariables(), redirect.perm());
+    return true;
   }
 
   public static class RedirectImpl implements Redirect {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2015, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,8 +29,9 @@ public interface Result<T extends Annotation> {
    * Executes the result.
    *
    * @param annotation The annotation that caused the result to be invoked.
-   * @throws IOException      If there is any IO error rendering the result.
+   * @return true if the result was handled, false if it was not.
+   * @throws IOException If there is any IO error rendering the result.
    * @throws ServletException If there is any servlet error rendering the result.
    */
-  void execute(T annotation) throws IOException, ServletException;
+  boolean execute(T annotation) throws IOException, ServletException;
 }

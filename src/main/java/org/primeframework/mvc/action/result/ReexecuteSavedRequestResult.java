@@ -46,7 +46,7 @@ public class ReexecuteSavedRequestResult extends AbstractRedirectResult<Reexecut
   /**
    * {@inheritDoc}
    */
-  public void execute(final ReexecuteSavedRequest reexecuteSavedRequest) throws IOException, ServletException {
+  public boolean execute(final ReexecuteSavedRequest reexecuteSavedRequest) throws IOException, ServletException {
     moveMessagesToFlash();
 
     String uri = null;
@@ -61,6 +61,7 @@ public class ReexecuteSavedRequestResult extends AbstractRedirectResult<Reexecut
     }
 
     sendRedirect(uri, reexecuteSavedRequest.uri(), reexecuteSavedRequest.encodeVariables(), reexecuteSavedRequest.perm());
+    return true;
   }
 
   public static class ReexecuteSavedRequestImpl implements ReexecuteSavedRequest {

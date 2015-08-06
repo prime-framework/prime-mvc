@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2015, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,12 +45,13 @@ public class StatusResult extends AbstractResult<Status> {
   /**
    * {@inheritDoc}
    */
-  public void execute(Status status) throws IOException, ServletException {
+  public boolean execute(Status status) throws IOException, ServletException {
     Object action = actionInvocationStore.getCurrent().action;
     setStatus(status.status(), status.statusStr(), action, response);
 
     for (Header header : status.headers()) {
       response.setHeader(header.name(), header.value());
     }
+    return true;
   }
 }

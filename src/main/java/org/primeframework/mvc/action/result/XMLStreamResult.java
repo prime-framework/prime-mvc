@@ -48,7 +48,7 @@ public class XMLStreamResult extends AbstractResult<XMLStream> {
     this.actionInvocationStore = actionInvocationStore;
   }
 
-  public void execute(XMLStream xmlStream) throws IOException, ServletException {
+  public boolean execute(XMLStream xmlStream) throws IOException, ServletException {
     String xml = xmlStream.property();
 
     ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
@@ -66,7 +66,7 @@ public class XMLStreamResult extends AbstractResult<XMLStream> {
     response.setContentLength(xmlBytes.length);
 
     if (isHeadRequest(actionInvocation)) {
-      return;
+      return true;
     }
 
     InputStream is = new ByteArrayInputStream(xmlBytes);
@@ -82,5 +82,7 @@ public class XMLStreamResult extends AbstractResult<XMLStream> {
       sos.flush();
       sos.close();
     }
+
+    return true;
   }
 }

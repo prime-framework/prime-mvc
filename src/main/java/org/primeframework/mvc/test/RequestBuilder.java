@@ -15,10 +15,7 @@
  */
 package org.primeframework.mvc.test;
 
-import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.File;
 import java.io.IOException;
@@ -55,6 +52,8 @@ public class RequestBuilder {
 
   public final MockHttpServletResponse response;
 
+  private Class<? extends Throwable> expectedException;
+
   public RequestBuilder(String uri, MockHttpSession session, PrimeFilter filter, Injector injector) {
     this.request = new MockHttpServletRequest(uri, Locale.getDefault(), false, "UTF-8", session);
     this.response = new MockHttpServletResponse();
@@ -86,6 +85,19 @@ public class RequestBuilder {
     request.setMethod(Method.DELETE);
     run();
     return new RequestResult(request, response, injector);
+  }
+
+  /**
+   * Indicates then when the HTTP method is called an exception is expected to be thrown.
+   * <p>
+   * An {@link AssertionError} will be thrown if the exception is not thrown.
+   *
+   * @param expectedException
+   * @return
+   */
+  public RequestBuilder expectException(Class<? extends Throwable> expectedException) {
+    this.expectedException = expectedException;
+    return this;
   }
 
   /**
@@ -407,14 +419,23 @@ public class RequestBuilder {
     ServletObjectsHolder.clearServletRequest();
     ServletObjectsHolder.clearServletResponse();
 
-    // Build the request and response for this pass
-    filter.doFilter(this.request, this.response, new FilterChain() {
-      @Override
-      public void doFilter(ServletRequest request, ServletResponse response) {
+    try {
+      // Build the request and response for this pass
+      filter.doFilter(this.request, this.response, (req, resp) -> {
         throw new UnsupportedOperationException("The RequestSimulator class doesn't support testing " +
             "URIs that don't map to Prime resources");
+      });
+    } catch (Throwable e) {
+      Class clazz = e.getClass();
+      if (expectedException == null || !expectedException.equals(clazz)) {
+        throw new AssertionError("\n\tUnexpected Exception thrown: [" + clazz.getCanonicalName() + "]\n\n" + e);
       }
-    });
+      expectedException = null;
+    }
+
+    if (expectedException != null) {
+      throw new AssertionError("Expected Exception were not thrown: [" + expectedException.getCanonicalName() + "]");
+    }
 
     // Add these back so that anything that needs them can be retrieved from the Injector after
     // the run has completed (i.e. MessageStore for the MVC and such)

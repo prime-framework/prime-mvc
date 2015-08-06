@@ -18,7 +18,6 @@ package org.primeframework.mvc.action.result;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.lang.annotation.Annotation;
 
 import org.primeframework.mvc.PrimeException;
@@ -66,9 +65,19 @@ public class ForwardResult extends AbstractResult<Forward> {
   /**
    * {@inheritDoc}
    */
-  public void execute(Forward forward) throws IOException, ServletException {
+  public boolean execute(Forward forward) throws IOException, ServletException {
+
     ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
     Object action = actionInvocation.action;
+
+    String page;
+    if (action == null) {
+      // No action, no template. Return false to allow the workflow chain to continue
+      page = resourceLocator.locate(configuration.resourceDirectory() + "/templates");
+      if (page == null) {
+        return false;
+      }
+    }
 
     // Set the content type for the response
     String contentType = expand(forward.contentType(), action, false);
@@ -77,25 +86,31 @@ public class ForwardResult extends AbstractResult<Forward> {
     // Set the status code
     setStatus(forward.status(), forward.statusStr(), action, response);
 
-    // Locate page if default
-    String page = forward.page();
-    boolean defaultPage = page.equals("");
-    if (defaultPage) {
-      page = locateDefault(actionInvocation, forward);
-    }
-
-    // Expand variables in the URI
-    page = expand(page, actionInvocation.action, false);
-
     if (isHeadRequest(actionInvocation)) {
-      return;
+      return true;
     }
 
-    if (page.startsWith("/")) {
-      // adjust URI if this isn't the default page or the default result (i.e. action == null)
-      if (!defaultPage && actionInvocation.action != null) {
-        page = configuration.resourceDirectory() + page;
-      }
+    // Locate the page and render the freemarker
+    page = buildFullyQualifiedPath(actionInvocation, forward);
+    freeMarkerService.render(response.getWriter(), page, freeMarkerMap);
+
+    return true;
+  }
+
+  /**
+   * Return a String representation of the absolute path in the container to the FreeMarker template.
+   *
+   * @param actionInvocation
+   * @param forward
+   * @return
+   */
+  private String buildFullyQualifiedPath(ActionInvocation actionInvocation, Forward forward) {
+    String page = forward.page();
+    if (page.equals("")) {
+      page = locateDefault(actionInvocation, forward);
+    } else if (page.startsWith("/")) {
+      // Adjust absolute path to be relative to the configuration resource directory
+      page = configuration.resourceDirectory() + page;
     } else {
       // Strip off the last part of the URI since it is relative
       String uri = actionInvocation.actionURI;
@@ -105,18 +120,20 @@ public class ForwardResult extends AbstractResult<Forward> {
       }
       page = configuration.resourceDirectory() + "/templates" + uri + "/" + page;
     }
-    PrintWriter writer = response.getWriter();
-    freeMarkerService.render(writer, page, freeMarkerMap);
+    return expand(page, actionInvocation.action, false);
   }
 
+  /**
+   * Locate the default template if one was not specified.
+   *
+   * @param actionInvocation
+   * @param forward
+   * @return
+   */
   private String locateDefault(ActionInvocation actionInvocation, Forward forward) {
     String page = resourceLocator.locate(configuration.resourceDirectory() + "/templates");
     if (page == null) {
-      if (actionInvocation.action == null) {
-        throw new PrimeException("Unable to locate result for URI [" + actionInvocation.uri() + "] and result code [" + forward.code() + "]");
-      } else {
-        throw new PrimeException("Missing result for action class [" + actionInvocation.configuration.actionClass + "] URI [" + actionInvocation.uri() + "] and result code [" + forward.code() + "]");
-      }
+      throw new PrimeException("Missing result for action class [" + actionInvocation.configuration.actionClass + "] URI [" + actionInvocation.uri() + "] and result code [" + forward.code() + "]");
     }
     return page;
   }

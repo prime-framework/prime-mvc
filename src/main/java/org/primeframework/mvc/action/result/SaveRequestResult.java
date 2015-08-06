@@ -49,7 +49,7 @@ public class SaveRequestResult extends AbstractRedirectResult<SaveRequest> {
   /**
    * {@inheritDoc}
    */
-  public void execute(SaveRequest saveRequest) throws IOException, ServletException {
+  public boolean execute(SaveRequest saveRequest) throws IOException, ServletException {
     moveMessagesToFlash();
 
     Map<String, String[]> requestParameters = null;
@@ -68,6 +68,7 @@ public class SaveRequestResult extends AbstractRedirectResult<SaveRequest> {
     session.setAttribute(SavedHttpRequest.INITIAL_SESSION_KEY, saved);
 
     sendRedirect(null, saveRequest.uri(), saveRequest.encodeVariables(), saveRequest.perm());
+    return true;
   }
 
   private String makeQueryString(Map<String, String[]> parameters) {

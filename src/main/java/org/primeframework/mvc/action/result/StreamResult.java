@@ -51,7 +51,7 @@ public class StreamResult extends AbstractResult<Stream> {
   /**
    * {@inheritDoc}
    */
-  public void execute(Stream stream) throws IOException, ServletException {
+  public boolean execute(Stream stream) throws IOException, ServletException {
     ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
     Object action = actionInvocation.action;
     String property = stream.property();
@@ -76,7 +76,7 @@ public class StreamResult extends AbstractResult<Stream> {
     }
 
     if (isHeadRequest(actionInvocation)) {
-      return;
+      return true;
     }
 
     InputStream is = (InputStream) object;
@@ -92,5 +92,7 @@ public class StreamResult extends AbstractResult<Stream> {
       sos.flush();
       sos.close();
     }
+
+    return true;
   }
 }

@@ -71,11 +71,15 @@ public class ForwardResultTest extends PrimeBaseTest {
     replay(service);
 
     configuration = createStrictMock(MVCConfiguration.class);
-    expect(configuration.resourceDirectory()).andReturn("");
+    expect(configuration.resourceDirectory()).andReturn("").anyTimes();
     replay(configuration);
 
+    ResourceLocator locator = createStrictMock(ResourceLocator.class);
+    expect(locator.locate("/templates")).andReturn("/templates/action.ftl");
+    replay(locator);
+
     Forward forward = new ForwardResult.ForwardImpl("/foo/bar.ftl", null);
-    ForwardResult forwardResult = new ForwardResult(store, null, null, service, response, map, configuration);
+    ForwardResult forwardResult = new ForwardResult(store, null, locator, service, response, map, configuration);
     forwardResult.execute(forward);
 
     if (httpMethod == HTTPMethod.GET) {
@@ -104,8 +108,12 @@ public class ForwardResultTest extends PrimeBaseTest {
     service.render(writer, "/WEB-INF/templates/bar.ftl", map);
     replay(service);
 
+    ResourceLocator locator = createStrictMock(ResourceLocator.class);
+    expect(locator.locate("/WEB-INF/templates")).andReturn("/WEB-INF/templates/action.ftl");
+    replay(locator);
+
     Forward forward = new ForwardResult.ForwardImpl("bar.ftl", null);
-    ForwardResult forwardResult = new ForwardResult(store, null, null, service, response, map, configuration);
+    ForwardResult forwardResult = new ForwardResult(store, null, locator, service, response, map, configuration);
     forwardResult.execute(forward);
 
     verify(response, store, map, service);
@@ -132,8 +140,12 @@ public class ForwardResultTest extends PrimeBaseTest {
     service.render(writer, "/WEB-INF/templates/action/bar.ftl", map);
     replay(service);
 
+    ResourceLocator locator = createStrictMock(ResourceLocator.class);
+    expect(locator.locate("/WEB-INF/templates")).andReturn("/WEB-INF/templates/action.ftl");
+    replay(locator);
+
     Forward forward = new ForwardResult.ForwardImpl("bar.ftl", null);
-    ForwardResult forwardResult = new ForwardResult(store, null, null, service, response, map, configuration);
+    ForwardResult forwardResult = new ForwardResult(store, null, locator, service, response, map, configuration);
     forwardResult.execute(forward);
 
     verify(response, store, map, service);
@@ -160,8 +172,12 @@ public class ForwardResultTest extends PrimeBaseTest {
     service.render(writer, "/WEB-INF/templates/bar.ftl", map);
     replay(service);
 
+    ResourceLocator locator = createStrictMock(ResourceLocator.class);
+    expect(locator.locate("/WEB-INF/templates")).andReturn("/WEB-INF/templates/action.ftl");
+    replay(locator);
+
     Forward forward = new ForwardResult.ForwardImpl("bar.ftl", null, "text/html; charset=UTF-8", 300);
-    ForwardResult forwardResult = new ForwardResult(store, null, null, service, response, map, configuration);
+    ForwardResult forwardResult = new ForwardResult(store, null, locator, service, response, map, configuration);
     forwardResult.execute(forward);
 
     verify(response, store, map, service);
@@ -180,7 +196,7 @@ public class ForwardResultTest extends PrimeBaseTest {
     Object action = new Object();
     ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
     expect(ee.expand("${contentType}", action, false)).andReturn("text/xml; charset=UTF-8");
-    expect(ee.expand("${page}", action, false)).andReturn("bar.ftl");
+    expect(ee.expand("/WEB-INF/templates/${page}", action, false)).andReturn("/WEB-INF/templates/bar.ftl");
     replay(ee);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
@@ -222,8 +238,12 @@ public class ForwardResultTest extends PrimeBaseTest {
     service.render(writer, "/WEB-INF/templates/bar.ftl", map);
     replay(service);
 
+    ResourceLocator locator = createStrictMock(ResourceLocator.class);
+    expect(locator.locate("/WEB-INF/templates")).andReturn("/WEB-INF/templates/action.ftl");
+    replay(locator);
+
     Forward forward = new ForwardResult.ForwardImpl("bar.ftl", null, "text/javascript; charset=UTF-8", 200);
-    ForwardResult forwardResult = new ForwardResult(store, null, null, service, response, map, configuration);
+    ForwardResult forwardResult = new ForwardResult(store, null, locator, service, response, map, configuration);
     forwardResult.execute(forward);
 
     verify(response, store, map, service);
@@ -247,7 +267,7 @@ public class ForwardResultTest extends PrimeBaseTest {
     replay(map);
 
     ResourceLocator locator = createStrictMock(ResourceLocator.class);
-    expect(locator.locate("/WEB-INF/templates")).andReturn("/WEB-INF/templates/action.ftl");
+    expect(locator.locate("/WEB-INF/templates")).andReturn("/WEB-INF/templates/action.ftl").times(2);
     replay(locator);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);

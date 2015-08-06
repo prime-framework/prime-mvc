@@ -57,11 +57,10 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
     replay(resultStore);
 
     ResourceLocator resourceLocator = createStrictMock(ResourceLocator.class);
-    expect(resourceLocator.locate(configuration.resourceDirectory() + "/templates")).andReturn("/foo/bar.ftl");
     replay(resourceLocator);
 
     ForwardResult result = createStrictMock(ForwardResult.class);
-    result.execute(isA(Forward.class));
+    expect(result.execute(isA(Forward.class))).andReturn(true);
     replay(result);
 
     Injector injector = createStrictMock(Injector.class);
@@ -93,16 +92,21 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
     replay(resultStore);
 
     ResourceLocator resourceLocator = createStrictMock(ResourceLocator.class);
-    expect(resourceLocator.locate(configuration.resourceDirectory() + "/templates")).andReturn(null);
     expect(resourceLocator.locateIndex(configuration.resourceDirectory() + "/templates")).andReturn("/foo/bar/");
     replay(resourceLocator);
 
+    ForwardResult forwardResult = createStrictMock(ForwardResult.class);
+    expect(forwardResult.execute(isA(Forward.class))).andReturn(false);
+    replay(forwardResult);
+
     RedirectResult result = createStrictMock(RedirectResult.class);
-    result.execute(isA(Redirect.class));
+    expect(result.execute(isA(Redirect.class))).andReturn(true);
     replay(result);
 
     Injector injector = createStrictMock(Injector.class);
+    expect(injector.getInstance(ForwardResult.class)).andReturn(forwardResult);
     expect(injector.getInstance(RedirectResult.class)).andReturn(result);
+
     replay(injector);
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
@@ -133,11 +137,15 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
     replay(resultStore);
 
     ResourceLocator resourceLocator = createStrictMock(ResourceLocator.class);
-    expect(resourceLocator.locate(configuration.resourceDirectory() + "/templates")).andReturn(null);
     expect(resourceLocator.locateIndex(configuration.resourceDirectory() + "/templates")).andReturn(null);
     replay(resourceLocator);
 
+    ForwardResult result = createStrictMock(ForwardResult.class);
+    expect(result.execute(isA(Forward.class))).andReturn(false);
+    replay(result);
+
     Injector injector = createStrictMock(Injector.class);
+    expect(injector.getInstance(ForwardResult.class)).andReturn(result);
     replay(injector);
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
@@ -177,7 +185,7 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
     replay(resourceLocator);
 
     ForwardResult result = createStrictMock(ForwardResult.class);
-    result.execute(isA(Forward.class));
+    expect(result.execute(isA(Forward.class))).andReturn(true);
     replay(result);
 
     Injector injector = createStrictMock(Injector.class);
@@ -254,7 +262,7 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
     replay(resourceLocator);
 
     ForwardResult result = createStrictMock(ForwardResult.class);
-    result.execute(annotation);
+    expect(result.execute(annotation)).andReturn(true);
     replay(result);
 
     Injector injector = createStrictMock(Injector.class);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2015, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ package org.primeframework.mvc;
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.Collection;
@@ -25,22 +27,17 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-import org.apache.commons.io.FileUtils;
 import org.primeframework.mvc.action.config.ActionConfigurationProvider;
 import org.primeframework.mvc.container.ContainerResolver;
-import org.primeframework.mvc.guice.MVCModule;
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.parameter.el.MissingPropertyExpressionException;
-import org.primeframework.mvc.test.RequestResult;
 import org.primeframework.mvc.test.RequestSimulator;
 import org.primeframework.mvc.util.URIBuilder;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.codahale.metrics.Meter;
-import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
@@ -48,8 +45,6 @@ import freemarker.template.Configuration;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertSame;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
 
 /**
  * This class tests the MVC from a high level perspective.
@@ -57,178 +52,64 @@ import static org.testng.Assert.fail;
  * @author Brian Pontarelli
  */
 public class GlobalTest extends PrimeBaseTest {
-  private MetricRegistry metricRegistry;
 
   @Test
-  public void actionlessRequest() throws Exception {
-    RequestSimulator simulator = new RequestSimulator(context, new MVCModule() {
-      @Override
-      protected void configure() {
-        super.configure();
-        install(new TestModule());
-      }
-    });
-
-    RequestResult result = simulator.test("/actionless").get();
-    assertEquals(result.response.getOutputStream().toString(), "Hello Actionless World");
+  public void get() throws Exception {
+    simulator.test("/user/edit")
+             .get()
+             .assertStatusCode(200)
+             .assertBodyFile(Paths.get("src/test/resources/html/edit.html"));
   }
 
   @Test
-  public void apiJSONBothWays() throws Exception {
-    RequestSimulator simulator = new RequestSimulator(context, new MVCModule() {
-      @Override
-      protected void configure() {
-        super.configure();
-        install(new TestModule());
-      }
-    });
-
-    String json = "{" +
-        "  \"active\":true," +
-        "  \"addresses\":{" +
-        "    \"home\":{" +
-        "      \"age\":100," +
-        "      \"city\":\"Broomfield\"," +
-        "      \"state\":\"Colorado\"," +
-        "      \"zipcode\":\"80023\"" +
-        "    }," +
-        "    \"work\":{" +
-        "      \"age\":100," +
-        "      \"city\":\"Denver\"," +
-        "      \"state\":\"Colorado\"," +
-        "      \"zipcode\":\"80202\"" +
-        "    }" +
-        "  }," +
-        "  \"age\":37," +
-        "  \"bar\":false," +
-        "  \"favoriteMonth\":5," +
-        "  \"favoriteYear\":1976," +
-        "  \"ids\":{" +
-        "    \"0\":1," +
-        "    \"1\":2" +
-        "  }," +
-        "  \"lifeStory\":\"Hello world\"," +
-        "  \"locale\":\"en_US\"," +
-        "  \"securityQuestions\":[\"one\",\"two\",\"three\",\"four\"]," +
-        "  \"siblings\":[" +
-        "    {" +
-        "      \"active\":false," +
-        "      \"bar\":false," +
-        "      \"name\":\"Brett\"" +
-        "    }," +
-        "    {" +
-        "      \"active\":false," +
-        "      \"bar\":false," +
-        "      \"name\":\"Beth\"" +
-        "    }" +
-        "  ]," +
-        "  \"type\":\"COOL\"" +
-        "}";
-
-    RequestResult result = simulator.test("/api")
-                                    .withContentType("application/json")
-                                    .withBody(json.getBytes())
-                                    .post();
-
-    assertEquals(result.body, json.replace("  ", ""));
-  }
-
-  @BeforeMethod
-  public void clearMetrics() {
-    metricRegistry = new MetricRegistry();
-  }
-
-  @Test
-  public void developmentExceptions() throws Exception {
-    RequestSimulator simulator = new RequestSimulator(context, new MVCModule() {
-      @Override
-      protected void configure() {
-        super.configure();
-        install(new TestModule());
-      }
-    });
-
+  public void get_developmentExceptions() throws Exception {
     // Bad annotation @Action("{id}") it should be @Action("{uuid}")
-    try {
-      simulator.test("/invalid-api/42").get();
-      fail("Should have thrown");
-    } catch (MissingPropertyExpressionException e) {
-      // Should throw
-    }
+    simulator.test("/invalid-api/42")
+             .expectException(MissingPropertyExpressionException.class)
+             .get()
+             .assertStatusCode(500);
 
     // Bad parameter (i.e. /invalid-api?bad-param=42
-    try {
-      simulator.test("/invalid-api").withParameter("bad-param", "42").get();
-      fail("Should have thrown");
-    } catch (MissingPropertyExpressionException e) {
-      // Should throw
-    }
+    simulator.test("/invalid-api")
+             .withParameter("bad-param", "42")
+             .expectException(MissingPropertyExpressionException.class)
+             .get()
+             .assertStatusCode(500);
   }
 
   @Test
-  public void expressionEvaluatorSkippedUsesRequest() throws Exception {
+  public void get_expressionEvaluatorSkippedUsesRequest() throws Exception {
     // Tests that the expression evaluator safely gets skipped while looking for values and Prime then checks the
     // HttpServletRequest and finds the value
-    RequestSimulator simulator = new RequestSimulator(context, new MVCModule() {
-      @Override
-      protected void configure() {
-        super.configure();
-        install(new TestModule());
-      }
-    });
-
-    RequestResult result = simulator.test("/value-in-request").get();
-    assertEquals(result.body, "baz");
-    assertEquals(result.request.getAttribute("bar"), "baz");
+    simulator.test("/value-in-request")
+             .get()
+             .assertBodyContains("baz")
+             .assertRequestContainsAttribute("bar", "baz");
   }
 
   @Test
-  public void fullFormWithAllAttributes() throws Exception {
-    RequestSimulator simulator = new RequestSimulator(context, new MVCModule() {
-      @Override
-      protected void configure() {
-        super.configure();
-        install(new TestModule());
-      }
-    });
-
-    RequestResult result = simulator.test("/user/full-form").get();
-    assertEquals(result.body, FileUtils.readFileToString(new File("src/test/java/org/primeframework/mvc/full-form-output.txt")));
+  public void get_fullFormWithAllAttributes() throws Exception {
+    simulator.test("/user/full-form")
+             .get()
+             .assertBodyFile(Paths.get("src/test/resources/html/full-form.html"));
   }
 
   @Test
-  public void metrics() throws Exception {
-    RequestSimulator simulator = new RequestSimulator(context, new MVCModule() {
-      @Override
-      protected void configure() {
-        super.configure();
-        install(new TestModule());
-        bind(MetricRegistry.class).toInstance(metricRegistry);
-      }
-    });
+  public void get_metrics() throws Exception {
+    simulator.test("/user/full-form")
+             .get()
+             .assertBodyFile(Paths.get("src/test/resources/html/full-form.html"));
 
-    RequestResult result = simulator.test("/user/full-form").get();
-    assertEquals(result.body, FileUtils.readFileToString(new File("src/test/java/org/primeframework/mvc/full-form-output.txt")));
     Map<String, Timer> timers = metricRegistry.getTimers();
     assertEquals(timers.get("prime-mvc.[/user/full-form].requests").getCount(), 1);
   }
 
   @Test
-  public void metricsErrors() throws Exception {
-    RequestSimulator simulator = new RequestSimulator(context, new MVCModule() {
-      @Override
-      protected void configure() {
-        super.configure();
-        install(new TestModule());
-        bind(MetricRegistry.class).toInstance(metricRegistry);
-      }
-    });
-
-    try {
-      simulator.test("/execute-method-throws-exception").get();
-    } catch (Exception e) {
-      // Expected
-    }
+  public void get_metricsErrors() throws Exception {
+    simulator.test("/execute-method-throws-exception")
+             .expectException(IllegalArgumentException.class)
+             .get()
+             .assertStatusCode(500);
 
     Map<String, Timer> timers = metricRegistry.getTimers();
     assertEquals(timers.get("prime-mvc.[/execute-method-throws-exception].requests").getCount(), 1);
@@ -238,78 +119,49 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
-  public void nonFormFields() throws Exception {
-    RequestSimulator simulator = new RequestSimulator(context, new MVCModule() {
-      @Override
-      protected void configure() {
-        super.configure();
-        install(new TestModule());
-      }
-    });
-
-    RequestResult result = simulator.test("/user/details-fields").get();
-    assertEquals(result.body, FileUtils.readFileToString(new File("src/test/java/org/primeframework/mvc/details-fields-output.txt")));
+  public void get_nonFormFields() throws Exception {
+    simulator.test("/user/details-fields")
+             .get()
+             .assertBodyFile(Paths.get("src/test/resources/html/details-fields.html"));
   }
 
   @Test
-  public void postRender() throws Exception {
-    RequestSimulator simulator = new RequestSimulator(context, new MVCModule() {
-      @Override
-      protected void configure() {
-        super.configure();
-        install(new TestModule());
-      }
-    });
-
-    RequestResult result = simulator.test("/post").post();
-    String html = result.response.getOutputStream().toString();
-    assertTrue(html.contains("Brian Pontarelli"));
-    assertTrue(html.contains("35"));
-    assertTrue(html.contains("Broomfield"));
-    assertTrue(html.contains("CO"));
+  public void head() throws Exception {
+    simulator.test("/head")
+             .head()
+             .assertStatusCode(200)
+             .assertBodyIsEmpty();
   }
 
   @Test
-  public void renderFTL() throws Exception {
-    RequestSimulator simulator = new RequestSimulator(context, new MVCModule() {
-      @Override
-      protected void configure() {
-        super.configure();
-        install(new TestModule());
-      }
-    });
-
-    RequestResult result = simulator.test("/user/edit").get();
-    assertEquals(result.body, FileUtils.readFileToString(new File("src/test/java/org/primeframework/mvc/edit-output.txt")));
+  public void post() throws Exception {
+    simulator.test("/post")
+             .post()
+             .assertStatusCode(200)
+             .assertBodyContains("Brian Pontarelli", "35", "Broomfield", "CO");
   }
 
   @Test
-  public void scopeStorage() throws Exception {
+  public void post_apiJSONBothWays() throws Exception {
+    Path json = Paths.get("src/test/resources/json/api-jsonBothWays-post.json");
+    simulator.test("/api")
+             .withJSONFile(json)
+             .post()
+             .assertJSONFile(json);
+  }
+
+  @Test
+  public void post_scopeStorage() throws Exception {
     // Tests that the expression evaluator safely gets skipped while looking for values and Prime then checks the
     // HttpServletRequest and finds the value
-    RequestSimulator simulator = new RequestSimulator(context, new MVCModule() {
-      @Override
-      protected void configure() {
-        super.configure();
-        install(new TestModule());
-      }
-    });
-
-    simulator.test("/scope-storage").
-        post();
+    simulator.test("/scope-storage")
+             .post();
 
     assertNotNull(simulator.session.getAttribute("sessionObject"));
   }
 
   @Test
   public void singletons() throws Exception {
-    RequestSimulator simulator = new RequestSimulator(context, new MVCModule() {
-      @Override
-      protected void configure() {
-        super.configure();
-        install(new TestModule());
-      }
-    });
     assertSingleton(simulator, ActionConfigurationProvider.class);
     assertSingleton(simulator, Configuration.class);
     assertSingleton(simulator, ResourceBundle.Control.class);

@@ -79,29 +79,41 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
     try {
       ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
       if (actionInvocation.executeResult) {
-        Annotation annotation;
-        if (actionInvocation.action == null) {
-          Pair<Annotation, Class<?>> p = defaultResult(actionInvocation);
-          if (p == null) {
-            chain.continueWorkflow();
-            return;
-          }
 
-          annotation = p.getLeft();
-        } else {
+        Annotation annotation = null;
+        if (actionInvocation.action != null) {
           String resultCode = resultStore.get();
           annotation = actionInvocation.configuration.resultConfigurations.get(resultCode);
-          if (annotation == null) {
-            // use the default and allow the ForwardResult to locate the page.
-            annotation = new ForwardImpl("", "success");
-          }
+        }
+
+        if (annotation == null) {
+          annotation = new ForwardImpl("", "success");
         }
 
         Result result = factory.build(annotation.annotationType());
-        result.execute(annotation);
+        boolean handled = result.execute(annotation);
+
+        if (!handled) {
+          handleContinueOrRedirect(actionInvocation, chain);
+        }
       }
     } finally {
       resultStore.clear();
+    }
+  }
+
+  private void handleContinueOrRedirect(ActionInvocation actionInvocation, WorkflowChain chain) throws IOException, ServletException {
+    if (actionInvocation.actionURI.endsWith("/")) {
+      chain.continueWorkflow();
+    } else {
+      String uri = resourceLocator.locateIndex(configuration.resourceDirectory() + "/templates");
+      if (uri == null) {
+        chain.continueWorkflow();
+      } else {
+        Annotation annotation = new RedirectImpl(uri, "success", true, false);
+        Result redirectResult = factory.build(annotation.annotationType());
+        redirectResult.execute((annotation));
+      }
     }
   }
 
@@ -128,7 +140,8 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
   protected Pair<Annotation, Class<?>> defaultResult(ActionInvocation actionInvocation) {
     String uri = resourceLocator.locate(configuration.resourceDirectory() + "/templates");
     if (uri != null) {
-      return Pair.<Annotation, Class<?>>of(new ForwardImpl(uri, "success"), ForwardResult.class);
+      // Use the un-adjusted URI w/out the configured resource directory and allow the ForwardResult to locate the page.
+      return Pair.<Annotation, Class<?>>of(new ForwardImpl(uri.substring(configuration.resourceDirectory().length()), "success"), ForwardResult.class);
     }
 
     // If the URI ends with a / and the forward result doesn't exist, redirecting won't help.

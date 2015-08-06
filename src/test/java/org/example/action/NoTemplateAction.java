@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2015, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,22 +13,17 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.action.result;
+package org.example.action;
 
-import javax.servlet.ServletException;
-import java.io.IOException;
-
-import org.primeframework.mvc.action.result.annotation.NoOp;
+import org.primeframework.mvc.action.annotation.Action;
 
 /**
- * Used when the result of the action is a no-op.
- *
- * @author James Humphrey
+ * @author Daniel DeGroff
  */
-public class NoOpResult implements Result<NoOp> {
-  @Override
-  public boolean execute(NoOp annotation) throws IOException, ServletException {
-    // No-op
-    return true;
+@Action
+public class NoTemplateAction {
+
+  public String get() {
+    return "success";
   }
 }
