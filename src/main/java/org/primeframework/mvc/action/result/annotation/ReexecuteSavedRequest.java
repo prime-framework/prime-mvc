@@ -53,4 +53,14 @@ public @interface ReexecuteSavedRequest {
    *         defaults to false to maintain backwards compatibility.
    */
   boolean encodeVariables() default false;
+
+  /**
+   * A list of ReexecuteSavedRequest annotations.
+   */
+  @ResultContainerAnnotation
+  @Retention(RUNTIME)
+  @Target(TYPE)
+  @interface List {
+    ReexecuteSavedRequest[] value();
+  }
 }
