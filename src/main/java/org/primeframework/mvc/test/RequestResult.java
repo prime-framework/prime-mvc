@@ -152,7 +152,7 @@ public class RequestResult {
    * field
    * contains an error.
    *
-   * @param fields The name of the fields.
+   * @param fields The name of the field code(s). Not the fully rendered message(s)
    * @return This.
    */
   public RequestResult assertContainsFieldErrors(String... fields) {
@@ -175,6 +175,46 @@ public class RequestResult {
         StringBuilder sb = new StringBuilder("\n\tMessageStore contains:\n");
         fieldMessages.stream().forEach((f) -> sb.append("\t\t[" + f.getType() + "]\n"));
         throw new AssertionError("The MessageStore contains messages but no errors for the field [" + field + "]" + sb);
+      }
+    }
+
+    return this;
+  }
+
+  /**
+   * Verifies that the system has general errors.. This doesn't assert the error itself, just that the
+   * general error code.
+   *
+   * @param errorCodes The name of the error code(s). Not the fully rendered message(s)
+   * @return This.
+   */
+  public RequestResult assertContainsGeneralErrorMessageCodes(String... errorCodes) {
+    return assertContainsGeneralMessageCodes(MessageType.ERROR, errorCodes);
+  }
+
+  /**
+   * Verifies that the system has general messages. This doesn't assert the message itself, just that the
+   * general message code.
+   *
+   * @param messageType The message type
+   * @param errorCodes  The name of the message code(s). Not the fully rendered message(s)
+   * @return This.
+   */
+  public RequestResult assertContainsGeneralMessageCodes(MessageType messageType, String... errorCodes) {
+    MessageStore messageStore = get(MessageStore.class);
+    List<Message> messages = messageStore.getGeneralMessages();
+    for (String errorCode : errorCodes) {
+      Message message = messages.stream().filter((m) -> m.getCode().equals(errorCode)).findFirst().orElse(null);
+      if (message == null) {
+        StringBuilder sb = new StringBuilder("\n\tMessageStore contains:\n");
+        messages.stream().forEach((m) -> sb.append("\t\t" + m.getCode() + " Type: " + m.getType() + "\n"));
+        throw new AssertionError("The MessageStore does not contain the general error [" + errorCode + "]" + sb);
+      }
+
+      if (message.getType() != messageType) {
+        StringBuilder sb = new StringBuilder("\n\tMessageStore contains:\n");
+        messages.stream().forEach((m) -> sb.append("\t\t" + m.getCode() + " Type: " + m.getType() + "\n"));
+        throw new AssertionError("The MessageStore contains message for code  [" + message.getCode() + "], but it is of type [" + message.getType() + "]" + sb);
       }
     }
 
