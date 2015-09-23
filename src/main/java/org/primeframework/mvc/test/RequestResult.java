@@ -182,7 +182,7 @@ public class RequestResult {
   }
 
   /**
-   * Verifies that the system has general errors.. This doesn't assert the error itself, just that the
+   * Verifies that the system has general errors. This doesn't assert the error itself, just that the
    * general error code.
    *
    * @param errorCodes The name of the error code(s). Not the fully rendered message(s)
@@ -269,6 +269,34 @@ public class RequestResult {
    */
   public RequestResult assertContainsWarnings(String... messages) {
     return assertContainsMessages(MessageType.WARNING, messages);
+  }
+
+  /**
+   * Verifies the response Content-Type.
+   *
+   * @param contentType The expected content-type
+   * @return This.
+   */
+  public RequestResult assertContentType(String contentType) {
+    String actual = response.getContentType();
+    if (actual != null && !actual.equals(contentType)) {
+      throw new AssertionError("Content-Type [" + actual + "] is not equal to the expected value [" + contentType + "]");
+    }
+    return this;
+  }
+
+  /**
+   * Verifies the response encoding.
+   *
+   * @param encoding The expected content-type
+   * @return This.
+   */
+  public RequestResult assertEncoding(String encoding) {
+    String actual = response.getEncoding();
+    if (actual != null && !actual.equals(encoding)) {
+      throw new AssertionError("Character Encoding [" + actual + "] is not equal to the expected value [" + encoding + "]");
+    }
+    return this;
   }
 
   /**
