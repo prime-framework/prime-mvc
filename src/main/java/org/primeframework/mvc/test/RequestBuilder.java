@@ -428,7 +428,7 @@ public class RequestBuilder {
     } catch (Throwable e) {
       Class clazz = e.getClass();
       if (expectedException == null || !expectedException.equals(clazz)) {
-        throw new AssertionError("\n\tUnexpected Exception thrown: [" + clazz.getCanonicalName() + "]\n\n" + e);
+        throw new AssertionError("\n\tUnexpected Exception thrown: [" + clazz.getCanonicalName() + "]", e);
       }
       expectedException = null;
     }
