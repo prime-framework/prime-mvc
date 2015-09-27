@@ -19,7 +19,6 @@ import javax.servlet.ServletException;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.ForwardResult.ForwardImpl;
@@ -81,13 +80,14 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
       if (actionInvocation.executeResult) {
 
         Annotation annotation = null;
+        String resultCode = "success";
         if (actionInvocation.action != null) {
-          String resultCode = resultStore.get();
+          resultCode = resultStore.get();
           annotation = actionInvocation.configuration.resultConfigurations.get(resultCode);
         }
 
         if (annotation == null) {
-          annotation = new ForwardImpl("", "success");
+          annotation = new ForwardImpl("", resultCode);
         }
 
         Result result = factory.build(annotation.annotationType());
@@ -102,6 +102,7 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
     }
   }
 
+  @SuppressWarnings("unchecked")
   private void handleContinueOrRedirect(ActionInvocation actionInvocation, WorkflowChain chain) throws IOException, ServletException {
     if (actionInvocation.actionURI.endsWith("/")) {
       chain.continueWorkflow();
@@ -112,49 +113,8 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
       } else {
         Annotation annotation = new RedirectImpl(uri, "success", true, false);
         Result redirectResult = factory.build(annotation.annotationType());
-        redirectResult.execute((annotation));
+        redirectResult.execute(annotation);
       }
     }
-  }
-
-  /**
-   * Locates the default Forward or Redirect result for an action invocation and result code from an action.
-   * <p>
-   * Checks for results using this search order:
-   * <p>
-   * <ol>
-   * <li>${configuration.resourceDirectory}/templates/&lt;uri&gt;-&lt;resultCode&gt;.jsp</li>
-   * <li>${configuration.resourceDirectory}/templates/&lt;uri&gt;-&lt;resultCode&gt;.ftl</li>
-   * <li>${configuration.resourceDirectory}/templates/&lt;uri&gt;.jsp</li>
-   * <li>${configuration.resourceDirectory}/templates/&lt;uri&gt;.ftl</li>
-   * <li>${configuration.resourceDirectory}/templates/&lt;uri&gt;/index.jsp</li>
-   * <li>${configuration.resourceDirectory}/templates/&lt;uri&gt;/index.ftl</li>
-   * </ol>
-   * <p>
-   * If nothing is found this bombs out.
-   *
-   * @param actionInvocation The action invocation.
-   * @return The Forward and never null.
-   * @throws RuntimeException If the default forward could not be found.
-   */
-  protected Pair<Annotation, Class<?>> defaultResult(ActionInvocation actionInvocation) {
-    String uri = resourceLocator.locate(configuration.resourceDirectory() + "/templates");
-    if (uri != null) {
-      // Use the un-adjusted URI w/out the configured resource directory and allow the ForwardResult to locate the page.
-      return Pair.<Annotation, Class<?>>of(new ForwardImpl(uri.substring(configuration.resourceDirectory().length()), "success"), ForwardResult.class);
-    }
-
-    // If the URI ends with a / and the forward result doesn't exist, redirecting won't help.
-    String actionURI = actionInvocation.actionURI;
-    if (actionURI.endsWith("/")) {
-      return null;
-    }
-
-    uri = resourceLocator.locateIndex(configuration.resourceDirectory() + "/templates");
-    if (uri != null) {
-      return Pair.<Annotation, Class<?>>of(new RedirectImpl(uri, "success", true, false), RedirectResult.class);
-    }
-
-    return null;
   }
 }

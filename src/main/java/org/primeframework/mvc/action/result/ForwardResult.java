@@ -100,9 +100,9 @@ public class ForwardResult extends AbstractResult<Forward> {
   /**
    * Return a String representation of the absolute path in the container to the FreeMarker template.
    *
-   * @param actionInvocation
-   * @param forward
-   * @return
+   * @param actionInvocation The current action invocation.
+   * @param forward          The annotation.
+   * @return The fully qualified path to the FTL file.
    */
   private String buildFullyQualifiedPath(ActionInvocation actionInvocation, Forward forward) {
     String page = forward.page();
@@ -124,16 +124,28 @@ public class ForwardResult extends AbstractResult<Forward> {
   }
 
   /**
-   * Locate the default template if one was not specified.
+   * Locate the default template if one was not specified. Checks for results using this search order:
+   * <p>
+   * <ol>
+   * <li>${configuration.resourceDirectory}/templates/&lt;uri&gt;-&lt;resultCode&gt;.jsp</li>
+   * <li>${configuration.resourceDirectory}/templates/&lt;uri&gt;-&lt;resultCode&gt;.ftl</li>
+   * <li>${configuration.resourceDirectory}/templates/&lt;uri&gt;.jsp</li>
+   * <li>${configuration.resourceDirectory}/templates/&lt;uri&gt;.ftl</li>
+   * <li>${configuration.resourceDirectory}/templates/&lt;uri&gt;/index.jsp</li>
+   * <li>${configuration.resourceDirectory}/templates/&lt;uri&gt;/index.ftl</li>
+   * </ol>
+   * <p>
+   * If nothing is found this bombs out.
    *
-   * @param actionInvocation
-   * @param forward
-   * @return
+   * @param actionInvocation The current action invocation.
+   * @param forward          The annotation.
+   * @return The default page.
    */
   private String locateDefault(ActionInvocation actionInvocation, Forward forward) {
     String page = resourceLocator.locate(configuration.resourceDirectory() + "/templates");
     if (page == null) {
-      throw new PrimeException("Missing result for action class [" + actionInvocation.configuration.actionClass + "] URI [" + actionInvocation.uri() + "] and result code [" + forward.code() + "]");
+      throw new PrimeException("Missing result for action class [" + actionInvocation.configuration.actionClass + "] URI [" +
+          actionInvocation.uri() + "] and result code [" + forward.code() + "]");
     }
     return page;
   }
