@@ -371,7 +371,7 @@ public class RequestResult {
    */
   public RequestResult assertRedirect(String uri) {
     if (redirect == null || !redirect.equals(uri)) {
-      throw new AssertionError("Redirect [" + redirect + "] was not equal to [" + uri + "]");
+      throw new AssertionError("\nActual redirect not equal to the expected.\n Actual: \t" + redirect + "\n Expected:\t" + uri);
     }
 
     return this;
