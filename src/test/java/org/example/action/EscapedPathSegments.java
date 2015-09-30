@@ -20,13 +20,14 @@ import java.util.List;
 import org.primeframework.mvc.action.annotation.Action;
 
 /**
- * Action for testing the encoding / decoding of the request parameter
+ * Action for testing the escaping / unescaping of path segments used as request parameters
  *
  * @author Daniel DeGroff
  */
-@Action("{email}/{*theRest}")
-public class EncodedRestValue {
-  public String email;
+@Action("{parm}/{*theRest}")
+public class EscapedPathSegments {
+  public String parm;
+
   public List<String> theRest;
 
   public String execute() {
