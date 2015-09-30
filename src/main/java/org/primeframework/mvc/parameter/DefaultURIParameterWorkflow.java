@@ -19,8 +19,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.primeframework.mvc.action.ActionInvocation;
@@ -99,14 +102,15 @@ public class DefaultURIParameterWorkflow implements URIParameterWorkflow {
           break;
         }
 
+        String encoding = request.getCharacterEncoding() == null ? "UTF-8" : request.getCharacterEncoding();
         if (patternPart.startsWith("{*")) {
           // Stuff the rest of the list into the property
           String name = patternPart.substring(2, patternPart.length() - 1);
-          uriParameters.put(name, parameters.toArray(new String[parameters.size()]));
+          uriParameters.put(name, decode(parameters, encoding).toArray(new String[parameters.size()]));
         } else if (patternPart.startsWith("{")) {
           // Stuff this parameter into the property
           String name = patternPart.substring(1, patternPart.length() - 1);
-          String value = parameters.removeFirst();
+          String value = decode(parameters.removeFirst(), encoding);
           uriParameters.put(name, new String[]{value});
         } else {
           // Pop the value off
@@ -120,5 +124,32 @@ public class DefaultURIParameterWorkflow implements URIParameterWorkflow {
     }
 
     workflowChain.continueWorkflow();
+  }
+
+  /**
+   * Decode all parameters provided in the list.
+   *
+   * @param parameters The list of parameters to decode.
+   * @param encoding   The character set to use for decoding.
+   * @return The list of decoded parameters.
+   * @throws UnsupportedEncodingException
+   */
+  private List<String> decode(List<String> parameters, String encoding) throws UnsupportedEncodingException {
+    for (int i = 0; i < parameters.size(); i++) {
+      parameters.set(i, URLDecoder.decode(parameters.get(i), encoding));
+    }
+    return parameters;
+  }
+
+  /**
+   * Return the decoded parameter.
+   *
+   * @param string   The parameter to decode.
+   * @param encoding The character set to use for decoding.
+   * @return
+   * @throws UnsupportedEncodingException
+   */
+  private String decode(String string, String encoding) throws UnsupportedEncodingException {
+    return URLDecoder.decode(string, encoding);
   }
 }

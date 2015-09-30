@@ -261,6 +261,33 @@ public class RequestResult {
   }
 
   /**
+   * Verifies that the system has no general error messages.
+   *
+   * @return
+   */
+  public RequestResult assertContainsNoGeneralErrors() {
+    return assertContainsNoGeneralErrors(MessageType.ERROR);
+  }
+
+  /**
+   * Verifies that the system has no general messages of the specified type.
+   *
+   * @param messageType The message type
+   * @return This.
+   */
+  public RequestResult assertContainsNoGeneralErrors(MessageType messageType) {
+    MessageStore messageStore = get(MessageStore.class);
+    List<Message> messages = messageStore.getGeneralMessages();
+    if (messages.isEmpty()) {
+      return this;
+    }
+
+    StringBuilder sb = new StringBuilder("\n\tMessageStore contains:\n");
+    messages.stream().forEach((m) -> sb.append("\t\t" + m.getCode() + " Type: " + m.getType() + "\n"));
+    throw new AssertionError("The MessageStore contains the following errors.]" + sb);
+  }
+
+  /**
    * Verifies that the system contains the given warning message(s). The message(s) might be in the request, flash,
    * session or application scopes.
    *

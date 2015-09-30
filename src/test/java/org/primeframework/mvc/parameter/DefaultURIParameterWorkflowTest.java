@@ -17,7 +17,10 @@ package org.primeframework.mvc.parameter;
 
 import javax.servlet.http.HttpServletRequestWrapper;
 
+import java.net.URLEncoder;
+
 import org.example.action.ComplexRest;
+import org.example.action.EncodedRestValue;
 import org.example.action.user.Edit;
 import org.example.action.user.RESTEdit;
 import org.primeframework.mvc.PrimeBaseTest;
@@ -71,6 +74,29 @@ public class DefaultURIParameterWorkflowTest extends PrimeBaseTest {
     workflow.perform(chain);
 
     assertEquals(wrapper.getParameter("id"), "12");
+
+    verify(store, chain);
+  }
+
+  @Test
+  public void encodedParameters() throws Exception {
+    EncodedRestValue action = new EncodedRestValue();
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    ActionInvocation ai = makeActionInvocation(action, HTTPMethod.POST, "", URLEncoder.encode("user@foo.com", "UTF-8"), URLEncoder.encode("bar@foo.com", "UTF-8"), URLEncoder.encode("baz@foo.com", "UTF-8"));
+    expect(store.getCurrent()).andReturn(ai);
+    replay(store);
+
+    WorkflowChain chain = createStrictMock(WorkflowChain.class);
+    chain.continueWorkflow();
+    replay(chain);
+
+    HttpServletRequestWrapper wrapper = new HttpServletRequestWrapper(request);
+    DefaultURIParameterWorkflow workflow = new DefaultURIParameterWorkflow(wrapper, store);
+    workflow.perform(chain);
+
+    assertEquals(wrapper.getParameter("email"), "user@foo.com");
+    assertEquals(wrapper.getParameterValues("theRest")[0], "bar@foo.com");
+    assertEquals(wrapper.getParameterValues("theRest")[1], "baz@foo.com");
 
     verify(store, chain);
   }
