@@ -50,7 +50,7 @@ public interface UserLoginSecurityContext {
   void login(Object user);
 
   /**
-   * Logs the user out.
+   * Logs the user out. The user's session will be invalidated.
    */
   void logout();
 }

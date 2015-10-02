@@ -67,6 +67,6 @@ public abstract class BaseHttpSessionUserLoginSecurityContext implements UserLog
       return;
     }
 
-    session.removeAttribute(USER_SESSION_KEY);
+    session.invalidate();
   }
 }
