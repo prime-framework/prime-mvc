@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.primeframework.mvc.action.ActionInvocation;
@@ -91,7 +92,7 @@ public class DefaultURIParameterWorkflow implements URIParameterWorkflow {
     ActionConfiguration actionConfiguration = actionInvocation.configuration;
 
     if (!parameters.isEmpty() && actionConfiguration != null) {
-      Map<String, String[]> uriParameters = new HashMap<String, String[]>();
+      Map<String, String[]> uriParameters = new HashMap<>();
       String[] patternParts = actionConfiguration.patternParts;
       for (String patternPart : patternParts) {
         // If there are no more URI parameters, we are finished
@@ -102,11 +103,11 @@ public class DefaultURIParameterWorkflow implements URIParameterWorkflow {
         if (patternPart.startsWith("{*")) {
           // Stuff the rest of the list into the property
           String name = patternPart.substring(2, patternPart.length() - 1);
-          uriParameters.put(name, parameters.toArray(new String[parameters.size()]));
+          uriParameters.put(name, unescape(parameters).toArray(new String[parameters.size()]));
         } else if (patternPart.startsWith("{")) {
           // Stuff this parameter into the property
           String name = patternPart.substring(1, patternPart.length() - 1);
-          String value = parameters.removeFirst();
+          String value = unescape(parameters.removeFirst());
           uriParameters.put(name, new String[]{value});
         } else {
           // Pop the value off
@@ -120,5 +121,28 @@ public class DefaultURIParameterWorkflow implements URIParameterWorkflow {
     }
 
     workflowChain.continueWorkflow();
+  }
+
+  /**
+   * Unescape all parameters provided in the list.
+   *
+   * @param parameters The list of parameters to unescape.
+   * @return The list of unescaped parameters.
+   */
+  private List<String> unescape(List<String> parameters) {
+    for (int i = 0; i < parameters.size(); i++) {
+      parameters.set(i, unescape(parameters.get(i)));
+    }
+    return parameters;
+  }
+
+  /**
+   * Return the unescaped parameter.
+   *
+   * @param string The parameter to unescape
+   * @return
+   */
+  private String unescape(String string) {
+    return string.replace("%20", " ");
   }
 }

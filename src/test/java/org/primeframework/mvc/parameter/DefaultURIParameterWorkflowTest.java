@@ -18,6 +18,7 @@ package org.primeframework.mvc.parameter;
 import javax.servlet.http.HttpServletRequestWrapper;
 
 import org.example.action.ComplexRest;
+import org.example.action.EscapedPathSegments;
 import org.example.action.user.Edit;
 import org.example.action.user.RESTEdit;
 import org.primeframework.mvc.PrimeBaseTest;
@@ -71,6 +72,30 @@ public class DefaultURIParameterWorkflowTest extends PrimeBaseTest {
     workflow.perform(chain);
 
     assertEquals(wrapper.getParameter("id"), "12");
+
+    verify(store, chain);
+  }
+
+  @Test
+  public void escapedParameters() throws Exception {
+    EscapedPathSegments action = new EscapedPathSegments();
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    ActionInvocation ai = makeActionInvocation(action, HTTPMethod.POST, "", "foo%20bar", "foobar", "foo%20bar", "foo@bar");
+    expect(store.getCurrent()).andReturn(ai);
+    replay(store);
+
+    WorkflowChain chain = createStrictMock(WorkflowChain.class);
+    chain.continueWorkflow();
+    replay(chain);
+
+    HttpServletRequestWrapper wrapper = new HttpServletRequestWrapper(request);
+    DefaultURIParameterWorkflow workflow = new DefaultURIParameterWorkflow(wrapper, store);
+    workflow.perform(chain);
+
+    assertEquals(wrapper.getParameter("parm"), "foo bar");
+    assertEquals(wrapper.getParameterValues("theRest")[0], "foobar");
+    assertEquals(wrapper.getParameterValues("theRest")[1], "foo bar");
+    assertEquals(wrapper.getParameterValues("theRest")[2], "foo@bar");
 
     verify(store, chain);
   }
