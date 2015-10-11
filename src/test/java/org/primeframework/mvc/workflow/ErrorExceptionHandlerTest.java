@@ -73,6 +73,42 @@ public class ErrorExceptionHandlerTest {
   }
 
   @Test
+  public void errorExceptionWithNoMessageLookup() {
+    ErrorException errorException = new ErrorException("error", false);
+    MVCConfiguration configuration = new AbstractMVCConfiguration() {
+      @Override
+      public int templateCheckSeconds() {
+        return 0;
+      }
+
+      @Override
+      public int l10nReloadSeconds() {
+        return 0;
+      }
+
+      @Override
+      public boolean allowUnknownParameters() {
+        return false;
+      }
+    };
+
+    MessageProvider messageProvider = createStrictMock(MessageProvider.class);
+    replay(messageProvider);
+
+    MessageStore messageStore = createStrictMock(MessageStore.class);
+    replay(messageStore);
+
+    ResultStore resultStore = createStrictMock(ResultStore.class);
+    resultStore.set("error");
+    replay(resultStore);
+
+    ErrorExceptionHandler handler = new ErrorExceptionHandler(resultStore, configuration, messageStore, messageProvider);
+    handler.handle(errorException);
+
+    verify(messageProvider, messageStore, resultStore);
+  }
+
+  @Test
   public void errorExceptionWithCustomResultCode() {
     ErrorException errorException = new MockErrorExceptionWithCode();
     MVCConfiguration configuration = new AbstractMVCConfiguration() {

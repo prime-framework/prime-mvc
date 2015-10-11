@@ -21,6 +21,10 @@ package org.primeframework.mvc;
  * @author Brian Pontarelli
  */
 public class ErrorException extends PrimeException {
+  /**
+   * Determines if the exception will be used to look up a message to add as a general error.
+   */
+  public boolean lookUpMessage = true;
 
   /**
    * The prime response result code
@@ -44,6 +48,10 @@ public class ErrorException extends PrimeException {
     this(resultCode, null, (Object[])null);
   }
 
+  public ErrorException(String resultCode, boolean lookUpMessage) {
+    this(resultCode, lookUpMessage, null, (Object[])null);
+  }
+
   public ErrorException(String resultCode, Object... args) {
     this(resultCode, null, args);
   }
@@ -51,6 +59,13 @@ public class ErrorException extends PrimeException {
   public ErrorException(String resultCode, Throwable cause, Object... args) {
     super(cause);
     this.resultCode = resultCode;
+    this.args = args;
+  }
+
+  public ErrorException(String resultCode, boolean lookUpMessage, Throwable cause, Object... args) {
+    super(cause);
+    this.resultCode = resultCode;
+    this.lookUpMessage = lookUpMessage;
     this.args = args;
   }
 }

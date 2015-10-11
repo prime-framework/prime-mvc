@@ -51,19 +51,20 @@ public class ErrorExceptionHandler implements TypedExceptionHandler<ErrorExcepti
 
   @Override
   public void handle(ErrorException exception) {
-
     // Set the result code.  if null, grab from mvc configuration
     String code = exception.resultCode != null ? exception.resultCode : configuration.exceptionResultCode();
     resultStore.set(code);
 
     // Get the message from the message provider.  key = name of the class
-    try {
-      String messageCode = "[" + exception.getClass().getSimpleName() + "]";
-      Object[] args = exception.args != null ? exception.args : new Object[]{exception.getMessage()};
-      String message = messageProvider.getMessage(messageCode, args);
-      messageStore.add(new SimpleMessage(MessageType.ERROR, messageCode, message));
-    } catch (MissingMessageException mme) {
-      // Ignore because there isn't a message
+    if (exception.lookUpMessage) {
+      try {
+        String messageCode = "[" + exception.getClass().getSimpleName() + "]";
+        Object[] args = exception.args != null ? exception.args : new Object[]{exception.getMessage()};
+        String message = messageProvider.getMessage(messageCode, args);
+        messageStore.add(new SimpleMessage(MessageType.ERROR, messageCode, message));
+      } catch (MissingMessageException mme) {
+        // Ignore because there isn't a message
+      }
     }
   }
 }
