@@ -46,8 +46,9 @@ public abstract class AbstractListInput extends AbstractInput {
 
   /**
    * Handles the items and value. Here's the skinny:
-   * <p/>
-   * <ul> <li>If items is null, just inserts an empty Map in the attributes under <code>options</code></li> <li>If items
+   * <p>
+   * <ul> <li>If items is null, just inserts an empty Map in the attributes under <code>options</code></li> <li>If
+   * items
    * is a Collection, loops over it and creates options. The selected state of the options are based on whether or not
    * the value is a Collection or an array or null or just a plain Object. In the collection/array case, if the current
    * items value is in the collection the option is selected. In the plain object case, if the current items value is
@@ -55,7 +56,8 @@ public abstract class AbstractListInput extends AbstractInput {
    * attributes or the current items value.</li> <li>If items is a Map, loops over it and creates options. The selected
    * state of the options are based on whether or not the value is a Collection or an array or null or just a plain
    * Object. In the collection/array case, if the current items value is in the collection the option is selected. In
-   * the plain object case, if the current items value is equal it is selected. Otherwise, it isn't selected. Also, this
+   * the plain object case, if the current items value is equal it is selected. Otherwise, it isn't selected. Also,
+   * this
    * handles the text and key using the key from the items Map, the expression attributes or the current items
    * value.</li> </ul>
    */
@@ -73,7 +75,7 @@ public abstract class AbstractListInput extends AbstractInput {
         message = messageProvider.getMessage(headerL10n);
       }
 
-      options.put(headerValue, new Option(message, false));
+      options.put(headerValue, new Option(message, false, null));
     }
 
     // Grab the value
@@ -130,7 +132,7 @@ public abstract class AbstractListInput extends AbstractInput {
    */
   private Option makeOption(Object item, Object value, Object beanValue, String textExpr, String l10nExpr) {
     if (item == null) {
-      return new Option("", false);
+      return new Option("", false, null);
     }
 
     String text = null;
@@ -158,11 +160,11 @@ public abstract class AbstractListInput extends AbstractInput {
     }
 
     if (beanValue == null) {
-      return new Option(text, false);
+      return new Option(text, false, item);
     }
 
     if (beanValue instanceof Collection) {
-      return new Option(text, ((Collection<?>) beanValue).contains(value));
+      return new Option(text, ((Collection<?>) beanValue).contains(value), item);
     }
 
     if (beanValue.getClass().isArray()) {
@@ -170,7 +172,7 @@ public abstract class AbstractListInput extends AbstractInput {
       for (int i = 0; i < length; i++) {
         Object arrayValue = Array.get(beanValue, i);
         if (arrayValue != null && arrayValue.equals(value)) {
-          return new Option(text, true);
+          return new Option(text, true, item);
         }
       }
     }
@@ -194,11 +196,12 @@ public abstract class AbstractListInput extends AbstractInput {
       }
     }
 
-    return new Option(text, equal);
+    return new Option(text, equal, item);
   }
 
   /**
-   * Determines the key. If the attribute contains a <code>keyExpr</code>, it is used against the object to get the key.
+   * Determines the key. If the attribute contains a <code>keyExpr</code>, it is used against the object to get the
+   * key.
    * Otherwise, the object is just converted to a String.
    *
    * @param itemsValue The current value from the items collection/array/map used to determine the key.
@@ -226,12 +229,20 @@ public abstract class AbstractListInput extends AbstractInput {
   }
 
   public static class Option {
-    private final String text;
+    private final Object object;
+
     private final boolean selected;
 
-    public Option(String text, boolean selected) {
+    private final String text;
+
+    public Option(String text, boolean selected, Object object) {
       this.text = text;
       this.selected = selected;
+      this.object = object;
+    }
+
+    public Object getObject() {
+      return object;
     }
 
     public String getText() {
