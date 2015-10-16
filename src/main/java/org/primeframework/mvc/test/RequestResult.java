@@ -26,10 +26,13 @@ import java.util.function.Consumer;
 
 import org.primeframework.mock.servlet.MockHttpServletRequest;
 import org.primeframework.mock.servlet.MockHttpServletResponse;
+import org.primeframework.mvc.action.ActionInvocation;
+import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.message.FieldMessage;
 import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
+import org.primeframework.mvc.message.l10n.MessageProvider;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -87,6 +90,27 @@ public class RequestResult {
     for (String string : strings) {
       if (!body.contains(string)) {
         throw new AssertionError("Body didn't contain [" + string + "]\nRedirect: [" + redirect + "]\nBody:\n" + body);
+      }
+    }
+
+    return this;
+  }
+
+  /**
+   * Verifies that the body contains the messages from the given keys. This uses the MessageProvider for the current
+   * test URI and the given keys to look up the messages.
+   *
+   * @param keys The keys.
+   * @return This.
+   */
+  public RequestResult assertBodyContainsMessagesFromKeys(String... keys) {
+    for (String key : keys) {
+      MessageProvider messageProvider = get(MessageProvider.class);
+      ActionInvocationStore actionInvocationStore = get(ActionInvocationStore.class);
+      actionInvocationStore.setCurrent(new ActionInvocation(null, null, request.getRequestURI(), null, null));
+      String message = messageProvider.getMessage(key);
+      if (!body.contains(message)) {
+        throw new AssertionError("Body didn't contain [" + message + "] for the key [" + key + "]\nRedirect: [" + redirect + "]\nBody:\n" + body);
       }
     }
 

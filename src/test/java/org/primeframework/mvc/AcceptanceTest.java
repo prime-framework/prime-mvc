@@ -44,7 +44,8 @@ public class AcceptanceTest extends PrimeBaseTest {
     simulator.test("/action-template")
              .get()
              .assertStatusCode(200)
-             .assertBody("Action and Template");
+             .assertBodyContains("Action and Template")
+             .assertBodyContainsMessagesFromKeys("message-key");
   }
 
   @Test
