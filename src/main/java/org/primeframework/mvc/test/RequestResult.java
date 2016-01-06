@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2014-2016, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.primeframework.mock.servlet.MockHttpServletRequest;
 import org.primeframework.mock.servlet.MockHttpServletResponse;
@@ -209,11 +210,22 @@ public class RequestResult {
    * Verifies that the system has general errors. This doesn't assert the error itself, just that the
    * general error code.
    *
-   * @param errorCodes The name of the error code(s). Not the fully rendered message(s)
+   * @param messageCodes The name of the error code(s). Not the fully rendered message(s)
    * @return This.
    */
-  public RequestResult assertContainsGeneralErrorMessageCodes(String... errorCodes) {
-    return assertContainsGeneralMessageCodes(MessageType.ERROR, errorCodes);
+  public RequestResult assertContainsGeneralErrorMessageCodes(String... messageCodes) {
+    return assertContainsGeneralMessageCodes(MessageType.ERROR, messageCodes);
+  }
+
+  /**
+   * Verifies that the system has info errors. This doesn't assert the message itself, just that the
+   * general message code.
+   *
+   * @param messageCodes The name of the message code(s). Not the fully rendered message(s)
+   * @return This.
+   */
+  public RequestResult assertContainsGeneralInfoMessageCodes(String... messageCodes) {
+    return assertContainsGeneralMessageCodes(MessageType.INFO, messageCodes);
   }
 
   /**
@@ -232,7 +244,7 @@ public class RequestResult {
       if (message == null) {
         StringBuilder sb = new StringBuilder("\n\tMessageStore contains:\n");
         messages.stream().forEach((m) -> sb.append("\t\t" + m.getCode() + " Type: " + m.getType() + "\n"));
-        throw new AssertionError("The MessageStore does not contain the general error [" + errorCode + "]" + sb);
+        throw new AssertionError("The MessageStore does not contain the general message [" + errorCode + "] Type: " + messageType + sb);
       }
 
       if (message.getType() != messageType) {
@@ -287,10 +299,10 @@ public class RequestResult {
   /**
    * Verifies that the system has no general error messages.
    *
-   * @return
+   * @return This.
    */
   public RequestResult assertContainsNoGeneralErrors() {
-    return assertContainsNoGeneralErrors(MessageType.ERROR);
+    return assertContainsNoMessages(MessageType.ERROR);
   }
 
   /**
@@ -299,9 +311,9 @@ public class RequestResult {
    * @param messageType The message type
    * @return This.
    */
-  public RequestResult assertContainsNoGeneralErrors(MessageType messageType) {
+  public RequestResult assertContainsNoMessages(MessageType messageType) {
     MessageStore messageStore = get(MessageStore.class);
-    List<Message> messages = messageStore.getGeneralMessages();
+    List<Message> messages = messageStore.getGeneralMessages().stream().filter((m) -> m.getType() == messageType).collect(Collectors.toList());
     if (messages.isEmpty()) {
       return this;
     }
@@ -479,9 +491,9 @@ public class RequestResult {
    *   .ifFalse(foo.isBar(), (requestResult) -> requestResult.assertBodyDoesNotContain("bar"))
    * </pre>
    *
-   * @param test
-   * @param consumer
-   * @return
+   * @param test     The boolean test to indicate if the consumer should be used.
+   * @param consumer The consumer that accepts the RequestResult.
+   * @return This.
    */
   public RequestResult ifFalse(boolean test, Consumer<RequestResult> consumer) {
     if (!test) {
@@ -496,9 +508,9 @@ public class RequestResult {
    *   .ifTrue(foo.isBar(), (requestResult) -> requestResult.assertBodyContains("bar"))
    * </pre>
    *
-   * @param test
-   * @param consumer
-   * @return
+   * @param test     The boolean test to indicate if the consumer should be used.
+   * @param consumer The consumer that accepts the RequestResult.
+   * @return This.
    */
   public RequestResult ifTrue(boolean test, Consumer<RequestResult> consumer) {
     if (test) {
@@ -510,7 +522,7 @@ public class RequestResult {
   /**
    * Can be called to setup objects for assertions.
    *
-   * @param consumer A consumer that accepts this RequestResult.
+   * @param consumer The consumer that accepts the RequestResult.
    * @return This.
    */
   public RequestResult setup(Consumer<RequestResult> consumer) {
