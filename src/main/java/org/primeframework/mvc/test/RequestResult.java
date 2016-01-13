@@ -108,7 +108,10 @@ public class RequestResult {
     for (String key : keys) {
       MessageProvider messageProvider = get(MessageProvider.class);
       ActionInvocationStore actionInvocationStore = get(ActionInvocationStore.class);
-      actionInvocationStore.setCurrent(new ActionInvocation(null, null, request.getRequestURI(), null, null));
+      // Use the current actionURI instead of request.getRequestURI, prime will have stripped off ids, etc from the URI.
+      ActionInvocation current = actionInvocationStore.getCurrent();
+      String actionURI = current != null ? current.actionURI : request.getRequestURI();
+      actionInvocationStore.setCurrent(new ActionInvocation(null, null, actionURI, null, null));
       String message = messageProvider.getMessage(key);
       if (!body.contains(message)) {
         throw new AssertionError("Body didn't contain [" + message + "] for the key [" + key + "]\nRedirect: [" + redirect + "]\nBody:\n" + body);
