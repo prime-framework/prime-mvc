@@ -73,22 +73,22 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/com/google/inject/extensions/guice-multibindings/4.0.0-beta.4/guice-multibindings-4.0.0-beta.4.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/com/google/inject/extensions/guice-multibindings/4.0.0/guice-multibindings-4.0.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/com/google/inject/extensions/guice-multibindings/4.0.0-beta.4/guice-multibindings-4.0.0-beta.4-src.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/com/google/inject/extensions/guice-multibindings/4.0.0/guice-multibindings-4.0.0-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/com/google/inject/guice/4.0.0-beta.4/guice-4.0.0-beta.4.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/com/google/inject/guice/4.0.0/guice-4.0.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/com/google/inject/guice/4.0.0-beta.4/guice-4.0.0-beta.4-src.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/com/google/inject/guice/4.0.0/guice-4.0.0-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -150,22 +150,22 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/freemarker/freemarker/2.3.19/freemarker-2.3.19.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/org/freemarker/freemarker/2.3.23/freemarker-2.3.23.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/freemarker/freemarker/2.3.19/freemarker-2.3.19-src.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/org/freemarker/freemarker/2.3.23/freemarker-2.3.23-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/primeframework/prime-mock/0.5.1/prime-mock-0.5.1.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/org/primeframework/prime-mock/0.5.5/prime-mock-0.5.5.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/primeframework/prime-mock/0.5.1/prime-mock-0.5.1-src.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/org/primeframework/prime-mock/0.5.5/prime-mock-0.5.5-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>

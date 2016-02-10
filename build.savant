@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-project(group: "org.primeframework", name: "prime-mvc", version: "1.0.16", licenses: ["ApacheV2_0"]) {
+project(group: "org.primeframework", name: "prime-mvc", version: "1.0.17", licenses: ["ApacheV2_0"]) {
   workflow {
     standard()
   }
@@ -31,14 +31,14 @@ project(group: "org.primeframework", name: "prime-mvc", version: "1.0.16", licen
       dependency(id: "com.fasterxml.jackson.core:jackson-annotations:2.4.2")
       dependency(id: "com.fasterxml.jackson.core:jackson-core:2.4.2")
       dependency(id: "com.fasterxml.jackson.core:jackson-databind:2.4.2")
-      dependency(id: "com.google.inject:guice:4.0.0-beta.4")
-      dependency(id: "com.google.inject.extensions:guice-multibindings:4.0-beta.4")
+      dependency(id: "com.google.inject:guice:4.0.0")
+      dependency(id: "com.google.inject.extensions:guice-multibindings:4.0")
       dependency(id: "io.dropwizard.metrics:metrics-core:3.1.0")
       dependency(id: "javax.inject:javax.inject:1.0.0")
       dependency(id: "org.apache.commons:commons-fileupload:1.2.1")
       dependency(id: "org.apache.commons:commons-io:2.1.0")
       dependency(id: "org.apache.commons:commons-lang3:3.1.0")
-      dependency(id: "org.freemarker:freemarker:2.3.19")
+      dependency(id: "org.freemarker:freemarker:2.3.23")
       dependency(id: "org.primeframework:prime-mock:0.5.5")
       dependency(id: "org.slf4j:slf4j-api:1.7.7")
     }
