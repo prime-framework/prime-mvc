@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2014-2016, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,8 +55,8 @@ import com.google.inject.Inject;
  * <li>Set optional parameters</li>
  * <li>Set required parameters</li>
  * <li>Set files</li>
- * <li>Invoke post-parameter methods</li>
  * </ol>
+ * If the action has post-parameter methods, they are handled in a subsequent workflow.
  *
  * @author Brian Pontarelli
  */
@@ -111,11 +111,6 @@ public class DefaultParameterHandler implements ParameterHandler {
     // Next, process the files
     if (parameters.files.size() > 0) {
       handleFiles(parameters.files, actionConfiguration, action);
-    }
-
-    // Finally, invoke post methods
-    if (actionConfiguration.postParameterMethods.size() > 0) {
-      ReflectionUtils.invokeAll(action, actionConfiguration.postParameterMethods);
     }
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2016, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,12 @@ package org.primeframework.mvc.parameter.guice;
 import org.primeframework.mvc.parameter.DefaultParameterHandler;
 import org.primeframework.mvc.parameter.DefaultParameterParser;
 import org.primeframework.mvc.parameter.DefaultParameterWorkflow;
+import org.primeframework.mvc.parameter.DefaultPostParameterWorkflow;
 import org.primeframework.mvc.parameter.DefaultURIParameterWorkflow;
 import org.primeframework.mvc.parameter.ParameterHandler;
 import org.primeframework.mvc.parameter.ParameterParser;
 import org.primeframework.mvc.parameter.ParameterWorkflow;
+import org.primeframework.mvc.parameter.PostParameterWorkflow;
 import org.primeframework.mvc.parameter.URIParameterWorkflow;
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
 import org.primeframework.mvc.parameter.convert.DefaultConverterProvider;
@@ -40,6 +42,7 @@ public class ParameterModule extends AbstractModule {
     bindParameterHandler();
     bindParameterParser();
     bindParameterWorkflow();
+    bindPostParameterWorkflow();
     bindURIParameterWorkflow();
     bindConverterProvider();
     bindExpressionEvaluator();
@@ -55,6 +58,10 @@ public class ParameterModule extends AbstractModule {
 
   protected void bindParameterWorkflow() {
     bind(ParameterWorkflow.class).to(DefaultParameterWorkflow.class);
+  }
+
+  protected void bindPostParameterWorkflow() {
+    bind(PostParameterWorkflow.class).to(DefaultPostParameterWorkflow.class);
   }
 
   protected void bindURIParameterWorkflow() {

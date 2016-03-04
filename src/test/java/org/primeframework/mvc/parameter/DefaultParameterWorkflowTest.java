@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2014-2016, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -521,6 +521,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
     chain.continueWorkflow();
+    expectLastCall().times(2);
     replay(chain);
 
     MVCConfiguration config = createStrictMock(MVCConfiguration.class);
@@ -537,6 +538,11 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     workflow.perform(chain);
 
     assertTrue(action.preCalled);
+    assertFalse(action.postCalled);
+
+    PostParameterWorkflow postParameterWorkflow = new DefaultPostParameterWorkflow(actionInvocationStore);
+    postParameterWorkflow.perform(chain);
+
     assertTrue(action.postCalled);
 
     verify(request, actionInvocationStore, messageStore, config, chain, provider);

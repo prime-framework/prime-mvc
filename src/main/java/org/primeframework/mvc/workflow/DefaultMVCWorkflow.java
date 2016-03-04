@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+` * Copyright (c) 2001-2016, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import org.primeframework.mvc.action.result.ResultInvocationWorkflow;
 import org.primeframework.mvc.content.ContentWorkflow;
 import org.primeframework.mvc.message.MessageWorkflow;
 import org.primeframework.mvc.parameter.ParameterWorkflow;
+import org.primeframework.mvc.parameter.PostParameterWorkflow;
 import org.primeframework.mvc.parameter.RequestBodyWorkflow;
 import org.primeframework.mvc.parameter.URIParameterWorkflow;
 import org.primeframework.mvc.scope.ScopeRetrievalWorkflow;
@@ -63,6 +64,7 @@ public class DefaultMVCWorkflow implements MVCWorkflow {
                             URIParameterWorkflow uriParameterWorkflow,
                             ParameterWorkflow parameterWorkflow,
                             ContentWorkflow contentWorkflow,
+                            PostParameterWorkflow postParameterWorkflow,
                             ValidationWorkflow validationWorkflow,
                             ActionInvocationWorkflow actionInvocationWorkflow,
                             ScopeStorageWorkflow scopeStorageWorkflow,
@@ -73,7 +75,7 @@ public class DefaultMVCWorkflow implements MVCWorkflow {
     this.errorWorkflow = errorWorkflow;
     this.workflows = asList(savedRequestWorkflow, requestBodyWorkflow, staticResourceWorkflow, actionMappingWorkflow,
         securityWorkflow, messageWorkflow, scopeRetrievalWorkflow, uriParameterWorkflow, parameterWorkflow,
-        contentWorkflow, validationWorkflow, actionInvocationWorkflow, scopeStorageWorkflow, resultInvocationWorkflow);
+        contentWorkflow, postParameterWorkflow, validationWorkflow, actionInvocationWorkflow, scopeStorageWorkflow, resultInvocationWorkflow);
   }
 
   /**
