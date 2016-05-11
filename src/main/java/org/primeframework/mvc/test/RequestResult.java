@@ -98,6 +98,30 @@ public class RequestResult {
   }
 
   /**
+   * Verifies that the body contains the messages from the given key and optionally provided replacement values. This
+   * uses the MessageProvider for the current
+   * test URI and the given keys to look up the messages.
+   *
+   * @param key    The key.
+   * @param values The replacement values.
+   * @return This.
+   */
+  public RequestResult assertBodyContainsMessagesFromKey(String key, Object... values) {
+    MessageProvider messageProvider = get(MessageProvider.class);
+    ActionInvocationStore actionInvocationStore = get(ActionInvocationStore.class);
+    // Use the current actionURI instead of request.getRequestURI, prime will have stripped off ids, etc from the URI.
+    ActionInvocation current = actionInvocationStore.getCurrent();
+    String actionURI = current != null ? current.actionURI : request.getRequestURI();
+    actionInvocationStore.setCurrent(new ActionInvocation(null, null, actionURI, null, null));
+    String message = messageProvider.getMessage(key, values);
+    if (!body.contains(message)) {
+      throw new AssertionError("Body didn't contain [" + message + "] for the key [" + key + "]\nRedirect: [" + redirect + "]\nBody:\n" + body);
+    }
+
+    return this;
+  }
+
+  /**
    * Verifies that the body contains the messages from the given keys. This uses the MessageProvider for the current
    * test URI and the given keys to look up the messages.
    *
@@ -106,16 +130,8 @@ public class RequestResult {
    */
   public RequestResult assertBodyContainsMessagesFromKeys(String... keys) {
     for (String key : keys) {
-      MessageProvider messageProvider = get(MessageProvider.class);
-      ActionInvocationStore actionInvocationStore = get(ActionInvocationStore.class);
-      // Use the current actionURI instead of request.getRequestURI, prime will have stripped off ids, etc from the URI.
-      ActionInvocation current = actionInvocationStore.getCurrent();
-      String actionURI = current != null ? current.actionURI : request.getRequestURI();
-      actionInvocationStore.setCurrent(new ActionInvocation(null, null, actionURI, null, null));
-      String message = messageProvider.getMessage(key);
-      if (!body.contains(message)) {
-        throw new AssertionError("Body didn't contain [" + message + "] for the key [" + key + "]\nRedirect: [" + redirect + "]\nBody:\n" + body);
-      }
+      String[] values = new String[]{"foo", "bar", "baz"};
+      assertBodyContainsMessagesFromKey(key, values);
     }
 
     return this;
