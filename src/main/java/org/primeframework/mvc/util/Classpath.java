@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2014, Inversoft, All Rights Reserved
+ * Copyright (c) 2001-2016, Inversoft, All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -80,24 +79,6 @@ public class Classpath {
   }
 
   /**
-   * Adds the file to the classpath by getting the file's absolute path and appending this string to the classpath.
-   *
-   * @param file The file to add to the classpath.
-   */
-  public void addFile(File file) {
-    names.add(file.getAbsolutePath());
-  }
-
-  /**
-   * Removes the existing file entry from the classpath.
-   *
-   * @param file The file whose absolute path to remove from the classpath.
-   */
-  public void removeFile(File file) {
-    names.remove(file.getAbsolutePath());
-  }
-
-  /**
    * Adds all the files to the classpath.
    *
    * @param files The files.
@@ -119,12 +100,12 @@ public class Classpath {
   }
 
   /**
-   * Removes the entry from the classpath.
+   * Adds the file to the classpath by getting the file's absolute path and appending this string to the classpath.
    *
-   * @param entry The entry to remove.
+   * @param file The file to add to the classpath.
    */
-  public void removeEntry(String entry) {
-    names.remove(entry);
+  public void addFile(File file) {
+    names.add(file.getAbsolutePath());
   }
 
   /**
@@ -135,8 +116,48 @@ public class Classpath {
   }
 
   /**
-   * Builds a URLClassLoader from the classpath. Each entry is first made into a URL. If this is successful, that URL is
-   * added to the URLClassLoader's URL list. If not, a File is created and if that File exists, it is converted to a URL
+   * Removes the entry from the classpath.
+   *
+   * @param entry The entry to remove.
+   */
+  public void removeEntry(String entry) {
+    names.remove(entry);
+  }
+
+  /**
+   * Removes the existing file entry from the classpath.
+   *
+   * @param file The file whose absolute path to remove from the classpath.
+   */
+  public void removeFile(File file) {
+    names.remove(file.getAbsolutePath());
+  }
+
+  /**
+   * Converts the classpath to a platform compatible classpath String using the path separator character from the File
+   * class.
+   *
+   * @return The classpath as a String or an empty String if the classpath is empty.
+   */
+  public String toString() {
+    StringBuffer buf = new StringBuffer();
+    for (int i = 0; i < names.size(); i++) {
+      String entry = names.get(i);
+      if (i != 0) {
+        buf.append(File.pathSeparator);
+      }
+
+      buf.append(entry);
+    }
+
+    return buf.toString();
+  }
+
+  /**
+   * Builds a URLClassLoader from the classpath. Each entry is first made into a URL. If this is successful, that URL
+   * is
+   * added to the URLClassLoader's URL list. If not, a File is created and if that File exists, it is converted to a
+   * URL
    * and then added to the URLClassLoader.
    *
    * @param parent The parent classloader of the URLClassLoader being created.
@@ -179,32 +200,14 @@ public class Classpath {
   }
 
   /**
-   * Converts the classpath to a platform compatible classpath String using the path separator character from the File
-   * class.
-   *
-   * @return The classpath as a String or an empty String if the classpath is empty.
-   */
-  public String toString() {
-    StringBuffer buf = new StringBuffer();
-    for (int i = 0; i < names.size(); i++) {
-      String entry = names.get(i);
-      if (i != 0) {
-        buf.append(File.pathSeparator);
-      }
-
-      buf.append(entry);
-    }
-
-    return buf.toString();
-  }
-
-  /**
    * Simple class to assist in build ClassPath objects using the classpath of a ClassLoader.
    */
   public static class ClasspathBuilder {
     private final ClassLoader classLoader;
-    private final Set<String> excludes = new HashSet<String>();
+
     private final Set<Pattern> excludePatterns = new HashSet<Pattern>();
+
+    private final Set<String> excludes = new HashSet<String>();
 
     public ClasspathBuilder(ClassLoader classLoader) {
       this.classLoader = classLoader;
@@ -266,27 +269,23 @@ public class Classpath {
         }
       }
 
-      return new Classpath(new ArrayList<String>(list));
+      return new Classpath(new ArrayList<>(list));
     }
 
     /**
-     * Return a {@link String} representation of the path. <p> The {@link URL} object provided ias assumed to have been returned from
-     * {@link ClassLoader#getResources(String)}. Calling {@link URL#toURI()} is never expected to throw a {@link
-     * URISyntaxException}, if it does we are catching it and wrapping in an {@link IOException}. </p>
+     * Return a {@link String} representation of the path. <p> The {@link URL} object provided is assumed to have been
+     * returned from {@link ClassLoader#getResources(String)}. Calling {@link URL#toURI()} is never expected to throw a
+     * {@link URISyntaxException}, if it does we are catching it and wrapping in an {@link IOException}. </p>
      *
-     * @param url
-     * @return
+     * @param url The url to clean.
+     * @return a String representation of the path.
      * @throws IOException
      */
     private String clean(URL url) throws IOException {
 
-      // JBoss scheme that is not supported
-      if (url.getProtocol().equals("vfsmemory")) {
-        return null;
-      }
-
       try {
-        String externalForm = url.toURI().toString();
+        // Decode scheme specific part of the URI. Do NOT use URLDecoder, it assumes a content type of x-www-form-urlencoded.
+        String externalForm = url.toURI().getSchemeSpecificPart();
         if (externalForm.endsWith("META-INF")) {
           externalForm = externalForm.substring(0, externalForm.length() - 8);
         } else if (externalForm.endsWith("META-INF/")) { /* JBoss work-around */
@@ -297,32 +296,11 @@ public class Classpath {
           externalForm = externalForm.substring(0, externalForm.length() - 2);
         }
 
-        if (externalForm.startsWith("file:")) {
-          externalForm = externalForm.substring(5);
-        }
-
-        if (externalForm.startsWith("jar:file:")) {
-          externalForm = externalForm.substring(9);
-        }
-
-        // JBoss schemes
-        int index = externalForm.indexOf("vfszip:");
-        if (index >= 0) {
-          externalForm = externalForm.substring(index + 7);
-        }
-
-        index = externalForm.indexOf("vfsfile:");
-        if (index >= 0) {
-          externalForm = externalForm.substring(index + 8);
-        }
-
-        externalForm = URLDecoder.decode(externalForm, "UTF-8");
-
-        return new File(externalForm).toURI().getPath();
+        // On Windows the externalForm will be /C:/foo/bar which is invalid. Calling new File().getPath() will strip the leading slash
+        return new File(externalForm).getPath();
       } catch (URISyntaxException e) {
         throw new IOException(e);
       }
-
     }
 
     private boolean exclude(String externalForm) {
