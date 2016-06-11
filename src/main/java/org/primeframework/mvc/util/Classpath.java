@@ -286,6 +286,7 @@ public class Classpath {
       try {
         // Decode scheme specific part of the URI. Do NOT use URLDecoder, it assumes a content type of x-www-form-urlencoded.
         String externalForm = url.toURI().getSchemeSpecificPart();
+
         if (externalForm.endsWith("META-INF")) {
           externalForm = externalForm.substring(0, externalForm.length() - 8);
         } else if (externalForm.endsWith("META-INF/")) { /* JBoss work-around */
@@ -294,6 +295,14 @@ public class Classpath {
 
         if (externalForm.endsWith("!/")) {
           externalForm = externalForm.substring(0, externalForm.length() - 2);
+        }
+
+        if (externalForm.startsWith("file:")) {
+          externalForm = externalForm.substring(5);
+        }
+
+        if (externalForm.startsWith("jar:file:")) {
+          externalForm = externalForm.substring(9);
         }
 
         // On Windows the externalForm will be /C:/foo/bar which is invalid. Calling new File().getPath() will strip the leading slash
