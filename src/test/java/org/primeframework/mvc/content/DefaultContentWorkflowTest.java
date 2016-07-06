@@ -29,7 +29,7 @@ import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.config.ActionConfiguration;
-import org.primeframework.mvc.content.binary.BinaryFileActionConfiguration;
+import org.primeframework.mvc.content.binary.BinaryActionConfiguration;
 import org.primeframework.mvc.content.guice.ContentHandlerFactory;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration;
 import org.primeframework.mvc.workflow.WorkflowChain;
@@ -60,7 +60,7 @@ public class DefaultContentWorkflowTest extends PrimeBaseTest {
     request.setContentType("application/octet-stream");
 
     Map<Class<?>, Object> additionalConfig = new HashMap<>();
-    additionalConfig.put(BinaryFileActionConfiguration.class, new BinaryFileActionConfiguration("binaryRequest", null));
+    additionalConfig.put(BinaryActionConfiguration.class, new BinaryActionConfiguration("binaryRequest", null));
 
     KitchenSink action = new KitchenSink(null);
     ActionConfiguration config = new ActionConfiguration(KitchenSink.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null);
@@ -70,31 +70,9 @@ public class DefaultContentWorkflowTest extends PrimeBaseTest {
     chain.continueWorkflow();
     replay(chain);
 
-    ContentHandlerFactory factory = new ContentHandlerFactory(injector);
-    new DefaultContentWorkflow(request, factory);
+    new DefaultContentWorkflow(request, new ContentHandlerFactory(injector)).perform(chain);
 
-    // Kind of a hack -- calling perform in pieces to verify the file gets constructed and then deleted.
-
-    // -------------------     DefaultContentWorkflow.perform(chain)      ---------------------------------------------/
-    String contentType = request.getContentType();
-    ContentHandler handler = factory.build(contentType);
-    if (handler != null) {
-      handler.handle();
-    }
-
-    chain.continueWorkflow();
-
-    assertNotNull(action.binaryRequest);
-    assertEquals(new String(Files.readAllBytes(action.binaryRequest)), "Binary File!");
-    assertEquals(action.binaryRequest.toFile().length(), "Binary File!".getBytes().length);
-
-    if (handler != null) {
-      handler.cleanup();
-    }
-
-    // ----------------------------------------------------------------------------------------------------------------/
-
-
+    // By the time the action is complete the file should have been deleted
     assertNotNull(action.binaryRequest);
     assertFalse(Files.exists(action.binaryRequest));
   }

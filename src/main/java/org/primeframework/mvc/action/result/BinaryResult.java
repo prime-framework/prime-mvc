@@ -27,7 +27,7 @@ import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.result.annotation.Binary;
-import org.primeframework.mvc.content.binary.BinaryFileActionConfiguration;
+import org.primeframework.mvc.content.binary.BinaryActionConfiguration;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 
 import com.google.inject.Inject;
@@ -66,7 +66,7 @@ public class BinaryResult extends AbstractResult<Binary> {
     }
 
     Path object;
-    BinaryFileActionConfiguration binaryFileActionConfiguration = (BinaryFileActionConfiguration) configuration.additionalConfiguration.get(BinaryFileActionConfiguration.class);
+    BinaryActionConfiguration binaryFileActionConfiguration = (BinaryActionConfiguration) configuration.additionalConfiguration.get(BinaryActionConfiguration.class);
     if (binaryFileActionConfiguration == null || binaryFileActionConfiguration.responseMember == null) {
       throw new PrimeException("The action [" + action.getClass() + "] is missing a field annotated with @BinaryResponse. This is used to figure out what to send back in the response.");
     }

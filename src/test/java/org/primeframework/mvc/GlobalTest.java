@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2016, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -148,6 +148,16 @@ public class GlobalTest extends PrimeBaseTest {
              .withJSONFile(json)
              .post()
              .assertJSONFile(json);
+  }
+
+  @Test
+  public void post_binary() throws Exception {
+    test.simulate(() -> simulator.test("/binary")
+                                 .withParameter("expected", "Hello World")
+                                 .withBody("Hello World")
+                                 .withContentType("application/octet-stream")
+                                 .post()
+                                 .assertStatusCode(200));
   }
 
   @Test

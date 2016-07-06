@@ -19,7 +19,7 @@ import org.primeframework.mvc.action.config.ActionConfigurator;
 import org.primeframework.mvc.content.ContentWorkflow;
 import org.primeframework.mvc.content.DefaultContentWorkflow;
 import org.primeframework.mvc.content.binary.BinaryContentHandler;
-import org.primeframework.mvc.content.binary.BinaryFileActionConfigurator;
+import org.primeframework.mvc.content.binary.BinaryActionConfigurator;
 import org.primeframework.mvc.content.json.JacksonActionConfigurator;
 import org.primeframework.mvc.content.json.JacksonContentHandler;
 
@@ -37,14 +37,14 @@ public class ContentModule extends AbstractModule {
   protected void bindContentHandlers() {
     // Bind the Jackson objects and content handler
     ContentHandlerFactory.addContentHandler(binder(), "application/json", JacksonContentHandler.class);
-    Multibinder.newSetBinder(binder(), ActionConfigurator.class).addBinding().to(JacksonActionConfigurator.class);
-
     ContentHandlerFactory.addContentHandler(binder(), "application/octet-stream", BinaryContentHandler.class);
-    Multibinder.newSetBinder(binder(), ActionConfigurator.class).addBinding().to(BinaryFileActionConfigurator.class);
+
+    Multibinder<ActionConfigurator> multiBinder = Multibinder.newSetBinder(binder(), ActionConfigurator.class);
+    multiBinder.addBinding().to(JacksonActionConfigurator.class);
+    multiBinder.addBinding().to(BinaryActionConfigurator.class);
 
     // Setup the Jackson Module bindings and the provider for the ObjectMapper
     Multibinder.newSetBinder(binder(), Module.class);
-
     bind(ObjectMapper.class).toProvider(ObjectMapperProvider.class).asEagerSingleton();
   }
 

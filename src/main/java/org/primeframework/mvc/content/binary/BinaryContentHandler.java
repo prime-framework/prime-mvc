@@ -89,7 +89,7 @@ public class BinaryContentHandler implements ContentHandler {
     }
 
     ActionConfiguration config = actionInvocation.configuration;
-    if (!config.additionalConfiguration.containsKey(BinaryFileActionConfiguration.class)) {
+    if (!config.additionalConfiguration.containsKey(BinaryActionConfiguration.class)) {
       return;
     }
 
@@ -98,7 +98,7 @@ public class BinaryContentHandler implements ContentHandler {
       return;
     }
 
-    BinaryFileActionConfiguration binaryFileActionConfiguration = (BinaryFileActionConfiguration) config.additionalConfiguration.get(BinaryFileActionConfiguration.class);
+    BinaryActionConfiguration binaryFileActionConfiguration = (BinaryActionConfiguration) config.additionalConfiguration.get(BinaryActionConfiguration.class);
     if (binaryFileActionConfiguration.requestMember != null) {
       setupTemporaryFile();
       try (InputStream inputStream = request.getInputStream()) {

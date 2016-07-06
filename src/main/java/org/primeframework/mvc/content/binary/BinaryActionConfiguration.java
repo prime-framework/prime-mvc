@@ -18,12 +18,12 @@ package org.primeframework.mvc.content.binary;
 /**
  * @author Daniel DeGroff
  */
-public class BinaryFileActionConfiguration {
+public class BinaryActionConfiguration {
   public String requestMember;
 
   public String responseMember;
 
-  public BinaryFileActionConfiguration(String requestMember, String responseMember) {
+  public BinaryActionConfiguration(String requestMember, String responseMember) {
     this.requestMember = requestMember;
     this.responseMember = responseMember;
   }

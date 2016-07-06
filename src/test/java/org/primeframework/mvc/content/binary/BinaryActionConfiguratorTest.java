@@ -27,7 +27,7 @@ import static org.testng.Assert.assertEquals;
 public class BinaryActionConfiguratorTest extends PrimeBaseTest {
   @Test
   public void configure() {
-    BinaryFileActionConfiguration config = (BinaryFileActionConfiguration) new BinaryFileActionConfigurator().configure(KitchenSink.class);
+    BinaryActionConfiguration config = (BinaryActionConfiguration) new BinaryActionConfigurator().configure(KitchenSink.class);
     assertEquals(config.requestMember, "binaryRequest");
     assertEquals(config.responseMember, "binaryResponse");
   }

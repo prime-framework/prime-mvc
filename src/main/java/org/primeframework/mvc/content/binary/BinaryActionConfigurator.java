@@ -25,7 +25,7 @@ import org.primeframework.mvc.util.ReflectionUtils;
 /**
  * @author Daniel DeGroff
  */
-public class BinaryFileActionConfigurator implements ActionConfigurator {
+public class BinaryActionConfigurator implements ActionConfigurator {
   @Override
   public Object configure(Class<?> actionClass) {
     Map<String, BinaryRequest> binaryRequestMembers = ReflectionUtils.findAllMembersWithAnnotation(actionClass, BinaryRequest.class);
@@ -37,7 +37,7 @@ public class BinaryFileActionConfigurator implements ActionConfigurator {
     String requestMember = (binaryRequestMembers.size() == 1) ? binaryRequestMembers.keySet().iterator().next() : null;
     String responseMember = (binaryResponseMembers.size() == 1) ? binaryResponseMembers.keySet().iterator().next() : null;
     if (requestMember != null || responseMember != null) {
-      return new BinaryFileActionConfiguration(requestMember, responseMember);
+      return new BinaryActionConfiguration(requestMember, responseMember);
     }
 
     return null;

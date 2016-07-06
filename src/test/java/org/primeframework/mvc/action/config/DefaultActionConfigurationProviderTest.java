@@ -31,8 +31,8 @@ import org.primeframework.mvc.action.result.annotation.Forward;
 import org.primeframework.mvc.action.result.annotation.JSON;
 import org.primeframework.mvc.action.result.annotation.Redirect;
 import org.primeframework.mvc.action.result.annotation.Status;
-import org.primeframework.mvc.content.binary.BinaryFileActionConfiguration;
-import org.primeframework.mvc.content.binary.BinaryFileActionConfigurator;
+import org.primeframework.mvc.content.binary.BinaryActionConfiguration;
+import org.primeframework.mvc.content.binary.BinaryActionConfigurator;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration;
 import org.primeframework.mvc.content.json.JacksonActionConfigurator;
 import org.primeframework.mvc.servlet.HTTPMethod;
@@ -61,7 +61,7 @@ public class DefaultActionConfigurationProviderTest {
     context.setAttribute(eq(DefaultActionConfigurationProvider.ACTION_CONFIGURATION_KEY), capture(c));
     EasyMock.replay(context);
 
-    new DefaultActionConfigurationProvider(context, new DefaultActionConfigurationBuilder(new DefaultURIBuilder(), new HashSet<>(Arrays.asList(new JacksonActionConfigurator(), new BinaryFileActionConfigurator()))));
+    new DefaultActionConfigurationProvider(context, new DefaultActionConfigurationBuilder(new DefaultURIBuilder(), new HashSet<>(Arrays.asList(new JacksonActionConfigurator(), new BinaryActionConfigurator()))));
 
     Map<String, ActionConfiguration> config = c.getValue();
     assertSame(config.get("/simple").actionClass, Simple.class);
@@ -135,8 +135,8 @@ public class DefaultActionConfigurationProviderTest {
     assertEquals(((JacksonActionConfiguration) config.get("/kitchen-sink").additionalConfiguration.get(JacksonActionConfiguration.class)).requestMember, "jsonRequest");
     assertEquals(((JacksonActionConfiguration) config.get("/kitchen-sink").additionalConfiguration.get(JacksonActionConfiguration.class)).requestMemberType, UserField.class);
     assertEquals(((JacksonActionConfiguration) config.get("/kitchen-sink").additionalConfiguration.get(JacksonActionConfiguration.class)).responseMember, "jsonResponse");
-    assertEquals(((BinaryFileActionConfiguration) config.get("/kitchen-sink").additionalConfiguration.get(BinaryFileActionConfiguration.class)).responseMember, "binaryResponse");
-    assertEquals(((BinaryFileActionConfiguration) config.get("/kitchen-sink").additionalConfiguration.get(BinaryFileActionConfiguration.class)).requestMember, "binaryRequest");
+    assertEquals(((BinaryActionConfiguration) config.get("/kitchen-sink").additionalConfiguration.get(BinaryActionConfiguration.class)).responseMember, "binaryResponse");
+    assertEquals(((BinaryActionConfiguration) config.get("/kitchen-sink").additionalConfiguration.get(BinaryActionConfiguration.class)).requestMember, "binaryRequest");
 
     // Verify inheritance results
     assertSame(config.get("/extension-inheritance").resultConfigurations.get("success").annotationType(), Forward.class);
