@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2013-2016, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,14 @@
  */
 package org.primeframework.mvc.content;
 
-import com.google.inject.Inject;
-import org.primeframework.mvc.content.guice.ContentHandlerFactory;
-import org.primeframework.mvc.workflow.WorkflowChain;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+
+import org.primeframework.mvc.content.guice.ContentHandlerFactory;
+import org.primeframework.mvc.workflow.WorkflowChain;
+
+import com.google.inject.Inject;
 
 /**
  * Default content workflow. This uses the Content-Type header and {@link ContentHandler} implementations to handle the
@@ -30,9 +31,9 @@ import java.io.IOException;
  * @author Brian Pontarelli
  */
 public class DefaultContentWorkflow implements ContentWorkflow {
-  private final HttpServletRequest request;
-
   private final ContentHandlerFactory factory;
+
+  private final HttpServletRequest request;
 
   @Inject
   public DefaultContentWorkflow(HttpServletRequest request, ContentHandlerFactory factory) {
@@ -49,5 +50,9 @@ public class DefaultContentWorkflow implements ContentWorkflow {
     }
 
     workflowChain.continueWorkflow();
+
+    if (handler != null) {
+      handler.cleanup();
+    }
   }
 }

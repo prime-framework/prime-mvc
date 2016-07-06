@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2016, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,17 +66,19 @@ public abstract class PrimeBaseTest {
 
   protected static Injector injector;
 
+  protected static MetricRegistry metricRegistry = new MetricRegistry();
+
   protected static MockHttpSession session;
+
+  protected static RequestSimulator simulator;
 
   @Inject public MVCConfiguration configuration;
 
-  protected static MetricRegistry metricRegistry = new MetricRegistry();
+  @Inject public TestBuilder test;
 
   protected MockHttpServletRequest request;
 
   protected MockHttpServletResponse response;
-
-  protected static RequestSimulator simulator;
 
   @BeforeSuite
   public static void init() throws ServletException {

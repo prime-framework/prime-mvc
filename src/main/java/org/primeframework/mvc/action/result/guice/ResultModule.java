@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2016, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,18 @@
  */
 package org.primeframework.mvc.action.result.guice;
 
-import com.google.inject.AbstractModule;
+import org.primeframework.mvc.action.result.BinaryResult;
 import org.primeframework.mvc.action.result.ForwardResult;
 import org.primeframework.mvc.action.result.JSONResult;
 import org.primeframework.mvc.action.result.NoOpResult;
 import org.primeframework.mvc.action.result.RedirectResult;
-import org.primeframework.mvc.action.result.ResultFactory;
 import org.primeframework.mvc.action.result.ReexecuteSavedRequestResult;
+import org.primeframework.mvc.action.result.ResultFactory;
 import org.primeframework.mvc.action.result.SaveRequestResult;
 import org.primeframework.mvc.action.result.StatusResult;
 import org.primeframework.mvc.action.result.StreamResult;
 import org.primeframework.mvc.action.result.XMLStreamResult;
+import org.primeframework.mvc.action.result.annotation.Binary;
 import org.primeframework.mvc.action.result.annotation.Forward;
 import org.primeframework.mvc.action.result.annotation.JSON;
 import org.primeframework.mvc.action.result.annotation.NoOp;
@@ -35,6 +36,8 @@ import org.primeframework.mvc.action.result.annotation.SaveRequest;
 import org.primeframework.mvc.action.result.annotation.Status;
 import org.primeframework.mvc.action.result.annotation.Stream;
 import org.primeframework.mvc.action.result.annotation.XMLStream;
+
+import com.google.inject.AbstractModule;
 
 /**
  * Binds results.
@@ -54,5 +57,6 @@ public class ResultModule extends AbstractModule {
     ResultFactory.addResult(binder(), Stream.class, StreamResult.class);
     ResultFactory.addResult(binder(), XMLStream.class, XMLStreamResult.class);
     ResultFactory.addResult(binder(), JSON.class, JSONResult.class);
+    ResultFactory.addResult(binder(), Binary.class, BinaryResult.class);
   }
 }

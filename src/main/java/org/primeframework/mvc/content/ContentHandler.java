@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2013-2016, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,12 @@ import java.io.IOException;
  * @author Brian Pontarelli
  */
 public interface ContentHandler {
+  /**
+   * Handles any cleanup that needs to be done by the content handler. This is called after the action invocation has
+   * completed. If any files were created by the content handler this is an opportunity to clean it up.
+   */
+  void cleanup();
+
   /**
    * Handles the content (HTTP request body) however is needed.
    *

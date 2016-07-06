@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2016, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package org.primeframework.mvc.action.config;
 
 import javax.servlet.ServletContext;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 
@@ -30,13 +31,14 @@ import org.primeframework.mvc.action.result.annotation.Forward;
 import org.primeframework.mvc.action.result.annotation.JSON;
 import org.primeframework.mvc.action.result.annotation.Redirect;
 import org.primeframework.mvc.action.result.annotation.Status;
+import org.primeframework.mvc.content.binary.BinaryFileActionConfiguration;
+import org.primeframework.mvc.content.binary.BinaryFileActionConfigurator;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration;
 import org.primeframework.mvc.content.json.JacksonActionConfigurator;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.util.DefaultURIBuilder;
 import org.testng.annotations.Test;
 
-import static java.util.Collections.singletonList;
 import static org.easymock.EasyMock.capture;
 import static org.easymock.EasyMock.eq;
 import static org.testng.Assert.assertEquals;
@@ -59,7 +61,7 @@ public class DefaultActionConfigurationProviderTest {
     context.setAttribute(eq(DefaultActionConfigurationProvider.ACTION_CONFIGURATION_KEY), capture(c));
     EasyMock.replay(context);
 
-    new DefaultActionConfigurationProvider(context, new DefaultActionConfigurationBuilder(new DefaultURIBuilder(), new HashSet<>(singletonList(new JacksonActionConfigurator()))));
+    new DefaultActionConfigurationProvider(context, new DefaultActionConfigurationBuilder(new DefaultURIBuilder(), new HashSet<>(Arrays.asList(new JacksonActionConfigurator(), new BinaryFileActionConfigurator()))));
 
     Map<String, ActionConfiguration> config = c.getValue();
     assertSame(config.get("/simple").actionClass, Simple.class);
@@ -90,7 +92,7 @@ public class DefaultActionConfigurationProviderTest {
     assertEquals(config.get("/kitchen-sink").executeMethods.get(HTTPMethod.POST).method, KitchenSink.class.getMethod("post"));
     assertNull(config.get("/kitchen-sink").executeMethods.get(HTTPMethod.PUT));
     assertNull(config.get("/kitchen-sink").executeMethods.get(HTTPMethod.DELETE));
-    assertEquals(config.get("/kitchen-sink").resultConfigurations.size(), 7);
+    assertEquals(config.get("/kitchen-sink").resultConfigurations.size(), 8);
     assertEquals(((Forward) config.get("/kitchen-sink").resultConfigurations.get("forward1")).code(), "forward1");
     assertEquals(((Forward) config.get("/kitchen-sink").resultConfigurations.get("forward1")).contentType(), "text");
     assertEquals(((Forward) config.get("/kitchen-sink").resultConfigurations.get("forward1")).page(), "/WEB-INF/forward1.ftl");
@@ -133,6 +135,8 @@ public class DefaultActionConfigurationProviderTest {
     assertEquals(((JacksonActionConfiguration) config.get("/kitchen-sink").additionalConfiguration.get(JacksonActionConfiguration.class)).requestMember, "jsonRequest");
     assertEquals(((JacksonActionConfiguration) config.get("/kitchen-sink").additionalConfiguration.get(JacksonActionConfiguration.class)).requestMemberType, UserField.class);
     assertEquals(((JacksonActionConfiguration) config.get("/kitchen-sink").additionalConfiguration.get(JacksonActionConfiguration.class)).responseMember, "jsonResponse");
+    assertEquals(((BinaryFileActionConfiguration) config.get("/kitchen-sink").additionalConfiguration.get(BinaryFileActionConfiguration.class)).responseMember, "binaryResponse");
+    assertEquals(((BinaryFileActionConfiguration) config.get("/kitchen-sink").additionalConfiguration.get(BinaryFileActionConfiguration.class)).requestMember, "binaryRequest");
 
     // Verify inheritance results
     assertSame(config.get("/extension-inheritance").resultConfigurations.get("success").annotationType(), Forward.class);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2016, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,20 @@
  */
 package org.example.action;
 
+import java.nio.file.Path;
+
 import com.google.inject.Inject;
 import org.example.domain.User;
 import org.example.domain.UserField;
 import org.primeframework.mvc.action.annotation.Action;
+import org.primeframework.mvc.action.result.annotation.Binary;
 import org.primeframework.mvc.action.result.annotation.Forward;
 import org.primeframework.mvc.action.result.annotation.JSON;
 import org.primeframework.mvc.action.result.annotation.Redirect;
 import org.primeframework.mvc.action.result.annotation.Status;
 import org.primeframework.mvc.action.result.annotation.Status.Header;
+import org.primeframework.mvc.content.binary.annotation.BinaryRequest;
+import org.primeframework.mvc.content.binary.annotation.BinaryResponse;
 import org.primeframework.mvc.content.json.annotation.JSONRequest;
 import org.primeframework.mvc.content.json.annotation.JSONResponse;
 import org.primeframework.mvc.message.MessageStore;
@@ -51,6 +56,7 @@ import org.primeframework.mvc.validation.annotation.PreValidationMethod;
 })
 @Status(code = "status", status = 300, statusStr = "hello world", headers = {@Header(name = "foo", value = "bar"), @Header(name = "baz", value = "fred")})
 @JSON(code = "json", status = 201)
+@Binary(code = "binary", status = 201)
 @TestAnnotation
 public class KitchenSink extends KitchenSinkSuperclass implements Validatable {
   private final MessageStore messageStore;
@@ -60,6 +66,12 @@ public class KitchenSink extends KitchenSinkSuperclass implements Validatable {
 
   @JSONRequest
   public UserField jsonRequest;
+
+  @BinaryRequest
+  public Path binaryRequest;
+
+  @BinaryResponse
+  public Path binaryResponse;
 
   @JSONResponse
   public User jsonResponse;

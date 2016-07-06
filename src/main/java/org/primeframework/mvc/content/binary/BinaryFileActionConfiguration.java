@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2016, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2016, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,20 +13,18 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.action.config;
+package org.primeframework.mvc.content.binary;
 
 /**
- * A class can implement this interface to provide additional configuration to an action.
- *
- * @author Brian Pontarelli
+ * @author Daniel DeGroff
  */
-public interface ActionConfigurator {
-  /**
-   * Takes the action class and returns a configuration object. This object is stored in a Map where the key is the
-   * object's class the value is the object.
-   *
-   * @param actionClass The action class.
-   * @return The configuration or null.
-   */
-  Object configure(Class<?> actionClass);
+public class BinaryFileActionConfiguration {
+  public String requestMember;
+
+  public String responseMember;
+
+  public BinaryFileActionConfiguration(String requestMember, String responseMember) {
+    this.requestMember = requestMember;
+    this.responseMember = responseMember;
+  }
 }

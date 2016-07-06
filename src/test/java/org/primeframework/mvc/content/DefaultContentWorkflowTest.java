@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2013-2016, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,12 @@
  */
 package org.primeframework.mvc.content;
 
-import com.google.inject.Inject;
+import javax.servlet.ServletException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.example.action.KitchenSink;
 import org.example.domain.UserField;
 import org.example.domain.UserType;
@@ -24,22 +29,21 @@ import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.config.ActionConfiguration;
+import org.primeframework.mvc.content.binary.BinaryFileActionConfiguration;
 import org.primeframework.mvc.content.guice.ContentHandlerFactory;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import javax.servlet.ServletException;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
+import com.google.inject.Inject;
 import static org.easymock.EasyMock.createStrictMock;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+import static org.testng.AssertJUnit.assertNotNull;
 
 /**
  * Tests the content workflow.
@@ -49,29 +53,53 @@ import static org.testng.Assert.assertTrue;
 public class DefaultContentWorkflowTest extends PrimeBaseTest {
   @Inject public ActionInvocationStore store;
 
-  @DataProvider(name = "contentTypes")
-  public Object[][] contentTypes() {
-    return new Object[][] {
-        {"application/json"},
-        {"application/json; charset=UTF-8"},
-        {"application/json; charset=utf-8"}
-    };
-  }
-
   @Test
-  public void missing() throws IOException, ServletException {
-    request.setContentType("application/missing");
+  public void binary() throws Exception {
+    test.createFile("Binary File!");
+    request.setInputStream(new MockServletInputStream(Files.readAllBytes(test.tempFile)));
+    request.setContentType("application/octet-stream");
+
+    Map<Class<?>, Object> additionalConfig = new HashMap<>();
+    additionalConfig.put(BinaryFileActionConfiguration.class, new BinaryFileActionConfiguration("binaryRequest", null));
+
+    KitchenSink action = new KitchenSink(null);
+    ActionConfiguration config = new ActionConfiguration(KitchenSink.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null);
+    store.setCurrent(new ActionInvocation(action, null, null, null, config));
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
     chain.continueWorkflow();
     replay(chain);
 
-    new DefaultContentWorkflow(request, new ContentHandlerFactory(injector)).perform(chain);
+    ContentHandlerFactory factory = new ContentHandlerFactory(injector);
+    new DefaultContentWorkflow(request, factory);
 
-    verify(chain);
+    // Kind of a hack -- calling perform in pieces to verify the file gets constructed and then deleted.
+
+    // -------------------     DefaultContentWorkflow.perform(chain)      ---------------------------------------------/
+    String contentType = request.getContentType();
+    ContentHandler handler = factory.build(contentType);
+    if (handler != null) {
+      handler.handle();
+    }
+
+    chain.continueWorkflow();
+
+    assertNotNull(action.binaryRequest);
+    assertEquals(new String(Files.readAllBytes(action.binaryRequest)), "Binary File!");
+    assertEquals(action.binaryRequest.toFile().length(), "Binary File!".getBytes().length);
+
+    if (handler != null) {
+      handler.cleanup();
+    }
+
+    // ----------------------------------------------------------------------------------------------------------------/
+
+
+    assertNotNull(action.binaryRequest);
+    assertFalse(Files.exists(action.binaryRequest));
   }
 
-  @Test(dataProvider = "contentTypes")
+  @Test(dataProvider = "jsonContentTypes")
   public void callJSON(String contentType) throws IOException, ServletException {
     String expected = "{" +
         "  \"active\":true," +
@@ -139,5 +167,27 @@ public class DefaultContentWorkflowTest extends PrimeBaseTest {
     assertEquals(action.jsonRequest.siblings.get(0).name, "Brett");
     assertEquals(action.jsonRequest.siblings.get(1).name, "Beth");
     assertEquals(action.jsonRequest.type, UserType.COOL);
+  }
+
+  @DataProvider(name = "jsonContentTypes")
+  public Object[][] contentTypes() {
+    return new Object[][]{
+        {"application/json"},
+        {"application/json; charset=UTF-8"},
+        {"application/json; charset=utf-8"}
+    };
+  }
+
+  @Test
+  public void missing() throws IOException, ServletException {
+    request.setContentType("application/missing");
+
+    WorkflowChain chain = createStrictMock(WorkflowChain.class);
+    chain.continueWorkflow();
+    replay(chain);
+
+    new DefaultContentWorkflow(request, new ContentHandlerFactory(injector)).perform(chain);
+
+    verify(chain);
   }
 }
