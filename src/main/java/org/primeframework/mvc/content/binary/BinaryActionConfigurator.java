@@ -37,7 +37,11 @@ public class BinaryActionConfigurator implements ActionConfigurator {
     String requestMember = (binaryRequestMembers.size() == 1) ? binaryRequestMembers.keySet().iterator().next() : null;
     String responseMember = (binaryResponseMembers.size() == 1) ? binaryResponseMembers.keySet().iterator().next() : null;
     if (requestMember != null || responseMember != null) {
-      return new BinaryActionConfiguration(requestMember, responseMember);
+      BinaryActionConfiguration configuration = new BinaryActionConfiguration(requestMember, responseMember);
+      if (responseMember != null) {
+        configuration.deleteResponseMemberUponCompletion = binaryResponseMembers.get(responseMember).deleteUponCompletion();
+      }
+      return configuration;
     }
 
     return null;

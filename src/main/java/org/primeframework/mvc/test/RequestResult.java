@@ -130,8 +130,7 @@ public class RequestResult {
    */
   public RequestResult assertBodyContainsMessagesFromKeys(String... keys) {
     for (String key : keys) {
-      String[] values = new String[]{"foo", "bar", "baz"};
-      assertBodyContainsMessagesFromKey(key, values);
+      assertBodyContainsMessagesFromKey(key, "foo", "bar", "baz");
     }
 
     return this;

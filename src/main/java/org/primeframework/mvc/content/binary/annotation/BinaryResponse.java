@@ -33,4 +33,13 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Target({FIELD, METHOD})
 public @interface BinaryResponse {
+
+  /**
+   * Default is true. When true prime will delete the file annotated with {@link BinaryResponse} once it is
+   * successfully written the contents to the output stream. If you do not want the file deleted or wish to handle it
+   * yourself set this parameter to false.
+   *
+   * @return true or false
+   */
+  boolean deleteUponCompletion() default true;
 }

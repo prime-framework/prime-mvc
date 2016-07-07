@@ -90,6 +90,14 @@ public class BinaryResult extends AbstractResult<Binary> {
       outputStream.write(bytes);
     }
 
+    // Delete the file if instructed by the @BinaryResponse
+    if (binaryFileActionConfiguration.deleteResponseMemberUponCompletion) {
+      try {
+        Files.deleteIfExists(object);
+      } catch (IOException ignore) {
+      }
+    }
+
     return true;
   }
 }
