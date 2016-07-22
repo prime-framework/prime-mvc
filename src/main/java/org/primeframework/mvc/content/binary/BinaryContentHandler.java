@@ -103,7 +103,10 @@ public class BinaryContentHandler implements ContentHandler {
       setupTemporaryFile();
       try (InputStream inputStream = request.getInputStream()) {
         Files.copy(inputStream, tempFile);
-        expressionEvaluator.setValue(binaryFileActionConfiguration.requestMember, action, tempFile);
+        // Leave the requestMember null if no bytes were read from the inputStream.
+        if (tempFile.toFile().length() > 0) {
+          expressionEvaluator.setValue(binaryFileActionConfiguration.requestMember, action, tempFile);
+        }
       } catch (IOException e) {
         logger.error("Failed to write out binary stream to a file. [" + tempFile.getFileName() + "]", e);
         messageStore.add(new SimpleMessage(MessageType.ERROR, "[couldNotWriteToFile]", messageProvider.getMessage("[couldNotWriteToFile]", e.getMessage())));
