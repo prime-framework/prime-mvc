@@ -58,13 +58,13 @@ public class DefaultMVCWorkflow implements MVCWorkflow {
                             RequestBodyWorkflow requestBodyWorkflow,
                             StaticResourceWorkflow staticResourceWorkflow,
                             ActionMappingWorkflow actionMappingWorkflow,
-                            SecurityWorkflow securityWorkflow,
                             MessageWorkflow messageWorkflow,
                             ScopeRetrievalWorkflow scopeRetrievalWorkflow,
                             URIParameterWorkflow uriParameterWorkflow,
                             ParameterWorkflow parameterWorkflow,
                             ContentWorkflow contentWorkflow,
                             PostParameterWorkflow postParameterWorkflow,
+                            SecurityWorkflow securityWorkflow,
                             ValidationWorkflow validationWorkflow,
                             ActionInvocationWorkflow actionInvocationWorkflow,
                             ScopeStorageWorkflow scopeStorageWorkflow,
@@ -74,8 +74,8 @@ public class DefaultMVCWorkflow implements MVCWorkflow {
     this.exceptionHandler = exceptionHandler;
     this.errorWorkflow = errorWorkflow;
     this.workflows = asList(savedRequestWorkflow, requestBodyWorkflow, staticResourceWorkflow, actionMappingWorkflow,
-        securityWorkflow, messageWorkflow, scopeRetrievalWorkflow, uriParameterWorkflow, parameterWorkflow,
-        contentWorkflow, postParameterWorkflow, validationWorkflow, actionInvocationWorkflow, scopeStorageWorkflow, resultInvocationWorkflow);
+        messageWorkflow, scopeRetrievalWorkflow, uriParameterWorkflow, parameterWorkflow,
+        contentWorkflow, postParameterWorkflow, securityWorkflow, validationWorkflow, actionInvocationWorkflow, scopeStorageWorkflow, resultInvocationWorkflow);
   }
 
   /**

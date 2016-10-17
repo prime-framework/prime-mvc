@@ -276,6 +276,7 @@
             <package name="" withSubpackages="true" static="false" />
           </value>
         </option>
+        <option name="RIGHT_MARGIN" value="140" />
         <option name="JD_ALIGN_EXCEPTION_COMMENTS" value="false" />
         <option name="JD_PRESERVE_LINE_FEEDS" value="true" />
         <option name="HTML_KEEP_WHITESPACES" value="true" />
@@ -286,6 +287,9 @@
         <JSCodeStyleSettings>
           <option name="SPACE_BEFORE_FUNCTION_LEFT_PARENTH" value="false" />
         </JSCodeStyleSettings>
+        <MarkdownNavigatorCodeStyleSettings>
+          <option name="RIGHT_MARGIN" value="72" />
+        </MarkdownNavigatorCodeStyleSettings>
         <XML>
           <option name="XML_ATTRIBUTE_WRAP" value="0" />
           <option name="XML_LEGACY_SETTINGS_IMPORTED" value="true" />

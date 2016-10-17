@@ -22,12 +22,15 @@ import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.UUID;
 
+import org.primeframework.mvc.test.RequestSimulator;
 import org.primeframework.mvc.util.ThrowingRunnable;
 
 /**
  * @author Daniel DeGroff
  */
 public class TestBuilder {
+
+  public RequestSimulator simulator;
 
   public Path tempFile;
 
@@ -49,5 +52,4 @@ public class TestBuilder {
     runnable.run();
     return this;
   }
-
 }

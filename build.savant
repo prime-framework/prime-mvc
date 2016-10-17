@@ -13,7 +13,10 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-project(group: "org.primeframework", name: "prime-mvc", version: "1.0.21", licenses: ["ApacheV2_0"]) {
+
+savantVersion = "1.0.0"
+
+project(group: "org.primeframework", name: "prime-mvc", version: "1.0.22", licenses: ["ApacheV2_0"]) {
   workflow {
     standard()
   }
@@ -28,9 +31,9 @@ project(group: "org.primeframework", name: "prime-mvc", version: "1.0.21", licen
     }
     group(name: "compile") {
       dependency(id: "org.ow2.asm:asm:5.0.3")
-      dependency(id: "com.fasterxml.jackson.core:jackson-annotations:2.4.2")
-      dependency(id: "com.fasterxml.jackson.core:jackson-core:2.4.2")
-      dependency(id: "com.fasterxml.jackson.core:jackson-databind:2.4.2")
+      dependency(id: "com.fasterxml.jackson.core:jackson-annotations:2.8.1")
+      dependency(id: "com.fasterxml.jackson.core:jackson-core:2.8.1")
+      dependency(id: "com.fasterxml.jackson.core:jackson-databind:2.8.1")
       dependency(id: "com.google.inject:guice:4.0.0")
       dependency(id: "com.google.inject.extensions:guice-multibindings:4.0")
       dependency(id: "io.dropwizard.metrics:metrics-core:3.1.0")
@@ -39,12 +42,17 @@ project(group: "org.primeframework", name: "prime-mvc", version: "1.0.21", licen
       dependency(id: "org.apache.commons:commons-io:2.1.0")
       dependency(id: "org.apache.commons:commons-lang3:3.1.0")
       dependency(id: "org.freemarker:freemarker:2.3.23")
+      dependency(id: "org.primeframework:prime-jwt:0.1.1-{integration}")
       dependency(id: "org.primeframework:prime-mock:0.5.6")
       dependency(id: "org.slf4j:slf4j-api:1.7.7")
     }
     group(name: "test-compile", export: false) {
       dependency(id: "org.easymock:easymock:3.2.0")
       dependency(id: "org.testng:testng:6.8.7")
+    }
+    group(name: "test-runtime") {
+      dependency(id: "ch.qos.logback:logback-core:1.0.11")
+      dependency(id: "ch.qos.logback:logback-classic:1.0.11")
     }
   }
 
@@ -54,12 +62,12 @@ project(group: "org.primeframework", name: "prime-mvc", version: "1.0.21", licen
 }
 
 // Plugins
-file = loadPlugin(id: "org.savantbuild.plugin:file:0.4.1")
-dependency = loadPlugin(id: "org.savantbuild.plugin:dependency:0.4.1")
-java = loadPlugin(id: "org.savantbuild.plugin:java:0.4.1")
-javaTestNG = loadPlugin(id: "org.savantbuild.plugin:java-testng:0.4.1")
-idea = loadPlugin(id: "org.savantbuild.plugin:idea:0.4.1")
-release = loadPlugin(id: "org.savantbuild.plugin:release-git:0.4.1")
+file = loadPlugin(id: "org.savantbuild.plugin:file:${savantVersion}")
+dependency = loadPlugin(id: "org.savantbuild.plugin:dependency:${savantVersion}")
+java = loadPlugin(id: "org.savantbuild.plugin:java:${savantVersion}")
+javaTestNG = loadPlugin(id: "org.savantbuild.plugin:java-testng:${savantVersion}")
+idea = loadPlugin(id: "org.savantbuild.plugin:idea:${savantVersion}")
+release = loadPlugin(id: "org.savantbuild.plugin:release-git:${savantVersion}")
 
 // Plugin settings
 java.settings.javaVersion = "1.8"

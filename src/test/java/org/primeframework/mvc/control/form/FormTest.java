@@ -48,7 +48,7 @@ public class FormTest extends ControlBaseTest {
     request.setUri("/user/");
     Index index = new Index();
     ais.setCurrent(new ActionInvocation(index, null, "/user/", null,
-      new ActionConfiguration(Index.class, null, null, new ArrayList<Method>(), null, null, null, null, null, null, null, null, null, null, "/user/")));
+      new ActionConfiguration(Index.class, null, null, new ArrayList<Method>(), null, null, null, null, null, null, null, null, null, null, "/user/", null)));
 
     new ControlTester(form).
       attr("action", "/user/").
@@ -64,7 +64,7 @@ public class FormTest extends ControlBaseTest {
     request.setUri("/user/;jsessionid=C35A2D9557C051F2854845305B1AB911");
     Index index = new Index();
     ais.setCurrent(new ActionInvocation(index, null, "/user/", null,
-      new ActionConfiguration(Index.class, null, null, new ArrayList<Method>(), null, null, null, null, null, null, null, null, null, null, "/user/")));
+      new ActionConfiguration(Index.class, null, null, new ArrayList<Method>(), null, null, null, null, null, null, null, null, null, null, "/user/", null)));
 
     new ControlTester(form).
       attr("action", "/user/").
@@ -95,7 +95,7 @@ public class FormTest extends ControlBaseTest {
     request.setUri("/user/");
     Index index = new Index();
     ais.setCurrent(new ActionInvocation(index, null, "/user/", null,
-      new ActionConfiguration(Index.class, null, null, new ArrayList<Method>(), null, null, null, null, null, null, null, null, null, null, "/user/")));
+      new ActionConfiguration(Index.class, null, null, new ArrayList<Method>(), null, null, null, null, null, null, null, null, null, null, "/user/", null)));
 
     new ControlTester(form).
       attr("action", "https://www.google.com").
@@ -112,7 +112,7 @@ public class FormTest extends ControlBaseTest {
     request.setContextPath("/context");
     Index index = new Index();
     ais.setCurrent(new ActionInvocation(index, null, "/user/", null,
-      new ActionConfiguration(Index.class, null, null, new ArrayList<Method>(), null, null, null, null, null, null, null, null, null, null, "/user/")));
+      new ActionConfiguration(Index.class, null, null, new ArrayList<Method>(), null, null, null, null, null, null, null, null, null, null, "/user/", null)));
 
     new ControlTester(form).
       attr("action", "/user/").
@@ -145,7 +145,7 @@ public class FormTest extends ControlBaseTest {
     request.setContextPath("/context");
     Index index = new Index();
     ais.setCurrent(new ActionInvocation(index, null, "/user/", null,
-      new ActionConfiguration(Index.class, null, null, new ArrayList<Method>(), null, null, null, null, null, null, null, null, null, null, "/user/")));
+      new ActionConfiguration(Index.class, null, null, new ArrayList<Method>(), null, null, null, null, null, null, null, null, null, null, "/user/", null)));
 
     new ControlTester(form).
       attr("action", "https://www.google.com").
@@ -161,7 +161,7 @@ public class FormTest extends ControlBaseTest {
     request.setUri("/user/edit");
     Edit edit = new Edit();
     ais.setCurrent(new ActionInvocation(edit, null, "/user/edit", null,
-      new ActionConfiguration(Index.class, null, null, asList(Edit.class.getMethod("formPrepare")), null, null, null, null, null, null, null, null, null, null, "/user/")));
+      new ActionConfiguration(Index.class, null, null, asList(Edit.class.getMethod("formPrepare")), null, null, null, null, null, null, null, null, null, null, "/user/", null)));
 
     new ControlTester(form).
       attr("action", "/user/edit").

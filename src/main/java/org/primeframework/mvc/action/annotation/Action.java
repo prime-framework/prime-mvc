@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2016, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,19 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface Action {
   /**
+   * @return the required roles for this action to be executed.
+   */
+  String[] constraints() default {};
+
+  /**
+   * Set this to true to enable JWT authorization. If JWT is enabled and a JWT Authorization header is sent in on the request the JWT
+   * Security Scheme will be utilized instead of the specified security scheme.
+   *
+   * @return true if this action allows JWT authorization.
+   */
+  boolean jwtEnabled() default false;
+
+  /**
    * Determines if the action can be overridden by another action that maps to the same URI. If a class that is marked
    * as overridable and another another class is found for the same URI but is not marked as overridable, that one is
    * used.
@@ -43,20 +56,16 @@ public @interface Action {
   boolean requiresAuthentication() default false;
 
   /**
-   * @return the required roles for this action to be executed.
-   */
-  String[] constraints() default {};
-
-  /**
    * @return The security scheme that handles the authentication and authorization for this action.
    */
   String scheme() default "user";
 
   /**
    * @return The value of the action annotation is used to determines the URI suffix patterns that the action class can
-   * handle. This is also known as RESTful URI handling. The pattern is derived from the current WADL specification from
-   * Sun. The base URI for the action is fixed based on the package and class name. However, everything after the base
-   * can be set into properties or fields of the action class using the WADL pattern here. The pattern is like this:
+   * handle. This is also known as RESTful URI handling. The pattern is derived from the current WADL specification
+   * from Sun. The base URI for the action is fixed based on the package and class name. However, everything after the
+   * base can be set into properties or fields of the action class using the WADL pattern here. The pattern is like
+   * this:
    * <p>
    * {@code {id}}
    * <p>
@@ -65,8 +74,8 @@ public @interface Action {
    * {@code {/admin/user/edit/{id}}
    * <p>
    * If the URI is <strong>/admin/user/edit/42</strong>, the value of 42 would be added to the HTTP request parameters
-   * under the key <strong>id</strong>. In most cases this means that the value will also be set into the action, but it
-   * could also be used as a {@link org.primeframework.mvc.parameter.annotation.PreParameter}.
+   * under the key <strong>id</strong>. In most cases this means that the value will also be set into the action, but
+   * it could also be used as a {@link org.primeframework.mvc.parameter.annotation.PreParameter}.
    */
   String value() default "";
 }

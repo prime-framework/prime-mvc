@@ -28,6 +28,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.example.action.user.Edit;
+import org.primeframework.jwt.Verifier;
 import org.primeframework.mock.servlet.MockHttpServletRequest;
 import org.primeframework.mock.servlet.MockHttpServletResponse;
 import org.primeframework.mock.servlet.MockHttpSession;
@@ -40,6 +41,9 @@ import org.primeframework.mvc.action.config.DefaultActionConfigurationBuilder;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.guice.GuiceBootstrap;
 import org.primeframework.mvc.guice.MVCModule;
+import org.primeframework.mvc.jwt.MockVerifierProvider;
+import org.primeframework.mvc.security.MockUserLoginSecurityContext;
+import org.primeframework.mvc.security.UserLoginSecurityContext;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.servlet.ServletObjectsHolder;
 import org.primeframework.mvc.test.RequestSimulator;
@@ -53,6 +57,8 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import com.google.inject.TypeLiteral;
+import com.google.inject.util.Modules;
 import static java.util.Arrays.asList;
 
 /**
@@ -87,14 +93,17 @@ public abstract class PrimeBaseTest {
     ServletObjectsHolder.setServletContext(context);
 
 
-    Module module = new MVCModule() {
+    Module mvcModule = new MVCModule() {
       @Override
       protected void configure() {
         super.configure();
         install(new TestModule());
         bind(MetricRegistry.class).toInstance(metricRegistry);
+        bind(UserLoginSecurityContext.class).to(MockUserLoginSecurityContext.class);
       }
     };
+
+    Module module = Modules.override(mvcModule).with(new SecurityModule());
     injector = GuiceBootstrap.initialize(module);
     simulator = new RequestSimulator(context, module);
   }
@@ -112,6 +121,7 @@ public abstract class PrimeBaseTest {
     ServletObjectsHolder.setServletResponse(response);
 
     injector.injectMembers(this);
+    test.simulator = simulator;
 
     metricRegistry = injector.getInstance(MetricRegistry.class);
     // clear the metric registry before each test
@@ -164,10 +174,16 @@ public abstract class PrimeBaseTest {
     resultConfigurations.put(resultCode, annotation);
 
     return new ActionInvocation(action, executeMethod, uri, extension,
-        new ActionConfiguration(Edit.class, executeMethods, validationMethods, new ArrayList<>(), new ArrayList<>(),
-            new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), resultConfigurations,
-            new HashMap<>(), new HashMap<>(), new HashSet<>(),
-            new ArrayList<>(), new HashMap<>(), uri));
+        new ActionConfiguration(Edit.class, executeMethods, validationMethods, new ArrayList<>(), null, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), resultConfigurations, new HashMap<>(), new HashMap<>(), new HashSet<>(), new ArrayList<>(), new HashMap<>(), uri, new ArrayList<>()
+        ));
+  }
+
+  public static class SecurityModule extends AbstractModule {
+    @Override
+    protected void configure() {
+      bind(new TypeLiteral<List<Verifier>>() {
+      }).toProvider(MockVerifierProvider.class);
+    }
   }
 
   public static class TestModule extends AbstractModule {
@@ -176,4 +192,5 @@ public abstract class PrimeBaseTest {
       bind(MVCConfiguration.class).toInstance(new MockConfiguration());
     }
   }
+
 }

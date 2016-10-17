@@ -95,6 +95,68 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void get_jwtAuthorized() throws Exception {
+    test.simulate(() -> simulator.test("/jwt-authorized")
+                                 .withParameter("authorized", true)
+                                 .withHeader("Authorization", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkifQ.qHdut1UR4-2FSAvh7U3YdeRR5r5boVqjIGQ16Ztp894")
+                                 .get()
+                                 .assertStatusCode(200));
+  }
+
+  @Test
+  public void get_jwtDisabledJwtAuthentication() throws Exception {
+    test.simulate(() -> simulator.test("/jwt-authorized-disabled")
+                                 .withParameter("authorized", true)
+                                 .withHeader("Authorization", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkifQ.qHdut1UR4-2FSAvh7U3YdeRR5r5boVqjIGQ16Ztp894")
+                                 .get()
+                                 .assertStatusCode(401));
+  }
+
+  @Test
+  public void get_jwtExpired() throws Exception {
+    test.simulate(() -> simulator.test("/jwt-authorized")
+                                 .withParameter("authorized", true)
+                                 .withHeader("Authorization", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0NDUxMDA3MzF9.K18gIegEBfxgj8rU4D2WDh3CzEmRUmy8qBS7SWAcG9w")
+                                 .get()
+                                 .assertStatusCode(401));
+  }
+
+  @Test
+  public void get_jwtInvalidSignature() throws Exception {
+    test.simulate(() -> simulator.test("/jwt-authorized")
+                                 .withParameter("authorized", true)
+                                 .withHeader("Authorization", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkifQ.aaabbbcccddd")
+                                 .get()
+                                 .assertStatusCode(401));
+  }
+
+  @Test
+  public void get_jwtMissingAuthorizeHeader() throws Exception {
+    test.simulate(() -> simulator.test("/jwt-authorized")
+                                 .withParameter("authorized", true)
+                                 .get()
+                                 .assertStatusCode(401));
+  }
+
+  @Test
+  public void get_jwtNotAuthorized() throws Exception {
+    test.simulate(() -> simulator.test("/jwt-authorized")
+                                 .withParameter("authorized", false)
+                                 .withHeader("Authorization", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkifQ.qHdut1UR4-2FSAvh7U3YdeRR5r5boVqjIGQ16Ztp894")
+                                 .get()
+                                 .assertStatusCode(401));
+  }
+
+  @Test
+  public void get_jwtNotBefore() throws Exception {
+    test.simulate(() -> simulator.test("/jwt-authorized")
+                                 .withParameter("authorized", true)
+                                 .withHeader("Authorization", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYmYiOjQ2MzIzOTY2NjV9.mRvvyJXvDD8RQ_PM1TadZdZNYXRa9CjOx62Tk866538")
+                                 .get()
+                                 .assertStatusCode(401));
+  }
+
+  @Test
   public void get_metrics() throws Exception {
     simulator.test("/user/full-form")
              .get()

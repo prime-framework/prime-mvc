@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2016, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,15 +21,21 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import org.primeframework.jwt.domain.JWT;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ExecuteMethodConfiguration;
+import org.primeframework.mvc.action.JWTMethodConfiguration;
 import org.primeframework.mvc.action.ValidationMethodConfiguration;
+import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.annotation.ResultAnnotation;
 import org.primeframework.mvc.action.result.annotation.ResultContainerAnnotation;
 import org.primeframework.mvc.control.form.annotation.FormPrepareMethod;
@@ -39,6 +45,7 @@ import org.primeframework.mvc.parameter.annotation.PreParameterMethod;
 import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
 import org.primeframework.mvc.scope.ScopeField;
 import org.primeframework.mvc.scope.annotation.ScopeAnnotation;
+import org.primeframework.mvc.security.annotation.JWTAuthorizeMethod;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.util.ReflectionUtils;
 import org.primeframework.mvc.util.URIBuilder;
@@ -90,14 +97,15 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
     Map<String, PreParameter> preParameterMembers = ReflectionUtils.findAllMembersWithAnnotation(actionClass, PreParameter.class);
     Map<String, FileUpload> fileUploadMembers = ReflectionUtils.findAllMembersWithAnnotation(actionClass, FileUpload.class);
     Set<String> memberNames = ReflectionUtils.findAllMembers(actionClass);
+    List<JWTMethodConfiguration> jwtAuthorizationMethods = findJwtAuthorizationMethods(actionClass, executeMethods.keySet());
 
     List<ScopeField> scopeFields = findScopeFields(actionClass);
 
     Map<Class<?>, Object> additionalConfiguration = getAdditionalConfiguration(actionClass);
 
-    return new ActionConfiguration(actionClass, executeMethods, validationMethods, formPrepareMethods, preValidationMethods,
-        postValidationMethods, preParameterMethods, postParameterMethods, resultAnnotations, preParameterMembers,
-        fileUploadMembers, memberNames, scopeFields, additionalConfiguration, uri);
+    return new ActionConfiguration(actionClass, executeMethods, validationMethods, formPrepareMethods, jwtAuthorizationMethods,
+        postValidationMethods, preParameterMethods, postParameterMethods, resultAnnotations, preParameterMembers, fileUploadMembers,
+        memberNames, scopeFields, additionalConfiguration, uri, preValidationMethods);
   }
 
   /**
@@ -224,6 +232,46 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
     return executeMethods;
   }
 
+  protected List<JWTMethodConfiguration> findJwtAuthorizationMethods(Class<?> actionClass, Set<HTTPMethod> executeMethods) {
+    if (!actionClass.getAnnotation(Action.class).jwtEnabled()) {
+      return Collections.emptyList();
+    }
+
+    List<Method> methods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, JWTAuthorizeMethod.class);
+    if (methods.isEmpty()) {
+      throw new PrimeException("The action class [" + actionClass + "] is missing at a JWT Authorization method. " +
+          "The class must define a one or more methods annotated " + JWTAuthorizeMethod.class.getSimpleName() + " when [jwtEnabled] is set to [true].");
+    }
+
+    executeMethods.remove(HTTPMethod.HEAD);
+    executeMethods.remove(HTTPMethod.TRACE);
+    executeMethods.remove(HTTPMethod.OPTIONS);
+    executeMethods.remove(HTTPMethod.CONNECT);
+
+    // Ensure all methods are accounted for JWT authorization
+    Set<HTTPMethod> httpMethods = methods.stream().flatMap(this::streamJWTAuthorizationHttpMethods).collect(Collectors.toSet());
+    if (!httpMethods.containsAll(executeMethods)) {
+      throw new PrimeException("The action class [" + actionClass + "] is missing at a JWT Authorization method. " +
+          "The class must define one or more methods annotated " + JWTAuthorizeMethod.class.getSimpleName() + " when [jwtEnabled] is set to [true]. "
+          + "Ensure that for each execute method in your action such as post, put, get and delete that a method is configured to authorize the JWT.");
+    }
+
+    // Return type must be Boolean or boolean
+    if (methods.stream().anyMatch(m -> m.getReturnType() != Boolean.TYPE && m.getReturnType() != Boolean.class)) {
+      throw new PrimeException("The action class [" + actionClass + "] has at least one JWT Authorization method that has declared a return "
+          + "type of something other than boolean. Your method annotated with " + JWTAuthorizeMethod.class.getSimpleName() + " must declare a return type"
+          + "of boolean or Boolean.");
+    }
+
+    // Must take a single parameter for a JWT
+    if (methods.stream().anyMatch(m -> m.getParameterCount() != 1 || m.getParameterTypes()[0] != JWT.class)) {
+      throw new PrimeException("The action class [" + actionClass + "] has at least one JWT Authorization method that has not declared the correct method "
+          + "signature. Your method annotated with " + JWTAuthorizeMethod.class.getSimpleName() + " must declare a single method parameter of type JWT.");
+    }
+
+    return methods.stream().map(m -> new JWTMethodConfiguration(m, m.getAnnotation(JWTAuthorizeMethod.class))).collect(Collectors.toList());
+  }
+
   /**
    * Finds all of the result configurations for the action class.
    *
@@ -306,5 +354,17 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
       }
     }
     return additionalConfiguration;
+  }
+
+  private Stream<HTTPMethod> streamJWTAuthorizationHttpMethods(Method method) {
+    Annotation[] annotations = method.getDeclaredAnnotations();
+    for (Annotation annotation : annotations) {
+      if (annotation instanceof JWTAuthorizeMethod) {
+        return Arrays.stream(((JWTAuthorizeMethod) annotation).httpMethods());
+      }
+    }
+
+    // This will never happen if it does, buy a lottery ticket.
+    throw new RuntimeException("Method does not have the JWTAuthorizedMethod.");
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2015-2016, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ package org.primeframework.mvc.security;
 
 import javax.servlet.ServletException;
 import java.io.IOException;
-import java.util.Map;
 
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
@@ -40,9 +39,12 @@ public class DefaultSecurityWorkflow implements SecurityWorkflow {
 
   private final SecuritySchemeFactory factory;
 
+  private final JWTExtractor jwtExtractor;
+
   @Inject
-  public DefaultSecurityWorkflow(ActionInvocationStore actionInvocationStore, SecuritySchemeFactory factory) {
+  public DefaultSecurityWorkflow(ActionInvocationStore actionInvocationStore, JWTExtractor jwtExtractor, SecuritySchemeFactory factory) {
     this.actionInvocationStore = actionInvocationStore;
+    this.jwtExtractor = jwtExtractor;
     this.factory = factory;
   }
 
@@ -60,7 +62,14 @@ public class DefaultSecurityWorkflow implements SecurityWorkflow {
       return;
     }
 
-    String scheme = actionAnnotation.scheme();
+    // If a JWT is provided but JWT is not enabled - Unauthorized.
+    boolean requestContainsJWT = jwtExtractor.requestContainsJWT();
+    if (requestContainsJWT && !actionAnnotation.jwtEnabled()) {
+      throw new UnauthorizedException();
+    }
+
+    // If JWT is enabled and a JWT was sent on the request the JWT scheme is always used, the scheme is ignored.
+    String scheme = (requestContainsJWT && actionAnnotation.jwtEnabled()) ? "jwt" : actionAnnotation.scheme();
     SecurityScheme securityScheme = factory.build(scheme);
     if (securityScheme == null) {
       throw new PrimeException("You have specified an invalid security scheme named [" + scheme + "]");

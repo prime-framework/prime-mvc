@@ -63,7 +63,7 @@ public class DefaultContentWorkflowTest extends PrimeBaseTest {
     additionalConfig.put(BinaryActionConfiguration.class, new BinaryActionConfiguration("binaryRequest", null));
 
     KitchenSink action = new KitchenSink(null);
-    ActionConfiguration config = new ActionConfiguration(KitchenSink.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null);
+    ActionConfiguration config = new ActionConfiguration(KitchenSink.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null, null);
     store.setCurrent(new ActionInvocation(action, null, null, null, config));
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
@@ -119,7 +119,7 @@ public class DefaultContentWorkflowTest extends PrimeBaseTest {
     additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration("jsonRequest", UserField.class, null));
 
     KitchenSink action = new KitchenSink(null);
-    ActionConfiguration config = new ActionConfiguration(KitchenSink.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null);
+    ActionConfiguration config = new ActionConfiguration(KitchenSink.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null, null);
     store.setCurrent(new ActionInvocation(action, null, null, null, config));
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);

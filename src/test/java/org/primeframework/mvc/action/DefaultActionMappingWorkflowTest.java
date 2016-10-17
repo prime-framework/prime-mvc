@@ -125,10 +125,8 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     EasyMock.expect(provider.lookup("/admin/user/rest-edit/12")).andReturn(null);
     EasyMock.expect(provider.lookup("/admin/user/rest-edit/12/index")).andReturn(null);
     EasyMock.expect(provider.lookup("/admin/user/rest-edit")).andReturn(new ActionConfiguration(RESTEdit.class, executeMethods,
-      new ArrayList<ValidationMethodConfiguration>(), new ArrayList<Method>(), new ArrayList<Method>(),
-      new ArrayList<Method>(), new ArrayList<Method>(), new ArrayList<Method>(),
-      new HashMap<String, Annotation>(), new HashMap<String, PreParameter>(), new HashMap<String, FileUpload>(),
-      new HashSet<String>(), new ArrayList<ScopeField>(), new HashMap<Class<?>, Object>(), "/admin/user/rest-edit"));
+      new ArrayList<ValidationMethodConfiguration>(), new ArrayList<Method>(), null, new ArrayList<Method>(), new ArrayList<Method>(), new ArrayList<Method>(), new HashMap<String, Annotation>(), new HashMap<String, PreParameter>(), new HashMap<String, FileUpload>(), new HashSet<String>(), new ArrayList<ScopeField>(), new HashMap<Class<?>, Object>(), "/admin/user/rest-edit", new ArrayList<Method>()
+    ));
     EasyMock.replay(provider);
 
     Capture<ActionInvocation> capture = new Capture<ActionInvocation>();
@@ -182,10 +180,8 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     EasyMock.expect(provider.lookup("/complex-rest/brian")).andReturn(null);
     EasyMock.expect(provider.lookup("/complex-rest")).andReturn(
       new ActionConfiguration(ComplexRest.class, executeMethods,
-        new ArrayList<ValidationMethodConfiguration>(), new ArrayList<Method>(), new ArrayList<Method>(),
-        new ArrayList<Method>(), new ArrayList<Method>(), new ArrayList<Method>(),
-        new HashMap<String, Annotation>(), new HashMap<String, PreParameter>(), new HashMap<String, FileUpload>(),
-        new HashSet<String>(), new ArrayList<ScopeField>(), new HashMap<Class<?>, Object>(), "/complex-rest"));
+        new ArrayList<ValidationMethodConfiguration>(), new ArrayList<Method>(), null, new ArrayList<Method>(), new ArrayList<Method>(), new ArrayList<Method>(), new HashMap<String, Annotation>(), new HashMap<String, PreParameter>(), new HashMap<String, FileUpload>(), new HashSet<String>(), new ArrayList<ScopeField>(), new HashMap<Class<?>, Object>(), "/complex-rest", new ArrayList<Method>()
+      ));
     EasyMock.replay(provider);
 
     Capture<ActionInvocation> capture = new Capture<ActionInvocation>();
@@ -228,10 +224,8 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     EasyMock.expect(provider.lookup("/foo")).andReturn(null);
     EasyMock.expect(provider.lookup("/foo/index")).andReturn(
       new ActionConfiguration(ComplexRest.class, new HashMap<HTTPMethod, ExecuteMethodConfiguration>(),
-        new ArrayList<ValidationMethodConfiguration>(), new ArrayList<Method>(), new ArrayList<Method>(),
-        new ArrayList<Method>(), new ArrayList<Method>(), new ArrayList<Method>(),
-        new HashMap<String, Annotation>(), new HashMap<String, PreParameter>(), new HashMap<String, FileUpload>(),
-        new HashSet<String>(), new ArrayList<ScopeField>(), new HashMap<Class<?>, Object>(), "/foo/index"));
+        new ArrayList<ValidationMethodConfiguration>(), new ArrayList<Method>(), null, new ArrayList<Method>(), new ArrayList<Method>(), new ArrayList<Method>(), new HashMap<String, Annotation>(), new HashMap<String, PreParameter>(), new HashMap<String, FileUpload>(), new HashSet<String>(), new ArrayList<ScopeField>(), new HashMap<Class<?>, Object>(), "/foo/index", new ArrayList<Method>()
+      ));
     EasyMock.replay(provider);
 
     ActionInvocationStore store = EasyMock.createStrictMock(ActionInvocationStore.class);
@@ -258,10 +252,8 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     ActionConfigurationProvider provider = EasyMock.createStrictMock(ActionConfigurationProvider.class);
     EasyMock.expect(provider.lookup(uri)).andReturn(
       new ActionConfiguration(Edit.class, executeMethods,
-        new ArrayList<ValidationMethodConfiguration>(), new ArrayList<Method>(), new ArrayList<Method>(),
-        new ArrayList<Method>(), new ArrayList<Method>(), new ArrayList<Method>(),
-        new HashMap<String, Annotation>(), new HashMap<String, PreParameter>(), new HashMap<String, FileUpload>(),
-        new HashSet<String>(), new ArrayList<ScopeField>(), new HashMap<Class<?>, Object>(), uri));
+        new ArrayList<ValidationMethodConfiguration>(), new ArrayList<Method>(), null, new ArrayList<Method>(), new ArrayList<Method>(), new ArrayList<Method>(), new HashMap<String, Annotation>(), new HashMap<String, PreParameter>(), new HashMap<String, FileUpload>(), new HashSet<String>(), new ArrayList<ScopeField>(), new HashMap<Class<?>, Object>(), uri, new ArrayList<Method>()
+      ));
     EasyMock.replay(provider);
 
     Capture<ActionInvocation> capture = new Capture<ActionInvocation>();

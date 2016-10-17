@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2016, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2016, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,34 +15,30 @@
  */
 package org.example.action;
 
-import org.example.domain.UserField;
+import org.primeframework.jwt.domain.JWT;
 import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.action.result.annotation.JSON;
-import org.primeframework.mvc.content.json.annotation.JSONRequest;
-import org.primeframework.mvc.content.json.annotation.JSONResponse;
+import org.primeframework.mvc.action.result.annotation.Status;
+import org.primeframework.mvc.security.annotation.JWTAuthorizeMethod;
 
 /**
- * This is a simple test action that has an invalid URL parameter in the @Action annotation.
- *
- * @author Brian Pontarelli
+ * @author Daniel DeGroff
  */
-@Action("{id}")
-@JSON
-public class InvalidApi {
-  public ActionType action;
+@Action(requiresAuthentication = true, jwtEnabled = false)
+@Status.List({
+    @Status(code = "success", status = 200),
+    @Status(code = "unauthenticated", status = 401),
+    @Status(code = "unauthorized", status = 401)
+})
+public class JwtAuthorizedDisabledAction {
 
-  @JSONRequest
-  @JSONResponse
-  public UserField user;
+  public boolean authorized;
 
-  public String uuid;
+  @JWTAuthorizeMethod
+  public boolean authorize(JWT jwt) {
+    return authorized;
+  }
 
   public String get() {
     return "success";
-  }
-
-  public enum ActionType {
-    ADD,
-    EDIT
   }
 }

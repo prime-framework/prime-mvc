@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2016, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,7 +64,7 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
     additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration("jsonRequest", UserField.class, null));
 
     KitchenSink action = new KitchenSink(null);
-    ActionConfiguration config = new ActionConfiguration(KitchenSink.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null);
+    ActionConfiguration config = new ActionConfiguration(KitchenSink.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null, null);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(action, null, "/action", null, config));
     replay(store);
@@ -140,7 +140,7 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
     additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration("jsonRequest", UserField.class, null));
 
     KitchenSink action = new KitchenSink(null);
-    ActionConfiguration config = new ActionConfiguration(KitchenSink.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null);
+    ActionConfiguration config = new ActionConfiguration(KitchenSink.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null, null);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(action, null, "/action", null, config));
     replay(store);
@@ -178,7 +178,7 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
     additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration("jsonRequest", UserField.class, null));
 
     KitchenSink action = new KitchenSink(null);
-    ActionConfiguration config = new ActionConfiguration(KitchenSink.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null);
+    ActionConfiguration config = new ActionConfiguration(KitchenSink.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null, null);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(action, null, "/action", null, config));
     replay(store);
@@ -216,7 +216,7 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
     additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration("jsonRequest", UserField.class, null));
 
     KitchenSink action = new KitchenSink(null);
-    ActionConfiguration config = new ActionConfiguration(KitchenSink.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null);
+    ActionConfiguration config = new ActionConfiguration(KitchenSink.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null, null);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(action, null, "/action", null, config));
     replay(store);
@@ -232,11 +232,11 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
     request.setInputStream(new MockServletInputStream(expected.getBytes()));
 
     MessageProvider messageProvider = createNiceMock(MessageProvider.class);
-    expect(messageProvider.getMessage(eq("[couldNotConvert]addresses.age"), isA(String.class))).andReturn("Bad age");
+    expect(messageProvider.getMessage(eq("[couldNotConvert]addresses.home.age"), isA(String.class))).andReturn("Bad age");
     replay(messageProvider);
 
     MessageStore messageStore = createNiceMock(MessageStore.class);
-    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "addresses.age", "[couldNotConvert]addresses.age", "Bad age"));
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "addresses.home.age", "[couldNotConvert]addresses.home.age", "Bad age"));
     replay(messageStore);
 
     JacksonContentHandler handler = new JacksonContentHandler(request, store, new ObjectMapper(), expressionEvaluator, messageProvider, messageStore);
@@ -258,7 +258,7 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
     additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration("jsonRequest", UserField.class, null));
 
     KitchenSink action = new KitchenSink(null);
-    ActionConfiguration config = new ActionConfiguration(KitchenSink.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null);
+    ActionConfiguration config = new ActionConfiguration(KitchenSink.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null, null);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(action, null, "/action", null, config));
     replay(store);
@@ -350,7 +350,7 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
     Map<Class<?>, Object> additionalConfig = new HashMap<>();
 
     KitchenSink action = new KitchenSink(null);
-    ActionConfiguration config = new ActionConfiguration(KitchenSink.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null);
+    ActionConfiguration config = new ActionConfiguration(KitchenSink.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null, null);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(action, null, "/action", null, config));
     replay(store);
