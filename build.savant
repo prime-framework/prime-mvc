@@ -42,7 +42,7 @@ project(group: "org.primeframework", name: "prime-mvc", version: "1.0.22", licen
       dependency(id: "org.apache.commons:commons-io:2.1.0")
       dependency(id: "org.apache.commons:commons-lang3:3.1.0")
       dependency(id: "org.freemarker:freemarker:2.3.23")
-      dependency(id: "org.primeframework:prime-jwt:0.1.1-{integration}")
+      dependency(id: "org.primeframework:prime-jwt:0.1.1")
       dependency(id: "org.primeframework:prime-mock:0.5.6")
       dependency(id: "org.slf4j:slf4j-api:1.7.7")
     }
