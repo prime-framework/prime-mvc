@@ -15,7 +15,7 @@
  */
 package org.primeframework.mvc.security.guice;
 
-import java.util.List;
+import java.util.Map;
 
 import org.primeframework.jwt.Verifier;
 import org.primeframework.mvc.security.DefaultJWTExtractor;
@@ -43,7 +43,7 @@ public class SecurityModule extends AbstractModule {
     bind(SavedRequestWorkflow.class).to(DefaultSavedRequestWorkflow.class);
 
     bind(JWTExtractor.class).to(DefaultJWTExtractor.class);
-    bind(new TypeLiteral<List<Verifier>>() {}).toProvider(ExplosiveVerifierProvider.class);
+    bind(new TypeLiteral<Map<String, Verifier>>() {}).toProvider(ExplosiveVerifierProvider.class);
 
     // Binds the user login scheme
     SecuritySchemeFactory.addSecurityScheme(binder(), "user", UserLoginSecurityScheme.class);

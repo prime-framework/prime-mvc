@@ -16,7 +16,7 @@
 package org.primeframework.mvc.jwt;
 
 import java.util.Collections;
-import java.util.List;
+import java.util.Map;
 
 import org.primeframework.jwt.Verifier;
 import org.primeframework.jwt.hmac.HMACVerifier;
@@ -26,10 +26,10 @@ import com.google.inject.Provider;
 /**
  * @author Daniel DeGroff
  */
-public class MockVerifierProvider implements Provider<List<Verifier>> {
+public class MockVerifierProvider implements Provider<Map<String, Verifier>> {
 
   @Override
-  public List<Verifier> get() {
-    return Collections.singletonList(HMACVerifier.newVerifier("secret"));
+  public Map<String, Verifier> get() {
+    return Collections.singletonMap(null, HMACVerifier.newVerifier("secret"));
   }
 }

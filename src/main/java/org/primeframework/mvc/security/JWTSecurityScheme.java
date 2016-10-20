@@ -16,7 +16,7 @@
 package org.primeframework.mvc.security;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.primeframework.jwt.Verifier;
@@ -50,10 +50,10 @@ public class JWTSecurityScheme implements SecurityScheme {
 
   protected final HttpServletRequest request;
 
-  protected final Provider<List<Verifier>> verifierProvider;
+  protected final Provider<Map<String, Verifier>> verifierProvider;
 
   @Inject
-  public JWTSecurityScheme(ActionInvocationStore actionInvocationStore, HTTPMethod httpMethod, JWTExtractor jwtExtractor, HttpServletRequest request, Provider<List<Verifier>> verifierProvider) {
+  public JWTSecurityScheme(ActionInvocationStore actionInvocationStore, HTTPMethod httpMethod, JWTExtractor jwtExtractor, HttpServletRequest request, Provider<Map<String, Verifier>> verifierProvider) {
     this.actionInvocationStore = actionInvocationStore;
     this.httpMethod = httpMethod;
     this.jwtExtractor = jwtExtractor;
@@ -70,7 +70,7 @@ public class JWTSecurityScheme implements SecurityScheme {
 
     try {
       String encodedJWT = jwtExtractor.get();
-      final JWT jwt = JWT.getDecoder().decode(encodedJWT, verifierProvider.get().stream().toArray(Verifier[]::new));
+      final JWT jwt = JWT.getDecoder().decode(encodedJWT, verifierProvider.get());
 
       // The JWT has a valid signature and is not expired, further authorization is delegated to the action.
       ActionConfiguration actionConfiguration = actionInvocation.configuration;

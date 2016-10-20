@@ -81,18 +81,18 @@ public class DefaultMVCWorkflow implements MVCWorkflow {
   /**
    * Creates a sub-chain of the MVC workflows and invokes it.
    *
-   * @param chain The chain.
+   * @param workflowChain The chain.
    * @throws IOException If the sub-chain throws an IOException
    * @throws ServletException If the sub-chain throws an ServletException
    */
-  public void perform(WorkflowChain chain) throws IOException, ServletException {
+  public void perform(WorkflowChain workflowChain) throws IOException, ServletException {
     try {
-      SubWorkflowChain subChain = new SubWorkflowChain(workflows, chain);
-      subChain.continueWorkflow();
+      WorkflowChain chain = new SubWorkflowChain(workflows, workflowChain);
+      chain.continueWorkflow();
     } catch (RuntimeException | Error e) {
       exceptionHandler.handle(e);
 
-      SubWorkflowChain errorChain = new SubWorkflowChain(singletonList(errorWorkflow), chain);
+      WorkflowChain errorChain = new SubWorkflowChain(singletonList(errorWorkflow), workflowChain);
       errorChain.continueWorkflow();
     }
   }

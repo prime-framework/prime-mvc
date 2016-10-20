@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2016, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,6 +52,16 @@ public abstract class AbstractResult<U extends Annotation> implements Result<U> 
   }
 
   /**
+   * Return true if the current invocation is for an HTTP HEAD request.
+   *
+   * @param actionInvocation the ActionInvocation
+   * @return true if the current action invocation is a HTTP HEAD request
+   */
+  protected boolean isHeadRequest(ActionInvocation actionInvocation) {
+    return actionInvocation.method != null && actionInvocation.method.httpMethod == HTTPMethod.HEAD;
+  }
+
+  /**
    * Sets the status into the response. If the String <code>statusStr</code> is set, it overrides the int code.
    *
    * @param status    The default code to use.
@@ -66,15 +76,5 @@ public abstract class AbstractResult<U extends Annotation> implements Result<U> 
     }
 
     response.setStatus(code);
-  }
-
-  /**
-   * Return true if the current invocation is for an HTTP HEAD request.
-   *
-   * @param actionInvocation the ActionInvocation
-   * @return true if the current action invocation is a HTTP HEAD request
-   */
-  protected boolean isHeadRequest(ActionInvocation actionInvocation) {
-    return actionInvocation.method != null && actionInvocation.method.httpMethod == HTTPMethod.HEAD;
   }
 }

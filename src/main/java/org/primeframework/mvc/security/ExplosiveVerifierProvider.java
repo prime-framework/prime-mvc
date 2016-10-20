@@ -15,7 +15,7 @@
  */
 package org.primeframework.mvc.security;
 
-import java.util.List;
+import java.util.Map;
 
 import org.primeframework.jwt.Verifier;
 import org.primeframework.mvc.PrimeException;
@@ -27,10 +27,10 @@ import com.google.inject.Provider;
  *
  * @author Daniel DeGroff
  */
-public class ExplosiveVerifierProvider implements Provider<List<Verifier>> {
+public class ExplosiveVerifierProvider implements Provider<Map<String, Verifier>> {
 
   @Override
-  public List<Verifier> get() {
+  public Map<String, Verifier> get() {
     throw new PrimeException("In order to use the JWT authorization scheme you must bind a Verifier Provider.");
   }
 }

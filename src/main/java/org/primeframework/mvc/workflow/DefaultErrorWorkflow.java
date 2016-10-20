@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2016, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +24,11 @@ import org.primeframework.mvc.message.MessageWorkflow;
 import org.primeframework.mvc.scope.ScopeStorageWorkflow;
 
 import com.google.inject.Inject;
-import static java.util.Arrays.*;
+import static java.util.Arrays.asList;
 
 /**
  * Default error workflow. This executes the workflows passed into the constructor in order.
+ *
  * @author Brian Pontarelli
  */
 public class DefaultErrorWorkflow implements ErrorWorkflow {
@@ -41,7 +42,7 @@ public class DefaultErrorWorkflow implements ErrorWorkflow {
 
   @Override
   public void perform(WorkflowChain workflowChain) throws IOException, ServletException {
-    SubWorkflowChain chain = new SubWorkflowChain(errorWorkflows, workflowChain);
+    WorkflowChain chain = new SubWorkflowChain(errorWorkflows, workflowChain);
     chain.continueWorkflow();
   }
 }

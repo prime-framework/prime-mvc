@@ -181,8 +181,7 @@ public abstract class PrimeBaseTest {
   public static class SecurityModule extends AbstractModule {
     @Override
     protected void configure() {
-      bind(new TypeLiteral<List<Verifier>>() {
-      }).toProvider(MockVerifierProvider.class);
+      bind(new TypeLiteral<Map<String, Verifier>>() { }).toProvider(MockVerifierProvider.class);
     }
   }
 
