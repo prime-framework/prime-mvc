@@ -15,6 +15,9 @@
  */
 package org.primeframework.mvc.config;
 
+import java.security.Key;
+import java.security.spec.AlgorithmParameterSpec;
+
 /**
  * The main configuration interface for Prime that outlines all of the configurable values for the framework. This
  * interface can easily be implemented to suit any needs in your application.
@@ -26,6 +29,16 @@ public interface MVCConfiguration {
    * @return Whether or not unknown parameters should be allowed or if they should throw an exception.
    */
   boolean allowUnknownParameters();
+
+  /**
+   * @return The encryption key that is used to encrypt cookies.
+   */
+  Key cookieEncryptionKey();
+
+  /**
+   * @return The IV that is used to encrypt cookies.
+   */
+  AlgorithmParameterSpec cookieEncryptionIV();
 
   /**
    * @return True if empty HTTP request parameters should be considered null values by the conversion system.

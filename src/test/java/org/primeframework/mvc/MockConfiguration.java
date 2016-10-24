@@ -15,6 +15,13 @@
  */
 package org.primeframework.mvc;
 
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+import java.security.Key;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.spec.AlgorithmParameterSpec;
+
 import org.primeframework.mvc.config.AbstractMVCConfiguration;
 
 /**
@@ -24,22 +31,51 @@ import org.primeframework.mvc.config.AbstractMVCConfiguration;
  * @author Brian Pontarelli
  */
 public class MockConfiguration extends AbstractMVCConfiguration {
-  private int freemarkerCheckSeconds;
-  private int l10nReloadSeconds;
   private boolean allowUnknownParameters;
-  
+
+  private AlgorithmParameterSpec cookieEncryptionIV;
+
+  private Key cookieEncryptionKey;
+
+  private int freemarkerCheckSeconds;
+
+  private int l10nReloadSeconds;
+
   public MockConfiguration() {
+    try {
+      SecureRandom randomSecureRandom = SecureRandom.getInstance("SHA1PRNG");
+      byte[] ivBytes = new byte[16];
+      randomSecureRandom.nextBytes(ivBytes);
+      this.cookieEncryptionIV = new IvParameterSpec(ivBytes);
+
+      byte[] keyBytes = new byte[16];
+      randomSecureRandom.nextBytes(keyBytes);
+      this.cookieEncryptionKey = new SecretKeySpec(keyBytes, "AES");
+    } catch (NoSuchAlgorithmException e) {
+      throw new IllegalStateException(e);
+    }
   }
 
   public MockConfiguration(int freemarkerCheckSeconds, int l10nReloadSeconds, boolean allowUnknownParameters) {
+    this();
     this.freemarkerCheckSeconds = freemarkerCheckSeconds;
     this.l10nReloadSeconds = l10nReloadSeconds;
     this.allowUnknownParameters = allowUnknownParameters;
   }
 
   @Override
-  public int templateCheckSeconds() {
-    return freemarkerCheckSeconds;
+  public boolean allowUnknownParameters() {
+    return allowUnknownParameters;
+  }
+
+  @Override
+  public AlgorithmParameterSpec cookieEncryptionIV() {
+    return cookieEncryptionIV;
+  }
+
+  @Override
+  public Key cookieEncryptionKey() {
+    return cookieEncryptionKey;
   }
 
   @Override
@@ -48,7 +84,7 @@ public class MockConfiguration extends AbstractMVCConfiguration {
   }
 
   @Override
-  public boolean allowUnknownParameters() {
-    return allowUnknownParameters;
+  public int templateCheckSeconds() {
+    return freemarkerCheckSeconds;
   }
 }

@@ -78,7 +78,7 @@ public class ReexecuteSavedRequestResultTest extends PrimeBaseTest {
     replay(messageStore);
 
     ReexecuteSavedRequest redirect = new ReexecuteSavedRequestImpl("/", "success", true, false);
-    ReexecuteSavedRequestResult result = new ReexecuteSavedRequestResult(messageStore, ee, response, request, store, new DefaultCipherProvider(), configuration, objectMapper);
+    ReexecuteSavedRequestResult result = new ReexecuteSavedRequestResult(messageStore, ee, response, request, store, new DefaultCipherProvider(configuration), configuration, objectMapper);
     result.execute(redirect);
 
     verify(response, request, ee, store, messageStore);
@@ -95,7 +95,7 @@ public class ReexecuteSavedRequestResultTest extends PrimeBaseTest {
     replay(session);
 
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    DefaultCipherProvider cipherProvider = new DefaultCipherProvider();
+    DefaultCipherProvider cipherProvider = new DefaultCipherProvider(configuration);
     Cookie cookie = SavedRequestTools.toCookie(savedRequest, objectMapper, configuration, cipherProvider);
     expect(request.getCookies()).andReturn(new Cookie[]{cookie});
     expect(request.getSession(true)).andReturn(session);

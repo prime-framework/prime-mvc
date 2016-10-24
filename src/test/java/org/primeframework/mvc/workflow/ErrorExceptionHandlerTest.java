@@ -16,8 +16,8 @@
 package org.primeframework.mvc.workflow;
 
 import org.primeframework.mvc.ErrorException;
+import org.primeframework.mvc.MockConfiguration;
 import org.primeframework.mvc.action.result.ResultStore;
-import org.primeframework.mvc.config.AbstractMVCConfiguration;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.SimpleMessage;
@@ -26,7 +26,12 @@ import org.primeframework.mvc.message.l10n.MissingMessageException;
 import org.primeframework.mvc.validation.ValidationException;
 import org.testng.annotations.Test;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.createStrictMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.isA;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 
 /**
  * @author James Humphrey
@@ -35,24 +40,32 @@ import static org.easymock.EasyMock.*;
 public class ErrorExceptionHandlerTest {
 
   @Test
+  public void errorExceptionWithCustomResultCode() {
+    ErrorException errorException = new MockErrorExceptionWithCode();
+    MVCConfiguration configuration = new MockConfiguration();
+
+    MessageProvider messageProvider = createStrictMock(MessageProvider.class);
+    expect(messageProvider.getMessage("[" + errorException.getClass().getSimpleName() + "]", errorException.args)).andReturn("foo");
+    replay(messageProvider);
+
+    MessageStore messageStore = createStrictMock(MessageStore.class);
+    messageStore.add(isA(SimpleMessage.class));
+    replay(messageStore);
+
+    ResultStore resultStore = createStrictMock(ResultStore.class);
+    resultStore.set(errorException.resultCode);
+    replay(resultStore);
+
+    ErrorExceptionHandler handler = new ErrorExceptionHandler(resultStore, configuration, messageStore, messageProvider);
+    handler.handle(errorException);
+
+    verify(messageProvider, messageStore, resultStore);
+  }
+
+  @Test
   public void errorExceptionWithDefaultResultCode() {
     ErrorException errorException = new MockErrorException();
-    MVCConfiguration configuration = new AbstractMVCConfiguration() {
-      @Override
-      public int templateCheckSeconds() {
-        return 0;
-      }
-
-      @Override
-      public int l10nReloadSeconds() {
-        return 0;
-      }
-
-      @Override
-      public boolean allowUnknownParameters() {
-        return false;
-      }
-    };
+    MVCConfiguration configuration = new MockConfiguration();
 
     MessageProvider messageProvider = createStrictMock(MessageProvider.class);
     expect(messageProvider.getMessage("[" + errorException.getClass().getSimpleName() + "]", errorException.args)).andReturn("foo");
@@ -75,22 +88,7 @@ public class ErrorExceptionHandlerTest {
   @Test
   public void errorExceptionWithNoMessageLookup() {
     ErrorException errorException = new ErrorException("error", false);
-    MVCConfiguration configuration = new AbstractMVCConfiguration() {
-      @Override
-      public int templateCheckSeconds() {
-        return 0;
-      }
-
-      @Override
-      public int l10nReloadSeconds() {
-        return 0;
-      }
-
-      @Override
-      public boolean allowUnknownParameters() {
-        return false;
-      }
-    };
+    MVCConfiguration configuration = new MockConfiguration();
 
     MessageProvider messageProvider = createStrictMock(MessageProvider.class);
     replay(messageProvider);
@@ -109,62 +107,9 @@ public class ErrorExceptionHandlerTest {
   }
 
   @Test
-  public void errorExceptionWithCustomResultCode() {
-    ErrorException errorException = new MockErrorExceptionWithCode();
-    MVCConfiguration configuration = new AbstractMVCConfiguration() {
-      @Override
-      public int templateCheckSeconds() {
-        return 0;
-      }
-
-      @Override
-      public int l10nReloadSeconds() {
-        return 0;
-      }
-
-      @Override
-      public boolean allowUnknownParameters() {
-        return false;
-      }
-    };
-
-    MessageProvider messageProvider = createStrictMock(MessageProvider.class);
-    expect(messageProvider.getMessage("[" + errorException.getClass().getSimpleName() + "]", errorException.args)).andReturn("foo");
-    replay(messageProvider);
-
-    MessageStore messageStore = createStrictMock(MessageStore.class);
-    messageStore.add(isA(SimpleMessage.class));
-    replay(messageStore);
-
-    ResultStore resultStore = createStrictMock(ResultStore.class);
-    resultStore.set(errorException.resultCode);
-    replay(resultStore);
-
-    ErrorExceptionHandler handler = new ErrorExceptionHandler(resultStore, configuration, messageStore, messageProvider);
-    handler.handle(errorException);
-
-    verify(messageProvider, messageStore, resultStore);
-  }
-
-  @Test
   public void validationExceptionWithoutMessage() {
     ValidationException e = new ValidationException();
-    MVCConfiguration configuration = new AbstractMVCConfiguration() {
-      @Override
-      public int templateCheckSeconds() {
-        return 0;
-      }
-
-      @Override
-      public int l10nReloadSeconds() {
-        return 0;
-      }
-
-      @Override
-      public boolean allowUnknownParameters() {
-        return false;
-      }
-    };
+    MVCConfiguration configuration = new MockConfiguration();
 
     MessageProvider messageProvider = createStrictMock(MessageProvider.class);
     messageProvider.getMessage("[" + e.getClass().getSimpleName() + "]", e.args);

@@ -49,22 +49,7 @@ public class GuiceBootstrapTest extends PrimeBaseTest {
       protected void configure() {
         super.configure();
 
-        bind(MVCConfiguration.class).toInstance(new AbstractMVCConfiguration() {
-          @Override
-          public int templateCheckSeconds() {
-            return 2;
-          }
-
-          @Override
-          public int l10nReloadSeconds() {
-            return 1;
-          }
-
-          @Override
-          public boolean allowUnknownParameters() {
-            return false;
-          }
-        });
+        bind(MVCConfiguration.class).toInstance(new MockConfiguration(2, 1, false));
 
         install(new CloseableModule());
       }

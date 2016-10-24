@@ -17,14 +17,15 @@ package org.primeframework.mvc.security;
 
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.security.spec.AlgorithmParameterSpec;
+
+import org.primeframework.mvc.config.MVCConfiguration;
+
+import com.google.inject.Inject;
 
 /**
  * Default implementation that generates a new key on startup. This will render all existing Saved Requests useless.
@@ -36,15 +37,10 @@ public class DefaultCipherProvider implements CipherProvider {
 
   private final Key key;
 
-  public DefaultCipherProvider() throws NoSuchAlgorithmException {
-    SecureRandom randomSecureRandom = SecureRandom.getInstance("SHA1PRNG");
-    byte[] ivBytes = new byte[16];
-    randomSecureRandom.nextBytes(ivBytes);
-    iv = new IvParameterSpec(ivBytes);
-
-    byte[] keyBytes = new byte[16];
-    randomSecureRandom.nextBytes(keyBytes);
-    key = new SecretKeySpec(keyBytes, "AES");
+  @Inject
+  public DefaultCipherProvider(MVCConfiguration configuration) throws NoSuchAlgorithmException {
+    this.iv = configuration.cookieEncryptionIV();
+    this.key = configuration.cookieEncryptionKey();
   }
 
   @Override

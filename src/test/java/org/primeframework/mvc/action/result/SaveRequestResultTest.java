@@ -67,7 +67,7 @@ public class SaveRequestResultTest extends PrimeBaseTest {
     request.setParameter("param1", "value1");
     request.setParameter("param2", "value2");
 
-    CipherProvider cipherProvider = new DefaultCipherProvider();
+    CipherProvider cipherProvider = new DefaultCipherProvider(configuration);
     SaveRequest annotation = new SaveRequestImpl("/login", "unauthenticated", true, false);
     SaveRequestResult result = new SaveRequestResult(messageStore, expressionEvaluator, response, request, store, configuration, objectMapper, cipherProvider);
     result.execute(annotation);
@@ -89,7 +89,7 @@ public class SaveRequestResultTest extends PrimeBaseTest {
     request.setParameter("param1", "value1");
     request.setParameter("param2", "value2");
 
-    CipherProvider cipherProvider = new DefaultCipherProvider();
+    CipherProvider cipherProvider = new DefaultCipherProvider(configuration);
     SaveRequest annotation = new SaveRequestImpl("/login", "unauthenticated", true, false);
     SaveRequestResult result = new SaveRequestResult(messageStore, expressionEvaluator, response, request, store, configuration, objectMapper, cipherProvider);
     result.execute(annotation);

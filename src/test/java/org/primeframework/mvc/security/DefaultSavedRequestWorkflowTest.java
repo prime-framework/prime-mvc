@@ -37,10 +37,10 @@ import static org.testng.Assert.assertTrue;
 /**
  * @author Brian Pontarelli
  */
-public class DefaultReexecuteSavedRequestWorkflowTest extends PrimeBaseTest {
+public class DefaultSavedRequestWorkflowTest extends PrimeBaseTest {
   @Test
   public void performNoSavedRequest() throws Exception {
-    CipherProvider cipherProvider = new DefaultCipherProvider();
+    CipherProvider cipherProvider = new DefaultCipherProvider(configuration);
     request.addCookie(SavedRequestTools.toCookie(new SavedHttpRequest(HTTPMethod.GET, "/secure?test=value&test2=value2", null), objectMapper, configuration, cipherProvider));
 
     HttpServletRequestWrapper wrapper = new HttpServletRequestWrapper(request);

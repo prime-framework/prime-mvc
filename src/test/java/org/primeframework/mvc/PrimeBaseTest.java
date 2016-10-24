@@ -195,5 +195,4 @@ public abstract class PrimeBaseTest {
       bind(MVCConfiguration.class).toInstance(new MockConfiguration());
     }
   }
-
 }
