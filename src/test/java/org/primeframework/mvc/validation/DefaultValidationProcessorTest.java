@@ -15,6 +15,8 @@
  */
 package org.primeframework.mvc.validation;
 
+import java.util.Arrays;
+
 import org.example.action.ValidationMethods;
 import org.primeframework.mock.servlet.MockHttpServletRequest.Method;
 import org.primeframework.mvc.PrimeBaseTest;
@@ -108,6 +110,21 @@ public class DefaultValidationProcessorTest extends PrimeBaseTest {
       assertEquals(messageStore.get(), asList(
           new SimpleMessage(MessageType.ERROR, "interface-general-code", "interface-general-message"),
           new SimpleFieldMessage(MessageType.ERROR, "interface-field", "interface-field-code", "interface-field-message")));
+    }
+  }
+
+  @Test
+  public void validateGet() throws Exception {
+    for (Method method : Arrays.asList(Method.GET, Method.HEAD)) {
+      request.setMethod(method);
+
+      ValidationMethods action = new ValidationMethods(messageStore);
+      store.setCurrent(makeActionInvocation(action, HTTPMethod.GET, ""));
+
+      DefaultValidationProcessor processor = new DefaultValidationProcessor(request, store, messageStore);
+      processor.validate();
+
+      assertTrue(action.getValidationCalled);
     }
   }
 
