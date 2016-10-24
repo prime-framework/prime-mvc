@@ -44,8 +44,6 @@ public class JWTSecurityScheme implements SecurityScheme {
 
   protected final ActionInvocationStore actionInvocationStore;
 
-  protected final HTTPMethod httpMethod;
-
   protected final JWTExtractor jwtExtractor;
 
   protected final HttpServletRequest request;
@@ -53,9 +51,8 @@ public class JWTSecurityScheme implements SecurityScheme {
   protected final Provider<Map<String, Verifier>> verifierProvider;
 
   @Inject
-  public JWTSecurityScheme(ActionInvocationStore actionInvocationStore, HTTPMethod httpMethod, JWTExtractor jwtExtractor, HttpServletRequest request, Provider<Map<String, Verifier>> verifierProvider) {
+  public JWTSecurityScheme(ActionInvocationStore actionInvocationStore, JWTExtractor jwtExtractor, HttpServletRequest request, Provider<Map<String, Verifier>> verifierProvider) {
     this.actionInvocationStore = actionInvocationStore;
-    this.httpMethod = httpMethod;
     this.jwtExtractor = jwtExtractor;
     this.request = request;
     this.verifierProvider = verifierProvider;
@@ -69,6 +66,7 @@ public class JWTSecurityScheme implements SecurityScheme {
     }
 
     try {
+      HTTPMethod method = HTTPMethod.valueOf(request.getMethod().toUpperCase());
       String encodedJWT = jwtExtractor.get();
       final JWT jwt = JWT.getDecoder().decode(encodedJWT, verifierProvider.get());
 
@@ -76,7 +74,7 @@ public class JWTSecurityScheme implements SecurityScheme {
       ActionConfiguration actionConfiguration = actionInvocation.configuration;
       for (JWTMethodConfiguration jwtConfiguration : actionConfiguration.jwtAuthorizationMethods) {
         HTTPMethod[] httpMethods = jwtConfiguration.annotation.httpMethods();
-        if (ArrayUtils.contains(httpMethods, httpMethod)) {
+        if (ArrayUtils.contains(httpMethods, method)) {
           try {
             Boolean authorized = ReflectionUtils.invoke(jwtConfiguration.method, actionInvocation.action, jwt);
             if (!authorized) {

@@ -33,24 +33,24 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 public class DefaultSavedRequestWorkflow implements SavedRequestWorkflow {
-  private final HttpServletRequest httpServletRequest;
+  private final HttpServletRequest request;
 
   @Inject
-  public DefaultSavedRequestWorkflow(HttpServletRequest httpServletRequest) {
-    this.httpServletRequest = httpServletRequest;
+  public DefaultSavedRequestWorkflow(HttpServletRequest request) {
+    this.request = request;
   }
 
   @Override
   public void perform(WorkflowChain workflowChain) throws IOException, ServletException {
-    HttpSession httpSession = httpServletRequest.getSession(false);
+    HttpSession httpSession = request.getSession(false);
     if (httpSession != null) {
       SavedHttpRequest savedHttpRequest = (SavedHttpRequest) httpSession.getAttribute(SavedHttpRequest.LOGGED_IN_SESSION_KEY);
       if (savedHttpRequest != null) {
         httpSession.removeAttribute(SavedHttpRequest.LOGGED_IN_SESSION_KEY);
 
-        HttpServletRequestWrapper wrapper = (HttpServletRequestWrapper) httpServletRequest;
+        HttpServletRequestWrapper wrapper = (HttpServletRequestWrapper) request;
         HttpServletRequest previous = (HttpServletRequest) wrapper.getRequest();
-        wrapper.setRequest(new SavedRequestHttpServletRequest(previous, savedHttpRequest.parameters));
+        wrapper.setRequest(new SavedRequestHttpServletRequest(previous, savedHttpRequest));
       }
     }
 

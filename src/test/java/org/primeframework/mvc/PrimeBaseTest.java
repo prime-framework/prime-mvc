@@ -53,6 +53,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 
 import com.codahale.metrics.MetricRegistry;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
@@ -79,6 +80,8 @@ public abstract class PrimeBaseTest {
   protected static RequestSimulator simulator;
 
   @Inject public MVCConfiguration configuration;
+
+  @Inject public ObjectMapper objectMapper;
 
   @Inject public TestBuilder test;
 
@@ -181,7 +184,8 @@ public abstract class PrimeBaseTest {
   public static class SecurityModule extends AbstractModule {
     @Override
     protected void configure() {
-      bind(new TypeLiteral<Map<String, Verifier>>() { }).toProvider(MockVerifierProvider.class);
+      bind(new TypeLiteral<Map<String, Verifier>>() {
+      }).toProvider(MockVerifierProvider.class);
     }
   }
 

@@ -16,13 +16,16 @@
 package org.primeframework.mvc.action.result;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.ReexecuteSavedRequestResult.ReexecuteSavedRequestImpl;
@@ -31,7 +34,9 @@ import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.scope.MessageScope;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
+import org.primeframework.mvc.security.DefaultCipherProvider;
 import org.primeframework.mvc.security.saved.SavedHttpRequest;
+import org.primeframework.mvc.servlet.HTTPMethod;
 import org.testng.annotations.Test;
 
 import static org.easymock.EasyMock.createStrictMock;
@@ -44,14 +49,14 @@ import static org.easymock.EasyMock.verify;
  *
  * @author Brian Pontarelli
  */
-public class ReexecuteSavedRequestResultTest {
+public class ReexecuteSavedRequestResultTest extends PrimeBaseTest {
   @Test
-  public void noSavedRequest() throws IOException, ServletException {
+  public void noSavedRequest() throws IOException, ServletException, NoSuchAlgorithmException {
     ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
     replay(ee);
 
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    expect(request.getSession(false)).andReturn(null);
+    expect(request.getCookies()).andReturn(null);
     expect(request.getContextPath()).andReturn("");
     expect(request.getRequestURI()).andReturn("/");
     replay(request);
@@ -73,31 +78,33 @@ public class ReexecuteSavedRequestResultTest {
     replay(messageStore);
 
     ReexecuteSavedRequest redirect = new ReexecuteSavedRequestImpl("/", "success", true, false);
-    ReexecuteSavedRequestResult result = new ReexecuteSavedRequestResult(messageStore, ee, response, request, store);
+    ReexecuteSavedRequestResult result = new ReexecuteSavedRequestResult(messageStore, ee, response, request, store, new DefaultCipherProvider(), configuration, objectMapper);
     result.execute(redirect);
 
     verify(response, request, ee, store, messageStore);
   }
 
   @Test
-  public void savedRequest() throws IOException, ServletException {
+  public void savedRequest() throws IOException, ServletException, NoSuchAlgorithmException {
     ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
     replay(ee);
 
-    SavedHttpRequest savedHttpRequest = new SavedHttpRequest("/secure?test=value1&test2=value2", null);
+    SavedHttpRequest savedRequest = new SavedHttpRequest(HTTPMethod.GET, "/secure?test=value1&test2=value2", null);
     HttpSession session = createStrictMock(HttpSession.class);
-    expect(session.getAttribute(SavedHttpRequest.INITIAL_SESSION_KEY)).andReturn(savedHttpRequest);
-    session.removeAttribute(SavedHttpRequest.INITIAL_SESSION_KEY);
-    session.setAttribute(SavedHttpRequest.LOGGED_IN_SESSION_KEY, savedHttpRequest);
+    session.setAttribute(SavedHttpRequest.LOGGED_IN_SESSION_KEY, savedRequest);
     replay(session);
 
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    expect(request.getSession(false)).andReturn(session);
+    DefaultCipherProvider cipherProvider = new DefaultCipherProvider();
+    Cookie cookie = SavedRequestTools.toCookie(savedRequest, objectMapper, configuration, cipherProvider);
+    expect(request.getCookies()).andReturn(new Cookie[]{cookie});
+    expect(request.getSession(true)).andReturn(session);
     expect(request.getContextPath()).andReturn("");
     expect(request.getRequestURI()).andReturn("/");
     replay(request);
 
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
+    response.addCookie(cookie);
     response.sendRedirect("/secure?test=value1&test2=value2");
     response.setStatus(301);
     replay(response);
@@ -113,7 +120,7 @@ public class ReexecuteSavedRequestResultTest {
     replay(messageStore);
 
     ReexecuteSavedRequest redirect = new ReexecuteSavedRequestImpl("/", "success", true, false);
-    ReexecuteSavedRequestResult result = new ReexecuteSavedRequestResult(messageStore, ee, response, request, store);
+    ReexecuteSavedRequestResult result = new ReexecuteSavedRequestResult(messageStore, ee, response, request, store, cipherProvider, configuration, objectMapper);
     result.execute(redirect);
 
     verify(response, request, ee, store, messageStore, session);

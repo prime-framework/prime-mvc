@@ -15,9 +15,11 @@
  */
 package org.primeframework.mvc.security.saved;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+
+import org.primeframework.mvc.servlet.HTTPMethod;
 
 /**
  * Stores the request information when a user accesses a resource that requires authentication and needs to be returned
@@ -26,54 +28,38 @@ import java.util.Map;
  * @author Brian Pontarelli
  */
 public class SavedHttpRequest {
-  public static final String INITIAL_SESSION_KEY = "prime-mvc-security-saved-request-initial";
-
   public static final String LOGGED_IN_SESSION_KEY = "prime-mvc-security-saved-request-logged-in";
 
-  public final Map<String, String[]> parameters;
+  public HTTPMethod method;
 
-  public final String uri;
+  public Map<String, String[]> parameters = new HashMap<>();
 
-  public SavedHttpRequest(String uri, Map<String, String[]> parameters) {
+  public String uri;
+
+  // For Jackson
+  public SavedHttpRequest() {
+  }
+
+  public SavedHttpRequest(HTTPMethod method, String uri, Map<String, String[]> parameters) {
+    this.method = method;
     this.uri = uri;
-    this.parameters = new HashMap<>();
     if (parameters != null) {
       this.parameters.putAll(parameters);
     }
   }
 
+  @Override
   public boolean equals(Object o) {
     if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-
-    SavedHttpRequest that = (SavedHttpRequest) o;
-
-    if (parameters != null) {
-      for (Map.Entry<String, String[]> entry : parameters.entrySet()) {
-        String key = entry.getKey();
-        if (!that.parameters.containsKey(key)) {
-          return false;
-        }
-
-        if (!Arrays.equals(parameters.get(key), that.parameters.get(key))) {
-          return false;
-        }
-      }
-    } else if (that.parameters != null) {
-      return false;
-    }
-
-    if (uri != null ? !uri.equals(that.uri) : that.uri != null) {
-      return false;
-    }
-
-    return true;
+    if (!(o instanceof SavedHttpRequest)) return false;
+    final SavedHttpRequest that = (SavedHttpRequest) o;
+    return method == that.method &&
+        Objects.equals(parameters, that.parameters) &&
+        Objects.equals(uri, that.uri);
   }
 
+  @Override
   public int hashCode() {
-    int result;
-    result = (uri != null ? uri.hashCode() : 0);
-    result = 31 * result + (parameters != null ? parameters.hashCode() : 0);
-    return result;
+    return Objects.hash(method, parameters, uri);
   }
 }

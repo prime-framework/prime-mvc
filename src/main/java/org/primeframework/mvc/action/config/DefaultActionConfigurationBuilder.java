@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -97,7 +98,7 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
     Map<String, PreParameter> preParameterMembers = ReflectionUtils.findAllMembersWithAnnotation(actionClass, PreParameter.class);
     Map<String, FileUpload> fileUploadMembers = ReflectionUtils.findAllMembersWithAnnotation(actionClass, FileUpload.class);
     Set<String> memberNames = ReflectionUtils.findAllMembers(actionClass);
-    List<JWTMethodConfiguration> jwtAuthorizationMethods = findJwtAuthorizationMethods(actionClass, executeMethods.keySet());
+    List<JWTMethodConfiguration> jwtAuthorizationMethods = findJwtAuthorizationMethods(actionClass, new HashSet<>(executeMethods.keySet()));
 
     List<ScopeField> scopeFields = findScopeFields(actionClass);
 

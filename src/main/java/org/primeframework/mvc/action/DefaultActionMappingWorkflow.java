@@ -47,8 +47,6 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
 
   private final ActionMapper actionMapper;
 
-  private final HTTPMethod httpMethod;
-
   private final HttpServletRequest request;
 
   private final HttpServletResponse response;
@@ -57,13 +55,11 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
 
   @Inject
   public DefaultActionMappingWorkflow(HttpServletRequest request, HttpServletResponse response,
-                                      ActionInvocationStore actionInvocationStore, ActionMapper actionMapper,
-                                      HTTPMethod httpMethod) {
+                                      ActionInvocationStore actionInvocationStore, ActionMapper actionMapper) {
     this.request = request;
     this.response = response;
     this.actionInvocationStore = actionInvocationStore;
     this.actionMapper = actionMapper;
-    this.httpMethod = httpMethod;
   }
 
   /**
@@ -80,8 +76,10 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
     if (logger.isDebugEnabled()) {
       logger.debug("METHOD: " + request.getMethod() + "; URI: " + uri);
     }
+
+    HTTPMethod method = HTTPMethod.valueOf(request.getMethod().toUpperCase());
     boolean executeResult = InternalParameters.is(request, InternalParameters.EXECUTE_RESULT);
-    ActionInvocation actionInvocation = actionMapper.map(httpMethod, uri, executeResult);
+    ActionInvocation actionInvocation = actionMapper.map(method, uri, executeResult);
 
     // This case is a redirect because they URI maps to something new and there isn't an action associated with it. For
     // example, this is how the index handling works.

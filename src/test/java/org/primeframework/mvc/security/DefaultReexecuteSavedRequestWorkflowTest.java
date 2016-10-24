@@ -16,12 +16,13 @@
 package org.primeframework.mvc.security;
 
 import javax.servlet.http.HttpServletRequestWrapper;
-
 import java.util.HashMap;
 import java.util.Map;
 
 import org.primeframework.mvc.PrimeBaseTest;
+import org.primeframework.mvc.action.result.SavedRequestTools;
 import org.primeframework.mvc.security.saved.SavedHttpRequest;
+import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
 
@@ -39,7 +40,8 @@ import static org.testng.Assert.assertTrue;
 public class DefaultReexecuteSavedRequestWorkflowTest extends PrimeBaseTest {
   @Test
   public void performNoSavedRequest() throws Exception {
-    session.setAttribute(SavedHttpRequest.INITIAL_SESSION_KEY, new SavedHttpRequest("/secure?test=value&test2=value2", null));
+    CipherProvider cipherProvider = new DefaultCipherProvider();
+    request.addCookie(SavedRequestTools.toCookie(new SavedHttpRequest(HTTPMethod.GET, "/secure?test=value&test2=value2", null), objectMapper, configuration, cipherProvider));
 
     HttpServletRequestWrapper wrapper = new HttpServletRequestWrapper(request);
     DefaultSavedRequestWorkflow workflow = new DefaultSavedRequestWorkflow(wrapper);
@@ -57,7 +59,7 @@ public class DefaultReexecuteSavedRequestWorkflowTest extends PrimeBaseTest {
 
   @Test
   public void performSavedRequestGET() throws Exception {
-    session.setAttribute(SavedHttpRequest.LOGGED_IN_SESSION_KEY, new SavedHttpRequest("/secure?test=value&test2=value2", null));
+    session.setAttribute(SavedHttpRequest.LOGGED_IN_SESSION_KEY, new SavedHttpRequest(HTTPMethod.GET, "/secure?test=value&test2=value2", null));
     request.setUri("/secure");
 
     HttpServletRequestWrapper wrapper = new HttpServletRequestWrapper(request);
@@ -82,7 +84,7 @@ public class DefaultReexecuteSavedRequestWorkflowTest extends PrimeBaseTest {
     parameters.put("test", new String[]{"value"});
     parameters.put("test2", new String[]{"value2"});
 
-    session.setAttribute(SavedHttpRequest.LOGGED_IN_SESSION_KEY, new SavedHttpRequest("/secure", parameters));
+    session.setAttribute(SavedHttpRequest.LOGGED_IN_SESSION_KEY, new SavedHttpRequest(HTTPMethod.POST, "/secure", parameters));
     request.setUri("/secure");
 
     HttpServletRequestWrapper wrapper = new HttpServletRequestWrapper(request);

@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc.validation;
 
-import com.google.inject.Inject;
 import org.example.action.ValidationMethods;
 import org.primeframework.mock.servlet.MockHttpServletRequest.Method;
 import org.primeframework.mvc.PrimeBaseTest;
@@ -27,8 +26,12 @@ import org.primeframework.mvc.message.SimpleMessage;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.testng.annotations.Test;
 
+import com.google.inject.Inject;
 import static java.util.Arrays.asList;
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 /**
  * Tests the JSR validation.
@@ -37,9 +40,45 @@ import static org.testng.Assert.*;
  */
 public class DefaultValidationProcessorTest extends PrimeBaseTest {
   @Inject
-  public ActionInvocationStore store;
-  @Inject
   public MessageStore messageStore;
+
+  @Inject
+  public ActionInvocationStore store;
+
+  @Test
+  public void disabled() throws Exception {
+    request.setMethod(Method.POST);
+
+    ValidationMethods action = new ValidationMethods(messageStore);
+    assertFalse(action.preValidation);
+    assertFalse(action.postValidation);
+
+    store.setCurrent(makeActionInvocation(action, HTTPMethod.POST, ""));
+
+    DefaultValidationProcessor processor = new DefaultValidationProcessor(request, store, messageStore);
+    processor.validate();
+    assertFalse(action.preValidation);
+    assertFalse(action.postValidation);
+  }
+
+  @Test
+  public void failureFromPrevious() throws Exception {
+    request.setMethod(Method.PUT);
+
+    ValidationMethods action = new ValidationMethods(messageStore);
+    store.setCurrent(makeActionInvocation(action, HTTPMethod.PUT, ""));
+
+    // Add a previous error
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "test", "code", "failure"));
+
+    try {
+      DefaultValidationProcessor processor = new DefaultValidationProcessor(request, store, messageStore);
+      processor.validate();
+      fail("Should have failed");
+    } catch (ValidationException e) {
+      assertEquals(messageStore.get(), asList(new SimpleFieldMessage(MessageType.ERROR, "test", "code", "failure")));
+    }
+  }
 
   @Test
   public void success() throws Exception {
@@ -48,8 +87,28 @@ public class DefaultValidationProcessorTest extends PrimeBaseTest {
     ValidationMethods action = new ValidationMethods(messageStore);
     store.setCurrent(makeActionInvocation(action, HTTPMethod.PUT, ""));
 
-    DefaultValidationProcessor processor = new DefaultValidationProcessor(store, messageStore, HTTPMethod.PUT);
+    DefaultValidationProcessor processor = new DefaultValidationProcessor(request, store, messageStore);
     processor.validate();
+  }
+
+  @Test
+  public void validatable() throws Exception {
+    request.setMethod(Method.PUT);
+
+    ValidationMethods action = new ValidationMethods(messageStore);
+    action.addInterfaceErrors = true;
+    store.setCurrent(makeActionInvocation(action, HTTPMethod.PUT, ""));
+
+    try {
+      DefaultValidationProcessor processor = new DefaultValidationProcessor(request, store, messageStore);
+      processor.validate();
+      fail("Should have failed");
+    } catch (ValidationException e) {
+      // Assert the message store
+      assertEquals(messageStore.get(), asList(
+          new SimpleMessage(MessageType.ERROR, "interface-general-code", "interface-general-message"),
+          new SimpleFieldMessage(MessageType.ERROR, "interface-field", "interface-field-code", "interface-field-message")));
+    }
   }
 
   @Test
@@ -61,7 +120,7 @@ public class DefaultValidationProcessorTest extends PrimeBaseTest {
     store.setCurrent(makeActionInvocation(action, HTTPMethod.PUT, ""));
 
     try {
-      DefaultValidationProcessor processor = new DefaultValidationProcessor(store, messageStore, HTTPMethod.PUT);
+      DefaultValidationProcessor processor = new DefaultValidationProcessor(request, store, messageStore);
       processor.validate();
       fail("Should have failed");
     } catch (ValidationException e) {
@@ -80,47 +139,8 @@ public class DefaultValidationProcessorTest extends PrimeBaseTest {
     action.addMethodErrors = true;
     store.setCurrent(makeActionInvocation(action, HTTPMethod.GET, ""));
 
-    DefaultValidationProcessor processor = new DefaultValidationProcessor(store, messageStore, HTTPMethod.GET);
+    DefaultValidationProcessor processor = new DefaultValidationProcessor(request, store, messageStore);
     processor.validate();
-  }
-
-  @Test
-  public void validatable() throws Exception {
-    request.setMethod(Method.PUT);
-
-    ValidationMethods action = new ValidationMethods(messageStore);
-    action.addInterfaceErrors = true;
-    store.setCurrent(makeActionInvocation(action, HTTPMethod.PUT, ""));
-
-    try {
-      DefaultValidationProcessor processor = new DefaultValidationProcessor(store, messageStore, HTTPMethod.PUT);
-      processor.validate();
-      fail("Should have failed");
-    } catch (ValidationException e) {
-      // Assert the message store
-      assertEquals(messageStore.get(), asList(
-          new SimpleMessage(MessageType.ERROR, "interface-general-code", "interface-general-message"),
-          new SimpleFieldMessage(MessageType.ERROR, "interface-field", "interface-field-code", "interface-field-message")));
-    }
-  }
-
-  @Test
-  public void failureFromPrevious() throws Exception {
-    request.setMethod(Method.PUT);
-
-    ValidationMethods action = new ValidationMethods(messageStore);
-    store.setCurrent(makeActionInvocation(action, HTTPMethod.PUT, ""));
-
-    // Add a previous error
-    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "test", "code", "failure"));
-
-    try {
-      DefaultValidationProcessor processor = new DefaultValidationProcessor(store, messageStore, HTTPMethod.PUT);
-      processor.validate();
-      fail("Should have failed");
-    } catch (ValidationException e) {
-      assertEquals(messageStore.get(), asList(new SimpleFieldMessage(MessageType.ERROR, "test", "code", "failure")));
-    }
   }
 
   @Test
@@ -132,7 +152,7 @@ public class DefaultValidationProcessorTest extends PrimeBaseTest {
     assertFalse(action.postValidation);
     store.setCurrent(makeActionInvocation(action, HTTPMethod.GET, ""));
 
-    DefaultValidationProcessor processor = new DefaultValidationProcessor(store, messageStore, HTTPMethod.GET);
+    DefaultValidationProcessor processor = new DefaultValidationProcessor(request, store, messageStore);
     processor.validate();
     assertTrue(action.preValidation);
     assertTrue(action.postValidation);
@@ -155,21 +175,5 @@ public class DefaultValidationProcessorTest extends PrimeBaseTest {
 
     assertTrue(action.preValidation);
     assertTrue(action.postValidation);
-  }
-
-  @Test
-  public void disabled() throws Exception {
-    request.setMethod(Method.POST);
-
-    ValidationMethods action = new ValidationMethods(messageStore);
-    assertFalse(action.preValidation);
-    assertFalse(action.postValidation);
-
-    store.setCurrent(makeActionInvocation(action, HTTPMethod.POST, ""));
-
-    DefaultValidationProcessor processor = new DefaultValidationProcessor(store, messageStore, HTTPMethod.POST);
-    processor.validate();
-    assertFalse(action.preValidation);
-    assertFalse(action.postValidation);
   }
 }

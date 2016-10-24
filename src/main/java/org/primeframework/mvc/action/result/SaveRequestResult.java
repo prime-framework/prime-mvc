@@ -18,7 +18,6 @@ package org.primeframework.mvc.action.result;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
@@ -28,22 +27,36 @@ import java.util.Map;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.annotation.ReexecuteSavedRequest;
 import org.primeframework.mvc.action.result.annotation.SaveRequest;
+import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
+import org.primeframework.mvc.security.CipherProvider;
 import org.primeframework.mvc.security.saved.SavedHttpRequest;
+import org.primeframework.mvc.servlet.HTTPMethod;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 
 /**
- * This result stores the current request and then performs a HTTP redirect to the login page.
+ * This result stores the current request in a cookie and then performs a HTTP redirect to the login page.
  *
  * @author Brian Pontarelli
  */
 public class SaveRequestResult extends AbstractRedirectResult<SaveRequest> {
+  private final CipherProvider cipherProvider;
+
+  private final MVCConfiguration configuration;
+
+  private final ObjectMapper objectMapper;
+
   @Inject
   public SaveRequestResult(MessageStore messageStore, ExpressionEvaluator expressionEvaluator, HttpServletResponse response,
-                           HttpServletRequest request, ActionInvocationStore actionInvocationStore) {
+                           HttpServletRequest request, ActionInvocationStore actionInvocationStore, MVCConfiguration configuration,
+                           ObjectMapper objectMapper, CipherProvider cipherProvider) {
     super(expressionEvaluator, actionInvocationStore, messageStore, request, response);
+    this.configuration = configuration;
+    this.objectMapper = objectMapper;
+    this.cipherProvider = cipherProvider;
   }
 
   /**
@@ -54,7 +67,8 @@ public class SaveRequestResult extends AbstractRedirectResult<SaveRequest> {
 
     Map<String, String[]> requestParameters = null;
     String redirectURI;
-    if (request.getMethod().equals("GET")) {
+    HTTPMethod method = HTTPMethod.valueOf(request.getMethod().toUpperCase());
+    if (method == HTTPMethod.GET) {
       Map<String, String[]> params = request.getParameterMap();
       redirectURI = request.getRequestURI() + makeQueryString(params);
     } else {
@@ -63,10 +77,7 @@ public class SaveRequestResult extends AbstractRedirectResult<SaveRequest> {
     }
 
     // Save the request
-    SavedHttpRequest saved = new SavedHttpRequest(redirectURI, requestParameters);
-    HttpSession session = request.getSession(true);
-    session.setAttribute(SavedHttpRequest.INITIAL_SESSION_KEY, saved);
-
+    response.addCookie(SavedRequestTools.toCookie(new SavedHttpRequest(method, redirectURI, requestParameters), objectMapper, configuration, cipherProvider));
     sendRedirect(null, saveRequest.uri(), saveRequest.encodeVariables(), saveRequest.perm());
     return true;
   }

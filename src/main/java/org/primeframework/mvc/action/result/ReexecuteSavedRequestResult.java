@@ -15,19 +15,35 @@
  */
 package org.primeframework.mvc.action.result;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.ShortBufferException;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.nio.charset.Charset;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.annotation.ReexecuteSavedRequest;
+import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
+import org.primeframework.mvc.security.CipherProvider;
 import org.primeframework.mvc.security.saved.SavedHttpRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 
 /**
@@ -37,10 +53,22 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 public class ReexecuteSavedRequestResult extends AbstractRedirectResult<ReexecuteSavedRequest> {
+  private static final Logger logger = LoggerFactory.getLogger(ReexecuteSavedRequestResult.class);
+
+  private final CipherProvider cipherProvider;
+
+  private final MVCConfiguration configuration;
+
+  private final ObjectMapper objectMapper;
+
   @Inject
   public ReexecuteSavedRequestResult(MessageStore messageStore, ExpressionEvaluator expressionEvaluator, HttpServletResponse response,
-                                     HttpServletRequest request, ActionInvocationStore actionInvocationStore) {
+                                     HttpServletRequest request, ActionInvocationStore actionInvocationStore,
+                                     CipherProvider cipherProvider, MVCConfiguration configuration, ObjectMapper objectMapper) {
     super(expressionEvaluator, actionInvocationStore, messageStore, request, response);
+    this.configuration = configuration;
+    this.cipherProvider = cipherProvider;
+    this.objectMapper = objectMapper;
   }
 
   /**
@@ -49,19 +77,47 @@ public class ReexecuteSavedRequestResult extends AbstractRedirectResult<Reexecut
   public boolean execute(final ReexecuteSavedRequest reexecuteSavedRequest) throws IOException, ServletException {
     moveMessagesToFlash();
 
+    String savedRequestCookieName = configuration.savedRequestCookieName();
+    Cookie[] cookies = request.getCookies();
     String uri = null;
-    HttpSession session = request.getSession(false);
-    if (session != null) {
-      SavedHttpRequest savedHttpRequest = (SavedHttpRequest) session.getAttribute(SavedHttpRequest.INITIAL_SESSION_KEY);
-      if (savedHttpRequest != null) {
-        session.removeAttribute(SavedHttpRequest.INITIAL_SESSION_KEY);
-        session.setAttribute(SavedHttpRequest.LOGGED_IN_SESSION_KEY, savedHttpRequest);
-        uri = savedHttpRequest.uri;
+
+    if (cookies != null) {
+      for (final Cookie cookie : cookies) {
+        if (cookie.getName().equals(savedRequestCookieName)) {
+          // Kill the cookie
+          cookie.setMaxAge(0);
+          response.addCookie(cookie);
+
+          // Move the saved request to the session and redirect the saved request URI
+          SavedHttpRequest savedRequest = parseSavedRequest(cookie.getValue());
+          if (savedRequest == null) {
+            break;
+          }
+
+          HttpSession session = request.getSession(true);
+          session.setAttribute(SavedHttpRequest.LOGGED_IN_SESSION_KEY, savedRequest);
+          uri = savedRequest.uri;
+        }
       }
     }
 
     sendRedirect(uri, reexecuteSavedRequest.uri(), reexecuteSavedRequest.encodeVariables(), reexecuteSavedRequest.perm());
     return true;
+  }
+
+  private SavedHttpRequest parseSavedRequest(String value) {
+    try {
+      byte[] bytes = Base64.getDecoder().decode(value);
+      Cipher cipher = cipherProvider.getDecryptor();
+      byte[] result = new byte[cipher.getOutputSize(bytes.length)];
+      int resultLength = cipher.update(bytes, 0, bytes.length, result, 0);
+      resultLength += cipher.doFinal(result, resultLength);
+      String json = new String(result, 0, resultLength, Charset.forName("UTF-8"));
+      return objectMapper.readValue(json, SavedHttpRequest.class);
+    } catch (IOException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | InvalidKeyException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | ShortBufferException e) {
+      logger.warn("Bad SavedRequest cookie [{}]. Error is [{}]", value, e.getMessage());
+      return null;
+    }
   }
 
   public static class ReexecuteSavedRequestImpl implements ReexecuteSavedRequest {

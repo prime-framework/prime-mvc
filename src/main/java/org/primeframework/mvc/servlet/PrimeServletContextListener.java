@@ -32,8 +32,20 @@ import com.google.inject.Module;
  * @author Brian Pontarelli
  */
 public abstract class PrimeServletContextListener implements ServletContextListener {
-  private static final Logger logger = LoggerFactory.getLogger(PrimeServletContextListener.class);
   public static final String GUICE_INJECTOR_KEY = "guiceInjector";
+
+  private static final Logger logger = LoggerFactory.getLogger(PrimeServletContextListener.class);
+
+  /**
+   * Shuts down the GuiceBootstrap.
+   *
+   * @param event Not used.
+   */
+  public void contextDestroyed(ServletContextEvent event) {
+    ServletContext context = event.getServletContext();
+    Injector injector = (Injector) context.getAttribute(GUICE_INJECTOR_KEY);
+    GuiceBootstrap.shutdown(injector);
+  }
 
   /**
    * Initialize the ServletContext into the {@link ServletObjectsHolder} and initializes Guice.
@@ -46,18 +58,8 @@ public abstract class PrimeServletContextListener implements ServletContextListe
     ServletObjectsHolder.setServletContext(context);
 
     // Start guice and set it into the servlet context
-    context.setAttribute(GUICE_INJECTOR_KEY, GuiceBootstrap.initialize(mainModule()));
-  }
-
-  /**
-   * Shuts down the GuiceBootstrap.
-   *
-   * @param event Not used.
-   */
-  public void contextDestroyed(ServletContextEvent event) {
-    ServletContext context = event.getServletContext();
-    Injector injector = (Injector) context.getAttribute(GUICE_INJECTOR_KEY);
-    GuiceBootstrap.shutdown(injector);
+    Injector injector = GuiceBootstrap.initialize(mainModule());
+    context.setAttribute(GUICE_INJECTOR_KEY, injector);
   }
 
   /**

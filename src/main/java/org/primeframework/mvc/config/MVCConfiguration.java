@@ -71,6 +71,11 @@ public interface MVCConfiguration {
   String resourceDirectory();
 
   /**
+   * @return The name of the cookie used to store Saved Request information.
+   */
+  String savedRequestCookieName();
+
+  /**
    * @return The static resource prefixes.
    */
   String[] staticResourcePrefixes();

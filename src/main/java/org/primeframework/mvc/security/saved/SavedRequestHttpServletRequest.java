@@ -36,31 +36,38 @@ import org.primeframework.mvc.util.IteratorEnumeration;
  * @author Brian Pontarelli
  */
 public class SavedRequestHttpServletRequest extends HttpServletRequestWrapper {
-  private final Map<String, String[]> parameters;
+  private final SavedHttpRequest savedRequest;
 
   /**
    * Constructs a new request facade.
    *
-   * @param request    The request to wrap.
-   * @param parameters Any additional parameters.
+   * @param request      The request to wrap.
+   * @param savedRequest The saved request.
    */
-  public SavedRequestHttpServletRequest(HttpServletRequest request, Map<String, String[]> parameters) {
+  public SavedRequestHttpServletRequest(HttpServletRequest request, SavedHttpRequest savedRequest) {
     super(request);
-    this.parameters = parameters;
+    this.savedRequest = savedRequest;
   }
 
+  @Override
+  public String getMethod() {
+    return savedRequest.method.toString();
+  }
+
+  @Override
   public String getParameter(String key) {
-    if (parameters != null && parameters.containsKey(key) && parameters.get(key) != null) {
-      return parameters.get(key)[0];
+    if (savedRequest.parameters != null && savedRequest.parameters.containsKey(key) && savedRequest.parameters.get(key) != null) {
+      return savedRequest.parameters.get(key)[0];
     }
 
     return super.getParameter(key);
   }
 
+  @Override
   public Map<String, String[]> getParameterMap() {
     Map<String, String[]> complete = new HashMap<>();
-    if (parameters != null) {
-      complete.putAll(parameters);
+    if (savedRequest.parameters != null) {
+      complete.putAll(savedRequest.parameters);
     }
 
     complete.putAll(super.getParameterMap());
@@ -68,10 +75,11 @@ public class SavedRequestHttpServletRequest extends HttpServletRequestWrapper {
     return complete;
   }
 
+  @Override
   public Enumeration<String> getParameterNames() {
     Set<String> names = new HashSet<>();
-    if (parameters != null) {
-      names.addAll(parameters.keySet());
+    if (savedRequest.parameters != null) {
+      names.addAll(savedRequest.parameters.keySet());
     }
 
     names.addAll(super.getParameterMap().keySet());
@@ -79,9 +87,10 @@ public class SavedRequestHttpServletRequest extends HttpServletRequestWrapper {
     return new IteratorEnumeration<>(names.iterator());
   }
 
+  @Override
   public String[] getParameterValues(String key) {
-    if (parameters != null && parameters.containsKey(key) && parameters.get(key) != null) {
-      return parameters.get(key);
+    if (savedRequest.parameters != null && savedRequest.parameters.containsKey(key) && savedRequest.parameters.get(key) != null) {
+      return savedRequest.parameters.get(key);
     }
 
     return super.getParameterValues(key);

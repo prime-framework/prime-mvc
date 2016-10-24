@@ -15,6 +15,8 @@
  */
 package org.primeframework.mvc.validation;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
@@ -35,17 +37,17 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 public class DefaultValidationProcessor implements ValidationProcessor {
-  private final HTTPMethod httpMethod;
+  private final HttpServletRequest request;
 
   private final MessageStore messageStore;
 
   private final ActionInvocationStore store;
 
   @Inject
-  public DefaultValidationProcessor(ActionInvocationStore store, MessageStore messageStore, HTTPMethod httpMethod) {
+  public DefaultValidationProcessor(HttpServletRequest request, ActionInvocationStore store, MessageStore messageStore) {
+    this.request = request;
     this.store = store;
     this.messageStore = messageStore;
-    this.httpMethod = httpMethod;
   }
 
   @Override
@@ -66,9 +68,10 @@ public class DefaultValidationProcessor implements ValidationProcessor {
     }
 
     if (actionConfiguration.validationMethods.size() > 0) {
+      HTTPMethod method = HTTPMethod.valueOf(request.getMethod().toUpperCase());
       for (ValidationMethodConfiguration configuration : actionConfiguration.validationMethods) {
         HTTPMethod[] httpMethods = configuration.annotation.httpMethods();
-        if (ArrayUtils.contains(httpMethods, httpMethod)) {
+        if (ArrayUtils.contains(httpMethods, method)) {
           try {
             ReflectionUtils.invoke(configuration.method, action);
           } catch (ExpressionException e) {

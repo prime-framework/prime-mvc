@@ -48,6 +48,8 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
 
   public String resourceDirectory = "/WEB-INF";
 
+  public String savedRequestCookieName = "prime-mvc-saved-request";
+
   public String[] staticResourcePrefixes = STATIC_PREFIXES;
 
   public boolean staticResourcesEnabled = true;
@@ -85,6 +87,11 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
   @Override
   public String resourceDirectory() {
     return resourceDirectory;
+  }
+
+  @Override
+  public String savedRequestCookieName() {
+    return savedRequestCookieName;
   }
 
   @Override

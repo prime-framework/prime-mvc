@@ -30,8 +30,11 @@ import org.primeframework.mvc.validation.Validation;
  */
 public class ExecuteMethodConfiguration {
   public final Map<Class<? extends Annotation>, Annotation> annotations = new HashMap<>();
+
   public final HTTPMethod httpMethod;
+
   public final Method method;
+
   public final Validation validation;
 
   public ExecuteMethodConfiguration(HTTPMethod httpMethod, Method method, Validation validation) {

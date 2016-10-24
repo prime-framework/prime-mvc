@@ -18,6 +18,8 @@ package org.primeframework.mvc.security.guice;
 import java.util.Map;
 
 import org.primeframework.jwt.Verifier;
+import org.primeframework.mvc.security.CipherProvider;
+import org.primeframework.mvc.security.DefaultCipherProvider;
 import org.primeframework.mvc.security.DefaultJWTExtractor;
 import org.primeframework.mvc.security.DefaultSavedRequestWorkflow;
 import org.primeframework.mvc.security.DefaultSecurityWorkflow;
@@ -48,5 +50,8 @@ public class SecurityModule extends AbstractModule {
     // Binds the user login scheme
     SecuritySchemeFactory.addSecurityScheme(binder(), "user", UserLoginSecurityScheme.class);
     SecuritySchemeFactory.addSecurityScheme(binder(), "jwt", JWTSecurityScheme.class);
+
+    // Bind the Cipher/Encryption interfaces
+    bind(CipherProvider.class).to(DefaultCipherProvider.class).asEagerSingleton();
   }
 }
