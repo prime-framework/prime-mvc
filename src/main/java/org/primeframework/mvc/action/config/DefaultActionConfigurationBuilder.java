@@ -263,7 +263,6 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
            .forEach(c -> Arrays.asList(c.annotation.httpMethods())
                                .forEach(m -> jwtMethods.computeIfAbsent(m, k -> new ArrayList<>()).add(c)));
 
-
     // Ensure we're calling the JWT Authorize GET method for a HEAD request
     if (jwtMethods.containsKey(HTTPMethod.GET) && !jwtMethods.containsKey(HTTPMethod.HEAD)) {
       jwtMethods.put(HTTPMethod.HEAD, jwtMethods.get(HTTPMethod.GET));

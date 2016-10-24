@@ -196,6 +196,25 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void head_jwtAuthorized() throws Exception {
+    // This test will pass if we call the JWT authorize method or not....
+    test.simulate(() -> simulator.test("/jwt-authorized")
+                                 .withParameter("authorized", true)
+                                 .withHeader("Authorization", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkifQ.qHdut1UR4-2FSAvh7U3YdeRR5r5boVqjIGQ16Ztp894")
+                                 .head()
+                                 .assertStatusCode(200));
+  }
+
+  @Test
+  public void head_jwtNotAuthorized() throws Exception {
+    test.simulate(() -> simulator.test("/jwt-authorized")
+                                 .withParameter("authorized", false)
+                                 .withHeader("Authorization", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkifQ.qHdut1UR4-2FSAvh7U3YdeRR5r5boVqjIGQ16Ztp894")
+                                 .head()
+                                 .assertStatusCode(401));
+  }
+
+  @Test
   public void post() throws Exception {
     simulator.test("/post")
              .post()
