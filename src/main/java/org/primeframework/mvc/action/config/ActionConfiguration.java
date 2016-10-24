@@ -53,7 +53,7 @@ public class ActionConfiguration {
 
   public final List<Method> formPrepareMethods;
 
-  public final List<JWTMethodConfiguration> jwtAuthorizationMethods;
+  public final Map<HTTPMethod, List<JWTMethodConfiguration>> jwtAuthorizationMethods;
 
   public final Set<String> memberNames;
 
@@ -79,10 +79,10 @@ public class ActionConfiguration {
 
   public final boolean validatable;
 
-  public final List<ValidationMethodConfiguration> validationMethods;
+  public final Map<HTTPMethod, List<ValidationMethodConfiguration>> validationMethods;
 
-  public ActionConfiguration(Class<?> actionClass, Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods, List<ValidationMethodConfiguration> validationMethods,
-                             List<Method> formPrepareMethods, List<JWTMethodConfiguration> jwtAuthorizationMethods, List<Method> postValidationMethods, List<Method> preParameterMethods,
+  public ActionConfiguration(Class<?> actionClass, Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods, Map<HTTPMethod, List<ValidationMethodConfiguration>> validationMethods,
+                             List<Method> formPrepareMethods, Map<HTTPMethod, List<JWTMethodConfiguration>> jwtAuthorizationMethods, List<Method> postValidationMethods, List<Method> preParameterMethods,
                              List<Method> postParameterMethods, Map<String, Annotation> resultConfigurations, Map<String, PreParameter> preParameterMembers, Map<String,
       FileUpload> fileUploadMembers, Set<String> memberNames, List<ScopeField> scopeFields, Map<Class<?>, Object> additionalConfiguration, String uri, List<Method> preValidationMethods) {
 

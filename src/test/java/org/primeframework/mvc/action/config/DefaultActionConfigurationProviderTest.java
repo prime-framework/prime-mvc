@@ -131,7 +131,7 @@ public class DefaultActionConfigurationProviderTest {
     assertEquals(config.get("/kitchen-sink").preValidationMethods.size(), 1);
     assertEquals(config.get("/kitchen-sink").postValidationMethods.size(), 1);
     assertEquals(config.get("/kitchen-sink").validationMethods.size(), 1);
-    assertEquals(config.get("/kitchen-sink").validationMethods.get(0).method, KitchenSink.class.getMethod("validate"));
+    assertEquals(config.get("/kitchen-sink").validationMethods.get(HTTPMethod.POST).get(0).method, KitchenSink.class.getMethod("validate"));
     assertEquals(((JacksonActionConfiguration) config.get("/kitchen-sink").additionalConfiguration.get(JacksonActionConfiguration.class)).requestMember, "jsonRequest");
     assertEquals(((JacksonActionConfiguration) config.get("/kitchen-sink").additionalConfiguration.get(JacksonActionConfiguration.class)).requestMemberType, UserField.class);
     assertEquals(((JacksonActionConfiguration) config.get("/kitchen-sink").additionalConfiguration.get(JacksonActionConfiguration.class)).responseMember, "jsonResponse");

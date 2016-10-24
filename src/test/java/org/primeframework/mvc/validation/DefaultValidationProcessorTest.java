@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2016, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -132,7 +132,7 @@ public class DefaultValidationProcessorTest extends PrimeBaseTest {
   }
 
   @Test
-  public void validationMethodNotExcutedForGET() throws Exception {
+  public void validationMethodNotExecutedForGET() throws Exception {
     request.setMethod(Method.GET);
 
     ValidationMethods action = new ValidationMethods(messageStore);

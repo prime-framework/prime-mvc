@@ -24,12 +24,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.primeframework.jwt.domain.JWT;
 import org.primeframework.mvc.PrimeException;
@@ -88,7 +85,6 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
 
     String uri = uriBuilder.build(actionClass);
     Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods = findExecuteMethods(actionClass);
-    List<ValidationMethodConfiguration> validationMethods = findValidationMethods(actionClass);
     List<Method> formPrepareMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, FormPrepareMethod.class);
     List<Method> preParameterMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, PreParameterMethod.class);
     List<Method> postParameterMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, PostParameterMethod.class);
@@ -98,7 +94,9 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
     Map<String, PreParameter> preParameterMembers = ReflectionUtils.findAllMembersWithAnnotation(actionClass, PreParameter.class);
     Map<String, FileUpload> fileUploadMembers = ReflectionUtils.findAllMembersWithAnnotation(actionClass, FileUpload.class);
     Set<String> memberNames = ReflectionUtils.findAllMembers(actionClass);
-    List<JWTMethodConfiguration> jwtAuthorizationMethods = findJwtAuthorizationMethods(actionClass, new HashSet<>(executeMethods.keySet()));
+
+    Map<HTTPMethod, List<ValidationMethodConfiguration>> validationMethods = findValidationMethods(actionClass);
+    Map<HTTPMethod, List<JWTMethodConfiguration>> jwtAuthorizationMethods = findJwtAuthorizationMethods(actionClass, executeMethods.keySet());
 
     List<ScopeField> scopeFields = findScopeFields(actionClass);
 
@@ -233,28 +231,16 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
     return executeMethods;
   }
 
-  protected List<JWTMethodConfiguration> findJwtAuthorizationMethods(Class<?> actionClass, Set<HTTPMethod> executeMethods) {
+  protected Map<HTTPMethod, List<JWTMethodConfiguration>> findJwtAuthorizationMethods(Class<?> actionClass, Set<HTTPMethod> executeMethods) {
+    // When JWT is not enabled, we will not call any of the JWT Authorization Methods.
     if (!actionClass.getAnnotation(Action.class).jwtEnabled()) {
-      return Collections.emptyList();
+      return Collections.emptyMap();
     }
 
     List<Method> methods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, JWTAuthorizeMethod.class);
     if (methods.isEmpty()) {
       throw new PrimeException("The action class [" + actionClass + "] is missing at a JWT Authorization method. " +
           "The class must define a one or more methods annotated " + JWTAuthorizeMethod.class.getSimpleName() + " when [jwtEnabled] is set to [true].");
-    }
-
-    executeMethods.remove(HTTPMethod.HEAD);
-    executeMethods.remove(HTTPMethod.TRACE);
-    executeMethods.remove(HTTPMethod.OPTIONS);
-    executeMethods.remove(HTTPMethod.CONNECT);
-
-    // Ensure all methods are accounted for JWT authorization
-    Set<HTTPMethod> httpMethods = methods.stream().flatMap(this::streamJWTAuthorizationHttpMethods).collect(Collectors.toSet());
-    if (!httpMethods.containsAll(executeMethods)) {
-      throw new PrimeException("The action class [" + actionClass + "] is missing at a JWT Authorization method. " +
-          "The class must define one or more methods annotated " + JWTAuthorizeMethod.class.getSimpleName() + " when [jwtEnabled] is set to [true]. "
-          + "Ensure that for each execute method in your action such as post, put, get and delete that a method is configured to authorize the JWT.");
     }
 
     // Return type must be Boolean or boolean
@@ -270,7 +256,27 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
           + "signature. Your method annotated with " + JWTAuthorizeMethod.class.getSimpleName() + " must declare a single method parameter of type JWT.");
     }
 
-    return methods.stream().map(m -> new JWTMethodConfiguration(m, m.getAnnotation(JWTAuthorizeMethod.class))).collect(Collectors.toList());
+    // Map HTTP method to a list of JWT Authorize Methods.
+    Map<HTTPMethod, List<JWTMethodConfiguration>> jwtMethods = new HashMap<>();
+    methods.stream()
+           .map(m -> new JWTMethodConfiguration(m, m.getAnnotation(JWTAuthorizeMethod.class)))
+           .forEach(c -> Arrays.asList(c.annotation.httpMethods())
+                               .forEach(m -> jwtMethods.computeIfAbsent(m, k -> new ArrayList<>()).add(c)));
+
+
+    // Ensure we're calling the JWT Authorize GET method for a HEAD request
+    if (jwtMethods.containsKey(HTTPMethod.GET) && !jwtMethods.containsKey(HTTPMethod.HEAD)) {
+      jwtMethods.put(HTTPMethod.HEAD, jwtMethods.get(HTTPMethod.GET));
+    }
+
+    // Ensure all methods are accounted for JWT authorization
+    if (executeMethods.equals(jwtMethods.keySet())) {
+      throw new PrimeException("The action class [" + actionClass + "] is missing at a JWT Authorization method. " +
+          "The class must define one or more methods annotated " + JWTAuthorizeMethod.class.getSimpleName() + " when [jwtEnabled] is set to [true]. "
+          + "Ensure that for each execute method in your action such as post, put, get and delete that a method is configured to authorize the JWT.");
+    }
+
+    return jwtMethods;
   }
 
   /**
@@ -317,16 +323,28 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
   }
 
   /**
-   * Locates all of the validation methods.
+   * Locates all of the validation methods and return a map keyed by HTTP Method.
    *
    * @param actionClass The action class.
    * @return The validation method configurations.
    */
-  protected List<ValidationMethodConfiguration> findValidationMethods(Class<?> actionClass) {
+  protected Map<HTTPMethod, List<ValidationMethodConfiguration>> findValidationMethods(Class<?> actionClass) {
     List<Method> methods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, ValidationMethod.class);
-    return methods.stream()
-                  .map(method -> new ValidationMethodConfiguration(method, method.getAnnotation(ValidationMethod.class)))
-                  .collect(Collectors.toList());
+
+    // Map HTTP method to a list of Validation Methods.
+    Map<HTTPMethod, List<ValidationMethodConfiguration>> validationMethods = new HashMap<>();
+    methods.stream()
+           .map(m -> new ValidationMethodConfiguration(m, m.getAnnotation(ValidationMethod.class)))
+           .forEach(c -> Arrays.asList(c.annotation.httpMethods())
+                               .forEach(m -> validationMethods.computeIfAbsent(m, k -> new ArrayList<>()).add(c)));
+
+
+    // Ensure we're calling the GET Validation Method for a HEAD request
+    if (validationMethods.containsKey(HTTPMethod.GET) && !validationMethods.containsKey(HTTPMethod.HEAD)) {
+      validationMethods.put(HTTPMethod.HEAD, validationMethods.get(HTTPMethod.GET));
+    }
+
+    return validationMethods;
   }
 
   /**
@@ -355,17 +373,5 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
       }
     }
     return additionalConfiguration;
-  }
-
-  private Stream<HTTPMethod> streamJWTAuthorizationHttpMethods(Method method) {
-    Annotation[] annotations = method.getDeclaredAnnotations();
-    for (Annotation annotation : annotations) {
-      if (annotation instanceof JWTAuthorizeMethod) {
-        return Arrays.stream(((JWTAuthorizeMethod) annotation).httpMethods());
-      }
-    }
-
-    // This will never happen if it does, buy a lottery ticket.
-    throw new RuntimeException("Method does not have the JWTAuthorizedMethod.");
   }
 }

@@ -171,7 +171,7 @@ public abstract class PrimeBaseTest {
     Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods = new HashMap<>();
     executeMethods.put(httpMethod, executeMethod);
 
-    List<ValidationMethodConfiguration> validationMethods = new ArrayList<>();
+    Map<HTTPMethod, List<ValidationMethodConfiguration>> validationMethods = new HashMap<>();
 
     Map<String, Annotation> resultConfigurations = new HashMap<>();
     resultConfigurations.put(resultCode, annotation);

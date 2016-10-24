@@ -18,7 +18,6 @@ package org.primeframework.mvc.security;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.primeframework.jwt.Verifier;
 import org.primeframework.jwt.domain.JWT;
 import org.primeframework.jwt.domain.JWTException;
@@ -66,17 +65,17 @@ public class JWTSecurityScheme implements SecurityScheme {
     }
 
     try {
-      HTTPMethod method = HTTPMethod.valueOf(request.getMethod().toUpperCase());
       String encodedJWT = jwtExtractor.get();
       final JWT jwt = JWT.getDecoder().decode(encodedJWT, verifierProvider.get());
 
       // The JWT has a valid signature and is not expired, further authorization is delegated to the action.
       ActionConfiguration actionConfiguration = actionInvocation.configuration;
-      for (JWTMethodConfiguration jwtConfiguration : actionConfiguration.jwtAuthorizationMethods) {
-        HTTPMethod[] httpMethods = jwtConfiguration.annotation.httpMethods();
-        if (ArrayUtils.contains(httpMethods, method)) {
+
+      HTTPMethod method = HTTPMethod.valueOf(request.getMethod().toUpperCase());
+      if (actionConfiguration.jwtAuthorizationMethods.containsKey(method)) {
+        for (JWTMethodConfiguration methodConfig : actionConfiguration.jwtAuthorizationMethods.get(method)) {
           try {
-            Boolean authorized = ReflectionUtils.invoke(jwtConfiguration.method, actionInvocation.action, jwt);
+            Boolean authorized = ReflectionUtils.invoke(methodConfig.method, actionInvocation.action, jwt);
             if (!authorized) {
               throw new UnauthorizedException();
             }

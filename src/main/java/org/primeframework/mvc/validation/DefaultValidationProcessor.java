@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2016, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ package org.primeframework.mvc.validation;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
@@ -37,9 +36,9 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 public class DefaultValidationProcessor implements ValidationProcessor {
-  private final HttpServletRequest request;
-
   private final MessageStore messageStore;
+
+  private final HttpServletRequest request;
 
   private final ActionInvocationStore store;
 
@@ -67,16 +66,13 @@ public class DefaultValidationProcessor implements ValidationProcessor {
       ((Validatable) action).validate();
     }
 
-    if (actionConfiguration.validationMethods.size() > 0) {
-      HTTPMethod method = HTTPMethod.valueOf(request.getMethod().toUpperCase());
-      for (ValidationMethodConfiguration configuration : actionConfiguration.validationMethods) {
-        HTTPMethod[] httpMethods = configuration.annotation.httpMethods();
-        if (ArrayUtils.contains(httpMethods, method)) {
-          try {
-            ReflectionUtils.invoke(configuration.method, action);
-          } catch (ExpressionException e) {
-            throw new PrimeException("Unable to invoke @ValidationMethod on the class [" + actionConfiguration.actionClass + "]", e);
-          }
+    HTTPMethod method = HTTPMethod.valueOf(request.getMethod().toUpperCase());
+    if (actionConfiguration.validationMethods.containsKey(method)) {
+      for (ValidationMethodConfiguration methodConfig : actionConfiguration.validationMethods.get(method)) {
+        try {
+          ReflectionUtils.invoke(methodConfig.method, action);
+        } catch (ExpressionException e) {
+          throw new PrimeException("Unable to invoke @ValidationMethod on the class [" + actionConfiguration.actionClass + "]", e);
         }
       }
     }
