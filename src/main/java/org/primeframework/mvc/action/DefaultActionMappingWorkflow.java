@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2016, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Set;
 
+import org.primeframework.mvc.NotImplementedException;
 import org.primeframework.mvc.parameter.DefaultParameterParser;
 import org.primeframework.mvc.parameter.InternalParameters;
 import org.primeframework.mvc.servlet.HTTPMethod;
@@ -90,6 +91,14 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
 
     // Keep the current action in the store if an exception is thrown so that it can be used from the error workflow
     actionInvocationStore.setCurrent(actionInvocation);
+
+    // Anyone downstream should understand it is possible for the method to be null in the ActionInvocation
+    if (actionInvocation.action != null && actionInvocation.method == null) {
+      Class<?> actionClass = actionInvocation.configuration.actionClass;
+      logger.warn("The action class [" + actionClass + "] does not have a valid execute method for the " +
+          "HTTP method [" + method + "]");
+      throw new NotImplementedException();
+    }
 
     // Start the timer and grab a meter for errors
     Timer.Context timer = null;

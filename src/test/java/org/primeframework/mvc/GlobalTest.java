@@ -215,6 +215,25 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void notImplemented() throws Exception {
+    simulator.test("/not-implemented")
+             .get()
+             .assertStatusCode(501);
+
+    simulator.test("/not-implemented")
+             .post()
+             .assertStatusCode(501);
+
+    simulator.test("/not-implemented")
+             .put()
+             .assertStatusCode(501);
+
+    simulator.test("/not-implemented")
+             .delete()
+             .assertStatusCode(501);
+  }
+
+  @Test
   public void post() throws Exception {
     simulator.test("/post")
              .post()

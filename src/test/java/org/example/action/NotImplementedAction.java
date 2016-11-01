@@ -15,31 +15,18 @@
  */
 package org.example.action;
 
-import org.primeframework.jwt.domain.JWT;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.annotation.Status;
-import org.primeframework.mvc.security.annotation.JWTAuthorizeMethod;
-import org.primeframework.mvc.servlet.HTTPMethod;
 
 /**
+ * GET, POST, PUT and DELETE are not implemented.
+ *
  * @author Daniel DeGroff
  */
-@Action(requiresAuthentication = true, jwtEnabled = true)
-@Status.List({
-    @Status(code = "success", status = 200),
-    @Status(code = "unauthenticated", status = 401),
-    @Status(code = "unauthorized", status = 401)
-})
-public class JwtAuthorizedAction {
-
-  public boolean authorized;
-
-  @JWTAuthorizeMethod(httpMethods = {HTTPMethod.GET})
-  public boolean authorize(JWT jwt) {
-    return authorized;
-  }
-
-  public String get() {
+@Action
+@Status(code = "not-implemented", status = 501)
+public class NotImplementedAction {
+  public String head() {
     return "success";
   }
 }

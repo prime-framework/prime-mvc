@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2016, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  */
 package org.primeframework.mvc.parameter.el;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -30,6 +32,8 @@ import org.example.domain.GenericBean;
 import org.example.domain.User;
 import org.example.domain.UserField;
 import org.primeframework.mvc.PrimeBaseTest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
 import com.google.inject.Inject;
@@ -46,6 +50,7 @@ import static org.testng.Assert.assertTrue;
  * @author Brian Pontarelli
  */
 public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
+  private static final Logger logger = LoggerFactory.getLogger(DefaultExpressionEvaluatorTest.class);
   DefaultExpressionEvaluator evaluator;
 
   @Inject
@@ -57,26 +62,26 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
   public void charArrayCachePerformance() {
     // On a MacBook Pro Quad core the cache is slower by 5 milliseconds for 1 million iterations.
     String expression = "user.address['work'].city";
-    long start = System.currentTimeMillis();
+    Instant start = Instant.now();
     char c = 0;
-    for (int i = 0; i < 1000000; i++) {
+    for (int i = 0; i < 1_000_000; i++) {
       char[] ca = expression.toCharArray();
       c = ca[2];
     }
 
-    System.out.println(c);
-    System.out.println("Time for toCharArray: " + (System.currentTimeMillis() - start));
+    logger.info(Character.toString(c));
+    logger.info("Time for toCharArray: " + Math.abs(Duration.between(Instant.now(), start).toMillis()));
 
-    start = System.currentTimeMillis();
+    start = Instant.now();
     c = 0;
-//    for (int i = 0; i < 1000000; i++) {
+//    for (int i = 0; i < 1_000_000; i++) {
       // This method has been removed because it was slow
 //      char[] ca = evaluator.toCharArray(expression);
 //      c = ca[2];
 //    }
 
-    System.out.println(c);
-    System.out.println("Time for cache: " + (System.currentTimeMillis() - start));
+    logger.info(Character.toString(c));
+    logger.info("Time for cache: " + Math.abs(Duration.between(Instant.now(), start).toMillis()));
   }
 
   @Test

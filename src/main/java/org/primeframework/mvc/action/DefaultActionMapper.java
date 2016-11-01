@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2016, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ import com.google.inject.Injector;
  */
 public class DefaultActionMapper implements ActionMapper {
   private final ActionConfigurationProvider actionConfigurationProvider;
+
   private final Injector injector;
 
   @Inject
@@ -100,14 +101,9 @@ public class DefaultActionMapper implements ActionMapper {
     Object action = null;
     ExecuteMethodConfiguration method = null;
     if (actionConfiguration != null) {
-      Class<?> actionClass = actionConfiguration.actionClass;
-      method = actionConfiguration.executeMethods.get(httpMethod);
-      if (method == null) {
-        throw new PrimeException("The action class [" + actionClass + "] does not have a valid execute method for the " +
-          "HTTP method [" + httpMethod + "]");
-      }
-
       action = injector.getInstance(actionConfiguration.actionClass);
+      // The action may be null if not implemented.
+      method = actionConfiguration.executeMethods.get(httpMethod);
     }
 
     return new ActionInvocation(action, method, uri, extension, uriParameters, actionConfiguration, executeResult);
@@ -146,26 +142,26 @@ public class DefaultActionMapper implements ActionMapper {
         // Bad pattern
         if (!actionConfiguration.patternParts[i].endsWith("}")) {
           throw new PrimeException("Action annotation in class [" + actionConfiguration.actionClass +
-            "] contains an invalid URI parameter pattern [" + actionConfiguration.pattern + "]. A curly " +
-            "bracket is unclosed. If you want to include a curly brakcet that is not " +
-            "a URI parameter capture, you need to escape it like \\{");
+              "] contains an invalid URI parameter pattern [" + actionConfiguration.pattern + "]. A curly " +
+              "bracket is unclosed. If you want to include a curly brakcet that is not " +
+              "a URI parameter capture, you need to escape it like \\{");
         }
 
         // Can't have wildcard capture in the middle
         if (i != actionConfiguration.patternParts.length - 1) {
           throw new PrimeException("Action annotation in class [" + actionConfiguration.actionClass +
-            "] contains an invalid URI parameter pattern [" + actionConfiguration.pattern + "]. You cannot " +
-            "have a wildcard capture (i.e. {*foo}) in the middle of the pattern. It must " +
-            "be on the end of the pattern.");
+              "] contains an invalid URI parameter pattern [" + actionConfiguration.pattern + "]. You cannot " +
+              "have a wildcard capture (i.e. {*foo}) in the middle of the pattern. It must " +
+              "be on the end of the pattern.");
         }
 
         break;
       } else if (actionConfiguration.patternParts[i].startsWith("{")) {
         if (!actionConfiguration.patternParts[i].endsWith("}")) {
           throw new PrimeException("Action annotation in class [" + actionConfiguration.actionClass +
-            "] contains an invalid URI parameter pattern [" + actionConfiguration.pattern + "]. A curly " +
-            "bracket is unclosed. If you want to include a curly brakcet that is not " +
-            "a URI parameter capture, you need to escape it like \\{");
+              "] contains an invalid URI parameter pattern [" + actionConfiguration.pattern + "]. A curly " +
+              "bracket is unclosed. If you want to include a curly brakcet that is not " +
+              "a URI parameter capture, you need to escape it like \\{");
         }
       } else {
         String patternPart = normalize(actionConfiguration.patternParts[i]);

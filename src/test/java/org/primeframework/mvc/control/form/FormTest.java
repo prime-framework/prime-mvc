@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2016, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ public class FormTest extends ControlBaseTest {
     request.setUri("/user/");
     Index index = new Index();
     ais.setCurrent(new ActionInvocation(index, null, "/user/", null,
-      new ActionConfiguration(Index.class, null, null, new ArrayList<Method>(), null, null, null, null, null, null, null, null, null, null, "/user/", null)));
+      new ActionConfiguration(Index.class, null, null, new ArrayList<>(), null, null, null, null, null, null, null, null, null, null, "/user/", null)));
 
     new ControlTester(form).
       attr("action", "/user/").
