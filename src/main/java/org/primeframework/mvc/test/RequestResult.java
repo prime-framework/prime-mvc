@@ -15,6 +15,7 @@
  */
 package org.primeframework.mvc.test;
 
+import javax.servlet.http.Cookie;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -176,6 +177,20 @@ public class RequestResult {
       throw new AssertionError("Body is not empty.\nBody:\n" + body);
     }
 
+    return this;
+  }
+
+  /**
+   * Assert the cookie exists by name.
+   *
+   * @param name The cookie name.
+   * @return This.
+   */
+  public RequestResult assertContainsCookie(String name) {
+    Cookie actual = response.getCookies().stream().filter(c -> c.getName().equals(name)).findFirst().orElse(null);
+    if (actual == null) {
+      throw new AssertionError("Cookie [" + name + "] was not found in the response. Cookies found [" + String.join(", ", response.getCookies().stream().map(Cookie::getName).collect(Collectors.toList())));
+    }
     return this;
   }
 
@@ -367,6 +382,38 @@ public class RequestResult {
   }
 
   /**
+   * Assert the cookie exists by name and then pass it to the provided consumer to allow the caller to assert on anything they wish.
+   *
+   * @param name     The cookie name.
+   * @param consumer The consumer used to perform assertions.
+   * @return This.
+   */
+  public RequestResult assertCookie(String name, Consumer<Cookie> consumer) {
+    assertContainsCookie(name);
+    Cookie actual = response.getCookies().stream().filter(c -> c.getName().equals(name)).findFirst().orElse(null);
+    if (consumer != null) {
+      consumer.accept(actual);
+    }
+    return this;
+  }
+
+  /**
+   * Assert the cookie exists by name and the value matches that of the provided value.
+   *
+   * @param name  The cookie name.
+   * @param value The cookie value.
+   * @return This.
+   */
+  public RequestResult assertCookie(String name, String value) {
+    assertContainsCookie(name);
+    Cookie actual = response.getCookies().stream().filter(c -> c.getName().equals(name)).findFirst().orElse(null);
+    if (actual.getValue() == null || !actual.getValue().equals(value)) {
+      throw new AssertionError("Cookie [" + name + "] with value [" + actual + "] was not equal to the expected value [" + value + "]");
+    }
+    return this;
+  }
+
+  /**
    * Verifies the response encoding.
    *
    * @param encoding The expected content-type
@@ -500,6 +547,21 @@ public class RequestResult {
    */
   public <T> T get(Class<T> type) {
     return injector.getInstance(type);
+  }
+
+  /**
+   * Retrieve a cookie by name. If the cookie does not exist in the response it will fail.
+   *
+   * @param name The name of the cookie.
+   * @return the Cookie.
+   */
+  public Cookie getCookie(String name) {
+    Cookie cookie = response.getCookies().stream().filter(c -> c.getName().equals(name)).findFirst().orElse(null);
+    if (cookie == null) {
+      throw new AssertionError("Cookie [" + name + "] was not found in the response. Cookies found [" + String.join(", ", response.getCookies().stream().map(Cookie::getName).collect(Collectors.toList())));
+    }
+
+    return cookie;
   }
 
   /**
