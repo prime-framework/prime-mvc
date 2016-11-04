@@ -457,6 +457,21 @@ public class RequestResult {
   }
 
   /**
+   * De-serialize the JSON response using the type provided and allow the caller to assert on the result.
+   *
+   * @param type The object type.
+   * @param type The consumer to pass the de-serialized object to.
+   * @return This.
+   * @throws IOException If the JSON marshalling failed.
+   */
+  public <T> RequestResult assertJSON(Class<T> type, Consumer<T> consumer) throws IOException {
+    ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
+    T response = objectMapper.readValue(body, type);
+    consumer.accept(response);
+    return this;
+  }
+
+  /**
    * Verifies that the response body is equal to the given JSON text.
    *
    * @param json The JSON text.
