@@ -1,0 +1,29 @@
+Prime MVC Changes
+
+Changes in 1.1.4
+
+ * Request Simulator. Add RequestResult.assertJSONFileWithActual. Support test assertions using actual values from the JSON response.
+
+Changes in 1.1.3
+
+ * Request Simulator. Add additional test assertions in RequestResult.
+
+Changes in 1.1.2
+
+ * Request Simulator. Add better assertions on Cookies in RequestResult.
+
+Changes in 1.1.1
+
+ * Fixes. JWT Security Scheme fixes.
+ * Enhancement. Better support for handling 501 Not Implemented.
+
+Changes in 1.1.0
+
+ * Feature. JWT Support. Added JWT Security Scheme.
+ * Build. Upgrade Jackson dependencies from 2.4.2 to 2.8.1
+
+
+
+
+
+
