@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2015-2016, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
 
 import freemarker.cache.FileTemplateLoader;
 import freemarker.template.Configuration;
@@ -34,19 +32,7 @@ import freemarker.template.TemplateException;
  */
 public final class BodyTools {
 
-  static final Configuration configuration;
-
-  static {
-    configuration = new Configuration();
-    configuration.setDefaultEncoding("UTF-8");
-    configuration.setNumberFormat("computer");
-    configuration.setTagSyntax(Configuration.SQUARE_BRACKET_TAG_SYNTAX);
-    try {
-      configuration.setTemplateLoader(new FileTemplateLoader(new File("/")));
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-  }
+  private static final Configuration configuration;
 
   /**
    * Process the FreeMarker template (JSON) and return the rendered string. <p>Example usage when a single replacement
@@ -61,7 +47,7 @@ public final class BodyTools {
    * @throws IOException
    */
   public static String processTemplate(Path path, Object... values) throws IOException {
-    return processTemplateWithMap(path, rootMap(values));
+    return processTemplateWithMap(path, new TestRootMap(values));
   }
 
   /**
@@ -78,7 +64,7 @@ public final class BodyTools {
    * @return
    * @throws IOException
    */
-  public static String processTemplateWithMap(Path path, Map<String, Object> values) throws IOException {
+  public static String processTemplateWithMap(Path path, Object values) throws IOException {
     StringWriter writer = new StringWriter();
     Template template = configuration.getTemplate(path.toAbsolutePath().toString());
     try {
@@ -89,24 +75,16 @@ public final class BodyTools {
     }
   }
 
-  /**
-   * Take array of objects assumed to be in pairs of String, Object and build and return a map.
-   *
-   * @param values
-   * @return
-   */
-  private static Map<String, Object> rootMap(Object... values) {
-    if (values.length % 2 != 0) {
-      String key = values[values.length - 1].toString();
-      throw new IllegalArgumentException("Invalid mapping values. Must have a multiple of 2. Missing value for key [" + key + "]");
+  static {
+    configuration = new Configuration();
+    configuration.setDefaultEncoding("UTF-8");
+    configuration.setNumberFormat("computer");
+    configuration.setTagSyntax(Configuration.SQUARE_BRACKET_TAG_SYNTAX);
+    try {
+      configuration.setTemplateLoader(new FileTemplateLoader(new File("/")));
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
-
-    Map<String, Object> map = new HashMap<>();
-    for (int i = 0; i < values.length; i = i + 2) {
-      map.put(values[i].toString(), values[i + 1]);
-    }
-
-    return map;
   }
 
 }

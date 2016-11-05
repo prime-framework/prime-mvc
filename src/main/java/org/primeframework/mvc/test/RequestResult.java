@@ -19,6 +19,9 @@ import javax.servlet.http.Cookie;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -322,7 +325,7 @@ public class RequestResult {
 
     if (!inMessageStore.containsAll(asList(messages))) {
       StringBuilder sb = new StringBuilder("\n\tMessageStore contains:\n");
-      msgs.stream().forEach((f) -> sb.append("\t\t[" + f + "]\n"));
+      msgs.forEach((f) -> sb.append("\t\t[" + f + "]\n"));
       throw new AssertionError("The MessageStore does not contain the [" + type + "] message " + asList(messages) + sb);
     }
 
@@ -507,6 +510,23 @@ public class RequestResult {
   }
 
   /**
+   * De-serialize the JSON response using the type provided. To use actual values in the JSON use ${actual.foo}
+   * to use the property named <code>foo</code>.
+   *
+   * @param type     The object type of the JSON.
+   * @param jsonFile The JSON file to load and compare to the JSON response.
+   * @param values   key value pairs of replacement values for use in the JSON file.
+   * @return This.
+   * @throws IOException If the JSON marshalling failed.
+   */
+  public <T> RequestResult assertJSONFileWithActual(Class<T> type, Path jsonFile, Object... values) throws IOException {
+    ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
+    T actual = objectMapper.readValue(body, type);
+
+    return assertJSONFile(jsonFile, appendArray(values, "actual", actual));
+  }
+
+  /**
    * Verifies that the redirect URI is the given URI.
    *
    * @param uri The redirect URI.
@@ -623,5 +643,12 @@ public class RequestResult {
   public RequestResult setup(Consumer<RequestResult> consumer) {
     consumer.accept(this);
     return this;
+  }
+
+  private Object[] appendArray(Object[] values, Object... objects) {
+    ArrayList<Object> list = new ArrayList<>(Arrays.asList(values));
+    Collections.addAll(list, objects);
+
+    return list.toArray();
   }
 }
