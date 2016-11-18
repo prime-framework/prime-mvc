@@ -19,8 +19,12 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 import org.primeframework.jwt.Verifier;
+import org.primeframework.jwt.domain.InvalidJWTException;
+import org.primeframework.jwt.domain.InvalidJWTSignatureException;
 import org.primeframework.jwt.domain.JWT;
 import org.primeframework.jwt.domain.JWTException;
+import org.primeframework.jwt.domain.JWTExpiredException;
+import org.primeframework.jwt.domain.JWTUnavailableForProcessingException;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
@@ -43,16 +47,16 @@ public class JWTSecurityScheme implements SecurityScheme {
 
   protected final ActionInvocationStore actionInvocationStore;
 
-  protected final JWTExtractor jwtExtractor;
+  protected final JWTRequestAdapter jwtAdapter;
 
   protected final HttpServletRequest request;
 
   protected final Provider<Map<String, Verifier>> verifierProvider;
 
   @Inject
-  public JWTSecurityScheme(ActionInvocationStore actionInvocationStore, JWTExtractor jwtExtractor, HttpServletRequest request, Provider<Map<String, Verifier>> verifierProvider) {
+  public JWTSecurityScheme(ActionInvocationStore actionInvocationStore, JWTRequestAdapter jwtAdapter, HttpServletRequest request, Provider<Map<String, Verifier>> verifierProvider) {
     this.actionInvocationStore = actionInvocationStore;
-    this.jwtExtractor = jwtExtractor;
+    this.jwtAdapter = jwtAdapter;
     this.request = request;
     this.verifierProvider = verifierProvider;
   }
@@ -65,7 +69,7 @@ public class JWTSecurityScheme implements SecurityScheme {
     }
 
     try {
-      String encodedJWT = jwtExtractor.get();
+      String encodedJWT = jwtAdapter.getEncodedJWT();
       final JWT jwt = JWT.getDecoder().decode(encodedJWT, verifierProvider.get());
 
       // The JWT has a valid signature and is not expired, further authorization is delegated to the action.
@@ -85,6 +89,9 @@ public class JWTSecurityScheme implements SecurityScheme {
         }
       }
 
+    } catch (InvalidJWTException | InvalidJWTSignatureException | JWTExpiredException | JWTUnavailableForProcessingException e) {
+      jwtAdapter.invalidateJWT();
+      throw new UnauthenticatedException();
     } catch (JWTException e) {
       throw new UnauthenticatedException();
     }

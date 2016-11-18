@@ -16,18 +16,26 @@
 package org.primeframework.mvc.security;
 
 /**
- * Extract the JWT from the request.
+ * Manage retrieving the JWT from the HTTP request and ensuring we don't return the JWT (in the form a cookie for example) on a response if
+ * it is invalid.
  *
  * @author Daniel DeGroff
  */
-public interface JWTExtractor {
+public interface JWTRequestAdapter {
 
   /**
    * Return the encoded JWT from the HTTP request.
    *
    * @return the encoded JWT or null if no JWT was found in the request.
    */
-  String get();
+  String getEncodedJWT();
+
+  /**
+   * Call when the JWT Security Scheme identifies an invalid JWT has been provided in the request.
+   *
+   * @return the refresh token or null if one was not found.
+   */
+  String invalidateJWT();
 
   /**
    * @return true if the HTTP request contains a JWT.
