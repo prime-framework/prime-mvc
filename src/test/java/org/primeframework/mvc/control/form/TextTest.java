@@ -76,6 +76,33 @@ public class TextTest extends ControlBaseTest {
       "<div class=\"label-container\"><label for=\"user_name\" class=\"label\">Your name</label></div>\n" +
       "<div class=\"control-container\"><input type=\"text\" id=\"user_name\" name=\"user.name\" value=\"&lt;Brian&gt;\"/></div>\n" +
       "</div>\n");
+
+    action.user.setName("'Brian'");
+    new ControlTester(text).
+      attr("name", "user.name").
+      go("<input type=\"hidden\" name=\"user.name@param\" value=\"param-value\"/>\n" +
+      "<div class=\"text input control\">\n" +
+      "<div class=\"label-container\"><label for=\"user_name\" class=\"label\">Your name</label></div>\n" +
+      "<div class=\"control-container\"><input type=\"text\" id=\"user_name\" name=\"user.name\" value=\"&#39;Brian&#39;\"/></div>\n" +
+      "</div>\n");
+
+    action.user.setName("\"Brian\"");
+    new ControlTester(text).
+      attr("name", "user.name").
+      go("<input type=\"hidden\" name=\"user.name@param\" value=\"param-value\"/>\n" +
+      "<div class=\"text input control\">\n" +
+      "<div class=\"label-container\"><label for=\"user_name\" class=\"label\">Your name</label></div>\n" +
+      "<div class=\"control-container\"><input type=\"text\" id=\"user_name\" name=\"user.name\" value=\"&quot;Brian&quot;\"/></div>\n" +
+      "</div>\n");
+
+    action.user.setName("&Brian&");
+    new ControlTester(text).
+      attr("name", "user.name").
+      go("<input type=\"hidden\" name=\"user.name@param\" value=\"param-value\"/>\n" +
+      "<div class=\"text input control\">\n" +
+      "<div class=\"label-container\"><label for=\"user_name\" class=\"label\">Your name</label></div>\n" +
+      "<div class=\"control-container\"><input type=\"text\" id=\"user_name\" name=\"user.name\" value=\"&amp;Brian&amp;\"/></div>\n" +
+      "</div>\n");
   }
 
   @Test

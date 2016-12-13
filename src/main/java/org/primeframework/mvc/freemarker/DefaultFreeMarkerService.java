@@ -64,9 +64,7 @@ public class DefaultFreeMarkerService implements FreeMarkerService {
       template.process(root, writer);
     } catch (FileNotFoundException fnfe) {
       throw new MissingTemplateException(fnfe);
-    } catch (IOException e) {
-      throw new FreeMarkerRenderException(e);
-    } catch (TemplateException e) {
+    } catch (IOException | TemplateException e) {
       throw new FreeMarkerRenderException(e);
     }
   }

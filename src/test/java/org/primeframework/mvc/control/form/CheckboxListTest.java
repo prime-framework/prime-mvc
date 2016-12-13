@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc.control.form;
 
-import com.google.inject.Inject;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.example.action.user.Edit;
@@ -27,6 +26,7 @@ import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.testng.annotations.Test;
 
+import com.google.inject.Inject;
 import static java.util.Arrays.asList;
 import static org.primeframework.mvc.util.MapBuilder.lmap;
 
@@ -39,30 +39,6 @@ public class CheckboxListTest extends ControlBaseTest {
   @Inject public CheckboxList checkboxList;
 
   @Test
-  public void actionLess() {
-    ais.setCurrent(new ActionInvocation(null, null, "/checkbox-list", null, null));
-    new ControlTester(checkboxList).
-      attr("name", "test").
-      attr("class", "css-class").
-      attr("items", asList("one", "two", "three")).
-      go("<input type=\"hidden\" name=\"test@param\" value=\"param-value\"/>\n" +
-        "<div class=\"css-class-checkbox-list css-class-input css-class-control checkbox-list input control\">\n" +
-        "<div class=\"label-container\"><label for=\"test\" class=\"label\">Test</label></div>\n" +
-        "<div class=\"control-container\">\n" +
-        "<div class=\"control-item-container\">\n" +
-        "<input type=\"checkbox\" value=\"one\" class=\"css-class\" name=\"test\"/><span class=\"checkbox-text\">one</span>\n" +
-        "</div>\n" +
-        "<div class=\"control-item-container\">\n" +
-        "<input type=\"checkbox\" value=\"two\" class=\"css-class\" name=\"test\"/><span class=\"checkbox-text\">two</span>\n" +
-        "</div>\n" +
-        "<div class=\"control-item-container\">\n" +
-        "<input type=\"checkbox\" value=\"three\" class=\"css-class\" name=\"test\"/><span class=\"checkbox-text\">three</span>\n" +
-        "</div>\n" +
-        "</div>\n" +
-        "</div>\n");
-  }
-
-  @Test
   public void action() {
     Address address = new Address();
     address.setCountry("US");
@@ -71,47 +47,45 @@ public class CheckboxListTest extends ControlBaseTest {
     action.user.setAddress("work", address);
 
     ais.setCurrent(new ActionInvocation(action, null, "/checkbox-list", null, null));
-    new ControlTester(checkboxList).
-      attr("name", "user.addresses['work'].country").
-      attr("items", lmap("US", "United States", "DE", "Germany")).
-      go("<input type=\"hidden\" name=\"user.addresses['work'].country@param\" value=\"param-value\"/>\n" +
-        "<div class=\"checkbox-list input control\">\n" +
-        "<div class=\"label-container\"><label for=\"user_addresses['work']_country\" class=\"label\">Country</label></div>\n" +
-        "<div class=\"control-container\">\n" +
-        "<div class=\"control-item-container\">\n" +
-        "<input type=\"checkbox\" checked=\"checked\" value=\"US\" name=\"user.addresses['work'].country\"/><span class=\"checkbox-text\">United States</span>\n" +
-        "</div>\n" +
-        "<div class=\"control-item-container\">\n" +
-        "<input type=\"checkbox\" value=\"DE\" name=\"user.addresses['work'].country\"/><span class=\"checkbox-text\">Germany</span>\n" +
-        "</div>\n" +
-        "</div>\n" +
-        "</div>\n");
+    new ControlTester(checkboxList)
+        .attr("name", "user.addresses['work'].country")
+        .attr("items", lmap("US", "United States", "DE", "Germany"))
+        .go("<input type=\"hidden\" name=\"user.addresses[&#39;work&#39;].country@param\" value=\"param-value\"/>\n" +
+            "<div class=\"checkbox-list input control\">\n" +
+            "<div class=\"label-container\"><label for=\"user_addresses[&#39;work&#39;]_country\" class=\"label\">Country</label></div>\n" +
+            "<div class=\"control-container\">\n" +
+            "<div class=\"control-item-container\">\n" +
+            "<input type=\"checkbox\" checked=\"checked\" value=\"US\" name=\"user.addresses[&#39;work&#39;].country\"/><span class=\"checkbox-text\">United States</span>\n" +
+            "</div>\n" +
+            "<div class=\"control-item-container\">\n" +
+            "<input type=\"checkbox\" value=\"DE\" name=\"user.addresses[&#39;work&#39;].country\"/><span class=\"checkbox-text\">Germany</span>\n" +
+            "</div>\n" +
+            "</div>\n" +
+            "</div>\n");
   }
 
   @Test
-  public void html() {
-    Address address = new Address();
-    address.setCountry("<US>");
-    Edit action = new Edit();
-    action.user = new User();
-    action.user.setAddress("work", address);
-
-    ais.setCurrent(new ActionInvocation(action, null, "/checkbox-list", null, null));
-    new ControlTester(checkboxList).
-      attr("name", "user.addresses['work'].country").
-      attr("items", lmap("<US>", "<United States>", "DE", "Germany")).
-      go("<input type=\"hidden\" name=\"user.addresses['work'].country@param\" value=\"param-value\"/>\n" +
-        "<div class=\"checkbox-list input control\">\n" +
-        "<div class=\"label-container\"><label for=\"user_addresses['work']_country\" class=\"label\">Country</label></div>\n" +
-        "<div class=\"control-container\">\n" +
-        "<div class=\"control-item-container\">\n" +
-        "<input type=\"checkbox\" checked=\"checked\" value=\"&lt;US&gt;\" name=\"user.addresses['work'].country\"/><span class=\"checkbox-text\"><United States></span>\n" +
-        "</div>\n" +
-        "<div class=\"control-item-container\">\n" +
-        "<input type=\"checkbox\" value=\"DE\" name=\"user.addresses['work'].country\"/><span class=\"checkbox-text\">Germany</span>\n" +
-        "</div>\n" +
-        "</div>\n" +
-        "</div>\n");
+  public void actionLess() {
+    ais.setCurrent(new ActionInvocation(null, null, "/checkbox-list", null, null));
+    new ControlTester(checkboxList)
+        .attr("name", "test")
+        .attr("class", "css-class")
+        .attr("items", asList("one", "two", "three"))
+        .go("<input type=\"hidden\" name=\"test@param\" value=\"param-value\"/>\n" +
+            "<div class=\"css-class-checkbox-list css-class-input css-class-control checkbox-list input control\">\n" +
+            "<div class=\"label-container\"><label for=\"test\" class=\"label\">Test</label></div>\n" +
+            "<div class=\"control-container\">\n" +
+            "<div class=\"control-item-container\">\n" +
+            "<input type=\"checkbox\" value=\"one\" class=\"css-class\" name=\"test\"/><span class=\"checkbox-text\">one</span>\n" +
+            "</div>\n" +
+            "<div class=\"control-item-container\">\n" +
+            "<input type=\"checkbox\" value=\"two\" class=\"css-class\" name=\"test\"/><span class=\"checkbox-text\">two</span>\n" +
+            "</div>\n" +
+            "<div class=\"control-item-container\">\n" +
+            "<input type=\"checkbox\" value=\"three\" class=\"css-class\" name=\"test\"/><span class=\"checkbox-text\">three</span>\n" +
+            "</div>\n" +
+            "</div>\n" +
+            "</div>\n");
   }
 
   @SuppressWarnings("unchecked")
@@ -128,23 +102,23 @@ public class CheckboxListTest extends ControlBaseTest {
     Pair<String, String> us = Pair.of("US", "United States");
     Pair<String, String> de = Pair.of("DE", "Germany");
 
-    new ControlTester(checkboxList).
-      attr("name", "user.addresses['work'].country").
-      attr("valueExpr", "left").
-      attr("textExpr", "right").
-      attr("items", ArrayUtils.toArray(us, de)).
-      go("<input type=\"hidden\" name=\"user.addresses['work'].country@param\" value=\"param-value\"/>\n" +
-        "<div class=\"checkbox-list input control\">\n" +
-        "<div class=\"label-container\"><label for=\"user_addresses['work']_country\" class=\"label\">Country</label></div>\n" +
-        "<div class=\"control-container\">\n" +
-        "<div class=\"control-item-container\">\n" +
-        "<input type=\"checkbox\" checked=\"checked\" value=\"US\" name=\"user.addresses['work'].country\"/><span class=\"checkbox-text\">United States</span>\n" +
-        "</div>\n" +
-        "<div class=\"control-item-container\">\n" +
-        "<input type=\"checkbox\" value=\"DE\" name=\"user.addresses['work'].country\"/><span class=\"checkbox-text\">Germany</span>\n" +
-        "</div>\n" +
-        "</div>\n" +
-        "</div>\n");
+    new ControlTester(checkboxList)
+        .attr("name", "user.addresses['work'].country")
+        .attr("valueExpr", "left")
+        .attr("textExpr", "right")
+        .attr("items", ArrayUtils.toArray(us, de))
+        .go("<input type=\"hidden\" name=\"user.addresses[&#39;work&#39;].country@param\" value=\"param-value\"/>\n" +
+            "<div class=\"checkbox-list input control\">\n" +
+            "<div class=\"label-container\"><label for=\"user_addresses[&#39;work&#39;]_country\" class=\"label\">Country</label></div>\n" +
+            "<div class=\"control-container\">\n" +
+            "<div class=\"control-item-container\">\n" +
+            "<input type=\"checkbox\" checked=\"checked\" value=\"US\" name=\"user.addresses[&#39;work&#39;].country\"/><span class=\"checkbox-text\">United States</span>\n" +
+            "</div>\n" +
+            "<div class=\"control-item-container\">\n" +
+            "<input type=\"checkbox\" value=\"DE\" name=\"user.addresses[&#39;work&#39;].country\"/><span class=\"checkbox-text\">Germany</span>\n" +
+            "</div>\n" +
+            "</div>\n" +
+            "</div>\n");
   }
 
   @Test
@@ -159,20 +133,46 @@ public class CheckboxListTest extends ControlBaseTest {
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "code1", "Country is required"));
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "code2", "Country must be cool"));
 
-    new ControlTester(checkboxList).
-      attr("name", "user.addresses['work'].country").
-      attr("items", lmap("US", "United States", "DE", "Germany")).
-      go("<input type=\"hidden\" name=\"user.addresses['work'].country@param\" value=\"param-value\"/>\n" +
-        "<div class=\"checkbox-list input control\">\n" +
-        "<div class=\"label-container\"><label for=\"user_addresses['work']_country\" class=\"label\"><span class=\"error\">Country (Country is required, Country must be cool)</span></label></div>\n" +
-        "<div class=\"control-container\">\n" +
-        "<div class=\"control-item-container\">\n" +
-        "<input type=\"checkbox\" checked=\"checked\" value=\"US\" name=\"user.addresses['work'].country\"/><span class=\"checkbox-text\">United States</span>\n" +
-        "</div>\n" +
-        "<div class=\"control-item-container\">\n" +
-        "<input type=\"checkbox\" value=\"DE\" name=\"user.addresses['work'].country\"/><span class=\"checkbox-text\">Germany</span>\n" +
-        "</div>\n" +
-        "</div>\n" +
-        "</div>\n");
+    new ControlTester(checkboxList)
+        .attr("name", "user.addresses['work'].country")
+        .attr("items", lmap("US", "United States", "DE", "Germany"))
+        .go("<input type=\"hidden\" name=\"user.addresses[&#39;work&#39;].country@param\" value=\"param-value\"/>\n" +
+            "<div class=\"checkbox-list input control\">\n" +
+            "<div class=\"label-container\"><label for=\"user_addresses[&#39;work&#39;]_country\" class=\"label\"><span class=\"error\">Country (Country is required, Country must be cool)</span></label></div>\n" +
+            "<div class=\"control-container\">\n" +
+            "<div class=\"control-item-container\">\n" +
+            "<input type=\"checkbox\" checked=\"checked\" value=\"US\" name=\"user.addresses[&#39;work&#39;].country\"/><span class=\"checkbox-text\">United States</span>\n" +
+            "</div>\n" +
+            "<div class=\"control-item-container\">\n" +
+            "<input type=\"checkbox\" value=\"DE\" name=\"user.addresses[&#39;work&#39;].country\"/><span class=\"checkbox-text\">Germany</span>\n" +
+            "</div>\n" +
+            "</div>\n" +
+            "</div>\n");
+  }
+
+  @Test
+  public void html() {
+    Address address = new Address();
+    address.setCountry("<US>");
+    Edit action = new Edit();
+    action.user = new User();
+    action.user.setAddress("work", address);
+
+    ais.setCurrent(new ActionInvocation(action, null, "/checkbox-list", null, null));
+    new ControlTester(checkboxList)
+        .attr("name", "user.addresses['work'].country")
+        .attr("items", lmap("<US>", "<United States>", "DE", "Germany"))
+        .go("<input type=\"hidden\" name=\"user.addresses[&#39;work&#39;].country@param\" value=\"param-value\"/>\n" +
+            "<div class=\"checkbox-list input control\">\n" +
+            "<div class=\"label-container\"><label for=\"user_addresses[&#39;work&#39;]_country\" class=\"label\">Country</label></div>\n" +
+            "<div class=\"control-container\">\n" +
+            "<div class=\"control-item-container\">\n" +
+            "<input type=\"checkbox\" checked=\"checked\" value=\"&lt;US&gt;\" name=\"user.addresses[&#39;work&#39;].country\"/><span class=\"checkbox-text\"><United States></span>\n" +
+            "</div>\n" +
+            "<div class=\"control-item-container\">\n" +
+            "<input type=\"checkbox\" value=\"DE\" name=\"user.addresses[&#39;work&#39;].country\"/><span class=\"checkbox-text\">Germany</span>\n" +
+            "</div>\n" +
+            "</div>\n" +
+            "</div>\n");
   }
 }

@@ -23,10 +23,11 @@ import java.util.stream.Collectors;
 import org.primeframework.mvc.control.Control;
 import org.primeframework.mvc.control.FreeMarkerControlProxy;
 import org.primeframework.mvc.control.guice.ControlFactory;
-import org.primeframework.mvc.freemarker.FieldSupportBeansWrapper;
 import org.primeframework.mvc.freemarker.FreeMarkerRenderException;
 
+import freemarker.ext.beans.BeansWrapper;
 import freemarker.ext.beans.CollectionModel;
+import freemarker.template.ObjectWrapper;
 import freemarker.template.TemplateCollectionModel;
 import freemarker.template.TemplateHashModelEx;
 import freemarker.template.TemplateModelException;
@@ -37,25 +38,18 @@ import freemarker.template.TemplateModelException;
  * @author Brian Pontarelli
  */
 public class ControlsHashModel implements TemplateHashModelEx {
-  private final Map<String, FreeMarkerControlProxy> controls = new HashMap<>();
-  private final String prefix;
   private final ControlFactory controlFactory;
 
-  public ControlsHashModel(String prefix, ControlFactory controlFactory) {
+  private final Map<String, FreeMarkerControlProxy> controls = new HashMap<>();
+
+  private final ObjectWrapper objectWrapper;
+
+  private final String prefix;
+
+  public ControlsHashModel(String prefix, ControlFactory controlFactory, ObjectWrapper objectWrapper) {
     this.prefix = prefix;
     this.controlFactory = controlFactory;
-  }
-
-  public TemplateCollectionModel keys() throws TemplateModelException {
-    return new CollectionModel(controlFactory.controlNames(prefix), FieldSupportBeansWrapper.INSTANCE);
-  }
-
-  public int size() {
-    return controlFactory.controlNames(prefix).size();
-  }
-
-  public boolean isEmpty() {
-    return controlFactory.controlNames(prefix).isEmpty();
+    this.objectWrapper = objectWrapper;
   }
 
   public FreeMarkerControlProxy get(String key) {
@@ -66,15 +60,27 @@ public class ControlsHashModel implements TemplateHashModelEx {
         throw new FreeMarkerRenderException("Prime control named [" + key + "] doesn't exist. Currently registered controls are " + controls.keySet());
       }
 
-      proxy = new FreeMarkerControlProxy(control);
+      proxy = new FreeMarkerControlProxy(control, objectWrapper);
       controls.put(key, proxy);
     }
 
     return proxy;
   }
 
+  public boolean isEmpty() {
+    return controlFactory.controlNames(prefix).isEmpty();
+  }
+
+  public TemplateCollectionModel keys() throws TemplateModelException {
+    return new CollectionModel(controlFactory.controlNames(prefix), (BeansWrapper) objectWrapper);
+  }
+
+  public int size() {
+    return controlFactory.controlNames(prefix).size();
+  }
+
   public TemplateCollectionModel values() {
-    return new CollectionModel(valueCollection(), FieldSupportBeansWrapper.INSTANCE);
+    return new CollectionModel(valueCollection(), (BeansWrapper) objectWrapper);
   }
 
   private Collection<FreeMarkerControlProxy> valueCollection() {

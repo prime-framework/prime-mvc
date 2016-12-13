@@ -20,9 +20,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.primeframework.mvc.freemarker.FieldSupportBeansWrapper;
-
 import freemarker.core.Environment;
+import freemarker.ext.beans.BeansWrapper;
+import freemarker.template.ObjectWrapper;
 import freemarker.template.TemplateDirectiveBody;
 import freemarker.template.TemplateDirectiveModel;
 import freemarker.template.TemplateException;
@@ -37,8 +37,11 @@ import freemarker.template.TemplateModelException;
 public class FreeMarkerControlProxy implements TemplateDirectiveModel {
   private final Control control;
 
-  public FreeMarkerControlProxy(Control control) {
+  private final ObjectWrapper objectWrapper;
+
+  public FreeMarkerControlProxy(Control control, ObjectWrapper objectWrapper) {
     this.control = control;
+    this.objectWrapper = objectWrapper;
   }
 
   /**
@@ -51,7 +54,7 @@ public class FreeMarkerControlProxy implements TemplateDirectiveModel {
    * @param body     The body of the directive.
    */
   public void execute(Environment env, Map params, TemplateModel[] loopVars, TemplateDirectiveBody body)
-    throws IOException, TemplateException {
+      throws IOException, TemplateException {
     Map<String, String> dynamicAttributes = makeDynamicAttributes(params);
     Map<String, Object> attributes = makeAttributes(params);
 
@@ -67,32 +70,12 @@ public class FreeMarkerControlProxy implements TemplateDirectiveModel {
    * @param env  The environment that can be used to get the writer. This default implementation uses this writer.
    * @param body The body.
    * @throws TemplateException If the body fails to render.
-   * @throws IOException       If the render can't write to the writer.
+   * @throws IOException If the render can't write to the writer.
    */
   protected void executeBody(Environment env, TemplateDirectiveBody body) throws IOException, TemplateException {
     if (body != null) {
       body.render(env.getOut());
     }
-  }
-
-  /**
-   * Creates the list of dynamic attributes from the given Map of parameters passed ot the control.
-   *
-   * @param params The parameters passed to this control in the FTL file.
-   * @return The dynamic attributes.
-   */
-  @SuppressWarnings("unchecked")
-  protected Map<String, String> makeDynamicAttributes(Map params) {
-    Map<String, String> dynamicAttributes = new HashMap<String, String>();
-    for (Iterator<String> i = params.keySet().iterator(); i.hasNext(); ) {
-      String key = i.next();
-      if (key.startsWith("_")) {
-        Object value = params.get(key);
-        dynamicAttributes.put(key.substring(1), value.toString());
-        i.remove();
-      }
-    }
-    return dynamicAttributes;
   }
 
   /**
@@ -103,15 +86,35 @@ public class FreeMarkerControlProxy implements TemplateDirectiveModel {
    * @throws freemarker.template.TemplateModelException If the unwrapping fails.
    */
   protected Map<String, Object> makeAttributes(Map params) throws TemplateModelException {
-    Map<String, Object> attributes = new HashMap<String, Object>(params.size());
+    Map<String, Object> attributes = new HashMap<>(params.size());
     for (Object o : params.entrySet()) {
       Map.Entry entry = (Map.Entry) o;
       Object value = entry.getValue();
       if (value != null) {
-        attributes.put((String) entry.getKey(), FieldSupportBeansWrapper.INSTANCE.unwrap((TemplateModel) value));
+        attributes.put((String) entry.getKey(), ((BeansWrapper) objectWrapper).unwrap((TemplateModel) value));
       }
     }
 
     return attributes;
+  }
+
+  /**
+   * Creates the list of dynamic attributes from the given Map of parameters passed ot the control.
+   *
+   * @param params The parameters passed to this control in the FTL file.
+   * @return The dynamic attributes.
+   */
+  @SuppressWarnings("unchecked")
+  protected Map<String, String> makeDynamicAttributes(Map params) {
+    Map<String, String> dynamicAttributes = new HashMap<>();
+    for (Iterator<String> i = params.keySet().iterator(); i.hasNext(); ) {
+      String key = i.next();
+      if (key.startsWith("_")) {
+        Object value = params.get(key);
+        dynamicAttributes.put(key.substring(1), value.toString());
+        i.remove();
+      }
+    }
+    return dynamicAttributes;
   }
 }

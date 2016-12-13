@@ -28,12 +28,12 @@ import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.control.annotation.ControlAttribute;
 import org.primeframework.mvc.control.annotation.ControlAttributes;
-import org.primeframework.mvc.control.form.AppendAttributesMethod;
 import org.primeframework.mvc.control.form.JoinMethod;
 import org.primeframework.mvc.freemarker.FreeMarkerService;
 import org.primeframework.mvc.util.ErrorList;
 
 import com.google.inject.Inject;
+import freemarker.template.Configuration;
 
 /**
  * This class an abstract Control implementation that is useful for creating new controls that might need access to
@@ -51,6 +51,8 @@ public abstract class AbstractControl implements Control {
   protected ActionInvocationStore actionInvocationStore;
 
   protected MVCConfiguration configuration;
+
+  protected Configuration freeMarkerConfig;
 
   protected FreeMarkerService freeMarkerService;
 
@@ -117,12 +119,13 @@ public abstract class AbstractControl implements Control {
 
   @Inject
   public void setServices(Locale locale, HttpServletRequest request, ActionInvocationStore actionInvocationStore,
-                          FreeMarkerService freeMarkerService, MVCConfiguration configuration) {
+                          FreeMarkerService freeMarkerService, MVCConfiguration configuration, Configuration freeMarkerConfig) {
     this.locale = locale;
     this.request = request;
     this.freeMarkerService = freeMarkerService;
     this.actionInvocationStore = actionInvocationStore;
     this.configuration = configuration;
+    this.freeMarkerConfig = freeMarkerConfig;
   }
 
   /**
@@ -162,8 +165,10 @@ public abstract class AbstractControl implements Control {
    * Creates the parameters Map that is the root node used by the FreeMarker template when rendering. This places these
    * values in the root map:
    * <p>
-   * <ul> <li>attributes - The attributes</li> <li>dynamic_attributes - The dynamic attributes</li>
-   * <li>append_attributes - A FreeMarker method that appends attributes ({@link AppendAttributesMethod})</li> </ul>
+   * <ul>
+   * <li>attributes - The attributes</li>
+   * <li>dynamic_attributes - The dynamic attributes</li>
+   * </ul>
    *
    * @return The Parameters Map.
    */
@@ -171,8 +176,7 @@ public abstract class AbstractControl implements Control {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("attributes", attributes);
     parameters.put("dynamicAttributes", dynamicAttributes);
-//        parameters.put("append_attributes", new AppendAttributesMethod());
-    parameters.put("join", new JoinMethod());
+    parameters.put("join", new JoinMethod(freeMarkerConfig.getObjectWrapper()));
     return parameters;
   }
 

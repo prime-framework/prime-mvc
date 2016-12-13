@@ -503,9 +503,6 @@ public class RequestResult {
    * @throws IOException If the JSON marshalling failed.
    */
   public RequestResult assertJSONFile(Path jsonFile, Object... values) throws IOException {
-    if (values.length == 0) {
-      return assertJSON(new String(Files.readAllBytes(jsonFile), "UTF-8"));
-    }
     return assertJSON(BodyTools.processTemplate(jsonFile, values));
   }
 
@@ -648,7 +645,6 @@ public class RequestResult {
   private Object[] appendArray(Object[] values, Object... objects) {
     ArrayList<Object> list = new ArrayList<>(Arrays.asList(values));
     Collections.addAll(list, objects);
-
     return list.toArray();
   }
 }

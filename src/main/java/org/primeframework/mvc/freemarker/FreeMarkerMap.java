@@ -48,11 +48,13 @@ import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.parameter.el.MissingPropertyExpressionException;
 
 import com.google.inject.Inject;
+import freemarker.ext.beans.BeansWrapper;
 import freemarker.ext.beans.CollectionModel;
 import freemarker.ext.jsp.TaglibFactory;
 import freemarker.ext.servlet.HttpRequestHashModel;
 import freemarker.ext.servlet.HttpSessionHashModel;
 import freemarker.ext.servlet.ServletContextHashModel;
+import freemarker.template.Configuration;
 import freemarker.template.TemplateCollectionModel;
 import freemarker.template.TemplateHashModelEx;
 import freemarker.template.TemplateModel;
@@ -91,6 +93,8 @@ public class FreeMarkerMap implements TemplateHashModelEx {
 
   protected final ActionInvocationStore actionInvocationStore;
 
+  protected final Configuration configuration;
+
   protected final ServletContext context;
 
   protected final ExpressionEvaluator expressionEvaluator;
@@ -104,18 +108,20 @@ public class FreeMarkerMap implements TemplateHashModelEx {
   @Inject
   public FreeMarkerMap(ServletContext context, HttpServletRequest request, HttpServletResponse response,
                        ExpressionEvaluator expressionEvaluator, ActionInvocationStore actionInvocationStore,
-                       MessageStore messageStore, ControlFactory controlFactory, TemplateModelFactory templateModelFactory) {
+                       MessageStore messageStore, ControlFactory controlFactory, TemplateModelFactory templateModelFactory,
+                       Configuration configuration) {
     this.context = context;
     this.taglibFactory = new TaglibFactory(context);
     this.request = request;
     this.expressionEvaluator = expressionEvaluator;
     this.actionInvocationStore = actionInvocationStore;
+    this.configuration = configuration;
 
-    objects.put(REQUEST_MODEL, new HttpRequestHashModel(request, response, FieldSupportBeansWrapper.INSTANCE));
+    objects.put(REQUEST_MODEL, new HttpRequestHashModel(request, response, configuration.getObjectWrapper()));
     objects.put(REQUEST, request);
     HttpSession session = request.getSession(false);
     if (session != null) {
-      objects.put(SESSION_MODEL, new HttpSessionHashModel(session, FieldSupportBeansWrapper.INSTANCE));
+      objects.put(SESSION_MODEL, new HttpSessionHashModel(session, configuration.getObjectWrapper()));
       objects.put(SESSION, session);
     }
 
@@ -134,7 +140,7 @@ public class FreeMarkerMap implements TemplateHashModelEx {
       }
 
 
-    }, FieldSupportBeansWrapper.INSTANCE));
+    }, configuration.getObjectWrapper()));
     objects.put(APPLICATION, context);
     objects.put(JSP_TAGLIBS, new TaglibFactory(context));
 
@@ -164,12 +170,12 @@ public class FreeMarkerMap implements TemplateHashModelEx {
 
     // Add the models
     for (String prefix : templateModelFactory.prefixes()) {
-      objects.put(prefix, new ModelsHashModel(prefix, templateModelFactory));
+      objects.put(prefix, new ModelsHashModel(prefix, templateModelFactory, configuration.getObjectWrapper()));
     }
 
     // Add the controls
     for (String prefix : controlFactory.prefixes()) {
-      objects.put(prefix, new ControlsHashModel(prefix, controlFactory));
+      objects.put(prefix, new ControlsHashModel(prefix, controlFactory, configuration.getObjectWrapper()));
     }
 
     // TODO add debugging for figuring out what scope an object is in
@@ -220,7 +226,7 @@ public class FreeMarkerMap implements TemplateHashModelEx {
     }
 
     try {
-      return FieldSupportBeansWrapper.INSTANCE.wrap(value);
+      return configuration.getObjectWrapper().wrap(value);
     } catch (TemplateModelException e) {
       throw new PrimeException(e);
     }
@@ -254,7 +260,7 @@ public class FreeMarkerMap implements TemplateHashModelEx {
 
     keys.add(JSP_TAGLIBS);
 
-    return new CollectionModel(keys, FieldSupportBeansWrapper.INSTANCE);
+    return new CollectionModel(keys, (BeansWrapper) configuration.getObjectWrapper());
   }
 
   @Override
@@ -315,7 +321,7 @@ public class FreeMarkerMap implements TemplateHashModelEx {
 
     values.add(taglibFactory);
 
-    return new CollectionModel(values, FieldSupportBeansWrapper.INSTANCE);
+    return new CollectionModel(values, (BeansWrapper) configuration.getObjectWrapper());
   }
 
   private int count(Enumeration<String> enumeration) {

@@ -55,11 +55,11 @@ public class SelectTest extends ControlBaseTest {
     new ControlTester(select)
         .attr("name", "user.addresses['work'].country")
         .attr("items", lmap("US", "United States", "DE", "Germany"))
-        .go("<input type=\"hidden\" name=\"user.addresses['work'].country@param\" value=\"param-value\"/>\n" +
+        .go("<input type=\"hidden\" name=\"user.addresses[&#39;work&#39;].country@param\" value=\"param-value\"/>\n" +
             "<div class=\"select input control\">\n" +
-            "<div class=\"label-container\"><label for=\"user_addresses['work']_country\" class=\"label\">Country</label></div>\n" +
+            "<div class=\"label-container\"><label for=\"user_addresses[&#39;work&#39;]_country\" class=\"label\">Country</label></div>\n" +
             "<div class=\"control-container\">\n" +
-            "<select id=\"user_addresses['work']_country\" name=\"user.addresses['work'].country\">\n" +
+            "<select id=\"user_addresses[&#39;work&#39;]_country\" name=\"user.addresses[&#39;work&#39;].country\">\n" +
             "<option value=\"US\" selected=\"selected\">United States</option>\n" +
             "<option value=\"DE\">Germany</option>\n" +
             "</select>\n" +
@@ -128,11 +128,11 @@ public class SelectTest extends ControlBaseTest {
         .attr("valueExpr", "left")
         .attr("textExpr", "right")
         .attr("items", ArrayUtils.toArray(us, de))
-        .go("<input type=\"hidden\" name=\"user.addresses['work'].country@param\" value=\"param-value\"/>\n" +
+        .go("<input type=\"hidden\" name=\"user.addresses[&#39;work&#39;].country@param\" value=\"param-value\"/>\n" +
             "<div class=\"select input control\">\n" +
-            "<div class=\"label-container\"><label for=\"user_addresses['work']_country\" class=\"label\">Country</label></div>\n" +
+            "<div class=\"label-container\"><label for=\"user_addresses[&#39;work&#39;]_country\" class=\"label\">Country</label></div>\n" +
             "<div class=\"control-container\">\n" +
-            "<select id=\"user_addresses['work']_country\" name=\"user.addresses['work'].country\">\n" +
+            "<select id=\"user_addresses[&#39;work&#39;]_country\" name=\"user.addresses[&#39;work&#39;].country\">\n" +
             "<option value=\"US\" selected=\"selected\">United States</option>\n" +
             "<option value=\"DE\">Germany</option>\n" +
             "</select>\n" +
@@ -155,11 +155,11 @@ public class SelectTest extends ControlBaseTest {
     new ControlTester(select)
         .attr("name", "user.addresses['work'].country")
         .attr("items", lmap("US", "United States", "DE", "Germany"))
-        .go("<input type=\"hidden\" name=\"user.addresses['work'].country@param\" value=\"param-value\"/>\n" +
+        .go("<input type=\"hidden\" name=\"user.addresses[&#39;work&#39;].country@param\" value=\"param-value\"/>\n" +
             "<div class=\"select input control\">\n" +
-            "<div class=\"label-container\"><label for=\"user_addresses['work']_country\" class=\"label\"><span class=\"error\">Country (fieldError1, fieldError2)</span></label></div>\n" +
+            "<div class=\"label-container\"><label for=\"user_addresses[&#39;work&#39;]_country\" class=\"label\"><span class=\"error\">Country (fieldError1, fieldError2)</span></label></div>\n" +
             "<div class=\"control-container\">\n" +
-            "<select id=\"user_addresses['work']_country\" name=\"user.addresses['work'].country\">\n" +
+            "<select id=\"user_addresses[&#39;work&#39;]_country\" name=\"user.addresses[&#39;work&#39;].country\">\n" +
             "<option value=\"US\" selected=\"selected\">United States</option>\n" +
             "<option value=\"DE\">Germany</option>\n" +
             "</select>\n" +
@@ -201,11 +201,11 @@ public class SelectTest extends ControlBaseTest {
     new ControlTester(select)
         .attr("name", "user.addresses['work'].country")
         .attr("items", lmap("<US>", "<United States>", "DE", "Germany"))
-        .go("<input type=\"hidden\" name=\"user.addresses['work'].country@param\" value=\"param-value\"/>\n" +
+        .go("<input type=\"hidden\" name=\"user.addresses[&#39;work&#39;].country@param\" value=\"param-value\"/>\n" +
             "<div class=\"select input control\">\n" +
-            "<div class=\"label-container\"><label for=\"user_addresses['work']_country\" class=\"label\">Country</label></div>\n" +
+            "<div class=\"label-container\"><label for=\"user_addresses[&#39;work&#39;]_country\" class=\"label\">Country</label></div>\n" +
             "<div class=\"control-container\">\n" +
-            "<select id=\"user_addresses['work']_country\" name=\"user.addresses['work'].country\">\n" +
+            "<select id=\"user_addresses[&#39;work&#39;]_country\" name=\"user.addresses[&#39;work&#39;].country\">\n" +
             "<option value=\"&lt;US&gt;\" selected=\"selected\"><United States></option>\n" +
             "<option value=\"DE\">Germany</option>\n" +
             "</select>\n" +

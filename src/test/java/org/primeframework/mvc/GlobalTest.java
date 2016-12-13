@@ -27,6 +27,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import org.example.domain.UserField;
 import org.primeframework.mvc.action.config.ActionConfigurationProvider;
 import org.primeframework.mvc.container.ContainerResolver;
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
@@ -248,6 +249,15 @@ public class GlobalTest extends PrimeBaseTest {
              .withJSONFile(json)
              .post()
              .assertJSONFile(json);
+  }
+
+  @Test
+  public void post_JSONWithActual() throws Exception {
+    Path json = Paths.get("src/test/resources/json/api-jsonWithActual-post.json");
+    simulator.test("/api")
+             .withJSONFile(json)
+             .post()
+             .assertJSONFileWithActual(UserField.class, Paths.get("src/test/resources/json/api-jsonWithActual-post-response.json"));
   }
 
   @Test

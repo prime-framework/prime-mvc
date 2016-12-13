@@ -15,12 +15,13 @@
  */
 package org.primeframework.mvc.freemarker.guice;
 
+import org.primeframework.mvc.config.MVCConfiguration;
+
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import freemarker.cache.TemplateLoader;
+import freemarker.ext.beans.BeansWrapperBuilder;
 import freemarker.template.Configuration;
-import org.primeframework.mvc.config.MVCConfiguration;
-import org.primeframework.mvc.freemarker.FieldSupportBeansWrapper;
 
 /**
  * Provides the FreeMarker {@link Configuration} instance.
@@ -29,6 +30,7 @@ import org.primeframework.mvc.freemarker.FieldSupportBeansWrapper;
  */
 public class FreeMarkerConfigurationProvider implements Provider<Configuration> {
   private final MVCConfiguration configuration;
+
   private final TemplateLoader loader;
 
   @Inject
@@ -39,13 +41,17 @@ public class FreeMarkerConfigurationProvider implements Provider<Configuration> 
 
   @Override
   public Configuration get() {
+    BeansWrapperBuilder builder = new BeansWrapperBuilder(Configuration.VERSION_2_3_23);
+    builder.setExposeFields(true);
+    builder.setSimpleMapWrapper(true);
+
     int checkSeconds = configuration.templateCheckSeconds();
-    Configuration config = new Configuration();
+    Configuration config = new Configuration(Configuration.VERSION_2_3_23);
     config.setTagSyntax(Configuration.SQUARE_BRACKET_TAG_SYNTAX);
-    config.setTemplateUpdateDelay(checkSeconds);
+    config.setTemplateUpdateDelayMilliseconds(checkSeconds * 1000);
     config.setTemplateLoader(loader);
     config.setDefaultEncoding("UTF-8");
-    config.setObjectWrapper(FieldSupportBeansWrapper.INSTANCE);
+    config.setObjectWrapper(builder.build());
     config.setNumberFormat("computer");
     return config;
   }

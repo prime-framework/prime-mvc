@@ -14,13 +14,13 @@
 
 [#macro dynamic_attributes attrs name]
   [#list attrs?keys as key]
-<input type="hidden" name="${name}@${key?html}" value="${attrs[key]?html}"/>
+<input type="hidden" name="${name?html}@${key?html}" value="${attrs[key]?html}"/>
   [/#list]
 [/#macro]
 
 [#macro label text fieldMessages required=false]
   [#assign hasFieldErrors = fieldMessages?size > 0/]
-  <label for="${attributes['id']}" class="label">[#t/]
+  <label for="${attributes['id']?html}" class="label">[#t/]
     [#if hasFieldErrors]<span class="error">[/#if][#t/]
     ${text}[#t/]
     [#if hasFieldErrors] ([#list fieldMessages as message]${message?string}[#if message_has_next], [/#if][/#list])[/#if][#t/]

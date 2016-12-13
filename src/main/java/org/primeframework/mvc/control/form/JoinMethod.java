@@ -18,8 +18,8 @@ package org.primeframework.mvc.control.form;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.primeframework.mvc.freemarker.FieldSupportBeansWrapper;
 
+import freemarker.template.ObjectWrapper;
 import freemarker.template.TemplateMethodModelEx;
 import freemarker.template.TemplateModelException;
 
@@ -31,16 +31,22 @@ import freemarker.template.TemplateModelException;
  * @author Brian Pontarelli
  */
 public class JoinMethod implements TemplateMethodModelEx {
+  private final ObjectWrapper objectWrapper;
+
+  public JoinMethod(ObjectWrapper objectWrapper) {
+    this.objectWrapper = objectWrapper;
+  }
+
   public Object exec(List arguments) throws TemplateModelException {
     if (arguments.size() == 0) {
-      return FieldSupportBeansWrapper.INSTANCE.wrap("");
+      return objectWrapper.wrap("");
     }
 
     Object first = arguments.get(0);
     if (first == null) {
-      return FieldSupportBeansWrapper.INSTANCE.wrap("");
+      return objectWrapper.wrap("");
     }
 
-    return FieldSupportBeansWrapper.INSTANCE.wrap(StringUtils.join(arguments.subList(1, arguments.size()), first.toString()));
+    return objectWrapper.wrap(StringUtils.join(arguments.subList(1, arguments.size()), first.toString()));
   }
 }

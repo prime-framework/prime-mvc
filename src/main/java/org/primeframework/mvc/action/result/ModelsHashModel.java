@@ -15,14 +15,14 @@
  */
 package org.primeframework.mvc.action.result;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.stream.Collectors;
 
-import org.primeframework.mvc.freemarker.FieldSupportBeansWrapper;
 import org.primeframework.mvc.freemarker.guice.TemplateModelFactory;
 
+import freemarker.ext.beans.BeansWrapper;
 import freemarker.ext.beans.CollectionModel;
+import freemarker.template.ObjectWrapper;
 import freemarker.template.TemplateCollectionModel;
 import freemarker.template.TemplateHashModelEx;
 import freemarker.template.TemplateModel;
@@ -34,39 +34,39 @@ import freemarker.template.TemplateModelException;
  * @author Brian Pontarelli
  */
 public class ModelsHashModel implements TemplateHashModelEx {
-  private final String prefix;
   private final TemplateModelFactory factory;
 
-  public ModelsHashModel(String prefix, TemplateModelFactory factory) {
+  private final ObjectWrapper objectWrapper;
+
+  private final String prefix;
+
+  public ModelsHashModel(String prefix, TemplateModelFactory factory, ObjectWrapper objectWrapper) {
     this.prefix = prefix;
     this.factory = factory;
-  }
-
-  public TemplateCollectionModel keys() throws TemplateModelException {
-    return new CollectionModel(factory.controlNames(prefix), FieldSupportBeansWrapper.INSTANCE);
-  }
-
-  public int size() {
-    return factory.controlNames(prefix).size();
-  }
-
-  public boolean isEmpty() {
-    return factory.controlNames(prefix).isEmpty();
+    this.objectWrapper = objectWrapper;
   }
 
   public TemplateModel get(String key) {
     return factory.build(prefix, key);
   }
 
+  public boolean isEmpty() {
+    return factory.controlNames(prefix).isEmpty();
+  }
+
+  public TemplateCollectionModel keys() throws TemplateModelException {
+    return new CollectionModel(factory.controlNames(prefix), (BeansWrapper) objectWrapper);
+  }
+
+  public int size() {
+    return factory.controlNames(prefix).size();
+  }
+
   public TemplateCollectionModel values() {
-    return new CollectionModel(valueCollection(), FieldSupportBeansWrapper.INSTANCE);
+    return new CollectionModel(valueCollection(), (BeansWrapper) objectWrapper);
   }
 
   private Collection<TemplateModel> valueCollection() {
-    List<TemplateModel> all = new ArrayList<TemplateModel>();
-    for (String name : factory.controlNames(prefix)) {
-      all.add(get(name));
-    }
-    return all;
+    return factory.controlNames(prefix).stream().map(this::get).collect(Collectors.toList());
   }
 }

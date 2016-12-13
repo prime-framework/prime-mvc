@@ -20,7 +20,6 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Locale;
 import java.util.function.Consumer;
@@ -92,8 +91,8 @@ public class RequestBuilder {
    * <p>
    * An {@link AssertionError} will be thrown if the exception is not thrown.
    *
-   * @param expectedException
-   * @return
+   * @param expectedException The expected exception.
+   * @return This.
    */
   public RequestBuilder expectException(Class<? extends Throwable> expectedException) {
     this.expectedException = expectedException;
@@ -249,13 +248,10 @@ public class RequestBuilder {
    *
    * @param body   The body as a {@link Path} to the JSON file.
    * @param values key value pairs of replacement values for use in the JSON file.
-   * @return
-   * @throws IOException
+   * @return This.
+   * @throws IOException If the file could not be loaded.
    */
   public RequestBuilder withBodyFile(Path body, Object... values) throws IOException {
-    if (values.length == 0) {
-      return withBody(Files.readAllBytes(body));
-    }
     return withBody(BodyTools.processTemplate(body, values));
   }
 
@@ -360,12 +356,12 @@ public class RequestBuilder {
   }
 
   /**
-   * Uses the given {@Path} object to a JSON file as the JSON body for the request.
+   * Uses the given {@link Path} object to a JSON file as the JSON body for the request.
    *
    * @param jsonFile The string representation of the JSON to send in the request.
    * @param values   key value pairs of replacement values for use in the JSON file.
    * @return This.
-   * @throws IOException
+   * @throws IOException If the file could not be loaded.
    */
   public RequestBuilder withJSONFile(Path jsonFile, Object... values) throws IOException {
     return withContentType("application/json").withBodyFile(jsonFile, values);

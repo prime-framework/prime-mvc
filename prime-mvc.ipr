@@ -95,6 +95,23 @@
     <entry_points version="2.0" />
   </component>
   <component name="IdProvider" IDEtalkID="FAFCC8F55516B0FC710A9E287F066E00" />
+  <component name="InspectionProjectProfileManager">
+    <profile version="1.0">
+      <option name="myName" value="Project Default" />
+      <inspection_tool class="LoggerInitializedWithForeignClass" enabled="false" level="WARNING" enabled_by_default="false">
+        <option name="loggerClassName" value="org.apache.log4j.Logger,org.slf4j.LoggerFactory,org.apache.commons.logging.LogFactory,java.util.logging.Logger" />
+        <option name="loggerFactoryMethodName" value="getLogger,getLogger,getLog,getLogger" />
+      </inspection_tool>
+      <inspection_tool class="WeakerAccess" enabled="false" level="WARNING" enabled_by_default="false">
+        <option name="SUGGEST_PACKAGE_LOCAL_FOR_MEMBERS" value="true" />
+        <option name="SUGGEST_PACKAGE_LOCAL_FOR_TOP_CLASSES" value="true" />
+        <option name="SUGGEST_PRIVATE_FOR_INNERS" value="false" />
+      </inspection_tool>
+    </profile>
+    <option name="PROJECT_PROFILE" value="Project Default" />
+    <option name="USE_PROJECT_PROFILE" value="true" />
+    <version value="1.0" />
+  </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_STRING" value="-Xlint:unchecked" />
   </component>
@@ -529,6 +546,16 @@
                     </AND>
                   </match>
                   <order>BY_NAME</order>
+                </rule>
+              </section>
+              <section>
+                <rule>
+                  <match>
+                    <AND>
+                      <INITIALIZER_BLOCK>true</INITIALIZER_BLOCK>
+                      <STATIC>true</STATIC>
+                    </AND>
+                  </match>
                 </rule>
               </section>
               <section>
