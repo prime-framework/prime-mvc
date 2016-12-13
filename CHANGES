@@ -1,5 +1,13 @@
 Prime MVC Changes
 
+Changes in 1.1.6
+
+ * Rename to JWTExtractor interface to JWTRequestAdapter.
+
+Changes in 1.1.5
+
+ * Fixes. Less strict enforcement of JWT Authorization methods.
+
 Changes in 1.1.4
 
  * Request Simulator. Add RequestResult.assertJSONFileWithActual. Support test assertions using actual values from the JSON response.

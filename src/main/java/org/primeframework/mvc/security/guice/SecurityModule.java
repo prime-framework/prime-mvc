@@ -20,11 +20,11 @@ import java.util.Map;
 import org.primeframework.jwt.Verifier;
 import org.primeframework.mvc.security.CipherProvider;
 import org.primeframework.mvc.security.DefaultCipherProvider;
-import org.primeframework.mvc.security.DefaultJWTExtractor;
+import org.primeframework.mvc.security.DefaultJWTRequestAdapter;
 import org.primeframework.mvc.security.DefaultSavedRequestWorkflow;
 import org.primeframework.mvc.security.DefaultSecurityWorkflow;
 import org.primeframework.mvc.security.ExplosiveVerifierProvider;
-import org.primeframework.mvc.security.JWTExtractor;
+import org.primeframework.mvc.security.JWTRequestAdapter;
 import org.primeframework.mvc.security.JWTSecurityScheme;
 import org.primeframework.mvc.security.SavedRequestWorkflow;
 import org.primeframework.mvc.security.SecurityWorkflow;
@@ -44,7 +44,7 @@ public class SecurityModule extends AbstractModule {
     bind(SecurityWorkflow.class).to(DefaultSecurityWorkflow.class);
     bind(SavedRequestWorkflow.class).to(DefaultSavedRequestWorkflow.class);
 
-    bind(JWTExtractor.class).to(DefaultJWTExtractor.class);
+    bind(JWTRequestAdapter.class).to(DefaultJWTRequestAdapter.class);
     bind(new TypeLiteral<Map<String, Verifier>>() {}).toProvider(ExplosiveVerifierProvider.class);
 
     // Binds the user login scheme

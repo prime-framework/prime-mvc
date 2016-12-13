@@ -54,8 +54,8 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
     store.setCurrent(actionInvocation);
 
     TestUserLoginSecurityContext securityContext = new TestUserLoginSecurityContext(request, emptySet());
-    JWTExtractor jwtExtractor = new DefaultJWTExtractor(request);
-    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, jwtExtractor, new TestSecuritySchemeFactory(securityContext));
+    JWTRequestAdapter jwtAdapter = new DefaultJWTRequestAdapter(request, response);
+    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, jwtAdapter, new TestSecuritySchemeFactory(securityContext));
 
     WorkflowChain workflowChain = createStrictMock(WorkflowChain.class);
     workflowChain.continueWorkflow();
@@ -74,8 +74,8 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
     store.setCurrent(actionInvocation);
 
     TestUserLoginSecurityContext securityContext = new TestUserLoginSecurityContext(request, new HashSet<>(singletonList("bad")));
-    JWTExtractor jwtExtractor = new DefaultJWTExtractor(request);
-    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, jwtExtractor, new TestSecuritySchemeFactory(securityContext));
+    JWTRequestAdapter jwtAdapter = new DefaultJWTRequestAdapter(request, response);
+    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, jwtAdapter, new TestSecuritySchemeFactory(securityContext));
     request.getSession().setAttribute(BaseHttpSessionUserLoginSecurityContext.USER_SESSION_KEY, "user"); // Log in the user
 
     WorkflowChain workflowChain = createStrictMock(WorkflowChain.class);
@@ -100,8 +100,8 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
     request.getParameters().put("test2", singletonList("value2"));
 
     TestUserLoginSecurityContext securityContext = new TestUserLoginSecurityContext(request, emptySet());
-    JWTExtractor jwtExtractor = new DefaultJWTExtractor(request);
-    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, jwtExtractor, new TestSecuritySchemeFactory(securityContext));
+    JWTRequestAdapter jwtAdapter = new DefaultJWTRequestAdapter(request, response);
+    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, jwtAdapter, new TestSecuritySchemeFactory(securityContext));
 
     WorkflowChain workflowChain = createStrictMock(WorkflowChain.class);
     replay(workflowChain);
@@ -129,8 +129,8 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
     request.getParameters().put("test2", singletonList("value2"));
 
     TestUserLoginSecurityContext securityContext = new TestUserLoginSecurityContext(request, emptySet());
-    JWTExtractor jwtExtractor = new DefaultJWTExtractor(request);
-    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, jwtExtractor, new TestSecuritySchemeFactory(securityContext));
+    JWTRequestAdapter jwtAdapter = new DefaultJWTRequestAdapter(request, response);
+    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, jwtAdapter, new TestSecuritySchemeFactory(securityContext));
 
     WorkflowChain workflowChain = createStrictMock(WorkflowChain.class);
     replay(workflowChain);
@@ -153,8 +153,8 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
     store.setCurrent(actionInvocation);
 
     TestUserLoginSecurityContext securityContext = new TestUserLoginSecurityContext(request, new HashSet<>(singletonList("admin")));
-    JWTExtractor jwtExtractor = new DefaultJWTExtractor(request);
-    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, jwtExtractor, new TestSecuritySchemeFactory(securityContext));
+    JWTRequestAdapter jwtAdapter = new DefaultJWTRequestAdapter(request, response);
+    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, jwtAdapter, new TestSecuritySchemeFactory(securityContext));
     request.getSession().setAttribute(BaseHttpSessionUserLoginSecurityContext.USER_SESSION_KEY, "user"); // Log in the user
 
     WorkflowChain workflowChain = createStrictMock(WorkflowChain.class);
@@ -174,8 +174,8 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
     store.setCurrent(actionInvocation);
 
     TestUserLoginSecurityContext securityContext = new TestUserLoginSecurityContext(request, new HashSet<>(singletonList("bad")));
-    JWTExtractor jwtExtractor = new DefaultJWTExtractor(request);
-    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, jwtExtractor, new TestSecuritySchemeFactory(securityContext));
+    JWTRequestAdapter jwtAdapter = new DefaultJWTRequestAdapter(request, response);
+    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, jwtAdapter, new TestSecuritySchemeFactory(securityContext));
     request.getSession().setAttribute(BaseHttpSessionUserLoginSecurityContext.USER_SESSION_KEY, "user"); // Log in the user
 
     WorkflowChain workflowChain = createStrictMock(WorkflowChain.class);
@@ -198,8 +198,8 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
     DefaultActionInvocationStore store = new DefaultActionInvocationStore(request);
     store.setCurrent(actionInvocation);
 
-    JWTExtractor jwtExtractor = new DefaultJWTExtractor(request);
-    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, jwtExtractor, new TestSecuritySchemeFactory(null));
+    JWTRequestAdapter jwtAdapter = new DefaultJWTRequestAdapter(request, response);
+    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, jwtAdapter, new TestSecuritySchemeFactory(null));
 
     WorkflowChain workflowChain = createStrictMock(WorkflowChain.class);
     workflowChain.continueWorkflow();

@@ -39,12 +39,12 @@ public class DefaultSecurityWorkflow implements SecurityWorkflow {
 
   private final SecuritySchemeFactory factory;
 
-  private final JWTExtractor jwtExtractor;
+  private final JWTRequestAdapter jwtAdapter;
 
   @Inject
-  public DefaultSecurityWorkflow(ActionInvocationStore actionInvocationStore, JWTExtractor jwtExtractor, SecuritySchemeFactory factory) {
+  public DefaultSecurityWorkflow(ActionInvocationStore actionInvocationStore, JWTRequestAdapter jwtAdapter, SecuritySchemeFactory factory) {
     this.actionInvocationStore = actionInvocationStore;
-    this.jwtExtractor = jwtExtractor;
+    this.jwtAdapter = jwtAdapter;
     this.factory = factory;
   }
 
@@ -63,7 +63,7 @@ public class DefaultSecurityWorkflow implements SecurityWorkflow {
     }
 
     // If a JWT is provided but JWT is not enabled - Unauthorized.
-    boolean requestContainsJWT = jwtExtractor.requestContainsJWT();
+    boolean requestContainsJWT = jwtAdapter.requestContainsJWT();
     if (requestContainsJWT && !actionAnnotation.jwtEnabled()) {
       throw new UnauthorizedException();
     }

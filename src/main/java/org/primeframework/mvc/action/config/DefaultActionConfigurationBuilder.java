@@ -268,8 +268,8 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
       jwtMethods.put(HTTPMethod.HEAD, jwtMethods.get(HTTPMethod.GET));
     }
 
-    // Ensure all methods are accounted for JWT authorization
-    if (!executeMethods.equals(jwtMethods.keySet())) {
+    // All Execute Methods need to be accounted for in JWT Methods. It is ok if the JWT Methods define a superset of the execute methods.
+    if (!jwtMethods.keySet().containsAll(executeMethods)) {
       throw new PrimeException("The action class [" + actionClass + "] is missing at a JWT Authorization method. " +
           "The class must define one or more methods annotated " + JWTAuthorizeMethod.class.getSimpleName() + " when [jwtEnabled] is set to [true]. "
           + "Ensure that for each execute method in your action such as post, put, get and delete that a method is configured to authorize the JWT.");
