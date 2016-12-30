@@ -106,6 +106,7 @@ public class GlobalTest extends PrimeBaseTest {
 
   @Test
   public void get_jwtDisabledJwtAuthentication() throws Exception {
+    // Send in a JWT Authorization header when the Action has JWT disabled. Should always get a 401. When a JWT is provided, the action expects JWT to be enabled.
     test.simulate(() -> simulator.test("/jwt-authorized-disabled")
                                  .withParameter("authorized", true)
                                  .withHeader("Authorization", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkifQ.qHdut1UR4-2FSAvh7U3YdeRR5r5boVqjIGQ16Ztp894")
@@ -150,6 +151,7 @@ public class GlobalTest extends PrimeBaseTest {
 
   @Test
   public void get_jwtNotBefore() throws Exception {
+    // Validating the JWT registered claim 'nbf' (Not Before). The JWT is validly signed, but it is instructed not to be valid before some point in the future. Expecting a 401.
     test.simulate(() -> simulator.test("/jwt-authorized")
                                  .withParameter("authorized", true)
                                  .withHeader("Authorization", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYmYiOjQ2MzIzOTY2NjV9.mRvvyJXvDD8RQ_PM1TadZdZNYXRa9CjOx62Tk866538")
@@ -232,6 +234,11 @@ public class GlobalTest extends PrimeBaseTest {
     simulator.test("/not-implemented")
              .delete()
              .assertStatusCode(501);
+
+    // head is implemented
+    simulator.test("/not-implemented")
+             .head()
+             .assertStatusCode(200);
   }
 
   @Test

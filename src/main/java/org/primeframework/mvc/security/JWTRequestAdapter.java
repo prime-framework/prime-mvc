@@ -33,7 +33,7 @@ public interface JWTRequestAdapter {
   /**
    * Call when the JWT Security Scheme identifies an invalid JWT has been provided in the request.
    *
-   * @return the refresh token or null if one was not found.
+   * @return the encoded JWT or null if one was not found.
    */
   String invalidateJWT();
 
