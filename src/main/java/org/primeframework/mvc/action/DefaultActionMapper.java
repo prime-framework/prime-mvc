@@ -70,7 +70,7 @@ public class DefaultActionMapper implements ActionMapper {
 
     // Okay, no index handling was found and there isn't anything yet, let's search for it, but
     // only if it isn't an index like URI (i.e. not /admin/)
-    Deque<String> uriParameters = new ArrayDeque<String>();
+    Deque<String> uriParameters = new ArrayDeque<>();
     if (actionConfiguration == null && !uri.endsWith("/")) {
       int index = uri.lastIndexOf('/');
       String localURI = uri;

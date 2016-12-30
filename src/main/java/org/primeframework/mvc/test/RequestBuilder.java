@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2016, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -407,6 +407,34 @@ public class RequestBuilder {
     }
 
     request.setParameter(DefaultParameterParser.RADIOBUTTON_PREFIX + name, uncheckedValue);
+    return this;
+  }
+
+  /**
+   * Append a url path segment to the current request URI.
+   * <p>
+   * For Example:
+   * <pre>
+   *   .simulator.test("/user/delete")
+   *             .withUrlSegment("bar")
+   *   </pre>
+   * This will result in a url of <code>/user/delete/bar</code>, this is equivalent to the following code:
+   * <pre>
+   *   .simulator.test("/user/delete/" + "bar")
+   *   </pre>
+   *
+   * @param value The url path segment. A null value will be ignored.
+   * @return This.
+   */
+  public RequestBuilder withUrlSegment(Object value) {
+    if (value != null) {
+      String uri = request.getRequestURI();
+      if (uri.charAt(uri.length() - 1) != '/') {
+        uri += ('/');
+      }
+
+      request.setUri(uri + value.toString());
+    }
     return this;
   }
 

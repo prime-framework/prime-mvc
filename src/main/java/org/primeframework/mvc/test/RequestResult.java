@@ -33,6 +33,7 @@ import org.primeframework.mock.servlet.MockHttpServletRequest;
 import org.primeframework.mock.servlet.MockHttpServletResponse;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
+import org.primeframework.mvc.action.ActionMapper;
 import org.primeframework.mvc.message.FieldMessage;
 import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;
@@ -113,10 +114,12 @@ public class RequestResult {
   public RequestResult assertBodyContainsMessagesFromKey(String key, Object... values) {
     MessageProvider messageProvider = get(MessageProvider.class);
     ActionInvocationStore actionInvocationStore = get(ActionInvocationStore.class);
-    // Use the current actionURI instead of request.getRequestURI, prime will have stripped off ids, etc from the URI.
-    ActionInvocation current = actionInvocationStore.getCurrent();
-    String actionURI = current != null ? current.actionURI : request.getRequestURI();
-    actionInvocationStore.setCurrent(new ActionInvocation(null, null, actionURI, null, null));
+    ActionMapper actionMapper = get(ActionMapper.class);
+
+    // Using the ActionMapper so that URL segments are properly handled and the correct URL is used for message lookups.
+    ActionInvocation actionInvocation = actionMapper.map(null, request.getRequestURI(), true);
+    actionInvocationStore.setCurrent(actionInvocation);
+
     String message = messageProvider.getMessage(key, values);
     if (!body.contains(message)) {
       throw new AssertionError("Body didn't contain [" + message + "] for the key [" + key + "]\nRedirect: [" + redirect + "]\nBody:\n" + body);
