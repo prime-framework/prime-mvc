@@ -1,5 +1,19 @@
 Prime MVC Changes
 
+Changes in 1.3.0
+
+ * Request Simulator. Add a conversion helper from ZonedDateTime to milliseconds for use in RequestResult.assertJSONFileWithActual and RequestResult.assertJSONFile
+ * JWT. Account for @AnonymousMethods when enforcing JWT Authorize method coverage during Action mapping.
+ * JWT. Allow a JWT on the request when JWt has not been enabled for an Action.
+
+Changes in 1.2.1
+
+ * Update prime-jwt dependency to version 0.2.0
+
+Changes in 1.2.0
+
+ * Internal, use BeansWrapperBuilder for better FreeMarker handling.
+
 Changes in 1.1.6
 
  * Rename to JWTExtractor interface to JWTRequestAdapter.

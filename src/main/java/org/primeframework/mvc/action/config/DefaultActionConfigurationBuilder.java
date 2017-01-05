@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.primeframework.jwt.domain.JWT;
 import org.primeframework.mvc.PrimeException;
@@ -43,6 +44,7 @@ import org.primeframework.mvc.parameter.annotation.PreParameterMethod;
 import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
 import org.primeframework.mvc.scope.ScopeField;
 import org.primeframework.mvc.scope.annotation.ScopeAnnotation;
+import org.primeframework.mvc.security.annotation.AnonymousAccess;
 import org.primeframework.mvc.security.annotation.JWTAuthorizeMethod;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.util.ReflectionUtils;
@@ -96,7 +98,7 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
     Set<String> memberNames = ReflectionUtils.findAllMembers(actionClass);
 
     Map<HTTPMethod, List<ValidationMethodConfiguration>> validationMethods = findValidationMethods(actionClass);
-    Map<HTTPMethod, List<JWTMethodConfiguration>> jwtAuthorizationMethods = findJwtAuthorizationMethods(actionClass, executeMethods.keySet());
+    Map<HTTPMethod, List<JWTMethodConfiguration>> jwtAuthorizationMethods = findJwtAuthorizationMethods(actionClass, executeMethods);
 
     List<ScopeField> scopeFields = findScopeFields(actionClass);
 
@@ -231,7 +233,7 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
     return executeMethods;
   }
 
-  protected Map<HTTPMethod, List<JWTMethodConfiguration>> findJwtAuthorizationMethods(Class<?> actionClass, Set<HTTPMethod> executeMethods) {
+  protected Map<HTTPMethod, List<JWTMethodConfiguration>> findJwtAuthorizationMethods(Class<?> actionClass, Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods) {
     // When JWT is not enabled, we will not call any of the JWT Authorization Methods.
     if (!actionClass.getAnnotation(Action.class).jwtEnabled()) {
       return Collections.emptyMap();
@@ -268,8 +270,13 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
       jwtMethods.put(HTTPMethod.HEAD, jwtMethods.get(HTTPMethod.GET));
     }
 
-    // All Execute Methods need to be accounted for in JWT Methods. It is ok if the JWT Methods define a superset of the execute methods.
-    if (!jwtMethods.keySet().containsAll(executeMethods)) {
+    // All Execute Methods that require authentication need to be accounted for in JWT Methods. It is ok if the JWT Methods define a superset of the execute methods.
+    Set<HTTPMethod> authenticatedMethods = executeMethods.keySet().stream().filter(k -> {
+      ExecuteMethodConfiguration methodConfiguration = executeMethods.get(k);
+      return methodConfiguration.annotations.containsKey(AnonymousAccess.class);
+    }).collect(Collectors.toSet());
+
+    if (!jwtMethods.keySet().containsAll(authenticatedMethods)) {
       throw new PrimeException("The action class [" + actionClass + "] is missing at a JWT Authorization method. " +
           "The class must define one or more methods annotated " + JWTAuthorizeMethod.class.getSimpleName() + " when [jwtEnabled] is set to [true]. "
           + "Ensure that for each execute method in your action such as post, put, get and delete that a method is configured to authorize the JWT.");
