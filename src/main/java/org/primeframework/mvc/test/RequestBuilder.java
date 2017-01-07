@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Locale;
 import java.util.function.Consumer;
@@ -246,8 +247,19 @@ public class RequestBuilder {
   /**
    * Sets the body content.
    *
-   * @param body   The body as a {@link Path} to the JSON file.
-   * @param values key value pairs of replacement values for use in the JSON file.
+   * @param body   The body as a {@link Path} to the raw file.
+   * @return This.
+   * @throws IOException If the file could not be loaded.
+   */
+  public RequestBuilder withBodyFileRaw(Path body) throws IOException {
+    return withBody(Files.readAllBytes(body));
+  }
+
+  /**
+   * Sets the body content. This processes the file using FreeMarker. Use {@link #withBodyFileRaw(Path)} to skip FreeMarker processing.
+   *
+   * @param body   The body as a {@link Path} to the file.
+   * @param values key value pairs of replacement values for use in the file.
    * @return This.
    * @throws IOException If the file could not be loaded.
    */

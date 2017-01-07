@@ -73,6 +73,26 @@ public class RequestResult {
   }
 
   /**
+   * Compares two JSON objects to ensure they are equal. This is done by converting the JSON objects to Maps, Lists, and primitives and then
+   * comparing them. The error is output so that IntelliJ can diff the two JSON objects in order to output the results.
+   *
+   * @param objectMapper The Jackson ObjectMapper used to convert the JSON strings to Maps.
+   * @param actual       The actual JSON.
+   * @param expected     The expected JSON.
+   * @throws IOException If the ObjectMapper fails.
+   */
+  public static void assertJSONEquals(ObjectMapper objectMapper, String actual, String expected) throws IOException {
+    Object response = objectMapper.readValue(actual, Object.class);
+    Object file = objectMapper.readValue(expected, Object.class);
+    if (!response.equals(file)) {
+      objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+      String bodyString = objectMapper.writeValueAsString(response);
+      String fileString = objectMapper.writeValueAsString(file);
+      throw new AssertionError("The body doesn't match the expected JSON output. expected [" + fileString + "] but found [" + bodyString + "]");
+    }
+  }
+
+  /**
    * Verifies that the body equals the given string.
    *
    * @param string The string to compare against the body.
@@ -486,14 +506,7 @@ public class RequestResult {
    */
   public RequestResult assertJSON(String json) throws IOException {
     ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
-    Object response = objectMapper.readValue(body, Object.class);
-    Object file = objectMapper.readValue(json, Object.class);
-    if (!response.equals(file)) {
-      objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
-      String bodyString = objectMapper.writeValueAsString(response);
-      String fileString = objectMapper.writeValueAsString(file);
-      throw new AssertionError("The body doesn't match the expected JSON output. expected [" + fileString + "] but found [" + bodyString + "]");
-    }
+    assertJSONEquals(objectMapper, body, json);
     return this;
   }
 
