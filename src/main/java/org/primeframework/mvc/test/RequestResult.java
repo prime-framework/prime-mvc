@@ -519,7 +519,7 @@ public class RequestResult {
    * @throws IOException If the JSON marshalling failed.
    */
   public RequestResult assertJSONFile(Path jsonFile, Object... values) throws IOException {
-    return assertJSON(BodyTools.processTemplate(jsonFile, values));
+    return assertJSON(BodyTools.processTemplate(jsonFile, appendArray(values, "_to_milli", new ZonedDateTimeToMilliSeconds())));
   }
 
   /**
@@ -536,7 +536,7 @@ public class RequestResult {
     ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
     T actual = objectMapper.readValue(body, type);
 
-    return assertJSONFile(jsonFile, appendArray(values, "actual", actual));
+    return assertJSONFile(jsonFile, appendArray(values, "actual", actual, "_to_milli", new ZonedDateTimeToMilliSeconds()));
   }
 
   /**

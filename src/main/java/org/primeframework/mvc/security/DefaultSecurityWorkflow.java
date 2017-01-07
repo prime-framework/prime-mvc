@@ -62,14 +62,13 @@ public class DefaultSecurityWorkflow implements SecurityWorkflow {
       return;
     }
 
-    // If a JWT is provided but JWT is not enabled - Unauthorized.
-    boolean requestContainsJWT = jwtAdapter.requestContainsJWT();
-    if (requestContainsJWT && !actionAnnotation.jwtEnabled()) {
-      throw new UnauthorizedException();
+    // Allowing the user to specify 'jwt' allows a JWT only scheme that doesn't use 'user' or 'api' for example.
+    String scheme = actionAnnotation.scheme();
+    // If the action has enabled JWT and the request contains a JWT override the scheme.
+    if (!scheme.equals("jwt") && jwtAdapter.requestContainsJWT() && actionAnnotation.jwtEnabled()) {
+      scheme = "jwt";
     }
 
-    // If JWT is enabled and a JWT was sent on the request the JWT scheme is always used, the scheme is ignored.
-    String scheme = (requestContainsJWT && actionAnnotation.jwtEnabled()) ? "jwt" : actionAnnotation.scheme();
     SecurityScheme securityScheme = factory.build(scheme);
     if (securityScheme == null) {
       throw new PrimeException("You have specified an invalid security scheme named [" + scheme + "]");
