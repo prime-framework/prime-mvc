@@ -1,5 +1,5 @@
 /*
-` * Copyright (c) 2012-2016, Inversoft Inc., All Rights Reserved
+` * Copyright (c) 2012-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package org.primeframework.mvc.content.guice;
 import org.primeframework.mvc.action.config.ActionConfigurator;
 import org.primeframework.mvc.content.ContentWorkflow;
 import org.primeframework.mvc.content.DefaultContentWorkflow;
-import org.primeframework.mvc.content.binary.BinaryContentHandler;
 import org.primeframework.mvc.content.binary.BinaryActionConfigurator;
+import org.primeframework.mvc.content.binary.BinaryContentHandler;
 import org.primeframework.mvc.content.json.JacksonActionConfigurator;
 import org.primeframework.mvc.content.json.JacksonContentHandler;
 
@@ -45,6 +45,10 @@ public class ContentModule extends AbstractModule {
 
     // Setup the Jackson Module bindings and the provider for the ObjectMapper
     Multibinder.newSetBinder(binder(), Module.class);
+    bindObjectMapper();
+  }
+
+  protected void bindObjectMapper() {
     bind(ObjectMapper.class).toProvider(ObjectMapperProvider.class).asEagerSingleton();
   }
 
