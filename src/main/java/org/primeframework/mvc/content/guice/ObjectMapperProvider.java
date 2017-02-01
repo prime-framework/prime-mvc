@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2013-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,12 @@
  */
 package org.primeframework.mvc.content.guice;
 
+import java.util.Set;
+
+import org.primeframework.mvc.config.MVCConfiguration;
+
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,19 +28,20 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
-import java.util.Set;
-
 /**
  * Guice provider for the Jackson {@link ObjectMapper}.
  *
  * @author Brian Pontarelli
  */
 public class ObjectMapperProvider implements Provider<ObjectMapper> {
+  private final boolean allowUnknownParameters;
+
   private final Set<Module> jacksonModules;
 
   @Inject
-  public ObjectMapperProvider(Set<Module> jacksonModules) {
+  public ObjectMapperProvider(Set<Module> jacksonModules, MVCConfiguration mvcConfiguration) {
     this.jacksonModules = jacksonModules;
+    this.allowUnknownParameters = mvcConfiguration.allowUnknownParameters();
   }
 
   @Override
@@ -44,6 +50,7 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
                                                   .configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true)
                                                   .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
                                                   .configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true)
+                                                  .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, !allowUnknownParameters)
                                                   .configure(SerializationFeature.WRITE_EMPTY_JSON_ARRAYS, false)
                                                   .configure(SerializationFeature.WRITE_NULL_MAP_VALUES, false);
     if (jacksonModules.size() > 0) {
