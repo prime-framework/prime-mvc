@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2016-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,6 +70,9 @@ public class JWTSecurityScheme implements SecurityScheme {
 
     try {
       String encodedJWT = jwtAdapter.getEncodedJWT();
+      if (encodedJWT == null) {
+        throw new UnauthenticatedException();
+      }
       final JWT jwt = JWT.getDecoder().decode(encodedJWT, verifierProvider.get());
 
       // The JWT has a valid signature and is not expired, further authorization is delegated to the action.
