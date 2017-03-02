@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,6 +50,41 @@ public class DefaultExpressionEvaluator implements ExpressionEvaluator {
    * {@inheritDoc}
    */
   @Override
+  public String expand(final String str, final Object object, final boolean encode)
+      throws ExpressionException {
+    return new StrSubstitutor(new StrLookup<String>() {
+      public String lookup(String name) {
+        String value = getValue(name, object, Collections.emptyMap());
+        if (encode) {
+          try {
+            value = URLEncoder.encode(value, "UTF-8");
+          } catch (UnsupportedEncodingException e) {
+            // Impossible
+          }
+        }
+
+        return value;
+      }
+    }).replace(str);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Collection<Object> getAllMemberValues(Object obj, Set<String> memberNames) {
+    Collection<Object> values = new ArrayList<>();
+    for (String name : memberNames) {
+      values.add(getValue(name, obj));
+    }
+
+    return values;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public <T> T getValue(String expression, Object object) throws ExpressionException {
     Expression expr = new Expression(converterProvider, expression, object, null);
     return (T) expr.traverseToEndForGet();
@@ -84,44 +119,9 @@ public class DefaultExpressionEvaluator implements ExpressionEvaluator {
    */
   @Override
   public void setValue(String expression, Object object, String[] values, Map<String, String> attributes)
-    throws ConversionException, ConverterStateException, ExpressionException {
+      throws ConversionException, ConverterStateException, ExpressionException {
     Expression expr = new Expression(converterProvider, expression, object, attributes);
     expr.traverseToEndForSet();
     expr.setCurrentValue(values);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String expand(final String str, final Object object, final boolean encode)
-    throws ExpressionException {
-    return new StrSubstitutor(new StrLookup<String>() {
-      public String lookup(String name) {
-        String value = getValue(name, object, Collections.<String, String>emptyMap());
-        if (encode) {
-          try {
-            value = URLEncoder.encode(value, "UTF-8");
-          } catch (UnsupportedEncodingException e) {
-            // Impossible
-          }
-        }
-
-        return value;
-      }
-    }).replace(str);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Collection<Object> getAllMemberValues(Object obj, Set<String> memberNames) {
-    Collection<Object> values = new ArrayList<Object>();
-    for (String name : memberNames) {
-      values.add(getValue(name, obj));
-    }
-
-    return values;
   }
 }
