@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -184,7 +184,7 @@ public class Expression {
    */
   private List<String> parse(String expression) throws ExpressionException {
     char[] ca = expression.toCharArray();
-    List<String> list = new ArrayList<String>();
+    List<String> list = new ArrayList<>();
     int index = 0;
     int position = 0;
     char[] buf = new char[128];

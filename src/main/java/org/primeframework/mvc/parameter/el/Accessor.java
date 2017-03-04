@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,13 +49,12 @@ import org.primeframework.mvc.util.TypeTools;
  */
 public abstract class Accessor {
   protected final ConverterProvider converterProvider;
-  protected Type type;
+
   protected Class<?> declaringClass;
+
   protected Object object;
 
-  protected Accessor(ConverterProvider converterProvider) {
-    this.converterProvider = converterProvider;
-  }
+  protected Type type;
 
   public Accessor(ConverterProvider converterProvider, Accessor accessor) {
     this.converterProvider = converterProvider;
@@ -63,19 +62,27 @@ public abstract class Accessor {
     this.declaringClass = accessor.declaringClass;
   }
 
-  public abstract boolean isIndexed();
-
-  protected abstract Object get(Expression expression);
-
-  protected abstract void set(String[] values, Expression expression);
-
-  protected abstract void set(Object value, Expression expression);
-
-  protected abstract <T extends Annotation> T getAnnotation(Class<T> type);
+  protected Accessor(ConverterProvider converterProvider) {
+    this.converterProvider = converterProvider;
+  }
 
   public final Object get(Object object, Expression expression) {
     this.object = object;
     return get(expression);
+  }
+
+  /**
+   * @return Returns the member accessor that is closest to the current atom in the expression. If the current atom is a
+   * member, this should just return <strong>this</strong>. If the current atom is a collection for example,
+   * this would return the member that the collection was retrieved from.
+   */
+  public abstract MemberAccessor getMemberAccessor();
+
+  public abstract boolean isIndexed();
+
+  public final void set(Object object, Object value, Expression expression) {
+    this.object = object;
+    set(value, expression);
   }
 
   public final void set(Object object, String[] values, Expression expression) {
@@ -83,9 +90,9 @@ public abstract class Accessor {
     set(values, expression);
   }
 
-  public final void set(Object object, Object value, Expression expression) {
-    this.object = object;
-    set(value, expression);
+  @Override
+  public String toString() {
+    return "declaring class [" + declaringClass + "]";
   }
 
   /**
@@ -104,52 +111,6 @@ public abstract class Accessor {
     }
 
     set(object, value, expression);
-  }
-
-  /**
-   * @return Returns the member accessor that is closest to the current atom in the expression. If the current atom is a
-   *         member, this should just return <strong>this</strong>. If the current atom is a collection for example,
-   *         this would return the member that the collection was retrieved from.
-   */
-  public abstract MemberAccessor getMemberAccessor();
-
-  /**
-   * Creates a new instance of the current type.
-   *
-   * @param key This is only used when creating arrays. It is the next atom, which is always the size of the array.
-   * @return The new value.
-   */
-  protected Object createValue(Object key) {
-    Class<?> typeClass = TypeTools.rawType(type);
-    Object value;
-    if (Map.class == typeClass) {
-      value = new HashMap();
-    } else if (List.class == typeClass) {
-      value = new ArrayList();
-    } else if (Set.class == typeClass) {
-      value = new HashSet();
-    } else if (Queue.class == typeClass) {
-      value = new LinkedList();
-    } else if (Deque.class == typeClass) {
-      value = new ArrayDeque();
-    } else if (SortedSet.class == typeClass) {
-      value = new TreeSet();
-    } else if (typeClass.isArray()) {
-      if (key == null) {
-        throw new UpdateExpressionException("Attempting to create an array, but there isn't an index " +
-          "available to determine the size of the array");
-      }
-
-      value = Array.newInstance(typeClass.getComponentType(), Integer.parseInt(key.toString()) + 1);
-    } else {
-      try {
-        value = typeClass.newInstance();
-      } catch (Exception e) {
-        throw new UpdateExpressionException("Unable to instantiate object [" + typeClass.getName() + "]");
-      }
-    }
-
-    return value;
   }
 
   /**
@@ -195,6 +156,49 @@ public abstract class Accessor {
   }
 
   /**
+   * Creates a new instance of the current type.
+   *
+   * @param key This is only used when creating arrays. It is the next atom, which is always the size of the array.
+   * @return The new value.
+   */
+  protected Object createValue(Object key) {
+    Class<?> typeClass = TypeTools.rawType(type);
+    Object value;
+    if (Map.class == typeClass) {
+      value = new HashMap();
+    } else if (List.class == typeClass) {
+      value = new ArrayList();
+    } else if (Set.class == typeClass) {
+      value = new HashSet();
+    } else if (Queue.class == typeClass) {
+      value = new LinkedList();
+    } else if (Deque.class == typeClass) {
+      value = new ArrayDeque();
+    } else if (SortedSet.class == typeClass) {
+      value = new TreeSet();
+    } else if (typeClass.isArray()) {
+      if (key == null) {
+        throw new UpdateExpressionException("Attempting to create an array, but there isn't an index " +
+            "available to determine the size of the array");
+      }
+
+      value = Array.newInstance(typeClass.getComponentType(), Integer.parseInt(key.toString()) + 1);
+    } else {
+      try {
+        value = newInstance(key, typeClass);
+      } catch (Exception e) {
+        throw new UpdateExpressionException("Unable to instantiate object [" + typeClass.getName() + "]");
+      }
+    }
+
+    return value;
+  }
+
+  protected abstract Object get(Expression expression);
+
+  protected abstract <T extends Annotation> T getAnnotation(Class<T> type);
+
+  /**
    * Gets a value from a collection using the index. This supports Arrays, Lists and Collections.
    *
    * @param index The index.
@@ -229,6 +233,14 @@ public abstract class Accessor {
     }
   }
 
+  protected Object newInstance(Object atom, Class<?> clazz) throws IllegalAccessException, InstantiationException {
+    return clazz.newInstance();
+  }
+
+  protected abstract void set(Object value, Expression expression);
+
+  protected abstract void set(String[] values, Expression expression);
+
   /**
    * Sets the given value into the collection at the given index.
    *
@@ -244,11 +256,7 @@ public abstract class Accessor {
       l.set(index, value);
     } else {
       throw new UpdateExpressionException("You can only set values into arrays and Lists. You are setting a parameter into [" +
-        getMemberAccessor() + "] which is of type [" + this.object.getClass() + "]");
+          getMemberAccessor() + "] which is of type [" + this.object.getClass() + "]");
     }
-  }
-
-  public String toString() {
-    return "declaring class [" + declaringClass + "]";
   }
 }
