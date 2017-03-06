@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.text.StrLookup;
 import org.apache.commons.lang3.text.StrSubstitutor;
+import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
@@ -39,11 +40,14 @@ import com.google.inject.Inject;
  */
 @SuppressWarnings("unchecked")
 public class DefaultExpressionEvaluator implements ExpressionEvaluator {
+  private final MVCConfiguration configuration;
+
   private final ConverterProvider converterProvider;
 
   @Inject
-  public DefaultExpressionEvaluator(ConverterProvider converterProvider) {
+  public DefaultExpressionEvaluator(ConverterProvider converterProvider, MVCConfiguration configuration) {
     this.converterProvider = converterProvider;
+    this.configuration = configuration;
   }
 
   /**
@@ -86,7 +90,7 @@ public class DefaultExpressionEvaluator implements ExpressionEvaluator {
    */
   @Override
   public <T> T getValue(String expression, Object object) throws ExpressionException {
-    Expression expr = new Expression(converterProvider, expression, object, null);
+    Expression expr = new Expression(converterProvider, expression, object, null, configuration);
     return (T) expr.traverseToEndForGet();
   }
 
@@ -95,7 +99,7 @@ public class DefaultExpressionEvaluator implements ExpressionEvaluator {
    */
   @Override
   public String getValue(String expression, Object object, Map<String, String> attributes) throws ExpressionException {
-    Expression expr = new Expression(converterProvider, expression, object, attributes);
+    Expression expr = new Expression(converterProvider, expression, object, attributes, configuration);
     Object value = expr.traverseToEndForGet();
     if (value == null) {
       return null;
@@ -109,7 +113,7 @@ public class DefaultExpressionEvaluator implements ExpressionEvaluator {
    */
   @Override
   public void setValue(String expression, Object object, Object value) throws ExpressionException {
-    Expression expr = new Expression(converterProvider, expression, object, null);
+    Expression expr = new Expression(converterProvider, expression, object, null, configuration);
     expr.traverseToEndForSet();
     expr.setCurrentValue(value);
   }
@@ -120,7 +124,7 @@ public class DefaultExpressionEvaluator implements ExpressionEvaluator {
   @Override
   public void setValue(String expression, Object object, String[] values, Map<String, String> attributes)
       throws ConversionException, ConverterStateException, ExpressionException {
-    Expression expr = new Expression(converterProvider, expression, object, attributes);
+    Expression expr = new Expression(converterProvider, expression, object, attributes, configuration);
     expr.traverseToEndForSet();
     expr.setCurrentValue(values);
   }

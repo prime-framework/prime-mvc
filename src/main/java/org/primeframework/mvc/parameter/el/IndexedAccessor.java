@@ -32,7 +32,7 @@ public class IndexedAccessor extends MemberAccessor {
   String index;
 
   public IndexedAccessor(ConverterProvider converterProvider, MemberAccessor accessor, String index) {
-    super(converterProvider, accessor);
+    super(converterProvider, accessor, null);
 
     this.index = index;
   }

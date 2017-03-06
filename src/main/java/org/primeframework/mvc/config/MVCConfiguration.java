@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,12 @@
  */
 package org.primeframework.mvc.config;
 
+import java.lang.annotation.Annotation;
 import java.security.Key;
 import java.security.spec.AlgorithmParameterSpec;
+import java.util.List;
+
+import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 
 /**
  * The main configuration interface for Prime that outlines all of the configurable values for the framework. This
@@ -31,14 +35,14 @@ public interface MVCConfiguration {
   boolean allowUnknownParameters();
 
   /**
-   * @return The encryption key that is used to encrypt cookies.
-   */
-  Key cookieEncryptionKey();
-
-  /**
    * @return The IV that is used to encrypt cookies.
    */
   AlgorithmParameterSpec cookieEncryptionIV();
+
+  /**
+   * @return The encryption key that is used to encrypt cookies.
+   */
+  Key cookieEncryptionKey();
 
   /**
    * @return True if empty HTTP request parameters should be considered null values by the conversion system.
@@ -103,4 +107,9 @@ public interface MVCConfiguration {
    * always).
    */
   int templateCheckSeconds();
+
+  /**
+   * @return The annotations that identify a field to be un-wrapped - or be considered transparent by the {@link ExpressionEvaluator}.
+   */
+  List<Class<? extends Annotation>> unwrapAnnotations();
 }

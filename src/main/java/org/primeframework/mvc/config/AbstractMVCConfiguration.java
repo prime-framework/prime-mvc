@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,13 @@
  * language governing permissions and limitations under the License.
  */
 package org.primeframework.mvc.config;
+
+import java.lang.annotation.Annotation;
+import java.util.Collections;
+import java.util.List;
+
+import org.primeframework.mvc.parameter.annotation.FieldUnwrapped;
+
 
 /**
  * This class is an abstract implementation of the {@link MVCConfiguration} interface. It provides good default values
@@ -53,6 +60,8 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
   public String[] staticResourcePrefixes = STATIC_PREFIXES;
 
   public boolean staticResourcesEnabled = true;
+
+  public List<Class<? extends Annotation>> unwrapAnnotations = Collections.singletonList(FieldUnwrapped.class);
 
   @Override
   public boolean emptyParametersAreNull() {
@@ -102,5 +111,10 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
   @Override
   public boolean staticResourcesEnabled() {
     return staticResourcesEnabled;
+  }
+
+  @Override
+  public List<Class<? extends Annotation>> unwrapAnnotations() {
+    return unwrapAnnotations;
   }
 }

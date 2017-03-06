@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
@@ -30,21 +31,30 @@ import org.primeframework.mvc.parameter.convert.GlobalConverter;
  * @author Brian Pontarelli
  */
 public class Expression {
-  private final String expression;
   private final List<String> atoms;
+
   private final Map<String, String> attributes;
+
   private final ConverterProvider converterProvider;
 
-  private Class<?> type;
-  private Object current;
+  private final String expression;
+
   private Accessor accessor;
+
+  private Object current;
+
   private int index;
 
-  public Expression(ConverterProvider converterProvider, String expression, Object current, Map<String, String> attributes) {
+  private Class<?> type;
+
+  private final MVCConfiguration configuration;
+
+  public Expression(ConverterProvider converterProvider, String expression, Object current, Map<String, String> attributes, MVCConfiguration configuration) {
     this.expression = expression;
     this.attributes = attributes;
     this.converterProvider = converterProvider;
     this.atoms = parse(expression);
+    this.configuration = configuration;
     setCurrentObject(current);
   }
 
@@ -133,7 +143,7 @@ public class Expression {
       } else if (Map.class.isAssignableFrom(type)) {
         accessor = new MapAccessor(converterProvider, accessor, atom, accessor.getMemberAccessor());
       } else {
-        accessor = new MemberAccessor(converterProvider, type, atom, expression);
+        accessor = new MemberAccessor(converterProvider, type, atom, expression, configuration);
       }
     }
 

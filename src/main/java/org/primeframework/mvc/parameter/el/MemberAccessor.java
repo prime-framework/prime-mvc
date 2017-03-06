@@ -18,11 +18,13 @@ package org.primeframework.mvc.parameter.el;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.primeframework.mvc.parameter.annotation.FieldUnwrapped;
+import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
 import org.primeframework.mvc.util.ReflectionUtils;
 
@@ -36,15 +38,26 @@ public class MemberAccessor extends Accessor {
 
   final ReflectionUtils.PropertyInfo propertyInfo;
 
-  public MemberAccessor(ConverterProvider converterProvider, MemberAccessor accessor) {
+  private final List<Class<? extends Annotation>> unWrappedAnnotations;
+
+  public MemberAccessor(ConverterProvider converterProvider, MemberAccessor accessor, MVCConfiguration configuration) {
     super(converterProvider, accessor);
     this.field = accessor.field;
     this.propertyInfo = accessor.propertyInfo;
+    if (configuration != null) {
+      this.unWrappedAnnotations = configuration.unwrapAnnotations();
+    } else {
+      this.unWrappedAnnotations = Collections.emptyList();
+    }
   }
 
-  public MemberAccessor(ConverterProvider converterProvider, Class<?> declaringClass, String name, String expression) {
+  public MemberAccessor(ConverterProvider converterProvider, Class<?> declaringClass, String name, String expression, MVCConfiguration configuration) {
     super(converterProvider);
-
+    if (configuration != null) {
+      this.unWrappedAnnotations = configuration.unwrapAnnotations();
+    } else {
+      this.unWrappedAnnotations = Collections.emptyList();
+    }
     this.declaringClass = declaringClass;
 
     Map<String, ReflectionUtils.PropertyInfo> properties = ReflectionUtils.findPropertyInfo(this.declaringClass);
@@ -156,7 +169,7 @@ public class MemberAccessor extends Accessor {
       return object;
     } else {
       // Otherwise if there is a nested field to unwrap, let's do that until we find it.
-      for (Field annotatedField : ReflectionUtils.findAllFieldsWithAnnotation(object.getClass(), FieldUnwrapped.class)) {
+      for (Field annotatedField : ReflectionUtils.findAllFieldsWithAnnotations(object.getClass(), unWrappedAnnotations)) {
         Object thisField = annotatedField.get(object);
         if (thisField == null) {
           annotatedField.set(object, newInstance(key, annotatedField.getType()));
@@ -168,8 +181,8 @@ public class MemberAccessor extends Accessor {
   }
 
   /**
-   * Find the fields in the declaring class being aware that if any of those fields are annotated with {@link FieldUnwrapped} we should
-   * ignore that field, and instead add the fields that belong to that object.
+   * Find the fields in the declaring class being aware that if any of those fields are annotated with an annotation indicating it should be
+   * unwrapped -  we should ignore that field, and instead add the fields that belong to that object.
    *
    * @return the fields found keyed by the field name.
    */
@@ -177,7 +190,7 @@ public class MemberAccessor extends Accessor {
     Map<String, Field> fields = new HashMap<>();
     try {
       for (Map.Entry<String, Field> entry : ReflectionUtils.findFields(this.declaringClass).entrySet()) {
-        if (entry.getValue().isAnnotationPresent(FieldUnwrapped.class)) {
+        if (ReflectionUtils.areAnyAnnotationsPresent(entry.getValue(), unWrappedAnnotations)) {
           Field unwrappedField = declaringClass.getField(entry.getKey());
           fields.putAll(ReflectionUtils.findFields(unwrappedField.getType()));
         } else {
@@ -191,8 +204,8 @@ public class MemberAccessor extends Accessor {
   }
 
   /**
-   * Return the field for the object being aware that the field may be nested inside of another object annotated with
-   * {@link FieldUnwrapped}.
+   * Return the field for the object being aware that the field may be nested inside of another object annotated with an annotation
+   * indicating it should be unwrapped.
    *
    * @return the field object.
    */
@@ -202,7 +215,7 @@ public class MemberAccessor extends Accessor {
     }
 
     try {
-      for (Field f : ReflectionUtils.findAllFieldsWithAnnotation(this.object.getClass(), FieldUnwrapped.class)) {
+      for (Field f : ReflectionUtils.findAllFieldsWithAnnotations(this.object.getClass(), unWrappedAnnotations)) {
         if (f.getType().equals(field.getDeclaringClass())) {
           return ReflectionUtils.getField(field, f.get(this.object));
         }
@@ -214,7 +227,8 @@ public class MemberAccessor extends Accessor {
   }
 
   /**
-   * Set the field in the object being aware that the field may be nested inside of another object annotated with {@link FieldUnwrapped}.
+   * Set the field in the object being aware that the field may be nested inside of another object annotated with an annotation indicating
+   * it should be unwrapped.
    *
    * @param value      The value to set into the field.
    * @param expression the current expression that was used to idenfity the field, used only for exception cases.
@@ -227,7 +241,7 @@ public class MemberAccessor extends Accessor {
     }
 
     // Declaring class doesn't match up with the object, look for unwrapped fields, the field may be nested.
-    for (Field f : ReflectionUtils.findAllFieldsWithAnnotation(this.object.getClass(), FieldUnwrapped.class)) {
+    for (Field f : ReflectionUtils.findAllFieldsWithAnnotations(this.object.getClass(), unWrappedAnnotations)) {
       if (f.getType().equals(field.getDeclaringClass())) {
         try {
           ReflectionUtils.setField(field, f.get(object), value);

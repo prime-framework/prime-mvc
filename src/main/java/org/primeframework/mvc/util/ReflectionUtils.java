@@ -61,6 +61,23 @@ public class ReflectionUtils {
   }
 
   /**
+   * Return true if any of the provided annotations are provided on the field.
+   *
+   * @param field       The field
+   * @param annotations a list of annotations to look for
+   * @return true if any of the provided annotations are present.
+   */
+  public static boolean areAnyAnnotationsPresent(Field field, List<Class<? extends Annotation>> annotations) {
+    for (Class<? extends Annotation> annotation : annotations) {
+      if (field.isAnnotationPresent(annotation)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
    * Finds all of the fields that have the given annotation on the given Object.
    *
    * @param type       The class to find fields from.
@@ -72,6 +89,26 @@ public class ReflectionUtils {
     for (Field field : fields.values()) {
       if (field.isAnnotationPresent(annotation)) {
         fieldList.add(field);
+      }
+    }
+    return fieldList;
+  }
+
+  /**
+   * Finds all of the fields that have the given annotation on the given Object.
+   *
+   * @param type        The class to find fields from.
+   * @param annotations The annotations.
+   */
+  public static List<Field> findAllFieldsWithAnnotations(Class<?> type, List<Class<? extends Annotation>> annotations) {
+    Map<String, Field> fields = findFields(type);
+    List<Field> fieldList = new ArrayList<>();
+    for (Field field : fields.values()) {
+      for (Class<? extends Annotation> annotation : annotations) {
+        if (field.isAnnotationPresent(annotation)) {
+          fieldList.add(field);
+          break;
+        }
       }
     }
     return fieldList;
