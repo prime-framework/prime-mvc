@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package org.primeframework.mvc.test;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.File;
 import java.io.IOException;
@@ -245,17 +246,6 @@ public class RequestBuilder {
   }
 
   /**
-   * Sets the body content.
-   *
-   * @param body   The body as a {@link Path} to the raw file.
-   * @return This.
-   * @throws IOException If the file could not be loaded.
-   */
-  public RequestBuilder withBodyFileRaw(Path body) throws IOException {
-    return withBody(Files.readAllBytes(body));
-  }
-
-  /**
    * Sets the body content. This processes the file using FreeMarker. Use {@link #withBodyFileRaw(Path)} to skip FreeMarker processing.
    *
    * @param body   The body as a {@link Path} to the file.
@@ -265,6 +255,17 @@ public class RequestBuilder {
    */
   public RequestBuilder withBodyFile(Path body, Object... values) throws IOException {
     return withBody(BodyTools.processTemplate(body, values));
+  }
+
+  /**
+   * Sets the body content.
+   *
+   * @param body The body as a {@link Path} to the raw file.
+   * @return This.
+   * @throws IOException If the file could not be loaded.
+   */
+  public RequestBuilder withBodyFileRaw(Path body) throws IOException {
+    return withBody(Files.readAllBytes(body));
   }
 
   /**
@@ -305,6 +306,33 @@ public class RequestBuilder {
    */
   public RequestBuilder withContextPath(String contextPath) {
     request.setContextPath(contextPath);
+    return this;
+  }
+
+  /**
+   * Add a cookie to the request.
+   *
+   * @param name  The name of the cookie.
+   * @param value The value of the cookie.
+   * @return This.
+   */
+  public RequestBuilder withCookie(String name, String value) {
+    if (name != null) {
+      request.addCookie(new Cookie(name, value));
+    }
+    return this;
+  }
+
+  /**
+   * Add a cookie to the request.
+   *
+   * @param cookie The cookie.
+   * @return This.
+   */
+  public RequestBuilder withCookie(Cookie cookie) {
+    if (cookie != null) {
+      request.addCookie(cookie);
+    }
     return this;
   }
 
