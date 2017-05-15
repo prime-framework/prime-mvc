@@ -73,6 +73,9 @@ public class JSONResult extends AbstractResult<JSON> {
     // If there are error messages, put them in a well known container and render that instead of looking for the
     // @JSONResponse annotation
     Object jacksonObject;
+
+    Class<?> jacksonView = null;
+
     List<Message> messages = messageStore.get(MessageScope.REQUEST);
     if (messages.size() > 0) {
       jacksonObject = convertErrors(messages);
@@ -82,6 +85,8 @@ public class JSONResult extends AbstractResult<JSON> {
         throw new PrimeException("The action [" + action.getClass() + "] is missing a field annotated with @JSONResponse. This is used to figure out what to send back in the response.");
       }
 
+      jacksonView = jacksonActionConfiguration.view;
+
       jacksonObject = expressionEvaluator.getValue(jacksonActionConfiguration.responseMember, action);
       if (jacksonObject == null) {
         throw new PrimeException("The @JSONResponse field [" + jacksonActionConfiguration.responseMember + "] in the action [" + action.getClass() + "] is null. It cannot be null!");
@@ -89,7 +94,11 @@ public class JSONResult extends AbstractResult<JSON> {
     }
 
     ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
-    objectMapper.writeValue(baos, jacksonObject);
+    if (jacksonView != Void.class) {
+      objectMapper.writerWithView(jacksonView).writeValue(baos, jacksonObject);
+    } else {
+      objectMapper.writeValue(baos, jacksonObject);
+    }
 
     byte[] result = baos.toByteArray();
     response.setStatus(json.status());

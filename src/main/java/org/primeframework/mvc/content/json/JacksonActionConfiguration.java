@@ -22,8 +22,12 @@ package org.primeframework.mvc.content.json;
  */
 public class JacksonActionConfiguration {
   public final String requestMember;
+
   public final Class<?> requestMemberType;
+
   public final String responseMember;
+
+  public Class<?> view;
 
   public JacksonActionConfiguration(String requestMember, Class<?> requestMemberType, String responseMember) {
     this.requestMember = requestMember;

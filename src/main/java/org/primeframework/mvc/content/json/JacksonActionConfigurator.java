@@ -40,8 +40,10 @@ public class JacksonActionConfigurator implements ActionConfigurator {
     Class<?> requestMemberType = (requestMember != null) ? ReflectionUtils.getMemberType(actionClass, requestMember) : null;
     String responseMember = (jsonResponseMembers.size() == 1) ? jsonResponseMembers.keySet().iterator().next() : null;
     Class<?> responseMemberType = (responseMember != null) ? ReflectionUtils.getMemberType(actionClass, responseMember) : null;
+
     if (requestMember != null || responseMember != null) {
-      return new JacksonActionConfiguration(requestMember, requestMemberType, responseMember);
+      JacksonActionConfiguration jacksonActionConfiguration = new JacksonActionConfiguration(requestMember, requestMemberType, responseMember);
+      jacksonActionConfiguration.view = jsonResponseMembers.values().iterator().next().value();
     }
 
     return null;
