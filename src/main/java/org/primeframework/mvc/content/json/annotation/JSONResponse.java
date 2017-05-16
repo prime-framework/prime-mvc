@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,9 +31,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({FIELD, METHOD})
 public @interface JSONResponse {
   /**
-   * View or views that annotated element is part of. Views are identified
-   * by classes, and use expected class inheritance relationship: child
-   * views contain all elements parent views have, for example.
+   * View to utilize when serializing the field. The default value of <code>void</code> indicates no view has been defined.
    */
-  Class<?> value() default Void.class;
+  Class<?> view() default void.class;
 }

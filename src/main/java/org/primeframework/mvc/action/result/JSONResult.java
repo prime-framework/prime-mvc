@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,8 +74,7 @@ public class JSONResult extends AbstractResult<JSON> {
     // @JSONResponse annotation
     Object jacksonObject;
 
-    Class<?> jacksonView = null;
-
+    Class<?> serializationView = null;
     List<Message> messages = messageStore.get(MessageScope.REQUEST);
     if (messages.size() > 0) {
       jacksonObject = convertErrors(messages);
@@ -84,9 +83,7 @@ public class JSONResult extends AbstractResult<JSON> {
       if (jacksonActionConfiguration == null || jacksonActionConfiguration.responseMember == null) {
         throw new PrimeException("The action [" + action.getClass() + "] is missing a field annotated with @JSONResponse. This is used to figure out what to send back in the response.");
       }
-
-      jacksonView = jacksonActionConfiguration.view;
-
+      serializationView = jacksonActionConfiguration.serializationView;
       jacksonObject = expressionEvaluator.getValue(jacksonActionConfiguration.responseMember, action);
       if (jacksonObject == null) {
         throw new PrimeException("The @JSONResponse field [" + jacksonActionConfiguration.responseMember + "] in the action [" + action.getClass() + "] is null. It cannot be null!");
@@ -94,8 +91,8 @@ public class JSONResult extends AbstractResult<JSON> {
     }
 
     ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
-    if (jacksonView != Void.class) {
-      objectMapper.writerWithView(jacksonView).writeValue(baos, jacksonObject);
+    if (serializationView != void.class) {
+      objectMapper.writerWithView(serializationView).writeValue(baos, jacksonObject);
     } else {
       objectMapper.writeValue(baos, jacksonObject);
     }

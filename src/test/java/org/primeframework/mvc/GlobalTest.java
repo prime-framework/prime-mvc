@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2016, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,6 +60,19 @@ public class GlobalTest extends PrimeBaseTest {
              .get()
              .assertStatusCode(200)
              .assertBodyFile(Paths.get("src/test/resources/html/edit.html"));
+  }
+
+  @Test
+  public void get_JSONView() throws Exception {
+    simulator.test("/views/entry/api")
+             .get()
+             .assertStatusCode(200)
+             .assertJSONFile(Paths.get("src/test/resources/json/views/entry/entry-api.json"));
+
+    simulator.test("/views/entry/export")
+             .get()
+             .assertStatusCode(200)
+             .assertJSONFile(Paths.get("src/test/resources/json/views/entry/entry-export.json"));
   }
 
   @Test
@@ -250,21 +263,21 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
-  public void post_apiJSONBothWays() throws Exception {
-    Path json = Paths.get("src/test/resources/json/api-jsonBothWays-post.json");
-    simulator.test("/api")
-             .withJSONFile(json)
-             .post()
-             .assertJSONFile(json);
-  }
-
-  @Test
   public void post_JSONWithActual() throws Exception {
     Path json = Paths.get("src/test/resources/json/api-jsonWithActual-post.json");
     simulator.test("/api")
              .withJSONFile(json)
              .post()
              .assertJSONFileWithActual(UserField.class, Paths.get("src/test/resources/json/api-jsonWithActual-post-response.json"));
+  }
+
+  @Test
+  public void post_apiJSONBothWays() throws Exception {
+    Path json = Paths.get("src/test/resources/json/api-jsonBothWays-post.json");
+    simulator.test("/api")
+             .withJSONFile(json)
+             .post()
+             .assertJSONFile(json);
   }
 
   @Test

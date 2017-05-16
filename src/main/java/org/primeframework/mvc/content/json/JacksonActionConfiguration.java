@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2013-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,11 +27,18 @@ public class JacksonActionConfiguration {
 
   public final String responseMember;
 
-  public Class<?> view;
+  public Class<?> serializationView;
 
   public JacksonActionConfiguration(String requestMember, Class<?> requestMemberType, String responseMember) {
     this.requestMember = requestMember;
     this.requestMemberType = requestMemberType;
     this.responseMember = responseMember;
+  }
+
+  public JacksonActionConfiguration(String requestMember, Class<?> requestMemberType, String responseMember, Class<?> serializationView) {
+    this.requestMember = requestMember;
+    this.requestMemberType = requestMemberType;
+    this.responseMember = responseMember;
+    this.serializationView = serializationView;
   }
 }

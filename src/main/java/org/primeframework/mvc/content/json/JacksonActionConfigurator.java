@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2013-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
  */
 package org.primeframework.mvc.content.json;
 
+import java.util.Map;
+
 import org.primeframework.mvc.action.config.ActionConfigurator;
 import org.primeframework.mvc.content.json.annotation.JSONRequest;
 import org.primeframework.mvc.content.json.annotation.JSONResponse;
 import org.primeframework.mvc.util.ReflectionUtils;
-
-import java.util.Map;
 
 /**
  * Uses the Jackson JSON processor to marshall JSON into Java objects and set them into the action.
@@ -38,12 +38,12 @@ public class JacksonActionConfigurator implements ActionConfigurator {
 
     String requestMember = (jsonRequestMembers.size() == 1) ? jsonRequestMembers.keySet().iterator().next() : null;
     Class<?> requestMemberType = (requestMember != null) ? ReflectionUtils.getMemberType(actionClass, requestMember) : null;
-    String responseMember = (jsonResponseMembers.size() == 1) ? jsonResponseMembers.keySet().iterator().next() : null;
-    Class<?> responseMemberType = (responseMember != null) ? ReflectionUtils.getMemberType(actionClass, responseMember) : null;
+    Map.Entry<String, JSONResponse> entry = (jsonResponseMembers.size() == 1) ? jsonResponseMembers.entrySet().iterator().next() : null;
+    String responseMember = entry == null ? null : entry.getKey();
+    Class<?> serializationView = entry == null ? null : entry.getValue().view();
 
     if (requestMember != null || responseMember != null) {
-      JacksonActionConfiguration jacksonActionConfiguration = new JacksonActionConfiguration(requestMember, requestMemberType, responseMember);
-      jacksonActionConfiguration.view = jsonResponseMembers.values().iterator().next().value();
+      return new JacksonActionConfiguration(requestMember, requestMemberType, responseMember, serializationView);
     }
 
     return null;
