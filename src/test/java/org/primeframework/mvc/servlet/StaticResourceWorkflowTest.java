@@ -28,8 +28,14 @@ import org.primeframework.mvc.workflow.StaticResourceWorkflow;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
 
-import static org.easymock.EasyMock.*;
-import static org.testng.Assert.*;
+import static java.util.Collections.EMPTY_SET;
+import static org.easymock.EasyMock.createStrictMock;
+import static org.easymock.EasyMock.eq;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.geq;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.testng.Assert.assertEquals;
 
 /**
  * This tests the static resource workflow.
@@ -37,6 +43,59 @@ import static org.testng.Assert.*;
  * @author Brian Pontarelli
  */
 public class StaticResourceWorkflowTest {
+  @Test
+  public void badRequest() throws IOException, ServletException {
+    MVCConfiguration configuration = makeConfiguration();
+
+    ServletContext context = createStrictMock(ServletContext.class);
+    expect(context.getResource("/static/2.1.1/bad.jpg")).andReturn(null);
+    replay(context);
+
+    HttpServletRequest req = createStrictMock(HttpServletRequest.class);
+    expect(req.getRequestURI()).andReturn("/static/2.1.1/bad.jpg");
+    expect(req.getContextPath()).andReturn("");
+    expect(req.getDateHeader("If-Modified-Since")).andReturn(0l);
+    replay(req);
+
+    HttpServletResponse res = createStrictMock(HttpServletResponse.class);
+    replay(res);
+
+    WorkflowChain wc = createStrictMock(WorkflowChain.class);
+    wc.continueWorkflow();
+    replay(wc);
+
+    StaticResourceWorkflow srw = new StaticResourceWorkflow(context, req, res, configuration, EMPTY_SET);
+    srw.perform(wc);
+    verify(configuration, req, res, wc);
+  }
+
+  @Test
+  public void cacheRequest() throws IOException, ServletException {
+    MVCConfiguration configuration = makeConfiguration();
+
+    ServletContext context = createStrictMock(ServletContext.class);
+    expect(context.getResource("/static/2.1.1/test.jpg")).andReturn(null);
+    replay(context);
+
+    HttpServletRequest req = createStrictMock(HttpServletRequest.class);
+    expect(req.getRequestURI()).andReturn("/static/2.1.1/test.jpg");
+    expect(req.getContextPath()).andReturn("");
+    expect(req.getDateHeader("If-Modified-Since")).andReturn(1l);
+    replay(req);
+
+    HttpServletResponse res = createStrictMock(HttpServletResponse.class);
+    res.setDateHeader("Expires", Long.MAX_VALUE);
+    res.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+    replay(res);
+
+    WorkflowChain wc = createStrictMock(WorkflowChain.class);
+    replay(wc);
+
+    StaticResourceWorkflow srw = new StaticResourceWorkflow(context, req, res, configuration, EMPTY_SET);
+    srw.perform(wc);
+    verify(configuration, req, res, wc);
+  }
+
   @Test
   public void newRequest() throws IOException, ServletException {
     MVCConfiguration configuration = makeConfiguration();
@@ -80,7 +139,7 @@ public class StaticResourceWorkflowTest {
     WorkflowChain wc = createStrictMock(WorkflowChain.class);
     replay(wc);
 
-    StaticResourceWorkflow srw = new StaticResourceWorkflow(context, req, res, configuration);
+    StaticResourceWorkflow srw = new StaticResourceWorkflow(context, req, res, configuration, EMPTY_SET);
     srw.perform(wc);
     verify(configuration, req, res, wc);
 
@@ -130,64 +189,11 @@ public class StaticResourceWorkflowTest {
     WorkflowChain wc = createStrictMock(WorkflowChain.class);
     replay(wc);
 
-    StaticResourceWorkflow srw = new StaticResourceWorkflow(context, req, res, configuration);
+    StaticResourceWorkflow srw = new StaticResourceWorkflow(context, req, res, configuration, EMPTY_SET);
     srw.perform(wc);
     verify(configuration, req, res, wc);
 
     assertEquals(build.toString(), "Test\n");
-  }
-
-  @Test
-  public void cacheRequest() throws IOException, ServletException {
-    MVCConfiguration configuration = makeConfiguration();
-
-    ServletContext context = createStrictMock(ServletContext.class);
-    expect(context.getResource("/static/2.1.1/test.jpg")).andReturn(null);
-    replay(context);
-
-    HttpServletRequest req = createStrictMock(HttpServletRequest.class);
-    expect(req.getRequestURI()).andReturn("/static/2.1.1/test.jpg");
-    expect(req.getContextPath()).andReturn("");
-    expect(req.getDateHeader("If-Modified-Since")).andReturn(1l);
-    replay(req);
-
-    HttpServletResponse res = createStrictMock(HttpServletResponse.class);
-    res.setDateHeader("Expires", Long.MAX_VALUE);
-    res.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-    replay(res);
-
-    WorkflowChain wc = createStrictMock(WorkflowChain.class);
-    replay(wc);
-
-    StaticResourceWorkflow srw = new StaticResourceWorkflow(context, req, res, configuration);
-    srw.perform(wc);
-    verify(configuration, req, res, wc);
-  }
-
-  @Test
-  public void badRequest() throws IOException, ServletException {
-    MVCConfiguration configuration = makeConfiguration();
-
-    ServletContext context = createStrictMock(ServletContext.class);
-    expect(context.getResource("/static/2.1.1/bad.jpg")).andReturn(null);
-    replay(context);
-
-    HttpServletRequest req = createStrictMock(HttpServletRequest.class);
-    expect(req.getRequestURI()).andReturn("/static/2.1.1/bad.jpg");
-    expect(req.getContextPath()).andReturn("");
-    expect(req.getDateHeader("If-Modified-Since")).andReturn(0l);
-    replay(req);
-
-    HttpServletResponse res = createStrictMock(HttpServletResponse.class);
-    replay(res);
-
-    WorkflowChain wc = createStrictMock(WorkflowChain.class);
-    wc.continueWorkflow();
-    replay(wc);
-
-    StaticResourceWorkflow srw = new StaticResourceWorkflow(context, req, res, configuration);
-    srw.perform(wc);
-    verify(configuration, req, res, wc);
   }
 
   @Test
@@ -209,7 +215,7 @@ public class StaticResourceWorkflowTest {
     wc.continueWorkflow();
     replay(wc);
 
-    StaticResourceWorkflow srw = new StaticResourceWorkflow(context, req, res, configuration);
+    StaticResourceWorkflow srw = new StaticResourceWorkflow(context, req, res, configuration, EMPTY_SET);
     srw.perform(wc);
     verify(configuration, req, res, wc);
   }

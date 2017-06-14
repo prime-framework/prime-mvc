@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
 import java.util.Calendar;
+import java.util.Set;
 
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.servlet.ServletTools;
@@ -53,15 +54,18 @@ public class StaticResourceWorkflow implements Workflow {
   private final HttpServletResponse response;
   private final String[] staticPrefixes;
   private final boolean enabled;
+  private final Set<ClassLoader> additionalClassLoaders;
 
   @Inject
   public StaticResourceWorkflow(ServletContext context, HttpServletRequest request,
-                                HttpServletResponse response, MVCConfiguration configuration) {
+                                HttpServletResponse response, MVCConfiguration configuration,
+                                Set<ClassLoader> additionalClassLoaders) {
     this.context = context;
     this.request = request;
     this.response = response;
     this.staticPrefixes = configuration.staticResourcePrefixes();
     this.enabled = configuration.staticResourcesEnabled();
+    this.additionalClassLoaders = additionalClassLoaders;
   }
 
   /**
@@ -178,7 +182,18 @@ public class StaticResourceWorkflow implements Workflow {
     if (uri.startsWith("/")) {
       uri = uri.substring(1);
     }
-    return Thread.currentThread().getContextClassLoader().getResourceAsStream(uri);
+
+    InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(uri);
+    if (is == null) {
+      for (ClassLoader classLoader : additionalClassLoaders) {
+        is = classLoader.getResourceAsStream(uri);
+        if (is != null) {
+          break;
+        }
+      }
+    }
+
+    return is;
   }
 
   /**

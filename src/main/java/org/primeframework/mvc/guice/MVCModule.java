@@ -33,6 +33,7 @@ import org.primeframework.mvc.validation.guice.ValidationModule;
 import org.primeframework.mvc.workflow.guice.WorkflowModule;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.multibindings.Multibinder;
 
 /**
  * A virtual module that installs all of the Prime MVC modules.
@@ -59,5 +60,8 @@ public class MVCModule extends AbstractModule {
     install(new UtilModule());
     install(new ValidationModule());
     install(new WorkflowModule());
+
+    // Allow web apps to bind additional class loaders for use in the StaticResourceWorkflow
+    Multibinder.newSetBinder(binder(), ClassLoader.class);
   }
 }

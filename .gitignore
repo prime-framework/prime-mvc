@@ -1,2 +1,3 @@
 *.iws
 build
+**/.DS_Store
