@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2016-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ public class TestBuilder {
   public TestBuilder createFile(String contents) throws IOException {
     String tmpdir = System.getProperty("java.io.tmpdir");
     String unique = new String(Base64.getEncoder().encode(UUID.randomUUID().toString().getBytes()), "UTF-8").substring(0, 5);
-    tempFile = Paths.get(tmpdir + "/" + "_prime_binaryContent_" + unique);
+    tempFile = Paths.get(tmpdir + "/" + "_prime_testFile_" + unique);
     tempFile.toFile().deleteOnExit();
 
     Files.write(tempFile, contents.getBytes());

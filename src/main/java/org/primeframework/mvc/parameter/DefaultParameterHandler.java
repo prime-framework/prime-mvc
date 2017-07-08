@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2016, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2014-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -127,7 +127,7 @@ public class DefaultParameterHandler implements ParameterHandler {
     // Set the files into the action
     for (String key : fileInfos.keySet()) {
       // Verify file sizes and types
-      List<FileInfo> list = new ArrayList<FileInfo>(fileInfos.get(key));
+      List<FileInfo> list = new ArrayList<>(fileInfos.get(key));
       FileUpload fileUpload = actionConfiguration.fileUploadMembers.get(key);
       for (Iterator<FileInfo> i = list.iterator(); i.hasNext(); ) {
         FileInfo info = i.next();
@@ -150,12 +150,15 @@ public class DefaultParameterHandler implements ParameterHandler {
           allowedContentTypes = fileUpload.contentTypes();
         }
 
-        String contentType = info.contentType;
-        if (!ArrayUtils.contains(allowedContentTypes, contentType)) {
-          String code = "[fileUploadBadContentType]" + key;
-          String message = messageProvider.getMessage(code, key, contentType, allowedContentTypes);
-          messageStore.add(new SimpleFieldMessage(MessageType.ERROR, key, code, message));
-          i.remove();
+        // If a single allowed content type of '*' is specified, skip this check, all Content Types are allowed.
+        if (allowedContentTypes.length > 1 || !allowedContentTypes[0].equals("*")) {
+          String contentType = info.contentType;
+          if (!ArrayUtils.contains(allowedContentTypes, contentType)) {
+            String code = "[fileUploadBadContentType]" + key;
+            String message = messageProvider.getMessage(code, key, contentType, allowedContentTypes);
+            messageStore.add(new SimpleFieldMessage(MessageType.ERROR, key, code, message));
+            i.remove();
+          }
         }
       }
 

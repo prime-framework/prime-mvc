@@ -272,6 +272,23 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void post_anyContentType() throws Exception {
+    test.createFile("Hello World")
+        .simulate(() -> simulator.test("/file-upload")
+                                 .withFile("dataAnyType", test.tempFile.toFile(), "text/plain")
+                                 .post()
+                                 .assertStatusCode(200))
+        .simulate(() -> simulator.test("/file-upload")
+                                 .withFile("dataAnyType", test.tempFile.toFile(), "text/html")
+                                 .post()
+                                 .assertStatusCode(200))
+        .simulate(() -> simulator.test("/file-upload")
+                                 .withFile("dataAnyType", test.tempFile.toFile(), "application/octet-stream")
+                                 .post()
+                                 .assertStatusCode(200));
+  }
+
+  @Test
   public void post_apiJSONBothWays() throws Exception {
     Path json = Paths.get("src/test/resources/json/api-jsonBothWays-post.json");
     simulator.test("/api")
@@ -286,6 +303,19 @@ public class GlobalTest extends PrimeBaseTest {
                                  .withParameter("expected", "Hello World")
                                  .withBody("Hello World")
                                  .withContentType("application/octet-stream")
+                                 .post()
+                                 .assertStatusCode(200));
+  }
+
+  @Test
+  public void post_onlyAllowTextHTML() throws Exception {
+    test.createFile("<strong>Hello World</strong>")
+        .simulate(() -> simulator.test("/file-upload")
+                                 .withFile("dataTextHtml", test.tempFile.toFile(), "text/plain")
+                                 .post()
+                                 .assertStatusCode(400))
+        .simulate(() -> simulator.test("/file-upload")
+                                 .withFile("dataTextHtml", test.tempFile.toFile(), "text/html")
                                  .post()
                                  .assertStatusCode(200));
   }
