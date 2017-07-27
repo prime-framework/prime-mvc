@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2016, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2014-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -82,13 +83,43 @@ public class RequestResult {
    * @throws IOException If the ObjectMapper fails.
    */
   public static void assertJSONEquals(ObjectMapper objectMapper, String actual, String expected) throws IOException {
-    Object response = objectMapper.readValue(actual, Object.class);
-    Object file = objectMapper.readValue(expected, Object.class);
+    Object response = readValue(objectMapper, actual);
+    Object file = readValue(objectMapper, expected);
     if (!response.equals(file)) {
       objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
       String bodyString = objectMapper.writeValueAsString(response);
       String fileString = objectMapper.writeValueAsString(file);
       throw new AssertionError("The body doesn't match the expected JSON output. expected [" + fileString + "] but found [" + bodyString + "]");
+    }
+  }
+
+  private static void _sort(Object object) {
+    if (object instanceof LinkedHashMap) {
+      LinkedHashMap<?, ?> map = (LinkedHashMap<?, ?>) object;
+      for (Object value : map.values()) {
+        if (value instanceof LinkedHashMap) {
+          _sort(value);
+        } else if (value instanceof List) {
+          List list = (List) value;
+          if (list.get(0) instanceof LinkedHashMap) {
+            for (Object i : list) {
+              _sort(i);
+            }
+          } else {
+            Collections.sort(list);
+          }
+        }
+      }
+    }
+  }
+
+  private static Object readValue(ObjectMapper objectMapper, String value) throws IOException {
+    Object object = objectMapper.readValue(value, Object.class);
+    try {
+      _sort(object);
+      return object;
+    } catch (Exception e) {
+      throw new RuntimeException("Failed to sort, this is a bug.", e);
     }
   }
 
