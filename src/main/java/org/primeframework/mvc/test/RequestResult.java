@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,6 +40,7 @@ import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.l10n.MessageProvider;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.inject.Injector;
@@ -83,43 +83,14 @@ public class RequestResult {
    * @throws IOException If the ObjectMapper fails.
    */
   public static void assertJSONEquals(ObjectMapper objectMapper, String actual, String expected) throws IOException {
-    Object response = readValue(objectMapper, actual);
-    Object file = readValue(objectMapper, expected);
+    JsonNode response = objectMapper.readTree(actual);
+    JsonNode file = objectMapper.readTree(expected);
+
     if (!response.equals(file)) {
       objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
       String bodyString = objectMapper.writeValueAsString(response);
       String fileString = objectMapper.writeValueAsString(file);
       throw new AssertionError("The body doesn't match the expected JSON output. expected [" + fileString + "] but found [" + bodyString + "]");
-    }
-  }
-
-  private static void _sort(Object object) {
-    if (object instanceof LinkedHashMap) {
-      LinkedHashMap<?, ?> map = (LinkedHashMap<?, ?>) object;
-      for (Object value : map.values()) {
-        if (value instanceof LinkedHashMap) {
-          _sort(value);
-        } else if (value instanceof List) {
-          List list = (List) value;
-          if (list.get(0) instanceof LinkedHashMap) {
-            for (Object i : list) {
-              _sort(i);
-            }
-          } else {
-            Collections.sort(list);
-          }
-        }
-      }
-    }
-  }
-
-  private static Object readValue(ObjectMapper objectMapper, String value) throws IOException {
-    Object object = objectMapper.readValue(value, Object.class);
-    try {
-      _sort(object);
-      return object;
-    } catch (Exception e) {
-      throw new RuntimeException("Failed to sort, this is a bug.", e);
     }
   }
 
