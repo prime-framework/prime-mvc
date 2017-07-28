@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,12 +41,12 @@ public class FreeMarkerConfigurationProvider implements Provider<Configuration> 
 
   @Override
   public Configuration get() {
-    BeansWrapperBuilder builder = new BeansWrapperBuilder(Configuration.VERSION_2_3_23);
+    BeansWrapperBuilder builder = new BeansWrapperBuilder(Configuration.VERSION_2_3_26);
     builder.setExposeFields(true);
     builder.setSimpleMapWrapper(true);
 
     int checkSeconds = configuration.templateCheckSeconds();
-    Configuration config = new Configuration(Configuration.VERSION_2_3_23);
+    Configuration config = new Configuration(Configuration.VERSION_2_3_26);
     config.setTagSyntax(Configuration.SQUARE_BRACKET_TAG_SYNTAX);
     config.setTemplateUpdateDelayMilliseconds(checkSeconds * 1000);
     config.setTemplateLoader(loader);

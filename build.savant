@@ -17,7 +17,7 @@
 savantVersion = "1.0.0"
 primeJwtVersion = "0.2.0"
 
-project(group: "org.primeframework", name: "prime-mvc", version: "1.4.6", licenses: ["ApacheV2_0"]) {
+project(group: "org.primeframework", name: "prime-mvc", version: "1.4.7", licenses: ["ApacheV2_0"]) {
   workflow {
     standard()
   }
@@ -42,7 +42,7 @@ project(group: "org.primeframework", name: "prime-mvc", version: "1.4.6", licens
       dependency(id: "org.apache.commons:commons-fileupload:1.2.1")
       dependency(id: "org.apache.commons:commons-io:2.1.0")
       dependency(id: "org.apache.commons:commons-lang3:3.1.0")
-      dependency(id: "org.freemarker:freemarker:2.3.23")
+      dependency(id: "org.freemarker:freemarker:2.3.26+incubating")
       dependency(id: "org.primeframework:prime-jwt:${primeJwtVersion}")
       dependency(id: "org.primeframework:prime-mock:0.5.6")
       dependency(id: "org.slf4j:slf4j-api:1.7.7")

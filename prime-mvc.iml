@@ -118,11 +118,11 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/freemarker/freemarker/2.3.23/freemarker-2.3.23.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/org/freemarker/freemarker/2.3.26+incubating/freemarker-2.3.26+incubating.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/freemarker/freemarker/2.3.23/freemarker-2.3.23-src.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/org/freemarker/freemarker/2.3.26+incubating/freemarker-2.3.26+incubating-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>

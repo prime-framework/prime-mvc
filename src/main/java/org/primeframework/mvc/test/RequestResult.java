@@ -39,6 +39,7 @@ import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.l10n.MessageProvider;
+import org.primeframework.mvc.test.jackson.TestNodeFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -51,6 +52,7 @@ import static java.util.Arrays.asList;
  *
  * @author Brian Pontarelli
  */
+@SuppressWarnings({"unused", "UnusedReturnValue"})
 public class RequestResult {
   public final String body;
 
@@ -248,7 +250,8 @@ public class RequestResult {
       List<FieldMessage> fieldMessages = msgs.get(field);
       if (fieldMessages == null) {
         StringBuilder sb = new StringBuilder("\n\tMessageStore contains:\n");
-        msgs.keySet().stream().forEach((f) -> sb.append("\t\t" + f + "\n"));
+        //noinspection StringConcatenationInsideStringBufferAppend
+        msgs.keySet().forEach((f) -> sb.append("\t\t" + f + "\n"));
         throw new AssertionError("The MessageStore does not contain a error for the field [" + field + "]" + sb);
       }
 
@@ -259,7 +262,8 @@ public class RequestResult {
 
       if (!found) {
         StringBuilder sb = new StringBuilder("\n\tMessageStore contains:\n");
-        fieldMessages.stream().forEach((f) -> sb.append("\t\t[" + f.getType() + "]\n"));
+        //noinspection StringConcatenationInsideStringBufferAppend
+        fieldMessages.forEach((f) -> sb.append("\t\t[" + f.getType() + "]\n"));
         throw new AssertionError("The MessageStore contains messages but no errors for the field [" + field + "]" + sb);
       }
     }
@@ -304,13 +308,15 @@ public class RequestResult {
       Message message = messages.stream().filter((m) -> m.getCode().equals(errorCode)).findFirst().orElse(null);
       if (message == null) {
         StringBuilder sb = new StringBuilder("\n\tMessageStore contains:\n");
-        messages.stream().forEach((m) -> sb.append("\t\t" + m.getCode() + " Type: " + m.getType() + "\n"));
+        //noinspection StringConcatenationInsideStringBufferAppend
+        messages.forEach((m) -> sb.append("\t\t" + m.getCode() + " Type: " + m.getType() + "\n"));
         throw new AssertionError("The MessageStore does not contain the general message [" + errorCode + "] Type: " + messageType + sb);
       }
 
       if (message.getType() != messageType) {
         StringBuilder sb = new StringBuilder("\n\tMessageStore contains:\n");
-        messages.stream().forEach((m) -> sb.append("\t\t" + m.getCode() + " Type: " + m.getType() + "\n"));
+        //noinspection StringConcatenationInsideStringBufferAppend
+        messages.forEach((m) -> sb.append("\t\t" + m.getCode() + " Type: " + m.getType() + "\n"));
         throw new AssertionError("The MessageStore contains message for code  [" + message.getCode() + "], but it is of type [" + message.getType() + "]" + sb);
       }
     }
@@ -350,6 +356,7 @@ public class RequestResult {
 
     if (!inMessageStore.containsAll(asList(messages))) {
       StringBuilder sb = new StringBuilder("\n\tMessageStore contains:\n");
+      //noinspection StringConcatenationInsideStringBufferAppend
       msgs.forEach((f) -> sb.append("\t\t[" + f + "]\n"));
       throw new AssertionError("The MessageStore does not contain the [" + type + "] message " + asList(messages) + sb);
     }
@@ -380,7 +387,8 @@ public class RequestResult {
     }
 
     StringBuilder sb = new StringBuilder("\n\tMessageStore contains:\n");
-    messages.stream().forEach((m) -> sb.append("\t\t" + m.getCode() + " Type: " + m.getType() + "\n"));
+    //noinspection StringConcatenationInsideStringBufferAppend
+    messages.forEach((m) -> sb.append("\t\t" + m.getCode() + " Type: " + m.getType() + "\n"));
     throw new AssertionError("The MessageStore contains the following errors.]" + sb);
   }
 
@@ -435,7 +443,7 @@ public class RequestResult {
   public RequestResult assertCookie(String name, String value) {
     assertContainsCookie(name);
     Cookie actual = response.getCookies().stream().filter(c -> c.getName().equals(name)).findFirst().orElse(null);
-    if (actual.getValue() == null || !actual.getValue().equals(value)) {
+    if (actual == null || actual.getValue() == null || !actual.getValue().equals(value)) {
       throw new AssertionError("Cookie [" + name + "] with value [" + actual + "] was not equal to the expected value [" + value + "]");
     }
     return this;
@@ -487,8 +495,8 @@ public class RequestResult {
   /**
    * De-serialize the JSON response using the type provided and allow the caller to assert on the result.
    *
-   * @param type The object type.
-   * @param type The consumer to pass the de-serialized object to.
+   * @param type     The object type.
+   * @param consumer The consumer to pass the de-serialized object to.
    * @return This.
    * @throws IOException If the JSON marshalling failed.
    */
@@ -508,6 +516,7 @@ public class RequestResult {
    */
   public RequestResult assertJSON(String json) throws IOException {
     ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
+    objectMapper.setNodeFactory(new TestNodeFactory());
     assertJSONEquals(objectMapper, body, json);
     return this;
   }

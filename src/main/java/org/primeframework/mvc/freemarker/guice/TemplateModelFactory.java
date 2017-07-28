@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,14 @@ import freemarker.template.TemplateModel;
  * @author Brian Pontarelli
  */
 public class TemplateModelFactory {
-  private static final Map<String, Map<String, Class<? extends TemplateModel>>> bindings = new HashMap<String, Map<String, Class<? extends TemplateModel>>>();
+  private static final Map<String, Map<String, Class<? extends TemplateModel>>> bindings = new HashMap<>();
+
   private final Injector injector;
+
+  @Inject
+  public TemplateModelFactory(Injector injector) {
+    this.injector = injector;
+  }
 
   /**
    * Adds a binding to a TemplateModel so that it can be accessed in FreeMarker like [prefix.name/]
@@ -43,11 +49,7 @@ public class TemplateModelFactory {
    */
   public static void addModel(Binder binder, String prefix, String name, Class<? extends TemplateModel> modelType) {
     binder.bind(modelType);
-    Map<String, Class<? extends TemplateModel>> models = bindings.get(prefix);
-    if (models == null) {
-      models = new HashMap<String, Class<? extends TemplateModel>>();
-      bindings.put(prefix, models);
-    }
+    Map<String, Class<? extends TemplateModel>> models = bindings.computeIfAbsent(prefix, k -> new HashMap<>());
 
     models.put(name, modelType);
   }
@@ -62,33 +64,9 @@ public class TemplateModelFactory {
    */
   public static void addSingletonModel(Binder binder, String prefix, String name, Class<? extends TemplateModel> modelType) {
     binder.bind(modelType).asEagerSingleton();
-    Map<String, Class<? extends TemplateModel>> models = bindings.get(prefix);
-    if (models == null) {
-      models = new HashMap<String, Class<? extends TemplateModel>>();
-      bindings.put(prefix, models);
-    }
+    Map<String, Class<? extends TemplateModel>> models = bindings.computeIfAbsent(prefix, k -> new HashMap<>());
 
     models.put(name, modelType);
-  }
-
-  @Inject
-  public TemplateModelFactory(Injector injector) {
-    this.injector = injector;
-  }
-
-  /**
-   * @return The prefixes of the TemplateModels that have been registered.
-   */
-  public Set<String> prefixes() {
-    return bindings.keySet();
-  }
-
-  /**
-   * @param prefix The prefix of the TemplateModels names to grab.
-   * @return The names of the TemplateModels registered under the given prefix.
-   */
-  public Set<String> controlNames(String prefix) {
-    return bindings.get(prefix).keySet();
   }
 
   /**
@@ -110,5 +88,20 @@ public class TemplateModelFactory {
     }
 
     return injector.getInstance(modelType);
+  }
+
+  /**
+   * @param prefix The prefix of the TemplateModels names to grab.
+   * @return The names of the TemplateModels registered under the given prefix.
+   */
+  public Set<String> controlNames(String prefix) {
+    return bindings.get(prefix).keySet();
+  }
+
+  /**
+   * @return The prefixes of the TemplateModels that have been registered.
+   */
+  public Set<String> prefixes() {
+    return bindings.keySet();
   }
 }

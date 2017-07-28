@@ -37,11 +37,11 @@ public final class BodyTools {
   private static final Configuration config;
 
   static {
-    BeansWrapperBuilder builder = new BeansWrapperBuilder(Configuration.VERSION_2_3_23);
+    BeansWrapperBuilder builder = new BeansWrapperBuilder(Configuration.VERSION_2_3_26);
     builder.setExposeFields(true);
     builder.setSimpleMapWrapper(true);
 
-    config = new Configuration(Configuration.VERSION_2_3_23);
+    config = new Configuration(Configuration.VERSION_2_3_26);
     config.setDefaultEncoding("UTF-8");
     config.setNumberFormat("computer");
     config.setTagSyntax(Configuration.SQUARE_BRACKET_TAG_SYNTAX);
