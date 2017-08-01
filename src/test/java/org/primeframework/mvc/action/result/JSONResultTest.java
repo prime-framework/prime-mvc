@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2013-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -112,7 +112,7 @@ public class JSONResultTest extends PrimeBaseTest {
     replay(response);
 
     Map<Class<?>, Object> additionalConfiguration = new HashMap<>();
-    additionalConfiguration.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(null, null, "user"));
+    additionalConfiguration.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(null, "user"));
     ActionConfiguration config = new ActionConfiguration(Post.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfiguration, null, null);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(action, new ExecuteMethodConfiguration(httpMethod, null, null), "/foo", "", config));
@@ -187,7 +187,7 @@ public class JSONResultTest extends PrimeBaseTest {
     replay(response);
 
     Map<Class<?>, Object> additionalConfiguration = new HashMap<>();
-    additionalConfiguration.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(null, null, "user"));
+    additionalConfiguration.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(null, "user"));
     ActionConfiguration config = new ActionConfiguration(Post.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfiguration, null, null);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
 

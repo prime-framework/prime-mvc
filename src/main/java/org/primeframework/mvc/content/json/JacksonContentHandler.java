@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2016, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2013-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,12 +24,14 @@ import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.content.ContentHandler;
+import org.primeframework.mvc.content.json.JacksonActionConfiguration.RequestMember;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.primeframework.mvc.message.SimpleMessage;
 import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
+import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.validation.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,18 +100,21 @@ public class JacksonContentHandler implements ContentHandler {
 
     // Process JSON and set into the object
     JacksonActionConfiguration jacksonConfiguration = (JacksonActionConfiguration) config.additionalConfiguration.get(JacksonActionConfiguration.class);
-    if (jacksonConfiguration.requestMember != null) {
+    if (!jacksonConfiguration.requestMembers.isEmpty()) {
+      HTTPMethod httpMethod = actionInvocation.method.httpMethod;
+      RequestMember requestMember = jacksonConfiguration.requestMembers.get(httpMethod);
+
       try {
         Object jsonObject;
         if (logger.isDebugEnabled()) {
           final String req = IOUtils.toString(request.getInputStream(), "UTF-8");
           logger.debug("Request: (" + request.getMethod() + " " + request.getRequestURI() + ") " + req);
-          jsonObject = objectMapper.reader(jacksonConfiguration.requestMemberType).readValue(req);
+          jsonObject = objectMapper.reader(requestMember.type).readValue(req);
         } else {
-          jsonObject = objectMapper.reader(jacksonConfiguration.requestMemberType).readValue(request.getInputStream());
+          jsonObject = objectMapper.reader(requestMember.type).readValue(request.getInputStream());
         }
 
-        expressionEvaluator.setValue(jacksonConfiguration.requestMember, action, jsonObject);
+        expressionEvaluator.setValue(requestMember.name, action, jsonObject);
       } catch (InvalidFormatException e) {
         logger.debug("Error parsing JSON request", e);
         addFieldError(e);

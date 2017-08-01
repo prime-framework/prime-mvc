@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2016, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -132,9 +132,11 @@ public class DefaultActionConfigurationProviderTest {
     assertEquals(config.get("/kitchen-sink").postValidationMethods.size(), 1);
     assertEquals(config.get("/kitchen-sink").validationMethods.size(), 1);
     assertEquals(config.get("/kitchen-sink").validationMethods.get(HTTPMethod.POST).get(0).method, KitchenSink.class.getMethod("validate"));
-    assertEquals(((JacksonActionConfiguration) config.get("/kitchen-sink").additionalConfiguration.get(JacksonActionConfiguration.class)).requestMember, "jsonRequest");
-    assertEquals(((JacksonActionConfiguration) config.get("/kitchen-sink").additionalConfiguration.get(JacksonActionConfiguration.class)).requestMemberType, UserField.class);
-    assertEquals(((JacksonActionConfiguration) config.get("/kitchen-sink").additionalConfiguration.get(JacksonActionConfiguration.class)).responseMember, "jsonResponse");
+    JacksonActionConfiguration jacksonActionConfiguration = (JacksonActionConfiguration) config.get("/kitchen-sink").additionalConfiguration.get(JacksonActionConfiguration.class);
+    assertTrue(jacksonActionConfiguration.requestMembers.containsKey(HTTPMethod.POST));
+    assertEquals(jacksonActionConfiguration.requestMembers.get(HTTPMethod.POST).name, "jsonRequest");
+    assertEquals(jacksonActionConfiguration.requestMembers.get(HTTPMethod.POST).type, UserField.class);
+    assertEquals(jacksonActionConfiguration.responseMember, "jsonResponse");
     assertEquals(((BinaryActionConfiguration) config.get("/kitchen-sink").additionalConfiguration.get(BinaryActionConfiguration.class)).responseMember, "binaryResponse");
     assertEquals(((BinaryActionConfiguration) config.get("/kitchen-sink").additionalConfiguration.get(BinaryActionConfiguration.class)).requestMember, "binaryRequest");
 

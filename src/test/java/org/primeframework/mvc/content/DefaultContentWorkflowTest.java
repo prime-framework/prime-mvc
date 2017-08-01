@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2016, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2013-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,10 +28,13 @@ import org.primeframework.mock.servlet.MockServletInputStream;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
+import org.primeframework.mvc.action.ExecuteMethodConfiguration;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.content.binary.BinaryActionConfiguration;
 import org.primeframework.mvc.content.guice.ContentHandlerFactory;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration;
+import org.primeframework.mvc.content.json.JacksonActionConfiguration.RequestMember;
+import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -115,12 +118,14 @@ public class DefaultContentWorkflowTest extends PrimeBaseTest {
     request.setInputStream(new MockServletInputStream(expected.getBytes()));
     request.setContentType(contentType);
 
-    Map<Class<?>, Object> additionalConfig = new HashMap<Class<?>, Object>();
-    additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration("jsonRequest", UserField.class, null));
+    Map<Class<?>, Object> additionalConfig = new HashMap<>();
+    Map<HTTPMethod, RequestMember> requestMembers = new HashMap<>();
+    requestMembers.put(HTTPMethod.POST, new RequestMember("jsonRequest", UserField.class));
+    additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(requestMembers, null));
 
     KitchenSink action = new KitchenSink(null);
     ActionConfiguration config = new ActionConfiguration(KitchenSink.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null, null);
-    store.setCurrent(new ActionInvocation(action, null, null, null, config));
+    store.setCurrent(new ActionInvocation(action, new ExecuteMethodConfiguration(HTTPMethod.POST, null, null), null, null, config));
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
     chain.continueWorkflow();

@@ -263,6 +263,24 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void multipleJSONRequestMembers() throws Exception {
+    simulator.test("/multiple-json-request")
+             .post()
+             .assertStatusCode(200);
+
+    simulator.test("/multiple-json-request")
+             .withJSON(new Object())
+             .post()
+             .assertStatusCode(201);
+
+    simulator.test("/multiple-json-request")
+             .withJSON(new Object())
+             .delete()
+             .assertStatusCode(202);
+
+  }
+
+  @Test
   public void post_JSONWithActual() throws Exception {
     Path json = Paths.get("src/test/resources/json/api-jsonWithActual-post.json");
     simulator.test("/api")

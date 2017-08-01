@@ -15,11 +15,14 @@
  */
 package org.primeframework.mvc.content.json;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.primeframework.mvc.action.config.ActionConfigurator;
+import org.primeframework.mvc.content.json.JacksonActionConfiguration.RequestMember;
 import org.primeframework.mvc.content.json.annotation.JSONRequest;
 import org.primeframework.mvc.content.json.annotation.JSONResponse;
+import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.util.ReflectionUtils;
 
 /**
@@ -30,20 +33,35 @@ import org.primeframework.mvc.util.ReflectionUtils;
 public class JacksonActionConfigurator implements ActionConfigurator {
   @Override
   public Object configure(Class<?> actionClass) {
-    Map<String, JSONRequest> jsonRequestMembers = ReflectionUtils.findAllMembersWithAnnotation(actionClass, JSONRequest.class);
+    Map<String, JSONRequest> jsonRequestMember = ReflectionUtils.findAllMembersWithAnnotation(actionClass, JSONRequest.class);
     Map<String, JSONResponse> jsonResponseMembers = ReflectionUtils.findAllMembersWithAnnotation(actionClass, JSONResponse.class);
-    if (jsonRequestMembers.size() > 1 || jsonResponseMembers.size() > 1) {
-      throw new IllegalArgumentException("Action class [" + actionClass + "] contains multiple fields with the @JSONRequest or @JSONResponse annotation. This annotation should only exist on a single field.");
+    if (jsonResponseMembers.size() > 1) {
+      throw new IllegalArgumentException("Action class [" + actionClass + "] contains multiple fields with the @JSONResponse annotation. This annotation should only exist on a single field.");
     }
 
-    String requestMember = (jsonRequestMembers.size() == 1) ? jsonRequestMembers.keySet().iterator().next() : null;
-    Class<?> requestMemberType = (requestMember != null) ? ReflectionUtils.getMemberType(actionClass, requestMember) : null;
+
+    // @JSONRequest members, more than one is allowed, up to one per HTTP Method
+    Map<HTTPMethod, RequestMember> configuredMembers = new HashMap<>(4);
+    for (Map.Entry<String, JSONRequest> requestMember : jsonRequestMember.entrySet()) {
+      String memberName = requestMember.getKey();
+      HTTPMethod[] httpMethods = requestMember.getValue().httpMethods();
+      for (HTTPMethod httpMethod : httpMethods) {
+        if (configuredMembers.containsKey(httpMethod)) {
+          throw new IllegalArgumentException("Action class [" + actionClass + "] contains multiple fields with the @JSONRequest annotation and they are not distinct for HTTPMethod [ " + httpMethod + "]."
+              + " This annotation should only exist on a single field for a particular HTTP Method.");
+        }
+
+        configuredMembers.put(httpMethod, new RequestMember(memberName, ReflectionUtils.getMemberType(actionClass, memberName)));
+      }
+    }
+
+    // Response
     Map.Entry<String, JSONResponse> entry = (jsonResponseMembers.size() == 1) ? jsonResponseMembers.entrySet().iterator().next() : null;
     String responseMember = entry == null ? null : entry.getKey();
     Class<?> serializationView = entry == null ? null : entry.getValue().view();
 
-    if (requestMember != null || responseMember != null) {
-      return new JacksonActionConfiguration(requestMember, requestMemberType, responseMember, serializationView);
+    if (!configuredMembers.isEmpty() || responseMember != null) {
+      return new JacksonActionConfiguration(configuredMembers, responseMember, serializationView);
     }
 
     return null;

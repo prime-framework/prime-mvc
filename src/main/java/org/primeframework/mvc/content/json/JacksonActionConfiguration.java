@@ -15,30 +15,42 @@
  */
 package org.primeframework.mvc.content.json;
 
+import java.util.Map;
+
+import org.primeframework.mvc.servlet.HTTPMethod;
+
 /**
  * Jackson action configuration.
  *
  * @author Brian Pontarelli
  */
 public class JacksonActionConfiguration {
-  public final String requestMember;
-
-  public final Class<?> requestMemberType;
+  public final Map<HTTPMethod, RequestMember> requestMembers;
 
   public final String responseMember;
 
   public Class<?> serializationView;
 
-  public JacksonActionConfiguration(String requestMember, Class<?> requestMemberType, String responseMember) {
-    this.requestMember = requestMember;
-    this.requestMemberType = requestMemberType;
+  public JacksonActionConfiguration(Map<HTTPMethod, RequestMember> requestMembers, String responseMember) {
+    this.requestMembers = requestMembers;
     this.responseMember = responseMember;
+    this.serializationView = null;
   }
 
-  public JacksonActionConfiguration(String requestMember, Class<?> requestMemberType, String responseMember, Class<?> serializationView) {
-    this.requestMember = requestMember;
-    this.requestMemberType = requestMemberType;
+  public JacksonActionConfiguration(Map<HTTPMethod, RequestMember> requestMembers, String responseMember, Class<?> serializationView) {
+    this.requestMembers = requestMembers;
     this.responseMember = responseMember;
     this.serializationView = serializationView;
+  }
+
+  public static class RequestMember {
+    public String name;
+
+    public Class<?> type;
+
+    public RequestMember(String name, Class<?> type) {
+      this.name = name;
+      this.type = type;
+    }
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ package org.primeframework.mvc.content.json.annotation;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import org.primeframework.mvc.servlet.HTTPMethod;
+
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
@@ -30,4 +32,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Target({FIELD, METHOD})
 public @interface JSONRequest {
+  /**
+   * @return The HTTP methods that this request object is utilized for.
+   */
+  HTTPMethod[] httpMethods() default {HTTPMethod.POST, HTTPMethod.PUT, HTTPMethod.GET, HTTPMethod.DELETE};
 }

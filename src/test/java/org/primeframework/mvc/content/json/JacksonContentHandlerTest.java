@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2016, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,13 +26,16 @@ import org.primeframework.mock.servlet.MockServletInputStream;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
+import org.primeframework.mvc.action.ExecuteMethodConfiguration;
 import org.primeframework.mvc.action.config.ActionConfiguration;
+import org.primeframework.mvc.content.json.JacksonActionConfiguration.RequestMember;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.primeframework.mvc.message.SimpleMessage;
 import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
+import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.validation.ValidationException;
 import org.testng.annotations.Test;
 
@@ -61,12 +64,14 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
   @Test
   public void handle() throws IOException {
     Map<Class<?>, Object> additionalConfig = new HashMap<>();
-    additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration("jsonRequest", UserField.class, null));
+    Map<HTTPMethod, RequestMember> requestMembers = new HashMap<>();
+    requestMembers.put(HTTPMethod.POST, new RequestMember("jsonRequest", UserField.class));
+    additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(requestMembers, null));
 
     KitchenSink action = new KitchenSink(null);
     ActionConfiguration config = new ActionConfiguration(KitchenSink.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null, null);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new ActionInvocation(action, null, "/action", null, config));
+    expect(store.getCurrent()).andReturn(new ActionInvocation(action, new ExecuteMethodConfiguration(HTTPMethod.POST, null, null), "/action", null, config));
     replay(store);
 
     String expected = "{" +
@@ -135,66 +140,32 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
   }
 
   @Test
-  public void handleBadJSON() throws IOException {
+  public void handleBadInArray() throws IOException {
     Map<Class<?>, Object> additionalConfig = new HashMap<>();
-    additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration("jsonRequest", UserField.class, null));
+    Map<HTTPMethod, RequestMember> requestMembers = new HashMap<>();
+    requestMembers.put(HTTPMethod.POST, new RequestMember("jsonRequest", UserField.class));
+    additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(requestMembers, null));
 
     KitchenSink action = new KitchenSink(null);
     ActionConfiguration config = new ActionConfiguration(KitchenSink.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null, null);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new ActionInvocation(action, null, "/action", null, config));
+    expect(store.getCurrent()).andReturn(new ActionInvocation(action,  new ExecuteMethodConfiguration(HTTPMethod.POST, null, null), "/action", null, config));
     replay(store);
 
     String expected = "{" +
-        "  \"bad-active\":true" +
+        "  \"siblings\":[{" +
+        "    \"age\":\"old\"" +
+        "  }]" +
         "}";
 
     request.setInputStream(new MockServletInputStream(expected.getBytes()));
 
     MessageProvider messageProvider = createStrictMock(MessageProvider.class);
-    expect(messageProvider.getMessage(eq("[unrecognizedProperty]"), eq("bad-active"), isA(String.class))).andReturn("foo");
+    expect(messageProvider.getMessage(eq("[couldNotConvert]siblings.age"), isA(String.class))).andReturn("Bad sibling age");
     replay(messageProvider);
 
     MessageStore messageStore = createStrictMock(MessageStore.class);
-    messageStore.add(new SimpleMessage(MessageType.ERROR, "[unrecognizedProperty]", "foo"));
-    replay(messageStore);
-
-    JacksonContentHandler handler = new JacksonContentHandler(request, store, new ObjectMapper(), expressionEvaluator, messageProvider, messageStore);
-    try {
-      handler.handle();
-      fail("Should have thrown");
-    } catch (ValidationException e) {
-      // Expected
-    }
-
-    assertNull(action.jsonRequest);
-
-    verify(store, messageProvider, messageStore);
-  }
-
-  @Test
-  public void handleBadRoot() throws IOException {
-    Map<Class<?>, Object> additionalConfig = new HashMap<>();
-    additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration("jsonRequest", UserField.class, null));
-
-    KitchenSink action = new KitchenSink(null);
-    ActionConfiguration config = new ActionConfiguration(KitchenSink.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null, null);
-    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new ActionInvocation(action, null, "/action", null, config));
-    replay(store);
-
-    String expected = "{" +
-        "  \"active\":\"bad\"" +
-        "}";
-
-    request.setInputStream(new MockServletInputStream(expected.getBytes()));
-
-    MessageProvider messageProvider = createStrictMock(MessageProvider.class);
-    expect(messageProvider.getMessage(eq("[couldNotConvert]active"), isA(String.class))).andReturn("Bad active");
-    replay(messageProvider);
-
-    MessageStore messageStore = createStrictMock(MessageStore.class);
-    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "active", "[couldNotConvert]active", "Bad active"));
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "siblings.age", "[couldNotConvert]siblings.age", "Bad sibling age"));
     replay(messageStore);
 
     JacksonContentHandler handler = new JacksonContentHandler(request, store, new ObjectMapper(), expressionEvaluator, messageProvider, messageStore);
@@ -213,12 +184,14 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
   @Test
   public void handleBadInMap() throws IOException {
     Map<Class<?>, Object> additionalConfig = new HashMap<>();
-    additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration("jsonRequest", UserField.class, null));
+    Map<HTTPMethod, RequestMember> requestMembers = new HashMap<>();
+    requestMembers.put(HTTPMethod.POST, new RequestMember("jsonRequest", UserField.class));
+    additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(requestMembers, null));
 
     KitchenSink action = new KitchenSink(null);
     ActionConfiguration config = new ActionConfiguration(KitchenSink.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null, null);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new ActionInvocation(action, null, "/action", null, config));
+    expect(store.getCurrent()).andReturn(new ActionInvocation(action,  new ExecuteMethodConfiguration(HTTPMethod.POST, null, null), "/action", null, config));
     replay(store);
 
     String expected = "{" +
@@ -253,30 +226,70 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
   }
 
   @Test
-  public void handleBadInArray() throws IOException {
+  public void handleBadJSON() throws IOException {
     Map<Class<?>, Object> additionalConfig = new HashMap<>();
-    additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration("jsonRequest", UserField.class, null));
+    Map<HTTPMethod, RequestMember> requestMembers = new HashMap<>();
+    requestMembers.put(HTTPMethod.POST, new RequestMember("jsonRequest", UserField.class));
+    additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(requestMembers, null));
 
     KitchenSink action = new KitchenSink(null);
     ActionConfiguration config = new ActionConfiguration(KitchenSink.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null, null);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new ActionInvocation(action, null, "/action", null, config));
+    expect(store.getCurrent()).andReturn(new ActionInvocation(action,  new ExecuteMethodConfiguration(HTTPMethod.POST, null, null), "/action", null, config));
     replay(store);
 
     String expected = "{" +
-        "  \"siblings\":[{" +
-        "    \"age\":\"old\"" +
-        "  }]" +
+        "  \"bad-active\":true" +
         "}";
 
     request.setInputStream(new MockServletInputStream(expected.getBytes()));
 
     MessageProvider messageProvider = createStrictMock(MessageProvider.class);
-    expect(messageProvider.getMessage(eq("[couldNotConvert]siblings.age"), isA(String.class))).andReturn("Bad sibling age");
+    expect(messageProvider.getMessage(eq("[unrecognizedProperty]"), eq("bad-active"), isA(String.class))).andReturn("foo");
     replay(messageProvider);
 
     MessageStore messageStore = createStrictMock(MessageStore.class);
-    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "siblings.age", "[couldNotConvert]siblings.age", "Bad sibling age"));
+    messageStore.add(new SimpleMessage(MessageType.ERROR, "[unrecognizedProperty]", "foo"));
+    replay(messageStore);
+
+    JacksonContentHandler handler = new JacksonContentHandler(request, store, new ObjectMapper(), expressionEvaluator, messageProvider, messageStore);
+    try {
+      handler.handle();
+      fail("Should have thrown");
+    } catch (ValidationException e) {
+      // Expected
+    }
+
+    assertNull(action.jsonRequest);
+
+    verify(store, messageProvider, messageStore);
+  }
+
+  @Test
+  public void handleBadRoot() throws IOException {
+    Map<Class<?>, Object> additionalConfig = new HashMap<>();
+    Map<HTTPMethod, RequestMember> requestMembers = new HashMap<>();
+    requestMembers.put(HTTPMethod.POST, new RequestMember("jsonRequest", UserField.class));
+    additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(requestMembers, null));
+
+    KitchenSink action = new KitchenSink(null);
+    ActionConfiguration config = new ActionConfiguration(KitchenSink.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null, null);
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(new ActionInvocation(action,  new ExecuteMethodConfiguration(HTTPMethod.POST, null, null), "/action", null, config));
+    replay(store);
+
+    String expected = "{" +
+        "  \"active\":\"bad\"" +
+        "}";
+
+    request.setInputStream(new MockServletInputStream(expected.getBytes()));
+
+    MessageProvider messageProvider = createStrictMock(MessageProvider.class);
+    expect(messageProvider.getMessage(eq("[couldNotConvert]active"), isA(String.class))).andReturn("Bad active");
+    replay(messageProvider);
+
+    MessageStore messageStore = createStrictMock(MessageStore.class);
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "active", "[couldNotConvert]active", "Bad active"));
     replay(messageStore);
 
     JacksonContentHandler handler = new JacksonContentHandler(request, store, new ObjectMapper(), expressionEvaluator, messageProvider, messageStore);
