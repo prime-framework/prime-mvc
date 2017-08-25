@@ -136,20 +136,7 @@ public class RequestResult {
    * @return This.
    */
   public RequestResult assertBodyContainsMessagesFromKey(String key, Object... values) {
-    MessageProvider messageProvider = get(MessageProvider.class);
-    ActionInvocationStore actionInvocationStore = get(ActionInvocationStore.class);
-    ActionMapper actionMapper = get(ActionMapper.class);
-
-    // Using the ActionMapper so that URL segments are properly handled and the correct URL is used for message lookups.
-    ActionInvocation actionInvocation = actionMapper.map(null, request.getRequestURI(), true);
-    actionInvocationStore.setCurrent(actionInvocation);
-
-    String message = messageProvider.getMessage(key, values);
-    if (!body.contains(message)) {
-      throw new AssertionError("Body didn't contain [" + message + "] for the key [" + key + "]\nRedirect: [" + redirect + "]\nBody:\n" + body);
-    }
-
-    return this;
+    return _assertBodyContainsMessagesFromKey(true, key, values);
   }
 
   /**
@@ -178,6 +165,34 @@ public class RequestResult {
       if (body.contains(string)) {
         throw new AssertionError("Body shouldn't contain [" + string + "]\nRedirect: [" + redirect + "]\nBody:\n" + body);
       }
+    }
+
+    return this;
+  }
+
+  /**
+   * Verifies that the body does not contain the messages from the given key and optionally provided replacement values. This
+   * uses the MessageProvider for the current
+   * test URI and the given keys to look up the messages.
+   *
+   * @param key    The key.
+   * @param values The replacement values.
+   * @return This.
+   */
+  public RequestResult assertBodyDoesNotContainMessagesFromKey(String key, Object... values) {
+    return _assertBodyContainsMessagesFromKey(false, key, values);
+  }
+
+  /**
+   * Verifies that the body does contain the messages from the given keys. This uses the MessageProvider for the current
+   * test URI and the given keys to look up the messages.
+   *
+   * @param keys The keys.
+   * @return This.
+   */
+  public RequestResult assertBodyDoesNotContainMessagesFromKeys(String... keys) {
+    for (String key : keys) {
+      assertBodyDoesNotContainMessagesFromKey(key, "foo", "bar", "baz");
     }
 
     return this;
@@ -666,6 +681,24 @@ public class RequestResult {
    */
   public RequestResult setup(Consumer<RequestResult> consumer) {
     consumer.accept(this);
+    return this;
+  }
+
+  private RequestResult _assertBodyContainsMessagesFromKey(boolean contains, String key, Object... values) {
+    MessageProvider messageProvider = get(MessageProvider.class);
+    ActionInvocationStore actionInvocationStore = get(ActionInvocationStore.class);
+    ActionMapper actionMapper = get(ActionMapper.class);
+
+    // Using the ActionMapper so that URL segments are properly handled and the correct URL is used for message lookups.
+    ActionInvocation actionInvocation = actionMapper.map(null, request.getRequestURI(), true);
+    actionInvocationStore.setCurrent(actionInvocation);
+
+    String message = messageProvider.getMessage(key, values);
+    if (contains != body.contains(message)) {
+      String text = contains ? "didn't" : "does";
+      throw new AssertionError("Body " + text + " contain [" + message + "] for the key [" + key + "]\nRedirect: [" + redirect + "]\nBody:\n" + body);
+    }
+
     return this;
   }
 
