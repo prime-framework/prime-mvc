@@ -66,6 +66,9 @@ public abstract class AbstractListInput extends AbstractInput {
     Map<String, Object> parameters = super.makeParameters();
     Map<String, Option> options = new LinkedHashMap<>();
 
+    // Grab the value
+    Object beanValue = currentAction() != null ? expressionEvaluator.getValue((String) attributes.get("name"), currentAction()) : null;
+
     // Handle the header option
     String headerValue = (String) attributes.remove("headerValue");
     String headerL10n = (String) attributes.remove("headerL10n");
@@ -75,11 +78,8 @@ public abstract class AbstractListInput extends AbstractInput {
         message = messageProvider.getMessage(headerL10n);
       }
 
-      options.put(headerValue, new Option(message, false, null));
+      options.put(headerValue, new Option(message, headerValue.equals("") && beanValue == null, null));
     }
-
-    // Grab the value
-    Object beanValue = currentAction() != null ? expressionEvaluator.getValue((String) attributes.get("name"), currentAction()) : null;
 
     // Next, let's handle the items here. I'll create a Map that contains a simple inner class
     // that determines if the option is selected or not. This will allow me to get the text
