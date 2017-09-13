@@ -29,7 +29,9 @@ import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.control.annotation.ControlAttribute;
 import org.primeframework.mvc.control.annotation.ControlAttributes;
 import org.primeframework.mvc.control.form.JoinMethod;
+import org.primeframework.mvc.control.message.Message;
 import org.primeframework.mvc.freemarker.FreeMarkerService;
+import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.util.ErrorList;
 
 import com.google.inject.Inject;
@@ -57,6 +59,8 @@ public abstract class AbstractControl implements Control {
   protected FreeMarkerService freeMarkerService;
 
   protected Locale locale;
+
+  protected MessageProvider messageProvider;
 
   protected HttpServletRequest request;
 
@@ -119,13 +123,15 @@ public abstract class AbstractControl implements Control {
 
   @Inject
   public void setServices(Locale locale, HttpServletRequest request, ActionInvocationStore actionInvocationStore,
-                          FreeMarkerService freeMarkerService, MVCConfiguration configuration, Configuration freeMarkerConfig) {
+                          FreeMarkerService freeMarkerService, MVCConfiguration configuration, Configuration freeMarkerConfig,
+                          MessageProvider messageProvider) {
     this.locale = locale;
     this.request = request;
     this.freeMarkerService = freeMarkerService;
     this.actionInvocationStore = actionInvocationStore;
     this.configuration = configuration;
     this.freeMarkerConfig = freeMarkerConfig;
+    this.messageProvider = messageProvider;
   }
 
   /**
@@ -177,6 +183,7 @@ public abstract class AbstractControl implements Control {
     parameters.put("attributes", attributes);
     parameters.put("dynamicAttributes", dynamicAttributes);
     parameters.put("join", new JoinMethod(freeMarkerConfig.getObjectWrapper()));
+    parameters.put("message", new Message(messageProvider));
     return parameters;
   }
 

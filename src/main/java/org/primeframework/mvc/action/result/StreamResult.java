@@ -65,6 +65,7 @@ public class StreamResult extends AbstractResult<Stream> {
           "property returned null or an Object that is not an InputStream.");
     }
 
+    response.setStatus(stream.status());
     response.setContentType(type);
 
     if (StringUtils.isNotBlank(length)) {

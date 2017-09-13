@@ -66,6 +66,11 @@ public @interface Stream {
   String property() default "stream";
 
   /**
+   * @return The HTTP status code of the response. This defaults to <code>200</code>.
+   */
+  int status() default 200;
+
+  /**
    * A list of Stream annotations.
    */
   @ResultContainerAnnotation

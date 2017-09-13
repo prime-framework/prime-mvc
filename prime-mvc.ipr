@@ -352,10 +352,10 @@
                 <rule>
                   <match>
                     <AND>
-                      <FIELD />
-                      <FINAL />
-                      <PUBLIC />
-                      <STATIC />
+                      <FIELD>true</FIELD>
+                      <FINAL>true</FINAL>
+                      <STATIC>true</STATIC>
+                      <visibility />
                     </AND>
                   </match>
                   <order>BY_NAME</order>
@@ -365,10 +365,9 @@
                 <rule>
                   <match>
                     <AND>
-                      <FIELD />
-                      <FINAL />
-                      <PROTECTED />
-                      <STATIC />
+                      <FIELD>true</FIELD>
+                      <STATIC>true</STATIC>
+                      <visibility />
                     </AND>
                   </match>
                   <order>BY_NAME</order>
@@ -378,10 +377,9 @@
                 <rule>
                   <match>
                     <AND>
-                      <FIELD />
-                      <FINAL />
-                      <PACKAGE_PRIVATE />
-                      <STATIC />
+                      <FIELD>true</FIELD>
+                      <FINAL>true</FINAL>
+                      <visibility />
                     </AND>
                   </match>
                   <order>BY_NAME</order>
@@ -391,150 +389,8 @@
                 <rule>
                   <match>
                     <AND>
-                      <FIELD />
-                      <FINAL />
-                      <PRIVATE />
-                      <STATIC />
-                    </AND>
-                  </match>
-                  <order>BY_NAME</order>
-                </rule>
-              </section>
-              <section>
-                <rule>
-                  <match>
-                    <AND>
-                      <FIELD />
-                      <PUBLIC />
-                      <STATIC />
-                    </AND>
-                  </match>
-                  <order>BY_NAME</order>
-                </rule>
-              </section>
-              <section>
-                <rule>
-                  <match>
-                    <AND>
-                      <FIELD />
-                      <PROTECTED />
-                      <STATIC />
-                    </AND>
-                  </match>
-                  <order>BY_NAME</order>
-                </rule>
-              </section>
-              <section>
-                <rule>
-                  <match>
-                    <AND>
-                      <FIELD />
-                      <PACKAGE_PRIVATE />
-                      <STATIC />
-                    </AND>
-                  </match>
-                  <order>BY_NAME</order>
-                </rule>
-              </section>
-              <section>
-                <rule>
-                  <match>
-                    <AND>
-                      <FIELD />
-                      <PRIVATE />
-                      <STATIC />
-                    </AND>
-                  </match>
-                  <order>BY_NAME</order>
-                </rule>
-              </section>
-              <section>
-                <rule>
-                  <match>
-                    <AND>
-                      <FIELD />
-                      <FINAL />
-                      <PUBLIC />
-                    </AND>
-                  </match>
-                  <order>BY_NAME</order>
-                </rule>
-              </section>
-              <section>
-                <rule>
-                  <match>
-                    <AND>
-                      <FIELD />
-                      <FINAL />
-                      <PROTECTED />
-                    </AND>
-                  </match>
-                  <order>BY_NAME</order>
-                </rule>
-              </section>
-              <section>
-                <rule>
-                  <match>
-                    <AND>
-                      <FIELD />
-                      <FINAL />
-                      <PACKAGE_PRIVATE />
-                    </AND>
-                  </match>
-                  <order>BY_NAME</order>
-                </rule>
-              </section>
-              <section>
-                <rule>
-                  <match>
-                    <AND>
-                      <FIELD />
-                      <FINAL />
-                      <PRIVATE />
-                    </AND>
-                  </match>
-                  <order>BY_NAME</order>
-                </rule>
-              </section>
-              <section>
-                <rule>
-                  <match>
-                    <AND>
-                      <FIELD />
-                      <PUBLIC />
-                    </AND>
-                  </match>
-                  <order>BY_NAME</order>
-                </rule>
-              </section>
-              <section>
-                <rule>
-                  <match>
-                    <AND>
-                      <FIELD />
-                      <PROTECTED />
-                    </AND>
-                  </match>
-                  <order>BY_NAME</order>
-                </rule>
-              </section>
-              <section>
-                <rule>
-                  <match>
-                    <AND>
-                      <FIELD />
-                      <PACKAGE_PRIVATE />
-                    </AND>
-                  </match>
-                  <order>BY_NAME</order>
-                </rule>
-              </section>
-              <section>
-                <rule>
-                  <match>
-                    <AND>
-                      <FIELD />
-                      <PRIVATE />
+                      <FIELD>true</FIELD>
+                      <visibility />
                     </AND>
                   </match>
                   <order>BY_NAME</order>
@@ -565,8 +421,8 @@
                 <rule>
                   <match>
                     <AND>
-                      <CONSTRUCTOR />
-                      <PUBLIC />
+                      <CONSTRUCTOR>true</CONSTRUCTOR>
+                      <visibility />
                     </AND>
                   </match>
                   <order>BY_NAME</order>
@@ -576,8 +432,9 @@
                 <rule>
                   <match>
                     <AND>
-                      <CONSTRUCTOR />
-                      <PROTECTED />
+                      <METHOD>true</METHOD>
+                      <STATIC>true</STATIC>
+                      <visibility />
                     </AND>
                   </match>
                   <order>BY_NAME</order>
@@ -587,111 +444,8 @@
                 <rule>
                   <match>
                     <AND>
-                      <CONSTRUCTOR />
-                      <PACKAGE_PRIVATE />
-                    </AND>
-                  </match>
-                  <order>BY_NAME</order>
-                </rule>
-              </section>
-              <section>
-                <rule>
-                  <match>
-                    <AND>
-                      <CONSTRUCTOR />
-                      <PRIVATE />
-                    </AND>
-                  </match>
-                  <order>BY_NAME</order>
-                </rule>
-              </section>
-              <section>
-                <rule>
-                  <match>
-                    <AND>
-                      <METHOD />
-                      <PUBLIC />
-                      <STATIC />
-                    </AND>
-                  </match>
-                  <order>BY_NAME</order>
-                </rule>
-              </section>
-              <section>
-                <rule>
-                  <match>
-                    <AND>
-                      <METHOD />
-                      <PROTECTED />
-                      <STATIC />
-                    </AND>
-                  </match>
-                  <order>BY_NAME</order>
-                </rule>
-              </section>
-              <section>
-                <rule>
-                  <match>
-                    <AND>
-                      <METHOD />
-                      <PACKAGE_PRIVATE />
-                      <STATIC />
-                    </AND>
-                  </match>
-                  <order>BY_NAME</order>
-                </rule>
-              </section>
-              <section>
-                <rule>
-                  <match>
-                    <AND>
-                      <METHOD />
-                      <PRIVATE />
-                      <STATIC />
-                    </AND>
-                  </match>
-                  <order>BY_NAME</order>
-                </rule>
-              </section>
-              <section>
-                <rule>
-                  <match>
-                    <AND>
-                      <METHOD />
-                      <PUBLIC />
-                    </AND>
-                  </match>
-                  <order>BY_NAME</order>
-                </rule>
-              </section>
-              <section>
-                <rule>
-                  <match>
-                    <AND>
-                      <METHOD />
-                      <PROTECTED />
-                    </AND>
-                  </match>
-                  <order>BY_NAME</order>
-                </rule>
-              </section>
-              <section>
-                <rule>
-                  <match>
-                    <AND>
-                      <METHOD />
-                      <PACKAGE_PRIVATE />
-                    </AND>
-                  </match>
-                  <order>BY_NAME</order>
-                </rule>
-              </section>
-              <section>
-                <rule>
-                  <match>
-                    <AND>
-                      <METHOD />
-                      <PRIVATE />
+                      <METHOD>true</METHOD>
+                      <visibility />
                     </AND>
                   </match>
                   <order>BY_NAME</order>

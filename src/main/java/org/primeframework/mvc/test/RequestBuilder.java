@@ -506,5 +506,4 @@ public class RequestBuilder {
     ServletObjectsHolder.setServletRequest(new HttpServletRequestWrapper(this.request));
     ServletObjectsHolder.setServletResponse(this.response);
   }
-
 }

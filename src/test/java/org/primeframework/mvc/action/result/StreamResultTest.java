@@ -32,8 +32,10 @@ import org.primeframework.mvc.servlet.HTTPMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import static org.easymock.EasyMock.*;
-import static org.testng.Assert.*;
+import static org.easymock.EasyMock.createStrictMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.testng.Assert.assertEquals;
 
 /**
  * This class tests the stream result.
@@ -41,9 +43,9 @@ import static org.testng.Assert.*;
  * @author Brian Pontarelli
  */
 public class StreamResultTest {
-  @DataProvider(name= "httMethod")
+  @DataProvider(name = "httMethod")
   public Object[][] httpMethod() {
-    return new Object[][] {{HTTPMethod.GET}, {HTTPMethod.HEAD}};
+    return new Object[][]{{HTTPMethod.GET}, {HTTPMethod.HEAD}};
   }
 
   @Test(dataProvider = "httpMethod")
@@ -58,6 +60,7 @@ public class StreamResultTest {
 
     MockServletOutputStream sos = new MockServletOutputStream();
     HttpServletResponse response = EasyMock.createStrictMock(HttpServletResponse.class);
+    response.setStatus(200);
     response.setContentType("application/octet-stream");
     response.setContentLength(10);
     response.setHeader("Content-Disposition", "attachment; filename=\"foo.zip\"");
@@ -83,10 +86,16 @@ public class StreamResultTest {
 
   public class StreamImpl implements Stream {
     private final String code;
+
     private final String name;
+
     private final String length;
+
     private final String type;
+
     private final String property;
+
+    private final int status = 200;
 
     public StreamImpl(String code, String name, String length, String type, String property) {
       this.code = code;
@@ -114,6 +123,11 @@ public class StreamResultTest {
 
     public String name() {
       return name;
+    }
+
+    @Override
+    public int status() {
+      return status;
     }
 
     public Class<? extends Annotation> annotationType() {

@@ -28,7 +28,7 @@ import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.message.l10n.MissingMessageException;
 
 import com.google.inject.Inject;
-import freemarker.template.TemplateMethodModel;
+import freemarker.template.TemplateMethodModelEx;
 import freemarker.template.TemplateModelException;
 
 /**
@@ -37,19 +37,37 @@ import freemarker.template.TemplateModelException;
  * @author Brian Pontarelli
  */
 @ControlAttributes(
-  required = {
-    @ControlAttribute(name = "key")
-  },
-  optional = {
-    @ControlAttribute(name = "values", types = List.class)
-  }
+    required = {
+        @ControlAttribute(name = "key")
+    },
+    optional = {
+        @ControlAttribute(name = "values", types = List.class)
+    }
 )
-public class Message extends AbstractControl implements TemplateMethodModel {
+public class Message extends AbstractControl implements TemplateMethodModelEx {
   private final MessageProvider messageProvider;
 
   @Inject
   public Message(MessageProvider messageProvider) {
     this.messageProvider = messageProvider;
+  }
+
+  /**
+   * Calls the {@link #renderStart(Writer, Map, Map)} and {@link #renderEnd(Writer)} methods using a StringWriter to
+   * collect the result and the first and second parameters to the method. The first is the key and the second is the
+   * bundle, which can be left out.
+   *
+   * @param arguments The method arguments.
+   * @return The result.
+   * @throws TemplateModelException If the action is null and bundle is not specified.
+   */
+  public Object exec(List arguments) throws TemplateModelException {
+    if (arguments.size() < 1) {
+      throw new TemplateModelException("Invalid parameters to the message method. This method takes one or more parameters like this: message(key) or message(key, values...)");
+    }
+
+    String key = (String) arguments.get(0);
+    return messageProvider.getMessage(key, arguments.subList(1, arguments.size()).toArray());
   }
 
   /**
@@ -72,30 +90,10 @@ public class Message extends AbstractControl implements TemplateMethodModel {
     }
 
     if (message == null) {
-      throw new PrimeException("The message for the key [" + key + "] is missing and there was no default set using the " +
-        "[default] attribute.");
+      throw new PrimeException("The message for the key [" + key + "] is missing and there was no default set using the [default] attribute.");
     }
 
     attributes.put("message", message);
-  }
-
-  /**
-   * Calls the {@link #renderStart(Writer, Map, Map)} and {@link #renderEnd(Writer)} methods using a StringWriter to
-   * collect the result and the first and second parameters to the method. The first is the key and the second is the
-   * bundle, which can be left out.
-   *
-   * @param arguments The method arguments.
-   * @return The result.
-   * @throws TemplateModelException If the action is null and bundle is not specified.
-   */
-  public Object exec(List arguments) throws TemplateModelException {
-    if (arguments.size() < 1) {
-      throw new TemplateModelException("Invalid parameters to the message method. This method " +
-        "takes one or more parameters like this: message(key) or message(key, values...)");
-    }
-
-    String key = (String) arguments.get(0);
-    return messageProvider.getMessage(key, arguments.subList(1, arguments.size()).toArray());
   }
 
   @Override
