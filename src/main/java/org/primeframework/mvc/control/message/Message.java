@@ -66,7 +66,7 @@ public class Message extends AbstractControl implements TemplateMethodModelEx {
       throw new TemplateModelException("Invalid parameters to the message method. This method takes one or more parameters like this: message(key) or message(key, values...)");
     }
 
-    String key = (String) arguments.get(0);
+    String key = arguments.get(0).toString();
     return messageProvider.getMessage(key, arguments.subList(1, arguments.size()).toArray());
   }
 
