@@ -48,6 +48,8 @@ import org.primeframework.mvc.parameter.el.UpdateExpressionException;
 public class ReflectionUtils {
   private static final Map<Class<?>, Map<String, Field>> fieldCache = new WeakHashMap<>();
 
+  private static final Map<String, Package> packageCache = new WeakHashMap<>();
+
   private static final Map<Class<?>, Method[]> methods = new WeakHashMap<>();
 
   private static final Map<Class<?>, Map<String, PropertyInfo>> propertyCache = new WeakHashMap<>();
@@ -203,6 +205,28 @@ public class ReflectionUtils {
     }
 
     return fieldMap;
+  }
+
+  /**
+   * Find a package by name and return it if it has the requested annotation.
+   *
+   * @param packageName the string name of the package.
+   * @param annotation  the annotation to find in that package.
+   * @return the package if it exists and has the requested annotation or null.
+   */
+  public static Package findPackageWithAnnotation(String packageName, Class<? extends Annotation> annotation) {
+    Package pkg;
+    synchronized (packageCache) {
+      pkg = packageCache.get(packageName);
+      if (pkg == null) {
+        pkg = Package.getPackage(packageName);
+        if (pkg != null) {
+          packageCache.put(packageName, pkg);
+        }
+      }
+    }
+
+    return pkg != null && pkg.isAnnotationPresent(annotation) ? pkg : null;
   }
 
   /**
@@ -697,7 +721,7 @@ public class ReflectionUtils {
    * @author Brian Pontarelli
    */
   public static class PropertyInfo {
-    private final Map<String, Method> methods = new HashMap<String, Method>();
+    private final Map<String, Method> methods = new HashMap<>();
 
     private Class<?> definingClass;
 

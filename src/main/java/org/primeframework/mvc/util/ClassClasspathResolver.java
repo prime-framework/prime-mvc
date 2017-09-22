@@ -88,7 +88,7 @@ public class ClassClasspathResolver<U> {
 
     Classpath classpath = Classpath.getCurrentClassPath();
     List<String> names = classpath.getNames();
-    Set<Class<U>> matches = new HashSet<Class<U>>();
+    Set<Class<U>> matches = new HashSet<>();
     for (String name : names) {
       File f = new File(name);
       if (f.isDirectory()) {
@@ -108,8 +108,8 @@ public class ClassClasspathResolver<U> {
 
   private Set<File> findDirectories(File dir, String locator) {
     // Loop over the files using tail-recursion
-    Set<File> directories = new HashSet<File>();
-    Queue<File> files = new LinkedList<File>(safeListFiles(dir, DirectoryFileFilter.INSTANCE));
+    Set<File> directories = new HashSet<>();
+    Queue<File> files = new LinkedList<>(safeListFiles(dir, DirectoryFileFilter.INSTANCE));
     while (!files.isEmpty()) {
       File file = files.poll();
       if (file.isDirectory() && file.getName().equals(locator)) {
@@ -142,10 +142,10 @@ public class ClassClasspathResolver<U> {
   }
 
   private Collection<Class<U>> loadFromDirectory(File dir, Test<Class<U>> test, boolean recursive) throws IOException {
-    Set<Class<U>> matches = new HashSet<Class<U>>();
+    Set<Class<U>> matches = new HashSet<>();
 
     // Loop over the files
-    Queue<File> files = new LinkedList<File>(safeListFiles(dir, null));
+    Queue<File> files = new LinkedList<>(safeListFiles(dir, null));
     while (!files.isEmpty()) {
       File file = files.poll();
       if (file.isDirectory() && recursive) {
@@ -164,7 +164,7 @@ public class ClassClasspathResolver<U> {
 
   private Collection<Class<U>> loadFromJar(File f, Test<Class<U>> test, boolean recursive, Iterable<String> locators, boolean embeddable)
     throws IOException {
-    Set<Class<U>> matches = new HashSet<Class<U>>();
+    Set<Class<U>> matches = new HashSet<>();
 
     JarFile jarFile;
     try {
@@ -207,7 +207,7 @@ public class ClassClasspathResolver<U> {
   /**
    * This is the testing interface that produces a testable object, given a file or JAR entry.
    */
-  public static interface Test<T> {
+  public interface Test<T> {
     Testable<T> prepare(File file) throws IOException;
 
     Testable<T> prepare(File jar, JarFile jarFile, JarEntry jarEntry) throws IOException;
@@ -216,7 +216,7 @@ public class ClassClasspathResolver<U> {
   /**
    * This is the testing interface that is used to accept or reject resources.
    */
-  public static interface Testable<T> {
+  public interface Testable<T> {
     /**
      * @return True if the testable passes, false if it doesn't.
      */
@@ -290,7 +290,7 @@ public class ClassClasspathResolver<U> {
       private IsAClassVisitor<U> visitor;
 
       public IsATestable(Class<U> parent, ClassReader classReader) {
-        this.visitor = new IsAClassVisitor<U>(parent);
+        this.visitor = new IsAClassVisitor<>(parent);
         this.classReader = classReader;
       }
 
@@ -387,14 +387,14 @@ public class ClassClasspathResolver<U> {
       if (!file.getName().endsWith(".class")) {
         return null;
       }
-      return new AnnotatedWithTestable<T, U>(annotation, load(file));
+      return new AnnotatedWithTestable<>(annotation, load(file));
     }
 
     public Testable<Class<U>> prepare(File jar, JarFile jarFile, JarEntry jarEntry) throws IOException {
       if (!jarEntry.getName().endsWith(".class")) {
         return null;
       }
-      return new AnnotatedWithTestable<T, U>(annotation, load(jar, jarFile, jarEntry));
+      return new AnnotatedWithTestable<>(annotation, load(jar, jarFile, jarEntry));
     }
 
     private static class AnnotatedWithTestable<T extends Annotation, U> implements Testable<Class<U>> {

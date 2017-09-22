@@ -15,9 +15,9 @@
  */
 
 savantVersion = "1.0.0"
-primeJwtVersion = "0.2.0"
+primeJWTVersion = "1.0.0-{integration}"
 
-project(group: "org.primeframework", name: "prime-mvc", version: "1.5.3", licenses: ["ApacheV2_0"]) {
+project(group: "org.primeframework", name: "prime-mvc", version: "1.5.4", licenses: ["ApacheV2_0"]) {
   workflow {
     standard()
   }
@@ -32,7 +32,7 @@ project(group: "org.primeframework", name: "prime-mvc", version: "1.5.3", licens
     }
     group(name: "compile") {
       dependency(id: "org.ow2.asm:asm:5.0.3")
-      dependency(id: "com.fasterxml.jackson.core:jackson-annotations:2.8.1")
+      dependency(id: "com.fasterxml.jackson.core:jackson-annotations:2.8.8")
       dependency(id: "com.fasterxml.jackson.core:jackson-core:2.8.8")
       dependency(id: "com.fasterxml.jackson.core:jackson-databind:2.8.8")
       dependency(id: "com.google.inject:guice:4.0.0")
@@ -43,7 +43,7 @@ project(group: "org.primeframework", name: "prime-mvc", version: "1.5.3", licens
       dependency(id: "org.apache.commons:commons-io:2.1.0")
       dependency(id: "org.apache.commons:commons-lang3:3.1.0")
       dependency(id: "org.freemarker:freemarker:2.3.26+incubating")
-      dependency(id: "org.primeframework:prime-jwt:${primeJwtVersion}")
+      dependency(id: "com.inversoft:prime-jwt:${primeJWTVersion}")
       dependency(id: "org.primeframework:prime-mock:0.5.8")
       dependency(id: "org.slf4j:slf4j-api:1.7.7")
     }

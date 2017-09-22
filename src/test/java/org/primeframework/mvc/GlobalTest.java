@@ -118,6 +118,28 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void get_wellKnownDotPrefixed() throws Exception {
+    test.simulate(() -> simulator.test("/.well-known/openid-configuration")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertJSON(new Object()));
+
+    test.simulate(() -> simulator.test("/.well-known/well-known/openid-configuration")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertJSON(new Object()));
+
+    test.simulate(() -> simulator.test("/.well-known/well-known/.well-known/openid-configuration")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertJSON(new Object()));
+
+    test.expectException(UnsupportedOperationException.class,
+        () -> test.simulate(() -> simulator.test("/.well-known/.well-known/openid-configuration")
+                                           .get()));
+  }
+
+  @Test
   public void get_jwtDisabledJwtAuthentication() throws Exception {
     // Send in a JWT Authorization header when the Action has JWT disabled. Should always get a 401. When a JWT is provided, the action expects JWT to be enabled.
     test.simulate(() -> simulator.test("/jwt-authorized-disabled")
