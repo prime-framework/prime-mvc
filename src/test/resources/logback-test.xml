@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-  ~ Copyright (c) 2016, Inversoft Inc., All Rights Reserved
+  ~ Copyright (c) 2016-2017, Inversoft Inc., All Rights Reserved
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -35,7 +35,11 @@
     <appender-ref ref="STDOUT"/>
   </logger>
 
-  <logger name="org.primeframework.mvc.guice" level="DEBUG" additivity="false">
+  <logger name="org.primeframework.mvc.guice" level="ERROR" additivity="false">
+    <appender-ref ref="STDOUT"/>
+  </logger>
+
+  <logger name="org.primeframework.mock.servlet" level="INFO" additivity="false">
     <appender-ref ref="STDOUT"/>
   </logger>
 

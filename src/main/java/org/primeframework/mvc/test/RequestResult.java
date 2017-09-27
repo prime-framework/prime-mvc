@@ -21,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -396,15 +397,43 @@ public class RequestResult {
    */
   public RequestResult assertContainsNoMessages(MessageType messageType) {
     MessageStore messageStore = get(MessageStore.class);
-    List<Message> messages = messageStore.getGeneralMessages().stream().filter((m) -> m.getType() == messageType).collect(Collectors.toList());
+    List<Message> messages = messageStore.getGeneralMessages().stream().filter(m -> m.getType() == messageType).collect(Collectors.toList());
     if (messages.isEmpty()) {
       return this;
     }
 
     StringBuilder sb = new StringBuilder("\n\tMessageStore contains:\n");
     //noinspection StringConcatenationInsideStringBufferAppend
-    messages.forEach((m) -> sb.append("\t\t" + m.getCode() + " Type: " + m.getType() + "\n"));
-    throw new AssertionError("The MessageStore contains the following errors.]" + sb);
+    messages.forEach(m -> sb.append("\t\t" + m.getCode() + " Type: " + m.getType() + "\n"));
+    throw new AssertionError("The MessageStore contains the following general errors.]" + sb);
+  }
+
+  /**
+   * Verifies that the response does not contain any field error messages.
+   *
+   * @return This.
+   */
+  public RequestResult assertContainsNoFieldMessages() {
+    return assertContainsNoFieldMessages(MessageType.ERROR);
+  }
+
+  /**
+   * Verifies that the response does not contain any messages of the provided type.
+   *
+   * @param messageType the message type to look for in the response
+   * @return This.
+   */
+  public RequestResult assertContainsNoFieldMessages(MessageType messageType) {
+    MessageStore messageStore = get(MessageStore.class);
+    List<FieldMessage> messages = messageStore.getFieldMessages().values().stream().flatMap(Collection::stream).filter(m -> m.getType() == messageType).collect(Collectors.toList());
+    if (messages.isEmpty()) {
+      return this;
+    }
+
+    StringBuilder sb = new StringBuilder("\n\tMessageStore contains:\n");
+    //noinspection StringConcatenationInsideStringBufferAppend
+    messages.forEach(m -> sb.append("\t\t" + " Field: " + m.getField() + " Code: " + m.getCode() + " Type: " + m.getType() + "\n"));
+    throw new AssertionError("The MessageStore contains the following field errors.]" + sb);
   }
 
   /**

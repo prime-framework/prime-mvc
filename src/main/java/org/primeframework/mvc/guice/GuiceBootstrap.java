@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,7 +73,7 @@ public class GuiceBootstrap {
               "  Unable to start the server. Here's why: \n\n\n" + String.join("\n", errorMessages) +
               "\n\n===================================================================================================\n\n"
       );
-      logger.debug("Unable to start the server. Exception: \n", e);
+      logger.error("Unable to start the server. Exception: \n", e);
       throw new PrimeException();
     }
   }
