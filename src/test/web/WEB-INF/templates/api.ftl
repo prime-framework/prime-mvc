@@ -1,5 +1,5 @@
 [#ftl/]
-[#-- @ftlvariable name="action" type="org.example.action.Api.ActionType" --]
+[#-- @ftlvariable name="action" type="org.example.action.ApiAction.ActionType" --]
 [#-- @ftlvariable name="user" type="org.example.domain.UserField" --]
 {
   "active": ${user.active?string},

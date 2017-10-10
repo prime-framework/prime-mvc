@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,45 +15,32 @@
  */
 package org.example.action.user;
 
+import com.google.inject.Inject;
 import org.example.domain.User;
 import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.action.result.annotation.Forward;
-import org.primeframework.mvc.control.form.annotation.FormPrepareMethod;
-import org.primeframework.mvc.parameter.annotation.PreParameterMethod;
-
+import org.primeframework.mvc.servlet.HTTPMethod;
 
 /**
- * This class is a simple edit action for testing.
- *
  * @author Brian Pontarelli
  */
 @Action
-@Forward(page = "")
-public class Edit {
-  public static final SomeEnum[] values = SomeEnum.values();
+public class ValidatableAction implements org.primeframework.mvc.validation.Validatable {
+  private final HTTPMethod method;
 
-  public SomeEnum enumValue = SomeEnum.VALUE1;
+  public User user = new User();
 
-  public User user;
+  @Inject
+  public ValidatableAction(HTTPMethod method) {
+    this.method = method;
+  }
 
-  public boolean preParameter = false;
-  public boolean formPrepared = false;
-
-  public String execute() {
-    return "success";
+  @Override
+  public void validate() {
+    if (method == HTTPMethod.POST) {
+    }
   }
 
   public String post() {
     return "success";
-  }
-
-  @PreParameterMethod
-  public void prepare() {
-    preParameter = true;
-  }
-
-  @FormPrepareMethod
-  public void formPrepare() {
-    formPrepared = true;
   }
 }

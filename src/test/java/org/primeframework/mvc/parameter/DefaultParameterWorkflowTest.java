@@ -27,7 +27,7 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.easymock.IArgumentMatcher;
-import org.example.action.user.Edit;
+import org.example.action.user.EditAction;
 import org.example.domain.Action;
 import org.example.domain.ActionField;
 import org.example.domain.PreAndPostAction;
@@ -564,7 +564,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     expect(config.fileUploadAllowedTypes()).andReturn(new String[]{"text/plain"});
     replay(config);
 
-    Edit action = new Edit();
+    EditAction action = new EditAction();
     ExpressionEvaluator expressionEvaluator = createStrictMock(ExpressionEvaluator.class);
     expressionEvaluator.setValue(eq("userfile"), same(action), assertFile());
     replay(expressionEvaluator);
@@ -610,7 +610,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     expect(config.fileUploadAllowedTypes()).andReturn(new String[]{"text/plain"});
     replay(config);
 
-    Edit action = new Edit();
+    EditAction action = new EditAction();
     ExpressionEvaluator expressionEvaluator = createStrictMock(ExpressionEvaluator.class);
     expressionEvaluator.setValue(eq("userfiles"), same(action), captureMultiple());
     replay(expressionEvaluator);
@@ -654,7 +654,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     expect(config.fileUploadAllowedTypes()).andReturn(AbstractMVCConfiguration.ALLOWED_TYPES);
     replay(config);
 
-    Edit action = new Edit();
+    EditAction action = new EditAction();
     ExpressionEvaluator expressionEvaluator = createStrictMock(ExpressionEvaluator.class);
     replay(expressionEvaluator);
 
@@ -701,7 +701,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     expect(config.fileUploadAllowedTypes()).andReturn(contentTypes);
     replay(config);
 
-    Edit action = new Edit();
+    EditAction action = new EditAction();
     ExpressionEvaluator expressionEvaluator = createStrictMock(ExpressionEvaluator.class);
     replay(expressionEvaluator);
 
@@ -747,7 +747,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     expect(config.fileUploadAllowedTypes()).andReturn(AbstractMVCConfiguration.ALLOWED_TYPES);
     replay(config);
 
-    Edit action = new Edit();
+    EditAction action = new EditAction();
     ExpressionEvaluator expressionEvaluator = createStrictMock(ExpressionEvaluator.class);
     replay(expressionEvaluator);
 
@@ -807,7 +807,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(config);
 
     final String[] annotationTypes = new String[]{"text/xml"};
-    Edit action = new Edit();
+    EditAction action = new EditAction();
     ExpressionEvaluator expressionEvaluator = createStrictMock(ExpressionEvaluator.class);
     replay(expressionEvaluator);
 

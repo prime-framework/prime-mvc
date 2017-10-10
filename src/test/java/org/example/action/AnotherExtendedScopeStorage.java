@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,31 +16,15 @@
 package org.example.action;
 
 import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.action.result.annotation.Forward;
-import org.primeframework.mvc.parameter.annotation.PostParameterMethod;
+import org.primeframework.mvc.action.result.annotation.Status;
 
 /**
- * This is a simple test action.
- *
- * @author Brian Pontarelli
+ * @author Daniel DeGroff
  */
 @Action
-@Forward(code = "success")
-public class ExtensionInheritance extends Extension {
-  public boolean invoked = false;
-
-  public String post() {
-    invoked = true;
-    return "child";
-  }
-
-  @PostParameterMethod
-  public void method2() {
-
-  }
-
-  @PostParameterMethod
-  public void method3() {
-
+@Status
+public class AnotherExtendedScopeStorage extends BaseScopeStorageAction {
+  public String get() {
+    return "success";
   }
 }

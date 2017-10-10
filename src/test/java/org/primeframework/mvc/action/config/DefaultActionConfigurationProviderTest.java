@@ -22,10 +22,10 @@ import java.util.Map;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.example.action.KitchenSink;
-import org.example.action.Simple;
+import org.example.action.KitchenSinkAction;
+import org.example.action.SimpleAction;
 import org.example.action.TestAnnotation;
-import org.example.action.user.Index;
+import org.example.action.user.IndexAction;
 import org.example.domain.UserField;
 import org.primeframework.mvc.action.result.annotation.Forward;
 import org.primeframework.mvc.action.result.annotation.JSON;
@@ -64,14 +64,14 @@ public class DefaultActionConfigurationProviderTest {
     new DefaultActionConfigurationProvider(context, new DefaultActionConfigurationBuilder(new DefaultURIBuilder(), new HashSet<>(Arrays.asList(new JacksonActionConfigurator(), new BinaryActionConfigurator()))));
 
     Map<String, ActionConfiguration> config = c.getValue();
-    assertSame(config.get("/simple").actionClass, Simple.class);
+    assertSame(config.get("/simple").actionClass, SimpleAction.class);
     assertNotNull(config.get("/simple").annotation);
     assertEquals(config.get("/simple").executeMethods.size(), 8);
-    assertEquals(config.get("/simple").executeMethods.get(HTTPMethod.GET).method, Simple.class.getMethod("execute"));
-    assertEquals(config.get("/simple").executeMethods.get(HTTPMethod.POST).method, Simple.class.getMethod("execute"));
-    assertEquals(config.get("/simple").executeMethods.get(HTTPMethod.PUT).method, Simple.class.getMethod("execute"));
-    assertEquals(config.get("/simple").executeMethods.get(HTTPMethod.HEAD).method, Simple.class.getMethod("execute"));
-    assertEquals(config.get("/simple").executeMethods.get(HTTPMethod.DELETE).method, Simple.class.getMethod("execute"));
+    assertEquals(config.get("/simple").executeMethods.get(HTTPMethod.GET).method, SimpleAction.class.getMethod("execute"));
+    assertEquals(config.get("/simple").executeMethods.get(HTTPMethod.POST).method, SimpleAction.class.getMethod("execute"));
+    assertEquals(config.get("/simple").executeMethods.get(HTTPMethod.PUT).method, SimpleAction.class.getMethod("execute"));
+    assertEquals(config.get("/simple").executeMethods.get(HTTPMethod.HEAD).method, SimpleAction.class.getMethod("execute"));
+    assertEquals(config.get("/simple").executeMethods.get(HTTPMethod.DELETE).method, SimpleAction.class.getMethod("execute"));
     assertEquals(config.get("/simple").resultConfigurations.size(), 0);
     assertEquals(config.get("/simple").pattern, "");
     assertEquals(config.get("/simple").patternParts.length, 0);
@@ -79,17 +79,17 @@ public class DefaultActionConfigurationProviderTest {
     assertEquals(config.get("/simple").validationMethods.size(), 0);
 
     assertNotNull(config.get("/user/index"));
-    assertSame(Index.class, config.get("/user/index").actionClass);
+    assertSame(IndexAction.class, config.get("/user/index").actionClass);
     assertEquals(config.get("/user/index").uri, "/user/index");
 
-    assertSame(config.get("/kitchen-sink").actionClass, KitchenSink.class);
+    assertSame(config.get("/kitchen-sink").actionClass, KitchenSinkAction.class);
     assertNotNull(config.get("/kitchen-sink").annotation);
     assertNotNull(config.get("/kitchen-sink").annotations.get(TestAnnotation.class));
     assertEquals(config.get("/kitchen-sink").executeMethods.size(), 3);
-    assertEquals(config.get("/kitchen-sink").executeMethods.get(HTTPMethod.GET).method, KitchenSink.class.getMethod("get"));
+    assertEquals(config.get("/kitchen-sink").executeMethods.get(HTTPMethod.GET).method, KitchenSinkAction.class.getMethod("get"));
     assertNotNull(config.get("/kitchen-sink").executeMethods.get(HTTPMethod.GET).annotations.get(TestAnnotation.class));
-    assertEquals(config.get("/kitchen-sink").executeMethods.get(HTTPMethod.HEAD).method, KitchenSink.class.getMethod("get"));
-    assertEquals(config.get("/kitchen-sink").executeMethods.get(HTTPMethod.POST).method, KitchenSink.class.getMethod("post"));
+    assertEquals(config.get("/kitchen-sink").executeMethods.get(HTTPMethod.HEAD).method, KitchenSinkAction.class.getMethod("get"));
+    assertEquals(config.get("/kitchen-sink").executeMethods.get(HTTPMethod.POST).method, KitchenSinkAction.class.getMethod("post"));
     assertNull(config.get("/kitchen-sink").executeMethods.get(HTTPMethod.PUT));
     assertNull(config.get("/kitchen-sink").executeMethods.get(HTTPMethod.DELETE));
     assertEquals(config.get("/kitchen-sink").resultConfigurations.size(), 8);
@@ -131,7 +131,7 @@ public class DefaultActionConfigurationProviderTest {
     assertEquals(config.get("/kitchen-sink").preValidationMethods.size(), 1);
     assertEquals(config.get("/kitchen-sink").postValidationMethods.size(), 1);
     assertEquals(config.get("/kitchen-sink").validationMethods.size(), 1);
-    assertEquals(config.get("/kitchen-sink").validationMethods.get(HTTPMethod.POST).get(0).method, KitchenSink.class.getMethod("validate"));
+    assertEquals(config.get("/kitchen-sink").validationMethods.get(HTTPMethod.POST).get(0).method, KitchenSinkAction.class.getMethod("validate"));
     JacksonActionConfiguration jacksonActionConfiguration = (JacksonActionConfiguration) config.get("/kitchen-sink").additionalConfiguration.get(JacksonActionConfiguration.class);
     assertTrue(jacksonActionConfiguration.requestMembers.containsKey(HTTPMethod.POST));
     assertEquals(jacksonActionConfiguration.requestMembers.get(HTTPMethod.POST).name, "jsonRequest");

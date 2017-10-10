@@ -16,7 +16,7 @@
 package org.primeframework.mvc.control.form;
 
 import com.google.inject.Inject;
-import org.example.action.user.Edit;
+import org.example.action.user.EditAction;
 import org.example.domain.User;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.control.ControlBaseTest;
@@ -55,7 +55,7 @@ public class CheckboxTest extends ControlBaseTest {
 
   @Test
   public void action() {
-    Edit action = new Edit();
+    EditAction action = new EditAction();
     ais.setCurrent(new ActionInvocation(action, null, "/checkbox", null, null));
 
     // Test booleans
@@ -121,7 +121,7 @@ public class CheckboxTest extends ControlBaseTest {
 
   @Test
   public void defaultChecked() {
-    Edit action = new Edit();
+    EditAction action = new EditAction();
     ais.setCurrent(new ActionInvocation(action, null, "/checkbox", null, null));
 
     new ControlTester(checkbox).
@@ -137,7 +137,7 @@ public class CheckboxTest extends ControlBaseTest {
 
   @Test
   public void hardCodedChecked() {
-    Edit action = new Edit();
+    EditAction action = new EditAction();
     ais.setCurrent(new ActionInvocation(action, null, "/checkbox", null, null));
 
     new ControlTester(checkbox).
@@ -153,7 +153,7 @@ public class CheckboxTest extends ControlBaseTest {
 
   @Test
   public void fieldErrors() {
-    Edit action = new Edit();
+    EditAction action = new EditAction();
     ais.setCurrent(new ActionInvocation(action, null, "/checkbox", null, null));
 
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.male", "code1", "fieldError1"));
@@ -171,7 +171,7 @@ public class CheckboxTest extends ControlBaseTest {
 
   @Test
   public void uncheckedValue() {
-    Edit action = new Edit();
+    EditAction action = new EditAction();
     ais.setCurrent(new ActionInvocation(action, null, "/checkbox", null, null));
 
     new ControlTester(checkbox).

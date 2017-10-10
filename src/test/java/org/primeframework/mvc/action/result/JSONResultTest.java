@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import org.example.action.Post;
+import org.example.action.PostAction;
 import org.example.domain.AddressField;
 import org.example.domain.UserField;
 import org.example.domain.UserType;
@@ -95,7 +95,7 @@ public class JSONResultTest extends PrimeBaseTest {
     userField.siblings.add(new UserField("Beth"));
     userField.type = UserType.COOL;
 
-    Post action = new Post();
+    PostAction action = new PostAction();
     ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
     expect(ee.getValue("user", action)).andReturn(userField);
     replay(ee);
@@ -113,7 +113,7 @@ public class JSONResultTest extends PrimeBaseTest {
 
     Map<Class<?>, Object> additionalConfiguration = new HashMap<>();
     additionalConfiguration.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(null, "user"));
-    ActionConfiguration config = new ActionConfiguration(Post.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfiguration, null, null);
+    ActionConfiguration config = new ActionConfiguration(PostAction.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfiguration, null, null);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(action, new ExecuteMethodConfiguration(httpMethod, null, null), "/foo", "", config));
     replay(store);
@@ -171,7 +171,7 @@ public class JSONResultTest extends PrimeBaseTest {
 
   @Test(dataProvider = "httpMethod")
   public void errors(HTTPMethod httpMethod) throws IOException, ServletException {
-    Post action = new Post();
+    PostAction action = new PostAction();
     ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
     replay(ee);
 
@@ -188,7 +188,7 @@ public class JSONResultTest extends PrimeBaseTest {
 
     Map<Class<?>, Object> additionalConfiguration = new HashMap<>();
     additionalConfiguration.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(null, "user"));
-    ActionConfiguration config = new ActionConfiguration(Post.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfiguration, null, null);
+    ActionConfiguration config = new ActionConfiguration(PostAction.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfiguration, null, null);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
 
     expect(store.getCurrent()).andReturn(new ActionInvocation(action, new ExecuteMethodConfiguration(httpMethod, null, null), "/foo", "", config));

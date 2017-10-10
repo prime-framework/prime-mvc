@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,34 +13,27 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.example.action.user;
+package org.example.action;
 
-import com.google.inject.Inject;
-import org.example.domain.User;
 import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.servlet.HTTPMethod;
+import org.primeframework.mvc.action.result.annotation.Status;
 
 /**
- * @author Brian Pontarelli
+ * @author Daniel DeGroff
  */
 @Action
-public class Validatable implements org.primeframework.mvc.validation.Validatable {
-  private final HTTPMethod method;
-
-  public User user = new User();
-
-  @Inject
-  public Validatable(HTTPMethod method) {
-    this.method = method;
+@Status
+public class ExtendedScopeStorage extends BaseScopeStorageAction {
+  public String get() {
+    return "success";
   }
 
-  @Override
-  public void validate() {
-    if (method == HTTPMethod.POST) {
-    }
-  }
-
+  @SuppressWarnings("Duplicates")
   public String post() {
+    actionSessionObject = new Object();
+    sessionObject = new Object();
+    contextObject = new Object();
+    requestObject = new Object();
     return "success";
   }
 }

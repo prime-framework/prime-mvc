@@ -21,7 +21,7 @@ import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.example.action.KitchenSink;
+import org.example.action.KitchenSinkAction;
 import org.example.domain.UserField;
 import org.example.domain.UserType;
 import org.primeframework.mock.servlet.MockServletInputStream;
@@ -65,8 +65,8 @@ public class DefaultContentWorkflowTest extends PrimeBaseTest {
     Map<Class<?>, Object> additionalConfig = new HashMap<>();
     additionalConfig.put(BinaryActionConfiguration.class, new BinaryActionConfiguration("binaryRequest", null));
 
-    KitchenSink action = new KitchenSink(null);
-    ActionConfiguration config = new ActionConfiguration(KitchenSink.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null, null);
+    KitchenSinkAction action = new KitchenSinkAction(null);
+    ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null, null);
     store.setCurrent(new ActionInvocation(action, null, null, null, config));
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
@@ -123,8 +123,8 @@ public class DefaultContentWorkflowTest extends PrimeBaseTest {
     requestMembers.put(HTTPMethod.POST, new RequestMember("jsonRequest", UserField.class));
     additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(requestMembers, null));
 
-    KitchenSink action = new KitchenSink(null);
-    ActionConfiguration config = new ActionConfiguration(KitchenSink.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null, null);
+    KitchenSinkAction action = new KitchenSinkAction(null);
+    ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null, null);
     store.setCurrent(new ActionInvocation(action, new ExecuteMethodConfiguration(HTTPMethod.POST, null, null), null, null, config));
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +15,24 @@
  */
 package org.example.action;
 
-import org.primeframework.mvc.action.annotation.Action;
+import org.primeframework.mvc.scope.annotation.ActionSession;
+import org.primeframework.mvc.scope.annotation.Context;
+import org.primeframework.mvc.scope.annotation.Request;
 import org.primeframework.mvc.scope.annotation.Session;
 
 /**
- * @author Brian Pontarelli
+ * @author Daniel DeGroff
  */
-@Action
-public class ScopeStorage {
+public abstract class BaseScopeStorageAction {
   @Session
   public Object sessionObject;
 
-  public String post() {
-    sessionObject = new Object();
-    return "success";
-  }
+  @Context
+  public Object contextObject;
+
+  @Request
+  public Object requestObject;
+
+  @ActionSession
+  public Object actionSessionObject;
 }

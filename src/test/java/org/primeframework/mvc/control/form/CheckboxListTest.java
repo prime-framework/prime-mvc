@@ -17,7 +17,7 @@ package org.primeframework.mvc.control.form;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.example.action.user.Edit;
+import org.example.action.user.EditAction;
 import org.example.domain.Address;
 import org.example.domain.User;
 import org.primeframework.mvc.action.ActionInvocation;
@@ -42,7 +42,7 @@ public class CheckboxListTest extends ControlBaseTest {
   public void action() {
     Address address = new Address();
     address.setCountry("US");
-    Edit action = new Edit();
+    EditAction action = new EditAction();
     action.user = new User();
     action.user.setAddress("work", address);
 
@@ -93,7 +93,7 @@ public class CheckboxListTest extends ControlBaseTest {
   public void expressions() {
     Address address = new Address();
     address.setCountry("US");
-    Edit action = new Edit();
+    EditAction action = new EditAction();
     action.user = new User();
     action.user.setAddress("work", address);
 
@@ -125,7 +125,7 @@ public class CheckboxListTest extends ControlBaseTest {
   public void fieldErrors() {
     Address address = new Address();
     address.setCountry("US");
-    Edit action = new Edit();
+    EditAction action = new EditAction();
     action.user = new User();
     action.user.setAddress("work", address);
 
@@ -154,7 +154,7 @@ public class CheckboxListTest extends ControlBaseTest {
   public void html() {
     Address address = new Address();
     address.setCountry("<US>");
-    Edit action = new Edit();
+    EditAction action = new EditAction();
     action.user = new User();
     action.user.setAddress("work", address);
 

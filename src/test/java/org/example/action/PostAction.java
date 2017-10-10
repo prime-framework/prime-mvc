@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2010, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  */
 package org.example.action;
 
+import org.example.domain.AddressField;
+import org.example.domain.UserField;
 import org.primeframework.mvc.action.annotation.Action;
 
 /**
@@ -23,11 +25,18 @@ import org.primeframework.mvc.action.annotation.Action;
  * @author Brian Pontarelli
  */
 @Action
-public class Head {
+public class PostAction {
+  public UserField user;
   public boolean invoked = false;
 
-  public String head() {
+  public String post() {
     invoked = true;
+    user = new UserField();
+    user.age = 35;
+    user.name = "Brian Pontarelli";
+    user.addresses.put("home", new AddressField());
+    user.addresses.get("home").city = "Broomfield";
+    user.addresses.get("home").state = "CO";
     return "success";
   }
 }

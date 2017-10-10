@@ -32,14 +32,12 @@ import static org.testng.Assert.assertNotNull;
 @Action
 @Status
 public class BinaryAction {
-
   public String expected;
 
   @BinaryRequest
   public Path file;
 
   public String post() {
-
     assertNotNull(expected, "You need to pass in the expected value on the request.");
     assertNotNull(file);
     try {

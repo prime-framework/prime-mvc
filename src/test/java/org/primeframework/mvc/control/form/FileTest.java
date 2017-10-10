@@ -15,7 +15,7 @@
  */
 package org.primeframework.mvc.control.form;
 
-import org.example.action.user.Edit;
+import org.example.action.user.EditAction;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.control.ControlBaseTest;
 import org.primeframework.mvc.message.MessageType;
@@ -48,7 +48,7 @@ public class FileTest extends ControlBaseTest {
 
   @Test
   public void action() {
-    Edit action = new Edit();
+    EditAction action = new EditAction();
     ais.setCurrent(new ActionInvocation(action, null, "/file", null, null));
 
     new ControlTester(file).
@@ -62,7 +62,7 @@ public class FileTest extends ControlBaseTest {
 
   @Test
   public void htmlLabel() {
-    Edit action = new Edit();
+    EditAction action = new EditAction();
     ais.setCurrent(new ActionInvocation(action, null, "/file", null, null));
 
     // This verifies that HTML is left in for labels. That way people can style their labels in the message properties files
@@ -77,7 +77,7 @@ public class FileTest extends ControlBaseTest {
 
   @Test
   public void fieldErrors() {
-    Edit action = new Edit();
+    EditAction action = new EditAction();
     ais.setCurrent(new ActionInvocation(action, null, "/file", null, null));
 
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.profile", "code1", "fieldError1"));

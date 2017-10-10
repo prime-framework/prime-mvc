@@ -28,7 +28,7 @@ import org.primeframework.mvc.content.json.annotation.JSONResponse;
  */
 @Action("{id}")
 @JSON
-public class InvalidApi {
+public class InvalidApiAction {
   public ActionType action;
 
   @JSONRequest

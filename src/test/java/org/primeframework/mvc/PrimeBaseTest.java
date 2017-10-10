@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.example.action.user.Edit;
+import org.example.action.user.EditAction;
 import org.primeframework.jwt.Verifier;
 import org.primeframework.mock.servlet.MockHttpServletRequest;
 import org.primeframework.mock.servlet.MockHttpServletResponse;
@@ -177,7 +177,7 @@ public abstract class PrimeBaseTest {
     resultConfigurations.put(resultCode, annotation);
 
     return new ActionInvocation(action, executeMethod, uri, extension,
-        new ActionConfiguration(Edit.class, executeMethods, validationMethods, new ArrayList<>(), null, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), resultConfigurations, new HashMap<>(), new HashMap<>(), new HashSet<>(), new ArrayList<>(), new HashMap<>(), uri, new ArrayList<>()
+        new ActionConfiguration(EditAction.class, executeMethods, validationMethods, new ArrayList<>(), null, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), resultConfigurations, new HashMap<>(), new HashMap<>(), new HashSet<>(), new ArrayList<>(), new HashMap<>(), uri, new ArrayList<>()
         ));
   }
 

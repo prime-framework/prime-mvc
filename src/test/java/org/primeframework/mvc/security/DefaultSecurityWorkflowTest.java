@@ -19,9 +19,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.example.action.Post;
-import org.example.action.Secure;
-import org.example.action.SecureNoRoles;
+import org.example.action.PostAction;
+import org.example.action.SecureAction;
+import org.example.action.SecureNoRolesAction;
 import org.primeframework.mock.servlet.MockHttpServletRequest.Method;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
@@ -48,8 +48,8 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
 
   @Test
   public void performAuthenticationNotRequired() throws Exception {
-    ActionConfiguration configuration = actionConfigurationBuilder.build(Post.class);
-    ActionInvocation actionInvocation = new ActionInvocation(new Post(), null, null, null, configuration);
+    ActionConfiguration configuration = actionConfigurationBuilder.build(PostAction.class);
+    ActionInvocation actionInvocation = new ActionInvocation(new PostAction(), null, null, null, configuration);
     DefaultActionInvocationStore store = new DefaultActionInvocationStore(request);
     store.setCurrent(actionInvocation);
 
@@ -68,8 +68,8 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
 
   @Test
   public void performAuthenticationRequiredNoRolesRequired() throws Exception {
-    ActionConfiguration configuration = actionConfigurationBuilder.build(SecureNoRoles.class);
-    ActionInvocation actionInvocation = new ActionInvocation(new SecureNoRoles(), null, null, null, configuration);
+    ActionConfiguration configuration = actionConfigurationBuilder.build(SecureNoRolesAction.class);
+    ActionInvocation actionInvocation = new ActionInvocation(new SecureNoRolesAction(), null, null, null, configuration);
     DefaultActionInvocationStore store = new DefaultActionInvocationStore(request);
     store.setCurrent(actionInvocation);
 
@@ -89,8 +89,8 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
 
   @Test
   public void performAuthenticationRequiredNotLoggedInGET() throws Exception {
-    ActionConfiguration configuration = actionConfigurationBuilder.build(Secure.class);
-    ActionInvocation actionInvocation = new ActionInvocation(new Secure(), null, null, null, configuration);
+    ActionConfiguration configuration = actionConfigurationBuilder.build(SecureAction.class);
+    ActionInvocation actionInvocation = new ActionInvocation(new SecureAction(), null, null, null, configuration);
     DefaultActionInvocationStore store = new DefaultActionInvocationStore(request);
     store.setCurrent(actionInvocation);
 
@@ -118,8 +118,8 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
 
   @Test
   public void performAuthenticationRequiredNotLoggedInPOST() throws Exception {
-    ActionConfiguration configuration = actionConfigurationBuilder.build(Secure.class);
-    ActionInvocation actionInvocation = new ActionInvocation(new Secure(), null, null, null, configuration);
+    ActionConfiguration configuration = actionConfigurationBuilder.build(SecureAction.class);
+    ActionInvocation actionInvocation = new ActionInvocation(new SecureAction(), null, null, null, configuration);
     DefaultActionInvocationStore store = new DefaultActionInvocationStore(request);
     store.setCurrent(actionInvocation);
 
@@ -147,8 +147,8 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
 
   @Test
   public void performAuthenticationRequiredSuccess() throws Exception {
-    ActionConfiguration configuration = actionConfigurationBuilder.build(Secure.class);
-    ActionInvocation actionInvocation = new ActionInvocation(new Secure(), null, null, null, configuration);
+    ActionConfiguration configuration = actionConfigurationBuilder.build(SecureAction.class);
+    ActionInvocation actionInvocation = new ActionInvocation(new SecureAction(), null, null, null, configuration);
     DefaultActionInvocationStore store = new DefaultActionInvocationStore(request);
     store.setCurrent(actionInvocation);
 
@@ -168,8 +168,8 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
 
   @Test
   public void performAuthenticationRequiredWrongRoles() throws Exception {
-    ActionConfiguration configuration = actionConfigurationBuilder.build(Secure.class);
-    ActionInvocation actionInvocation = new ActionInvocation(new Secure(), null, null, null, configuration);
+    ActionConfiguration configuration = actionConfigurationBuilder.build(SecureAction.class);
+    ActionInvocation actionInvocation = new ActionInvocation(new SecureAction(), null, null, null, configuration);
     DefaultActionInvocationStore store = new DefaultActionInvocationStore(request);
     store.setCurrent(actionInvocation);
 
@@ -193,8 +193,8 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
 
   @Test
   public void performNotConfigured() throws Exception {
-    ActionConfiguration configuration = actionConfigurationBuilder.build(Post.class);
-    ActionInvocation actionInvocation = new ActionInvocation(new Post(), null, null, null, configuration);
+    ActionConfiguration configuration = actionConfigurationBuilder.build(PostAction.class);
+    ActionInvocation actionInvocation = new ActionInvocation(new PostAction(), null, null, null, configuration);
     DefaultActionInvocationStore store = new DefaultActionInvocationStore(request);
     store.setCurrent(actionInvocation);
 

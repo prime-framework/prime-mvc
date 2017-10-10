@@ -13,34 +13,47 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.example.action;
+package org.example.action.user;
 
-import org.example.domain.UserField;
+import org.example.domain.User;
 import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.action.result.annotation.JSON;
-import org.primeframework.mvc.content.json.annotation.JSONRequest;
-import org.primeframework.mvc.content.json.annotation.JSONResponse;
+import org.primeframework.mvc.action.result.annotation.Forward;
+import org.primeframework.mvc.control.form.annotation.FormPrepareMethod;
+import org.primeframework.mvc.parameter.annotation.PreParameterMethod;
+
 
 /**
- * This is a simple test action.
+ * This class is a simple edit action for testing.
  *
  * @author Brian Pontarelli
  */
 @Action
-@JSON
-public class Api {
-  public ActionType action;
+@Forward(page = "")
+public class EditAction {
+  public static final SomeEnum[] values = SomeEnum.values();
 
-  @JSONRequest
-  @JSONResponse
-  public UserField user;
+  public SomeEnum enumValue = SomeEnum.VALUE1;
+
+  public User user;
+
+  public boolean preParameter = false;
+  public boolean formPrepared = false;
+
+  public String execute() {
+    return "success";
+  }
 
   public String post() {
     return "success";
   }
 
-  public static enum ActionType {
-    ADD,
-    EDIT
+  @PreParameterMethod
+  public void prepare() {
+    preParameter = true;
+  }
+
+  @FormPrepareMethod
+  public void formPrepare() {
+    formPrepared = true;
   }
 }

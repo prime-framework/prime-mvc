@@ -13,30 +13,18 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.example.action;
+package org.example.action.user;
 
-import org.example.domain.AddressField;
-import org.example.domain.UserField;
 import org.primeframework.mvc.action.annotation.Action;
 
 /**
- * This is a simple test action.
+ * This is a test index action.
  *
  * @author Brian Pontarelli
  */
 @Action
-public class Post {
-  public UserField user;
-  public boolean invoked = false;
-
-  public String post() {
-    invoked = true;
-    user = new UserField();
-    user.age = 35;
-    user.name = "Brian Pontarelli";
-    user.addresses.put("home", new AddressField());
-    user.addresses.get("home").city = "Broomfield";
-    user.addresses.get("home").state = "CO";
-    return "success";
+public class IndexAction {
+  public String execute() {
+    return null;
   }
 }

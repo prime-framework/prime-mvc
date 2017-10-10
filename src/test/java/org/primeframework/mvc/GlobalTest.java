@@ -44,7 +44,6 @@ import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import freemarker.template.Configuration;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertSame;
 
 /**
@@ -364,10 +363,39 @@ public class GlobalTest extends PrimeBaseTest {
   public void post_scopeStorage() throws Exception {
     // Tests that the expression evaluator safely gets skipped while looking for values and Prime then checks the
     // HttpServletRequest and finds the value
-    simulator.test("/scope-storage")
-             .post();
+    test.simulate(() -> test.simulator.test("/scope-storage")
+                                      .post())
+        .assertContextAttributeNotNull("contextObject")
+        .assertRequestAttributeNotNull("requestObject")
+        .assertActionSessionAttributeNotNull("org.example.action.ScopeStorageAction", "actionSessionObject")
+        .assertSessionAttributeNotNull("sessionObject");
+  }
 
-    assertNotNull(simulator.session.getAttribute("sessionObject"));
+  @Test
+  public void post_scopeStorageInBaseClass() throws Exception {
+    // Set values during POST - fields exist in base abstract class
+    test.simulate(() -> test.simulator.test("/extended-scope-storage")
+                                      .post())
+        .assertContextAttributeNotNull("contextObject")
+        .assertRequestAttributeNotNull("requestObject")
+        .assertActionSessionAttributeNotNull("org.example.action.ExtendedScopeStorage", "actionSessionObject")
+        .assertSessionAttributeNotNull("sessionObject")
+
+        // Call [GET] -- assume everything is set from prior request except request attribute is null.
+        .simulate(() -> test.simulator.test("/extended-scope-storage")
+                                      .get())
+        .assertContextAttributeNotNull("contextObject")
+        .assertRequestAttributeIsNull("requestObject")
+        .assertActionSessionAttributeNotNull("org.example.action.ExtendedScopeStorage", "actionSessionObject")
+        .assertSessionAttributeNotNull("sessionObject")
+
+        // Call [GET] on a different action -- only action and context attributes come over, request and action session are null.
+        .simulate(() -> test.simulator.test("/another-extended-scope-storage")
+                                      .get())
+        .assertContextAttributeNotNull("contextObject")
+        .assertRequestAttributeIsNull("requestObject")
+        .assertActionSessionAttributeIsNull("org.example.action.AnotherExtendedScopeStorage", "actionSessionObject")
+        .assertSessionAttributeNotNull("sessionObject");
   }
 
   @Test

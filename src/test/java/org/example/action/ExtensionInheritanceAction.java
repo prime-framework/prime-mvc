@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 package org.example.action;
 
 import org.primeframework.mvc.action.annotation.Action;
+import org.primeframework.mvc.action.result.annotation.Forward;
+import org.primeframework.mvc.parameter.annotation.PostParameterMethod;
 
 /**
  * This is a simple test action.
@@ -23,11 +25,22 @@ import org.primeframework.mvc.action.annotation.Action;
  * @author Brian Pontarelli
  */
 @Action
-public class Simple {
+@Forward(code = "success")
+public class ExtensionInheritanceAction extends Extension {
   public boolean invoked = false;
 
-  public String execute() {
+  public String post() {
     invoked = true;
-    return "success";
+    return "child";
+  }
+
+  @PostParameterMethod
+  public void method2() {
+
+  }
+
+  @PostParameterMethod
+  public void method3() {
+
   }
 }

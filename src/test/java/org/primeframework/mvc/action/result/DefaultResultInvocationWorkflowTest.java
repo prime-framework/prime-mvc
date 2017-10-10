@@ -15,7 +15,7 @@
  */
 package org.primeframework.mvc.action.result;
 
-import org.example.action.user.Edit;
+import org.example.action.user.EditAction;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
@@ -168,7 +168,7 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
   @Test
   public void actionMissingResult() throws Exception {
     ForwardImpl annotation = new ForwardImpl("/user/edit", "success");
-    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, new Edit(), "post", "/user/edit", "", "success", annotation);
+    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, new EditAction(), "post", "/user/edit", "", "success", annotation);
     ActionInvocationStore ais = createStrictMock(ActionInvocationStore.class);
     expect(ais.getCurrent()).andReturn(ai);
     replay(ais);
@@ -245,7 +245,7 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
   @Test
   public void actionWithResult() throws Exception {
     ForwardImpl annotation = new ForwardImpl("/user/edit", "success");
-    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, new Edit(), "post", "/user/edit", "", "success", annotation);
+    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, new EditAction(), "post", "/user/edit", "", "success", annotation);
     ActionInvocationStore ais = createStrictMock(ActionInvocationStore.class);
     expect(ais.getCurrent()).andReturn(ai);
     replay(ais);

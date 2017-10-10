@@ -15,7 +15,7 @@
  */
 package org.primeframework.mvc.content.binary;
 
-import org.example.action.KitchenSink;
+import org.example.action.KitchenSinkAction;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.testng.annotations.Test;
 
@@ -27,7 +27,7 @@ import static org.testng.Assert.assertEquals;
 public class BinaryActionConfiguratorTest extends PrimeBaseTest {
   @Test
   public void configure() {
-    BinaryActionConfiguration config = (BinaryActionConfiguration) new BinaryActionConfigurator().configure(KitchenSink.class);
+    BinaryActionConfiguration config = (BinaryActionConfiguration) new BinaryActionConfigurator().configure(KitchenSinkAction.class);
     assertEquals(config.requestMember, "binaryRequest");
     assertEquals(config.responseMember, "binaryResponse");
   }

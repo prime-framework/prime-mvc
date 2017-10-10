@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,18 +13,23 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.example.action;
+package org.primeframework.mvc.util;
 
-import org.primeframework.mvc.action.annotation.Action;
+import java.util.concurrent.Callable;
 
 /**
- * Secure action.
+ * Identical to the {@link Callable} interface except that the <code>run</code> method may throw {@link Exception}.
  *
- * @author Brian Pontarelli
+ * @author Daniel DeGroff
  */
-@Action(requiresAuthentication = true, constraints = {"admin", "user"})
-public class Secure {
-  public String get() {
-    return "success";
-  }
+@FunctionalInterface
+public interface ThrowingCallable<V> {
+
+  /**
+   * Identical to {@link Callable#call()} except it is declared as throwing {@link Exception}.
+   *
+   * @throws Exception
+   * @see Callable#call()
+   */
+  V call() throws Exception;
 }

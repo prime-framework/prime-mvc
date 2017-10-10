@@ -15,22 +15,16 @@
  */
 package org.example.action;
 
-import java.util.List;
-
 import org.primeframework.mvc.action.annotation.Action;
 
 /**
- * Action for testing the escaping / unescaping of path segments used as request parameters
+ * Secure action.
  *
- * @author Daniel DeGroff
+ * @author Brian Pontarelli
  */
-@Action("{parm}/{*theRest}")
-public class EscapedPathSegments {
-  public String parm;
-
-  public List<String> theRest;
-
-  public String execute() {
+@Action(requiresAuthentication = true, constraints = {"admin", "user"})
+public class SecureAction {
+  public String get() {
     return "success";
   }
 }

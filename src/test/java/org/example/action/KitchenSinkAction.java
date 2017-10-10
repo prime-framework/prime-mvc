@@ -58,7 +58,7 @@ import org.primeframework.mvc.validation.annotation.PreValidationMethod;
 @JSON(code = "json", status = 201)
 @Binary(code = "binary", status = 201)
 @TestAnnotation
-public class KitchenSink extends KitchenSinkSuperclass implements Validatable {
+public class KitchenSinkAction extends KitchenSinkSuperclass implements Validatable {
   private final MessageStore messageStore;
 
   @Session
@@ -77,7 +77,7 @@ public class KitchenSink extends KitchenSinkSuperclass implements Validatable {
   public User jsonResponse;
 
   @Inject
-  public KitchenSink(MessageStore messageStore) {
+  public KitchenSinkAction(MessageStore messageStore) {
     this.messageStore = messageStore;
   }
 

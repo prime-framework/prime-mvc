@@ -15,7 +15,7 @@
  */
 package org.primeframework.mvc.control.form;
 
-import org.example.action.user.Edit;
+import org.example.action.user.EditAction;
 import org.example.domain.User;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.control.ControlBaseTest;
@@ -48,7 +48,7 @@ public class TextareaTest extends ControlBaseTest {
 
   @Test
   public void action() {
-    Edit action = new Edit();
+    EditAction action = new EditAction();
     action.user = new User();
     action.user.setName("Brian");
 
@@ -64,7 +64,7 @@ public class TextareaTest extends ControlBaseTest {
 
   @Test
   public void html() {
-    Edit action = new Edit();
+    EditAction action = new EditAction();
     action.user = new User();
     action.user.setName("<b>brian</b>");
 
@@ -80,7 +80,7 @@ public class TextareaTest extends ControlBaseTest {
 
   @Test
   public void fieldErrors() {
-    Edit action = new Edit();
+    EditAction action = new EditAction();
     action.user = new User();
     action.user.setName("Barry");
 
@@ -100,7 +100,7 @@ public class TextareaTest extends ControlBaseTest {
 
   @Test
   public void defaultValue() {
-    Edit action = new Edit();
+    EditAction action = new EditAction();
 
     ais.setCurrent(new ActionInvocation(action, null, "/textarea", null, null));
 
@@ -116,7 +116,7 @@ public class TextareaTest extends ControlBaseTest {
 
   @Test
   public void hardCodedValue() {
-    Edit action = new Edit();
+    EditAction action = new EditAction();
     action.user = new User();
     action.user.setName("Brian");
 

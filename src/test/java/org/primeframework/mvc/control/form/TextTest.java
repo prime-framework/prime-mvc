@@ -15,7 +15,7 @@
  */
 package org.primeframework.mvc.control.form;
 
-import org.example.action.user.Edit;
+import org.example.action.user.EditAction;
 import org.example.domain.User;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.control.ControlBaseTest;
@@ -48,7 +48,7 @@ public class TextTest extends ControlBaseTest {
 
   @Test
   public void action() {
-    Edit action = new Edit();
+    EditAction action = new EditAction();
     action.user = new User();
     action.user.setName("Brian");
 
@@ -64,7 +64,7 @@ public class TextTest extends ControlBaseTest {
 
   @Test
   public void html() {
-    Edit action = new Edit();
+    EditAction action = new EditAction();
     action.user = new User();
     action.user.setName("<Brian>");
 
@@ -107,7 +107,7 @@ public class TextTest extends ControlBaseTest {
 
   @Test
   public void fieldErrors() {
-    Edit action = new Edit();
+    EditAction action = new EditAction();
     action.user = new User();
     action.user.setName("Barry");
 
@@ -127,7 +127,7 @@ public class TextTest extends ControlBaseTest {
 
   @Test
   public void defaultValue() {
-    Edit action = new Edit();
+    EditAction action = new EditAction();
 
     ais.setCurrent(new ActionInvocation(action, null, "/text", null, null));
 
@@ -143,7 +143,7 @@ public class TextTest extends ControlBaseTest {
 
   @Test
   public void hardCodedValue() {
-    Edit action = new Edit();
+    EditAction action = new EditAction();
     action.user = new User();
     action.user.setName("Brian");
 
@@ -161,7 +161,7 @@ public class TextTest extends ControlBaseTest {
 
   @Test
   public void labelKey() {
-    Edit action = new Edit();
+    EditAction action = new EditAction();
     action.user = new User();
     action.user.setName("Brian");
 

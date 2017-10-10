@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,33 @@
 package org.example.action;
 
 import org.primeframework.mvc.action.annotation.Action;
+import org.primeframework.mvc.scope.annotation.ActionSession;
+import org.primeframework.mvc.scope.annotation.Context;
+import org.primeframework.mvc.scope.annotation.Request;
+import org.primeframework.mvc.scope.annotation.Session;
 
 /**
- * Secure action.
- *
  * @author Brian Pontarelli
  */
-@Action(requiresAuthentication = true)
-public class SecureNoRoles {
-  public String get() {
+@Action
+public class ScopeStorageAction {
+  @Session
+  public Object sessionObject;
+
+  @Context
+  public Object contextObject;
+
+  @Request
+  public Object requestObject;
+
+  @ActionSession
+  public Object actionSessionObject;
+
+  public String post() {
+    actionSessionObject = new Object();
+    sessionObject = new Object();
+    contextObject = new Object();
+    requestObject = new Object();
     return "success";
   }
 }

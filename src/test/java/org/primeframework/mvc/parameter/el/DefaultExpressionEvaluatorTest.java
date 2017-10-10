@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.HashMap;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.example.action.ExtensionInheritance;
+import org.example.action.ExtensionInheritanceAction;
 import org.example.domain.Action;
 import org.example.domain.ActionField;
 import org.example.domain.Address;
@@ -166,7 +166,7 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
 
   @Test
   public void fieldInheritance() {
-    ExtensionInheritance action = new ExtensionInheritance();
+    ExtensionInheritanceAction action = new ExtensionInheritanceAction();
 
     // Manually set the field and then retrieve it from the base class
     action.baseField = "bar";

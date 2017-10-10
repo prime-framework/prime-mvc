@@ -17,9 +17,9 @@ package org.primeframework.mvc.parameter;
 
 import javax.servlet.http.HttpServletRequestWrapper;
 
-import org.example.action.ComplexRest;
-import org.example.action.EscapedPathSegments;
-import org.example.action.user.Edit;
+import org.example.action.ComplexRestAction;
+import org.example.action.EscapedPathSegmentsAction;
+import org.example.action.user.EditAction;
 import org.example.action.user.RESTEdit;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
@@ -41,7 +41,7 @@ public class DefaultURIParameterWorkflowTest extends PrimeBaseTest {
   @Test
   public void noParameters() throws Exception {
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    ActionInvocation ai = makeActionInvocation(new Edit(), HTTPMethod.POST, "");
+    ActionInvocation ai = makeActionInvocation(new EditAction(), HTTPMethod.POST, "");
     expect(store.getCurrent()).andReturn(ai);
     replay(store);
 
@@ -78,7 +78,7 @@ public class DefaultURIParameterWorkflowTest extends PrimeBaseTest {
 
   @Test
   public void escapedParameters() throws Exception {
-    EscapedPathSegments action = new EscapedPathSegments();
+    EscapedPathSegmentsAction action = new EscapedPathSegmentsAction();
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     ActionInvocation ai = makeActionInvocation(action, HTTPMethod.POST, "", "foo%20bar", "foobar", "foo%20bar", "foo@bar");
     expect(store.getCurrent()).andReturn(ai);
@@ -102,7 +102,7 @@ public class DefaultURIParameterWorkflowTest extends PrimeBaseTest {
 
   @Test
   public void complexParameters() throws Exception {
-    ComplexRest action = new ComplexRest();
+    ComplexRestAction action = new ComplexRestAction();
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     ActionInvocation ai = makeActionInvocation(action, HTTPMethod.POST, "", "brian", "static", "pontarelli", "then", "a", "bunch", "of", "stuff");
     expect(store.getCurrent()).andReturn(ai);

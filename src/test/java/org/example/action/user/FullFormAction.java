@@ -15,9 +15,16 @@
  */
 package org.example.action.user;
 
-import org.example.domain.AddressField;
+import org.example.domain.Role;
 import org.example.domain.UserField;
+import org.example.domain.UserType;
 import org.primeframework.mvc.action.annotation.Action;
+import org.primeframework.mvc.parameter.fileupload.FileInfo;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.util.Arrays.asList;
 
 /**
  * This class is a simple edit action for testing.
@@ -25,19 +32,28 @@ import org.primeframework.mvc.action.annotation.Action;
  * @author Brian Pontarelli
  */
 @Action
-public class DetailsFields {
+public class FullFormAction {
+  public List<Role> roles = asList(new Role(1, "Admin"), new Role(2, "User"));
+  public UserType[] userTypes = UserType.values();
+  public List<Integer> ages = new ArrayList<Integer>();
+
   public UserField user;
 
-  public String execute() {
-    user = new UserField();
-    user.age = 12;
-    user.name = "Frank";
-    user.securityQuestions = new String[]{"One", "Two"};
-    user.addresses.put("home", new AddressField());
-    user.addresses.get("home").street = "123 Main St.";
-    user.addresses.get("home").city = "Springfield";
-    user.addresses.get("home").state = "IL";
-    user.addresses.get("home").zipcode = "00000";
+  public List<Integer> roleIds;
+
+  public FileInfo image;
+
+  public FullFormAction() {
+    for (int i = 1; i < 100; i++) {
+      ages.add(i);
+    }
+  }
+
+  public String get() {
+    return "input";
+  }
+
+  public String post() {
     return "success";
   }
 }

@@ -17,7 +17,7 @@ package org.primeframework.mvc.control.form;
 
 import java.time.ZonedDateTime;
 
-import org.example.action.user.Edit;
+import org.example.action.user.EditAction;
 import org.example.domain.User;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.control.ControlBaseTest;
@@ -62,7 +62,7 @@ public class YearSelectTest extends ControlBaseTest {
 
   @Test
   public void action() {
-    Edit edit = new Edit();
+    EditAction edit = new EditAction();
     edit.user = new User();
     edit.user.setYear(2003);
 

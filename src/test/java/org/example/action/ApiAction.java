@@ -15,7 +15,11 @@
  */
 package org.example.action;
 
+import org.example.domain.UserField;
 import org.primeframework.mvc.action.annotation.Action;
+import org.primeframework.mvc.action.result.annotation.JSON;
+import org.primeframework.mvc.content.json.annotation.JSONRequest;
+import org.primeframework.mvc.content.json.annotation.JSONResponse;
 
 /**
  * This is a simple test action.
@@ -23,11 +27,20 @@ import org.primeframework.mvc.action.annotation.Action;
  * @author Brian Pontarelli
  */
 @Action
-public class ExecuteMethodThrowsException {
-  public boolean invoked = false;
+@JSON
+public class ApiAction {
+  public ActionType action;
 
-  public String execute() {
-    invoked = true;
-    throw new IllegalArgumentException();
+  @JSONRequest
+  @JSONResponse
+  public UserField user;
+
+  public String post() {
+    return "success";
+  }
+
+  public static enum ActionType {
+    ADD,
+    EDIT
   }
 }

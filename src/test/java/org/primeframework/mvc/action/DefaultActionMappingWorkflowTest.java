@@ -24,8 +24,8 @@ import java.util.Map;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.example.action.ComplexRest;
-import org.example.action.user.Edit;
+import org.example.action.ComplexRestAction;
+import org.example.action.user.EditAction;
 import org.example.action.user.RESTEdit;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.config.ActionConfiguration;
@@ -94,7 +94,7 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     ActionConfigurationProvider provider = EasyMock.createStrictMock(ActionConfigurationProvider.class);
     EasyMock.expect(provider.lookup("/foo")).andReturn(null);
     EasyMock.expect(provider.lookup("/foo/index")).andReturn(
-        new ActionConfiguration(ComplexRest.class, new HashMap<>(),
+        new ActionConfiguration(ComplexRestAction.class, new HashMap<>(),
             new HashMap<>(), new ArrayList<>(), null, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new HashMap<>(),
             new HashMap<>(), new HashMap<>(), new HashSet<>(), new ArrayList<>(), new HashMap<>(), "/foo/index", new ArrayList<>()
         ));
@@ -148,7 +148,7 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     request.setParameter("submit", "Submit");
 
     Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods = new HashMap<>();
-    executeMethods.put(HTTPMethod.POST, new ExecuteMethodConfiguration(HTTPMethod.POST, Edit.class.getMethod("execute"), null));
+    executeMethods.put(HTTPMethod.POST, new ExecuteMethodConfiguration(HTTPMethod.POST, EditAction.class.getMethod("execute"), null));
 
     ActionConfigurationProvider provider = EasyMock.createStrictMock(ActionConfigurationProvider.class);
     EasyMock.expect(provider.lookup("/complex-rest/brian/static/pontarelli/then/a/bunch/of/stuff")).andReturn(null);
@@ -161,7 +161,7 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     EasyMock.expect(provider.lookup("/complex-rest/brian/static")).andReturn(null);
     EasyMock.expect(provider.lookup("/complex-rest/brian")).andReturn(null);
     EasyMock.expect(provider.lookup("/complex-rest")).andReturn(
-        new ActionConfiguration(ComplexRest.class, executeMethods,
+        new ActionConfiguration(ComplexRestAction.class, executeMethods,
             new HashMap<>(), new ArrayList<>(), null, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new HashMap<>(),
             new HashMap<>(), new HashMap<>(), new HashSet<>(), new ArrayList<>(), new HashMap<>(), "/complex-rest", new ArrayList<>()
         ));
@@ -174,7 +174,7 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     EasyMock.replay(store);
 
     Injector injector = EasyMock.createStrictMock(Injector.class);
-    EasyMock.expect(injector.getInstance(ComplexRest.class)).andReturn(new ComplexRest());
+    EasyMock.expect(injector.getInstance(ComplexRestAction.class)).andReturn(new ComplexRestAction());
     EasyMock.replay(injector);
 
     WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);
@@ -203,7 +203,7 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     request.setParameter("submit", "Submit");
 
     Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods = new HashMap<>();
-    executeMethods.put(HTTPMethod.POST, new ExecuteMethodConfiguration(HTTPMethod.POST, Edit.class.getMethod("execute"), null));
+    executeMethods.put(HTTPMethod.POST, new ExecuteMethodConfiguration(HTTPMethod.POST, EditAction.class.getMethod("execute"), null));
 
     ActionConfigurationProvider provider = EasyMock.createStrictMock(ActionConfigurationProvider.class);
     EasyMock.expect(provider.lookup("/admin/user/rest-edit/12")).andReturn(null);
@@ -257,11 +257,11 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
 
   private void run(String uri, String extension) throws Exception {
     Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods = new HashMap<>();
-    executeMethods.put(HTTPMethod.POST, new ExecuteMethodConfiguration(HTTPMethod.POST, Edit.class.getMethod("post"), null));
+    executeMethods.put(HTTPMethod.POST, new ExecuteMethodConfiguration(HTTPMethod.POST, EditAction.class.getMethod("post"), null));
 
     ActionConfigurationProvider provider = EasyMock.createStrictMock(ActionConfigurationProvider.class);
     EasyMock.expect(provider.lookup(uri)).andReturn(
-        new ActionConfiguration(Edit.class, executeMethods,
+        new ActionConfiguration(EditAction.class, executeMethods,
             new HashMap<>(), new ArrayList<>(), null, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new HashMap<>(), new HashMap<>(),
             new HashMap<>(), new HashSet<>(), new ArrayList<>(), new HashMap<>(), uri, new ArrayList<>()
         ));
@@ -274,7 +274,7 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     EasyMock.replay(store);
 
     Injector injector = EasyMock.createStrictMock(Injector.class);
-    EasyMock.expect(injector.getInstance(Edit.class)).andReturn(new Edit());
+    EasyMock.expect(injector.getInstance(EditAction.class)).andReturn(new EditAction());
     EasyMock.replay(injector);
 
     WorkflowChain chain = EasyMock.createStrictMock(WorkflowChain.class);

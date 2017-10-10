@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.example.action.KitchenSink;
+import org.example.action.KitchenSinkAction;
 import org.example.domain.UserField;
 import org.example.domain.UserType;
 import org.primeframework.mock.servlet.MockServletInputStream;
@@ -68,8 +68,8 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
     requestMembers.put(HTTPMethod.POST, new RequestMember("jsonRequest", UserField.class));
     additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(requestMembers, null));
 
-    KitchenSink action = new KitchenSink(null);
-    ActionConfiguration config = new ActionConfiguration(KitchenSink.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null, null);
+    KitchenSinkAction action = new KitchenSinkAction(null);
+    ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null, null);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(action, new ExecuteMethodConfiguration(HTTPMethod.POST, null, null), "/action", null, config));
     replay(store);
@@ -146,8 +146,8 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
     requestMembers.put(HTTPMethod.POST, new RequestMember("jsonRequest", UserField.class));
     additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(requestMembers, null));
 
-    KitchenSink action = new KitchenSink(null);
-    ActionConfiguration config = new ActionConfiguration(KitchenSink.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null, null);
+    KitchenSinkAction action = new KitchenSinkAction(null);
+    ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null, null);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(action,  new ExecuteMethodConfiguration(HTTPMethod.POST, null, null), "/action", null, config));
     replay(store);
@@ -188,8 +188,8 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
     requestMembers.put(HTTPMethod.POST, new RequestMember("jsonRequest", UserField.class));
     additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(requestMembers, null));
 
-    KitchenSink action = new KitchenSink(null);
-    ActionConfiguration config = new ActionConfiguration(KitchenSink.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null, null);
+    KitchenSinkAction action = new KitchenSinkAction(null);
+    ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null, null);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(action,  new ExecuteMethodConfiguration(HTTPMethod.POST, null, null), "/action", null, config));
     replay(store);
@@ -232,8 +232,8 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
     requestMembers.put(HTTPMethod.POST, new RequestMember("jsonRequest", UserField.class));
     additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(requestMembers, null));
 
-    KitchenSink action = new KitchenSink(null);
-    ActionConfiguration config = new ActionConfiguration(KitchenSink.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null, null);
+    KitchenSinkAction action = new KitchenSinkAction(null);
+    ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null, null);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(action,  new ExecuteMethodConfiguration(HTTPMethod.POST, null, null), "/action", null, config));
     replay(store);
@@ -272,8 +272,8 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
     requestMembers.put(HTTPMethod.POST, new RequestMember("jsonRequest", UserField.class));
     additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(requestMembers, null));
 
-    KitchenSink action = new KitchenSink(null);
-    ActionConfiguration config = new ActionConfiguration(KitchenSink.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null, null);
+    KitchenSinkAction action = new KitchenSinkAction(null);
+    ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null, null);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(action,  new ExecuteMethodConfiguration(HTTPMethod.POST, null, null), "/action", null, config));
     replay(store);
@@ -362,8 +362,8 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
   public void handleNoConfig() throws IOException {
     Map<Class<?>, Object> additionalConfig = new HashMap<>();
 
-    KitchenSink action = new KitchenSink(null);
-    ActionConfiguration config = new ActionConfiguration(KitchenSink.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null, null);
+    KitchenSinkAction action = new KitchenSinkAction(null);
+    ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null, null);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(action, null, "/action", null, config));
     replay(store);

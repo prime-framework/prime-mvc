@@ -15,7 +15,7 @@
  */
 package org.primeframework.mvc.control.form;
 
-import org.example.action.user.Edit;
+import org.example.action.user.EditAction;
 import org.example.domain.User;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.control.ControlBaseTest;
@@ -32,7 +32,7 @@ public class HiddenTest extends ControlBaseTest {
 
   @Test
   public void action_boolean_true() {
-    Edit action = new Edit();
+    EditAction action = new EditAction();
     ais.setCurrent(new ActionInvocation(action, null, "/hidden", null, null));
 
     action.user = new User();
@@ -42,7 +42,7 @@ public class HiddenTest extends ControlBaseTest {
 
   @Test
   public void action_boolean_false() {
-    Edit action = new Edit();
+    EditAction action = new EditAction();
     ais.setCurrent(new ActionInvocation(action, null, "/hidden", null, null));
 
     action.user = new User();
@@ -52,7 +52,7 @@ public class HiddenTest extends ControlBaseTest {
 
   @Test
   public void action_boolean_default() {
-    Edit action = new Edit();
+    EditAction action = new EditAction();
     ais.setCurrent(new ActionInvocation(action, null, "/hidden", null, null));
 
     action.user = new User();

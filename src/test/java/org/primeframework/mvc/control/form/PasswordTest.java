@@ -15,7 +15,7 @@
  */
 package org.primeframework.mvc.control.form;
 
-import org.example.action.user.Edit;
+import org.example.action.user.EditAction;
 import org.example.domain.User;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.control.ControlBaseTest;
@@ -49,7 +49,7 @@ public class PasswordTest extends ControlBaseTest {
 
   @Test
   public void action() {
-    Edit edit = new Edit();
+    EditAction edit = new EditAction();
     edit.user = new User();
     edit.user.setPassword("Test");
 
@@ -66,7 +66,7 @@ public class PasswordTest extends ControlBaseTest {
 
   @Test
   public void fieldErrors() {
-    Edit edit = new Edit();
+    EditAction edit = new EditAction();
     edit.user = new User();
     edit.user.setPassword("Test");
 

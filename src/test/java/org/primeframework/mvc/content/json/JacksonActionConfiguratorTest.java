@@ -18,7 +18,7 @@ package org.primeframework.mvc.content.json;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.example.action.KitchenSink;
+import org.example.action.KitchenSinkAction;
 import org.example.domain.UserField;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration.RequestMember;
@@ -36,7 +36,7 @@ import static org.testng.Assert.assertTrue;
 public class JacksonActionConfiguratorTest extends PrimeBaseTest {
   @Test
   public void configure() {
-    JacksonActionConfiguration config = (JacksonActionConfiguration) new JacksonActionConfigurator().configure(KitchenSink.class);
+    JacksonActionConfiguration config = (JacksonActionConfiguration) new JacksonActionConfigurator().configure(KitchenSinkAction.class);
 
     Map<HTTPMethod, RequestMember> requestMembers = new HashMap<>();
     requestMembers.put(HTTPMethod.POST, new RequestMember("jsonRequest", UserField.class));

@@ -13,18 +13,24 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.example.action.user;
+package org.example.action;
+
+import java.util.List;
 
 import org.primeframework.mvc.action.annotation.Action;
 
 /**
- * This is a test index action.
+ * This class is a simple edit action for testing.
  *
  * @author Brian Pontarelli
  */
-@Action
-public class Index {
+@Action("{firstName}/static/{lastName}/{*theRest}")
+public class ComplexRestAction {
+  public String firstName;
+  public String lastName;
+  public List<String> theRest;
+
   public String execute() {
-    return null;
+    return "success";
   }
 }

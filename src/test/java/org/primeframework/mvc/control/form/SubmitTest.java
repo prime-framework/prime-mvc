@@ -15,7 +15,7 @@
  */
 package org.primeframework.mvc.control.form;
 
-import org.example.action.user.Edit;
+import org.example.action.user.EditAction;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.control.ControlBaseTest;
 import org.testng.annotations.Test;
@@ -47,7 +47,7 @@ public class SubmitTest extends ControlBaseTest {
 
   @Test
   public void action() {
-    ais.setCurrent(new ActionInvocation(new Edit(), null, "/button", null, null));
+    ais.setCurrent(new ActionInvocation(new EditAction(), null, "/button", null, null));
     new ControlTester(submit).
       attr("name", "button").
       attr("value", "test-value").
@@ -61,7 +61,7 @@ public class SubmitTest extends ControlBaseTest {
 
   @Test
   public void html() {
-    ais.setCurrent(new ActionInvocation(new Edit(), null, "/button", null, null));
+    ais.setCurrent(new ActionInvocation(new EditAction(), null, "/button", null, null));
     new ControlTester(submit).
       attr("name", "html").
       attr("value", "test-value").
@@ -75,7 +75,7 @@ public class SubmitTest extends ControlBaseTest {
 
   @Test
   public void actionAttribute() {
-    ais.setCurrent(new ActionInvocation(new Edit(), null, "/button", null, null));
+    ais.setCurrent(new ActionInvocation(new EditAction(), null, "/button", null, null));
     new ControlTester(submit).
       attr("name", "button").
       attr("action", "/foo").
@@ -91,7 +91,7 @@ public class SubmitTest extends ControlBaseTest {
   @Test
   public void actionAttributeContext() {
     request.setContextPath("/context");
-    ais.setCurrent(new ActionInvocation(new Edit(), null, "/button", null, null));
+    ais.setCurrent(new ActionInvocation(new EditAction(), null, "/button", null, null));
     new ControlTester(submit).
       attr("name", "button").
       attr("action", "/foo").
@@ -107,7 +107,7 @@ public class SubmitTest extends ControlBaseTest {
   @Test
   public void actionAttributeContextRelative() {
     request.setContextPath("/context");
-    ais.setCurrent(new ActionInvocation(new Edit(), null, "/button", null, null));
+    ais.setCurrent(new ActionInvocation(new EditAction(), null, "/button", null, null));
     new ControlTester(submit).
       attr("name", "button").
       attr("action", "foo").

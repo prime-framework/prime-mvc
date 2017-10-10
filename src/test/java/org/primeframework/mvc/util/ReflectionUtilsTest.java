@@ -16,7 +16,7 @@
 package org.primeframework.mvc.util;
 
 import org.example.action.Extension;
-import org.example.action.ExtensionInheritance;
+import org.example.action.ExtensionInheritanceAction;
 import org.example.domain.InvalidJavaBeanGetter;
 import org.example.domain.InvalidJavaBeanSetter;
 import org.primeframework.mvc.parameter.annotation.PostParameterMethod;
@@ -55,7 +55,7 @@ public class ReflectionUtilsTest {
 
   @Test
   public void methodOrdering() throws Exception {
-    List<Method> methods = ReflectionUtils.findAllMethodsWithAnnotation(ExtensionInheritance.class, PostParameterMethod.class);
-    assertEquals(methods, asList(Extension.class.getMethod("method"), Extension.class.getMethod("method1"), ExtensionInheritance.class.getMethod("method2"), ExtensionInheritance.class.getMethod("method3")));
+    List<Method> methods = ReflectionUtils.findAllMethodsWithAnnotation(ExtensionInheritanceAction.class, PostParameterMethod.class);
+    assertEquals(methods, asList(Extension.class.getMethod("method"), Extension.class.getMethod("method1"), ExtensionInheritanceAction.class.getMethod("method2"), ExtensionInheritanceAction.class.getMethod("method3")));
   }
 }

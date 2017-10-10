@@ -15,7 +15,7 @@
  */
 package org.primeframework.mvc.scope;
 
-import org.example.action.KitchenSink;
+import org.example.action.KitchenSinkAction;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
@@ -35,7 +35,7 @@ public class DefaultScopeRetrievalWorkflowTest extends PrimeBaseTest {
   @Test
   public void perform() throws Exception {
     Object obj = new Object();
-    KitchenSink action = new KitchenSink(null);
+    KitchenSinkAction action = new KitchenSinkAction(null);
     session.setAttribute("sessionObject", obj);
 
     ActionInvocation ai = makeActionInvocation(action, HTTPMethod.POST, null);

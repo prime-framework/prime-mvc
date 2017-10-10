@@ -15,7 +15,7 @@
  */
 package org.primeframework.mvc.control.message;
 
-import org.example.action.user.Edit;
+import org.example.action.user.EditAction;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.control.ControlBaseTest;
@@ -35,7 +35,7 @@ public class MessageTest extends ControlBaseTest {
 
   @Test
   public void messageAction() {
-    Edit action = new Edit();
+    EditAction action = new EditAction();
     ais.setCurrent(new ActionInvocation(action, null, "/user/edit", null, null));
     new ControlTester(message).
       attr("key", "key").
@@ -44,7 +44,7 @@ public class MessageTest extends ControlBaseTest {
 
   @Test
   public void messageBundleWithParams() {
-    Edit action = new Edit();
+    EditAction action = new EditAction();
     ais.setCurrent(new ActionInvocation(action, null, "/user/edit", null, null));
     new ControlTester(message).
       attr("key", "params").
@@ -54,7 +54,7 @@ public class MessageTest extends ControlBaseTest {
 
   @Test
   public void messageFailure() {
-    Edit action = new Edit();
+    EditAction action = new EditAction();
     ais.setCurrent(new ActionInvocation(action, null, "/user/edit", null, null));
     try {
       new ControlTester(message).
@@ -68,7 +68,7 @@ public class MessageTest extends ControlBaseTest {
 
   @Test
   public void defaultMessage() {
-    Edit action = new Edit();
+    EditAction action = new EditAction();
     ais.setCurrent(new ActionInvocation(action, null, "/user/edit", null, null));
     new ControlTester(message).
       attr("key", "bad").

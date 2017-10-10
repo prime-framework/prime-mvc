@@ -21,8 +21,8 @@ import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
-import org.example.action.user.Edit;
-import org.example.action.user.Index;
+import org.example.action.user.EditAction;
+import org.example.action.user.IndexAction;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.control.ControlBaseTest;
@@ -46,9 +46,9 @@ public class FormTest extends ControlBaseTest {
   @Test
   public void noPrepare() {
     request.setUri("/user/");
-    Index index = new Index();
+    IndexAction index = new IndexAction();
     ais.setCurrent(new ActionInvocation(index, null, "/user/", null,
-      new ActionConfiguration(Index.class, null, null, new ArrayList<>(), null, null, null, null, null, null, null, null, null, null, "/user/", null)));
+      new ActionConfiguration(IndexAction.class, null, null, new ArrayList<>(), null, null, null, null, null, null, null, null, null, null, "/user/", null)));
 
     new ControlTester(form).
       attr("action", "/user/").
@@ -62,9 +62,9 @@ public class FormTest extends ControlBaseTest {
   @Test
   public void jsessionid() {
     request.setUri("/user/;jsessionid=C35A2D9557C051F2854845305B1AB911");
-    Index index = new Index();
+    IndexAction index = new IndexAction();
     ais.setCurrent(new ActionInvocation(index, null, "/user/", null,
-      new ActionConfiguration(Index.class, null, null, new ArrayList<Method>(), null, null, null, null, null, null, null, null, null, null, "/user/", null)));
+      new ActionConfiguration(IndexAction.class, null, null, new ArrayList<Method>(), null, null, null, null, null, null, null, null, null, null, "/user/", null)));
 
     new ControlTester(form).
       attr("action", "/user/").
@@ -78,7 +78,7 @@ public class FormTest extends ControlBaseTest {
   @Test
   public void noPrepareRelative() {
     request.setUri("/user/");
-    Index index = new Index();
+    IndexAction index = new IndexAction();
     ais.setCurrent(new ActionInvocation(index, null, "/user/", null, null));
 
     new ControlTester(form).
@@ -93,9 +93,9 @@ public class FormTest extends ControlBaseTest {
   @Test
   public void noPrepareFullyQualified() {
     request.setUri("/user/");
-    Index index = new Index();
+    IndexAction index = new IndexAction();
     ais.setCurrent(new ActionInvocation(index, null, "/user/", null,
-      new ActionConfiguration(Index.class, null, null, new ArrayList<Method>(), null, null, null, null, null, null, null, null, null, null, "/user/", null)));
+      new ActionConfiguration(IndexAction.class, null, null, new ArrayList<Method>(), null, null, null, null, null, null, null, null, null, null, "/user/", null)));
 
     new ControlTester(form).
       attr("action", "https://www.google.com").
@@ -110,9 +110,9 @@ public class FormTest extends ControlBaseTest {
   public void noPrepareContextPath() {
     request.setUri("/context/user/");
     request.setContextPath("/context");
-    Index index = new Index();
+    IndexAction index = new IndexAction();
     ais.setCurrent(new ActionInvocation(index, null, "/user/", null,
-      new ActionConfiguration(Index.class, null, null, new ArrayList<Method>(), null, null, null, null, null, null, null, null, null, null, "/user/", null)));
+      new ActionConfiguration(IndexAction.class, null, null, new ArrayList<Method>(), null, null, null, null, null, null, null, null, null, null, "/user/", null)));
 
     new ControlTester(form).
       attr("action", "/user/").
@@ -127,7 +127,7 @@ public class FormTest extends ControlBaseTest {
   public void relativeContextPath() {
     request.setUri("/context/user/");
     request.setContextPath("/context");
-    Index index = new Index();
+    IndexAction index = new IndexAction();
     ais.setCurrent(new ActionInvocation(index, null, "/user/", null, null));
 
     new ControlTester(form).
@@ -143,9 +143,9 @@ public class FormTest extends ControlBaseTest {
   public void fullyQualifiedContextPath() {
     request.setUri("/context/user/");
     request.setContextPath("/context");
-    Index index = new Index();
+    IndexAction index = new IndexAction();
     ais.setCurrent(new ActionInvocation(index, null, "/user/", null,
-      new ActionConfiguration(Index.class, null, null, new ArrayList<Method>(), null, null, null, null, null, null, null, null, null, null, "/user/", null)));
+      new ActionConfiguration(IndexAction.class, null, null, new ArrayList<Method>(), null, null, null, null, null, null, null, null, null, null, "/user/", null)));
 
     new ControlTester(form).
       attr("action", "https://www.google.com").
@@ -159,9 +159,9 @@ public class FormTest extends ControlBaseTest {
   @Test
   public void prepare() throws IOException, ServletException, NoSuchMethodException {
     request.setUri("/user/edit");
-    Edit edit = new Edit();
+    EditAction edit = new EditAction();
     ais.setCurrent(new ActionInvocation(edit, null, "/user/edit", null,
-      new ActionConfiguration(Index.class, null, null, asList(Edit.class.getMethod("formPrepare")), null, null, null, null, null, null, null, null, null, null, "/user/", null)));
+      new ActionConfiguration(IndexAction.class, null, null, asList(EditAction.class.getMethod("formPrepare")), null, null, null, null, null, null, null, null, null, null, "/user/", null)));
 
     new ControlTester(form).
       attr("action", "/user/edit").
@@ -176,17 +176,17 @@ public class FormTest extends ControlBaseTest {
   @Test
   public void actionIsDifferentURI() throws IOException, ServletException {
     request.setUri("/user/");
-    Index index = new Index();
+    IndexAction index = new IndexAction();
     ais.setCurrent(new ActionInvocation(index, null, "/user/", null, null));
 
     StringWriter writer = new StringWriter();
     form.renderStart(writer, MapBuilder.map("action", (Object) "/user/edit").put("method", "POST").done(), MapBuilder.map("param", "param-value").done());
 
-    Edit edit = (Edit) ais.getCurrent().action;
+    EditAction edit = (EditAction) ais.getCurrent().action;
     assertTrue(edit.formPrepared);
 
     form.renderEnd(writer);
-    assertSame(Index.class, ais.getCurrent().action.getClass());
+    assertSame(IndexAction.class, ais.getCurrent().action.getClass());
     assertEquals(
       "<div class=\"form\">\n" +
         "<form action=\"/user/edit\" method=\"POST\">\n" +

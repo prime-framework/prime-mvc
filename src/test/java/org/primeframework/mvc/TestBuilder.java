@@ -20,20 +20,28 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Base64;
+import java.util.Map;
 import java.util.UUID;
 
+import org.primeframework.mvc.test.RequestResult;
 import org.primeframework.mvc.test.RequestSimulator;
+import org.primeframework.mvc.util.ThrowingCallable;
 import org.primeframework.mvc.util.ThrowingRunnable;
 import org.testng.Assert;
+
+import static org.primeframework.mvc.scope.ActionSessionScope.ACTION_SESSION_KEY;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
 
 /**
  * @author Daniel DeGroff
  */
 public class TestBuilder {
-
   public RequestSimulator simulator;
 
   public Path tempFile;
+
+  public RequestResult requestResult;
 
   public TestBuilder createFile() throws IOException {
     return createFile("Test File");
@@ -49,8 +57,50 @@ public class TestBuilder {
     return this;
   }
 
-  public TestBuilder simulate(ThrowingRunnable runnable) throws Exception {
-    runnable.run();
+  public TestBuilder assertRequestAttributeNotNull(String attributeName) {
+    assertNotNull(requestResult.request.getAttribute(attributeName));
+    return this;
+  }
+
+  public TestBuilder assertRequestAttributeIsNull(String attributeName) {
+    assertNull(requestResult.request.getAttribute(attributeName));
+    return this;
+  }
+
+  public TestBuilder assertContextAttributeNotNull(String attributeName) {
+    assertNotNull(simulator.context.getAttribute(attributeName));
+    return this;
+  }
+
+  public TestBuilder assertActionSessionAttributeIsNull(String actionName, String attributeName) {
+    Object object = simulator.session.getAttribute(ACTION_SESSION_KEY);
+    assertNotNull(object);
+    Map<String, Map<String, Object>> map = (Map<String, Map<String, Object>>) object;
+    Object actionAttributes = map.get(actionName);
+    assertNotNull(actionAttributes);
+    Map<String, Object> actionAttributesMap = (Map<String, Object>) actionAttributes;
+    assertNull(actionAttributesMap.get(attributeName));
+    return this;
+  }
+
+  public TestBuilder assertActionSessionAttributeNotNull(String actionName, String attributeName) {
+    Object object = simulator.session.getAttribute(ACTION_SESSION_KEY);
+    assertNotNull(object);
+    Map<String, Map<String, Object>> map = (Map<String, Map<String, Object>>) object;
+    Object actionAttributes = map.get(actionName);
+    assertNotNull(actionAttributes);
+    Map<String, Object> actionAttributesMap = (Map<String, Object>) actionAttributes;
+    assertNotNull(actionAttributesMap.get(attributeName));
+    return this;
+  }
+
+  public TestBuilder assertSessionAttributeNotNull(String attributeName) {
+    assertNotNull(simulator.session.getAttribute(attributeName));
+    return this;
+  }
+
+  public TestBuilder simulate(ThrowingCallable<RequestResult> callable) throws Exception {
+    requestResult = callable.call();
     return this;
   }
 
