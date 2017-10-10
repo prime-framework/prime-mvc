@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,21 @@
  */
 package org.primeframework.mvc.message;
 
-import com.google.inject.Inject;
-import org.primeframework.mvc.message.scope.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
-import java.util.*;
+import org.primeframework.mvc.message.scope.ApplicationScope;
+import org.primeframework.mvc.message.scope.FlashScope;
+import org.primeframework.mvc.message.scope.MessageScope;
+import org.primeframework.mvc.message.scope.RequestScope;
+import org.primeframework.mvc.message.scope.Scope;
+import org.primeframework.mvc.message.scope.SessionScope;
+
+import com.google.inject.Inject;
 
 /**
  * This is the default message workflow implementation. It removes all flash messages from the session and places them
@@ -27,7 +38,8 @@ import java.util.*;
  * @author Brian Pontarelli
  */
 public class DefaultMessageStore implements MessageStore {
-  private final Map<MessageScope, Scope> scopes = new LinkedHashMap<MessageScope, Scope>();
+  private final Map<MessageScope, Scope> scopes = new LinkedHashMap<>();
+
   private final RequestScope requestScope;
 
   @Inject
@@ -58,7 +70,7 @@ public class DefaultMessageStore implements MessageStore {
 
   @Override
   public List<Message> get() {
-    List<Message> messages = new ArrayList<Message>();
+    List<Message> messages = new ArrayList<>();
     for (Scope scope : scopes.values()) {
       messages.addAll(scope.get());
     }
@@ -67,7 +79,7 @@ public class DefaultMessageStore implements MessageStore {
 
   @Override
   public List<Message> get(MessageScope scope) {
-    List<Message> messages = new ArrayList<Message>();
+    List<Message> messages = new ArrayList<>();
     Scope s = scopes.get(scope);
     messages.addAll(s.get());
     return messages;
@@ -76,7 +88,7 @@ public class DefaultMessageStore implements MessageStore {
   @Override
   public List<Message> getGeneralMessages() {
     List<Message> messages = get();
-    List<Message> list = new ArrayList<Message>();
+    List<Message> list = new ArrayList<>();
     for (Message message : messages) {
       if (!(message instanceof FieldMessage)) {
         list.add(message);
@@ -88,37 +100,17 @@ public class DefaultMessageStore implements MessageStore {
 
   @Override
   public Map<String, List<FieldMessage>> getFieldMessages() {
-    List<Message> messages = get();
-    Map<String, List<FieldMessage>> map = new HashMap<String, List<FieldMessage>>();
-    for (Message message : messages) {
-      if (message instanceof FieldMessage) {
-        FieldMessage fm = (FieldMessage) message;
-        List<FieldMessage> list = map.get(fm.getField());
-        if (list == null) {
-          list = new ArrayList<FieldMessage>();
-          map.put(fm.getField(), list);
-        }
-
-        list.add(fm);
-      }
-    }
-
-    return map;
+    return getFieldMessages(null);
   }
 
   @Override
   public Map<String, List<FieldMessage>> getFieldMessages(MessageScope scope) {
-    List<Message> messages = get(scope);
-    Map<String, List<FieldMessage>> map = new HashMap<String, List<FieldMessage>>();
+    List<Message> messages = scope == null ? get() : get(scope);
+    Map<String, List<FieldMessage>> map = new HashMap<>();
     for (Message message : messages) {
       if (message instanceof FieldMessage) {
         FieldMessage fm = (FieldMessage) message;
-        List<FieldMessage> list = map.get(fm.getField());
-        if (list == null) {
-          list = new ArrayList<FieldMessage>();
-          map.put(fm.getField(), list);
-        }
-
+        List<FieldMessage> list = map.computeIfAbsent(fm.getField(), k -> new ArrayList<>());
         list.add(fm);
       }
     }

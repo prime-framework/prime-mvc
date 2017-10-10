@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,16 @@
 package org.primeframework.mvc.validation;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.function.Predicate;
 
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.ValidationMethodConfiguration;
 import org.primeframework.mvc.action.config.ActionConfiguration;
+import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;
+import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.scope.MessageScope;
 import org.primeframework.mvc.parameter.el.ExpressionException;
 import org.primeframework.mvc.servlet.HTTPMethod;
@@ -36,6 +39,8 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 public class DefaultValidationProcessor implements ValidationProcessor {
+  private static final Predicate<Message> ErrorOrWarningMessages = (m) -> m.getType() == MessageType.WARNING || m.getType() == MessageType.ERROR;
+
   private final MessageStore messageStore;
 
   private final HttpServletRequest request;
@@ -80,10 +85,10 @@ public class DefaultValidationProcessor implements ValidationProcessor {
     // Finally, invoke post methods
     ReflectionUtils.invokeAll(action, actionConfiguration.postValidationMethods);
 
-    // If there are any messages, throw an exception. This will handle the violations that were transferred to the
-    // MessageStore as well as the conversion errors since both are placed into the REQUEST scope. The FLASH scope
-    // shouldn't impact this since it is transferred to the REQUEST scope after the validation occurs
-    if (messageStore.get(MessageScope.REQUEST).size() > 0) {
+    // If there are any messages of type ERROR or WARNING, throw an exception. This will handle the violations that were transferred
+    // to the MessageStore as well as the conversion errors since both are placed into the REQUEST scope. The FLASH scope shouldn't
+    // impact this since it is transferred to the REQUEST scope after the validation occurs
+    if (messageStore.get(MessageScope.REQUEST).stream().anyMatch(ErrorOrWarningMessages)) {
       throw new ValidationException();
     }
   }
