@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.File;
@@ -44,9 +43,7 @@ import org.primeframework.mvc.jwt.MockVerifierProvider;
 import org.primeframework.mvc.security.MockUserLoginSecurityContext;
 import org.primeframework.mvc.security.UserLoginSecurityContext;
 import org.primeframework.mvc.servlet.HTTPMethod;
-import org.primeframework.mvc.servlet.PrimeServletContextListener;
 import org.primeframework.mvc.servlet.ServletObjectsHolder;
-import org.primeframework.mvc.servlet.guice.ServletModule;
 import org.primeframework.mvc.test.RequestSimulator;
 import org.primeframework.mvc.validation.Validation;
 import org.testng.annotations.AfterMethod;
@@ -62,6 +59,7 @@ import com.google.inject.Module;
 import com.google.inject.TypeLiteral;
 import com.google.inject.util.Modules;
 import static java.util.Arrays.asList;
+import static org.primeframework.mvc.action.config.DefaultActionConfigurationProvider.ACTION_CONFIGURATION_KEY;
 
 /**
  * This class is a base test for testing the Prime framework. It isn't recommended to use it outside of the Prime
@@ -100,13 +98,14 @@ public abstract class PrimeBaseTest {
       }
     };
 
-    Module module = Modules.override(mvcModule).with(new TestSecurityModule(), new TestServletModule());
+    Module module = Modules.override(mvcModule).with(new TestSecurityModule());
 
     container = new MockContainer();
     container.newServletContext(new File("src/test/web"));
 
     simulator = new RequestSimulator(container, module);
     injector = simulator.injector;
+    container.contextSavePoint();
   }
 
   /**
@@ -114,14 +113,10 @@ public abstract class PrimeBaseTest {
    */
   @BeforeMethod
   public void setUp() {
-    container.resetSession();
-
-    // rebuild the entire servlet context
-    container.resetContext();
-    container.getContext().setAttribute(PrimeServletContextListener.GUICE_INJECTOR_KEY, injector);
-
+    container.restoreContextToSavePoint(ACTION_CONFIGURATION_KEY);
     request = container.newServletRequest("/", Locale.getDefault(), false, "UTF-8");
     response = container.newServletResponse();
+    container.resetSession();
 
     ServletObjectsHolder.setServletRequest(new HttpServletRequestWrapper(request));
     ServletObjectsHolder.setServletResponse(response);
@@ -196,13 +191,6 @@ public abstract class PrimeBaseTest {
     protected void configure() {
       bind(new TypeLiteral<Map<String, Verifier>>() {
       }).toProvider(MockVerifierProvider.class);
-    }
-  }
-
-  public static class TestServletModule extends ServletModule {
-    @Override
-    protected void configure() {
-      bind(ServletContext.class).toProvider(() -> container.getContext());
     }
   }
 }

@@ -34,10 +34,9 @@ import com.google.inject.Provides;
 public class ServletModule extends AbstractModule {
   @Override
   protected void configure() {
-    // bind to a provider so we can override w/out getting a null binding.
-    bind(ServletContext.class).toProvider(ServletObjectsHolder::getServletContext);
+    bind(ServletContext.class).toInstance(ServletObjectsHolder.getServletContext());
   }
-  
+
   @Provides
   public HttpServletRequest request() {
     return ServletObjectsHolder.getServletRequest();

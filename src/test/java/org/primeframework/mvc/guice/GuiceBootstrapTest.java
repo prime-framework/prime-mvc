@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import org.easymock.EasyMock;
 import org.primeframework.mvc.CloseableModule;
 import org.primeframework.mvc.MockConfiguration;
 import org.primeframework.mvc.PrimeBaseTest;
-import org.primeframework.mvc.config.AbstractMVCConfiguration;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.servlet.ServletObjectsHolder;
 import org.primeframework.mvc.workflow.MVCWorkflow;
