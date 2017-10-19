@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,8 @@ import com.google.inject.Provides;
 public class ServletModule extends AbstractModule {
   @Override
   protected void configure() {
-    bind(ServletContext.class).toInstance(ServletObjectsHolder.getServletContext());
+    // bind to a provider so we can override w/out getting a null binding.
+    bind(ServletContext.class).toProvider(ServletObjectsHolder::getServletContext);
   }
   
   @Provides
