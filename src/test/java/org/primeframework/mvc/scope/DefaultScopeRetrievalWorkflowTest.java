@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ public class DefaultScopeRetrievalWorkflowTest extends PrimeBaseTest {
   public void perform() throws Exception {
     Object obj = new Object();
     KitchenSinkAction action = new KitchenSinkAction(null);
-    session.setAttribute("sessionObject", obj);
+    container.getSession().setAttribute("sessionObject", obj);
 
     ActionInvocation ai = makeActionInvocation(action, HTTPMethod.POST, null);
     ActionInvocationStore ais = createStrictMock(ActionInvocationStore.class);

@@ -26,10 +26,10 @@ import java.nio.file.Path;
 import java.util.Locale;
 import java.util.function.Consumer;
 
+import org.primeframework.mock.servlet.MockContainer;
 import org.primeframework.mock.servlet.MockHttpServletRequest;
 import org.primeframework.mock.servlet.MockHttpServletRequest.Method;
 import org.primeframework.mock.servlet.MockHttpServletResponse;
-import org.primeframework.mock.servlet.MockHttpSession;
 import org.primeframework.mock.servlet.MockServletInputStream;
 import org.primeframework.mvc.parameter.DefaultParameterParser;
 import org.primeframework.mvc.servlet.PrimeFilter;
@@ -55,8 +55,8 @@ public class RequestBuilder {
 
   private Class<? extends Throwable> expectedException;
 
-  public RequestBuilder(String uri, MockHttpSession session, PrimeFilter filter, Injector injector) {
-    this.request = new MockHttpServletRequest(uri, Locale.getDefault(), false, "UTF-8", session);
+  public RequestBuilder(String uri, MockContainer container, PrimeFilter filter, Injector injector) {
+    this.request = container.newServletRequest(uri, Locale.getDefault(), false, "UTF-8");
     this.response = new MockHttpServletResponse();
     this.filter = filter;
     this.injector = injector;

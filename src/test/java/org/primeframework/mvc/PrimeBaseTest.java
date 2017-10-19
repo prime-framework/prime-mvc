@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.primeframework.mvc;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.File;
@@ -29,23 +30,23 @@ import java.util.Map;
 
 import org.example.action.user.EditAction;
 import org.primeframework.jwt.Verifier;
+import org.primeframework.mock.servlet.MockContainer;
 import org.primeframework.mock.servlet.MockHttpServletRequest;
 import org.primeframework.mock.servlet.MockHttpServletResponse;
-import org.primeframework.mock.servlet.MockHttpSession;
-import org.primeframework.mock.servlet.MockServletContext;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ExecuteMethodConfiguration;
 import org.primeframework.mvc.action.ValidationMethodConfiguration;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.config.DefaultActionConfigurationBuilder;
 import org.primeframework.mvc.config.MVCConfiguration;
-import org.primeframework.mvc.guice.GuiceBootstrap;
 import org.primeframework.mvc.guice.MVCModule;
 import org.primeframework.mvc.jwt.MockVerifierProvider;
 import org.primeframework.mvc.security.MockUserLoginSecurityContext;
 import org.primeframework.mvc.security.UserLoginSecurityContext;
 import org.primeframework.mvc.servlet.HTTPMethod;
+import org.primeframework.mvc.servlet.PrimeServletContextListener;
 import org.primeframework.mvc.servlet.ServletObjectsHolder;
+import org.primeframework.mvc.servlet.guice.ServletModule;
 import org.primeframework.mvc.test.RequestSimulator;
 import org.primeframework.mvc.validation.Validation;
 import org.testng.annotations.AfterMethod;
@@ -69,13 +70,11 @@ import static java.util.Arrays.asList;
  * @author Brian Pontarelli and James Humphrey
  */
 public abstract class PrimeBaseTest {
-  protected static MockServletContext context;
+  protected static MockContainer container;
 
   protected static Injector injector;
 
   protected static MetricRegistry metricRegistry = new MetricRegistry();
-
-  protected static MockHttpSession session;
 
   protected static RequestSimulator simulator;
 
@@ -91,33 +90,37 @@ public abstract class PrimeBaseTest {
 
   @BeforeSuite
   public static void init() throws ServletException {
-    context = new MockServletContext(new File("src/test/web"));
-    session = new MockHttpSession(context);
-    ServletObjectsHolder.setServletContext(context);
-
-
     Module mvcModule = new MVCModule() {
       @Override
       protected void configure() {
         super.configure();
-        install(new TestModule());
+        install(new TestMVCConfigurationModule());
         bind(MetricRegistry.class).toInstance(metricRegistry);
         bind(UserLoginSecurityContext.class).to(MockUserLoginSecurityContext.class);
       }
     };
 
-    Module module = Modules.override(mvcModule).with(new SecurityModule());
-    injector = GuiceBootstrap.initialize(module);
-    simulator = new RequestSimulator(context, module);
+    Module module = Modules.override(mvcModule).with(new TestSecurityModule(), new TestServletModule());
+
+    container = new MockContainer();
+    container.newServletContext(new File("src/test/web"));
+
+    simulator = new RequestSimulator(container, module);
+    injector = simulator.injector;
   }
 
   /**
    * Sets up the servlet objects and injects the test.
    */
   @BeforeMethod
-  public void setUp(Method method) {
-    session.clear();
-    request = new MockHttpServletRequest("/", Locale.getDefault(), false, "utf-8", session);
+  public void setUp() {
+    container.resetSession();
+
+    // rebuild the entire servlet context
+    container.resetContext();
+    container.getContext().setAttribute(PrimeServletContextListener.GUICE_INJECTOR_KEY, injector);
+
+    request = container.newServletRequest("/", Locale.getDefault(), false, "UTF-8");
     response = new MockHttpServletResponse();
 
     ServletObjectsHolder.setServletRequest(new HttpServletRequestWrapper(request));
@@ -181,7 +184,14 @@ public abstract class PrimeBaseTest {
         ));
   }
 
-  public static class SecurityModule extends AbstractModule {
+  public static class TestMVCConfigurationModule extends AbstractModule {
+    @Override
+    protected void configure() {
+      bind(MVCConfiguration.class).toInstance(new MockConfiguration());
+    }
+  }
+
+  public static class TestSecurityModule extends AbstractModule {
     @Override
     protected void configure() {
       bind(new TypeLiteral<Map<String, Verifier>>() {
@@ -189,10 +199,10 @@ public abstract class PrimeBaseTest {
     }
   }
 
-  public static class TestModule extends AbstractModule {
+  public static class TestServletModule extends ServletModule {
     @Override
     protected void configure() {
-      bind(MVCConfiguration.class).toInstance(new MockConfiguration());
+      bind(ServletContext.class).toProvider(() -> container.getContext());
     }
   }
 }

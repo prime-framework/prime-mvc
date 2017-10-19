@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,11 @@ import javax.servlet.http.HttpSession;
 import java.util.Locale;
 
 import org.easymock.EasyMock;
+import org.primeframework.mock.servlet.MockContainer;
 import org.primeframework.mock.servlet.MockHttpServletRequest;
-import org.primeframework.mock.servlet.MockServletContext;
 import org.testng.annotations.Test;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
 
 /**
  * This tests the default locale store.
@@ -46,7 +46,7 @@ public class DefaultLocaleProviderTest {
   public void fallBackViaMock() {
     Locale.setDefault(Locale.FRENCH);
 
-    MockHttpServletRequest request = new MockHttpServletRequest("/", (MockServletContext) null);
+    MockHttpServletRequest request = new MockContainer().newServletRequest("/");
     DefaultLocaleProvider provider = new DefaultLocaleProvider(request);
     assertEquals(provider.get(), Locale.FRENCH);
 

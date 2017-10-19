@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,13 @@
  */
 package org.primeframework.mvc.test;
 
-import com.google.inject.Injector;
-import com.google.inject.Module;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import java.util.Enumeration;
+
+import org.primeframework.mock.servlet.MockContainer;
 import org.primeframework.mock.servlet.MockHttpServletResponse;
-import org.primeframework.mock.servlet.MockHttpSession;
-import org.primeframework.mock.servlet.MockServletContext;
 import org.primeframework.mvc.guice.GuiceBootstrap;
 import org.primeframework.mvc.servlet.PrimeFilter;
 import org.primeframework.mvc.servlet.PrimeServletContextListener;
@@ -27,47 +29,42 @@ import org.primeframework.mvc.servlet.ServletObjectsHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import java.util.Enumeration;
+import com.google.inject.Injector;
+import com.google.inject.Module;
 
 /**
  * This class provides a method for testing a full invocation of Prime. This simulates the JEE web objects
  * (HttpServletRequest, etc.) and an invocation of the PrimeFilter. You can also simulate multiple invocations across a
  * single session by using the same instance of this class multiple times.
- * <p/>
- * <h3>Examples</h3>
- * <p/>
- * <pre>
- * TODO: Add examples.
- * </pre>
  *
  * @author Brian Pontarelli
  */
 public class RequestSimulator {
   private final static Logger logger = LoggerFactory.getLogger(RequestSimulator.class);
+
   public final PrimeFilter filter = new PrimeFilter();
-  public MockServletContext context;
-  public MockHttpSession session;
+
+  public final MockContainer container;
+
   public Injector injector;
+
   // the response of the last request, deprecated, Do Not use, only added for CS
   public MockHttpServletResponse response;
 
   /**
    * Creates a new request simulator that can be used to simulate requests to a Prime application.
    *
-   * @param context    The servlet context to use for this simulator.
+   * @param container  The application container to use for this simulator.
    * @param mainModule The main module.
    * @throws ServletException If the initialization of the PrimeServletContextListener failed.
    */
-  public RequestSimulator(final MockServletContext context, Module mainModule) throws ServletException {
-    logger.debug("Built RequestSimulator with context webDir " + context.webDir.getAbsolutePath());
-    ServletObjectsHolder.setServletContext(context);
-    this.context = context;
-    this.session = new MockHttpSession(this.context);
+  public RequestSimulator(final MockContainer container, Module mainModule) throws ServletException {
+    // This isn't necessary if you override the ServletModule. Leaving in case anyone wishes to use this.
+    ServletObjectsHolder.setServletContext(container.getContext());
+    this.container = container;
     this.injector = GuiceBootstrap.initialize(mainModule);
-    this.context.setAttribute(PrimeServletContextListener.GUICE_INJECTOR_KEY, this.injector);
+    this.container.getContext().setAttribute(PrimeServletContextListener.GUICE_INJECTOR_KEY, this.injector);
+    logger.debug("Built RequestSimulator with context webDir " + container.getContext().webDir.getAbsolutePath());
     this.filter.init(new FilterConfig() {
       @Override
       public String getFilterName() {
@@ -76,7 +73,7 @@ public class RequestSimulator {
 
       @Override
       public ServletContext getServletContext() {
-        return context;
+        return container.getContext();
       }
 
       @Override
@@ -100,26 +97,8 @@ public class RequestSimulator {
    */
   public RequestBuilder test(String uri) {
     // cache the response of the last request
-    RequestBuilder rb = new RequestBuilder(uri, session, filter, injector);
+    RequestBuilder rb = new RequestBuilder(uri, container, filter, injector);
     response = rb.response;
     return rb;
-  }
-
-  /**
-   * Retrieves the instance of the given type from the Guice Injector.
-   * @deprecated   to allow cleanspeak to compile....
-   * @param type The type.
-   * @param <T>  The type.
-   * @return The instance.
-   */
-  public <T> T get(Class<T> type) {
-    return injector.getInstance(type);
-  }
-
-  /**
-   * Resets the session by creating a new session that is empty.
-   */
-  public void resetSession() {
-    session = new MockHttpSession(this.context);
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ public class DefaultConverterProviderTest extends PrimeBaseTest {
       @Override
       protected void configure() {
         super.configure();
-        install(new TestModule());
+        install(new TestMVCConfigurationModule());
       }
     });
     ConverterProvider provider = new DefaultConverterProvider(injector, injector.getInstance(Key.get(new TypeLiteral<Map<Class<?>, GlobalConverter>>(){})));

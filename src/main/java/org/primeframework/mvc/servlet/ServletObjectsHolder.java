@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,8 @@ import org.primeframework.mvc.PrimeException;
  */
 public final class ServletObjectsHolder {
   private static ServletContext servletContext;
-  private static ThreadLocal<HttpServletRequestWrapper> request = new ThreadLocal<HttpServletRequestWrapper>();
-  private static ThreadLocal<HttpServletResponse> response = new ThreadLocal<HttpServletResponse>();
+  private static ThreadLocal<HttpServletRequestWrapper> request = new ThreadLocal<>();
+  private static ThreadLocal<HttpServletResponse> response = new ThreadLocal<>();
 
   /**
    * Gets the servlet context.

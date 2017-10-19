@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2015-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ public class DefaultSavedRequestWorkflowTest extends PrimeBaseTest {
 
   @Test
   public void performSavedRequestGET() throws Exception {
-    session.setAttribute(SavedHttpRequest.LOGGED_IN_SESSION_KEY, new SavedHttpRequest(HTTPMethod.GET, "/secure?test=value&test2=value2", null));
+    container.getSession().setAttribute(SavedHttpRequest.LOGGED_IN_SESSION_KEY, new SavedHttpRequest(HTTPMethod.GET, "/secure?test=value&test2=value2", null));
     request.setUri("/secure");
 
     HttpServletRequestWrapper wrapper = new HttpServletRequestWrapper(request);
@@ -84,7 +84,7 @@ public class DefaultSavedRequestWorkflowTest extends PrimeBaseTest {
     parameters.put("test", new String[]{"value"});
     parameters.put("test2", new String[]{"value2"});
 
-    session.setAttribute(SavedHttpRequest.LOGGED_IN_SESSION_KEY, new SavedHttpRequest(HTTPMethod.POST, "/secure", parameters));
+    container.getSession().setAttribute(SavedHttpRequest.LOGGED_IN_SESSION_KEY, new SavedHttpRequest(HTTPMethod.POST, "/secure", parameters));
     request.setUri("/secure");
 
     HttpServletRequestWrapper wrapper = new HttpServletRequestWrapper(request);

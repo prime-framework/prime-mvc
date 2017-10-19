@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,11 @@ package org.primeframework.mvc.message.l10n;
 import java.io.File;
 import java.util.Locale;
 
+import org.primeframework.mock.servlet.MockContainer;
 import org.primeframework.mock.servlet.MockServletContext;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
-import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.container.ServletContainerResolver;
 import org.testng.annotations.Test;
 
@@ -41,7 +41,7 @@ import static org.testng.Assert.fail;
 public class ResourceBundleMessageProviderTest extends PrimeBaseTest {
   @Test
   public void format() {
-    MockServletContext context = new MockServletContext(new File("src/test/java"));
+    MockServletContext context = new MockContainer().newServletContext(new File("src/test/java"));
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/l10n/Test", null, null));
@@ -63,7 +63,7 @@ public class ResourceBundleMessageProviderTest extends PrimeBaseTest {
 
   @Test
   public void missing() {
-    MockServletContext context = new MockServletContext(new File("src/test/java"));
+    MockServletContext context = new MockContainer().newServletContext(new File("src/test/java"));
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/l10n/Test", null, null));
@@ -82,7 +82,7 @@ public class ResourceBundleMessageProviderTest extends PrimeBaseTest {
 
   @Test
   public void search() {
-    MockServletContext context = new MockServletContext(new File("src/test/java"));
+    MockServletContext context = new MockContainer().newServletContext(new File("src/test/java"));
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/l10n/Test", null, null));

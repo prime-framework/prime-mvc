@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,8 @@ package org.primeframework.mvc.servlet;
 import javax.servlet.http.HttpServletRequest;
 import java.net.URL;
 
+import org.primeframework.mock.servlet.MockContainer;
 import org.primeframework.mock.servlet.MockHttpServletRequest;
-import org.primeframework.mock.servlet.MockHttpSession;
-import org.primeframework.mock.servlet.MockServletContext;
 import org.testng.annotations.Test;
 
 import static org.easymock.EasyMock.createStrictMock;
@@ -64,19 +63,21 @@ public class ServletToolsTest {
 
   @Test
   public void requestURI() {
-    MockHttpServletRequest request = new MockHttpServletRequest("/login;jsessionid=C35A2D9557C051F2854845305B1AB911", new MockHttpSession(new MockServletContext()));
+    MockContainer container = new MockContainer();
+    MockHttpServletRequest request = container.newServletRequest("/login;jsessionid=C35A2D9557C051F2854845305B1AB911");
     assertEquals(ServletTools.getRequestURI(request), "/login");
 
-    request = new MockHttpServletRequest("/;jsessionid=C35A2D9557C051F2854845305B1AB911", new MockHttpSession(new MockServletContext()));
+    request = container.newServletRequest("/;jsessionid=C35A2D9557C051F2854845305B1AB911");
     assertEquals(ServletTools.getRequestURI(request), "/");
   }
 
   @Test
   public void SessionId() {
-    MockHttpServletRequest request = new MockHttpServletRequest("/login;jsessionid=C35A2D9557C051F2854845305B1AB911", new MockHttpSession(new MockServletContext()));
+    MockContainer container = new MockContainer();
+    MockHttpServletRequest request = container.newServletRequest("/login;jsessionid=C35A2D9557C051F2854845305B1AB911");
     assertEquals(ServletTools.getSessionId(request), ";jsessionid=C35A2D9557C051F2854845305B1AB911");
 
-    request = new MockHttpServletRequest("/;jsessionid=C35A2D9557C051F2854845305B1AB911", new MockHttpSession(new MockServletContext()));
+    request = container.newServletRequest("/;jsessionid=C35A2D9557C051F2854845305B1AB911");
     assertEquals(ServletTools.getSessionId(request), ";jsessionid=C35A2D9557C051F2854845305B1AB911");
   }
 }

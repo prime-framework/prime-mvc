@@ -68,12 +68,12 @@ public class TestBuilder {
   }
 
   public TestBuilder assertContextAttributeNotNull(String attributeName) {
-    assertNotNull(simulator.context.getAttribute(attributeName));
+    assertNotNull(simulator.container.getContext().getAttribute(attributeName));
     return this;
   }
 
   public TestBuilder assertActionSessionAttributeIsNull(String actionName, String attributeName) {
-    Object object = simulator.session.getAttribute(ACTION_SESSION_KEY);
+    Object object = simulator.container.getSession().getAttribute(ACTION_SESSION_KEY);
     assertNotNull(object);
     Map<String, Map<String, Object>> map = (Map<String, Map<String, Object>>) object;
     Object actionAttributes = map.get(actionName);
@@ -84,7 +84,7 @@ public class TestBuilder {
   }
 
   public TestBuilder assertActionSessionAttributeNotNull(String actionName, String attributeName) {
-    Object object = simulator.session.getAttribute(ACTION_SESSION_KEY);
+    Object object = simulator.container.getSession().getAttribute(ACTION_SESSION_KEY);
     assertNotNull(object);
     Map<String, Map<String, Object>> map = (Map<String, Map<String, Object>>) object;
     Object actionAttributes = map.get(actionName);
@@ -95,7 +95,7 @@ public class TestBuilder {
   }
 
   public TestBuilder assertSessionAttributeNotNull(String attributeName) {
-    assertNotNull(simulator.session.getAttribute(attributeName));
+    assertNotNull(simulator.container.getSession().getAttribute(attributeName));
     return this;
   }
 
