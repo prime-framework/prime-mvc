@@ -57,7 +57,7 @@ public class RequestBuilder {
 
   public RequestBuilder(String uri, MockContainer container, PrimeFilter filter, Injector injector) {
     this.request = container.newServletRequest(uri, Locale.getDefault(), false, "UTF-8");
-    this.response = new MockHttpServletResponse();
+    this.response = container.newServletResponse();
     this.filter = filter;
     this.injector = injector;
   }

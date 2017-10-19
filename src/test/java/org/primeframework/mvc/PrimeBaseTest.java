@@ -121,7 +121,7 @@ public abstract class PrimeBaseTest {
     container.getContext().setAttribute(PrimeServletContextListener.GUICE_INJECTOR_KEY, injector);
 
     request = container.newServletRequest("/", Locale.getDefault(), false, "UTF-8");
-    response = new MockHttpServletResponse();
+    response = container.newServletResponse();
 
     ServletObjectsHolder.setServletRequest(new HttpServletRequestWrapper(request));
     ServletObjectsHolder.setServletResponse(response);
