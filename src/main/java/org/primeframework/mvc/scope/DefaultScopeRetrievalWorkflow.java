@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,9 @@ package org.primeframework.mvc.scope;
 
 import javax.servlet.ServletException;
 import java.io.IOException;
-import java.util.List;
 
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
-import org.primeframework.mvc.action.config.ActionConfiguration;
-import org.primeframework.mvc.util.ReflectionUtils;
 import org.primeframework.mvc.workflow.WorkflowChain;
 
 import com.google.inject.Inject;
@@ -35,14 +32,16 @@ import com.google.inject.Inject;
  */
 public class DefaultScopeRetrievalWorkflow implements ScopeRetrievalWorkflow {
   private final ActionInvocationStore actionInvocationStore;
+
   private final FlashScope flashScope;
-  private final ScopeProvider scopeProvider;
+
+  private final ScopeRetriever scopeRetriever;
 
   @Inject
-  public DefaultScopeRetrievalWorkflow(ActionInvocationStore actionInvocationStore, FlashScope flashScope, ScopeProvider scopeProvider) {
+  public DefaultScopeRetrievalWorkflow(ActionInvocationStore actionInvocationStore, FlashScope flashScope, ScopeRetriever scopeRetriever) {
     this.actionInvocationStore = actionInvocationStore;
     this.flashScope = flashScope;
-    this.scopeProvider = scopeProvider;
+    this.scopeRetriever = scopeRetriever;
   }
 
   /**
@@ -53,15 +52,8 @@ public class DefaultScopeRetrievalWorkflow implements ScopeRetrievalWorkflow {
   public void perform(WorkflowChain chain) throws IOException, ServletException {
     flashScope.transferFlash();
 
-    ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
-    Object action = actionInvocation.action;
-
     // Handle loading scoped members into the action
-    ActionConfiguration actionConfiguration = actionInvocation.configuration;
-    List<ScopeField> scopeFields = (actionConfiguration != null) ? actionConfiguration.scopeFields : null;
-    if (action != null && scopeFields != null && scopeFields.size() > 0) {
-      loadScopedMembers(action, scopeFields);
-    }
+    loadScopedMembers(actionInvocationStore.getCurrent());
 
     chain.continueWorkflow();
   }
@@ -69,17 +61,10 @@ public class DefaultScopeRetrievalWorkflow implements ScopeRetrievalWorkflow {
   /**
    * Loads all of the values into the action from the scopes.
    *
-   * @param action The action to sets the values from scopes into.
-   * @param scopeFields The scope fields.
+   * @param actionInvocation The action invocation
    */
   @SuppressWarnings("unchecked")
-  protected void loadScopedMembers(Object action, List<ScopeField> scopeFields) {
-    for (ScopeField scopeField : scopeFields) {
-      Scope scope = scopeProvider.lookup(scopeField.annotationType);
-      Object value = scope.get(scopeField.field.getName(), scopeField.annotation);
-      if (value != null) {
-        ReflectionUtils.setField(scopeField.field, action, value);
-      }
-    }
+  protected void loadScopedMembers(ActionInvocation actionInvocation) {
+    scopeRetriever.setScopedValues(actionInvocation);
   }
 }

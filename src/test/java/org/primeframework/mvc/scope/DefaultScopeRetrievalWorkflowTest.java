@@ -51,7 +51,7 @@ public class DefaultScopeRetrievalWorkflowTest extends PrimeBaseTest {
     chain.continueWorkflow();
     replay(chain);
 
-    DefaultScopeRetrievalWorkflow workflow = new DefaultScopeRetrievalWorkflow(ais, fs, new DefaultScopeProvider(injector));
+    DefaultScopeRetrievalWorkflow workflow = new DefaultScopeRetrievalWorkflow(ais, fs, new DefaultScopeRetriever(new DefaultScopeProvider(injector)));
     workflow.perform(chain);
 
     assertSame(action.sessionObject, obj);

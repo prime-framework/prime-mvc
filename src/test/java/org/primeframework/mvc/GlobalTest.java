@@ -62,6 +62,29 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void get_sessionStorageInFormTag() throws Exception {
+    // Ensure we fill out scope storage in an action when we build a new action based upon hitting a
+    // form tag that has a different action then the current action invocation.
+
+    // Page2 has a session variable and a form, set it, assert it stays in the session.
+    test.simulate(() -> simulator.test("/scope/page-two")
+                                 .withParameter("searchText", "42")
+                                 .post()
+                                 .assertStatusCode(200))
+
+        .simulate(() -> simulator.test("/scope/page-two")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertBodyContains("42"))
+
+        // Now hit Page1 that contains a form tag with an action of /scope/page-two
+        .simulate(() -> simulator.test("/scope/page-one")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertBodyContains("42"));
+  }
+
+  @Test
   public void get_JSONView() throws Exception {
     simulator.test("/views/entry/api")
              .get()
@@ -298,7 +321,6 @@ public class GlobalTest extends PrimeBaseTest {
              .withJSON(new Object())
              .delete()
              .assertStatusCode(202);
-
   }
 
   @Test

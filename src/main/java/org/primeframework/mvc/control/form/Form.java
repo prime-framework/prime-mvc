@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.primeframework.mvc.action.ActionMapper;
 import org.primeframework.mvc.control.AbstractControl;
 import org.primeframework.mvc.control.annotation.ControlAttribute;
 import org.primeframework.mvc.control.annotation.ControlAttributes;
+import org.primeframework.mvc.scope.ScopeRetriever;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.servlet.ServletTools;
 
@@ -45,12 +46,14 @@ public class Form extends AbstractControl {
   private final ActionInvocationStore actionInvocationStore;
   private final ActionMapper actionMapper;
   private boolean differentURI = false;
+  private final ScopeRetriever scopeRetriever;
 
   @Inject
-  public Form(FormPreparer formPreparer, ActionInvocationStore actionInvocationStore, ActionMapper actionMapper) {
+  public Form(FormPreparer formPreparer, ActionInvocationStore actionInvocationStore, ActionMapper actionMapper, ScopeRetriever scopeRetriever) {
     this.formPreparer = formPreparer;
     this.actionInvocationStore = actionInvocationStore;
     this.actionMapper = actionMapper;
+    this.scopeRetriever = scopeRetriever;
   }
 
   /**
@@ -93,6 +96,7 @@ public class Form extends AbstractControl {
         throw new PrimeException("The form action [" + action + "] is not a valid URI that maps to an action " +
           "class by the Prime MVC.");
       } else if (current == null || current.action == null || current.action.getClass() != actionInvocation.action.getClass()) {
+        scopeRetriever.setScopedValues(actionInvocation);
         actionInvocationStore.setCurrent(actionInvocation);
         differentURI = true;
       }

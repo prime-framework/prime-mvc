@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,11 @@ package org.primeframework.mvc.scope.guice;
 
 import org.primeframework.mvc.scope.DefaultScopeProvider;
 import org.primeframework.mvc.scope.DefaultScopeRetrievalWorkflow;
+import org.primeframework.mvc.scope.DefaultScopeRetriever;
 import org.primeframework.mvc.scope.DefaultScopeStorageWorkflow;
 import org.primeframework.mvc.scope.ScopeProvider;
 import org.primeframework.mvc.scope.ScopeRetrievalWorkflow;
+import org.primeframework.mvc.scope.ScopeRetriever;
 import org.primeframework.mvc.scope.ScopeStorageWorkflow;
 
 import com.google.inject.AbstractModule;
@@ -33,12 +35,9 @@ public class ScopeModule extends AbstractModule {
   @Override
   protected void configure() {
     bindScopeProvider();
+    bindScopeRetriever();
     bindScopeRetrievalWorkflow();
     bindScopeStorageWorkflow();
-  }
-
-  private void bindScopeProvider() {
-    bind(ScopeProvider.class).to(DefaultScopeProvider.class);
   }
 
   protected void bindScopeRetrievalWorkflow() {
@@ -47,5 +46,13 @@ public class ScopeModule extends AbstractModule {
 
   protected void bindScopeStorageWorkflow() {
     bind(ScopeStorageWorkflow.class).to(DefaultScopeStorageWorkflow.class);
+  }
+
+  private void bindScopeProvider() {
+    bind(ScopeProvider.class).to(DefaultScopeProvider.class);
+  }
+
+  private void bindScopeRetriever() {
+    bind(ScopeRetriever.class).to(DefaultScopeRetriever.class);
   }
 }
