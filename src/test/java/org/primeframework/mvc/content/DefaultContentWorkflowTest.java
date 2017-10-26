@@ -18,6 +18,7 @@ package org.primeframework.mvc.content;
 import javax.servlet.ServletException;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -66,7 +67,7 @@ public class DefaultContentWorkflowTest extends PrimeBaseTest {
     additionalConfig.put(BinaryActionConfiguration.class, new BinaryActionConfiguration("binaryRequest", null));
 
     KitchenSinkAction action = new KitchenSinkAction(null);
-    ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null, null);
+    ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, null, null, null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, additionalConfig, null, null);
     store.setCurrent(new ActionInvocation(action, null, null, null, config));
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
@@ -124,7 +125,7 @@ public class DefaultContentWorkflowTest extends PrimeBaseTest {
     additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(requestMembers, null));
 
     KitchenSinkAction action = new KitchenSinkAction(null);
-    ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null, null);
+    ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, null, null, null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, additionalConfig, null, null);
     store.setCurrent(new ActionInvocation(action, new ExecuteMethodConfiguration(HTTPMethod.POST, null, null), null, null, config));
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);

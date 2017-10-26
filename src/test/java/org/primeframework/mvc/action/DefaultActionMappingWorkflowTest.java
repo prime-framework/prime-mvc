@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2016, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package org.primeframework.mvc.action;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -95,9 +96,9 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     EasyMock.expect(provider.lookup("/foo")).andReturn(null);
     EasyMock.expect(provider.lookup("/foo/index")).andReturn(
         new ActionConfiguration(ComplexRestAction.class, new HashMap<>(),
-            new HashMap<>(), new ArrayList<>(), null, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new HashMap<>(),
-            new HashMap<>(), new HashMap<>(), new HashSet<>(), new ArrayList<>(), new HashMap<>(), "/foo/index", new ArrayList<>()
-        ));
+            new HashMap<>(), new ArrayList<>(), Collections.emptyMap(), Collections.emptyMap(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(),
+            new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashSet<>(), Collections.emptyList(), new ArrayList<>(), new HashMap<>(), "/foo/index",
+            new ArrayList<>()));
     EasyMock.replay(provider);
 
     ActionInvocationStore store = EasyMock.createStrictMock(ActionInvocationStore.class);
@@ -162,9 +163,9 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     EasyMock.expect(provider.lookup("/complex-rest/brian")).andReturn(null);
     EasyMock.expect(provider.lookup("/complex-rest")).andReturn(
         new ActionConfiguration(ComplexRestAction.class, executeMethods,
-            new HashMap<>(), new ArrayList<>(), null, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new HashMap<>(),
-            new HashMap<>(), new HashMap<>(), new HashSet<>(), new ArrayList<>(), new HashMap<>(), "/complex-rest", new ArrayList<>()
-        ));
+            new HashMap<>(), new ArrayList<>(), Collections.emptyMap(), Collections.emptyMap(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(),
+            new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashSet<>(), Collections.emptyList(), new ArrayList<>(), new HashMap<>(), "/complex-rest",
+            new ArrayList<>()));
     EasyMock.replay(provider);
 
     Capture<ActionInvocation> capture = new Capture<>();
@@ -209,9 +210,9 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     EasyMock.expect(provider.lookup("/admin/user/rest-edit/12")).andReturn(null);
     EasyMock.expect(provider.lookup("/admin/user/rest-edit/12/index")).andReturn(null);
     EasyMock.expect(provider.lookup("/admin/user/rest-edit")).andReturn(new ActionConfiguration(RESTEdit.class, executeMethods,
-        new HashMap<>(), new ArrayList<>(), null, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new HashMap<>(),
-        new HashMap<>(), new HashMap<>(), new HashSet<>(), new ArrayList<>(), new HashMap<>(), "/admin/user/rest-edit", new ArrayList<>()
-    ));
+        new HashMap<>(), new ArrayList<>(), Collections.emptyMap(), Collections.emptyMap(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(),
+        new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashSet<>(), Collections.emptyList(), new ArrayList<>(), new HashMap<>(), "/admin/user/rest-edit",
+        new ArrayList<>()));
     EasyMock.replay(provider);
 
     Capture<ActionInvocation> capture = new Capture<>();
@@ -262,9 +263,9 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     ActionConfigurationProvider provider = EasyMock.createStrictMock(ActionConfigurationProvider.class);
     EasyMock.expect(provider.lookup(uri)).andReturn(
         new ActionConfiguration(EditAction.class, executeMethods,
-            new HashMap<>(), new ArrayList<>(), null, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new HashMap<>(), new HashMap<>(),
-            new HashMap<>(), new HashSet<>(), new ArrayList<>(), new HashMap<>(), uri, new ArrayList<>()
-        ));
+            new HashMap<>(), new ArrayList<>(), new HashMap<>(), new HashMap<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new HashMap<>(),
+            new HashMap<>(), new HashMap<>(), new HashSet<>(), new ArrayList<>(), new ArrayList<>(), new HashMap<>(), uri,
+            new ArrayList<>()));
     EasyMock.replay(provider);
 
     Capture<ActionInvocation> capture = new Capture<>();

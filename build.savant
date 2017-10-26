@@ -15,7 +15,7 @@
  */
 
 savantVersion = "1.0.0"
-primeJWTVersion = "1.0.0"
+primeJWTVersion = "1.1.0"
 
 project(group: "org.primeframework", name: "prime-mvc", version: "1.5.7", licenses: ["ApacheV2_0"]) {
   workflow {

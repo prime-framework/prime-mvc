@@ -72,6 +72,7 @@ public class TestBuilder {
     return this;
   }
 
+  @SuppressWarnings("unchecked")
   public TestBuilder assertActionSessionAttributeIsNull(String actionName, String attributeName) {
     Object object = simulator.container.getSession().getAttribute(ACTION_SESSION_KEY);
     assertNotNull(object);
@@ -83,6 +84,7 @@ public class TestBuilder {
     return this;
   }
 
+  @SuppressWarnings("unchecked")
   public TestBuilder assertActionSessionAttributeNotNull(String actionName, String attributeName) {
     Object object = simulator.container.getSession().getAttribute(ACTION_SESSION_KEY);
     assertNotNull(object);

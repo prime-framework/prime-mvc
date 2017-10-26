@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2015-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,9 +26,11 @@ import org.primeframework.mock.servlet.MockHttpServletRequest.Method;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.DefaultActionInvocationStore;
+import org.primeframework.mvc.action.ExecuteMethodConfiguration;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.config.DefaultActionConfigurationBuilder;
 import org.primeframework.mvc.security.guice.SecuritySchemeFactory;
+import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
 
@@ -49,13 +51,13 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
   @Test
   public void performAuthenticationNotRequired() throws Exception {
     ActionConfiguration configuration = actionConfigurationBuilder.build(PostAction.class);
-    ActionInvocation actionInvocation = new ActionInvocation(new PostAction(), null, null, null, configuration);
+    ExecuteMethodConfiguration methodConfiguration = new ExecuteMethodConfiguration(HTTPMethod.GET, null, null);
+    ActionInvocation actionInvocation = new ActionInvocation(new PostAction(), methodConfiguration, null, null, configuration);
     DefaultActionInvocationStore store = new DefaultActionInvocationStore(request);
     store.setCurrent(actionInvocation);
 
     TestUserLoginSecurityContext securityContext = new TestUserLoginSecurityContext(request, emptySet());
-    JWTRequestAdapter jwtAdapter = new DefaultJWTRequestAdapter(request, response);
-    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, jwtAdapter, new TestSecuritySchemeFactory(securityContext));
+    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, new TestSecuritySchemeFactory(securityContext));
 
     WorkflowChain workflowChain = createStrictMock(WorkflowChain.class);
     workflowChain.continueWorkflow();
@@ -69,13 +71,13 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
   @Test
   public void performAuthenticationRequiredNoRolesRequired() throws Exception {
     ActionConfiguration configuration = actionConfigurationBuilder.build(SecureNoRolesAction.class);
-    ActionInvocation actionInvocation = new ActionInvocation(new SecureNoRolesAction(), null, null, null, configuration);
+    ExecuteMethodConfiguration methodConfiguration = new ExecuteMethodConfiguration(HTTPMethod.GET, null, null);
+    ActionInvocation actionInvocation = new ActionInvocation(new SecureNoRolesAction(), methodConfiguration, null, null, configuration);
     DefaultActionInvocationStore store = new DefaultActionInvocationStore(request);
     store.setCurrent(actionInvocation);
 
     TestUserLoginSecurityContext securityContext = new TestUserLoginSecurityContext(request, new HashSet<>(singletonList("bad")));
-    JWTRequestAdapter jwtAdapter = new DefaultJWTRequestAdapter(request, response);
-    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, jwtAdapter, new TestSecuritySchemeFactory(securityContext));
+    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, new TestSecuritySchemeFactory(securityContext));
     request.getSession().setAttribute(BaseHttpSessionUserLoginSecurityContext.USER_SESSION_KEY, "user"); // Log in the user
 
     WorkflowChain workflowChain = createStrictMock(WorkflowChain.class);
@@ -90,7 +92,8 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
   @Test
   public void performAuthenticationRequiredNotLoggedInGET() throws Exception {
     ActionConfiguration configuration = actionConfigurationBuilder.build(SecureAction.class);
-    ActionInvocation actionInvocation = new ActionInvocation(new SecureAction(), null, null, null, configuration);
+    ExecuteMethodConfiguration methodConfiguration = new ExecuteMethodConfiguration(HTTPMethod.GET, null, null);
+    ActionInvocation actionInvocation = new ActionInvocation(new SecureAction(), methodConfiguration, null, null, configuration);
     DefaultActionInvocationStore store = new DefaultActionInvocationStore(request);
     store.setCurrent(actionInvocation);
 
@@ -100,8 +103,7 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
     request.getParameters().put("test2", singletonList("value2"));
 
     TestUserLoginSecurityContext securityContext = new TestUserLoginSecurityContext(request, emptySet());
-    JWTRequestAdapter jwtAdapter = new DefaultJWTRequestAdapter(request, response);
-    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, jwtAdapter, new TestSecuritySchemeFactory(securityContext));
+    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, new TestSecuritySchemeFactory(securityContext));
 
     WorkflowChain workflowChain = createStrictMock(WorkflowChain.class);
     replay(workflowChain);
@@ -119,7 +121,8 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
   @Test
   public void performAuthenticationRequiredNotLoggedInPOST() throws Exception {
     ActionConfiguration configuration = actionConfigurationBuilder.build(SecureAction.class);
-    ActionInvocation actionInvocation = new ActionInvocation(new SecureAction(), null, null, null, configuration);
+    ExecuteMethodConfiguration methodConfiguration = new ExecuteMethodConfiguration(HTTPMethod.POST, null, null);
+    ActionInvocation actionInvocation = new ActionInvocation(new SecureAction(), methodConfiguration, null, null, configuration);
     DefaultActionInvocationStore store = new DefaultActionInvocationStore(request);
     store.setCurrent(actionInvocation);
 
@@ -129,8 +132,7 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
     request.getParameters().put("test2", singletonList("value2"));
 
     TestUserLoginSecurityContext securityContext = new TestUserLoginSecurityContext(request, emptySet());
-    JWTRequestAdapter jwtAdapter = new DefaultJWTRequestAdapter(request, response);
-    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, jwtAdapter, new TestSecuritySchemeFactory(securityContext));
+    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, new TestSecuritySchemeFactory(securityContext));
 
     WorkflowChain workflowChain = createStrictMock(WorkflowChain.class);
     replay(workflowChain);
@@ -148,13 +150,13 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
   @Test
   public void performAuthenticationRequiredSuccess() throws Exception {
     ActionConfiguration configuration = actionConfigurationBuilder.build(SecureAction.class);
-    ActionInvocation actionInvocation = new ActionInvocation(new SecureAction(), null, null, null, configuration);
+    ExecuteMethodConfiguration methodConfiguration = new ExecuteMethodConfiguration(HTTPMethod.GET, null, null);
+    ActionInvocation actionInvocation = new ActionInvocation(new SecureAction(), methodConfiguration, null, null, configuration);
     DefaultActionInvocationStore store = new DefaultActionInvocationStore(request);
     store.setCurrent(actionInvocation);
 
     TestUserLoginSecurityContext securityContext = new TestUserLoginSecurityContext(request, new HashSet<>(singletonList("admin")));
-    JWTRequestAdapter jwtAdapter = new DefaultJWTRequestAdapter(request, response);
-    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, jwtAdapter, new TestSecuritySchemeFactory(securityContext));
+    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, new TestSecuritySchemeFactory(securityContext));
     request.getSession().setAttribute(BaseHttpSessionUserLoginSecurityContext.USER_SESSION_KEY, "user"); // Log in the user
 
     WorkflowChain workflowChain = createStrictMock(WorkflowChain.class);
@@ -169,13 +171,13 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
   @Test
   public void performAuthenticationRequiredWrongRoles() throws Exception {
     ActionConfiguration configuration = actionConfigurationBuilder.build(SecureAction.class);
-    ActionInvocation actionInvocation = new ActionInvocation(new SecureAction(), null, null, null, configuration);
+    ExecuteMethodConfiguration methodConfiguration = new ExecuteMethodConfiguration(HTTPMethod.GET, null, null);
+    ActionInvocation actionInvocation = new ActionInvocation(new SecureAction(), methodConfiguration, null, null, configuration);
     DefaultActionInvocationStore store = new DefaultActionInvocationStore(request);
     store.setCurrent(actionInvocation);
 
     TestUserLoginSecurityContext securityContext = new TestUserLoginSecurityContext(request, new HashSet<>(singletonList("bad")));
-    JWTRequestAdapter jwtAdapter = new DefaultJWTRequestAdapter(request, response);
-    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, jwtAdapter, new TestSecuritySchemeFactory(securityContext));
+    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, new TestSecuritySchemeFactory(securityContext));
     request.getSession().setAttribute(BaseHttpSessionUserLoginSecurityContext.USER_SESSION_KEY, "user"); // Log in the user
 
     WorkflowChain workflowChain = createStrictMock(WorkflowChain.class);
@@ -194,12 +196,12 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
   @Test
   public void performNotConfigured() throws Exception {
     ActionConfiguration configuration = actionConfigurationBuilder.build(PostAction.class);
-    ActionInvocation actionInvocation = new ActionInvocation(new PostAction(), null, null, null, configuration);
+    ExecuteMethodConfiguration methodConfiguration = new ExecuteMethodConfiguration(HTTPMethod.GET, null, null);
+    ActionInvocation actionInvocation = new ActionInvocation(new PostAction(), methodConfiguration, null, null, configuration);
     DefaultActionInvocationStore store = new DefaultActionInvocationStore(request);
     store.setCurrent(actionInvocation);
 
-    JWTRequestAdapter jwtAdapter = new DefaultJWTRequestAdapter(request, response);
-    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, jwtAdapter, new TestSecuritySchemeFactory(null));
+    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, new TestSecuritySchemeFactory(null));
 
     WorkflowChain workflowChain = createStrictMock(WorkflowChain.class);
     workflowChain.continueWorkflow();
@@ -222,7 +224,6 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
     public SecurityScheme build(String scheme) {
       UserLoginSecurityScheme s = new UserLoginSecurityScheme();
       s.setUserLoginSecurityContext(securityContext);
-      s.setActionInvocationStore(null);
       return s;
     }
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 
 import org.primeframework.jwt.domain.JWT;
 import org.primeframework.mvc.PrimeException;
+import org.primeframework.mvc.action.AuthorizationMethodConfiguration;
 import org.primeframework.mvc.action.ExecuteMethodConfiguration;
 import org.primeframework.mvc.action.JWTMethodConfiguration;
 import org.primeframework.mvc.action.ValidationMethodConfiguration;
@@ -44,7 +45,9 @@ import org.primeframework.mvc.parameter.annotation.PreParameterMethod;
 import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
 import org.primeframework.mvc.scope.ScopeField;
 import org.primeframework.mvc.scope.annotation.ScopeAnnotation;
+import org.primeframework.mvc.security.AuthorizeSchemeData;
 import org.primeframework.mvc.security.annotation.AnonymousAccess;
+import org.primeframework.mvc.security.annotation.AuthorizeMethod;
 import org.primeframework.mvc.security.annotation.JWTAuthorizeMethod;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.util.ReflectionUtils;
@@ -98,15 +101,18 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
     Set<String> memberNames = ReflectionUtils.findAllMembers(actionClass);
 
     Map<HTTPMethod, List<ValidationMethodConfiguration>> validationMethods = findValidationMethods(actionClass);
-    Map<HTTPMethod, List<JWTMethodConfiguration>> jwtAuthorizationMethods = findJwtAuthorizationMethods(actionClass, executeMethods);
+
+    List<String> securitySchemes = findSecuritySchemes(actionClass);
+    Map<HTTPMethod, List<AuthorizationMethodConfiguration>> authorizationMethods = findAuthorizationMethods(actionClass, securitySchemes, executeMethods);
+    Map<HTTPMethod, List<JWTMethodConfiguration>> jwtAuthorizationMethods = findJwtAuthorizationMethods(actionClass, securitySchemes, executeMethods);
 
     List<ScopeField> scopeFields = findScopeFields(actionClass);
 
     Map<Class<?>, Object> additionalConfiguration = getAdditionalConfiguration(actionClass);
 
-    return new ActionConfiguration(actionClass, executeMethods, validationMethods, formPrepareMethods, jwtAuthorizationMethods,
-        postValidationMethods, preParameterMethods, postParameterMethods, resultAnnotations, preParameterMembers, fileUploadMembers,
-        memberNames, scopeFields, additionalConfiguration, uri, preValidationMethods);
+    return new ActionConfiguration(actionClass, executeMethods, validationMethods, formPrepareMethods, authorizationMethods,
+        jwtAuthorizationMethods, postValidationMethods, preParameterMethods, postParameterMethods, resultAnnotations, preParameterMembers,
+        fileUploadMembers, memberNames, securitySchemes, scopeFields, additionalConfiguration, uri, preValidationMethods);
   }
 
   /**
@@ -233,9 +239,67 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
     return executeMethods;
   }
 
-  protected Map<HTTPMethod, List<JWTMethodConfiguration>> findJwtAuthorizationMethods(Class<?> actionClass, Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods) {
-    // When JWT is not enabled, we will not call any of the JWT Authorization Methods.
-    if (!actionClass.getAnnotation(Action.class).jwtEnabled()) {
+  protected Map<HTTPMethod, List<AuthorizationMethodConfiguration>> findAuthorizationMethods(Class<?> actionClass, List<String> securitySchemes, Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods) {
+    // When Authorize Method scheme is not enabled, we will not call any of the Authorization Methods.
+    if (!securitySchemes.contains("authorize-method")) {
+      return Collections.emptyMap();
+    }
+
+    List<Method> methods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, AuthorizeMethod.class);
+    if (methods.isEmpty()) {
+      throw new PrimeException("The action class [" + actionClass + "] is missing at a Authorization method. " +
+          "The class must define a one or more methods annotated " + AuthorizeMethod.class.getSimpleName() + " when the [authorize-method] is specified as a security scheme.");
+    }
+
+    // Return type must be Boolean or boolean
+    if (methods.stream().anyMatch(m -> m.getReturnType() != Boolean.TYPE && m.getReturnType() != Boolean.class)) {
+      throw new PrimeException("The action class [" + actionClass + "] has at least one Authorization method that has declared a return "
+          + "type of something other than boolean. Your method annotated with " + AuthorizeMethod.class.getSimpleName() + " must declare a return type"
+          + "of boolean or Boolean.");
+    }
+
+    // Optionally take a single parameter
+    if (methods.stream().anyMatch(m -> m.getParameterCount() > 1)) {
+      throw new PrimeException("The action class [" + actionClass + "] has at least one Authorization method that has not declared the correct method "
+          + "signature. Your method annotated with " + AuthorizeMethod.class.getSimpleName() + " may be declared without parameters, or a single parameter of type " + AuthorizeSchemeData.class.getSimpleName() + ".");
+    }
+
+    // If a parameter is in the signature, it must be of type AuthorizeSchemeData
+    if (methods.stream().filter(m -> m.getParameterCount() == 1).anyMatch(m -> m.getParameterTypes()[0] != AuthorizeSchemeData.class)) {
+      throw new PrimeException("The action class [" + actionClass + "] has at least one Authorization method that has not declared the correct method "
+          + "signature. Your method annotated with " + AuthorizeMethod.class.getSimpleName() + " must declare a single method parameter of type " + AuthorizeSchemeData.class.getSimpleName() + ".");
+    }
+
+    // Map HTTP method to a list of Authorize Methods.
+    Map<HTTPMethod, List<AuthorizationMethodConfiguration>> authorizationMethods = new HashMap<>();
+    methods.stream()
+           .map(m -> new AuthorizationMethodConfiguration(m, m.getAnnotation(AuthorizeMethod.class)))
+           .forEach(c -> Arrays.asList(c.annotation.httpMethods())
+                               .forEach(m -> authorizationMethods.computeIfAbsent(m, k -> new ArrayList<>()).add(c)));
+
+    // Ensure we're calling the Authorize GET method for a HEAD request
+    if (authorizationMethods.containsKey(HTTPMethod.GET) && !authorizationMethods.containsKey(HTTPMethod.HEAD)) {
+      authorizationMethods.put(HTTPMethod.HEAD, authorizationMethods.get(HTTPMethod.GET));
+    }
+
+    // All Execute Methods that require authentication need to be accounted for in Authorization Methods. It is ok if the Authorization Methods define a superset of the execute methods.
+    Set<HTTPMethod> authenticatedMethods = executeMethods.keySet().stream().filter(k -> {
+      ExecuteMethodConfiguration methodConfiguration = executeMethods.get(k);
+      return methodConfiguration.annotations.containsKey(AnonymousAccess.class);
+    }).collect(Collectors.toSet());
+
+    if (!authorizationMethods.keySet().containsAll(authenticatedMethods)) {
+      throw new PrimeException("The action class [" + actionClass + "] is missing at an Authorization method. " +
+          "The class must define one or more methods annotated " + AuthorizeMethod.class.getSimpleName() + " when the [authorize-method] is specified as a security scheme. "
+          + "Ensure that for each execute method in your action such as post, put, get and delete that a method is configured to authorize the request.");
+    }
+
+    return authorizationMethods;
+  }
+
+  protected Map<HTTPMethod, List<JWTMethodConfiguration>> findJwtAuthorizationMethods(Class<?> actionClass, List<String> securitySchemes, Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods) {
+    // When JWT scheme is not enabled, we will not call any of the JWT Authorization Methods.
+    if (!securitySchemes.contains("jwt")) {
       return Collections.emptyMap();
     }
 
@@ -368,6 +432,24 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
           "  return \"success\"\n" +
           "}");
     }
+  }
+
+  private List<String> findSecuritySchemes(Class<?> actionClass) {
+    List<String> securitySchemes = new ArrayList<>();
+    String[] schemes = actionClass.getAnnotation(Action.class).schemes();
+    if (schemes.length == 0) {
+      securitySchemes.add(actionClass.getAnnotation(Action.class).scheme());
+    } else {
+      // When 'schemes' are specified, we're ignoring the value set in 'scheme'
+      securitySchemes.addAll(Arrays.asList(schemes));
+    }
+
+    // jwtEnabled is deprecated, but if in use, add 'jwt' to the schemes list, adding it last.
+    if (!securitySchemes.contains("jwt") && actionClass.getAnnotation(Action.class).jwtEnabled()) {
+      securitySchemes.add("jwt");
+    }
+
+    return securitySchemes;
   }
 
   private Map<Class<?>, Object> getAdditionalConfiguration(Class<?> actionClass) {

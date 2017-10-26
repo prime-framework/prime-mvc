@@ -21,6 +21,7 @@ import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -175,8 +176,8 @@ public abstract class PrimeBaseTest {
     resultConfigurations.put(resultCode, annotation);
 
     return new ActionInvocation(action, executeMethod, uri, extension,
-        new ActionConfiguration(EditAction.class, executeMethods, validationMethods, new ArrayList<>(), null, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), resultConfigurations, new HashMap<>(), new HashMap<>(), new HashSet<>(), new ArrayList<>(), new HashMap<>(), uri, new ArrayList<>()
-        ));
+        new ActionConfiguration(EditAction.class, executeMethods, validationMethods, new ArrayList<>(), null, null, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), resultConfigurations, new HashMap<>(), new HashMap<>(), new HashSet<>(), Collections.emptyList(), new ArrayList<>(), new HashMap<>(), uri,
+            new ArrayList<>()));
   }
 
   public static class TestMVCConfigurationModule extends AbstractModule {

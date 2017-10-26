@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,13 @@ import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Collections;
 
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.workflow.StaticResourceWorkflow;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
 
-import static java.util.Collections.EMPTY_SET;
 import static org.easymock.EasyMock.createStrictMock;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
@@ -64,7 +64,7 @@ public class StaticResourceWorkflowTest {
     wc.continueWorkflow();
     replay(wc);
 
-    StaticResourceWorkflow srw = new StaticResourceWorkflow(context, req, res, configuration, EMPTY_SET);
+    StaticResourceWorkflow srw = new StaticResourceWorkflow(context, req, res, configuration, Collections.emptySet());
     srw.perform(wc);
     verify(configuration, req, res, wc);
   }
@@ -91,7 +91,7 @@ public class StaticResourceWorkflowTest {
     WorkflowChain wc = createStrictMock(WorkflowChain.class);
     replay(wc);
 
-    StaticResourceWorkflow srw = new StaticResourceWorkflow(context, req, res, configuration, EMPTY_SET);
+    StaticResourceWorkflow srw = new StaticResourceWorkflow(context, req, res, configuration, Collections.emptySet());
     srw.perform(wc);
     verify(configuration, req, res, wc);
   }
@@ -139,7 +139,7 @@ public class StaticResourceWorkflowTest {
     WorkflowChain wc = createStrictMock(WorkflowChain.class);
     replay(wc);
 
-    StaticResourceWorkflow srw = new StaticResourceWorkflow(context, req, res, configuration, EMPTY_SET);
+    StaticResourceWorkflow srw = new StaticResourceWorkflow(context, req, res, configuration, Collections.emptySet());
     srw.perform(wc);
     verify(configuration, req, res, wc);
 
@@ -189,7 +189,7 @@ public class StaticResourceWorkflowTest {
     WorkflowChain wc = createStrictMock(WorkflowChain.class);
     replay(wc);
 
-    StaticResourceWorkflow srw = new StaticResourceWorkflow(context, req, res, configuration, EMPTY_SET);
+    StaticResourceWorkflow srw = new StaticResourceWorkflow(context, req, res, configuration, Collections.emptySet());
     srw.perform(wc);
     verify(configuration, req, res, wc);
 
@@ -215,7 +215,7 @@ public class StaticResourceWorkflowTest {
     wc.continueWorkflow();
     replay(wc);
 
-    StaticResourceWorkflow srw = new StaticResourceWorkflow(context, req, res, configuration, EMPTY_SET);
+    StaticResourceWorkflow srw = new StaticResourceWorkflow(context, req, res, configuration, Collections.emptySet());
     srw.perform(wc);
     verify(configuration, req, res, wc);
   }

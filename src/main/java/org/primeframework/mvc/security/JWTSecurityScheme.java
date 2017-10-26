@@ -31,7 +31,6 @@ import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.JWTMethodConfiguration;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.parameter.el.ExpressionException;
-import org.primeframework.mvc.security.annotation.AnonymousAccess;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.util.ReflectionUtils;
 
@@ -64,9 +63,6 @@ public class JWTSecurityScheme implements SecurityScheme {
   @Override
   public void handle(String[] constraints) {
     ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
-    if (actionInvocation.method.annotations.containsKey(AnonymousAccess.class)) {
-      return;
-    }
 
     try {
       String encodedJWT = jwtAdapter.getEncodedJWT();

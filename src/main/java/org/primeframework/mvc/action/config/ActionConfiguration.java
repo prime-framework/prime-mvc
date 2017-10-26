@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2016, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import org.primeframework.mvc.action.AuthorizationMethodConfiguration;
 import org.primeframework.mvc.action.ExecuteMethodConfiguration;
 import org.primeframework.mvc.action.JWTMethodConfiguration;
 import org.primeframework.mvc.action.ValidationMethodConfiguration;
@@ -46,6 +47,8 @@ public class ActionConfiguration {
   public final Action annotation;
 
   public final Map<Class<? extends Annotation>, Annotation> annotations = new HashMap<>();
+
+  public final Map<HTTPMethod, List<AuthorizationMethodConfiguration>> authorizationMethods;
 
   public final Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods;
 
@@ -75,6 +78,8 @@ public class ActionConfiguration {
 
   public final List<ScopeField> scopeFields;
 
+  public final List<String> securitySchemes;
+
   public final String uri;
 
   public final boolean validatable;
@@ -82,14 +87,15 @@ public class ActionConfiguration {
   public final Map<HTTPMethod, List<ValidationMethodConfiguration>> validationMethods;
 
   public ActionConfiguration(Class<?> actionClass, Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods, Map<HTTPMethod, List<ValidationMethodConfiguration>> validationMethods,
-                             List<Method> formPrepareMethods, Map<HTTPMethod, List<JWTMethodConfiguration>> jwtAuthorizationMethods, List<Method> postValidationMethods, List<Method> preParameterMethods,
+                             List<Method> formPrepareMethods, Map<HTTPMethod, List<AuthorizationMethodConfiguration>> authorizationMethods, Map<HTTPMethod, List<JWTMethodConfiguration>> jwtAuthorizationMethods, List<Method> postValidationMethods, List<Method> preParameterMethods,
                              List<Method> postParameterMethods, Map<String, Annotation> resultConfigurations, Map<String, PreParameter> preParameterMembers, Map<String,
-      FileUpload> fileUploadMembers, Set<String> memberNames, List<ScopeField> scopeFields, Map<Class<?>, Object> additionalConfiguration, String uri, List<Method> preValidationMethods) {
+      FileUpload> fileUploadMembers, Set<String> memberNames, List<String> securitySchemes, List<ScopeField> scopeFields, Map<Class<?>, Object> additionalConfiguration, String uri, List<Method> preValidationMethods) {
 
     Objects.requireNonNull(actionClass);
 
     this.actionClass = actionClass;
     this.formPrepareMethods = formPrepareMethods;
+    this.authorizationMethods = authorizationMethods;
     this.jwtAuthorizationMethods = jwtAuthorizationMethods;
     this.preValidationMethods = preValidationMethods;
     this.postValidationMethods = postValidationMethods;
@@ -102,6 +108,7 @@ public class ActionConfiguration {
     this.resultConfigurations = resultConfigurations;
     this.memberNames = memberNames;
     this.scopeFields = scopeFields;
+    this.securitySchemes = securitySchemes;
     this.additionalConfiguration = additionalConfiguration;
     this.validatable = Validatable.class.isAssignableFrom(actionClass);
     this.uri = uri;

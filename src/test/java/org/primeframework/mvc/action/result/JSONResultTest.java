@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -64,9 +65,9 @@ import static org.testng.Assert.assertEquals;
 public class JSONResultTest extends PrimeBaseTest {
   @Inject public ObjectMapper objectMapper;
 
-  @DataProvider(name= "httMethod")
+  @DataProvider(name = "httMethod")
   public Object[][] httpMethod() {
-    return new Object[][] {{HTTPMethod.GET}, {HTTPMethod.HEAD}};
+    return new Object[][]{{HTTPMethod.GET}, {HTTPMethod.HEAD}};
   }
 
   @Test(dataProvider = "httpMethod")
@@ -113,7 +114,7 @@ public class JSONResultTest extends PrimeBaseTest {
 
     Map<Class<?>, Object> additionalConfiguration = new HashMap<>();
     additionalConfiguration.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(null, "user"));
-    ActionConfiguration config = new ActionConfiguration(PostAction.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfiguration, null, null);
+    ActionConfiguration config = new ActionConfiguration(PostAction.class, null, null, null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, additionalConfiguration, null, null);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(action, new ExecuteMethodConfiguration(httpMethod, null, null), "/foo", "", config));
     replay(store);
@@ -188,7 +189,7 @@ public class JSONResultTest extends PrimeBaseTest {
 
     Map<Class<?>, Object> additionalConfiguration = new HashMap<>();
     additionalConfiguration.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(null, "user"));
-    ActionConfiguration config = new ActionConfiguration(PostAction.class, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfiguration, null, null);
+    ActionConfiguration config = new ActionConfiguration(PostAction.class, null, null, null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, additionalConfiguration, null, null);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
 
     expect(store.getCurrent()).andReturn(new ActionInvocation(action, new ExecuteMethodConfiguration(httpMethod, null, null), "/foo", "", config));
@@ -224,6 +225,7 @@ public class JSONResultTest extends PrimeBaseTest {
 
   public class JSONImpl implements JSON {
     private final String code;
+
     private final int status;
 
     public JSONImpl(String code, int status) {

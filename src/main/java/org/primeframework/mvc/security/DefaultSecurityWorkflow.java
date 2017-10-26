@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2015-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.config.MVCConfiguration;
+import org.primeframework.mvc.security.annotation.AnonymousAccess;
 import org.primeframework.mvc.security.guice.SecuritySchemeFactory;
 import org.primeframework.mvc.workflow.WorkflowChain;
 
@@ -39,12 +40,9 @@ public class DefaultSecurityWorkflow implements SecurityWorkflow {
 
   private final SecuritySchemeFactory factory;
 
-  private final JWTRequestAdapter jwtAdapter;
-
   @Inject
-  public DefaultSecurityWorkflow(ActionInvocationStore actionInvocationStore, JWTRequestAdapter jwtAdapter, SecuritySchemeFactory factory) {
+  public DefaultSecurityWorkflow(ActionInvocationStore actionInvocationStore, SecuritySchemeFactory factory) {
     this.actionInvocationStore = actionInvocationStore;
-    this.jwtAdapter = jwtAdapter;
     this.factory = factory;
   }
 
@@ -62,19 +60,27 @@ public class DefaultSecurityWorkflow implements SecurityWorkflow {
       return;
     }
 
-    // Allowing the user to specify 'jwt' allows a JWT only scheme that doesn't use 'user' or 'api' for example.
-    String scheme = actionAnnotation.scheme();
-    // If the action has enabled JWT and the request contains a JWT override the scheme.
-    if (!scheme.equals("jwt") && jwtAdapter.requestContainsJWT() && actionAnnotation.jwtEnabled()) {
-      scheme = "jwt";
+    if (actionInvocation.method.annotations.containsKey(AnonymousAccess.class)) {
+      workflowChain.continueWorkflow();
+      return;
     }
 
-    SecurityScheme securityScheme = factory.build(scheme);
-    if (securityScheme == null) {
-      throw new PrimeException("You have specified an invalid security scheme named [" + scheme + "]");
+    for (String scheme : actionInvocation.configuration.securitySchemes) {
+      SecurityScheme securityScheme = factory.build(scheme);
+      if (securityScheme == null) {
+        throw new PrimeException("You have specified an invalid security scheme named [" + scheme + "]");
+      }
+
+      // Catch UnauthenticatedException and continue, allow UnauthorizedException to propagate.
+      try {
+        securityScheme.handle(actionAnnotation.constraints());
+        workflowChain.continueWorkflow();
+        return;
+      } catch (UnauthenticatedException ignore) {
+        // Continue, to the next security scheme.
+      }
     }
 
-    securityScheme.handle(actionAnnotation.constraints());
-    workflowChain.continueWorkflow();
+    throw new UnauthenticatedException();
   }
 }
