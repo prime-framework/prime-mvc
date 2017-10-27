@@ -325,11 +325,10 @@ public class GlobalTest extends PrimeBaseTest {
 
   @Test
   public void post_JSONWithActual() throws Exception {
-    Path json = Paths.get("src/test/resources/json/api-jsonWithActual-post.json");
     simulator.test("/api")
-             .withJSONFile(json)
+             .withJSONFile(Paths.get("src/test/resources/json/api-jsonWithActual-post.json"))
              .post()
-             .assertJSONFileWithActual(UserField.class, Paths.get("src/test/resources/json/api-jsonWithActual-post-response.json"));
+             .assertJSONFileWithActual(UserField.class, Paths.get("src/test/resources/json/api-jsonWithActual-post-response.ftl"));
   }
 
   @Test
@@ -351,11 +350,11 @@ public class GlobalTest extends PrimeBaseTest {
 
   @Test
   public void post_apiJSONBothWays() throws Exception {
-    Path json = Paths.get("src/test/resources/json/api-jsonBothWays-post.json");
+    Path jsonFile = Paths.get("src/test/resources/json/api-jsonBothWays-post.json");
     simulator.test("/api")
-             .withJSONFile(json)
+             .withJSONFile(jsonFile)
              .post()
-             .assertJSONFile(json);
+             .assertJSONFile(jsonFile);
   }
 
   @Test
@@ -391,6 +390,13 @@ public class GlobalTest extends PrimeBaseTest {
         .assertRequestAttributeNotNull("requestObject")
         .assertActionSessionAttributeNotNull("org.example.action.ScopeStorageAction", "actionSessionObject")
         .assertSessionAttributeNotNull("sessionObject");
+  }
+
+  @Test
+  public void get_secure() throws Exception {
+    test.simulate(() -> test.simulator.test("/secure")
+                                      .get()
+                                      .assertStatusCode(401));
   }
 
   @Test

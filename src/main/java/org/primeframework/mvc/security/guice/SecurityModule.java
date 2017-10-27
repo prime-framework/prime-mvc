@@ -21,10 +21,12 @@ import org.primeframework.jwt.Verifier;
 import org.primeframework.mvc.security.AuthorizeMethodScheme;
 import org.primeframework.mvc.security.CipherProvider;
 import org.primeframework.mvc.security.DefaultCipherProvider;
+import org.primeframework.mvc.security.DefaultJWTConstraintsValidator;
 import org.primeframework.mvc.security.DefaultJWTRequestAdapter;
 import org.primeframework.mvc.security.DefaultSavedRequestWorkflow;
 import org.primeframework.mvc.security.DefaultSecurityWorkflow;
 import org.primeframework.mvc.security.ExplosiveVerifierProvider;
+import org.primeframework.mvc.security.JWTConstraintsValidator;
 import org.primeframework.mvc.security.JWTRequestAdapter;
 import org.primeframework.mvc.security.JWTSecurityScheme;
 import org.primeframework.mvc.security.SavedRequestWorkflow;
@@ -45,6 +47,7 @@ public class SecurityModule extends AbstractModule {
     bind(SecurityWorkflow.class).to(DefaultSecurityWorkflow.class);
     bind(SavedRequestWorkflow.class).to(DefaultSavedRequestWorkflow.class);
 
+    bind(JWTConstraintsValidator.class).to(DefaultJWTConstraintsValidator.class);
     bind(JWTRequestAdapter.class).to(DefaultJWTRequestAdapter.class);
     bind(new TypeLiteral<Map<String, Verifier>>() {}).toProvider(ExplosiveVerifierProvider.class);
 

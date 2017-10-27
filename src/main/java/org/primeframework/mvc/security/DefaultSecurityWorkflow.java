@@ -24,6 +24,7 @@ import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.security.annotation.AnonymousAccess;
+import org.primeframework.mvc.security.annotation.ConstraintOverride;
 import org.primeframework.mvc.security.guice.SecuritySchemeFactory;
 import org.primeframework.mvc.workflow.WorkflowChain;
 
@@ -65,7 +66,10 @@ public class DefaultSecurityWorkflow implements SecurityWorkflow {
       return;
     }
 
+    String[] constraints = getConstraints(actionInvocation);
+
     for (String scheme : actionInvocation.configuration.securitySchemes) {
+
       SecurityScheme securityScheme = factory.build(scheme);
       if (securityScheme == null) {
         throw new PrimeException("You have specified an invalid security scheme named [" + scheme + "]");
@@ -73,7 +77,7 @@ public class DefaultSecurityWorkflow implements SecurityWorkflow {
 
       // Catch UnauthenticatedException and continue, allow UnauthorizedException to propagate.
       try {
-        securityScheme.handle(actionAnnotation.constraints());
+        securityScheme.handle(constraints);
         workflowChain.continueWorkflow();
         return;
       } catch (UnauthenticatedException ignore) {
@@ -82,5 +86,15 @@ public class DefaultSecurityWorkflow implements SecurityWorkflow {
     }
 
     throw new UnauthenticatedException();
+  }
+
+  protected String[] getConstraints(ActionInvocation actionInvocation) {
+    // Validate constraints, if provided on the method, this will override the ones on the @Action
+    ConstraintOverride methodConstraints = (ConstraintOverride) actionInvocation.method.annotations.get(ConstraintOverride.class);
+    if (methodConstraints != null) {
+      return methodConstraints.constraints();
+    } else {
+      return actionInvocation.configuration.annotation.constraints();
+    }
   }
 }

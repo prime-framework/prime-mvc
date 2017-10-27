@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2014, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,19 +28,33 @@ import java.util.Map;
  */
 public class UserField {
   public boolean active;
+
   public boolean bar;
-  public Map<String, AddressField> addresses = new HashMap<String, AddressField>();
+
+  public Map<String, AddressField> addresses = new HashMap<>();
+
   public Integer age;
+
   public Integer favoriteMonth;
+
   public Integer favoriteYear;
+
   public Integer id;
-  public Map<Integer, Integer> ids = new HashMap<Integer, Integer>();
+
+  public Map<Integer, Integer> ids = new HashMap<>();
+
   public String lifeStory;
+
   public Locale locale;
+
   public String name;
+
   public String password;
+
   public String[] securityQuestions;
-  public List<UserField> siblings = new ArrayList<UserField>();
+
+  public List<UserField> siblings = new ArrayList<>();
+
   public UserType type;
 
   public UserField() {

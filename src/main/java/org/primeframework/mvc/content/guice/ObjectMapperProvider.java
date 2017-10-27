@@ -40,24 +40,32 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
 
   @Inject
   public ObjectMapperProvider(Set<Module> jacksonModules, MVCConfiguration configuration) {
-    this.jacksonModules = jacksonModules;
     this.configuration = configuration;
+    this.jacksonModules = jacksonModules;
   }
 
   @Override
   public ObjectMapper get() {
     // Use the configured value for allUnknownParameters on each get() request in case this is bound in the request scope and the configuration has changed.
-    ObjectMapper objectMapper = new ObjectMapper().setSerializationInclusion(Include.NON_NULL)
-                                                  .configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true)
-                                                  .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
-                                                  .configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true)
-                                                  .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, !configuration.allowUnknownParameters())
-                                                  .configure(SerializationFeature.WRITE_EMPTY_JSON_ARRAYS, false)
-                                                  .configure(SerializationFeature.WRITE_NULL_MAP_VALUES, false);
+    ObjectMapper objectMapper = new ObjectMapper();
+
     if (jacksonModules.size() > 0) {
       objectMapper.registerModules(jacksonModules);
     }
 
-    return objectMapper;
+    return configure(objectMapper);
+  }
+
+  protected boolean allowUnknownParameters() {
+    return !configuration.allowUnknownParameters();
+  }
+
+  protected ObjectMapper configure(ObjectMapper objectMapper) {
+    return objectMapper.setSerializationInclusion(Include.NON_NULL)
+                       .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, allowUnknownParameters())
+                       .configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true)
+                       .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
+                       .configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true)
+                       .configure(SerializationFeature.WRITE_NULL_MAP_VALUES, false);
   }
 }

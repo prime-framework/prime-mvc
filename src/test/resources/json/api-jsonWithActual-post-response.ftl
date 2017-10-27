@@ -14,7 +14,9 @@
       "zipcode": "80202"
     }
   },
-  "age": ${actual.age},
+  "age": ${
+actual.age
+},
   "bar": false,
   "favoriteMonth": 5,
   "favoriteYear": 1976,
@@ -33,13 +35,19 @@
   "siblings": [
     {
       "active": false,
+      "addresses": {},
       "bar": false,
-      "name": "Brett"
+      "ids": {},
+      "name": "Brett",
+      "siblings": []
     },
     {
       "active": false,
+      "addresses": {},
       "bar": false,
-      "name": "Beth"
+      "ids": {},
+      "name": "Beth",
+      "siblings": []
     }
   ],
   "type": "COOL"

@@ -106,7 +106,7 @@ public class JSONResultTest extends PrimeBaseTest {
     response.setStatus(200);
     response.setCharacterEncoding("UTF-8");
     response.setContentType("application/json");
-    response.setContentLength(462);
+    response.setContentLength(538);
     if (httpMethod == HTTPMethod.GET) {
       expect(response.getOutputStream()).andReturn(sos);
     }
@@ -156,12 +156,18 @@ public class JSONResultTest extends PrimeBaseTest {
         "  \"securityQuestions\":[\"one\",\"two\",\"three\",\"four\"]," +
         "  \"siblings\":[{" +
         "    \"active\":false," +
+        "    \"addresses\":{}," +
         "    \"bar\":false," +
-        "    \"name\":\"Brett\"" +
+        "    \"ids\":{}," +
+        "    \"name\":\"Brett\"," +
+        "    \"siblings\":[]" +
         "  },{" +
         "    \"active\":false," +
+        "    \"addresses\":{}," +
         "    \"bar\":false," +
-        "    \"name\":\"Beth\"" +
+        "    \"ids\":{}," +
+        "    \"name\":\"Beth\"," +
+        "    \"siblings\":[]" +
         "  }]," +
         "  \"type\":\"COOL\"" +
         "}";

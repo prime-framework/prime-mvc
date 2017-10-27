@@ -303,11 +303,8 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
       return Collections.emptyMap();
     }
 
+    // JWT Authorize methods are not required.
     List<Method> methods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, JWTAuthorizeMethod.class);
-    if (methods.isEmpty()) {
-      throw new PrimeException("The action class [" + actionClass + "] is missing at a JWT Authorization method. " +
-          "The class must define a one or more methods annotated " + JWTAuthorizeMethod.class.getSimpleName() + " when [jwtEnabled] is set to [true].");
-    }
 
     // Return type must be Boolean or boolean
     if (methods.stream().anyMatch(m -> m.getReturnType() != Boolean.TYPE && m.getReturnType() != Boolean.class)) {
@@ -435,18 +432,11 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
   }
 
   private List<String> findSecuritySchemes(Class<?> actionClass) {
-    List<String> securitySchemes = new ArrayList<>();
-    String[] schemes = actionClass.getAnnotation(Action.class).schemes();
-    if (schemes.length == 0) {
-      securitySchemes.add(actionClass.getAnnotation(Action.class).scheme());
-    } else {
-      // When 'schemes' are specified, we're ignoring the value set in 'scheme'
-      securitySchemes.addAll(Arrays.asList(schemes));
-    }
+    List<String> securitySchemes = new ArrayList<>(Arrays.asList(actionClass.getAnnotation(Action.class).scheme()));
 
     // jwtEnabled is deprecated, but if in use, add 'jwt' to the schemes list, adding it last.
     if (!securitySchemes.contains("jwt") && actionClass.getAnnotation(Action.class).jwtEnabled()) {
-      securitySchemes.add("jwt");
+      securitySchemes.add(0, "jwt");
     }
 
     return securitySchemes;

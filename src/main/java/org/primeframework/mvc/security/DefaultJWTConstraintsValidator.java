@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,20 +13,18 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.example.action;
+package org.primeframework.mvc.security;
 
-import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.action.result.annotation.Status;
+import org.primeframework.jwt.domain.JWT;
 
 /**
- * Secure action.
+ * Default no-op implementation of the JWT Constraint Validator.
  *
- * @author Brian Pontarelli
+ * @author Daniel DeGroff
  */
-@Action(requiresAuthentication = true, constraints = {"admin", "user"}, scheme = "user")
-@Status(code = "unauthenticated", status = 401)
-public class SecureAction {
-  public String get() {
-    return "success";
+public class DefaultJWTConstraintsValidator implements JWTConstraintsValidator {
+  @Override
+  public boolean validate(JWT jwt, String[] constraints) {
+    return true;
   }
 }

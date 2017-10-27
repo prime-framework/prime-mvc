@@ -38,7 +38,7 @@ public @interface Action {
    * Security Scheme will be utilized instead of the specified security scheme.
    *
    * @return true if this action allows JWT authorization.
-   * @deprecated Use "jwt" as a security scheme. For example: <code>schemes = {"jwt", "api"}</code>.
+   * @deprecated Use "jwt" as a security scheme. For example: <code>scheme = {"jwt", "api"}</code>.
    */
   @Deprecated
   boolean jwtEnabled() default false;
@@ -58,21 +58,10 @@ public @interface Action {
   boolean requiresAuthentication() default false;
 
   /**
-   * Use this if only a single scheme is used, this is mutually exclusive with {@link #schemes()} - use one or the other.
-   *
-   * @return The security scheme that handles the authentication and authorization for this action.
-   * @deprecated Use {@link #schemes()}" instead. For example: <code>schemes = {"user"}</code>.
-   */
-  @Deprecated
-  String scheme() default "user";
-
-  /**
-   * Use this if more than one security scheme is used, this is mutually exclusive with {@link #scheme()} - use one or the other.
-   *
    * @return The security scheme(s) that handle authentication and authorization for this action. These are applied in order and the
    * constraints are offered to each scheme.
    */
-  String[] schemes() default {};
+  String[] scheme() default {"user"};
 
   /**
    * @return The value of the action annotation is used to determines the URI suffix patterns that the action class can

@@ -43,19 +43,21 @@ import com.google.inject.Provider;
  * @author Daniel DeGroff
  */
 public class JWTSecurityScheme implements SecurityScheme {
-
   protected final ActionInvocationStore actionInvocationStore;
 
-  protected final JWTRequestAdapter jwtAdapter;
+  protected final JWTRequestAdapter requestAdapter;
+
+  protected final JWTConstraintsValidator constraintsValidator;
 
   protected final HttpServletRequest request;
 
   protected final Provider<Map<String, Verifier>> verifierProvider;
 
   @Inject
-  public JWTSecurityScheme(ActionInvocationStore actionInvocationStore, JWTRequestAdapter jwtAdapter, HttpServletRequest request, Provider<Map<String, Verifier>> verifierProvider) {
+  public JWTSecurityScheme(ActionInvocationStore actionInvocationStore, JWTRequestAdapter requestAdapter, JWTConstraintsValidator constraintsValidator, HttpServletRequest request, Provider<Map<String, Verifier>> verifierProvider) {
     this.actionInvocationStore = actionInvocationStore;
-    this.jwtAdapter = jwtAdapter;
+    this.constraintsValidator = constraintsValidator;
+    this.requestAdapter = requestAdapter;
     this.request = request;
     this.verifierProvider = verifierProvider;
   }
@@ -65,11 +67,15 @@ public class JWTSecurityScheme implements SecurityScheme {
     ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
 
     try {
-      String encodedJWT = jwtAdapter.getEncodedJWT();
+      String encodedJWT = requestAdapter.getEncodedJWT();
       if (encodedJWT == null) {
         throw new UnauthenticatedException();
       }
       final JWT jwt = JWT.getDecoder().decode(encodedJWT, verifierProvider.get());
+
+      if (!constraintsValidator.validate(jwt, constraints)) {
+        throw new UnauthorizedException();
+      }
 
       // The JWT has a valid signature and is not expired, further authorization is delegated to the action.
       ActionConfiguration actionConfiguration = actionInvocation.configuration;
@@ -89,7 +95,7 @@ public class JWTSecurityScheme implements SecurityScheme {
       }
 
     } catch (InvalidJWTException | InvalidJWTSignatureException | JWTExpiredException | JWTUnavailableForProcessingException e) {
-      jwtAdapter.invalidateJWT();
+      requestAdapter.invalidateJWT();
       throw new UnauthenticatedException();
     } catch (JWTException e) {
       throw new UnauthenticatedException();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,11 @@
 package org.example.domain;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This is a test user.
@@ -27,9 +31,13 @@ public class User {
   private String name;
 
   private Integer age;
+
   private boolean male;
-  private Map<String, Address> addresses = new HashMap<String, Address>();
-  private List<User> siblings = new ArrayList<User>();
+
+  private Map<String, Address> addresses = new HashMap<>();
+
+  private List<User> siblings = new ArrayList<>();
+
   private String[] securityQuestions;
 
   private int month;
@@ -41,13 +49,16 @@ public class User {
   private String password;
 
   private int[] intIDs;
+
   private Set<String> setIDs;
+
   private List<Integer> listIDs;
+
   private Boolean maleWrapper;
 
   private boolean active;
 
-  private Map<Integer, Integer> ids = new HashMap<Integer, Integer>();
+  private Map<Integer, Integer> ids = new HashMap<>();
 
   public String getName() {
     return name;
@@ -77,12 +88,12 @@ public class User {
     return addresses;
   }
 
-  public Address getAddress(String type) {
-    return addresses.get(type);
-  }
-
   public void setAddresses(Map<String, Address> addresses) {
     this.addresses = addresses;
+  }
+
+  public Address getAddress(String type) {
+    return addresses.get(type);
   }
 
   public void setAddress(String type, Address address) {
@@ -93,16 +104,16 @@ public class User {
     return siblings;
   }
 
+  public void setSiblings(List<User> siblings) {
+    this.siblings = siblings;
+  }
+
   public User getSibling(int index) {
     if (index >= this.siblings.size()) {
       return null;
     }
 
     return siblings.get(index);
-  }
-
-  public void setSiblings(List<User> siblings) {
-    this.siblings = siblings;
   }
 
   public void setSibling(int index, User sibling) {
