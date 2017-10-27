@@ -90,9 +90,9 @@ public class DefaultSecurityWorkflow implements SecurityWorkflow {
 
   protected String[] getConstraints(ActionInvocation actionInvocation) {
     // Validate constraints, if provided on the method, this will override the ones on the @Action
-    ConstraintOverride methodConstraints = (ConstraintOverride) actionInvocation.method.annotations.get(ConstraintOverride.class);
-    if (methodConstraints != null) {
-      return methodConstraints.constraints();
+    ConstraintOverride constraint = (ConstraintOverride) actionInvocation.method.annotations.get(ConstraintOverride.class);
+    if (constraint != null) {
+      return constraint.value();
     } else {
       return actionInvocation.configuration.annotation.constraints();
     }

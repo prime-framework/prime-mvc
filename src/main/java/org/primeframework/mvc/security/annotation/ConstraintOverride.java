@@ -34,5 +34,5 @@ public @interface ConstraintOverride {
   /**
    * @return the required roles for this action to be executed.
    */
-  String[] constraints() default {};
+  String[] value() default {};
 }
