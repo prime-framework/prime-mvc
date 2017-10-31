@@ -152,6 +152,11 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     assertEquals(evaluator.getValue("user.addresses['home'].street", action), "Test");
     assertEquals(evaluator.getValue("user.addresses['home'].zipcode", action), "80020");
 
+    // Null key
+    action.user.addresses.put(null, address);
+    assertEquals(evaluator.getValue("user.addresses[].zipcode", action), "80020");
+    assertEquals(evaluator.getValue("user.addresses[''].zipcode", action), "80020");
+
     UserField brother = new UserField();
     brother.name = "Brett";
     brother.age = 34;
@@ -486,6 +491,14 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     // Test empty is null
     evaluator.setValue("user.addresses['home'].zipcode", action, ArrayUtils.toArray(""), null);
     assertNull(action.getUser().getAddresses().get("home").getZipcode());
+
+    // Test special value is a null key
+    evaluator.setValue("user.addresses[].zipcode", action, ArrayUtils.toArray("80020"), null);
+    assertEquals(action.getUser().getAddresses().get(null).getZipcode(), "80020");
+
+    // Test empty string key, same as null key
+    evaluator.setValue("user.addresses[''].zipcode", action, ArrayUtils.toArray("80020"), null);
+    assertEquals(action.getUser().getAddresses().get(null).getZipcode(), "80020");
 
     action.getUser().setSiblings(null);
     evaluator.setValue("user.siblings[0].age", action, ArrayUtils.toArray("34"), null);

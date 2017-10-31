@@ -713,6 +713,17 @@ public class RequestResult {
     return this;
   }
 
+  /**
+   * Can be called to setup objects for assertions.
+   *
+   * @param runnable The runnable to stuff.
+   * @return This.
+   */
+  public RequestResult setup(Runnable runnable) {
+    runnable.run();
+    return this;
+  }
+
   private RequestResult _assertBodyContainsMessagesFromKey(boolean contains, String key, Object... values) {
     MessageProvider messageProvider = get(MessageProvider.class);
     ActionInvocationStore actionInvocationStore = get(ActionInvocationStore.class);
