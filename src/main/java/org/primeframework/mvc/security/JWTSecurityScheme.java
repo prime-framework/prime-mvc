@@ -16,15 +16,8 @@
 package org.primeframework.mvc.security;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Map;
 
-import org.primeframework.jwt.Verifier;
-import org.primeframework.jwt.domain.InvalidJWTException;
-import org.primeframework.jwt.domain.InvalidJWTSignatureException;
 import org.primeframework.jwt.domain.JWT;
-import org.primeframework.jwt.domain.JWTException;
-import org.primeframework.jwt.domain.JWTExpiredException;
-import org.primeframework.jwt.domain.JWTUnavailableForProcessingException;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
@@ -35,7 +28,6 @@ import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.util.ReflectionUtils;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 /**
  * Default implementation of the JWT security scheme.
@@ -45,60 +37,44 @@ import com.google.inject.Provider;
 public class JWTSecurityScheme implements SecurityScheme {
   protected final ActionInvocationStore actionInvocationStore;
 
-  protected final JWTRequestAdapter requestAdapter;
-
   protected final JWTConstraintsValidator constraintsValidator;
 
   protected final HttpServletRequest request;
 
-  protected final Provider<Map<String, Verifier>> verifierProvider;
+  private JWTSecurityContext jwtSecurityContext;
 
   @Inject
-  public JWTSecurityScheme(ActionInvocationStore actionInvocationStore, JWTRequestAdapter requestAdapter, JWTConstraintsValidator constraintsValidator, HttpServletRequest request, Provider<Map<String, Verifier>> verifierProvider) {
+  public JWTSecurityScheme(ActionInvocationStore actionInvocationStore, JWTConstraintsValidator constraintsValidator, JWTSecurityContext jwtSecurityContext, HttpServletRequest request) {
     this.actionInvocationStore = actionInvocationStore;
     this.constraintsValidator = constraintsValidator;
-    this.requestAdapter = requestAdapter;
+    this.jwtSecurityContext = jwtSecurityContext;
     this.request = request;
-    this.verifierProvider = verifierProvider;
   }
 
   @Override
   public void handle(String[] constraints) {
     ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
 
-    try {
-      String encodedJWT = requestAdapter.getEncodedJWT();
-      if (encodedJWT == null) {
-        throw new UnauthenticatedException();
-      }
-      final JWT jwt = JWT.getDecoder().decode(encodedJWT, verifierProvider.get());
+    JWT jwt = jwtSecurityContext.getJWT();
+    if (!constraintsValidator.validate(jwt, constraints)) {
+      throw new UnauthorizedException();
+    }
 
-      if (!constraintsValidator.validate(jwt, constraints)) {
-        throw new UnauthorizedException();
-      }
+    // The JWT has a valid signature and is not expired, further authorization is delegated to the action.
+    ActionConfiguration actionConfiguration = actionInvocation.configuration;
 
-      // The JWT has a valid signature and is not expired, further authorization is delegated to the action.
-      ActionConfiguration actionConfiguration = actionInvocation.configuration;
-
-      HTTPMethod method = HTTPMethod.valueOf(request.getMethod().toUpperCase());
-      if (actionConfiguration.jwtAuthorizationMethods.containsKey(method)) {
-        for (JWTMethodConfiguration methodConfig : actionConfiguration.jwtAuthorizationMethods.get(method)) {
-          try {
-            Boolean authorized = ReflectionUtils.invoke(methodConfig.method, actionInvocation.action, jwt);
-            if (!authorized) {
-              throw new UnauthorizedException();
-            }
-          } catch (ExpressionException e) {
-            throw new PrimeException("Unable to invoke @JWTAuthorizeMethod on the class [" + actionConfiguration.actionClass + "]", e);
+    HTTPMethod method = HTTPMethod.valueOf(request.getMethod().toUpperCase());
+    if (actionConfiguration.jwtAuthorizationMethods.containsKey(method)) {
+      for (JWTMethodConfiguration methodConfig : actionConfiguration.jwtAuthorizationMethods.get(method)) {
+        try {
+          Boolean authorized = ReflectionUtils.invoke(methodConfig.method, actionInvocation.action, jwt);
+          if (!authorized) {
+            throw new UnauthorizedException();
           }
+        } catch (ExpressionException e) {
+          throw new PrimeException("Unable to invoke @JWTAuthorizeMethod on the class [" + actionConfiguration.actionClass + "]", e);
         }
       }
-
-    } catch (InvalidJWTException | InvalidJWTSignatureException | JWTExpiredException | JWTUnavailableForProcessingException e) {
-      requestAdapter.invalidateJWT();
-      throw new UnauthenticatedException();
-    } catch (JWTException e) {
-      throw new UnauthenticatedException();
     }
   }
 }

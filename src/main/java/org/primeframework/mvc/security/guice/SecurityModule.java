@@ -23,14 +23,18 @@ import org.primeframework.mvc.security.CipherProvider;
 import org.primeframework.mvc.security.DefaultCipherProvider;
 import org.primeframework.mvc.security.DefaultJWTConstraintsValidator;
 import org.primeframework.mvc.security.DefaultJWTRequestAdapter;
+import org.primeframework.mvc.security.DefaultJWTSecurityContext;
 import org.primeframework.mvc.security.DefaultSavedRequestWorkflow;
 import org.primeframework.mvc.security.DefaultSecurityWorkflow;
+import org.primeframework.mvc.security.DefaultUserLoginConstraintValidator;
 import org.primeframework.mvc.security.ExplosiveVerifierProvider;
 import org.primeframework.mvc.security.JWTConstraintsValidator;
 import org.primeframework.mvc.security.JWTRequestAdapter;
+import org.primeframework.mvc.security.JWTSecurityContext;
 import org.primeframework.mvc.security.JWTSecurityScheme;
 import org.primeframework.mvc.security.SavedRequestWorkflow;
 import org.primeframework.mvc.security.SecurityWorkflow;
+import org.primeframework.mvc.security.UserLoginConstraintsValidator;
 import org.primeframework.mvc.security.UserLoginSecurityScheme;
 
 import com.google.inject.AbstractModule;
@@ -49,7 +53,9 @@ public class SecurityModule extends AbstractModule {
 
     bind(JWTConstraintsValidator.class).to(DefaultJWTConstraintsValidator.class);
     bind(JWTRequestAdapter.class).to(DefaultJWTRequestAdapter.class);
+    bind(JWTSecurityContext.class).to(DefaultJWTSecurityContext.class);
     bind(new TypeLiteral<Map<String, Verifier>>() {}).toProvider(ExplosiveVerifierProvider.class);
+    bind(UserLoginConstraintsValidator.class).to(DefaultUserLoginConstraintValidator.class);
 
     // Binds the user login scheme
     SecuritySchemeFactory.addSecurityScheme(binder(), "jwt", JWTSecurityScheme.class);

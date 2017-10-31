@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,38 +15,32 @@
  */
 package org.primeframework.mvc.security;
 
+import java.util.Arrays;
+import java.util.Set;
+
 import com.google.inject.Inject;
 
 /**
- * A security scheme that authenticates and authorizes users using a UserLoginSecurityContext implementation.
+ * Default User Login constraints validator. If the UserLoginSecurityContext is available ensure the logged in user meets the required
+ * constraints.
  *
- * @author Brian Pontarelli
+ * @author Daniel DeGroff
  */
-public class UserLoginSecurityScheme implements SecurityScheme {
-  private final UserLoginConstraintsValidator constraintsValidator;
-
+public class DefaultUserLoginConstraintValidator implements UserLoginConstraintsValidator {
   private UserLoginSecurityContext userLoginSecurityContext;
 
-  @Inject
-  public UserLoginSecurityScheme(UserLoginConstraintsValidator constraintsValidator) {
-    this.constraintsValidator = constraintsValidator;
-  }
-
   @Override
-  public void handle(String[] constraints) {
+  public boolean validate(String[] constraints) {
     if (userLoginSecurityContext == null) {
-      return;
+      return true;
     }
 
-    // Check if user is signed in
-    if (!userLoginSecurityContext.isLoggedIn()) {
-      throw new UnauthenticatedException();
+    if (constraints.length > 0) {
+      Set<String> userRoles = userLoginSecurityContext.getCurrentUsersRoles();
+      return Arrays.stream(constraints).anyMatch(userRoles::contains);
     }
 
-    // Check roles
-    if (!constraintsValidator.validate(constraints)) {
-      throw new UnauthorizedException();
-    }
+    return true;
   }
 
   @Inject(optional = true)

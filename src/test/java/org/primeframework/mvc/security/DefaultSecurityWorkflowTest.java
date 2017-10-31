@@ -222,7 +222,10 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
 
     @Override
     public SecurityScheme build(String scheme) {
-      UserLoginSecurityScheme s = new UserLoginSecurityScheme();
+      DefaultUserLoginConstraintValidator constraintsValidator = new DefaultUserLoginConstraintValidator();
+      constraintsValidator.setUserLoginSecurityContext(securityContext);
+
+      UserLoginSecurityScheme s = new UserLoginSecurityScheme(constraintsValidator);
       s.setUserLoginSecurityContext(securityContext);
       return s;
     }
