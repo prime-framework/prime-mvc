@@ -39,6 +39,8 @@ import org.primeframework.mvc.message.FieldMessage;
 import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
+import org.primeframework.mvc.message.SimpleFieldMessage;
+import org.primeframework.mvc.message.SimpleMessage;
 import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.test.jackson.TestNodeFactory;
 
@@ -325,14 +327,14 @@ public class RequestResult {
       if (message == null) {
         StringBuilder sb = new StringBuilder("\n\tMessageStore contains:\n");
         //noinspection StringConcatenationInsideStringBufferAppend
-        messages.forEach((m) -> sb.append("\t\t" + m.getCode() + " Type: " + m.getType() + "\n"));
+        messages.forEach((m) -> sb.append("\t\t" + m.getType() + " " + m.getCode() + "\t" + ((m instanceof SimpleMessage) ? ((SimpleMessage) m).message : "") + "\n"));
         throw new AssertionError("The MessageStore does not contain the general message [" + errorCode + "] Type: " + messageType + sb);
       }
 
       if (message.getType() != messageType) {
         StringBuilder sb = new StringBuilder("\n\tMessageStore contains:\n");
         //noinspection StringConcatenationInsideStringBufferAppend
-        messages.forEach((m) -> sb.append("\t\t" + m.getCode() + " Type: " + m.getType() + "\n"));
+        messages.forEach((m) -> sb.append("\t\t" + m.getType() + " " + m.getCode() + "\t" + ((m instanceof SimpleMessage) ? ((SimpleMessage) m).message : "") + "\n"));
         throw new AssertionError("The MessageStore contains message for code  [" + message.getCode() + "], but it is of type [" + message.getType() + "]" + sb);
       }
     }
@@ -404,7 +406,7 @@ public class RequestResult {
 
     StringBuilder sb = new StringBuilder("\n\tMessageStore contains:\n");
     //noinspection StringConcatenationInsideStringBufferAppend
-    messages.forEach(m -> sb.append("\t\t" + m.getCode() + " Type: " + m.getType() + "\n"));
+    messages.forEach(m -> sb.append("\t\t" + m.getType() + "\t" + m.getCode() + "\t" + ((m instanceof SimpleMessage) ? ((SimpleMessage) m).message : "") + "\n"));
     throw new AssertionError("The MessageStore contains the following general errors.]" + sb);
   }
 
@@ -432,7 +434,7 @@ public class RequestResult {
 
     StringBuilder sb = new StringBuilder("\n\tMessageStore contains:\n");
     //noinspection StringConcatenationInsideStringBufferAppend
-    messages.forEach(m -> sb.append("\t\t" + " Field: " + m.getField() + " Code: " + m.getCode() + " Type: " + m.getType() + "\n"));
+    messages.forEach(m -> sb.append("\t\t" + m.getType() + "\tField: " + m.getField() + " Code: " + m.getCode() + "\t" + ((m instanceof SimpleFieldMessage) ? ((SimpleFieldMessage) m).message : "") + "\n"));
     throw new AssertionError("The MessageStore contains the following field errors.]" + sb);
   }
 
