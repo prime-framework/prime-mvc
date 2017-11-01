@@ -390,6 +390,13 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     assertEquals(evaluator.getValue("user.addresses['home'].street", action), "Test");
     assertEquals(evaluator.getValue("user.addresses['home'].zipcode", action), "80020");
 
+    // Test w/ a space in the key
+    action.getUser().getAddresses().put("summer home", address);
+    assertEquals(evaluator.getValue("user.addresses['summer home'].city", action), "Broomfield");
+    assertEquals(evaluator.getValue("user.addresses['summer home'].state", action), "CO");
+    assertEquals(evaluator.getValue("user.addresses['summer home'].street", action), "Test");
+    assertEquals(evaluator.getValue("user.addresses['summer home'].zipcode", action), "80020");
+
     User brother = new User();
     brother.setName("Brett");
     brother.setAge(34);
