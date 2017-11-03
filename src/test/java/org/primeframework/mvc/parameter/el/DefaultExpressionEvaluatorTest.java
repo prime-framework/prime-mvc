@@ -152,11 +152,6 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     assertEquals(evaluator.getValue("user.addresses['home'].street", action), "Test");
     assertEquals(evaluator.getValue("user.addresses['home'].zipcode", action), "80020");
 
-    // Null key
-    action.user.addresses.put(null, address);
-    assertEquals(evaluator.getValue("user.addresses[].zipcode", action), "80020");
-    assertEquals(evaluator.getValue("user.addresses[''].zipcode", action), "80020");
-
     UserField brother = new UserField();
     brother.name = "Brett";
     brother.age = 34;
@@ -167,6 +162,33 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     user.securityQuestions = new String[]{"What is your pet's name?", "What is your home town?"};
     assertEquals(evaluator.getValue("user.securityQuestions[0]", action), "What is your pet's name?");
     assertEquals(evaluator.getValue("user.securityQuestions[1]", action), "What is your home town?");
+  }
+
+  @Test
+  public void nullMapKeys() {
+    ActionField action = new ActionField();
+    action.user = new UserField();
+
+    AddressField address1 = new AddressField();
+    address1.state = "CO";
+
+    AddressField address2 = new AddressField();
+    address2.state = "MN";
+
+    // Expected state, null key, and empty key
+    action.user.addresses.put(null, address1);
+    action.user.addresses.put("", address2);
+
+    // Get [] == null key, [''] == empty string key
+    assertEquals(evaluator.getValue("user.addresses[].state", action), "CO");
+    assertEquals(evaluator.getValue("user.addresses[''].state", action), "MN");
+
+    // swap them
+    evaluator.setValue("user.addresses[].state", action, "MN");
+    evaluator.setValue("user.addresses[''].state", action,"CO");
+
+    assertEquals(evaluator.getValue("user.addresses[].state", action), "MN");
+    assertEquals(evaluator.getValue("user.addresses[''].state", action), "CO");
   }
 
   @Test

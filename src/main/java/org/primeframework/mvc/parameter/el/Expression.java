@@ -197,6 +197,7 @@ public class Expression {
     List<String> list = new ArrayList<>();
     int index = 0;
     int position = 0;
+    int openBracket = 0;
     char[] buf = new char[128];
     boolean insideBracket = false;
     boolean insideQuote = false;
@@ -221,9 +222,16 @@ public class Expression {
         list.add(new String(buf, 0, position));
         insideBracket = true;
         position = 0;
+        openBracket = index;
       } else if (ca[index] == ']' && !insideQuote) {
         if (!insideBracket) {
           throw new InvalidExpressionException("The expression string [" + expression + "] contains an invalid indices");
+        }
+
+        if (position == 0 && (index - openBracket == 1)) {
+          list.add(null);
+        } else {
+          list.add(new String(buf, 0, position));
         }
 
         // Gobble up the period if there is one
@@ -232,7 +240,6 @@ public class Expression {
         }
 
         insideBracket = false;
-        list.add(new String(buf, 0, position));
         position = 0;
       } else if (ca[index] == '\'' || ca[index] == '\"') {
         if (!insideBracket) {

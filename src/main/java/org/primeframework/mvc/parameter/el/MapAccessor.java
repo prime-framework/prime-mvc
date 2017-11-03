@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2010, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,13 @@ public class MapAccessor extends Accessor {
       throw new ConversionException("No type converter is registered for the type [" + keyType + "], which is the " +
         "type for the key of the map at [" + path + "]");
     }
-    this.key = converter.convertFromStrings(keyType, null, path, index);
+
+    // Use null and empty string from the parsed expression as is.
+    if (index == null || index.length() == 0) {
+      this.key = index;
+    } else {
+      this.key = converter.convertFromStrings(keyType, null, path, index);
+    }
   }
 
   /**
