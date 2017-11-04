@@ -69,19 +69,20 @@ public class GlobalTest extends PrimeBaseTest {
     // Page2 has a session variable and a form, set it, assert it stays in the session.
     test.simulate(() -> simulator.test("/scope/page-two")
                                  .withParameter("searchText", "42")
+                                 .withParameter("searchType", "meaning")
                                  .post()
                                  .assertStatusCode(200))
 
         .simulate(() -> simulator.test("/scope/page-two")
                                  .get()
                                  .assertStatusCode(200)
-                                 .assertBodyContains("42"))
+                                 .assertBodyContains("42", "meaning"))
 
         // Now hit Page1 that contains a form tag with an action of /scope/page-two
         .simulate(() -> simulator.test("/scope/page-one")
                                  .get()
                                  .assertStatusCode(200)
-                                 .assertBodyContains("42"));
+                                 .assertBodyContains("42", "meaning"));
   }
 
   @Test

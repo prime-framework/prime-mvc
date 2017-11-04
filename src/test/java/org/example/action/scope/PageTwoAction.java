@@ -16,6 +16,7 @@
 package org.example.action.scope;
 
 import org.primeframework.mvc.action.annotation.Action;
+import org.primeframework.mvc.scope.annotation.ActionSession;
 import org.primeframework.mvc.scope.annotation.Session;
 
 /**
@@ -25,6 +26,9 @@ import org.primeframework.mvc.scope.annotation.Session;
 public class PageTwoAction {
   @Session
   public String searchText;
+
+  @ActionSession
+  public String searchType;
 
   public String get() {
     return "input";
