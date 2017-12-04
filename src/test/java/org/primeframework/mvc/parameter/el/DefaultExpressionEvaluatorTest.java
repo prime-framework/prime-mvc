@@ -588,6 +588,13 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     assertEquals((int) action.getAssociations().get("ids")[2], 3);
   }
 
+  @Test
+  public void longToken() {
+    ActionField action = new ActionField();
+    evaluator.setValue("reallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyLongFieldName", action, ArrayUtils.toArray("value"), null);
+    assertEquals(action.reallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyLongFieldName, "value");
+  }
+
   @Inject
   public void setEvaluator(DefaultExpressionEvaluator evaluator) {
     this.evaluator = evaluator;

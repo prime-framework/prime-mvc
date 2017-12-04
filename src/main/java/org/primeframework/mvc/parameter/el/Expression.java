@@ -39,6 +39,8 @@ public class Expression {
 
   private final String expression;
 
+  private final MVCConfiguration configuration;
+
   private Accessor accessor;
 
   private Object current;
@@ -46,8 +48,6 @@ public class Expression {
   private int index;
 
   private Class<?> type;
-
-  private final MVCConfiguration configuration;
 
   public Expression(ConverterProvider converterProvider, String expression, Object current, Map<String, String> attributes, MVCConfiguration configuration) {
     this.expression = expression;
@@ -74,6 +74,11 @@ public class Expression {
     return current;
   }
 
+  private void setCurrentObject(Object object) {
+    this.current = object;
+    this.type = object.getClass();
+  }
+
   public String getCurrentValueAsString() {
     Class<?> type = current.getClass();
     GlobalConverter converter = converterProvider.lookup(type);
@@ -86,10 +91,6 @@ public class Expression {
 
   public void setCurrentValue(String[] values) {
     accessor.set(current, values, this);
-  }
-
-  public void setCurrentValue(Object value) {
-    accessor.set(current, value, this);
   }
 
   public Object traverseToEndForGet() {
@@ -174,13 +175,12 @@ public class Expression {
     return accessor.get(current, this);
   }
 
-  private boolean skip() {
-    return accessor != null && accessor.isIndexed();
+  public void setCurrentValue(Object value) {
+    accessor.set(current, value, this);
   }
 
-  private void setCurrentObject(Object object) {
-    this.current = object;
-    this.type = object.getClass();
+  private boolean skip() {
+    return accessor != null && accessor.isIndexed();
   }
 
   /**
@@ -248,6 +248,16 @@ public class Expression {
 
         insideQuote = !insideQuote;
       } else {
+        if (position == buf.length) {
+          if (buf.length >= 32_768) {
+            throw new InvalidExpressionException("The expression token [" + new String(buf, 0, position) + "] is too long");
+          }
+
+          char[] newBuf = new char[buf.length + 128];
+          System.arraycopy(buf, 0, newBuf, 0, position);
+          buf = newBuf;
+        }
+
         buf[position++] = ca[index];
       }
     }

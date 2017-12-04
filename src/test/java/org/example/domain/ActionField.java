@@ -25,9 +25,10 @@ public class ActionField extends ParentField {
   public UserField user;
 
   public boolean foo;
+
   public boolean bar;
 
-
+  public String reallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyLongFieldName;
 
   public String post() {
     return null;
