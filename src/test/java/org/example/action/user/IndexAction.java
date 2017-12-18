@@ -25,6 +25,6 @@ import org.primeframework.mvc.action.annotation.Action;
 @Action
 public class IndexAction {
   public String execute() {
-    return null;
+    return "success";
   }
 }

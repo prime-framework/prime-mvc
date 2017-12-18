@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,22 +15,14 @@
  */
 package org.example.action;
 
-import java.util.List;
-
 import org.primeframework.mvc.action.annotation.Action;
 
 /**
- * This class is a simple edit action for testing.
- *
- * @author Brian Pontarelli
+ * @author Daniel DeGroff
  */
-@Action("{firstName}/static/{lastName}/{*theRest}")
-public class ComplexRestAction {
-  public String firstName;
-
-  public String lastName;
-
-  public List<String> theRest;
+@Action("{id}")
+public class FooAction {
+  public String id;
 
   public String execute() {
     return "success";

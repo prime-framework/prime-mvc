@@ -20,13 +20,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
-import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.workflow.WorkflowChain;
 
 import com.google.inject.Inject;
@@ -88,61 +87,18 @@ public class DefaultURIParameterWorkflow implements URIParameterWorkflow {
    */
   public void perform(WorkflowChain workflowChain) throws IOException, ServletException {
     ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
-    LinkedList<String> parameters = new LinkedList<String>(actionInvocation.uriParameters);
-    ActionConfiguration actionConfiguration = actionInvocation.configuration;
-
-    if (!parameters.isEmpty() && actionConfiguration != null) {
-      Map<String, String[]> uriParameters = new HashMap<>();
-      String[] patternParts = actionConfiguration.patternParts;
-      for (String patternPart : patternParts) {
-        // If there are no more URI parameters, we are finished
-        if (parameters.isEmpty()) {
-          break;
-        }
-
-        if (patternPart.startsWith("{*")) {
-          // Stuff the rest of the list into the property
-          String name = patternPart.substring(2, patternPart.length() - 1);
-          uriParameters.put(name, unescape(parameters).toArray(new String[parameters.size()]));
-        } else if (patternPart.startsWith("{")) {
-          // Stuff this parameter into the property
-          String name = patternPart.substring(1, patternPart.length() - 1);
-          String value = unescape(parameters.removeFirst());
-          uriParameters.put(name, new String[]{value});
-        } else {
-          // Pop the value off
-          parameters.removeFirst();
-        }
-      }
-
+    if (actionInvocation.uriParameters.size() > 0) {
       HttpServletRequestWrapper wrapper = (HttpServletRequestWrapper) request;
       HttpServletRequest old = (HttpServletRequest) wrapper.getRequest();
-      wrapper.setRequest(new ParameterHttpServletRequest(old, uriParameters));
+      Map<String, List<String>> params = actionInvocation.uriParameters;
+      Map<String, String[]> fixed = new HashMap<>();
+      for (Entry<String, List<String>> entry : params.entrySet()) {
+        fixed.put(entry.getKey(), entry.getValue().toArray(new String[entry.getValue().size()]));
+      }
+
+      wrapper.setRequest(new ParameterHttpServletRequest(old, fixed));
     }
 
     workflowChain.continueWorkflow();
-  }
-
-  /**
-   * Unescape all parameters provided in the list.
-   *
-   * @param parameters The list of parameters to unescape.
-   * @return The list of unescaped parameters.
-   */
-  private List<String> unescape(List<String> parameters) {
-    for (int i = 0; i < parameters.size(); i++) {
-      parameters.set(i, unescape(parameters.get(i)));
-    }
-    return parameters;
-  }
-
-  /**
-   * Return the unescaped parameter.
-   *
-   * @param string The parameter to unescape
-   * @return
-   */
-  private String unescape(String string) {
-    return string.replace("%20", " ");
   }
 }

@@ -109,11 +109,12 @@ public class TestBuilder {
   public void expectException(Class<? extends Throwable> throwable, ThrowingRunnable runnable) {
     try {
       runnable.run();
-      Assert.fail("Expected [" + throwable.getName() + "], but no exception was thrown.");
     } catch (Throwable e) {
       if (!e.getClass().isAssignableFrom(throwable) && !e.getCause().getClass().isAssignableFrom(throwable)) {
         Assert.fail("Expected [" + throwable.getName() + "], but caught [" + e.getClass().getName() + "]");
       }
+      return;
     }
+    Assert.fail("Expected [" + throwable.getName() + "], but no exception was thrown.");
   }
 }

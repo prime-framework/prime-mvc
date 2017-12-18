@@ -59,8 +59,6 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.TypeLiteral;
 import com.google.inject.util.Modules;
-import static java.util.Arrays.asList;
-import static org.primeframework.mvc.action.config.DefaultActionConfigurationProvider.ACTION_CONFIGURATION_KEY;
 
 /**
  * This class is a base test for testing the Prime framework. It isn't recommended to use it outside of the Prime
@@ -114,7 +112,6 @@ public abstract class PrimeBaseTest {
    */
   @BeforeMethod
   public void setUp() {
-    container.restoreContextToSavePoint(ACTION_CONFIGURATION_KEY);
     request = container.newServletRequest("/", Locale.getDefault(), false, "UTF-8");
     response = container.newServletResponse();
     container.resetSession();
@@ -145,11 +142,34 @@ public abstract class PrimeBaseTest {
    * @return The action invocation.
    * @throws Exception If the construction fails.
    */
-  protected ActionInvocation makeActionInvocation(Object action, HTTPMethod httpMethod, String extension, String... uriParameters) throws Exception {
+  protected ActionInvocation makeActionInvocation(Object action, HTTPMethod httpMethod, String extension) throws Exception {
     DefaultActionConfigurationBuilder builder = injector.getInstance(DefaultActionConfigurationBuilder.class);
     ActionConfiguration actionConfiguration = builder.build(action.getClass());
-    return new ActionInvocation(action, actionConfiguration.executeMethods.get(httpMethod), actionConfiguration.uri,
-        extension, asList(uriParameters), actionConfiguration, true);
+    return new ActionInvocation(action, actionConfiguration.executeMethods.get(httpMethod), actionConfiguration.uri, extension, actionConfiguration);
+  }
+
+  /**
+   * Makes an action invocation and configuration.
+   *
+   * @param action     The action object.
+   * @param httpMethod The HTTP method.
+   * @param extension  The extension.
+   * @return The action invocation.
+   * @throws Exception If the construction fails.
+   */
+  protected ActionInvocation makeActionInvocation(Object action, HTTPMethod httpMethod, String extension, Map<String, List<String>> uriParameters) throws Exception {
+    DefaultActionConfigurationBuilder builder = injector.getInstance(DefaultActionConfigurationBuilder.class);
+    ActionConfiguration actionConfiguration = builder.build(action.getClass());
+    return new ActionInvocation(action, actionConfiguration.executeMethods.get(httpMethod), actionConfiguration.uri, extension, uriParameters, actionConfiguration, true);
+  }
+
+  @SuppressWarnings("unchecked")
+  protected Map<String, List<String>> map(Object... params) {
+    Map<String, List<String>> map = new HashMap<>();
+    for (int i = 0; i < params.length; i += 2) {
+      map.put(params[i].toString(), (List<String>) params[i + 1]);
+    }
+    return map;
   }
 
   /**

@@ -27,8 +27,8 @@ import org.primeframework.mvc.parameter.annotation.PreParameterMethod;
  *
  * @author Brian Pontarelli
  */
-@Action
-@Forward(page = "")
+@Action("{id}")
+@Forward
 public class EditAction {
   public static final SomeEnum[] values = SomeEnum.values();
 
@@ -36,7 +36,10 @@ public class EditAction {
 
   public User user;
 
+  public String id;
+
   public boolean preParameter = false;
+
   public boolean formPrepared = false;
 
   public String execute() {

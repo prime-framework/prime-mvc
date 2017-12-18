@@ -53,6 +53,13 @@ public @interface Action {
   boolean overridable() default false;
 
   /**
+   * Parameters in the URI that are before the URI segment for the action itself.
+   *
+   * @return The parameters.
+   */
+  String prefixParameters() default "";
+
+  /**
    * @return If this action requires authentication.
    */
   boolean requiresAuthentication() default false;

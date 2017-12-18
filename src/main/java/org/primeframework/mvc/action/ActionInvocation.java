@@ -15,8 +15,9 @@
  */
 package org.primeframework.mvc.action;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.primeframework.mvc.action.config.ActionConfiguration;
 
@@ -26,25 +27,33 @@ import org.primeframework.mvc.action.config.ActionConfiguration;
  * @author Brian Pontarelli
  */
 public class ActionInvocation {
-  public final Object action;
-  public final ExecuteMethodConfiguration method;
-  public final String actionURI;
-  public final String extension;
-  public final Collection<String> uriParameters;
-  public final ActionConfiguration configuration;
-  public final boolean executeResult;
+  public Object action;
+
+  public ExecuteMethodConfiguration method;
+
+  public String actionURI;
+
+  public String extension;
+
+  public Map<String, List<String>> uriParameters;
+
+  public ActionConfiguration configuration;
+
+  public boolean executeResult;
+
+  public boolean redirectToIndex;
 
   public ActionInvocation(Object action, ExecuteMethodConfiguration method, String uri, String extension, ActionConfiguration configuration) {
     this.action = action;
     this.method = method;
     this.actionURI = uri;
     this.extension = extension;
-    this.uriParameters = new ArrayList<>();
+    this.uriParameters = new HashMap<>();
     this.configuration = configuration;
     this.executeResult = true;
   }
 
-  public ActionInvocation(Object action, ExecuteMethodConfiguration method, String uri, String extension, Collection<String> uriParameters,
+  public ActionInvocation(Object action, ExecuteMethodConfiguration method, String uri, String extension, Map<String, List<String>> uriParameters,
                           ActionConfiguration configuration, boolean executeResult) {
     this.action = action;
     this.method = method;

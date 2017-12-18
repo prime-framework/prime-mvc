@@ -77,7 +77,7 @@ public class AcceptanceTest extends PrimeBaseTest {
   @Test
   public void get_nonPrimeResourceEndingWithSlash() throws Exception {
     // simulator doesn't support chain.continueWorkflow(), so we'll get UnsupportedOperationException
-    simulator.test("/foo/")
+    simulator.test("/potato/")
              .expectException(UnsupportedOperationException.class)
              .get()
              .assertStatusCode(500)

@@ -84,8 +84,9 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
 
     // This case is a redirect because they URI maps to something new and there isn't an action associated with it. For
     // example, this is how the index handling works.
-    if (!actionInvocation.uri().equals(uri) && actionInvocation.action == null) {
+    if (actionInvocation.redirectToIndex) {
       response.sendRedirect(actionInvocation.uri());
+      response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
       return;
     }
 
@@ -95,8 +96,7 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
     // Anyone downstream should understand it is possible for the method to be null in the ActionInvocation
     if (actionInvocation.action != null && actionInvocation.method == null) {
       Class<?> actionClass = actionInvocation.configuration.actionClass;
-      logger.warn("The action class [" + actionClass + "] does not have a valid execute method for the " +
-          "HTTP method [" + method + "]");
+      logger.warn("The action class [" + actionClass + "] does not have a valid execute method for the HTTP method [" + method + "]");
       throw new NotImplementedException();
     }
 

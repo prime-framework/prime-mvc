@@ -62,6 +62,78 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void get_action_package_collision() throws Exception {
+    test.simulate(() -> test.simulator.test("/foo/view/bar/baz")
+                                      .withUrlSegment("42")
+                                      .get()
+                                      .assertStatusCode(200)
+                                      .assertBodyContains("/foo/view/bar/baz!", "42"))
+
+        .simulate(() -> test.simulator.test("/foo/view/bar/baz")
+                                      .get()
+                                      .assertStatusCode(200)
+                                      .assertBodyContains("/foo/view/bar/baz!", "empty"))
+
+        .simulate(() -> test.simulator.test("/foo/view/bar")
+                                      .withUrlSegment("42")
+                                      .get()
+                                      .assertStatusCode(200)
+                                      .assertBodyContains("/foo/view/bar!", "42"))
+
+        .simulate(() -> test.simulator.test("/foo/view/bar")
+                                      .get()
+                                      .assertStatusCode(200)
+                                      .assertBodyContains("/foo/view/bar!", "empty"))
+
+        .simulate(() -> test.simulator.test("/foo/view")
+                                      .withUrlSegment("42")
+                                      .get()
+                                      .assertStatusCode(200)
+                                      .assertBodyContains("/foo/view!", "42"))
+
+        .simulate(() -> test.simulator.test("/foo/view")
+                                      .get()
+                                      .assertStatusCode(200)
+                                      .assertBodyContains("/foo/view!", "empty"))
+
+        .simulate(() -> test.simulator.test("/foo")
+                                      .withUrlSegment("42")
+                                      .get()
+                                      .assertStatusCode(200)
+                                      .assertBodyContains("/foo!", "42"))
+
+        .simulate(() -> test.simulator.test("/foo")
+                                      .get()
+                                      .assertStatusCode(200)
+                                      .assertBodyContains("/foo!", "empty"));
+  }
+
+  @Test
+  public void escapePathSegmentsWithWildCard() throws Exception {
+    test.simulate(() -> test.simulator.test("/escaped-path-segments")
+                                      .withUrlSegment("foo%20bar")
+                                      .withUrlSegment("foobar")
+                                      .withUrlSegment("foo%20bar")
+                                      .withUrlSegment("foo@bar")
+                                      .get()
+                                      .assertStatusCode(200)
+                                      .assertBodyContains("Success!", "parm=foo bar", "theRest=foobar,foo bar,foo@bar"));
+  }
+
+  @Test
+  public void get_nested_parameters() throws Exception {
+    test.simulate(() -> test.simulator.test("/nested")
+                                      .withUrlSegment("42")
+                                      .withUrlSegment("99")
+                                      .withUrlSegment("parameter")
+                                      .withUrlSegment("foo")
+                                      .withUrlSegment("bar")
+                                      .get()
+                                      .assertStatusCode(200)
+                                      .assertBodyContains("Success!", "preParam1=42", "preParam2=99", "endParam1=foo", "endParam2=bar"));
+  }
+
+  @Test
   public void get_sessionStorageInFormTag() throws Exception {
     // Ensure we fill out scope storage in an action when we build a new action based upon hitting a
     // form tag that has a different action then the current action invocation.
@@ -170,6 +242,18 @@ public class GlobalTest extends PrimeBaseTest {
                                  .withHeader("Authorization", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkifQ.qHdut1UR4-2FSAvh7U3YdeRR5r5boVqjIGQ16Ztp894")
                                  .get()
                                  .assertStatusCode(401));
+  }
+
+  @Test
+  public void get_index() throws Exception {
+    test.simulate(() -> simulator.test("/user/")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertBodyContains("Yeah!"));
+    test.simulate(() -> simulator.test("/user")
+                                 .get()
+                                 .assertStatusCode(301)
+                                 .assertRedirect("/user/"));
   }
 
   @Test
@@ -425,6 +509,14 @@ public class GlobalTest extends PrimeBaseTest {
         .assertRequestAttributeIsNull("requestObject")
         .assertActionSessionAttributeIsNull("org.example.action.AnotherExtendedScopeStorage", "actionSessionObject")
         .assertSessionAttributeNotNull("sessionObject");
+  }
+
+  @Test
+  public void uriParameters() throws Exception {
+    test.simulate(() -> test.simulator.test("/complex-rest/brian/static/pontarelli/then/a/bunch/of/stuff")
+                                      .post()
+                                      .assertStatusCode(200)
+                                      .assertBodyContains("firstName=brian", "lastName=pontarelli", "theRest=then,a,bunch,of,stuff"));
   }
 
   @Test

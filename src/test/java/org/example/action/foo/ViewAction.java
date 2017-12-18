@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2017, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,10 +13,19 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.example.action.redirect;
+package org.example.action.foo;
+
+import org.primeframework.mvc.action.annotation.Action;
 
 /**
  * @author Daniel DeGroff
  */
-public class IndexAction {
+@Action("{id}")
+public class ViewAction {
+
+  public String id;
+
+  public String execute() {
+    return "success";
+  }
 }
