@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,9 +73,9 @@ public class DefaultParameterParser implements ParameterParser {
 
     // Pull out the check box, radio button and action parameter
     if (!parameters.isEmpty()) {
-      Map<String, String[]> checkBoxes = new HashMap<String, String[]>();
-      Map<String, String[]> radioButtons = new HashMap<String, String[]>();
-      Set<String> actions = new HashSet<String>();
+      Map<String, String[]> checkBoxes = new HashMap<>();
+      Map<String, String[]> radioButtons = new HashMap<>();
+      Set<String> actions = new HashSet<>();
 
       separateParameters(parameters, result, checkBoxes, radioButtons, actions);
 

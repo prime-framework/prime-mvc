@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,51 +34,32 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 @SuppressWarnings("unchecked")
-public class FlashScope implements Scope {
+public class FlashScope extends AbstractSessionScope implements Scope {
   public static final String KEY = "primeFlashMessages";
-  private final HttpServletRequest request;
 
   @Inject
   public FlashScope(HttpServletRequest request) {
-    this.request = request;
+    super(request, KEY);
   }
 
   @Override
   public void add(Message message) {
-    HttpSession session = request.getSession(true);
-    synchronized (session) {
-      List<Message> messages = (List<Message>) session.getAttribute(KEY);
-      if (messages == null) {
-        messages = new ArrayList<Message>();
-        session.setAttribute(KEY, messages);
-      }
-
-      messages.add(message);
-    }
+    addMessage(message);
   }
 
   @Override
   public void addAll(Collection<Message> messages) {
-    HttpSession session = request.getSession(true);
-    synchronized (session) {
-      List<Message> scopeMessages = (List<Message>) session.getAttribute(KEY);
-      if (scopeMessages == null) {
-        scopeMessages = new ArrayList<Message>();
-        session.setAttribute(KEY, scopeMessages);
-      }
-
-      scopeMessages.addAll(messages);
-    }
+    addAllMessages(messages);
   }
 
   @Override
   public List<Message> get() {
-    List<Message> messages = new ArrayList<Message>();
+    List<Message> messages = new ArrayList<>();
     List<Message> requestList = (List<Message>) request.getAttribute(KEY);
     if (requestList != null) {
       messages.addAll(requestList);
     }
-    
+
     HttpSession session = request.getSession(false);
     if (session != null) {
       synchronized (session) {
@@ -88,7 +69,7 @@ public class FlashScope implements Scope {
         }
       }
     }
-    
+
     return messages;
   }
 

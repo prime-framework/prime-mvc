@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ package org.primeframework.mvc.message.scope;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -32,41 +31,22 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 @SuppressWarnings("unchecked")
-public class SessionScope implements Scope {
+public class SessionScope extends AbstractSessionScope implements Scope {
   public static final String KEY = "primeMessages";
-  private final HttpServletRequest request;
 
   @Inject
   public SessionScope(HttpServletRequest request) {
-    this.request = request;
+    super(request, KEY);
   }
 
   @Override
   public void add(Message message) {
-    HttpSession session = request.getSession(true);
-    synchronized (session) {
-      List<Message> messages = (List<Message>) session.getAttribute(KEY);
-      if (messages == null) {
-        messages = new ArrayList<Message>();
-        session.setAttribute(KEY, messages);
-      }
-
-      messages.add(message);
-    }
+    addMessage(message);
   }
 
   @Override
   public void addAll(Collection<Message> messages) {
-    HttpSession session = request.getSession(true);
-    synchronized (session) {
-      List<Message> scopeMessages = (List<Message>) session.getAttribute(KEY);
-      if (scopeMessages == null) {
-        scopeMessages = new ArrayList<Message>();
-        session.setAttribute(KEY, scopeMessages);
-      }
-
-      scopeMessages.addAll(messages);
-    }
+    addAllMessages(messages);
   }
 
   @Override
