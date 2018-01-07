@@ -44,7 +44,7 @@ project(group: "org.primeframework", name: "prime-mvc", version: "1.7.2", licens
       dependency(id: "org.apache.commons:commons-lang3:3.1.0")
       dependency(id: "org.freemarker:freemarker:2.3.26+incubating")
       dependency(id: "com.inversoft:prime-jwt:${primeJWTVersion}")
-      dependency(id: "org.primeframework:prime-mock:0.6.2-{integration}")
+      dependency(id: "org.primeframework:prime-mock:0.6.2")
       dependency(id: "org.slf4j:slf4j-api:1.7.7")
     }
     group(name: "test-compile", export: false) {
