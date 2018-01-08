@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft, All Rights Reserved
+ * Copyright (c) 2001-2018, Inversoft, All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,8 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Opcodes;
 import org.primeframework.mvc.PrimeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.util.Arrays.asList;
 
@@ -53,6 +55,7 @@ import static java.util.Arrays.asList;
  * @author Brian Pontarelli
  */
 public class ClassClasspathResolver<U> {
+  private final Logger logger = LoggerFactory.getLogger(ClassClasspathResolver.class);
 
   /**
    * Attempts to discover resources that pass the test.
@@ -170,7 +173,12 @@ public class ClassClasspathResolver<U> {
     try {
       jarFile = new JarFile(f);
     } catch (IOException e) {
-      throw new IOException("Error opening JAR file [" + f.getAbsolutePath() + "]", e);
+      if (logger.isDebugEnabled()) {
+        logger.debug("Error opening JAR file [" + f.getAbsolutePath() + "]", e);
+      } else {
+        logger.warn("Error opening JAR file [" + f.getAbsolutePath() + "]");
+      }
+      return Collections.emptyList();
     }
 
     Enumeration<JarEntry> en = jarFile.entries();
