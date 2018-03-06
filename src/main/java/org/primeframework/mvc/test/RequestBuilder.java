@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Locale;
 import java.util.function.Consumer;
 
@@ -428,6 +429,20 @@ public class RequestBuilder {
    */
   public RequestBuilder withParameter(String name, Object value) {
     request.setParameter(name, value.toString());
+    return this;
+  }
+
+  /**
+   * Sets HTTP request parameters. This takes the provided collection and adds a request parameter for each item in the collection.
+   *
+   * @param name   The name of the parameter.
+   * @param values The collection of parameter values.
+   * @return This.
+   */
+  public RequestBuilder withParameters(String name, Collection<?> values) {
+    for (Object value : values) {
+      request.setParameter(name, value.toString());
+    }
     return this;
   }
 
