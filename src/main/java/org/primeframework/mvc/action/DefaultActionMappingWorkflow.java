@@ -96,7 +96,7 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
     // Anyone downstream should understand it is possible for the method to be null in the ActionInvocation
     if (actionInvocation.action != null && actionInvocation.method == null) {
       Class<?> actionClass = actionInvocation.configuration.actionClass;
-      logger.warn("The action class [" + actionClass + "] does not have a valid execute method for the HTTP method [" + method + "]");
+      logger.warn("The action class [" + actionClass.getCanonicalName() + "] does not have a valid execute method for the HTTP method [" + method + "]");
       throw new NotImplementedException();
     }
 
