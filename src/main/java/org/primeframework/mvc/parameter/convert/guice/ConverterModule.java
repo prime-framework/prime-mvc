@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ package org.primeframework.mvc.parameter.convert.guice;
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.URI;
+import java.net.URL;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.Collection;
@@ -27,14 +29,16 @@ import java.util.UUID;
 import org.primeframework.mvc.parameter.convert.converters.BooleanConverter;
 import org.primeframework.mvc.parameter.convert.converters.CharacterConverter;
 import org.primeframework.mvc.parameter.convert.converters.CollectionConverter;
-import org.primeframework.mvc.parameter.convert.converters.ZonedDateTimeConverter;
 import org.primeframework.mvc.parameter.convert.converters.EnumConverter;
 import org.primeframework.mvc.parameter.convert.converters.FileConverter;
 import org.primeframework.mvc.parameter.convert.converters.LocalDateConverter;
 import org.primeframework.mvc.parameter.convert.converters.LocaleConverter;
 import org.primeframework.mvc.parameter.convert.converters.NumberConverter;
 import org.primeframework.mvc.parameter.convert.converters.StringConverter;
+import org.primeframework.mvc.parameter.convert.converters.URIConverter;
+import org.primeframework.mvc.parameter.convert.converters.URLConverter;
 import org.primeframework.mvc.parameter.convert.converters.UUIDConverter;
+import org.primeframework.mvc.parameter.convert.converters.ZonedDateTimeConverter;
 
 import com.google.inject.AbstractModule;
 
@@ -57,6 +61,8 @@ public class ConverterModule extends AbstractModule {
     binder.add(LocaleConverter.class).forTypes(Locale.class);
     binder.add(NumberConverter.class).forTypes(Number.class, byte.class, short.class, int.class, long.class, float.class, double.class, BigDecimal.class, BigInteger.class);
     binder.add(StringConverter.class).forTypes(String.class);
+    binder.add(URIConverter.class).forTypes(URI.class);
+    binder.add(URLConverter.class).forTypes(URL.class);
     binder.add(UUIDConverter.class).forTypes(UUID.class);
   }
 }
