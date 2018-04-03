@@ -21,6 +21,7 @@ import java.math.BigInteger;
 import java.net.URI;
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Locale;
@@ -38,6 +39,7 @@ import org.primeframework.mvc.parameter.convert.converters.StringConverter;
 import org.primeframework.mvc.parameter.convert.converters.URIConverter;
 import org.primeframework.mvc.parameter.convert.converters.URLConverter;
 import org.primeframework.mvc.parameter.convert.converters.UUIDConverter;
+import org.primeframework.mvc.parameter.convert.converters.ZoneIdConverter;
 import org.primeframework.mvc.parameter.convert.converters.ZonedDateTimeConverter;
 
 import com.google.inject.AbstractModule;
@@ -64,5 +66,6 @@ public class ConverterModule extends AbstractModule {
     binder.add(URIConverter.class).forTypes(URI.class);
     binder.add(URLConverter.class).forTypes(URL.class);
     binder.add(UUIDConverter.class).forTypes(UUID.class);
+    binder.add(ZoneIdConverter.class).forTypes(ZoneId.class);
   }
 }
