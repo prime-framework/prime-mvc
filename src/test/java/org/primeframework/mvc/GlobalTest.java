@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -155,6 +155,25 @@ public class GlobalTest extends PrimeBaseTest {
                                  .get()
                                  .assertStatusCode(200)
                                  .assertBodyContains("42", "meaning"));
+  }
+
+  @Test
+  public void get_postParameterBeforeFormPrepare() throws Exception {
+    // Ensure we hit PostParameterMethods in an action when we build a new action based upon hitting a
+    // form tag that has a different action then the current action invocation.
+
+    test.simulate(() -> simulator.test("/scope/page-two")
+                                 .post()
+                                 .assertStatusCode(200)
+                                 .assertBodyContains("postParameterMethodCalled:first")
+                                 .assertBodyContains("formPrepareMethodCalled:second"))
+
+        // Now hit /api/page-one which contains a form tag with an action of /scope/page-two
+        .simulate(() -> simulator.test("/scope/page-one")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertBodyContains("postParameterMethodCalled:first")
+                                 .assertBodyContains("formPrepareMethodCalled:second"));
   }
 
   @Test

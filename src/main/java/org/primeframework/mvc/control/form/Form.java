@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,9 +25,13 @@ import org.primeframework.mvc.action.ActionMapper;
 import org.primeframework.mvc.control.AbstractControl;
 import org.primeframework.mvc.control.annotation.ControlAttribute;
 import org.primeframework.mvc.control.annotation.ControlAttributes;
+import org.primeframework.mvc.parameter.ParameterHandler;
+import org.primeframework.mvc.parameter.ParameterParser;
+import org.primeframework.mvc.parameter.PostParameterHandler;
 import org.primeframework.mvc.scope.ScopeRetriever;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.servlet.ServletTools;
+import org.primeframework.mvc.workflow.DefaultMVCWorkflow;
 
 import com.google.inject.Inject;
 
@@ -36,23 +40,34 @@ import com.google.inject.Inject;
  *
  * @author Brian Pontarelli
  */
-@ControlAttributes(
-  required = {
+@ControlAttributes(required = {
     @ControlAttribute(name = "action")
-  }
-)
+})
 public class Form extends AbstractControl {
   private final FormPreparer formPreparer;
+
   private final ActionInvocationStore actionInvocationStore;
+
   private final ActionMapper actionMapper;
-  private boolean differentURI = false;
+
   private final ScopeRetriever scopeRetriever;
 
+  private final PostParameterHandler postParameterHandler;
+
+  private final ParameterParser parameterParser;
+
+  private final ParameterHandler parameterHandler;
+
+  private boolean differentURI = false;
+
   @Inject
-  public Form(FormPreparer formPreparer, ActionInvocationStore actionInvocationStore, ActionMapper actionMapper, ScopeRetriever scopeRetriever) {
+  public Form(FormPreparer formPreparer, ActionInvocationStore actionInvocationStore, ActionMapper actionMapper, ParameterParser parameterParser, ParameterHandler parameterHandler, PostParameterHandler postParameterHandler, ScopeRetriever scopeRetriever) {
     this.formPreparer = formPreparer;
     this.actionInvocationStore = actionInvocationStore;
     this.actionMapper = actionMapper;
+    this.parameterHandler = parameterHandler;
+    this.parameterParser = parameterParser;
+    this.postParameterHandler = postParameterHandler;
     this.scopeRetriever = scopeRetriever;
   }
 
@@ -94,11 +109,11 @@ public class Form extends AbstractControl {
       ActionInvocation actionInvocation = actionMapper.map(httpMethod, action, false);
       if (actionInvocation == null || actionInvocation.action == null) {
         throw new PrimeException("The form action [" + action + "] is not a valid URI that maps to an action " +
-          "class by the Prime MVC.");
+            "class by the Prime MVC.");
       } else if (current == null || current.action == null || current.action.getClass() != actionInvocation.action.getClass()) {
-        // call setCurrent first, then set scopedVariables to ensure the ActionSession scope works correctly.
+        // call setCurrent first, then prepare the action
         actionInvocationStore.setCurrent(actionInvocation);
-        scopeRetriever.setScopedValues(actionInvocation);
+        prepareActionInvocation(actionInvocation);
         differentURI = true;
       }
     }
@@ -145,5 +160,25 @@ public class Form extends AbstractControl {
    */
   protected String endTemplateName() {
     return "form-end.ftl";
+  }
+
+  /**
+   * Fill out the action so that when the form prepare methods are called the action is properly constructed. This is
+   * intended to be used when this action invocation is not really the current, but it has been set as the
+   * current to handle embedded forms.
+   * <p>
+   * Any equivalent workflow tasks performed should follow the same order as used in the {@link DefaultMVCWorkflow}
+   *
+   * @param actionInvocation the action invocation.
+   */
+  private void prepareActionInvocation(ActionInvocation actionInvocation) {
+    // See ScopeRetrievalWorkflow
+    scopeRetriever.setScopedValues(actionInvocation);
+
+    // See ParameterWorkflow 
+    parameterHandler.handle(parameterParser.parse());
+
+    // See PostParameterWorkflow
+    postParameterHandler.handle(actionInvocation);
   }
 }

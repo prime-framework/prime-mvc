@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,13 @@ package org.primeframework.mvc.parameter.guice;
 import org.primeframework.mvc.parameter.DefaultParameterHandler;
 import org.primeframework.mvc.parameter.DefaultParameterParser;
 import org.primeframework.mvc.parameter.DefaultParameterWorkflow;
+import org.primeframework.mvc.parameter.DefaultPostParameterHandler;
 import org.primeframework.mvc.parameter.DefaultPostParameterWorkflow;
 import org.primeframework.mvc.parameter.DefaultURIParameterWorkflow;
 import org.primeframework.mvc.parameter.ParameterHandler;
 import org.primeframework.mvc.parameter.ParameterParser;
 import org.primeframework.mvc.parameter.ParameterWorkflow;
+import org.primeframework.mvc.parameter.PostParameterHandler;
 import org.primeframework.mvc.parameter.PostParameterWorkflow;
 import org.primeframework.mvc.parameter.URIParameterWorkflow;
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
@@ -42,10 +44,15 @@ public class ParameterModule extends AbstractModule {
     bindParameterHandler();
     bindParameterParser();
     bindParameterWorkflow();
+    bindPostParameterHandler();
     bindPostParameterWorkflow();
     bindURIParameterWorkflow();
     bindConverterProvider();
     bindExpressionEvaluator();
+  }
+
+  protected void bindPostParameterHandler() {
+    bind(PostParameterHandler.class).to(DefaultPostParameterHandler.class);
   }
 
   protected void bindParameterHandler() {

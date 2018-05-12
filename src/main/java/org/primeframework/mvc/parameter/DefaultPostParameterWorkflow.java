@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2016-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,7 @@ import java.io.IOException;
 
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
-import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.parameter.annotation.PostParameterMethod;
-import org.primeframework.mvc.util.ReflectionUtils;
 import org.primeframework.mvc.workflow.WorkflowChain;
 
 import com.google.inject.Inject;
@@ -36,23 +34,23 @@ public class DefaultPostParameterWorkflow implements PostParameterWorkflow {
 
   private final ActionInvocationStore actionInvocationStore;
 
+  private final PostParameterHandler postParameterHandler;
+
   @Inject
-  public DefaultPostParameterWorkflow(ActionInvocationStore actionInvocationStore) {
+  public DefaultPostParameterWorkflow(ActionInvocationStore actionInvocationStore, PostParameterHandler postParameterHandle) {
     this.actionInvocationStore = actionInvocationStore;
+    this.postParameterHandler = postParameterHandle;
   }
 
   @Override
   public void perform(WorkflowChain workflowChain) throws IOException, ServletException {
     ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
-
-    if (actionInvocation.action != null) {
-      ActionConfiguration actionConfiguration = actionInvocation.configuration;
-      if (actionConfiguration.postParameterMethods.size() > 0) {
-        Object action = actionInvocation.action;
-        ReflectionUtils.invokeAll(action, actionConfiguration.postParameterMethods);
-      }
-    }
+    invokeMethods(actionInvocation);
 
     workflowChain.continueWorkflow();
+  }
+
+  protected void invokeMethods(ActionInvocation actionInvocation) {
+    postParameterHandler.handle(actionInvocation);
   }
 }

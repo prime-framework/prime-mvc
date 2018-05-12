@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2017-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 package org.example.action.scope;
 
 import org.primeframework.mvc.action.annotation.Action;
+import org.primeframework.mvc.control.form.annotation.FormPrepareMethod;
+import org.primeframework.mvc.parameter.annotation.PostParameterMethod;
 import org.primeframework.mvc.scope.annotation.ActionSession;
 import org.primeframework.mvc.scope.annotation.Session;
 
@@ -27,6 +29,10 @@ public class PageTwoAction {
   @Session
   public String searchText;
 
+  public String postParameterMethodCalled;
+
+  public String formPrepareMethodCalled;
+
   @ActionSession
   public String searchType;
 
@@ -36,5 +42,23 @@ public class PageTwoAction {
 
   public String post() {
     return "success";
+  }
+
+  @PostParameterMethod
+  public void postParameterMethod() {
+    if (formPrepareMethodCalled == null) {
+      postParameterMethodCalled = "first";
+    } else {
+      postParameterMethodCalled = "second";
+    }
+  }
+
+  @FormPrepareMethod
+  public void formPrepareMethod() {
+    if (postParameterMethodCalled == null) {
+      formPrepareMethodCalled = "first";
+    } else {
+      formPrepareMethodCalled = "second";
+    }
   }
 }

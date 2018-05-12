@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2016, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2014-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -495,8 +495,8 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
   }
 
   /*
-  * Tests that all of the pre and post handling works correctly.
-  */
+   * Tests that all of the pre and post handling works correctly.
+   */
   @Test
   public void preAndPost() throws Exception {
     PreAndPostAction action = new PreAndPostAction();
@@ -540,7 +540,8 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     assertTrue(action.preCalled);
     assertFalse(action.postCalled);
 
-    PostParameterWorkflow postParameterWorkflow = new DefaultPostParameterWorkflow(actionInvocationStore);
+    PostParameterHandler postParameterHandler = new DefaultPostParameterHandler();
+    PostParameterWorkflow postParameterWorkflow = new DefaultPostParameterWorkflow(actionInvocationStore, postParameterHandler);
     postParameterWorkflow.perform(chain);
 
     assertTrue(action.postCalled);
