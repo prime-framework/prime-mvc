@@ -1,5 +1,13 @@
 Prime MVC Changes
 
+Changes in 1.8.4
+
+ * Skip file handling during the ParameterWorkflow when processing an embedded form.
+
+Changes in 1.8.3
+
+ * Make required parameters optional during the ParameterWorkflow when processing an embedded form.
+
 Changes in 1.8.2
 
  * Update prime-mock dependency to version 0.6.3
