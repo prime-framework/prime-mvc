@@ -22,6 +22,8 @@ import org.primeframework.mvc.scope.annotation.ActionSession;
 import org.primeframework.mvc.scope.annotation.Session;
 
 /**
+ * This action does NOT take the URL segment and sets it to 'id' field.
+ *
  * @author Daniel DeGroff
  */
 @Action

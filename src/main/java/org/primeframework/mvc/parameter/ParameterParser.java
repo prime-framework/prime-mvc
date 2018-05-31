@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
  */
 package org.primeframework.mvc.parameter;
 
-import org.primeframework.mvc.parameter.fileupload.FileInfo;
-
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.primeframework.mvc.parameter.fileupload.FileInfo;
 
 /**
  * This interface defines how parameters are retrieved from the request (usually) and separated into Required, Optional
@@ -38,14 +38,28 @@ public interface ParameterParser {
    */
   Parameters parse();
 
-  public static class Parameters {
-    public final Map<String, Struct> required = new LinkedHashMap<String, Struct>();
-    public final Map<String, Struct> optional = new LinkedHashMap<String, Struct>();
-    public final Map<String, Struct> pre = new LinkedHashMap<String, Struct>();
-    public final Map<String, List<FileInfo>> files = new LinkedHashMap<String, List<FileInfo>>();
+  class Parameters {
+    public final Map<String, Struct> required = new LinkedHashMap<>();
+
+    public final Map<String, Struct> optional = new LinkedHashMap<>();
+
+    public final Map<String, Struct> pre = new LinkedHashMap<>();
+
+    public final Map<String, List<FileInfo>> files = new LinkedHashMap<>();
+
+    @Override
+    public String toString() {
+      return "Parameters{" +
+          "required=" + required +
+          ", optional=" + optional +
+          ", pre=" + pre +
+          ", files=" + files +
+          '}';
+    }
 
     public static class Struct {
-      public Map<String, String> attributes = new LinkedHashMap<String, String>();
+      public Map<String, String> attributes = new LinkedHashMap<>();
+
       public String[] values;
 
       public Struct() {
@@ -62,16 +76,6 @@ public interface ParameterParser {
             ", values=" + Arrays.toString(values) +
             '}';
       }
-    }
-
-    @Override
-    public String toString() {
-      return "Parameters{" +
-          "required=" + required +
-          ", optional=" + optional +
-          ", pre=" + pre +
-          ", files=" + files +
-          '}';
     }
   }
 }
