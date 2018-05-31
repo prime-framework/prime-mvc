@@ -173,11 +173,11 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/primeframework/prime-mock/0.6.3-{integration}/prime-mock-0.6.3-{integration}.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/org/primeframework/prime-mock/0.6.3/prime-mock-0.6.3.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/primeframework/prime-mock/0.6.3-{integration}/prime-mock-0.6.3-{integration}-src.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/org/primeframework/prime-mock/0.6.3/prime-mock-0.6.3-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
