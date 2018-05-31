@@ -182,6 +182,9 @@ public class Form extends AbstractControl {
     parameters.optional.putAll(parameters.required);
     parameters.required.clear();
 
+    // Also do not attempt to handle files in this workflow.
+    parameters.files.clear();
+
     // See ParameterWorkflow
     parameterHandler.handle(parameters);
 
