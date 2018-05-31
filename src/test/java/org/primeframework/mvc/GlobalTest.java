@@ -152,11 +152,25 @@ public class GlobalTest extends PrimeBaseTest {
 
         // Now hit /api/page-one which contains a form tag with an action of /scope/page-two
         .simulate(() -> simulator.test("/scope/page-one")
-                                 // ensure this 'required' parameter for PageOne does not mess up PageTWo which does not have an Id field.
-                                 .withUrlSegment("IdOnlyForPageOne")
                                  .get()
                                  .assertStatusCode(200)
                                  .assertBodyContains("42", "meaning"));
+  }
+
+  @Test
+  public void embeddedFormHandling() throws Exception {
+    // Ensure this 'required' parameter for PageOne does not mess up PageTwo which does not have an Id field.
+    test.simulate(() -> simulator.test("/scope/page-one")
+                                 .withUrlSegment("IdOnlyForPageOne")
+                                 .get()
+                                 .assertStatusCode(200));
+
+    // Ensure the @FileUpload in the PageOneAction does not mess up PageTwo
+    test.createFile()
+        .simulate(() -> simulator.test("/scope/page-one")
+                                 .withFile("file", test.tempFile.toFile(), "text/plain")
+                                 .get()
+                                 .assertStatusCode(200));
   }
 
   @Test

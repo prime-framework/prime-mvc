@@ -16,6 +16,8 @@
 package org.example.action.scope;
 
 import org.primeframework.mvc.action.annotation.Action;
+import org.primeframework.mvc.parameter.fileupload.FileInfo;
+import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
 
 /**
  * This action takes the URL segment and sets it to 'id' field.
@@ -24,8 +26,11 @@ import org.primeframework.mvc.action.annotation.Action;
  */
 @Action(value = "{id}")
 public class PageOneAction {
-
   public String id;
+
+  // This only exists on PageOneAction, not PageTwoAction
+  @FileUpload(contentTypes = {"*"})
+  public FileInfo file;
 
   public String get() {
     return "input";
