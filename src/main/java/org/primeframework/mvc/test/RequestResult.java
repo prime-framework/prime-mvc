@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2014-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -238,6 +238,20 @@ public class RequestResult {
     Cookie actual = response.getCookies().stream().filter(c -> c.getName().equals(name)).findFirst().orElse(null);
     if (actual == null) {
       throw new AssertionError("Cookie [" + name + "] was not found in the response. Cookies found [" + String.join(", ", response.getCookies().stream().map(Cookie::getName).collect(Collectors.toList())));
+    }
+    return this;
+  }
+
+  /**
+   * Assert the cookie does NOT exist by name.
+   *
+   * @param name The cookie name.
+   * @return This.
+   */
+  public RequestResult assertDoesContainsCookie(String name) {
+    Cookie actual = response.getCookies().stream().filter(c -> c.getName().equals(name)).findFirst().orElse(null);
+    if (actual != null) {
+      throw new AssertionError("Cookie [" + name + "] was not expected to be found in the response. Cookies found [" + String.join(", ", response.getCookies().stream().map(Cookie::getName).collect(Collectors.toList())));
     }
     return this;
   }
