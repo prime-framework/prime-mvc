@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2015-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,15 @@
  */
 package org.primeframework.mvc.action.result;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.primeframework.mock.servlet.MockHttpServletRequest.Method;
 import org.primeframework.mvc.PrimeBaseTest;
@@ -57,7 +61,7 @@ public class SaveRequestResultTest extends PrimeBaseTest {
   @Inject public ObjectMapper objectMapper;
 
   @Test
-  public void saveRequestGET() throws IOException, ServletException, NoSuchAlgorithmException {
+  public void saveRequestGET() throws IOException, NoSuchAlgorithmException {
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/foo", "", null));
     replay(store);
@@ -79,7 +83,7 @@ public class SaveRequestResultTest extends PrimeBaseTest {
   }
 
   @Test
-  public void saveRequestPOST() throws IOException, ServletException, NoSuchAlgorithmException {
+  public void saveRequestPOST() throws IOException, NoSuchAlgorithmException {
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/foo", "", null));
     replay(store);
@@ -95,6 +99,39 @@ public class SaveRequestResultTest extends PrimeBaseTest {
     result.execute(annotation);
 
     assertCookieEquals(response.getCookies(), singletonList(SavedRequestTools.toCookie(new SavedHttpRequest(HTTPMethod.POST, "/test", request.getParameterMap()), objectMapper, configuration, cipherProvider)));
+    assertEquals(response.getRedirect(), "/login");
+
+    verify(store);
+  }
+
+  @Test
+  public void saveRequestPOST_tooBig() throws IOException, NoSuchAlgorithmException {
+    // By default Tomcat limits the HTTP Header to 8k (see Tomcat maxHttpHeaderSize)
+    // If we think we might be surpassing that size, we should skip the save request otherwise we'll return a 500 to the client
+
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    Map<String, List<String>> parameters = new HashMap<>();
+    parameters.put("largeParam1", new ArrayList<>(Arrays.asList(new String(new char[2048]).replace('\0', 'a'))));
+    parameters.put("largeParam2", new ArrayList<>(Arrays.asList(new String(new char[2048]).replace('\0', 'b'))));
+    parameters.put("largeParam3", new ArrayList<>(Arrays.asList(new String(new char[2048]).replace('\0', 'c'))));
+    parameters.put("largeParam4", new ArrayList<>(Arrays.asList(new String(new char[2048]).replace('\0', 'd'))));
+    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/foo", "", parameters, null, true));
+    replay(store);
+
+    request.setUri("/test");
+    request.setMethod(Method.POST);
+    request.setParameter("largeParam1", parameters.get("largeParam1").get(0));
+    request.setParameter("largeParam2", parameters.get("largeParam2").get(0));
+    request.setParameter("largeParam3", parameters.get("largeParam3").get(0));
+    request.setParameter("largeParam4", parameters.get("largeParam4").get(0));
+
+    CipherProvider cipherProvider = new DefaultCipherProvider(configuration);
+    SaveRequest annotation = new SaveRequestImpl("/login", "unauthenticated", true, false);
+    SaveRequestResult result = new SaveRequestResult(messageStore, expressionEvaluator, response, request, store, configuration, objectMapper, cipherProvider);
+    result.execute(annotation);
+
+    // Expect no cookies in the response, sadly, the cookie was just too big and we omitted it from the HTTP response.
+    assertCookieEquals(response.getCookies(), Collections.emptyList());
     assertEquals(response.getRedirect(), "/login");
 
     verify(store);

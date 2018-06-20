@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2015-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,14 @@
  */
 package org.primeframework.mvc.action.result;
 
-import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.Map;
 
 import org.primeframework.mvc.action.ActionInvocationStore;
@@ -59,10 +60,7 @@ public class SaveRequestResult extends AbstractRedirectResult<SaveRequest> {
     this.cipherProvider = cipherProvider;
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  public boolean execute(SaveRequest saveRequest) throws IOException, ServletException {
+  public boolean execute(SaveRequest saveRequest) throws IOException {
     moveMessagesToFlash();
 
     Map<String, String[]> requestParameters = null;
@@ -76,8 +74,17 @@ public class SaveRequestResult extends AbstractRedirectResult<SaveRequest> {
       redirectURI = request.getRequestURI();
     }
 
-    // Save the request
-    response.addCookie(SavedRequestTools.toCookie(new SavedHttpRequest(method, redirectURI, requestParameters), objectMapper, configuration, cipherProvider));
+    // Build a saved request cookie
+    Cookie saveRequestCookie = SavedRequestTools.toCookie(new SavedHttpRequest(method, redirectURI, requestParameters), objectMapper, configuration, cipherProvider);
+
+    // By default, Tomcat limits the header size to 8192 bytes. See maxHttpHeaderSize on https://tomcat.apache.org/tomcat-8.5-doc/config/http.html
+    // If we exceed this length Tomcat will explode and return a 500 to the client, this is not ideal.
+    // If the cookie we are writing is under 7K (leaving some room of other header values), write it to the response, else skip it, we don't
+    // want a 500 and this is some monster request to save, probably a search or something like that.
+    if (saveRequestCookie.getValue().getBytes(Charset.forName("UTF-8")).length <= 7_168) {
+      response.addCookie(SavedRequestTools.toCookie(new SavedHttpRequest(method, redirectURI, requestParameters), objectMapper, configuration, cipherProvider));
+    }
+
     sendRedirect(null, saveRequest.uri(), saveRequest.encodeVariables(), saveRequest.perm());
     return true;
   }
