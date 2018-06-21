@@ -114,6 +114,20 @@ public class RequestResult {
   }
 
   /**
+   * Verifies that the normalized body equals the given string.
+   *
+   * @param string The string to compare against the body.
+   * @return This.
+   */
+  public RequestResult assertNormalizedBody(String string) {
+    if (!normalize(body).equals(string)) {
+      throw new AssertionError("Body didn't match [" + string + "]\nRedirect: [" + redirect + "]\nBody:\n" + body.trim().replace("\r\n", "\n").replace("\r", "\n"));
+    }
+
+    return this;
+  }
+
+  /**
    * Verifies that the body contains all of the given Strings.
    *
    * @param strings The strings to check.
@@ -213,6 +227,22 @@ public class RequestResult {
       return assertBody(new String(Files.readAllBytes(path), "UTF-8"));
     }
     return assertBody(BodyTools.processTemplate(path, values));
+  }
+
+  /**
+   * Verifies that the body equals the content of the given File.
+   * <p>
+   * This assertion will trim and normalize line returns before performing an equality check.
+   *
+   * @param path   The file to load and compare to the response.
+   * @param values key value pairs of replacement values for use in the file.
+   * @return This.
+   */
+  public RequestResult assertNormalizedBodyFile(Path path, Object... values) throws IOException {
+    if (values.length == 0) {
+      return assertNormalizedBody(normalize(new String(Files.readAllBytes(path), "UTF-8")));
+    }
+    return assertNormalizedBody(normalize(BodyTools.processTemplate(path, values)));
   }
 
   /**
@@ -738,6 +768,10 @@ public class RequestResult {
   public RequestResult setup(Runnable runnable) {
     runnable.run();
     return this;
+  }
+
+  private String normalize(String input) {
+    return input.trim().replace("\r\n", "\n").replace("\r", "\n");
   }
 
   private RequestResult _assertBodyContainsMessagesFromKey(boolean contains, String key, Object... values) {
