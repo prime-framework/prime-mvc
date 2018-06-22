@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,6 +91,24 @@ public interface MVCConfiguration {
    * @return The name of the cookie used to store Saved Request information.
    */
   String savedRequestCookieName();
+
+  /**
+   * Tomcat limits the header size to 8192 bytes (8 KB). See maxHttpHeaderSize on https://tomcat.apache.org/tomcat-8.5-doc/config/http.html
+   * <br>
+   * If we write the save request cookie to big we will exceed 8 KB and the client will receive a 500 from Tomcat with the following stack trace.
+   * <pre>
+   *    org.apache.coyote.http11.HeadersTooLargeException: An attempt was made to write more data to the response headers than there was room available in the buffer.
+   *      Increase maxHttpHeaderSize on the connector or write less data into the response headers.
+   * </pre>
+   * <p>
+   * For this reason we should have a configured limit to the size of the cookie to attempt to prevent this scenario. Once this limit
+   * is exceeded Prime will choose not to write the save request cookie and the user will not be redirected after login. This seems to
+   * be a better user experience than a 500. If you were to increase the maxHttpHeaderSize configured in Tomcat, this value then could also be
+   * increased.
+   *
+   * @return The maximum size in bytes of the save request cookie.
+   */
+  int savedRequestCookieMaximumSize();
 
   /**
    * @return The static resource prefixes.

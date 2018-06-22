@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,8 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
 
   public boolean emptyParametersAreNull = true;
 
+  public int savedRequestCookieMaximumSize = 6 * 1024; // 6 KB
+
   public String exceptionResultCode = "error";
 
   public String[] fileUploadAllowedTypes = ALLOWED_TYPES;
@@ -51,7 +53,7 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
 
   public boolean ignoreEmptyParameters = false;
 
-  public boolean propogateRuntimeException = true;
+  public boolean propagateRuntimeException = true;
 
   public String resourceDirectory = "/WEB-INF";
 
@@ -90,7 +92,7 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
 
   @Override
   public boolean propagateRuntimeExceptions() {
-    return propogateRuntimeException;
+    return propagateRuntimeException;
   }
 
   @Override
@@ -101,6 +103,11 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
   @Override
   public String savedRequestCookieName() {
     return savedRequestCookieName;
+  }
+
+  @Override
+  public int savedRequestCookieMaximumSize() {
+    return savedRequestCookieMaximumSize;
   }
 
   @Override

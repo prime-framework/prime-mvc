@@ -106,7 +106,7 @@ public class SaveRequestResultTest extends PrimeBaseTest {
 
   @Test
   public void saveRequestPOST_tooBig() throws IOException, NoSuchAlgorithmException {
-    // By default Tomcat limits the HTTP Header to 8k (see Tomcat maxHttpHeaderSize)
+    // By default Tomcat limits the HTTP Header to 8 KB (see Tomcat maxHttpHeaderSize)
     // If we think we might be surpassing that size, we should skip the save request otherwise we'll return a 500 to the client
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);

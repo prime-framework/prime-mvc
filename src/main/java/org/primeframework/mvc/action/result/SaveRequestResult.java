@@ -77,11 +77,15 @@ public class SaveRequestResult extends AbstractRedirectResult<SaveRequest> {
     // Build a saved request cookie
     Cookie saveRequestCookie = SavedRequestTools.toCookie(new SavedHttpRequest(method, redirectURI, requestParameters), objectMapper, configuration, cipherProvider);
 
-    // By default, Tomcat limits the header size to 8192 bytes. See maxHttpHeaderSize on https://tomcat.apache.org/tomcat-8.5-doc/config/http.html
-    // If we exceed this length Tomcat will explode and return a 500 to the client, this is not ideal.
-    // If the cookie we are writing is under 7K (leaving some room of other header values), write it to the response, else skip it, we don't
-    // want a 500 and this is some monster request to save, probably a search or something like that.
-    if (saveRequestCookie.getValue().getBytes(Charset.forName("UTF-8")).length <= 7_168) {
+    // If the resulting cookie exceeds the maximum configured size in bytes, it would be bad.
+    //
+    // Peter: I'm fuzzy on the whole good/bad thing. What do you mean, "bad"?
+    // Egon: Try to imagine all life as you know it stopping instantaneously, and every molecule in your body exploding at the speed of light.
+    // Ray: [shocked gasp] Total protonic reversal.
+    // Peter:  Right. That's bad. Okay. All right. Important safety tip. Thanks, Egon.
+    //
+    // Ok, not that bad, but Tomcat will exception and the user will receive a 500. See MVCConfiguration.savedRequestCookieMaximumSize for more information.
+    if (saveRequestCookie.getValue().getBytes(Charset.forName("UTF-8")).length <= configuration.savedRequestCookieMaximumSize()) {
       response.addCookie(SavedRequestTools.toCookie(new SavedHttpRequest(method, redirectURI, requestParameters), objectMapper, configuration, cipherProvider));
     }
 
