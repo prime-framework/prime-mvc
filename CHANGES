@@ -3,6 +3,8 @@ Prime MVC Changes
 Changes in 1.8.5
 
  * Added RequestResult.assertDoesContainsCookie
+ * Added RequestResult.assertNormalizedBody
+ * Added RequestResult.assertNormalizedBodyFile
  * Limit the size of the save request cookie to 6 KB. The default maximum header size in Tomcat is 8 KB and once this limit is exceeded
    an exception will be thrown. If the limit is exceeded the cookie will no longer be written.
 
