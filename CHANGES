@@ -1,5 +1,9 @@
 Prime MVC Changes
 
+Changes in 1.8.6
+
+ * Update guice, asm and freemarker dependencies.
+
 Changes in 1.8.5
 
  * Added RequestResult.assertDoesContainsCookie

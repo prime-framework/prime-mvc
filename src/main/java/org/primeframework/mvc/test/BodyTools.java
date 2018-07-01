@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2015-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,11 +37,11 @@ public final class BodyTools {
   private static final Configuration config;
 
   static {
-    BeansWrapperBuilder builder = new BeansWrapperBuilder(Configuration.VERSION_2_3_26);
+    BeansWrapperBuilder builder = new BeansWrapperBuilder(Configuration.VERSION_2_3_28);
     builder.setExposeFields(true);
     builder.setSimpleMapWrapper(true);
 
-    config = new Configuration(Configuration.VERSION_2_3_26);
+    config = new Configuration(Configuration.VERSION_2_3_28);
     config.setDefaultEncoding("UTF-8");
     config.setNumberFormat("computer");
     config.setTagSyntax(Configuration.SQUARE_BRACKET_TAG_SYNTAX);
