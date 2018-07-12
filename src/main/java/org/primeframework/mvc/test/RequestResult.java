@@ -321,7 +321,7 @@ public class RequestResult {
       if (fieldMessages == null) {
         StringBuilder sb = new StringBuilder("\n\tMessageStore contains:\n");
         //noinspection StringConcatenationInsideStringBufferAppend
-        msgs.keySet().forEach((f) -> sb.append("\t\t" + f + "\n"));
+        msgs.keySet().forEach(f -> sb.append("\t\t" + f + "\n"));
         throw new AssertionError("The MessageStore does not contain a error for the field [" + field + "]" + sb);
       }
 
@@ -333,7 +333,7 @@ public class RequestResult {
       if (!found) {
         StringBuilder sb = new StringBuilder("\n\tMessageStore contains:\n");
         //noinspection StringConcatenationInsideStringBufferAppend
-        fieldMessages.forEach((f) -> sb.append("\t\t[" + f.getType() + "]\n"));
+        fieldMessages.forEach(f -> sb.append("\t\t[" + f.getType() + "]\n"));
         throw new AssertionError("The MessageStore contains messages but no errors for the field [" + field + "]" + sb);
       }
     }
@@ -375,18 +375,18 @@ public class RequestResult {
     MessageStore messageStore = get(MessageStore.class);
     List<Message> messages = messageStore.getGeneralMessages();
     for (String errorCode : errorCodes) {
-      Message message = messages.stream().filter((m) -> m.getCode().equals(errorCode)).findFirst().orElse(null);
+      Message message = messages.stream().filter(m -> m.getCode().equals(errorCode)).findFirst().orElse(null);
       if (message == null) {
         StringBuilder sb = new StringBuilder("\n\tMessageStore contains:\n");
         //noinspection StringConcatenationInsideStringBufferAppend
-        messages.forEach((m) -> sb.append("\t\t" + m.getType() + " " + m.getCode() + "\t" + ((m instanceof SimpleMessage) ? ((SimpleMessage) m).message : "") + "\n"));
+        messages.forEach(m -> sb.append("\t\t" + m.getType() + " " + m.getCode() + "\t" + ((m instanceof SimpleMessage) ? ((SimpleMessage) m).message : "") + "\n"));
         throw new AssertionError("The MessageStore does not contain the general message [" + errorCode + "] Type: " + messageType + sb);
       }
 
       if (message.getType() != messageType) {
         StringBuilder sb = new StringBuilder("\n\tMessageStore contains:\n");
         //noinspection StringConcatenationInsideStringBufferAppend
-        messages.forEach((m) -> sb.append("\t\t" + m.getType() + " " + m.getCode() + "\t" + ((m instanceof SimpleMessage) ? ((SimpleMessage) m).message : "") + "\n"));
+        messages.forEach(m -> sb.append("\t\t" + m.getType() + " " + m.getCode() + "\t" + ((m instanceof SimpleMessage) ? ((SimpleMessage) m).message : "") + "\n"));
         throw new AssertionError("The MessageStore contains message for code  [" + message.getCode() + "], but it is of type [" + message.getType() + "]" + sb);
       }
     }
@@ -427,7 +427,7 @@ public class RequestResult {
     if (!inMessageStore.containsAll(asList(messages))) {
       StringBuilder sb = new StringBuilder("\n\tMessageStore contains:\n");
       //noinspection StringConcatenationInsideStringBufferAppend
-      msgs.forEach((f) -> sb.append("\t\t[" + f + "]\n"));
+      msgs.forEach(f -> sb.append("\t\t[" + f + "]\n"));
       throw new AssertionError("The MessageStore does not contain the [" + type + "] message " + asList(messages) + sb);
     }
 
