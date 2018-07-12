@@ -91,6 +91,14 @@ public class RequestResult {
     JsonNode response = objectMapper.readTree(actual);
     JsonNode file = objectMapper.readTree(expected);
 
+    if (response == null) {
+      throw new AssertionError("The actual JSON was empty or once deserialize returned a null JsonNode object. Actual [" + actual + "]");
+    }
+
+    if (file == null) {
+      throw new AssertionError("The expected JSON was empty or once deserialize returned a null JsonNode object. Expected [" + expected + "]");
+    }
+
     if (!response.equals(file)) {
       objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
       String bodyString = objectMapper.writeValueAsString(response);
