@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2013-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.primeframework.mvc.action.config.ActionConfigurator;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration.RequestMember;
+import org.primeframework.mvc.content.json.JacksonActionConfiguration.ResponseMember;
 import org.primeframework.mvc.content.json.annotation.JSONRequest;
 import org.primeframework.mvc.content.json.annotation.JSONResponse;
 import org.primeframework.mvc.servlet.HTTPMethod;
@@ -57,11 +58,13 @@ public class JacksonActionConfigurator implements ActionConfigurator {
 
     // Response
     Map.Entry<String, JSONResponse> entry = (jsonResponseMembers.size() == 1) ? jsonResponseMembers.entrySet().iterator().next() : null;
-    String responseMember = entry == null ? null : entry.getKey();
-    Class<?> serializationView = entry == null ? null : entry.getValue().view();
+    ResponseMember responseMember = null;
+    if (entry != null) {
+      responseMember = new ResponseMember(entry.getValue(), entry.getKey());
+    }
 
     if (!configuredMembers.isEmpty() || responseMember != null) {
-      return new JacksonActionConfiguration(configuredMembers, responseMember, serializationView);
+      return new JacksonActionConfiguration(configuredMembers, responseMember);
     }
 
     return null;

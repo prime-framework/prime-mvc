@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2013-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,11 @@
  */
 package org.primeframework.mvc.action.result;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -38,6 +39,8 @@ import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.result.annotation.JSON;
 import org.primeframework.mvc.action.result.annotation.XMLStream;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration;
+import org.primeframework.mvc.content.json.JacksonActionConfiguration.ResponseMember;
+import org.primeframework.mvc.content.json.annotation.JSONResponse;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
@@ -63,6 +66,24 @@ import static org.testng.Assert.assertEquals;
  * @author Brian Pontarelli
  */
 public class JSONResultTest extends PrimeBaseTest {
+  private static JSONResponse JSON_RESPONSE_ANNOTATION = new JSONResponse() {
+
+    @Override
+    public Class<? extends Annotation> annotationType() {
+      return null;
+    }
+
+    @Override
+    public Class<?> view() {
+      return null;
+    }
+
+    @Override
+    public boolean prettyPrint() {
+      return false;
+    }
+  };
+
   @Inject public ObjectMapper objectMapper;
 
   @DataProvider(name = "httMethod")
@@ -71,7 +92,7 @@ public class JSONResultTest extends PrimeBaseTest {
   }
 
   @Test(dataProvider = "httpMethod")
-  public void all(HTTPMethod httpMethod) throws IOException, ServletException {
+  public void all(HTTPMethod httpMethod) throws IOException {
     UserField userField = new UserField();
     userField.addresses.put("work", new AddressField());
     userField.addresses.get("work").age = 100;
@@ -113,7 +134,7 @@ public class JSONResultTest extends PrimeBaseTest {
     replay(response);
 
     Map<Class<?>, Object> additionalConfiguration = new HashMap<>();
-    additionalConfiguration.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(null, "user"));
+    additionalConfiguration.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(null, new ResponseMember(JSON_RESPONSE_ANNOTATION, "user")));
     ActionConfiguration config = new ActionConfiguration(PostAction.class, null, null, null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, additionalConfiguration, null, null);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(action, new ExecuteMethodConfiguration(httpMethod, null, null), "/foo", "", config));
@@ -176,8 +197,52 @@ public class JSONResultTest extends PrimeBaseTest {
     verify(ee, messageStore, response);
   }
 
+  /**
+   * Using this test to ensure the JSONResult is fast enough even if we call writerWithDefaultPrettyPrinter or writerWithView which
+   * construct new Object Writers.
+   * <p>
+   * This seems to be fast as balls, and not worth worrying about.
+   * <p>
+   * Enable the test and see for yourself. Hopefully the JVM isn't so smart to see that I am not storing the
+   * references and then optimizing away the code.
+   */
+  @Test(enabled = false)
+  public void objectWriter_performance() {
+    long loopCount = 1_000_000;
+
+    // Test performance of constructing a new objectMapper for prettyPrint
+    Instant start = Instant.now();
+    for (int i = 0; i < loopCount; i++) {
+      objectMapper.writerWithDefaultPrettyPrinter();
+    }
+    Duration duration = Duration.between(start, Instant.now());
+    double avg = duration.toMillis() / loopCount;
+    System.out.println("Time: " + duration.toMillis());
+    System.out.println("Each iteration: " + avg);
+
+    // Test performance of constructing a new objectMapper for views
+    start = Instant.now();
+    for (int i = 0; i < loopCount; i++) {
+      objectMapper.writerWithView(Object.class);
+    }
+    duration = Duration.between(start, Instant.now());
+    avg = duration.toMillis() / loopCount;
+    System.out.println("Time: " + duration.toMillis());
+    System.out.println("Each iteration: " + avg);
+
+    // Test performance of constructing a new objectMapper for views with pretty print
+    start = Instant.now();
+    for (int i = 0; i < loopCount; i++) {
+      objectMapper.writerWithView(Object.class).withDefaultPrettyPrinter();
+    }
+    duration = Duration.between(start, Instant.now());
+    avg = duration.toMillis() / loopCount;
+    System.out.println("Time: " + duration.toMillis());
+    System.out.println("Each iteration: " + avg);
+  }
+
   @Test(dataProvider = "httpMethod")
-  public void errors(HTTPMethod httpMethod) throws IOException, ServletException {
+  public void errors(HTTPMethod httpMethod) throws IOException {
     PostAction action = new PostAction();
     ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
     replay(ee);
@@ -194,7 +259,7 @@ public class JSONResultTest extends PrimeBaseTest {
     replay(response);
 
     Map<Class<?>, Object> additionalConfiguration = new HashMap<>();
-    additionalConfiguration.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(null, "user"));
+    additionalConfiguration.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(null, new ResponseMember(JSON_RESPONSE_ANNOTATION, "user")));
     ActionConfiguration config = new ActionConfiguration(PostAction.class, null, null, null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, additionalConfiguration, null, null);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,6 +56,6 @@ public class JacksonActionConfiguratorTest extends PrimeBaseTest {
     assertEquals(config.requestMembers.get(HTTPMethod.GET).type, requestMembers.get(HTTPMethod.GET).type);
     assertEquals(config.requestMembers.get(HTTPMethod.DELETE).type, requestMembers.get(HTTPMethod.DELETE).type);
 
-    assertEquals(config.responseMember, "jsonResponse");
+    assertEquals(config.responseMember.name, "jsonResponse");
   }
 }

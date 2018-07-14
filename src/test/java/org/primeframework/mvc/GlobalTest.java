@@ -555,7 +555,7 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
-  public void singletons() throws Exception {
+  public void singletons() {
     assertSingleton(simulator, ActionConfigurationProvider.class);
     assertSingleton(simulator, Configuration.class);
     assertSingleton(simulator, ResourceBundle.Control.class);

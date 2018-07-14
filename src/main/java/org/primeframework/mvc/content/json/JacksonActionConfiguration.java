@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2013-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package org.primeframework.mvc.content.json;
 
 import java.util.Map;
 
+import org.primeframework.mvc.content.json.annotation.JSONResponse;
 import org.primeframework.mvc.servlet.HTTPMethod;
 
 /**
@@ -27,20 +28,19 @@ import org.primeframework.mvc.servlet.HTTPMethod;
 public class JacksonActionConfiguration {
   public final Map<HTTPMethod, RequestMember> requestMembers;
 
-  public final String responseMember;
+  public final ResponseMember responseMember;
 
-  public Class<?> serializationView;
-
-  public JacksonActionConfiguration(Map<HTTPMethod, RequestMember> requestMembers, String responseMember) {
+  public JacksonActionConfiguration(Map<HTTPMethod, RequestMember> requestMembers, ResponseMember responseMember) {
     this.requestMembers = requestMembers;
     this.responseMember = responseMember;
-    this.serializationView = null;
   }
 
-  public JacksonActionConfiguration(Map<HTTPMethod, RequestMember> requestMembers, String responseMember, Class<?> serializationView) {
-    this.requestMembers = requestMembers;
-    this.responseMember = responseMember;
-    this.serializationView = serializationView;
+  public Class<?> getSerializationView() {
+    if (responseMember == null || responseMember.annotation == null) {
+      return null;
+    }
+
+    return responseMember.annotation.view();
   }
 
   public static class RequestMember {
@@ -51,6 +51,17 @@ public class JacksonActionConfiguration {
     public RequestMember(String name, Class<?> type) {
       this.name = name;
       this.type = type;
+    }
+  }
+
+  public static class ResponseMember {
+    public String name;
+
+    public JSONResponse annotation;
+
+    public ResponseMember(JSONResponse annotation, String name) {
+      this.annotation = annotation;
+      this.name = name;
     }
   }
 }

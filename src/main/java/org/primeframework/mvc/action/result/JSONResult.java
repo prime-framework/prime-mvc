@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,24 +15,28 @@
  */
 package org.primeframework.mvc.action.result;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.inject.Inject;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.List;
+
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.result.annotation.JSON;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration;
-import org.primeframework.mvc.message.*;
+import org.primeframework.mvc.message.ErrorMessage;
+import org.primeframework.mvc.message.ErrorMessages;
+import org.primeframework.mvc.message.FieldMessage;
+import org.primeframework.mvc.message.Message;
+import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.scope.MessageScope;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.Inject;
 
 /**
  * This result writes out Java objects to JSON using Jackson. The content type is set to 'application/json'.
@@ -58,7 +62,7 @@ public class JSONResult extends AbstractResult<JSON> {
     this.objectMapper = objectMapper;
   }
 
-  public boolean execute(JSON json) throws IOException, ServletException {
+  public boolean execute(JSON json) throws IOException {
     ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
     Object action = actionInvocation.action;
     if (action == null) {
@@ -74,6 +78,7 @@ public class JSONResult extends AbstractResult<JSON> {
     // @JSONResponse annotation
     Object jacksonObject;
 
+    boolean prettyPrint = false;
     Class<?> serializationView = null;
     List<Message> messages = messageStore.get(MessageScope.REQUEST);
     if (messages.size() > 0) {
@@ -83,21 +88,19 @@ public class JSONResult extends AbstractResult<JSON> {
       if (jacksonActionConfiguration == null || jacksonActionConfiguration.responseMember == null) {
         throw new PrimeException("The action [" + action.getClass() + "] is missing a field annotated with @JSONResponse. This is used to figure out what to send back in the response.");
       }
-      serializationView = jacksonActionConfiguration.serializationView;
-      jacksonObject = expressionEvaluator.getValue(jacksonActionConfiguration.responseMember, action);
+      serializationView = jacksonActionConfiguration.getSerializationView();
+      jacksonObject = expressionEvaluator.getValue(jacksonActionConfiguration.responseMember.name, action);
       if (jacksonObject == null) {
-        throw new PrimeException("The @JSONResponse field [" + jacksonActionConfiguration.responseMember + "] in the action [" + action.getClass() + "] is null. It cannot be null!");
+        throw new PrimeException("The @JSONResponse field [" + jacksonActionConfiguration.responseMember.name + "] in the action [" + action.getClass() + "] is null. It cannot be null!");
       }
+
+      prettyPrint = jacksonActionConfiguration.responseMember.annotation.prettyPrint();
     }
 
-    ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
-    if (serializationView != void.class) {
-      objectMapper.writerWithView(serializationView).writeValue(baos, jacksonObject);
-    } else {
-      objectMapper.writeValue(baos, jacksonObject);
-    }
+    ByteArrayOutputStream os = new ByteArrayOutputStream(1024);
+    writeValue(os, jacksonObject, serializationView, prettyPrint);
 
-    byte[] result = baos.toByteArray();
+    byte[] result = os.toByteArray();
     response.setStatus(json.status());
     response.setCharacterEncoding("UTF-8");
     response.setContentType("application/json");
@@ -111,6 +114,27 @@ public class JSONResult extends AbstractResult<JSON> {
     outputStream.write(result);
     outputStream.flush();
     return true;
+  }
+
+  private void writeValue(ByteArrayOutputStream os, Object jacksonObject, Class<?> serializationView, boolean prettyPrint) throws IOException {
+    // Most common path
+    if (!prettyPrint && serializationView == null) {
+      objectMapper.writeValue(os, jacksonObject);
+      return;
+    }
+
+    if (prettyPrint && serializationView != null) {
+      objectMapper.writerWithView(serializationView).withDefaultPrettyPrinter().writeValue(os, jacksonObject);
+      return;
+    }
+
+    if (prettyPrint) {
+      objectMapper.writerWithDefaultPrettyPrinter().writeValue(os, jacksonObject);
+      return;
+    }
+
+    // serializationView is always non-null here
+    objectMapper.writerWithView(serializationView).writeValue(os, jacksonObject);
   }
 
   private ErrorMessages convertErrors(List<Message> messages) {

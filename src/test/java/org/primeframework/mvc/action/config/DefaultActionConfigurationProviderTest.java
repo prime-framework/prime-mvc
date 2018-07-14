@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -150,7 +150,7 @@ public class DefaultActionConfigurationProviderTest {
     assertTrue(jacksonActionConfiguration.requestMembers.containsKey(HTTPMethod.POST));
     assertEquals(jacksonActionConfiguration.requestMembers.get(HTTPMethod.POST).name, "jsonRequest");
     assertEquals(jacksonActionConfiguration.requestMembers.get(HTTPMethod.POST).type, UserField.class);
-    assertEquals(jacksonActionConfiguration.responseMember, "jsonResponse");
+    assertEquals(jacksonActionConfiguration.responseMember.name, "jsonResponse");
     assertEquals(((BinaryActionConfiguration) invocation.configuration.additionalConfiguration.get(BinaryActionConfiguration.class)).responseMember, "binaryResponse");
     assertEquals(((BinaryActionConfiguration) invocation.configuration.additionalConfiguration.get(BinaryActionConfiguration.class)).requestMember, "binaryRequest");
 
