@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -104,7 +104,12 @@ public class CollectionConverter extends AbstractGlobalConverter {
       }
 
       for (String value : values) {
-        collection.add(converter.convertFromStrings(parameter, dynamicAttributes, expression, StringUtils.split(value, ',')));
+        // Split and preserve all tokens so that we can rebuild the original value if necessary.
+        //      See StringConverter.stringsToObject we rejoin String[] using a ','
+        //
+        // Example: The first element in [ ",foo,", "bar" ]
+        //        String[] split = split(",foo,");  =>  ["", "foo", ""]
+        collection.add(converter.convertFromStrings(parameter, dynamicAttributes, expression, StringUtils.splitPreserveAllTokens(value, ',')));
       }
     }
 

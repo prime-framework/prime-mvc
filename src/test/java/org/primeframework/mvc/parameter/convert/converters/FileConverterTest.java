@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ public class FileConverterTest {
    */
   @Test
   public void fromStrings() {
-    Map<String, String> map = new HashMap<String, String>();
+    Map<String, String> map = new HashMap<>();
     GlobalConverter converter = new FileConverter();
     File f = (File) converter.convertFromStrings(File.class, map, "testExpr", ArrayUtils.toArray((String) null));
     assertNull(f);
