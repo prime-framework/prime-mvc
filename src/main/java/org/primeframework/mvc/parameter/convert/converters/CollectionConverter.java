@@ -71,7 +71,7 @@ public class CollectionConverter extends AbstractGlobalConverter {
   protected Object stringToObject(String value, Type convertTo, Map<String, String> dynamicAttributes,
                                   String expression)
     throws ConversionException, ConverterStateException {
-    return stringsToObject(StringUtils.split(value, ','), convertTo, dynamicAttributes, expression);
+    return stringsToObject(new String[]{value}, convertTo, dynamicAttributes, expression);
   }
 
   /**
@@ -104,12 +104,7 @@ public class CollectionConverter extends AbstractGlobalConverter {
       }
 
       for (String value : values) {
-        // Split and preserve all tokens so that we can rebuild the original value if necessary.
-        //      See StringConverter.stringsToObject we rejoin String[] using a ','
-        //
-        // Example: The first element in [ ",foo,", "bar" ]
-        //        String[] split = split(",foo,");  =>  ["", "foo", ""]
-        collection.add(converter.convertFromStrings(parameter, dynamicAttributes, expression, StringUtils.splitPreserveAllTokens(value, ',')));
+        collection.add(converter.convertFromStrings(parameter, dynamicAttributes, expression, value));
       }
     }
 
