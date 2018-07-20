@@ -79,7 +79,7 @@ public class JSONResult extends AbstractResult<JSON> {
     Object jacksonObject;
 
     boolean prettyPrint = false;
-    Class<?> serializationView = null;
+    Class<?> serializationView = void.class;
     List<Message> messages = messageStore.get(MessageScope.REQUEST);
     if (messages.size() > 0) {
       jacksonObject = convertErrors(messages);
@@ -118,12 +118,12 @@ public class JSONResult extends AbstractResult<JSON> {
 
   private void writeValue(ByteArrayOutputStream os, Object jacksonObject, Class<?> serializationView, boolean prettyPrint) throws IOException {
     // Most common path
-    if (!prettyPrint && serializationView == null) {
+    if (!prettyPrint && serializationView == void.class) {
       objectMapper.writeValue(os, jacksonObject);
       return;
     }
 
-    if (prettyPrint && serializationView != null) {
+    if (prettyPrint && serializationView != void.class) {
       objectMapper.writerWithView(serializationView).withDefaultPrettyPrinter().writeValue(os, jacksonObject);
       return;
     }
