@@ -1,5 +1,12 @@
 Prime MVC Changes
 
+Changes in 1.9.0
+
+ * Add prettyPrint to the @JSONResponse annotation
+ * Remove ability to send a string that is a comma separated list and have it marshalled into a collection during the ParameterWorkflow.
+   This was causing ambiguity when an array of string values was sent in and one or more of the values contained a comma.
+ * Update Jackson to 2.9.6
+
 Changes in 1.8.6
 
  * Update guice, asm and freemarker dependencies.
