@@ -216,8 +216,8 @@ public class RequestBuilder {
    * @param value The value of the <code>Authorization</code> header
    * @return This.
    */
-  public RequestBuilder withAuthorizationHeader(String value) {
-    request.addHeader("Authorization", value);
+  public RequestBuilder withAuthorizationHeader(Object value) {
+    request.addHeader("Authorization", value.toString());
     return this;
   }
 
@@ -368,8 +368,8 @@ public class RequestBuilder {
    * @param value The value of the header.
    * @return This.
    */
-  public RequestBuilder withHeader(String name, String value) {
-    request.addHeader(name, value);
+  public RequestBuilder withHeader(String name, Object value) {
+    request.addHeader(name, value.toString());
     return this;
   }
 

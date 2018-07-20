@@ -18,6 +18,7 @@ package org.primeframework.mvc.parameter.convert.converters;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -62,16 +63,28 @@ public class CollectionsConverterTest extends PrimeBaseTest {
     private void assertConversion() {
       // --> java.util.Set
       Set<String> set = (Set<String>) converter.convertFromStrings(ParameterizedTypeImpl.make(Set.class, new Type[]{String.class}, null), null, "variations", values);
-      // ensure we compare sorted collections
       assertEquals(new TreeSet(set), new TreeSet<>(Arrays.asList(values)));
+
+      // Without a parameterized type
+      set = (Set<String>) converter.convertFromStrings(HashSet.class, null, "variations", values);
+      assertEquals(new TreeSet(set), new TreeSet<>(Arrays.asList(values)));
+
 
       // --> java.util.TreeSet
       TreeSet<String> sortedSet = (TreeSet<String>) converter.convertFromStrings(ParameterizedTypeImpl.make(TreeSet.class, new Type[]{String.class}, null), null, "variations", values);
-      // ensure we compare sorted collections
       assertEquals(sortedSet, new TreeSet<>(Arrays.asList(values)));
+
+      // Without a parameterized type
+      sortedSet = (TreeSet<String>) converter.convertFromStrings(TreeSet.class, null, "variations", values);
+      assertEquals(sortedSet, new TreeSet<>(Arrays.asList(values)));
+
 
       // --> java.util.List
       List<String> list = (List<String>) converter.convertFromStrings(ParameterizedTypeImpl.make(List.class, new Type[]{String.class}, null), null, "variations", values);
+      assertEquals(list, new ArrayList<>(Arrays.asList(values)));
+
+      // Without a parameterized type
+      list = (List<String>) converter.convertFromStrings(ParameterizedTypeImpl.make(List.class, new Type[]{String.class}, null), null, "variations", values);
       assertEquals(list, new ArrayList<>(Arrays.asList(values)));
     }
   }
