@@ -79,7 +79,13 @@ target(name: "clean", description: "Cleans the project") {
 }
 
 target(name: "compile", description: "Compiles the project") {
-  java.compile()
+  java.compileMain()
+
+  // allow the user of sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl in tests
+  java.settings.compilerArguments = "-XDignore.symbol.file"
+  java.compileTest()
+
+  java.settings.compilerArguments = ""
 
   file.copy(to: "build/classes/main") {
     fileSet(dir: "src/main/ftl")
