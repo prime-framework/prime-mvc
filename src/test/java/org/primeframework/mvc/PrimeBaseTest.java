@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import org.example.action.user.EditAction;
 import org.primeframework.jwt.Verifier;
@@ -39,6 +40,7 @@ import org.primeframework.mvc.action.ValidationMethodConfiguration;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.config.DefaultActionConfigurationBuilder;
 import org.primeframework.mvc.config.MVCConfiguration;
+import org.primeframework.mvc.content.guice.ObjectMapperProvider;
 import org.primeframework.mvc.guice.MVCModule;
 import org.primeframework.mvc.jwt.MockVerifierProvider;
 import org.primeframework.mvc.security.MockUserLoginSecurityContext;
@@ -57,6 +59,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
 import com.google.inject.util.Modules;
 
@@ -97,7 +100,7 @@ public abstract class PrimeBaseTest {
       }
     };
 
-    Module module = Modules.override(mvcModule).with(new TestSecurityModule());
+    Module module = Modules.override(mvcModule).with(new TestContentModule(), new TestSecurityModule());
 
     container = new MockContainer();
     container.newServletContext(new File("src/test/web"));
@@ -121,6 +124,7 @@ public abstract class PrimeBaseTest {
 
     injector.injectMembers(this);
     test.simulator = simulator;
+    TestObjectMapperProvider.test = test;
 
     metricRegistry = injector.getInstance(MetricRegistry.class);
     // clear the metric registry before each test
@@ -200,10 +204,37 @@ public abstract class PrimeBaseTest {
             new ArrayList<>()));
   }
 
+  public static class TestContentModule extends AbstractModule {
+    @Override
+    protected void configure() {
+      bind(ObjectMapper.class).toProvider(TestObjectMapperProvider.class);
+    }
+  }
+
   public static class TestMVCConfigurationModule extends AbstractModule {
     @Override
     protected void configure() {
       bind(MVCConfiguration.class).toInstance(new MockConfiguration());
+    }
+  }
+
+  public static class TestObjectMapperProvider extends ObjectMapperProvider {
+    public static TestBuilder test;
+
+    @Inject
+    public TestObjectMapperProvider(Set<com.fasterxml.jackson.databind.Module> jacksonModules, MVCConfiguration configuration) {
+      super(jacksonModules, configuration);
+    }
+
+    @Override
+    public ObjectMapper get() {
+      ObjectMapper objectMapper = super.get();
+
+      if (test != null && test.objectMapperFunction != null) {
+        return test.objectMapperFunction.apply(objectMapper);
+      }
+
+      return objectMapper;
     }
   }
 

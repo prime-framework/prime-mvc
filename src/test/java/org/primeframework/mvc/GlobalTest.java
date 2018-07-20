@@ -40,6 +40,7 @@ import org.testng.annotations.Test;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.Timer;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import freemarker.template.Configuration;
@@ -194,15 +195,42 @@ public class GlobalTest extends PrimeBaseTest {
 
   @Test
   public void get_JSONView() throws Exception {
-    simulator.test("/views/entry/api")
-             .get()
-             .assertStatusCode(200)
-             .assertJSONFile(Paths.get("src/test/resources/json/views/entry/entry-api.json"));
+    test.simulate(() -> simulator.test("/views/entry/api")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertJSONFile(Paths.get("src/test/resources/json/views/entry/entry-api.json")));
 
-    simulator.test("/views/entry/export")
-             .get()
-             .assertStatusCode(200)
-             .assertJSONFile(Paths.get("src/test/resources/json/views/entry/entry-export.json"));
+    test.simulate(() -> simulator.test("/views/entry/export")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertJSONFile(Paths.get("src/test/resources/json/views/entry/entry-export.json")));
+
+    // Serialize an object using @JSONResponse when no view is specified for an object that has only annotated fields
+    // The DEFAULT_VIEW_INCLUSION is the default value, but expliclty configured in case the default prime configuration changes
+    test.configureObjectMapper(om -> objectMapper.enable(MapperFeature.DEFAULT_VIEW_INCLUSION))
+        .simulate(() -> simulator.test("/views/entry/no-view-defined")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertJSONFile(Paths.get("src/test/resources/json/views/entry/entry-no-view-defined.json")));
+
+    // Default view inclusion is enabled and if we serialize a @JSONResponse with a view that has no fields in the object - empty response
+    test.simulate(() -> simulator.test("/views/entry/wrong-view-defined")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertJSON("{}"));
+
+    // Ensure we get a response even when we disable the default view inclusion if we do not specify a view
+    test.configureObjectMapper(om -> objectMapper.disable(MapperFeature.DEFAULT_VIEW_INCLUSION))
+        .simulate(() -> simulator.test("/views/entry/no-view-defined")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertJSONFile(Paths.get("src/test/resources/json/views/entry/entry-no-view-defined.json")));
+
+    // Default view inclusion is disabled and if we serialize a @JSONResponse with a view that has no fields in the object - empty response.
+    test.simulate(() -> simulator.test("/views/entry/wrong-view-defined")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertJSON("{}"));
   }
 
   @Test

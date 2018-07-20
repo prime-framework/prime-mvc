@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2016-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
 
 import org.primeframework.mvc.test.RequestResult;
 import org.primeframework.mvc.test.RequestSimulator;
@@ -29,6 +30,7 @@ import org.primeframework.mvc.util.ThrowingCallable;
 import org.primeframework.mvc.util.ThrowingRunnable;
 import org.testng.Assert;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import static org.primeframework.mvc.scope.ActionSessionScope.ACTION_SESSION_KEY;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
@@ -43,6 +45,8 @@ public class TestBuilder {
 
   public RequestResult requestResult;
 
+  public Function<ObjectMapper, ObjectMapper> objectMapperFunction;
+
   public TestBuilder createFile() throws IOException {
     return createFile("Test File");
   }
@@ -54,6 +58,11 @@ public class TestBuilder {
     tempFile.toFile().deleteOnExit();
 
     Files.write(tempFile, contents.getBytes());
+    return this;
+  }
+
+  public TestBuilder configureObjectMapper(Function<ObjectMapper, ObjectMapper> function) {
+    this.objectMapperFunction = function;
     return this;
   }
 
