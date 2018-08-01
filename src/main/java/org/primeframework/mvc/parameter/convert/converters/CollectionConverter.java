@@ -28,6 +28,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.commons.lang3.StringUtils;
+import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.parameter.convert.AbstractGlobalConverter;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
@@ -36,7 +37,7 @@ import org.primeframework.mvc.parameter.convert.GlobalConverter;
 import org.primeframework.mvc.util.TypeTools;
 
 import com.google.inject.Inject;
-import static java.util.Arrays.*;
+import static java.util.Arrays.asList;
 
 /**
  * This converts to and from Collection types. This handles complex parameterized types by first creating the
@@ -50,9 +51,12 @@ import static java.util.Arrays.*;
 public class CollectionConverter extends AbstractGlobalConverter {
   private final ConverterProvider provider;
 
+  private final boolean emptyIsNull;
+
   @Inject
-  public CollectionConverter(ConverterProvider provider) {
+  public CollectionConverter(ConverterProvider provider, MVCConfiguration configuration) {
     this.provider = provider;
+    this.emptyIsNull = configuration.emptyParametersAreNull();
   }
 
   /**
@@ -64,13 +68,16 @@ public class CollectionConverter extends AbstractGlobalConverter {
    * @param dynamicAttributes The dynamic attributes used to assist in conversion.
    * @param expression        The full path to the expression that is causing the conversion.
    * @return The converted value.
-   * @throws ConversionException     If the conversion failed.
+   * @throws ConversionException If the conversion failed.
    * @throws ConverterStateException if the converter didn't have all of the information it needed to perform the
-   *                                 conversion.
+   * conversion.
    */
   protected Object stringToObject(String value, Type convertTo, Map<String, String> dynamicAttributes,
-                                  String expression)
-    throws ConversionException, ConverterStateException {
+                                  String expression) throws ConversionException, ConverterStateException {
+    if (emptyIsNull && StringUtils.isBlank(value)) {
+      return null;
+    }
+
     return stringsToObject(new String[]{value}, convertTo, dynamicAttributes, expression);
   }
 
@@ -83,13 +90,12 @@ public class CollectionConverter extends AbstractGlobalConverter {
    * @param dynamicAttributes The dynamic attributes used to assist in conversion.
    * @param expression        The full path to the expression that is causing the conversion.
    * @return The converted value.
-   * @throws ConversionException     If the conversion failed.
+   * @throws ConversionException If the conversion failed.
    * @throws ConverterStateException if the converter didn't have all of the information it needed to perform the
-   *                                 conversion.
+   * conversion.
    */
   protected Object stringsToObject(String[] values, Type convertTo, Map<String, String> dynamicAttributes,
-                                   String expression)
-    throws ConversionException, ConverterStateException {
+                                   String expression) throws ConversionException, ConverterStateException {
     Class<?> rawType = TypeTools.rawType(convertTo);
     Class<?> parameter = parameterType(convertTo);
     Collection collection = makeCollection(rawType);
@@ -99,8 +105,8 @@ public class CollectionConverter extends AbstractGlobalConverter {
       GlobalConverter converter = provider.lookup(parameter);
       if (converter == null) {
         throw new ConverterStateException("Unable to convert to the type [" + convertTo +
-          "] because the parameter type [" + parameter + "] doesn't have a Converter " +
-          "associated with it.");
+            "] because the parameter type [" + parameter + "] doesn't have a Converter " +
+            "associated with it.");
       }
 
       for (String value : values) {
@@ -120,13 +126,13 @@ public class CollectionConverter extends AbstractGlobalConverter {
    * @param dynamicAttributes The dynamic attributes used to assist in conversion.
    * @param expression        The full path to the expression that is causing the conversion.
    * @return The converted value.
-   * @throws ConversionException     If the conversion failed.
+   * @throws ConversionException If the conversion failed.
    * @throws ConverterStateException if the converter didn't have all of the information it needed to perform the
-   *                                 conversion.
+   * conversion.
    */
   protected String objectToString(Object value, Type convertFrom, Map<String, String> dynamicAttributes,
                                   String expression)
-    throws ConversionException, ConverterStateException {
+      throws ConversionException, ConverterStateException {
     Collection collection = (Collection) value;
     Class<?> parameter = parameterType(convertFrom);
     if (parameter == null) {
@@ -135,8 +141,8 @@ public class CollectionConverter extends AbstractGlobalConverter {
       GlobalConverter converter = provider.lookup(parameter);
       if (converter == null) {
         throw new ConverterStateException("Unable to convert to the type [" + convertFrom +
-          "] because the parameter type [" + parameter + "] doesn't have a Converter " +
-          "associated with it.");
+            "] because the parameter type [" + parameter + "] doesn't have a Converter " +
+            "associated with it.");
       }
 
       StringBuilder build = new StringBuilder();
@@ -175,7 +181,7 @@ public class CollectionConverter extends AbstractGlobalConverter {
       return (Collection) type.newInstance();
     } catch (Exception e) {
       throw new ConverterStateException("The type [" + type + "] is a collection but could not " +
-        "be instantiated by the converter class");
+          "be instantiated by the converter class");
     }
   }
 }

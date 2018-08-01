@@ -28,6 +28,7 @@ import org.testng.annotations.Test;
 
 import com.google.inject.Inject;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNull;
 import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
 /**
@@ -46,6 +47,13 @@ public class CollectionsConverterTest extends PrimeBaseTest {
     // values that contain commas
     withValues(",foo,").assertConversion();
     withValues("foo,bar").assertConversion();
+
+    // Special case, no values
+    //noinspection ConfusingArgumentToVarargsMethod
+    withValues(null).assertConversion();
+
+    // Special case - empty string value
+    assertNull(converter.convertFromStrings(ParameterizedTypeImpl.make(Set.class, new Type[]{String.class}, null), null, "variations", ""));
   }
 
   private Builder withValues(String... values) {
@@ -63,29 +71,51 @@ public class CollectionsConverterTest extends PrimeBaseTest {
     private void assertConversion() {
       // --> java.util.Set
       Set<String> set = (Set<String>) converter.convertFromStrings(ParameterizedTypeImpl.make(Set.class, new Type[]{String.class}, null), null, "variations", values);
-      assertEquals(new TreeSet(set), new TreeSet<>(Arrays.asList(values)));
+      if (set == null) {
+        assertNull(values);
+      } else {
+        assertEquals(new TreeSet(set), new TreeSet<>(Arrays.asList(values)));
+      }
 
       // Without a parameterized type
       set = (Set<String>) converter.convertFromStrings(HashSet.class, null, "variations", values);
-      assertEquals(new TreeSet(set), new TreeSet<>(Arrays.asList(values)));
-
+      if (set == null) {
+        assertNull(values);
+      } else {
+        assertEquals(new TreeSet(set), new TreeSet<>(Arrays.asList(values)));
+      }
 
       // --> java.util.TreeSet
       TreeSet<String> sortedSet = (TreeSet<String>) converter.convertFromStrings(ParameterizedTypeImpl.make(TreeSet.class, new Type[]{String.class}, null), null, "variations", values);
-      assertEquals(sortedSet, new TreeSet<>(Arrays.asList(values)));
+      if (sortedSet == null) {
+        assertNull(values);
+      } else {
+        assertEquals(sortedSet, new TreeSet<>(Arrays.asList(values)));
+      }
 
       // Without a parameterized type
       sortedSet = (TreeSet<String>) converter.convertFromStrings(TreeSet.class, null, "variations", values);
-      assertEquals(sortedSet, new TreeSet<>(Arrays.asList(values)));
-
+      if (sortedSet == null) {
+        assertNull(values);
+      } else {
+        assertEquals(sortedSet, new TreeSet<>(Arrays.asList(values)));
+      }
 
       // --> java.util.List
       List<String> list = (List<String>) converter.convertFromStrings(ParameterizedTypeImpl.make(List.class, new Type[]{String.class}, null), null, "variations", values);
-      assertEquals(list, new ArrayList<>(Arrays.asList(values)));
+      if (list == null) {
+        assertNull(values);
+      } else {
+        assertEquals(list, new ArrayList<>(Arrays.asList(values)));
+      }
 
       // Without a parameterized type
       list = (List<String>) converter.convertFromStrings(ParameterizedTypeImpl.make(List.class, new Type[]{String.class}, null), null, "variations", values);
-      assertEquals(list, new ArrayList<>(Arrays.asList(values)));
+      if (list == null) {
+        assertNull(values);
+      } else {
+        assertEquals(list, new ArrayList<>(Arrays.asList(values)));
+      }
     }
   }
 }
