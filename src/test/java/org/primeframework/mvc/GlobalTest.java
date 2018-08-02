@@ -516,6 +516,52 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void post_dateConversion() throws Exception {
+    // Multiple LocalDate formats
+    test.forEach(
+        "01-01-2018",
+        "01-01-2018",
+        "1-1-2018",
+        "1/01/2018",
+        "01/1/2018")
+        .test(date -> simulator.test("/date-time-converter")
+                               .withParameter("localDate", date)
+                               .withParameter("localDate@dateTimeFormat", "[MM/dd/yyyy][M/dd/yyyy][M/d/yyyy][MM-dd-yyyy][M-dd-yyyy][M-d-yyyy]")
+                               .post()
+                               .assertContainsNoFieldMessages()
+                               .assertStatusCode(200));
+
+    // Single LocalDate format
+    test.simulate(() -> simulator.test("/date-time-converter")
+                                 .withParameter("localDate", "01/01/2018")
+                                 .withParameter("localDate@dateTimeFormat", "MM/dd/yyyy")
+                                 .post()
+                                 .assertContainsNoFieldMessages()
+                                 .assertStatusCode(200));
+
+    // Multiple ZonedDateTime formats
+    test.forEach(
+        "07-08-2008 10:13:34 AM -0800",
+        "07/08/2008 10:13:34 AM -0800",
+        "7-8-2008 10:13:34 AM -0800",
+        "7/8/2008 10:13:34 AM -0800")
+        .test(zoneDateTime -> simulator.test("/date-time-converter")
+                                       .withParameter("zonedDateTime", zoneDateTime)
+                                       .withParameter("zonedDateTime@dateTimeFormat", "[MM-dd-yyyy hh:mm:ss a Z][MM/dd/yyyy hh:mm:ss a Z][M/d/yyyy hh:mm:ss a Z][M-d-yyyy hh:mm:ss a Z]")
+                                       .post()
+                                       .assertContainsNoFieldMessages()
+                                       .assertStatusCode(200));
+
+    // Single ZonedDateTime format
+    test.simulate(() -> simulator.test("/date-time-converter")
+                                 .withParameter("zonedDateTime", "07-08-2008 10:13:34 AM -0800")
+                                 .withParameter("zonedDateTime@dateTimeFormat", "MM-dd-yyyy hh:mm:ss a Z")
+                                 .post()
+                                 .assertContainsNoFieldMessages()
+                                 .assertStatusCode(200));
+  }
+
+  @Test
   public void post_onlyAllowTextHTML() throws Exception {
     test.createFile("<strong>Hello World</strong>")
         .simulate(() -> simulator.test("/file-upload")

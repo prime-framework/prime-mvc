@@ -689,7 +689,27 @@ public class RequestResult {
    */
   public RequestResult assertStatusCode(int statusCode) {
     if (this.statusCode != statusCode) {
-      throw new AssertionError("Status code [" + this.statusCode + "] was not equal to [" + statusCode + "]\nResponse body: [" + body + "]\nRedirect: [" + redirect + "]");
+      StringBuilder sb = new StringBuilder("Status code [" + this.statusCode + "] was not equal to [" + statusCode + "]\n");
+      MessageStore messageStore = get(MessageStore.class);
+
+      // Append any General Messages to the error message to aid in debug
+      List<Message> generatorMessages = messageStore.getGeneralMessages();
+      if (!generatorMessages.isEmpty()) {
+        sb.append("\nThe following general error messages were returned in the message store:\n\n");
+      }
+      generatorMessages.forEach(m -> sb.append("\t\t" + m.getType() + "\t" + m.getCode() + "\t" + ((m instanceof SimpleMessage) ? ((SimpleMessage) m).message : "") + "\n"));
+
+      // Append any Field Messages to the error message to aid in debug
+      List<FieldMessage> fieldMessages = messageStore.getFieldMessages().values().stream().flatMap(Collection::stream).collect(Collectors.toList());
+      if (!fieldMessages.isEmpty()) {
+        sb.append("\nThe following field error messages were returned in the message store:\n\n");
+      }
+      //noinspection StringConcatenationInsideStringBufferAppend
+      fieldMessages.forEach(m -> sb.append("\t\t" + m.getType() + "\tField: " + m.getField() + " Code: " + m.getCode() + "\t" + ((m instanceof SimpleFieldMessage) ? ((SimpleFieldMessage) m).message : "") + "\n"));
+
+      sb.append("\nRedirect: [" + redirect + "]\n");
+      sb.append("Response body: \n" + body);
+      throw new AssertionError(sb.toString());
     }
 
     return this;

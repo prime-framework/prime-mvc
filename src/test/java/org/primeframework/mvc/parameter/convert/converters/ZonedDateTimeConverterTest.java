@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import java.util.Locale;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.primeframework.mvc.MockConfiguration;
+import org.primeframework.mvc.TestBuilder;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
 import org.primeframework.mvc.util.MapBuilder;
@@ -29,7 +30,6 @@ import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNull;
-import static org.testng.Assert.fail;
 
 /**
  * This tests the date time converter.
@@ -52,12 +52,16 @@ public class ZonedDateTimeConverterTest {
     assertEquals(value.getSecond(), 34);
     assertEquals(value.getZone(), ZoneOffset.ofHours(-8));
 
-    try {
-      converter.convertFromStrings(Locale.class, MapBuilder.asMap("dateTimeFormat", "MM-dd-yyyy"), "testExpr", ArrayUtils.toArray("07/08/2008"));
-      fail("Should have failed");
-    } catch (ConversionException e) {
-      // Expected
-    }
+    // Expect conversion error when no time or zone exist
+    TestBuilder.expectException(ConversionException.class,
+        () -> converter.convertFromStrings(Locale.class, MapBuilder.asMap("dateTimeFormat", "MM-dd-yyyy"), "testExpr", ArrayUtils.toArray("07/08/2008")));
+
+    converter.convertFromStrings(Locale.class, MapBuilder.asMap("dateTimeFormat", "[MM-dd-yyyy hh:mm:ss a Z][MM/dd/yyyy hh;mm;ss a Z]"), "testExpr", ArrayUtils.toArray("07-08-2008 10:13:34 AM -0800"));
+    converter.convertFromStrings(Locale.class, MapBuilder.asMap("dateTimeFormat", "[MM-dd-yyyy hh:mm:ss a Z][MM/dd/yyyy hh;mm;ss a Z]"), "testExpr", ArrayUtils.toArray("07/08/2008 10;13;34 AM -0800"));
+
+    // A third format which is not one of the two will fail
+    TestBuilder.expectException(ConversionException.class,
+        () -> converter.convertFromStrings(Locale.class, MapBuilder.asMap("dateTimeFormat", "[MM-dd-yyyy hh:mm:ss a Z][MM/dd/yyyy hh;mm;ss a Z]"), "testExpr", ArrayUtils.toArray("07_08_2008 10;13;34 AM -0800")));
   }
 
   @Test
@@ -68,5 +72,12 @@ public class ZonedDateTimeConverterTest {
 
     str = converter.convertToString(ZonedDateTime.class, MapBuilder.asMap("dateTimeFormat", "MM-dd-yyyy"), "testExpr", ZonedDateTime.of(2008, 7, 8, 1, 1, 1, 0, ZoneId.systemDefault()));
     assertEquals(str, "07-08-2008");
+
+    // Multiple formats defined, expect the first one to dictate the string output
+    str = converter.convertToString(ZonedDateTime.class, MapBuilder.asMap("dateTimeFormat", "[MM-dd-yyyy][MM/dd/yyyy]"), "testExpr", ZonedDateTime.of(2008, 7, 8, 1, 1, 1, 0, ZoneId.systemDefault()));
+    assertEquals(str, "07-08-2008");
+
+    str = converter.convertToString(ZonedDateTime.class, MapBuilder.asMap("dateTimeFormat", "[MM/dd/yyyy][MM-dd-yyyy]"), "testExpr", ZonedDateTime.of(2008, 7, 8, 1, 1, 1, 0, ZoneId.systemDefault()));
+    assertEquals(str, "07/08/2008");
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@ public class FreeMarkerControlProxy implements TemplateDirectiveModel {
    * @param body     The body of the directive.
    */
   public void execute(Environment env, Map params, TemplateModel[] loopVars, TemplateDirectiveBody body)
-      throws IOException, TemplateException {
+      throws TemplateException {
     Map<String, String> dynamicAttributes = makeDynamicAttributes(params);
     Map<String, Object> attributes = makeAttributes(params);
 
@@ -99,7 +99,7 @@ public class FreeMarkerControlProxy implements TemplateDirectiveModel {
   }
 
   /**
-   * Creates the list of dynamic attributes from the given Map of parameters passed ot the control.
+   * Creates the list of dynamic attributes from the given Map of parameters passed to the control.
    *
    * @param params The parameters passed to this control in the FTL file.
    * @return The dynamic attributes.

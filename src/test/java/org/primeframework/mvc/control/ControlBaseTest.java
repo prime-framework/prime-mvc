@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ package org.primeframework.mvc.control;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,7 +42,7 @@ public class ControlBaseTest extends PrimeBaseTest {
    */
   public static class ControlTester {
     private final Control control;
-    private final Map<String, Object> attributes = new HashMap<String, Object>();
+    private final Map<String, Object> attributes = new HashMap<>();
     private String body;
 
     public ControlTester(Control control) {
@@ -65,13 +64,11 @@ public class ControlBaseTest extends PrimeBaseTest {
       control.renderStart(writer, attributes, MapBuilder.map("param", "param-value").done());
 
       if (body != null) {
-        control.renderBody(writer, new Body() {
-          public void render(Writer writer) {
-            try {
-              writer.write(body);
-            } catch (IOException e) {
-              throw new RuntimeException(e);
-            }
+        control.renderBody(writer, w -> {
+          try {
+            w.write(body);
+          } catch (IOException e) {
+            throw new RuntimeException(e);
           }
         });
       }

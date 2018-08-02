@@ -19,8 +19,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -46,6 +49,18 @@ public class TestBuilder {
   public RequestResult requestResult;
 
   public Function<ObjectMapper, ObjectMapper> objectMapperFunction;
+
+  public static void expectException(Class<? extends Throwable> throwable, ThrowingRunnable runnable) {
+    try {
+      runnable.run();
+    } catch (Throwable e) {
+      if (!e.getClass().isAssignableFrom(throwable) && !e.getCause().getClass().isAssignableFrom(throwable)) {
+        Assert.fail("Expected [" + throwable.getName() + "], but caught [" + e.getClass().getName() + "]");
+      }
+      return;
+    }
+    Assert.fail("Expected [" + throwable.getName() + "], but no exception was thrown.");
+  }
 
   public TestBuilder createFile() throws IOException {
     return createFile("Test File");
@@ -115,15 +130,38 @@ public class TestBuilder {
     return this;
   }
 
-  public void expectException(Class<? extends Throwable> throwable, ThrowingRunnable runnable) {
-    try {
-      runnable.run();
-    } catch (Throwable e) {
-      if (!e.getClass().isAssignableFrom(throwable) && !e.getCause().getClass().isAssignableFrom(throwable)) {
-        Assert.fail("Expected [" + throwable.getName() + "], but caught [" + e.getClass().getName() + "]");
-      }
-      return;
+  public <T> TestIterator<T> forEach(T... collection) throws Exception {
+    return new TestIterator<>(this, collection);
+  }
+
+  @FunctionalInterface
+  public interface ThrowingConsumer<T> {
+    void accept(T t) throws Exception;
+
+    default ThrowingConsumer<T> andThen(ThrowingConsumer<? super T> after) throws Exception {
+      Objects.requireNonNull(after);
+      return (T t) -> {
+        accept(t);
+        after.accept(t);
+      };
     }
-    Assert.fail("Expected [" + throwable.getName() + "], but no exception was thrown.");
+  }
+
+  public class TestIterator<T> {
+    public Collection<T> collection;
+
+    public TestBuilder testBuilder;
+
+    public TestIterator(TestBuilder testBuilder, T... collection) {
+      this.collection = Arrays.asList(collection);
+      this.testBuilder = testBuilder;
+    }
+
+    public TestBuilder test(ThrowingConsumer<T> consumer) throws Exception {
+      for (T t : collection) {
+        consumer.accept(t);
+      }
+      return testBuilder;
+    }
   }
 }

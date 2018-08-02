@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
  */
 package org.primeframework.mvc.control.form;
 
-import javax.servlet.ServletException;
-import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -157,7 +155,7 @@ public class FormTest extends ControlBaseTest {
   }
 
   @Test
-  public void prepare() throws IOException, ServletException, NoSuchMethodException {
+  public void prepare() throws NoSuchMethodException {
     request.setUri("/user/edit");
     EditAction edit = new EditAction();
     ais.setCurrent(new ActionInvocation(edit, null, "/user/edit", null,
@@ -174,7 +172,7 @@ public class FormTest extends ControlBaseTest {
   }
 
   @Test
-  public void actionIsDifferentURI() throws IOException, ServletException {
+  public void actionIsDifferentURI() {
     request.setUri("/user/");
     IndexAction index = new IndexAction();
     ais.setCurrent(new ActionInvocation(index, null, "/user/", null, null));

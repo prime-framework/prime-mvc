@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,7 +86,13 @@ public class ZonedDateTimeConverter extends AbstractGlobalConverter {
           "NOTE: The format must include the time and a timezone. Otherwise, it will be unparseable");
     }
 
-    return ((ZonedDateTime) value).format(DateTimeFormatter.ofPattern(format));
+    // Multiple formats are supported using a bracket syntax [M/dd/yyyy][MM/dd/yyyy]
+    // Use the first pattern if multiple exists for displaying the value
+    DateTimeFormatter formatter = format.indexOf("[") == 0
+        ? DateTimeFormatter.ofPattern(format.substring(1, format.indexOf("]", 1)))
+        : DateTimeFormatter.ofPattern(format);
+
+    return ((ZonedDateTime) value).format(formatter);
   }
 
   private ZonedDateTime toDateTime(String value, String format) {

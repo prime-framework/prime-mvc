@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import java.util.Locale;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.primeframework.mvc.MockConfiguration;
+import org.primeframework.mvc.TestBuilder;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
 import org.primeframework.mvc.util.MapBuilder;
@@ -27,7 +28,6 @@ import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNull;
-import static org.testng.Assert.fail;
 
 /**
  * This tests the local date converter.
@@ -46,12 +46,16 @@ public class LocalDateConverterTest {
     assertEquals(value.getDayOfMonth(), 8);
     assertEquals(value.getYear(), 2008);
 
-    try {
-      converter.convertFromStrings(Locale.class, MapBuilder.asMap("dateTimeFormat", "MM-dd-yyyy"), "testExpr", ArrayUtils.toArray("07/08/2008"));
-      fail("Should have failed");
-    } catch (ConversionException e) {
-      // Expected
-    }
+    TestBuilder.expectException(ConversionException.class,
+        () -> converter.convertFromStrings(Locale.class, MapBuilder.asMap("dateTimeFormat", "MM-dd-yyyy"), "testExpr", ArrayUtils.toArray("07/08/2008")));
+
+    // Either format should work since we provided two options
+    converter.convertFromStrings(Locale.class, MapBuilder.asMap("dateTimeFormat", "[MM-dd-yyyy][MM/dd/yyyy]"), "testExpr", ArrayUtils.toArray("07-08-2008"));
+    converter.convertFromStrings(Locale.class, MapBuilder.asMap("dateTimeFormat", "[MM-dd-yyyy][MM/dd/yyyy]"), "testExpr", ArrayUtils.toArray("07/08/2008"));
+
+    // Using a third format that is not one of the supported two formats will still fail
+    TestBuilder.expectException(ConversionException.class,
+        () -> converter.convertFromStrings(Locale.class, MapBuilder.asMap("dateTimeFormat", "[MM-dd-yyyy][MM/dd/yyyy]"), "testExpr", ArrayUtils.toArray("07_08_2008")));
   }
 
   @Test
@@ -62,5 +66,12 @@ public class LocalDateConverterTest {
 
     str = converter.convertToString(LocalDate.class, MapBuilder.asMap("dateTimeFormat", "MM-dd-yyyy"), "testExpr", LocalDate.of(2008, 7, 8));
     assertEquals(str, "07-08-2008");
+
+    // Multiple formats defined, expect the first one to dictate the string output
+    str = converter.convertToString(LocalDate.class, MapBuilder.asMap("dateTimeFormat", "[MM-dd-yyyy][MM/dd/yyyy]"), "testExpr", LocalDate.of(2008, 7, 8));
+    assertEquals(str, "07-08-2008");
+
+    str = converter.convertToString(LocalDate.class, MapBuilder.asMap("dateTimeFormat", "[MM/dd/yyyy][MM-dd-yyyy]"), "testExpr", LocalDate.of(2008, 7, 8));
+    assertEquals(str, "07/08/2008");
   }
 }
