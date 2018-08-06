@@ -24,6 +24,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.primeframework.mvc.PrimeBaseTest;
+import org.primeframework.mvc.TestBuilder;
+import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.testng.annotations.Test;
 
 import com.google.inject.Inject;
@@ -48,6 +50,12 @@ public class CollectionsConverterTest extends PrimeBaseTest {
 
     withValues("").withExpectedResult(new String[0]).assertConversion();
     withValues("foo", "").withExpectedResult(new String[]{"foo"}).assertConversion();
+  }
+
+  @Test
+  public void toStrings() {
+    TestBuilder.expectException(ConverterStateException.class,
+        () -> converter.convertToString(ParameterizedTypeImpl.make(Set.class, new Type[]{String.class}, null), null, "variations", new String[]{"foo", "bar"}));
   }
 
   private Builder withValues(String... values) {
