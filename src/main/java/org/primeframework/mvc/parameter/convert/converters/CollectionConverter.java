@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.apache.commons.lang3.StringUtils;
 import org.primeframework.mvc.parameter.convert.AbstractGlobalConverter;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
@@ -132,7 +133,7 @@ public class CollectionConverter extends AbstractGlobalConverter {
   protected String objectToString(Object value, Type convertFrom, Map<String, String> dynamicAttributes,
                                   String expression)
       throws ConversionException, ConverterStateException {
-    throw new ConverterStateException("This operation is unsupported. You may not serialize a collection to a string.");
+    throw new ConverterStateException("This operation is unsupported. You may not serialize a collection to a string. Expression[" + expression + "], values [" + StringUtils.join(value, ",") + "]");
   }
 
   /**
