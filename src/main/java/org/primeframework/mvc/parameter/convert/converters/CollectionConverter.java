@@ -27,8 +27,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.apache.commons.lang3.StringUtils;
-import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.parameter.convert.AbstractGlobalConverter;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
@@ -37,7 +35,6 @@ import org.primeframework.mvc.parameter.convert.GlobalConverter;
 import org.primeframework.mvc.util.TypeTools;
 
 import com.google.inject.Inject;
-import static java.util.Arrays.asList;
 
 /**
  * This converts to and from Collection types. This handles complex parameterized types by first creating the
@@ -51,12 +48,9 @@ import static java.util.Arrays.asList;
 public class CollectionConverter extends AbstractGlobalConverter {
   private final ConverterProvider provider;
 
-  private final boolean emptyIsNull;
-
   @Inject
-  public CollectionConverter(ConverterProvider provider, MVCConfiguration configuration) {
+  public CollectionConverter(ConverterProvider provider) {
     this.provider = provider;
-    this.emptyIsNull = configuration.emptyParametersAreNull();
   }
 
   /**
@@ -74,10 +68,6 @@ public class CollectionConverter extends AbstractGlobalConverter {
    */
   protected Object stringToObject(String value, Type convertTo, Map<String, String> dynamicAttributes,
                                   String expression) throws ConversionException, ConverterStateException {
-    if (emptyIsNull && StringUtils.isBlank(value)) {
-      return null;
-    }
-
     return stringsToObject(new String[]{value}, convertTo, dynamicAttributes, expression);
   }
 
@@ -100,7 +90,13 @@ public class CollectionConverter extends AbstractGlobalConverter {
     Class<?> parameter = parameterType(convertTo);
     Collection collection = makeCollection(rawType);
     if (parameter == null) {
-      collection.addAll(asList(values));
+      StringConverter converter = (StringConverter) provider.lookup(String.class);
+      for (String value : values) {
+        Object converted = converter.stringToObject(value, String.class, dynamicAttributes, expression);
+        if (converted != null) {
+          collection.add(converted);
+        }
+      }
     } else {
       GlobalConverter converter = provider.lookup(parameter);
       if (converter == null) {
@@ -110,7 +106,10 @@ public class CollectionConverter extends AbstractGlobalConverter {
       }
 
       for (String value : values) {
-        collection.add(converter.convertFromStrings(parameter, dynamicAttributes, expression, value));
+        Object converted = converter.convertFromStrings(parameter, dynamicAttributes, expression, value);
+        if (converted != null) {
+          collection.add(converted);
+        }
       }
     }
 
@@ -133,29 +132,7 @@ public class CollectionConverter extends AbstractGlobalConverter {
   protected String objectToString(Object value, Type convertFrom, Map<String, String> dynamicAttributes,
                                   String expression)
       throws ConversionException, ConverterStateException {
-    Collection collection = (Collection) value;
-    Class<?> parameter = parameterType(convertFrom);
-    if (parameter == null) {
-      return StringUtils.join(collection, ",");
-    } else {
-      GlobalConverter converter = provider.lookup(parameter);
-      if (converter == null) {
-        throw new ConverterStateException("Unable to convert to the type [" + convertFrom +
-            "] because the parameter type [" + parameter + "] doesn't have a Converter " +
-            "associated with it.");
-      }
-
-      StringBuilder build = new StringBuilder();
-      for (Object o : collection) {
-        String str = converter.convertToString(parameter, dynamicAttributes, expression, o);
-        if (build.length() > 0) {
-          build.append(",");
-        }
-        build.append(str);
-      }
-
-      return build.toString();
-    }
+    throw new ConverterStateException("This operation is unsupported. You may not serialize a collection to a string.");
   }
 
   /**
