@@ -48,7 +48,9 @@ import org.primeframework.mvc.security.UserLoginSecurityContext;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.servlet.ServletObjectsHolder;
 import org.primeframework.mvc.test.RequestSimulator;
+import org.primeframework.mvc.util.ThrowingRunnable;
 import org.primeframework.mvc.validation.Validation;
+import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
@@ -59,7 +61,6 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Module;
-import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
 import com.google.inject.util.Modules;
 
@@ -135,6 +136,27 @@ public abstract class PrimeBaseTest {
   public void tearDown() {
     ServletObjectsHolder.clearServletRequest();
     ServletObjectsHolder.clearServletResponse();
+  }
+
+  @SuppressWarnings("Duplicates")
+  protected void expectException(Class<? extends Throwable> throwable, ThrowingRunnable runnable) {
+    try {
+      runnable.run();
+    } catch (Throwable e) {
+      int count = 0;
+      Throwable t = e;
+      // Attempt to go up to 4 levels deep to find the cause of the exception
+      while (count < 4 && t != null) {
+        if (t.getClass().isAssignableFrom(throwable)) {
+          return;
+        }
+        count++;
+        t = t.getCause();
+      }
+      Assert.fail("Expected [" + throwable.getName() + "], but caught [" + e.getClass().getName() + "]");
+      return;
+    }
+    Assert.fail("Expected [" + throwable.getName() + "], but no exception was thrown.");
   }
 
   /**

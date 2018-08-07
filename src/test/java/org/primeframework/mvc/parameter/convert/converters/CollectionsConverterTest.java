@@ -24,7 +24,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.primeframework.mvc.PrimeBaseTest;
-import org.primeframework.mvc.TestBuilder;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.testng.annotations.Test;
 
@@ -73,7 +72,7 @@ public class CollectionsConverterTest extends PrimeBaseTest {
 
   @Test
   public void toStrings() {
-    TestBuilder.expectException(ConverterStateException.class,
+    expectException(ConverterStateException.class,
         () -> converter.convertToString(ParameterizedTypeImpl.make(Set.class, new Type[]{String.class}, null), null, "variations", new String[]{"foo", "bar"}));
   }
 

@@ -20,7 +20,7 @@ import java.util.Locale;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.primeframework.mvc.MockConfiguration;
-import org.primeframework.mvc.TestBuilder;
+import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
 import org.primeframework.mvc.util.MapBuilder;
@@ -34,7 +34,7 @@ import static org.testng.Assert.assertNull;
  *
  * @author Brian Pontarelli
  */
-public class LocalDateConverterTest {
+public class LocalDateConverterTest extends PrimeBaseTest {
   @Test
   public void fromStrings() {
     GlobalConverter converter = new LocalDateConverter(new MockConfiguration());
@@ -46,7 +46,7 @@ public class LocalDateConverterTest {
     assertEquals(value.getDayOfMonth(), 8);
     assertEquals(value.getYear(), 2008);
 
-    TestBuilder.expectException(ConversionException.class,
+    expectException(ConversionException.class,
         () -> converter.convertFromStrings(Locale.class, MapBuilder.asMap("dateTimeFormat", "MM-dd-yyyy"), "testExpr", ArrayUtils.toArray("07/08/2008")));
 
     // Either format should work since we provided two options
@@ -54,7 +54,7 @@ public class LocalDateConverterTest {
     converter.convertFromStrings(Locale.class, MapBuilder.asMap("dateTimeFormat", "[MM-dd-yyyy][MM/dd/yyyy]"), "testExpr", ArrayUtils.toArray("07/08/2008"));
 
     // Using a third format that is not one of the supported two formats will still fail
-    TestBuilder.expectException(ConversionException.class,
+    expectException(ConversionException.class,
         () -> converter.convertFromStrings(Locale.class, MapBuilder.asMap("dateTimeFormat", "[MM-dd-yyyy][MM/dd/yyyy]"), "testExpr", ArrayUtils.toArray("07_08_2008")));
   }
 

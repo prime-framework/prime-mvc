@@ -22,7 +22,7 @@ import java.util.Locale;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.primeframework.mvc.MockConfiguration;
-import org.primeframework.mvc.TestBuilder;
+import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
 import org.primeframework.mvc.util.MapBuilder;
@@ -36,7 +36,7 @@ import static org.testng.Assert.assertNull;
  *
  * @author Brian Pontarelli
  */
-public class ZonedDateTimeConverterTest {
+public class ZonedDateTimeConverterTest extends PrimeBaseTest {
   @Test
   public void fromStrings() {
     GlobalConverter converter = new ZonedDateTimeConverter(new MockConfiguration());
@@ -53,14 +53,14 @@ public class ZonedDateTimeConverterTest {
     assertEquals(value.getZone(), ZoneOffset.ofHours(-8));
 
     // Expect conversion error when no time or zone exist
-    TestBuilder.expectException(ConversionException.class,
+    expectException(ConversionException.class,
         () -> converter.convertFromStrings(Locale.class, MapBuilder.asMap("dateTimeFormat", "MM-dd-yyyy"), "testExpr", ArrayUtils.toArray("07/08/2008")));
 
     converter.convertFromStrings(Locale.class, MapBuilder.asMap("dateTimeFormat", "[MM-dd-yyyy hh:mm:ss a Z][MM/dd/yyyy hh;mm;ss a Z]"), "testExpr", ArrayUtils.toArray("07-08-2008 10:13:34 AM -0800"));
     converter.convertFromStrings(Locale.class, MapBuilder.asMap("dateTimeFormat", "[MM-dd-yyyy hh:mm:ss a Z][MM/dd/yyyy hh;mm;ss a Z]"), "testExpr", ArrayUtils.toArray("07/08/2008 10;13;34 AM -0800"));
 
     // A third format which is not one of the two will fail
-    TestBuilder.expectException(ConversionException.class,
+    expectException(ConversionException.class,
         () -> converter.convertFromStrings(Locale.class, MapBuilder.asMap("dateTimeFormat", "[MM-dd-yyyy hh:mm:ss a Z][MM/dd/yyyy hh;mm;ss a Z]"), "testExpr", ArrayUtils.toArray("07_08_2008 10;13;34 AM -0800")));
   }
 

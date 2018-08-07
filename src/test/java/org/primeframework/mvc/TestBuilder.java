@@ -50,13 +50,22 @@ public class TestBuilder {
 
   public Function<ObjectMapper, ObjectMapper> objectMapperFunction;
 
-  public static void expectException(Class<? extends Throwable> throwable, ThrowingRunnable runnable) {
+  @SuppressWarnings("Duplicates")
+  public void expectException(Class<? extends Throwable> throwable, ThrowingRunnable runnable) {
     try {
       runnable.run();
     } catch (Throwable e) {
-      if (!e.getClass().isAssignableFrom(throwable) && !e.getCause().getClass().isAssignableFrom(throwable)) {
-        Assert.fail("Expected [" + throwable.getName() + "], but caught [" + e.getClass().getName() + "]");
+      int count = 0;
+      Throwable t = e;
+      // Attempt to go up to 4 levels deep to find the cause of the exception
+      while (count < 4 && t != null) {
+        if (t.getClass().isAssignableFrom(throwable)) {
+          return;
+        }
+        count++;
+        t = t.getCause();
       }
+      Assert.fail("Expected [" + throwable.getName() + "], but caught [" + e.getClass().getName() + "]");
       return;
     }
     Assert.fail("Expected [" + throwable.getName() + "], but no exception was thrown.");

@@ -31,6 +31,7 @@ import org.example.domain.UserField;
 import org.primeframework.mvc.action.config.ActionConfigurationProvider;
 import org.primeframework.mvc.container.ContainerResolver;
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
+import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.parameter.el.MissingPropertyExpressionException;
@@ -513,6 +514,61 @@ public class GlobalTest extends PrimeBaseTest {
                                  .withContentType("application/octet-stream")
                                  .post()
                                  .assertStatusCode(200));
+  }
+
+  @Test
+  public void post_collectionConverter() throws Exception {
+    // Single string containing commas, output contains the same string
+    test.simulate(() -> simulator.test("/collection-converter")
+                                 .withParameter("strings", "foo,bar,baz")
+                                 .post()
+                                 .assertStatusCode(200));
+
+    // Multiple values, output contains these two values in a collection
+    test.simulate(() -> simulator.test("/collection-converter")
+                                 .withParameter("strings", "bar")
+                                 .withParameter("strings", "baz")
+                                 .post()
+                                 .assertStatusCode(200));
+  }
+
+  @Test
+  public void get_collectionConverter() throws Exception {
+    // Both of these will fail because the action has a List<String> as the backing values for this form, and the input field is a text field.
+    test.expectException(ConverterStateException.class,
+        () -> test.simulate(() -> simulator.test("/collection-converter")
+                                           .withParameter("string", "foo,bar,baz")
+                                           .get()));
+
+    test.expectException(ConverterStateException.class,
+        () -> simulator.test("/collection-converter")
+                       .withParameter("string", "bar")
+                       .withParameter("string", "baz")
+                       .get());
+
+    // It will work if we use a backing collection with an iterator in the form to build multiple form fields
+    test.simulate(() -> simulator.test("/collection-converter")
+                                 .withParameter("strings", "bar")
+                                 .withParameter("strings", "baz")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertBodyDoesNotContain("__empty2__', '__empty3__")
+                                 .assertBodyContains("__empty1__")
+                                 .assertBodyContains("[bar, baz]")
+                                 .assertBodyContains("<input type=\"text\" id=\"string\" name=\"string\"/>")
+                                 .assertBodyContains("<input type=\"text\" id=\"strings\" name=\"strings\" value=\"bar\"/")
+                                 .assertBodyContains("<input type=\"text\" id=\"strings\" name=\"strings\" value=\"baz\"/"));
+
+    // Single string containing commas, output contains the same string
+    test.simulate(() -> simulator.test("/collection-converter")
+                                 .withParameter("strings", "foo,bar,baz")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertBodyDoesNotContain("__empty2__', '__empty3__")
+                                 .assertBodyContains("__empty1__")
+                                 .assertBodyContains("[foo,bar,baz]")
+                                 .assertBodyContains("<input type=\"text\" id=\"string\" name=\"string\"/>")
+                                 .assertBodyContains("<input type=\"text\" id=\"strings\" name=\"strings\" value=\"foo,bar,baz\"/"));
   }
 
   @Test
