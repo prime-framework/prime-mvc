@@ -41,15 +41,34 @@ public class CollectionsConverterTest extends PrimeBaseTest {
 
   @Test
   public void fromStrings() {
-    withValues("foo", "bar").assertConversion();
-    withValues("foo", "bar,baz").assertConversion();
-    withValues(",foo,", "bar,baz").assertConversion();
+    withValues("foo", "bar")
+        .withExpectedResult(new String[]{"foo", "bar"})
+        .assertConversion();
 
-    withValues(",foo,").assertConversion();
-    withValues("foo,bar").assertConversion();
+    withValues("foo", "bar,baz")
+        .withExpectedResult(new String[]{"foo", "bar,baz"})
+        .assertConversion();
 
-    withValues("").withExpectedResult(new String[0]).assertConversion();
-    withValues("foo", "").withExpectedResult(new String[]{"foo"}).assertConversion();
+    withValues(",foo,", "bar,baz")
+        .withExpectedResult(new String[]{",foo,", "bar,baz"})
+        .assertConversion();
+
+    withValues(",foo,")
+        .withExpectedResult(new String[]{",foo,"})
+        .assertConversion();
+
+    withValues("foo,bar")
+        .withExpectedResult(new String[]{"foo,bar"}).assertConversion();
+
+    // Expect a single empty string will result in an empty collection
+    withValues("")
+        .withExpectedResult(new String[]{})
+        .assertConversion();
+
+    // Expect a value and an empty value will result in a collection with a single value
+    withValues("foo", "")
+        .withExpectedResult(new String[]{"foo"}
+        ).assertConversion();
   }
 
   @Test
