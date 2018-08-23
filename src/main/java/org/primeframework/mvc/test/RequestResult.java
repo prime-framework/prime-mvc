@@ -100,7 +100,8 @@ public class RequestResult {
     }
 
     if (!response.equals(file)) {
-      objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+      objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true)
+                  .configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
       String bodyString = objectMapper.writeValueAsString(response);
       String fileString = objectMapper.writeValueAsString(file);
       throw new AssertionError("The body doesn't match the expected JSON output. expected [" + fileString + "] but found [" + bodyString + "]");
