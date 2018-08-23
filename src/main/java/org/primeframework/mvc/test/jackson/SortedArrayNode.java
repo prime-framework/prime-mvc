@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2017-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,21 +61,23 @@ public class SortedArrayNode extends ArrayNode {
         return super.equals(o);
       }
 
-      ArrayNode sortedNode1 = sort(this);
-      ArrayNode sortedNode2 = sort(other);
 
-      return sortedNode1.equals(sortedNode2);
+
+      sort(this);
+      sort(other);
+      return super.equals(o);
     }
+
     return false;
   }
 
-  private ArrayNode sort(ArrayNode node) {
+  private void sort(ArrayNode node) {
     List<String> sorted = new ArrayList<>();
     node.elements().forEachRemaining(n -> sorted.add(n.asText()));
     Collections.sort(sorted);
 
-    ArrayNode sortedNode = JsonNodeFactory.instance.arrayNode();
-    sorted.forEach(s -> sortedNode.add(JsonNodeFactory.instance.textNode(s)));
-    return sortedNode;
+    for (int i = 0; i < sorted.size(); i++) {
+      set(i, JsonNodeFactory.instance.textNode(sorted.get(i)));
+    }
   }
 }

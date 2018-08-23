@@ -50,18 +50,19 @@ public class SortedObjectNode extends ObjectNode {
         return true;
       }
 
-      ObjectNode sortedNode1 = sort(this);
-      ObjectNode sortedNode2 = sort(other);
+      sort(this);
+      sort(other);
 
-      return sortedNode1.equals(sortedNode2);
+      return super.equals(o);
     }
     return false;
   }
 
-  private ObjectNode sort(ObjectNode node) {
+  private void sort(ObjectNode node) {
     Map<String, JsonNode> sorted = new TreeMap<>();
     node.fields().forEachRemaining(entry -> sorted.put(entry.getKey(), entry.getValue()));
 
-    return new ObjectNode(_nodeFactory, sorted);
+    _children.clear();
+    sorted.forEach(this::set);
   }
 }
