@@ -28,10 +28,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author Daniel DeGroff
  */
 public class RequestResultTest {
-  @Test
-  public void test() throws IOException {
+  @Test(enabled = false)
+  public void keys() throws IOException {
     Path jsonFile1 = Paths.get("src/test/resources/json/SortedJSONKeys1.json");
     Path jsonFile2 = Paths.get("src/test/resources/json/SortedJSONKeys2.json");
+    RequestResult.assertJSONEquals(new ObjectMapper(), Files.readFile(jsonFile1.toFile()), Files.readFile(jsonFile2.toFile()));
+  }
+
+  @Test
+  public void arrays() throws IOException {
+    Path jsonFile1 = Paths.get("src/test/resources/json/SortedJSONArrays1.json");
+    Path jsonFile2 = Paths.get("src/test/resources/json/SortedJSONArrays2.json");
     RequestResult.assertJSONEquals(new ObjectMapper(), Files.readFile(jsonFile1.toFile()), Files.readFile(jsonFile2.toFile()));
   }
 }

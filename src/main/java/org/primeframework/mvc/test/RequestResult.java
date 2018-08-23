@@ -23,10 +23,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -42,9 +44,8 @@ import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.primeframework.mvc.message.SimpleMessage;
 import org.primeframework.mvc.message.l10n.MessageProvider;
-import org.primeframework.mvc.test.jackson.TestNodeFactory;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.inject.Injector;
@@ -88,8 +89,8 @@ public class RequestResult {
    * @throws IOException If the ObjectMapper fails.
    */
   public static void assertJSONEquals(ObjectMapper objectMapper, String actual, String expected) throws IOException {
-    JsonNode response = objectMapper.readTree(actual);
-    JsonNode file = objectMapper.readTree(expected);
+    Map<String, Object> response = objectMapper.readerFor(Map.class).readValue(actual);
+    Map<String, Object> file = objectMapper.readerFor(Map.class).readValue(expected);
 
     if (response == null) {
       throw new AssertionError("The actual JSON was empty or once deserialize returned a null JsonNode object. Actual [" + actual + "]");
@@ -99,13 +100,55 @@ public class RequestResult {
       throw new AssertionError("The expected JSON was empty or once deserialize returned a null JsonNode object. Expected [" + expected + "]");
     }
 
+    objectMapper = objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true)
+                               .configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
+
+    response = deepSort(response, objectMapper);
+    file = deepSort(file, objectMapper);
+
     if (!response.equals(file)) {
-      objectMapper = objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true)
-                                 .configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
       String bodyString = objectMapper.writeValueAsString(response);
       String fileString = objectMapper.writeValueAsString(file);
       throw new AssertionError("The body doesn't match the expected JSON output. expected [" + fileString + "] but found [" + bodyString + "]");
     }
+  }
+
+  private static Map<String, Object> deepSort(Map<String, Object> response, ObjectMapper objectMapper) {
+    Map<String, Object> sorted = new TreeMap<>();
+    response.forEach((key, value) -> {
+      if (value instanceof Map) {
+        sorted.put(key, deepSort((Map) value, objectMapper));
+      } else if (value instanceof List) {
+        sorted.put(key, deepSort((List) value, objectMapper));
+      } else {
+        sorted.put(key, value);
+      }
+    });
+
+    return sorted;
+  }
+
+  private static List<Object> deepSort(List<Object> list, ObjectMapper objectMapper) {
+    List<Object> sorted = new ArrayList<>();
+    list.forEach(value -> {
+      if (value instanceof Map) {
+        sorted.add(deepSort((Map) value, objectMapper));
+      } else if (value instanceof List) {
+        sorted.add(deepSort((List) value, objectMapper));
+      } else {
+        sorted.add(value);
+      }
+    });
+
+    sorted.sort(Comparator.comparing(value -> {
+      try {
+        return objectMapper.writeValueAsString(value);
+      } catch (JsonProcessingException e) {
+        throw new RuntimeException(e);
+      }
+    }));
+
+    return sorted;
   }
 
   /**
@@ -615,7 +658,6 @@ public class RequestResult {
    */
   public RequestResult assertJSON(String json) throws IOException {
     ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
-    objectMapper.setNodeFactory(new TestNodeFactory());
     assertJSONEquals(objectMapper, body, json);
     return this;
   }
