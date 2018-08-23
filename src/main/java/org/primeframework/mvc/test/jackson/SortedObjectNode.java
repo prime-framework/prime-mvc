@@ -61,8 +61,7 @@ public class SortedObjectNode extends ObjectNode {
   private void sort(ObjectNode node) {
     Map<String, JsonNode> sorted = new TreeMap<>();
     node.fields().forEachRemaining(entry -> sorted.put(entry.getKey(), entry.getValue()));
-
-    _children.clear();
-    sorted.forEach(this::set);
+    node.removeAll();
+    sorted.forEach(node::replace);
   }
 }
