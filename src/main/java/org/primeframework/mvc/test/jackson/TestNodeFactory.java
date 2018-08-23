@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * A Test version of JsonNodeFactory that allows us to utilize a Sorted Array Node impl.
+ * A Test version of JsonNodeFactory that allows us to utilize a Sorted Array and a Sorted Object Node impl.
  *
  * @author Daniel DeGroff
  */

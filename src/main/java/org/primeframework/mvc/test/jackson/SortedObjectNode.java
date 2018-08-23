@@ -21,7 +21,6 @@ import java.util.TreeMap;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
 
 /**
  * A sorted implementation of ObjectNode used for testing assertions.
@@ -29,7 +28,6 @@ import com.fasterxml.jackson.databind.node.TextNode;
  * @author Daniel DeGroff
  */
 public class SortedObjectNode extends ObjectNode {
-
   public SortedObjectNode(JsonNodeFactory nf) {
     super(nf);
   }
@@ -52,13 +50,6 @@ public class SortedObjectNode extends ObjectNode {
         return true;
       }
 
-      // If this collection doesn't contain text nodes, delegate to super
-      Object foo = other.elements().next();
-
-      if (other.size() > 0 && !other.elements().next().isTextual()) {
-        return super.equals(o);
-      }
-
       ObjectNode sortedNode1 = sort(this);
       ObjectNode sortedNode2 = sort(other);
 
@@ -71,8 +62,6 @@ public class SortedObjectNode extends ObjectNode {
     Map<String, JsonNode> sorted = new TreeMap<>();
     node.fields().forEachRemaining(entry -> sorted.put(entry.getKey(), entry.getValue()));
 
-    ObjectNode sortedNode = JsonNodeFactory.instance.objectNode();
-    sorted.forEach(sortedNode::set);
-    return sortedNode;
+    return new ObjectNode(_nodeFactory, sorted);
   }
 }
