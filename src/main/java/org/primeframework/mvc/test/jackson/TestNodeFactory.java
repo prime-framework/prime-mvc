@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2017-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.primeframework.mvc.test.jackson;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * A Test version of JsonNodeFactory that allows us to utilize a Sorted Array Node impl.
@@ -33,5 +34,10 @@ public class TestNodeFactory extends JsonNodeFactory {
   @Override
   public ArrayNode arrayNode(int capacity) {
     return new SortedArrayNode(this, capacity);
+  }
+
+  @Override
+  public ObjectNode objectNode() {
+    return new SortedObjectNode(this);
   }
 }
