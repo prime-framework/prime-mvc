@@ -15,21 +15,23 @@
  */
 package org.primeframework.mvc.test;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import org.testng.annotations.Test;
+import org.testng.reporters.Files;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.inject.Inject;
 
 /**
  * @author Daniel DeGroff
  */
 public class RequestResultTest {
-  @Inject
-  private ObjectMapper objectMapper;
-
   @Test
-  public void test() {
-
-//    RequestResult.assertJSONEquals(objectMapper, "{ \"foo\":");
+  public void test() throws IOException {
+    Path jsonFile1 = Paths.get("src/test/resources/json/SortedJSONKeys1.json");
+    Path jsonFile2 = Paths.get("src/test/resources/json/SortedJSONKeys2.json");
+    RequestResult.assertJSONEquals(new ObjectMapper(), Files.readFile(jsonFile1.toFile()), Files.readFile(jsonFile2.toFile()));
   }
 }
