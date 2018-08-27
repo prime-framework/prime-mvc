@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -89,8 +90,16 @@ public class RequestResult {
    * @throws IOException If the ObjectMapper fails.
    */
   public static void assertJSONEquals(ObjectMapper objectMapper, String actual, String expected) throws IOException {
+    if (actual == null || actual.equals("")) {
+      throw new AssertionError("The actual response body is empty or is equal to an empty string without any JSON. This was "
+          + "unexpected since you are trying to assert on JSON.");
+    }
+
     Map<String, Object> response = objectMapper.readerFor(Map.class).readValue(actual);
-    Map<String, Object> file = objectMapper.readerFor(Map.class).readValue(expected);
+    Map<String, Object> file = new HashMap<>();
+    if (expected != null && !expected.equals("{}")) {
+      file = objectMapper.readerFor(Map.class).readValue(expected);
+    }
 
     if (response == null) {
       throw new AssertionError("The actual JSON was empty or once deserialize returned a null JsonNode object. Actual [" + actual + "]");
