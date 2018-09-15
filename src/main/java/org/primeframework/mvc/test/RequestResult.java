@@ -168,7 +168,7 @@ public class RequestResult {
    */
   public RequestResult assertBody(String string) {
     if (!body.equals(string)) {
-      throw new AssertionError("Body didn't match [" + string + "]\nRedirect: [" + redirect + "]\nBody:\n" + body);
+      throw new AssertionError("The body doesn't match the expected output. expected [" + string + "] but found [" + body + "]");
     }
 
     return this;
@@ -182,7 +182,7 @@ public class RequestResult {
    */
   public RequestResult assertNormalizedBody(String string) {
     if (!normalize(body).equals(string)) {
-      throw new AssertionError("Body didn't match [" + string + "]\nRedirect: [" + redirect + "]\nBody:\n" + body.trim().replace("\r\n", "\n").replace("\r", "\n"));
+      throw new AssertionError("The body doesn't match the expected output. expected [" + string + "] but found [" + body.trim().replace("\r\n", "\n").replace("\r", "\n") + "]");
     }
 
     return this;
