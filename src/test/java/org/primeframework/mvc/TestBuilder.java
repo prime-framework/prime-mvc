@@ -23,11 +23,11 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
 
 import org.primeframework.mvc.test.RequestResult;
+import org.primeframework.mvc.test.RequestResult.ThrowingConsumer;
 import org.primeframework.mvc.test.RequestSimulator;
 import org.primeframework.mvc.util.ThrowingCallable;
 import org.primeframework.mvc.util.ThrowingRunnable;
@@ -141,19 +141,6 @@ public class TestBuilder {
 
   public <T> TestIterator<T> forEach(T... collection) throws Exception {
     return new TestIterator<>(this, collection);
-  }
-
-  @FunctionalInterface
-  public interface ThrowingConsumer<T> {
-    void accept(T t) throws Exception;
-
-    default ThrowingConsumer<T> andThen(ThrowingConsumer<? super T> after) throws Exception {
-      Objects.requireNonNull(after);
-      return (T t) -> {
-        accept(t);
-        after.accept(t);
-      };
-    }
   }
 
   public class TestIterator<T> {

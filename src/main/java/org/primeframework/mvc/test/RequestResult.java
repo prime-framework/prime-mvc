@@ -821,7 +821,7 @@ public class RequestResult {
    * @param consumer The consumer that accepts the RequestResult.
    * @return This.
    */
-  public RequestResult ifTrue(boolean test, Consumer<RequestResult> consumer) {
+  public RequestResult ifTrue(boolean test, ThrowingConsumer<RequestResult> consumer) throws Exception {
     if (test) {
       consumer.accept(this);
     }
@@ -876,5 +876,10 @@ public class RequestResult {
     ArrayList<Object> list = new ArrayList<>(Arrays.asList(values));
     Collections.addAll(list, objects);
     return list.toArray();
+  }
+
+  @FunctionalInterface
+  public interface ThrowingConsumer<T> {
+    void accept(T t) throws Exception;
   }
 }
