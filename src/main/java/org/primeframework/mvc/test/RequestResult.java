@@ -575,7 +575,7 @@ public class RequestResult {
    * @param consumer The consumer used to perform assertions.
    * @return This.
    */
-  public RequestResult assertCookie(String name, Consumer<Cookie> consumer) {
+  public RequestResult assertCookie(String name, ThrowingConsumer<Cookie> consumer) throws Exception {
     assertContainsCookie(name);
     Cookie actual = response.getCookies().stream().filter(c -> c.getName().equals(name)).findFirst().orElse(null);
     if (consumer != null) {
@@ -804,7 +804,7 @@ public class RequestResult {
    * @param consumer The consumer that accepts the RequestResult.
    * @return This.
    */
-  public RequestResult ifFalse(boolean test, Consumer<RequestResult> consumer) {
+  public RequestResult ifFalse(boolean test, ThrowingConsumer<RequestResult> consumer) throws Exception {
     if (!test) {
       consumer.accept(this);
     }
@@ -834,7 +834,7 @@ public class RequestResult {
    * @param consumer The consumer that accepts the RequestResult.
    * @return This.
    */
-  public RequestResult setup(Consumer<RequestResult> consumer) {
+  public RequestResult setup(ThrowingConsumer<RequestResult> consumer) throws Exception {
     consumer.accept(this);
     return this;
   }
