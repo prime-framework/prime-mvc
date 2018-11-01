@@ -750,6 +750,16 @@ public class RequestResult {
    */
   public RequestResult assertRedirect(String uri, Consumer<RequestResult> consumer) {
     assertRedirect(uri);
+    return assertRedirect(consumer);
+  }
+
+  /**
+   * Assert on the on the response from the followed redirect.
+   *
+   * @param consumer The request result from following the redirect.
+   * @return This.
+   */
+  public RequestResult assertRedirect(Consumer<RequestResult> consumer) {
     RequestResult redirectResult = new RequestBuilder(redirect, container, filter, injector).get();
     consumer.accept(redirectResult);
     return this;
