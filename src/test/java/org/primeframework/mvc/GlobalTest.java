@@ -309,6 +309,17 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void get_redirect_follow() throws Exception {
+    // Follow the redirect and assert on that response as well
+    test.simulate(() -> simulator.test("/temp-redirect")
+                                 .get()
+                                 .assertStatusCode(302)
+                                 .assertRedirect("/temp-redirect-target",
+                                     redirect -> redirect.assertStatusCode(200)
+                                                         .assertBodyContains("Look Ma, I'm redirected.")));
+  }
+
+  @Test
   public void get_index() throws Exception {
     test.simulate(() -> simulator.test("/user/")
                                  .get()

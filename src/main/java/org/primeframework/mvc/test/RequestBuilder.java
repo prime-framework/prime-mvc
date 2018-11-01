@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc.test;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.File;
@@ -54,9 +53,12 @@ public class RequestBuilder {
 
   public final MockHttpServletResponse response;
 
+  public final MockContainer container;
+
   private Class<? extends Throwable> expectedException;
 
   public RequestBuilder(String uri, MockContainer container, PrimeFilter filter, Injector injector) {
+    this.container = container;
     this.filter = filter;
     this.injector = injector;
     this.request = container.newServletRequest(uri, Locale.getDefault(), false, "UTF-8");
@@ -67,26 +69,22 @@ public class RequestBuilder {
    * Sends the HTTP request to the MVC as a CONNECT.
    *
    * @return The response.
-   * @throws IOException If the MVC throws an exception.
-   * @throws ServletException If the MVC throws an exception.
    */
-  public RequestResult connect() throws IOException, ServletException {
+  public RequestResult connect() {
     request.setMethod(Method.CONNECT);
     run();
-    return new RequestResult(request, response, injector);
+    return new RequestResult(container, filter, request, response, injector);
   }
 
   /**
    * Sends the HTTP request to the MVC as a DELETE.
    *
    * @return The response.
-   * @throws IOException If the MVC throws an exception.
-   * @throws ServletException If the MVC throws an exception.
    */
-  public RequestResult delete() throws IOException, ServletException {
+  public RequestResult delete() {
     request.setMethod(Method.DELETE);
     run();
-    return new RequestResult(request, response, injector);
+    return new RequestResult(container, filter, request, response, injector);
   }
 
   /**
@@ -106,13 +104,11 @@ public class RequestBuilder {
    * Sends the HTTP request to the MVC as a GET.
    *
    * @return The response.
-   * @throws IOException If the MVC throws an exception.
-   * @throws ServletException If the MVC throws an exception.
    */
-  public RequestResult get() throws IOException, ServletException {
+  public RequestResult get() {
     request.setPost(false);
     run();
-    return new RequestResult(request, response, injector);
+    return new RequestResult(container, filter, request, response, injector);
   }
 
   public MockHttpServletRequest getRequest() {
@@ -123,52 +119,44 @@ public class RequestBuilder {
    * Sends the HTTP request to the MVC as a HEAD.
    *
    * @return The response.
-   * @throws IOException If the MVC throws an exception.
-   * @throws ServletException If the MVC throws an exception.
    */
-  public RequestResult head() throws IOException, ServletException {
+  public RequestResult head() {
     request.setMethod(Method.HEAD);
     run();
-    return new RequestResult(request, response, injector);
+    return new RequestResult(container, filter, request, response, injector);
   }
 
   /**
    * Sends the HTTP request to the MVC as a OPTIONS.
    *
    * @return The response.
-   * @throws IOException If the MVC throws an exception.
-   * @throws ServletException If the MVC throws an exception.
    */
-  public RequestResult options() throws IOException, ServletException {
+  public RequestResult options() {
     request.setMethod(Method.OPTIONS);
     run();
-    return new RequestResult(request, response, injector);
+    return new RequestResult(container, filter, request, response, injector);
   }
 
   /**
    * Sends the HTTP request to the MVC as a POST.
    *
    * @return The response.
-   * @throws IOException If the MVC throws an exception.
-   * @throws ServletException If the MVC throws an exception.
    */
-  public RequestResult post() throws IOException, ServletException {
+  public RequestResult post() {
     request.setPost(true);
     run();
-    return new RequestResult(request, response, injector);
+    return new RequestResult(container, filter, request, response, injector);
   }
 
   /**
    * Sends the HTTP request to the MVC as a PUT.
    *
    * @return The response.
-   * @throws IOException If the MVC throws an exception.
-   * @throws ServletException If the MVC throws an exception.
    */
-  public RequestResult put() throws IOException, ServletException {
+  public RequestResult put() {
     request.setMethod(Method.PUT);
     run();
-    return new RequestResult(request, response, injector);
+    return new RequestResult(container, filter, request, response, injector);
   }
 
   /**
@@ -186,13 +174,11 @@ public class RequestBuilder {
    * Sends the HTTP request to the MVC as a TRACE.
    *
    * @return The response.
-   * @throws IOException If the MVC throws an exception.
-   * @throws ServletException If the MVC throws an exception.
    */
-  public RequestResult trace() throws IOException, ServletException {
+  public RequestResult trace() {
     request.setMethod(Method.TRACE);
     run();
-    return new RequestResult(request, response, injector);
+    return new RequestResult(container, filter, request, response, injector);
   }
 
   /**
@@ -392,7 +378,7 @@ public class RequestBuilder {
    * @param json The string representation of the JSON to send in the request.
    * @return This.
    */
-  public RequestBuilder withJSON(String json) throws JsonProcessingException {
+  public RequestBuilder withJSON(String json) {
     return withContentType("application/json").withBody(json);
   }
 
@@ -493,7 +479,7 @@ public class RequestBuilder {
     return this;
   }
 
-  void run() throws IOException, ServletException {
+  void run() {
     // Remove the web objects if this instance is being used across multiple invocations
     ServletObjectsHolder.clearServletRequest();
     ServletObjectsHolder.clearServletResponse();

@@ -139,7 +139,7 @@ public class TestBuilder {
     return this;
   }
 
-  public <T> TestIterator<T> forEach(T... collection) throws Exception {
+  public <T> TestIterator<T> forEach(T... collection) {
     return new TestIterator<>(this, collection);
   }
 

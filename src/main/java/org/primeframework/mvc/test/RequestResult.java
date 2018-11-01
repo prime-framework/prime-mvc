@@ -33,6 +33,7 @@ import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import org.primeframework.mock.servlet.MockContainer;
 import org.primeframework.mock.servlet.MockHttpServletRequest;
 import org.primeframework.mock.servlet.MockHttpServletResponse;
 import org.primeframework.mvc.action.ActionInvocation;
@@ -45,6 +46,7 @@ import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.primeframework.mvc.message.SimpleMessage;
 import org.primeframework.mvc.message.l10n.MessageProvider;
+import org.primeframework.mvc.servlet.PrimeFilter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -69,9 +71,15 @@ public class RequestResult {
 
   public final MockHttpServletResponse response;
 
+  public final MockContainer container;
+
+  public final PrimeFilter filter;
+
   public final int statusCode;
 
-  public RequestResult(MockHttpServletRequest request, MockHttpServletResponse response, Injector injector) {
+  public RequestResult(MockContainer container, PrimeFilter filter, MockHttpServletRequest request, MockHttpServletResponse response, Injector injector) {
+    this.container = container;
+    this.filter = filter;
     this.request = request;
     this.response = response;
     this.injector = injector;
@@ -730,6 +738,20 @@ public class RequestResult {
       throw new AssertionError("Attribute [" + name + "] was not equal to the expected value.\n\tActual: " + value + "\n\tExpected: " + request.getAttribute(name) + "\n");
     }
 
+    return this;
+  }
+
+  /**
+   * Verifies that the redirect URI is the given URI and allows the caller to assert on the response from the followed redirect.
+   *
+   * @param uri      The redirect URI.
+   * @param consumer The request result from following the redirect.
+   * @return This.
+   */
+  public RequestResult assertRedirect(String uri, Consumer<RequestResult> consumer) {
+    assertRedirect(uri);
+    RequestResult redirectResult = new RequestBuilder(redirect, container, filter, injector).get();
+    consumer.accept(redirectResult);
     return this;
   }
 
