@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2016-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,10 @@ package org.primeframework.mvc.security;
 
 import java.util.Map;
 
-import org.primeframework.jwt.Verifier;
 import org.primeframework.mvc.PrimeException;
 
 import com.google.inject.Provider;
+import io.fusionauth.jwt.Verifier;
 
 /**
  * This provider will explode nicely if you try to use it. Users of JWT should bind their own Verifier Provider.

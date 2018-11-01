@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2016-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ package org.primeframework.mvc.security;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.primeframework.jwt.domain.JWT;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
@@ -28,6 +27,7 @@ import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.util.ReflectionUtils;
 
 import com.google.inject.Inject;
+import io.fusionauth.jwt.domain.JWT;
 
 /**
  * Default implementation of the JWT security scheme.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2016-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,12 @@
  */
 package org.example.action;
 
-import org.primeframework.jwt.domain.JWT;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.annotation.Status;
 import org.primeframework.mvc.security.annotation.JWTAuthorizeMethod;
 import org.primeframework.mvc.servlet.HTTPMethod;
+
+import io.fusionauth.jwt.domain.JWT;
 
 /**
  * @author Daniel DeGroff

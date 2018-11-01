@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2015-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ package org.primeframework.mvc.security.guice;
 
 import java.util.Map;
 
-import org.primeframework.jwt.Verifier;
 import org.primeframework.mvc.security.AuthorizeMethodScheme;
 import org.primeframework.mvc.security.CipherProvider;
 import org.primeframework.mvc.security.DefaultCipherProvider;
@@ -39,6 +38,7 @@ import org.primeframework.mvc.security.UserLoginSecurityScheme;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;
+import io.fusionauth.jwt.Verifier;
 
 /**
  * A Guice modules for the Security classes.

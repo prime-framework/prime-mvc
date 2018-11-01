@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2017-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package org.primeframework.mvc.security;
 
-import org.primeframework.jwt.domain.JWT;
+import io.fusionauth.jwt.domain.JWT;
 
 /**
  * Default no-op implementation of the JWT Constraint Validator.

@@ -30,7 +30,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.example.action.user.EditAction;
-import org.primeframework.jwt.Verifier;
 import org.primeframework.mock.servlet.MockContainer;
 import org.primeframework.mock.servlet.MockHttpServletRequest;
 import org.primeframework.mock.servlet.MockHttpServletResponse;
@@ -63,6 +62,7 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.TypeLiteral;
 import com.google.inject.util.Modules;
+import io.fusionauth.jwt.Verifier;
 
 /**
  * This class is a base test for testing the Prime framework. It isn't recommended to use it outside of the Prime

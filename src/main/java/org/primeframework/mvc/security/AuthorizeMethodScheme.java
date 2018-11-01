@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2017-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Map;
 
-import org.primeframework.jwt.Verifier;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
@@ -32,6 +31,7 @@ import org.primeframework.mvc.util.ReflectionUtils;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import io.fusionauth.jwt.Verifier;
 
 /**
  * The scheme itself performs no authentication or authorization, it only calls the method(s) annotated with the {@link AuthorizeMethod}.

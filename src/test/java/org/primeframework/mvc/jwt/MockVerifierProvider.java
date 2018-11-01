@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2016-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,9 @@ package org.primeframework.mvc.jwt;
 import java.util.Collections;
 import java.util.Map;
 
-import org.primeframework.jwt.Verifier;
-import org.primeframework.jwt.hmac.HMACVerifier;
-
 import com.google.inject.Provider;
+import io.fusionauth.jwt.Verifier;
+import io.fusionauth.jwt.hmac.HMACVerifier;
 
 /**
  * @author Daniel DeGroff

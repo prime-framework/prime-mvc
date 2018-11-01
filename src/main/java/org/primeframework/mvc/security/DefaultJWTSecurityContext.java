@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2017-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +17,15 @@ package org.primeframework.mvc.security;
 
 import java.util.Map;
 
-import org.primeframework.jwt.Verifier;
-import org.primeframework.jwt.domain.InvalidJWTException;
-import org.primeframework.jwt.domain.InvalidJWTSignatureException;
-import org.primeframework.jwt.domain.JWT;
-import org.primeframework.jwt.domain.JWTException;
-import org.primeframework.jwt.domain.JWTExpiredException;
-import org.primeframework.jwt.domain.JWTUnavailableForProcessingException;
-
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import io.fusionauth.jwt.Verifier;
+import io.fusionauth.jwt.domain.InvalidJWTException;
+import io.fusionauth.jwt.domain.InvalidJWTSignatureException;
+import io.fusionauth.jwt.domain.JWT;
+import io.fusionauth.jwt.domain.JWTException;
+import io.fusionauth.jwt.domain.JWTExpiredException;
+import io.fusionauth.jwt.domain.JWTUnavailableForProcessingException;
 
 /**
  * @author Daniel DeGroff

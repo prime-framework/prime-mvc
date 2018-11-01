@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.primeframework.jwt.domain.JWT;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.AuthorizationMethodConfiguration;
 import org.primeframework.mvc.action.ExecuteMethodConfiguration;
@@ -58,6 +57,7 @@ import org.primeframework.mvc.validation.annotation.PostValidationMethod;
 import org.primeframework.mvc.validation.annotation.PreValidationMethod;
 
 import com.google.inject.Inject;
+import io.fusionauth.jwt.domain.JWT;
 
 /**
  * Default action configuration builder.
