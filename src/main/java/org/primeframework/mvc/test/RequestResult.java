@@ -712,31 +712,47 @@ public class RequestResult {
   }
 
   /**
-   * Verifies that the redirect URI is the given URI.
+   * Verifies that the redirect URI is the given URI. The order of the parameters added using the builder is not important.
    *
    * @param uri      The base redirect URI.
    * @param consumer The consumer to accept a URI builder to add parameters
    * @return This.
    */
   public RequestResult assertRedirect(String uri, Consumer<TestURIBuilder> consumer) {
+    if (redirect == null) {
+      throw new AssertionError("\nActual redirect was null. Why do you want to assert on it? Status code was [" + statusCode + "]");
+    }
+
     TestURIBuilder builder = new TestURIBuilder();
     consumer.accept(builder);
-    if (builder.sb.length() > 0) {
-      return assertRedirect(uri + "?" + builder.toString());
-    } else {
-      return assertRedirect(uri);
+
+    String expectedUri = uri + (builder.sb.length() > 0 ? "?" + builder.toString() : "");
+    Map<String, List<String>> expected = uriToMap(expectedUri);
+    Map<String, List<String>> actual = uriToMap(redirect);
+
+    if (!expected.equals(actual)) {
+      throw new AssertionError("\nActual redirect not equal to the expected.\n Actual: \t" + redirect + "\n Expected:\t" + expectedUri);
     }
+
+    return this;
   }
 
   /**
-   * Verifies that the redirect URI is the given URI.
+   * Verifies that the redirect URI is the given URI. The parameter order on the URI is not important.
    *
-   * @param uri The full redirect URI include parameters
+   * @param expectedUri The full redirect URI include parameters
    * @return This.
    */
-  public RequestResult assertRedirect(String uri) {
-    if (redirect == null || !redirect.equals(uri)) {
-      throw new AssertionError("\nActual redirect not equal to the expected.\n Actual: \t" + redirect + "\n Expected:\t" + uri);
+  public RequestResult assertRedirect(String expectedUri) {
+    if (redirect == null) {
+      throw new AssertionError("\nActual redirect was null. \nExpected:\t" + expectedUri);
+    }
+
+    Map<String, List<String>> actual = uriToMap(redirect);
+    Map<String, List<String>> expected = uriToMap(expectedUri);
+
+    if (!actual.equals(expected)) {
+      throw new AssertionError("\nActual redirect not equal to the expected.\n Actual: \t" + redirect + "\n Expected:\t" + expectedUri);
     }
 
     return this;
@@ -762,28 +778,20 @@ public class RequestResult {
   }
 
   /**
-   * Verifies that the redirect URI is the given URI and allows the caller to assert on the response from the followed redirect.
-   *
-   * @param uri      The redirect URI.
-   * @param consumer The request result from following the redirect.
-   * @return This.
-   */
-  public RequestResult assertRedirectResponse(String uri, Consumer<RequestResult> consumer) {
-    assertRedirect(uri);
-    return assertRedirectResponse(consumer);
-  }
-
-  /**
-   * Assert on the on the response from the followed redirect.
+   * Execute the redirect and accept a consumer to assert on the response.
    *
    * @param consumer The request result from following the redirect.
    * @return This.
    */
-  public RequestResult assertRedirectResponse(Consumer<RequestResult> consumer) {
+  public RequestResult executeRedirect(Consumer<RequestResult> consumer) {
     String uri = redirect.contains("?") ? redirect.substring(0, redirect.indexOf("?")) : redirect;
 
     RequestBuilder rb = new RequestBuilder(uri, container, filter, injector);
     if (uri.length() != redirect.length()) {
+
+      Map<String, List<String>> actual = uriToMap(redirect);
+      Map<String, List<String>> expected = uriToMap(redirect);
+
       try {
         String params = redirect.substring(redirect.indexOf("?") + 1);
         String decoded = URLDecoder.decode(params, "UTF-8");
@@ -918,6 +926,32 @@ public class RequestResult {
   public RequestResult setup(Runnable runnable) {
     runnable.run();
     return this;
+  }
+
+  private Map<String, List<String>> uriToMap(String uri) {
+    Map<String, List<String>> map = new TreeMap<>();
+    int index = uri.indexOf("?");
+    if (index == -1) {
+      // First key will be the URI and an empty value, no parameters
+      map.put(uri, Collections.emptyList());
+      return map;
+    }
+
+    // First key will be the URI and a value of "?"
+    map.put(uri.substring(0, index), Collections.singletonList("?"));
+    String params = uri.substring(index + 1);
+    String[] keyValuePairs = params.split("&");
+    for (String keyValuePair : keyValuePairs) {
+      String[] parts = keyValuePair.split("=");
+      if (parts.length == 2) {
+        List<String> value = map.computeIfAbsent(parts[0], k -> new ArrayList<>());
+        value.add(parts[1]);
+      }
+    }
+
+    // Sort the lists so we can check for equality
+    map.values().forEach(l -> l.sort(Comparator.naturalOrder()));
+    return map;
   }
 
   private String normalize(String input) {

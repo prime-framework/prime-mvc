@@ -309,19 +309,14 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
-  public void get_redirect_follow() throws Exception {
+  public void get_execute_redirect() throws Exception {
     // Follow the redirect and assert on that response as well
     test.simulate(() -> simulator.test("/temp-redirect")
                                  .get()
                                  .assertStatusCode(302)
-
-                                 // Option 1 - assert both redirect string and redirect response at the same time.
-                                 .assertRedirectResponse("/temp-redirect-target", response -> response.assertStatusCode(200)
-                                                                                                      .assertBodyContains("Look Ma, I'm redirected."))
-
-                                 // Option 2 - Do some other assertions, etc. and then come back to asserting on the followed redirect
-                                 .assertRedirectResponse(response -> response.assertStatusCode(200)
-                                                                             .assertBodyContains("Look Ma, I'm redirected.")));
+                                 .assertRedirect("/temp-redirect-target")
+                                 .executeRedirect(response -> response.assertStatusCode(200)
+                                                                      .assertBodyContains("Look Ma, I'm redirected.")));
   }
 
   @Test
