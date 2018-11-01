@@ -48,8 +48,8 @@ public class DefaultJWTSecurityContext implements JWTSecurityContext {
       if (encodedJWT == null) {
         throw new UnauthenticatedException();
       }
-      return JWT.getDecoder().decode(encodedJWT, verifierProvider.get());
 
+      return JWT.getDecoder().decode(encodedJWT, verifierProvider.get());
     } catch (InvalidJWTException | InvalidJWTSignatureException | JWTExpiredException | JWTUnavailableForProcessingException e) {
       requestAdapter.invalidateJWT();
       throw new UnauthenticatedException();
