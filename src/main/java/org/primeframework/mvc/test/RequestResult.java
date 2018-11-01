@@ -17,6 +17,8 @@ package org.primeframework.mvc.test;
 
 import javax.servlet.http.Cookie;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -760,8 +762,26 @@ public class RequestResult {
    * @return This.
    */
   public RequestResult assertRedirect(Consumer<RequestResult> consumer) {
-    RequestResult redirectResult = new RequestBuilder(redirect, container, filter, injector).get();
-    consumer.accept(redirectResult);
+    String uri = redirect.contains("?") ? redirect.substring(0, redirect.indexOf("?")) : redirect;
+
+    RequestBuilder rb = new RequestBuilder(uri, container, filter, injector);
+    if (uri.length() != redirect.length()) {
+      try {
+        String params = redirect.substring(redirect.indexOf("?") + 1);
+        String decoded = URLDecoder.decode(params, "UTF-8");
+        String[] keyValuePairs = decoded.split("&");
+        for (String keyValuePair : keyValuePairs) {
+          String[] parts = keyValuePair.split("=");
+          if (parts.length == 2) {
+            rb.withParameter(parts[0], parts[1]);
+          }
+        }
+      } catch (UnsupportedEncodingException e) {
+        throw new RuntimeException(e);
+      }
+    }
+
+    consumer.accept(rb.get());
     return this;
   }
 
