@@ -316,13 +316,12 @@ public class GlobalTest extends PrimeBaseTest {
                                  .assertStatusCode(302)
 
                                  // Option 1 - assert both redirect string and redirect response at the same time.
-                                 .assertRedirect("/temp-redirect-target",
-                                     redirect -> redirect.assertStatusCode(200)
-                                                         .assertBodyContains("Look Ma, I'm redirected."))
+                                 .assertRedirectResponse("/temp-redirect-target", response -> response.assertStatusCode(200)
+                                                                                                      .assertBodyContains("Look Ma, I'm redirected."))
 
                                  // Option 2 - Do some other assertions, etc. and then come back to asserting on the followed redirect
-                                 .assertRedirect(redirect -> redirect.assertStatusCode(200)
-                                                                     .assertBodyContains("Look Ma, I'm redirected.")));
+                                 .assertRedirectResponse(response -> response.assertStatusCode(200)
+                                                                             .assertBodyContains("Look Ma, I'm redirected.")));
   }
 
   @Test

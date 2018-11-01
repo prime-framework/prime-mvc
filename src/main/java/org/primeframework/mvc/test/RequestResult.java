@@ -19,6 +19,7 @@ import javax.servlet.http.Cookie;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -713,7 +714,24 @@ public class RequestResult {
   /**
    * Verifies that the redirect URI is the given URI.
    *
-   * @param uri The redirect URI.
+   * @param uri      The base redirect URI.
+   * @param consumer The consumer to accept a URI builder to add parameters
+   * @return This.
+   */
+  public RequestResult assertRedirect(String uri, Consumer<TestURIBuilder> consumer) {
+    TestURIBuilder builder = new TestURIBuilder();
+    consumer.accept(builder);
+    if (builder.sb.length() > 0) {
+      return assertRedirect(uri + "?" + builder.toString());
+    } else {
+      return assertRedirect(uri);
+    }
+  }
+
+  /**
+   * Verifies that the redirect URI is the given URI.
+   *
+   * @param uri The full redirect URI include parameters
    * @return This.
    */
   public RequestResult assertRedirect(String uri) {
@@ -750,9 +768,9 @@ public class RequestResult {
    * @param consumer The request result from following the redirect.
    * @return This.
    */
-  public RequestResult assertRedirect(String uri, Consumer<RequestResult> consumer) {
+  public RequestResult assertRedirectResponse(String uri, Consumer<RequestResult> consumer) {
     assertRedirect(uri);
-    return assertRedirect(consumer);
+    return assertRedirectResponse(consumer);
   }
 
   /**
@@ -761,7 +779,7 @@ public class RequestResult {
    * @param consumer The request result from following the redirect.
    * @return This.
    */
-  public RequestResult assertRedirect(Consumer<RequestResult> consumer) {
+  public RequestResult assertRedirectResponse(Consumer<RequestResult> consumer) {
     String uri = redirect.contains("?") ? redirect.substring(0, redirect.indexOf("?")) : redirect;
 
     RequestBuilder rb = new RequestBuilder(uri, container, filter, injector);
@@ -933,5 +951,36 @@ public class RequestResult {
   @FunctionalInterface
   public interface ThrowingConsumer<T> {
     void accept(T t) throws Exception;
+  }
+
+  public static class TestURIBuilder {
+    private final StringBuilder sb = new StringBuilder();
+
+    public static TestURIBuilder builder() {
+      return new TestURIBuilder();
+    }
+
+    @Override
+    public String toString() {
+      return sb.toString();
+    }
+
+    public TestURIBuilder with(String name, Object value) {
+      if (value == null) {
+        return this;
+      }
+
+      if (sb.length() > 0) {
+        sb.append("&");
+      }
+
+      try {
+        sb.append(name).append("=").append(URLEncoder.encode(value.toString(), "UTF-8"));
+      } catch (UnsupportedEncodingException e) {
+        throw new RuntimeException(e);
+      }
+
+      return this;
+    }
   }
 }
