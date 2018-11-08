@@ -235,7 +235,7 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
-  public void get_developmentExceptions() throws Exception {
+  public void get_developmentExceptions() {
     // Bad annotation @Action("{id}") it should be @Action("{uuid}")
     simulator.test("/invalid-api/42")
              .expectException(MissingPropertyExpressionException.class)
@@ -251,7 +251,7 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
-  public void get_expressionEvaluatorSkippedUsesRequest() throws Exception {
+  public void get_expressionEvaluatorSkippedUsesRequest() {
     // Tests that the expression evaluator safely gets skipped while looking for values and Prime then checks the
     // HttpServletRequest and finds the value
     simulator.test("/value-in-request")
@@ -387,7 +387,7 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
-  public void get_metricsErrors() throws Exception {
+  public void get_metricsErrors() {
     simulator.test("/execute-method-throws-exception")
              .expectException(IllegalArgumentException.class)
              .get()
@@ -408,7 +408,7 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
-  public void head() throws Exception {
+  public void head() {
     simulator.test("/head")
              .head()
              .assertStatusCode(200)
@@ -435,7 +435,7 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
-  public void notImplemented() throws Exception {
+  public void notImplemented() {
     simulator.test("/not-implemented")
              .get()
              .assertStatusCode(501);
@@ -459,7 +459,7 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
-  public void post() throws Exception {
+  public void post() {
     simulator.test("/post")
              .post()
              .assertStatusCode(200)
@@ -658,6 +658,52 @@ public class GlobalTest extends PrimeBaseTest {
     test.simulate(() -> test.simulator.test("/secure")
                                       .get()
                                       .assertStatusCode(401));
+  }
+
+  @Test
+  public void post_generics() throws Exception {
+    test.simulate(() -> simulator.test("/generics")
+                                 .withParameter("type", "one")
+                                 .withParameter("typedObject.mapOfTypes[49e0f299-a2b0-4439-b0d5-3e2cc8949675].one", "value")
+                                 .post()
+                                 .assertStatusCode(200)
+                                 .assertBodyContains("Map one = value"))
+        .simulate(() -> simulator.test("/generics")
+                                 .withParameter("type", "two")
+                                 .withParameter("typedObject.mapOfTypes[eee47c8b-4134-4c4d-ab28-cacaeed84cdb].two", "value")
+                                 .post()
+                                 .assertStatusCode(200)
+                                 .assertBodyContains("Map two = value"))
+        .simulate(() -> simulator.test("/generics")
+                                 .withParameter("type", "two")
+                                 .withParameter("typedObject.fullyGenericMapOfTypes[eee47c8b-4134-4c4d-ab28-cacaeed84cdb].two", "value")
+                                 .post()
+                                 .assertStatusCode(200)
+                                 .assertBodyContains("Map key/value = value"))
+        .simulate(() -> simulator.test("/generics")
+                                 .withParameter("type", "two")
+                                 .withParameter("typedObject.listOfStrings[0]", "value")
+                                 .post()
+                                 .assertStatusCode(200)
+                                 .assertBodyContains("List string = value"))
+        .simulate(() -> simulator.test("/generics")
+                                 .withParameter("type", "two")
+                                 .withParameter("typedObject.listOfTypes[0].two", "value")
+                                 .post()
+                                 .assertStatusCode(200)
+                                 .assertBodyContains("List two = value"))
+        .simulate(() -> simulator.test("/generics")
+                                 .withParameter("type", "two")
+                                 .withParameter("typedObject.singleString", "value")
+                                 .post()
+                                 .assertStatusCode(200)
+                                 .assertBodyContains("Single string = value"))
+        .simulate(() -> simulator.test("/generics")
+                                 .withParameter("type", "two")
+                                 .withParameter("typedObject.singleType.two", "value")
+                                 .post()
+                                 .assertStatusCode(200)
+                                 .assertBodyContains("Single two = value"));
   }
 
   @Test

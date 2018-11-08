@@ -17,6 +17,7 @@ package org.primeframework.mvc.parameter.el;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
+import java.lang.reflect.TypeVariable;
 import java.util.List;
 
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
@@ -29,13 +30,18 @@ import org.primeframework.mvc.util.TypeTools;
  */
 public class IndexedCollectionAccessor extends Accessor {
   Integer index;
+
   MemberAccessor memberAccessor;
 
   public IndexedCollectionAccessor(ConverterProvider converterProvider, Accessor accessor, Integer index,
                                    MemberAccessor memberAccessor) {
     super(converterProvider, accessor);
     this.index = index;
-    super.type = TypeTools.componentType(super.type, memberAccessor.toString());
+    this.type = TypeTools.componentType(this.type, memberAccessor.toString());
+    if (this.type instanceof TypeVariable<?>) {
+      this.type = TypeTools.resolveGenericType(memberAccessor.declaringClass, this.currentClass, (TypeVariable<?>) this.type);
+    }
+
     this.memberAccessor = memberAccessor;
   }
 
@@ -48,7 +54,7 @@ public class IndexedCollectionAccessor extends Accessor {
 
   /**
    * @return Always false. The reason is that since this retrieves from a Collection, we want it to look like a
-   *         non-indexed property so that the context will invoke the method.
+   *     non-indexed property so that the context will invoke the method.
    */
   public boolean isIndexed() {
     return false;
@@ -82,8 +88,8 @@ public class IndexedCollectionAccessor extends Accessor {
   /**
    * Adds padding to the array or list so that it can hold the item being inserted.
    *
-   * @param object  The object to pad. If this isn't a List or an array, this method does nothing and just returns the
-   *                Object.
+   * @param object     The object to pad. If this isn't a List or an array, this method does nothing and just returns the
+   *                   Object.
    * @param expression The current expression.
    * @return The padded list or array.
    */

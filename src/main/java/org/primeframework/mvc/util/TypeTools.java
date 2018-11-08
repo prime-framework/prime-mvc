@@ -19,7 +19,11 @@ import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import org.primeframework.mvc.parameter.el.CollectionExpressionException;
@@ -141,5 +145,62 @@ public class TypeTools {
     }
 
     return (Class<?>) type;
+  }
+
+  /**
+   * Resolves the generic types of a field or method by matching up the generics in the class definition to the ones used in the
+   * method/field. This also works for methods/fields that use other types that are generic. For example, Map&lt;T, U> can be resolved.
+   *
+   * @param declaringClassGeneric The class where the generic method/field was defined that uses the generic.
+   * @param currentClass          The current class that has completely defined all the generic information to satisfy the method/field.
+   * @param typeVariable          The generic type variable from the method/field.
+   * @return The type of the generic method/field.
+   */
+  public static Type resolveGenericType(Class<?> declaringClassGeneric, Class<?> currentClass, final TypeVariable<?> typeVariable) {
+    List<Class<?>> classes = new ArrayList<>();
+    while (currentClass != declaringClassGeneric) {
+      classes.add(currentClass);
+      currentClass = currentClass.getSuperclass();
+    }
+    classes.add(declaringClassGeneric);
+
+    // Reverse it to work from base class to child class
+    Collections.reverse(classes);
+
+    int position = -1;
+    TypeVariable<?> currentTypeVariable = typeVariable;
+    for (Class<?> klass : classes) {
+      TypeVariable<?>[] genericTypes = klass.getTypeParameters();
+      if (genericTypes == null) {
+        break;
+      }
+
+      if (position != -1) {
+        Type genericSuperclass = klass.getGenericSuperclass();
+        if (!(genericSuperclass instanceof ParameterizedType)) {
+          throw new IllegalStateException("Something bad happened while trying to resolve generic types. The class [" + genericSuperclass +
+              "] was encountered but didn't have generic types. It probably should have.");
+        }
+
+        Type[] inheritedGenericTypes = ((ParameterizedType) genericSuperclass).getActualTypeArguments();
+        Type nextParameterType = inheritedGenericTypes[position];
+        if (nextParameterType instanceof TypeVariable<?>) {
+          currentTypeVariable = (TypeVariable<?>) nextParameterType;
+        } else if (nextParameterType instanceof Class<?>) {
+          return nextParameterType;
+        }
+      }
+
+      String name = currentTypeVariable.getName();
+      for (int i = 0; i < genericTypes.length; i++) {
+        if (genericTypes[i].getName().equals(name)) {
+          position = i;
+          currentTypeVariable = genericTypes[i];
+          break;
+        }
+      }
+    }
+
+    return typeVariable;
   }
 }

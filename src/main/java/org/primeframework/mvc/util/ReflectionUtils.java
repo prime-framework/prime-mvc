@@ -306,7 +306,7 @@ public class ReflectionUtils {
         if (info == null) {
           info = new PropertyInfo();
           info.setName(name.getName());
-          info.setDefiningClass(type);
+          info.setDeclaringClass(type);
           constructed = true;
         }
 
@@ -723,7 +723,7 @@ public class ReflectionUtils {
   public static class PropertyInfo {
     private final Map<String, Method> methods = new HashMap<>();
 
-    private Class<?> definingClass;
+    private Class<?> declaringClass;
 
     private Type genericType;
 
@@ -769,12 +769,16 @@ public class ReflectionUtils {
       this.indexed = indexed;
     }
 
-    public void setDefiningClass(Class<?> definingClass) {
-      this.definingClass = definingClass;
+    public Class<?> getDeclaringClass() {
+      return declaringClass;
+    }
+
+    public void setDeclaringClass(Class<?> declaringClass) {
+      this.declaringClass = declaringClass;
     }
 
     public String toString() {
-      return "Property named [" + name + "] in class [" + definingClass + "]";
+      return "Property named [" + name + "] in class [" + declaringClass + "]";
     }
   }
 

@@ -15,10 +15,63 @@
  */
 package org.example.domain;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 /**
  * For testing odd generic cases.
  */
 public class GenericBean {
   public MapSubclass mapSubclass;
+
   public MapImplements mapImplements;
+
+  public TypedObject<?, ?, ?> typedObject;
+
+  // S = String
+  // T = ParameterType*
+  // U = String
+  // V = Not used
+  public abstract static class BaseTypedObject<S, T, U, V> {
+    public Map<UUID, T> mapOfTypes = new HashMap<>();
+
+    public Map<V, T> fullyGenericMapOfTypes = new HashMap<>();
+
+    public List<S> listOfStrings = new ArrayList<>();
+
+    public List<T> listOfTypes = new ArrayList<>();
+
+    public U singleString;
+
+    public T singleType;
+  }
+
+  public static class FinalHardTypeOne extends HardTypeOne {
+  }
+
+  public static class FinalHardTypeTwo extends HardTypeTwo {
+  }
+
+  public static class HardTypeOne extends MovedTypedObject<String, String, ParameterTypeOne> {
+  }
+
+  public static class HardTypeTwo extends MovedTypedObject<String, String, ParameterTypeTwo> {
+  }
+
+  public abstract static class MovedTypedObject<B, C, A> extends TypedObject<A, B, C> {
+  }
+
+  public static class ParameterTypeOne {
+    public String one;
+  }
+
+  public static class ParameterTypeTwo {
+    public String two;
+  }
+
+  public abstract static class TypedObject<S, T, U> extends BaseTypedObject<U, S, T, UUID> {
+  }
 }

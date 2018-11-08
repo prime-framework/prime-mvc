@@ -18,6 +18,7 @@ package org.primeframework.mvc.parameter.el;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.TypeVariable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +28,7 @@ import java.util.Set;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
 import org.primeframework.mvc.util.ReflectionUtils;
+import org.primeframework.mvc.util.TypeTools;
 
 /**
  * This class provides member access.
@@ -38,12 +40,16 @@ public class MemberAccessor extends Accessor {
 
   final ReflectionUtils.PropertyInfo propertyInfo;
 
+  final Class<?> declaringClass;
+
   private final List<Class<? extends Annotation>> unWrappedAnnotations;
 
   public MemberAccessor(ConverterProvider converterProvider, MemberAccessor accessor, MVCConfiguration configuration) {
     super(converterProvider, accessor);
     this.field = accessor.field;
     this.propertyInfo = accessor.propertyInfo;
+    this.declaringClass = this.field != null ? this.field.getDeclaringClass() : this.propertyInfo.getDeclaringClass();
+
     if (configuration != null) {
       this.unWrappedAnnotations = configuration.unwrapAnnotations();
     } else {
@@ -51,16 +57,17 @@ public class MemberAccessor extends Accessor {
     }
   }
 
-  public MemberAccessor(ConverterProvider converterProvider, Class<?> declaringClass, String name, String expression, MVCConfiguration configuration) {
+  public MemberAccessor(ConverterProvider converterProvider, Class<?> currentClass, String name, String expression, MVCConfiguration configuration) {
     super(converterProvider);
     if (configuration != null) {
       this.unWrappedAnnotations = configuration.unwrapAnnotations();
     } else {
       this.unWrappedAnnotations = Collections.emptyList();
     }
-    this.declaringClass = declaringClass;
 
-    Map<String, ReflectionUtils.PropertyInfo> properties = ReflectionUtils.findPropertyInfo(this.declaringClass);
+    this.currentClass = currentClass;
+
+    Map<String, ReflectionUtils.PropertyInfo> properties = ReflectionUtils.findPropertyInfo(this.currentClass);
     ReflectionUtils.PropertyInfo bpi = properties.get(name);
 
     if (bpi == null) {
@@ -74,10 +81,14 @@ public class MemberAccessor extends Accessor {
 
     if (this.field == null && this.propertyInfo == null) {
       throw new MissingPropertyExpressionException("While evaluating the expression [" + expression + "]. The property/field [" +
-          name + "] does not exist in the class [" + declaringClass + "]", name, declaringClass, expression);
+          name + "] does not exist in the class [" + currentClass + "]", name, currentClass, expression);
     }
 
-    super.type = (bpi != null) ? bpi.getGenericType() : this.field.getGenericType();
+    this.declaringClass = this.field != null ? this.field.getDeclaringClass() : this.propertyInfo.getDeclaringClass();
+    this.type = (bpi != null) ? bpi.getGenericType() : this.field.getGenericType();
+    if (this.type instanceof TypeVariable<?>) {
+      this.type = TypeTools.resolveGenericType(this.declaringClass, this.currentClass, (TypeVariable<?>) this.type);
+    }
   }
 
   public Object get(Expression expression) {
@@ -85,7 +96,7 @@ public class MemberAccessor extends Accessor {
       Method getter = propertyInfo.getMethods().get("get");
       if (getter == null) {
         throw new ReadExpressionException("Missing getter for property [" + propertyInfo.getName() +
-            "] in class [" + declaringClass + "]");
+            "] in class [" + currentClass + "]");
       }
       return ReflectionUtils.invokeGetter(getter, this.object);
     }
@@ -109,7 +120,7 @@ public class MemberAccessor extends Accessor {
       Method setter = propertyInfo.getMethods().get("set");
       if (setter == null) {
         throw new UpdateExpressionException("Missing setter for property [" + propertyInfo.getName() +
-            "] in class [" + declaringClass + "]");
+            "] in class [" + currentClass + "]");
       }
       ReflectionUtils.invokeSetter(setter, object, value);
     } else {
@@ -146,7 +157,7 @@ public class MemberAccessor extends Accessor {
 
       // Get the field for the property
       String name = propertyInfo.getName();
-      Field field = ReflectionUtils.findFields(declaringClass).get(name);
+      Field field = ReflectionUtils.findFields(currentClass).get(name);
       if (field != null && field.isAnnotationPresent(type)) {
         return field.getAnnotation(type);
       }
@@ -189,9 +200,9 @@ public class MemberAccessor extends Accessor {
   private Map<String, Field> findFields() {
     Map<String, Field> fields = new HashMap<>();
     try {
-      for (Map.Entry<String, Field> entry : ReflectionUtils.findFields(this.declaringClass).entrySet()) {
+      for (Map.Entry<String, Field> entry : ReflectionUtils.findFields(this.currentClass).entrySet()) {
         if (ReflectionUtils.areAnyAnnotationsPresent(entry.getValue(), unWrappedAnnotations)) {
-          Field unwrappedField = declaringClass.getField(entry.getKey());
+          Field unwrappedField = currentClass.getField(entry.getKey());
           fields.putAll(ReflectionUtils.findFields(unwrappedField.getType()));
         } else {
           fields.put(entry.getKey(), entry.getValue());

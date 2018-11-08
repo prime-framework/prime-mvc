@@ -17,6 +17,7 @@ package org.primeframework.mvc.parameter.el;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.Map;
 
 import org.primeframework.mvc.parameter.convert.ConversionException;
@@ -31,30 +32,49 @@ import org.primeframework.mvc.util.TypeTools;
  */
 public class MapAccessor extends Accessor {
   final Object key;
+
   final MemberAccessor memberAccessor;
 
   public MapAccessor(ConverterProvider converterProvider, Accessor accessor, String index, MemberAccessor memberAccessor) {
     super(converterProvider, accessor);
 
     String path = memberAccessor.toString();
-    Type objectType = super.type;
+    Type objectType = this.type;
     this.memberAccessor = memberAccessor;
 
     Type[] types = TypeTools.mapTypes(objectType, path);
-    super.type = types[1]; // Value type
 
-    Class<?> keyType = TypeTools.rawType(types[0]); // Key type
-    GlobalConverter converter = converterProvider.lookup(keyType);
+    Class<?> classDeclaringMap = memberAccessor.field != null ? memberAccessor.field.getDeclaringClass() : memberAccessor.propertyInfo.getDeclaringClass();
+    Type valueType = types[1];
+    if (valueType instanceof TypeVariable<?>) {
+      this.type = TypeTools.resolveGenericType(classDeclaringMap, currentClass, (TypeVariable<?>) valueType);
+    } else {
+      this.type = types[1]; // Value type
+    }
+
+    Type keyType = types[0];
+    if (keyType instanceof TypeVariable<?>) {
+      keyType= TypeTools.resolveGenericType(classDeclaringMap, currentClass, (TypeVariable<?>) keyType);
+    } else {
+      keyType = TypeTools.rawType(keyType); // Key type
+    }
+
+    if (!(keyType instanceof Class<?>)) {
+      throw new IllegalStateException("Unable to determine concrete type of Map key for [" + toString() + "]");
+    }
+
+    Class<?> keyClass = (Class<?>) keyType;
+    GlobalConverter converter = converterProvider.lookup(keyClass);
     if (converter == null) {
-      throw new ConversionException("No type converter is registered for the type [" + keyType + "], which is the " +
-        "type for the key of the map at [" + path + "]");
+      throw new ConversionException("No type converter is registered for the type [" + keyClass + "], which is the " +
+          "type for the key of the map at [" + path + "]");
     }
 
     // Use null and empty string from the parsed expression as is.
     if (index == null || index.length() == 0) {
       this.key = index;
     } else {
-      this.key = converter.convertFromStrings(keyType, null, path, index);
+      this.key = converter.convertFromStrings(keyClass, null, path, index);
     }
   }
 
@@ -67,7 +87,7 @@ public class MapAccessor extends Accessor {
 
   /**
    * @return Always false. The reason is that since this retrieves from a Collection, we want it to look like a
-   *         non-indexed property so that the context will invoke the method.
+   * non-indexed property so that the context will invoke the method.
    */
   public boolean isIndexed() {
     return false;

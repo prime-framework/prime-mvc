@@ -50,7 +50,7 @@ import org.primeframework.mvc.util.TypeTools;
 public abstract class Accessor {
   protected final ConverterProvider converterProvider;
 
-  protected Class<?> declaringClass;
+  protected Class<?> currentClass;
 
   protected Object object;
 
@@ -59,7 +59,7 @@ public abstract class Accessor {
   public Accessor(ConverterProvider converterProvider, Accessor accessor) {
     this.converterProvider = converterProvider;
     this.type = accessor.type;
-    this.declaringClass = accessor.declaringClass;
+    this.currentClass = accessor.currentClass;
   }
 
   protected Accessor(ConverterProvider converterProvider) {
@@ -73,8 +73,8 @@ public abstract class Accessor {
 
   /**
    * @return Returns the member accessor that is closest to the current atom in the expression. If the current atom is a
-   * member, this should just return <strong>this</strong>. If the current atom is a collection for example,
-   * this would return the member that the collection was retrieved from.
+   *     member, this should just return <strong>this</strong>. If the current atom is a collection for example,
+   *     this would return the member that the collection was retrieved from.
    */
   public abstract MemberAccessor getMemberAccessor();
 
@@ -92,7 +92,7 @@ public abstract class Accessor {
 
   @Override
   public String toString() {
-    return "declaring class [" + declaringClass + "]";
+    return "declaring class [" + currentClass + "]";
   }
 
   /**
