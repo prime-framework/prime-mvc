@@ -306,7 +306,7 @@ public class ReflectionUtils {
         if (info == null) {
           info = new PropertyInfo();
           info.setName(name.getName());
-          info.setDeclaringClass(type);
+          info.setDeclaringClass(method.getDeclaringClass());
           constructed = true;
         }
 

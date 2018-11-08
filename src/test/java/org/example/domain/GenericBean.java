@@ -47,6 +47,66 @@ public class GenericBean {
     public U singleString;
 
     public T singleType;
+
+    private Map<UUID, T> privateMapOfTypes = new HashMap<>();
+
+    private Map<V, T> privateFullyGenericMapOfTypes = new HashMap<>();
+
+    private List<S> privateListOfStrings = new ArrayList<>();
+
+    private List<T> privateListOfTypes = new ArrayList<>();
+
+    private U privateSingleString;
+
+    private T privateSingleType;
+
+    public Map<UUID, T> getPrivateMapOfTypes() {
+      return privateMapOfTypes;
+    }
+
+    public void setPrivateMapOfTypes(Map<UUID, T> privateMapOfTypes) {
+      this.privateMapOfTypes = privateMapOfTypes;
+    }
+
+    public Map<V, T> getPrivateFullyGenericMapOfTypes() {
+      return privateFullyGenericMapOfTypes;
+    }
+
+    public void setPrivateFullyGenericMapOfTypes(Map<V, T> privateFullyGenericMapOfTypes) {
+      this.privateFullyGenericMapOfTypes = privateFullyGenericMapOfTypes;
+    }
+
+    public List<S> getPrivateListOfStrings() {
+      return privateListOfStrings;
+    }
+
+    public void setPrivateListOfStrings(List<S> privateListOfStrings) {
+      this.privateListOfStrings = privateListOfStrings;
+    }
+
+    public List<T> getPrivateListOfTypes() {
+      return privateListOfTypes;
+    }
+
+    public void setPrivateListOfTypes(List<T> privateListOfTypes) {
+      this.privateListOfTypes = privateListOfTypes;
+    }
+
+    public U getPrivateSingleString() {
+      return privateSingleString;
+    }
+
+    public void setPrivateSingleString(U privateSingleString) {
+      this.privateSingleString = privateSingleString;
+    }
+
+    public T getPrivateSingleType() {
+      return privateSingleType;
+    }
+
+    public void setPrivateSingleType(T privateSingleType) {
+      this.privateSingleType = privateSingleType;
+    }
   }
 
   public static class FinalHardTypeOne extends HardTypeOne {
