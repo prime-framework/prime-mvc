@@ -1,5 +1,30 @@
 Prime MVC Changes
 
+Changes in 1.10.0
+
+ * Better support for complex generics in expression evaluator / map accessor.
+
+Changes in 1.9.5
+
+ * Add a ThrowingConsumer to RequestResult.assertCookie
+
+Changes in 1.9.4
+
+ * Add a ThrowingConsumer to RequestResult.ifTrue
+
+Changes in 1.9.3
+
+ * Support the TestNG assert language to allow ItelliJ to show the diff for RequestResult.assertBody and RequestResult.assertNormalizedBody
+
+Changes in 1.9.2
+
+ * Better support for an empty JSON result in RequestResult.assertJSONEquals
+
+Changes in 1.9.1
+
+ * Better assertion support in RequestResult for JSON objects. We now do a much better job of sorting the objects to ensure a clean equality check.
+ * Support for multiple data formats in the ZonedDateTimeConverter
+
 Changes in 1.9.0
 
  * Add prettyPrint to the @JSONResponse annotation
