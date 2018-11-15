@@ -122,7 +122,7 @@ public class JacksonContentHandler implements ContentHandler {
       } catch (UnrecognizedPropertyException e) {
         logger.debug("Error parsing JSON request", e);
         String field = buildField(e);
-        messageStore.add(new SimpleMessage(MessageType.ERROR, "[unrecognizedProperty]", messageProvider.getMessage("[unrecognizedProperty]", field, e.getMessage())));
+        messageStore.add(new SimpleMessage(MessageType.ERROR, "[invalidJSON]", messageProvider.getMessage("[invalidJSON]", field, "Unrecognized property", e.getMessage())));
         throw new ValidationException(e);
       } catch (JsonMappingException e) {
         logger.debug("Error parsing JSON request", e);
@@ -130,12 +130,12 @@ public class JacksonContentHandler implements ContentHandler {
         if (!(e.getCause() instanceof JsonParseException)) {
           addFieldError(e);
         } else {
-          messageStore.add(new SimpleMessage(MessageType.ERROR, "[couldNotParseJSON]", messageProvider.getMessage("[couldNotParseJSON]", e.getMessage())));
+          messageStore.add(new SimpleMessage(MessageType.ERROR, "[invalidJSON]", messageProvider.getMessage("[invalidJSON]", "unknown", "Unexpected mapping exception", e.getMessage())));
         }
         throw new ValidationException(e);
       } catch (JsonProcessingException e) {
         logger.debug("Error parsing JSON request", e);
-        messageStore.add(new SimpleMessage(MessageType.ERROR, "[couldNotParseJSON]", messageProvider.getMessage("[couldNotParseJSON]", e.getMessage())));
+        messageStore.add(new SimpleMessage(MessageType.ERROR, "[invalidJSON]", messageProvider.getMessage("[invalidJSON]", "unknown", "Unexpected processing exception", e.getMessage())));
         throw new ValidationException(e);
       }
     }
@@ -149,9 +149,9 @@ public class JacksonContentHandler implements ContentHandler {
   private void addFieldError(JsonMappingException e) {
     // Build the path so we can make the error
     String field = buildField(e);
-    String code = "[couldNotConvert]" + field;
+    String code = "[invalidJSON]";
 
-    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, field, code, messageProvider.getMessage(code, e.getMessage())));
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, field, code, messageProvider.getMessage(code, field, "Possible conversion error", e.getMessage())));
   }
 
   private String buildField(JsonMappingException e) {

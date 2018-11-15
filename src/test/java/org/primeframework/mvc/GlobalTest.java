@@ -777,6 +777,16 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void post_invalidJSON() throws Exception {
+    test.simulate(() -> test.simulator.test("/invalid-json")
+                                      .withJSONFile(Paths.get("src/test/resources/json/invalid-json.json"))
+                                      .post()
+                                      .assertStatusCode(400)
+                                      .assertContainsFieldErrors("active")
+                                      .assertBodyContains("Unable to parse JSON. The property [active] was invalid. The error was [Possible conversion error]. The detailed exception was [Cannot deserialize instance of `boolean` out of START_ARRAY token\\n at [Source: (org.primeframework.mock.servlet.MockServletInputStream); line: 2, column: 13] (through reference chain: org.example.domain.UserField[\\\"active\\\"])]"));
+  }
+
+  @Test
   public void uriParameters() throws Exception {
     test.simulate(() -> test.simulator.test("/complex-rest/brian/static/pontarelli/then/a/bunch/of/stuff")
                                       .post()

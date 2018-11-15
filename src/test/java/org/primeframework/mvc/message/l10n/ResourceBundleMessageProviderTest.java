@@ -66,7 +66,7 @@ public class ResourceBundleMessageProviderTest extends PrimeBaseTest {
     MockServletContext context = new MockContainer().newServletContext(new File("src/test/java"));
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/l10n/Test", null, null));
+    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/l10n/Test", null, null)).times(2);
     replay(store);
 
     ResourceBundleMessageProvider provider = new ResourceBundleMessageProvider(Locale.US, new WebControl(new ServletContainerResolver(context), configuration), store);

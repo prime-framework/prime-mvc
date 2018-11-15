@@ -32,4 +32,14 @@ public interface MessageProvider {
    * @throws MissingMessageException If the message is missing.
    */
   String getMessage(String key, Object... values) throws MissingMessageException;
+
+  /**
+   * Finds an untyped message with the given key and for the current locale. This should then process the message using
+   * the attributes and values given in order to token replace and format the message correctly.
+   *
+   * @param key    The key of the message.
+   * @param values Any additional values for the message.
+   * @return The message or null if the message doesn't exist.
+   */
+  String getOptionalMessage(String key, Object... values);
 }

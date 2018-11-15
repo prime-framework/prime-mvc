@@ -74,8 +74,23 @@ public class ResourceBundleMessageProvider implements MessageProvider {
 
   @Override
   public String getMessage(String key, Object... values) throws MissingMessageException {
+    String message = getOptionalMessage(key, values);
+    if (message == null) {
+      ActionInvocation actionInvocation = invocationStore.getCurrent();
+      throw new MissingMessageException("Message could not be found for the URI [" + actionInvocation.actionURI + "] and key [" + key + "]");
+    }
+
+    return message;
+  }
+
+  @Override
+  public String getOptionalMessage(String key, Object... values) {
     ActionInvocation actionInvocation = invocationStore.getCurrent();
     String template = findMessage(actionInvocation, key);
+    if (template == null) {
+      return null;
+    }
+
     Formatter f = new Formatter();
     f.format(locale, template, values);
     return f.out().toString();
@@ -118,6 +133,6 @@ public class ResourceBundleMessageProvider implements MessageProvider {
       logger.warn("Message could not be found for the URI [" + uri + "] and key [" + key + "]");
     }
 
-    throw new MissingMessageException("Message could not be found for the URI [" + uri + "] and key [" + key + "]");
+    return null;
   }
 }

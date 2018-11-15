@@ -162,11 +162,11 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
     request.setInputStream(new MockServletInputStream(expected.getBytes()));
 
     MessageProvider messageProvider = createStrictMock(MessageProvider.class);
-    expect(messageProvider.getMessage(eq("[couldNotConvert]siblings.age"), isA(String.class))).andReturn("Bad sibling age");
+    expect(messageProvider.getMessage(eq("[invalidJSON]"), eq("siblings.age"), eq("Possible conversion error"), isA(String.class))).andReturn("Bad sibling age");
     replay(messageProvider);
 
     MessageStore messageStore = createStrictMock(MessageStore.class);
-    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "siblings.age", "[couldNotConvert]siblings.age", "Bad sibling age"));
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "siblings.age", "[invalidJSON]", "Bad sibling age"));
     replay(messageStore);
 
     JacksonContentHandler handler = new JacksonContentHandler(request, store, new ObjectMapper(), expressionEvaluator, messageProvider, messageStore);
@@ -206,11 +206,11 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
     request.setInputStream(new MockServletInputStream(expected.getBytes()));
 
     MessageProvider messageProvider = createNiceMock(MessageProvider.class);
-    expect(messageProvider.getMessage(eq("[couldNotConvert]addresses.home.age"), isA(String.class))).andReturn("Bad age");
+    expect(messageProvider.getMessage(eq("[invalidJSON]"), eq("addresses.home.age"), eq("Possible conversion error"), isA(String.class))).andReturn("Bad age");
     replay(messageProvider);
 
     MessageStore messageStore = createNiceMock(MessageStore.class);
-    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "addresses.home.age", "[couldNotConvert]addresses.home.age", "Bad age"));
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "addresses.home.age", "[invalidJSON]", "Bad age"));
     replay(messageStore);
 
     JacksonContentHandler handler = new JacksonContentHandler(request, store, new ObjectMapper(), expressionEvaluator, messageProvider, messageStore);
@@ -246,11 +246,11 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
     request.setInputStream(new MockServletInputStream(expected.getBytes()));
 
     MessageProvider messageProvider = createStrictMock(MessageProvider.class);
-    expect(messageProvider.getMessage(eq("[unrecognizedProperty]"), eq("bad-active"), isA(String.class))).andReturn("foo");
+    expect(messageProvider.getMessage(eq("[invalidJSON]"), eq("bad-active"), eq("Unrecognized property"), isA(String.class))).andReturn("foo");
     replay(messageProvider);
 
     MessageStore messageStore = createStrictMock(MessageStore.class);
-    messageStore.add(new SimpleMessage(MessageType.ERROR, "[unrecognizedProperty]", "foo"));
+    messageStore.add(new SimpleMessage(MessageType.ERROR, "[invalidJSON]", "foo"));
     replay(messageStore);
 
     JacksonContentHandler handler = new JacksonContentHandler(request, store, new ObjectMapper(), expressionEvaluator, messageProvider, messageStore);
@@ -286,11 +286,11 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
     request.setInputStream(new MockServletInputStream(expected.getBytes()));
 
     MessageProvider messageProvider = createStrictMock(MessageProvider.class);
-    expect(messageProvider.getMessage(eq("[couldNotConvert]active"), isA(String.class))).andReturn("Bad active");
+    expect(messageProvider.getMessage(eq("[invalidJSON]"), eq("active"), eq("Possible conversion error"), isA(String.class))).andReturn("Bad active");
     replay(messageProvider);
 
     MessageStore messageStore = createStrictMock(MessageStore.class);
-    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "active", "[couldNotConvert]active", "Bad active"));
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "active", "[invalidJSON]", "Bad active"));
     replay(messageStore);
 
     JacksonContentHandler handler = new JacksonContentHandler(request, store, new ObjectMapper(), expressionEvaluator, messageProvider, messageStore);
