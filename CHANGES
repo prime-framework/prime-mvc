@@ -1,5 +1,13 @@
 Prime MVC Changes
 
+Changes in 1.11.1
+
+ * Add RequestBuilder.withBasicAuthorizationHeader
+
+Changes in 1.11.0
+
+ * Better invalid JSON handling. This will assist in providing better error messages when invalid JSON cannot be parsed by Jackson.
+
 Changes in 1.10.0
 
  * Better support for complex generics in expression evaluator / map accessor.

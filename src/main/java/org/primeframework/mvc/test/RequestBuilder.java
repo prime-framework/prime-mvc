@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.function.Consumer;
@@ -204,6 +205,24 @@ public class RequestBuilder {
    */
   public RequestBuilder withAuthorizationHeader(Object value) {
     request.addHeader("Authorization", value.toString());
+    return this;
+  }
+
+  /**
+   * Adds a Basic Authorization header to the request using the specified value.
+   * <p>Shorthand for calling
+   * <pre>
+   *   String basic = username + (password != null ? ":" + password : "");
+   *   withHeader("Authorization", "Basic " + Base64.getEncoder().encodeToString(basic.getBytes());)
+   * </pre>
+   *
+   * @param username The username used to build the basic authorization scheme
+   * @param password The password used to build the basic authorization scheme
+   * @return This.
+   */
+  public RequestBuilder withBasicAuthorizationHeader(String username, String password) {
+    String basic = username + (password != null ? ":" + password : "");
+    request.addHeader("Authorization", "Basic " + Base64.getEncoder().encodeToString(basic.getBytes()));
     return this;
   }
 
