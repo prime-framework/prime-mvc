@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2019, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,15 @@
 package org.primeframework.mvc;
 
 /**
- * This HTTP Method is not implemented by this MVC. Generally you'll want to return a <code>501</code> for this result code.
+ * The HTTP method is implemented by the MVC, but the specified URI does not allow this HTTP Method.
+ * <p>
+ * Generally you'll want to return a <code>405</code> for this result code.
  *
  * @author Daniel DeGroff
  */
-public class NotImplementedException extends ErrorException {
-  public NotImplementedException() {
-    super("not-implemented");
+public class NotAllowedException extends ErrorException {
+  public NotAllowedException() {
+    super("not-allowed");
     lookUpMessage = false;
   }
 }

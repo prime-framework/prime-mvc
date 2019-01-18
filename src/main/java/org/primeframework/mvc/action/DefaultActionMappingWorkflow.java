@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2016, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Set;
 
+import org.primeframework.mvc.NotAllowedException;
 import org.primeframework.mvc.NotImplementedException;
 import org.primeframework.mvc.parameter.DefaultParameterParser;
 import org.primeframework.mvc.parameter.InternalParameters;
@@ -78,7 +79,15 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
       logger.debug("METHOD: " + request.getMethod() + "; URI: " + uri);
     }
 
-    HTTPMethod method = HTTPMethod.valueOf(request.getMethod().toUpperCase());
+    HTTPMethod method = null;
+    boolean notImplemented = false;
+
+    try {
+      method = HTTPMethod.valueOf(request.getMethod().toUpperCase());
+    } catch (IllegalArgumentException e) {
+      notImplemented = true;
+    }
+
     boolean executeResult = InternalParameters.is(request, InternalParameters.EXECUTE_RESULT);
     ActionInvocation actionInvocation = actionMapper.map(method, uri, executeResult);
 
@@ -93,11 +102,16 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
     // Keep the current action in the store if an exception is thrown so that it can be used from the error workflow
     actionInvocationStore.setCurrent(actionInvocation);
 
+    // Throw this after we've set the current action invocation
+    if (notImplemented) {
+      throw new NotImplementedException();
+    }
+
     // Anyone downstream should understand it is possible for the method to be null in the ActionInvocation
     if (actionInvocation.action != null && actionInvocation.method == null) {
       Class<?> actionClass = actionInvocation.configuration.actionClass;
       logger.warn("The action class [" + actionClass.getCanonicalName() + "] does not have a valid execute method for the HTTP method [" + method + "]");
-      throw new NotImplementedException();
+      throw new NotAllowedException();
     }
 
     // Start the timer and grab a meter for errors

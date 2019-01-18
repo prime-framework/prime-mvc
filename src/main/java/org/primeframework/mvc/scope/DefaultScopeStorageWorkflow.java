@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ import com.google.inject.Inject;
  */
 public class DefaultScopeStorageWorkflow implements ScopeStorageWorkflow {
   private final ActionInvocationStore actionInvocationStore;
+
   private final ScopeProvider scopeProvider;
 
   @Inject
@@ -64,7 +65,7 @@ public class DefaultScopeStorageWorkflow implements ScopeStorageWorkflow {
   /**
    * Stores all of the values from the action from into the scopes.
    *
-   * @param action The action to get the values from.
+   * @param action      The action to get the values from.
    * @param scopeFields The scope fields.
    */
   @SuppressWarnings("unchecked")

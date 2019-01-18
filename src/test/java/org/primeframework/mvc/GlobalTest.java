@@ -436,24 +436,31 @@ public class GlobalTest extends PrimeBaseTest {
 
   @Test
   public void notImplemented() {
-    simulator.test("/not-implemented")
+    simulator.test("/not-allowed")
+             .method("POTATO")
+             .assertStatusCode(501);
+  }
+
+  @Test
+  public void notAllowed() {
+    simulator.test("/not-allowed")
              .get()
-             .assertStatusCode(501);
+             .assertStatusCode(405);
 
-    simulator.test("/not-implemented")
+    simulator.test("/not-allowed")
              .post()
-             .assertStatusCode(501);
+             .assertStatusCode(405);
 
-    simulator.test("/not-implemented")
+    simulator.test("/not-allowed")
              .put()
-             .assertStatusCode(501);
+             .assertStatusCode(405);
 
-    simulator.test("/not-implemented")
+    simulator.test("/not-allowed")
              .delete()
-             .assertStatusCode(501);
+             .assertStatusCode(405);
 
-    // head is implemented
-    simulator.test("/not-implemented")
+    // head is allowed
+    simulator.test("/not-allowed")
              .head()
              .assertStatusCode(200);
   }

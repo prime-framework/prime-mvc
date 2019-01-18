@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2016-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,16 @@ import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.annotation.Status;
 
 /**
- * GET, POST, PUT and DELETE are not implemented.
+ * GET, POST, PUT and DELETE are not allowed.
  *
  * @author Daniel DeGroff
  */
 @Action
-@Status(code = "not-implemented", status = 501)
-public class NotImplementedAction {
+@Status.List({
+    @Status(code = "not-allowed", status = 405),
+    @Status(code = "not-implemented", status = 501)
+})
+public class NotAllowedAction {
   public String head() {
     return "success";
   }

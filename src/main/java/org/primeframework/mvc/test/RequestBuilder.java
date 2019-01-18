@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2018, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Base64;
@@ -108,6 +109,18 @@ public class RequestBuilder {
    */
   public RequestResult get() {
     request.setPost(false);
+    run();
+    return new RequestResult(container, filter, request, response, injector);
+  }
+
+  /**
+   * Overrides the HTTP Method from that set by calling {@link #get()} or {@link #post()} for example.
+   *
+   * @param method the string value of an HTTP method, this does not have to be a real HTTP method
+   * @return This.
+   */
+  public RequestResult method(String method) {
+    request.setOverrideMethod(method);
     run();
     return new RequestResult(container, filter, request, response, injector);
   }
@@ -244,11 +257,7 @@ public class RequestBuilder {
    * @return This.
    */
   public RequestBuilder withBody(String body) {
-    try {
-      return withBody(body.getBytes("UTF-8"));
-    } catch (UnsupportedEncodingException e) {
-      throw new IllegalStateException(e);
-    }
+    return withBody(body.getBytes(StandardCharsets.UTF_8));
   }
 
   /**
