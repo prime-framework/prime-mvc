@@ -19,7 +19,7 @@ import javax.servlet.http.Cookie;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -31,7 +31,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -50,6 +52,7 @@ import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.primeframework.mvc.message.SimpleMessage;
 import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.servlet.PrimeFilter;
+import org.primeframework.mvc.util.QueryStringBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -296,7 +299,7 @@ public class RequestResult {
    */
   public RequestResult assertBodyFile(Path path, Object... values) throws IOException {
     if (values.length == 0) {
-      return assertBody(new String(Files.readAllBytes(path), "UTF-8"));
+      return assertBody(new String(Files.readAllBytes(path), StandardCharsets.UTF_8));
     }
     return assertBody(BodyTools.processTemplate(path, values));
   }
@@ -312,7 +315,7 @@ public class RequestResult {
    */
   public RequestResult assertNormalizedBodyFile(Path path, Object... values) throws IOException {
     if (values.length == 0) {
-      return assertNormalizedBody(normalize(new String(Files.readAllBytes(path), "UTF-8")));
+      return assertNormalizedBody(normalize(new String(Files.readAllBytes(path), StandardCharsets.UTF_8)));
     }
     return assertNormalizedBody(normalize(BodyTools.processTemplate(path, values)));
   }
@@ -723,10 +726,10 @@ public class RequestResult {
       throw new AssertionError("\nActual redirect was null. Why do you want to assert on it? Status code was [" + statusCode + "]");
     }
 
-    TestURIBuilder builder = new TestURIBuilder();
+    TestURIBuilder builder = TestURIBuilder.builder(uri);
     consumer.accept(builder);
 
-    String expectedUri = uri + builder.toString();
+    String expectedUri = builder.toString();
     assertRedirectEquality(expectedUri);
     return this;
   }
@@ -917,16 +920,48 @@ public class RequestResult {
   }
 
   private void assertRedirectEquality(String expectedUri) {
-    Map<String, List<String>> actual = uriToMap(redirect);
-    Map<String, List<String>> expected = uriToMap(expectedUri);
+    SortedMap<String, List<String>> actual = uriToMap(redirect);
+    SortedMap<String, List<String>> expected = uriToMap(expectedUri);
 
     if (!actual.equals(expected)) {
-      throw new AssertionError("\nActual redirect not equal to the expected.\n Actual: \t" + redirect + "\n Expected:\t" + expectedUri);
+      // Replace any 'actual' values requested and then try again
+      boolean recheck = replaceWithActualValues(actual, expected);
+      if (!recheck || !actual.equals(expected)) {
+        throw new AssertionError("\nActual redirect not equal to the expected.\n Actual: \t" + redirect + "\n Expected:\t" + expectedUri);
+      }
+
     }
   }
 
-  private Map<String, List<String>> uriToMap(String uri) {
-    Map<String, List<String>> map = new TreeMap<>();
+  private boolean replaceWithActualValues(SortedMap<String, List<String>> actual, Map<String, List<String>> expected) {
+    boolean recheck = false;
+
+    // Bail early they are not even the same size
+    if (actual.keySet().size() != expected.keySet().size()) {
+      return false;
+    }
+
+    List<String> actualKeys = new ArrayList<>(actual.keySet());
+    List<String> expectedKeys = new ArrayList<>(expected.keySet());
+
+    for (int i = 0; i < actualKeys.size(); i++) {
+      if (!Objects.equals(actualKeys.get(i), expectedKeys.get(i))) {
+        return false;
+      }
+
+      List<String> expectedValues = expected.get(actualKeys.get(i));
+      if (expectedValues.get(0).equals("___actual___")) {
+        expectedValues.clear();
+        expectedValues.addAll(actual.get(actualKeys.get(i)));
+        recheck = true;
+      }
+    }
+
+    return recheck;
+  }
+
+  private SortedMap<String, List<String>> uriToMap(String uri) {
+    SortedMap<String, List<String>> map = new TreeMap<>();
     int queryIndex = uri.indexOf("?");
     int fragmentIndex = uri.indexOf("#");
     if (queryIndex == -1 && fragmentIndex == -1) {
@@ -1010,47 +1045,34 @@ public class RequestResult {
     void accept(T t) throws Exception;
   }
 
-  public static class TestURIBuilder {
-    private final StringBuilder sb = new StringBuilder();
+  public static class TestURIBuilder extends QueryStringBuilder {
+    private TestURIBuilder() {
+    }
+
+    private TestURIBuilder(String uri) {
+      super(uri);
+    }
 
     public static TestURIBuilder builder() {
       return new TestURIBuilder();
     }
 
+    public static TestURIBuilder builder(String uri) {
+      return new TestURIBuilder(uri);
+    }
+
+    /**
+     * Add a parameter to the request that you will expect to match the expected. This may be useful if a
+     * timestamp oro other random data is returned that is not important to assert on.
+     *
+     * <strong>This is only intended for use during testing.</strong>
+     *
+     * @param name the parameter name
+     * @return this
+     */
     @Override
-    public String toString() {
-      return sb.toString();
-    }
-
-    public TestURIBuilder beginQuery() {
-      sb.append("?");
-      return this;
-    }
-
-    public TestURIBuilder beginFragment() {
-      sb.append("#");
-      return this;
-    }
-
-    public TestURIBuilder with(String name, Object value) {
-      if (value == null) {
-        return this;
-      }
-
-      if (sb.length() == 0) {
-        sb.append("?");
-      }
-
-      if (sb.length() > 1) {
-        sb.append("&");
-      }
-
-      try {
-        sb.append(name).append("=").append(URLEncoder.encode(value.toString(), "UTF-8"));
-      } catch (UnsupportedEncodingException e) {
-        throw new RuntimeException(e);
-      }
-
+    public TestURIBuilder withActual(String name) {
+      with(name, "___actual___");
       return this;
     }
   }

@@ -398,6 +398,27 @@ public class GlobalTest extends PrimeBaseTest {
                                                                          .with("middle", "out")
                                                                          .with("not", "hotdog")));
 
+    // URL has multiple parameters
+    test.simulate(() -> simulator.test("/complex-redirect")
+                                 .withParameter("redirectURI", "/foo?bar=baz&q=foo&code=bar")
+                                 .get()
+                                 .assertStatusCode(302)
+                                 .assertRedirect("/foo?bar=baz&q=foo&code=bar")
+                                 .assertRedirect("/foo", params -> params.beginQuery()
+                                                                         .with("bar", "baz")
+                                                                         .with("q", "foo")
+                                                                         .with("code", "bar")));
+  }
+
+  @Test
+  public void get_redirect_withActual() throws Exception {
+    // Contains no parameters
+    test.simulate(() -> simulator.test("/complex-redirect")
+                                 .withParameter("redirectURI", "/foo?bing=bam&instant=" + System.currentTimeMillis())
+                                 .get()
+                                 .assertStatusCode(302)
+                                 .assertRedirect("/foo", params -> params.withActual("instant")
+                                                                         .with("bing", "bam")));
   }
 
   @Test

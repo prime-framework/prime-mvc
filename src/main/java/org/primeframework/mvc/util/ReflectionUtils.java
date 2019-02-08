@@ -390,7 +390,7 @@ public class ReflectionUtils {
    * @param object The object to get he field from.
    * @return The value of the field.
    * @throws ExpressionException If any mishap occurred whilst Reflecting sire. All the exceptions that could be thrown
-   * whilst invoking will be wrapped inside the ReflectionException.
+   *     whilst invoking will be wrapped inside the ReflectionException.
    */
   public static Object getField(Field field, Object object) throws ExpressionException {
     try {
@@ -482,9 +482,9 @@ public class ReflectionUtils {
    * @param object The object to invoke the method on.
    * @return The return value of the method.
    * @throws RuntimeException If the target of the InvocationTargetException is a RuntimeException, in which case, it is
-   * re-thrown.
+   *     re-thrown.
    * @throws Error If the target of the InvocationTargetException is an Error, in which case, it is
-   * re-thrown.
+   *     re-thrown.
    */
   public static Object invokeGetter(Method method, Object object) throws RuntimeException, Error {
     return invoke(method, object);
@@ -498,9 +498,9 @@ public class ReflectionUtils {
    * @param object The object to invoke the method on.
    * @param value  The value to set into the method.
    * @throws RuntimeException If the target of the InvocationTargetException is a RuntimeException, in which case, it is
-   * re-thrown.
+   *     re-thrown.
    * @throws Error If the target of the InvocationTargetException is an Error, in which case, it is
-   * re-thrown.
+   *     re-thrown.
    */
   public static void invokeSetter(Method method, Object object, Object value) throws RuntimeException, Error {
     Class[] types = method.getParameterTypes();
@@ -575,7 +575,7 @@ public class ReflectionUtils {
    * @param object The object to set the field on.
    * @param value  The value to set into the field.
    * @throws ExpressionException If any mishap occurred whilst Reflecting sire. All the exceptions that could be thrown
-   * whilst invoking will be wrapped inside the ReflectionException.
+   *     whilst invoking will be wrapped inside the ReflectionException.
    */
   public static void setField(Field field, Object object, Object value) throws ExpressionException {
     Class type = field.getType();
