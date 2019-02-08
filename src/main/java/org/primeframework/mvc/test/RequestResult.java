@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2014-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -726,14 +726,8 @@ public class RequestResult {
     TestURIBuilder builder = new TestURIBuilder();
     consumer.accept(builder);
 
-    String expectedUri = uri + (builder.sb.length() > 0 ? "?" + builder.toString() : "");
-    Map<String, List<String>> expected = uriToMap(expectedUri);
-    Map<String, List<String>> actual = uriToMap(redirect);
-
-    if (!expected.equals(actual)) {
-      throw new AssertionError("\nActual redirect not equal to the expected.\n Actual: \t" + redirect + "\n Expected:\t" + expectedUri);
-    }
-
+    String expectedUri = uri + builder.toString();
+    assertRedirectEquality(expectedUri);
     return this;
   }
 
@@ -748,13 +742,7 @@ public class RequestResult {
       throw new AssertionError("\nActual redirect was null. \nExpected:\t" + expectedUri);
     }
 
-    Map<String, List<String>> actual = uriToMap(redirect);
-    Map<String, List<String>> expected = uriToMap(expectedUri);
-
-    if (!actual.equals(expected)) {
-      throw new AssertionError("\nActual redirect not equal to the expected.\n Actual: \t" + redirect + "\n Expected:\t" + expectedUri);
-    }
-
+    assertRedirectEquality(expectedUri);
     return this;
   }
 
@@ -928,18 +916,55 @@ public class RequestResult {
     return this;
   }
 
+  private void assertRedirectEquality(String expectedUri) {
+    Map<String, List<String>> actual = uriToMap(redirect);
+    Map<String, List<String>> expected = uriToMap(expectedUri);
+
+    if (!actual.equals(expected)) {
+      throw new AssertionError("\nActual redirect not equal to the expected.\n Actual: \t" + redirect + "\n Expected:\t" + expectedUri);
+    }
+  }
+
   private Map<String, List<String>> uriToMap(String uri) {
     Map<String, List<String>> map = new TreeMap<>();
-    int index = uri.indexOf("?");
-    if (index == -1) {
+    int queryIndex = uri.indexOf("?");
+    int fragmentIndex = uri.indexOf("#");
+    if (queryIndex == -1 && fragmentIndex == -1) {
       // First key will be the URI and an empty value, no parameters
       map.put(uri, Collections.emptyList());
       return map;
     }
 
-    // First key will be the URI and a value of "?"
-    map.put(uri.substring(0, index), Collections.singletonList("?"));
-    String params = uri.substring(index + 1);
+    // First key will be the URI and a value of "?" or "#"
+    if (queryIndex != -1) {
+      map.put(uri.substring(0, queryIndex), Collections.singletonList("?"));
+    } else {
+      map.put(uri.substring(0, fragmentIndex), Collections.singletonList("#"));
+    }
+
+    String params;
+    if (queryIndex != -1) {
+      params = uri.substring(queryIndex + 1, (fragmentIndex == -1 ? uri.length() : fragmentIndex));
+    } else {
+      // Only fragment parameters exist
+      params = uri.substring(fragmentIndex + 1);
+    }
+
+    map.putAll(extractParams(params));
+
+    // Collect the fragment parameters now since there are both on the URI
+    if (queryIndex != -1 && fragmentIndex != -1) {
+      params = uri.substring(fragmentIndex + 1);
+      map.putAll(extractParams(params));
+    }
+
+    // Sort the lists so we can check for equality
+    map.values().forEach(l -> l.sort(Comparator.naturalOrder()));
+    return map;
+  }
+
+  private Map<String, List<String>> extractParams(String params) {
+    Map<String, List<String>> map = new TreeMap<>();
     String[] keyValuePairs = params.split("&");
     for (String keyValuePair : keyValuePairs) {
       String[] parts = keyValuePair.split("=");
@@ -949,8 +974,6 @@ public class RequestResult {
       }
     }
 
-    // Sort the lists so we can check for equality
-    map.values().forEach(l -> l.sort(Comparator.naturalOrder()));
     return map;
   }
 
@@ -999,12 +1022,26 @@ public class RequestResult {
       return sb.toString();
     }
 
+    public TestURIBuilder beginQuery() {
+      sb.append("?");
+      return this;
+    }
+
+    public TestURIBuilder beginFragment() {
+      sb.append("#");
+      return this;
+    }
+
     public TestURIBuilder with(String name, Object value) {
       if (value == null) {
         return this;
       }
 
-      if (sb.length() > 0) {
+      if (sb.length() == 0) {
+        sb.append("?");
+      }
+
+      if (sb.length() > 1) {
         sb.append("&");
       }
 

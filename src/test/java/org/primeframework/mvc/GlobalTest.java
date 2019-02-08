@@ -320,6 +320,87 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void get_redirect() throws Exception {
+    // Contains no parameters
+    test.simulate(() -> simulator.test("/complex-redirect")
+                                 .withParameter("redirectURI", "/foo")
+                                 .get()
+                                 .assertStatusCode(302)
+                                 .assertRedirect("/foo"));
+
+    // Contains a single parameter, calling beginQuery is optional
+    test.simulate(() -> simulator.test("/complex-redirect")
+                                 .withParameter("redirectURI", "/foo?bar=baz")
+                                 .get()
+                                 .assertStatusCode(302)
+                                 .assertRedirect("/foo?bar=baz")
+                                 .assertRedirect("/foo", params -> params.with("bar", "baz")));
+
+    // Contains a single parameter with calling beginQuery()
+    test.simulate(() -> simulator.test("/complex-redirect")
+                                 .withParameter("redirectURI", "/foo?bar=baz")
+                                 .get()
+                                 .assertStatusCode(302)
+                                 .assertRedirect("/foo?bar=baz")
+                                 .assertRedirect("/foo", params -> params.beginQuery()
+                                                                         .with("bar", "baz")));
+
+    // Contains multiple parameters
+    test.simulate(() -> simulator.test("/complex-redirect")
+                                 .withParameter("redirectURI", "/foo?bar=baz&boom=dynamite")
+                                 .get()
+                                 .assertStatusCode(302)
+                                 .assertRedirect("/foo?bar=baz&boom=dynamite")
+                                 .assertRedirect("/foo", params -> params.beginQuery()
+                                                                         .with("bar", "baz")
+                                                                         .with("boom", "dynamite")));
+
+    // Contains a single parameter after a fragment
+    test.simulate(() -> simulator.test("/complex-redirect")
+                                 .withParameter("redirectURI", "/foo#bar=baz")
+                                 .get()
+                                 .assertStatusCode(302)
+                                 .assertRedirect("/foo#bar=baz")
+                                 .assertRedirect("/foo", params -> params.beginFragment()
+                                                                         .with("bar", "baz")));
+
+    // Contains multiple parameters after a fragment
+    test.simulate(() -> simulator.test("/complex-redirect")
+                                 .withParameter("redirectURI", "/foo#bar=baz&boom=dynamite")
+                                 .get()
+                                 .assertStatusCode(302)
+                                 .assertRedirect("/foo#bar=baz&boom=dynamite")
+                                 .assertRedirect("/foo", params -> params.beginFragment()
+                                                                         .with("bar", "baz")
+                                                                         .with("boom", "dynamite")));
+
+    // Contains a single parameter and a single parameter after a fragment
+    test.simulate(() -> simulator.test("/complex-redirect")
+                                 .withParameter("redirectURI", "/foo?bar=baz#middle=out")
+                                 .get()
+                                 .assertStatusCode(302)
+                                 .assertRedirect("/foo?bar=baz#middle=out")
+                                 .assertRedirect("/foo", params -> params.beginQuery()
+                                                                         .with("bar", "baz")
+                                                                         .beginFragment()
+                                                                         .with("middle", "out")));
+
+    // Contains multiple parameters and multiple parameters after a fragment
+    test.simulate(() -> simulator.test("/complex-redirect")
+                                 .withParameter("redirectURI", "/foo?bar=baz&boom=dynamite#middle=out&not=hotdog")
+                                 .get()
+                                 .assertStatusCode(302)
+                                 .assertRedirect("/foo?bar=baz&boom=dynamite#middle=out&not=hotdog")
+                                 .assertRedirect("/foo", params -> params.beginQuery()
+                                                                         .with("bar", "baz")
+                                                                         .with("boom", "dynamite")
+                                                                         .beginFragment()
+                                                                         .with("middle", "out")
+                                                                         .with("not", "hotdog")));
+
+  }
+
+  @Test
   public void get_index() throws Exception {
     test.simulate(() -> simulator.test("/user/")
                                  .get()

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2015-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import org.testng.annotations.Test;
 public class AcceptanceTest extends PrimeBaseTest {
 
   @Test
-  public void get_absoluteForward() throws Exception {
+  public void get_absoluteForward() {
     simulator.test("/absolute-forward-result")
              .get()
              .assertStatusCode(200)
@@ -31,7 +31,7 @@ public class AcceptanceTest extends PrimeBaseTest {
   }
 
   @Test
-  public void get_action_noTemplate() throws Exception {
+  public void get_action_noTemplate() {
     simulator.test("/no-template")
              .expectException(PrimeException.class)
              .get()
@@ -40,7 +40,7 @@ public class AcceptanceTest extends PrimeBaseTest {
   }
 
   @Test
-  public void get_action_withTemplate() throws Exception {
+  public void get_action_withTemplate() {
     simulator.test("/action-template")
              .get()
              .assertStatusCode(200)
@@ -49,7 +49,7 @@ public class AcceptanceTest extends PrimeBaseTest {
   }
 
   @Test
-  public void get_defaultForward() throws Exception {
+  public void get_defaultForward() {
     simulator.test("/default-forward-result")
              .get()
              .assertStatusCode(200)
@@ -57,7 +57,7 @@ public class AcceptanceTest extends PrimeBaseTest {
   }
 
   @Test
-  public void get_noAction_noTemplate() throws Exception {
+  public void get_noAction_noTemplate() {
     // simulator doesn't support chain.continueWorkflow(), so we'll get UnsupportedOperationException
     simulator.test("/no-action-no-template")
              .expectException(UnsupportedOperationException.class)
@@ -67,7 +67,7 @@ public class AcceptanceTest extends PrimeBaseTest {
   }
 
   @Test
-  public void get_noAction_withTemplate() throws Exception {
+  public void get_noAction_withTemplate() {
     simulator.test("/actionless")
              .get()
              .assertStatusCode(200)
@@ -75,7 +75,7 @@ public class AcceptanceTest extends PrimeBaseTest {
   }
 
   @Test
-  public void get_nonPrimeResourceEndingWithSlash() throws Exception {
+  public void get_nonPrimeResourceEndingWithSlash() {
     // simulator doesn't support chain.continueWorkflow(), so we'll get UnsupportedOperationException
     simulator.test("/potato/")
              .expectException(UnsupportedOperationException.class)
@@ -85,7 +85,7 @@ public class AcceptanceTest extends PrimeBaseTest {
   }
 
   @Test
-  public void get_redirectToIndex() throws Exception {
+  public void get_redirectToIndex() {
     simulator.test("/redirect")
              .get()
              .assertStatusCode(301)
@@ -93,7 +93,7 @@ public class AcceptanceTest extends PrimeBaseTest {
   }
 
   @Test
-  public void get_redirectToIndexWithTrailingSlash() throws Exception {
+  public void get_redirectToIndexWithTrailingSlash() {
     simulator.test("/redirect/")
              .get()
              .assertStatusCode(200)
@@ -101,7 +101,7 @@ public class AcceptanceTest extends PrimeBaseTest {
   }
 
   @Test
-  public void get_relativeForward() throws Exception {
+  public void get_relativeForward() {
     simulator.test("/relative-forward-result")
              .get()
              .assertStatusCode(200)
