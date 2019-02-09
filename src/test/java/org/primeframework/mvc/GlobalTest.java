@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2018, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -207,7 +207,7 @@ public class GlobalTest extends PrimeBaseTest {
                                  .assertJSONFile(Paths.get("src/test/resources/json/views/entry/entry-export.json")));
 
     // Serialize an object using @JSONResponse when no view is specified for an object that has only annotated fields
-    // The DEFAULT_VIEW_INCLUSION is the default value, but expliclty configured in case the default prime configuration changes
+    // The DEFAULT_VIEW_INCLUSION is the default value, but explicitly configured in case the default prime configuration changes
     test.configureObjectMapper(om -> objectMapper.enable(MapperFeature.DEFAULT_VIEW_INCLUSION))
         .simulate(() -> simulator.test("/views/entry/no-view-defined")
                                  .get()
