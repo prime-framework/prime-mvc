@@ -59,10 +59,46 @@ public class RequestSimulator {
    * @throws ServletException If the initialization of the PrimeServletContextListener failed.
    */
   public RequestSimulator(final MockContainer container, Module mainModule) throws ServletException {
-    // This isn't necessary if you override the ServletModule. Leaving in case anyone wishes to use this.
     ServletObjectsHolder.setServletContext(container.getContext());
     this.container = container;
     this.injector = GuiceBootstrap.initialize(mainModule);
+    this.container.getContext().setAttribute(PrimeServletContextListener.GUICE_INJECTOR_KEY, this.injector);
+    logger.debug("Built RequestSimulator with context webDir " + container.getContext().webDir.getAbsolutePath());
+    this.filter.init(new FilterConfig() {
+      @Override
+      public String getFilterName() {
+        return "prime";
+      }
+
+      @Override
+      public ServletContext getServletContext() {
+        return container.getContext();
+      }
+
+      @Override
+      public String getInitParameter(String s) {
+        return null;
+      }
+
+      @Override
+      public Enumeration<String> getInitParameterNames() {
+        return null;
+      }
+    });
+  }
+
+  /**
+   * Creates a new request simulator that can be used to simulate requests to a Prime application.
+   *
+   * @param container The application container to use for this simulator.
+   * @param injector  The Guice injector.
+   * @throws ServletException If the initialization of the PrimeServletContextListener failed.
+   */
+  public RequestSimulator(final MockContainer container, Injector injector) throws ServletException {
+    // This isn't necessary if you override the ServletModule. Leaving in case anyone wishes to use this.
+    ServletObjectsHolder.setServletContext(container.getContext());
+    this.container = container;
+    this.injector = injector;
     this.container.getContext().setAttribute(PrimeServletContextListener.GUICE_INJECTOR_KEY, this.injector);
     logger.debug("Built RequestSimulator with context webDir " + container.getContext().webDir.getAbsolutePath());
     this.filter.init(new FilterConfig() {
