@@ -828,8 +828,7 @@ public class RequestResult {
       //noinspection StringConcatenationInsideStringBufferAppend
       fieldMessages.forEach(m -> sb.append("\t\t" + m.getType() + "\tField: " + m.getField() + " Code: " + m.getCode() + "\t" + ((m instanceof SimpleFieldMessage) ? ((SimpleFieldMessage) m).message : "") + "\n"));
 
-      sb.append("\nRedirect: [" + redirect + "]\n");
-      sb.append("Response body: \n" + body);
+      sb.append("\nRedirect: [").append(redirect).append("]\n").append("Response body: \n").append(body);
       throw new AssertionError(sb.toString());
     }
 

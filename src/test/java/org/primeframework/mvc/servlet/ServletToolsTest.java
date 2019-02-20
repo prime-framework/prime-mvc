@@ -16,16 +16,12 @@
  */
 package org.primeframework.mvc.servlet;
 
-import javax.servlet.http.HttpServletRequest;
-import java.net.URL;
+import java.net.URI;
 
 import org.primeframework.mock.servlet.MockContainer;
 import org.primeframework.mock.servlet.MockHttpServletRequest;
 import org.testng.annotations.Test;
 
-import static org.easymock.EasyMock.createStrictMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.testng.Assert.assertEquals;
 
 /**
@@ -34,31 +30,69 @@ import static org.testng.Assert.assertEquals;
  * @author James Humphrey
  */
 public class ServletToolsTest {
+//  @Test
+//  public void buildBaseUrlWithPortZero() {
+//    HttpServletRequest req = createStrictMock(HttpServletRequest.class);
+//    expect(req.getScheme()).andReturn("http");
+//    expect(req.getServerName()).andReturn("www.Inversoft Inc.");
+//    expect(req.getServerPort()).andReturn(0);
+//    replay(req);
+//
+//    URL url = ServletTools.getBaseUrl(req);
+//
+//    assertEquals(url.toString(), "http://www.Inversoft Inc./");
+//  }
+//
+//  @Test
+//  public void buildBaseUrlWithPort() {
+//    HttpServletRequest req = createStrictMock(HttpServletRequest.class);
+//    expect(req.getScheme()).andReturn("http");
+//    expect(req.getServerName()).andReturn("www.inversoft.com");
+//    expect(req.getServerPort()).andReturn(8080);
+//    replay(req);
+//
+//    URL url = ServletTools.getBaseUrl(req);
+//
+//    assertEquals(url.toString(), "http://www.inversoft.com:8080/");
+//  }
 
   @Test
-  public void buildBaseUrlWithPortZero() {
-    HttpServletRequest req = createStrictMock(HttpServletRequest.class);
-    expect(req.getScheme()).andReturn("http");
-    expect(req.getServerName()).andReturn("www.Inversoft Inc.");
-    expect(req.getServerPort()).andReturn(0);
-    replay(req);
+  public void buildBaseURI() {
+    MockContainer container = new MockContainer();
+    MockHttpServletRequest req = container.newServletRequest("http://www.example.com:9011/foo/bar");
+    req.setScheme("http");
+    req.setServerPort(9011);
+    req.setServerName("www.example.com");
 
-    URL url = ServletTools.getBaseUrl(req);
+    URI uri = ServletTools.getBaseURI(req);
+    assertEquals(uri.toString(), "http://www.example.com:9011");
 
-    assertEquals(url.toString(), "http://www.Inversoft Inc./");
-  }
+    req.setScheme("http");
+    req.setServerPort(80);
+    uri = ServletTools.getBaseURI(req);
+    assertEquals(uri.toString(), "http://www.example.com");
 
-  @Test
-  public void buildBaseUrlWithPort() {
-    HttpServletRequest req = createStrictMock(HttpServletRequest.class);
-    expect(req.getScheme()).andReturn("http");
-    expect(req.getServerName()).andReturn("www.Inversoft Inc.");
-    expect(req.getServerPort()).andReturn(8080);
-    replay(req);
+    req.setScheme("https");
+    req.setServerPort(80);
+    uri = ServletTools.getBaseURI(req);
+    assertEquals(uri.toString(), "https://www.example.com:80");
 
-    URL url = ServletTools.getBaseUrl(req);
+    req.setScheme("https");
+    req.setServerPort(443);
+    uri = ServletTools.getBaseURI(req);
+    assertEquals(uri.toString(), "https://www.example.com");
 
-    assertEquals(url.toString(), "http://www.Inversoft Inc.:8080/");
+    req.addHeader("X-Forwarded-Host", "foobar.com");
+    uri = ServletTools.getBaseURI(req);
+    assertEquals(uri.toString(), "https://foobar.com");
+
+    req.addHeader("X-Forwarded-Proto", "http");
+    uri = ServletTools.getBaseURI(req);
+    assertEquals(uri.toString(), "http://foobar.com:443");
+
+    req.addHeader("X-Forwarded-Port", "80");
+    uri = ServletTools.getBaseURI(req);
+    assertEquals(uri.toString(), "http://foobar.com");
   }
 
   @Test

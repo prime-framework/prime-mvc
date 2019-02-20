@@ -15,7 +15,14 @@
  */
 package org.primeframework.mvc.security;
 
+import javax.servlet.http.HttpServletRequest;
+import java.net.URI;
+
 import com.google.inject.Inject;
+import org.primeframework.mvc.config.MVCConfiguration;
+import org.primeframework.mvc.servlet.HTTPMethod;
+import org.primeframework.mvc.servlet.ServletTools;
+import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 /**
  * A security scheme that authenticates and authorizes users using a UserLoginSecurityContext implementation.
@@ -23,13 +30,23 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 public class UserLoginSecurityScheme implements SecurityScheme {
+  private final MVCConfiguration configuration;
+
   private final UserLoginConstraintsValidator constraintsValidator;
+
+  private final HTTPMethod method;
+
+  private final HttpServletRequest request;
 
   private UserLoginSecurityContext userLoginSecurityContext;
 
   @Inject
-  public UserLoginSecurityScheme(UserLoginConstraintsValidator constraintsValidator) {
+  public UserLoginSecurityScheme(MVCConfiguration configuration, UserLoginConstraintsValidator constraintsValidator,
+                                 HttpServletRequest request, HTTPMethod method) {
+    this.configuration = configuration;
     this.constraintsValidator = constraintsValidator;
+    this.request = request;
+    this.method = method;
   }
 
   @Override
@@ -46,6 +63,32 @@ public class UserLoginSecurityScheme implements SecurityScheme {
     // Check roles
     if (!constraintsValidator.validate(constraints)) {
       throw new UnauthorizedException();
+    }
+
+    if (!configuration.csrfEnabled()) {
+      return;
+    }
+
+    // CSRF on POST only
+    if (method == HTTPMethod.POST) {
+      // Check for CSRF request origins
+      String source = defaultIfNull(request.getHeader("Origin"), request.getHeader("Referer"));
+      if (source == null) {
+        throw new UnauthorizedException();
+      }
+
+      URI uri = ServletTools.getBaseURI(request);
+      URI sourceURI = URI.create(source);
+      if (!uri.getScheme().equals(sourceURI.getScheme()) || uri.getPort() != sourceURI.getPort() || !uri.getHost().equals(sourceURI.getHost())) {
+        throw new UnauthorizedException();
+      }
+
+      // Handle CSRF tokens (for POST only) and remove it from the parameter map
+      String token = CSRF.getSessionToken(request);
+      String formToken = CSRF.getParameterToken(request);
+      if (token != null && !token.equals(formToken)) {
+        throw new UnauthorizedException();
+      }
     }
   }
 

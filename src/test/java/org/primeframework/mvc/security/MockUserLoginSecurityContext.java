@@ -15,35 +15,26 @@
  */
 package org.primeframework.mvc.security;
 
-import java.util.Collections;
+import javax.servlet.http.HttpServletRequest;
+import java.util.HashSet;
 import java.util.Set;
+
+import com.google.inject.Inject;
+import org.primeframework.mvc.config.MVCConfiguration;
 
 /**
  * @author Daniel DeGroff
  */
-public class MockUserLoginSecurityContext implements UserLoginSecurityContext {
-  @Override
-  public Object getCurrentUser() {
-    return null;
+public class MockUserLoginSecurityContext extends BaseHttpSessionUserLoginSecurityContext {
+  public static Set<String> roles = new HashSet<>();
+
+  @Inject
+  public MockUserLoginSecurityContext(MVCConfiguration configuration, HttpServletRequest request) {
+    super(configuration, request);
   }
 
   @Override
   public Set<String> getCurrentUsersRoles() {
-    return Collections.emptySet();
-  }
-
-  @Override
-  public boolean isLoggedIn() {
-    return false;
-  }
-
-  @Override
-  public void login(Object user) {
-
-  }
-
-  @Override
-  public void logout() {
-
+    return roles;
   }
 }

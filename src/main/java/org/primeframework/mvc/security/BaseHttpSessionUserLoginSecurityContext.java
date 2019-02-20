@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import com.google.inject.Inject;
+import org.primeframework.mvc.config.MVCConfiguration;
 
 /**
  * Uses the HttpSession object to store the user.
@@ -28,10 +29,13 @@ import com.google.inject.Inject;
 public abstract class BaseHttpSessionUserLoginSecurityContext implements UserLoginSecurityContext {
   public static final String USER_SESSION_KEY = "prime-mvc-security-user";
 
+  private final MVCConfiguration configuration;
+
   private final HttpServletRequest request;
 
   @Inject
-  public BaseHttpSessionUserLoginSecurityContext(HttpServletRequest request) {
+  public BaseHttpSessionUserLoginSecurityContext(MVCConfiguration configuration, HttpServletRequest request) {
+    this.configuration = configuration;
     this.request = request;
   }
 
@@ -55,6 +59,10 @@ public abstract class BaseHttpSessionUserLoginSecurityContext implements UserLog
     HttpSession session = request.getSession();
     if (session == null) {
       throw new IllegalStateException("Unable to create session");
+    }
+
+    if (configuration.csrfEnabled()) {
+      CSRF.storeToken(session);
     }
 
     session.setAttribute(USER_SESSION_KEY, user);

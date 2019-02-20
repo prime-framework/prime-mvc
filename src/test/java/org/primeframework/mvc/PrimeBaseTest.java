@@ -29,6 +29,15 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import com.codahale.metrics.MetricRegistry;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.AbstractModule;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
+import com.google.inject.Module;
+import com.google.inject.TypeLiteral;
+import com.google.inject.util.Modules;
+import io.fusionauth.jwt.Verifier;
 import org.example.action.user.EditAction;
 import org.primeframework.mock.servlet.MockContainer;
 import org.primeframework.mock.servlet.MockHttpServletRequest;
@@ -54,16 +63,6 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 
-import com.codahale.metrics.MetricRegistry;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.inject.AbstractModule;
-import com.google.inject.Inject;
-import com.google.inject.Injector;
-import com.google.inject.Module;
-import com.google.inject.TypeLiteral;
-import com.google.inject.util.Modules;
-import io.fusionauth.jwt.Verifier;
-
 /**
  * This class is a base test for testing the Prime framework. It isn't recommended to use it outside of the Prime
  * project.
@@ -71,6 +70,8 @@ import io.fusionauth.jwt.Verifier;
  * @author Brian Pontarelli and James Humphrey
  */
 public abstract class PrimeBaseTest {
+  public static MockConfiguration configuration = new MockConfiguration();
+
   protected static MockContainer container;
 
   protected static Injector injector;
@@ -78,8 +79,6 @@ public abstract class PrimeBaseTest {
   protected static MetricRegistry metricRegistry = new MetricRegistry();
 
   protected static RequestSimulator simulator;
-
-  @Inject public MVCConfiguration configuration;
 
   @Inject public ObjectMapper objectMapper;
 
@@ -130,6 +129,12 @@ public abstract class PrimeBaseTest {
     metricRegistry = injector.getInstance(MetricRegistry.class);
     // clear the metric registry before each test
     metricRegistry.getNames().forEach(metricRegistry::remove);
+
+    // Clear the roles
+    MockUserLoginSecurityContext.roles.clear();
+
+    // Reset CSRF configuration
+    configuration.csrfEnabled = false;
   }
 
   @AfterMethod
@@ -168,7 +173,8 @@ public abstract class PrimeBaseTest {
    * @return The action invocation.
    * @throws Exception If the construction fails.
    */
-  protected ActionInvocation makeActionInvocation(Object action, HTTPMethod httpMethod, String extension) throws Exception {
+  protected ActionInvocation makeActionInvocation(Object action, HTTPMethod httpMethod, String extension)
+      throws Exception {
     DefaultActionConfigurationBuilder builder = injector.getInstance(DefaultActionConfigurationBuilder.class);
     ActionConfiguration actionConfiguration = builder.build(action.getClass());
     return new ActionInvocation(action, actionConfiguration.executeMethods.get(httpMethod), actionConfiguration.uri, extension, actionConfiguration);
@@ -183,19 +189,11 @@ public abstract class PrimeBaseTest {
    * @return The action invocation.
    * @throws Exception If the construction fails.
    */
-  protected ActionInvocation makeActionInvocation(Object action, HTTPMethod httpMethod, String extension, Map<String, List<String>> uriParameters) throws Exception {
+  protected ActionInvocation makeActionInvocation(Object action, HTTPMethod httpMethod, String extension,
+                                                  Map<String, List<String>> uriParameters) throws Exception {
     DefaultActionConfigurationBuilder builder = injector.getInstance(DefaultActionConfigurationBuilder.class);
     ActionConfiguration actionConfiguration = builder.build(action.getClass());
     return new ActionInvocation(action, actionConfiguration.executeMethods.get(httpMethod), actionConfiguration.uri, extension, uriParameters, actionConfiguration, true);
-  }
-
-  @SuppressWarnings("unchecked")
-  protected Map<String, List<String>> map(Object... params) {
-    Map<String, List<String>> map = new HashMap<>();
-    for (int i = 0; i < params.length; i += 2) {
-      map.put(params[i].toString(), (List<String>) params[i + 1]);
-    }
-    return map;
   }
 
   /**
@@ -210,7 +208,8 @@ public abstract class PrimeBaseTest {
    * @throws Exception If the construction fails.
    */
   protected ActionInvocation makeActionInvocation(HTTPMethod httpMethod, Object action, String methodName, String uri,
-                                                  String extension, String resultCode, Annotation annotation) throws Exception {
+                                                  String extension, String resultCode, Annotation annotation)
+      throws Exception {
     Method method = action.getClass().getMethod(methodName);
     ExecuteMethodConfiguration executeMethod = new ExecuteMethodConfiguration(httpMethod, method, method.getAnnotation(Validation.class));
     Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods = new HashMap<>();
@@ -226,6 +225,15 @@ public abstract class PrimeBaseTest {
             new ArrayList<>()));
   }
 
+  @SuppressWarnings("unchecked")
+  protected Map<String, List<String>> map(Object... params) {
+    Map<String, List<String>> map = new HashMap<>();
+    for (int i = 0; i < params.length; i += 2) {
+      map.put(params[i].toString(), (List<String>) params[i + 1]);
+    }
+    return map;
+  }
+
   public static class TestContentModule extends AbstractModule {
     @Override
     protected void configure() {
@@ -236,7 +244,7 @@ public abstract class PrimeBaseTest {
   public static class TestMVCConfigurationModule extends AbstractModule {
     @Override
     protected void configure() {
-      bind(MVCConfiguration.class).toInstance(new MockConfiguration());
+      bind(MVCConfiguration.class).toInstance(configuration);
     }
   }
 
@@ -244,7 +252,8 @@ public abstract class PrimeBaseTest {
     public static TestBuilder test;
 
     @Inject
-    public TestObjectMapperProvider(Set<com.fasterxml.jackson.databind.Module> jacksonModules, MVCConfiguration configuration) {
+    public TestObjectMapperProvider(Set<com.fasterxml.jackson.databind.Module> jacksonModules,
+                                    MVCConfiguration configuration) {
       super(jacksonModules, configuration);
     }
 

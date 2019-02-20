@@ -32,6 +32,7 @@ import org.primeframework.mvc.control.form.JoinMethod;
 import org.primeframework.mvc.control.message.Message;
 import org.primeframework.mvc.freemarker.FreeMarkerService;
 import org.primeframework.mvc.message.l10n.MessageProvider;
+import org.primeframework.mvc.security.CSRF;
 import org.primeframework.mvc.util.ErrorList;
 
 import com.google.inject.Inject;
@@ -172,6 +173,7 @@ public abstract class AbstractControl implements Control {
    * values in the root map:
    * <p>
    * <ul>
+   * <li>csrfToken - The CSRF token in the session (if it exists)</li>
    * <li>attributes - The attributes</li>
    * <li>dynamic_attributes - The dynamic attributes</li>
    * </ul>
@@ -180,6 +182,7 @@ public abstract class AbstractControl implements Control {
    */
   protected Map<String, Object> makeParameters() {
     Map<String, Object> parameters = new HashMap<>();
+    parameters.put("csrfToken", CSRF.getSessionToken(request));
     parameters.put("attributes", attributes);
     parameters.put("dynamicAttributes", dynamicAttributes);
     parameters.put("join", new JoinMethod(freeMarkerConfig.getObjectWrapper()));

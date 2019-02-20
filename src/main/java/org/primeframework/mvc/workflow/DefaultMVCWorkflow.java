@@ -19,6 +19,7 @@ import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.List;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.ErrorException;
 import org.primeframework.mvc.action.ActionInvocationWorkflow;
 import org.primeframework.mvc.action.ActionMappingWorkflow;
@@ -34,8 +35,6 @@ import org.primeframework.mvc.scope.ScopeStorageWorkflow;
 import org.primeframework.mvc.security.SavedRequestWorkflow;
 import org.primeframework.mvc.security.SecurityWorkflow;
 import org.primeframework.mvc.validation.ValidationWorkflow;
-
-import com.google.inject.Inject;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 
@@ -75,14 +74,15 @@ public class DefaultMVCWorkflow implements MVCWorkflow {
     this.errorWorkflow = errorWorkflow;
     this.workflows = asList(savedRequestWorkflow, requestBodyWorkflow, staticResourceWorkflow, actionMappingWorkflow,
         messageWorkflow, scopeRetrievalWorkflow, uriParameterWorkflow, parameterWorkflow,
-        contentWorkflow, postParameterWorkflow, securityWorkflow, validationWorkflow, actionInvocationWorkflow, scopeStorageWorkflow, resultInvocationWorkflow);
+        contentWorkflow, postParameterWorkflow, securityWorkflow, validationWorkflow, actionInvocationWorkflow,
+        scopeStorageWorkflow, resultInvocationWorkflow);
   }
 
   /**
    * Creates a sub-chain of the MVC workflows and invokes it.
    *
    * @param workflowChain The chain.
-   * @throws IOException If the sub-chain throws an IOException
+   * @throws IOException      If the sub-chain throws an IOException
    * @throws ServletException If the sub-chain throws an ServletException
    */
   public void perform(WorkflowChain workflowChain) throws IOException, ServletException {

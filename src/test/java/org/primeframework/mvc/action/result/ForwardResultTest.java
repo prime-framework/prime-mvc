@@ -70,7 +70,7 @@ public class ForwardResultTest extends PrimeBaseTest {
     service.render(writer, "/foo/bar.ftl", map);
     replay(service);
 
-    configuration = createStrictMock(MVCConfiguration.class);
+    MVCConfiguration configuration = createStrictMock(MVCConfiguration.class);
     expect(configuration.resourceDirectory()).andReturn("").anyTimes();
     replay(configuration);
 

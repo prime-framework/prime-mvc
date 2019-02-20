@@ -18,6 +18,7 @@ package org.primeframework.mvc.control.form;
 import java.io.Writer;
 import java.util.Map;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
@@ -34,8 +35,6 @@ import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.servlet.ServletTools;
 import org.primeframework.mvc.workflow.DefaultMVCWorkflow;
 
-import com.google.inject.Inject;
-
 /**
  * This is the form control that is used for rendering the open and close form tags.
  *
@@ -45,24 +44,26 @@ import com.google.inject.Inject;
     @ControlAttribute(name = "action")
 })
 public class Form extends AbstractControl {
-  private final FormPreparer formPreparer;
-
   private final ActionInvocationStore actionInvocationStore;
 
   private final ActionMapper actionMapper;
 
-  private final ScopeRetriever scopeRetriever;
+  private final FormPreparer formPreparer;
 
-  private final PostParameterHandler postParameterHandler;
+  private final ParameterHandler parameterHandler;
 
   private final ParameterParser parameterParser;
 
-  private final ParameterHandler parameterHandler;
+  private final PostParameterHandler postParameterHandler;
+
+  private final ScopeRetriever scopeRetriever;
 
   private boolean differentURI = false;
 
   @Inject
-  public Form(FormPreparer formPreparer, ActionInvocationStore actionInvocationStore, ActionMapper actionMapper, ParameterParser parameterParser, ParameterHandler parameterHandler, PostParameterHandler postParameterHandler, ScopeRetriever scopeRetriever) {
+  public Form(FormPreparer formPreparer, ActionInvocationStore actionInvocationStore, ActionMapper actionMapper,
+              ParameterParser parameterParser, ParameterHandler parameterHandler,
+              PostParameterHandler postParameterHandler, ScopeRetriever scopeRetriever) {
     this.formPreparer = formPreparer;
     this.actionInvocationStore = actionInvocationStore;
     this.actionMapper = actionMapper;
@@ -70,6 +71,21 @@ public class Form extends AbstractControl {
     this.parameterParser = parameterParser;
     this.postParameterHandler = postParameterHandler;
     this.scopeRetriever = scopeRetriever;
+  }
+
+  /**
+   * Overrides the renderEnd method to pop the action invocation of the form from the stack.
+   *
+   * @param writer The writer to output to.
+   */
+  @Override
+  public void renderEnd(Writer writer) {
+    if (differentURI) {
+      actionInvocationStore.removeCurrent();
+      differentURI = false;
+    }
+
+    super.renderEnd(writer);
   }
 
   /**
@@ -135,18 +151,10 @@ public class Form extends AbstractControl {
   }
 
   /**
-   * Overrides the renderEnd method to pop the action invocation of the form from the stack.
-   *
-   * @param writer The writer to output to.
+   * @return form-end.ftl
    */
-  @Override
-  public void renderEnd(Writer writer) {
-    if (differentURI) {
-      actionInvocationStore.removeCurrent();
-      differentURI = false;
-    }
-
-    super.renderEnd(writer);
+  protected String endTemplateName() {
+    return "form-end.ftl";
   }
 
   /**
@@ -157,16 +165,9 @@ public class Form extends AbstractControl {
   }
 
   /**
-   * @return form-end.ftl
-   */
-  protected String endTemplateName() {
-    return "form-end.ftl";
-  }
-
-  /**
    * Fill out the action so that when the form prepare methods are called the action is properly constructed. This is
-   * intended to be used when this action invocation is not really the current, but it has been set as the
-   * current to handle embedded forms.
+   * intended to be used when this action invocation is not really the current, but it has been set as the current to
+   * handle embedded forms.
    * <p>
    * Any equivalent workflow tasks performed should follow the same order as used in the {@link DefaultMVCWorkflow}
    *

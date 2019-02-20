@@ -63,7 +63,6 @@ public class DefaultParameterParser implements ParameterParser {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public Parameters parse() {
     Map<String, String[]> parameters = request.getParameterMap();
     Parameters result = new Parameters();

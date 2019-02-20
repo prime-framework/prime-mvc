@@ -280,7 +280,7 @@ public class RequestBodyWorkflow implements Workflow {
     public final Map<String, List<String>> parameters = new HashMap<>();
   }
 
-  private static class ParameterHttpServletRequestWrapper extends HttpServletRequestWrapper {
+  public static class ParameterHttpServletRequestWrapper extends HttpServletRequestWrapper {
     private final Map<String, String[]> parameters;
 
     public ParameterHttpServletRequestWrapper(HttpServletRequest previous, Map<String, String[]> parameters) {

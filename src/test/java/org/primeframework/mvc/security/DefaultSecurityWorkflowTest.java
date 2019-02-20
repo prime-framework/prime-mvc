@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.google.inject.Inject;
 import org.example.action.PostAction;
 import org.example.action.SecureAction;
 import org.example.action.SecureNoRolesAction;
@@ -29,12 +30,11 @@ import org.primeframework.mvc.action.DefaultActionInvocationStore;
 import org.primeframework.mvc.action.ExecuteMethodConfiguration;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.config.DefaultActionConfigurationBuilder;
+import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.security.guice.SecuritySchemeFactory;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
-
-import com.google.inject.Inject;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static org.easymock.EasyMock.createStrictMock;
@@ -56,8 +56,8 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
     DefaultActionInvocationStore store = new DefaultActionInvocationStore(request);
     store.setCurrent(actionInvocation);
 
-    TestUserLoginSecurityContext securityContext = new TestUserLoginSecurityContext(request, emptySet());
-    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, new TestSecuritySchemeFactory(securityContext));
+    TestUserLoginSecurityContext securityContext = new TestUserLoginSecurityContext(super.configuration, request, emptySet());
+    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, new TestSecuritySchemeFactory(super.configuration, securityContext, request));
 
     WorkflowChain workflowChain = createStrictMock(WorkflowChain.class);
     workflowChain.continueWorkflow();
@@ -76,13 +76,17 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
     DefaultActionInvocationStore store = new DefaultActionInvocationStore(request);
     store.setCurrent(actionInvocation);
 
-    TestUserLoginSecurityContext securityContext = new TestUserLoginSecurityContext(request, new HashSet<>(singletonList("bad")));
-    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, new TestSecuritySchemeFactory(securityContext));
+    TestUserLoginSecurityContext securityContext = new TestUserLoginSecurityContext(super.configuration, request, new HashSet<>(singletonList("bad")));
+    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, new TestSecuritySchemeFactory(super.configuration, securityContext, request));
     request.getSession().setAttribute(BaseHttpSessionUserLoginSecurityContext.USER_SESSION_KEY, "user"); // Log in the user
 
     WorkflowChain workflowChain = createStrictMock(WorkflowChain.class);
     workflowChain.continueWorkflow();
     replay(workflowChain);
+
+    // Setup CSRF Origin and Referer
+    request.setServerName("example.com");
+    request.addHeader("Origin", "http://example.com:10000");
 
     workflow.perform(workflowChain);
 
@@ -102,8 +106,8 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
     request.getParameters().put("test", singletonList("value"));
     request.getParameters().put("test2", singletonList("value2"));
 
-    TestUserLoginSecurityContext securityContext = new TestUserLoginSecurityContext(request, emptySet());
-    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, new TestSecuritySchemeFactory(securityContext));
+    TestUserLoginSecurityContext securityContext = new TestUserLoginSecurityContext(super.configuration, request, emptySet());
+    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, new TestSecuritySchemeFactory(super.configuration, securityContext, request));
 
     WorkflowChain workflowChain = createStrictMock(WorkflowChain.class);
     replay(workflowChain);
@@ -131,8 +135,8 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
     request.getParameters().put("test", singletonList("value"));
     request.getParameters().put("test2", singletonList("value2"));
 
-    TestUserLoginSecurityContext securityContext = new TestUserLoginSecurityContext(request, emptySet());
-    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, new TestSecuritySchemeFactory(securityContext));
+    TestUserLoginSecurityContext securityContext = new TestUserLoginSecurityContext(super.configuration, request, emptySet());
+    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, new TestSecuritySchemeFactory(super.configuration, securityContext, request));
 
     WorkflowChain workflowChain = createStrictMock(WorkflowChain.class);
     replay(workflowChain);
@@ -155,13 +159,17 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
     DefaultActionInvocationStore store = new DefaultActionInvocationStore(request);
     store.setCurrent(actionInvocation);
 
-    TestUserLoginSecurityContext securityContext = new TestUserLoginSecurityContext(request, new HashSet<>(singletonList("admin")));
-    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, new TestSecuritySchemeFactory(securityContext));
+    TestUserLoginSecurityContext securityContext = new TestUserLoginSecurityContext(super.configuration, request, new HashSet<>(singletonList("admin")));
+    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, new TestSecuritySchemeFactory(super.configuration, securityContext, request));
     request.getSession().setAttribute(BaseHttpSessionUserLoginSecurityContext.USER_SESSION_KEY, "user"); // Log in the user
 
     WorkflowChain workflowChain = createStrictMock(WorkflowChain.class);
     workflowChain.continueWorkflow();
     replay(workflowChain);
+
+    // Setup CSRF Origin and Referer
+    request.setServerName("example.com");
+    request.addHeader("Origin", "http://example.com:10000");
 
     workflow.perform(workflowChain);
 
@@ -176,8 +184,8 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
     DefaultActionInvocationStore store = new DefaultActionInvocationStore(request);
     store.setCurrent(actionInvocation);
 
-    TestUserLoginSecurityContext securityContext = new TestUserLoginSecurityContext(request, new HashSet<>(singletonList("bad")));
-    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, new TestSecuritySchemeFactory(securityContext));
+    TestUserLoginSecurityContext securityContext = new TestUserLoginSecurityContext(super.configuration, request, new HashSet<>(singletonList("bad")));
+    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, new TestSecuritySchemeFactory(super.configuration, securityContext, request));
     request.getSession().setAttribute(BaseHttpSessionUserLoginSecurityContext.USER_SESSION_KEY, "user"); // Log in the user
 
     WorkflowChain workflowChain = createStrictMock(WorkflowChain.class);
@@ -201,7 +209,7 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
     DefaultActionInvocationStore store = new DefaultActionInvocationStore(request);
     store.setCurrent(actionInvocation);
 
-    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, new TestSecuritySchemeFactory(null));
+    DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, new TestSecuritySchemeFactory(super.configuration, null, request));
 
     WorkflowChain workflowChain = createStrictMock(WorkflowChain.class);
     workflowChain.continueWorkflow();
@@ -213,11 +221,18 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
   }
 
   public static class TestSecuritySchemeFactory extends SecuritySchemeFactory {
+    private final MVCConfiguration configuration;
+
+    private final HttpServletRequest request;
+
     private final TestUserLoginSecurityContext securityContext;
 
-    public TestSecuritySchemeFactory(TestUserLoginSecurityContext securityContext) {
+    public TestSecuritySchemeFactory(MVCConfiguration configuration, TestUserLoginSecurityContext securityContext,
+                                     HttpServletRequest request) {
       super(PrimeBaseTest.injector);
+      this.configuration = configuration;
       this.securityContext = securityContext;
+      this.request = request;
     }
 
     @Override
@@ -225,7 +240,7 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
       DefaultUserLoginConstraintValidator constraintsValidator = new DefaultUserLoginConstraintValidator();
       constraintsValidator.setUserLoginSecurityContext(securityContext);
 
-      UserLoginSecurityScheme s = new UserLoginSecurityScheme(constraintsValidator);
+      UserLoginSecurityScheme s = new UserLoginSecurityScheme(configuration, constraintsValidator, request, HTTPMethod.valueOf(request.getMethod()));
       s.setUserLoginSecurityContext(securityContext);
       return s;
     }
@@ -234,8 +249,8 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
   public static class TestUserLoginSecurityContext extends BaseHttpSessionUserLoginSecurityContext {
     public final Set<String> roles = new HashSet<>();
 
-    public TestUserLoginSecurityContext(HttpServletRequest request, Set<String> roles) {
-      super(request);
+    public TestUserLoginSecurityContext(MVCConfiguration configuration, HttpServletRequest request, Set<String> roles) {
+      super(configuration, request);
       this.roles.addAll(roles);
     }
 

@@ -24,9 +24,16 @@ import org.primeframework.mvc.action.result.annotation.Status;
  * @author Brian Pontarelli
  */
 @Action(requiresAuthentication = true, constraints = {"admin", "user"}, scheme = "user")
-@Status(code = "unauthenticated", status = 401)
+@Status.List({
+    @Status(code = "unauthenticated", status = 401),
+    @Status(code = "unauthorized", status = 403)
+})
 public class SecureAction {
   public String get() {
+    return "success";
+  }
+
+  public String post() {
     return "success";
   }
 }

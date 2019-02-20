@@ -45,6 +45,11 @@ public interface MVCConfiguration {
   Key cookieEncryptionKey();
 
   /**
+   * @return Whether or not the CSRF handling is enabled or not.
+   */
+  boolean csrfEnabled();
+
+  /**
    * @return True if empty HTTP request parameters should be considered null values by the conversion system.
    */
   boolean emptyParametersAreNull();
@@ -88,27 +93,28 @@ public interface MVCConfiguration {
   String resourceDirectory();
 
   /**
-   * @return The name of the cookie used to store Saved Request information.
-   */
-  String savedRequestCookieName();
-
-  /**
    * Tomcat limits the header size to 8192 bytes (8 KB). See maxHttpHeaderSize on https://tomcat.apache.org/tomcat-8.5-doc/config/http.html
    * <br>
-   * If we write the save request cookie to big we will exceed 8 KB and the client will receive a 500 from Tomcat with the following stack trace.
+   * If we write the save request cookie to big we will exceed 8 KB and the client will receive a 500 from Tomcat with
+   * the following stack trace.
    * <pre>
    *    org.apache.coyote.http11.HeadersTooLargeException: An attempt was made to write more data to the response headers than there was room available in the buffer.
    *      Increase maxHttpHeaderSize on the connector or write less data into the response headers.
    * </pre>
    * <p>
-   * For this reason we should have a configured limit to the size of the cookie to attempt to prevent this scenario. Once this limit
-   * is exceeded Prime will choose not to write the save request cookie and the user will not be redirected after login. This seems to
-   * be a better user experience than a 500. If you were to increase the maxHttpHeaderSize configured in Tomcat, this value then could also be
-   * increased.
+   * For this reason we should have a configured limit to the size of the cookie to attempt to prevent this scenario.
+   * Once this limit is exceeded Prime will choose not to write the save request cookie and the user will not be
+   * redirected after login. This seems to be a better user experience than a 500. If you were to increase the
+   * maxHttpHeaderSize configured in Tomcat, this value then could also be increased.
    *
    * @return The maximum size in bytes of the save request cookie.
    */
   int savedRequestCookieMaximumSize();
+
+  /**
+   * @return The name of the cookie used to store Saved Request information.
+   */
+  String savedRequestCookieName();
 
   /**
    * @return The static resource prefixes.
@@ -127,7 +133,8 @@ public interface MVCConfiguration {
   int templateCheckSeconds();
 
   /**
-   * @return The annotations that identify a field to be un-wrapped - or be considered transparent by the {@link ExpressionEvaluator}.
+   * @return The annotations that identify a field to be un-wrapped - or be considered transparent by the {@link
+   * ExpressionEvaluator}.
    */
   List<Class<? extends Annotation>> unwrapAnnotations();
 }

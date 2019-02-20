@@ -15,7 +15,7 @@
  */
 
 savantVersion = "1.0.0"
-fusionAuthJWTVersion = "3.0.0"
+fusionAuthJWTVersion = "3.0.1"
 
 project(group: "org.primeframework", name: "prime-mvc", version: "1.13.0", licenses: ["ApacheV2_0"]) {
   workflow {
@@ -44,7 +44,7 @@ project(group: "org.primeframework", name: "prime-mvc", version: "1.13.0", licen
       dependency(id: "org.apache.commons:commons-lang3:3.1.0")
       dependency(id: "org.freemarker:freemarker:2.3.28")
       dependency(id: "io.fusionauth:fusionauth-jwt:${fusionAuthJWTVersion}")
-      dependency(id: "org.primeframework:prime-mock:0.6.7")
+      dependency(id: "org.primeframework:prime-mock:0.6.9")
       dependency(id: "org.slf4j:slf4j-api:1.7.7")
     }
     group(name: "test-compile", export: false) {

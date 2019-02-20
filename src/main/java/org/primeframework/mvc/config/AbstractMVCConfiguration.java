@@ -25,8 +25,8 @@ import org.primeframework.mvc.parameter.annotation.FieldUnwrapped;
 /**
  * This class is an abstract implementation of the {@link MVCConfiguration} interface. It provides good default values
  * for most of the methods on that interface but leaves a few methods to be implemented by your application. To
- * accomplish this, sub-class this class and implement the missing methods. Then bind your implementation into the
- * Guice injector using a Module.
+ * accomplish this, sub-class this class and implement the missing methods. Then bind your implementation into the Guice
+ * injector using a Module.
  *
  * @author Brian Pontarelli
  */
@@ -41,9 +41,9 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
 
   public static final String[] STATIC_PREFIXES = new String[]{"/static"};
 
-  public boolean emptyParametersAreNull = true;
+  public boolean csrfEnabled = false;
 
-  public int savedRequestCookieMaximumSize = 6 * 1024; // 6 KB
+  public boolean emptyParametersAreNull = true;
 
   public String exceptionResultCode = "error";
 
@@ -57,6 +57,8 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
 
   public String resourceDirectory = "/WEB-INF";
 
+  public int savedRequestCookieMaximumSize = 6 * 1024; // 6 KB
+
   public String savedRequestCookieName = "prime-mvc-saved-request";
 
   public String[] staticResourcePrefixes = STATIC_PREFIXES;
@@ -64,6 +66,11 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
   public boolean staticResourcesEnabled = true;
 
   public List<Class<? extends Annotation>> unwrapAnnotations = Collections.singletonList(FieldUnwrapped.class);
+
+  @Override
+  public boolean csrfEnabled() {
+    return csrfEnabled;
+  }
 
   @Override
   public boolean emptyParametersAreNull() {
@@ -101,13 +108,13 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
   }
 
   @Override
-  public String savedRequestCookieName() {
-    return savedRequestCookieName;
+  public int savedRequestCookieMaximumSize() {
+    return savedRequestCookieMaximumSize;
   }
 
   @Override
-  public int savedRequestCookieMaximumSize() {
-    return savedRequestCookieMaximumSize;
+  public String savedRequestCookieName() {
+    return savedRequestCookieName;
   }
 
   @Override

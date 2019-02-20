@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import java.util.Enumeration;
 
+import com.google.inject.Injector;
+import com.google.inject.Module;
 import org.primeframework.mock.servlet.MockContainer;
 import org.primeframework.mock.servlet.MockHttpServletResponse;
 import org.primeframework.mvc.guice.GuiceBootstrap;
@@ -28,9 +30,6 @@ import org.primeframework.mvc.servlet.PrimeServletContextListener;
 import org.primeframework.mvc.servlet.ServletObjectsHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.inject.Injector;
-import com.google.inject.Module;
 
 /**
  * This class provides a method for testing a full invocation of Prime. This simulates the JEE web objects
@@ -42,9 +41,9 @@ import com.google.inject.Module;
 public class RequestSimulator {
   private final static Logger logger = LoggerFactory.getLogger(RequestSimulator.class);
 
-  public final PrimeFilter filter = new PrimeFilter();
-
   public final MockContainer container;
+
+  public final PrimeFilter filter = new PrimeFilter();
 
   public Injector injector;
 
@@ -62,33 +61,13 @@ public class RequestSimulator {
     ServletObjectsHolder.setServletContext(container.getContext());
     this.container = container;
     this.injector = GuiceBootstrap.initialize(mainModule);
-    this.container.getContext().setAttribute(PrimeServletContextListener.GUICE_INJECTOR_KEY, this.injector);
-    logger.debug("Built RequestSimulator with context webDir " + container.getContext().webDir.getAbsolutePath());
-    this.filter.init(new FilterConfig() {
-      @Override
-      public String getFilterName() {
-        return "prime";
-      }
-
-      @Override
-      public ServletContext getServletContext() {
-        return container.getContext();
-      }
-
-      @Override
-      public String getInitParameter(String s) {
-        return null;
-      }
-
-      @Override
-      public Enumeration<String> getInitParameterNames() {
-        return null;
-      }
-    });
+    init();
   }
 
   /**
    * Creates a new request simulator that can be used to simulate requests to a Prime application.
+   * <p>
+   * This constructor can be used if you already have an injector built through a test framework.
    *
    * @param container The application container to use for this simulator.
    * @param injector  The Guice injector.
@@ -99,29 +78,7 @@ public class RequestSimulator {
     ServletObjectsHolder.setServletContext(container.getContext());
     this.container = container;
     this.injector = injector;
-    this.container.getContext().setAttribute(PrimeServletContextListener.GUICE_INJECTOR_KEY, this.injector);
-    logger.debug("Built RequestSimulator with context webDir " + container.getContext().webDir.getAbsolutePath());
-    this.filter.init(new FilterConfig() {
-      @Override
-      public String getFilterName() {
-        return "prime";
-      }
-
-      @Override
-      public ServletContext getServletContext() {
-        return container.getContext();
-      }
-
-      @Override
-      public String getInitParameter(String s) {
-        return null;
-      }
-
-      @Override
-      public Enumeration<String> getInitParameterNames() {
-        return null;
-      }
-    });
+    init();
   }
 
   /**
@@ -136,5 +93,31 @@ public class RequestSimulator {
     RequestBuilder rb = new RequestBuilder(uri, container, filter, injector);
     response = rb.response;
     return rb;
+  }
+
+  private void init() throws ServletException {
+    this.container.getContext().setAttribute(PrimeServletContextListener.GUICE_INJECTOR_KEY, this.injector);
+    logger.debug("Built RequestSimulator with context webDir " + container.getContext().webDir.getAbsolutePath());
+    this.filter.init(new FilterConfig() {
+      @Override
+      public String getFilterName() {
+        return "prime";
+      }
+
+      @Override
+      public String getInitParameter(String s) {
+        return null;
+      }
+
+      @Override
+      public Enumeration<String> getInitParameterNames() {
+        return null;
+      }
+
+      @Override
+      public ServletContext getServletContext() {
+        return container.getContext();
+      }
+    });
   }
 }

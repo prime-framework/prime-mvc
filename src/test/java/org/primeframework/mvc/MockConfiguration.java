@@ -25,21 +25,23 @@ import java.security.spec.AlgorithmParameterSpec;
 import org.primeframework.mvc.config.AbstractMVCConfiguration;
 
 /**
- * This is a mock configuration object that delegates to another MVCConfiguration instance, but also allows
- * specific properties to be mocked out.
+ * This is a mock configuration object that delegates to another MVCConfiguration instance, but also allows specific
+ * properties to be mocked out.
  *
  * @author Brian Pontarelli
  */
 public class MockConfiguration extends AbstractMVCConfiguration {
-  private boolean allowUnknownParameters;
+  public boolean allowUnknownParameters;
 
-  private AlgorithmParameterSpec cookieEncryptionIV;
+  public AlgorithmParameterSpec cookieEncryptionIV;
 
-  private Key cookieEncryptionKey;
+  public Key cookieEncryptionKey;
 
-  private int freemarkerCheckSeconds;
+  public boolean csrfEnabled;
 
-  private int l10nReloadSeconds;
+  public int freemarkerCheckSeconds;
+
+  public int l10nReloadSeconds;
 
   public MockConfiguration() {
     try {
@@ -56,11 +58,13 @@ public class MockConfiguration extends AbstractMVCConfiguration {
     }
   }
 
-  public MockConfiguration(int freemarkerCheckSeconds, int l10nReloadSeconds, boolean allowUnknownParameters) {
+  public MockConfiguration(int freemarkerCheckSeconds, int l10nReloadSeconds, boolean allowUnknownParameters,
+                           boolean csrfEnabled) {
     this();
     this.freemarkerCheckSeconds = freemarkerCheckSeconds;
     this.l10nReloadSeconds = l10nReloadSeconds;
     this.allowUnknownParameters = allowUnknownParameters;
+    this.csrfEnabled = csrfEnabled;
   }
 
   @Override
@@ -76,6 +80,11 @@ public class MockConfiguration extends AbstractMVCConfiguration {
   @Override
   public Key cookieEncryptionKey() {
     return cookieEncryptionKey;
+  }
+
+  @Override
+  public boolean csrfEnabled() {
+    return csrfEnabled;
   }
 
   @Override

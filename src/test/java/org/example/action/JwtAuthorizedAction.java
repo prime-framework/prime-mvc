@@ -32,8 +32,7 @@ import io.fusionauth.jwt.domain.JWT;
     @Status(code = "unauthorized", status = 401)
 })
 public class JwtAuthorizedAction {
-
-  public boolean authorized;
+  public static boolean authorized;
 
   @JWTAuthorizeMethod(httpMethods = {HTTPMethod.GET})
   public boolean authorize(JWT jwt) {

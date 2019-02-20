@@ -48,7 +48,7 @@ public class GuiceBootstrapTest extends PrimeBaseTest {
       protected void configure() {
         super.configure();
 
-        bind(MVCConfiguration.class).toInstance(new MockConfiguration(2, 1, false));
+        bind(MVCConfiguration.class).toInstance(new MockConfiguration(2, 1, false, false));
 
         install(new CloseableModule());
       }

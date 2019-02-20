@@ -19,10 +19,13 @@ package org.primeframework.mvc.servlet;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 /**
  * Toolkit for Servlet related tasks
@@ -47,6 +50,7 @@ public class ServletTools {
    *
    * @param request the ServletRequest
    * @return a URL in the format of protocol://host[:port]/
+   * @deprecated Use the URI method.
    */
   public static URL getBaseUrl(ServletRequest request) {
     String scheme = request.getScheme();
@@ -65,6 +69,35 @@ public class ServletTools {
     }
 
     return baseUrl;
+  }
+
+  /**
+   * Returns the base URI in the following format:
+   * <p/>
+   * protocol://host[:port]
+   * <p/>
+   * This handles proxies, ports, schemes, everything.
+   *
+   * @param request the ServletRequest
+   * @return A URI in the format of protocol://host[:port]
+   */
+  public static URI getBaseURI(HttpServletRequest request) {
+    String scheme = defaultIfNull(request.getHeader("X-Forwarded-Proto"), request.getScheme()).toLowerCase();
+    String serverName = defaultIfNull(request.getHeader("X-Forwarded-Host"), request.getServerName()).toLowerCase();
+    int serverPort = request.getServerPort();
+    String forwardedPort = request.getHeader("X-Forwarded-Port");
+    if (forwardedPort != null) {
+      serverPort = Integer.parseInt(forwardedPort);
+    }
+
+    String uri = scheme + "://" + serverName;
+    if (serverPort > 0) {
+      if ((scheme.equals("http") && serverPort != 80) || (scheme.equals("https") && serverPort != 443)) {
+        uri += ":" + serverPort;
+      }
+    }
+
+    return URI.create(uri);
   }
 
   /**

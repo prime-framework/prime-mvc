@@ -19,7 +19,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,25 +27,28 @@ import java.util.Collection;
 import java.util.Locale;
 import java.util.function.Consumer;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.Injector;
 import org.primeframework.mock.servlet.MockContainer;
 import org.primeframework.mock.servlet.MockHttpServletRequest;
 import org.primeframework.mock.servlet.MockHttpServletRequest.Method;
 import org.primeframework.mock.servlet.MockHttpServletResponse;
 import org.primeframework.mock.servlet.MockServletInputStream;
 import org.primeframework.mvc.parameter.DefaultParameterParser;
+import org.primeframework.mvc.security.CSRF;
 import org.primeframework.mvc.servlet.PrimeFilter;
 import org.primeframework.mvc.servlet.ServletObjectsHolder;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.inject.Injector;
 
 /**
  * This class is a builder that helps create a test HTTP request that is sent to the MVC.
  *
  * @author Brian Pontarelli
  */
+@SuppressWarnings("unused")
 public class RequestBuilder {
+  public final MockContainer container;
+
   public final PrimeFilter filter;
 
   public final Injector injector;
@@ -54,8 +56,6 @@ public class RequestBuilder {
   public final MockHttpServletRequest request;
 
   public final MockHttpServletResponse response;
-
-  public final MockContainer container;
 
   private Class<? extends Throwable> expectedException;
 
@@ -113,18 +113,6 @@ public class RequestBuilder {
     return new RequestResult(container, filter, request, response, injector);
   }
 
-  /**
-   * Overrides the HTTP Method from that set by calling {@link #get()} or {@link #post()} for example.
-   *
-   * @param method the string value of an HTTP method, this does not have to be a real HTTP method
-   * @return This.
-   */
-  public RequestResult method(String method) {
-    request.setOverrideMethod(method);
-    run();
-    return new RequestResult(container, filter, request, response, injector);
-  }
-
   public MockHttpServletRequest getRequest() {
     return request;
   }
@@ -136,6 +124,18 @@ public class RequestBuilder {
    */
   public RequestResult head() {
     request.setMethod(Method.HEAD);
+    run();
+    return new RequestResult(container, filter, request, response, injector);
+  }
+
+  /**
+   * Overrides the HTTP Method from that set by calling {@link #get()} or {@link #post()} for example.
+   *
+   * @param method the string value of an HTTP method, this does not have to be a real HTTP method
+   * @return This.
+   */
+  public RequestResult method(String method) {
+    request.setOverrideMethod(method);
     run();
     return new RequestResult(container, filter, request, response, injector);
   }
@@ -261,7 +261,8 @@ public class RequestBuilder {
   }
 
   /**
-   * Sets the body content. This processes the file using FreeMarker. Use {@link #withBodyFileRaw(Path)} to skip FreeMarker processing.
+   * Sets the body content. This processes the file using FreeMarker. Use {@link #withBodyFileRaw(Path)} to skip
+   * FreeMarker processing.
    *
    * @param body   The body as a {@link Path} to the file.
    * @param values key value pairs of replacement values for use in the file.
@@ -284,8 +285,19 @@ public class RequestBuilder {
   }
 
   /**
-   * Sets an HTTP request parameter as a Prime MVC checkbox widget. This can be called multiple times with the same
-   * name it it will create a list of values for the HTTP parameter.
+   * Adds a CSRF token to the request parameters.
+   *
+   * @param token The token.
+   * @return This.
+   */
+  public RequestBuilder withCSRFToken(String token) {
+    request.removeParameter(CSRF.CSRF_PARAMETER_KEY);
+    return withParameter(CSRF.CSRF_PARAMETER_KEY, token);
+  }
+
+  /**
+   * Sets an HTTP request parameter as a Prime MVC checkbox widget. This can be called multiple times with the same name
+   * it it will create a list of values for the HTTP parameter.
    *
    * @param name           The name of the parameter.
    * @param checkedValue   The checked value of the checkbox.
@@ -447,7 +459,8 @@ public class RequestBuilder {
   }
 
   /**
-   * Sets HTTP request parameters. This takes the provided collection and adds a request parameter for each item in the collection.
+   * Sets HTTP request parameters. This takes the provided collection and adds a request parameter for each item in the
+   * collection.
    *
    * @param name   The name of the parameter.
    * @param values The collection of parameter values.
@@ -476,6 +489,12 @@ public class RequestBuilder {
     }
 
     request.setParameter(DefaultParameterParser.RADIOBUTTON_PREFIX + name, uncheckedValue);
+    return this;
+  }
+
+  public RequestBuilder withSingleHeader(String name, String value) {
+    request.removeHeader(name);
+    request.addHeader(name, value);
     return this;
   }
 
@@ -511,6 +530,11 @@ public class RequestBuilder {
     // Remove the web objects if this instance is being used across multiple invocations
     ServletObjectsHolder.clearServletRequest();
     ServletObjectsHolder.clearServletResponse();
+
+    // If the CSRF token is enabled and the parameter isn't set, we set it to be consistent.
+    if (CSRF.getParameterToken(request) == null) {
+      CSRF.setParameterToken(request);
+    }
 
     try {
       // Build the request and response for this pass

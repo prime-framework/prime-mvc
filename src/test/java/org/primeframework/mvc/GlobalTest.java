@@ -27,6 +27,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import org.example.action.JwtAuthorizedAction;
 import org.example.domain.UserField;
 import org.primeframework.mvc.action.config.ActionConfigurationProvider;
 import org.primeframework.mvc.container.ContainerResolver;
@@ -269,8 +270,8 @@ public class GlobalTest extends PrimeBaseTest {
 
   @Test
   public void get_jwtAuthorized() throws Exception {
+    JwtAuthorizedAction.authorized = true;
     test.simulate(() -> simulator.test("/jwt-authorized")
-                                 .withParameter("authorized", true)
                                  .withHeader("Authorization", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkifQ.qHdut1UR4-2FSAvh7U3YdeRR5r5boVqjIGQ16Ztp894")
                                  .get()
                                  .assertStatusCode(200));
@@ -453,16 +454,16 @@ public class GlobalTest extends PrimeBaseTest {
 
   @Test
   public void get_jwtMissingAuthorizeHeader() throws Exception {
+    JwtAuthorizedAction.authorized = true;
     test.simulate(() -> simulator.test("/jwt-authorized")
-                                 .withParameter("authorized", true)
                                  .get()
                                  .assertStatusCode(401));
   }
 
   @Test
   public void get_jwtNotAuthorized() throws Exception {
+    JwtAuthorizedAction.authorized = false;
     test.simulate(() -> simulator.test("/jwt-authorized")
-                                 .withParameter("authorized", false)
                                  .withHeader("Authorization", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkifQ.qHdut1UR4-2FSAvh7U3YdeRR5r5boVqjIGQ16Ztp894")
                                  .get()
                                  .assertStatusCode(401));
@@ -471,8 +472,8 @@ public class GlobalTest extends PrimeBaseTest {
   @Test
   public void get_jwtNotBefore() throws Exception {
     // Validating the JWT registered claim 'nbf' (Not Before). The JWT is validly signed, but it is instructed not to be valid before some point in the future. Expecting a 401.
+    JwtAuthorizedAction.authorized = true;
     test.simulate(() -> simulator.test("/jwt-authorized")
-                                 .withParameter("authorized", true)
                                  .withHeader("Authorization", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYmYiOjQ2MzIzOTY2NjV9.mRvvyJXvDD8RQ_PM1TadZdZNYXRa9CjOx62Tk866538")
                                  .get()
                                  .assertStatusCode(401));
@@ -520,8 +521,8 @@ public class GlobalTest extends PrimeBaseTest {
   @Test
   public void head_jwtAuthorized() throws Exception {
     // This test will pass if we call the JWT authorize method or not....
+    JwtAuthorizedAction.authorized = true;
     test.simulate(() -> simulator.test("/jwt-authorized")
-                                 .withParameter("authorized", true)
                                  .withHeader("Authorization", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkifQ.qHdut1UR4-2FSAvh7U3YdeRR5r5boVqjIGQ16Ztp894")
                                  .head()
                                  .assertStatusCode(200));
@@ -529,8 +530,8 @@ public class GlobalTest extends PrimeBaseTest {
 
   @Test
   public void head_jwtNotAuthorized() throws Exception {
+    JwtAuthorizedAction.authorized = false;
     test.simulate(() -> simulator.test("/jwt-authorized")
-                                 .withParameter("authorized", false)
                                  .withHeader("Authorization", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkifQ.qHdut1UR4-2FSAvh7U3YdeRR5r5boVqjIGQ16Ztp894")
                                  .head()
                                  .assertStatusCode(401));
