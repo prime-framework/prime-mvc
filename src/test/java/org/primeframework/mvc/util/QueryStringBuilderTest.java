@@ -18,8 +18,8 @@ package org.primeframework.mvc.util;
 import java.util.function.Consumer;
 
 import org.testng.annotations.Test;
-
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.fail;
 
 /**
  * @author Daniel DeGroff
@@ -28,10 +28,12 @@ public class QueryStringBuilderTest {
   @Test
   public void testBuilder() {
     // Just parms
+    test(null, b -> b.with("foo", "bar"), "foo=bar");
     test(b -> b.with("foo", "bar"), "foo=bar");
     test(b -> b.with("foo", "bar").with("bing", "baz"), "foo=bar&bing=baz");
     test(b -> b.beginQuery().with("foo", "bar").with("bing", "baz"), "?foo=bar&bing=baz");
     test(b -> b.beginFragment().with("foo", "bar").with("bing", "baz"), "#foo=bar&bing=baz");
+    test(null, b -> b.beginQuery().with("foo", "bar").with("bing", "baz").beginFragment().with("joe", "mama").with("boom", "dynamite"), "?foo=bar&bing=baz#joe=mama&boom=dynamite");
     test(b -> b.beginQuery().with("foo", "bar").with("bing", "baz").beginFragment().with("joe", "mama").with("boom", "dynamite"), "?foo=bar&bing=baz#joe=mama&boom=dynamite");
 
     // With a URL
@@ -53,6 +55,22 @@ public class QueryStringBuilderTest {
     // Whole URLs w/out a builder with both query and fragment parts
     test("http://acme.com?foo=bar#bing=baz", "http://acme.com?foo=bar#bing=baz");
     test("http://acme.com?foo=bar&lorem=ipsum#bing=baz&joe=mama", "http://acme.com?foo=bar&lorem=ipsum#bing=baz&joe=mama");
+
+    // Add some URL segments into the mix, some with trailing slash
+    test("http://acme.com", b -> b.withSegment("bar").with("foo", "bar"), "http://acme.com/bar?foo=bar");
+    test("http://acme.com/", b -> b.withSegment("bar").with("foo", "bar"), "http://acme.com/bar?foo=bar");
+    test("http://acme.com/", b -> b.withSegment("bar").withSegment(null).with("foo", "bar"), "http://acme.com/bar?foo=bar");
+    test("http://acme.com/", b -> b.withSegment("bar").withSegment("baz").with("foo", "bar"), "http://acme.com/bar/baz?foo=bar");
+    test("http://acme.com", b -> b.withSegment("bar").beginQuery().with("foo", "bar").beginFragment().with("bing", "baz"), "http://acme.com/bar?foo=bar#bing=baz");
+    test("http://acme.com/", b -> b.withSegment("bar").beginQuery().with("foo", "bar").beginFragment().with("bing", "baz"), "http://acme.com/bar?foo=bar#bing=baz");
+    test("http://acme.com/", b -> b.withSegment("bar").withSegment("baz").beginQuery().with("foo", "bar").beginFragment().with("bing", "baz"), "http://acme.com/bar/baz?foo=bar#bing=baz");
+
+    // Expect to explode, if you leave a ? at the end of the initial URL you can't have any segments
+    try {
+      test("http://acme.com?", b -> b.withSegment("bar").with("foo", "bar"), "http://acme.com?foo=bar");
+      fail("Expected this to fail");
+    } catch (IllegalStateException ignore) {
+    }
   }
 
   private void test(String uri, String expected) {

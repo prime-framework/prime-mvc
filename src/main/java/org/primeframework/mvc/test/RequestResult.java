@@ -949,7 +949,7 @@ public class RequestResult {
       // Replace any 'actual' values requested and then try again
       boolean recheck = replaceWithActualValues(actual, expected);
       if (!recheck || !actual.equals(expected)) {
-        throw new AssertionError("Actual redirect not equal to the expected.\n Expected [ " + expectedUri + " ] but found [" + redirect + " ]");
+        throw new AssertionError("Actual redirect not equal to the expected.\n Expected [ " + expectedUri + " ] but found [ " + redirect + " ]\n\n");
       }
     }
   }

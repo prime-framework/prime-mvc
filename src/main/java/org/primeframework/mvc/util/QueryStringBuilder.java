@@ -17,6 +17,8 @@ package org.primeframework.mvc.util;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.primeframework.mvc.NotImplementedException;
 
@@ -26,16 +28,18 @@ import org.primeframework.mvc.NotImplementedException;
 public class QueryStringBuilder {
   private final StringBuilder sb = new StringBuilder();
 
-  private String uri;
+  private final List<String> segments = new ArrayList<>();
 
   private boolean addSeparator;
+
+  private StringBuilder uri = new StringBuilder();
 
   protected QueryStringBuilder() {
   }
 
   protected QueryStringBuilder(String uri) {
-    this.uri = uri;
     if (uri != null) {
+      this.uri.append(uri);
       if (uri.contains("?") && !uri.endsWith("&")) {
         addSeparator = true;
       }
@@ -48,10 +52,6 @@ public class QueryStringBuilder {
 
   public static QueryStringBuilder builder(String uri) {
     return new QueryStringBuilder(uri);
-  }
-
-  public QueryStringBuilder withActual(String name) {
-    throw new NotImplementedException();
   }
 
   public QueryStringBuilder beginFragment() {
@@ -68,31 +68,39 @@ public class QueryStringBuilder {
 
   @Override
   public String toString() {
-    if (uri == null) {
+    if (uri.length() == 0) {
       return sb.toString();
     }
 
     // URL provided contains a ?, perhaps other parameters as well
-    if (uri.contains("?")) {
+    if (uri.indexOf("?") != -1) {
       if (sb.indexOf("?") == 0) {
         return uri + sb.substring(1);
       }
-      return uri + sb.toString();
+      return uri.append(sb).toString();
+    } else {
+      if (segments.size() > 0) {
+        if (uri.lastIndexOf("/") != uri.length() - 1) {
+          uri.append("/");
+        }
+
+        uri.append(String.join("/", segments));
+      }
     }
 
     if (sb.indexOf("?") == 0) {
-      return uri + sb.toString();
+      return uri.append(sb).toString();
     }
 
     if (sb.indexOf("#") == 0) {
-      return uri + sb.toString();
+      return uri.append(sb).toString();
     }
 
-    if (uri.contains("#") && sb.length() > 0) {
-      return uri + "&" + sb.toString();
+    if (uri.indexOf("#") != -1 && sb.length() > 0) {
+      return uri.append("&").append(sb).toString();
     }
 
-    return uri + "?" + sb.toString();
+    return uri.append("?").append(sb).toString();
   }
 
   public QueryStringBuilder with(String name, Object value) {
@@ -112,6 +120,22 @@ public class QueryStringBuilder {
     }
 
     addSeparator = true;
+    return this;
+  }
+
+  public QueryStringBuilder withActual(String name) {
+    throw new NotImplementedException();
+  }
+
+  public QueryStringBuilder withSegment(String segment) {
+    if (uri.length() > 0 && (uri.indexOf("?") == uri.length() - 1)) {
+      throw new IllegalStateException("You cannot add a URL segment after you have appended a ? to the end of the URL");
+    }
+
+    if (segment != null) {
+      segments.add(segment);
+    }
+
     return this;
   }
 }
