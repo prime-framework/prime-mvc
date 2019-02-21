@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
+import com.google.inject.Inject;
 import org.apache.commons.lang3.ArrayUtils;
 import org.example.action.ExtensionInheritanceAction;
 import org.example.domain.Action;
@@ -36,8 +37,6 @@ import org.primeframework.mvc.PrimeBaseTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
-
-import com.google.inject.Inject;
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -165,33 +164,6 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
   }
 
   @Test
-  public void nullMapKeys() {
-    ActionField action = new ActionField();
-    action.user = new UserField();
-
-    AddressField address1 = new AddressField();
-    address1.state = "CO";
-
-    AddressField address2 = new AddressField();
-    address2.state = "MN";
-
-    // Expected state, null key, and empty key
-    action.user.addresses.put(null, address1);
-    action.user.addresses.put("", address2);
-
-    // Get [] == null key, [''] == empty string key
-    assertEquals(evaluator.getValue("user.addresses[].state", action), "CO");
-    assertEquals(evaluator.getValue("user.addresses[''].state", action), "MN");
-
-    // swap them
-    evaluator.setValue("user.addresses[].state", action, "MN");
-    evaluator.setValue("user.addresses[''].state", action,"CO");
-
-    assertEquals(evaluator.getValue("user.addresses[].state", action), "MN");
-    assertEquals(evaluator.getValue("user.addresses[''].state", action), "CO");
-  }
-
-  @Test
   public void fieldInheritance() {
     ExtensionInheritanceAction action = new ExtensionInheritanceAction();
 
@@ -279,6 +251,13 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
   }
 
   @Test
+  public void longToken() {
+    ActionField action = new ActionField();
+    evaluator.setValue("reallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyLongFieldName", action, ArrayUtils.toArray("value"), null);
+    assertEquals(action.reallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyLongFieldName, "value");
+  }
+
+  @Test
   public void nonStringKeyForMap() {
     Action action = new Action();
     action.setUser(null);
@@ -292,6 +271,33 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
 
     evaluator.setValue("user.ids[0]", actionField, new String[]{"0"}, null);
     assertEquals(actionField.user.ids.get(0).intValue(), 0);
+  }
+
+  @Test
+  public void nullMapKeys() {
+    ActionField action = new ActionField();
+    action.user = new UserField();
+
+    AddressField address1 = new AddressField();
+    address1.state = "CO";
+
+    AddressField address2 = new AddressField();
+    address2.state = "MN";
+
+    // Expected state, null key, and empty key
+    action.user.addresses.put(null, address1);
+    action.user.addresses.put("", address2);
+
+    // Get [] == null key, [''] == empty string key
+    assertEquals(evaluator.getValue("user.addresses[].state", action), "CO");
+    assertEquals(evaluator.getValue("user.addresses[''].state", action), "MN");
+
+    // swap them
+    evaluator.setValue("user.addresses[].state", action, "MN");
+    evaluator.setValue("user.addresses[''].state", action, "CO");
+
+    assertEquals(evaluator.getValue("user.addresses[].state", action), "MN");
+    assertEquals(evaluator.getValue("user.addresses[''].state", action), "CO");
   }
 
   @Test(enabled = false)
@@ -451,6 +457,10 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     assertEquals(evaluator.getValue("bean1.bar", action), "bing");
     assertEquals(evaluator.getValue("bean1.baz", action), "boom");
 
+    // Manually set values on a top level and retrieve them
+    action.bean3.bar = "kabam";
+    assertEquals(evaluator.getValue("bar", action), "kabam");
+
     // Set values using the evaluator and retrieve them.
     evaluator.setValue("bean1.bar", action, ArrayUtils.toArray("bada-bing"), null);
     evaluator.setValue("bean1.baz", action, ArrayUtils.toArray("bada-boom"), null);
@@ -470,11 +480,14 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     assertEquals(evaluator.getValue("bean2.user.name", action), "Art Vandelay");
     assertEquals(evaluator.getValue("bean2.bar", action), "bing");
     assertEquals(evaluator.getValue("bean2.baz", action), "boom");
+
+    // Set top level fields using unwrapped
+    evaluator.setValue("bar", action, ArrayUtils.toArray("Art Vandelay"), null);
+    assertEquals(evaluator.getValue("bar", action), "Art Vandelay");
   }
 
   /**
-   * /**
-   * Tests setting of bean properties
+   * /** Tests setting of bean properties
    */
   @Test
   public void propertySetting() {
@@ -586,13 +599,6 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     assertEquals((int) action.getAssociations().get("ids")[0], 1);
     assertEquals((int) action.getAssociations().get("ids")[1], 2);
     assertEquals((int) action.getAssociations().get("ids")[2], 3);
-  }
-
-  @Test
-  public void longToken() {
-    ActionField action = new ActionField();
-    evaluator.setValue("reallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyLongFieldName", action, ArrayUtils.toArray("value"), null);
-    assertEquals(action.reallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyLongFieldName, "value");
   }
 
   @Inject

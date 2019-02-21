@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2017-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,15 @@ import org.primeframework.mvc.parameter.annotation.FieldUnwrapped;
 @org.primeframework.mvc.action.annotation.Action
 public class NestedDataUnwrappedAction {
 
+  // @FieldUnwrapped is on a field inside this object
   public Foo bean1 = new Foo();
 
+  // @FieldUnwrapped is on a field inside this object, and this object is null
   public Foo bean2;
+
+  // Top level
+  @FieldUnwrapped
+  public NestedConfiguration1 bean3 = new NestedConfiguration1();
 
   public static class Foo {
     @FieldUnwrapped
