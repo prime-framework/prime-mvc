@@ -38,6 +38,10 @@ import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.google.inject.Injector;
 import org.primeframework.mock.servlet.MockContainer;
 import org.primeframework.mock.servlet.MockHttpServletRequest;
 import org.primeframework.mock.servlet.MockHttpServletResponse;
@@ -53,11 +57,6 @@ import org.primeframework.mvc.message.SimpleMessage;
 import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.servlet.PrimeFilter;
 import org.primeframework.mvc.util.QueryStringBuilder;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.google.inject.Injector;
 import static java.util.Arrays.asList;
 
 /**
@@ -69,6 +68,10 @@ import static java.util.Arrays.asList;
 public class RequestResult {
   public final String body;
 
+  public final MockContainer container;
+
+  public final PrimeFilter filter;
+
   public final Injector injector;
 
   public final String redirect;
@@ -77,13 +80,10 @@ public class RequestResult {
 
   public final MockHttpServletResponse response;
 
-  public final MockContainer container;
-
-  public final PrimeFilter filter;
-
   public final int statusCode;
 
-  public RequestResult(MockContainer container, PrimeFilter filter, MockHttpServletRequest request, MockHttpServletResponse response, Injector injector) {
+  public RequestResult(MockContainer container, PrimeFilter filter, MockHttpServletRequest request,
+                       MockHttpServletResponse response, Injector injector) {
     this.container = container;
     this.filter = filter;
     this.request = request;
@@ -95,8 +95,9 @@ public class RequestResult {
   }
 
   /**
-   * Compares two JSON objects to ensure they are equal. This is done by converting the JSON objects to Maps, Lists, and primitives and then
-   * comparing them. The error is output so that IntelliJ can diff the two JSON objects in order to output the results.
+   * Compares two JSON objects to ensure they are equal. This is done by converting the JSON objects to Maps, Lists, and
+   * primitives and then comparing them. The error is output so that IntelliJ can diff the two JSON objects in order to
+   * output the results.
    *
    * @param objectMapper The Jackson ObjectMapper used to convert the JSON strings to Maps.
    * @param actual       The actual JSON.
@@ -189,20 +190,6 @@ public class RequestResult {
   }
 
   /**
-   * Verifies that the normalized body equals the given string.
-   *
-   * @param string The string to compare against the body.
-   * @return This.
-   */
-  public RequestResult assertNormalizedBody(String string) {
-    if (!normalize(body).equals(string)) {
-      throw new AssertionError("The body doesn't match the expected output. expected [" + string + "] but found [" + body.trim().replace("\r\n", "\n").replace("\r", "\n") + "]");
-    }
-
-    return this;
-  }
-
-  /**
    * Verifies that the body contains all of the given Strings.
    *
    * @param strings The strings to check.
@@ -220,8 +207,7 @@ public class RequestResult {
 
   /**
    * Verifies that the body contains the messages from the given key and optionally provided replacement values. This
-   * uses the MessageProvider for the current
-   * test URI and the given keys to look up the messages.
+   * uses the MessageProvider for the current test URI and the given keys to look up the messages.
    *
    * @param key    The key.
    * @param values The replacement values.
@@ -263,9 +249,8 @@ public class RequestResult {
   }
 
   /**
-   * Verifies that the body does not contain the messages from the given key and optionally provided replacement values. This
-   * uses the MessageProvider for the current
-   * test URI and the given keys to look up the messages.
+   * Verifies that the body does not contain the messages from the given key and optionally provided replacement values.
+   * This uses the MessageProvider for the current test URI and the given keys to look up the messages.
    *
    * @param key    The key.
    * @param values The replacement values.
@@ -305,22 +290,6 @@ public class RequestResult {
   }
 
   /**
-   * Verifies that the body equals the content of the given File.
-   * <p>
-   * This assertion will trim and normalize line returns before performing an equality check.
-   *
-   * @param path   The file to load and compare to the response.
-   * @param values key value pairs of replacement values for use in the file.
-   * @return This.
-   */
-  public RequestResult assertNormalizedBodyFile(Path path, Object... values) throws IOException {
-    if (values.length == 0) {
-      return assertNormalizedBody(normalize(new String(Files.readAllBytes(path), StandardCharsets.UTF_8)));
-    }
-    return assertNormalizedBody(normalize(BodyTools.processTemplate(path, values)));
-  }
-
-  /**
    * Verifies that the body is empty.
    *
    * @return This
@@ -348,20 +317,6 @@ public class RequestResult {
   }
 
   /**
-   * Assert the cookie does NOT exist by name.
-   *
-   * @param name The cookie name.
-   * @return This.
-   */
-  public RequestResult assertDoesContainsCookie(String name) {
-    Cookie actual = response.getCookies().stream().filter(c -> c.getName().equals(name)).findFirst().orElse(null);
-    if (actual != null) {
-      throw new AssertionError("Cookie [" + name + "] was not expected to be found in the response. Cookies found [" + String.join(", ", response.getCookies().stream().map(Cookie::getName).collect(Collectors.toList())));
-    }
-    return this;
-  }
-
-  /**
    * Verifies that the system contains the given error message(s). The message(s) might be in the request, flash,
    * session or application scopes.
    *
@@ -373,8 +328,7 @@ public class RequestResult {
   }
 
   /**
-   * Verifies that the system has errors for the given fields. This doesn't assert the error itself, just that the
-   * field
+   * Verifies that the system has errors for the given fields. This doesn't assert the error itself, just that the field
    * contains an error.
    *
    * @param fields The name of the field code(s). Not the fully rendered message(s)
@@ -409,8 +363,8 @@ public class RequestResult {
   }
 
   /**
-   * Verifies that the system has general errors. This doesn't assert the error itself, just that the
-   * general error code.
+   * Verifies that the system has general errors. This doesn't assert the error itself, just that the general error
+   * code.
    *
    * @param messageCodes The name of the error code(s). Not the fully rendered message(s)
    * @return This.
@@ -420,8 +374,8 @@ public class RequestResult {
   }
 
   /**
-   * Verifies that the system has info errors. This doesn't assert the message itself, just that the
-   * general message code.
+   * Verifies that the system has info errors. This doesn't assert the message itself, just that the general message
+   * code.
    *
    * @param messageCodes The name of the message code(s). Not the fully rendered message(s)
    * @return This.
@@ -431,8 +385,8 @@ public class RequestResult {
   }
 
   /**
-   * Verifies that the system has general messages. This doesn't assert the message itself, just that the
-   * general message code.
+   * Verifies that the system has general messages. This doesn't assert the message itself, just that the general
+   * message code.
    *
    * @param messageType The message type
    * @param errorCodes  The name of the message code(s). Not the fully rendered message(s)
@@ -462,8 +416,7 @@ public class RequestResult {
   }
 
   /**
-   * Verifies that the system contains the given info message(s). The message(s) might be in the request, flash,
-   * session
+   * Verifies that the system contains the given info message(s). The message(s) might be in the request, flash, session
    * or application scopes.
    *
    * @param messages The fully rendered info message(s) (not the code).
@@ -502,34 +455,6 @@ public class RequestResult {
   }
 
   /**
-   * Verifies that the system has no general error messages.
-   *
-   * @return This.
-   */
-  public RequestResult assertContainsNoGeneralErrors() {
-    return assertContainsNoMessages(MessageType.ERROR);
-  }
-
-  /**
-   * Verifies that the system has no general messages of the specified type.
-   *
-   * @param messageType The message type
-   * @return This.
-   */
-  public RequestResult assertContainsNoMessages(MessageType messageType) {
-    MessageStore messageStore = get(MessageStore.class);
-    List<Message> messages = messageStore.getGeneralMessages().stream().filter(m -> m.getType() == messageType).collect(Collectors.toList());
-    if (messages.isEmpty()) {
-      return this;
-    }
-
-    StringBuilder sb = new StringBuilder("\n\tMessageStore contains:\n");
-    //noinspection StringConcatenationInsideStringBufferAppend
-    messages.forEach(m -> sb.append("\t\t" + m.getType() + "\t" + m.getCode() + "\t" + ((m instanceof SimpleMessage) ? ((SimpleMessage) m).message : "") + "\n"));
-    throw new AssertionError("The MessageStore contains the following general errors.]" + sb);
-  }
-
-  /**
    * Verifies that the response does not contain any field error messages.
    *
    * @return This.
@@ -558,6 +483,34 @@ public class RequestResult {
   }
 
   /**
+   * Verifies that the system has no general error messages.
+   *
+   * @return This.
+   */
+  public RequestResult assertContainsNoGeneralErrors() {
+    return assertContainsNoMessages(MessageType.ERROR);
+  }
+
+  /**
+   * Verifies that the system has no general messages of the specified type.
+   *
+   * @param messageType The message type
+   * @return This.
+   */
+  public RequestResult assertContainsNoMessages(MessageType messageType) {
+    MessageStore messageStore = get(MessageStore.class);
+    List<Message> messages = messageStore.getGeneralMessages().stream().filter(m -> m.getType() == messageType).collect(Collectors.toList());
+    if (messages.isEmpty()) {
+      return this;
+    }
+
+    StringBuilder sb = new StringBuilder("\n\tMessageStore contains:\n");
+    //noinspection StringConcatenationInsideStringBufferAppend
+    messages.forEach(m -> sb.append("\t\t" + m.getType() + "\t" + m.getCode() + "\t" + ((m instanceof SimpleMessage) ? ((SimpleMessage) m).message : "") + "\n"));
+    throw new AssertionError("The MessageStore contains the following general errors.]" + sb);
+  }
+
+  /**
    * Verifies that the system contains the given warning message(s). The message(s) might be in the request, flash,
    * session or application scopes.
    *
@@ -583,7 +536,8 @@ public class RequestResult {
   }
 
   /**
-   * Assert the cookie exists by name and then pass it to the provided consumer to allow the caller to assert on anything they wish.
+   * Assert the cookie exists by name and then pass it to the provided consumer to allow the caller to assert on
+   * anything they wish.
    *
    * @param name     The cookie name.
    * @param consumer The consumer used to perform assertions.
@@ -610,6 +564,20 @@ public class RequestResult {
     Cookie actual = response.getCookies().stream().filter(c -> c.getName().equals(name)).findFirst().orElse(null);
     if (actual == null || actual.getValue() == null || !actual.getValue().equals(value)) {
       throw new AssertionError("Cookie [" + name + "] with value [" + actual + "] was not equal to the expected value [" + value + "]");
+    }
+    return this;
+  }
+
+  /**
+   * Assert the cookie does NOT exist by name.
+   *
+   * @param name The cookie name.
+   * @return This.
+   */
+  public RequestResult assertDoesContainsCookie(String name) {
+    Cookie actual = response.getCookies().stream().filter(c -> c.getName().equals(name)).findFirst().orElse(null);
+    if (actual != null) {
+      throw new AssertionError("Cookie [" + name + "] was not expected to be found in the response. Cookies found [" + String.join(", ", response.getCookies().stream().map(Cookie::getName).collect(Collectors.toList())));
     }
     return this;
   }
@@ -698,8 +666,8 @@ public class RequestResult {
   }
 
   /**
-   * De-serialize the JSON response using the type provided. To use actual values in the JSON use ${actual.foo}
-   * to use the property named <code>foo</code>.
+   * De-serialize the JSON response using the type provided. To use actual values in the JSON use ${actual.foo} to use
+   * the property named <code>foo</code>.
    *
    * @param type     The object type of the JSON.
    * @param jsonFile The JSON file to load and compare to the JSON response.
@@ -715,7 +683,38 @@ public class RequestResult {
   }
 
   /**
-   * Verifies that the redirect URI is the given URI. The order of the parameters added using the builder is not important.
+   * Verifies that the normalized body equals the given string.
+   *
+   * @param string The string to compare against the body.
+   * @return This.
+   */
+  public RequestResult assertNormalizedBody(String string) {
+    if (!normalize(body).equals(string)) {
+      throw new AssertionError("The body doesn't match the expected output. expected [" + string + "] but found [" + body.trim().replace("\r\n", "\n").replace("\r", "\n") + "]");
+    }
+
+    return this;
+  }
+
+  /**
+   * Verifies that the body equals the content of the given File.
+   * <p>
+   * This assertion will trim and normalize line returns before performing an equality check.
+   *
+   * @param path   The file to load and compare to the response.
+   * @param values key value pairs of replacement values for use in the file.
+   * @return This.
+   */
+  public RequestResult assertNormalizedBodyFile(Path path, Object... values) throws IOException {
+    if (values.length == 0) {
+      return assertNormalizedBody(normalize(new String(Files.readAllBytes(path), StandardCharsets.UTF_8)));
+    }
+    return assertNormalizedBody(normalize(BodyTools.processTemplate(path, values)));
+  }
+
+  /**
+   * Verifies that the redirect URI is the given URI. The order of the parameters added using the builder is not
+   * important.
    *
    * @param uri      The base redirect URI.
    * @param consumer The consumer to accept a URI builder to add parameters
@@ -769,6 +768,39 @@ public class RequestResult {
   }
 
   /**
+   * Verifies that the response status code is equal to the given code.
+   *
+   * @param statusCode The status code.
+   * @return This.
+   */
+  public RequestResult assertStatusCode(int statusCode) {
+    if (this.statusCode != statusCode) {
+      StringBuilder sb = new StringBuilder("Status code [" + this.statusCode + "] was not equal to [" + statusCode + "]\n");
+      MessageStore messageStore = get(MessageStore.class);
+
+      // Append any General Messages to the error message to aid in debug
+      List<Message> generatorMessages = messageStore.getGeneralMessages();
+      if (!generatorMessages.isEmpty()) {
+        sb.append("\nThe following general error messages were returned in the message store:\n\n");
+      }
+      generatorMessages.forEach(m -> sb.append("\t\t" + m.getType() + "\t" + m.getCode() + "\t" + ((m instanceof SimpleMessage) ? ((SimpleMessage) m).message : "") + "\n"));
+
+      // Append any Field Messages to the error message to aid in debug
+      List<FieldMessage> fieldMessages = messageStore.getFieldMessages().values().stream().flatMap(Collection::stream).collect(Collectors.toList());
+      if (!fieldMessages.isEmpty()) {
+        sb.append("\nThe following field error messages were returned in the message store:\n\n");
+      }
+      //noinspection StringConcatenationInsideStringBufferAppend
+      fieldMessages.forEach(m -> sb.append("\t\t" + m.getType() + "\tField: " + m.getField() + " Code: " + m.getCode() + "\t" + ((m instanceof SimpleFieldMessage) ? ((SimpleFieldMessage) m).message : "") + "\n"));
+
+      sb.append("\nRedirect: [").append(redirect).append("]\n").append("Response body: \n").append(body);
+      throw new AssertionError(sb.toString());
+    }
+
+    return this;
+  }
+
+  /**
    * Execute the redirect and accept a consumer to assert on the response.
    *
    * @param consumer The request result from following the redirect.
@@ -799,39 +831,6 @@ public class RequestResult {
     }
 
     consumer.accept(rb.get());
-    return this;
-  }
-
-  /**
-   * Verifies that the response status code is equal to the given code.
-   *
-   * @param statusCode The status code.
-   * @return This.
-   */
-  public RequestResult assertStatusCode(int statusCode) {
-    if (this.statusCode != statusCode) {
-      StringBuilder sb = new StringBuilder("Status code [" + this.statusCode + "] was not equal to [" + statusCode + "]\n");
-      MessageStore messageStore = get(MessageStore.class);
-
-      // Append any General Messages to the error message to aid in debug
-      List<Message> generatorMessages = messageStore.getGeneralMessages();
-      if (!generatorMessages.isEmpty()) {
-        sb.append("\nThe following general error messages were returned in the message store:\n\n");
-      }
-      generatorMessages.forEach(m -> sb.append("\t\t" + m.getType() + "\t" + m.getCode() + "\t" + ((m instanceof SimpleMessage) ? ((SimpleMessage) m).message : "") + "\n"));
-
-      // Append any Field Messages to the error message to aid in debug
-      List<FieldMessage> fieldMessages = messageStore.getFieldMessages().values().stream().flatMap(Collection::stream).collect(Collectors.toList());
-      if (!fieldMessages.isEmpty()) {
-        sb.append("\nThe following field error messages were returned in the message store:\n\n");
-      }
-      //noinspection StringConcatenationInsideStringBufferAppend
-      fieldMessages.forEach(m -> sb.append("\t\t" + m.getType() + "\tField: " + m.getField() + " Code: " + m.getCode() + "\t" + ((m instanceof SimpleFieldMessage) ? ((SimpleFieldMessage) m).message : "") + "\n"));
-
-      sb.append("\nRedirect: [").append(redirect).append("]\n").append("Response body: \n").append(body);
-      throw new AssertionError(sb.toString());
-    }
-
     return this;
   }
 
@@ -918,6 +917,30 @@ public class RequestResult {
     return this;
   }
 
+  private RequestResult _assertBodyContainsMessagesFromKey(boolean contains, String key, Object... values) {
+    MessageProvider messageProvider = get(MessageProvider.class);
+    ActionInvocationStore actionInvocationStore = get(ActionInvocationStore.class);
+    ActionMapper actionMapper = get(ActionMapper.class);
+
+    // Using the ActionMapper so that URL segments are properly handled and the correct URL is used for message lookups.
+    ActionInvocation actionInvocation = actionMapper.map(null, request.getRequestURI(), true);
+    actionInvocationStore.setCurrent(actionInvocation);
+
+    String message = messageProvider.getMessage(key, values);
+    if (contains != body.contains(message)) {
+      String text = contains ? "didn't" : "does";
+      throw new AssertionError("Body " + text + " contain [" + message + "] for the key [" + key + "]\nRedirect: [" + redirect + "]\nBody:\n" + body);
+    }
+
+    return this;
+  }
+
+  private Object[] appendArray(Object[] values, Object... objects) {
+    ArrayList<Object> list = new ArrayList<>(Arrays.asList(values));
+    Collections.addAll(list, objects);
+    return list.toArray();
+  }
+
   private void assertRedirectEquality(String expectedUri) {
     SortedMap<String, List<String>> actual = uriToMap(redirect);
     SortedMap<String, List<String>> expected = uriToMap(expectedUri);
@@ -926,10 +949,27 @@ public class RequestResult {
       // Replace any 'actual' values requested and then try again
       boolean recheck = replaceWithActualValues(actual, expected);
       if (!recheck || !actual.equals(expected)) {
-        throw new AssertionError("\nActual redirect not equal to the expected.\n Actual: \t" + redirect + "\n Expected:\t" + expectedUri);
+        throw new AssertionError("Actual redirect not equal to the expected.\n Expected [ " + expectedUri + " ] but found [" + redirect + " ]");
       }
-
     }
+  }
+
+  private Map<String, List<String>> extractParams(String params) {
+    Map<String, List<String>> map = new TreeMap<>();
+    String[] keyValuePairs = params.split("&");
+    for (String keyValuePair : keyValuePairs) {
+      String[] parts = keyValuePair.split("=");
+      if (parts.length == 2) {
+        List<String> value = map.computeIfAbsent(parts[0], k -> new ArrayList<>());
+        value.add(parts[1]);
+      }
+    }
+
+    return map;
+  }
+
+  private String normalize(String input) {
+    return input.trim().replace("\r\n", "\n").replace("\r", "\n");
   }
 
   private boolean replaceWithActualValues(SortedMap<String, List<String>> actual, Map<String, List<String>> expected) {
@@ -997,48 +1037,6 @@ public class RequestResult {
     return map;
   }
 
-  private Map<String, List<String>> extractParams(String params) {
-    Map<String, List<String>> map = new TreeMap<>();
-    String[] keyValuePairs = params.split("&");
-    for (String keyValuePair : keyValuePairs) {
-      String[] parts = keyValuePair.split("=");
-      if (parts.length == 2) {
-        List<String> value = map.computeIfAbsent(parts[0], k -> new ArrayList<>());
-        value.add(parts[1]);
-      }
-    }
-
-    return map;
-  }
-
-  private String normalize(String input) {
-    return input.trim().replace("\r\n", "\n").replace("\r", "\n");
-  }
-
-  private RequestResult _assertBodyContainsMessagesFromKey(boolean contains, String key, Object... values) {
-    MessageProvider messageProvider = get(MessageProvider.class);
-    ActionInvocationStore actionInvocationStore = get(ActionInvocationStore.class);
-    ActionMapper actionMapper = get(ActionMapper.class);
-
-    // Using the ActionMapper so that URL segments are properly handled and the correct URL is used for message lookups.
-    ActionInvocation actionInvocation = actionMapper.map(null, request.getRequestURI(), true);
-    actionInvocationStore.setCurrent(actionInvocation);
-
-    String message = messageProvider.getMessage(key, values);
-    if (contains != body.contains(message)) {
-      String text = contains ? "didn't" : "does";
-      throw new AssertionError("Body " + text + " contain [" + message + "] for the key [" + key + "]\nRedirect: [" + redirect + "]\nBody:\n" + body);
-    }
-
-    return this;
-  }
-
-  private Object[] appendArray(Object[] values, Object... objects) {
-    ArrayList<Object> list = new ArrayList<>(Arrays.asList(values));
-    Collections.addAll(list, objects);
-    return list.toArray();
-  }
-
   @FunctionalInterface
   public interface ThrowingConsumer<T> {
     void accept(T t) throws Exception;
@@ -1061,8 +1059,8 @@ public class RequestResult {
     }
 
     /**
-     * Add a parameter to the request that you will expect to match the expected. This may be useful if a
-     * timestamp oro other random data is returned that is not important to assert on.
+     * Add a parameter to the request that you will expect to match the expected. This may be useful if a timestamp oro
+     * other random data is returned that is not important to assert on.
      *
      * <strong>This is only intended for use during testing.</strong>
      *
