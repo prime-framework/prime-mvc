@@ -309,9 +309,9 @@ public class RequestResult {
    * @return This.
    */
   public RequestResult assertContainsCookie(String name) {
-    Cookie actual = response.getCookies().stream().filter(c -> c.getName().equals(name)).findFirst().orElse(null);
+    Cookie actual = getCookie(name);
     if (actual == null) {
-      throw new AssertionError("Cookie [" + name + "] was not found in the response. Cookies found [" + String.join(", ", response.getCookies().stream().map(Cookie::getName).collect(Collectors.toList())));
+      throw new AssertionError("Cookie [" + name + "] was not found in the response. Cookies found [" + response.getCookies().stream().map(Cookie::getName).collect(Collectors.joining(", ")) + "]");
     }
     return this;
   }
@@ -545,10 +545,12 @@ public class RequestResult {
    */
   public RequestResult assertCookie(String name, ThrowingConsumer<Cookie> consumer) throws Exception {
     assertContainsCookie(name);
-    Cookie actual = response.getCookies().stream().filter(c -> c.getName().equals(name)).findFirst().orElse(null);
+
+    Cookie actual = getCookie(name);
     if (consumer != null) {
       consumer.accept(actual);
     }
+
     return this;
   }
 
@@ -561,10 +563,29 @@ public class RequestResult {
    */
   public RequestResult assertCookie(String name, String value) {
     assertContainsCookie(name);
-    Cookie actual = response.getCookies().stream().filter(c -> c.getName().equals(name)).findFirst().orElse(null);
-    if (actual == null || actual.getValue() == null || !actual.getValue().equals(value)) {
-      throw new AssertionError("Cookie [" + name + "] with value [" + actual + "] was not equal to the expected value [" + value + "]");
+
+    Cookie actual = getCookie(name);
+    if (!actual.getValue().equals(value)) {
+      throw new AssertionError("Cookie [" + name + "] with value [" + actual.getValue() + "] was not equal to the expected value [" + value + "]");
     }
+
+    return this;
+  }
+
+  /**
+   * Assert the cookie was deleted on the server by sending back a null value and a max age of 0.
+   *
+   * @param name  The cookie name.
+   * @return This.
+   */
+  public RequestResult assertCookieWasDeleted(String name) {
+    assertContainsCookie(name);
+
+    Cookie actual = getCookie(name);
+    if (actual.getValue() != null && actual.getMaxAge() != 0) {
+      throw new AssertionError("Cookie [" + name + "] was not deleted. The value is [" + actual.getValue() + "] and the maxAge is [" + actual.getMaxAge() + "]");
+    }
+
     return this;
   }
 
@@ -574,10 +595,10 @@ public class RequestResult {
    * @param name The cookie name.
    * @return This.
    */
-  public RequestResult assertDoesContainsCookie(String name) {
-    Cookie actual = response.getCookies().stream().filter(c -> c.getName().equals(name)).findFirst().orElse(null);
+  public RequestResult assertDoesNotContainsCookie(String name) {
+    Cookie actual = getCookie(name);
     if (actual != null) {
-      throw new AssertionError("Cookie [" + name + "] was not expected to be found in the response. Cookies found [" + String.join(", ", response.getCookies().stream().map(Cookie::getName).collect(Collectors.toList())));
+      throw new AssertionError("Cookie [" + name + "] was not expected to be found in the response. Cookies found [" + response.getCookies().stream().map(Cookie::getName).collect(Collectors.joining(", ")) + "]");
     }
     return this;
   }
@@ -783,7 +804,7 @@ public class RequestResult {
       if (!generatorMessages.isEmpty()) {
         sb.append("\nThe following general error messages were returned in the message store:\n\n");
       }
-      generatorMessages.forEach(m -> sb.append("\t\t" + m.getType() + "\t" + m.getCode() + "\t" + ((m instanceof SimpleMessage) ? ((SimpleMessage) m).message : "") + "\n"));
+      generatorMessages.forEach(m -> sb.append("\t\t").append(m.getType()).append("\t").append(m.getCode()).append("\t").append((m instanceof SimpleMessage) ? ((SimpleMessage) m).message : "").append("\n"));
 
       // Append any Field Messages to the error message to aid in debug
       List<FieldMessage> fieldMessages = messageStore.getFieldMessages().values().stream().flatMap(Collection::stream).collect(Collectors.toList());
@@ -846,18 +867,13 @@ public class RequestResult {
   }
 
   /**
-   * Retrieve a cookie by name. If the cookie does not exist in the response it will fail.
+   * Retrieve a cookie by name. If the cookie does not exist in the response, this returns null.
    *
    * @param name The name of the cookie.
-   * @return the Cookie.
+   * @return The Cookie or null.
    */
   public Cookie getCookie(String name) {
-    Cookie cookie = response.getCookies().stream().filter(c -> c.getName().equals(name)).findFirst().orElse(null);
-    if (cookie == null) {
-      throw new AssertionError("Cookie [" + name + "] was not found in the response. Cookies found [" + String.join(", ", response.getCookies().stream().map(Cookie::getName).collect(Collectors.toList())));
-    }
-
-    return cookie;
+    return response.getCookies().stream().filter(c -> c.getName().equals(name)).findFirst().orElse(null);
   }
 
   /**
