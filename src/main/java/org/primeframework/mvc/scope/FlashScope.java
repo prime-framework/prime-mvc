@@ -85,7 +85,7 @@ public class FlashScope implements Scope<Flash> {
     synchronized (session) {
       flash = (Map<String, Object>) session.getAttribute(FLASH_KEY);
       if (flash == null) {
-        flash = new HashMap<String, Object>();
+        flash = new HashMap<>();
         session.setAttribute(FLASH_KEY, flash);
       }
     }

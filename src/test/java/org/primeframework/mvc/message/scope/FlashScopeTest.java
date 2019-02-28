@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +15,21 @@
  */
 package org.primeframework.mvc.message.scope;
 
-import org.primeframework.mvc.message.Message;
-import org.primeframework.mvc.message.MessageType;
-import org.primeframework.mvc.message.SimpleMessage;
-import org.testng.annotations.Test;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.primeframework.mvc.message.Message;
+import org.primeframework.mvc.message.MessageType;
+import org.primeframework.mvc.message.SimpleMessage;
+import org.testng.annotations.Test;
 import static java.util.Arrays.asList;
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.createStrictMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 import static org.testng.Assert.assertEquals;
 
 /**
@@ -36,6 +38,47 @@ import static org.testng.Assert.assertEquals;
  * @author Brian Pontarelli
  */
 public class FlashScopeTest {
+  @Test
+  public void add() {
+    List<Message> messages = new ArrayList<>();
+
+    HttpSession session = createStrictMock(HttpSession.class);
+    expect(session.getAttribute(FlashScope.KEY)).andReturn(messages);
+    replay(session);
+
+    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
+    expect(request.getSession(true)).andReturn(session);
+    replay(request);
+
+    FlashScope scope = new FlashScope(request, new RequestScope(request));
+    scope.add(new SimpleMessage(MessageType.ERROR, "code", "Foo"));
+    assertEquals(messages.size(), 1);
+    assertEquals(messages.get(0).toString(), "Foo");
+
+    verify(session, request);
+  }
+
+  @Test
+  public void addAll() {
+    List<Message> messages = new ArrayList<>();
+
+    HttpSession session = createStrictMock(HttpSession.class);
+    expect(session.getAttribute(FlashScope.KEY)).andReturn(messages);
+    replay(session);
+
+    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
+    expect(request.getSession(true)).andReturn(session);
+    replay(request);
+
+    FlashScope scope = new FlashScope(request, new RequestScope(request));
+    scope.addAll(Arrays.<Message>asList(new SimpleMessage(MessageType.ERROR, "code1", "Foo"), new SimpleMessage(MessageType.ERROR, "code2", "Bar")));
+    assertEquals(messages.size(), 2);
+    assertEquals(messages.get(0).toString(), "Foo");
+    assertEquals(messages.get(1).toString(), "Bar");
+
+    verify(session, request);
+  }
+
   @Test
   public void get() {
     HttpSession session = createStrictMock(HttpSession.class);
@@ -47,7 +90,7 @@ public class FlashScopeTest {
     expect(request.getSession(false)).andReturn(session);
     replay(request);
 
-    FlashScope scope = new FlashScope(request);
+    FlashScope scope = new FlashScope(request, new RequestScope(request));
     List<Message> messages = scope.get();
     assertEquals(messages.size(), 2);
     assertEquals(messages.get(0).toString(), "Request");
@@ -57,49 +100,8 @@ public class FlashScopeTest {
   }
 
   @Test
-  public void add() {
-    List<Message> messages = new ArrayList<Message>();
-
-    HttpSession session = createStrictMock(HttpSession.class);
-    expect(session.getAttribute(FlashScope.KEY)).andReturn(messages);
-    replay(session);
-
-    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    expect(request.getSession(true)).andReturn(session);
-    replay(request);
-
-    FlashScope scope = new FlashScope(request);
-    scope.add(new SimpleMessage(MessageType.ERROR, "code", "Foo"));
-    assertEquals(messages.size(), 1);
-    assertEquals(messages.get(0).toString(), "Foo");
-
-    verify(session, request);
-  }
-
-  @Test
-  public void addAll() {
-    List<Message> messages = new ArrayList<Message>();
-
-    HttpSession session = createStrictMock(HttpSession.class);
-    expect(session.getAttribute(FlashScope.KEY)).andReturn(messages);
-    replay(session);
-
-    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    expect(request.getSession(true)).andReturn(session);
-    replay(request);
-
-    FlashScope scope = new FlashScope(request);
-    scope.addAll(Arrays.<Message>asList(new SimpleMessage(MessageType.ERROR, "code1", "Foo"), new SimpleMessage(MessageType.ERROR, "code2", "Bar")));
-    assertEquals(messages.size(), 2);
-    assertEquals(messages.get(0).toString(), "Foo");
-    assertEquals(messages.get(1).toString(), "Bar");
-
-    verify(session, request);
-  }
-
-  @Test
   public void transferFlash() {
-    List<Message> messages = new ArrayList<Message>();
+    List<Message> messages = new ArrayList<>();
 
     HttpSession session = createStrictMock(HttpSession.class);
     expect(session.getAttribute(FlashScope.KEY)).andReturn(messages);
@@ -108,10 +110,11 @@ public class FlashScopeTest {
 
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
     expect(request.getSession(false)).andReturn(session);
-    request.setAttribute(FlashScope.KEY, messages);
+    expect(request.getAttribute(RequestScope.KEY)).andReturn(null);
+    request.setAttribute(RequestScope.KEY, new ArrayList<>());
     replay(request);
 
-    FlashScope scope = new FlashScope(request);
+    FlashScope scope = new FlashScope(request, new RequestScope(request));
     scope.transferFlash();
 
     verify(session, request);
@@ -123,7 +126,7 @@ public class FlashScopeTest {
     expect(request.getSession(false)).andReturn(null);
     replay(request);
 
-    FlashScope scope = new FlashScope(request);
+    FlashScope scope = new FlashScope(request, new RequestScope(request));
     scope.transferFlash();
 
     verify(request);

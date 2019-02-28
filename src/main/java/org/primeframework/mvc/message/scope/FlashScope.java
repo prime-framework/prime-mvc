@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2018, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.primeframework.mvc.message.Message;
-
 import com.google.inject.Inject;
+import org.primeframework.mvc.message.Message;
 
 /**
  * This is the flash scope which stores messages in the HttpSession under the flash key. It fetches values from the
@@ -37,9 +36,12 @@ import com.google.inject.Inject;
 public class FlashScope extends AbstractSessionScope implements Scope {
   public static final String KEY = "primeFlashMessages";
 
+  private final RequestScope requestScope;
+
   @Inject
-  public FlashScope(HttpServletRequest request) {
+  public FlashScope(HttpServletRequest request, RequestScope requestScope) {
     super(request, KEY);
+    this.requestScope = requestScope;
   }
 
   @Override
@@ -50,6 +52,15 @@ public class FlashScope extends AbstractSessionScope implements Scope {
   @Override
   public void addAll(Collection<Message> messages) {
     addAllMessages(messages);
+  }
+
+  @Override
+  public void clear() {
+    request.removeAttribute(KEY);
+    HttpSession session = request.getSession(false);
+    if (session != null) {
+      session.removeAttribute(KEY);
+    }
   }
 
   @Override
@@ -73,15 +84,6 @@ public class FlashScope extends AbstractSessionScope implements Scope {
     return messages;
   }
 
-  @Override
-  public void clear() {
-    request.removeAttribute(KEY);
-    HttpSession session = request.getSession(false);
-    if (session != null) {
-      session.removeAttribute(KEY);
-    }
-  }
-
   /**
    * Moves the flash from the session to the request.
    */
@@ -92,7 +94,7 @@ public class FlashScope extends AbstractSessionScope implements Scope {
         List<Message> messages = (List<Message>) session.getAttribute(KEY);
         if (messages != null) {
           session.removeAttribute(KEY);
-          request.setAttribute(KEY, messages);
+          requestScope.addAll(messages);
         }
       }
     }

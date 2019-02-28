@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2019, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,13 @@
 package org.example.action;
 
 import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.action.result.annotation.Redirect;
 
 /**
  * @author Daniel DeGroff
  */
 @Action
-@Redirect(code = "redirect", uri = "/temp-redirect-target-target")
-public class TempRedirectTargetAction {
+public class TempRedirectTargetTargetAction {
   public String get() {
-    return "redirect";
+    return "input";
   }
 }

@@ -41,7 +41,8 @@ public abstract class AbstractRedirectResult<T extends Annotation> extends Abstr
   protected final HttpServletResponse response;
 
   protected AbstractRedirectResult(ExpressionEvaluator expressionEvaluator, ActionInvocationStore actionInvocationStore,
-                                   MessageStore messageStore, HttpServletRequest request, HttpServletResponse response) {
+                                   MessageStore messageStore, HttpServletRequest request,
+                                   HttpServletResponse response) {
     super(expressionEvaluator);
     this.actionInvocationStore = actionInvocationStore;
     this.messageStore = messageStore;

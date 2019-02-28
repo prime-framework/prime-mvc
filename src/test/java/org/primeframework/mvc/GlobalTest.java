@@ -27,6 +27,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.Timer;
+import com.fasterxml.jackson.databind.MapperFeature;
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
+import freemarker.template.Configuration;
 import org.example.action.JwtAuthorizedAction;
 import org.example.domain.UserField;
 import org.primeframework.mvc.action.config.ActionConfigurationProvider;
@@ -39,13 +45,6 @@ import org.primeframework.mvc.parameter.el.MissingPropertyExpressionException;
 import org.primeframework.mvc.test.RequestSimulator;
 import org.primeframework.mvc.util.URIBuilder;
 import org.testng.annotations.Test;
-
-import com.codahale.metrics.Meter;
-import com.codahale.metrics.Timer;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.google.inject.Key;
-import com.google.inject.TypeLiteral;
-import freemarker.template.Configuration;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertSame;
 
@@ -57,11 +56,79 @@ import static org.testng.Assert.assertSame;
 public class GlobalTest extends PrimeBaseTest {
 
   @Test
+  public void embeddedFormHandling() throws Exception {
+    // Ensure this 'required' parameter for PageOne does not mess up PageTwo which does not have an Id field.
+    test.simulate(() -> simulator.test("/scope/page-one")
+                                 .withUrlSegment("IdOnlyForPageOne")
+                                 .get()
+                                 .assertStatusCode(200));
+
+    // Ensure the @FileUpload in the PageOneAction does not mess up PageTwo
+    test.createFile()
+        .simulate(() -> simulator.test("/scope/page-one")
+                                 .withFile("file", test.tempFile.toFile(), "text/plain")
+                                 .get()
+                                 .assertStatusCode(200));
+  }
+
+  @Test
+  public void escapePathSegmentsWithWildCard() throws Exception {
+    test.simulate(() -> test.simulator.test("/escaped-path-segments")
+                                      .withUrlSegment("foo%20bar")
+                                      .withUrlSegment("foobar")
+                                      .withUrlSegment("foo%20bar")
+                                      .withUrlSegment("foo@bar")
+                                      .get()
+                                      .assertStatusCode(200)
+                                      .assertBodyContains("Success!", "parm=foo bar", "theRest=foobar,foo bar,foo@bar"));
+  }
+
+  @Test
   public void get() throws Exception {
     simulator.test("/user/edit")
              .get()
              .assertStatusCode(200)
              .assertBodyFile(Paths.get("src/test/resources/html/edit.html"));
+  }
+
+  @Test
+  public void get_JSONView() throws Exception {
+    test.simulate(() -> simulator.test("/views/entry/api")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertJSONFile(Paths.get("src/test/resources/json/views/entry/entry-api.json")));
+
+    test.simulate(() -> simulator.test("/views/entry/export")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertJSONFile(Paths.get("src/test/resources/json/views/entry/entry-export.json")));
+
+    // Serialize an object using @JSONResponse when no view is specified for an object that has only annotated fields
+    // The DEFAULT_VIEW_INCLUSION is the default value, but explicitly configured in case the default prime configuration changes
+    test.configureObjectMapper(om -> objectMapper.enable(MapperFeature.DEFAULT_VIEW_INCLUSION))
+        .simulate(() -> simulator.test("/views/entry/no-view-defined")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertJSONFile(Paths.get("src/test/resources/json/views/entry/entry-no-view-defined.json")));
+
+    // Default view inclusion is enabled and if we serialize a @JSONResponse with a view that has no fields in the object - empty response
+    test.simulate(() -> simulator.test("/views/entry/wrong-view-defined")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertJSON("{}"));
+
+    // Ensure we get a response even when we disable the default view inclusion if we do not specify a view
+    test.configureObjectMapper(om -> objectMapper.disable(MapperFeature.DEFAULT_VIEW_INCLUSION))
+        .simulate(() -> simulator.test("/views/entry/no-view-defined")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertJSONFile(Paths.get("src/test/resources/json/views/entry/entry-no-view-defined.json")));
+
+    // Default view inclusion is disabled and if we serialize a @JSONResponse with a view that has no fields in the object - empty response.
+    test.simulate(() -> simulator.test("/views/entry/wrong-view-defined")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertJSON("{}"));
   }
 
   @Test
@@ -112,127 +179,42 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
-  public void escapePathSegmentsWithWildCard() throws Exception {
-    test.simulate(() -> test.simulator.test("/escaped-path-segments")
-                                      .withUrlSegment("foo%20bar")
-                                      .withUrlSegment("foobar")
-                                      .withUrlSegment("foo%20bar")
-                                      .withUrlSegment("foo@bar")
-                                      .get()
-                                      .assertStatusCode(200)
-                                      .assertBodyContains("Success!", "parm=foo bar", "theRest=foobar,foo bar,foo@bar"));
-  }
+  public void get_collectionConverter() throws Exception {
+    // Both of these will fail because the action has a List<String> as the backing values for this form, and the input field is a text field.
+    test.expectException(ConverterStateException.class,
+        () -> test.simulate(() -> simulator.test("/collection-converter")
+                                           .withParameter("string", "foo,bar,baz")
+                                           .get()));
 
-  @Test
-  public void get_nested_parameters() throws Exception {
-    test.simulate(() -> test.simulator.test("/nested")
-                                      .withUrlSegment("42")
-                                      .withUrlSegment("99")
-                                      .withUrlSegment("parameter")
-                                      .withUrlSegment("foo")
-                                      .withUrlSegment("bar")
-                                      .get()
-                                      .assertStatusCode(200)
-                                      .assertBodyContains("Success!", "preParam1=42", "preParam2=99", "endParam1=foo", "endParam2=bar"));
-  }
+    test.expectException(ConverterStateException.class,
+        () -> simulator.test("/collection-converter")
+                       .withParameter("string", "bar")
+                       .withParameter("string", "baz")
+                       .get());
 
-  @Test
-  public void get_sessionStorageInFormTag() throws Exception {
-    // Ensure we fill out scope storage in an action when we build a new action based upon hitting a
-    // form tag that has a different action then the current action invocation.
-
-    // Page2 has a session variable and a form, set it, assert it stays in the session.
-    test.simulate(() -> simulator.test("/scope/page-two")
-                                 .withParameter("searchText", "42") // @Session
-                                 .withParameter("searchType", "meaning") // @ActionSession
-                                 .post()
-                                 .assertStatusCode(200))
-
-        .simulate(() -> simulator.test("/scope/page-two")
+    // It will work if we use a backing collection with an iterator in the form to build multiple form fields
+    test.simulate(() -> simulator.test("/collection-converter")
+                                 .withParameter("strings", "bar")
+                                 .withParameter("strings", "baz")
                                  .get()
                                  .assertStatusCode(200)
-                                 .assertBodyContains("42", "meaning"))
+                                 .assertBodyDoesNotContain("__empty2__', '__empty3__")
+                                 .assertBodyContains("__empty1__")
+                                 .assertBodyContains("[bar, baz]")
+                                 .assertBodyContains("<input type=\"text\" id=\"string\" name=\"string\"/>")
+                                 .assertBodyContains("<input type=\"text\" id=\"strings\" name=\"strings\" value=\"bar\"/")
+                                 .assertBodyContains("<input type=\"text\" id=\"strings\" name=\"strings\" value=\"baz\"/"));
 
-        // Now hit /api/page-one which contains a form tag with an action of /scope/page-two
-        .simulate(() -> simulator.test("/scope/page-one")
+    // Single string containing commas, output contains the same string
+    test.simulate(() -> simulator.test("/collection-converter")
+                                 .withParameter("strings", "foo,bar,baz")
                                  .get()
                                  .assertStatusCode(200)
-                                 .assertBodyContains("42", "meaning"));
-  }
-
-  @Test
-  public void embeddedFormHandling() throws Exception {
-    // Ensure this 'required' parameter for PageOne does not mess up PageTwo which does not have an Id field.
-    test.simulate(() -> simulator.test("/scope/page-one")
-                                 .withUrlSegment("IdOnlyForPageOne")
-                                 .get()
-                                 .assertStatusCode(200));
-
-    // Ensure the @FileUpload in the PageOneAction does not mess up PageTwo
-    test.createFile()
-        .simulate(() -> simulator.test("/scope/page-one")
-                                 .withFile("file", test.tempFile.toFile(), "text/plain")
-                                 .get()
-                                 .assertStatusCode(200));
-  }
-
-  @Test
-  public void get_postParameterBeforeFormPrepare() throws Exception {
-    // Ensure we hit PostParameterMethods in an action when we build a new action based upon hitting a
-    // form tag that has a different action then the current action invocation.
-
-    test.simulate(() -> simulator.test("/scope/page-two")
-                                 .post()
-                                 .assertStatusCode(200)
-                                 .assertBodyContains("postParameterMethodCalled:first")
-                                 .assertBodyContains("formPrepareMethodCalled:second"))
-
-        // Now hit /api/page-one which contains a form tag with an action of /scope/page-two
-        .simulate(() -> simulator.test("/scope/page-one")
-                                 .get()
-                                 .assertStatusCode(200)
-                                 .assertBodyContains("postParameterMethodCalled:first")
-                                 .assertBodyContains("formPrepareMethodCalled:second"));
-  }
-
-  @Test
-  public void get_JSONView() throws Exception {
-    test.simulate(() -> simulator.test("/views/entry/api")
-                                 .get()
-                                 .assertStatusCode(200)
-                                 .assertJSONFile(Paths.get("src/test/resources/json/views/entry/entry-api.json")));
-
-    test.simulate(() -> simulator.test("/views/entry/export")
-                                 .get()
-                                 .assertStatusCode(200)
-                                 .assertJSONFile(Paths.get("src/test/resources/json/views/entry/entry-export.json")));
-
-    // Serialize an object using @JSONResponse when no view is specified for an object that has only annotated fields
-    // The DEFAULT_VIEW_INCLUSION is the default value, but explicitly configured in case the default prime configuration changes
-    test.configureObjectMapper(om -> objectMapper.enable(MapperFeature.DEFAULT_VIEW_INCLUSION))
-        .simulate(() -> simulator.test("/views/entry/no-view-defined")
-                                 .get()
-                                 .assertStatusCode(200)
-                                 .assertJSONFile(Paths.get("src/test/resources/json/views/entry/entry-no-view-defined.json")));
-
-    // Default view inclusion is enabled and if we serialize a @JSONResponse with a view that has no fields in the object - empty response
-    test.simulate(() -> simulator.test("/views/entry/wrong-view-defined")
-                                 .get()
-                                 .assertStatusCode(200)
-                                 .assertJSON("{}"));
-
-    // Ensure we get a response even when we disable the default view inclusion if we do not specify a view
-    test.configureObjectMapper(om -> objectMapper.disable(MapperFeature.DEFAULT_VIEW_INCLUSION))
-        .simulate(() -> simulator.test("/views/entry/no-view-defined")
-                                 .get()
-                                 .assertStatusCode(200)
-                                 .assertJSONFile(Paths.get("src/test/resources/json/views/entry/entry-no-view-defined.json")));
-
-    // Default view inclusion is disabled and if we serialize a @JSONResponse with a view that has no fields in the object - empty response.
-    test.simulate(() -> simulator.test("/views/entry/wrong-view-defined")
-                                 .get()
-                                 .assertStatusCode(200)
-                                 .assertJSON("{}"));
+                                 .assertBodyDoesNotContain("__empty2__', '__empty3__")
+                                 .assertBodyContains("__empty1__")
+                                 .assertBodyContains("[foo,bar,baz]")
+                                 .assertBodyContains("<input type=\"text\" id=\"string\" name=\"string\"/>")
+                                 .assertBodyContains("<input type=\"text\" id=\"strings\" name=\"strings\" value=\"foo,bar,baz\"/"));
   }
 
   @Test
@@ -249,6 +231,27 @@ public class GlobalTest extends PrimeBaseTest {
              .expectException(MissingPropertyExpressionException.class)
              .get()
              .assertStatusCode(500);
+  }
+
+  @Test
+  public void get_execute_redirect() throws Exception {
+    // Follow the redirect and another redirect and assert on that response as well - and ensure a message set in the first redirect gets all the way to the end
+    test.simulate(() -> simulator.test("/temp-redirect")
+                                 .get()
+                                 .assertStatusCode(302)
+                                 // Message is in the store
+                                 .assertContainsGeneralInfoMessageCodes("[Success]")
+                                 .assertRedirect("/temp-redirect-target")
+                                 .executeRedirect(response -> response.assertStatusCode(302)
+                                                                      // Message is still in the store
+                                                                      .assertContainsGeneralInfoMessageCodes("[Success]")
+                                                                      .assertRedirect("/temp-redirect-target-target")
+                                                                      .executeRedirect(subResponse -> subResponse.assertStatusCode(200)
+                                                                                                                 .assertBodyContains("Look Ma, I'm redirected.")
+                                                                                                                 // Message is still in the store and is rendered on the page
+                                                                                                                 .assertContainsGeneralInfoMessageCodes("[Success]")
+                                                                                                                 .assertBodyContainsMessagesFromKey("[Success]")
+                                                                                                                 .assertBodyContains("This is a success message for temp redirect target target."))));
   }
 
   @Test
@@ -269,34 +272,24 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void get_index() throws Exception {
+    test.simulate(() -> simulator.test("/user/")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertBodyContains("Yeah!"));
+    test.simulate(() -> simulator.test("/user")
+                                 .get()
+                                 .assertStatusCode(301)
+                                 .assertRedirect("/user/"));
+  }
+
+  @Test
   public void get_jwtAuthorized() throws Exception {
     JwtAuthorizedAction.authorized = true;
     test.simulate(() -> simulator.test("/jwt-authorized")
                                  .withHeader("Authorization", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkifQ.qHdut1UR4-2FSAvh7U3YdeRR5r5boVqjIGQ16Ztp894")
                                  .get()
                                  .assertStatusCode(200));
-  }
-
-  @Test
-  public void get_wellKnownDotPrefixed() throws Exception {
-    test.simulate(() -> simulator.test("/.well-known/openid-configuration")
-                                 .get()
-                                 .assertStatusCode(200)
-                                 .assertJSON(new Object()));
-
-    test.simulate(() -> simulator.test("/.well-known/well-known/openid-configuration")
-                                 .get()
-                                 .assertStatusCode(200)
-                                 .assertJSON(new Object()));
-
-    test.simulate(() -> simulator.test("/.well-known/well-known/.well-known/openid-configuration")
-                                 .get()
-                                 .assertStatusCode(200)
-                                 .assertJSON(new Object()));
-
-    test.expectException(UnsupportedOperationException.class,
-        () -> test.simulate(() -> simulator.test("/.well-known/.well-known/openid-configuration")
-                                           .get()));
   }
 
   @Test
@@ -310,14 +303,111 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
-  public void get_execute_redirect() throws Exception {
-    // Follow the redirect and assert on that response as well
-    test.simulate(() -> simulator.test("/temp-redirect")
+  public void get_jwtExpired() throws Exception {
+    test.simulate(() -> simulator.test("/jwt-authorized")
+                                 .withParameter("authorized", true)
+                                 .withHeader("Authorization", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0NDUxMDA3MzF9.K18gIegEBfxgj8rU4D2WDh3CzEmRUmy8qBS7SWAcG9w")
                                  .get()
-                                 .assertStatusCode(302)
-                                 .assertRedirect("/temp-redirect-target")
-                                 .executeRedirect(response -> response.assertStatusCode(200)
-                                                                      .assertBodyContains("Look Ma, I'm redirected.")));
+                                 .assertStatusCode(401));
+  }
+
+  @Test
+  public void get_jwtInvalidSignature() throws Exception {
+    test.simulate(() -> simulator.test("/jwt-authorized")
+                                 .withParameter("authorized", true)
+                                 .withHeader("Authorization", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkifQ.aaabbbcccddd")
+                                 .get()
+                                 .assertStatusCode(401));
+  }
+
+  @Test
+  public void get_jwtMissingAuthorizeHeader() throws Exception {
+    JwtAuthorizedAction.authorized = true;
+    test.simulate(() -> simulator.test("/jwt-authorized")
+                                 .get()
+                                 .assertStatusCode(401));
+  }
+
+  @Test
+  public void get_jwtNotAuthorized() throws Exception {
+    JwtAuthorizedAction.authorized = false;
+    test.simulate(() -> simulator.test("/jwt-authorized")
+                                 .withHeader("Authorization", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkifQ.qHdut1UR4-2FSAvh7U3YdeRR5r5boVqjIGQ16Ztp894")
+                                 .get()
+                                 .assertStatusCode(401));
+  }
+
+  @Test
+  public void get_jwtNotBefore() throws Exception {
+    // Validating the JWT registered claim 'nbf' (Not Before). The JWT is validly signed, but it is instructed not to be valid before some point in the future. Expecting a 401.
+    JwtAuthorizedAction.authorized = true;
+    test.simulate(() -> simulator.test("/jwt-authorized")
+                                 .withHeader("Authorization", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYmYiOjQ2MzIzOTY2NjV9.mRvvyJXvDD8RQ_PM1TadZdZNYXRa9CjOx62Tk866538")
+                                 .get()
+                                 .assertStatusCode(401));
+  }
+
+  @Test
+  public void get_metrics() throws Exception {
+    simulator.test("/user/full-form")
+             .get()
+             .assertBodyFile(Paths.get("src/test/resources/html/full-form.html"));
+
+    Map<String, Timer> timers = metricRegistry.getTimers();
+    assertEquals(timers.get("prime-mvc.[/user/full-form].requests").getCount(), 1);
+  }
+
+  @Test
+  public void get_metricsErrors() {
+    simulator.test("/execute-method-throws-exception")
+             .expectException(IllegalArgumentException.class)
+             .get()
+             .assertStatusCode(500);
+
+    Map<String, Timer> timers = metricRegistry.getTimers();
+    assertEquals(timers.get("prime-mvc.[/execute-method-throws-exception].requests").getCount(), 1);
+
+    Map<String, Meter> meters = metricRegistry.getMeters();
+    assertEquals(meters.get("prime-mvc.[/execute-method-throws-exception].errors").getCount(), 1);
+  }
+
+  @Test
+  public void get_nested_parameters() throws Exception {
+    test.simulate(() -> test.simulator.test("/nested")
+                                      .withUrlSegment("42")
+                                      .withUrlSegment("99")
+                                      .withUrlSegment("parameter")
+                                      .withUrlSegment("foo")
+                                      .withUrlSegment("bar")
+                                      .get()
+                                      .assertStatusCode(200)
+                                      .assertBodyContains("Success!", "preParam1=42", "preParam2=99", "endParam1=foo", "endParam2=bar"));
+  }
+
+  @Test
+  public void get_nonFormFields() throws Exception {
+    simulator.test("/user/details-fields")
+             .get()
+             .assertBodyFile(Paths.get("src/test/resources/html/details-fields.html"));
+  }
+
+  @Test
+  public void get_postParameterBeforeFormPrepare() throws Exception {
+    // Ensure we hit PostParameterMethods in an action when we build a new action based upon hitting a
+    // form tag that has a different action then the current action invocation.
+
+    test.simulate(() -> simulator.test("/scope/page-two")
+                                 .post()
+                                 .assertStatusCode(200)
+                                 .assertBodyContains("postParameterMethodCalled:first")
+                                 .assertBodyContains("formPrepareMethodCalled:second"))
+
+        // Now hit /api/page-one which contains a form tag with an action of /scope/page-two
+        .simulate(() -> simulator.test("/scope/page-one")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertBodyContains("postParameterMethodCalled:first")
+                                 .assertBodyContains("formPrepareMethodCalled:second"));
   }
 
   @Test
@@ -423,91 +513,56 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
-  public void get_index() throws Exception {
-    test.simulate(() -> simulator.test("/user/")
+  public void get_secure() throws Exception {
+    test.simulate(() -> test.simulator.test("/secure")
+                                      .get()
+                                      .assertStatusCode(401));
+  }
+
+  @Test
+  public void get_sessionStorageInFormTag() throws Exception {
+    // Ensure we fill out scope storage in an action when we build a new action based upon hitting a
+    // form tag that has a different action then the current action invocation.
+
+    // Page2 has a session variable and a form, set it, assert it stays in the session.
+    test.simulate(() -> simulator.test("/scope/page-two")
+                                 .withParameter("searchText", "42") // @Session
+                                 .withParameter("searchType", "meaning") // @ActionSession
+                                 .post()
+                                 .assertStatusCode(200))
+
+        .simulate(() -> simulator.test("/scope/page-two")
                                  .get()
                                  .assertStatusCode(200)
-                                 .assertBodyContains("Yeah!"));
-    test.simulate(() -> simulator.test("/user")
+                                 .assertBodyContains("42", "meaning"))
+
+        // Now hit /api/page-one which contains a form tag with an action of /scope/page-two
+        .simulate(() -> simulator.test("/scope/page-one")
                                  .get()
-                                 .assertStatusCode(301)
-                                 .assertRedirect("/user/"));
+                                 .assertStatusCode(200)
+                                 .assertBodyContains("42", "meaning"));
   }
 
   @Test
-  public void get_jwtExpired() throws Exception {
-    test.simulate(() -> simulator.test("/jwt-authorized")
-                                 .withParameter("authorized", true)
-                                 .withHeader("Authorization", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0NDUxMDA3MzF9.K18gIegEBfxgj8rU4D2WDh3CzEmRUmy8qBS7SWAcG9w")
+  public void get_wellKnownDotPrefixed() throws Exception {
+    test.simulate(() -> simulator.test("/.well-known/openid-configuration")
                                  .get()
-                                 .assertStatusCode(401));
-  }
+                                 .assertStatusCode(200)
+                                 .assertJSON(new Object()));
 
-  @Test
-  public void get_jwtInvalidSignature() throws Exception {
-    test.simulate(() -> simulator.test("/jwt-authorized")
-                                 .withParameter("authorized", true)
-                                 .withHeader("Authorization", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkifQ.aaabbbcccddd")
+    test.simulate(() -> simulator.test("/.well-known/well-known/openid-configuration")
                                  .get()
-                                 .assertStatusCode(401));
-  }
+                                 .assertStatusCode(200)
+                                 .assertJSON(new Object()));
 
-  @Test
-  public void get_jwtMissingAuthorizeHeader() throws Exception {
-    JwtAuthorizedAction.authorized = true;
-    test.simulate(() -> simulator.test("/jwt-authorized")
+    test.simulate(() -> simulator.test("/.well-known/well-known/.well-known/openid-configuration")
                                  .get()
-                                 .assertStatusCode(401));
-  }
+                                 .assertStatusCode(200)
+                                 .assertJSON(new Object()));
 
-  @Test
-  public void get_jwtNotAuthorized() throws Exception {
-    JwtAuthorizedAction.authorized = false;
-    test.simulate(() -> simulator.test("/jwt-authorized")
-                                 .withHeader("Authorization", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkifQ.qHdut1UR4-2FSAvh7U3YdeRR5r5boVqjIGQ16Ztp894")
-                                 .get()
-                                 .assertStatusCode(401));
-  }
-
-  @Test
-  public void get_jwtNotBefore() throws Exception {
-    // Validating the JWT registered claim 'nbf' (Not Before). The JWT is validly signed, but it is instructed not to be valid before some point in the future. Expecting a 401.
-    JwtAuthorizedAction.authorized = true;
-    test.simulate(() -> simulator.test("/jwt-authorized")
-                                 .withHeader("Authorization", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYmYiOjQ2MzIzOTY2NjV9.mRvvyJXvDD8RQ_PM1TadZdZNYXRa9CjOx62Tk866538")
-                                 .get()
-                                 .assertStatusCode(401));
-  }
-
-  @Test
-  public void get_metrics() throws Exception {
-    simulator.test("/user/full-form")
-             .get()
-             .assertBodyFile(Paths.get("src/test/resources/html/full-form.html"));
-
-    Map<String, Timer> timers = metricRegistry.getTimers();
-    assertEquals(timers.get("prime-mvc.[/user/full-form].requests").getCount(), 1);
-  }
-
-  @Test
-  public void get_metricsErrors() {
-    simulator.test("/execute-method-throws-exception")
-             .expectException(IllegalArgumentException.class)
-             .get()
-             .assertStatusCode(500);
-
-    Map<String, Timer> timers = metricRegistry.getTimers();
-    assertEquals(timers.get("prime-mvc.[/execute-method-throws-exception].requests").getCount(), 1);
-
-    Map<String, Meter> meters = metricRegistry.getMeters();
-    assertEquals(meters.get("prime-mvc.[/execute-method-throws-exception].errors").getCount(), 1);
-  }
-
-  @Test
-  public void get_nonFormFields() throws Exception {
-    simulator.test("/user/details-fields")
-             .get()
-             .assertBodyFile(Paths.get("src/test/resources/html/details-fields.html"));
+    test.expectException(UnsupportedOperationException.class,
+        () -> test.simulate(() -> simulator.test("/.well-known/.well-known/openid-configuration")
+                                           .get()));
   }
 
   @Test
@@ -538,10 +593,20 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
-  public void notImplemented() {
-    simulator.test("/not-allowed")
-             .method("POTATO")
-             .assertStatusCode(501);
+  public void multipleJSONRequestMembers() throws Exception {
+    simulator.test("/multiple-json-request")
+             .post()
+             .assertStatusCode(200);
+
+    simulator.test("/multiple-json-request")
+             .withJSON(new Object())
+             .post()
+             .assertStatusCode(201);
+
+    simulator.test("/multiple-json-request")
+             .withJSON(new Object())
+             .delete()
+             .assertStatusCode(202);
   }
 
   @Test
@@ -569,28 +634,18 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void notImplemented() {
+    simulator.test("/not-allowed")
+             .method("POTATO")
+             .assertStatusCode(501);
+  }
+
+  @Test
   public void post() {
     simulator.test("/post")
              .post()
              .assertStatusCode(200)
              .assertBodyContains("Brian Pontarelli", "35", "Broomfield", "CO");
-  }
-
-  @Test
-  public void multipleJSONRequestMembers() throws Exception {
-    simulator.test("/multiple-json-request")
-             .post()
-             .assertStatusCode(200);
-
-    simulator.test("/multiple-json-request")
-             .withJSON(new Object())
-             .post()
-             .assertStatusCode(201);
-
-    simulator.test("/multiple-json-request")
-             .withJSON(new Object())
-             .delete()
-             .assertStatusCode(202);
   }
 
   @Test
@@ -654,45 +709,6 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
-  public void get_collectionConverter() throws Exception {
-    // Both of these will fail because the action has a List<String> as the backing values for this form, and the input field is a text field.
-    test.expectException(ConverterStateException.class,
-        () -> test.simulate(() -> simulator.test("/collection-converter")
-                                           .withParameter("string", "foo,bar,baz")
-                                           .get()));
-
-    test.expectException(ConverterStateException.class,
-        () -> simulator.test("/collection-converter")
-                       .withParameter("string", "bar")
-                       .withParameter("string", "baz")
-                       .get());
-
-    // It will work if we use a backing collection with an iterator in the form to build multiple form fields
-    test.simulate(() -> simulator.test("/collection-converter")
-                                 .withParameter("strings", "bar")
-                                 .withParameter("strings", "baz")
-                                 .get()
-                                 .assertStatusCode(200)
-                                 .assertBodyDoesNotContain("__empty2__', '__empty3__")
-                                 .assertBodyContains("__empty1__")
-                                 .assertBodyContains("[bar, baz]")
-                                 .assertBodyContains("<input type=\"text\" id=\"string\" name=\"string\"/>")
-                                 .assertBodyContains("<input type=\"text\" id=\"strings\" name=\"strings\" value=\"bar\"/")
-                                 .assertBodyContains("<input type=\"text\" id=\"strings\" name=\"strings\" value=\"baz\"/"));
-
-    // Single string containing commas, output contains the same string
-    test.simulate(() -> simulator.test("/collection-converter")
-                                 .withParameter("strings", "foo,bar,baz")
-                                 .get()
-                                 .assertStatusCode(200)
-                                 .assertBodyDoesNotContain("__empty2__', '__empty3__")
-                                 .assertBodyContains("__empty1__")
-                                 .assertBodyContains("[foo,bar,baz]")
-                                 .assertBodyContains("<input type=\"text\" id=\"string\" name=\"string\"/>")
-                                 .assertBodyContains("<input type=\"text\" id=\"strings\" name=\"strings\" value=\"foo,bar,baz\"/"));
-  }
-
-  @Test
   public void post_dateConversion() throws Exception {
     // Multiple LocalDate formats
     test.forEach(
@@ -736,38 +752,6 @@ public class GlobalTest extends PrimeBaseTest {
                                  .post()
                                  .assertContainsNoFieldMessages()
                                  .assertStatusCode(200));
-  }
-
-  @Test
-  public void post_onlyAllowTextHTML() throws Exception {
-    test.createFile("<strong>Hello World</strong>")
-        .simulate(() -> simulator.test("/file-upload")
-                                 .withFile("dataTextHtml", test.tempFile.toFile(), "text/plain")
-                                 .post()
-                                 .assertStatusCode(400))
-        .simulate(() -> simulator.test("/file-upload")
-                                 .withFile("dataTextHtml", test.tempFile.toFile(), "text/html")
-                                 .post()
-                                 .assertStatusCode(200));
-  }
-
-  @Test
-  public void post_scopeStorage() throws Exception {
-    // Tests that the expression evaluator safely gets skipped while looking for values and Prime then checks the
-    // HttpServletRequest and finds the value
-    test.simulate(() -> test.simulator.test("/scope-storage")
-                                      .post())
-        .assertContextAttributeNotNull("contextObject")
-        .assertRequestAttributeNotNull("requestObject")
-        .assertActionSessionAttributeNotNull("org.example.action.ScopeStorageAction", "actionSessionObject")
-        .assertSessionAttributeNotNull("sessionObject");
-  }
-
-  @Test
-  public void get_secure() throws Exception {
-    test.simulate(() -> test.simulator.test("/secure")
-                                      .get()
-                                      .assertStatusCode(401));
   }
 
   @Test
@@ -860,6 +844,41 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void post_invalidJSON() throws Exception {
+    test.simulate(() -> test.simulator.test("/invalid-json")
+                                      .withJSONFile(Paths.get("src/test/resources/json/invalid-json.json"))
+                                      .post()
+                                      .assertStatusCode(400)
+                                      .assertContainsFieldErrors("active")
+                                      .assertBodyContains("Unable to parse JSON. The property [active] was invalid. The error was [Possible conversion error]. The detailed exception was [Cannot deserialize instance of `boolean` out of START_ARRAY token\\n at [Source: (org.primeframework.mock.servlet.MockServletInputStream); line: 2, column: 13] (through reference chain: org.example.domain.UserField[\\\"active\\\"])]"));
+  }
+
+  @Test
+  public void post_onlyAllowTextHTML() throws Exception {
+    test.createFile("<strong>Hello World</strong>")
+        .simulate(() -> simulator.test("/file-upload")
+                                 .withFile("dataTextHtml", test.tempFile.toFile(), "text/plain")
+                                 .post()
+                                 .assertStatusCode(400))
+        .simulate(() -> simulator.test("/file-upload")
+                                 .withFile("dataTextHtml", test.tempFile.toFile(), "text/html")
+                                 .post()
+                                 .assertStatusCode(200));
+  }
+
+  @Test
+  public void post_scopeStorage() throws Exception {
+    // Tests that the expression evaluator safely gets skipped while looking for values and Prime then checks the
+    // HttpServletRequest and finds the value
+    test.simulate(() -> test.simulator.test("/scope-storage")
+                                      .post())
+        .assertContextAttributeNotNull("contextObject")
+        .assertRequestAttributeNotNull("requestObject")
+        .assertActionSessionAttributeNotNull("org.example.action.ScopeStorageAction", "actionSessionObject")
+        .assertSessionAttributeNotNull("sessionObject");
+  }
+
+  @Test
   public void post_scopeStorageInBaseClass() throws Exception {
     // Set values during POST - fields exist in base abstract class
     test.simulate(() -> test.simulator.test("/extended-scope-storage")
@@ -884,24 +903,6 @@ public class GlobalTest extends PrimeBaseTest {
         .assertRequestAttributeIsNull("requestObject")
         .assertActionSessionAttributeIsNull("org.example.action.AnotherExtendedScopeStorage", "actionSessionObject")
         .assertSessionAttributeNotNull("sessionObject");
-  }
-
-  @Test
-  public void post_invalidJSON() throws Exception {
-    test.simulate(() -> test.simulator.test("/invalid-json")
-                                      .withJSONFile(Paths.get("src/test/resources/json/invalid-json.json"))
-                                      .post()
-                                      .assertStatusCode(400)
-                                      .assertContainsFieldErrors("active")
-                                      .assertBodyContains("Unable to parse JSON. The property [active] was invalid. The error was [Possible conversion error]. The detailed exception was [Cannot deserialize instance of `boolean` out of START_ARRAY token\\n at [Source: (org.primeframework.mock.servlet.MockServletInputStream); line: 2, column: 13] (through reference chain: org.example.domain.UserField[\\\"active\\\"])]"));
-  }
-
-  @Test
-  public void uriParameters() throws Exception {
-    test.simulate(() -> test.simulator.test("/complex-rest/brian/static/pontarelli/then/a/bunch/of/stuff")
-                                      .post()
-                                      .assertStatusCode(200)
-                                      .assertBodyContains("firstName=brian", "lastName=pontarelli", "theRest=then,a,bunch,of,stuff"));
   }
 
   @Test
@@ -932,6 +933,14 @@ public class GlobalTest extends PrimeBaseTest {
     assertSingletonConverter(simulator, LocalDate.class);
     assertSingletonConverter(simulator, Locale.class);
     assertSingletonConverter(simulator, String.class);
+  }
+
+  @Test
+  public void uriParameters() throws Exception {
+    test.simulate(() -> test.simulator.test("/complex-rest/brian/static/pontarelli/then/a/bunch/of/stuff")
+                                      .post()
+                                      .assertStatusCode(200)
+                                      .assertBodyContains("firstName=brian", "lastName=pontarelli", "theRest=then,a,bunch,of,stuff"));
   }
 
   private void assertSingleton(RequestSimulator simulator, Class<?> type) {

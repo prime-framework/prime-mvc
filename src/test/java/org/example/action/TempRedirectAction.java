@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2018-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,13 @@
  */
 package org.example.action;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.annotation.Redirect;
+import org.primeframework.mvc.message.MessageStore;
+import org.primeframework.mvc.message.MessageType;
+import org.primeframework.mvc.message.SimpleMessage;
+import org.primeframework.mvc.message.l10n.MessageProvider;
 
 /**
  * @author Daniel DeGroff
@@ -24,7 +29,19 @@ import org.primeframework.mvc.action.result.annotation.Redirect;
 @Action
 @Redirect(code = "redirect", uri = "/temp-redirect-target")
 public class TempRedirectAction {
+  private final MessageProvider messageProvider;
+
+  private final MessageStore messageStore;
+
+  @Inject
+  public TempRedirectAction(MessageProvider messageProvider, MessageStore messageStore) {
+    this.messageProvider = messageProvider;
+    this.messageStore = messageStore;
+  }
+
   public String get() {
+    String message = messageProvider.getMessage("[Success]");
+    messageStore.add(new SimpleMessage(MessageType.INFO, "[Success]", message));
     return "redirect";
   }
 }
