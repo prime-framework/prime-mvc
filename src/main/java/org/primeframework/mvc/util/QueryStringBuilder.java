@@ -19,6 +19,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.primeframework.mvc.NotImplementedException;
 
@@ -38,12 +39,7 @@ public class QueryStringBuilder {
   }
 
   protected QueryStringBuilder(String uri) {
-    if (uri != null) {
-      this.uri.append(uri);
-      if (uri.contains("?") && !uri.endsWith("&")) {
-        addSeparator = true;
-      }
-    }
+    uri(uri);
   }
 
   public static QueryStringBuilder builder() {
@@ -101,6 +97,26 @@ public class QueryStringBuilder {
     }
 
     return uri.append("?").append(sb).toString();
+  }
+
+  public QueryStringBuilder uri(String uri) {
+    if (this.uri.length() > 0) {
+      throw new IllegalStateException("Object has already been initialized with a URL");
+    }
+
+    if (uri != null) {
+      this.uri.append(uri);
+      if (uri.contains("?") && !uri.endsWith("&")) {
+        addSeparator = true;
+      }
+    }
+    return this;
+  }
+
+  public QueryStringBuilder with(String name, Consumer<QueryStringBuilder> consumer) {
+    QueryStringBuilder b = new QueryStringBuilder();
+    consumer.accept(b);
+    return with(name, b);
   }
 
   public QueryStringBuilder with(String name, Object value) {
