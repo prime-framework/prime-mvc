@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,11 +36,11 @@ import org.primeframework.mvc.util.TypeTools;
  * @author Brian Pontarelli
  */
 public class MemberAccessor extends Accessor {
+  final Class<?> declaringClass;
+
   final Field field;
 
   final ReflectionUtils.PropertyInfo propertyInfo;
-
-  final Class<?> declaringClass;
 
   private final List<Class<? extends Annotation>> unWrappedAnnotations;
 
@@ -57,7 +57,8 @@ public class MemberAccessor extends Accessor {
     }
   }
 
-  public MemberAccessor(ConverterProvider converterProvider, Class<?> currentClass, String name, String expression, MVCConfiguration configuration) {
+  public MemberAccessor(ConverterProvider converterProvider, Class<?> currentClass, String name, String expression,
+                        MVCConfiguration configuration) {
     super(converterProvider);
     if (configuration != null) {
       this.unWrappedAnnotations = configuration.unwrapAnnotations();
@@ -192,31 +193,28 @@ public class MemberAccessor extends Accessor {
   }
 
   /**
-   * Find the fields in the declaring class being aware that if any of those fields are annotated with an annotation indicating it should be
-   * unwrapped -  we should ignore that field, and instead add the fields that belong to that object.
+   * Find the fields in the declaring class being aware that if any of those fields are annotated with an annotation
+   * indicating it should be unwrapped -  we should ignore that field, and instead add the fields that belong to that
+   * object.
    *
    * @return the fields found keyed by the field name.
    */
   private Map<String, Field> findFields() {
     Map<String, Field> fields = new HashMap<>();
-    try {
-      for (Map.Entry<String, Field> entry : ReflectionUtils.findFields(this.currentClass).entrySet()) {
-        if (ReflectionUtils.areAnyAnnotationsPresent(entry.getValue(), unWrappedAnnotations)) {
-          Field unwrappedField = currentClass.getField(entry.getKey());
-          fields.putAll(ReflectionUtils.findFields(unwrappedField.getType()));
-        } else {
-          fields.put(entry.getKey(), entry.getValue());
-        }
+    for (Map.Entry<String, Field> entry : ReflectionUtils.findFields(this.currentClass).entrySet()) {
+      if (ReflectionUtils.areAnyAnnotationsPresent(entry.getValue(), unWrappedAnnotations)) {
+        fields.putAll(ReflectionUtils.findFields(entry.getValue().getType()));
+      } else {
+        fields.put(entry.getKey(), entry.getValue());
       }
-    } catch (NoSuchFieldException ignore) {
     }
 
     return fields;
   }
 
   /**
-   * Return the field for the object being aware that the field may be nested inside of another object annotated with an annotation
-   * indicating it should be unwrapped.
+   * Return the field for the object being aware that the field may be nested inside of another object annotated with an
+   * annotation indicating it should be unwrapped.
    *
    * @return the field object.
    */
@@ -238,11 +236,11 @@ public class MemberAccessor extends Accessor {
   }
 
   /**
-   * Set the field in the object being aware that the field may be nested inside of another object annotated with an annotation indicating
-   * it should be unwrapped.
+   * Set the field in the object being aware that the field may be nested inside of another object annotated with an
+   * annotation indicating it should be unwrapped.
    *
    * @param value      The value to set into the field.
-   * @param expression the current expression that was used to idenfity the field, used only for exception cases.
+   * @param expression the current expression that was used to identify the field, used only for exception cases.
    */
   private void setField(Object value, Expression expression) {
     // Normal case, the field is found in the object.
