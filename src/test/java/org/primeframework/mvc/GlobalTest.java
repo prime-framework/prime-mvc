@@ -37,6 +37,7 @@ import org.example.action.JwtAuthorizedAction;
 import org.example.domain.UserField;
 import org.primeframework.mvc.action.config.ActionConfigurationProvider;
 import org.primeframework.mvc.container.ContainerResolver;
+import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
@@ -54,7 +55,6 @@ import static org.testng.Assert.assertSame;
  * @author Brian Pontarelli
  */
 public class GlobalTest extends PrimeBaseTest {
-
   @Test
   public void embeddedFormHandling() throws Exception {
     // Ensure this 'required' parameter for PageOne does not mess up PageTwo which does not have an Id field.
@@ -239,19 +239,25 @@ public class GlobalTest extends PrimeBaseTest {
     test.simulate(() -> simulator.test("/temp-redirect")
                                  .get()
                                  .assertStatusCode(302)
-                                 // Message is in the store
-                                 .assertContainsGeneralInfoMessageCodes("[Success]")
+                                 // Messages are in the store
+                                 .assertContainsGeneralMessageCodes(MessageType.ERROR, "[ERROR]")
+                                 .assertContainsGeneralMessageCodes(MessageType.INFO, "[INFO]")
+                                 .assertContainsGeneralMessageCodes(MessageType.WARNING, "[WARNING]")
                                  .assertRedirect("/temp-redirect-target")
                                  .executeRedirect(response -> response.assertStatusCode(302)
                                                                       // Message is still in the store
-                                                                      .assertContainsGeneralInfoMessageCodes("[Success]")
+                                                                      .assertContainsGeneralMessageCodes(MessageType.ERROR, "[ERROR]")
+                                                                      .assertContainsGeneralMessageCodes(MessageType.INFO, "[INFO]")
+                                                                      .assertContainsGeneralMessageCodes(MessageType.WARNING, "[WARNING]")
                                                                       .assertRedirect("/temp-redirect-target-target")
                                                                       .executeRedirect(subResponse -> subResponse.assertStatusCode(200)
                                                                                                                  .assertBodyContains("Look Ma, I'm redirected.")
-                                                                                                                 // Message is still in the store and is rendered on the page
-                                                                                                                 .assertContainsGeneralInfoMessageCodes("[Success]")
-                                                                                                                 .assertBodyContainsMessagesFromKey("[Success]")
-                                                                                                                 .assertBodyContains("This is a success message for temp redirect target target."))));
+                                                                                                                 // Message is still in the store and also rendered on the page
+                                                                                                                 .assertContainsGeneralMessageCodes(MessageType.ERROR, "[ERROR]")
+                                                                                                                 .assertContainsGeneralMessageCodes(MessageType.INFO, "[INFO]")
+                                                                                                                 .assertContainsGeneralMessageCodes(MessageType.WARNING, "[WARNING]")
+                                                                                                                 .assertBodyContainsMessagesFromKey("[ERROR]", "[INFO]", "[WARNING]")
+                                                                                                                 .assertBodyContains("Error 3", "Info 3", "Warning 3"))));
   }
 
   @Test

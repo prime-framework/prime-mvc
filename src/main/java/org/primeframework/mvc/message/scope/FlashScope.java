@@ -36,12 +36,9 @@ import org.primeframework.mvc.message.Message;
 public class FlashScope extends AbstractSessionScope implements Scope {
   public static final String KEY = "primeFlashMessages";
 
-  private final RequestScope requestScope;
-
   @Inject
-  public FlashScope(HttpServletRequest request, RequestScope requestScope) {
+  public FlashScope(HttpServletRequest request) {
     super(request, KEY);
-    this.requestScope = requestScope;
   }
 
   @Override
@@ -94,7 +91,7 @@ public class FlashScope extends AbstractSessionScope implements Scope {
         List<Message> messages = (List<Message>) session.getAttribute(KEY);
         if (messages != null) {
           session.removeAttribute(KEY);
-          requestScope.addAll(messages);
+          request.setAttribute(KEY, messages);
         }
       }
     }

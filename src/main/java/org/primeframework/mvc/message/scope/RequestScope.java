@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ public class RequestScope implements Scope {
   public void add(Message message) {
     List<Message> messages = (List<Message>) request.getAttribute(KEY);
     if (messages == null) {
-      messages = new ArrayList<Message>();
+      messages = new ArrayList<>();
       request.setAttribute(KEY, messages);
     }
 
@@ -55,7 +55,7 @@ public class RequestScope implements Scope {
   public void addAll(Collection<Message> messages) {
     List<Message> scopeMessages = (List<Message>) request.getAttribute(KEY);
     if (scopeMessages == null) {
-      scopeMessages = new ArrayList<Message>();
+      scopeMessages = new ArrayList<>();
       request.setAttribute(KEY, scopeMessages);
     }
 

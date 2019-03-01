@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2015-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,13 +32,13 @@ import org.primeframework.mvc.action.result.ReexecuteSavedRequestResult.Reexecut
 import org.primeframework.mvc.action.result.annotation.ReexecuteSavedRequest;
 import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;
+import org.primeframework.mvc.message.scope.FlashScope;
 import org.primeframework.mvc.message.scope.MessageScope;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.security.DefaultCipherProvider;
 import org.primeframework.mvc.security.saved.SavedHttpRequest;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.testng.annotations.Test;
-
 import static org.easymock.EasyMock.createStrictMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
@@ -55,7 +55,9 @@ public class ReexecuteSavedRequestResultTest extends PrimeBaseTest {
     ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
     replay(ee);
 
+    List<Message> messages = new ArrayList<>();
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
+    expect(request.getAttribute(FlashScope.KEY)).andReturn(messages);
     expect(request.getCookies()).andReturn(null);
     expect(request.getContextPath()).andReturn("");
     expect(request.getRequestURI()).andReturn("/");
@@ -70,10 +72,10 @@ public class ReexecuteSavedRequestResultTest extends PrimeBaseTest {
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/foo", "", null));
     replay(store);
 
-    List<Message> messages = new ArrayList<>();
     MessageStore messageStore = createStrictMock(MessageStore.class);
     expect(messageStore.get(MessageScope.REQUEST)).andReturn(messages);
     messageStore.clear(MessageScope.REQUEST);
+    messageStore.addAll(MessageScope.FLASH, messages);
     messageStore.addAll(MessageScope.FLASH, messages);
     replay(messageStore);
 
@@ -94,9 +96,11 @@ public class ReexecuteSavedRequestResultTest extends PrimeBaseTest {
     session.setAttribute(SavedHttpRequest.LOGGED_IN_SESSION_KEY, savedRequest);
     replay(session);
 
+    List<Message> messages = new ArrayList<>();
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
     DefaultCipherProvider cipherProvider = new DefaultCipherProvider(configuration);
     Cookie cookie = SavedRequestTools.toCookie(savedRequest, objectMapper, configuration, cipherProvider);
+    expect(request.getAttribute(FlashScope.KEY)).andReturn(messages);
     expect(request.getCookies()).andReturn(new Cookie[]{cookie});
     expect(request.getSession(true)).andReturn(session);
     expect(request.getContextPath()).andReturn("");
@@ -112,10 +116,10 @@ public class ReexecuteSavedRequestResultTest extends PrimeBaseTest {
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     replay(store);
 
-    List<Message> messages = new ArrayList<>();
     MessageStore messageStore = createStrictMock(MessageStore.class);
     expect(messageStore.get(MessageScope.REQUEST)).andReturn(messages);
     messageStore.clear(MessageScope.REQUEST);
+    messageStore.addAll(MessageScope.FLASH, messages);
     messageStore.addAll(MessageScope.FLASH, messages);
     replay(messageStore);
 

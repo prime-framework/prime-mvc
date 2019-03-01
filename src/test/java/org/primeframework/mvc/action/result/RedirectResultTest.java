@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,11 +28,14 @@ import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.annotation.Redirect;
 import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;
+import org.primeframework.mvc.message.scope.FlashScope;
 import org.primeframework.mvc.message.scope.MessageScope;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.testng.annotations.Test;
-
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.createStrictMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 
 /**
  * This class tests the redirect result.
@@ -41,11 +44,87 @@ import static org.easymock.EasyMock.*;
  */
 public class RedirectResultTest {
   @Test
+  public void encode() throws IOException, ServletException {
+    Object action = new Object();
+    ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
+    expect(ee.expand("${foo}", action, true)).andReturn("result");
+    replay(ee);
+
+    List<Message> messages = new ArrayList<>();
+    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
+    expect(request.getAttribute(FlashScope.KEY)).andReturn(messages);
+    expect(request.getContextPath()).andReturn("/");
+    expect(request.getRequestURI()).andReturn("/");
+    replay(request);
+
+    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
+    response.sendRedirect("result");
+    response.setStatus(302);
+    replay(response);
+
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(new ActionInvocation(action, null, "foo", "", null));
+    replay(store);
+
+    MessageStore messageStore = createStrictMock(MessageStore.class);
+    expect(messageStore.get(MessageScope.REQUEST)).andReturn(messages);
+    messageStore.clear(MessageScope.REQUEST);
+    messageStore.addAll(MessageScope.FLASH, messages);
+    messageStore.addAll(MessageScope.FLASH, messages);
+    replay(messageStore);
+
+    Redirect redirect = new RedirectImpl("success", "${foo}", false, true);
+    RedirectResult result = new RedirectResult(messageStore, ee, response, request, store);
+    result.execute(redirect);
+
+    verify(response);
+  }
+
+  @Test
+  public void expand() throws IOException, ServletException {
+    Object action = new Object();
+    ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
+    expect(ee.expand("${foo}", action, false)).andReturn("result");
+    replay(ee);
+
+    List<Message> messages = new ArrayList<>();
+    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
+    expect(request.getAttribute(FlashScope.KEY)).andReturn(messages);
+    expect(request.getContextPath()).andReturn("");
+    expect(request.getRequestURI()).andReturn("/");
+    replay(request);
+
+    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
+    response.sendRedirect("result");
+    response.setStatus(302);
+    replay(response);
+
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(new ActionInvocation(action, null, "foo", "", null));
+    replay(store);
+
+    MessageStore messageStore = createStrictMock(MessageStore.class);
+    expect(messageStore.get(MessageScope.REQUEST)).andReturn(messages);
+    messageStore.clear(MessageScope.REQUEST);
+    messageStore.addAll(MessageScope.FLASH, messages);
+    messageStore.addAll(MessageScope.FLASH, messages);
+    replay(messageStore);
+
+    Redirect redirect = new RedirectImpl("success", "${foo}", false, false);
+    RedirectResult result = new RedirectResult(messageStore, ee, response, request, store);
+    result.execute(redirect);
+
+    verify(response);
+  }
+
+  @Test
   public void fullyQualified() throws IOException, ServletException {
     ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
     replay(ee);
 
+    List<Message> messages = new ArrayList<>();
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
+    expect(request.getAttribute(FlashScope.KEY)).andReturn(messages);
     expect(request.getContextPath()).andReturn("");
     expect(request.getRequestURI()).andReturn("/");
     replay(request);
@@ -59,10 +138,10 @@ public class RedirectResultTest {
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/foo", "", null));
     replay(store);
 
-    List<Message> messages = new ArrayList<Message>();
     MessageStore messageStore = createStrictMock(MessageStore.class);
     expect(messageStore.get(MessageScope.REQUEST)).andReturn(messages);
     messageStore.clear(MessageScope.REQUEST);
+    messageStore.addAll(MessageScope.FLASH, messages);
     messageStore.addAll(MessageScope.FLASH, messages);
     replay(messageStore);
 
@@ -78,7 +157,9 @@ public class RedirectResultTest {
     ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
     replay(ee);
 
+    List<Message> messages = new ArrayList<>();
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
+    expect(request.getAttribute(FlashScope.KEY)).andReturn(messages);
     expect(request.getContextPath()).andReturn("");
     expect(request.getRequestURI()).andReturn("/");
     replay(request);
@@ -92,10 +173,10 @@ public class RedirectResultTest {
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "foo", "", null));
     replay(store);
 
-    List<Message> messages = new ArrayList<Message>();
     MessageStore messageStore = createStrictMock(MessageStore.class);
     expect(messageStore.get(MessageScope.REQUEST)).andReturn(messages);
     messageStore.clear(MessageScope.REQUEST);
+    messageStore.addAll(MessageScope.FLASH, messages);
     messageStore.addAll(MessageScope.FLASH, messages);
     replay(messageStore);
 
@@ -111,7 +192,9 @@ public class RedirectResultTest {
     ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
     replay(ee);
 
+    List<Message> messages = new ArrayList<>();
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
+    expect(request.getAttribute(FlashScope.KEY)).andReturn(messages);
     expect(request.getContextPath()).andReturn("/context-path");
     expect(request.getRequestURI()).andReturn("/");
     replay(request);
@@ -125,10 +208,10 @@ public class RedirectResultTest {
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "foo", "", null));
     replay(store);
 
-    List<Message> messages = new ArrayList<Message>();
     MessageStore messageStore = createStrictMock(MessageStore.class);
     expect(messageStore.get(MessageScope.REQUEST)).andReturn(messages);
     messageStore.clear(MessageScope.REQUEST);
+    messageStore.addAll(MessageScope.FLASH, messages);
     messageStore.addAll(MessageScope.FLASH, messages);
     replay(messageStore);
 
@@ -144,7 +227,9 @@ public class RedirectResultTest {
     ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
     replay(ee);
 
+    List<Message> messages = new ArrayList<>();
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
+    expect(request.getAttribute(FlashScope.KEY)).andReturn(messages);
     expect(request.getContextPath()).andReturn("/context-path");
     expect(request.getRequestURI()).andReturn("/");
     replay(request);
@@ -158,10 +243,10 @@ public class RedirectResultTest {
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "foo", "", null));
     replay(store);
 
-    List<Message> messages = new ArrayList<Message>();
     MessageStore messageStore = createStrictMock(MessageStore.class);
     expect(messageStore.get(MessageScope.REQUEST)).andReturn(messages);
     messageStore.clear(MessageScope.REQUEST);
+    messageStore.addAll(MessageScope.FLASH, messages);
     messageStore.addAll(MessageScope.FLASH, messages);
     replay(messageStore);
 
@@ -172,81 +257,14 @@ public class RedirectResultTest {
     verify(response);
   }
 
-  @Test
-  public void expand() throws IOException, ServletException {
-    Object action = new Object();
-    ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
-    expect(ee.expand("${foo}", action, false)).andReturn("result");
-    replay(ee);
-
-    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    expect(request.getContextPath()).andReturn("");
-    expect(request.getRequestURI()).andReturn("/");
-    replay(request);
-
-    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    response.sendRedirect("result");
-    response.setStatus(302);
-    replay(response);
-
-    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new ActionInvocation(action, null, "foo", "", null));
-    replay(store);
-
-    List<Message> messages = new ArrayList<Message>();
-    MessageStore messageStore = createStrictMock(MessageStore.class);
-    expect(messageStore.get(MessageScope.REQUEST)).andReturn(messages);
-    messageStore.clear(MessageScope.REQUEST);
-    messageStore.addAll(MessageScope.FLASH, messages);
-    replay(messageStore);
-
-    Redirect redirect = new RedirectImpl("success", "${foo}", false, false);
-    RedirectResult result = new RedirectResult(messageStore, ee, response, request, store);
-    result.execute(redirect);
-
-    verify(response);
-  }
-
-  @Test
-  public void encode() throws IOException, ServletException {
-    Object action = new Object();
-    ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
-    expect(ee.expand("${foo}", action, true)).andReturn("result");
-    replay(ee);
-
-    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    expect(request.getContextPath()).andReturn("");
-    expect(request.getRequestURI()).andReturn("/");
-    replay(request);
-
-    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    response.sendRedirect("result");
-    response.setStatus(302);
-    replay(response);
-
-    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new ActionInvocation(action, null, "foo", "", null));
-    replay(store);
-
-    List<Message> messages = new ArrayList<Message>();
-    MessageStore messageStore = createStrictMock(MessageStore.class);
-    expect(messageStore.get(MessageScope.REQUEST)).andReturn(messages);
-    messageStore.clear(MessageScope.REQUEST);
-    messageStore.addAll(MessageScope.FLASH, messages);
-    replay(messageStore);
-
-    Redirect redirect = new RedirectImpl("success", "${foo}", false, true);
-    RedirectResult result = new RedirectResult(messageStore, ee, response, request, store);
-    result.execute(redirect);
-
-    verify(response);
-  }
-
   public class RedirectImpl implements Redirect {
     private final String code;
-    private final String uri;
-    private final boolean perm;
+
     private final boolean encode;
+
+    private final boolean perm;
+
+    private final String uri;
 
     public RedirectImpl(String code, String uri, boolean perm, boolean encode) {
       this.code = code;
@@ -255,24 +273,24 @@ public class RedirectResultTest {
       this.encode = encode;
     }
 
+    public Class<? extends Annotation> annotationType() {
+      return Redirect.class;
+    }
+
     public String code() {
       return code;
-    }
-
-    public String uri() {
-      return uri;
-    }
-
-    public boolean perm() {
-      return perm;
     }
 
     public boolean encodeVariables() {
       return encode;
     }
 
-    public Class<? extends Annotation> annotationType() {
-      return Redirect.class;
+    public boolean perm() {
+      return perm;
+    }
+
+    public String uri() {
+      return uri;
     }
   }
 }

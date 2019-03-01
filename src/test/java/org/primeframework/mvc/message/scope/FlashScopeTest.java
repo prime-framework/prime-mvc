@@ -50,7 +50,7 @@ public class FlashScopeTest {
     expect(request.getSession(true)).andReturn(session);
     replay(request);
 
-    FlashScope scope = new FlashScope(request, new RequestScope(request));
+    FlashScope scope = new FlashScope(request);
     scope.add(new SimpleMessage(MessageType.ERROR, "code", "Foo"));
     assertEquals(messages.size(), 1);
     assertEquals(messages.get(0).toString(), "Foo");
@@ -70,8 +70,8 @@ public class FlashScopeTest {
     expect(request.getSession(true)).andReturn(session);
     replay(request);
 
-    FlashScope scope = new FlashScope(request, new RequestScope(request));
-    scope.addAll(Arrays.<Message>asList(new SimpleMessage(MessageType.ERROR, "code1", "Foo"), new SimpleMessage(MessageType.ERROR, "code2", "Bar")));
+    FlashScope scope = new FlashScope(request);
+    scope.addAll(Arrays.asList(new SimpleMessage(MessageType.ERROR, "code1", "Foo"), new SimpleMessage(MessageType.ERROR, "code2", "Bar")));
     assertEquals(messages.size(), 2);
     assertEquals(messages.get(0).toString(), "Foo");
     assertEquals(messages.get(1).toString(), "Bar");
@@ -90,7 +90,7 @@ public class FlashScopeTest {
     expect(request.getSession(false)).andReturn(session);
     replay(request);
 
-    FlashScope scope = new FlashScope(request, new RequestScope(request));
+    FlashScope scope = new FlashScope(request);
     List<Message> messages = scope.get();
     assertEquals(messages.size(), 2);
     assertEquals(messages.get(0).toString(), "Request");
@@ -110,11 +110,10 @@ public class FlashScopeTest {
 
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
     expect(request.getSession(false)).andReturn(session);
-    expect(request.getAttribute(RequestScope.KEY)).andReturn(null);
-    request.setAttribute(RequestScope.KEY, new ArrayList<>());
+    request.setAttribute(FlashScope.KEY, messages);
     replay(request);
 
-    FlashScope scope = new FlashScope(request, new RequestScope(request));
+    FlashScope scope = new FlashScope(request);
     scope.transferFlash();
 
     verify(session, request);
@@ -126,7 +125,7 @@ public class FlashScopeTest {
     expect(request.getSession(false)).andReturn(null);
     replay(request);
 
-    FlashScope scope = new FlashScope(request, new RequestScope(request));
+    FlashScope scope = new FlashScope(request);
     scope.transferFlash();
 
     verify(request);

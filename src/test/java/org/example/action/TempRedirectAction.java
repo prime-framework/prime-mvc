@@ -40,8 +40,9 @@ public class TempRedirectAction {
   }
 
   public String get() {
-    String message = messageProvider.getMessage("[Success]");
-    messageStore.add(new SimpleMessage(MessageType.INFO, "[Success]", message));
+    messageStore.add(new SimpleMessage(MessageType.ERROR, "[ERROR]", messageProvider.getMessage("[ERROR]")));
+    messageStore.add(new SimpleMessage(MessageType.INFO, "[INFO]", messageProvider.getMessage("[INFO]")));
+    messageStore.add(new SimpleMessage(MessageType.WARNING, "[WARNING]", messageProvider.getMessage("[WARNING]")));
     return "redirect";
   }
 }

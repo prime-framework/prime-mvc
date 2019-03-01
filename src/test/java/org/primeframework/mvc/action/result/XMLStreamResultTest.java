@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,9 +29,11 @@ import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-
-import static org.easymock.EasyMock.*;
-import static org.testng.Assert.*;
+import static org.easymock.EasyMock.createStrictMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.testng.Assert.assertEquals;
 
 /**
  * This class tests the XML Stream result.
@@ -39,11 +41,6 @@ import static org.testng.Assert.*;
  * @author jhumphrey
  */
 public class XMLStreamResultTest {
-  @DataProvider(name= "httMethod")
-  public Object[][] httpMethod() {
-    return new Object[][] {{HTTPMethod.GET}, {HTTPMethod.HEAD}};
-  }
-
   @Test(dataProvider = "httpMethod")
   public void explicit(HTTPMethod httpMethod) throws IOException, ServletException {
     String property = "xml";
@@ -81,15 +78,26 @@ public class XMLStreamResultTest {
     verify(ee, response);
   }
 
+  @DataProvider(name = "httMethod")
+  public Object[][] httpMethod() {
+    return new Object[][]{{HTTPMethod.GET}, {HTTPMethod.HEAD}};
+  }
+
   public class XMLStreamImpl implements XMLStream {
     private final String code;
+
     private final String property;
+
     private final int status;
 
     public XMLStreamImpl(String code, String property, int status) {
       this.code = code;
       this.property = property;
       this.status = status;
+    }
+
+    public Class<? extends Annotation> annotationType() {
+      return XMLStream.class;
     }
 
     public String code() {
@@ -102,10 +110,6 @@ public class XMLStreamResultTest {
 
     public int status() {
       return status;
-    }
-
-    public Class<? extends Annotation> annotationType() {
-      return XMLStream.class;
     }
   }
 }

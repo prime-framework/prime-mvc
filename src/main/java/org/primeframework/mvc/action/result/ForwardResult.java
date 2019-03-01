@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,11 @@
  */
 package org.primeframework.mvc.action.result;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
@@ -28,8 +28,6 @@ import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.freemarker.FreeMarkerMap;
 import org.primeframework.mvc.freemarker.FreeMarkerService;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-
-import com.google.inject.Inject;
 
 /**
  * This result renders a FreeMarker template depending on the extension of the page.
@@ -51,7 +49,8 @@ public class ForwardResult extends AbstractResult<Forward> {
 
   @Inject
   public ForwardResult(ActionInvocationStore actionInvocationStore, ExpressionEvaluator expressionEvaluator,
-                       ResourceLocator resourceLocator, FreeMarkerService freeMarkerService, HttpServletResponse response,
+                       ResourceLocator resourceLocator, FreeMarkerService freeMarkerService,
+                       HttpServletResponse response,
                        FreeMarkerMap freeMarkerMap, MVCConfiguration configuration) {
     super(expressionEvaluator);
     this.resourceLocator = resourceLocator;
@@ -65,7 +64,7 @@ public class ForwardResult extends AbstractResult<Forward> {
   /**
    * {@inheritDoc}
    */
-  public boolean execute(Forward forward) throws IOException, ServletException {
+  public boolean execute(Forward forward) throws IOException {
 
     ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
     Object action = actionInvocation.action;

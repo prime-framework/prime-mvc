@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.primeframework.mvc.validation;
 import javax.servlet.http.HttpServletRequest;
 import java.util.function.Predicate;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
@@ -31,15 +32,13 @@ import org.primeframework.mvc.parameter.el.ExpressionException;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.util.ReflectionUtils;
 
-import com.google.inject.Inject;
-
 /**
  * A validator that uses annotations and methods to perform validation.
  *
  * @author Brian Pontarelli
  */
 public class DefaultValidationProcessor implements ValidationProcessor {
-  private static final Predicate<Message> ErrorOrWarningMessages = (m) -> m.getType() == MessageType.WARNING || m.getType() == MessageType.ERROR;
+  private static final Predicate<Message> ErrorOrWarningMessages = m -> m.getType() == MessageType.WARNING || m.getType() == MessageType.ERROR;
 
   private final MessageStore messageStore;
 
@@ -48,14 +47,14 @@ public class DefaultValidationProcessor implements ValidationProcessor {
   private final ActionInvocationStore store;
 
   @Inject
-  public DefaultValidationProcessor(HttpServletRequest request, ActionInvocationStore store, MessageStore messageStore) {
+  public DefaultValidationProcessor(HttpServletRequest request, ActionInvocationStore store,
+                                    MessageStore messageStore) {
     this.request = request;
     this.store = store;
     this.messageStore = messageStore;
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public void validate() throws ValidationException {
     ActionInvocation actionInvocation = store.getCurrent();
     Object action = actionInvocation.action;

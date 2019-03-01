@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2015-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import java.util.List;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;
+import org.primeframework.mvc.message.scope.FlashScope;
 import org.primeframework.mvc.message.scope.MessageScope;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.servlet.ServletTools;
@@ -55,6 +56,13 @@ public abstract class AbstractRedirectResult<T extends Annotation> extends Abstr
     List<Message> messages = messageStore.get(MessageScope.REQUEST);
     messageStore.clear(MessageScope.REQUEST);
     messageStore.addAll(MessageScope.FLASH, messages);
+
+    // Preserve previously flashed messages so they will survive redirect after redirect
+    @SuppressWarnings("unchecked")
+    List<Message> requestList = (List<Message>) request.getAttribute(FlashScope.KEY);
+    if (requestList != null) {
+      messageStore.addAll(MessageScope.FLASH, requestList);
+    }
   }
 
   protected void sendRedirect(String uri, String defaultURI, boolean encodeVariables, boolean perm) throws IOException {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package org.primeframework.mvc.action.result.annotation;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import static java.lang.annotation.ElementType.*;
-import static java.lang.annotation.RetentionPolicy.*;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * This annotation marks a result from an action as a Streaming XML result using a xml string from the action.
@@ -36,14 +36,14 @@ public @interface XMLStream {
   String code() default "success";
 
   /**
-   * @return The HTTP status code.
-   */
-  int status() default 200;
-
-  /**
    * @return The name of the property of the action that represents an XML string.
    */
   String property() default "xml";
+
+  /**
+   * @return The HTTP status code.
+   */
+  int status() default 200;
 
   /**
    * A list of XMLStream annotations.
@@ -51,7 +51,7 @@ public @interface XMLStream {
   @ResultContainerAnnotation
   @Retention(RUNTIME)
   @Target(TYPE)
-  public static @interface List {
+  @interface List {
     XMLStream[] value();
   }
 }
