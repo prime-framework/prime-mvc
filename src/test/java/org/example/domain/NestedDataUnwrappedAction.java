@@ -21,7 +21,7 @@ import org.primeframework.mvc.parameter.annotation.FieldUnwrapped;
  * @author Daniel DeGroff
  */
 @org.primeframework.mvc.action.annotation.Action
-public class NestedDataUnwrappedAction {
+public class NestedDataUnwrappedAction extends BaseNestedDataUnwrappedAction {
 
   // @FieldUnwrapped is on a field inside this object
   public Foo bean1 = new Foo();
@@ -31,7 +31,7 @@ public class NestedDataUnwrappedAction {
 
   // Top level
   @FieldUnwrapped
-  public NestedConfiguration1 bean3 = new NestedConfiguration1();
+  public NestedConfiguration3 bean3 = new NestedConfiguration3();
 
   public static class Foo {
     @FieldUnwrapped
@@ -52,5 +52,17 @@ public class NestedDataUnwrappedAction {
   public static class NestedConfiguration2 {
     // When unwrapped foo.user
     public User user;
+  }
+
+  public static class NestedConfiguration3 {
+    public String bing;
+  }
+
+  public static class NestedConfiguration4 {
+    public String bam;
+  }
+
+  public static class NestedConfiguration5 {
+    public String womp;
   }
 }

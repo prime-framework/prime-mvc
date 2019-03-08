@@ -43,6 +43,7 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertSame;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 /**
  * Tests the expression evaluator.
@@ -458,8 +459,12 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     assertEquals(evaluator.getValue("bean1.baz", action), "boom");
 
     // Manually set values on a top level and retrieve them
-    action.bean3.bar = "kabam";
-    assertEquals(evaluator.getValue("bar", action), "kabam");
+    action.bean3.bing = "kabam";
+    assertEquals(evaluator.getValue("bing", action), "kabam");
+
+    // Manually set values on a top level in a base class and retrieve them
+    action.bean4.bam = "kapow";
+    assertEquals(evaluator.getValue("bam", action), "kapow");
 
     // Set values using the evaluator and retrieve them.
     evaluator.setValue("bean1.bar", action, ArrayUtils.toArray("bada-bing"), null);
@@ -482,8 +487,21 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     assertEquals(evaluator.getValue("bean2.baz", action), "boom");
 
     // Set top level fields using unwrapped
-    evaluator.setValue("bar", action, ArrayUtils.toArray("Art Vandelay"), null);
-    assertEquals(evaluator.getValue("bar", action), "Art Vandelay");
+    evaluator.setValue("bing", action, ArrayUtils.toArray("Art Vandelay"), null);
+    assertEquals(evaluator.getValue("bing", action), "Art Vandelay");
+
+    // Set top level fields in base class using unwrapped
+    evaluator.setValue("bam", action, ArrayUtils.toArray("Art Vandelay"), null);
+    assertEquals(evaluator.getValue("bam", action), "Art Vandelay");
+
+    // Set top level fields in base class using unwrapped that is a null object
+    try {
+      evaluator.setValue("womp", action, ArrayUtils.toArray("Art Vandelay"), null);
+      assertEquals(evaluator.getValue("womp", action), "Art Vandelay");
+      fail("This should not happen - this is failing, it would be nice if it did not. But it may be a large change.");
+    } catch (NullPointerException e) {
+      // Expected
+    }
   }
 
   /**
