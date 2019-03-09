@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2018, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
+import com.fasterxml.jackson.core.util.DefaultIndenter;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.google.inject.Inject;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
@@ -34,9 +40,6 @@ import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.scope.MessageScope;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.inject.Inject;
 
 /**
  * This result writes out Java objects to JSON using Jackson. The content type is set to 'application/json'.
@@ -53,7 +56,8 @@ public class JSONResult extends AbstractResult<JSON> {
   private final HttpServletResponse response;
 
   @Inject
-  public JSONResult(ExpressionEvaluator expressionEvaluator, ActionInvocationStore actionInvocationStore, MessageStore messageStore,
+  public JSONResult(ExpressionEvaluator expressionEvaluator, ActionInvocationStore actionInvocationStore,
+                    MessageStore messageStore,
                     ObjectMapper objectMapper, HttpServletResponse response) {
     super(expressionEvaluator);
     this.messageStore = messageStore;
@@ -116,27 +120,6 @@ public class JSONResult extends AbstractResult<JSON> {
     return true;
   }
 
-  private void writeValue(ByteArrayOutputStream os, Object jacksonObject, Class<?> serializationView, boolean prettyPrint) throws IOException {
-    // Most common path
-    if (!prettyPrint && serializationView == void.class) {
-      objectMapper.writeValue(os, jacksonObject);
-      return;
-    }
-
-    if (prettyPrint && serializationView != void.class) {
-      objectMapper.writerWithView(serializationView).withDefaultPrettyPrinter().writeValue(os, jacksonObject);
-      return;
-    }
-
-    if (prettyPrint) {
-      objectMapper.writerWithDefaultPrettyPrinter().writeValue(os, jacksonObject);
-      return;
-    }
-
-    // serializationView is always non-null here
-    objectMapper.writerWithView(serializationView).writeValue(os, jacksonObject);
-  }
-
   private ErrorMessages convertErrors(List<Message> messages) {
     ErrorMessages errorMessages = new ErrorMessages();
     for (Message message : messages) {
@@ -149,6 +132,37 @@ public class JSONResult extends AbstractResult<JSON> {
     }
 
     return errorMessages;
+  }
+
+  private ObjectWriter getPrettyWriter(ObjectMapper objectMapper) {
+    DefaultPrettyPrinter prettyPrinter = new DefaultPrettyPrinter();
+    prettyPrinter.indentArraysWith(new DefaultIndenter());
+
+    return objectMapper.writerWithDefaultPrettyPrinter()
+                       .withFeatures(SerializationFeature.INDENT_OUTPUT)
+                       .with(prettyPrinter);
+  }
+
+  private void writeValue(ByteArrayOutputStream os, Object jacksonObject, Class<?> serializationView,
+                          boolean prettyPrint) throws IOException {
+    // Most common path
+    if (!prettyPrint && serializationView == void.class) {
+      objectMapper.writeValue(os, jacksonObject);
+      return;
+    }
+
+    if (prettyPrint && serializationView != void.class) {
+      getPrettyWriter(objectMapper).withView(serializationView).writeValue(os, jacksonObject);
+      return;
+    }
+
+    if (prettyPrint) {
+      getPrettyWriter(objectMapper).writeValue(os, jacksonObject);
+      return;
+    }
+
+    // serializationView is always non-null here
+    objectMapper.writerWithView(serializationView).writeValue(os, jacksonObject);
   }
 
 }
