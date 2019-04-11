@@ -39,6 +39,7 @@ import org.primeframework.mvc.parameter.DefaultParameterParser;
 import org.primeframework.mvc.security.CSRF;
 import org.primeframework.mvc.servlet.PrimeFilter;
 import org.primeframework.mvc.servlet.ServletObjectsHolder;
+import org.primeframework.mvc.util.QueryStringTools;
 
 /**
  * This class is a builder that helps create a test HTTP request that is sent to the MVC.
@@ -470,6 +471,18 @@ public class RequestBuilder {
     for (Object value : values) {
       request.setParameter(name, value.toString());
     }
+    return this;
+  }
+
+  /**
+   * Sets HTTP request parameters from a query String that is already encoded and might contain multiple parameters.
+   * This will split the parameters up and decode them.
+   *
+   * @param query The query string.
+   * @return This.
+   */
+  public RequestBuilder withQueryString(String query) {
+    QueryStringTools.parseQueryString(query).forEach(this::withParameters);
     return this;
   }
 

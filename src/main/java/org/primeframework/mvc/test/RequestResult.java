@@ -17,8 +17,6 @@ package org.primeframework.mvc.test;
 
 import javax.servlet.http.Cookie;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -57,6 +55,7 @@ import org.primeframework.mvc.message.SimpleMessage;
 import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.servlet.PrimeFilter;
 import org.primeframework.mvc.util.QueryStringBuilder;
+import org.primeframework.mvc.util.QueryStringTools;
 import static java.util.Arrays.asList;
 
 /**
@@ -137,13 +136,14 @@ public class RequestResult {
     }
   }
 
+  @SuppressWarnings("unchecked")
   private static Map<String, Object> deepSort(Map<String, Object> response, ObjectMapper objectMapper) {
     Map<String, Object> sorted = new TreeMap<>();
     response.forEach((key, value) -> {
       if (value instanceof Map) {
-        sorted.put(key, deepSort((Map) value, objectMapper));
+        sorted.put(key, deepSort((Map<String, Object>) value, objectMapper));
       } else if (value instanceof List) {
-        sorted.put(key, deepSort((List) value, objectMapper));
+        sorted.put(key, deepSort((List<Object>) value, objectMapper));
       } else {
         sorted.put(key, value);
       }
@@ -152,13 +152,14 @@ public class RequestResult {
     return sorted;
   }
 
+  @SuppressWarnings("unchecked")
   private static List<Object> deepSort(List<Object> list, ObjectMapper objectMapper) {
     List<Object> sorted = new ArrayList<>();
     list.forEach(value -> {
       if (value instanceof Map) {
-        sorted.add(deepSort((Map) value, objectMapper));
+        sorted.add(deepSort((Map<String, Object>) value, objectMapper));
       } else if (value instanceof List) {
-        sorted.add(deepSort((List) value, objectMapper));
+        sorted.add(deepSort((List<Object>) value, objectMapper));
       } else {
         sorted.add(value);
       }
@@ -575,7 +576,7 @@ public class RequestResult {
   /**
    * Assert the cookie was deleted on the server by sending back a null value and a max age of 0.
    *
-   * @param name  The cookie name.
+   * @param name The cookie name.
    * @return This.
    */
   public RequestResult assertCookieWasDeleted(String name) {
@@ -832,23 +833,8 @@ public class RequestResult {
 
     RequestBuilder rb = new RequestBuilder(uri, container, filter, injector);
     if (uri.length() != redirect.length()) {
-
-      Map<String, List<String>> actual = uriToMap(redirect);
-      Map<String, List<String>> expected = uriToMap(redirect);
-
-      try {
-        String params = redirect.substring(redirect.indexOf("?") + 1);
-        String decoded = URLDecoder.decode(params, "UTF-8");
-        String[] keyValuePairs = decoded.split("&");
-        for (String keyValuePair : keyValuePairs) {
-          String[] parts = keyValuePair.split("=");
-          if (parts.length == 2) {
-            rb.withParameter(parts[0], parts[1]);
-          }
-        }
-      } catch (UnsupportedEncodingException e) {
-        throw new RuntimeException(e);
-      }
+      String params = redirect.substring(redirect.indexOf("?") + 1);
+      QueryStringTools.parseQueryString(params).forEach(rb::withParameters);
     }
 
     consumer.accept(rb.get());
@@ -965,23 +951,9 @@ public class RequestResult {
       // Replace any 'actual' values requested and then try again
       boolean recheck = replaceWithActualValues(actual, expected);
       if (!recheck || !actual.equals(expected)) {
-        throw new AssertionError("Actual redirect not equal to the expected.\n Expected [ " + expectedUri + " ] but found [ " + redirect + " ]\n\n");
+        throw new AssertionError("Actual redirect not equal to the expected. expected [" + expectedUri + "] but found [" + redirect + "]");
       }
     }
-  }
-
-  private Map<String, List<String>> extractParams(String params) {
-    Map<String, List<String>> map = new TreeMap<>();
-    String[] keyValuePairs = params.split("&");
-    for (String keyValuePair : keyValuePairs) {
-      String[] parts = keyValuePair.split("=");
-      if (parts.length == 2) {
-        List<String> value = map.computeIfAbsent(parts[0], k -> new ArrayList<>());
-        value.add(parts[1]);
-      }
-    }
-
-    return map;
   }
 
   private String normalize(String input) {
@@ -1005,7 +977,7 @@ public class RequestResult {
       }
 
       List<String> expectedValues = expected.get(actualKeys.get(i));
-      if (expectedValues.get(0).equals("___actual___")) {
+      if (expectedValues != null && expectedValues.size() > 0 && expectedValues.get(0).equals("___actual___")) {
         expectedValues.clear();
         expectedValues.addAll(actual.get(actualKeys.get(i)));
         recheck = true;
@@ -1040,12 +1012,12 @@ public class RequestResult {
       params = uri.substring(fragmentIndex + 1);
     }
 
-    map.putAll(extractParams(params));
+    map.putAll(QueryStringTools.parseQueryString(params));
 
     // Collect the fragment parameters now since there are both on the URI
     if (queryIndex != -1 && fragmentIndex != -1) {
       params = uri.substring(fragmentIndex + 1);
-      map.putAll(extractParams(params));
+      map.putAll(QueryStringTools.parseQueryString(params));
     }
 
     // Sort the lists so we can check for equality
