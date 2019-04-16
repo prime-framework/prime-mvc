@@ -87,7 +87,12 @@ public class GlobalTest extends PrimeBaseTest {
   public void get() throws Exception {
     simulator.test("/user/edit")
              .get()
+             .setup(r -> r.container.getResponse().setHeader("Referer", "http://localhost"))
              .assertStatusCode(200)
+             // header name is not case sensitive
+             .assertHeaderContains("referer", "http://localhost")
+             .assertHeaderContains("Referer", "http://localhost")
+             .assertHeaderDoesNotContain("Potato")
              .assertBodyFile(Paths.get("src/test/resources/html/edit.html"));
   }
 

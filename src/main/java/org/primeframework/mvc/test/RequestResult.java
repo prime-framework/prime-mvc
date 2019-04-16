@@ -626,9 +626,18 @@ public class RequestResult {
    * @return This.
    */
   public RequestResult assertHeaderContains(String header, String value) {
-    List<String> actual = response.getHeaders().get(header);
+    List<String> actual = null;
+    for (String key : response.getHeaders().keySet()) {
+      if (key.equalsIgnoreCase(header)) {
+        actual = response.getHeaders().get(key);
+        break;
+      }
+    }
+
     if ((actual == null && value != null) || (actual != null && !actual.contains((value)))) {
-      throw new AssertionError("Header [" + header + "] with value [" + actual + "] was not equal to the expected value [" + value + "]");
+      StringBuilder responseHeaders = new StringBuilder();
+      response.getHeaders().forEach((k, v) -> responseHeaders.append("\t").append(k).append(": ").append(v).append("\n"));
+      throw new AssertionError("Header [" + header + "] with value [" + (actual == null ? null : String.join(", ", actual)) + "] was not equal to the expected value [" + value + "].\n\nResponse Headers:\n" + responseHeaders);
     }
     return this;
   }
@@ -640,9 +649,18 @@ public class RequestResult {
    * @return This.
    */
   public RequestResult assertHeaderDoesNotContain(String header) {
-    List<String> actual = response.getHeaders().get(header);
+    List<String> actual = null;
+    for (String key : response.getHeaders().keySet()) {
+      if (key.equalsIgnoreCase(header)) {
+        actual = response.getHeaders().get(key);
+        break;
+      }
+    }
+
     if (actual != null && !actual.isEmpty()) {
-      throw new AssertionError("Header [" + header + "] with value [" + actual + "] was not expected in the HTTP response");
+      StringBuilder responseHeaders = new StringBuilder();
+      response.getHeaders().forEach((k, v) -> responseHeaders.append("\t").append(k).append(": ").append(v).append("\n"));
+      throw new AssertionError("Header [" + header + "] with value [" + String.join(", ", actual) + "] was not expected in the HTTP response.\n\nResponse Headers:\n" + responseHeaders);
     }
 
     return this;
