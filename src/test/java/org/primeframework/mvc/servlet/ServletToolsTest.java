@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import java.net.URI;
 import org.primeframework.mock.servlet.MockContainer;
 import org.primeframework.mock.servlet.MockHttpServletRequest;
 import org.testng.annotations.Test;
-
 import static org.testng.Assert.assertEquals;
 
 /**
@@ -67,16 +66,49 @@ public class ServletToolsTest {
     URI uri = ServletTools.getBaseURI(req);
     assertEquals(uri.toString(), "http://www.example.com:9011");
 
+    // http w/ port 80
     req.setScheme("http");
     req.setServerPort(80);
     uri = ServletTools.getBaseURI(req);
     assertEquals(uri.toString(), "http://www.example.com");
 
+    // http w/ port 80 behind an https proxy
+    req.setScheme("http");
+    req.setServerPort(80);
+    req.addHeader("X-Forwarded-Proto", "https");
+    uri = ServletTools.getBaseURI(req);
+    assertEquals(uri.toString(), "https://www.example.com");
+
+    // Reset header
+    req.removeHeader("X-Forwarded-Proto");
+
+    // https w/ port 443 behind an http proxy
+    req.setScheme("https");
+    req.setServerPort(443);
+    req.addHeader("X-Forwarded-Proto", "http");
+    uri = ServletTools.getBaseURI(req);
+    assertEquals(uri.toString(), "http://www.example.com:443");
+
+    // Reset header
+    req.removeHeader("X-Forwarded-Proto");
+
+    // https w/ port 443 behind an https proxy
+    req.setScheme("https");
+    req.setServerPort(443);
+    req.addHeader("X-Forwarded-Proto", "https");
+    uri = ServletTools.getBaseURI(req);
+    assertEquals(uri.toString(), "https://www.example.com");
+
+    // Reset header
+    req.removeHeader("X-Forwarded-Proto");
+
+    // https w/ port 80
     req.setScheme("https");
     req.setServerPort(80);
     uri = ServletTools.getBaseURI(req);
     assertEquals(uri.toString(), "https://www.example.com:80");
 
+    // https w/ port 443
     req.setScheme("https");
     req.setServerPort(443);
     uri = ServletTools.getBaseURI(req);

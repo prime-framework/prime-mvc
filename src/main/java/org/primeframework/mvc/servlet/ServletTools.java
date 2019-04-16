@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import java.net.URL;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 /**
@@ -34,6 +33,8 @@ import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
  */
 public class ServletTools {
   private static final Logger logger = LoggerFactory.getLogger(ServletTools.class);
+
+
 
   /**
    * Returns the base url in the following format:
@@ -85,6 +86,11 @@ public class ServletTools {
     String scheme = defaultIfNull(request.getHeader("X-Forwarded-Proto"), request.getScheme()).toLowerCase();
     String serverName = defaultIfNull(request.getHeader("X-Forwarded-Host"), request.getServerName()).toLowerCase();
     int serverPort = request.getServerPort();
+    // Ignore port 80 for http
+    if (request.getScheme().toLowerCase().equals("http") && serverPort == 80) {
+      serverPort = -1;
+    }
+
     String forwardedPort = request.getHeader("X-Forwarded-Port");
     if (forwardedPort != null) {
       serverPort = Integer.parseInt(forwardedPort);
