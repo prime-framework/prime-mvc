@@ -634,6 +634,21 @@ public class RequestResult {
   }
 
   /**
+   * Verifies that the HTTP response does not contains the specified header.
+   *
+   * @param header the name of the HTTP response header
+   * @return This.
+   */
+  public RequestResult assertHeaderDoesNotContain(String header) {
+    List<String> actual = response.getHeaders().get(header);
+    if (actual != null && !actual.isEmpty()) {
+      throw new AssertionError("Header [" + header + "] with value [" + actual + "] was not expected in the HTTP response");
+    }
+
+    return this;
+  }
+
+  /**
    * Verifies that the response body is equal to the JSON created from the given object. The object is marshalled using
    * Jackson.
    *
