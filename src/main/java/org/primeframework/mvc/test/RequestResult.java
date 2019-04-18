@@ -73,6 +73,8 @@ public class RequestResult {
 
   public final Injector injector;
 
+  public final byte[] rawBody;
+
   public final String redirect;
 
   public final MockHttpServletRequest request;
@@ -89,6 +91,7 @@ public class RequestResult {
     this.response = response;
     this.injector = injector;
     this.body = response.getStream().toString();
+    this.rawBody = response.getStream().toByteArray();
     this.redirect = response.getRedirect();
     this.statusCode = response.getCode();
   }
