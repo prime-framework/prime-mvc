@@ -19,8 +19,6 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 
 import com.google.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
@@ -29,6 +27,7 @@ import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.annotation.Stream;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
+import org.primeframework.mvc.util.EncodingUtils;
 
 /**
  * This result writes bytes to the response output steam.
@@ -73,7 +72,7 @@ public class StreamResult extends AbstractResult<Stream> {
     }
 
     if (StringUtils.isNotBlank(name)) {
-      response.setHeader("Content-Disposition", "attachment; filename=\"" + name + "\"; filename*=UTF-8''" + rfc5987_encode(name));
+      response.setHeader("Content-Disposition", "attachment; filename=\"" + EncodingUtils.escapedQuotedString(name) + "\"; filename*=UTF-8''" + EncodingUtils.rfc5987_encode(name));
     }
 
     if (isHeadRequest(actionInvocation)) {
@@ -95,27 +94,5 @@ public class StreamResult extends AbstractResult<Stream> {
     }
 
     return true;
-  }
-
-  // https://stackoverflow.com/a/11307864
-  // http://tools.ietf.org/html/rfc5987
-  private String rfc5987_encode(final String s) {
-    final byte[] s_bytes = s.getBytes(StandardCharsets.UTF_8);
-    final int len = s_bytes.length;
-    final StringBuilder sb = new StringBuilder(len << 1);
-    final char[] digits = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
-    final byte[] attr_char = {'!', '#', '$', '&', '+', '-', '.', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '^', '_', '`', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '|', '~'};
-    for (int i = 0; i < len; ++i) {
-      final byte b = s_bytes[i];
-      if (Arrays.binarySearch(attr_char, b) >= 0) {
-        sb.append((char) b);
-      } else {
-        sb.append('%');
-        sb.append(digits[0x0f & (b >>> 4)]);
-        sb.append(digits[b & 0x0f]);
-      }
-    }
-
-    return sb.toString();
   }
 }

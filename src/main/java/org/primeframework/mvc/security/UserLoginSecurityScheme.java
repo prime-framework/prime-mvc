@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2015-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,9 +79,7 @@ public class UserLoginSecurityScheme implements SecurityScheme {
 
       URI uri = ServletTools.getBaseURI(request);
       URI sourceURI = URI.create(source);
-      // TODO Should we do equalsIgnoreCase on the scheme and host? the 'sourceURI' in theory could have a different case.
-      // - I think in the getBaseURI we lowercase everything.
-      if (!uri.getScheme().equals(sourceURI.getScheme()) || uri.getPort() != sourceURI.getPort() || !uri.getHost().equals(sourceURI.getHost())) {
+      if (!uri.getScheme().equalsIgnoreCase(sourceURI.getScheme()) || uri.getPort() != sourceURI.getPort() || !uri.getHost().equalsIgnoreCase(sourceURI.getHost())) {
         throw new UnauthorizedException();
       }
 

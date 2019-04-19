@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc.action.result;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -31,7 +30,6 @@ import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-
 import static org.easymock.EasyMock.createStrictMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
@@ -43,17 +41,13 @@ import static org.testng.Assert.assertEquals;
  * @author Brian Pontarelli
  */
 public class StreamResultTest {
-  @DataProvider(name = "httMethod")
-  public Object[][] httpMethod() {
-    return new Object[][]{{HTTPMethod.GET}, {HTTPMethod.HEAD}};
-  }
-
   @Test(dataProvider = "httpMethod")
-  public void explicit(HTTPMethod httpMethod) throws IOException, ServletException {
+  public void explicit(HTTPMethod httpMethod, String fileName, String basicEncoded, String utf8Encoded)
+      throws IOException {
     Object action = new Object();
     ExpressionEvaluator ee = EasyMock.createStrictMock(ExpressionEvaluator.class);
     EasyMock.expect(ee.expand("10", action, false)).andReturn("10");
-    EasyMock.expect(ee.expand("foo.zip", action, true)).andReturn("foo.zip");
+    EasyMock.expect(ee.expand(fileName, action, false)).andReturn(fileName);
     EasyMock.expect(ee.expand("application/octet-stream", action, false)).andReturn("application/octet-stream");
     EasyMock.expect(ee.getValue("stream", action)).andReturn(new ByteArrayInputStream("test".getBytes()));
     EasyMock.replay(ee);
@@ -63,7 +57,7 @@ public class StreamResultTest {
     response.setStatus(200);
     response.setContentType("application/octet-stream");
     response.setContentLength(10);
-    response.setHeader("Content-Disposition", "attachment; filename=\"foo.zip\"");
+    response.setHeader("Content-Disposition", "attachment; filename=\"" + basicEncoded + "\"; filename*=UTF-8''" + utf8Encoded);
     EasyMock.expect(response.getOutputStream()).andReturn(sos);
     EasyMock.replay(response);
 
@@ -71,7 +65,7 @@ public class StreamResultTest {
     expect(store.getCurrent()).andReturn(new ActionInvocation(action, new ExecuteMethodConfiguration(httpMethod, null, null), "/foo", "", null));
     replay(store);
 
-    Stream stream = new StreamImpl("success", "foo.zip", "10", "application/octet-stream", "stream");
+    Stream stream = new StreamImpl("success", fileName, "10", "application/octet-stream", "stream");
     StreamResult streamResult = new StreamResult(ee, response, store);
     streamResult.execute(stream);
 
@@ -81,21 +75,38 @@ public class StreamResultTest {
     } else {
       assertEquals(sos.toString(), "");
     }
+  }
 
+  @DataProvider(name = "httMethod")
+  public Object[][] httpMethod() {
+    return new Object[][]{
+        // METHOD, File, Simple escaped, UTF8 Escaped
+        {HTTPMethod.GET, "foo.zip", "foo.zip", "foo.zip"}, // normal
+        {HTTPMethod.GET, "foo \\bar.zip", "foo \\\\bar.zip", "foo%20%5Cbar.zip"}, // contains back slash
+        {HTTPMethod.GET, "foo bar.zip", "foo bar.zip", "foo%20bar.zip"}, // contains space
+        {HTTPMethod.GET, "foo \"bar\" baz.zip", "foo \\\"bar\\\" baz.zip", "foo%20%22bar%22%20baz.zip"}, // contains double quote
+        {HTTPMethod.GET, "foo \uD83D\uDE00 baz.zip", "foo \uD83D\uDE00 baz.zip", "foo%20%F0%9F%98%80%20baz.zip"}, // emoji
+
+        {HTTPMethod.HEAD, "foo.zip", "foo.zip", "foo.zip"}, // normal
+        {HTTPMethod.HEAD, "foo \\bar.zip", "foo \\\\bar.zip", "foo%20%5Cbar.zip"}, // contains back slash
+        {HTTPMethod.HEAD, "foo bar.zip", "foo bar.zip", "foo%20bar.zip"}, // contains space
+        {HTTPMethod.HEAD, "foo \"bar\" baz.zip", "foo \\\"bar\\\" baz.zip", "foo%20%22bar%22%20baz.zip"}, // contains double quote
+        {HTTPMethod.HEAD, "foo \uD83D\uDE00 baz.zip", "foo \uD83D\uDE00 baz.zip", "foo%20%F0%9F%98%80%20baz.zip"} // emoji
+    };
   }
 
   public class StreamImpl implements Stream {
     private final String code;
 
-    private final String name;
-
     private final String length;
 
-    private final String type;
+    private final String name;
 
     private final String property;
 
     private final int status = 200;
+
+    private final String type;
 
     public StreamImpl(String code, String name, String length, String type, String property) {
       this.code = code;
@@ -105,16 +116,12 @@ public class StreamResultTest {
       this.property = property;
     }
 
+    public Class<? extends Annotation> annotationType() {
+      return Stream.class;
+    }
+
     public String code() {
       return code;
-    }
-
-    public String property() {
-      return property;
-    }
-
-    public String type() {
-      return type;
     }
 
     public String length() {
@@ -125,13 +132,17 @@ public class StreamResultTest {
       return name;
     }
 
+    public String property() {
+      return property;
+    }
+
     @Override
     public int status() {
       return status;
     }
 
-    public Class<? extends Annotation> annotationType() {
-      return Stream.class;
+    public String type() {
+      return type;
     }
   }
 }
