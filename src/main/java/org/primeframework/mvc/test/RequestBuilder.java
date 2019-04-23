@@ -130,6 +130,32 @@ public class RequestBuilder {
   }
 
   /**
+   * If the provided test is false invoke the consumer.
+   *
+   * @param test     the test
+   * @param consumer the consumer of this request builder
+   * @return This.
+   */
+  public RequestBuilder ifFalse(boolean test, Consumer<RequestBuilder> consumer) {
+    return ifTrue(!test, consumer);
+  }
+
+  /**
+   * If the provided test is true invoke the consumer.
+   *
+   * @param test     the test
+   * @param consumer the consumer of this request builder
+   * @return This.
+   */
+  public RequestBuilder ifTrue(boolean test, Consumer<RequestBuilder> consumer) {
+    if (test) {
+      consumer.accept(this);
+    }
+
+    return this;
+  }
+
+  /**
    * Overrides the HTTP Method from that set by calling {@link #get()} or {@link #post()} for example.
    *
    * @param method the string value of an HTTP method, this does not have to be a real HTTP method

@@ -1,5 +1,16 @@
 Prime MVC Changes
 
+Changes in 1.13.3
+
+ * Fixes in building query strings
+ * Add RequestResult.assertHeaderDoesNotContain
+ * assertHeaderContains should be case insensitive
+ * Enhance StreamResult to support UTF-8 encoding in the fileName parameter of the Content-Disposition header
+
+Changes in 1.13.2
+
+ * Additional cookie assertions
+
 Changes in 1.13.1
 
  * Add better assertion error message for assertRedirect so IJ does a nice diff
