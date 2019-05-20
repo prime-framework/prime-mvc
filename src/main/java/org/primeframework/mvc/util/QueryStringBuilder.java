@@ -129,7 +129,9 @@ public class QueryStringBuilder {
     }
 
     try {
-      sb.append(name).append("=").append(URLEncoder.encode(value.toString(), "UTF-8"));
+      sb.append(URLEncoder.encode(name, "UTF-8"))
+        .append("=")
+        .append(URLEncoder.encode(value.toString(), "UTF-8"));
     } catch (UnsupportedEncodingException e) {
       // Uh, oh, UTF-8 is no longer supported.
       throw new RuntimeException(e);
