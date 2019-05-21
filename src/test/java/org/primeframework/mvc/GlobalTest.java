@@ -720,6 +720,57 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void post_couldNotConvert() throws Exception {
+    // Could not convert, no specific message for key
+    test.simulate(() -> simulator.test("/could-not-convert")
+                                 .withParameter("integerMap1['foo']", "bar")
+                                 .post()
+                                 .assertStatusCode(200)
+                                 .assertContainsFieldErrors("integerMap1['foo']")
+                                 .assertBodyContainsMessagesFromKeys("[couldNotConvert]integerMap1[]"))
+
+        // Could not convert, specific message for this key
+        .simulate(() -> simulator.test("/could-not-convert")
+                                 .withParameter("integerMap1['bar']", "baz")
+                                 .post()
+                                 .assertStatusCode(200)
+                                 .assertContainsFieldErrors("integerMap1['bar']")
+                                 .assertBodyContainsMessagesFromKeys("[couldNotConvert]integerMap1['bar']"))
+
+        // Could not convert, using generic message from Prime
+        .simulate(() -> simulator.test("/could-not-convert")
+                                 .withParameter("integerMap2['baz']", "bing")
+                                 .post()
+                                 .assertStatusCode(200)
+                                 .assertContainsFieldErrors("integerMap2['baz']")
+                                 .assertBodyContains("Value Baz (java.lang.NumberFormatException: For input string: \"bing\""))
+
+        // Could not convert, no specific message for this index in a list
+        .simulate(() -> simulator.test("/could-not-convert")
+                                 .withParameter("integerList1[0]", "bar")
+                                 .post()
+                                 .assertStatusCode(200)
+                                 .assertContainsFieldErrors("integerList1[0]")
+                                 .assertBodyContainsMessagesFromKeys("[couldNotConvert]integerList1[]"))
+
+        // Could not convert, specific message for this index in a list
+        .simulate(() -> simulator.test("/could-not-convert")
+                                 .withParameter("integerList1[1]", "baz")
+                                 .post()
+                                 .assertStatusCode(200)
+                                 .assertContainsFieldErrors("integerList1[1]")
+                                 .assertBodyContainsMessagesFromKeys("[couldNotConvert]integerList1[1]"))
+
+        // Could not convert, using generic message from Prime for the list
+        .simulate(() -> simulator.test("/could-not-convert")
+                                 .withParameter("integerList2[0]", "bing")
+                                 .post()
+                                 .assertStatusCode(200)
+                                 .assertContainsFieldErrors("integerList2[0]")
+                                 .assertBodyContains("List 2 - Int 1 (java.lang.NumberFormatException: For input string: \"bing\""));
+  }
+
+  @Test
   public void post_dateConversion() throws Exception {
     // Multiple LocalDate formats
     test.forEach(

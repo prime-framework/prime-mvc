@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2014-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.google.inject.Inject;
 import org.apache.commons.lang3.ArrayUtils;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
@@ -42,8 +43,6 @@ import org.primeframework.mvc.util.ArrayBuilder;
 import org.primeframework.mvc.util.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.inject.Inject;
 
 /**
  * This class is the default parameter handler. It sets all of the parameters into the action in the following order
@@ -120,7 +119,8 @@ public class DefaultParameterHandler implements ParameterHandler {
    * @param fileInfos The file info.
    * @param action    The action.
    */
-  protected void handleFiles(Map<String, List<FileInfo>> fileInfos, ActionConfiguration actionConfiguration, Object action) {
+  protected void handleFiles(Map<String, List<FileInfo>> fileInfos, ActionConfiguration actionConfiguration,
+                             Object action) {
     long maxSize = configuration.fileUploadMaxSize();
     String[] allowedContentTypes = configuration.fileUploadAllowedTypes();
 
@@ -208,6 +208,19 @@ public class DefaultParameterHandler implements ParameterHandler {
       String message = messageProvider.getMessage(code, (Object[]) new ArrayBuilder<>(String.class, key).addAll(struct.values).done());
       messageStore.add(new SimpleFieldMessage(MessageType.ERROR, key, code, message));
     } catch (MissingMessageException mme) {
+      // Retry if the message key is using a bracketed syntax for a map or an array
+      // For example: foo['bar'] or foo[0]
+      String[] parts = key.split("(?:\\['.+?'])|(?:\\[[0-9]+])");
+      if (!parts[0].equals(key)) {
+        try {
+          String modifiedCode = "[couldNotConvert]" + parts[0] + "[]";
+          String message = messageProvider.getMessage(modifiedCode, (Object[]) new ArrayBuilder<>(String.class, key).addAll(struct.values).done());
+          messageStore.add(new SimpleFieldMessage(MessageType.ERROR, key, modifiedCode, message));
+          return;
+        } catch (MissingMessageException ignore) {
+        }
+      }
+
       messageStore.add(new SimpleFieldMessage(MessageType.ERROR, key, code, ce.getMessage()));
     }
   }
