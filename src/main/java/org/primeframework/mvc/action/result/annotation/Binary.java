@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2016-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import org.primeframework.mvc.content.binary.annotation.BinaryResponse;
-
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
@@ -42,4 +41,10 @@ public @interface Binary {
    * @return The HTTP status code.
    */
   int status() default 200;
+
+  /**
+   * @return The content type of the InputStream. This is used to set the HTTP header and disposition so that the
+   * browser can correctly handle the response.
+   */
+  String type() default "application/octet-stream";
 }

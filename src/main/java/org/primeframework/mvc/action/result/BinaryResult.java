@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2016-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
@@ -30,11 +31,10 @@ import org.primeframework.mvc.action.result.annotation.Binary;
 import org.primeframework.mvc.content.binary.BinaryActionConfiguration;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 
-import com.google.inject.Inject;
-
 /**
  * This result writes bytes to the response output stream with <code>Content-Type</code> set to
- * <code>application/octet-stream</code>.
+ * <code>application/octet-stream</code>. The default <code>Content-Type</code> can modified in the {@link Binary}
+ * annotation.
  *
  * @author Daniel DeGroff
  */
@@ -44,7 +44,8 @@ public class BinaryResult extends AbstractResult<Binary> {
   private final HttpServletResponse response;
 
   @Inject
-  public BinaryResult(ExpressionEvaluator expressionEvaluator, ActionInvocationStore actionInvocationStore, HttpServletResponse response) {
+  public BinaryResult(ExpressionEvaluator expressionEvaluator, ActionInvocationStore actionInvocationStore,
+                      HttpServletResponse response) {
     super(expressionEvaluator);
     this.actionInvocationStore = actionInvocationStore;
     this.response = response;
@@ -79,7 +80,7 @@ public class BinaryResult extends AbstractResult<Binary> {
     byte[] bytes = Files.readAllBytes(object);
     response.setStatus(binary.status());
     response.setCharacterEncoding("UTF-8");
-    response.setContentType("application/octet-stream");
+    response.setContentType(binary.type());
     response.setContentLength(bytes.length);
 
     if (isHeadRequest(actionInvocation)) {
