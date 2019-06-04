@@ -1,5 +1,11 @@
 Prime MVC Changes
 
+Changes in 1.14.0
+
+ * Allow the Content-Type header to be set when using the @Binary result
+ * Cleanup the XML and Stream result handlers to use common code for writing to the output stream
+ * Enhance the [couldNotConvert] exception handling to use a generic message for indexed or keyed collections
+
 Changes in 1.13.3
 
  * Fixes in building query strings
