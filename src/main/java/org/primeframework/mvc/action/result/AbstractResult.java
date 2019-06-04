@@ -16,6 +16,9 @@
 package org.primeframework.mvc.action.result;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 
 import org.primeframework.mvc.action.ActionInvocation;
@@ -76,5 +79,26 @@ public abstract class AbstractResult<U extends Annotation> implements Result<U> 
     }
 
     response.setStatus(code);
+  }
+
+  /**
+   * Write the provided {@link InputStream} to the HTTP Servlet Output Stream.
+   *
+   * @param is       the input stream
+   * @param response the HTTP Servlet Response
+   * @throws IOException if #@#! goes south
+   */
+  protected void writeToOutputStream(InputStream is, HttpServletResponse response) throws IOException {
+    OutputStream os = response.getOutputStream();
+    try {
+      // Then output the file
+      byte[] b = new byte[8192];
+      int len;
+      while ((len = is.read(b)) != -1) {
+        os.write(b, 0, len);
+      }
+    } finally {
+      os.flush();
+    }
   }
 }

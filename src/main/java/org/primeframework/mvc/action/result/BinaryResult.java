@@ -87,9 +87,8 @@ public class BinaryResult extends AbstractResult<Binary> {
       return true;
     }
 
-    try (ServletOutputStream outputStream = response.getOutputStream()) {
-      outputStream.write(bytes);
-    }
+    ServletOutputStream outputStream = response.getOutputStream();
+    outputStream.write(bytes);
 
     // Delete the file if instructed by the @BinaryResponse
     if (binaryFileActionConfiguration.deleteResponseMemberUponCompletion) {

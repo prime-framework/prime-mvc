@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc.action.result;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
@@ -64,6 +63,8 @@ public class StreamResult extends AbstractResult<Stream> {
           "property returned null or an Object that is not an InputStream.");
     }
 
+    InputStream is = (InputStream) object;
+
     response.setStatus(stream.status());
     response.setContentType(type);
 
@@ -79,20 +80,7 @@ public class StreamResult extends AbstractResult<Stream> {
       return true;
     }
 
-    InputStream is = (InputStream) object;
-    ServletOutputStream sos = response.getOutputStream();
-    try {
-      // Then output the file
-      byte[] b = new byte[8192];
-      int len;
-      while ((len = is.read(b)) != -1) {
-        sos.write(b, 0, len);
-      }
-    } finally {
-      sos.flush();
-      sos.close();
-    }
-
+    writeToOutputStream(is, response);
     return true;
   }
 }
