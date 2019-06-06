@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.util.DefaultIndenter;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
@@ -38,6 +39,7 @@ import org.primeframework.mvc.message.ErrorMessages;
 import org.primeframework.mvc.message.FieldMessage;
 import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;
+import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.scope.MessageScope;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 
@@ -78,15 +80,15 @@ public class JSONResult extends AbstractResult<JSON> {
       throw new PrimeException("The action [" + action.getClass() + "] has no configuration. This should be impossible!");
     }
 
-    // If there are error messages, put them in a well known container and render that instead of looking for the
-    // @JSONResponse annotation
     Object jacksonObject;
-
     boolean prettyPrint = false;
     Class<?> serializationView = void.class;
-    List<Message> messages = messageStore.get(MessageScope.REQUEST);
-    if (messages.size() > 0) {
-      jacksonObject = convertErrors(messages);
+    List<Message> errorMessages = messageStore.get(MessageScope.REQUEST).stream()
+                                              .filter(m -> m.getType() == MessageType.ERROR)
+                                              .collect(Collectors.toList());
+    // If there are ERROR messages, put them in a well known container and render that instead of looking for the @JSONResponse annotation
+    if (errorMessages.size() > 0) {
+      jacksonObject = convertErrors(errorMessages);
     } else {
       JacksonActionConfiguration jacksonActionConfiguration = (JacksonActionConfiguration) configuration.additionalConfiguration.get(JacksonActionConfiguration.class);
       if (jacksonActionConfiguration == null || jacksonActionConfiguration.responseMember == null) {
