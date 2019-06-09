@@ -1,5 +1,9 @@
 Prime MVC Changes
 
+Changes in 1.14.1
+
+ * Ignore Warning and Information messages in the message store for a JSON result
+
 Changes in 1.14.0
 
  * Allow the Content-Type header to be set when using the @Binary result
