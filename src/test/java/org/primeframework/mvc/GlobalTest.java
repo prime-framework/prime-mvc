@@ -665,6 +665,12 @@ public class GlobalTest extends PrimeBaseTest {
              .withJSONFile(Paths.get("src/test/resources/json/api-jsonWithActual-post.json"))
              .post()
              .assertJSONFileWithActual(UserField.class, Paths.get("src/test/resources/json/api-jsonWithActual-post-response.ftl"));
+
+    // Test a final field (the Jackson handler will put the JSON into the final field)
+    simulator.test("/api-final")
+             .withJSONFile(Paths.get("src/test/resources/json/api-jsonWithActual-post.json"))
+             .post()
+             .assertJSONFileWithActual(UserField.class, Paths.get("src/test/resources/json/api-jsonWithActual-post-response.ftl"));
   }
 
   @Test

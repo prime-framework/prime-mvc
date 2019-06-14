@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.ObjectReader;
 import org.apache.commons.io.IOUtils;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
@@ -105,16 +106,28 @@ public class JacksonContentHandler implements ContentHandler {
       RequestMember requestMember = jacksonConfiguration.requestMembers.get(httpMethod);
 
       try {
+        // Retrieve the current value from the action so we can see if it is non-null
+        Object currentValue = expressionEvaluator.getValue(requestMember.name, action);
+        ObjectReader reader;
+        if (currentValue != null) {
+          reader = objectMapper.readerForUpdating(currentValue);
+        } else {
+          reader = objectMapper.readerFor(requestMember.type);
+        }
+
         Object jsonObject;
         if (logger.isDebugEnabled()) {
           final String req = IOUtils.toString(request.getInputStream(), "UTF-8");
           logger.debug("Request: (" + request.getMethod() + " " + request.getRequestURI() + ") " + req);
-          jsonObject = objectMapper.readValue(req, requestMember.type);
+          jsonObject = reader.readValue(req);
         } else {
-          jsonObject = objectMapper.readValue(request.getInputStream(), requestMember.type);
+          jsonObject = reader.readValue(request.getInputStream());
         }
 
-        expressionEvaluator.setValue(requestMember.name, action, jsonObject);
+        // Set the value into the action if the currentValue from the action was null
+        if (currentValue == null) {
+          expressionEvaluator.setValue(requestMember.name, action, jsonObject);
+        }
       } catch (InvalidFormatException e) {
         logger.debug("Error parsing JSON request", e);
         addFieldError(e);
