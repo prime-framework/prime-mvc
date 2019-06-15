@@ -1,5 +1,10 @@
 Prime MVC Changes
 
+Changes in 1.15.0
+
+ * Support a final object when using @JSONRequest and @JSONResponse and merge request into non null object
+
+
 Changes in 1.14.1
 
  * Ignore Warning and Information messages in the message store for a JSON result
