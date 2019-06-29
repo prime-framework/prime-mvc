@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,7 +97,7 @@ public class ResourceBundleMessageProvider implements MessageProvider {
   }
 
   protected Queue<String> determineBundles(String bundle) {
-    Queue<String> names = new LinkedList<String>();
+    Queue<String> names = new LinkedList<>();
     names.offer(bundle);
 
     int index = bundle.lastIndexOf('/');
