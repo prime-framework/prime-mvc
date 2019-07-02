@@ -23,16 +23,14 @@ import java.util.Queue;
 import java.util.ResourceBundle;
 import java.util.ResourceBundle.Control;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.inject.Inject;
-
 /**
- * This implements the MessageProvider using ResourceBundles inside the web context. It also adds the additional step
- * of
+ * This implements the MessageProvider using ResourceBundles inside the web context. It also adds the additional step of
  * looking for multiple bundles if the message isn't initially found. The search method is:
  * <p>
  * <pre>
@@ -88,6 +86,10 @@ public class ResourceBundleMessageProvider implements MessageProvider {
     ActionInvocation actionInvocation = invocationStore.getCurrent();
     String template = findMessage(actionInvocation, key);
     if (template == null) {
+      if (!"[ValidationException]".equals(key)) {
+        logger.debug("Message could not be found for the URI [" + actionInvocation.actionURI + "] and key [" + key + "]");
+      }
+
       return null;
     }
 
@@ -124,13 +126,9 @@ public class ResourceBundleMessageProvider implements MessageProvider {
       try {
         ResourceBundle rb = ResourceBundle.getBundle(name, locale, control);
         return rb.getString(key);
-      } catch (MissingResourceException e) {
+      } catch (MissingResourceException ignore) {
         // Ignore and check the next bundle
       }
-    }
-
-    if (!"[ValidationException]".equals(key)) {
-      logger.warn("Message could not be found for the URI [" + uri + "] and key [" + key + "]");
     }
 
     return null;
