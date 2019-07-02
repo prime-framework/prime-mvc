@@ -1,5 +1,10 @@
 Prime MVC Changes
 
+Changes in 1.15.1
+
+ * Remove WARN log statement when an optional key is not found in the message bundle.
+
+
 Changes in 1.15.0
 
  * Support a final object when using @JSONRequest and @JSONResponse and merge request into non null object
