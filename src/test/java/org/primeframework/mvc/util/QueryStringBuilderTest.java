@@ -74,6 +74,8 @@ public class QueryStringBuilderTest {
     test("http://acme.com/#/login", "http://acme.com/#/login");
     test("http://acme.com/#/login", b -> b.with("foo", "bar"), "http://acme.com/#/login?foo=bar");
     test("http://acme.com/#/login", b -> b.with("foo", "bar").with("bing", "baz"), "http://acme.com/#/login?foo=bar&bing=baz");
+    test("http://acme.com/#/login", b -> b.beginFragment().with("foo", "bar").with("bing", "baz"), "http://acme.com/#/login#foo=bar&bing=baz");
+    test("http://acme.com/#/login", b -> b.beginQuery().with("foo", "bar").with("bing", "baz"), "http://acme.com/#/login?foo=bar&bing=baz");
 
     // Standard deep link
     test("https://fusionauth.io/#section-a", "https://fusionauth.io/#section-a");
