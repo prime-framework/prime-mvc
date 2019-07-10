@@ -62,8 +62,7 @@ public class QueryStringBuilder {
     return this;
   }
 
-  @Override
-  public String toString() {
+  public String build() {
     if (uri.length() == 0) {
       return sb.toString();
     }
@@ -92,11 +91,19 @@ public class QueryStringBuilder {
       return uri.append(sb).toString();
     }
 
-    if (uri.indexOf("#") != -1 && sb.length() > 0) {
+    // If the query begins with a '#' then that is equivalent to '?' and the next separator should be a '&'
+    // - It is possible that a '#' exists in the uri as part of an SPA URL or something like that, assuming it is
+    //   a '#' followed by a slash. For example http://example.com/#/
+    int index = uri.indexOf("#");
+    if (index != -1 && uri.indexOf("#/") == -1 && sb.length() > 0) {
       return uri.append("&").append(sb).toString();
     }
 
-    return uri.append("?").append(sb).toString();
+    if (sb.length() > 0) {
+      return uri.append("?").append(sb).toString();
+    } else {
+      return uri.toString();
+    }
   }
 
   public QueryStringBuilder uri(String uri) {

@@ -786,7 +786,7 @@ public class RequestResult {
     TestURIBuilder builder = TestURIBuilder.builder(uri);
     consumer.accept(builder);
 
-    String expectedUri = builder.toString();
+    String expectedUri = builder.build();
     assertRedirectEquality(expectedUri);
     return this;
   }
@@ -1027,6 +1027,13 @@ public class RequestResult {
     SortedMap<String, List<String>> map = new TreeMap<>();
     int queryIndex = uri.indexOf("?");
     int fragmentIndex = uri.indexOf("#");
+    if (fragmentIndex != -1) {
+      // If the fragment is followed by a '/' then ignore it.
+      if ((fragmentIndex + 1) < uri.length() && uri.charAt(fragmentIndex + 1) == '/') {
+        fragmentIndex = -1;
+      }
+    }
+
     if (queryIndex == -1 && fragmentIndex == -1) {
       // First key will be the URI and an empty value, no parameters
       map.put(uri, Collections.emptyList());

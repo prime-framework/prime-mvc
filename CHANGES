@@ -3,6 +3,8 @@ Prime MVC Changes
 Changes in 1.15.1
 
  * Remove WARN log statement when an optional key is not found in the message bundle.
+ * Fix '#' handling in a URL for assertRedirect and QueryStringBuilder when the '#' is followed by a / as you
+   may find in a single page webapp URL.
 
 
 Changes in 1.15.0

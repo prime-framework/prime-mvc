@@ -26,6 +26,11 @@ import static org.testng.Assert.fail;
  */
 public class QueryStringBuilderTest {
   @Test
+  public void one() {
+    test("http://acme.com", b -> b.with("foo", "bar"), "http://acme.com?foo=bar");
+  }
+
+  @Test
   public void testBuilder() {
     // Just parms
     test(null, b -> b.with("foo", "bar"), "foo=bar");
@@ -65,6 +70,16 @@ public class QueryStringBuilderTest {
     test("http://acme.com/", b -> b.withSegment("bar").beginQuery().with("foo", "bar").beginFragment().with("bing", "baz"), "http://acme.com/bar?foo=bar#bing=baz");
     test("http://acme.com/", b -> b.withSegment("bar").withSegment("baz").beginQuery().with("foo", "bar").beginFragment().with("bing", "baz"), "http://acme.com/bar/baz?foo=bar#bing=baz");
 
+    // SPA style base URL
+    test("http://acme.com/#/login", "http://acme.com/#/login");
+    test("http://acme.com/#/login", b -> b.with("foo", "bar"), "http://acme.com/#/login?foo=bar");
+    test("http://acme.com/#/login", b -> b.with("foo", "bar").with("bing", "baz"), "http://acme.com/#/login?foo=bar&bing=baz");
+
+    // Standard deep link
+    test("https://fusionauth.io/#section-a", "https://fusionauth.io/#section-a");
+    // Page deep link w/ a query parameter
+    test("https://fusionauth.io/?foo=bar#section-a", "https://fusionauth.io/?foo=bar#section-a");
+
     // Expect to explode, if you leave a ? at the end of the initial URL you can't have any segments
     try {
       test("http://acme.com?", b -> b.withSegment("bar").with("foo", "bar"), "http://acme.com?foo=bar");
@@ -75,18 +90,18 @@ public class QueryStringBuilderTest {
 
   private void test(String uri, String expected) {
     QueryStringBuilder builder = QueryStringBuilder.builder(uri);
-    assertEquals(builder.toString(), expected);
+    assertEquals(builder.build(), expected);
   }
 
   private void test(String uri, Consumer<QueryStringBuilder> consumer, String expected) {
     QueryStringBuilder builder = QueryStringBuilder.builder(uri);
     consumer.accept(builder);
-    assertEquals(builder.toString(), expected);
+    assertEquals(builder.build(), expected);
   }
 
   private void test(Consumer<QueryStringBuilder> consumer, String expected) {
     QueryStringBuilder builder = QueryStringBuilder.builder();
     consumer.accept(builder);
-    assertEquals(builder.toString(), expected);
+    assertEquals(builder.build(), expected);
   }
 }
