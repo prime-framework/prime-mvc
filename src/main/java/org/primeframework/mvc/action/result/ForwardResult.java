@@ -119,6 +119,11 @@ public class ForwardResult extends AbstractResult<Forward> {
       }
       page = configuration.resourceDirectory() + "/templates" + uri + "/" + page;
     }
+
+    if (!forward.pagePrefix().equals("")) {
+      page = forward.pagePrefix() + page;
+    }
+
     return expand(page, actionInvocation.action, false);
   }
 
@@ -154,6 +159,8 @@ public class ForwardResult extends AbstractResult<Forward> {
 
     private final String contentType;
 
+    private final String prefix;
+
     private final int status;
 
     private final String statusStr;
@@ -164,6 +171,7 @@ public class ForwardResult extends AbstractResult<Forward> {
       this.uri = uri;
       this.code = code;
       this.contentType = "text/html; charset=UTF-8";
+      this.prefix = "";
       this.status = 200;
       this.statusStr = "";
     }
@@ -172,6 +180,7 @@ public class ForwardResult extends AbstractResult<Forward> {
       this.uri = uri;
       this.code = code;
       this.contentType = contentType;
+      this.prefix = "";
       this.status = status;
       this.statusStr = "";
     }
@@ -194,6 +203,11 @@ public class ForwardResult extends AbstractResult<Forward> {
     @Override
     public String page() {
       return uri;
+    }
+
+    @Override
+    public String pagePrefix() {
+      return prefix;
     }
 
     @Override

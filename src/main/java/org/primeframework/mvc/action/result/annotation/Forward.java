@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ package org.primeframework.mvc.action.result.annotation;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import static java.lang.annotation.ElementType.*;
-import static java.lang.annotation.RetentionPolicy.*;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * This annotation marks a result from an action as a forward to a JSP or FreeMarker template.
@@ -50,6 +50,12 @@ public @interface Forward {
   String contentType() default "text/html; charset=UTF-8";
 
   /**
+   * @return an optional prefix that can be added to the page value.
+   */
+
+  String pagePrefix() default "";
+
+  /**
    * @return The HTTP response status code. This defaults to 200.
    */
   int status() default 200;
@@ -59,7 +65,7 @@ public @interface Forward {
    *         It uses the <code>${variable}</code> notation that is common for variable expanders. After it has been
    *         expanded, the result is converted into an int. Therefore, you can specify either a number as a String, or a
    *         variable expansion. Here are some examples: <code>"${myStatus}"</code>, <code>"200"</code>,
-   *         <code>"40${someField}"</code>
+   * <code>"40${someField}"</code>
    */
   String statusStr() default "";
 
@@ -69,7 +75,7 @@ public @interface Forward {
   @ResultContainerAnnotation
   @Retention(RUNTIME)
   @Target(TYPE)
-  public static @interface List {
+  @interface List {
     Forward[] value();
   }
 }
