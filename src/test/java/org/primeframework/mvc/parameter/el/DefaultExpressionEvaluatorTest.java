@@ -117,6 +117,16 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     action.user.age = 35;
     result = evaluator.expand("My age is ${user.age}", action, true);
     assertEquals(result, "My age is 35");
+
+    // Test null expansion w/out encoding
+    action.user.age = null;
+    result = evaluator.expand("My age is ${user.age}", action, false);
+    assertEquals(result, "My age is ");
+
+    // Test null expansion w/ encoding
+    action.user.age = null;
+    result = evaluator.expand("My age is ${user.age}", action, true);
+    assertEquals(result, "My age is ");
   }
 
   @Test

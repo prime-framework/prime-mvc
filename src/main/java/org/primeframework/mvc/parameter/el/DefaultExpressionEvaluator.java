@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,6 +59,9 @@ public class DefaultExpressionEvaluator implements ExpressionEvaluator {
     return new StrSubstitutor(new StrLookup<String>() {
       public String lookup(String name) {
         String value = getValue(name, object, Collections.emptyMap());
+        if (value == null) {
+          return "";
+        }
         if (encode) {
           try {
             value = URLEncoder.encode(value, "UTF-8");

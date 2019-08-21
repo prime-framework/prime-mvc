@@ -50,12 +50,6 @@ public @interface Forward {
   String contentType() default "text/html; charset=UTF-8";
 
   /**
-   * @return an optional prefix that can be added to the page value.
-   */
-
-  String pagePrefix() default "";
-
-  /**
    * @return The HTTP response status code. This defaults to 200.
    */
   int status() default 200;

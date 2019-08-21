@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2016, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,7 +75,7 @@ public abstract class AbstractResult<U extends Annotation> implements Result<U> 
   protected void setStatus(int status, String statusStr, Object action, HttpServletResponse response) {
     int code = status;
     if (!statusStr.isEmpty()) {
-      code = Integer.valueOf(expand(statusStr, action, false));
+      code = Integer.parseInt(expand(statusStr, action, false));
     }
 
     response.setStatus(code);
