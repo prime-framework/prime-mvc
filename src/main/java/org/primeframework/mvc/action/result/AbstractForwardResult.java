@@ -92,6 +92,10 @@ public abstract class AbstractForwardResult<U extends Annotation> extends Abstra
     return true;
   }
 
+  protected String expandPage(String page, ActionInvocation actionInvocation) {
+    return expand(page, actionInvocation.action, false);
+  }
+
   protected abstract String getCode(U forward);
 
   protected abstract String getContentType(U forward);
@@ -126,7 +130,7 @@ public abstract class AbstractForwardResult<U extends Annotation> extends Abstra
       page = configuration.resourceDirectory() + "/templates" + uri + "/" + page;
     }
 
-    return expand(page, actionInvocation.action, false);
+    return expandPage(page, actionInvocation);
   }
 
   /**
