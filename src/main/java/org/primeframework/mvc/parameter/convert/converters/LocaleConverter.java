@@ -15,16 +15,16 @@
  */
 package org.primeframework.mvc.parameter.convert.converters;
 
+import java.lang.reflect.Type;
+import java.util.Locale;
+import java.util.Map;
+
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primeframework.mvc.parameter.convert.AbstractGlobalConverter;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.convert.annotation.GlobalConverter;
-
-import java.lang.reflect.Type;
-import java.util.Locale;
-import java.util.Map;
 
 /**
  * This converts to and from Locales.
@@ -33,14 +33,24 @@ import java.util.Map;
  */
 @GlobalConverter
 public class LocaleConverter extends AbstractGlobalConverter {
-  protected Object stringToObject(String value, Type convertTo, Map<String, String> attributes, String expression) throws ConversionException, ConverterStateException {
-    if (StringUtils.isBlank(value)) {
+  protected String objectToString(Object value, Type convertFrom, Map<String, String> attributes, String expression)
+      throws org.primeframework.mvc.parameter.convert.ConversionException, ConverterStateException {
+    return value.toString();
+  }
+
+  protected Object stringToObject(String value, Type convertTo, Map<String, String> attributes, String expression)
+      throws ConversionException, ConverterStateException {
+    if (value == null) {
       return null;
+    }
+
+    if (StringUtils.isBlank(value)) {
+      return Locale.ROOT;
     }
 
     try {
       return LocaleUtils.toLocale(value);
-    } catch (IllegalArgumentException e) {
+    } catch (Exception e) {
       throw new ConversionException("Invalid locale [" + value + "]", e);
     }
   }
@@ -48,11 +58,6 @@ public class LocaleConverter extends AbstractGlobalConverter {
   protected Object stringsToObject(String[] values, Type convertTo, Map<String, String> attributes, String expression)
       throws org.primeframework.mvc.parameter.convert.ConversionException, ConverterStateException {
     return toLocale(values);
-  }
-
-  protected String objectToString(Object value, Type convertFrom, Map<String, String> attributes, String expression)
-      throws org.primeframework.mvc.parameter.convert.ConversionException, ConverterStateException {
-    return value.toString();
   }
 
   private Locale toLocale(String[] parts) {

@@ -254,6 +254,9 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     evaluator.setValue("mapSubclass['foo']", bean, new String[]{"value"}, Collections.emptyMap());
     assertEquals(bean.mapSubclass.get("foo"), "value");
 
+    evaluator.setValue("mapSubclassSubclass['foo']", bean, new String[]{"value"}, Collections.emptyMap());
+    assertEquals(bean.mapSubclassSubclass.get("foo"), "value");
+
     evaluator.setValue("mapImplements['foo']", bean, "value");
     assertEquals(bean.mapImplements.get("foo"), "value");
 

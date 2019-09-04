@@ -15,14 +15,15 @@
  */
 package org.primeframework.mvc.parameter.convert.converters;
 
+import java.util.Locale;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
 import org.testng.annotations.Test;
-
-import java.util.Locale;
-
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.fail;
 
 /**
  * This tests the locale converter.
@@ -31,10 +32,24 @@ import static org.testng.Assert.*;
  */
 public class LocaleConverterTest {
   @Test
+  public void errorFromStrings() {
+    GlobalConverter converter = new LocaleConverter();
+    try {
+      converter.convertFromStrings(Locale.class, null, "testExpr", ArrayUtils.toArray("enabc"));
+      fail("Should have thrown a ConversionException");
+    } catch (ConversionException e) {
+      // Expected
+    }
+  }
+
+  @Test
   public void fromStrings() {
     GlobalConverter converter = new LocaleConverter();
     Locale locale = (Locale) converter.convertFromStrings(Locale.class, null, "testExpr", ArrayUtils.toArray((String) null));
     assertNull(locale);
+
+    locale = (Locale) converter.convertFromStrings(Locale.class, null, "testExpr", ArrayUtils.toArray(""));
+    assertEquals(locale.getLanguage(), "");
 
     locale = (Locale) converter.convertFromStrings(Locale.class, null, "testExpr", ArrayUtils.toArray("en"));
     assertEquals(locale.getLanguage(), "en");
@@ -56,17 +71,6 @@ public class LocaleConverterTest {
     assertEquals(locale.getLanguage(), "en");
     assertEquals(locale.getCountry(), "US");
     assertEquals(locale.getVariant(), "UTF8");
-  }
-
-  @Test
-  public void errorFromStrings() {
-    GlobalConverter converter = new LocaleConverter();
-    try {
-      converter.convertFromStrings(Locale.class, null, "testExpr", ArrayUtils.toArray("enabc"));
-      fail("Should have thrown a ConversionException");
-    } catch (ConversionException e) {
-      // Expected
-    }
   }
 
   @Test

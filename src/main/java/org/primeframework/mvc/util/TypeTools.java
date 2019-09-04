@@ -35,6 +35,22 @@ import org.primeframework.mvc.parameter.el.CollectionExpressionException;
  */
 public class TypeTools {
   /**
+   * Determines the final component type. This continues to loop over Collections until it hits a non-parameterized
+   * type.
+   *
+   * @param type The parametrized type.
+   * @param path The path to the type, used in exception message.
+   * @return The final component type.
+   */
+  public static Class<?> componentFinalType(Type type, String path) {
+    while (!(type instanceof Class)) {
+      type = componentType(type, path);
+    }
+
+    return (Class<?>) type;
+  }
+
+  /**
    * Determines the component type. Lists is the first type, Map is the second type, etc.
    *
    * @param type The parametrized type.
@@ -69,6 +85,16 @@ public class TypeTools {
   }
 
   /**
+   * Returns true if the given type is a Parameterized type with a raw type of Map.
+   *
+   * @param t The type.
+   * @return True or false.
+   */
+  public static boolean isGenericMap(Type t) {
+    return t instanceof ParameterizedType && Map.class.isAssignableFrom((Class) ((ParameterizedType) t).getRawType());
+  }
+
+  /**
    * Determines the key type for a Map.
    *
    * @param type The parametrized type.
@@ -77,9 +103,9 @@ public class TypeTools {
    */
   public static Type[] mapTypes(Type type, String path) {
     if (type instanceof Class) {
-      Class c = (Class) type;
-      type = c.getGenericSuperclass();
-      if (!(isGenericMap(type))) {
+      Class<?> c = (Class<?>) type;
+
+      while (c != null && !isGenericMap(type)) {
         Type[] types = c.getGenericInterfaces();
         if (types != null && types.length > 0) {
           for (Type t : types) {
@@ -87,6 +113,18 @@ public class TypeTools {
               type = t;
               break;
             }
+          }
+        }
+
+        // Go up to the next parent and check
+        if (!isGenericMap(type)) {
+          type = c.getGenericSuperclass();
+          if (type instanceof Class) {
+            c = (Class<?>) type;
+          } else if (type instanceof ParameterizedType) {
+            c = (Class) ((ParameterizedType) type).getRawType();
+          } else {
+            c = null;
           }
         }
       }
@@ -102,32 +140,6 @@ public class TypeTools {
 
     throw new CollectionExpressionException("The method or member [" + path + "] returns a simple Map. Unable to determine the " +
         "types of the Map. Please make this method or member generic so that the correct type can be determined.");
-  }
-
-  /**
-   * Returns true if the given type is a Parameterized type with a raw type of Map.
-   *
-   * @param t The type.
-   * @return True or false.
-   */
-  public static boolean isGenericMap(Type t) {
-    return t instanceof ParameterizedType && Map.class.isAssignableFrom((Class) ((ParameterizedType) t).getRawType());
-  }
-
-  /**
-   * Determines the final component type. This continues to loop over Collections until it hits a non-parameterized
-   * type.
-   *
-   * @param type The parametrized type.
-   * @param path The path to the type, used in exception message.
-   * @return The final component type.
-   */
-  public static Class<?> componentFinalType(Type type, String path) {
-    while (!(type instanceof Class)) {
-      type = componentType(type, path);
-    }
-
-    return (Class<?>) type;
   }
 
   /**
@@ -148,15 +160,18 @@ public class TypeTools {
   }
 
   /**
-   * Resolves the generic types of a field or method by matching up the generics in the class definition to the ones used in the
-   * method/field. This also works for methods/fields that use other types that are generic. For example, Map&lt;T, U> can be resolved.
+   * Resolves the generic types of a field or method by matching up the generics in the class definition to the ones
+   * used in the method/field. This also works for methods/fields that use other types that are generic. For example,
+   * Map&lt;T, U> can be resolved.
    *
    * @param declaringClassGeneric The class where the generic method/field was defined that uses the generic.
-   * @param currentClass          The current class that has completely defined all the generic information to satisfy the method/field.
+   * @param currentClass          The current class that has completely defined all the generic information to satisfy
+   *                              the method/field.
    * @param typeVariable          The generic type variable from the method/field.
    * @return The type of the generic method/field.
    */
-  public static Type resolveGenericType(Class<?> declaringClassGeneric, Class<?> currentClass, final TypeVariable<?> typeVariable) {
+  public static Type resolveGenericType(Class<?> declaringClassGeneric, Class<?> currentClass,
+                                        final TypeVariable<?> typeVariable) {
     List<Class<?>> classes = new ArrayList<>();
     while (currentClass != declaringClassGeneric) {
       classes.add(currentClass);

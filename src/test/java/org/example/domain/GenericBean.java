@@ -25,6 +25,8 @@ import java.util.UUID;
  * For testing odd generic cases.
  */
 public class GenericBean {
+  public MapSubclassSubclass mapSubclassSubclass;
+
   public MapSubclass mapSubclass;
 
   public MapImplements mapImplements;
