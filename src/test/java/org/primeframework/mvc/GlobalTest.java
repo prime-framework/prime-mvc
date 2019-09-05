@@ -510,15 +510,6 @@ public class GlobalTest extends PrimeBaseTest {
                                                                          .with("bar", "baz")
                                                                          .with("q", "foo")
                                                                          .with("code", "bar")));
-
-    // SPA style redirect
-    test.simulate(() -> simulator.test("/complex-redirect")
-                                 .withParameter("redirectURI", "/foo/#/?bar=baz")
-                                 .get()
-                                 .assertStatusCode(302)
-                                 .assertRedirect("/foo/#/?bar=baz")
-                                 .assertRedirect("/foo/#/", params -> params.beginQuery()
-                                                                            .with("bar", "baz")));
   }
 
   @Test

@@ -70,18 +70,6 @@ public class QueryStringBuilderTest {
     test("http://acme.com/", b -> b.withSegment("bar").beginQuery().with("foo", "bar").beginFragment().with("bing", "baz"), "http://acme.com/bar?foo=bar#bing=baz");
     test("http://acme.com/", b -> b.withSegment("bar").withSegment("baz").beginQuery().with("foo", "bar").beginFragment().with("bing", "baz"), "http://acme.com/bar/baz?foo=bar#bing=baz");
 
-    // SPA style base URL
-    test("http://acme.com/#/login", "http://acme.com/#/login");
-    test("http://acme.com/#/login", b -> b.with("foo", "bar"), "http://acme.com/#/login?foo=bar");
-    test("http://acme.com/#/login", b -> b.with("foo", "bar").with("bing", "baz"), "http://acme.com/#/login?foo=bar&bing=baz");
-    test("http://acme.com/#/login", b -> b.beginFragment().with("foo", "bar").with("bing", "baz"), "http://acme.com/#/login#foo=bar&bing=baz");
-    test("http://acme.com/#/login", b -> b.beginQuery().with("foo", "bar").with("bing", "baz"), "http://acme.com/#/login?foo=bar&bing=baz");
-
-    // Standard deep link
-    test("https://fusionauth.io/#section-a", "https://fusionauth.io/#section-a");
-    // Page deep link w/ a query parameter
-    test("https://fusionauth.io/?foo=bar#section-a", "https://fusionauth.io/?foo=bar#section-a");
-
     // Expect to explode, if you leave a ? at the end of the initial URL you can't have any segments
     try {
       test("http://acme.com?", b -> b.withSegment("bar").with("foo", "bar"), "http://acme.com?foo=bar");
