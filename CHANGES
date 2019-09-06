@@ -1,5 +1,10 @@
 Prime MVC Changes
 
+
+Changes in 1.15.2
+
+ * Add HTMLAsserter
+
 Changes in 1.15.1
 
  * Remove WARN log statement when an optional key is not found in the message bundle.

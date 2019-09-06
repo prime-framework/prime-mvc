@@ -40,6 +40,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.inject.Injector;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.primeframework.mock.servlet.MockContainer;
 import org.primeframework.mock.servlet.MockHttpServletRequest;
 import org.primeframework.mock.servlet.MockHttpServletResponse;
@@ -622,6 +626,16 @@ public class RequestResult {
   }
 
   /**
+   * @param consumer a consumer of the HTML asserter
+   * @return return a new HTML asserter
+   * @throws Exception exceptions that happen..
+   */
+  public RequestResult assertHTML(ThrowingConsumer<HTMLAsserter> consumer) throws Exception {
+    consumer.accept(new HTMLAsserter(this));
+    return this;
+  }
+
+  /**
    * Verifies that the HTTP response contains the specified header.
    *
    * @param header the name of the HTTP response header
@@ -1071,6 +1085,79 @@ public class RequestResult {
   @FunctionalInterface
   public interface ThrowingConsumer<T> {
     void accept(T t) throws Exception;
+  }
+
+  public static class HTMLAsserter {
+    public Document document;
+
+    public RequestResult requestResult;
+
+    public HTMLAsserter(RequestResult requestResult) {
+      this.requestResult = requestResult;
+      document = Jsoup.parse(requestResult.body);
+    }
+
+    /**
+     * Ensure no elements match the provided selector.
+     *
+     * @param selector the DOM selector
+     * @return this.
+     */
+    public HTMLAsserter assertElementDoesNotExist(String selector) {
+      Elements elements = document.select(selector);
+      if (elements.size() > 0) {
+        throw new AssertionError("Expected the selector to return 0 elements. Found [" + (elements.size() + "] elements.\n" + elements));
+      }
+
+      return this;
+    }
+
+    /**
+     * Ensure a single element matches the provided selector.
+     *
+     * @param selector the DOM selector
+     * @return this.
+     */
+    public HTMLAsserter assertElementExists(String selector) {
+      Elements elements = document.select(selector);
+      if (elements.size() != 1) {
+        throw new AssertionError("Expected a single element to match. 0 elements found.");
+      }
+
+      return this;
+    }
+
+    /**
+     * Ensure a single element matches the provided selector and equals the provided value.
+     *
+     * @param selector the DOM selector
+     * @param value    the expected value
+     * @return this.
+     */
+    public HTMLAsserter assertElementValue(String selector, Object value) {
+      Elements elements = document.select(selector);
+      if (elements.size() != 1) {
+        throw new AssertionError("Expected a single element to match. Found [" + elements.size() + "]" + ((elements.size() > 1) ? "" : elements));
+      }
+
+      Element element = elements.get(0);
+      if (!element.val().equals(value.toString())) {
+        throw new AssertionError("Expected [" + value.toString() + "] but found [" + element.val() + "]. Actual matched element: \n\n" + element);
+      }
+
+      return this;
+    }
+
+    /**
+     * Perform any custom assertions on the parsed HTML document.
+     *
+     * @param consumer the HTML document consumer
+     * @return this.
+     */
+    public HTMLAsserter custom(ThrowingConsumer<Document> consumer) throws Exception {
+      consumer.accept(document);
+      return this;
+    }
   }
 
   public static class TestURIBuilder extends QueryStringBuilder {
