@@ -24,8 +24,8 @@ import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.container.ServletContainerResolver;
+import org.primeframework.mvc.locale.LocaleProvider;
 import org.testng.annotations.Test;
-
 import static org.easymock.EasyMock.createStrictMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
@@ -50,12 +50,17 @@ public class ResourceBundleMessageProviderTest extends PrimeBaseTest {
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/l10n/Test", null, null));
     replay(store);
 
-    ResourceBundleMessageProvider provider = new ResourceBundleMessageProvider(Locale.US, new WebControl(new ServletContainerResolver(context), configuration), store);
+    LocaleProvider localeProvider = createStrictMock(LocaleProvider.class);
+    expect(localeProvider.get()).andReturn(Locale.US).times(9);
+    expect(localeProvider.get()).andReturn(Locale.GERMAN).times(3);
+    replay(localeProvider);
+
+    ResourceBundleMessageProvider provider = new ResourceBundleMessageProvider(localeProvider, new WebControl(new ServletContainerResolver(context), configuration), store);
     assertEquals(provider.getMessage("format_key", "b", "a", "c"), "American English Message b a c");
     assertEquals(provider.getMessage("format_key", "b", "a", "c"), "Package Message b a c");
     assertEquals(provider.getMessage("format_key", "b", "a", "c"), "Super Package Message b a c");
 
-    provider = new ResourceBundleMessageProvider(Locale.GERMAN, new WebControl(new ServletContainerResolver(context), configuration), store);
+    provider = new ResourceBundleMessageProvider(localeProvider, new WebControl(new ServletContainerResolver(context), configuration), store);
     assertEquals(provider.getMessage("format_key", "b", "a", "c"), "Default Message b a c");
 
     verify(store);
@@ -69,7 +74,11 @@ public class ResourceBundleMessageProviderTest extends PrimeBaseTest {
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/l10n/Test", null, null)).times(2);
     replay(store);
 
-    ResourceBundleMessageProvider provider = new ResourceBundleMessageProvider(Locale.US, new WebControl(new ServletContainerResolver(context), configuration), store);
+    LocaleProvider localeProvider = createStrictMock(LocaleProvider.class);
+    expect(localeProvider.get()).andReturn(Locale.US).times(3);
+    replay(localeProvider);
+
+    ResourceBundleMessageProvider provider = new ResourceBundleMessageProvider(localeProvider, new WebControl(new ServletContainerResolver(context), configuration), store);
     try {
       provider.getMessage("bad_key");
       fail("Should have failed");
@@ -91,12 +100,17 @@ public class ResourceBundleMessageProviderTest extends PrimeBaseTest {
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/l10n/Test", null, null));
     replay(store);
 
-    ResourceBundleMessageProvider provider = new ResourceBundleMessageProvider(Locale.US, new WebControl(new ServletContainerResolver(context), configuration), store);
+    LocaleProvider localeProvider = createStrictMock(LocaleProvider.class);
+    expect(localeProvider.get()).andReturn(Locale.US).times(9);
+    expect(localeProvider.get()).andReturn(Locale.GERMAN).times(3);
+    replay(localeProvider);
+
+    ResourceBundleMessageProvider provider = new ResourceBundleMessageProvider(localeProvider, new WebControl(new ServletContainerResolver(context), configuration), store);
     assertEquals(provider.getMessage("key"), "American English Message");
     assertEquals(provider.getMessage("key"), "Package Message");
     assertEquals(provider.getMessage("key"), "Super Package Message");
 
-    provider = new ResourceBundleMessageProvider(Locale.GERMAN, new WebControl(new ServletContainerResolver(context), configuration), store);
+    provider = new ResourceBundleMessageProvider(localeProvider, new WebControl(new ServletContainerResolver(context), configuration), store);
     assertEquals(provider.getMessage("key"), "Default Message");
 
     verify(store);

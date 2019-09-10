@@ -19,14 +19,13 @@ package org.primeframework.mvc.freemarker;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Locale;
-
-import org.primeframework.mvc.config.MVCConfiguration;
 
 import com.google.inject.Inject;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import org.primeframework.mvc.config.MVCConfiguration;
+import org.primeframework.mvc.locale.LocaleProvider;
 
 /**
  * This is a simple FreeMarkerService implementation. It uses two configuration parameters and the {@link
@@ -46,21 +45,23 @@ import freemarker.template.TemplateException;
  */
 public class DefaultFreeMarkerService implements FreeMarkerService {
   private final Configuration configuration;
-  private final Locale locale;
+
+  private final LocaleProvider localeProvider;
 
   @Inject
-  public DefaultFreeMarkerService(Configuration configuration, Locale locale) {
+  public DefaultFreeMarkerService(Configuration configuration, LocaleProvider localeProvider) {
     this.configuration = configuration;
-    this.locale = locale;
+    this.localeProvider = localeProvider;
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public void render(Writer writer, String templateName, Object root) throws FreeMarkerRenderException, MissingTemplateException {
+  public void render(Writer writer, String templateName, Object root)
+      throws FreeMarkerRenderException, MissingTemplateException {
     try {
-      Template template = configuration.getTemplate(templateName, locale);
+      Template template = configuration.getTemplate(templateName, localeProvider.get());
       template.process(root, writer);
     } catch (FileNotFoundException fnfe) {
       throw new MissingTemplateException(fnfe);

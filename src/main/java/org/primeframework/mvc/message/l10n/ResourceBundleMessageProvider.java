@@ -17,7 +17,6 @@ package org.primeframework.mvc.message.l10n;
 
 import java.util.Formatter;
 import java.util.LinkedList;
-import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.Queue;
 import java.util.ResourceBundle;
@@ -26,6 +25,7 @@ import java.util.ResourceBundle.Control;
 import com.google.inject.Inject;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
+import org.primeframework.mvc.locale.LocaleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,11 +61,12 @@ public class ResourceBundleMessageProvider implements MessageProvider {
 
   private final ActionInvocationStore invocationStore;
 
-  private final Locale locale;
+  private final LocaleProvider localeProvider;
 
   @Inject
-  public ResourceBundleMessageProvider(Locale locale, Control control, ActionInvocationStore invocationStore) {
-    this.locale = locale;
+  public ResourceBundleMessageProvider(LocaleProvider localeProvider, Control control,
+                                       ActionInvocationStore invocationStore) {
+    this.localeProvider = localeProvider;
     this.control = control;
     this.invocationStore = invocationStore;
   }
@@ -94,7 +95,7 @@ public class ResourceBundleMessageProvider implements MessageProvider {
     }
 
     Formatter f = new Formatter();
-    f.format(locale, template, values);
+    f.format(localeProvider.get(), template, values);
     return f.out().toString();
   }
 
@@ -124,7 +125,7 @@ public class ResourceBundleMessageProvider implements MessageProvider {
     Queue<String> names = determineBundles(uri);
     for (String name : names) {
       try {
-        ResourceBundle rb = ResourceBundle.getBundle(name, locale, control);
+        ResourceBundle rb = ResourceBundle.getBundle(name, localeProvider.get(), control);
         return rb.getString(key);
       } catch (MissingResourceException ignore) {
         // Ignore and check the next bundle

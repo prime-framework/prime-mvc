@@ -93,6 +93,11 @@ public class MockConfiguration extends AbstractMVCConfiguration {
   }
 
   @Override
+  public String localeCookieName() {
+    return localeCookieName;
+  }
+
+  @Override
   public int templateCheckSeconds() {
     return freemarkerCheckSeconds;
   }

@@ -53,6 +53,8 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
 
   public boolean ignoreEmptyParameters = false;
 
+  public String localeCookieName = "prime-locale";
+
   public boolean propagateRuntimeException = true;
 
   public String resourceDirectory = "/WEB-INF";
@@ -95,6 +97,11 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
   @Override
   public boolean ignoreEmptyParameters() {
     return ignoreEmptyParameters;
+  }
+
+  @Override
+  public String localeCookieName() {
+    return localeCookieName;
   }
 
   @Override

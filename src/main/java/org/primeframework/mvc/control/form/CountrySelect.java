@@ -32,18 +32,18 @@ import org.primeframework.mvc.control.annotation.ControlAttributes;
  * @author Brian Pontarelli
  */
 @ControlAttributes(
-  required = {
-    @ControlAttribute(name = "name")
-  },
-  optional = {
-    @ControlAttribute(name = "disabled", types = {boolean.class, Boolean.class}),
-    @ControlAttribute(name = "includeBlank", types = {boolean.class, Boolean.class}),
-    @ControlAttribute(name = "multiple", types = {boolean.class, Boolean.class}),
-    @ControlAttribute(name = "readonly", types = {boolean.class, Boolean.class}),
-    @ControlAttribute(name = "required", types = {boolean.class, Boolean.class}),
-    @ControlAttribute(name = "size", types = {int.class, Number.class}),
-    @ControlAttribute(name = "tabindex", types = {int.class, Number.class})
-  }
+    required = {
+        @ControlAttribute(name = "name")
+    },
+    optional = {
+        @ControlAttribute(name = "disabled", types = {boolean.class, Boolean.class}),
+        @ControlAttribute(name = "includeBlank", types = {boolean.class, Boolean.class}),
+        @ControlAttribute(name = "multiple", types = {boolean.class, Boolean.class}),
+        @ControlAttribute(name = "readonly", types = {boolean.class, Boolean.class}),
+        @ControlAttribute(name = "required", types = {boolean.class, Boolean.class}),
+        @ControlAttribute(name = "size", types = {int.class, Number.class}),
+        @ControlAttribute(name = "tabindex", types = {int.class, Number.class})
+    }
 )
 public class CountrySelect extends Select {
   /**
@@ -51,7 +51,7 @@ public class CountrySelect extends Select {
    */
   @Override
   protected Map<String, Object> makeParameters() {
-    LinkedHashMap<String, String> countries = new LinkedHashMap<String, String>();
+    LinkedHashMap<String, String> countries = new LinkedHashMap<>();
 
     if (attributes.containsKey("includeBlank") && (Boolean) attributes.get("includeBlank")) {
       countries.put("", "");
@@ -66,7 +66,7 @@ public class CountrySelect extends Select {
       }
     }
 
-    SortedSet<Locale> alphabetical = new TreeSet<Locale>(new LocaleComparator(locale));
+    SortedSet<Locale> alphabetical = new TreeSet<>(new LocaleComparator(localeProvider.get()));
     Locale[] locales = Locale.getAvailableLocales();
     for (Locale locale : locales) {
       if (StringUtils.isNotBlank(locale.getCountry()) && StringUtils.isNotBlank(locale.getDisplayCountry(locale))) {
@@ -76,7 +76,7 @@ public class CountrySelect extends Select {
 
     for (Locale locale : alphabetical) {
       if (!countries.containsKey(locale.getCountry())) {
-        countries.put(locale.getCountry(), locale.getDisplayCountry(this.locale));
+        countries.put(locale.getCountry(), locale.getDisplayCountry(localeProvider.get()));
       }
     }
 

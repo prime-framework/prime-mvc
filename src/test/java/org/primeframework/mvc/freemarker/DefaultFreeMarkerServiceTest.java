@@ -25,8 +25,11 @@ import org.easymock.EasyMock;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.container.ContainerResolver;
 import org.primeframework.mvc.freemarker.guice.FreeMarkerConfigurationProvider;
+import org.primeframework.mvc.locale.LocaleProvider;
 import org.testng.annotations.Test;
-
+import static org.easymock.EasyMock.createStrictMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
 import static org.testng.Assert.assertEquals;
 
 /**
@@ -45,9 +48,13 @@ public class DefaultFreeMarkerServiceTest {
     EasyMock.expect(containerResolver.getRealPath("src/test/java/org/primeframework/mvc/freemarker/test-locale_fr.ftl")).andReturn("src/test/java/org/primeframework/mvc/freemarker/test-locale.ftl");
     EasyMock.replay(containerResolver);
 
-    DefaultFreeMarkerService service = new DefaultFreeMarkerService(new FreeMarkerConfigurationProvider(config, new OverridingTemplateLoader(containerResolver)).get(), Locale.FRENCH);
+    LocaleProvider localeProvider = createStrictMock(LocaleProvider.class);
+    expect(localeProvider.get()).andReturn(Locale.FRENCH);
+    replay(localeProvider);
 
-    Map<String, Object> context = new HashMap<String, Object>();
+    DefaultFreeMarkerService service = new DefaultFreeMarkerService(new FreeMarkerConfigurationProvider(config, new OverridingTemplateLoader(containerResolver)).get(), localeProvider);
+
+    Map<String, Object> context = new HashMap<>();
     StringWriter writer = new StringWriter();
     service.render(writer, "src/test/java/org/primeframework/mvc/freemarker/test-locale.ftl", context);
     assertEquals(writer.toString(), "3,14");
@@ -63,7 +70,11 @@ public class DefaultFreeMarkerServiceTest {
     EasyMock.expect(containerResolver.getRealPath("src/test/java/org/primeframework/mvc/freemarker/test-with-bean_en_US.ftl")).andReturn("src/test/java/org/primeframework/mvc/freemarker/test-with-bean.ftl");
     EasyMock.replay(containerResolver);
 
-    DefaultFreeMarkerService service = new DefaultFreeMarkerService(new FreeMarkerConfigurationProvider(config, new OverridingTemplateLoader(containerResolver)).get(), Locale.US);
+    LocaleProvider localeProvider = createStrictMock(LocaleProvider.class);
+    expect(localeProvider.get()).andReturn(Locale.US);
+    replay(localeProvider);
+
+    DefaultFreeMarkerService service = new DefaultFreeMarkerService(new FreeMarkerConfigurationProvider(config, new OverridingTemplateLoader(containerResolver)).get(), localeProvider);
 
     Bean bean = new Bean();
     bean.coolMap.put(1, "test");
@@ -86,7 +97,11 @@ public class DefaultFreeMarkerServiceTest {
     EasyMock.expect(containerResolver.getRealPath("src/test/java/org/primeframework/mvc/freemarker/test_en_US.ftl")).andReturn("src/test/java/org/primeframework/mvc/freemarker/test.ftl");
     EasyMock.replay(containerResolver);
 
-    DefaultFreeMarkerService service = new DefaultFreeMarkerService(new FreeMarkerConfigurationProvider(config, new OverridingTemplateLoader(containerResolver)).get(), Locale.US);
+    LocaleProvider localeProvider = createStrictMock(LocaleProvider.class);
+    expect(localeProvider.get()).andReturn(Locale.US);
+    replay(localeProvider);
+
+    DefaultFreeMarkerService service = new DefaultFreeMarkerService(new FreeMarkerConfigurationProvider(config, new OverridingTemplateLoader(containerResolver)).get(), localeProvider);
     StringWriter writer = new StringWriter();
     service.render(writer, "src/test/java/org/primeframework/mvc/freemarker/test.ftl", new HashMap<String, Object>());
     assertEquals(writer.toString(), "It worked!");

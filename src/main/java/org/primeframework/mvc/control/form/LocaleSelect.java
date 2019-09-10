@@ -17,16 +17,16 @@ package org.primeframework.mvc.control.form;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import com.google.inject.Inject;
 import org.apache.commons.lang3.LocaleUtils;
 import org.primeframework.mvc.control.annotation.ControlAttribute;
 import org.primeframework.mvc.control.annotation.ControlAttributes;
-
-import com.google.inject.Inject;
 
 /**
  * This class is the control for a Locale select box.
@@ -41,7 +41,7 @@ import com.google.inject.Inject;
         @ControlAttribute(name = "disabled", types = {boolean.class, Boolean.class}),
         @ControlAttribute(name = "includeCountries", types = {boolean.class, Boolean.class}),
         @ControlAttribute(name = "multiple", types = {boolean.class, Boolean.class}),
-        @ControlAttribute(name = "preferredLocales", types = {String.class}),
+        @ControlAttribute(name = "preferredLocales"),
         @ControlAttribute(name = "readonly", types = {boolean.class, Boolean.class}),
         @ControlAttribute(name = "required", types = {boolean.class, Boolean.class}),
         @ControlAttribute(name = "size", types = {int.class, Number.class}),
@@ -49,11 +49,8 @@ import com.google.inject.Inject;
     }
 )
 public class LocaleSelect extends Select {
-  private final Locale locale;
-
   @Inject
-  public LocaleSelect(Locale locale) {
-    this.locale = locale;
+  public LocaleSelect() {
   }
 
   /**
@@ -76,11 +73,11 @@ public class LocaleSelect extends Select {
     Collections.addAll(allLocales, Locale.getAvailableLocales());
     allLocales.removeIf((locale) -> locale.getLanguage().isEmpty() || locale.hasExtensions() || !locale.getScript().isEmpty() ||
         !locale.getVariant().isEmpty() || (!includeCountries && !locale.getCountry().isEmpty()));
-    allLocales.sort((one, two) -> one.getDisplayName(locale).compareTo(two.getDisplayName(locale)));
+    allLocales.sort(Comparator.comparing(one -> one.getDisplayName(localeProvider.get())));
 
     for (Locale locale : allLocales) {
       if (!locales.containsKey(locale.getCountry())) {
-        locales.put(locale.toString(), locale.getDisplayName(this.locale));
+        locales.put(locale.toString(), locale.getDisplayName(localeProvider.get()));
       }
     }
 

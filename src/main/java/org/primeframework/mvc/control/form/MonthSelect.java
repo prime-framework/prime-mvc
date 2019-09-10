@@ -51,7 +51,7 @@ public class MonthSelect extends Select {
     super.addAdditionalAttributes();
 
     Map<Integer, String> months = new TreeMap<>();
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM").withLocale(locale);
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM").withLocale(localeProvider.get());
     for (int i = 1; i <= 12; i++) {
       LocalDate date = LocalDate.of(2008, i, 1);
       months.put(i, date.format(formatter));

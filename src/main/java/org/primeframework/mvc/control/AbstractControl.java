@@ -18,10 +18,11 @@ package org.primeframework.mvc.control;
 import javax.servlet.http.HttpServletRequest;
 import java.io.Writer;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.google.inject.Inject;
+import freemarker.template.Configuration;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
@@ -31,12 +32,10 @@ import org.primeframework.mvc.control.annotation.ControlAttributes;
 import org.primeframework.mvc.control.form.JoinMethod;
 import org.primeframework.mvc.control.message.Message;
 import org.primeframework.mvc.freemarker.FreeMarkerService;
+import org.primeframework.mvc.locale.LocaleProvider;
 import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.security.CSRF;
 import org.primeframework.mvc.util.ErrorList;
-
-import com.google.inject.Inject;
-import freemarker.template.Configuration;
 
 /**
  * This class an abstract Control implementation that is useful for creating new controls that might need access to
@@ -59,7 +58,7 @@ public abstract class AbstractControl implements Control {
 
   protected FreeMarkerService freeMarkerService;
 
-  protected Locale locale;
+  protected LocaleProvider localeProvider;
 
   protected MessageProvider messageProvider;
 
@@ -78,8 +77,7 @@ public abstract class AbstractControl implements Control {
   }
 
   /**
-   * Implements the controls renderEnd method that is called directly by the JSP taglibs. This method is the main
-   * render
+   * Implements the controls renderEnd method that is called directly by the JSP taglibs. This method is the main render
    * point for the control and it uses the {@link FreeMarkerService} to render the control. Sub-classes need to
    * implement a number of methods in order to setup the Map that is passed to FreeMarker as well as determine the name
    * of the template
@@ -123,10 +121,11 @@ public abstract class AbstractControl implements Control {
   }
 
   @Inject
-  public void setServices(Locale locale, HttpServletRequest request, ActionInvocationStore actionInvocationStore,
-                          FreeMarkerService freeMarkerService, MVCConfiguration configuration, Configuration freeMarkerConfig,
+  public void setServices(LocaleProvider localeProvider, HttpServletRequest request,
+                          ActionInvocationStore actionInvocationStore, FreeMarkerService freeMarkerService,
+                          MVCConfiguration configuration, Configuration freeMarkerConfig,
                           MessageProvider messageProvider) {
-    this.locale = locale;
+    this.localeProvider = localeProvider;
     this.request = request;
     this.freeMarkerService = freeMarkerService;
     this.actionInvocationStore = actionInvocationStore;
@@ -191,8 +190,7 @@ public abstract class AbstractControl implements Control {
   }
 
   /**
-   * Converts the given parameters into a FreeMarker root node. This can be overridden by sub-classes to convert the
-   * Map
+   * Converts the given parameters into a FreeMarker root node. This can be overridden by sub-classes to convert the Map
    * or wrap it. This method simply returns the given Map.
    *
    * @return The root.

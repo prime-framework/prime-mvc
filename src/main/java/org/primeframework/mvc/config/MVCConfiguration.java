@@ -82,6 +82,11 @@ public interface MVCConfiguration {
   int l10nReloadSeconds();
 
   /**
+   * @return The cookie name used to store the locale.
+   */
+  String localeCookieName();
+
+  /**
    * @return Whether or not runtime exceptions should be re-thrown out of Prime MVC.
    */
   boolean propagateRuntimeExceptions();

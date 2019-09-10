@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,23 +13,35 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.locale.guice;
+package org.example.action;
 
 import java.util.Locale;
 
-import org.primeframework.mvc.locale.DefaultLocaleProvider;
+import com.google.inject.Inject;
+import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.locale.LocaleProvider;
 
-import com.google.inject.AbstractModule;
-
 /**
- * This class is a Guice module for the Prime MVC Locale handling.
- *
  * @author Brian Pontarelli
  */
-public class LocaleModule extends AbstractModule {
-  @Override
-  protected void configure() {
-    bind(LocaleProvider.class).to(DefaultLocaleProvider.class);
+@Action
+public class LocaleAction {
+  public final LocaleProvider localeProvider;
+
+  public Locale locale;
+
+  @Inject
+  public LocaleAction(LocaleProvider localeProvider) {
+    this.localeProvider = localeProvider;
+  }
+
+  public String get() {
+    this.locale = localeProvider.get();
+    return "input";
+  }
+
+  public String post() {
+    localeProvider.set(this.locale);
+    return "input";
   }
 }
