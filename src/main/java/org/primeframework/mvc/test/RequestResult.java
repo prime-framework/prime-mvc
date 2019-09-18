@@ -878,7 +878,7 @@ public class RequestResult {
    * @param consumer The request result from following the redirect.
    * @return This.
    */
-  public RequestResult executeRedirect(Consumer<RequestResult> consumer) {
+  public RequestResult executeRedirect(ThrowingConsumer<RequestResult> consumer) throws Exception {
     String uri = redirect.contains("?") ? redirect.substring(0, redirect.indexOf("?")) : redirect;
 
     RequestBuilder rb = new RequestBuilder(uri, container, filter, injector);
@@ -1137,12 +1137,12 @@ public class RequestResult {
     public HTMLAsserter assertElementValue(String selector, Object value) {
       Elements elements = document.select(selector);
       if (elements.size() != 1) {
-        throw new AssertionError("Expected a single element to match. Found [" + elements.size() + "]" + ((elements.size() > 1) ? "" : elements));
+        throw new AssertionError("Expected a single element to match the selector " + selector + ". Found [" + elements.size() + "] instead." + ((elements.size() == 0) ? "" : "\n\n" + elements));
       }
 
       Element element = elements.get(0);
       if (!element.val().equals(value.toString())) {
-        throw new AssertionError("Expected [" + value.toString() + "] but found [" + element.val() + "]. Actual matched element: \n\n" + element);
+        throw new AssertionError("Using the selector [" + selector + "] expected [" + value.toString() + "] but found [" + element.val() + "]. Actual matched element: \n\n" + element);
       }
 
       return this;
