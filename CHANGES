@@ -1,6 +1,10 @@
 Prime MVC Changes
 
 
+Changes in 1.16.0
+
+ * Better support for localization
+
 Changes in 1.15.2
 
  * Add HTMLAsserter
