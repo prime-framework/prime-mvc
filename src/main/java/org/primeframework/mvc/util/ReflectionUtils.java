@@ -588,10 +588,14 @@ public class ReflectionUtils {
     // I think we have a winner
     try {
       // If we have a final collection we can't call field.set, clear the collection and the values
-      if (Modifier.isFinal(field.getModifiers()) && (Collection.class.isAssignableFrom(field.getType()) && value.getClass().isArray())) {
+      if (Modifier.isFinal(field.getModifiers()) && (Collection.class.isAssignableFrom(field.getType()) && (value.getClass().isArray() || Collection.class.isAssignableFrom(value.getClass())))) {
         Collection collection = (Collection) field.get(object);
         collection.clear();
-        collection.addAll(Arrays.asList((Object[]) value));
+        if (value.getClass().isArray()) {
+          collection.addAll(Arrays.asList((Object[]) value));
+        } else {
+          collection.addAll((Collection) value);
+        }
       } else {
         field.set(object, value);
       }

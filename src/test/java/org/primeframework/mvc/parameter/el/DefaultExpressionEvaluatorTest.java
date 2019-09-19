@@ -19,6 +19,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
@@ -246,8 +247,20 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     assertEquals(action.names.get(1), "Richard");
     assertEquals(action.names.get(2), "Monica");
 
+    // Try again using a List instead of an Array
+    evaluator.setValue("names", action, new ArrayList<>(Arrays.asList("Erlich", "Richard", "Monica")));
+    assertEquals(action.names.size(), 3);
+    assertEquals(action.names.get(0), "Erlich");
+    assertEquals(action.names.get(1), "Richard");
+    assertEquals(action.names.get(2), "Monica");
+
     // Test a final collection of ZoneId
     evaluator.setValue("timeZones", action, ArrayUtils.toArray(ZoneId.of("America/Denver")));
+    assertEquals(action.timeZones.size(), 1);
+    assertEquals(action.timeZones.get(0), ZoneId.of("America/Denver"));
+
+    // Try again, using a List instead of an Array
+    evaluator.setValue("timeZones", action, new ArrayList<>(Collections.singletonList(ZoneId.of("America/Denver"))));
     assertEquals(action.timeZones.size(), 1);
     assertEquals(action.timeZones.get(0), ZoneId.of("America/Denver"));
   }
