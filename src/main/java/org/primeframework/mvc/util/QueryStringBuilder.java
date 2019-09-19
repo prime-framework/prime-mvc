@@ -144,13 +144,13 @@ public class QueryStringBuilder {
     throw new NotImplementedException();
   }
 
-  public QueryStringBuilder withSegment(String segment) {
+  public QueryStringBuilder withSegment(Object segment) {
     if (uri.length() > 0 && (uri.indexOf("?") == uri.length() - 1)) {
       throw new IllegalStateException("You cannot add a URL segment after you have appended a ? to the end of the URL");
     }
 
     if (segment != null) {
-      segments.add(segment);
+      segments.add(segment.toString());
     }
 
     return this;

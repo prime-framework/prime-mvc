@@ -1106,7 +1106,7 @@ public class RequestResult {
     public HTMLAsserter assertElementDoesNotExist(String selector) {
       Elements elements = document.select(selector);
       if (elements.size() > 0) {
-        throw new AssertionError("Expected the selector to return 0 elements. Found [" + (elements.size() + "] elements.\n" + elements));
+        throw new AssertionError("Expected 0 elements to match the selector " + selector + ". Found [" + (elements.size() + "] elements.\n" + elements));
       }
 
       return this;
@@ -1121,7 +1121,28 @@ public class RequestResult {
     public HTMLAsserter assertElementExists(String selector) {
       Elements elements = document.select(selector);
       if (elements.size() != 1) {
-        throw new AssertionError("Expected a single element to match. 0 elements found.");
+        throw new AssertionError("Expected a single element to match the selector " + selector + ". Found [" + elements.size() + "] elements instead." + ((elements.size() == 0) ? "" : "\n\n" + elements));
+      }
+
+      return this;
+    }
+
+    /**
+     * Ensure a single element matches the provided selector and has an expected inner HTML.
+     *
+     * @param selector          the DOM selector
+     * @param expectedInnerHTML the expected inner HTML
+     * @return this.
+     */
+    public HTMLAsserter assertElementInnerHTML(String selector, String expectedInnerHTML) {
+      Elements elements = document.select(selector);
+      if (elements.size() != 1) {
+        throw new AssertionError("Expected a single element to match the selector " + selector + ". Found [" + elements.size() + "] elements instead." + ((elements.size() == 0) ? "" : "\n\n" + elements));
+      }
+
+      Element element = elements.get(0);
+      if (!expectedInnerHTML.equals(element.html())) {
+        throw new AssertionError("Expected a value of [" + expectedInnerHTML + "] to match the selector " + selector + ". Found [" + element.html() + "] instead.");
       }
 
       return this;
