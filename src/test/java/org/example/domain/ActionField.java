@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2014, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,11 @@
  */
 package org.example.domain;
 
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
 /**
  * This is a test action with fields.
  *
@@ -22,13 +27,19 @@ package org.example.domain;
  */
 @org.primeframework.mvc.action.annotation.Action
 public class ActionField extends ParentField {
-  public UserField user;
+  public final List<Locale> locales = new ArrayList<>();
 
-  public boolean foo;
+  public final List<String> names = new ArrayList<>();
+
+  public final List<ZoneId> timeZones = new ArrayList<>();
 
   public boolean bar;
 
+  public boolean foo;
+
   public String reallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyLongFieldName;
+
+  public UserField user;
 
   public String post() {
     return null;

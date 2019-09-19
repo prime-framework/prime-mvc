@@ -17,9 +17,11 @@ package org.primeframework.mvc.parameter.el;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Locale;
 
 import com.google.inject.Inject;
 import org.apache.commons.lang3.ArrayUtils;
@@ -231,6 +233,23 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     assertEquals(action.user.securityQuestions.length, 2);
     assertEquals(action.user.securityQuestions[0], "What is your pet's name?");
     assertEquals(action.user.securityQuestions[1], "What is your home town?");
+
+    // Test a final collection of Locale objects
+    evaluator.setValue("locales", action, ArrayUtils.toArray(Locale.US));
+    assertEquals(action.locales.size(), 1);
+    assertEquals(action.locales.get(0), Locale.US);
+
+    // Test a final collection of Strings
+    evaluator.setValue("names", action, ArrayUtils.toArray("Erlich", "Richard", "Monica"));
+    assertEquals(action.names.size(), 3);
+    assertEquals(action.names.get(0), "Erlich");
+    assertEquals(action.names.get(1), "Richard");
+    assertEquals(action.names.get(2), "Monica");
+
+    // Test a final collection of ZoneId
+    evaluator.setValue("timeZones", action, ArrayUtils.toArray(ZoneId.of("America/Denver")));
+    assertEquals(action.timeZones.size(), 1);
+    assertEquals(action.timeZones.get(0), ZoneId.of("America/Denver"));
   }
 
   /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,19 +49,13 @@ import org.primeframework.mvc.parameter.el.UpdateExpressionException;
 public class ReflectionUtils {
   private static final Map<Class<?>, Map<String, Field>> fieldCache = new WeakHashMap<>();
 
-  private static final Map<String, Package> packageCache = new WeakHashMap<>();
-
   private static final Map<Class<?>, Method[]> methods = new WeakHashMap<>();
+
+  private static final Map<String, Package> packageCache = new WeakHashMap<>();
 
   private static final Map<Class<?>, Map<String, PropertyInfo>> propertyCache = new WeakHashMap<>();
 
   private static final Map<String, MethodInformationExtractor> verifiers = new HashMap<>();
-
-  static {
-    verifiers.put("is", new GetMethodInformationExtractor());
-    verifiers.put("get", new GetMethodInformationExtractor());
-    verifiers.put("set", new SetMethodInformationExtractor());
-  }
 
   /**
    * Return true if any of the provided annotations are provided on the field.
@@ -208,28 +203,6 @@ public class ReflectionUtils {
   }
 
   /**
-   * Find a package by name and return it if it has the requested annotation.
-   *
-   * @param packageName the string name of the package.
-   * @param annotation  the annotation to find in that package.
-   * @return the package if it exists and has the requested annotation or null.
-   */
-  public static Package findPackageWithAnnotation(String packageName, Class<? extends Annotation> annotation) {
-    Package pkg;
-    synchronized (packageCache) {
-      pkg = packageCache.get(packageName);
-      if (pkg == null) {
-        pkg = Package.getPackage(packageName);
-        if (pkg != null) {
-          packageCache.put(packageName, pkg);
-        }
-      }
-    }
-
-    return pkg != null && pkg.isAnnotationPresent(annotation) ? pkg : null;
-  }
-
-  /**
    * Loads and caches the methods of the given Class in an order array. The order of this array is that methods defined
    * in superclasses are in the array first, followed by methods in the given type. The deeper the superclass, the
    * earlier the methods are in the array.
@@ -269,6 +242,28 @@ public class ReflectionUtils {
       }
       return array;
     }
+  }
+
+  /**
+   * Find a package by name and return it if it has the requested annotation.
+   *
+   * @param packageName the string name of the package.
+   * @param annotation  the annotation to find in that package.
+   * @return the package if it exists and has the requested annotation or null.
+   */
+  public static Package findPackageWithAnnotation(String packageName, Class<? extends Annotation> annotation) {
+    Package pkg;
+    synchronized (packageCache) {
+      pkg = packageCache.get(packageName);
+      if (pkg == null) {
+        pkg = Package.getPackage(packageName);
+        if (pkg != null) {
+          packageCache.put(packageName, pkg);
+        }
+      }
+    }
+
+    return pkg != null && pkg.isAnnotationPresent(annotation) ? pkg : null;
   }
 
   /**
@@ -390,7 +385,7 @@ public class ReflectionUtils {
    * @param object The object to get he field from.
    * @return The value of the field.
    * @throws ExpressionException If any mishap occurred whilst Reflecting sire. All the exceptions that could be thrown
-   *     whilst invoking will be wrapped inside the ReflectionException.
+   *                             whilst invoking will be wrapped inside the ReflectionException.
    */
   public static Object getField(Field field, Object object) throws ExpressionException {
     try {
@@ -482,9 +477,9 @@ public class ReflectionUtils {
    * @param object The object to invoke the method on.
    * @return The return value of the method.
    * @throws RuntimeException If the target of the InvocationTargetException is a RuntimeException, in which case, it is
-   *     re-thrown.
-   * @throws Error If the target of the InvocationTargetException is an Error, in which case, it is
-   *     re-thrown.
+   *                          re-thrown.
+   * @throws Error            If the target of the InvocationTargetException is an Error, in which case, it is
+   *                          re-thrown.
    */
   public static Object invokeGetter(Method method, Object object) throws RuntimeException, Error {
     return invoke(method, object);
@@ -498,9 +493,9 @@ public class ReflectionUtils {
    * @param object The object to invoke the method on.
    * @param value  The value to set into the method.
    * @throws RuntimeException If the target of the InvocationTargetException is a RuntimeException, in which case, it is
-   *     re-thrown.
-   * @throws Error If the target of the InvocationTargetException is an Error, in which case, it is
-   *     re-thrown.
+   *                          re-thrown.
+   * @throws Error            If the target of the InvocationTargetException is an Error, in which case, it is
+   *                          re-thrown.
    */
   public static void invokeSetter(Method method, Object object, Object value) throws RuntimeException, Error {
     Class[] types = method.getParameterTypes();
@@ -575,11 +570,11 @@ public class ReflectionUtils {
    * @param object The object to set the field on.
    * @param value  The value to set into the field.
    * @throws ExpressionException If any mishap occurred whilst Reflecting sire. All the exceptions that could be thrown
-   *     whilst invoking will be wrapped inside the ReflectionException.
+   *                             whilst invoking will be wrapped inside the ReflectionException.
    */
   public static void setField(Field field, Object object, Object value) throws ExpressionException {
     Class type = field.getType();
-    if (!type.isInstance(value) && Collection.class.isInstance(value)) {
+    if (!type.isInstance(value) && value instanceof Collection) {
       // Handle the Collection special case
       Collection c = (Collection) value;
       if (c.size() == 1) {
@@ -590,9 +585,16 @@ public class ReflectionUtils {
       }
     }
 
+    // I think we have a winner
     try {
-      // I think we have a winner
-      field.set(object, value);
+      // If we have a final collection we can't call field.set, clear the collection and the values
+      if (Modifier.isFinal(field.getModifiers()) && (Collection.class.isAssignableFrom(field.getType()) && value.getClass().isArray())) {
+        Collection collection = (Collection) field.get(object);
+        collection.clear();
+        collection.addAll(Arrays.asList((Object[]) value));
+      } else {
+        field.set(object, value);
+      }
     } catch (IllegalAccessException iae) {
       throw new UpdateExpressionException("Illegal access for field [" + field + "]", iae);
     } catch (IllegalArgumentException iare) {
@@ -733,6 +735,14 @@ public class ReflectionUtils {
 
     private Class<?> type;
 
+    public Class<?> getDeclaringClass() {
+      return declaringClass;
+    }
+
+    public void setDeclaringClass(Class<?> declaringClass) {
+      this.declaringClass = declaringClass;
+    }
+
     public Type getGenericType() {
       return genericType;
     }
@@ -767,14 +777,6 @@ public class ReflectionUtils {
 
     public void setIndexed(boolean indexed) {
       this.indexed = indexed;
-    }
-
-    public Class<?> getDeclaringClass() {
-      return declaringClass;
-    }
-
-    public void setDeclaringClass(Class<?> declaringClass) {
-      this.declaringClass = declaringClass;
     }
 
     public String toString() {
@@ -847,5 +849,11 @@ public class ReflectionUtils {
     public boolean isIndexed(Method method) {
       return isValidIndexedSetter(method);
     }
+  }
+
+  static {
+    verifiers.put("is", new GetMethodInformationExtractor());
+    verifiers.put("get", new GetMethodInformationExtractor());
+    verifiers.put("set", new SetMethodInformationExtractor());
   }
 }
