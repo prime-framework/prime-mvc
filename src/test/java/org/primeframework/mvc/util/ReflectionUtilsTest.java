@@ -17,6 +17,7 @@ package org.primeframework.mvc.util;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Locale;
 
 import org.example.action.Extension;
 import org.example.action.ExtensionInheritanceAction;
@@ -24,7 +25,6 @@ import org.example.domain.InvalidJavaBeanGetter;
 import org.example.domain.InvalidJavaBeanSetter;
 import org.primeframework.mvc.parameter.annotation.PostParameterMethod;
 import org.testng.annotations.Test;
-
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
@@ -51,6 +51,11 @@ public class ReflectionUtilsTest {
     } catch (Exception e) {
       // Expected
     }
+  }
+
+  @Test
+  public void localeIssues() {
+    ReflectionUtils.findPropertyInfo(Locale.class);
   }
 
   @Test
