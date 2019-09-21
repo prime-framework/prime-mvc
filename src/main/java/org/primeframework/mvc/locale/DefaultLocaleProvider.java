@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -106,6 +106,7 @@ public class DefaultLocaleProvider implements LocaleProvider {
     String key = configuration.localeCookieName();
     Cookie cookie = new Cookie(key, locale != null ? locale.toString() : null);
     cookie.setMaxAge(locale != null ? Integer.MAX_VALUE : 0);
+    cookie.setPath("/");
     response.addCookie(cookie);
   }
 }
