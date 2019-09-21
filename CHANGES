@@ -1,5 +1,13 @@
 Prime MVC Changes
 
+Changes in 1.16.2
+
+ * Set the path on the locale cookie set in the DefaultLocaleProvider
+ * Update ReflectionUtils to support setting values into a final collection
+
+ Changes in 1.16.1
+
+  * Enhance HTMLAsserter
 
 Changes in 1.16.0
 
