@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2015-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,13 +58,13 @@ public class LocaleSelect extends Select {
    */
   @Override
   protected Map<String, Object> makeParameters() {
-    LinkedHashMap<String, String> locales = new LinkedHashMap<>();
+    LinkedHashMap<Locale, String> locales = new LinkedHashMap<>();
     String preferred = (String) attributes.get("preferredLocales");
     if (preferred != null) {
       String[] parts = preferred.split(",");
       for (String part : parts) {
         Locale locale = LocaleUtils.toLocale(part);
-        locales.put(locale.toString(), locale.getDisplayName(locale));
+        locales.put(locale, locale.getDisplayName(locale));
       }
     }
 
@@ -76,8 +76,8 @@ public class LocaleSelect extends Select {
     allLocales.sort(Comparator.comparing(one -> one.getDisplayName(localeProvider.get())));
 
     for (Locale locale : allLocales) {
-      if (!locales.containsKey(locale.getCountry())) {
-        locales.put(locale.toString(), locale.getDisplayName(localeProvider.get()));
+      if (!locales.containsKey(locale)) {
+        locales.put(locale, locale.getDisplayName(localeProvider.get()));
       }
     }
 
