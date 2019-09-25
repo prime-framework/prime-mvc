@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ public class RedirectResult extends AbstractRedirectResult<Redirect> {
   /**
    * {@inheritDoc}
    */
-  public boolean execute(Redirect redirect) throws IOException, ServletException {
+  public boolean execute(Redirect redirect) throws IOException {
     moveMessagesToFlash();
     sendRedirect(null, redirect.uri(), redirect.encodeVariables(), redirect.perm());
     return true;
