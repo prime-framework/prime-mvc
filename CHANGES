@@ -1,5 +1,9 @@
 Prime MVC Changes
 
+Changes in 1.16.3
+
+ * Fixed the QueryStringBuilder to handle a null parameter w/out adding a ?
+
 Changes in 1.16.2
 
  * Set the path on the locale cookie set in the DefaultLocaleProvider

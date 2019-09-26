@@ -95,6 +95,10 @@ public class QueryStringBuilder {
       return uri.append("&").append(sb).toString();
     }
 
+    if (sb.length() == 0) {
+      return uri.toString();
+    }
+
     return uri.append("?").append(sb).toString();
   }
 

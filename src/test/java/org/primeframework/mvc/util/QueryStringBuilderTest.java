@@ -46,6 +46,9 @@ public class QueryStringBuilderTest {
     test("http://acme.com?foo=bar", b -> b.with("bing", "baz"), "http://acme.com?foo=bar&bing=baz");
     test("http://acme.com?foo=bar&bing=baz", b -> b.with("boom", "dynamite"), "http://acme.com?foo=bar&bing=baz&boom=dynamite");
 
+    // Null parameter
+    test("http://acme.com", b -> b.with("foo", (String) null), "http://acme.com");
+
     // With a URL and a fragment
     test("http://acme.com", b -> b.beginFragment().with("foo", "bar"), "http://acme.com#foo=bar");
     test("http://acme.com#foo=bar", b -> b.with("bing", "baz"), "http://acme.com#foo=bar&bing=baz");
