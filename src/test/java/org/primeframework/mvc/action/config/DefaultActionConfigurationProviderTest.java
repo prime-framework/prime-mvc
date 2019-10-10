@@ -64,12 +64,13 @@ public class DefaultActionConfigurationProviderTest {
     ActionInvocation invocation = provider.lookup("/simple");
     assertSame(invocation.configuration.actionClass, SimpleAction.class);
     assertNotNull(invocation.configuration.annotation);
-    assertEquals(invocation.configuration.executeMethods.size(), 8);
+    assertEquals(invocation.configuration.executeMethods.size(), 9);
     assertEquals(invocation.configuration.executeMethods.get(HTTPMethod.GET).method, SimpleAction.class.getMethod("execute"));
     assertEquals(invocation.configuration.executeMethods.get(HTTPMethod.POST).method, SimpleAction.class.getMethod("execute"));
     assertEquals(invocation.configuration.executeMethods.get(HTTPMethod.PUT).method, SimpleAction.class.getMethod("execute"));
     assertEquals(invocation.configuration.executeMethods.get(HTTPMethod.HEAD).method, SimpleAction.class.getMethod("execute"));
     assertEquals(invocation.configuration.executeMethods.get(HTTPMethod.DELETE).method, SimpleAction.class.getMethod("execute"));
+    assertEquals(invocation.configuration.executeMethods.get(HTTPMethod.PATCH).method, SimpleAction.class.getMethod("execute"));
     assertEquals(invocation.configuration.resultConfigurations.size(), 0);
     assertEquals(invocation.configuration.pattern, "");
     assertEquals(invocation.configuration.patternParts.length, 0);
@@ -140,7 +141,7 @@ public class DefaultActionConfigurationProviderTest {
     assertEquals(invocation.configuration.pattern, "{name}/{value}/static/{foo}");
     assertEquals(invocation.configuration.patternParts.length, 4);
     assertEquals(invocation.configuration.uri, "/kitchen-sink");
-    assertEquals(invocation.configuration.preParameterMethods.size(), 1);
+    assertEquals(invocation.configuration.preParameterMethods.size(), 9);
     assertEquals(invocation.configuration.postParameterMethods.size(), 1);
     assertEquals(invocation.configuration.preValidationMethods.size(), 1);
     assertEquals(invocation.configuration.postValidationMethods.size(), 1);
@@ -160,7 +161,7 @@ public class DefaultActionConfigurationProviderTest {
   }
 
   @Test
-  public void postParametersOnly() throws Exception {
+  public void postParametersOnly() {
     DefaultActionConfigurationProvider provider = new DefaultActionConfigurationProvider(
         new DefaultActionConfigurationBuilder(new DefaultURIBuilder(), new HashSet<>(Arrays.asList(new JacksonActionConfigurator(),
             new BinaryActionConfigurator())))
@@ -174,7 +175,7 @@ public class DefaultActionConfigurationProviderTest {
   }
 
   @Test
-  public void lookupPrefixParameters() throws Exception {
+  public void lookupPrefixParameters() {
     DefaultActionConfigurationProvider provider = new DefaultActionConfigurationProvider(
         new DefaultActionConfigurationBuilder(new DefaultURIBuilder(), new HashSet<>(Arrays.asList(new JacksonActionConfigurator(),
             new BinaryActionConfigurator())))
@@ -190,7 +191,7 @@ public class DefaultActionConfigurationProviderTest {
   }
 
   @Test
-  public void lookupMultipleTreePaths() throws Exception {
+  public void lookupMultipleTreePaths() {
     DefaultActionConfigurationProvider provider = new DefaultActionConfigurationProvider(
         new DefaultActionConfigurationBuilder(new DefaultURIBuilder(), new HashSet<>(Arrays.asList(new JacksonActionConfigurator(),
             new BinaryActionConfigurator())))
@@ -206,7 +207,7 @@ public class DefaultActionConfigurationProviderTest {
   }
 
   @Test
-  public void index() throws Exception {
+  public void index() {
     DefaultActionConfigurationProvider provider = new DefaultActionConfigurationProvider(
         new DefaultActionConfigurationBuilder(new DefaultURIBuilder(), new HashSet<>(Arrays.asList(new JacksonActionConfigurator(),
             new BinaryActionConfigurator())))
@@ -241,7 +242,7 @@ public class DefaultActionConfigurationProviderTest {
 //  }
 
   @Test
-  public void recursion() throws Exception {
+  public void recursion() {
     DefaultActionConfigurationProvider provider = new DefaultActionConfigurationProvider(
         new DefaultActionConfigurationBuilder(new DefaultURIBuilder(), new HashSet<>(Arrays.asList(new JacksonActionConfigurator(),
             new BinaryActionConfigurator())))

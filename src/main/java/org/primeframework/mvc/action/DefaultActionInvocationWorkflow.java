@@ -18,12 +18,11 @@ package org.primeframework.mvc.action;
 import javax.servlet.ServletException;
 import java.io.IOException;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.result.ResultStore;
 import org.primeframework.mvc.util.ReflectionUtils;
 import org.primeframework.mvc.workflow.WorkflowChain;
-
-import com.google.inject.Inject;
 
 /**
  * This class is the default implementation of the action invocation workflow. It looks up the ActionInvocation using
@@ -54,10 +53,9 @@ public class DefaultActionInvocationWorkflow implements ActionInvocationWorkflow
    * <ul> <li>Invoke the action</li> </ul>
    *
    * @param chain The chain.
-   * @throws IOException If the chain throws an IOException.
+   * @throws IOException      If the chain throws an IOException.
    * @throws ServletException If the chain throws a ServletException or if the result can't be found.
    */
-  @SuppressWarnings("unchecked")
   public void perform(WorkflowChain chain) throws IOException, ServletException {
     ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
     if (actionInvocation.action != null) {
@@ -69,17 +67,14 @@ public class DefaultActionInvocationWorkflow implements ActionInvocationWorkflow
   }
 
   /**
-   * Invokes the execute method on the action. This first checks if there is an extension and if there is it looks for
-   * a
+   * Invokes the execute method on the action. This first checks if there is an extension and if there is it looks for a
    * method with the same name. Next, it looks for a method that matches the current method (i.e. get or post) and
    * finally falls back to execute.
    *
    * @param actionInvocation The action invocation.
    * @return The result code from the execute method and never null.
-   * @throws ServletException If the execute method doesn't exist, has the wrong signature, couldn't be invoked, threw
-   * an exception or returned null.
    */
-  protected String execute(ActionInvocation actionInvocation) throws ServletException {
+  protected String execute(ActionInvocation actionInvocation) {
     Object action = actionInvocation.action;
     String result = ReflectionUtils.invoke(actionInvocation.method.method, action);
     if (result == null) {

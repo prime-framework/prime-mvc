@@ -127,7 +127,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
         actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
-        new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
+        new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore, request));
     workflow.perform(chain);
 
     verify(request, expressionEvaluator, actionInvocationStore, messageStore, config, chain, provider);
@@ -168,7 +168,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
         actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
-        new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
+        new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore, request));
     workflow.perform(chain);
 
     verify(request, actionInvocationStore, messageStore, config, chain, provider);
@@ -211,7 +211,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
         actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
-        new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
+        new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore, request));
     workflow.perform(chain);
 
     verify(request, actionInvocationStore, messageStore, config, chain, provider);
@@ -256,7 +256,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
         actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
-        new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
+        new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore, request));
     workflow.perform(chain);
 
     verify(request, actionInvocationStore, messageStore, config, chain, provider);
@@ -297,7 +297,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
         actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
-        new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
+        new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore, request));
     workflow.perform(chain);
 
     verify(request, actionInvocationStore, messageStore, config, chain, provider);
@@ -343,7 +343,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
         actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
-        new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
+        new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore, request));
     try {
       workflow.perform(chain);
       fail("Should have thrown an exception");
@@ -393,7 +393,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
         actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
-        new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
+        new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore, request));
     workflow.perform(chain);
 
     verify(request, expressionEvaluator, actionInvocationStore, messageStore, config, chain, provider);
@@ -440,7 +440,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
         actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
-        new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
+        new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore, request));
     workflow.perform(chain);
 
     verify(request, expressionEvaluator, actionInvocationStore, messageStore, config, chain, provider);
@@ -488,7 +488,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
         actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
-        new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
+        new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore, request));
     workflow.perform(chain);
 
     verify(request, expressionEvaluator, actionInvocationStore, messageStore, config, chain, provider);
@@ -509,6 +509,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     final HttpServletRequest request = createStrictMock(HttpServletRequest.class);
     expect(request.getParameterMap()).andReturn(values);
     expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(null);
+    expect(request.getMethod()).andReturn("GET");
     replay(request);
 
     ActionInvocation ai = makeActionInvocation(action, HTTPMethod.POST, "");
@@ -534,7 +535,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
         actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
-        new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
+        new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore, request));
     workflow.perform(chain);
 
     assertTrue(action.preCalled);
@@ -557,6 +558,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
     expect(request.getParameterMap()).andReturn(new HashMap<>());
     expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(files);
+    expect(request.getMethod()).andReturn("GET");
     replay(request);
 
     MVCConfiguration config = createStrictMock(MVCConfiguration.class);
@@ -587,7 +589,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
         actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
-        new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
+        new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore, request));
     workflow.perform(chain);
 
     verify(request, config, chain, actionInvocationStore, expressionEvaluator, messageStore, provider);
@@ -603,6 +605,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
     expect(request.getParameterMap()).andReturn(new HashMap<>());
     expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(files);
+    expect(request.getMethod()).andReturn("GET");
     replay(request);
 
     MVCConfiguration config = createStrictMock(MVCConfiguration.class);
@@ -633,7 +636,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
         actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
-        new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
+        new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore, request));
     workflow.perform(chain);
 
     verify(request, config, chain, actionInvocationStore, expressionEvaluator, messageStore, provider);
@@ -647,6 +650,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
     expect(request.getParameterMap()).andReturn(new HashMap<>());
     expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(files);
+    expect(request.getMethod()).andReturn("GET");
     replay(request);
 
     MVCConfiguration config = createStrictMock(MVCConfiguration.class);
@@ -679,7 +683,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
         actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
-        new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
+        new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore, request));
     workflow.perform(chain);
 
     verify(request, config, chain, actionInvocationStore, expressionEvaluator, messageStore, provider);
@@ -693,6 +697,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
     expect(request.getParameterMap()).andReturn(new HashMap<>());
     expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(files);
+    expect(request.getMethod()).andReturn("GET");
     replay(request);
 
     String[] contentTypes = new String[]{"test/xml"};
@@ -726,7 +731,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
         actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
-        new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
+        new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore, request));
     workflow.perform(chain);
 
     verify(request, config, chain, actionInvocationStore, expressionEvaluator, messageStore, provider);
@@ -740,6 +745,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
     expect(request.getParameterMap()).andReturn(new HashMap<>());
     expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(files);
+    expect(request.getMethod()).andReturn("GET");
     replay(request);
 
     MVCConfiguration config = createStrictMock(MVCConfiguration.class);
@@ -785,7 +791,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
         actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
-        new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
+        new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore, request));
     workflow.perform(chain);
 
     verify(request, config, chain, actionInvocationStore, expressionEvaluator, messageStore, provider);
@@ -799,6 +805,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
     expect(request.getParameterMap()).andReturn(new HashMap<>());
     expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(files);
+    expect(request.getMethod()).andReturn("GET");
     replay(request);
 
     MVCConfiguration config = createStrictMock(MVCConfiguration.class);
@@ -845,7 +852,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
         actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
-        new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore));
+        new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore, request));
     workflow.perform(chain);
 
     verify(request, config, chain, actionInvocationStore, expressionEvaluator, messageStore, provider);

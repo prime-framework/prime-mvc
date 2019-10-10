@@ -179,6 +179,17 @@ public class RequestBuilder {
   }
 
   /**
+   * Sends the HTTP request to the MVC as a PATCH.
+   *
+   * @return The response.
+   */
+  public RequestResult patch() {
+    request.setMethod(Method.PATCH);
+    run();
+    return new RequestResult(container, filter, request, response, injector);
+  }
+
+  /**
    * Sends the HTTP request to the MVC as a POST.
    *
    * @return The response.
@@ -553,7 +564,7 @@ public class RequestBuilder {
    * @param value The url path segment. A null value will be ignored.
    * @return This.
    */
-  public RequestBuilder withUrlSegment(Object value) {
+  public RequestBuilder withURLSegment(Object value) {
     if (value != null) {
       String uri = request.getRequestURI();
       if (uri.charAt(uri.length() - 1) != '/') {
@@ -563,6 +574,15 @@ public class RequestBuilder {
       request.setUri(uri + value.toString());
     }
     return this;
+  }
+
+  /**
+   * Bad name, use the correct URL method.
+   *
+   * @deprecated
+   */
+  public RequestBuilder withUrlSegment(Object value) {
+    return withURLSegment(value);
   }
 
   void run() {

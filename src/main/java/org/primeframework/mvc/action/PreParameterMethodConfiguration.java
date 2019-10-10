@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,21 +13,24 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.servlet;
+package org.primeframework.mvc.action;
+
+import java.lang.reflect.Method;
+
+import org.primeframework.mvc.parameter.annotation.PreParameterMethod;
 
 /**
- * This enum lists all of the HTTP methods. These are injectable.
+ * Stores the Method and annotations for the PreParameter methods on an action.
  *
  * @author Brian Pontarelli
  */
-public enum HTTPMethod {
-  GET,
-  POST,
-  PUT,
-  DELETE,
-  HEAD,
-  TRACE,
-  OPTIONS,
-  CONNECT,
-  PATCH
+public class PreParameterMethodConfiguration {
+  public final PreParameterMethod annotation;
+
+  public final Method method;
+
+  public PreParameterMethodConfiguration(Method method, PreParameterMethod annotation) {
+    this.method = method;
+    this.annotation = annotation;
+  }
 }

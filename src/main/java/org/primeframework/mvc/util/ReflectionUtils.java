@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -215,31 +214,15 @@ public class ReflectionUtils {
       Method[] array = methods.get(type);
       if (array == null) {
         array = type.getMethods();
+        array = Arrays.stream(array)
+                      .map(m -> new SortableMethod(m, type))
+                      .sorted()
+                      .map(sm -> sm.method)
+                      .toArray(Method[]::new);
         methods.put(type, array);
-
-        Arrays.sort(array, new Comparator<Method>() {
-          @Override
-          public int compare(Method method1, Method method2) {
-            int depth1 = depth(method1, type);
-            int depth2 = depth(method2, type);
-            if (depth1 == depth2) {
-              return method1.getName().compareTo(method2.getName());
-            }
-
-            return depth2 - depth1;
-          }
-
-          public int depth(Method method, Class<?> type) {
-            int depth = 0;
-            Class<?> declaringType = method.getDeclaringClass();
-            while (declaringType != type && type != null) {
-              type = type.getSuperclass();
-              depth++;
-            }
-            return depth;
-          }
-        });
+        return array;
       }
+
       return array;
     }
   }
@@ -504,7 +487,7 @@ public class ReflectionUtils {
     }
 
     Class type = types[0];
-    if (!type.isInstance(value) && Collection.class.isInstance(value)) {
+    if (!type.isInstance(value) && value instanceof Collection) {
       // Handle the Collection special case
       Collection c = (Collection) value;
       if (c.size() == 1) {
@@ -604,6 +587,25 @@ public class ReflectionUtils {
     } catch (IllegalArgumentException iare) {
       throw new UpdateExpressionException("Illegal argument for field [" + field + "]", iare);
     }
+  }
+
+  private static Set<Class<?>> allInterfaces(Class<?> type) {
+    Class<?>[] interfaces = type.getInterfaces();
+    Set<Class<?>> set = new HashSet<>(Arrays.asList(interfaces));
+    for (Class<?> anInterface : interfaces) {
+      set.addAll(allInterfaces(anInterface));
+    }
+    return set;
+  }
+
+  private static boolean declaredOnImplementedInterface(Method method, Class<?> target) {
+    if (!method.isDefault()) {
+      return false;
+    }
+
+    Class<?> declaringType = method.getDeclaringClass();
+    Set<Class<?>> interfaces = allInterfaces(target);
+    return interfaces.contains(declaringType);
   }
 
   /**
@@ -852,6 +854,33 @@ public class ReflectionUtils {
     @Override
     public boolean isIndexed(Method method) {
       return isValidIndexedSetter(method);
+    }
+  }
+
+  public static class SortableMethod implements Comparable<SortableMethod> {
+    private final int depth;
+
+    private final Method method;
+
+    public SortableMethod(Method method, Class<?> targetType) {
+      this.method = method;
+
+      int depth = 0;
+      Class<?> declaringType = method.getDeclaringClass();
+      while (declaringType != targetType && !declaredOnImplementedInterface(method, targetType) && targetType != null) {
+        targetType = targetType.getSuperclass();
+        depth++;
+      }
+      this.depth = depth;
+    }
+
+    @Override
+    public int compareTo(SortableMethod o) {
+      if (depth == o.depth) {
+        return method.getName().compareTo(o.method.getName());
+      }
+
+      return o.depth - depth;
     }
   }
 

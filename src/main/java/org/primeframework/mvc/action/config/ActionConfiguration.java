@@ -26,6 +26,7 @@ import java.util.Set;
 import org.primeframework.mvc.action.AuthorizationMethodConfiguration;
 import org.primeframework.mvc.action.ExecuteMethodConfiguration;
 import org.primeframework.mvc.action.JWTMethodConfiguration;
+import org.primeframework.mvc.action.PreParameterMethodConfiguration;
 import org.primeframework.mvc.action.ValidationMethodConfiguration;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.parameter.annotation.PreParameter;
@@ -70,7 +71,7 @@ public class ActionConfiguration {
 
   public final Map<String, PreParameter> preParameterMembers;
 
-  public final List<Method> preParameterMethods;
+  public final Map<HTTPMethod, List<PreParameterMethodConfiguration>> preParameterMethods;
 
   public final List<Method> preValidationMethods;
 
@@ -86,10 +87,18 @@ public class ActionConfiguration {
 
   public final Map<HTTPMethod, List<ValidationMethodConfiguration>> validationMethods;
 
-  public ActionConfiguration(Class<?> actionClass, Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods, Map<HTTPMethod, List<ValidationMethodConfiguration>> validationMethods,
-                             List<Method> formPrepareMethods, Map<HTTPMethod, List<AuthorizationMethodConfiguration>> authorizationMethods, Map<HTTPMethod, List<JWTMethodConfiguration>> jwtAuthorizationMethods, List<Method> postValidationMethods, List<Method> preParameterMethods,
-                             List<Method> postParameterMethods, Map<String, Annotation> resultConfigurations, Map<String, PreParameter> preParameterMembers, Map<String,
-      FileUpload> fileUploadMembers, Set<String> memberNames, List<String> securitySchemes, List<ScopeField> scopeFields, Map<Class<?>, Object> additionalConfiguration, String uri, List<Method> preValidationMethods) {
+  public ActionConfiguration(Class<?> actionClass, Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods,
+                             Map<HTTPMethod, List<ValidationMethodConfiguration>> validationMethods,
+                             List<Method> formPrepareMethods,
+                             Map<HTTPMethod, List<AuthorizationMethodConfiguration>> authorizationMethods,
+                             Map<HTTPMethod, List<JWTMethodConfiguration>> jwtAuthorizationMethods,
+                             List<Method> postValidationMethods,
+                             Map<HTTPMethod, List<PreParameterMethodConfiguration>> preParameterMethods,
+                             List<Method> postParameterMethods, Map<String, Annotation> resultConfigurations,
+                             Map<String, PreParameter> preParameterMembers, Map<String,
+      FileUpload> fileUploadMembers, Set<String> memberNames, List<String> securitySchemes,
+                             List<ScopeField> scopeFields, Map<Class<?>, Object> additionalConfiguration, String uri,
+                             List<Method> preValidationMethods) {
 
     Objects.requireNonNull(actionClass);
 

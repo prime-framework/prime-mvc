@@ -221,8 +221,9 @@ public abstract class PrimeBaseTest {
     resultConfigurations.put(resultCode, annotation);
 
     return new ActionInvocation(action, executeMethod, uri, extension,
-        new ActionConfiguration(EditAction.class, executeMethods, validationMethods, new ArrayList<>(), null, null, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), resultConfigurations, new HashMap<>(), new HashMap<>(), new HashSet<>(), Collections.emptyList(), new ArrayList<>(), new HashMap<>(), uri,
-            new ArrayList<>()));
+        new ActionConfiguration(EditAction.class, executeMethods, validationMethods, new ArrayList<>(), null, null,
+            new ArrayList<>(), new HashMap<>(), new ArrayList<>(), resultConfigurations, new HashMap<>(), new HashMap<>(),
+            new HashSet<>(), Collections.emptyList(), new ArrayList<>(), new HashMap<>(), uri, new ArrayList<>()));
   }
 
   @SuppressWarnings("unchecked")

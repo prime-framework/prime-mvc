@@ -107,9 +107,9 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
         new ActionInvocation(
             EditAction.class, null, uri, extension,
             new ActionConfiguration(EditAction.class, executeMethods,
-                new HashMap<>(), new ArrayList<>(), new HashMap<>(), new HashMap<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new HashMap<>(),
-                new HashMap<>(), new HashMap<>(), new HashSet<>(), new ArrayList<>(), new ArrayList<>(), new HashMap<>(), uri,
-                new ArrayList<>())
+                new HashMap<>(), new ArrayList<>(), new HashMap<>(), new HashMap<>(), new ArrayList<>(), new HashMap<>(),
+                new ArrayList<>(), new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashSet<>(), new ArrayList<>(),
+                new ArrayList<>(), new HashMap<>(), uri, new ArrayList<>())
         )
     );
     EasyMock.replay(provider);

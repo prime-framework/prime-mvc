@@ -27,12 +27,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.google.inject.Inject;
+import io.fusionauth.jwt.domain.JWT;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.AuthorizationMethodConfiguration;
 import org.primeframework.mvc.action.ExecuteMethodConfiguration;
 import org.primeframework.mvc.action.JWTMethodConfiguration;
+import org.primeframework.mvc.action.PreParameterMethodConfiguration;
 import org.primeframework.mvc.action.ValidationMethodConfiguration;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.annotation.ResultAnnotation;
@@ -55,9 +60,6 @@ import org.primeframework.mvc.validation.Validation;
 import org.primeframework.mvc.validation.ValidationMethod;
 import org.primeframework.mvc.validation.annotation.PostValidationMethod;
 import org.primeframework.mvc.validation.annotation.PreValidationMethod;
-
-import com.google.inject.Inject;
-import io.fusionauth.jwt.domain.JWT;
 
 /**
  * Default action configuration builder.
@@ -91,7 +93,6 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
     String uri = uriBuilder.build(actionClass);
     Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods = findExecuteMethods(actionClass);
     List<Method> formPrepareMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, FormPrepareMethod.class);
-    List<Method> preParameterMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, PreParameterMethod.class);
     List<Method> postParameterMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, PostParameterMethod.class);
     List<Method> preValidationMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, PreValidationMethod.class);
     List<Method> postValidationMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, PostValidationMethod.class);
@@ -100,7 +101,16 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
     Map<String, FileUpload> fileUploadMembers = ReflectionUtils.findAllMembersWithAnnotation(actionClass, FileUpload.class);
     Set<String> memberNames = ReflectionUtils.findAllMembers(actionClass);
 
-    Map<HTTPMethod, List<ValidationMethodConfiguration>> validationMethods = findValidationMethods(actionClass);
+    Map<HTTPMethod, List<PreParameterMethodConfiguration>> preParameterMethods = findAnnotatedMethods(
+        actionClass,
+        PreParameterMethod.class,
+        (annotation, method) -> new PreParameterMethodConfiguration(method, annotation),
+        config -> config.annotation.httpMethods());
+    Map<HTTPMethod, List<ValidationMethodConfiguration>> validationMethods = findAnnotatedMethods(
+        actionClass,
+        ValidationMethod.class,
+        (annotation, method) -> new ValidationMethodConfiguration(method, annotation),
+        config -> config.annotation.httpMethods());
 
     List<String> securitySchemes = findSecuritySchemes(actionClass);
     Map<HTTPMethod, List<AuthorizationMethodConfiguration>> authorizationMethods = findAuthorizationMethods(actionClass, securitySchemes, executeMethods);
@@ -182,64 +192,36 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
   }
 
   /**
-   * Locates all the valid execute methods on the action.
+   * Locates all of the validation methods and return a map keyed by HTTP Method.
    *
    * @param actionClass The action class.
-   * @return The execute methods Map.
+   * @return The validation method configurations.
    */
-  protected Map<HTTPMethod, ExecuteMethodConfiguration> findExecuteMethods(Class<?> actionClass) {
-    Method defaultMethod = null;
-    try {
-      defaultMethod = actionClass.getMethod("execute");
-    } catch (NoSuchMethodException e) {
-      // Ignore
+  protected <T extends Annotation, U> Map<HTTPMethod, List<U>> findAnnotatedMethods(Class<?> actionClass,
+                                                                                    Class<T> annotationType,
+                                                                                    BiFunction<T, Method, U> constructor,
+                                                                                    Function<U, HTTPMethod[]> methodFunction) {
+    List<Method> methods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, annotationType);
+
+    // Map HTTP method to a list of Validation Methods.
+    Map<HTTPMethod, List<U>> map = new HashMap<>();
+    methods.stream()
+           .map(m -> constructor.apply(m.getAnnotation(annotationType), m))
+           .forEach(c -> Arrays.asList(methodFunction.apply(c))
+                               .forEach(m -> map.computeIfAbsent(m, k -> new ArrayList<>()).add(c)));
+
+
+    // Ensure we're calling the GET Validation Method for a HEAD request
+    if (map.containsKey(HTTPMethod.GET) && !map.containsKey(HTTPMethod.HEAD)) {
+      map.put(HTTPMethod.HEAD, map.get(HTTPMethod.GET));
     }
 
-    Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods = new HashMap<>();
-    for (HTTPMethod httpMethod : HTTPMethod.values()) {
-      Method method = null;
-      try {
-        method = actionClass.getMethod(httpMethod.name().toLowerCase());
-      } catch (NoSuchMethodException e) {
-        // Ignore
-      }
-
-      // Handle HEAD requests using a GET
-      if (method == null && httpMethod == HTTPMethod.HEAD) {
-        try {
-          method = actionClass.getMethod("get");
-        } catch (NoSuchMethodException e) {
-          // Ignore
-        }
-      }
-
-      if (method == null) {
-        method = defaultMethod;
-      }
-
-      if (method != null) {
-        verify(method);
-        executeMethods.put(httpMethod, new ExecuteMethodConfiguration(httpMethod, method, method.getAnnotation(Validation.class)));
-      }
-    }
-
-    if (executeMethods.isEmpty()) {
-      throw new PrimeException("The action class [" + actionClass + "] is missing at least one valid execute method. " +
-          "The class can define execute methods with the same names as the HTTP methods (lowercased) or a default execute " +
-          "method named [execute]. For example:\n\n" +
-          "public String execute() {\n" +
-          "  return \"success\"\n" +
-          "}\n\n" +
-          "or\n\n" +
-          "public String post() {\n" +
-          "  return \"success\"\n" +
-          "}");
-    }
-
-    return executeMethods;
+    return map;
   }
 
-  protected Map<HTTPMethod, List<AuthorizationMethodConfiguration>> findAuthorizationMethods(Class<?> actionClass, List<String> securitySchemes, Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods) {
+  protected Map<HTTPMethod, List<AuthorizationMethodConfiguration>> findAuthorizationMethods(Class<?> actionClass,
+                                                                                             List<String> securitySchemes,
+                                                                                             Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods) {
     // When Authorize Method scheme is not enabled, we will not call any of the Authorization Methods.
     if (!securitySchemes.contains("authorize-method")) {
       return Collections.emptyMap();
@@ -297,7 +279,67 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
     return authorizationMethods;
   }
 
-  protected Map<HTTPMethod, List<JWTMethodConfiguration>> findJwtAuthorizationMethods(Class<?> actionClass, List<String> securitySchemes, Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods) {
+  /**
+   * Locates all the valid execute methods on the action.
+   *
+   * @param actionClass The action class.
+   * @return The execute methods Map.
+   */
+  protected Map<HTTPMethod, ExecuteMethodConfiguration> findExecuteMethods(Class<?> actionClass) {
+    Method defaultMethod = null;
+    try {
+      defaultMethod = actionClass.getMethod("execute");
+    } catch (NoSuchMethodException e) {
+      // Ignore
+    }
+
+    Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods = new HashMap<>();
+    for (HTTPMethod httpMethod : HTTPMethod.values()) {
+      Method method = null;
+      try {
+        method = actionClass.getMethod(httpMethod.name().toLowerCase());
+      } catch (NoSuchMethodException e) {
+        // Ignore
+      }
+
+      // Handle HEAD requests using a GET
+      if (method == null && httpMethod == HTTPMethod.HEAD) {
+        try {
+          method = actionClass.getMethod("get");
+        } catch (NoSuchMethodException e) {
+          // Ignore
+        }
+      }
+
+      if (method == null) {
+        method = defaultMethod;
+      }
+
+      if (method != null) {
+        verify(method);
+        executeMethods.put(httpMethod, new ExecuteMethodConfiguration(httpMethod, method, method.getAnnotation(Validation.class)));
+      }
+    }
+
+    if (executeMethods.isEmpty()) {
+      throw new PrimeException("The action class [" + actionClass + "] is missing at least one valid execute method. " +
+          "The class can define execute methods with the same names as the HTTP methods (lowercased) or a default execute " +
+          "method named [execute]. For example:\n\n" +
+          "public String execute() {\n" +
+          "  return \"success\"\n" +
+          "}\n\n" +
+          "or\n\n" +
+          "public String post() {\n" +
+          "  return \"success\"\n" +
+          "}");
+    }
+
+    return executeMethods;
+  }
+
+  protected Map<HTTPMethod, List<JWTMethodConfiguration>> findJwtAuthorizationMethods(Class<?> actionClass,
+                                                                                      List<String> securitySchemes,
+                                                                                      Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods) {
     // When JWT scheme is not enabled, we will not call any of the JWT Authorization Methods.
     if (!securitySchemes.contains("jwt")) {
       return Collections.emptyMap();
@@ -387,31 +429,6 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
     }
 
     return scopeFields;
-  }
-
-  /**
-   * Locates all of the validation methods and return a map keyed by HTTP Method.
-   *
-   * @param actionClass The action class.
-   * @return The validation method configurations.
-   */
-  protected Map<HTTPMethod, List<ValidationMethodConfiguration>> findValidationMethods(Class<?> actionClass) {
-    List<Method> methods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, ValidationMethod.class);
-
-    // Map HTTP method to a list of Validation Methods.
-    Map<HTTPMethod, List<ValidationMethodConfiguration>> validationMethods = new HashMap<>();
-    methods.stream()
-           .map(m -> new ValidationMethodConfiguration(m, m.getAnnotation(ValidationMethod.class)))
-           .forEach(c -> Arrays.asList(c.annotation.httpMethods())
-                               .forEach(m -> validationMethods.computeIfAbsent(m, k -> new ArrayList<>()).add(c)));
-
-
-    // Ensure we're calling the GET Validation Method for a HEAD request
-    if (validationMethods.containsKey(HTTPMethod.GET) && !validationMethods.containsKey(HTTPMethod.HEAD)) {
-      validationMethods.put(HTTPMethod.HEAD, validationMethods.get(HTTPMethod.GET));
-    }
-
-    return validationMethods;
   }
 
   /**

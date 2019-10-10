@@ -25,8 +25,9 @@ import org.primeframework.mvc.validation.ValidationMethod;
  * @author Brian Pontarelli
  */
 public class ValidationMethodConfiguration {
-  public final Method method;
   public final ValidationMethod annotation;
+
+  public final Method method;
 
   public ValidationMethodConfiguration(Method method, ValidationMethod annotation) {
     this.method = method;

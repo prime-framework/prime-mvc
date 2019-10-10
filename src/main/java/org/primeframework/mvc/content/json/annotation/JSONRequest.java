@@ -35,5 +35,5 @@ public @interface JSONRequest {
   /**
    * @return The HTTP methods that this request object is utilized for.
    */
-  HTTPMethod[] httpMethods() default {HTTPMethod.POST, HTTPMethod.PUT, HTTPMethod.GET, HTTPMethod.DELETE};
+  HTTPMethod[] httpMethods() default {HTTPMethod.POST, HTTPMethod.PUT, HTTPMethod.GET, HTTPMethod.DELETE, HTTPMethod.PATCH};
 }

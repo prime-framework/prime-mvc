@@ -15,6 +15,7 @@
  */
 package org.primeframework.mvc.parameter;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -24,6 +25,7 @@ import com.google.inject.Inject;
 import org.apache.commons.lang3.ArrayUtils;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
+import org.primeframework.mvc.action.PreParameterMethodConfiguration;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.message.MessageStore;
@@ -39,6 +41,7 @@ import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.parameter.el.ExpressionException;
 import org.primeframework.mvc.parameter.fileupload.FileInfo;
 import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
+import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.util.ArrayBuilder;
 import org.primeframework.mvc.util.ReflectionUtils;
 import org.slf4j.Logger;
@@ -72,15 +75,18 @@ public class DefaultParameterHandler implements ParameterHandler {
 
   private final MessageStore messageStore;
 
+  private final HttpServletRequest request;
+
   @Inject
   public DefaultParameterHandler(MVCConfiguration configuration, ActionInvocationStore actionInvocationStore,
                                  ExpressionEvaluator expressionEvaluator, MessageProvider messageProvider,
-                                 MessageStore messageStore) {
+                                 MessageStore messageStore, HttpServletRequest request) {
     this.configuration = configuration;
     this.actionInvocationStore = actionInvocationStore;
     this.expressionEvaluator = expressionEvaluator;
     this.messageProvider = messageProvider;
     this.messageStore = messageStore;
+    this.request = request;
   }
 
   @Override
@@ -98,7 +104,12 @@ public class DefaultParameterHandler implements ParameterHandler {
     // Next, invoke pre methods
     ActionConfiguration actionConfiguration = actionInvocation.configuration;
     if (actionConfiguration.preParameterMethods.size() > 0) {
-      ReflectionUtils.invokeAll(action, actionConfiguration.preParameterMethods);
+      HTTPMethod method = HTTPMethod.valueOf(request.getMethod().toUpperCase());
+      if (actionConfiguration.preParameterMethods.containsKey(method)) {
+        for (PreParameterMethodConfiguration methodConfig : actionConfiguration.preParameterMethods.get(method)) {
+          ReflectionUtils.invoke(methodConfig.method, action);
+        }
+      }
     }
 
     // Next, process the optional

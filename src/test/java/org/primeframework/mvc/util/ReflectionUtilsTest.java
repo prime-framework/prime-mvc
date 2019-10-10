@@ -15,6 +15,8 @@
  */
 package org.primeframework.mvc.util;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Locale;
@@ -54,6 +56,14 @@ public class ReflectionUtilsTest {
   }
 
   @Test
+  public void findMethodsWithAnnotation() {
+    List<Method> methods = ReflectionUtils.findAllMethodsWithAnnotation(C1.class, Foo.class);
+    assertEquals(methods.get(0).getName(), "method3");
+    assertEquals(methods.get(1).getName(), "method1");
+    assertEquals(methods.get(2).getName(), "method2");
+  }
+
+  @Test
   public void localeIssues() {
     // This is currently expected to fail, we could fix this, but it may be failing correctly.
     // This class has many duplicate get methods such as :
@@ -79,6 +89,36 @@ public class ReflectionUtilsTest {
   @Test
   public void methodOrdering() throws Exception {
     List<Method> methods = ReflectionUtils.findAllMethodsWithAnnotation(ExtensionInheritanceAction.class, PostParameterMethod.class);
+    System.out.println(methods);
     assertEquals(methods, asList(Extension.class.getMethod("method"), Extension.class.getMethod("method1"), ExtensionInheritanceAction.class.getMethod("method2"), ExtensionInheritanceAction.class.getMethod("method3")));
+  }
+
+  @Retention(RetentionPolicy.RUNTIME)
+  public @interface Foo {
+  }
+
+  public interface I1 extends I2 {
+    @Foo
+    default void method1() {
+    }
+  }
+
+  public interface I2 {
+    @Foo
+    default void method2() {
+    }
+  }
+
+  public interface I3 {
+    @Foo
+    default void method3() {
+    }
+  }
+
+  public static class C1 extends C2 implements I1 {
+
+  }
+
+  public static class C2 implements I3 {
   }
 }

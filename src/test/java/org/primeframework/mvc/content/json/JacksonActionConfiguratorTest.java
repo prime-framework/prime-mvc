@@ -43,6 +43,7 @@ public class JacksonActionConfiguratorTest extends PrimeBaseTest {
     requestMembers.put(HTTPMethod.PUT, new RequestMember("jsonRequest", UserField.class));
     requestMembers.put(HTTPMethod.DELETE, new RequestMember("jsonRequest", UserField.class));
     requestMembers.put(HTTPMethod.GET, new RequestMember("jsonRequest", UserField.class));
+    requestMembers.put(HTTPMethod.PATCH, new RequestMember("jsonRequest", UserField.class));
 
     assertEquals(config.requestMembers.size(), requestMembers.size());
     assertTrue(config.requestMembers.keySet().containsAll(requestMembers.keySet()));
@@ -50,11 +51,13 @@ public class JacksonActionConfiguratorTest extends PrimeBaseTest {
     assertEquals(config.requestMembers.get(HTTPMethod.PUT).name, requestMembers.get(HTTPMethod.PUT).name);
     assertEquals(config.requestMembers.get(HTTPMethod.GET).name, requestMembers.get(HTTPMethod.GET).name);
     assertEquals(config.requestMembers.get(HTTPMethod.DELETE).name, requestMembers.get(HTTPMethod.DELETE).name);
+    assertEquals(config.requestMembers.get(HTTPMethod.PATCH).name, requestMembers.get(HTTPMethod.PATCH).name);
 
     assertEquals(config.requestMembers.get(HTTPMethod.POST).type, requestMembers.get(HTTPMethod.POST).type);
     assertEquals(config.requestMembers.get(HTTPMethod.PUT).type, requestMembers.get(HTTPMethod.PUT).type);
     assertEquals(config.requestMembers.get(HTTPMethod.GET).type, requestMembers.get(HTTPMethod.GET).type);
     assertEquals(config.requestMembers.get(HTTPMethod.DELETE).type, requestMembers.get(HTTPMethod.DELETE).type);
+    assertEquals(config.requestMembers.get(HTTPMethod.PATCH).type, requestMembers.get(HTTPMethod.PATCH).type);
 
     assertEquals(config.responseMember.name, "jsonResponse");
   }
