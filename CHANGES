@@ -1,5 +1,9 @@
 Prime MVC Changes
 
+Changes in 1.17.1
+
+ * Fail early when value for X-Forwarded-Proto is not http or https
+
 Changes in 1.17.0
 
  * Support for PATCH

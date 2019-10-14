@@ -35,42 +35,6 @@ public class ServletTools {
   private static final Logger logger = LoggerFactory.getLogger(ServletTools.class);
 
   /**
-   * Returns the base url in the following format:
-   * <p/>
-   * protocol://host[:port]/
-   * <p/>
-   * The protocol, host and port are extracted from the ServletRequest using the following methods:
-   * <p/>
-   * protocol = ServletRequest.getScheme() host = ServletRequest.getServerName() port = ServletRequest.getServerPost()
-   * <p/>
-   * Below are some examples of base URLs that can be returned:
-   * <p/>
-   * <strong>http://www.Inversoft Inc./</strong> <strong>https://www.Inversoft Inc.:8080/</strong>
-   *
-   * @param request the ServletRequest
-   * @return a URL in the format of protocol://host[:port]/
-   * @deprecated Use the URI method.
-   */
-  public static URL getBaseUrl(ServletRequest request) {
-    String scheme = request.getScheme();
-    String serverName = request.getServerName();
-    int serverPort = request.getServerPort();
-
-    URL baseUrl = null;
-    try {
-      if (serverPort > 0) {
-        baseUrl = new URL(scheme, serverName, serverPort, "/");
-      } else {
-        baseUrl = new URL(scheme, serverName, "/");
-      }
-    } catch (MalformedURLException e) {
-      logger.error(e.getMessage(), e);
-    }
-
-    return baseUrl;
-  }
-
-  /**
    * Returns the base URI in the following format:
    * <p/>
    * protocol://host[:port]
@@ -106,6 +70,42 @@ public class ServletTools {
     }
 
     return URI.create(uri);
+  }
+
+  /**
+   * Returns the base url in the following format:
+   * <p/>
+   * protocol://host[:port]/
+   * <p/>
+   * The protocol, host and port are extracted from the ServletRequest using the following methods:
+   * <p/>
+   * protocol = ServletRequest.getScheme() host = ServletRequest.getServerName() port = ServletRequest.getServerPost()
+   * <p/>
+   * Below are some examples of base URLs that can be returned:
+   * <p/>
+   * <strong>http://www.Inversoft Inc./</strong> <strong>https://www.Inversoft Inc.:8080/</strong>
+   *
+   * @param request the ServletRequest
+   * @return a URL in the format of protocol://host[:port]/
+   * @deprecated Use the URI method.
+   */
+  public static URL getBaseUrl(ServletRequest request) {
+    String scheme = request.getScheme();
+    String serverName = request.getServerName();
+    int serverPort = request.getServerPort();
+
+    URL baseUrl = null;
+    try {
+      if (serverPort > 0) {
+        baseUrl = new URL(scheme, serverName, serverPort, "/");
+      } else {
+        baseUrl = new URL(scheme, serverName, "/");
+      }
+    } catch (MalformedURLException e) {
+      logger.error(e.getMessage(), e);
+    }
+
+    return baseUrl;
   }
 
   /**
