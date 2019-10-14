@@ -34,8 +34,6 @@ import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 public class ServletTools {
   private static final Logger logger = LoggerFactory.getLogger(ServletTools.class);
 
-
-
   /**
    * Returns the base url in the following format:
    * <p/>
@@ -84,6 +82,10 @@ public class ServletTools {
    */
   public static URI getBaseURI(HttpServletRequest request) {
     String scheme = defaultIfNull(request.getHeader("X-Forwarded-Proto"), request.getScheme()).toLowerCase();
+    // Setting the wrong value in the X-Forwarded-Proto header seems to be a common issue that causes an exception during URI.create. Assuming request.getScheme() is not the problem and it is related to the proxy configuration.
+    if (!scheme.equals("http") && !scheme.equals("https")) {
+      throw new IllegalArgumentException("The request scheme is invalid. Only http or https are valid schemes. The X-Forwarded-Proto header has a value of [" + request.getHeader("X-Forwarded-Proto") + "], this is likely an issue in your proxy configuration.");
+    }
     String serverName = defaultIfNull(request.getHeader("X-Forwarded-Host"), request.getServerName()).toLowerCase();
     int serverPort = request.getServerPort();
     // Ignore port 80 for http
