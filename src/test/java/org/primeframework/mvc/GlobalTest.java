@@ -555,6 +555,13 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void get_underscore() {
+    simulator.test("/test_underscore")
+             .get()
+             .assertStatusCode(200);
+  }
+
+  @Test
   public void get_wellKnownDotPrefixed() throws Exception {
     test.simulate(() -> simulator.test("/.well-known/openid-configuration")
                                  .get()
