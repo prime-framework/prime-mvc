@@ -262,7 +262,19 @@ public class GlobalTest extends PrimeBaseTest {
                                                                                                                  .assertContainsGeneralMessageCodes(MessageType.INFO, "[INFO]")
                                                                                                                  .assertContainsGeneralMessageCodes(MessageType.WARNING, "[WARNING]")
                                                                                                                  .assertBodyContainsMessagesFromKey("[ERROR]", "[INFO]", "[WARNING]")
-                                                                                                                 .assertBodyContains("Error 3", "Info 3", "Warning 3"))));
+                                                                                                                 .assertBodyContains("Error 3", "Info 3", "Warning 3")
+
+                                                                                                                 // Execute the form POST in the response body
+                                                                                                                 .executeFormPostInResponseBody("form", formResponse ->
+                                                                                                                     formResponse.assertStatusCode(200)
+                                                                                                                                 .assertBodyContains(
+                                                                                                                                     "textValue",
+                                                                                                                                     "disabledEmpty", // This will be missing so the 'Empty' value will be rendered
+                                                                                                                                     "hiddenValue",
+                                                                                                                                     "radioValue",
+                                                                                                                                     "checkboxValue",
+                                                                                                                                     "textareaValue")
+                                                                                                                                 .assertBodyDoesNotContain("disabledValue")))));
   }
 
   @Test

@@ -873,6 +873,41 @@ public class RequestResult {
   }
 
   /**
+   * Attempt to submit the form found in the response body.
+   *
+   * @param selector The selector used to find the form in the DOM
+   * @param consumer The request result from following the redirect.
+   * @return This.
+   */
+  public RequestResult executeFormPostInResponseBody(String selector, ThrowingConsumer<RequestResult> consumer)
+      throws Exception {
+    Document document = Jsoup.parse(body);
+    Element form = document.selectFirst(selector);
+
+    if (form == null) {
+      throw new AssertionError("Unable to find a form in the body using the provided select [" + selector + "]. Response body\n" + body);
+    }
+
+    String uri = form.attr("action");
+    RequestBuilder rb = new RequestBuilder(uri, container, filter, injector);
+
+    for (Element element : form.select("input, textarea")) {
+      if (!element.hasAttr("disabled")) {
+        rb.withParameter(element.attr("name"), element.val());
+      }
+    }
+
+    String method = form.attr("method");
+    if (method == null || method.equalsIgnoreCase("GET")) {
+      consumer.accept(rb.get());
+    } else if (method.equalsIgnoreCase("POST")) {
+      consumer.accept(rb.post());
+    }
+
+    return this;
+  }
+
+  /**
    * Execute the redirect and accept a consumer to assert on the response.
    *
    * @param consumer The request result from following the redirect.
