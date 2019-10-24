@@ -876,10 +876,24 @@ public class RequestResult {
    * Attempt to submit the form found in the response body.
    *
    * @param selector The selector used to find the form in the DOM
-   * @param consumer The request result from following the redirect.
+   * @param result   A consumer for the request result from following the redirect.
    * @return This.
    */
-  public RequestResult executeFormPostInResponseBody(String selector, ThrowingConsumer<RequestResult> consumer)
+  public RequestResult executeFormPostInResponseBody(String selector, ThrowingConsumer<RequestResult> result)
+      throws Exception {
+    return executeFormPostInResponseBody(selector, null, result);
+  }
+
+  /**
+   * Attempt to submit the form found in the response body.
+   *
+   * @param selector  The selector used to find the form in the DOM
+   * @param domHelper A consumer for the DOM Helper
+   * @param result    A consumer for the request result from following the redirect.
+   * @return This.
+   */
+  public RequestResult executeFormPostInResponseBody(String selector, ThrowingConsumer<DOMHelper> domHelper,
+                                                     ThrowingConsumer<RequestResult> result)
       throws Exception {
     Document document = Jsoup.parse(body);
     Element form = document.selectFirst(selector);
@@ -888,7 +902,21 @@ public class RequestResult {
       throw new AssertionError("Unable to find a form in the body using the provided select [" + selector + "]. Response body\n" + body);
     }
 
+    if (domHelper != null) {
+      domHelper.accept(new DOMHelper(document));
+    }
+
     String uri = form.attr("action");
+    // Try to handle relative URLs, assuming they are relative to the current request. Maybe a naive assumption, but it our use cases it works ok.
+    // - We could also just allow the caller to pass in the URI
+    if (!uri.startsWith("/")) {
+      String baseURI = request.getRequestURI();
+      if (baseURI.contains("/")) {
+        baseURI = request.getRequestURI().substring(0, baseURI.lastIndexOf("/") + 1);
+        uri = baseURI + uri;
+      }
+    }
+
     RequestBuilder rb = new RequestBuilder(uri, container, filter, injector);
 
     for (Element element : form.select("input, textarea")) {
@@ -899,9 +927,9 @@ public class RequestResult {
 
     String method = form.attr("method");
     if (method == null || method.equalsIgnoreCase("GET")) {
-      consumer.accept(rb.get());
+      result.accept(rb.get());
     } else if (method.equalsIgnoreCase("POST")) {
-      consumer.accept(rb.post());
+      result.accept(rb.post());
     }
 
     return this;
@@ -1120,6 +1148,25 @@ public class RequestResult {
   @FunctionalInterface
   public interface ThrowingConsumer<T> {
     void accept(T t) throws Exception;
+  }
+
+  public static class DOMHelper {
+    public Document document;
+
+    public DOMHelper(Document document) {
+      this.document = document;
+    }
+
+    public DOMHelper setValue(String selector, Object value) {
+      if (value != null) {
+        Element element = document.selectFirst(selector);
+        if (element != null) {
+          element.val(value.toString());
+        }
+      }
+
+      return this;
+    }
   }
 
   public static class HTMLAsserter {
