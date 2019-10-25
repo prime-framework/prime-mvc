@@ -1,5 +1,9 @@
 Prime MVC Changes
 
+Changes in 1.18.0
+
+ * Add ScopeTools
+
 Changes in 1.17.2
 
  * Add RequestResult.executeFormPostInResponseBody
