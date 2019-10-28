@@ -1,5 +1,9 @@
 Prime MVC Changes
 
+Changes in 1.18.1
+
+ * Set the default FreeMarker class resolver to TemplateClassResolver.ALLOWS_NOTHING_RESOLVER
+
 Changes in 1.18.0
 
  * Add ScopeTools
@@ -275,9 +279,3 @@ Changes in 1.1.0
 
  * Feature. JWT Support. Added JWT Security Scheme.
  * Build. Upgrade Jackson dependencies from 2.4.2 to 2.8.1
-
-
-
-
-
-
