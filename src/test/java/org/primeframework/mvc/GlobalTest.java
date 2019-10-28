@@ -37,6 +37,7 @@ import org.example.action.JwtAuthorizedAction;
 import org.example.domain.UserField;
 import org.primeframework.mvc.action.config.ActionConfigurationProvider;
 import org.primeframework.mvc.container.ContainerResolver;
+import org.primeframework.mvc.freemarker.FreeMarkerRenderException;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
@@ -593,6 +594,16 @@ public class GlobalTest extends PrimeBaseTest {
     test.expectException(UnsupportedOperationException.class,
         () -> test.simulate(() -> simulator.test("/.well-known/.well-known/openid-configuration")
                                            .get()));
+  }
+
+  @Test
+  public void hacked() {
+    // Make sure we don't invoke 'freemarker.template.utility.Execute"
+    simulator.test("/hacked")
+             .expectException(FreeMarkerRenderException.class)
+             .get()
+             .assertStatusCode(500)
+             .assertBodyContains("Instantiating freemarker.template.utility.Execute is not allowed in the template for security reasons.");
   }
 
   @Test
