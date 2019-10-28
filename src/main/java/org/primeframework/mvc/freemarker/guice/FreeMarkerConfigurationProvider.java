@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2018, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,13 @@
  */
 package org.primeframework.mvc.freemarker.guice;
 
-import org.primeframework.mvc.config.MVCConfiguration;
-
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import freemarker.cache.TemplateLoader;
+import freemarker.core.TemplateClassResolver;
 import freemarker.ext.beans.BeansWrapperBuilder;
 import freemarker.template.Configuration;
+import org.primeframework.mvc.config.MVCConfiguration;
 
 /**
  * Provides the FreeMarker {@link Configuration} instance.
@@ -53,6 +53,14 @@ public class FreeMarkerConfigurationProvider implements Provider<Configuration> 
     config.setDefaultEncoding("UTF-8");
     config.setObjectWrapper(builder.build());
     config.setNumberFormat("computer");
+
+    // Security settings
+
+    // 'UNRESTRICTED_RESOLVER' is the default at 2.3.x (Fail!), starting in 2.4 it will be SAFER_RESOLVER, set to Allow Nothing!
+    config.setNewBuiltinClassResolver(TemplateClassResolver.ALLOWS_NOTHING_RESOLVER);
+    // Disable the API built in, should be disabled by default, trust no one.
+    config.setAPIBuiltinEnabled(false);
+
     return config;
   }
 }
