@@ -682,6 +682,30 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void patch_testing() throws Exception {
+    // POST no big deal
+    simulator.test("/patch/test")
+             .withJSONFile(Paths.get("src/test/resources/json/patch/test.json"), "config", "post")
+             .post()
+             .assertStatusCode(200)
+             .assertJSONFile(Paths.get("src/test/resources/json/patch/test-response.json"), "config", "post");
+
+    // PUT no big deal
+    simulator.test("/patch/test")
+             .withJSONFile(Paths.get("src/test/resources/json/patch/test.json"), "config", "put")
+             .put()
+             .assertStatusCode(200)
+             .assertJSONFile(Paths.get("src/test/resources/json/patch/test-response.json"), "config", "put");
+
+    // PATCH damn that is cool
+    simulator.test("/patch/test")
+             .withJSONFile(Paths.get("src/test/resources/json/patch/test-patch.json"))
+             .patch()
+             .assertStatusCode(200)
+             .assertJSONFile(Paths.get("src/test/resources/json/patch/test-response.json"), "config", "patched");
+  }
+
+  @Test
   public void post() {
     simulator.test("/post")
              .post()

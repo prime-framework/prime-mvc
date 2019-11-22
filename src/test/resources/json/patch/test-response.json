@@ -1,0 +1,6 @@
+{
+  "data" : {
+    "config" : "${config}",
+    "type" : "Facebook"
+  }
+}
