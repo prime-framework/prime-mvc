@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2013-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,6 +62,7 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
 
   protected ObjectMapper configure(ObjectMapper objectMapper) {
     return objectMapper.setSerializationInclusion(Include.NON_NULL)
+                       .setDefaultMergeable(true)
                        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, allowUnknownParameters())
                        .configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true)
                        .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)

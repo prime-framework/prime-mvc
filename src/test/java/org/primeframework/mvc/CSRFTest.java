@@ -35,6 +35,14 @@ public class CSRFTest extends PrimeBaseTest {
              .setup(req -> securityContext.login(new User()))
              .post()
              .assertStatusCode(403); // Unauthorized
+
+    // Re-test with a "null" value for the Origin header
+    simulator.test("/secure")
+             .withSingleHeader("Origin", "null")
+             .withSingleHeader("Referer", null)
+             .setup(req -> securityContext.login(new User()))
+             .post()
+             .assertStatusCode(403); // Unauthorized
   }
 
   @Test

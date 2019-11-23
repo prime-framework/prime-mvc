@@ -85,9 +85,10 @@
     <file url="PROJECT" charset="UTF-8" />
   </component>
   <component name="EntryPointsManager">
-    <list size="2">
+    <list size="3">
       <item index="0" class="java.lang.String" itemvalue="org.primeframework.mvc.action.annotation.Action" />
-      <item index="1" class="java.lang.String" itemvalue="org.primeframework.mvc.util.ReflectionUtilsTest.Foo" />
+      <item index="1" class="java.lang.String" itemvalue="org.primeframework.mvc.parameter.annotation.PreParameterMethod" />
+      <item index="2" class="java.lang.String" itemvalue="org.primeframework.mvc.util.ReflectionUtilsTest.Foo" />
     </list>
   </component>
   <component name="IdProvider" IDEtalkID="FAFCC8F55516B0FC710A9E287F066E00" />

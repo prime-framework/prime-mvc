@@ -22,7 +22,6 @@ import com.google.inject.Inject;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.servlet.ServletTools;
-import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 /**
  * A security scheme that authenticates and authorizes users using a UserLoginSecurityContext implementation.
@@ -72,7 +71,7 @@ public class UserLoginSecurityScheme implements SecurityScheme {
     // CSRF on POST only
     if (method == HTTPMethod.POST) {
       // Check for CSRF request origins
-      String source = defaultIfNull(request.getHeader("Origin"), request.getHeader("Referer"));
+      String source = ServletTools.getOriginHeader(request);
       if (source == null) {
         throw new UnauthorizedException();
       }

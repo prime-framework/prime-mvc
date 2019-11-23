@@ -1,5 +1,11 @@
 Prime MVC Changes
 
+Changes in 1.18.2
+
+ * Add ServletTools.getOriginHeader so that we can generically account for a "null" Origin header
+ * Add some tests for PATCH
+ * Add .setDefaultMergeable(true) in the ObjectMapperProvider configuration
+
 Changes in 1.18.1
 
  * Set the default FreeMarker class resolver to TemplateClassResolver.ALLOWS_NOTHING_RESOLVER
