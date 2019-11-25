@@ -111,6 +111,26 @@ public class RequestResult {
    * @throws IOException If the ObjectMapper fails.
    */
   public static void assertJSONEquals(ObjectMapper objectMapper, String actual, String expected) throws IOException {
+    _assertJSONEquals(objectMapper, actual, expected, true);
+  }
+
+  /**
+   * Compares two JSON objects to ensure they are equal. This is done by converting the JSON objects to Maps, Lists, and
+   * primitives and then comparing them. The error is output so that IntelliJ can diff the two JSON objects in order to
+   * output the results.
+   *
+   * @param objectMapper The Jackson ObjectMapper used to convert the JSON strings to Maps.
+   * @param actual       The actual JSON.
+   * @param expected     The expected JSON.
+   * @throws IOException If the ObjectMapper fails.
+   */
+  public static void assertSortedJSONEquals(ObjectMapper objectMapper, String actual, String expected)
+      throws IOException {
+    _assertJSONEquals(objectMapper, actual, expected, false);
+  }
+
+  private static void _assertJSONEquals(ObjectMapper objectMapper, String actual, String expected, boolean sortArrays)
+      throws IOException {
     if (actual == null || actual.equals("")) {
       throw new AssertionError("The actual response body is empty or is equal to an empty string without any JSON. This was "
           + "unexpected since you are trying to assert on JSON.");
@@ -133,8 +153,8 @@ public class RequestResult {
     objectMapper = objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true)
                                .configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
 
-    response = deepSort(response, objectMapper);
-    file = deepSort(file, objectMapper);
+    response = deepSort(response, objectMapper, sortArrays);
+    file = deepSort(file, objectMapper, sortArrays);
 
     if (!response.equals(file)) {
       String bodyString = objectMapper.writeValueAsString(response);
@@ -144,13 +164,14 @@ public class RequestResult {
   }
 
   @SuppressWarnings("unchecked")
-  private static Map<String, Object> deepSort(Map<String, Object> response, ObjectMapper objectMapper) {
+  private static Map<String, Object> deepSort(Map<String, Object> response, ObjectMapper objectMapper,
+                                              boolean sortArrays) {
     Map<String, Object> sorted = new TreeMap<>();
     response.forEach((key, value) -> {
       if (value instanceof Map) {
-        sorted.put(key, deepSort((Map<String, Object>) value, objectMapper));
+        sorted.put(key, deepSort((Map<String, Object>) value, objectMapper, sortArrays));
       } else if (value instanceof List) {
-        sorted.put(key, deepSort((List<Object>) value, objectMapper));
+        sorted.put(key, deepSort((List<Object>) value, objectMapper, sortArrays));
       } else {
         sorted.put(key, value);
       }
@@ -160,25 +181,27 @@ public class RequestResult {
   }
 
   @SuppressWarnings("unchecked")
-  private static List<Object> deepSort(List<Object> list, ObjectMapper objectMapper) {
+  private static List<Object> deepSort(List<Object> list, ObjectMapper objectMapper, boolean sortArrays) {
     List<Object> sorted = new ArrayList<>();
     list.forEach(value -> {
       if (value instanceof Map) {
-        sorted.add(deepSort((Map<String, Object>) value, objectMapper));
+        sorted.add(deepSort((Map<String, Object>) value, objectMapper, sortArrays));
       } else if (value instanceof List) {
-        sorted.add(deepSort((List<Object>) value, objectMapper));
+        sorted.add(deepSort((List<Object>) value, objectMapper, sortArrays));
       } else {
         sorted.add(value);
       }
     });
 
-    sorted.sort(Comparator.comparing(value -> {
-      try {
-        return objectMapper.writeValueAsString(value);
-      } catch (JsonProcessingException e) {
-        throw new RuntimeException(e);
-      }
-    }));
+    if (sortArrays) {
+      sorted.sort(Comparator.comparing(value -> {
+        try {
+          return objectMapper.writeValueAsString(value);
+        } catch (JsonProcessingException e) {
+          throw new RuntimeException(e);
+        }
+      }));
+    }
 
     return sorted;
   }
@@ -837,6 +860,63 @@ public class RequestResult {
     }
 
     return this;
+  }
+
+  /**
+   * Verifies that the response body is equal to the JSON created from the given object,  preserving the order of JSON
+   * arrays. The object is marshalled using Jackson.
+   *
+   * @param object The object.
+   * @return This.
+   * @throws IOException If the JSON marshalling failed.
+   */
+  public RequestResult assertSortedJSON(Object object) throws IOException {
+    ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
+    String json = objectMapper.writeValueAsString(object);
+    return assertSortedJSON(json);
+  }
+
+  /**
+   * Verifies that the response body is equal to the given JSON text,  preserving the order of JSON arrays.
+   *
+   * @param json The JSON text.
+   * @return This.
+   * @throws IOException If the JSON marshalling failed.
+   */
+  public RequestResult assertSortedJSON(String json) throws IOException {
+    ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
+    assertSortedJSONEquals(objectMapper, body, json);
+    return this;
+  }
+
+  /**
+   * Verifies that the response body is equal to the given JSON text file,  preserving the order of JSON arrays.
+   *
+   * @param jsonFile The JSON file to load and compare to the JSON response.
+   * @param values   key value pairs of replacement values for use in the JSON file.
+   * @return This.
+   * @throws IOException If the JSON marshalling failed.
+   */
+  public RequestResult assertSortedJSONFile(Path jsonFile, Object... values) throws IOException {
+    return assertSortedJSON(BodyTools.processTemplate(jsonFile, appendArray(values, "_to_milli", new ZonedDateTimeToMilliSeconds())));
+  }
+
+  /**
+   * De-serialize the JSON response using the type provided, preserving the order of JSON arrays. To use actual values
+   * in the JSON use ${actual.foo} to use the property named <code>foo</code>.
+   *
+   * @param type     The object type of the JSON.
+   * @param jsonFile The JSON file to load and compare to the JSON response.
+   * @param values   key value pairs of replacement values for use in the JSON file.
+   * @return This.
+   * @throws IOException If the JSON marshalling failed.
+   */
+  public <T> RequestResult assertSortedJSONFileWithActual(Class<T> type, Path jsonFile, Object... values)
+      throws IOException {
+    ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
+    T actual = objectMapper.readValue(body, type);
+
+    return assertSortedJSONFile(jsonFile, appendArray(values, "actual", actual, "_to_milli", new ZonedDateTimeToMilliSeconds()));
   }
 
   /**
