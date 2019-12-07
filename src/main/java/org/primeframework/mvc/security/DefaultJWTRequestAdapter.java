@@ -26,11 +26,16 @@ import com.google.inject.Inject;
  * <pre>
  *   Authorization: JWT "XXXXXXXXXX.YYYYYYYYYY.ZZZZZZZZZZ"
  * </pre>
+ * or
+ * * <pre>
+ *  *   Authorization: Bearer "XXXXXXXXXX.YYYYYYYYYY.ZZZZZZZZZZ"
+ *  * </pre>
  * <p>
  * If an <code>Authorization</code> header is not found in the request next we'll look for a Cookie with a name of
  * <code>access_token</code>.
  * <p/>
- * If you expect the JWT in a different authorization scheme, or a different Cookie name, etc you should bind a different Extractor.
+ * If you expect the JWT in a different authorization scheme, or a different Cookie name, etc you should bind a
+ * different Extractor.
  *
  * @author Daniel DeGroff
  */
@@ -49,8 +54,13 @@ public class DefaultJWTRequestAdapter implements JWTRequestAdapter {
   @Override
   public String getEncodedJWT() {
     String authorization = request.getHeader("Authorization");
-    if (authorization != null && authorization.startsWith("JWT ")) {
-      return authorization.substring("JWT ".length());
+    if (authorization != null) {
+      // Support Bearer and JWT scheme
+      if (authorization.startsWith("Bearer")) {
+        return authorization.substring("Bearer " .length());
+      } else if (authorization.startsWith("JWT ")) {
+        return authorization.substring("JWT " .length());
+      }
     }
 
     Cookie[] cookies = request.getCookies();

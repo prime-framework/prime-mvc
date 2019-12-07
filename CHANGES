@@ -1,5 +1,10 @@
 Prime MVC Changes
 
+Changes in 1.18.3
+
+ * Support Bearer scheme in addition to JWT. This was previously supported by binding your own JWTRequestAdapter. Now the default
+   adapter will look for Bearer and then JWT.
+
 Changes in 1.18.2
 
  * Add ServletTools.getOriginHeader so that we can generically account for a "null" Origin header

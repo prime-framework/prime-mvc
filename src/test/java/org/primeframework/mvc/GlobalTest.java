@@ -310,8 +310,16 @@ public class GlobalTest extends PrimeBaseTest {
   @Test
   public void get_jwtAuthorized() throws Exception {
     JwtAuthorizedAction.authorized = true;
+
+    // Test with JWT scheme
     test.simulate(() -> simulator.test("/jwt-authorized")
                                  .withHeader("Authorization", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkifQ.qHdut1UR4-2FSAvh7U3YdeRR5r5boVqjIGQ16Ztp894")
+                                 .get()
+                                 .assertStatusCode(200));
+
+    // Test with Bearer scheme
+    test.simulate(() -> simulator.test("/jwt-authorized")
+                                 .withHeader("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkifQ.qHdut1UR4-2FSAvh7U3YdeRR5r5boVqjIGQ16Ztp894")
                                  .get()
                                  .assertStatusCode(200));
   }
@@ -322,6 +330,13 @@ public class GlobalTest extends PrimeBaseTest {
     test.simulate(() -> simulator.test("/jwt-authorized-disabled")
                                  .withParameter("authorized", true)
                                  .withHeader("Authorization", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkifQ.qHdut1UR4-2FSAvh7U3YdeRR5r5boVqjIGQ16Ztp894")
+                                 .get()
+                                 .assertStatusCode(401));
+
+    // Same, use Bearer scheme
+    test.simulate(() -> simulator.test("/jwt-authorized-disabled")
+                                 .withParameter("authorized", true)
+                                 .withHeader("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkifQ.qHdut1UR4-2FSAvh7U3YdeRR5r5boVqjIGQ16Ztp894")
                                  .get()
                                  .assertStatusCode(401));
   }
