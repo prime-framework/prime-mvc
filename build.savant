@@ -17,7 +17,7 @@
 savantVersion = "1.0.0"
 fusionAuthJWTVersion = "3.1.6"
 
-project(group: "org.primeframework", name: "prime-mvc", version: "1.18.3", licenses: ["ApacheV2_0"]) {
+project(group: "org.primeframework", name: "prime-mvc", version: "1.18.4", licenses: ["ApacheV2_0"]) {
   workflow {
     standard()
   }
@@ -32,9 +32,9 @@ project(group: "org.primeframework", name: "prime-mvc", version: "1.18.3", licen
     }
     group(name: "compile") {
       dependency(id: "org.ow2.asm:asm:6.1.1")
-      dependency(id: "com.fasterxml.jackson.core:jackson-annotations:2.10.0")
-      dependency(id: "com.fasterxml.jackson.core:jackson-core:2.10.0")
-      dependency(id: "com.fasterxml.jackson.core:jackson-databind:2.10.0")
+      dependency(id: "com.fasterxml.jackson.core:jackson-annotations:2.10.1")
+      dependency(id: "com.fasterxml.jackson.core:jackson-core:2.10.1")
+      dependency(id: "com.fasterxml.jackson.core:jackson-databind:2.10.1")
       dependency(id: "com.google.inject:guice:4.2.2")
       dependency(id: "com.google.inject.extensions:guice-multibindings:4.2.2")
       dependency(id: "io.dropwizard.metrics:metrics-core:3.1.0")

@@ -1022,11 +1022,21 @@ public class RequestResult {
    * @return This.
    */
   public RequestResult executeRedirect(ThrowingConsumer<RequestResult> consumer) throws Exception {
-    String uri = redirect.contains("?") ? redirect.substring(0, redirect.indexOf("?")) : redirect;
+    String baseURI = redirect.contains("?") ? redirect.substring(0, redirect.indexOf("?")) : redirect;
+    String originalURI = baseURI;
+    String newRedirect = redirect;
 
-    RequestBuilder rb = new RequestBuilder(uri, container, filter, injector);
-    if (uri.length() != redirect.length()) {
-      String params = redirect.substring(redirect.indexOf("?") + 1);
+    // Handle a relative URI
+    if (!baseURI.startsWith("/")) {
+      int index = request.getRequestURI().lastIndexOf('/');
+      String baseURL = request.getRequestURI().substring(0, index);
+      baseURI = baseURL + "/" + baseURI;
+      newRedirect = redirect.replace(originalURI, baseURI);
+    }
+
+    RequestBuilder rb = new RequestBuilder(baseURI, container, filter, injector);
+    if (baseURI.length() != newRedirect.length()) {
+      String params = newRedirect.substring(newRedirect.indexOf("?") + 1);
       QueryStringTools.parseQueryString(params).forEach(rb::withParameters);
     }
 

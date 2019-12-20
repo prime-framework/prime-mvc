@@ -279,6 +279,45 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void get_execute_relativeRedirect() throws Exception {
+    // Follow the redirect and another redirect and assert on that response as well - and ensure a message set in the first redirect gets all the way to the end
+    test.simulate(() -> simulator.test("/temp-relative-redirect")
+                                 .get()
+                                 .assertStatusCode(302)
+                                 // Messages are in the store
+                                 .assertContainsGeneralMessageCodes(MessageType.ERROR, "[ERROR]")
+                                 .assertContainsGeneralMessageCodes(MessageType.INFO, "[INFO]")
+                                 .assertContainsGeneralMessageCodes(MessageType.WARNING, "[WARNING]")
+                                 .assertRedirect("temp-redirect-target")
+                                 .executeRedirect(response -> response.assertStatusCode(302)
+                                                                      // Message is still in the store
+                                                                      .assertContainsGeneralMessageCodes(MessageType.ERROR, "[ERROR]")
+                                                                      .assertContainsGeneralMessageCodes(MessageType.INFO, "[INFO]")
+                                                                      .assertContainsGeneralMessageCodes(MessageType.WARNING, "[WARNING]")
+                                                                      .assertRedirect("/temp-redirect-target-target")
+                                                                      .executeRedirect(subResponse -> subResponse.assertStatusCode(200)
+                                                                                                                 .assertBodyContains("Look Ma, I'm redirected.")
+                                                                                                                 // Message is still in the store and also rendered on the page
+                                                                                                                 .assertContainsGeneralMessageCodes(MessageType.ERROR, "[ERROR]")
+                                                                                                                 .assertContainsGeneralMessageCodes(MessageType.INFO, "[INFO]")
+                                                                                                                 .assertContainsGeneralMessageCodes(MessageType.WARNING, "[WARNING]")
+                                                                                                                 .assertBodyContainsMessagesFromKey("[ERROR]", "[INFO]", "[WARNING]")
+                                                                                                                 .assertBodyContains("Error 3", "Info 3", "Warning 3")
+
+                                                                                                                 // Execute the form POST in the response body
+                                                                                                                 .executeFormPostInResponseBody("form", formResponse ->
+                                                                                                                     formResponse.assertStatusCode(200)
+                                                                                                                                 .assertBodyContains(
+                                                                                                                                     "textValue",
+                                                                                                                                     "disabledEmpty", // This will be missing so the 'Empty' value will be rendered
+                                                                                                                                     "hiddenValue",
+                                                                                                                                     "radioValue",
+                                                                                                                                     "checkboxValue",
+                                                                                                                                     "textareaValue")
+                                                                                                                                 .assertBodyDoesNotContain("disabledValue")))));
+  }
+
+  @Test
   public void get_expressionEvaluatorSkippedUsesRequest() {
     // Tests that the expression evaluator safely gets skipped while looking for values and Prime then checks the
     // HttpServletRequest and finds the value

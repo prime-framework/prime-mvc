@@ -1,5 +1,9 @@
 Prime MVC Changes
 
+Changes in 1.18.4
+
+ * Try to support a relative URI during an executeRedirect in RequestResult
+
 Changes in 1.18.3
 
  * Support Bearer scheme in addition to JWT. This was previously supported by binding your own JWTRequestAdapter. Now the default
