@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2019, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2014-2020, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 savantVersion = "1.0.0"
 fusionAuthJWTVersion = "3.1.6"
 
-project(group: "org.primeframework", name: "prime-mvc", version: "1.18.4", licenses: ["ApacheV2_0"]) {
+project(group: "org.primeframework", name: "prime-mvc", version: "1.18.5", licenses: ["ApacheV2_0"]) {
   workflow {
     standard()
   }

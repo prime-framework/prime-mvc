@@ -1,5 +1,10 @@
 Prime MVC Changes
 
+Changes in 1.18.5
+
+ * By default in RequestResult.assertContainsFieldErrors all field errors will have to be accounted for.
+ * Add RequestResult.assertContainsAtLeastTheseFieldErrors which provides the legacy behavior
+
 Changes in 1.18.4
 
  * Try to support a relative URI during an executeRedirect in RequestResult

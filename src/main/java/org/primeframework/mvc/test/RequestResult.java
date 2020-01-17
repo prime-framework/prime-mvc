@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2019, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2014-2020, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -334,6 +334,42 @@ public class RequestResult {
   }
 
   /**
+   * Verifies that the system has errors for the given fields. This doesn't assert the error itself, just that the field
+   * contains an error.
+   * <p>
+   * There may be additional field errors in the message store than the ones requested and this will not fail.
+   *
+   * @param fields The name of the field code(s). Not the fully rendered message(s)
+   * @return This.
+   */
+  @SuppressWarnings("StringConcatenationInsideStringBufferAppend")
+  public RequestResult assertContainsAtLeastTheseFieldErrors(String... fields) {
+    MessageStore messageStore = get(MessageStore.class);
+    Map<String, List<FieldMessage>> msgs = messageStore.getFieldMessages();
+    for (String field : fields) {
+      List<FieldMessage> fieldMessages = msgs.get(field);
+      if (fieldMessages == null) {
+        StringBuilder sb = new StringBuilder("\n\tMessageStore contains:\n");
+        msgs.keySet().forEach(f -> sb.append("\t\t" + f + "\n"));
+        throw new AssertionError("The MessageStore does not contain a error for the field [" + field + "]" + sb);
+      }
+
+      boolean found = false;
+      for (FieldMessage fieldMessage : fieldMessages) {
+        found |= fieldMessage.getType() == MessageType.ERROR;
+      }
+
+      if (!found) {
+        StringBuilder sb = new StringBuilder("\n\tMessageStore contains:\n");
+        fieldMessages.forEach(f -> sb.append("\t\t[" + f.getType() + "]\n"));
+        throw new AssertionError("The MessageStore contains messages but no errors for the field [" + field + "]" + sb);
+      }
+    }
+
+    return this;
+  }
+
+  /**
    * Assert the cookie exists by name.
    *
    * @param name The cookie name.
@@ -361,33 +397,44 @@ public class RequestResult {
   /**
    * Verifies that the system has errors for the given fields. This doesn't assert the error itself, just that the field
    * contains an error.
+   * <p>
+   * If additional field errors exist in the message store not provided here an error will occur to ensure you have
+   * accounted for all errors.
    *
    * @param fields The name of the field code(s). Not the fully rendered message(s)
    * @return This.
    */
+  @SuppressWarnings("StringConcatenationInsideStringBufferAppend")
   public RequestResult assertContainsFieldErrors(String... fields) {
+    // First check to see if all of the field errors exist that were requested
+    assertContainsAtLeastTheseFieldErrors(fields);
+
     MessageStore messageStore = get(MessageStore.class);
     Map<String, List<FieldMessage>> msgs = messageStore.getFieldMessages();
-    for (String field : fields) {
-      List<FieldMessage> fieldMessages = msgs.get(field);
-      if (fieldMessages == null) {
-        StringBuilder sb = new StringBuilder("\n\tMessageStore contains:\n");
-        //noinspection StringConcatenationInsideStringBufferAppend
-        msgs.keySet().forEach(f -> sb.append("\t\t" + f + "\n"));
-        throw new AssertionError("The MessageStore does not contain a error for the field [" + field + "]" + sb);
-      }
 
-      boolean found = false;
-      for (FieldMessage fieldMessage : fieldMessages) {
-        found |= fieldMessage.getType() == MessageType.ERROR;
-      }
+    // Now Ensure that all fields have been accounted for, if there are more field errors than were requested fail
+    Set<String> requestedFields = new HashSet<>(Arrays.asList(fields));
+    List<String> remaining = msgs.keySet().stream().filter(k -> !requestedFields.contains(k)).collect(Collectors.toList());
+    if (remaining.size() > 0) {
+      StringBuilder sb = new StringBuilder("The MessageStore contains additional field messages that you did not assert.\n");
 
-      if (!found) {
-        StringBuilder sb = new StringBuilder("\n\tMessageStore contains:\n");
-        //noinspection StringConcatenationInsideStringBufferAppend
-        fieldMessages.forEach(f -> sb.append("\t\t[" + f.getType() + "]\n"));
-        throw new AssertionError("The MessageStore contains messages but no errors for the field [" + field + "]" + sb);
-      }
+      // You asserted these
+      sb.append("\nYou asserted the following field errors exist:\n");
+      requestedFields.forEach(f -> sb.append("\t\tField: " + f + "\n"));
+
+      // Fields you are missing
+      sb.append("\nYou are missing the following field errors from your assertion:\n");
+      remaining.forEach(field -> sb.append("\t\tField: ").append(field).append("\n"));
+
+      // The message store contains
+      sb.append("\nThe MessageStore contains the following field errors:\n");
+      msgs.keySet().forEach(f -> {
+        StringBuilder fieldMessages = new StringBuilder();
+        msgs.get(f).forEach(fm -> fieldMessages.append("\t\t\t[" + fm.getType() + "] " + fm.getCode()));
+        sb.append("\t\tField: " + f + "\n" + fieldMessages + "\n");
+      });
+
+      throw new AssertionError(sb);
     }
 
     return this;
