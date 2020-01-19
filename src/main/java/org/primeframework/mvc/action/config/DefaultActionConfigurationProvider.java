@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2020, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.annotation.Action;
@@ -33,8 +34,6 @@ import org.primeframework.mvc.util.ClassClasspathResolver;
 import org.primeframework.mvc.util.URITools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.inject.Inject;
 
 /**
  * This class loads the configuration by scanning the classpath for packages and action classes.
@@ -45,9 +44,9 @@ import com.google.inject.Inject;
 public class DefaultActionConfigurationProvider implements ActionConfigurationProvider {
   private static final Logger logger = LoggerFactory.getLogger(DefaultActionConfigurationProvider.class);
 
-  private final Node root = new Node();
-
   private final List<ActionConfiguration> actionConfigurations = new ArrayList<>();
+
+  private final Node root = new Node();
 
   @Inject
   public DefaultActionConfigurationProvider(ActionConfigurationBuilder builder) {
@@ -90,6 +89,11 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
     }
   }
 
+  @Override
+  public List<ActionConfiguration> getActionConfigurations() {
+    return new ArrayList<>(actionConfigurations);
+  }
+
   /**
    * {@inheritDoc}
    */
@@ -116,58 +120,6 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
     return invocation;
   }
 
-  @Override
-  public List<ActionConfiguration> getActionConfigurations() {
-    return new ArrayList<>(actionConfigurations);
-  }
-
-  /**
-   * Traverses the Tree and attempts to locate an Action node.
-   *
-   * @param node         The current node.
-   * @param uriParts     The URI parts (all of them).
-   * @param currentIndex The current node index (in the URI parts)
-   * @param state        The state of the traversal.
-   * @return True if we found an action node, false if not.
-   */
-  protected boolean traverse(Node node, String[] uriParts, int currentIndex, TraversalState state) {
-    // Exit condition
-    if (currentIndex == uriParts.length) {
-      return false;
-    }
-
-    // First, recurse on package names
-    String uriPart = uriParts[currentIndex];
-    if (node.packages.containsKey(uriPart)) {
-      if (traverse(node.packages.get(uriPart), uriParts, currentIndex + 1, state)) {
-        return true;
-      }
-    }
-
-    // Second, recurse on parameters
-    if (node.parameters.size() > 0) {
-      for (String parameterName : node.parameters.keySet()) {
-        state.uriParameters.computeIfAbsent(parameterName, k -> new ArrayList<>()).add(uriPart);
-        if (traverse(node.parameters.get(parameterName), uriParts, currentIndex + 1, state)) {
-          return true;
-        }
-        state.uriParameters.get(parameterName).remove(uriPart);
-      }
-    }
-
-    // Last, check for actions
-    if (node.actions.containsKey(uriPart)) {
-      String[] remainingURIParts = Arrays.copyOfRange(uriParts, currentIndex + 1, uriParts.length);
-      Node actionNode = node.actions.get(uriPart);
-      if (canHandle(actionNode.actionConfiguration, remainingURIParts, state)) {
-        state.actionConfiguration = actionNode.actionConfiguration;
-        return true;
-      }
-    }
-
-    return false;
-  }
-
   /**
    * Determines if the action configuration can handle the given URI parts. MVCConfiguration objects provide additional
    * handling for URI parameters and other cases and this method uses the full incoming URI to determine if the
@@ -177,7 +129,8 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
    * @param remainingURIParts   The remaining URI parts after the traversal in the lookup method.
    * @return True if this configuration can handle the URI, false if not.
    */
-  protected boolean canHandle(ActionConfiguration actionConfiguration, String[] remainingURIParts, TraversalState state) {
+  protected boolean canHandle(ActionConfiguration actionConfiguration, String[] remainingURIParts,
+                              TraversalState state) {
     Map<String, List<String>> uriParameters = new HashMap<>();
     for (int i = 0; i < remainingURIParts.length; i++) {
       String uriPart = remainingURIParts[i];
@@ -252,13 +205,78 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
   }
 
   /**
+   * Traverses the Tree and attempts to locate an Action node.
+   *
+   * @param node         The current node.
+   * @param uriParts     The URI parts (all of them).
+   * @param currentIndex The current node index (in the URI parts)
+   * @param state        The state of the traversal.
+   * @return True if we found an action node, false if not.
+   */
+  protected boolean traverse(Node node, String[] uriParts, int currentIndex, TraversalState state) {
+    // Exit condition
+    if (currentIndex == uriParts.length) {
+      return false;
+    }
+
+    // First, recurse on package names
+    String uriPart = uriParts[currentIndex];
+    if (node.packages.containsKey(uriPart)) {
+      if (traverse(node.packages.get(uriPart), uriParts, currentIndex + 1, state)) {
+        return true;
+      }
+    }
+
+    // Second, recurse on parameters
+    if (node.parameters.size() > 0) {
+      for (String parameterName : node.parameters.keySet()) {
+        state.uriParameters.computeIfAbsent(parameterName, k -> new ArrayList<>()).add(uriPart);
+        if (traverse(node.parameters.get(parameterName), uriParts, currentIndex + 1, state)) {
+          return true;
+        }
+        state.uriParameters.get(parameterName).remove(uriPart);
+      }
+    }
+
+    // Last, check for actions
+    if (node.actions.containsKey(uriPart)) {
+      String[] remainingURIParts = Arrays.copyOfRange(uriParts, currentIndex + 1, uriParts.length);
+      Node actionNode = node.actions.get(uriPart);
+      if (canHandle(actionNode.actionConfiguration, remainingURIParts, state)) {
+        state.actionConfiguration = actionNode.actionConfiguration;
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Return true if the {@code actionClass} is loaded by {@code classLoader} or one of it's descendant {@link
+   * ClassLoader}
+   *
+   * @param classLoader the ClassLoader
+   * @param actionClass the Class to test
+   * @return true if actionClass was loaded by classLoader or one one of its children
+   */
+  private boolean inClassLoaderOrParentClassLoader(ClassLoader classLoader, Class<?> actionClass) {
+    ClassLoader actionClassClassLoader = actionClass.getClassLoader();
+    while (actionClassClassLoader != null) {
+      if (classLoader.equals(actionClassClassLoader)) {
+        return true;
+      }
+      actionClassClassLoader = actionClassClassLoader.getParent();
+    }
+    return false;
+  }
+
+  /**
    * Process prefix parameters.
    * <p>
-   * Process an action that has defined a prefix parameter.
-   * Example : /api/application/{id}/oauth-configuration
+   * Process an action that has defined a prefix parameter. Example : /api/application/{id}/oauth-configuration
    * <p>
-   * The {id} parameter will be set on the package node to identify the parameter as coming before the
-   * action name on the URI when the URI is processed later by {@link #lookup(String)}.
+   * The {id} parameter will be set on the package node to identify the parameter as coming before the action name on
+   * the URI when the URI is processed later by {@link #lookup(String)}.
    *
    * @param actionConfiguration The action configuration.
    * @param current             The current node.
@@ -278,24 +296,6 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
   }
 
   /**
-   * Return true if the {@code actionClass} is loaded by {@code classLoader} or one of it's descendant {@link ClassLoader}
-   *
-   * @param classLoader the ClassLoader
-   * @param actionClass the Class to test
-   * @return true if actionClass was loaded by classLoader or one one of its children
-   */
-  private boolean inClassLoaderOrParentClassLoader(ClassLoader classLoader, Class<?> actionClass) {
-    ClassLoader actionClassClassLoader = actionClass.getClassLoader();
-    while (actionClassClassLoader != null) {
-      if (classLoader.equals(actionClassClassLoader)) {
-        return true;
-      }
-      actionClassClassLoader = actionClassClassLoader.getParent();
-    }
-    return false;
-  }
-
-  /**
    * Return the unescaped parameter.
    *
    * @param string The parameter to unescape
@@ -308,13 +308,13 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
   private static class Node {
     public ActionConfiguration actionConfiguration;
 
-    public Map<String, Node> packages = new TreeMap<>();
-
     public Map<String, Node> actions = new TreeMap<>();
 
-    public Map<String, Node> parameters = new TreeMap<>();
+    public Map<String, Node> packages = new TreeMap<>();
 
     public String parameterName;
+
+    public Map<String, Node> parameters = new TreeMap<>();
 
     public Node() {
     }

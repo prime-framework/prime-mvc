@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2018, Inversoft, All Rights Reserved
+ * Copyright (c) 2001-2020, Inversoft, All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,6 @@ import org.objectweb.asm.Opcodes;
 import org.primeframework.mvc.PrimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import static java.util.Arrays.asList;
 
 /**
@@ -56,6 +55,38 @@ import static java.util.Arrays.asList;
  */
 public class ClassClasspathResolver<U> {
   private final Logger logger = LoggerFactory.getLogger(ClassClasspathResolver.class);
+
+  /**
+   * Attempts to load the given file into a ClassReader.
+   *
+   * @param file The file to load.
+   * @return The ClassReader and never null.
+   * @throws IOException If the file doesn't point to a valid class.
+   */
+  public static ClassReader load(File file) throws IOException {
+    try {
+      return new ClassReader(new FileInputStream(file));
+    } catch (IOException e) {
+      throw new IOException("Error parsing class file at [" + file.getAbsolutePath() + "]", e);
+    }
+  }
+
+  /**
+   * Attempts to load the JarEntry into a ClassReader.
+   *
+   * @param jar      The JAR file that the entry is in.
+   * @param jarFile  The JAR file used to get the InputStream to the entry.
+   * @param jarEntry The JAR entry to load.
+   * @return The ClassReader and never null.
+   * @throws IOException If the JarEntry doesn't point to a valid class.
+   */
+  public static ClassReader load(File jar, JarFile jarFile, JarEntry jarEntry) throws IOException {
+    try {
+      return new ClassReader(jarFile.getInputStream(jarEntry));
+    } catch (IOException e) {
+      throw new IOException("Error parsing class file at [" + jar.getAbsolutePath() + "!/" + jarEntry.getName() + "]", e);
+    }
+  }
 
   /**
    * Attempts to discover resources that pass the test.
@@ -76,15 +107,15 @@ public class ClassClasspathResolver<U> {
    * This will find directories com/example/foo and com/example/bar
    * </pre>
    *
-   * @param test       The test implementation to determine matching resources.
-   * @param recursive  If true, this will recurse into sub-directories. If false, this will only look in the directories
-   *                   given.
-   * @param locators   A list of directory locators that are used to locate directories to find resources in.
+   * @param test      The test implementation to determine matching resources.
+   * @param recursive If true, this will recurse into sub-directories. If false, this will only look in the directories
+   *                  given.
+   * @param locators  A list of directory locators that are used to locate directories to find resources in.
    * @return The matching set.
    * @throws IOException If there was any errors while inspecting the classpath.
    */
   public Set<Class<U>> findByLocators(Test<Class<U>> test, boolean recursive, String... locators)
-    throws IOException {
+      throws IOException {
     if (locators == null) {
       return null;
     }
@@ -125,25 +156,6 @@ public class ClassClasspathResolver<U> {
     return directories;
   }
 
-  /**
-   * This provides a safe mechanism for listing all of the files in a directory. The listFiles method can return null
-   * and cause major issues. This performs that method in a null safe manner.
-   *
-   *
-   * @param dir    The directory to list the files for.
-   * @param filter An optional FileFilter.
-   * @return A List of Files, which is never null.
-   */
-  private List<File> safeListFiles(File dir, FileFilter filter) {
-    File[] files = dir.listFiles(filter);
-
-    if (files == null) {
-      return Collections.emptyList();
-    }
-
-    return asList(files);
-  }
-
   private Collection<Class<U>> loadFromDirectory(File dir, Test<Class<U>> test, boolean recursive) throws IOException {
     Set<Class<U>> matches = new HashSet<>();
 
@@ -165,8 +177,9 @@ public class ClassClasspathResolver<U> {
     return matches;
   }
 
-  private Collection<Class<U>> loadFromJar(File f, Test<Class<U>> test, boolean recursive, Iterable<String> locators, boolean embeddable)
-    throws IOException {
+  private Collection<Class<U>> loadFromJar(File f, Test<Class<U>> test, boolean recursive, Iterable<String> locators,
+                                           boolean embeddable)
+      throws IOException {
     Set<Class<U>> matches = new HashSet<>();
 
     JarFile jarFile;
@@ -213,6 +226,24 @@ public class ClassClasspathResolver<U> {
   }
 
   /**
+   * This provides a safe mechanism for listing all of the files in a directory. The listFiles method can return null
+   * and cause major issues. This performs that method in a null safe manner.
+   *
+   * @param dir    The directory to list the files for.
+   * @param filter An optional FileFilter.
+   * @return A List of Files, which is never null.
+   */
+  private List<File> safeListFiles(File dir, FileFilter filter) {
+    File[] files = dir.listFiles(filter);
+
+    if (files == null) {
+      return Collections.emptyList();
+    }
+
+    return asList(files);
+  }
+
+  /**
    * This is the testing interface that produces a testable object, given a file or JAR entry.
    */
   public interface Test<T> {
@@ -237,34 +268,77 @@ public class ClassClasspathResolver<U> {
   }
 
   /**
-   * Attempts to load the given file into a ClassReader.
-   *
-   * @param file The file to load.
-   * @return The ClassReader and never null.
-   * @throws IOException If the file doesn't point to a valid class.
+   * A Test that checks to see if each class is annotated with any of a number of annotations. If it is, then the test
+   * returns true, otherwise false.
    */
-  public static ClassReader load(File file) throws IOException {
-    try {
-      return new ClassReader(new FileInputStream(file));
-    } catch (IOException e) {
-      throw new IOException("Error parsing class file at [" + file.getAbsolutePath() + "]", e);
-    }
-  }
+  public static class AnnotatedWith<T extends Annotation, U> implements Test<Class<U>> {
+    private final Class<T> annotation;
 
-  /**
-   * Attempts to load the JarEntry into a ClassReader.
-   *
-   * @param jar      The JAR file that the entry is in.
-   * @param jarFile  The JAR file used to get the InputStream to the entry.
-   * @param jarEntry The JAR entry to load.
-   * @return The ClassReader and never null.
-   * @throws IOException If the JarEntry doesn't point to a valid class.
-   */
-  public static ClassReader load(File jar, JarFile jarFile, JarEntry jarEntry) throws IOException {
-    try {
-      return new ClassReader(jarFile.getInputStream(jarEntry));
-    } catch (IOException e) {
-      throw new IOException("Error parsing class file at [" + jar.getAbsolutePath() + "!/" + jarEntry.getName() + "]", e);
+    public AnnotatedWith(Class<T> annotation) {
+      this.annotation = annotation;
+    }
+
+    public Testable<Class<U>> prepare(File file) throws IOException {
+      if (!file.getName().endsWith(".class")) {
+        return null;
+      }
+      return new AnnotatedWithTestable<>(annotation, load(file));
+    }
+
+    public Testable<Class<U>> prepare(File jar, JarFile jarFile, JarEntry jarEntry) throws IOException {
+      if (!jarEntry.getName().endsWith(".class")) {
+        return null;
+      }
+      return new AnnotatedWithTestable<>(annotation, load(jar, jarFile, jarEntry));
+    }
+
+    private static class AnnotatedWithTestable<T extends Annotation, U> implements Testable<Class<U>> {
+      private final ClassReader classReader;
+
+      private AnnotatedWithClassVisitor<T> visitor;
+
+      public AnnotatedWithTestable(Class<T> annotation, ClassReader classReader) {
+        this.visitor = new AnnotatedWithClassVisitor<>(annotation);
+        this.classReader = classReader;
+      }
+
+      public boolean passes() {
+        classReader.accept(visitor, ClassReader.SKIP_CODE);
+        return visitor.isPasses();
+      }
+
+      @SuppressWarnings("unchecked")
+      public Class<U> result() {
+        try {
+          return (Class<U>) Thread.currentThread().getContextClassLoader().loadClass(classReader.getClassName().replace('/', '.'));
+        } catch (ClassNotFoundException e) {
+          throw new PrimeException(e);
+        }
+      }
+
+      private static class AnnotatedWithClassVisitor<T extends Annotation> extends ClassVisitor {
+        private final Class<T> annotation;
+
+        private boolean passes;
+
+        private AnnotatedWithClassVisitor(Class<T> annotation) {
+          super(Opcodes.ASM4);
+          this.annotation = annotation;
+        }
+
+        public boolean isPasses() {
+          return passes;
+        }
+
+        @Override
+        public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
+          desc = desc.replaceAll("^L|;$", "");
+          desc = desc.replace('/', '.');
+
+          passes |= desc.equals(annotation.getName());
+          return null;
+        }
+      }
     }
   }
 
@@ -295,6 +369,7 @@ public class ClassClasspathResolver<U> {
 
     private static class IsATestable<U> implements Testable<Class<U>> {
       private final ClassReader classReader;
+
       private IsAClassVisitor<U> visitor;
 
       public IsATestable(Class<U> parent, ClassReader classReader) {
@@ -318,6 +393,7 @@ public class ClassClasspathResolver<U> {
 
       private static class IsAClassVisitor<U> extends ClassVisitor {
         private final Class<U> parent;
+
         private boolean passes;
 
         private IsAClassVisitor(Class<U> parent) {
@@ -325,8 +401,13 @@ public class ClassClasspathResolver<U> {
           this.parent = parent;
         }
 
+        public boolean isPasses() {
+          return passes;
+        }
+
         @Override
-        public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
+        public void visit(int version, int access, String name, String signature, String superName,
+                          String[] interfaces) {
           String parentInternalName = parent.getName().replace('.', '/');
           passes = superName.equals(parentInternalName);
           if (passes) {
@@ -371,83 +452,6 @@ public class ClassClasspathResolver<U> {
               return;
             }
           }
-        }
-
-        public boolean isPasses() {
-          return passes;
-        }
-      }
-    }
-  }
-
-  /**
-   * A Test that checks to see if each class is annotated with any of a number of annotations. If it is, then the test
-   * returns true, otherwise false.
-   */
-  public static class AnnotatedWith<T extends Annotation, U> implements Test<Class<U>> {
-    private final Class<T> annotation;
-
-    public AnnotatedWith(Class<T> annotation) {
-      this.annotation = annotation;
-    }
-
-    public Testable<Class<U>> prepare(File file) throws IOException {
-      if (!file.getName().endsWith(".class")) {
-        return null;
-      }
-      return new AnnotatedWithTestable<>(annotation, load(file));
-    }
-
-    public Testable<Class<U>> prepare(File jar, JarFile jarFile, JarEntry jarEntry) throws IOException {
-      if (!jarEntry.getName().endsWith(".class")) {
-        return null;
-      }
-      return new AnnotatedWithTestable<>(annotation, load(jar, jarFile, jarEntry));
-    }
-
-    private static class AnnotatedWithTestable<T extends Annotation, U> implements Testable<Class<U>> {
-      private final ClassReader classReader;
-      private AnnotatedWithClassVisitor<T> visitor;
-
-      public AnnotatedWithTestable(Class<T> annotation, ClassReader classReader) {
-        this.visitor = new AnnotatedWithClassVisitor<T>(annotation);
-        this.classReader = classReader;
-      }
-
-      public boolean passes() {
-        classReader.accept(visitor, ClassReader.SKIP_CODE);
-        return visitor.isPasses();
-      }
-
-      @SuppressWarnings("unchecked")
-      public Class<U> result() {
-        try {
-          return (Class<U>) Thread.currentThread().getContextClassLoader().loadClass(classReader.getClassName().replace('/', '.'));
-        } catch (ClassNotFoundException e) {
-          throw new PrimeException(e);
-        }
-      }
-
-      private static class AnnotatedWithClassVisitor<T extends Annotation> extends ClassVisitor {
-        private final Class<T> annotation;
-        private boolean passes;
-
-        private AnnotatedWithClassVisitor(Class<T> annotation) {
-          super(Opcodes.ASM4);
-          this.annotation = annotation;
-        }
-
-        @Override
-        public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
-          desc = desc.replaceAll("^L|;$", "");
-          desc = desc.replace('/', '.');
-
-          passes |= desc.equals(annotation.getName());
-          return null;
-        }
-
-        public boolean isPasses() {
-          return passes;
         }
       }
     }
