@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2018, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2020, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,11 @@ public interface MVCConfiguration {
    * @return Whether or not unknown parameters should be allowed or if they should throw an exception.
    */
   boolean allowUnknownParameters();
+
+  /**
+   * @return Whether or not auto HTML escaping will be enabled for all templates.
+   */
+  boolean autoHTMLEscapingEnabled();
 
   /**
    * @return The IV that is used to encrypt cookies.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2019, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2020, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.primeframework.mvc.freemarker.guice;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import freemarker.cache.TemplateLoader;
+import freemarker.core.HTMLOutputFormat;
 import freemarker.core.TemplateClassResolver;
 import freemarker.ext.beans.BeansWrapperBuilder;
 import freemarker.template.Configuration;
@@ -55,6 +56,10 @@ public class FreeMarkerConfigurationProvider implements Provider<Configuration> 
     config.setNumberFormat("computer");
 
     // Security settings
+    // Use html output format by default so that we always auto escape (unless explicitly told not to by each template)
+    if (configuration.autoHTMLEscapingEnabled()) {
+      config.setOutputFormat(HTMLOutputFormat.INSTANCE);
+    }
 
     // 'UNRESTRICTED_RESOLVER' is the default at 2.3.x (Fail!), starting in 2.4 it will be SAFER_RESOLVER, set to Allow Nothing!
     config.setNewBuiltinClassResolver(TemplateClassResolver.ALLOWS_NOTHING_RESOLVER);

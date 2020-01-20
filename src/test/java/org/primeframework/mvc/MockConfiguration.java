@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2020, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,8 @@ import org.primeframework.mvc.config.AbstractMVCConfiguration;
  */
 public class MockConfiguration extends AbstractMVCConfiguration {
   public boolean allowUnknownParameters;
+
+  public boolean autoHTMLEscapingEnabled = true;
 
   public AlgorithmParameterSpec cookieEncryptionIV;
 
@@ -70,6 +72,11 @@ public class MockConfiguration extends AbstractMVCConfiguration {
   @Override
   public boolean allowUnknownParameters() {
     return allowUnknownParameters;
+  }
+
+  @Override
+  public boolean autoHTMLEscapingEnabled() {
+    return autoHTMLEscapingEnabled;
   }
 
   @Override

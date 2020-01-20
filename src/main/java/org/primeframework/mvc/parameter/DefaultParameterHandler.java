@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2019, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2014-2020, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -221,10 +221,10 @@ public class DefaultParameterHandler implements ParameterHandler {
     } catch (MissingMessageException mme) {
       // Retry if the message key is using a bracketed syntax for a map or an array
       // For example: foo['bar'] or foo[0]
-      String[] parts = key.split("(?:\\['.+?'])|(?:\\[[0-9]+])");
-      if (!parts[0].equals(key)) {
+      String part = key.replaceAll("\\[.+?]$", "");
+      if (!part.equals(key)) {
         try {
-          String modifiedCode = "[couldNotConvert]" + parts[0] + "[]";
+          String modifiedCode = "[couldNotConvert]" + part + "[]";
           String message = messageProvider.getMessage(modifiedCode, (Object[]) new ArrayBuilder<>(String.class, key).addAll(struct.values).done());
           messageStore.add(new SimpleFieldMessage(MessageType.ERROR, key, modifiedCode, message));
           return;

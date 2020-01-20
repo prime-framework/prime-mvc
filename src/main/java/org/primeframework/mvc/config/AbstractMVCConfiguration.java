@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2018, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2020, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,8 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
 
   public static final String[] STATIC_PREFIXES = new String[]{"/static"};
 
+  public boolean autoHTMLEscapingEnabled = true;
+
   public boolean csrfEnabled = false;
 
   public boolean emptyParametersAreNull = true;
@@ -68,6 +70,11 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
   public boolean staticResourcesEnabled = true;
 
   public List<Class<? extends Annotation>> unwrapAnnotations = Collections.singletonList(FieldUnwrapped.class);
+
+  @Override
+  public boolean autoHTMLEscapingEnabled() {
+    return autoHTMLEscapingEnabled;
+  }
 
   @Override
   public boolean csrfEnabled() {

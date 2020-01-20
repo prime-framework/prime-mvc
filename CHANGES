@@ -1,5 +1,11 @@
 Prime MVC Changes
 
+Changes in 1.19.0
+
+ * Enable auto HTML escaping by default, this can be disabled by setting autoHTMLEscapingEnabled in the MVC Configuration.
+   Note that if you disable this feature you will need to account for the default prime control templates to ensure
+   they are properly escaping HTML characters.
+
 Changes in 1.18.5
 
  * By default in RequestResult.assertContainsFieldErrors all field errors will have to be accounted for.

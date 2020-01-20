@@ -2,7 +2,7 @@
 [#import "_macros.ftl" as macros/]
 [@macros.dynamic_attributes attrs=dynamicAttributes name=attributes['name']/]
 [#if actionURI??]
-<input type="hidden" name="__a_${attributes['name']}" value="${actionURI?html}"/>
+<input type="hidden" name="__a_${attributes['name']}" value="${actionURI}"/>
 [/#if]
 <div class="[@macros.class attrs=attributes name="image-button" input=false/]">
 <div class="label-container"> </div>

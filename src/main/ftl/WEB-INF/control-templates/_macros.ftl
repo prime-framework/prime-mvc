@@ -7,20 +7,20 @@
 [#macro append_attributes attributes excludes]
   [#list attributes?keys as key]
     [#if !excludes?seq_contains(key)]
- ${key?html}="${attributes(key)?string?html}"[#rt/]
+ ${key}="${attributes(key)?string}"[#rt/]
     [/#if]
   [/#list]
 [/#macro]
 
 [#macro dynamic_attributes attrs name]
   [#list attrs?keys as key]
-<input type="hidden" name="${name?html}@${key?html}" value="${attrs[key]?html}"/>
+<input type="hidden" name="${name}@${key}" value="${attrs[key]}"/>
   [/#list]
 [/#macro]
 
 [#macro label text fieldMessages required=false]
   [#assign hasFieldErrors = fieldMessages?size > 0/]
-  <label for="${attributes['id']?html}" class="label">[#t/]
+  <label for="${attributes['id']}" class="label">[#t/]
     [#if hasFieldErrors]<span class="error">[/#if][#t/]
     ${text}[#t/]
     [#if hasFieldErrors] ([#list fieldMessages as message]${message?string}[#if message_has_next], [/#if][/#list])[/#if][#t/]

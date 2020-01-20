@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2014, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2020, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,11 @@
  */
 package org.primeframework.mvc.control.form;
 
+import com.google.inject.Inject;
+import freemarker.core.TemplateHTMLOutputModel;
 import org.primeframework.mvc.control.annotation.ControlAttribute;
 import org.primeframework.mvc.control.annotation.ControlAttributes;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-
-import com.google.inject.Inject;
 
 /**
  * This class is the control for a input type=text.
@@ -27,19 +27,19 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 @ControlAttributes(
-  required = {
-    @ControlAttribute(name = "name")
-  },
-  optional = {
-    @ControlAttribute(name = "disabled", types = {boolean.class, Boolean.class}),
-    @ControlAttribute(name = "maxlength", types = {int.class, Number.class}),
-    @ControlAttribute(name = "readonly", types = {boolean.class, Boolean.class}),
-    @ControlAttribute(name = "required", types = {boolean.class, Boolean.class}),
-    @ControlAttribute(name = "size", types = {int.class, Number.class}),
-    @ControlAttribute(name = "tabindex", types = {int.class, Number.class}),
-    @ControlAttribute(name = "autocomplete", types = {String.class}),
-    @ControlAttribute(name = "placeholder", types = {String.class})
-  }
+    required = {
+        @ControlAttribute(name = "name")
+    },
+    optional = {
+        @ControlAttribute(name = "disabled", types = {boolean.class, Boolean.class}),
+        @ControlAttribute(name = "maxlength", types = {int.class, Number.class}),
+        @ControlAttribute(name = "readonly", types = {boolean.class, Boolean.class}),
+        @ControlAttribute(name = "required", types = {boolean.class, Boolean.class}),
+        @ControlAttribute(name = "size", types = {int.class, Number.class}),
+        @ControlAttribute(name = "tabindex", types = {int.class, Number.class}),
+        @ControlAttribute(name = "autocomplete", types = {String.class}),
+        @ControlAttribute(name = "placeholder", types = {String.class, TemplateHTMLOutputModel.class})
+    }
 )
 public class Text extends AbstractValueInput {
   @Inject

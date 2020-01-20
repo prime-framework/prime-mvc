@@ -6,9 +6,9 @@
 <div class="control-container">
 [#list options?keys as key]
 <div class="control-item-container">
-<input type="radio"[#if options[key].selected] checked="checked"[/#if] value="${key?html}"[@macros.append_attributes attributes=attributes excludes=['id']/]/><span class="radio-text">${options[key].text}</span>
+<input type="radio"[#if options[key].selected] checked="checked"[/#if] value="${key}"[@macros.append_attributes attributes=attributes excludes=['id']/]/><span class="radio-text">${options[key].text}</span>
 </div>
 [/#list]
 </div>
 </div>
-<input type="hidden" name="__rb_${attributes['name']?html}" value="${uncheckedValue?html}"/>
+<input type="hidden" name="__rb_${attributes['name']}" value="${uncheckedValue}"/>

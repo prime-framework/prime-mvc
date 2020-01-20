@@ -6,7 +6,7 @@
 <div class="control-container">
 <select[@macros.append_attributes attributes=attributes excludes=[]/]>
 [#list options?keys as key]
-<option value="${key?html}"[#if options[key].selected] selected="selected"[/#if]>${options[key].text}</option>
+<option value="${key}"[#if options[key].selected] selected="selected"[/#if]>${options[key].text}</option>
 [/#list]
 </select>
 </div>

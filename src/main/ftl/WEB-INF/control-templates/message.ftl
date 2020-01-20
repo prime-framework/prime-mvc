@@ -1,1 +1,1 @@
-${attributes['message']}
+[#noautoesc]${attributes['message']}[/#noautoesc]

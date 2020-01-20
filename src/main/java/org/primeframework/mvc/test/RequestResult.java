@@ -237,6 +237,33 @@ public class RequestResult {
   }
 
   /**
+   * Verifies that the body contains the messages (escaped) from the given key and optionally provided replacement
+   * values. This uses the MessageProvider for the current test URI and the given keys to look up the messages.
+   *
+   * @param key    The key.
+   * @param values The replacement values.
+   * @return This.
+   */
+  public RequestResult assertBodyContainsEscapedMessagesFromKey(String key, Object... values) {
+    return _assertBodyContainsMessagesFromKey(true, key, true, values);
+  }
+
+  /**
+   * Verifies that the body contains the messages (escaped) from the given keys. This uses the MessageProvider for the
+   * current test URI and the given keys to look up the messages.
+   *
+   * @param keys The keys.
+   * @return This.
+   */
+  public RequestResult assertBodyContainsEscapedMessagesFromKeys(String... keys) {
+    for (String key : keys) {
+      assertBodyContainsEscapedMessagesFromKey(key, "foo", "bar", "baz");
+    }
+
+    return this;
+  }
+
+  /**
    * Verifies that the body contains the messages from the given key and optionally provided replacement values. This
    * uses the MessageProvider for the current test URI and the given keys to look up the messages.
    *
@@ -245,7 +272,7 @@ public class RequestResult {
    * @return This.
    */
   public RequestResult assertBodyContainsMessagesFromKey(String key, Object... values) {
-    return _assertBodyContainsMessagesFromKey(true, key, values);
+    return _assertBodyContainsMessagesFromKey(true, key, false, values);
   }
 
   /**
@@ -288,7 +315,7 @@ public class RequestResult {
    * @return This.
    */
   public RequestResult assertBodyDoesNotContainMessagesFromKey(String key, Object... values) {
-    return _assertBodyContainsMessagesFromKey(false, key, values);
+    return _assertBodyContainsMessagesFromKey(false, key, false, values);
   }
 
   /**
@@ -1169,7 +1196,8 @@ public class RequestResult {
     return this;
   }
 
-  private RequestResult _assertBodyContainsMessagesFromKey(boolean contains, String key, Object... values) {
+  private RequestResult _assertBodyContainsMessagesFromKey(boolean contains, String key, boolean escaped,
+                                                           Object... values) {
     MessageProvider messageProvider = get(MessageProvider.class);
     ActionInvocationStore actionInvocationStore = get(ActionInvocationStore.class);
     ActionMapper actionMapper = get(ActionMapper.class);
@@ -1179,6 +1207,15 @@ public class RequestResult {
     actionInvocationStore.setCurrent(actionInvocation);
 
     String message = messageProvider.getMessage(key, values);
+
+    // TODO
+    // Should we be escaping everything that FreeMarker does? We could also just build a small template
+    // and render it to allow FreeMarker to escape it like we do with BodyTools
+    if (escaped) {
+      message = message.replaceAll("\"", "&quot;")
+                       .replaceAll("'", "&#39;");
+    }
+
     if (contains != body.contains(message)) {
       String text = contains ? "didn't" : "does";
       throw new AssertionError("Body " + text + " contain [" + message + "] for the key [" + key + "]\nRedirect: [" + redirect + "]\nBody:\n" + body);

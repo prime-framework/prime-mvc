@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2020, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.primeframework.mvc.control.form;
 
+import com.google.inject.Inject;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.example.action.user.EditAction;
@@ -27,8 +28,6 @@ import org.primeframework.mvc.control.ControlBaseTest;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.testng.annotations.Test;
-
-import com.google.inject.Inject;
 import static java.util.Arrays.asList;
 import static org.primeframework.mvc.util.MapBuilder.lmap;
 import static org.testng.Assert.assertTrue;
@@ -206,7 +205,7 @@ public class SelectTest extends ControlBaseTest {
             "<div class=\"label-container\"><label for=\"user_addresses[&#39;work&#39;]_country\" class=\"label\">Country</label></div>\n" +
             "<div class=\"control-container\">\n" +
             "<select id=\"user_addresses[&#39;work&#39;]_country\" name=\"user.addresses[&#39;work&#39;].country\">\n" +
-            "<option value=\"&lt;US&gt;\" selected=\"selected\"><United States></option>\n" +
+            "<option value=\"&lt;US&gt;\" selected=\"selected\">&lt;United States&gt;</option>\n" +
             "<option value=\"DE\">Germany</option>\n" +
             "</select>\n" +
             "</div>\n" +

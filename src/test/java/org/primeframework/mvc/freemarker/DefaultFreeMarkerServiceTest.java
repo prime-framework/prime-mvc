@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2020, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,7 @@ public class DefaultFreeMarkerServiceTest {
   public void locale() {
     MVCConfiguration config = EasyMock.createStrictMock(MVCConfiguration.class);
     EasyMock.expect(config.templateCheckSeconds()).andReturn(2);
+    EasyMock.expect(config.autoHTMLEscapingEnabled()).andReturn(true);
     EasyMock.replay(config);
 
     ContainerResolver containerResolver = EasyMock.createStrictMock(ContainerResolver.class);
@@ -64,6 +65,7 @@ public class DefaultFreeMarkerServiceTest {
   public void objectWrapper() {
     MVCConfiguration config = EasyMock.createStrictMock(MVCConfiguration.class);
     EasyMock.expect(config.templateCheckSeconds()).andReturn(2);
+    EasyMock.expect(config.autoHTMLEscapingEnabled()).andReturn(true);
     EasyMock.replay(config);
 
     ContainerResolver containerResolver = EasyMock.createStrictMock(ContainerResolver.class);
@@ -91,6 +93,7 @@ public class DefaultFreeMarkerServiceTest {
   public void use() {
     MVCConfiguration config = EasyMock.createStrictMock(MVCConfiguration.class);
     EasyMock.expect(config.templateCheckSeconds()).andReturn(2);
+    EasyMock.expect(config.autoHTMLEscapingEnabled()).andReturn(true);
     EasyMock.replay(config);
 
     ContainerResolver containerResolver = EasyMock.createStrictMock(ContainerResolver.class);

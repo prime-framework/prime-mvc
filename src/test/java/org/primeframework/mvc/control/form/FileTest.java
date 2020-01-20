@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2020, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,13 @@
  */
 package org.primeframework.mvc.control.form;
 
+import com.google.inject.Inject;
 import org.example.action.user.EditAction;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.control.ControlBaseTest;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.testng.annotations.Test;
-
-import com.google.inject.Inject;
 
 /**
  * This tests the file control.
@@ -69,10 +68,10 @@ public class FileTest extends ControlBaseTest {
     new ControlTester(file).
       attr("name", "user.name").
       go("<input type=\"hidden\" name=\"user.name@param\" value=\"param-value\"/>\n" +
-      "<div class=\"file input control\">\n" +
-      "<div class=\"label-container\"><label for=\"user_name\" class=\"label\"><Name></label></div>\n" +
-      "<div class=\"control-container\"><input type=\"file\" id=\"user_name\" name=\"user.name\"/></div>\n" +
-      "</div>\n");
+          "<div class=\"file input control\">\n" +
+          "<div class=\"label-container\"><label for=\"user_name\" class=\"label\">&lt;Name&gt;</label></div>\n" +
+          "<div class=\"control-container\"><input type=\"file\" id=\"user_name\" name=\"user.name\"/></div>\n" +
+          "</div>\n");
   }
 
   @Test

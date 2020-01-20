@@ -48,6 +48,7 @@ import org.primeframework.mvc.parameter.el.MissingPropertyExpressionException;
 import org.primeframework.mvc.test.RequestSimulator;
 import org.primeframework.mvc.util.URIBuilder;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertSame;
@@ -334,6 +335,56 @@ public class GlobalTest extends PrimeBaseTest {
              .get()
              .assertBodyContains("baz")
              .assertRequestContainsAttribute("bar", "baz");
+  }
+
+  @Test
+  public void get_freemarker_double_escape() {
+    simulator.test("/freemarker/double-escape")
+             .expectException(FreeMarkerRenderException.class)
+             .get();
+  }
+
+  @Test(dataProvider = "get_freemarker_escape_parameters")
+  public void get_freemarker_escape(String mode, boolean shouldBeEscaped) {
+    if (shouldBeEscaped) {
+      // Test from user data
+      simulator.test("/freemarker/escape")
+               .withParameter("mode", mode)
+               .get()
+               .assertStatusCode(200)
+               .assertBodyContains("Output format: HTML",
+                   "Auto-escaping: true",
+                   "Select\u2026",
+                   ",\u0020",
+                   "&lt;p&gt;Are you sure?&lt;/p&gt;",
+                   "Hello, to access your account go to &lt;a href=&quot;https://foo.com&quot;&gt;foo.com&lt;/a&gt;.")
+               .assertBodyDoesNotContain("<p>Are you sure?</p>",
+                   "Hello, to access your account go to <a href=\"https://foo.com\">foo.com</a>.");
+    } else {
+      simulator.test("/freemarker/escape")
+               .withParameter("mode", mode)
+               .get()
+               .assertStatusCode(200)
+               .assertBodyContains("Output format: HTML",
+                   "Auto-escaping: true",
+                   "Select\u2026",
+                   ",\u0020",
+                   "<p>Are you sure?</p>",
+                   "Hello, to access your account go to <a href=\"https://foo.com\">foo.com</a>.")
+               .assertBodyDoesNotContain("&lt;p&gt;Are you sure?&lt;/p&gt;",
+                   "Hello, to access your account go to &lt;a href=&quot;https://foo.com&quot;&gt;foo.com&lt;/a&gt;.");
+    }
+  }
+
+  @DataProvider
+  public Object[][] get_freemarker_escape_parameters() {
+    return new Object[][]{
+        {"message", false}, // We explicitly set the control to not escape anything
+        {"function", true}, // This is a direct function call
+        {"functionUnescaped", false}, // Direct function call wrapped in noautoesc
+        {"directProperties", true}, // This is a direct property access
+        {"indirectProperties", true} // This is an indirect property access using ?eval
+    };
   }
 
   @Test
@@ -866,7 +917,34 @@ public class GlobalTest extends PrimeBaseTest {
                                  .post()
                                  .assertStatusCode(200)
                                  .assertContainsFieldErrors("integerMap2['baz']")
-                                 .assertBodyContains("Value Baz (java.lang.NumberFormatException: For input string: \"bing\""))
+                                 .assertBodyContains("Value Baz (java.lang.NumberFormatException: For input string: &quot;bing&quot;"))
+
+        // Unquoted versions
+
+        .simulate(() -> simulator.test("/could-not-convert")
+                                 .withParameter("integerMap1[foo2]", "bar")
+                                 .post()
+                                 .assertStatusCode(200)
+                                 .assertContainsFieldErrors("integerMap1[foo2]")
+                                 .assertBodyContainsMessagesFromKeys("[couldNotConvert]integerMap1[]"))
+
+        // Could not convert, specific message for this key
+        .simulate(() -> simulator.test("/could-not-convert")
+                                 .withParameter("integerMap1[bar2]", "baz")
+                                 .post()
+                                 .assertStatusCode(200)
+                                 .assertContainsFieldErrors("integerMap1[bar2]")
+                                 .assertBodyContainsMessagesFromKeys("[couldNotConvert]integerMap1[bar2]"))
+
+        // Could not convert, using generic message from Prime
+        .simulate(() -> simulator.test("/could-not-convert")
+                                 .withParameter("integerMap2[baz2]", "bing")
+                                 .post()
+                                 .assertStatusCode(200)
+                                 .assertContainsFieldErrors("integerMap2[baz2]")
+                                 .assertBodyContains("Value Baz (java.lang.NumberFormatException: For input string: &quot;bing&quot;"))
+
+        // Numeric
 
         // Could not convert, no specific message for this index in a list
         .simulate(() -> simulator.test("/could-not-convert")
@@ -890,7 +968,7 @@ public class GlobalTest extends PrimeBaseTest {
                                  .post()
                                  .assertStatusCode(200)
                                  .assertContainsFieldErrors("integerList2[0]")
-                                 .assertBodyContains("List 2 - Int 1 (java.lang.NumberFormatException: For input string: \"bing\""));
+                                 .assertBodyContains("List 2 - Int 1 (java.lang.NumberFormatException: For input string: &quot;bing&quot;"));
   }
 
   @Test
