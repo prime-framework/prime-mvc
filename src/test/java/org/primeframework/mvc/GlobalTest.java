@@ -1195,6 +1195,13 @@ public class GlobalTest extends PrimeBaseTest {
              .assertContainsNoFieldMessages()
              .assertBodyContains("/api/no-action-value/login", "potato:null", "userId:null");
 
+    // All of these will be ignored
+    simulator.test("/api/no-action-value/login/foo/bar/baz")
+             .post()
+             .assertStatusCode(200)
+             .assertContainsNoFieldMessages()
+             .assertBodyContains("/api/no-action-value/login", "potato:null", "userId:null");
+
     // Manually added the 'index' suffix, not expect a URL segment, so it is ignored.
     simulator.test("/api/no-action-value/login/index")
              .post()
