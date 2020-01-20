@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2020, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ public class DefaultActionMapper implements ActionMapper {
    * {@inheritDoc}
    */
   public ActionInvocation map(HTTPMethod httpMethod, String uri, boolean executeResult) {
-    ActionInvocation invocation = actionConfigurationProvider.lookup(uri.endsWith("/") ? uri + "index" : uri);
+    ActionInvocation invocation = actionConfigurationProvider.lookup(uri);
     if (invocation.configuration == null && !uri.endsWith("/")) {
       // Do an index check but if it doesn't return a valid invocation, then return the original one from above.
       ActionInvocation indexInvocation = actionConfigurationProvider.lookup(uri + "/index");

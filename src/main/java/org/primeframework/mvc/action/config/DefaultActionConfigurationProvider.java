@@ -105,10 +105,14 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
       uri = uri.substring(0, uri.length() - extension.length() - 1);
     }
 
+    // When ending in a slash, add 'index' to see if that helps us match an Index action.
+    String augmentedURI = uri.endsWith("/") ? uri + "index" : uri;
+
     ActionInvocation invocation = new ActionInvocation(null, null, uri, extension, null);
-    String[] uriParts = uri.substring(1).split("/");
+    String[] augmentedURIParts = augmentedURI.substring(1).split("/");
+    String[] actualURIParts = uri.substring(1).split("/");
     TraversalState state = new TraversalState();
-    boolean result = traverse(root, uriParts, 0, state);
+    boolean result = traverse(root, actualURIParts, augmentedURIParts, 0, state);
     if (result) {
       invocation.actionURI = state.actionConfiguration.uri;
       invocation.configuration = state.actionConfiguration;
@@ -207,22 +211,24 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
   /**
    * Traverses the Tree and attempts to locate an Action node.
    *
-   * @param node         The current node.
-   * @param uriParts     The URI parts (all of them).
-   * @param currentIndex The current node index (in the URI parts)
-   * @param state        The state of the traversal.
+   * @param node              The current node.
+   * @param actualURIParts    The URI parts (all of them) from the original request URI.
+   * @param augmentedURIParts The URI parts (all of them) with an optionally added 'index' URI part.
+   * @param currentIndex      The current node index (in the URI parts)
+   * @param state             The state of the traversal.
    * @return True if we found an action node, false if not.
    */
-  protected boolean traverse(Node node, String[] uriParts, int currentIndex, TraversalState state) {
+  protected boolean traverse(Node node, String[] actualURIParts, String[] augmentedURIParts, int currentIndex,
+                             TraversalState state) {
     // Exit condition
-    if (currentIndex == uriParts.length) {
+    if (currentIndex == augmentedURIParts.length) {
       return false;
     }
 
     // First, recurse on package names
-    String uriPart = uriParts[currentIndex];
+    String uriPart = augmentedURIParts[currentIndex];
     if (node.packages.containsKey(uriPart)) {
-      if (traverse(node.packages.get(uriPart), uriParts, currentIndex + 1, state)) {
+      if (traverse(node.packages.get(uriPart), actualURIParts, augmentedURIParts, currentIndex + 1, state)) {
         return true;
       }
     }
@@ -231,7 +237,7 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
     if (node.parameters.size() > 0) {
       for (String parameterName : node.parameters.keySet()) {
         state.uriParameters.computeIfAbsent(parameterName, k -> new ArrayList<>()).add(uriPart);
-        if (traverse(node.parameters.get(parameterName), uriParts, currentIndex + 1, state)) {
+        if (traverse(node.parameters.get(parameterName), actualURIParts, augmentedURIParts, currentIndex + 1, state)) {
           return true;
         }
         state.uriParameters.get(parameterName).remove(uriPart);
@@ -240,7 +246,7 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
 
     // Last, check for actions
     if (node.actions.containsKey(uriPart)) {
-      String[] remainingURIParts = Arrays.copyOfRange(uriParts, currentIndex + 1, uriParts.length);
+      String[] remainingURIParts = actualURIParts.length <= 1 ? new String[]{} : Arrays.copyOfRange(actualURIParts, currentIndex + 1, actualURIParts.length);
       Node actionNode = node.actions.get(uriPart);
       if (canHandle(actionNode.actionConfiguration, remainingURIParts, state)) {
         state.actionConfiguration = actionNode.actionConfiguration;

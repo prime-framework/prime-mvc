@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2019, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2020, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.UUID;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.Timer;
@@ -46,6 +47,7 @@ import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.parameter.el.MissingPropertyExpressionException;
 import org.primeframework.mvc.test.RequestSimulator;
 import org.primeframework.mvc.util.URIBuilder;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertSame;
@@ -56,11 +58,18 @@ import static org.testng.Assert.assertSame;
  * @author Brian Pontarelli
  */
 public class GlobalTest extends PrimeBaseTest {
+  private Path jsonDir;
+
+  @BeforeClass
+  public void beforeClass() {
+    jsonDir = Paths.get("src/test/resources/json");
+  }
+
   @Test
   public void embeddedFormHandling() throws Exception {
     // Ensure this 'required' parameter for PageOne does not mess up PageTwo which does not have an Id field.
     test.simulate(() -> simulator.test("/scope/page-one")
-                                 .withUrlSegment("IdOnlyForPageOne")
+                                 .withURLSegment("IdOnlyForPageOne")
                                  .get()
                                  .assertStatusCode(200));
 
@@ -75,10 +84,10 @@ public class GlobalTest extends PrimeBaseTest {
   @Test
   public void escapePathSegmentsWithWildCard() throws Exception {
     test.simulate(() -> test.simulator.test("/escaped-path-segments")
-                                      .withUrlSegment("foo%20bar")
-                                      .withUrlSegment("foobar")
-                                      .withUrlSegment("foo%20bar")
-                                      .withUrlSegment("foo@bar")
+                                      .withURLSegment("foo%20bar")
+                                      .withURLSegment("foobar")
+                                      .withURLSegment("foo%20bar")
+                                      .withURLSegment("foo@bar")
                                       .get()
                                       .assertStatusCode(200)
                                       .assertBodyContains("Success!", "parm=foo bar", "theRest=foobar,foo bar,foo@bar"));
@@ -102,12 +111,12 @@ public class GlobalTest extends PrimeBaseTest {
     test.simulate(() -> simulator.test("/views/entry/api")
                                  .get()
                                  .assertStatusCode(200)
-                                 .assertJSONFile(Paths.get("src/test/resources/json/views/entry/entry-api.json")));
+                                 .assertJSONFile(jsonDir.resolve("views/entry/entry-api.json")));
 
     test.simulate(() -> simulator.test("/views/entry/export")
                                  .get()
                                  .assertStatusCode(200)
-                                 .assertJSONFile(Paths.get("src/test/resources/json/views/entry/entry-export.json")));
+                                 .assertJSONFile(jsonDir.resolve("views/entry/entry-export.json")));
 
     // Serialize an object using @JSONResponse when no view is specified for an object that has only annotated fields
     // The DEFAULT_VIEW_INCLUSION is the default value, but explicitly configured in case the default prime configuration changes
@@ -115,7 +124,7 @@ public class GlobalTest extends PrimeBaseTest {
         .simulate(() -> simulator.test("/views/entry/no-view-defined")
                                  .get()
                                  .assertStatusCode(200)
-                                 .assertJSONFile(Paths.get("src/test/resources/json/views/entry/entry-no-view-defined.json")));
+                                 .assertJSONFile(jsonDir.resolve("views/entry/entry-no-view-defined.json")));
 
     // Default view inclusion is enabled and if we serialize a @JSONResponse with a view that has no fields in the object - empty response
     test.simulate(() -> simulator.test("/views/entry/wrong-view-defined")
@@ -128,7 +137,7 @@ public class GlobalTest extends PrimeBaseTest {
         .simulate(() -> simulator.test("/views/entry/no-view-defined")
                                  .get()
                                  .assertStatusCode(200)
-                                 .assertJSONFile(Paths.get("src/test/resources/json/views/entry/entry-no-view-defined.json")));
+                                 .assertJSONFile(jsonDir.resolve("views/entry/entry-no-view-defined.json")));
 
     // Default view inclusion is disabled and if we serialize a @JSONResponse with a view that has no fields in the object - empty response.
     test.simulate(() -> simulator.test("/views/entry/wrong-view-defined")
@@ -140,7 +149,7 @@ public class GlobalTest extends PrimeBaseTest {
   @Test
   public void get_action_package_collision() throws Exception {
     test.simulate(() -> test.simulator.test("/foo/view/bar/baz")
-                                      .withUrlSegment("42")
+                                      .withURLSegment("42")
                                       .get()
                                       .assertStatusCode(200)
                                       .assertBodyContains("/foo/view/bar/baz!", "42"))
@@ -151,7 +160,7 @@ public class GlobalTest extends PrimeBaseTest {
                                       .assertBodyContains("/foo/view/bar/baz!", "empty"))
 
         .simulate(() -> test.simulator.test("/foo/view/bar")
-                                      .withUrlSegment("42")
+                                      .withURLSegment("42")
                                       .get()
                                       .assertStatusCode(200)
                                       .assertBodyContains("/foo/view/bar!", "42"))
@@ -162,7 +171,7 @@ public class GlobalTest extends PrimeBaseTest {
                                       .assertBodyContains("/foo/view/bar!", "empty"))
 
         .simulate(() -> test.simulator.test("/foo/view")
-                                      .withUrlSegment("42")
+                                      .withURLSegment("42")
                                       .get()
                                       .assertStatusCode(200)
                                       .assertBodyContains("/foo/view!", "42"))
@@ -173,7 +182,7 @@ public class GlobalTest extends PrimeBaseTest {
                                       .assertBodyContains("/foo/view!", "empty"))
 
         .simulate(() -> test.simulator.test("/foo")
-                                      .withUrlSegment("42")
+                                      .withURLSegment("42")
                                       .get()
                                       .assertStatusCode(200)
                                       .assertBodyContains("/foo!", "42"))
@@ -452,11 +461,11 @@ public class GlobalTest extends PrimeBaseTest {
   @Test
   public void get_nested_parameters() throws Exception {
     test.simulate(() -> test.simulator.test("/nested")
-                                      .withUrlSegment("42")
-                                      .withUrlSegment("99")
-                                      .withUrlSegment("parameter")
-                                      .withUrlSegment("foo")
-                                      .withUrlSegment("bar")
+                                      .withURLSegment("42")
+                                      .withURLSegment("99")
+                                      .withURLSegment("parameter")
+                                      .withURLSegment("foo")
+                                      .withURLSegment("bar")
                                       .get()
                                       .assertStatusCode(200)
                                       .assertBodyContains("Success!", "preParam1=42", "preParam2=99", "endParam1=foo", "endParam2=bar"));
@@ -742,21 +751,21 @@ public class GlobalTest extends PrimeBaseTest {
              .withJSONFile(Paths.get("src/test/resources/json/patch/test.json"), "config", "post")
              .post()
              .assertStatusCode(200)
-             .assertJSONFile(Paths.get("src/test/resources/json/patch/test-response.json"), "config", "post");
+             .assertJSONFile(jsonDir.resolve("patch/test-response.json"), "config", "post");
 
     // PUT no big deal
     simulator.test("/patch/test")
              .withJSONFile(Paths.get("src/test/resources/json/patch/test.json"), "config", "put")
              .put()
              .assertStatusCode(200)
-             .assertJSONFile(Paths.get("src/test/resources/json/patch/test-response.json"), "config", "put");
+             .assertJSONFile(jsonDir.resolve("patch/test-response.json"), "config", "put");
 
     // PATCH damn that is cool
     simulator.test("/patch/test")
              .withJSONFile(Paths.get("src/test/resources/json/patch/test-patch.json"))
              .patch()
              .assertStatusCode(200)
-             .assertJSONFile(Paths.get("src/test/resources/json/patch/test-response.json"), "config", "patched");
+             .assertJSONFile(jsonDir.resolve("patch/test-response.json"), "config", "patched");
   }
 
   @Test
@@ -1079,6 +1088,202 @@ public class GlobalTest extends PrimeBaseTest {
         .assertRequestAttributeIsNull("requestObject")
         .assertActionSessionAttributeIsNull("org.example.action.AnotherExtendedScopeStorage", "actionSessionObject")
         .assertSessionAttributeNotNull("sessionObject");
+  }
+
+  @Test
+  public void post_withURLParameter_IndexAmbiguity() {
+    // https://github.com/FusionAuth/fusionauth-issues/issues/434
+
+    // Add a trailing slash when the URL parameter is {userId} which is a UUID
+    // - Ok, it is ignored and there are no conversion exceptions
+    simulator.test("/api/action-value/login/")
+             .post()
+             .assertStatusCode(200)
+             .assertContainsNoFieldMessages()
+             .assertBodyContains("/api/action-value/login", "potato:null", "userId:null");
+
+    // Manually added the 'index' suffix, expect a couldNotConvert error because this is not a UUID
+    simulator.test("/api/action-value/login/index")
+             .post()
+             .assertStatusCode(200)
+             .assertContainsFieldErrors("userId")
+             .assertBodyContains("/api/action-value/login", "potato:null", "userId:null");
+
+    // Leave a trailing slash and pass an invalid type for userId as a request parameter
+    simulator.test("/api/action-value/login/")
+             .withParameter("userId", "index")
+             .post()
+             .assertStatusCode(200)
+             .assertContainsFieldErrors("userId")
+             .assertBodyContains("/api/action-value/login", "potato:null", "userId:null");
+
+    // No trailing slash and pass an invalid type for userId as a request parameter
+    simulator.test("/api/action-value/login")
+             .withParameter("userId", "index")
+             .post()
+             .assertStatusCode(200)
+             .assertContainsFieldErrors("userId")
+             .assertBodyContains("/api/action-value/login", "potato:null", "userId:null");
+
+    // Leave a trailing slash and use a separate variable with the name 'index'
+    simulator.test("/api/action-value/login/")
+             .withParameter("potato", "index")
+             .post()
+             .assertStatusCode(200)
+             .assertContainsNoFieldMessages()
+             .assertBodyContains("/api/action-value/login", "potato:index", "userId:null");
+
+    // Correct usage, URL parameter with the correct type.
+    UUID userId = UUID.randomUUID();
+    simulator.test("/api/action-value/login")
+             .withURLSegment(userId)
+             .withParameter("potato", "index")
+             .post()
+             .assertStatusCode(200)
+             .assertContainsNoFieldMessages()
+             .assertBodyContains("/api/action-value/login", "potato:index", "userId:" + userId);
+
+    // With a real Index page, add a URL parameter, add a separate request parameter with a value of index
+    simulator.test("/api/action-value/index")
+             .withParameter("potato", "index")
+             .post()
+             .assertStatusCode(200)
+             .assertContainsNoFieldMessages()
+             .assertBodyContains("/api/action-value/index", "potato:index", "userId:null");
+
+    // Real Index page, add a trailing slash when the URL parameter is a UUID
+    // - The trailing slash should be ignored, no errors
+    simulator.test("/api/action-value/index/")
+             .post()
+             .assertStatusCode(200)
+             .assertContainsNoFieldMessages()
+             .assertBodyContains("/api/action-value/index", "potato:null", "userId:null");
+
+    // Real Index page, with a legit UUID on the URL
+    simulator.test("/api/action-value/index/" + userId)
+             .post()
+             .assertStatusCode(200)
+             .assertContainsNoFieldMessages()
+             .assertBodyContains("/api/action-value/index", "potato:null", "userId:" + userId);
+
+    // Real Index page, with a legit UUID using a URL segment and a trailing slash
+    simulator.test("/api/action-value/index/")
+             .withURLSegment(userId)
+             .post()
+             .assertStatusCode(200)
+             .assertContainsNoFieldMessages()
+             .assertBodyContains("/api/action-value/index", "potato:null", "userId:" + userId);
+
+    // Real Index page, with a legit UUID using a URL segment and no trailing slash
+    simulator.test("/api/action-value/index")
+             .withURLSegment(userId)
+             .post()
+             .assertStatusCode(200)
+             .assertContainsNoFieldMessages()
+             .assertBodyContains("/api/action-value/index", "potato:null", "userId:" + userId);
+  }
+
+  @Test
+  public void post_withoutURLParameter_IndexAmbiguity() {
+    // https://github.com/FusionAuth/fusionauth-issues/issues/434
+
+    // Add a trailing slash when the URL parameter is {userId} which is a UUID
+    // - Ok, it is ignored and there are no conversion exceptions
+    simulator.test("/api/no-action-value/login/")
+             .post()
+             .assertStatusCode(200)
+             .assertContainsNoFieldMessages()
+             .assertBodyContains("/api/no-action-value/login", "potato:null", "userId:null");
+
+    // Manually added the 'index' suffix, not expect a URL segment, so it is ignored.
+    simulator.test("/api/no-action-value/login/index")
+             .post()
+             .assertStatusCode(200)
+             .assertContainsNoFieldMessages()
+             .assertBodyContains("/api/no-action-value/login", "potato:null", "userId:null");
+
+    // Leave a trailing slash and pass an invalid type for userId as a request parameter
+    simulator.test("/api/no-action-value/login/")
+             .withParameter("userId", "index")
+             .post()
+             .assertStatusCode(200)
+             .assertContainsFieldErrors("userId")
+             .assertBodyContains("/api/no-action-value/login", "potato:null", "userId:null");
+
+    // No trailing slash and pass an invalid type for userId as a request parameter
+    simulator.test("/api/no-action-value/login")
+             .withParameter("userId", "index")
+             .post()
+             .assertStatusCode(200)
+             .assertContainsFieldErrors("userId")
+             .assertBodyContains("/api/no-action-value/login", "potato:null", "userId:null");
+
+    // Leave a trailing slash and use a separate variable with the name 'index'
+    simulator.test("/api/no-action-value/login/")
+             .withParameter("potato", "index")
+             .post()
+             .assertStatusCode(200)
+             .assertContainsNoFieldMessages()
+             .assertBodyContains("/api/no-action-value/login", "potato:index", "userId:null");
+
+    // URL parameter is ignored since the Action is not configured to take a URL parameter
+    UUID userId = UUID.randomUUID();
+    simulator.test("/api/no-action-value/login")
+             .withURLSegment(userId)
+             .withParameter("potato", "index")
+             .post()
+             .assertStatusCode(200)
+             .assertContainsNoFieldMessages()
+             .assertBodyContains("/api/no-action-value/login", "potato:index", "userId:null");
+
+    // userId and potato are taking as request parameters, bonzai!
+    simulator.test("/api/no-action-value/login")
+             .withURLSegment(userId)
+             .withParameter("potato", "index")
+             .withParameter("userId", userId)
+             .post()
+             .assertStatusCode(200)
+             .assertContainsNoFieldMessages()
+             .assertBodyContains("/api/no-action-value/login", "potato:index", "userId:" + userId);
+
+    // With a real Index page, add a URL parameter, add a separate request parameter with a value of index
+    simulator.test("/api/no-action-value/index")
+             .withParameter("potato", "index")
+             .post()
+             .assertStatusCode(200)
+             .assertContainsNoFieldMessages()
+             .assertBodyContains("/api/no-action-value/index", "potato:index", "userId:null");
+
+    // Real Index page, add a trailing slash when the URL parameter is a UUID
+    // - The trailing slash should be ignored, no errors
+    simulator.test("/api/no-action-value/index/")
+             .post()
+             .assertStatusCode(200)
+             .assertContainsNoFieldMessages()
+             .assertBodyContains("/api/no-action-value/index", "potato:null", "userId:null");
+
+    // Real Index page, with a legit UUID on the URL but it is ignored because are not capturing URL parameters
+    simulator.test("/api/no-action-value/index/" + userId)
+             .post()
+             .assertStatusCode(200)
+             .assertContainsNoFieldMessages()
+             .assertBodyContains("/api/no-action-value/index", "potato:null", "userId:null");
+
+    // Real Index page, with a legit UUID using a URL segment and a trailing slash, ignored.
+    simulator.test("/api/no-action-value/index/")
+             .withURLSegment(userId)
+             .post()
+             .assertStatusCode(200)
+             .assertContainsNoFieldMessages()
+             .assertBodyContains("/api/no-action-value/index", "potato:null", "userId:null");
+
+    // Real Index page, with a legit UUID using a URL segment and no trailing slash, ignored
+    simulator.test("/api/no-action-value/index")
+             .withURLSegment(userId)
+             .post()
+             .assertStatusCode(200)
+             .assertContainsNoFieldMessages()
+             .assertBodyContains("/api/no-action-value/index", "potato:null", "userId:null");
   }
 
   @Test
