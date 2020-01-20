@@ -4,6 +4,8 @@ Changes in 1.18.5
 
  * By default in RequestResult.assertContainsFieldErrors all field errors will have to be accounted for.
  * Add RequestResult.assertContainsAtLeastTheseFieldErrors which provides the legacy behavior
+ * Better handle /foo/ URL when the endpoint is /foo with an URL parameter, ignore the trailing slash and do not pick up
+   empty string in the URL parameter handler.
 
 Changes in 1.18.4
 
