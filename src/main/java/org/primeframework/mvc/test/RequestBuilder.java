@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2019, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2020, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,7 @@ import org.primeframework.mvc.security.CSRF;
 import org.primeframework.mvc.servlet.PrimeFilter;
 import org.primeframework.mvc.servlet.ServletObjectsHolder;
 import org.primeframework.mvc.util.QueryStringTools;
+import org.primeframework.mvc.util.URITools;
 
 /**
  * This class is a builder that helps create a test HTTP request that is sent to the MVC.
@@ -523,6 +524,7 @@ public class RequestBuilder {
     return this;
   }
 
+
   /**
    * Sets an HTTP request parameter as a Prime MVC radio button widget. This can be called multiple times with the same
    * name it it will create a list of values for the HTTP parameter.
@@ -571,7 +573,7 @@ public class RequestBuilder {
         uri += ('/');
       }
 
-      request.setUri(uri + value.toString());
+      request.setUri(uri + URITools.encodeURIPathSegment(value));
     }
     return this;
   }

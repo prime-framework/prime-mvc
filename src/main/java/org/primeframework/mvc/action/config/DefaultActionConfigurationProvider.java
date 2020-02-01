@@ -168,7 +168,7 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
         String[] parts = Arrays.copyOfRange(remainingURIParts, i, remainingURIParts.length);
         List<String> params = uriParameters.computeIfAbsent(name, k -> new ArrayList<>());
         for (String part : parts) {
-          params.add(unescape(part));
+          params.add(URITools.decodeURIPathSegment(part));
         }
 
         break;
@@ -182,7 +182,7 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
 
         // Store the singular matched URI parameter
         String name = actionConfiguration.patternParts[i].substring(1, actionConfiguration.patternParts[i].length() - 1);
-        uriParameters.computeIfAbsent(name, k -> new ArrayList<>()).add(unescape(uriPart));
+        uriParameters.computeIfAbsent(name, k -> new ArrayList<>()).add(URITools.decodeURIPathSegment(uriPart));
       } else {
         // Ensure that the URI matches the literal from the annotation (i.e. {foo}/bar/{baz})
         String patternPart = normalize(actionConfiguration.patternParts[i]);
@@ -303,16 +303,6 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
     }
 
     return current;
-  }
-
-  /**
-   * Return the unescaped parameter.
-   *
-   * @param string The parameter to unescape
-   * @return The unescaped String.
-   */
-  private String unescape(String string) {
-    return string.replace("%20", " ");
   }
 
   private static class Node {

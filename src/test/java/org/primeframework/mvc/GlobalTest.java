@@ -85,13 +85,29 @@ public class GlobalTest extends PrimeBaseTest {
   @Test
   public void escapePathSegmentsWithWildCard() throws Exception {
     test.simulate(() -> test.simulator.test("/escaped-path-segments")
-                                      .withURLSegment("foo%20bar")
+                                      .withURLSegment("foo bar")
                                       .withURLSegment("foobar")
-                                      .withURLSegment("foo%20bar")
+                                      .withURLSegment("foo bar")
                                       .withURLSegment("foo@bar")
                                       .get()
                                       .assertStatusCode(200)
-                                      .assertBodyContains("Success!", "parm=foo bar", "theRest=foobar,foo bar,foo@bar"));
+                                      .assertBodyContains(
+                                          "Success!",
+                                          "parm=foo bar",
+                                          "theRest=foobar,foo bar,foo@bar"));
+
+    test.simulate(() -> test.simulator.test("/escaped-path-segments")
+                                      .withURLSegment("<foo>")
+                                      .withURLSegment("foo bar")
+                                      .withURLSegment("foobar")
+                                      .withURLSegment("foo bar")
+                                      .withURLSegment("foo@bar")
+                                      .get()
+                                      .assertStatusCode(200)
+                                      .assertBodyContains(
+                                          "Success!",
+                                          "parm=&lt;foo&gt;",
+                                          "theRest=foo bar,foobar,foo bar,foo@bar"));
   }
 
   @Test
@@ -527,6 +543,20 @@ public class GlobalTest extends PrimeBaseTest {
     simulator.test("/user/details-fields")
              .get()
              .assertBodyFile(Paths.get("src/test/resources/html/details-fields.html"));
+  }
+
+  @Test
+  public void get_percent_encoded_segment() throws Exception {
+    test.simulate(() -> test.simulator.test("/foo/view")
+                                      .withURLSegment("<strong>foo</strong>")
+                                      .get()
+                                      .assertStatusCode(200)
+                                      .assertBodyContains("/foo/view!", "id=&lt;strong&gt;foo&lt;/strong&gt;"));
+
+    test.simulate(() -> test.simulator.test("/foo/view/%3Cstrong%3Efoo%3C%2Fstrong%3E")
+                                      .get()
+                                      .assertStatusCode(200)
+                                      .assertBodyContains("/foo/view!", "id=&lt;strong&gt;foo&lt;/strong&gt;"));
   }
 
   @Test
