@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2015-2020, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,19 +20,20 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.ShortBufferException;
-import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.Inject;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.annotation.ReexecuteSavedRequest;
 import org.primeframework.mvc.config.MVCConfiguration;
@@ -42,9 +43,6 @@ import org.primeframework.mvc.security.CipherProvider;
 import org.primeframework.mvc.security.saved.SavedHttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.inject.Inject;
 
 /**
  * This result performs a HTTP redirect to a Saved Request URL. This also transfers all messages from the request to the
@@ -62,9 +60,11 @@ public class ReexecuteSavedRequestResult extends AbstractRedirectResult<Reexecut
   private final ObjectMapper objectMapper;
 
   @Inject
-  public ReexecuteSavedRequestResult(MessageStore messageStore, ExpressionEvaluator expressionEvaluator, HttpServletResponse response,
+  public ReexecuteSavedRequestResult(MessageStore messageStore, ExpressionEvaluator expressionEvaluator,
+                                     HttpServletResponse response,
                                      HttpServletRequest request, ActionInvocationStore actionInvocationStore,
-                                     CipherProvider cipherProvider, MVCConfiguration configuration, ObjectMapper objectMapper) {
+                                     CipherProvider cipherProvider, MVCConfiguration configuration,
+                                     ObjectMapper objectMapper) {
     super(expressionEvaluator, actionInvocationStore, messageStore, request, response);
     this.configuration = configuration;
     this.cipherProvider = cipherProvider;
@@ -74,7 +74,7 @@ public class ReexecuteSavedRequestResult extends AbstractRedirectResult<Reexecut
   /**
    * {@inheritDoc}
    */
-  public boolean execute(final ReexecuteSavedRequest reexecuteSavedRequest) throws IOException, ServletException {
+  public boolean execute(final ReexecuteSavedRequest reexecuteSavedRequest) throws IOException {
     moveMessagesToFlash();
 
     String savedRequestCookieName = configuration.savedRequestCookieName();
@@ -112,7 +112,7 @@ public class ReexecuteSavedRequestResult extends AbstractRedirectResult<Reexecut
       byte[] result = new byte[cipher.getOutputSize(bytes.length)];
       int resultLength = cipher.update(bytes, 0, bytes.length, result, 0);
       resultLength += cipher.doFinal(result, resultLength);
-      String json = new String(result, 0, resultLength, Charset.forName("UTF-8"));
+      String json = new String(result, 0, resultLength, StandardCharsets.UTF_8);
       return objectMapper.readValue(json, SavedHttpRequest.class);
     } catch (IOException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | InvalidKeyException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | ShortBufferException e) {
       logger.warn("Bad SavedRequest cookie [{}]. Error is [{}]", value, e.getMessage());
