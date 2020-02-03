@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2016-2020, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,8 @@ import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.AlgorithmParameterSpec;
 
-import org.primeframework.mvc.config.MVCConfiguration;
-
 import com.google.inject.Inject;
+import org.primeframework.mvc.config.MVCConfiguration;
 
 /**
  * Default implementation that generates a new key on startup. This will render all existing Saved Requests useless.
@@ -38,20 +37,22 @@ public class DefaultCipherProvider implements CipherProvider {
   private final Key key;
 
   @Inject
-  public DefaultCipherProvider(MVCConfiguration configuration) throws NoSuchAlgorithmException {
+  public DefaultCipherProvider(MVCConfiguration configuration) {
     this.iv = configuration.cookieEncryptionIV();
     this.key = configuration.cookieEncryptionKey();
   }
 
   @Override
-  public Cipher getDecryptor() throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
+  public Cipher getDecryptor()
+      throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
     Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
     cipher.init(Cipher.DECRYPT_MODE, key, iv);
     return cipher;
   }
 
   @Override
-  public Cipher getEncryptor() throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
+  public Cipher getEncryptor()
+      throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
     Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
     cipher.init(Cipher.ENCRYPT_MODE, key, iv);
     return cipher;

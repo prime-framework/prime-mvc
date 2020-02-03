@@ -22,8 +22,9 @@ package org.primeframework.mvc.util;
  */
 public class URITools {
   private static final String URL_PATH_OTHER_SAFE_CHARS =
-      // Unreserved characters
-      "-._~"
+      "" +
+          // Unreserved characters
+          "-._~"
           // The subdelim characters
           + "!$'()*,;&=+"
           // The gendelim characters permitted in paths
@@ -35,7 +36,7 @@ public class URITools {
           // 0-9
           + "0123456789";
 
-  private static final boolean[] UrlPathSafeCharacters = initializeURLPathSafeCharacters();
+  private static final boolean[] URL_PATH_SAFE_CHARS_ARRAY;
 
   public static String decodeURIPathSegment(Object value) {
     StringBuilder sb = new StringBuilder();
@@ -87,7 +88,7 @@ public class URITools {
   public static String encodeURIPathSegment(Object value) {
     StringBuilder sb = new StringBuilder();
     for (char ch : value.toString().toCharArray()) {
-      if (UrlPathSafeCharacters[ch]) {
+      if (URL_PATH_SAFE_CHARS_ARRAY[ch]) {
         sb.append(ch);
       } else {
         sb.append('%');
@@ -99,7 +100,15 @@ public class URITools {
     return sb.toString();
   }
 
-  private static boolean[] initializeURLPathSafeCharacters() {
+  private static char toHex(int ch) {
+    return (char) (ch < 10 ? '0' + ch : 'A' + ch - 10);
+  }
+
+  private static String unHex(String s) {
+    return String.valueOf((char) Integer.parseInt(s, 16));
+  }
+
+  static {
     int maxChar = -1;
     char[] safeCharArray = URL_PATH_OTHER_SAFE_CHARS.toCharArray();
     for (char c : safeCharArray) {
@@ -110,14 +119,6 @@ public class URITools {
       octets[c] = true;
     }
 
-    return octets;
-  }
-
-  private static char toHex(int ch) {
-    return (char) (ch < 10 ? '0' + ch : 'A' + ch - 10);
-  }
-
-  private static String unHex(String s) {
-    return String.valueOf((char) Integer.parseInt(s, 16));
+    URL_PATH_SAFE_CHARS_ARRAY = octets;
   }
 }

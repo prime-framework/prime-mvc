@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2016-2020, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,20 +21,19 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.ShortBufferException;
 import javax.servlet.http.Cookie;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Base64;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.security.CipherProvider;
 import org.primeframework.mvc.security.SavedRequestException;
 import org.primeframework.mvc.security.saved.SavedHttpRequest;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Toolkit to help with Saved Request stuff.
@@ -50,12 +49,13 @@ public class SavedRequestTools {
    * @param configuration THe MVC Configuration that is used to determine the cookie name.
    * @return The cookie.
    */
-  public static Cookie toCookie(SavedHttpRequest savedRequest, ObjectMapper objectMapper, MVCConfiguration configuration,
+  public static Cookie toCookie(SavedHttpRequest savedRequest, ObjectMapper objectMapper,
+                                MVCConfiguration configuration,
                                 CipherProvider cipherProvider) {
     try {
       String value = objectMapper.writer().writeValueAsString(savedRequest);
       Cipher cipher = cipherProvider.getEncryptor();
-      byte[] input = value.getBytes(Charset.forName("UTF-8"));
+      byte[] input = value.getBytes(StandardCharsets.UTF_8);
       byte[] result = new byte[cipher.getOutputSize(input.length)];
       int resultLength = cipher.update(input, 0, input.length, result, 0);
       resultLength += cipher.doFinal(result, resultLength);
