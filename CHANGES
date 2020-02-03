@@ -1,5 +1,9 @@
 Prime MVC Changes
 
+Changes in 1.19.1
+
+ * Better handling of % encoded values in a URL path segment.
+
 Changes in 1.19.0
 
  * Enable auto HTML escaping by default, this can be disabled by setting autoHTMLEscapingEnabled in the MVC Configuration.
