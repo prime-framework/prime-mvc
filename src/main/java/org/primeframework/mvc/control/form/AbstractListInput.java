@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2020, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -157,6 +157,7 @@ public abstract class AbstractListInput extends AbstractInput {
       }
     }
 
+    // Retrieve the wrapped value of the markup output model
     if (text == null && item instanceof TemplateMarkupOutputModel<?>) {
       try {
         //noinspection rawtypes,unchecked
@@ -211,8 +212,7 @@ public abstract class AbstractListInput extends AbstractInput {
   }
 
   /**
-   * Determines the key. If the attribute contains a <code>keyExpr</code>, it is used against the object to get the
-   * key.
+   * Determines the key. If the attribute contains a <code>keyExpr</code>, it is used against the object to get the key.
    * Otherwise, the object is just converted to a String.
    *
    * @param itemsValue The current value from the items collection/array/map used to determine the key.
