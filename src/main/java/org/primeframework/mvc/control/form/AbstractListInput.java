@@ -20,11 +20,13 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.google.inject.Inject;
+import freemarker.core.TemplateMarkupOutputModel;
+import freemarker.template.TemplateModelException;
+import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.message.l10n.MissingMessageException;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-
-import com.google.inject.Inject;
 
 /**
  * This class is an abstract input that is used for any input that uses a list or items. This includes select boxes and
@@ -152,6 +154,15 @@ public abstract class AbstractListInput extends AbstractInput {
         text = messageProvider.getMessage(item.toString());
       } catch (MissingMessageException e) {
         // Smother this and continue to use the toString() for the text
+      }
+    }
+
+    if (text == null && item instanceof TemplateMarkupOutputModel<?>) {
+      try {
+        //noinspection rawtypes,unchecked
+        text = ((TemplateMarkupOutputModel) item).getOutputFormat().getMarkupString((TemplateMarkupOutputModel) item);
+      } catch (TemplateModelException e) {
+        throw new PrimeException(e);
       }
     }
 

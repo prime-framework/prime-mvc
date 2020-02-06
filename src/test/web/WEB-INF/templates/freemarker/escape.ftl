@@ -59,6 +59,11 @@
             [#break/]
 
     [/#switch]
+
+    [#-- An example taken from CleanSpeak where the hash strings are getting converted to TemplateHTMLOutput objects --]
+    [@control.radio_list name="listTest" items={"dismissed": function.message("dismiss"), "none": function.message("ignore")}/]
+    [@control.checkbox_list name="listTest2" items={"dismissed": function.message("dismiss"), "none": function.message("ignore")}/]
+
 </div>
 </body>
 </html>

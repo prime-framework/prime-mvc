@@ -24,6 +24,10 @@ import org.primeframework.mvc.action.annotation.Action;
 public class EscapeAction {
   public String listSeparator = ",\u0020";
 
+  public String listTest;
+
+  public String listTest2;
+
   public String mode = "message";
 
   public String selectionRequired = "Select\u2026";
@@ -33,6 +37,10 @@ public class EscapeAction {
   public String welcome = "Hello, to access your account go to <a href=\"https://foo.com\">foo.com</a>.";
 
   public String get() {
+    return "success";
+  }
+
+  public String post() {
     return "success";
   }
 }

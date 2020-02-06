@@ -373,9 +373,12 @@ public class GlobalTest extends PrimeBaseTest {
                    "Select\u2026",
                    ",\u0020",
                    "&lt;p&gt;Are you sure?&lt;/p&gt;",
-                   "Hello, to access your account go to &lt;a href=&quot;https://foo.com&quot;&gt;foo.com&lt;/a&gt;.")
+                   "Hello, to access your account go to &lt;a href=&quot;https://foo.com&quot;&gt;foo.com&lt;/a&gt;.",
+                   "Dismiss",
+                   "Ignore")
                .assertBodyDoesNotContain("<p>Are you sure?</p>",
-                   "Hello, to access your account go to <a href=\"https://foo.com\">foo.com</a>.");
+                   "Hello, to access your account go to <a href=\"https://foo.com\">foo.com</a>.",
+                   "freemarker.core.TemplateHTMLOutputModel"); // Check to make sure that we don't toString an output model
     } else {
       simulator.test("/freemarker/escape")
                .withParameter("mode", mode)
@@ -386,9 +389,12 @@ public class GlobalTest extends PrimeBaseTest {
                    "Select\u2026",
                    ",\u0020",
                    "<p>Are you sure?</p>",
-                   "Hello, to access your account go to <a href=\"https://foo.com\">foo.com</a>.")
+                   "Hello, to access your account go to <a href=\"https://foo.com\">foo.com</a>.",
+                   "Dismiss",
+                   "Ignore")
                .assertBodyDoesNotContain("&lt;p&gt;Are you sure?&lt;/p&gt;",
-                   "Hello, to access your account go to &lt;a href=&quot;https://foo.com&quot;&gt;foo.com&lt;/a&gt;.");
+                   "Hello, to access your account go to &lt;a href=&quot;https://foo.com&quot;&gt;foo.com&lt;/a&gt;.",
+                   "freemarker.core.TemplateHTMLOutputModel"); // Check to make sure that we don't toString an output model
     }
   }
 
@@ -1045,6 +1051,18 @@ public class GlobalTest extends PrimeBaseTest {
                                  .post()
                                  .assertContainsNoFieldMessages()
                                  .assertStatusCode(200));
+  }
+
+  // Test that the control behaves as expected
+  @Test
+  public void post_freemarker_escape() throws Exception {
+    simulator.test("/freemarker/escape")
+             .withParameter("listTest", "none")
+             .withParameter("listTest2", "none")
+             .post()
+             .assertStatusCode(200)
+             .assertHTML(html -> html.assertElementExists("input[name=listTest][value=none][checked]")
+                                     .assertElementExists("input[name=listTest2][value=none][checked]"));
   }
 
   @Test
