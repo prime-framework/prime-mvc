@@ -1,5 +1,9 @@
 Prime MVC Changes
 
+Changes in 1.19.3
+
+ * Fix a bug in RequestResult so that we do not change the default ObjectMapper instance.
+
 Changes in 1.19.2
 
  * Fix handling of inline collection when HTML escaping is enabled, changes made to AbstractListInput.makeOption

@@ -150,15 +150,17 @@ public class RequestResult {
       throw new AssertionError("The expected JSON was empty or once deserialize returned a null JsonNode object. Expected [" + expected + "]");
     }
 
-    objectMapper = objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true)
-                               .configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
+    // Don't modify the objectMapper, create a new configuration
+    ObjectMapper prettyPrinter = objectMapper.copy()
+                                             .configure(SerializationFeature.INDENT_OUTPUT, true)
+                                             .configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
 
-    response = deepSort(response, objectMapper, sortArrays);
-    file = deepSort(file, objectMapper, sortArrays);
+    response = deepSort(response, prettyPrinter, sortArrays);
+    file = deepSort(file, prettyPrinter, sortArrays);
 
     if (!response.equals(file)) {
-      String bodyString = objectMapper.writeValueAsString(response);
-      String fileString = objectMapper.writeValueAsString(file);
+      String bodyString = prettyPrinter.writeValueAsString(response);
+      String fileString = prettyPrinter.writeValueAsString(file);
       throw new AssertionError("The body doesn't match the expected JSON output. expected [" + fileString + "] but found [" + bodyString + "]");
     }
   }
