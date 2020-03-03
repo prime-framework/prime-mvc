@@ -27,9 +27,9 @@ import com.google.inject.Inject;
  *   Authorization: JWT "XXXXXXXXXX.YYYYYYYYYY.ZZZZZZZZZZ"
  * </pre>
  * or
- * * <pre>
- *  *   Authorization: Bearer "XXXXXXXXXX.YYYYYYYYYY.ZZZZZZZZZZ"
- *  * </pre>
+ * <pre>
+ *   Authorization: Bearer "XXXXXXXXXX.YYYYYYYYYY.ZZZZZZZZZZ"
+ * </pre>
  * <p>
  * If an <code>Authorization</code> header is not found in the request next we'll look for a Cookie with a name of
  * <code>access_token</code>.
@@ -57,9 +57,9 @@ public class DefaultJWTRequestAdapter implements JWTRequestAdapter {
     if (authorization != null) {
       // Support Bearer and JWT scheme
       if (authorization.startsWith("Bearer")) {
-        return authorization.substring("Bearer " .length());
+        return authorization.substring("Bearer ".length());
       } else if (authorization.startsWith("JWT ")) {
-        return authorization.substring("JWT " .length());
+        return authorization.substring("JWT ".length());
       }
     }
 
