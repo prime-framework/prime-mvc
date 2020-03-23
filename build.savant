@@ -36,7 +36,6 @@ project(group: "org.primeframework", name: "prime-mvc", version: "2.0.0", licens
       dependency(id: "com.fasterxml.jackson.core:jackson-databind:2.10.3")
       dependency(id: "com.google.inject:guice:4.2.3")
       dependency(id: "com.google.inject.extensions:guice-multibindings:4.2.3")
-      dependency(id: "com.google.guava:guava:27.1.0-jre", skipCompatibilityCheck: true)
       dependency(id: "io.dropwizard.metrics:metrics-core:3.1.0")
       dependency(id: "io.fusionauth:fusionauth-jwt:${fusionAuthJWTVersion}")
       dependency(id: "javax.inject:javax.inject:1.0.0")
@@ -48,6 +47,9 @@ project(group: "org.primeframework", name: "prime-mvc", version: "2.0.0", licens
       dependency(id: "org.ow2.asm:asm:7.3.1")
       dependency(id: "org.primeframework:prime-mock:0.7.3")
       dependency(id: "org.slf4j:slf4j-api:1.7.7")
+    }
+    group(name: "runtime") {
+      dependency(id: "com.google.guava:guava:27.1.0-jre", skipCompatibilityCheck: true)
     }
     group(name: "test-compile", export: false) {
       dependency(id: "org.easymock:easymock:4.2.0")

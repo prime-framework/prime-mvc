@@ -195,17 +195,6 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/com/google/guava/guava/27.1.0-jre/guava-27.1.0-jre.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/com/google/guava/guava/27.1.0-jre/guava-27.1.0-jre-src.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
           <root url="jar://$USER_HOME$/.savant/cache/org/slf4j/slf4j-api/1.7.7/slf4j-api-1.7.7.jar!/" />
         </CLASSES>
         <JAVADOC />
@@ -264,6 +253,17 @@
         <JAVADOC />
         <SOURCES>
           <root url="jar://$USER_HOME$/.savant/cache/org/aopalliance/aopalliance/1.0.0/aopalliance-1.0.0-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="TEST">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.savant/cache/com/google/guava/guava/27.1.0-jre/guava-27.1.0-jre.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.savant/cache/com/google/guava/guava/27.1.0-jre/guava-27.1.0-jre-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -388,3 +388,4 @@
     </orderEntry>
   </component>
 </module>
+
