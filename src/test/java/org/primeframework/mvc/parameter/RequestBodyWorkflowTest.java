@@ -15,17 +15,6 @@
  */
 package org.primeframework.mvc.parameter;
 
-import org.apache.commons.io.FileUtils;
-import org.easymock.Capture;
-import org.easymock.EasyMock;
-import org.primeframework.mock.servlet.MockServletInputStream;
-import org.primeframework.mvc.parameter.fileupload.FileInfo;
-import org.primeframework.mvc.servlet.MockWorkflowChain;
-import org.primeframework.mvc.util.MapBuilder;
-import org.primeframework.mvc.util.RequestKeys;
-import org.primeframework.mvc.workflow.WorkflowChain;
-import org.testng.annotations.Test;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
@@ -38,6 +27,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.commons.io.FileUtils;
+import org.easymock.Capture;
+import org.easymock.EasyMock;
+import org.primeframework.mock.servlet.MockServletInputStream;
+import org.primeframework.mvc.parameter.fileupload.FileInfo;
+import org.primeframework.mvc.servlet.MockWorkflowChain;
+import org.primeframework.mvc.util.MapBuilder;
+import org.primeframework.mvc.util.RequestKeys;
+import org.primeframework.mvc.workflow.WorkflowChain;
+import org.testng.annotations.Test;
 import static java.util.Arrays.asList;
 import static org.easymock.EasyMock.capture;
 import static org.easymock.EasyMock.createStrictMock;
@@ -85,7 +84,7 @@ public class RequestBodyWorkflowTest {
     EasyMock.expect(request.getInputStream()).andReturn(new MockServletInputStream(body.getBytes()));
     EasyMock.expect(request.getCharacterEncoding()).andReturn("UTF-8");
     EasyMock.expect(request.getContentLength()).andReturn(body.length());
-    final Capture<Map<String, List<FileInfo>>> capture = new Capture<>();
+    final Capture<Map<String, List<FileInfo>>> capture = Capture.newInstance();
     request.setAttribute(eq(RequestKeys.FILE_ATTRIBUTE), capture(capture));
     EasyMock.replay(request);
 
@@ -150,15 +149,14 @@ public class RequestBodyWorkflowTest {
     RequestBodyWorkflow workflow = new RequestBodyWorkflow(wrapper);
     workflow.perform(chain);
 
-    @SuppressWarnings("unchecked")
     Map<String, String[]> actual = wrapper.getParameterMap();
     Map<String, String[]> expected =
         MapBuilder.<String, String[]>map()
-                  .put("param1", new String[]{"value1"})
-                  .put("param2", new String[]{"value2"})
-                  .put("param space key", new String[]{"param space value"})
-                  .put("param+encoded+key", new String[]{"param+encoded+value"})
-                  .done();
+            .put("param1", new String[]{"value1"})
+            .put("param2", new String[]{"value2"})
+            .put("param space key", new String[]{"param space value"})
+            .put("param+encoded+key", new String[]{"param+encoded+value"})
+            .done();
     assertParameterMapsEquals(actual, expected);
 
     verify(request, chain);
@@ -187,13 +185,12 @@ public class RequestBodyWorkflowTest {
     RequestBodyWorkflow workflow = new RequestBodyWorkflow(wrapper);
     workflow.perform(chain);
 
-    @SuppressWarnings("unchecked")
     Map<String, String[]> actual = wrapper.getParameterMap();
     Map<String, String[]> expected =
         MapBuilder.<String, String[]>map()
-                  .put("param1", new String[]{"oldvalue1", "oldvalue2", "value1", "value2"})
-                  .put("param2", new String[]{"oldvalue3", "value3"})
-                  .done();
+            .put("param1", new String[]{"oldvalue1", "oldvalue2", "value1", "value2"})
+            .put("param2", new String[]{"oldvalue3", "value3"})
+            .done();
     assertParameterMapsEquals(actual, expected);
 
     verify(request, chain);
@@ -218,13 +215,12 @@ public class RequestBodyWorkflowTest {
     RequestBodyWorkflow workflow = new RequestBodyWorkflow(wrapper);
     workflow.perform(chain);
 
-    @SuppressWarnings("unchecked")
     Map<String, String[]> actual = wrapper.getParameterMap();
     Map<String, String[]> expected =
         MapBuilder.<String, String[]>map()
-                  .put("param1", new String[]{"value1", "value2"})
-                  .put("param2", new String[]{"value3"})
-                  .done();
+            .put("param1", new String[]{"value1", "value2"})
+            .put("param2", new String[]{"value3"})
+            .done();
     assertParameterMapsEquals(actual, expected);
 
     verify(request, chain);
@@ -240,7 +236,7 @@ public class RequestBodyWorkflowTest {
     EasyMock.expect(request.getInputStream()).andReturn(new MockServletInputStream(body.getBytes()));
     EasyMock.expect(request.getCharacterEncoding()).andReturn("UTF-8");
     EasyMock.expect(request.getContentLength()).andReturn(body.length());
-    final Capture<Map<String, List<FileInfo>>> capture = new Capture<>();
+    final Capture<Map<String, List<FileInfo>>> capture = Capture.newInstance();
     request.setAttribute(eq(RequestKeys.FILE_ATTRIBUTE), capture(capture));
     EasyMock.replay(request);
 
@@ -293,8 +289,7 @@ public class RequestBodyWorkflowTest {
   }
 
   private String keyDiff(Map<String, String[]> actual, Map<String, String[]> expected) {
-    Set<String> finalSet = new HashSet<>();
-    finalSet.addAll(actual.keySet());
+    Set<String> finalSet = new HashSet<>(actual.keySet());
     finalSet.removeAll(expected.keySet());
     finalSet.addAll(expected.keySet());
     finalSet.removeAll(actual.keySet());

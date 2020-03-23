@@ -17,7 +17,7 @@
 savantVersion = "1.0.0"
 fusionAuthJWTVersion = "3.1.6"
 
-project(group: "org.primeframework", name: "prime-mvc", version: "1.19.4", licenses: ["ApacheV2_0"]) {
+project(group: "org.primeframework", name: "prime-mvc", version: "2.0.0", licenses: ["ApacheV2_0"]) {
   workflow {
     standard()
   }
@@ -31,30 +31,31 @@ project(group: "org.primeframework", name: "prime-mvc", version: "1.19.4", licen
       dependency(id: "javax.servlet:servlet-api:3.1.0", skipCompatibilityCheck: true)
     }
     group(name: "compile") {
-      dependency(id: "org.ow2.asm:asm:6.1.1")
       dependency(id: "com.fasterxml.jackson.core:jackson-annotations:2.10.3")
       dependency(id: "com.fasterxml.jackson.core:jackson-core:2.10.3")
       dependency(id: "com.fasterxml.jackson.core:jackson-databind:2.10.3")
-      dependency(id: "com.google.inject:guice:4.2.2")
-      dependency(id: "com.google.inject.extensions:guice-multibindings:4.2.2")
+      dependency(id: "com.google.inject:guice:4.2.3")
+      dependency(id: "com.google.inject.extensions:guice-multibindings:4.2.3")
+      dependency(id: "com.google.guava:guava:27.1.0-jre", skipCompatibilityCheck: true)
       dependency(id: "io.dropwizard.metrics:metrics-core:3.1.0")
+      dependency(id: "io.fusionauth:fusionauth-jwt:${fusionAuthJWTVersion}")
       dependency(id: "javax.inject:javax.inject:1.0.0")
       dependency(id: "org.apache.commons:commons-fileupload:1.2.1")
       dependency(id: "org.apache.commons:commons-io:2.1.0")
       dependency(id: "org.apache.commons:commons-lang3:3.1.0")
       dependency(id: "org.freemarker:freemarker:2.3.28")
-      dependency(id: "io.fusionauth:fusionauth-jwt:${fusionAuthJWTVersion}")
       dependency(id: "org.jsoup:jsoup:1.12.1")
+      dependency(id: "org.ow2.asm:asm:7.3.1")
       dependency(id: "org.primeframework:prime-mock:0.7.3")
       dependency(id: "org.slf4j:slf4j-api:1.7.7")
     }
     group(name: "test-compile", export: false) {
-      dependency(id: "org.easymock:easymock:3.2.0")
-      dependency(id: "org.testng:testng:6.8.7")
+      dependency(id: "org.easymock:easymock:4.2.0")
+      dependency(id: "org.testng:testng:7.1.0")
     }
     group(name: "test-runtime") {
-      dependency(id: "ch.qos.logback:logback-core:1.0.11")
       dependency(id: "ch.qos.logback:logback-classic:1.0.11")
+      dependency(id: "ch.qos.logback:logback-core:1.0.11")
     }
   }
 
@@ -72,8 +73,8 @@ idea = loadPlugin(id: "org.savantbuild.plugin:idea:1.0.1")
 release = loadPlugin(id: "org.savantbuild.plugin:release-git:${savantVersion}")
 
 // Plugin settings
-java.settings.javaVersion = "1.8"
-javaTestNG.settings.javaVersion = "1.8"
+java.settings.javaVersion = "14"
+javaTestNG.settings.javaVersion = "14"
 
 target(name: "clean", description: "Cleans the project") {
   java.clean()
@@ -83,9 +84,8 @@ target(name: "compile", description: "Compiles the project") {
   java.compileMain()
 
   // allow the user of sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl in tests
-  java.settings.compilerArguments = "-XDignore.symbol.file"
+  java.settings.compilerArguments = "--add-exports java.base/sun.reflect.generics.reflectiveObjects=ALL-UNNAMED"
   java.compileTest()
-
   java.settings.compilerArguments = ""
 
   file.copy(to: "build/classes/main") {

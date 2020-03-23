@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+import com.google.inject.Injector;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.example.action.user.EditAction;
@@ -29,8 +30,6 @@ import org.primeframework.mvc.action.config.ActionConfigurationProvider;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
-
-import com.google.inject.Injector;
 import static org.easymock.EasyMock.capture;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
@@ -114,7 +113,7 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     );
     EasyMock.replay(provider);
 
-    Capture<ActionInvocation> capture = new Capture<>();
+    Capture<ActionInvocation> capture = Capture.newInstance();
     ActionInvocationStore store = EasyMock.createStrictMock(ActionInvocationStore.class);
     store.setCurrent(capture(capture));
     store.removeCurrent();

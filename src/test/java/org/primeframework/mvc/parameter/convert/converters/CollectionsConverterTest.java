@@ -23,13 +23,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.testng.annotations.Test;
-
-import com.google.inject.Inject;
-import static org.testng.Assert.assertEquals;
 import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
+import static org.testng.Assert.assertEquals;
 
 /**
  * @author Daniel DeGroff
@@ -81,9 +80,9 @@ public class CollectionsConverterTest extends PrimeBaseTest {
   }
 
   private class Builder {
-    public String[] values;
-
     public Object[] expected;
+
+    public String[] values;
 
     public Builder(String... values) {
       this.values = values;

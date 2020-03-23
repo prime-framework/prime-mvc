@@ -86,7 +86,7 @@ public class JSONResultTest extends PrimeBaseTest {
 
   @Inject public ObjectMapper objectMapper;
 
-  @DataProvider(name = "httMethod")
+  @DataProvider(name = "httpMethod")
   public Object[][] httpMethod() {
     return new Object[][]{{HTTPMethod.GET}, {HTTPMethod.HEAD}};
   }

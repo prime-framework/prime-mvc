@@ -212,11 +212,11 @@ public class ClassClasspathResolver<U> {
           continue;
         }
 
-        Testable<Class<U>> testable = test.prepare(f, jarFile, entry);
-        if (testable != null && testable.passes()) {
-          matches.add(testable.result());
-          break;
-        }
+          Testable<Class<U>> testable = test.prepare(f, jarFile, entry);
+          if (testable != null && testable.passes()) {
+            matches.add(testable.result());
+            break;
+          }
       }
     }
 
@@ -322,7 +322,7 @@ public class ClassClasspathResolver<U> {
         private boolean passes;
 
         private AnnotatedWithClassVisitor(Class<T> annotation) {
-          super(Opcodes.ASM4);
+          super(Opcodes.ASM7);
           this.annotation = annotation;
         }
 
@@ -397,7 +397,7 @@ public class ClassClasspathResolver<U> {
         private boolean passes;
 
         private IsAClassVisitor(Class<U> parent) {
-          super(Opcodes.ASM4);
+          super(Opcodes.ASM7);
           this.parent = parent;
         }
 

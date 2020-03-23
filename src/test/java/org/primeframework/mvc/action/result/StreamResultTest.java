@@ -77,7 +77,7 @@ public class StreamResultTest {
     }
   }
 
-  @DataProvider(name = "httMethod")
+  @DataProvider(name = "httpMethod")
   public Object[][] httpMethod() {
     return new Object[][]{
         // METHOD, File, Simple escaped, UTF8 Escaped
