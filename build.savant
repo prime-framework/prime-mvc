@@ -17,7 +17,7 @@
 savantVersion = "1.0.0"
 fusionAuthJWTVersion = "3.1.6"
 
-project(group: "org.primeframework", name: "prime-mvc", version: "2.0.0", licenses: ["ApacheV2_0"]) {
+project(group: "org.primeframework", name: "prime-mvc", version: "1.20.0", licenses: ["ApacheV2_0"]) {
   workflow {
     standard()
   }
@@ -70,13 +70,13 @@ project(group: "org.primeframework", name: "prime-mvc", version: "2.0.0", licens
 file = loadPlugin(id: "org.savantbuild.plugin:file:1.0.2")
 dependency = loadPlugin(id: "org.savantbuild.plugin:dependency:1.0.2")
 java = loadPlugin(id: "org.savantbuild.plugin:java:1.0.2")
-javaTestNG = loadPlugin(id: "org.savantbuild.plugin:java-testng:1.0.2")
+javaTestNG = loadPlugin(id: "org.savantbuild.plugin:java-testng:1.0.5")
 idea = loadPlugin(id: "org.savantbuild.plugin:idea:1.0.1")
 release = loadPlugin(id: "org.savantbuild.plugin:release-git:${savantVersion}")
 
 // Plugin settings
-java.settings.javaVersion = "14"
-javaTestNG.settings.javaVersion = "14"
+java.settings.javaVersion = "1.8"
+javaTestNG.settings.javaVersion = "1.8"
 
 target(name: "clean", description: "Cleans the project") {
   java.clean()
@@ -86,7 +86,7 @@ target(name: "compile", description: "Compiles the project") {
   java.compileMain()
 
   // allow the user of sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl in tests
-  java.settings.compilerArguments = "--add-exports java.base/sun.reflect.generics.reflectiveObjects=ALL-UNNAMED"
+  java.settings.compilerArguments = "-XDignore.symbol.file"
   java.compileTest()
   java.settings.compilerArguments = ""
 

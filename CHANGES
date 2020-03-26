@@ -1,8 +1,8 @@
 Prime MVC Changes
 
-Changes in 2.0.0
+Changes in 1.19.4
 
- * Support for Java 14
+ * Update ASM and Guice, and support X-HTTP-Method-Override and X-Method-Override.
 
 Changes in 1.19.3
 

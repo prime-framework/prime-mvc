@@ -783,6 +783,16 @@ public class GlobalTest extends PrimeBaseTest {
                                  .assertStatusCode(401));
   }
 
+  @DataProvider(name = "methodOverrides")
+  public Object[][] methodOverrides() {
+    return new Object[][]{
+        {"X-HTTP-Method-Override"},
+        {"x-http-method-override"},
+        {"X-Method-Override"},
+        {"x-method-override"}
+    };
+  }
+
   @Test
   public void multipleJSONRequestMembers() throws Exception {
     simulator.test("/multiple-json-request")
@@ -829,6 +839,16 @@ public class GlobalTest extends PrimeBaseTest {
     simulator.test("/not-allowed")
              .method("POTATO")
              .assertStatusCode(501);
+  }
+
+  @Test(dataProvider = "methodOverrides")
+  public void patch_MethodOverride(String overrideHeaderName) throws Exception {
+    simulator.test("/patch/test")
+             .withJSONFile(Paths.get("src/test/resources/json/patch/test-patch.json"))
+             .withHeader(overrideHeaderName, "PATCH")
+             .post()
+             .assertStatusCode(200)
+             .assertJSONFile(jsonDir.resolve("patch/test-response.json"), "config", "patched");
   }
 
   @Test

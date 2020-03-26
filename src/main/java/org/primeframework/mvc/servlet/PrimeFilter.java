@@ -23,16 +23,14 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import com.google.inject.Injector;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.workflow.MVCWorkflow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.inject.Injector;
 
 /**
  * This is the main Servlet filter for the Prime MVC. This will setup the {@link ServletObjectsHolder} so that the
@@ -60,7 +58,7 @@ public class PrimeFilter implements Filter {
    * @param request  Passed down chain.
    * @param response Passed down chain.
    * @param chain    The chain.
-   * @throws IOException If the chain throws an exception.
+   * @throws IOException      If the chain throws an exception.
    * @throws ServletException If the chain throws an exception.
    */
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -76,7 +74,7 @@ public class PrimeFilter implements Filter {
     HttpServletRequest httpServletRequest = (HttpServletRequest) request;
     HttpServletResponse httpServletResponse = (HttpServletResponse) response;
     MVCConfiguration configuration = injector.getInstance(MVCConfiguration.class);
-    ServletObjectsHolder.setServletRequest(new HttpServletRequestWrapper(httpServletRequest));
+    ServletObjectsHolder.setServletRequest(new HTTPMethodOverrideServletRequestWrapper(httpServletRequest));
     ServletObjectsHolder.setServletResponse(httpServletResponse);
 
     try {
@@ -114,7 +112,7 @@ public class PrimeFilter implements Filter {
    *
    * @param filterConfig Not used.
    */
-  public void init(FilterConfig filterConfig) throws ServletException {
+  public void init(FilterConfig filterConfig) {
     this.context = filterConfig.getServletContext();
   }
 }
