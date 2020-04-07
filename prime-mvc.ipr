@@ -109,7 +109,7 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_STRING" value="-Xlint:unchecked" />
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="prime-mvc" options="-Xlint:unchecked --add-exports java.base/sun.reflect.generics.reflectiveObjects=ALL-UNNAMED" />
+      <module name="prime-mvc" options="-Xlint:unchecked" />
     </option>
   </component>
   <component name="JavadocGenerationManager">
