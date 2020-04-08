@@ -102,6 +102,22 @@ public class QueryStringBuilder {
     return uri.append("?").append(sb).toString();
   }
 
+  public QueryStringBuilder ifFalse(boolean test, Consumer<QueryStringBuilder> consumer) {
+    if (!test) {
+      consumer.accept(this);
+    }
+
+    return this;
+  }
+
+  public QueryStringBuilder ifTrue(boolean test, Consumer<QueryStringBuilder> consumer) {
+    if (test) {
+      consumer.accept(this);
+    }
+
+    return this;
+  }
+
   public QueryStringBuilder uri(String uri) {
     if (this.uri.length() > 0) {
       throw new IllegalStateException("Object has already been initialized with a URL");
