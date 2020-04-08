@@ -1,6 +1,10 @@
 Prime MVC Changes
 
-Changes in 1.19.4
+Changes in 1.20.1
+
+ * Add assertBodyContains for escaped strings
+
+Changes in 1.20.0
 
  * Update ASM and Guice, and support X-HTTP-Method-Override and X-Method-Override.
 

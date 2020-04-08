@@ -229,13 +229,18 @@ public class RequestResult {
    * @return This.
    */
   public RequestResult assertBodyContains(String... strings) {
-    for (String string : strings) {
-      if (!body.contains(string)) {
-        throw new AssertionError("Body didn't contain [" + string + "]\nRedirect: [" + redirect + "]\nBody:\n" + body);
-      }
-    }
+    return _assertBodyContains(false, strings);
 
-    return this;
+  }
+
+  /**
+   * Verifies that the body contains all of the given Strings.
+   *
+   * @param strings The strings to check.
+   * @return This.
+   */
+  public RequestResult assertBodyContainsEscaped(String... strings) {
+    return _assertBodyContains(true, strings);
   }
 
   /**
@@ -1198,7 +1203,23 @@ public class RequestResult {
     return this;
   }
 
-  private RequestResult _assertBodyContainsMessagesFromKey(boolean contains, String key, boolean escaped,
+  private RequestResult _assertBodyContains(boolean escape, String... strings) {
+    if (escape) {
+      for (int i = 0; i < strings.length; i++) {
+        strings[i] = escape(strings[i]);
+      }
+    }
+
+    for (String string : strings) {
+      if (!body.contains(string)) {
+        throw new AssertionError("Body didn't contain [" + string + "]\nRedirect: [" + redirect + "]\nBody:\n" + body);
+      }
+    }
+
+    return this;
+  }
+
+  private RequestResult _assertBodyContainsMessagesFromKey(boolean contains, String key, boolean escape,
                                                            Object... values) {
     MessageProvider messageProvider = get(MessageProvider.class);
     ActionInvocationStore actionInvocationStore = get(ActionInvocationStore.class);
@@ -1210,12 +1231,8 @@ public class RequestResult {
 
     String message = messageProvider.getMessage(key, values);
 
-    // TODO
-    // Should we be escaping everything that FreeMarker does? We could also just build a small template
-    // and render it to allow FreeMarker to escape it like we do with BodyTools
-    if (escaped) {
-      message = message.replaceAll("\"", "&quot;")
-                       .replaceAll("'", "&#39;");
+    if (escape) {
+      message = escape(message);
     }
 
     if (contains != body.contains(message)) {
@@ -1243,6 +1260,16 @@ public class RequestResult {
         throw new AssertionError("Actual redirect not equal to the expected. expected [" + expectedUri + "] but found [" + redirect + "]");
       }
     }
+  }
+
+  private String escape(String s) {
+    // TODO
+    // Should we be escaping everything that FreeMarker does? We could also just build a small template
+    // and render it to allow FreeMarker to escape it like we do with BodyTools
+    return s.replaceAll("\"", "&quot;")
+            .replaceAll("'", "&#39;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;");
   }
 
   private String normalize(String input) {
