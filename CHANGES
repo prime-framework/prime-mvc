@@ -1,5 +1,9 @@
 Prime MVC Changes
 
+Changes in 1.20.3
+
+ * Set save request cookie as HTTP Only and use the Secure flag if on https.
+
 Changes in 1.20.2
 
  * Add optional ifTrue and ifFalse to the QueryStringBuilder.
