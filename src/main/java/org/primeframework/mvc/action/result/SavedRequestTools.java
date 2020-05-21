@@ -65,6 +65,9 @@ public class SavedRequestTools {
       cookie.setPath("/"); // Turn the cookie on for everything since we have no clue what URI will Re-execute the Saved Request
       cookie.setMaxAge(-1); // Be explicit
       cookie.setVersion(1); // Be explicit
+      cookie.setHttpOnly(true);
+      // Set to secure when schema is 'https'
+      cookie.setSecure(savedRequest.uri.startsWith("https"));
       return cookie;
     } catch (JsonProcessingException | IllegalBlockSizeException | BadPaddingException | NoSuchPaddingException | InvalidAlgorithmParameterException | InvalidKeyException | NoSuchAlgorithmException | ShortBufferException e) {
       throw new SavedRequestException(e);
