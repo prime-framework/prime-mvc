@@ -105,7 +105,7 @@ public interface MVCConfiguration {
   /**
    * Tomcat limits the header size to 8192 bytes (8 KB). See maxHttpHeaderSize on https://tomcat.apache.org/tomcat-8.5-doc/config/http.html
    * <br>
-   * If we write the save request cookie to big we will exceed 8 KB and the client will receive a 500 from Tomcat with
+   * If we write the save request cookie too big we will exceed 8 KB and the client will receive a 500 from Tomcat with
    * the following stack trace.
    * <pre>
    *    org.apache.coyote.http11.HeadersTooLargeException: An attempt was made to write more data to the response headers than there was room available in the buffer.
