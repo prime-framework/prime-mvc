@@ -90,6 +90,33 @@ public class ResourceBundleMessageProviderTest extends PrimeBaseTest {
   }
 
   @Test
+  public void defaultMessages() {
+    MockServletContext context = new MockContainer().newServletContext(new File("src/test/java"));
+
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/l10n/", null, null)).times(4);
+    replay(store);
+
+    LocaleProvider localeProvider = createStrictMock(LocaleProvider.class);
+    expect(localeProvider.get()).andReturn(Locale.US).times(15);
+    replay(localeProvider);
+
+    ResourceBundleMessageProvider provider = new ResourceBundleMessageProvider(localeProvider, new WebControl(new ServletContainerResolver(context), configuration), store);
+    assertEquals(provider.getMessage("[blank]foo.bar"), "Required (foo.bar)");
+    assertEquals(provider.getMessage("[blank]baz"), "Required (default)");
+
+    // Really missing
+    try {
+      provider.getMessage("[not_found]bar");
+      fail("Should have failed");
+    } catch (MissingMessageException e) {
+      // Expected
+    }
+
+    verify(store);
+  }
+
+  @Test
   public void search() {
     MockServletContext context = new MockContainer().newServletContext(new File("src/test/java"));
 

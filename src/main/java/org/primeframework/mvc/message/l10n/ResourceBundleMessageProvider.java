@@ -86,6 +86,11 @@ public class ResourceBundleMessageProvider implements MessageProvider {
   public String getOptionalMessage(String key, Object... values) {
     ActionInvocation actionInvocation = invocationStore.getCurrent();
     String template = findMessage(actionInvocation, key);
+    // See if a default message exists for this key
+    if (template == null) {
+      template = findDefaultMessage(actionInvocation, key);
+    }
+
     if (template == null) {
       if (!"[ValidationException]".equals(key)) {
         logger.debug("Message could not be found for the URI [" + actionInvocation.actionURI + "] and key [" + key + "]");
@@ -129,6 +134,24 @@ public class ResourceBundleMessageProvider implements MessageProvider {
         return rb.getString(key);
       } catch (MissingResourceException ignore) {
         // Ignore and check the next bundle
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * For "bracketed" style messages such as [blank]foo.bar, fall back to [blank] as a default.
+   *
+   * @param actionInvocation The action invocation.
+   * @param key              The key of the message.
+   * @return The message or null if it doesn't exist.
+   */
+  private String findDefaultMessage(ActionInvocation actionInvocation, String key) {
+    if (key.indexOf('[') == 0) {
+      int index = key.indexOf(']', 1);
+      if (index != -1) {
+        return findMessage(actionInvocation, key.substring(0, index + 1));
       }
     }
 
