@@ -16,6 +16,7 @@
 package org.primeframework.mvc.action.config;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
@@ -81,6 +82,8 @@ public class ActionConfiguration {
 
   public final List<String> securitySchemes;
 
+  public final List<Field> unknownParameterFields;
+
   public final String uri;
 
   public final boolean validatable;
@@ -98,7 +101,7 @@ public class ActionConfiguration {
                              Map<String, PreParameter> preParameterMembers, Map<String,
       FileUpload> fileUploadMembers, Set<String> memberNames, List<String> securitySchemes,
                              List<ScopeField> scopeFields, Map<Class<?>, Object> additionalConfiguration, String uri,
-                             List<Method> preValidationMethods) {
+                             List<Method> preValidationMethods, List<Field> unknownParameterFields) {
 
     Objects.requireNonNull(actionClass);
 
@@ -122,6 +125,7 @@ public class ActionConfiguration {
     this.validatable = Validatable.class.isAssignableFrom(actionClass);
     this.uri = uri;
     this.annotation = actionClass.getAnnotation(Action.class);
+    this.unknownParameterFields = unknownParameterFields;
 
     // Load the annotations on the class
     Annotation[] annotations = actionClass.getAnnotations();

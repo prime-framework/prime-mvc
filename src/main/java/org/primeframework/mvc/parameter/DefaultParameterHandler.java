@@ -16,7 +16,9 @@
 package org.primeframework.mvc.parameter;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +41,7 @@ import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.el.BeanExpressionException;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.parameter.el.ExpressionException;
+import org.primeframework.mvc.parameter.el.ReadExpressionException;
 import org.primeframework.mvc.parameter.fileupload.FileInfo;
 import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
 import org.primeframework.mvc.servlet.HTTPMethod;
@@ -99,7 +102,7 @@ public class DefaultParameterHandler implements ParameterHandler {
     Object action = actionInvocation.action;
 
     // First, process the pre-parameters
-    setValues(parameters.pre, action, true);
+    setValues(parameters.pre, actionInvocation, true);
 
     // Next, invoke pre methods
     ActionConfiguration actionConfiguration = actionInvocation.configuration;
@@ -113,10 +116,10 @@ public class DefaultParameterHandler implements ParameterHandler {
     }
 
     // Next, process the optional
-    setValues(parameters.optional, action, true);
+    setValues(parameters.optional, actionInvocation, true);
 
     // Next, process the required
-    setValues(parameters.required, action, configuration.allowUnknownParameters());
+    setValues(parameters.required, actionInvocation, configuration.allowUnknownParameters());
 
     // Next, process the files
     if (parameters.files.size() > 0) {
@@ -184,11 +187,13 @@ public class DefaultParameterHandler implements ParameterHandler {
    * Sets the given values into the action.
    *
    * @param values                 The value mapping.
-   * @param action                 The action.
+   * @param actionInvocation       The action invocation.
    * @param allowUnknownParameters Whether or not invalid parameters should throw an exception or just be ignored and
    *                               log a fine message.
    */
-  protected void setValues(Map<String, Struct> values, Object action, boolean allowUnknownParameters) {
+  protected void setValues(Map<String, Struct> values, ActionInvocation actionInvocation,
+                           boolean allowUnknownParameters) {
+    Object action = actionInvocation.action;
     for (String key : values.keySet()) {
       Struct struct = values.get(key);
 
@@ -204,7 +209,9 @@ public class DefaultParameterHandler implements ParameterHandler {
       } catch (BeanExpressionException ee) {
         throw ee;
       } catch (ExpressionException ee) {
-        if (!allowUnknownParameters) {
+        if (actionInvocation.configuration.unknownParameterFields.size() == 1) {
+          captureUnknownParameter(key, struct, actionInvocation);
+        } else if (!allowUnknownParameters) {
           throw ee;
         }
 
@@ -233,6 +240,24 @@ public class DefaultParameterHandler implements ParameterHandler {
       }
 
       messageStore.add(new SimpleFieldMessage(MessageType.ERROR, key, code, ce.getMessage()));
+    }
+  }
+
+  private void captureUnknownParameter(String key, Struct struct, ActionInvocation actionInvocation) {
+    Field field = actionInvocation.configuration.unknownParameterFields.get(0);
+    try {
+      @SuppressWarnings("unchecked")
+      Map<String, String[]> unknownParameters = (Map<String, String[]>) field.get(actionInvocation.action);
+      String[] existing = unknownParameters.get(key);
+      if (existing == null) {
+        unknownParameters.put(key, struct.values);
+      } else {
+        List<String> e = new ArrayList<>(Arrays.asList(existing));
+        e.addAll(Arrays.asList(struct.values));
+        unknownParameters.put(key, e.toArray(new String[]{}));
+      }
+    } catch (IllegalAccessException e) {
+      throw new ReadExpressionException("Illegal access for field [" + field + "]", e);
     }
   }
 }

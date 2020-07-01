@@ -4,6 +4,7 @@ Changes in 1.21.0
 
  * Support default messages. For example, a message key such as [blank]foo.bar=Required can be replaced with [blank]=Required.
    This allows for common UI message keys to be collapsed to a single value when specific messages are not required.
+ * Add support for a catch all Map<String, String[]> for unknown parameters using @UnknownParameters.
 
 Changes in 1.20.3
 

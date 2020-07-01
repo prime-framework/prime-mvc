@@ -46,6 +46,7 @@ import org.primeframework.mvc.control.form.annotation.FormPrepareMethod;
 import org.primeframework.mvc.parameter.annotation.PostParameterMethod;
 import org.primeframework.mvc.parameter.annotation.PreParameter;
 import org.primeframework.mvc.parameter.annotation.PreParameterMethod;
+import org.primeframework.mvc.parameter.annotation.UnknownParameters;
 import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
 import org.primeframework.mvc.scope.ScopeField;
 import org.primeframework.mvc.scope.annotation.ScopeAnnotation;
@@ -120,9 +121,12 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
 
     Map<Class<?>, Object> additionalConfiguration = getAdditionalConfiguration(actionClass);
 
+    // Unknown parameters map
+    List<Field> unknownParameters = findUnknownParameterFields(actionClass);
+
     return new ActionConfiguration(actionClass, executeMethods, validationMethods, formPrepareMethods, authorizationMethods,
         jwtAuthorizationMethods, postValidationMethods, preParameterMethods, postParameterMethods, resultAnnotations, preParameterMembers,
-        fileUploadMembers, memberNames, securitySchemes, scopeFields, additionalConfiguration, uri, preValidationMethods);
+        fileUploadMembers, memberNames, securitySchemes, scopeFields, additionalConfiguration, uri, preValidationMethods, unknownParameters);
   }
 
   /**
@@ -429,6 +433,15 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
     }
 
     return scopeFields;
+  }
+
+  protected List<Field> findUnknownParameterFields(Class<?> actionClass) {
+    List<Field> unknownParameters = ReflectionUtils.findAllFieldsWithAnnotation(actionClass, UnknownParameters.class);
+    if (unknownParameters.size() > 1) {
+      throw new PrimeException("The action class [" + actionClass + "] has more than one field annotated with " + UnknownParameters.class.getSimpleName() + ". This annotation may only be used once in the action class.");
+    }
+
+    return unknownParameters;
   }
 
   /**

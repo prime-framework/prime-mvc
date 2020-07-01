@@ -135,7 +135,7 @@ public class JSONResultTest extends PrimeBaseTest {
 
     Map<Class<?>, Object> additionalConfiguration = new HashMap<>();
     additionalConfiguration.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(null, new ResponseMember(JSON_RESPONSE_ANNOTATION, "user")));
-    ActionConfiguration config = new ActionConfiguration(PostAction.class, null, null, null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, additionalConfiguration, null, null);
+    ActionConfiguration config = new ActionConfiguration(PostAction.class, null, null, null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, additionalConfiguration, null, null, null);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(action, new ExecuteMethodConfiguration(httpMethod, null, null), "/foo", "", config));
     replay(store);
@@ -260,7 +260,7 @@ public class JSONResultTest extends PrimeBaseTest {
 
     Map<Class<?>, Object> additionalConfiguration = new HashMap<>();
     additionalConfiguration.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(null, new ResponseMember(JSON_RESPONSE_ANNOTATION, "user")));
-    ActionConfiguration config = new ActionConfiguration(PostAction.class, null, null, null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, additionalConfiguration, null, null);
+    ActionConfiguration config = new ActionConfiguration(PostAction.class, null, null, null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, additionalConfiguration, null, null, null);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
 
     expect(store.getCurrent()).andReturn(new ActionInvocation(action, new ExecuteMethodConfiguration(httpMethod, null, null), "/foo", "", config));

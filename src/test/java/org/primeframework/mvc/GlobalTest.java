@@ -725,6 +725,23 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void get_unknownParameter() throws Exception {
+    configuration.allowUnknownParameters = false;
+    test.simulate(() -> simulator.test("/unknown-parameter")
+                                 .withParameter("foo", "bar")
+                                 .withParameter("foo", "baz")
+                                 .withParameter("foo.bar", "baz")
+                                 .withParameter("foo/0/bar/bam", "purple")
+                                 .post()
+                                 .assertStatusCode(200)
+                                 .assertBodyContains(
+                                     "foo => [bar,baz]",
+                                     "foo.bar => [baz]",
+                                     "foo/0/bar/bam => [purple]"
+                                 ));
+  }
+
+  @Test
   public void get_wellKnownDotPrefixed() throws Exception {
     test.simulate(() -> simulator.test("/.well-known/openid-configuration")
                                  .get()
