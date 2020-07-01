@@ -1221,6 +1221,46 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void post_objectMapValues() throws Exception {
+    // Dot notation, set into typed map of Map<String, Object>
+    test.simulate(() -> simulator.test("/object-map-values")
+                                 .withParameter("foo.bar.baz", "bing")
+                                 .post()
+                                 .assertStatusCode(200)
+                                 .assertJSONFile(jsonDir.resolve("ObjectMapValues-post-test-1-response.json")));
+
+    // Bracketed notation - functionally the same as dot. This should produce a map.
+    test.simulate(() -> simulator.test("/object-map-values")
+                                 .withParameter("foo.bar['baz']", "bing")
+                                 .post()
+                                 .assertStatusCode(200)
+                                 .assertJSONFile(jsonDir.resolve("ObjectMapValues-post-test-2-response.json")));
+
+    // Bracketed notation - functionally the same as dot. This should produce a map.
+    test.simulate(() -> simulator.test("/object-map-values")
+                                 .withParameter("foo.bar['baz']", "bing")
+                                 .withParameter("foo.bar['baz']", "boom")
+                                 .post()
+                                 .assertStatusCode(200)
+                                 .assertJSONFile(jsonDir.resolve("ObjectMapValues-post-test-3-response.json")));
+
+    // Bracketed notation using an integer, this is an array.
+    test.simulate(() -> simulator.test("/object-map-values")
+                                 .withParameter("foo.bar[0]", "bing")
+                                 .post()
+                                 .assertStatusCode(200)
+                                 .assertJSONFile(jsonDir.resolve("ObjectMapValues-post-test-4-response.json")));
+
+    // Bracketed notation using an integer, this is an array.
+    test.simulate(() -> simulator.test("/object-map-values")
+                                 .withParameter("foo.bar[0]", "bing")
+                                 .withParameter("foo.bar[1]", "boom")
+                                 .post()
+                                 .assertStatusCode(200)
+                                 .assertJSONFile(jsonDir.resolve("ObjectMapValues-post-test-5-response.json")));
+  }
+
+  @Test
   public void post_onlyAllowTextHTML() throws Exception {
     test.createFile("<strong>Hello World</strong>")
         .simulate(() -> simulator.test("/file-upload")

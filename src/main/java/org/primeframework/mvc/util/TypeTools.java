@@ -138,8 +138,8 @@ public class TypeTools {
       }
     }
 
-    throw new CollectionExpressionException("The method or member [" + path + "] returns a simple Map. Unable to determine the " +
-        "types of the Map. Please make this method or member generic so that the correct type can be determined.");
+    // Default to a string object map.
+    return new Type[]{String.class, Object.class};
   }
 
   /**

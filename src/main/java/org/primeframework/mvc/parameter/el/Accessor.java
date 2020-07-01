@@ -141,7 +141,7 @@ public abstract class Accessor {
       }
     }
 
-    // The converter does this, but pre-emptively checking these conditions will speed up conversion times
+    // The converter does this, but preemptively checking these conditions will speed up conversion times
     Class<?> typeClass = TypeTools.rawType(type);
     if (!typeClass.isInstance(values)) {
       GlobalConverter converter = converterProvider.lookup(typeClass);
@@ -163,19 +163,19 @@ public abstract class Accessor {
    */
   protected Object createValue(Object key) {
     Class<?> typeClass = TypeTools.rawType(type);
-    Object value;
+    Object value = null;
     if (Map.class == typeClass) {
-      value = new HashMap();
+      value = new HashMap<>();
     } else if (List.class == typeClass) {
-      value = new ArrayList();
+      value = new ArrayList<>();
     } else if (Set.class == typeClass) {
-      value = new HashSet();
+      value = new HashSet<>();
     } else if (Queue.class == typeClass) {
-      value = new LinkedList();
+      value = new LinkedList<>();
     } else if (Deque.class == typeClass) {
-      value = new ArrayDeque();
+      value = new ArrayDeque<>();
     } else if (SortedSet.class == typeClass) {
-      value = new TreeSet();
+      value = new TreeSet<>();
     } else if (typeClass.isArray()) {
       if (key == null) {
         throw new UpdateExpressionException("Attempting to create an array, but there isn't an index " +
@@ -185,7 +185,22 @@ public abstract class Accessor {
       value = Array.newInstance(typeClass.getComponentType(), Integer.parseInt(key.toString()) + 1);
     } else {
       try {
-        value = newInstance(key, typeClass);
+        if (typeClass == Object.class) {
+          if (key instanceof String) {
+            try {
+              Integer.parseInt((String) key);
+              value = new ArrayList<>();
+            } catch (Exception ignore) {
+            }
+          }
+
+          if (value == null) {
+            value = new HashMap<>();
+          }
+
+        } else {
+          value = newInstance(key, typeClass);
+        }
       } catch (Exception e) {
         throw new UpdateExpressionException("Unable to instantiate object [" + typeClass.getName() + "]");
       }
@@ -212,14 +227,14 @@ public abstract class Accessor {
 
       return Array.get(this.object, index);
     } else if (this.object instanceof List) {
-      List l = (List) this.object;
+      List<?> l = (List<?>) this.object;
       if (l.size() <= index) {
         return null;
       }
 
       return l.get(index);
     } else {
-      Iterator iter = ((Collection) this.object).iterator();
+      Iterator<?> iter = ((Collection<?>) this.object).iterator();
       Object value = null;
       for (int i = 0; i < index; i++) {
         if (iter.hasNext()) {
@@ -252,7 +267,7 @@ public abstract class Accessor {
     if (this.object.getClass().isArray()) {
       Array.set(this.object, index, value);
     } else if (this.object instanceof List) {
-      List l = (List) this.object;
+      List<Object> l = (List<Object>) this.object;
       l.set(index, value);
     } else {
       throw new UpdateExpressionException("You can only set values into arrays and Lists. You are setting a parameter into [" +
