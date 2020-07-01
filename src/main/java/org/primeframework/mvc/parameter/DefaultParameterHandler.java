@@ -18,7 +18,6 @@ package org.primeframework.mvc.parameter;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -248,14 +247,7 @@ public class DefaultParameterHandler implements ParameterHandler {
     try {
       @SuppressWarnings("unchecked")
       Map<String, String[]> unknownParameters = (Map<String, String[]>) field.get(actionInvocation.action);
-      String[] existing = unknownParameters.get(key);
-      if (existing == null) {
-        unknownParameters.put(key, struct.values);
-      } else {
-        List<String> e = new ArrayList<>(Arrays.asList(existing));
-        e.addAll(Arrays.asList(struct.values));
-        unknownParameters.put(key, e.toArray(new String[]{}));
-      }
+      unknownParameters.put(key, struct.values);
     } catch (IllegalAccessException e) {
       throw new ReadExpressionException("Illegal access for field [" + field + "]", e);
     }
