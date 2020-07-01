@@ -27,6 +27,7 @@ import org.primeframework.mvc.scope.ActionSessionScope;
  * @author Daniel DeGroff
  */
 public class ScopeTools {
+  @SuppressWarnings("unused")
   public static <T> T getActionSessionAttribute(HttpServletRequest request, String key, Class action) {
     HttpSession session = request.getSession(false);
     if (session == null) {
@@ -40,6 +41,7 @@ public class ScopeTools {
         @SuppressWarnings("unchecked")
         Map<String, Object> requestedSession = (Map<String, Object>) actionSession.get(action.getCanonicalName());
         if (requestedSession != null) {
+          //noinspection unchecked
           return (T) requestedSession.get(key);
         }
       }

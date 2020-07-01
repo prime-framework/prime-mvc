@@ -208,13 +208,14 @@ public class DefaultParameterHandler implements ParameterHandler {
       } catch (BeanExpressionException ee) {
         throw ee;
       } catch (ExpressionException ee) {
-        if (actionInvocation.configuration.unknownParameterFields.size() == 1) {
+        // If unknownParametersField is defined, then the allowUnknownParameters is ignored.
+        if (actionInvocation.configuration.unknownParametersField != null) {
           captureUnknownParameter(key, struct, actionInvocation);
-        } else if (!allowUnknownParameters) {
+        } else if (allowUnknownParameters) {
+          logger.debug("Invalid parameter to action [" + action.getClass().getName() + "]", ee);
+        } else {
           throw ee;
         }
-
-        logger.debug("Invalid parameter to action [" + action.getClass().getName() + "]", ee);
       }
     }
   }
@@ -243,7 +244,7 @@ public class DefaultParameterHandler implements ParameterHandler {
   }
 
   private void captureUnknownParameter(String key, Struct struct, ActionInvocation actionInvocation) {
-    Field field = actionInvocation.configuration.unknownParameterFields.get(0);
+    Field field = actionInvocation.configuration.unknownParametersField;
     try {
       @SuppressWarnings("unchecked")
       Map<String, String[]> unknownParameters = (Map<String, String[]>) field.get(actionInvocation.action);

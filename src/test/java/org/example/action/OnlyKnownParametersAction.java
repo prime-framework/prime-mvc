@@ -15,20 +15,13 @@
  */
 package org.example.action;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.parameter.annotation.UnknownParameters;
 
 /**
  * @author Daniel DeGroff
  */
 @Action
-public class UnknownParameterAction {
-  @UnknownParameters
-  public Map<String, String[]> unknownParameters = new HashMap<>();
-
+public class OnlyKnownParametersAction {
   public String post() {
     return "input";
   }

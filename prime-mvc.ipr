@@ -86,8 +86,9 @@
     <file url="PROJECT" charset="UTF-8" />
   </component>
   <component name="EntryPointsManager">
-    <list size="1">
+    <list size="2">
       <item index="0" class="java.lang.String" itemvalue="org.primeframework.mvc.action.annotation.Action" />
+      <item index="1" class="java.lang.String" itemvalue="org.primeframework.mvc.parameter.annotation.UnknownParameters" />
     </list>
   </component>
   <component name="IdProvider" IDEtalkID="FAFCC8F55516B0FC710A9E287F066E00" />

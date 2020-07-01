@@ -552,6 +552,25 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void get_onlyKnownParameters() {
+    // Action w/out @UnknownParameters
+    configuration.allowUnknownParameters = false;
+    test.expectException(MissingPropertyExpressionException.class, () ->
+        simulator.test("/only-known-parameters")
+                 .withParameter("foo", "bar")
+                 .withParameter("foo", "baz")
+                 .withParameter("foo.bar", "baz")
+                 .withParameter("foo/0/bar/bam", "purple")
+                 .post()
+                 .assertStatusCode(200)
+                 .assertBodyContains(
+                     "foo => [bar,baz]",
+                     "foo.bar => [baz]",
+                     "foo/0/bar/bam => [purple]"
+                 ));
+  }
+
+  @Test
   public void get_percent_encoded_segment() throws Exception {
     test.simulate(() -> test.simulator.test("/foo/view")
                                       .withURLSegment("<strong>foo</strong>")
@@ -725,9 +744,9 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
-  public void get_unknownParameter() throws Exception {
+  public void get_unknownParameters() throws Exception {
     configuration.allowUnknownParameters = false;
-    test.simulate(() -> simulator.test("/unknown-parameter")
+    test.simulate(() -> simulator.test("/unknown-parameters")
                                  .withParameter("foo", "bar")
                                  .withParameter("foo", "baz")
                                  .withParameter("foo.bar", "baz")

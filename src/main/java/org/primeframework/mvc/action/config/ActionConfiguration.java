@@ -82,7 +82,7 @@ public class ActionConfiguration {
 
   public final List<String> securitySchemes;
 
-  public final List<Field> unknownParameterFields;
+  public final Field unknownParametersField;
 
   public final String uri;
 
@@ -101,7 +101,7 @@ public class ActionConfiguration {
                              Map<String, PreParameter> preParameterMembers, Map<String,
       FileUpload> fileUploadMembers, Set<String> memberNames, List<String> securitySchemes,
                              List<ScopeField> scopeFields, Map<Class<?>, Object> additionalConfiguration, String uri,
-                             List<Method> preValidationMethods, List<Field> unknownParameterFields) {
+                             List<Method> preValidationMethods, Field unknownParametersField) {
 
     Objects.requireNonNull(actionClass);
 
@@ -125,7 +125,7 @@ public class ActionConfiguration {
     this.validatable = Validatable.class.isAssignableFrom(actionClass);
     this.uri = uri;
     this.annotation = actionClass.getAnnotation(Action.class);
-    this.unknownParameterFields = unknownParameterFields;
+    this.unknownParametersField = unknownParametersField;
 
     // Load the annotations on the class
     Annotation[] annotations = actionClass.getAnnotations();
