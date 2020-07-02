@@ -1042,7 +1042,8 @@ public class RequestResult {
    */
   public RequestResult executeFormPostInResponseBody(String selector, ThrowingConsumer<RequestResult> result)
       throws Exception {
-    return executeFormPostInResponseBody(selector, null, result);
+    executeFormPost(selector, null, result);
+    return this;
   }
 
   /**
@@ -1056,44 +1057,36 @@ public class RequestResult {
   public RequestResult executeFormPostInResponseBody(String selector, ThrowingConsumer<DOMHelper> domHelper,
                                                      ThrowingConsumer<RequestResult> result)
       throws Exception {
-    Document document = Jsoup.parse(body);
-    Element form = document.selectFirst(selector);
-
-    if (form == null) {
-      throw new AssertionError("Unable to find a form in the body using the provided select [" + selector + "]. Response body\n" + body);
-    }
-
-    if (domHelper != null) {
-      domHelper.accept(new DOMHelper(document));
-    }
-
-    String uri = form.attr("action");
-    // Try to handle relative URLs, assuming they are relative to the current request. Maybe a naive assumption, but it our use cases it works ok.
-    // - We could also just allow the caller to pass in the URI
-    if (!uri.startsWith("/")) {
-      String baseURI = request.getRequestURI();
-      if (baseURI.contains("/")) {
-        baseURI = request.getRequestURI().substring(0, baseURI.lastIndexOf("/") + 1);
-        uri = baseURI + uri;
-      }
-    }
-
-    RequestBuilder rb = new RequestBuilder(uri, container, filter, injector);
-
-    for (Element element : form.select("input, textarea")) {
-      if (!element.hasAttr("disabled")) {
-        rb.withParameter(element.attr("name"), element.val());
-      }
-    }
-
-    String method = form.attr("method");
-    if (method == null || method.equalsIgnoreCase("GET")) {
-      result.accept(rb.get());
-    } else if (method.equalsIgnoreCase("POST")) {
-      result.accept(rb.post());
-    }
-
+    executeFormPost(selector, domHelper, result);
     return this;
+  }
+
+  /**
+   * Attempt to submit the form found in the response body.
+   *
+   * @param selector The selector used to find the form in the DOM
+   * @param result   A consumer for the request result from following the redirect.
+   * @return This.
+   */
+  public RequestResult executeFormPostInResponseBodyReturnPostResult(String selector,
+                                                                     ThrowingConsumer<RequestResult> result)
+      throws Exception {
+    return executeFormPost(selector, null, result);
+  }
+
+  /**
+   * Attempt to submit the form found in the response body.
+   *
+   * @param selector  The selector used to find the form in the DOM
+   * @param domHelper A consumer for the DOM Helper
+   * @param result    A consumer for the request result from following the redirect.
+   * @return This.
+   */
+  public RequestResult executeFormPostInResponseBodyReturnPostResult(String selector,
+                                                                     ThrowingConsumer<DOMHelper> domHelper,
+                                                                     ThrowingConsumer<RequestResult> result)
+      throws Exception {
+    return executeFormPost(selector, domHelper, result);
   }
 
   /**
@@ -1270,6 +1263,51 @@ public class RequestResult {
             .replaceAll("'", "&#39;")
             .replaceAll("<", "&lt;")
             .replaceAll(">", "&gt;");
+  }
+
+  private RequestResult executeFormPost(String selector, ThrowingConsumer<DOMHelper> domHelper,
+                                        ThrowingConsumer<RequestResult> result)
+      throws Exception {
+    Document document = Jsoup.parse(body);
+    Element form = document.selectFirst(selector);
+
+    if (form == null) {
+      throw new AssertionError("Unable to find a form in the body using the provided select [" + selector + "]. Response body\n" + body);
+    }
+
+    if (domHelper != null) {
+      domHelper.accept(new DOMHelper(document));
+    }
+
+    String uri = form.attr("action");
+    // Try to handle relative URLs, assuming they are relative to the current request. Maybe a naive assumption, but it our use cases it works ok.
+    // - We could also just allow the caller to pass in the URI
+    if (!uri.startsWith("/")) {
+      String baseURI = request.getRequestURI();
+      if (baseURI.contains("/")) {
+        baseURI = request.getRequestURI().substring(0, baseURI.lastIndexOf("/") + 1);
+        uri = baseURI + uri;
+      }
+    }
+
+    RequestBuilder rb = new RequestBuilder(uri, container, filter, injector);
+
+    for (Element element : form.select("input, textarea")) {
+      if (!element.hasAttr("disabled")) {
+        rb.withParameter(element.attr("name"), element.val());
+      }
+    }
+
+    String method = form.attr("method");
+    RequestResult requestResult = null;
+    if (method == null || method.equalsIgnoreCase("GET")) {
+      requestResult = rb.get();
+    } else if (method.equalsIgnoreCase("POST")) {
+      requestResult = rb.post();
+    }
+
+    result.accept(requestResult);
+    return requestResult;
   }
 
   private String normalize(String input) {
