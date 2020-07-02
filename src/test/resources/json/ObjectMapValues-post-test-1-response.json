@@ -1,5 +1,5 @@
 {
   "bar" : {
-    "baz" : [ "bing" ]
+    "baz" : "bing"
   }
 }

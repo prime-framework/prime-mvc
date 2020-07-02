@@ -54,7 +54,7 @@ public class MapAccessor extends Accessor {
 
     Type keyType = types[0];
     if (keyType instanceof TypeVariable<?>) {
-      keyType= TypeTools.resolveGenericType(classDeclaringMap, currentClass, (TypeVariable<?>) keyType);
+      keyType = TypeTools.resolveGenericType(classDeclaringMap, currentClass, (TypeVariable<?>) keyType);
     } else {
       keyType = TypeTools.rawType(keyType); // Key type
     }
@@ -103,7 +103,11 @@ public class MapAccessor extends Accessor {
 
   @SuppressWarnings("unchecked")
   public void set(Object value, Expression expression) {
-    ((Map) this.object).put(key, value);
+    if (value instanceof String[] && ((String[]) value).length == 1) {
+      ((Map) this.object).put(key, ((String[]) value)[0]);
+    } else {
+      ((Map) this.object).put(key, value);
+    }
   }
 
   /**

@@ -69,9 +69,12 @@ public class IndexedCollectionAccessor extends Accessor {
   }
 
   public void set(Object value, Expression expression) {
-    object = pad(object, expression);
-
-    setValueIntoCollection(index, value);
+    if (value instanceof String[] && ((String[]) value).length == 1) {
+      expression.setCurrentValue(((String[]) value)[0]);
+    } else {
+      object = pad(object, expression);
+      setValueIntoCollection(index, value);
+    }
   }
 
   /**

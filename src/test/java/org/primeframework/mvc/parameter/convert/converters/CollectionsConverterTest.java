@@ -101,11 +101,11 @@ public class CollectionsConverterTest extends PrimeBaseTest {
 
       // --> java.util.Set
       Set<String> set = (Set<String>) converter.convertFromStrings(ParameterizedTypeImpl.make(Set.class, new Type[]{String.class}, null), null, "variations", values);
-      assertEquals(new TreeSet(set), new TreeSet<>(Arrays.asList(expected)));
+      assertEquals(new TreeSet<>(set), new TreeSet<>(Arrays.asList(expected)));
 
       // Without a parameterized type
       set = (Set<String>) converter.convertFromStrings(HashSet.class, null, "variations", values);
-      assertEquals(new TreeSet(set), new TreeSet<>(Arrays.asList(expected)));
+      assertEquals(new TreeSet<>(set), new TreeSet<>(Arrays.asList(expected)));
 
       // --> java.util.TreeSet
       TreeSet<String> sortedSet = (TreeSet<String>) converter.convertFromStrings(ParameterizedTypeImpl.make(TreeSet.class, new Type[]{String.class}, null), null, "variations", values);
