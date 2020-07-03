@@ -1294,7 +1294,9 @@ public class RequestResult {
 
     for (Element element : form.select("input, textarea")) {
       if (!element.hasAttr("disabled")) {
-        rb.withParameter(element.attr("name"), element.val());
+        if (!element.is("[type=radio], [type=checkbox]") || element.hasAttr("checked")) {
+          rb.withParameter(element.attr("name"), element.val());
+        }
       }
     }
 
@@ -1396,6 +1398,15 @@ public class RequestResult {
 
     public DOMHelper(Document document) {
       this.document = document;
+    }
+
+    public DOMHelper setChecked(String selector, boolean value) {
+      Element element = document.selectFirst(selector);
+      if (element != null) {
+        element.attr("checked", value);
+      }
+
+      return this;
     }
 
     public DOMHelper setValue(String selector, Object value) {

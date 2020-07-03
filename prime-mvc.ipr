@@ -1782,6 +1782,7 @@
     <dictionary name="bpontarelli" />
     <dictionary name="degroff">
       <words>
+        <w>asserter</w>
         <w>marshalled</w>
       </words>
     </dictionary>

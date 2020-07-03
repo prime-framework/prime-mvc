@@ -298,10 +298,13 @@ public class GlobalTest extends PrimeBaseTest {
                                                                                                                                      "textValue",
                                                                                                                                      "disabledEmpty", // This will be missing so the 'Empty' value will be rendered
                                                                                                                                      "hiddenValue",
-                                                                                                                                     "radioValue",
-                                                                                                                                     "checkboxValue",
+                                                                                                                                     "radioValue2",
+                                                                                                                                     "checkboxValue2",
                                                                                                                                      "textareaValue")
-                                                                                                                                 .assertBodyDoesNotContain("disabledValue")))));
+                                                                                                                                 .assertBodyDoesNotContain(
+                                                                                                                                     "disabledValue",
+                                                                                                                                     "radioValue1",
+                                                                                                                                     "checkboxValue1")))));
   }
 
   @Test
