@@ -594,7 +594,10 @@ public class RequestBuilder {
 
     // If the CSRF token is enabled and the parameter isn't set, we set it to be consistent.
     if (CSRF.getParameterToken(request) == null) {
-      CSRF.setParameterToken(request);
+      String token = CSRF.getSessionToken(request);
+      if (token != null) {
+        request.setParameter(CSRF.CSRF_PARAMETER_KEY, token);
+      }
     }
 
     try {

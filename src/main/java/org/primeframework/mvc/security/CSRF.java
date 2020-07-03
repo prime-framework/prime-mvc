@@ -20,8 +20,6 @@ import javax.servlet.http.HttpSession;
 import java.security.SecureRandom;
 import java.util.Base64;
 
-import org.primeframework.mock.servlet.MockHttpServletRequest;
-
 /**
  * Helper class for CSRF tokens and session keys.
  *
@@ -50,13 +48,6 @@ public final class CSRF {
     }
 
     return null;
-  }
-
-  public static void setParameterToken(MockHttpServletRequest request) {
-    String token = getSessionToken(request);
-    if (token != null) {
-      request.setParameter(CSRF_PARAMETER_KEY, token);
-    }
   }
 
   public static void storeToken(HttpSession session) {
