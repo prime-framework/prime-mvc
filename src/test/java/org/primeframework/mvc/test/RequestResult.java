@@ -1276,7 +1276,7 @@ public class RequestResult {
     }
 
     if (domHelper != null) {
-      domHelper.accept(new DOMHelper(document));
+      domHelper.accept(new DOMHelper(body, document));
     }
 
     String uri = form.attr("action");
@@ -1394,27 +1394,33 @@ public class RequestResult {
   }
 
   public static class DOMHelper {
+    public String body;
+
     public Document document;
 
-    public DOMHelper(Document document) {
+    public DOMHelper(String body, Document document) {
+      this.body = body;
       this.document = document;
     }
 
     public DOMHelper setChecked(String selector, boolean value) {
       Element element = document.selectFirst(selector);
-      if (element != null) {
-        element.attr("checked", value);
+      if (element == null) {
+        throw new AssertionError("Expected at least one element to match the selector " + selector + ". Found [0] elements instead. Unable to set element value.\n\nActual body:\n" + body);
       }
 
+      element.attr("checked", value);
       return this;
     }
 
     public DOMHelper setValue(String selector, Object value) {
       if (value != null) {
         Element element = document.selectFirst(selector);
-        if (element != null) {
-          element.val(value.toString());
+        if (element == null) {
+          throw new AssertionError("Expected at least one element to match the selector " + selector + ". Found [0] elements instead. Unable to set element value.\n\nActual body:\n" + body);
         }
+
+        element.val(value.toString());
       }
 
       return this;
@@ -1440,7 +1446,7 @@ public class RequestResult {
     public HTMLAsserter assertElementDoesNotExist(String selector) {
       Elements elements = document.select(selector);
       if (elements.size() > 0) {
-        throw new AssertionError("Expected 0 elements to match the selector " + selector + ". Found [" + (elements.size() + "] elements.\n" + elements));
+        throw new AssertionError("Expected 0 elements to match the selector " + selector + ". Found [" + (elements.size() + "] elements.\n" + elements) + "\n\nActual body:\n" + requestResult.body);
       }
 
       return this;
@@ -1455,7 +1461,7 @@ public class RequestResult {
     public HTMLAsserter assertElementExists(String selector) {
       Elements elements = document.select(selector);
       if (elements.size() != 1) {
-        throw new AssertionError("Expected a single element to match the selector " + selector + ". Found [" + elements.size() + "] elements instead." + ((elements.size() == 0) ? "" : "\n\n" + elements));
+        throw new AssertionError("Expected a single element to match the selector " + selector + ". Found [" + elements.size() + "] elements instead." + ((elements.size() == 0) ? "" : "\n\n" + elements) + "\n\nActual body:\n" + requestResult.body);
       }
 
       return this;
@@ -1471,12 +1477,12 @@ public class RequestResult {
     public HTMLAsserter assertElementInnerHTML(String selector, String expectedInnerHTML) {
       Elements elements = document.select(selector);
       if (elements.size() != 1) {
-        throw new AssertionError("Expected a single element to match the selector " + selector + ". Found [" + elements.size() + "] elements instead." + ((elements.size() == 0) ? "" : "\n\n" + elements));
+        throw new AssertionError("Expected a single element to match the selector " + selector + ". Found [" + elements.size() + "] elements instead." + ((elements.size() == 0) ? "" : "\n\n" + elements) + "\n\nActual body:\n" + requestResult.body);
       }
 
       Element element = elements.get(0);
       if (!expectedInnerHTML.equals(element.html())) {
-        throw new AssertionError("Expected a value of [" + expectedInnerHTML + "] to match the selector " + selector + ". Found [" + element.html() + "] instead.");
+        throw new AssertionError("Expected a value of [" + expectedInnerHTML + "] to match the selector " + selector + ". Found [" + element.html() + "] instead." + "\n\nActual body:\n" + requestResult.body);
       }
 
       return this;
@@ -1492,12 +1498,12 @@ public class RequestResult {
     public HTMLAsserter assertElementValue(String selector, Object value) {
       Elements elements = document.select(selector);
       if (elements.size() != 1) {
-        throw new AssertionError("Expected a single element to match the selector " + selector + ". Found [" + elements.size() + "] instead." + ((elements.size() == 0) ? "" : "\n\n" + elements));
+        throw new AssertionError("Expected a single element to match the selector " + selector + ". Found [" + elements.size() + "] instead." + ((elements.size() == 0) ? "" : "\n\n" + elements) + "\n\nActual body:\n" + requestResult.body);
       }
 
       Element element = elements.get(0);
       if (!element.val().equals(value.toString())) {
-        throw new AssertionError("Using the selector [" + selector + "] expected [" + value.toString() + "] but found [" + element.val() + "]. Actual matched element: \n\n" + element);
+        throw new AssertionError("Using the selector [" + selector + "] expected [" + value.toString() + "] but found [" + element.val() + "]. Actual matched element: \n\n" + element + "\n\nActual body:\n" + requestResult.body);
       }
 
       return this;

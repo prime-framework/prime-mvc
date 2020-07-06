@@ -19,17 +19,6 @@
     <orderEntry type="module-library" scope="PROVIDED">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/jsoup/jsoup/1.12.1/jsoup-1.12.1.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/jsoup/jsoup/1.12.1/jsoup-1.12.1-src.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" scope="PROVIDED">
-      <library>
-        <CLASSES>
           <root url="jar://$USER_HOME$/.savant/cache/javax/servlet/servlet-api/3.1.0/servlet-api-3.1.0.jar!/" />
         </CLASSES>
         <JAVADOC />
@@ -151,11 +140,11 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/freemarker/freemarker/2.3.28/freemarker-2.3.28.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/org/freemarker/freemarker/2.3.30/freemarker-2.3.30.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/freemarker/freemarker/2.3.28/freemarker-2.3.28-src.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/org/freemarker/freemarker/2.3.30/freemarker-2.3.30-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -167,17 +156,6 @@
         <JAVADOC />
         <SOURCES>
           <root url="jar://$USER_HOME$/.savant/cache/org/ow2/asm/asm/7.3.1/asm-7.3.1-src.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/primeframework/prime-mock/0.7.3/prime-mock-0.7.3.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/primeframework/prime-mock/0.7.3/prime-mock-0.7.3-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -361,6 +339,28 @@
         <JAVADOC />
         <SOURCES>
           <root url="jar://$USER_HOME$/.savant/cache/com/beust/jcommander/1.72.0/jcommander-1.72.0-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="TEST">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.savant/cache/org/jsoup/jsoup/1.12.1/jsoup-1.12.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.savant/cache/org/jsoup/jsoup/1.12.1/jsoup-1.12.1-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="TEST">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.savant/cache/org/primeframework/prime-mock/0.7.3/prime-mock-0.7.3.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.savant/cache/org/primeframework/prime-mock/0.7.3/prime-mock-0.7.3-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>

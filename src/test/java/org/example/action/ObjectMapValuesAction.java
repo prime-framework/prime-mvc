@@ -30,6 +30,10 @@ public class ObjectMapValuesAction {
   @JSONResponse
   public Map<String, Object> foo;
 
+  public String get() {
+    return "input";
+  }
+
   public String post() {
     return "success";
   }

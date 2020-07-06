@@ -555,6 +555,17 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void get_objectMapValues() throws Exception {
+    // Testing ?eval against a generic map
+    test.simulate(() -> simulator.test("/object-map-values")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertBodyContains(
+                                     "Name:foo.data.preferences.coffee.style",
+                                     ":Value::Value:"));
+  }
+
+  @Test
   public void get_onlyKnownParameters() {
     // Action w/out @UnknownParameters
     configuration.allowUnknownParameters = false;

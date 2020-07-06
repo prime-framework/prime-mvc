@@ -42,12 +42,12 @@ public class FreeMarkerConfigurationProvider implements Provider<Configuration> 
 
   @Override
   public Configuration get() {
-    BeansWrapperBuilder builder = new BeansWrapperBuilder(Configuration.VERSION_2_3_28);
+    BeansWrapperBuilder builder = new BeansWrapperBuilder(Configuration.VERSION_2_3_30);
     builder.setExposeFields(true);
     builder.setSimpleMapWrapper(true);
 
     int checkSeconds = configuration.templateCheckSeconds();
-    Configuration config = new Configuration(Configuration.VERSION_2_3_28);
+    Configuration config = new Configuration(Configuration.VERSION_2_3_30);
     config.setTagSyntax(Configuration.SQUARE_BRACKET_TAG_SYNTAX);
     config.setTemplateUpdateDelayMilliseconds(checkSeconds * 1000);
     config.setTemplateLoader(loader);
