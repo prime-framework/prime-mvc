@@ -1,0 +1,13 @@
+{
+  "data": {
+    "preferences": {
+      "cars": {
+        "count": "2"
+      },
+      "coffee": {
+        "style": "with cream"
+      },
+      "fruit" : [ "apples", "oranges", "strawberries" ]
+    }
+  }
+}

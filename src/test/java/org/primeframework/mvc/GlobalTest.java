@@ -1261,6 +1261,17 @@ public class GlobalTest extends PrimeBaseTest {
                                  .post()
                                  .assertStatusCode(200)
                                  .assertJSONFile(jsonDir.resolve("ObjectMapValues-post-test-5-response.json")));
+
+    // Nested properties
+    test.simulate(() -> simulator.test("/object-map-values")
+                                 .withParameter("foo.data.preferences.coffee.style", "with cream")
+                                 .withParameter("foo.data.preferences.cars.count", 2)
+                                 .withParameter("foo.data.preferences.fruit", "oranges")
+                                 .withParameter("foo.data.preferences.fruit", "apples")
+                                 .withParameter("foo.data.preferences.fruit", "strawberries")
+                                 .post()
+                                 .assertStatusCode(200)
+                                 .assertJSONFile(jsonDir.resolve("ObjectMapValues-post-test-6-response.json")));
   }
 
   @Test
