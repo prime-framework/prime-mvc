@@ -230,7 +230,6 @@ public class RequestResult {
    */
   public RequestResult assertBodyContains(String... strings) {
     return _assertBodyContains(false, strings);
-
   }
 
   /**
