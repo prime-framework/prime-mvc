@@ -1,0 +1,11 @@
+{
+  "fieldErrors": {
+    "active": [
+      {
+        "code": "[invalidJSON]",
+        "message": "Unable to parse JSON. The property [active] was invalid. The error was [Possible conversion error]. The detailed exception was [Cannot deserialize instance of `boolean` out of START_ARRAY token\n at [Source: (String)\"{\n  \"active\": [\"true\"]\n}\"; line: 2, column: 13] (through reference chain: org.example.domain.UserField[\"active\"])]."
+      }
+    ]
+  },
+  "generalErrors": []
+}

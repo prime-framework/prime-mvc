@@ -96,6 +96,11 @@ target(name: "compile", description: "Compiles the project") {
 }
 
 target(name: "jar", description: "JARs the project", dependsOn: ["compile"]) {
+  // Don't include the logback-test.xml in the test jar
+  file.delete {
+    fileSet(dir: "build/classes/test/", includePatterns: [~/logback-test.xml/])
+  }
+
   java.jar()
 }
 
