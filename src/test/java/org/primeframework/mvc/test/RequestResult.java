@@ -1311,24 +1311,19 @@ public class RequestResult {
   }
 
   private MessageProvider getMessageProviderToLookupMessages() {
-    boolean testing = false;
-    if (testing) {
-      return get(MessageProvider.class);
-//      ActionInvocationStore store = injector.getInstance(ActionInvocationStore.class);
-//      store.getCurrent();
-//      store.getCurrent()
-//      return null;
-    } else {
-      MessageProvider messageProvider = get(MessageProvider.class);
-      ActionInvocationStore actionInvocationStore = get(ActionInvocationStore.class);
-      ActionMapper actionMapper = get(ActionMapper.class);
+    // TODO Since prime has already injected the action, can we just get the message provider that prime already built ?
+    // - Or is that already GC'd because the action is toast? Maybe the request result could obtain a reference to the last
+    //  action invocation that came off the stack and use that?
 
-      // Using the ActionMapper so that URL segments are properly handled and the correct URL is used for message lookups.
-      ActionInvocation actionInvocation = actionMapper.map(null, request.getRequestURI(), true);
-      actionInvocationStore.setCurrent(actionInvocation);
+    MessageProvider messageProvider = get(MessageProvider.class);
+    ActionInvocationStore actionInvocationStore = get(ActionInvocationStore.class);
+    ActionMapper actionMapper = get(ActionMapper.class);
 
-      return messageProvider;
-    }
+    // Using the ActionMapper so that URL segments are properly handled and the correct URL is used for message lookups.
+    ActionInvocation actionInvocation = actionMapper.map(null, request.getRequestURI(), true);
+    actionInvocationStore.setCurrent(actionInvocation);
+
+    return messageProvider;
   }
 
   private String normalize(String input) {
