@@ -20,6 +20,8 @@ import org.primeframework.mvc.servlet.HTTPMethod;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is the default action mapper implementation.
@@ -27,6 +29,8 @@ import com.google.inject.Injector;
  * @author Brian Pontarelli
  */
 public class DefaultActionMapper implements ActionMapper {
+  private static final Logger logger = LoggerFactory.getLogger(DefaultActionMapper.class);
+
   private final ActionConfigurationProvider actionConfigurationProvider;
 
   private final Injector injector;
@@ -51,8 +55,21 @@ public class DefaultActionMapper implements ActionMapper {
         return indexInvocation;
       }
     } else if (invocation.configuration != null) {
+      // Timer if debug is enabled
+      long start = 0;
+      if (logger.isDebugEnabled()) {
+        start = System.currentTimeMillis();
+      }
+
       // Create the action and find the method
       invocation.action = injector.getInstance(invocation.configuration.actionClass);
+
+      // Spit out the timer
+      if (logger.isDebugEnabled()) {
+        logger.debug("Injection took [{}] for [{}]", (System.currentTimeMillis() - start), invocation.actionURI);
+        Thread.dumpStack();
+      }
+
       invocation.method = invocation.configuration.executeMethods.get(httpMethod);
     }
 
