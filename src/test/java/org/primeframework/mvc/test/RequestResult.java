@@ -251,7 +251,8 @@ public class RequestResult {
    * @return This.
    */
   public RequestResult assertBodyContainsEscapedMessagesFromKey(String key, Object... values) {
-    return _assertBodyContainsMessagesFromKey(true, key, true, values);
+    MessageProvider messageProvider = getMessageProviderToLookupMessages();
+    return _assertBodyContainsMessagesFromKey(messageProvider, true, key, true, values);
   }
 
   /**
@@ -262,8 +263,9 @@ public class RequestResult {
    * @return This.
    */
   public RequestResult assertBodyContainsEscapedMessagesFromKeys(String... keys) {
+    MessageProvider messageProvider = getMessageProviderToLookupMessages();
     for (String key : keys) {
-      assertBodyContainsEscapedMessagesFromKey(key, "foo", "bar", "baz");
+      _assertBodyContainsMessagesFromKey(messageProvider, true, key, true);
     }
 
     return this;
@@ -278,7 +280,8 @@ public class RequestResult {
    * @return This.
    */
   public RequestResult assertBodyContainsMessagesFromKey(String key, Object... values) {
-    return _assertBodyContainsMessagesFromKey(true, key, false, values);
+    MessageProvider messageProvider = getMessageProviderToLookupMessages();
+    return _assertBodyContainsMessagesFromKey(messageProvider, true, key, false, values);
   }
 
   /**
@@ -289,8 +292,9 @@ public class RequestResult {
    * @return This.
    */
   public RequestResult assertBodyContainsMessagesFromKeys(String... keys) {
+    MessageProvider messageProvider = getMessageProviderToLookupMessages();
     for (String key : keys) {
-      assertBodyContainsMessagesFromKey(key, "foo", "bar", "baz");
+      _assertBodyContainsMessagesFromKey(messageProvider, true, key, false, "foo", "bar", "baz");
     }
 
     return this;
@@ -321,7 +325,8 @@ public class RequestResult {
    * @return This.
    */
   public RequestResult assertBodyDoesNotContainMessagesFromKey(String key, Object... values) {
-    return _assertBodyContainsMessagesFromKey(false, key, false, values);
+    MessageProvider messageProvider = getMessageProviderToLookupMessages();
+    return _assertBodyContainsMessagesFromKey(messageProvider, false, key, false, values);
   }
 
   /**
@@ -332,8 +337,9 @@ public class RequestResult {
    * @return This.
    */
   public RequestResult assertBodyDoesNotContainMessagesFromKeys(String... keys) {
+    MessageProvider messageProvider = getMessageProviderToLookupMessages();
     for (String key : keys) {
-      assertBodyDoesNotContainMessagesFromKey(key, "foo", "bar", "baz");
+      _assertBodyContainsMessagesFromKey(messageProvider, false, key, false, "foo", "bar", "baz");
     }
 
     return this;
@@ -1211,16 +1217,9 @@ public class RequestResult {
     return this;
   }
 
-  private RequestResult _assertBodyContainsMessagesFromKey(boolean contains, String key, boolean escape,
+  private RequestResult _assertBodyContainsMessagesFromKey(MessageProvider messageProvider, boolean contains,
+                                                           String key, boolean escape,
                                                            Object... values) {
-    MessageProvider messageProvider = get(MessageProvider.class);
-    ActionInvocationStore actionInvocationStore = get(ActionInvocationStore.class);
-    ActionMapper actionMapper = get(ActionMapper.class);
-
-    // Using the ActionMapper so that URL segments are properly handled and the correct URL is used for message lookups.
-    ActionInvocation actionInvocation = actionMapper.map(null, request.getRequestURI(), true);
-    actionInvocationStore.setCurrent(actionInvocation);
-
     String message = messageProvider.getMessage(key, values);
 
     if (escape) {
@@ -1309,6 +1308,27 @@ public class RequestResult {
 
     result.accept(requestResult);
     return requestResult;
+  }
+
+  private MessageProvider getMessageProviderToLookupMessages() {
+    boolean testing = false;
+    if (testing) {
+      return get(MessageProvider.class);
+//      ActionInvocationStore store = injector.getInstance(ActionInvocationStore.class);
+//      store.getCurrent();
+//      store.getCurrent()
+//      return null;
+    } else {
+      MessageProvider messageProvider = get(MessageProvider.class);
+      ActionInvocationStore actionInvocationStore = get(ActionInvocationStore.class);
+      ActionMapper actionMapper = get(ActionMapper.class);
+
+      // Using the ActionMapper so that URL segments are properly handled and the correct URL is used for message lookups.
+      ActionInvocation actionInvocation = actionMapper.map(null, request.getRequestURI(), true);
+      actionInvocationStore.setCurrent(actionInvocation);
+
+      return messageProvider;
+    }
   }
 
   private String normalize(String input) {
