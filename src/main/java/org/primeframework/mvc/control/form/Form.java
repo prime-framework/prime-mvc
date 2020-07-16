@@ -23,6 +23,7 @@ import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.ActionMapper;
+import org.primeframework.mvc.action.config.ActionConfigurationProvider;
 import org.primeframework.mvc.control.AbstractControl;
 import org.primeframework.mvc.control.annotation.ControlAttribute;
 import org.primeframework.mvc.control.annotation.ControlAttributes;
@@ -44,6 +45,8 @@ import org.primeframework.mvc.workflow.DefaultMVCWorkflow;
     @ControlAttribute(name = "action")
 })
 public class Form extends AbstractControl {
+  private final ActionConfigurationProvider actionConfigurationProvider;
+
   private final ActionInvocationStore actionInvocationStore;
 
   private final ActionMapper actionMapper;
@@ -61,9 +64,11 @@ public class Form extends AbstractControl {
   private boolean differentURI = false;
 
   @Inject
-  public Form(FormPreparer formPreparer, ActionInvocationStore actionInvocationStore, ActionMapper actionMapper,
+  public Form(ActionConfigurationProvider actionConfigurationProvider,
+              FormPreparer formPreparer, ActionInvocationStore actionInvocationStore, ActionMapper actionMapper,
               ParameterParser parameterParser, ParameterHandler parameterHandler,
               PostParameterHandler postParameterHandler, ScopeRetriever scopeRetriever) {
+    this.actionConfigurationProvider = actionConfigurationProvider;
     this.formPreparer = formPreparer;
     this.actionInvocationStore = actionInvocationStore;
     this.actionMapper = actionMapper;
@@ -123,12 +128,17 @@ public class Form extends AbstractControl {
       }
 
       ActionInvocation current = actionInvocationStore.getCurrent();
-      ActionInvocation actionInvocation = actionMapper.map(httpMethod, action, false);
-      if (actionInvocation == null || actionInvocation.action == null) {
-        throw new PrimeException("The form action [" + action + "] is not a valid URI that maps to an action " +
-            "class by the Prime MVC.");
-      } else if (current == null || current.action == null || current.action.getClass() != actionInvocation.action.getClass()) {
-        // call setCurrent first, then prepare the action
+      ActionInvocation actionInvocation = actionConfigurationProvider.lookup(action);
+      if (current == null || current.action == null || current.action.getClass() != actionInvocation.configuration.actionClass) {
+        // - Now that we know we need it, map the action before setting it as the current value in the invocation store
+        //   And we can now verify we can build the action. Not sure this is necessary?
+        actionInvocation = actionMapper.map(httpMethod, action, false);
+        if (actionInvocation == null || actionInvocation.action == null) {
+          throw new PrimeException("The form action [" + action + "] is not a valid URI that maps to an action " +
+              "class by the Prime MVC.");
+        }
+
+        // Call setCurrent first, then prepare the action
         actionInvocationStore.setCurrent(actionInvocation);
         prepareActionInvocation(actionInvocation);
         differentURI = true;
