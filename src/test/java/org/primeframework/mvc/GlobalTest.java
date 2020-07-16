@@ -35,6 +35,7 @@ import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import freemarker.template.Configuration;
 import org.example.action.JwtAuthorizedAction;
+import org.example.action.LotsOfMessagesAction;
 import org.example.domain.UserField;
 import org.primeframework.mvc.action.config.ActionConfigurationProvider;
 import org.primeframework.mvc.container.ContainerResolver;
@@ -1233,6 +1234,27 @@ public class GlobalTest extends PrimeBaseTest {
                                       .assertContainsFieldErrors("active")
                                       .assertContentType("application/json")
                                       .assertJSONFile(jsonDir.resolve("InvalidJsonAction-response.json")));
+  }
+
+  @Test
+  public void post_lotsOfMessagesFromKeys() throws Exception {
+    test.simulate(() -> simulator.test("/lots-of-messages")
+                                 .post()
+                                 .assertStatusCode(200)
+                                 .assertBodyContainsMessagesFromKeys(
+                                     "message1",
+                                     "message2",
+                                     "message3",
+                                     "message4",
+                                     "message5",
+                                     "message6",
+                                     "message7",
+                                     "message8",
+                                     "message9",
+                                     "message10"));
+
+    // Once for the API call and another for the message lookup
+    assertEquals(LotsOfMessagesAction.invocationCount.get(), 2);
   }
 
   @Test
