@@ -1,5 +1,10 @@
 Prime MVC Changes
 
+Changes in 1.21.1
+
+  * Add some additional debug output.
+  * Remove some un-necessary injections during tests and form render.
+
 Changes in 1.21.0
 
  * Support default messages. For example, a message key such as [blank]foo.bar=Required can be replaced with [blank]=Required.
