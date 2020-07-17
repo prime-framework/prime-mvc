@@ -56,10 +56,7 @@ public class DefaultActionMapper implements ActionMapper {
       }
     } else if (invocation.configuration != null) {
       // Timer if debug is enabled
-      long start = 0;
-      if (logger.isDebugEnabled()) {
-        start = System.currentTimeMillis();
-      }
+      long start = System.currentTimeMillis();
 
       // Create the action and find the method
       invocation.action = injector.getInstance(invocation.configuration.actionClass);
@@ -67,7 +64,6 @@ public class DefaultActionMapper implements ActionMapper {
       // Spit out the timer
       if (logger.isDebugEnabled()) {
         logger.debug("Injection took [{}] for [{}]", (System.currentTimeMillis() - start), invocation.actionURI);
-        Thread.dumpStack();
       }
 
       invocation.method = invocation.configuration.executeMethods.get(httpMethod);

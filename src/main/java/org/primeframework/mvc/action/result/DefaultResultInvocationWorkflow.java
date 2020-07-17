@@ -19,14 +19,15 @@ import javax.servlet.ServletException;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.ForwardResult.ForwardImpl;
 import org.primeframework.mvc.action.result.RedirectResult.RedirectImpl;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.workflow.WorkflowChain;
-
-import com.google.inject.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Handles invoking the result.
@@ -34,6 +35,8 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow {
+  private static final Logger logger = LoggerFactory.getLogger(DefaultResultInvocationWorkflow.class);
+
   private final ActionInvocationStore actionInvocationStore;
 
   private final MVCConfiguration configuration;
@@ -70,7 +73,7 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
    * <li>Invoke the Result</li> </ul>
    *
    * @param chain The chain.
-   * @throws IOException If the chain throws an IOException.
+   * @throws IOException      If the chain throws an IOException.
    * @throws ServletException If the chain throws a ServletException or if the result can't be found.
    */
   @SuppressWarnings("unchecked")
@@ -78,7 +81,6 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
     try {
       ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
       if (actionInvocation.executeResult) {
-
         Annotation annotation = null;
         String resultCode = "success";
         if (actionInvocation.action != null) {
@@ -90,8 +92,13 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
           annotation = new ForwardImpl("", resultCode);
         }
 
+        long start = System.currentTimeMillis();
         Result result = factory.build(annotation.annotationType());
         boolean handled = result.execute(annotation);
+
+        if (logger.isDebugEnabled()) {
+          logger.debug("Result execute took [{}]", (System.currentTimeMillis() - start));
+        }
 
         if (!handled) {
           handleContinueOrRedirect(actionInvocation, chain);
@@ -103,7 +110,8 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
   }
 
   @SuppressWarnings("unchecked")
-  private void handleContinueOrRedirect(ActionInvocation actionInvocation, WorkflowChain chain) throws IOException, ServletException {
+  private void handleContinueOrRedirect(ActionInvocation actionInvocation, WorkflowChain chain)
+      throws IOException, ServletException {
     if (actionInvocation.actionURI.endsWith("/")) {
       chain.continueWorkflow();
     } else {

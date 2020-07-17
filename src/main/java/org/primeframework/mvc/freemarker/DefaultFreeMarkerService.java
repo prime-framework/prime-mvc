@@ -26,6 +26,8 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.locale.LocaleProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is a simple FreeMarkerService implementation. It uses two configuration parameters and the {@link
@@ -44,6 +46,8 @@ import org.primeframework.mvc.locale.LocaleProvider;
  * @author Brian Pontarelli
  */
 public class DefaultFreeMarkerService implements FreeMarkerService {
+  private static final Logger logger = LoggerFactory.getLogger(DefaultFreeMarkerService.class);
+
   private final Configuration configuration;
 
   private final LocaleProvider localeProvider;
@@ -61,8 +65,19 @@ public class DefaultFreeMarkerService implements FreeMarkerService {
   public void render(Writer writer, String templateName, Object root)
       throws FreeMarkerRenderException, MissingTemplateException {
     try {
+      long start = System.currentTimeMillis();
       Template template = configuration.getTemplate(templateName, localeProvider.get());
+
+      if (logger.isDebugEnabled()) {
+        logger.debug("Freemarker getTemplate took [{}]", (System.currentTimeMillis() - start));
+      }
+
+      start = System.currentTimeMillis();
       template.process(root, writer);
+
+      if (logger.isDebugEnabled()) {
+        logger.debug("Freemarker process took [{}]", (System.currentTimeMillis() - start));
+      }
     } catch (FileNotFoundException fnfe) {
       throw new MissingTemplateException(fnfe);
     } catch (IOException | TemplateException e) {

@@ -19,14 +19,20 @@ import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * This class is a sub-workflow chain that can be used to chain multiple workflows under a single workflow.
  *
  * @author Brian Pontarelli
  */
 public class SubWorkflowChain implements WorkflowChain {
+  private static final Logger logger = LoggerFactory.getLogger(SubWorkflowChain.class);
+
   private final WorkflowChain outer;
-  private Iterator<Workflow> iterator;
+
+  private final Iterator<Workflow> iterator;
 
   public SubWorkflowChain(Iterable<Workflow> workflows, WorkflowChain outer) {
     this.outer = outer;
@@ -39,8 +45,14 @@ public class SubWorkflowChain implements WorkflowChain {
   @Override
   public void continueWorkflow() throws IOException, ServletException {
     if (iterator.hasNext()) {
+      long start = System.currentTimeMillis();
+
       Workflow workflow = iterator.next();
       workflow.perform(this);
+
+      if (logger.isDebugEnabled()) {
+        logger.debug("Workflow [{}]] took [{}]", workflow.getClass(), (System.currentTimeMillis() - start));
+      }
     } else {
       outer.continueWorkflow();
     }
