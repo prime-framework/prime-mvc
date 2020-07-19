@@ -17,7 +17,7 @@
 savantVersion = "1.0.0"
 fusionAuthJWTVersion = "3.1.6"
 
-project(group: "org.primeframework", name: "prime-mvc", version: "1.21.2", licenses: ["ApacheV2_0"]) {
+project(group: "org.primeframework", name: "prime-mvc", version: "1.21.3", licenses: ["ApacheV2_0"]) {
   workflow {
     standard()
   }
@@ -63,7 +63,9 @@ project(group: "org.primeframework", name: "prime-mvc", version: "1.21.2", licen
   publications {
     standard()
     main {
-      publication(name: "${project.name}-simulator", type: "jar", file: "build/jars/${project.name}-simulator-${project.version}.jar")
+      publication(name: "${project.name}-simulator", type: "jar",
+                  file: "build/jars/${project.name}-simulator-${project.version}.jar",
+                  source: "build/jars/${project.name}-simulator-${project.version}-src.jar")
     }
   }
 }
@@ -101,12 +103,21 @@ target(name: "jar", description: "JARs the project", dependsOn: ["compile"]) {
   java.jar()
 
   // Create a separate test jar that only includes org/primeframework
-  file.copy(to: "build/simulator") {
+  file.copy(to: "build/classes/simulator") {
     fileSet(dir: "build/classes/test", includePatterns: [~/org\/primeframework\/mvc/])
   }
 
+  // Create a separate test jar that only includes org/primeframework
+  file.copy(to: "build/src/simulator") {
+    fileSet(dir: "src/test/java", includePatterns: [~/org\/primeframework\/mvc/])
+  }
+
   file.jar(file: "build/jars/${project.name}-simulator-${project.version}.jar") {
-    fileSet(dir: "build/simulator")
+    fileSet(dir: "build/classes/simulator")
+  }
+
+  file.jar(file: "build/jars/${project.name}-simulator-${project.version}-src.jar") {
+    fileSet(dir: "build/src/simulator")
   }
 }
 
