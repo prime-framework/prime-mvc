@@ -1235,8 +1235,11 @@ public class GlobalTest extends PrimeBaseTest {
                                       .post()
                                       .assertStatusCode(400)
                                       .assertContainsFieldErrors("active")
+                                      // The actual exception seems to vary a bit, so instead we are asserting the content type and then that some specific info is in the body.
                                       .assertContentType("application/json")
-                                      .assertJSONFile(jsonDir.resolve("InvalidJsonAction-response.json")));
+                                      .assertBodyContains(
+                                          "[invalidJSON]",
+                                          "Unable to parse JSON. The property [active] was invalid. The error was [Possible conversion error]. The detailed exception was ["));
   }
 
   @Test
