@@ -780,17 +780,20 @@ public class GlobalTest extends PrimeBaseTest {
     test.simulate(() -> simulator.test("/.well-known/openid-configuration")
                                  .get()
                                  .assertStatusCode(200)
-                                 .assertJSON(new Object()));
+                                 .assertJSON("{\"called\": \"/.well-known/openid-configuration\"}"));
 
+    // The nested directory does not have a package-modifier, so we will get the actual path of 'well-known' instead of '.well-known'.
     test.simulate(() -> simulator.test("/.well-known/well-known/openid-configuration")
                                  .get()
                                  .assertStatusCode(200)
-                                 .assertJSON(new Object()));
+                                 .assertJSON("{\"called\": \"/.well-known/well-known/openid-configuration\"}"));
 
+    // Testing two levels deep, but only the 1st and 3rd level have a package modifier.
+    // .well-known -> well-known -> .well-known. The package modifier caauses us to ignore the 'potato' package name.
     test.simulate(() -> simulator.test("/.well-known/well-known/.well-known/openid-configuration")
                                  .get()
                                  .assertStatusCode(200)
-                                 .assertJSON(new Object()));
+                                 .assertJSON("{\"called\": \"/.well-known/well-known/potato/openid-configuration\"}"));
 
     test.expectException(UnsupportedOperationException.class,
         () -> test.simulate(() -> simulator.test("/.well-known/.well-known/openid-configuration")

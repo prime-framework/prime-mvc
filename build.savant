@@ -17,7 +17,7 @@
 savantVersion = "1.0.0"
 fusionAuthJWTVersion = "3.1.6"
 
-project(group: "org.primeframework", name: "prime-mvc", version: "1.21.1", licenses: ["ApacheV2_0"]) {
+project(group: "org.primeframework", name: "prime-mvc", version: "1.21.2", licenses: ["ApacheV2_0"]) {
   workflow {
     standard()
   }
@@ -62,6 +62,9 @@ project(group: "org.primeframework", name: "prime-mvc", version: "1.21.1", licen
 
   publications {
     standard()
+    main {
+      publication(name: "${project.name}-simulator", type: "jar", file: "build/jars/${project.name}-simulator-${project.version}.jar")
+    }
   }
 }
 
@@ -95,12 +98,16 @@ target(name: "compile", description: "Compiles the project") {
 }
 
 target(name: "jar", description: "JARs the project", dependsOn: ["compile"]) {
-  // Don't include the logback-test.xml in the test jar
-  file.delete {
-    fileSet(dir: "build/classes/test/", includePatterns: [~/logback-test.xml/])
+  java.jar()
+
+  // Create a separate test jar that only includes org/primeframework
+  file.copy(to: "build/simulator") {
+    fileSet(dir: "build/classes/test", includePatterns: [~/org\/primeframework\/mvc/])
   }
 
-  java.jar()
+  file.jar(file: "build/jars/${project.name}-simulator-${project.version}.jar") {
+    fileSet(dir: "build/simulator")
+  }
 }
 
 target(name: "test", description: "Runs the project's tests", dependsOn: ["jar"]) {

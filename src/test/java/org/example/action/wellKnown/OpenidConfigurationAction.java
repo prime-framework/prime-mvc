@@ -15,6 +15,9 @@
  */
 package org.example.action.wellKnown;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.annotation.JSON;
 import org.primeframework.mvc.content.json.annotation.JSONResponse;
@@ -26,10 +29,10 @@ import org.primeframework.mvc.content.json.annotation.JSONResponse;
 @JSON
 public class OpenidConfigurationAction {
   @JSONResponse
-  public Object response;
+  public Map<String, String> response = new HashMap<>();
 
   public String get() {
-    response = new Object();
+    response.put("called", "/.well-known/openid-configuration");
     return "success";
   }
 }
