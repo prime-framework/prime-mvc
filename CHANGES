@@ -1,5 +1,9 @@
 Prime MVC Changes
 
+Changes in 1.21.2
+
+  * Publish a new simulator jar
+
 Changes in 1.21.1
 
   * Add some additional debug output.
