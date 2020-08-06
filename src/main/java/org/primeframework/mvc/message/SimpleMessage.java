@@ -25,6 +25,11 @@ public class SimpleMessage implements Message {
   public final String code;
   public final String message;
 
+  // Jackson constructor
+  public SimpleMessage() {
+    this(null, null, null);
+  }
+
   public SimpleMessage(MessageType type, String code, String message) {
     this.type = type;
     this.code = code;

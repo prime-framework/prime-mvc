@@ -95,7 +95,7 @@ public class ActionSessionScope implements Scope<ActionSession> {
     String className = getActionClassName(scope);
     Map<String, Object> values = actionSession.get(className);
     if (values == null) {
-      values = new HashMap<String, Object>();
+      values = new HashMap<>();
       actionSession.put(className, values);
     }
 

@@ -118,6 +118,7 @@ public abstract class PrimeBaseTest {
     request = container.newServletRequest("/", Locale.getDefault(), false, "UTF-8");
     response = container.newServletResponse();
     container.resetSession();
+    container.resetUserAgent();
 
     ServletObjectsHolder.setServletRequest(new HttpServletRequestWrapper(request));
     ServletObjectsHolder.setServletResponse(response);

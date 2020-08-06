@@ -384,7 +384,7 @@ public class RequestBuilder {
    */
   public RequestBuilder withCookie(String name, String value) {
     if (name != null) {
-      request.addCookie(new Cookie(name, value));
+      container.getUserAgent().addCookie(request, new Cookie(name, value));
     }
     return this;
   }
@@ -397,7 +397,7 @@ public class RequestBuilder {
    */
   public RequestBuilder withCookie(Cookie cookie) {
     if (cookie != null) {
-      request.addCookie(cookie);
+      container.getUserAgent().addCookie(request, cookie);
     }
     return this;
   }
@@ -600,6 +600,9 @@ public class RequestBuilder {
       }
     }
 
+    // Move cookies from the response back to the request so we can be ready for the next request.
+    request.readCookiesFromUserAgent();
+
     try {
       // Build the request and response for this pass
       filter.doFilter(this.request, this.response, (req, resp) -> {
@@ -607,7 +610,7 @@ public class RequestBuilder {
             "URIs that don't map to Prime resources");
       });
     } catch (Throwable e) {
-      Class clazz = e.getClass();
+      Class<?> clazz = e.getClass();
       if (expectedException == null || !expectedException.equals(clazz)) {
         throw new AssertionError("\n\tUnexpected Exception thrown: [" + clazz.getCanonicalName() + "]", e);
       }

@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc.action.result;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -44,7 +43,7 @@ import static org.easymock.EasyMock.verify;
  */
 public class RedirectResultTest {
   @Test
-  public void encode() throws IOException, ServletException {
+  public void encode() throws IOException {
     Object action = new Object();
     ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
     expect(ee.expand("${foo}", action, true)).andReturn("result");
@@ -81,7 +80,7 @@ public class RedirectResultTest {
   }
 
   @Test
-  public void expand() throws IOException, ServletException {
+  public void expand() throws IOException {
     Object action = new Object();
     ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
     expect(ee.expand("${foo}", action, false)).andReturn("result");
@@ -118,7 +117,7 @@ public class RedirectResultTest {
   }
 
   @Test
-  public void fullyQualified() throws IOException, ServletException {
+  public void fullyQualified() throws IOException {
     ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
     replay(ee);
 
@@ -153,7 +152,7 @@ public class RedirectResultTest {
   }
 
   @Test
-  public void relative() throws IOException, ServletException {
+  public void relative() throws IOException {
     ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
     replay(ee);
 
@@ -188,7 +187,7 @@ public class RedirectResultTest {
   }
 
   @Test
-  public void relativeContext() throws IOException, ServletException {
+  public void relativeContext() throws IOException {
     ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
     replay(ee);
 
@@ -223,7 +222,7 @@ public class RedirectResultTest {
   }
 
   @Test
-  public void relativeContextNoSlash() throws IOException, ServletException {
+  public void relativeContextNoSlash() throws IOException {
     ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
     replay(ee);
 

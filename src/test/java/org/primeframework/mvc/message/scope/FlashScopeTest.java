@@ -16,11 +16,15 @@
 package org.primeframework.mvc.message.scope;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.primeframework.mvc.MockConfiguration;
+import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleMessage;
@@ -50,7 +54,13 @@ public class FlashScopeTest {
     expect(request.getSession(true)).andReturn(session);
     replay(request);
 
-    FlashScope scope = new FlashScope(request);
+    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
+    replay(response);
+
+    MVCConfiguration configuration = new MockConfiguration();
+    ObjectMapper objectMapper = new ObjectMapper();
+    FlashScope scope = new FlashScope(configuration, objectMapper, request, response);
+
     scope.add(new SimpleMessage(MessageType.ERROR, "code", "Foo"));
     assertEquals(messages.size(), 1);
     assertEquals(messages.get(0).toString(), "Foo");
@@ -70,7 +80,13 @@ public class FlashScopeTest {
     expect(request.getSession(true)).andReturn(session);
     replay(request);
 
-    FlashScope scope = new FlashScope(request);
+    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
+    replay(response);
+
+    MVCConfiguration configuration = new MockConfiguration();
+    ObjectMapper objectMapper = new ObjectMapper();
+    FlashScope scope = new FlashScope(configuration, objectMapper, request, response);
+
     scope.addAll(Arrays.asList(new SimpleMessage(MessageType.ERROR, "code1", "Foo"), new SimpleMessage(MessageType.ERROR, "code2", "Bar")));
     assertEquals(messages.size(), 2);
     assertEquals(messages.get(0).toString(), "Foo");
@@ -90,7 +106,13 @@ public class FlashScopeTest {
     expect(request.getSession(false)).andReturn(session);
     replay(request);
 
-    FlashScope scope = new FlashScope(request);
+    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
+    replay(response);
+
+    MVCConfiguration configuration = new MockConfiguration();
+    ObjectMapper objectMapper = new ObjectMapper();
+    FlashScope scope = new FlashScope(configuration, objectMapper, request, response);
+
     List<Message> messages = scope.get();
     assertEquals(messages.size(), 2);
     assertEquals(messages.get(0).toString(), "Request");
@@ -113,7 +135,13 @@ public class FlashScopeTest {
     request.setAttribute(FlashScope.KEY, messages);
     replay(request);
 
-    FlashScope scope = new FlashScope(request);
+    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
+    replay(response);
+
+    MVCConfiguration configuration = new MockConfiguration();
+    ObjectMapper objectMapper = new ObjectMapper();
+    FlashScope scope = new FlashScope(configuration, objectMapper, request, response);
+
     scope.transferFlash();
 
     verify(session, request);
@@ -125,7 +153,13 @@ public class FlashScopeTest {
     expect(request.getSession(false)).andReturn(null);
     replay(request);
 
-    FlashScope scope = new FlashScope(request);
+    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
+    replay(response);
+
+    MVCConfiguration configuration = new MockConfiguration();
+    ObjectMapper objectMapper = new ObjectMapper();
+    FlashScope scope = new FlashScope(configuration, objectMapper, request, response);
+
     scope.transferFlash();
 
     verify(request);

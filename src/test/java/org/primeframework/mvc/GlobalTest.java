@@ -1004,6 +1004,29 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void post_cookies() throws Exception {
+    // Test cookie propagation between invocations within the same test
+    test.simulate(() -> simulator.test("/cookie")
+                                 .withParameter("name", "token")
+                                 .withParameter("value", "secret")
+                                 .post()
+                                 .assertStatusCode(200)
+                                 .assertBodyIsEmpty()
+                                 // Assert the cookie is set
+                                 .assertCookie("token", "secret"))
+
+        // Now make a GET request to the same action and verify the cookies were picked up on the request.
+        .simulate(() -> simulator.test("/cookie")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertBodyContains(
+                                     "Count:1",
+                                     "token:secret")
+                                 // Cookie is not written back on this response
+                                 .assertDoesNotContainsCookie("token"));
+  }
+
+  @Test
   public void post_couldNotConvert() throws Exception {
     // Could not convert, no specific message for key
     test.simulate(() -> simulator.test("/could-not-convert")

@@ -16,12 +16,16 @@
 package org.primeframework.mvc.scope;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.easymock.EasyMock;
+import org.primeframework.mvc.MockConfiguration;
+import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.scope.annotation.Flash;
 import org.testng.annotations.Test;
 
@@ -36,14 +40,20 @@ public class FlashScopeTest {
   @Test
   public void getRequest() {
     Object value = new Object();
-    Map<String, Object> map = new HashMap<String, Object>();
+    Map<String, Object> map = new HashMap<>();
     map.put("test", value);
 
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
     EasyMock.expect(request.getAttribute("primeFlash")).andReturn(map);
     EasyMock.replay(request);
 
-    FlashScope scope = new FlashScope(request);
+    HttpServletResponse response = EasyMock.createStrictMock(HttpServletResponse.class);
+    EasyMock.replay(response);
+
+    MVCConfiguration configuration = new MockConfiguration();
+    ObjectMapper objectMapper = new ObjectMapper();
+
+    FlashScope scope = new FlashScope(configuration, objectMapper, request, response);
     assertSame(value, scope.get("test", new Flash() {
       public String value() {
         return "##field-name##";
@@ -60,14 +70,20 @@ public class FlashScopeTest {
   @Test
   public void getRequestDifferentKey() {
     Object value = new Object();
-    Map<String, Object> map = new HashMap<String, Object>();
+    Map<String, Object> map = new HashMap<>();
     map.put("other", value);
 
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
     EasyMock.expect(request.getAttribute("primeFlash")).andReturn(map);
     EasyMock.replay(request);
 
-    FlashScope scope = new FlashScope(request);
+    HttpServletResponse response = EasyMock.createStrictMock(HttpServletResponse.class);
+    EasyMock.replay(response);
+
+    MVCConfiguration configuration = new MockConfiguration();
+    ObjectMapper objectMapper = new ObjectMapper();
+
+    FlashScope scope = new FlashScope(configuration, objectMapper, request, response);
     assertSame(value, scope.get("test", new Flash() {
       public String value() {
         return "other";
@@ -84,7 +100,7 @@ public class FlashScopeTest {
   @Test
   public void getFromSession() {
     Object value = new Object();
-    Map<String, Object> map = new HashMap<String, Object>();
+    Map<String, Object> map = new HashMap<>();
     map.put("test", value);
 
     HttpSession session = EasyMock.createStrictMock(HttpSession.class);
@@ -96,7 +112,13 @@ public class FlashScopeTest {
     EasyMock.expect(request.getSession(false)).andReturn(session);
     EasyMock.replay(request);
 
-    FlashScope scope = new FlashScope(request);
+    HttpServletResponse response = EasyMock.createStrictMock(HttpServletResponse.class);
+    EasyMock.replay(response);
+
+    MVCConfiguration configuration = new MockConfiguration();
+    ObjectMapper objectMapper = new ObjectMapper();
+
+    FlashScope scope = new FlashScope(configuration, objectMapper, request, response);
     assertSame(value, scope.get("test", new Flash() {
       public String value() {
         return "##field-name##";
@@ -117,7 +139,13 @@ public class FlashScopeTest {
     EasyMock.expect(request.getSession(false)).andReturn(null);
     EasyMock.replay(request);
 
-    FlashScope scope = new FlashScope(request);
+    HttpServletResponse response = EasyMock.createStrictMock(HttpServletResponse.class);
+    EasyMock.replay(response);
+
+    MVCConfiguration configuration = new MockConfiguration();
+    ObjectMapper objectMapper = new ObjectMapper();
+
+    FlashScope scope = new FlashScope(configuration, objectMapper, request, response);
     assertNull(scope.get("test", new Flash() {
       public String value() {
         return "##field-name##";
@@ -134,7 +162,7 @@ public class FlashScopeTest {
   @Test
   public void getFromSessionDifferentKey() {
     Object value = new Object();
-    Map<String, Object> map = new HashMap<String, Object>();
+    Map<String, Object> map = new HashMap<>();
     map.put("other", value);
 
     HttpSession session = EasyMock.createStrictMock(HttpSession.class);
@@ -146,7 +174,13 @@ public class FlashScopeTest {
     EasyMock.expect(request.getSession(false)).andReturn(session);
     EasyMock.replay(request);
 
-    FlashScope scope = new FlashScope(request);
+    HttpServletResponse response = EasyMock.createStrictMock(HttpServletResponse.class);
+    EasyMock.replay(response);
+
+    MVCConfiguration configuration = new MockConfiguration();
+    ObjectMapper objectMapper = new ObjectMapper();
+
+    FlashScope scope = new FlashScope(configuration, objectMapper, request, response);
     assertSame(value, scope.get("test", new Flash() {
       public String value() {
         return "other";
@@ -167,7 +201,13 @@ public class FlashScopeTest {
     EasyMock.expect(request.getSession(false)).andReturn(null);
     EasyMock.replay(request);
 
-    FlashScope scope = new FlashScope(request);
+    HttpServletResponse response = EasyMock.createStrictMock(HttpServletResponse.class);
+    EasyMock.replay(response);
+
+    MVCConfiguration configuration = new MockConfiguration();
+    ObjectMapper objectMapper = new ObjectMapper();
+
+    FlashScope scope = new FlashScope(configuration, objectMapper, request, response);
     assertNull(scope.get("test", new Flash() {
       public String value() {
         return "other";
@@ -184,7 +224,7 @@ public class FlashScopeTest {
   @Test
   public void set() {
     Object value = new Object();
-    Map<String, Object> map = new HashMap<String, Object>();
+    Map<String, Object> map = new HashMap<>();
 
     HttpSession session = EasyMock.createStrictMock(HttpSession.class);
     EasyMock.expect(session.getAttribute("primeFlash")).andReturn(map);
@@ -194,7 +234,13 @@ public class FlashScopeTest {
     EasyMock.expect(request.getSession(true)).andReturn(session);
     EasyMock.replay(request);
 
-    FlashScope scope = new FlashScope(request);
+    HttpServletResponse response = EasyMock.createStrictMock(HttpServletResponse.class);
+    EasyMock.replay(response);
+
+    MVCConfiguration configuration = new MockConfiguration();
+    ObjectMapper objectMapper = new ObjectMapper();
+
+    FlashScope scope = new FlashScope(configuration, objectMapper, request, response);
     scope.set("test", value, new Flash() {
       public String value() {
         return "##field-name##";
@@ -211,7 +257,7 @@ public class FlashScopeTest {
 
   @Test
   public void setNull() {
-    Map<String, Object> map = new HashMap<String, Object>();
+    Map<String, Object> map = new HashMap<>();
     map.put("test", "value");
 
     HttpSession session = EasyMock.createStrictMock(HttpSession.class);
@@ -222,7 +268,13 @@ public class FlashScopeTest {
     EasyMock.expect(request.getSession(false)).andReturn(session);
     EasyMock.replay(request);
 
-    FlashScope scope = new FlashScope(request);
+    HttpServletResponse response = EasyMock.createStrictMock(HttpServletResponse.class);
+    EasyMock.replay(response);
+
+    MVCConfiguration configuration = new MockConfiguration();
+    ObjectMapper objectMapper = new ObjectMapper();
+
+    FlashScope scope = new FlashScope(configuration, objectMapper, request, response);
     scope.set("test", null, new Flash() {
       public String value() {
         return "##field-name##";
@@ -243,7 +295,13 @@ public class FlashScopeTest {
     EasyMock.expect(request.getSession(false)).andReturn(null);
     EasyMock.replay(request);
 
-    FlashScope scope = new FlashScope(request);
+    HttpServletResponse response = EasyMock.createStrictMock(HttpServletResponse.class);
+    EasyMock.replay(response);
+
+    MVCConfiguration configuration = new MockConfiguration();
+    ObjectMapper objectMapper = new ObjectMapper();
+
+    FlashScope scope = new FlashScope(configuration, objectMapper, request, response);
     scope.set("test", null, new Flash() {
       public String value() {
         return "##field-name##";
@@ -260,7 +318,7 @@ public class FlashScopeTest {
   @Test
   public void setDifferentkey() {
     Object value = new Object();
-    Map<String, Object> map = new HashMap<String, Object>();
+    Map<String, Object> map = new HashMap<>();
 
     HttpSession session = EasyMock.createStrictMock(HttpSession.class);
     EasyMock.expect(session.getAttribute("primeFlash")).andReturn(map);
@@ -270,7 +328,13 @@ public class FlashScopeTest {
     EasyMock.expect(request.getSession(true)).andReturn(session);
     EasyMock.replay(request);
 
-    FlashScope scope = new FlashScope(request);
+    HttpServletResponse response = EasyMock.createStrictMock(HttpServletResponse.class);
+    EasyMock.replay(response);
+
+    MVCConfiguration configuration = new MockConfiguration();
+    ObjectMapper objectMapper = new ObjectMapper();
+
+    FlashScope scope = new FlashScope(configuration, objectMapper, request, response);
     scope.set("test", value, new Flash() {
       public String value() {
         return "other";

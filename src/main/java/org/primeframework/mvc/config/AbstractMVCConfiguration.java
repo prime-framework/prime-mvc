@@ -53,9 +53,13 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
 
   public long fileUploadMaxSize = MAX_SIZE;
 
+  public String flashScopeCookieName = "prime-mvc-flash";
+
   public boolean ignoreEmptyParameters = false;
 
   public String localeCookieName = "prime-locale";
+
+  public String messageFlashScopeCookieName = "prime-mvc-msg-flash";
 
   public boolean propagateRuntimeException = true;
 
@@ -70,6 +74,8 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
   public boolean staticResourcesEnabled = true;
 
   public List<Class<? extends Annotation>> unwrapAnnotations = Collections.singletonList(FieldUnwrapped.class);
+
+  public boolean useCookieForFlashScope;
 
   @Override
   public boolean autoHTMLEscapingEnabled() {
@@ -102,6 +108,11 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
   }
 
   @Override
+  public String flashScopeCookieName() {
+    return flashScopeCookieName;
+  }
+
+  @Override
   public boolean ignoreEmptyParameters() {
     return ignoreEmptyParameters;
   }
@@ -109,6 +120,11 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
   @Override
   public String localeCookieName() {
     return localeCookieName;
+  }
+
+  @Override
+  public String messageFlashScopeCookieName() {
+    return messageFlashScopeCookieName;
   }
 
   @Override
@@ -144,5 +160,10 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
   @Override
   public List<Class<? extends Annotation>> unwrapAnnotations() {
     return unwrapAnnotations;
+  }
+
+  @Override
+  public boolean useCookieForFlashScope() {
+    return useCookieForFlashScope;
   }
 }

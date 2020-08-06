@@ -75,6 +75,11 @@ public interface MVCConfiguration {
   long fileUploadMaxSize();
 
   /**
+   * @return The name of the flash cookie.
+   */
+  String flashScopeCookieName();
+
+  /**
    * Set to true if actions should ignore empty parameters.  Defaults to false
    *
    * @return true or false
@@ -90,6 +95,11 @@ public interface MVCConfiguration {
    * @return The cookie name used to store the locale.
    */
   String localeCookieName();
+
+  /**
+   * @return The name of the message flash cookie.
+   */
+  String messageFlashScopeCookieName();
 
   /**
    * @return Whether or not runtime exceptions should be re-thrown out of Prime MVC.
@@ -147,4 +157,10 @@ public interface MVCConfiguration {
    * ExpressionEvaluator}.
    */
   List<Class<? extends Annotation>> unwrapAnnotations();
+
+  /**
+   * @return true if cookies should be used instead of an HTTP session to store messages in FlashScope during a
+   * redirect.
+   */
+  boolean useCookieForFlashScope();
 }

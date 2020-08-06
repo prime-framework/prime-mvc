@@ -16,13 +16,18 @@
 package org.primeframework.mvc.message.scope;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
+import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.message.Message;
+import org.primeframework.mvc.util.FlashCookie;
 
 /**
  * This is the flash scope which stores messages in the HttpSession under the flash key. It fetches values from the
@@ -36,62 +41,102 @@ import org.primeframework.mvc.message.Message;
 public class FlashScope extends AbstractSessionScope implements Scope {
   public static final String KEY = "primeFlashMessages";
 
+  private final FlashCookie<List<Message>> cookie;
+
+  private final HttpServletRequest request;
+
   @Inject
-  public FlashScope(HttpServletRequest request) {
+  public FlashScope(MVCConfiguration configuration, ObjectMapper objectMapper, HttpServletRequest request,
+                    HttpServletResponse response) {
     super(request, KEY);
+    this.request = request;
+    if (configuration.useCookieForFlashScope()) {
+      cookie = new FlashCookie<>(configuration.messageFlashScopeCookieName(), objectMapper, request, response, new TypeReference<List<Message>>() {
+      }, ArrayList::new);
+    } else {
+      cookie = null;
+    }
   }
 
   @Override
   public void add(Message message) {
-    addMessage(message);
+    if (cookie != null) {
+      List<Message> flash = cookie.get();
+      flash.add(message);
+      cookie.update(flash);
+    } else {
+      addMessage(message);
+    }
   }
 
   @Override
   public void addAll(Collection<Message> messages) {
-    addAllMessages(messages);
+    if (cookie != null) {
+      List<Message> flash = cookie.get();
+      flash.addAll(messages);
+      cookie.update(flash);
+    } else {
+      addAllMessages(messages);
+    }
   }
 
   @Override
   public void clear() {
-    request.removeAttribute(KEY);
-    HttpSession session = request.getSession(false);
-    if (session != null) {
-      session.removeAttribute(KEY);
+    if (cookie != null) {
+      cookie.delete();
+    } else {
+      request.removeAttribute(KEY);
+      HttpSession session = request.getSession(false);
+      if (session != null) {
+        session.removeAttribute(KEY);
+      }
     }
   }
 
   @Override
   public List<Message> get() {
-    List<Message> messages = new ArrayList<>();
-    List<Message> requestList = (List<Message>) request.getAttribute(KEY);
-    if (requestList != null) {
-      messages.addAll(requestList);
-    }
+    if (cookie != null) {
+      return cookie.get();
+    } else {
+      List<Message> messages = new ArrayList<>();
+      List<Message> requestList = (List<Message>) request.getAttribute(KEY);
+      if (requestList != null) {
+        messages.addAll(requestList);
+      }
 
-    HttpSession session = request.getSession(false);
-    if (session != null) {
-      synchronized (session) {
-        List<Message> sessionList = (List<Message>) session.getAttribute(KEY);
-        if (sessionList != null) {
-          messages.addAll(sessionList);
+      HttpSession session = request.getSession(false);
+      if (session != null) {
+        synchronized (session) {
+          List<Message> sessionList = (List<Message>) session.getAttribute(KEY);
+          if (sessionList != null) {
+            messages.addAll(sessionList);
+          }
         }
       }
-    }
 
-    return messages;
+      return messages;
+    }
   }
 
   /**
    * Moves the flash from the session to the request.
    */
   public void transferFlash() {
-    HttpSession session = request.getSession(false);
-    if (session != null) {
-      synchronized (session) {
-        List<Message> messages = (List<Message>) session.getAttribute(KEY);
-        if (messages != null) {
-          session.removeAttribute(KEY);
-          request.setAttribute(KEY, messages);
+    if (cookie != null) {
+      List<Message> flash = cookie.get();
+      if (flash.size() > 0) {
+        cookie.delete();
+        request.setAttribute(KEY, flash);
+      }
+    } else {
+      HttpSession session = request.getSession(false);
+      if (session != null) {
+        synchronized (session) {
+          List<Message> messages = (List<Message>) session.getAttribute(KEY);
+          if (messages != null) {
+            session.removeAttribute(KEY);
+            request.setAttribute(KEY, messages);
+          }
         }
       }
     }

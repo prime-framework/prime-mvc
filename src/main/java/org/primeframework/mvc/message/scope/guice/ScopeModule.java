@@ -34,5 +34,9 @@ public class ScopeModule extends AbstractModule {
     bind(SessionScope.class);
     bind(FlashScope.class);
     bind(RequestScope.class);
+
+    // FlashScope needs to de-serialize messages when using cookies
+
+
   }
 }

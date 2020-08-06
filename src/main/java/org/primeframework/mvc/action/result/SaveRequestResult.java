@@ -25,6 +25,8 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.Inject;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.annotation.ReexecuteSavedRequest;
 import org.primeframework.mvc.action.result.annotation.SaveRequest;
@@ -34,9 +36,6 @@ import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.security.CipherProvider;
 import org.primeframework.mvc.security.saved.SavedHttpRequest;
 import org.primeframework.mvc.servlet.HTTPMethod;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.inject.Inject;
 
 /**
  * This result stores the current request in a cookie and then performs a HTTP redirect to the login page.
@@ -51,8 +50,10 @@ public class SaveRequestResult extends AbstractRedirectResult<SaveRequest> {
   private final ObjectMapper objectMapper;
 
   @Inject
-  public SaveRequestResult(MessageStore messageStore, ExpressionEvaluator expressionEvaluator, HttpServletResponse response,
-                           HttpServletRequest request, ActionInvocationStore actionInvocationStore, MVCConfiguration configuration,
+  public SaveRequestResult(MessageStore messageStore, ExpressionEvaluator expressionEvaluator,
+                           HttpServletResponse response,
+                           HttpServletRequest request, ActionInvocationStore actionInvocationStore,
+                           MVCConfiguration configuration,
                            ObjectMapper objectMapper, CipherProvider cipherProvider) {
     super(expressionEvaluator, actionInvocationStore, messageStore, request, response);
     this.configuration = configuration;
@@ -86,7 +87,7 @@ public class SaveRequestResult extends AbstractRedirectResult<SaveRequest> {
     //
     // Ok, not that bad, but Tomcat will exception and the user will receive a 500. See MVCConfiguration.savedRequestCookieMaximumSize for more information.
     if (saveRequestCookie.getValue().getBytes(StandardCharsets.UTF_8).length <= configuration.savedRequestCookieMaximumSize()) {
-      response.addCookie(SavedRequestTools.toCookie(new SavedHttpRequest(method, redirectURI, requestParameters), objectMapper, configuration, cipherProvider));
+      response.addCookie(saveRequestCookie);
     }
 
     sendRedirect(null, saveRequest.uri(), saveRequest.encodeVariables(), saveRequest.perm());
