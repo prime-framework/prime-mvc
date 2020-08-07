@@ -21,18 +21,20 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.function.Supplier;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.primeframework.mvc.ErrorException;
+import org.primeframework.mvc.message.Message;
 
 /**
  * @author Daniel DeGroff
  */
-public class FlashCookie<T> {
-
+public class FlashMessageCookie {
   private final String name;
 
   private final ObjectMapper objectMapper;
@@ -41,18 +43,12 @@ public class FlashCookie<T> {
 
   private final HttpServletResponse response;
 
-  private final Supplier<T> supplier;
-
-  private final TypeReference<T> typeReference;
-
-  public FlashCookie(String name, ObjectMapper objectMapper, HttpServletRequest request, HttpServletResponse response,
-                     TypeReference<T> typeReference, Supplier<T> supplier) {
+  public FlashMessageCookie(String name, ObjectMapper objectMapper, HttpServletRequest request,
+                            HttpServletResponse response) {
     this.name = name;
-    this.typeReference = typeReference;
     this.objectMapper = objectMapper;
     this.request = request;
     this.response = response;
-    this.supplier = supplier;
   }
 
   public void delete() {
@@ -62,10 +58,10 @@ public class FlashCookie<T> {
     response.addCookie(cookie);
   }
 
-  public T get() {
+  public List<Message> get() {
     for (Cookie cookie : request.getCookies()) {
       if (cookie.getName().equals(name)) {
-        T flash = deserialize(cookie.getValue());
+        List<Message> flash = deserialize(cookie.getValue());
         if (flash != null) {
           return flash;
         }
@@ -73,14 +69,16 @@ public class FlashCookie<T> {
     }
 
     try {
-      return supplier.get();
+      return new ArrayList<>();
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
   }
 
-  public void update(T t) {
-    String value = serialize(t);
+  public void update(Consumer<List<Message>> consumer) {
+    List<Message> messages = get();
+    consumer.accept(messages);
+    String value = serialize(messages);
     Cookie cookie = new Cookie(name, value);
     cookie.setSecure("https".equals(defaultIfNull(request.getHeader("X-Forwarded-Proto"), request.getScheme()).toLowerCase()));
     cookie.setHttpOnly(true);
@@ -93,19 +91,20 @@ public class FlashCookie<T> {
     return string == null ? defaultString : string;
   }
 
-  private T deserialize(String s) {
+  private List<Message> deserialize(String s) {
     try {
       String decoded = URLDecoder.decode(s, "UTF-8");
-      return objectMapper.readerFor(typeReference).readValue(decoded);
+      return objectMapper.readerFor(new TypeReference<List<Message>>() {
+      }).readValue(decoded);
     } catch (JsonProcessingException | UnsupportedEncodingException e) {
       return null;
     }
   }
 
 
-  private String serialize(T o) {
+  private String serialize(List<Message> messages) {
     try {
-      return URLEncoder.encode(objectMapper.writeValueAsString(o), "UTF-8");
+      return URLEncoder.encode(objectMapper.writeValueAsString(messages), "UTF-8");
     } catch (JsonProcessingException | UnsupportedEncodingException e) {
       throw new ErrorException(e);
     }

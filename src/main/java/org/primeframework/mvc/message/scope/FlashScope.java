@@ -22,12 +22,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.message.Message;
-import org.primeframework.mvc.util.FlashCookie;
+import org.primeframework.mvc.util.FlashMessageCookie;
 
 /**
  * This is the flash scope which stores messages in the HttpSession under the flash key. It fetches values from the
@@ -41,7 +40,7 @@ import org.primeframework.mvc.util.FlashCookie;
 public class FlashScope extends AbstractSessionScope implements Scope {
   public static final String KEY = "primeFlashMessages";
 
-  private final FlashCookie<List<Message>> cookie;
+  private final FlashMessageCookie cookie;
 
   private final HttpServletRequest request;
 
@@ -49,23 +48,18 @@ public class FlashScope extends AbstractSessionScope implements Scope {
   public FlashScope(MVCConfiguration configuration, ObjectMapper objectMapper, HttpServletRequest request,
                     HttpServletResponse response) {
     super(request, KEY);
+    cookie = configuration.useCookieForMessageFlashScope()
+        ? new FlashMessageCookie(configuration.messageFlashScopeCookieName(), objectMapper, request, response)
+        : null;
     this.request = request;
-    if (configuration.useCookieForFlashScope()) {
-      cookie = new FlashCookie<>(configuration.messageFlashScopeCookieName(), objectMapper, request, response, new TypeReference<List<Message>>() {
-      }, ArrayList::new);
-    } else {
-      cookie = null;
-    }
   }
 
   @Override
   public void add(Message message) {
-    if (cookie != null) {
-      List<Message> flash = cookie.get();
-      flash.add(message);
-      cookie.update(flash);
-    } else {
+    if (cookie == null) {
       addMessage(message);
+    } else {
+      cookie.update(c -> c.add(message));
     }
   }
 
@@ -75,25 +69,24 @@ public class FlashScope extends AbstractSessionScope implements Scope {
       return;
     }
 
-    if (cookie != null) {
-      List<Message> flash = cookie.get();
-      flash.addAll(messages);
-      cookie.update(flash);
-    } else {
+    if (cookie == null) {
       addAllMessages(messages);
+    } else {
+      cookie.update(c -> c.addAll(messages));
     }
   }
 
   @Override
   public void clear() {
     request.removeAttribute(KEY);
-    if (cookie != null) {
-      cookie.delete();
-    } else {
+
+    if (cookie == null) {
       HttpSession session = request.getSession(false);
       if (session != null) {
         session.removeAttribute(KEY);
       }
+    } else {
+      cookie.delete();
     }
   }
 
@@ -105,14 +98,10 @@ public class FlashScope extends AbstractSessionScope implements Scope {
       messages.addAll(requestList);
     }
 
-    if (cookie != null) {
-      synchronized (cookie) {
-        List<Message> cookieList = cookie.get();
-        messages.addAll(cookieList);
-      }
-    } else {
+    if (cookie == null) {
       HttpSession session = request.getSession(false);
       if (session != null) {
+        //noinspection SynchronizationOnLocalVariableOrMethodParameter
         synchronized (session) {
           List<Message> sessionList = (List<Message>) session.getAttribute(KEY);
           if (sessionList != null) {
@@ -120,6 +109,9 @@ public class FlashScope extends AbstractSessionScope implements Scope {
           }
         }
       }
+
+    } else {
+      messages.addAll(cookie.get());
     }
 
     return messages;
@@ -129,17 +121,10 @@ public class FlashScope extends AbstractSessionScope implements Scope {
    * Moves the flash from the session to the request.
    */
   public void transferFlash() {
-    if (cookie != null) {
-      synchronized (cookie) {
-        List<Message> messages = cookie.get();
-        if (messages.size() > 0) {
-          cookie.delete();
-          request.setAttribute(KEY, messages);
-        }
-      }
-    } else {
+    if (cookie == null) {
       HttpSession session = request.getSession(false);
       if (session != null) {
+        //noinspection SynchronizationOnLocalVariableOrMethodParameter
         synchronized (session) {
           List<Message> messages = (List<Message>) session.getAttribute(KEY);
           if (messages != null) {
@@ -147,6 +132,12 @@ public class FlashScope extends AbstractSessionScope implements Scope {
             request.setAttribute(KEY, messages);
           }
         }
+      }
+    } else {
+      List<Message> messages = cookie.get();
+      if (messages.size() > 0) {
+        cookie.delete();
+        request.setAttribute(KEY, messages);
       }
     }
   }

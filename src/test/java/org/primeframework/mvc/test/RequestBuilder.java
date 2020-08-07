@@ -601,7 +601,7 @@ public class RequestBuilder {
     }
 
     // Move cookies from the response back to the request so we can be ready for the next request.
-    request.readCookiesFromUserAgent();
+    request.copyCookiesFromUserAgent();
 
     try {
       // Build the request and response for this pass
@@ -616,6 +616,9 @@ public class RequestBuilder {
       }
       expectedException = null;
     }
+
+    // Commit the response. In practice this allows us to transfer cookies from the Servlet Response to the User Agent.
+    response.flushBuffer();
 
     if (expectedException != null) {
       throw new AssertionError("Expected Exception were not thrown: [" + expectedException.getCanonicalName() + "]");

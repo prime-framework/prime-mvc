@@ -74,6 +74,9 @@ public class SaveRequestResultTest extends PrimeBaseTest {
     SaveRequestResult result = new SaveRequestResult(messageStore, expressionEvaluator, response, request, store, configuration, objectMapper, cipherProvider);
     result.execute(annotation);
 
+    // Commit the response and ensure we have written the cookie to the User Agent.
+    container.getResponse().flushBuffer();
+
     assertCookieEquals(container.getUserAgent().getCookies(container.getRequest()), singletonList(SavedRequestTools.toCookie(new SavedHttpRequest(HTTPMethod.GET, "/test?param1=value1&param2=value2", null), objectMapper, configuration, cipherProvider)));
     assertEquals(response.getRedirect(), "/login");
 
@@ -95,6 +98,9 @@ public class SaveRequestResultTest extends PrimeBaseTest {
     SaveRequest annotation = new SaveRequestImpl("/login", "unauthenticated", true, false);
     SaveRequestResult result = new SaveRequestResult(messageStore, expressionEvaluator, response, request, store, configuration, objectMapper, cipherProvider);
     result.execute(annotation);
+
+    // Commit the response and ensure we have written the cookie to the User Agent.
+    container.getResponse().flushBuffer();
 
     assertCookieEquals(container.getUserAgent().getCookies(container.getRequest()), singletonList(SavedRequestTools.toCookie(new SavedHttpRequest(HTTPMethod.POST, "/test", request.getParameterMap()), objectMapper, configuration, cipherProvider)));
     assertEquals(response.getRedirect(), "/login");

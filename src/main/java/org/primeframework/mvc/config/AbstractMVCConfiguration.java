@@ -108,11 +108,6 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
   }
 
   @Override
-  public String flashScopeCookieName() {
-    return flashScopeCookieName;
-  }
-
-  @Override
   public boolean ignoreEmptyParameters() {
     return ignoreEmptyParameters;
   }
@@ -163,7 +158,7 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
   }
 
   @Override
-  public boolean useCookieForFlashScope() {
+  public boolean useCookieForMessageFlashScope() {
     return useCookieForFlashScope;
   }
 }
