@@ -600,7 +600,7 @@ public class RequestBuilder {
       }
     }
 
-    // Move cookies from the response back to the request so we can be ready for the next request.
+    // Copy cookies from the response back to the request so we can be ready for the next request.
     request.copyCookiesFromUserAgent();
 
     try {
