@@ -18,6 +18,7 @@ package org.primeframework.mvc.scope;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -65,8 +66,10 @@ public class FlashScope implements Scope<Flash> {
     String key = scope.value().equals("##field-name##") ? fieldName : scope.value();
 
     if (cookie != null) {
-      Map<String, Object> storage = cookie.get();
-      return storage.get(key);
+      synchronized (cookie) {
+        Map<String, Object> flash = cookie.get();
+        return flash.get(key);
+      }
     } else {
       Map<String, Object> flash = (Map<String, Object>) request.getAttribute(FLASH_KEY);
 
@@ -94,14 +97,15 @@ public class FlashScope implements Scope<Flash> {
     String key = scope.value().equals("##field-name##") ? fieldName : scope.value();
 
     if (cookie != null) {
-      Map<String, Object> storage = cookie.get();
-      if (value != null) {
-        storage.put(key, value);
-      } else {
-        storage.remove(key);
+      synchronized (cookie) {
+        Map<String, Object> storage = cookie.get();
+        if (value != null) {
+          storage.put(key, value);
+        } else {
+          storage.remove(key);
+        }
+        cookie.update(storage);
       }
-      cookie.update(storage);
-
     } else {
       HttpSession session;
       if (value != null) {
@@ -136,24 +140,27 @@ public class FlashScope implements Scope<Flash> {
    * Moves the flash from the session to the request.
    */
   public void transferFlash() {
+    Map<String, Object> flash = Collections.emptyMap();
+
     if (cookie != null) {
-      Map<String, Object> storage = cookie.get();
-      if (storage.size() > 0) {
+      synchronized (cookie) {
+        flash = cookie.get();
         cookie.delete();
-        request.setAttribute(FLASH_KEY, storage);
       }
     } else {
       HttpSession session = request.getSession(false);
       if (session != null) {
         synchronized (session) {
-          Map<String, Object> flash = (Map<String, Object>) session.getAttribute(FLASH_KEY);
+          flash = (Map<String, Object>) session.getAttribute(FLASH_KEY);
           if (flash != null) {
             session.removeAttribute(FLASH_KEY);
-            request.setAttribute(FLASH_KEY, flash);
           }
         }
       }
     }
 
+    if (flash != null) {
+      request.setAttribute(FLASH_KEY, flash);
+    }
   }
 }

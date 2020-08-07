@@ -40,7 +40,7 @@ public class MessageTypeSerializer extends StdSerializer<MessageType> {
       if (value instanceof PrimeInfoMessageType) {
         gen.writeString("INFO");
       } else if (value instanceof PrimeWarningMessageType) {
-        gen.writeString("WARING");
+        gen.writeString("WARNING");
       } else {
         gen.writeString("ERROR");
       }

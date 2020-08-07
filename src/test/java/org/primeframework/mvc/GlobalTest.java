@@ -266,9 +266,10 @@ public class GlobalTest extends PrimeBaseTest {
              .assertStatusCode(500);
   }
 
-  @Test
-  public void get_execute_redirect() throws Exception {
+  @Test(dataProvider = "useCookieFlash")
+  public void get_execute_redirect(boolean useCookieFlash) throws Exception {
     // Follow the redirect and another redirect and assert on that response as well - and ensure a message set in the first redirect gets all the way to the end
+    configuration.useCookieForFlashScope = useCookieFlash;
     test.simulate(() -> simulator.test("/temp-redirect")
                                  .get()
                                  .assertStatusCode(302)
@@ -277,12 +278,14 @@ public class GlobalTest extends PrimeBaseTest {
                                  .assertContainsGeneralMessageCodes(MessageType.INFO, "[INFO]")
                                  .assertContainsGeneralMessageCodes(MessageType.WARNING, "[WARNING]")
                                  .assertRedirect("/temp-redirect-target")
+
                                  .executeRedirect(response -> response.assertStatusCode(302)
                                                                       // Message is still in the store
                                                                       .assertContainsGeneralMessageCodes(MessageType.ERROR, "[ERROR]")
                                                                       .assertContainsGeneralMessageCodes(MessageType.INFO, "[INFO]")
                                                                       .assertContainsGeneralMessageCodes(MessageType.WARNING, "[WARNING]")
                                                                       .assertRedirect("/temp-redirect-target-target")
+
                                                                       .executeRedirect(subResponse -> subResponse.assertStatusCode(200)
                                                                                                                  .assertBodyContains("Look Ma, I'm redirected.")
                                                                                                                  // Message is still in the store and also rendered on the page
@@ -1628,6 +1631,14 @@ public class GlobalTest extends PrimeBaseTest {
                                       .post()
                                       .assertStatusCode(200)
                                       .assertBodyContains("firstName=brian", "lastName=pontarelli", "theRest=then,a,bunch,of,stuff"));
+  }
+
+  @DataProvider(name = "useCookieFlash")
+  public Object[][] useCookieFlash() {
+    return new Object[][]{
+        {true},
+        {false}
+    };
   }
 
   private void assertSingleton(RequestSimulator simulator, Class<?> type) {

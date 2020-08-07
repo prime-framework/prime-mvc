@@ -71,6 +71,10 @@ public class FlashScope extends AbstractSessionScope implements Scope {
 
   @Override
   public void addAll(Collection<Message> messages) {
+    if (messages.isEmpty()) {
+      return;
+    }
+
     if (cookie != null) {
       List<Message> flash = cookie.get();
       flash.addAll(messages);
@@ -82,10 +86,10 @@ public class FlashScope extends AbstractSessionScope implements Scope {
 
   @Override
   public void clear() {
+    request.removeAttribute(KEY);
     if (cookie != null) {
       cookie.delete();
     } else {
-      request.removeAttribute(KEY);
       HttpSession session = request.getSession(false);
       if (session != null) {
         session.removeAttribute(KEY);
@@ -95,15 +99,18 @@ public class FlashScope extends AbstractSessionScope implements Scope {
 
   @Override
   public List<Message> get() {
-    if (cookie != null) {
-      return cookie.get();
-    } else {
-      List<Message> messages = new ArrayList<>();
-      List<Message> requestList = (List<Message>) request.getAttribute(KEY);
-      if (requestList != null) {
-        messages.addAll(requestList);
-      }
+    List<Message> messages = new ArrayList<>();
+    List<Message> requestList = (List<Message>) request.getAttribute(KEY);
+    if (requestList != null) {
+      messages.addAll(requestList);
+    }
 
+    if (cookie != null) {
+      synchronized (cookie) {
+        List<Message> cookieList = cookie.get();
+        messages.addAll(cookieList);
+      }
+    } else {
       HttpSession session = request.getSession(false);
       if (session != null) {
         synchronized (session) {
@@ -113,9 +120,9 @@ public class FlashScope extends AbstractSessionScope implements Scope {
           }
         }
       }
-
-      return messages;
     }
+
+    return messages;
   }
 
   /**
@@ -123,10 +130,12 @@ public class FlashScope extends AbstractSessionScope implements Scope {
    */
   public void transferFlash() {
     if (cookie != null) {
-      List<Message> flash = cookie.get();
-      if (flash.size() > 0) {
-        cookie.delete();
-        request.setAttribute(KEY, flash);
+      synchronized (cookie) {
+        List<Message> messages = cookie.get();
+        if (messages.size() > 0) {
+          cookie.delete();
+          request.setAttribute(KEY, messages);
+        }
       }
     } else {
       HttpSession session = request.getSession(false);
