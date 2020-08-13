@@ -28,11 +28,11 @@ import org.primeframework.mvc.config.MVCConfiguration;
  */
 @SuppressWarnings("unused")
 public abstract class BaseCookieSessionUserLoginSecurityContext implements UserLoginSecurityContext {
-  private final MVCConfiguration configuration;
+  protected final MVCConfiguration configuration;
 
-  private final HttpServletRequest request;
+  protected final HttpServletRequest request;
 
-  private final HttpServletResponse response;
+  protected final HttpServletResponse response;
 
   protected BaseCookieSessionUserLoginSecurityContext(MVCConfiguration configuration, HttpServletRequest request,
                                                       HttpServletResponse response) {
