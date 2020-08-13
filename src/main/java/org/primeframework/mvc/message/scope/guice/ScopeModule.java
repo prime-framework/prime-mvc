@@ -15,12 +15,12 @@
  */
 package org.primeframework.mvc.message.scope.guice;
 
+import com.google.inject.AbstractModule;
 import org.primeframework.mvc.message.scope.ApplicationScope;
 import org.primeframework.mvc.message.scope.FlashScope;
 import org.primeframework.mvc.message.scope.RequestScope;
+import org.primeframework.mvc.message.scope.SessionFlashScope;
 import org.primeframework.mvc.message.scope.SessionScope;
-
-import com.google.inject.AbstractModule;
 
 /**
  * Scope module.
@@ -32,11 +32,9 @@ public class ScopeModule extends AbstractModule {
   protected void configure() {
     bind(ApplicationScope.class).asEagerSingleton();
     bind(SessionScope.class);
-    bind(FlashScope.class);
     bind(RequestScope.class);
 
-    // FlashScope needs to de-serialize messages when using cookies
-
-
+    // Defaults to Session based Flash Scope
+    bind(FlashScope.class).to(SessionFlashScope.class);
   }
 }

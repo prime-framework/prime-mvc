@@ -15,11 +15,8 @@
  */
 package org.primeframework.mvc.security;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.primeframework.mvc.config.MVCConfiguration;
 
 /**
  * Uses a cookie to manage the user session.
@@ -28,15 +25,15 @@ import org.primeframework.mvc.config.MVCConfiguration;
  */
 @SuppressWarnings("unused")
 public abstract class BaseCookieSessionUserLoginSecurityContext implements UserLoginSecurityContext {
-  protected final MVCConfiguration configuration;
-
   protected final HttpServletRequest request;
 
   protected final HttpServletResponse response;
 
-  protected BaseCookieSessionUserLoginSecurityContext(MVCConfiguration configuration, HttpServletRequest request,
+  private final CookieConfig cookie;
+
+  protected BaseCookieSessionUserLoginSecurityContext(CookieConfig cookie, HttpServletRequest request,
                                                       HttpServletResponse response) {
-    this.configuration = configuration;
+    this.cookie = cookie;
     this.request = request;
     this.response = response;
   }
@@ -49,16 +46,7 @@ public abstract class BaseCookieSessionUserLoginSecurityContext implements UserL
 
   @Override
   public String getSessionId() {
-    Cookie[] cookies = request.getCookies();
-    if (cookies != null) {
-      for (Cookie cookie : cookies) {
-        if (cookie.getName().equals(configuration.userLoginSecurityContextCookieName())) {
-          return cookie.getValue();
-        }
-      }
-    }
-
-    return null;
+    return cookie.get(request);
   }
 
   @Override
@@ -73,27 +61,29 @@ public abstract class BaseCookieSessionUserLoginSecurityContext implements UserL
       return;
     }
 
-    Cookie cookie = new Cookie(configuration.userLoginSecurityContextCookieName(), (String) sessionId);
-    cookie.setSecure("https".equals(defaultIfNull(request.getHeader("X-Forwarded-Proto"), request.getScheme()).toLowerCase()));
-    cookie.setHttpOnly(true);
-    cookie.setMaxAge(-1);
-    cookie.setPath("/");
-    response.addCookie(cookie);
+    cookie.add(request, response, (String) sessionId);
   }
 
   @Override
   public void logout() {
-    Cookie cookie = new Cookie(configuration.userLoginSecurityContextCookieName(), null);
-    cookie.setSecure("https".equals(defaultIfNull(request.getHeader("X-Forwarded-Proto"), request.getScheme()).toLowerCase()));
-    cookie.setHttpOnly(true);
-    cookie.setMaxAge(0);
-    cookie.setPath("/");
-    response.addCookie(cookie);
+    cookie.delete(request, response);
   }
 
+  /**
+   * Return the sessionId for the provider user.
+   *
+   * @param user the user
+   * @return the session Id or null if no session is found for this user.
+   */
   protected abstract Object getSessionIdFromUser(Object user);
 
-  protected abstract Object getUserFromSessionId(Object id);
+  /**
+   * Return the User for the given sessionId
+   *
+   * @param sessionId the sessionId
+   * @return the user or null if no user was found.
+   */
+  protected abstract Object getUserFromSessionId(Object sessionId);
 
   private String defaultIfNull(String string, String defaultString) {
     return string == null ? defaultString : string;

@@ -51,7 +51,7 @@ import static org.easymock.EasyMock.verify;
  */
 public class ReexecuteSavedRequestResultTest extends PrimeBaseTest {
   @Test
-  public void noSavedRequest() throws IOException, ServletException, NoSuchAlgorithmException {
+  public void noSavedRequest() throws IOException {
     ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
     replay(ee);
 

@@ -147,15 +147,4 @@ public interface MVCConfiguration {
    * ExpressionEvaluator}.
    */
   List<Class<? extends Annotation>> unwrapAnnotations();
-
-  /**
-   * @return true if cookies should be used instead of an HTTP session to store messages in FlashScope during a
-   * redirect.
-   */
-  boolean useCookieForMessageFlashScope();
-
-  /**
-   * @return the cookie name used to store the user login security context cookie.
-   */
-  String userLoginSecurityContextCookieName();
 }

@@ -22,14 +22,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.message.scope.ApplicationScope;
 import org.primeframework.mvc.message.scope.FlashScope;
 import org.primeframework.mvc.message.scope.MessageScope;
 import org.primeframework.mvc.message.scope.RequestScope;
 import org.primeframework.mvc.message.scope.Scope;
 import org.primeframework.mvc.message.scope.SessionScope;
-
-import com.google.inject.Inject;
 
 /**
  * This is the default message workflow implementation. It removes all flash messages from the session and places them
@@ -38,12 +37,13 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 public class DefaultMessageStore implements MessageStore {
-  private final Map<MessageScope, Scope> scopes = new LinkedHashMap<>();
-
   private final RequestScope requestScope;
 
+  private final Map<MessageScope, Scope> scopes = new LinkedHashMap<>();
+
   @Inject
-  public DefaultMessageStore(ApplicationScope applicationScope, SessionScope sessionScope, FlashScope flashScope, RequestScope requestScope) {
+  public DefaultMessageStore(ApplicationScope applicationScope, SessionScope sessionScope, FlashScope flashScope,
+                             RequestScope requestScope) {
     scopes.put(MessageScope.REQUEST, requestScope);
     scopes.put(MessageScope.FLASH, flashScope);
     scopes.put(MessageScope.SESSION, sessionScope);
@@ -69,6 +69,18 @@ public class DefaultMessageStore implements MessageStore {
   }
 
   @Override
+  public void clear() {
+    for (Scope scope : scopes.values()) {
+      scope.clear();
+    }
+  }
+
+  @Override
+  public void clear(MessageScope scope) {
+    scopes.get(scope).clear();
+  }
+
+  @Override
   public List<Message> get() {
     List<Message> messages = new ArrayList<>();
     for (Scope scope : scopes.values()) {
@@ -83,19 +95,6 @@ public class DefaultMessageStore implements MessageStore {
     Scope s = scopes.get(scope);
     messages.addAll(s.get());
     return messages;
-  }
-
-  @Override
-  public List<Message> getGeneralMessages() {
-    List<Message> messages = get();
-    List<Message> list = new ArrayList<>();
-    for (Message message : messages) {
-      if (!(message instanceof FieldMessage)) {
-        list.add(message);
-      }
-    }
-
-    return list;
   }
 
   @Override
@@ -119,14 +118,15 @@ public class DefaultMessageStore implements MessageStore {
   }
 
   @Override
-  public void clear() {
-    for (Scope scope : scopes.values()) {
-      scope.clear();
+  public List<Message> getGeneralMessages() {
+    List<Message> messages = get();
+    List<Message> list = new ArrayList<>();
+    for (Message message : messages) {
+      if (!(message instanceof FieldMessage)) {
+        list.add(message);
+      }
     }
-  }
 
-  @Override
-  public void clear(MessageScope scope) {
-    scopes.get(scope).clear();
+    return list;
   }
 }

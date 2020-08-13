@@ -16,17 +16,15 @@
 package org.primeframework.mvc.security.csrf;
 
 import javax.crypto.Cipher;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Base64;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.inject.Inject;
 import org.primeframework.mvc.ErrorException;
-import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.security.CipherProvider;
+import org.primeframework.mvc.security.CookieConfig;
 
 /**
  * A CSRF Provider leveraging the Encryption based Token Pattern  as defined by OWASP.
@@ -36,24 +34,24 @@ import org.primeframework.mvc.security.CipherProvider;
  * OWASP CSRF Cheat Sheet - Encryption based Token Pattern
  * </a>
  */
-public class EncryptionBasedTokenCSRFProvider implements CSRFProvider {
+@SuppressWarnings("unused")
+public abstract class BaseEncryptionBasedTokenCSRFProvider implements CSRFProvider {
   private final CipherProvider cipherProvider;
 
-  private final MVCConfiguration configuration;
+  private final CookieConfig cookie;
 
   private final ObjectMapper objectMapper;
 
-  @Inject
-  public EncryptionBasedTokenCSRFProvider(CipherProvider cipherProvider, MVCConfiguration configuration,
-                                          ObjectMapper objectMapper) {
+  protected BaseEncryptionBasedTokenCSRFProvider(CipherProvider cipherProvider, CookieConfig cookie,
+                                                 ObjectMapper objectMapper) {
     this.cipherProvider = cipherProvider;
-    this.configuration = configuration;
+    this.cookie = cookie;
     this.objectMapper = objectMapper;
   }
 
   @Override
   public String getToken(HttpServletRequest request) {
-    String sessionId = getSessionId(request);
+    String sessionId = cookie.get(request);
     return sessionId == null ? null : generateToken(sessionId);
   }
 
@@ -65,15 +63,16 @@ public class EncryptionBasedTokenCSRFProvider implements CSRFProvider {
     }
 
     // The sessionId must match.
-    if (!token.sid.equals(getSessionId(request))) {
+    String sessionId = cookie.get(request);
+    if (!token.sid.equals(sessionId)) {
       return false;
     }
 
-    // Token can be up to 10 minutes old. This is totally made up. But the OWASP guide suggests using a timestamp as a 'nonce'
+    // Token can be up to 15 minutes old. This is totally made up. But the OWASP guide suggests using a timestamp as a 'nonce'
     // of sorts. So we could optionally ask the configuration for how long this should good for or just assume 10 minutes is long enough
     // to prevent a replay attack.
     long now = System.currentTimeMillis();
-    return (token.instant + 600_000) >= now;
+    return (token.instant + 900_000) >= now;
   }
 
   private CSRFToken decrypt(String s) {
@@ -106,19 +105,6 @@ public class EncryptionBasedTokenCSRFProvider implements CSRFProvider {
     } catch (Exception e) {
       throw new ErrorException("error", e);
     }
-  }
-
-  private String getSessionId(HttpServletRequest request) {
-    Cookie[] cookies = request.getCookies();
-    if (cookies != null) {
-      for (Cookie cookie : cookies) {
-        if (cookie.getName().equals(configuration.userLoginSecurityContextCookieName())) {
-          return cookie.getValue();
-        }
-      }
-    }
-
-    return null;
   }
 
   private static class CSRFToken {
