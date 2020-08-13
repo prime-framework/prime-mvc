@@ -97,11 +97,6 @@ public interface MVCConfiguration {
   String messageFlashScopeCookieName();
 
   /**
-   * @return Whether or not runtime exceptions should be re-thrown out of Prime MVC.
-   */
-  boolean propagateRuntimeExceptions();
-
-  /**
    * @return The resource directory where the templates, message bundles, emails, control templates, etc are loaded
    * from.
    */

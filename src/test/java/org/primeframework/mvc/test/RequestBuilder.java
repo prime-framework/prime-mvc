@@ -41,6 +41,7 @@ import org.primeframework.mvc.servlet.PrimeFilter;
 import org.primeframework.mvc.servlet.ServletObjectsHolder;
 import org.primeframework.mvc.util.QueryStringTools;
 import org.primeframework.mvc.util.URITools;
+import static org.testng.Assert.fail;
 
 /**
  * This class is a builder that helps create a test HTTP request that is sent to the MVC.
@@ -58,8 +59,6 @@ public class RequestBuilder {
   public final MockHttpServletRequest request;
 
   public final MockHttpServletResponse response;
-
-  private Class<? extends Throwable> expectedException;
 
   public RequestBuilder(String uri, MockContainer container, PrimeFilter filter, Injector injector) {
     this.container = container;
@@ -89,19 +88,6 @@ public class RequestBuilder {
     request.setMethod(Method.DELETE);
     run();
     return new RequestResult(container, filter, request, response, injector);
-  }
-
-  /**
-   * Indicates then when the HTTP method is called an exception is expected to be thrown.
-   * <p>
-   * An {@link AssertionError} will be thrown if the exception is not thrown.
-   *
-   * @param expectedException The expected exception.
-   * @return This.
-   */
-  public RequestBuilder expectException(Class<? extends Throwable> expectedException) {
-    this.expectedException = expectedException;
-    return this;
   }
 
   /**
@@ -610,16 +596,8 @@ public class RequestBuilder {
         throw new UnsupportedOperationException("The RequestSimulator class doesn't support testing " +
             "URIs that don't map to Prime resources");
       });
-    } catch (Throwable e) {
-      Class<?> clazz = e.getClass();
-      if (expectedException == null || !expectedException.equals(clazz)) {
-        throw new AssertionError("\n\tUnexpected Exception thrown: [" + clazz.getCanonicalName() + "]", e);
-      }
-      expectedException = null;
-    }
-
-    if (expectedException != null) {
-      throw new AssertionError("Expected Exception were not thrown: [" + expectedException.getCanonicalName() + "]");
+    } catch (Throwable t) {
+      fail("The exception should have been caught by the PrimeFilter", t);
     }
 
     // Add these back so that anything that needs them can be retrieved from the Injector after

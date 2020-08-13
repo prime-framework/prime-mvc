@@ -61,8 +61,6 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
 
   public String messageFlashScopeCookieName = "prime-mvc-msg-flash";
 
-  public boolean propagateRuntimeException = true;
-
   public String resourceDirectory = "/WEB-INF";
 
   public int savedRequestCookieMaximumSize = 6 * 1024; // 6 KB
@@ -120,11 +118,6 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
   @Override
   public String messageFlashScopeCookieName() {
     return messageFlashScopeCookieName;
-  }
-
-  @Override
-  public boolean propagateRuntimeExceptions() {
-    return propagateRuntimeException;
   }
 
   @Override

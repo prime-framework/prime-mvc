@@ -39,13 +39,10 @@ import org.example.action.LotsOfMessagesAction;
 import org.example.domain.UserField;
 import org.primeframework.mvc.action.config.ActionConfigurationProvider;
 import org.primeframework.mvc.container.ContainerResolver;
-import org.primeframework.mvc.freemarker.FreeMarkerRenderException;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
-import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-import org.primeframework.mvc.parameter.el.MissingPropertyExpressionException;
 import org.primeframework.mvc.test.RequestSimulator;
 import org.primeframework.mvc.util.URIBuilder;
 import org.testng.annotations.BeforeClass;
@@ -214,16 +211,16 @@ public class GlobalTest extends PrimeBaseTest {
   @Test
   public void get_collectionConverter() throws Exception {
     // Both of these will fail because the action has a List<String> as the backing values for this form, and the input field is a text field.
-    test.expectException(ConverterStateException.class,
-        () -> test.simulate(() -> simulator.test("/collection-converter")
-                                           .withParameter("string", "foo,bar,baz")
-                                           .get()));
+    test.simulate(() -> simulator.test("/collection-converter")
+                                 .withParameter("string", "foo,bar,baz")
+                                 .get()
+                                 .assertStatusCode(500));
 
-    test.expectException(ConverterStateException.class,
-        () -> simulator.test("/collection-converter")
-                       .withParameter("string", "bar")
-                       .withParameter("string", "baz")
-                       .get());
+    test.simulate(() -> simulator.test("/collection-converter")
+                                 .withParameter("string", "bar")
+                                 .withParameter("string", "baz")
+                                 .get()
+                                 .assertStatusCode(500));
 
     // It will work if we use a backing collection with an iterator in the form to build multiple form fields
     test.simulate(() -> simulator.test("/collection-converter")
@@ -254,14 +251,12 @@ public class GlobalTest extends PrimeBaseTest {
   public void get_developmentExceptions() {
     // Bad annotation @Action("{id}") it should be @Action("{uuid}")
     simulator.test("/invalid-api/42")
-             .expectException(MissingPropertyExpressionException.class)
              .get()
              .assertStatusCode(500);
 
     // Bad parameter (i.e. /invalid-api?bad-param=42
     simulator.test("/invalid-api")
              .withParameter("bad-param", "42")
-             .expectException(MissingPropertyExpressionException.class)
              .get()
              .assertStatusCode(500);
   }
@@ -363,8 +358,8 @@ public class GlobalTest extends PrimeBaseTest {
   @Test
   public void get_freemarker_double_escape() {
     simulator.test("/freemarker/double-escape")
-             .expectException(FreeMarkerRenderException.class)
-             .get();
+             .get()
+             .assertStatusCode(500);
   }
 
   @Test(dataProvider = "get_freemarker_escape_parameters")
@@ -527,7 +522,6 @@ public class GlobalTest extends PrimeBaseTest {
   @Test
   public void get_metricsErrors() {
     simulator.test("/execute-method-throws-exception")
-             .expectException(IllegalArgumentException.class)
              .get()
              .assertStatusCode(500);
 
@@ -570,22 +564,16 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
-  public void get_onlyKnownParameters() {
+  public void get_onlyKnownParameters() throws Exception {
     // Action w/out @UnknownParameters
     configuration.allowUnknownParameters = false;
-    test.expectException(MissingPropertyExpressionException.class, () ->
-        simulator.test("/only-known-parameters")
-                 .withParameter("foo", "bar")
-                 .withParameter("foo", "baz")
-                 .withParameter("foo.bar", "baz")
-                 .withParameter("foo/0/bar/bam", "purple")
-                 .post()
-                 .assertStatusCode(200)
-                 .assertBodyContains(
-                     "foo => [bar,baz]",
-                     "foo.bar => [baz]",
-                     "foo/0/bar/bam => [purple]"
-                 ));
+    test.simulate(() -> simulator.test("/only-known-parameters")
+                                 .withParameter("foo", "bar")
+                                 .withParameter("foo", "baz")
+                                 .withParameter("foo.bar", "baz")
+                                 .withParameter("foo/0/bar/bam", "purple")
+                                 .post()
+                                 .assertStatusCode(500));
   }
 
   @Test
@@ -798,16 +786,15 @@ public class GlobalTest extends PrimeBaseTest {
                                  .assertStatusCode(200)
                                  .assertJSON("{\"called\": \"/.well-known/well-known/potato/openid-configuration\"}"));
 
-    test.expectException(UnsupportedOperationException.class,
-        () -> test.simulate(() -> simulator.test("/.well-known/.well-known/openid-configuration")
-                                           .get()));
+    test.simulate(() -> simulator.test("/.well-known/.well-known/openid-configuration")
+                                 .get()
+                                 .assertStatusCode(500));
   }
 
   @Test
   public void hacked() {
     // Make sure we don't invoke 'freemarker.template.utility.Execute"
     simulator.test("/hacked")
-             .expectException(FreeMarkerRenderException.class)
              .get()
              .assertStatusCode(500)
              .assertBodyContains("Instantiating freemarker.template.utility.Execute is not allowed in the template for security reasons.");
