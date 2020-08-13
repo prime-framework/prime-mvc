@@ -36,6 +36,11 @@ public interface UserLoginSecurityContext {
   Set<String> getCurrentUsersRoles();
 
   /**
+   * @return the current sessionId or null if the user is not logged in.
+   */
+  String getSessionId();
+
+  /**
    * Determines if the user is currently logged in.
    *
    * @return True if the user is logged in, false otherwise.

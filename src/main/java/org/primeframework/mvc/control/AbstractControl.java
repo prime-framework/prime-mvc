@@ -34,7 +34,7 @@ import org.primeframework.mvc.control.message.Message;
 import org.primeframework.mvc.freemarker.FreeMarkerService;
 import org.primeframework.mvc.locale.LocaleProvider;
 import org.primeframework.mvc.message.l10n.MessageProvider;
-import org.primeframework.mvc.security.CSRF;
+import org.primeframework.mvc.security.csrf.CSRFProvider;
 import org.primeframework.mvc.util.ErrorList;
 
 /**
@@ -53,6 +53,8 @@ public abstract class AbstractControl implements Control {
   protected ActionInvocationStore actionInvocationStore;
 
   protected MVCConfiguration configuration;
+
+  protected CSRFProvider csrfProvider;
 
   protected Configuration freeMarkerConfig;
 
@@ -124,7 +126,8 @@ public abstract class AbstractControl implements Control {
   public void setServices(LocaleProvider localeProvider, HttpServletRequest request,
                           ActionInvocationStore actionInvocationStore, FreeMarkerService freeMarkerService,
                           MVCConfiguration configuration, Configuration freeMarkerConfig,
-                          MessageProvider messageProvider) {
+                          MessageProvider messageProvider, CSRFProvider csrfProvider) {
+    this.csrfProvider = csrfProvider;
     this.localeProvider = localeProvider;
     this.request = request;
     this.freeMarkerService = freeMarkerService;
@@ -181,7 +184,7 @@ public abstract class AbstractControl implements Control {
    */
   protected Map<String, Object> makeParameters() {
     Map<String, Object> parameters = new HashMap<>();
-    parameters.put("csrfToken", CSRF.getSessionToken(request));
+    parameters.put("csrfToken", csrfProvider.getToken(request));
     parameters.put("attributes", attributes);
     parameters.put("dynamicAttributes", dynamicAttributes);
     parameters.put("join", new JoinMethod(freeMarkerConfig.getObjectWrapper()));

@@ -158,4 +158,9 @@ public interface MVCConfiguration {
    * redirect.
    */
   boolean useCookieForMessageFlashScope();
+
+  /**
+   * @return the cookie name used to store the user login security context cookie.
+   */
+  String userLoginSecurityContextCookieName();
 }

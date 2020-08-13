@@ -18,8 +18,9 @@ package org.primeframework.mvc.security;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import com.google.inject.Inject;
 import org.primeframework.mvc.config.MVCConfiguration;
+import org.primeframework.mvc.security.csrf.CSRFProvider;
+import static org.primeframework.mvc.security.csrf.SynchronizerTokenCSRFProvider.CSRF_SESSION_KEY;
 
 /**
  * Uses the HttpSession object to store the user.
@@ -31,11 +32,14 @@ public abstract class BaseHttpSessionUserLoginSecurityContext implements UserLog
 
   private final MVCConfiguration configuration;
 
+  private final CSRFProvider csrfProvider;
+
   private final HttpServletRequest request;
 
-  @Inject
-  public BaseHttpSessionUserLoginSecurityContext(MVCConfiguration configuration, HttpServletRequest request) {
+  protected BaseHttpSessionUserLoginSecurityContext(MVCConfiguration configuration, CSRFProvider csrfProvider,
+                                                    HttpServletRequest request) {
     this.configuration = configuration;
+    this.csrfProvider = csrfProvider;
     this.request = request;
   }
 
@@ -47,6 +51,16 @@ public abstract class BaseHttpSessionUserLoginSecurityContext implements UserLog
     }
 
     return session.getAttribute(USER_SESSION_KEY);
+  }
+
+  @Override
+  public String getSessionId() {
+    HttpSession session = request.getSession(false);
+    if (session == null) {
+      return null;
+    }
+
+    return session.getId();
   }
 
   @Override
@@ -62,7 +76,7 @@ public abstract class BaseHttpSessionUserLoginSecurityContext implements UserLog
     }
 
     if (configuration.csrfEnabled()) {
-      CSRF.storeToken(session);
+      session.setAttribute(CSRF_SESSION_KEY, csrfProvider.getToken(request));
     }
 
     session.setAttribute(USER_SESSION_KEY, user);

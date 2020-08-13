@@ -36,7 +36,7 @@ import org.primeframework.mock.servlet.MockHttpServletRequest.Method;
 import org.primeframework.mock.servlet.MockHttpServletResponse;
 import org.primeframework.mock.servlet.MockServletInputStream;
 import org.primeframework.mvc.parameter.DefaultParameterParser;
-import org.primeframework.mvc.security.CSRF;
+import org.primeframework.mvc.security.csrf.CSRFProvider;
 import org.primeframework.mvc.servlet.PrimeFilter;
 import org.primeframework.mvc.servlet.ServletObjectsHolder;
 import org.primeframework.mvc.util.QueryStringTools;
@@ -330,8 +330,8 @@ public class RequestBuilder {
    * @return This.
    */
   public RequestBuilder withCSRFToken(String token) {
-    request.removeParameter(CSRF.CSRF_PARAMETER_KEY);
-    return withParameter(CSRF.CSRF_PARAMETER_KEY, token);
+    request.removeParameter(CSRFProvider.CSRF_PARAMETER_KEY);
+    return withParameter(CSRFProvider.CSRF_PARAMETER_KEY, token);
   }
 
   /**
@@ -593,10 +593,11 @@ public class RequestBuilder {
     ServletObjectsHolder.clearServletResponse();
 
     // If the CSRF token is enabled and the parameter isn't set, we set it to be consistent.
-    if (CSRF.getParameterToken(request) == null) {
-      String token = CSRF.getSessionToken(request);
+    CSRFProvider csrfProvider = injector.getInstance(CSRFProvider.class);
+    if (csrfProvider.getTokenFromRequest(request) == null) {
+      String token = csrfProvider.getToken(request);
       if (token != null) {
-        request.setParameter(CSRF.CSRF_PARAMETER_KEY, token);
+        request.setParameter(CSRFProvider.CSRF_PARAMETER_KEY, token);
       }
     }
 

@@ -53,7 +53,7 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
 
   public long fileUploadMaxSize = MAX_SIZE;
 
-  public String flashScopeCookieName = "prime-mvc-flash";
+  public String userLoginSecurityContextCookieName = "prime-session";
 
   public boolean ignoreEmptyParameters = false;
 
@@ -160,5 +160,10 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
   @Override
   public boolean useCookieForMessageFlashScope() {
     return useCookieForFlashScope;
+  }
+
+  @Override
+  public String userLoginSecurityContextCookieName() {
+    return userLoginSecurityContextCookieName;
   }
 }

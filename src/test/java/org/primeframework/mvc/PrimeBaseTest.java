@@ -53,6 +53,7 @@ import org.primeframework.mvc.guice.MVCModule;
 import org.primeframework.mvc.jwt.MockVerifierProvider;
 import org.primeframework.mvc.security.MockUserLoginSecurityContext;
 import org.primeframework.mvc.security.UserLoginSecurityContext;
+import org.primeframework.mvc.security.csrf.CSRFProvider;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.servlet.ServletObjectsHolder;
 import org.primeframework.mvc.test.RequestSimulator;
@@ -79,6 +80,8 @@ public abstract class PrimeBaseTest {
   protected static MetricRegistry metricRegistry = new MetricRegistry();
 
   protected static RequestSimulator simulator;
+
+  @Inject public CSRFProvider csrfProvider;
 
   @Inject public ObjectMapper objectMapper;
 

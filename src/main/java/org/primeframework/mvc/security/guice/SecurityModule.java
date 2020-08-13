@@ -17,6 +17,9 @@ package org.primeframework.mvc.security.guice;
 
 import java.util.Map;
 
+import com.google.inject.AbstractModule;
+import com.google.inject.TypeLiteral;
+import io.fusionauth.jwt.Verifier;
 import org.primeframework.mvc.security.AuthorizeMethodScheme;
 import org.primeframework.mvc.security.CipherProvider;
 import org.primeframework.mvc.security.DefaultCipherProvider;
@@ -35,10 +38,8 @@ import org.primeframework.mvc.security.SavedRequestWorkflow;
 import org.primeframework.mvc.security.SecurityWorkflow;
 import org.primeframework.mvc.security.UserLoginConstraintsValidator;
 import org.primeframework.mvc.security.UserLoginSecurityScheme;
-
-import com.google.inject.AbstractModule;
-import com.google.inject.TypeLiteral;
-import io.fusionauth.jwt.Verifier;
+import org.primeframework.mvc.security.csrf.CSRFProvider;
+import org.primeframework.mvc.security.csrf.SynchronizerTokenCSRFProvider;
 
 /**
  * A Guice modules for the Security classes.
@@ -54,7 +55,8 @@ public class SecurityModule extends AbstractModule {
     bind(JWTConstraintsValidator.class).to(DefaultJWTConstraintsValidator.class);
     bind(JWTRequestAdapter.class).to(DefaultJWTRequestAdapter.class);
     bind(JWTSecurityContext.class).to(DefaultJWTSecurityContext.class);
-    bind(new TypeLiteral<Map<String, Verifier>>() {}).toProvider(ExplosiveVerifierProvider.class);
+    bind(new TypeLiteral<Map<String, Verifier>>() {
+    }).toProvider(ExplosiveVerifierProvider.class);
     bind(UserLoginConstraintsValidator.class).to(DefaultUserLoginConstraintValidator.class);
 
     // Binds the user login scheme
@@ -64,5 +66,8 @@ public class SecurityModule extends AbstractModule {
 
     // Bind the Cipher/Encryption interfaces
     bind(CipherProvider.class).to(DefaultCipherProvider.class).asEagerSingleton();
+
+    // Bind CSRF Provider
+    bind(CSRFProvider.class).to(SynchronizerTokenCSRFProvider.class);
   }
 }

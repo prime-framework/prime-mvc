@@ -20,6 +20,7 @@ import java.net.URI;
 
 import com.google.inject.Inject;
 import org.primeframework.mvc.config.MVCConfiguration;
+import org.primeframework.mvc.security.csrf.CSRFProvider;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.servlet.ServletTools;
 
@@ -33,6 +34,8 @@ public class UserLoginSecurityScheme implements SecurityScheme {
 
   private final UserLoginConstraintsValidator constraintsValidator;
 
+  private final CSRFProvider csrfProvider;
+
   private final HTTPMethod method;
 
   private final HttpServletRequest request;
@@ -41,9 +44,10 @@ public class UserLoginSecurityScheme implements SecurityScheme {
 
   @Inject
   public UserLoginSecurityScheme(MVCConfiguration configuration, UserLoginConstraintsValidator constraintsValidator,
-                                 HttpServletRequest request, HTTPMethod method) {
+                                 CSRFProvider csrfProvider, HttpServletRequest request, HTTPMethod method) {
     this.configuration = configuration;
     this.constraintsValidator = constraintsValidator;
+    this.csrfProvider = csrfProvider;
     this.request = request;
     this.method = method;
   }
@@ -83,9 +87,7 @@ public class UserLoginSecurityScheme implements SecurityScheme {
       }
 
       // Handle CSRF tokens (for POST only) and remove it from the parameter map
-      String token = CSRF.getSessionToken(request);
-      String formToken = CSRF.getParameterToken(request);
-      if (token != null && !token.equals(formToken)) {
+      if (!csrfProvider.validateRequest(request)) {
         throw new UnauthorizedException();
       }
     }
