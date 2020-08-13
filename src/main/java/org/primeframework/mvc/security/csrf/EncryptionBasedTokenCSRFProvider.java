@@ -78,7 +78,7 @@ public class EncryptionBasedTokenCSRFProvider implements CSRFProvider {
 
   private CSRFToken decrypt(String s) {
     try {
-      byte[] bytes = Base64.getDecoder().decode(s.getBytes(StandardCharsets.UTF_8));
+      byte[] bytes = Base64.getUrlDecoder().decode(s.getBytes(StandardCharsets.UTF_8));
       Cipher cipher = cipherProvider.getDecryptor();
       byte[] result = new byte[cipher.getOutputSize(bytes.length)];
       int resultLength = cipher.update(bytes, 0, bytes.length, result, 0);
@@ -102,7 +102,7 @@ public class EncryptionBasedTokenCSRFProvider implements CSRFProvider {
       int resultLength = cipher.update(input, 0, input.length, result, 0);
       resultLength += cipher.doFinal(result, resultLength);
 
-      return Base64.getEncoder().encodeToString(Arrays.copyOfRange(result, 0, resultLength));
+      return Base64.getUrlEncoder().encodeToString(Arrays.copyOfRange(result, 0, resultLength));
     } catch (Exception e) {
       throw new ErrorException("error", e);
     }
