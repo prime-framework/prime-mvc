@@ -59,11 +59,14 @@ public class FlashMessageCookie {
   }
 
   public List<Message> get() {
-    for (Cookie cookie : request.getCookies()) {
-      if (cookie.getName().equals(name)) {
-        List<Message> flash = deserialize(cookie.getValue());
-        if (flash != null) {
-          return flash;
+    Cookie[] cookies = request.getCookies();
+    if (cookies != null) {
+      for (Cookie cookie : cookies) {
+        if (cookie.getName().equals(name)) {
+          List<Message> flash = deserialize(cookie.getValue());
+          if (flash != null) {
+            return flash;
+          }
         }
       }
     }

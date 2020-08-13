@@ -109,9 +109,12 @@ public class EncryptionBasedTokenCSRFProvider implements CSRFProvider {
   }
 
   private String getSessionId(HttpServletRequest request) {
-    for (Cookie cookie : request.getCookies()) {
-      if (cookie.getName().equals(configuration.userLoginSecurityContextCookieName())) {
-        return cookie.getValue();
+    Cookie[] cookies = request.getCookies();
+    if (cookies != null) {
+      for (Cookie cookie : cookies) {
+        if (cookie.getName().equals(configuration.userLoginSecurityContextCookieName())) {
+          return cookie.getValue();
+        }
       }
     }
 
