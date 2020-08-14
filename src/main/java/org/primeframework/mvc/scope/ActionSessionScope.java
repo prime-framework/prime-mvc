@@ -88,16 +88,12 @@ public class ActionSessionScope implements Scope<ActionSession> {
 
     Map<String, Map<String, Object>> actionSession = (Map<String, Map<String, Object>>) session.getAttribute(ACTION_SESSION_KEY);
     if (actionSession == null) {
-      actionSession = new HashMap<String, Map<String, Object>>();
+      actionSession = new HashMap<>();
       session.setAttribute(ACTION_SESSION_KEY, actionSession);
     }
 
     String className = getActionClassName(scope);
-    Map<String, Object> values = actionSession.get(className);
-    if (values == null) {
-      values = new HashMap<>();
-      actionSession.put(className, values);
-    }
+    Map<String, Object> values = actionSession.computeIfAbsent(className, k -> new HashMap<>());
 
     String key = scope.value().equals("##field-name##") ? fieldName : scope.value();
     if (value != null) {
