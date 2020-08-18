@@ -85,7 +85,7 @@ public class FlashMessageCookie {
     Cookie cookie = new Cookie(name, value);
     cookie.setSecure("https".equals(defaultIfNull(request.getHeader("X-Forwarded-Proto"), request.getScheme()).toLowerCase()));
     cookie.setHttpOnly(true);
-    cookie.setMaxAge(-1);
+    cookie.setMaxAge(-1); // session cookie
     cookie.setPath("/");
     response.addCookie(cookie);
   }

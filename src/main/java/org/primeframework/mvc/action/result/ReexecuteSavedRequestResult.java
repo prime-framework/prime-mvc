@@ -16,7 +16,6 @@
 package org.primeframework.mvc.action.result;
 
 import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.ShortBufferException;
@@ -26,20 +25,17 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
-import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.annotation.ReexecuteSavedRequest;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-import org.primeframework.mvc.security.CipherProvider;
+import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.security.saved.SavedHttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,22 +49,18 @@ import org.slf4j.LoggerFactory;
 public class ReexecuteSavedRequestResult extends AbstractRedirectResult<ReexecuteSavedRequest> {
   private static final Logger logger = LoggerFactory.getLogger(ReexecuteSavedRequestResult.class);
 
-  private final CipherProvider cipherProvider;
-
   private final MVCConfiguration configuration;
 
-  private final ObjectMapper objectMapper;
+  private final Encryptor encryptor;
 
   @Inject
   public ReexecuteSavedRequestResult(MessageStore messageStore, ExpressionEvaluator expressionEvaluator,
-                                     HttpServletResponse response,
-                                     HttpServletRequest request, ActionInvocationStore actionInvocationStore,
-                                     CipherProvider cipherProvider, MVCConfiguration configuration,
-                                     ObjectMapper objectMapper) {
+                                     HttpServletResponse response, HttpServletRequest request,
+                                     ActionInvocationStore actionInvocationStore,
+                                     MVCConfiguration configuration, Encryptor encryptor) {
     super(expressionEvaluator, actionInvocationStore, messageStore, request, response);
     this.configuration = configuration;
-    this.cipherProvider = cipherProvider;
-    this.objectMapper = objectMapper;
+    this.encryptor = encryptor;
   }
 
   /**
@@ -107,13 +99,7 @@ public class ReexecuteSavedRequestResult extends AbstractRedirectResult<Reexecut
 
   private SavedHttpRequest parseSavedRequest(String value) {
     try {
-      byte[] bytes = Base64.getDecoder().decode(value);
-      Cipher cipher = cipherProvider.getDecryptor();
-      byte[] result = new byte[cipher.getOutputSize(bytes.length)];
-      int resultLength = cipher.update(bytes, 0, bytes.length, result, 0);
-      resultLength += cipher.doFinal(result, resultLength);
-      String json = new String(result, 0, resultLength, StandardCharsets.UTF_8);
-      return objectMapper.readValue(json, SavedHttpRequest.class);
+      return encryptor.decrypt(SavedHttpRequest.class, value);
     } catch (IOException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | InvalidKeyException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | ShortBufferException e) {
       logger.warn("Bad SavedRequest cookie [{}]. Error is [{}]", value, e.getMessage());
       return null;

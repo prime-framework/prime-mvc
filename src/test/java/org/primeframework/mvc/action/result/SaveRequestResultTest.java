@@ -34,8 +34,9 @@ import org.primeframework.mvc.action.result.SaveRequestResult.SaveRequestImpl;
 import org.primeframework.mvc.action.result.annotation.SaveRequest;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-import org.primeframework.mvc.security.CipherProvider;
 import org.primeframework.mvc.security.DefaultCipherProvider;
+import org.primeframework.mvc.security.DefaultEncryptor;
+import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.security.saved.SavedHttpRequest;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.testng.annotations.Test;
@@ -69,15 +70,15 @@ public class SaveRequestResultTest extends PrimeBaseTest {
     request.setParameter("param1", "value1");
     request.setParameter("param2", "value2");
 
-    CipherProvider cipherProvider = new DefaultCipherProvider(configuration);
+    Encryptor encryptor = new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper);
     SaveRequest annotation = new SaveRequestImpl("/login", "unauthenticated", true, false);
-    SaveRequestResult result = new SaveRequestResult(messageStore, expressionEvaluator, response, request, store, configuration, objectMapper, cipherProvider);
+    SaveRequestResult result = new SaveRequestResult(messageStore, expressionEvaluator, response, request, store, configuration, encryptor);
     result.execute(annotation);
 
     // Commit the response and ensure we have written the cookie to the User Agent.
     container.getResponse().flushBuffer();
 
-    assertCookieEquals(container.getUserAgent().getCookies(container.getRequest()), singletonList(SavedRequestTools.toCookie(new SavedHttpRequest(HTTPMethod.GET, "/test?param1=value1&param2=value2", null), objectMapper, configuration, cipherProvider)));
+    assertCookieEquals(container.getUserAgent().getCookies(container.getRequest()), singletonList(SavedRequestTools.toCookie(new SavedHttpRequest(HTTPMethod.GET, "/test?param1=value1&param2=value2", null), configuration, encryptor)));
     assertEquals(response.getRedirect(), "/login");
 
     verify(store);
@@ -94,15 +95,15 @@ public class SaveRequestResultTest extends PrimeBaseTest {
     request.setParameter("param1", "value1");
     request.setParameter("param2", "value2");
 
-    CipherProvider cipherProvider = new DefaultCipherProvider(configuration);
+    Encryptor encryptor = new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper);
     SaveRequest annotation = new SaveRequestImpl("/login", "unauthenticated", true, false);
-    SaveRequestResult result = new SaveRequestResult(messageStore, expressionEvaluator, response, request, store, configuration, objectMapper, cipherProvider);
+    SaveRequestResult result = new SaveRequestResult(messageStore, expressionEvaluator, response, request, store, configuration, encryptor);
     result.execute(annotation);
 
     // Commit the response and ensure we have written the cookie to the User Agent.
     container.getResponse().flushBuffer();
 
-    assertCookieEquals(container.getUserAgent().getCookies(container.getRequest()), singletonList(SavedRequestTools.toCookie(new SavedHttpRequest(HTTPMethod.POST, "/test", request.getParameterMap()), objectMapper, configuration, cipherProvider)));
+    assertCookieEquals(container.getUserAgent().getCookies(container.getRequest()), singletonList(SavedRequestTools.toCookie(new SavedHttpRequest(HTTPMethod.POST, "/test", request.getParameterMap()), configuration, encryptor)));
     assertEquals(response.getRedirect(), "/login");
 
     verify(store);
@@ -129,9 +130,9 @@ public class SaveRequestResultTest extends PrimeBaseTest {
     request.setParameter("largeParam3", parameters.get("largeParam3").get(0));
     request.setParameter("largeParam4", parameters.get("largeParam4").get(0));
 
-    CipherProvider cipherProvider = new DefaultCipherProvider(configuration);
+    Encryptor encryptor = new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper);
     SaveRequest annotation = new SaveRequestImpl("/login", "unauthenticated", true, false);
-    SaveRequestResult result = new SaveRequestResult(messageStore, expressionEvaluator, response, request, store, configuration, objectMapper, cipherProvider);
+    SaveRequestResult result = new SaveRequestResult(messageStore, expressionEvaluator, response, request, store, configuration, encryptor);
     result.execute(annotation);
 
     // Expect no cookies in the response, sadly, the cookie was just too big and we omitted it from the HTTP response.

@@ -15,13 +15,16 @@
  */
 package org.primeframework.mvc.scope;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.List;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.util.ReflectionUtils;
-
-import com.google.inject.Inject;
+import org.primeframework.mvc.util.TypeTools;
 
 /**
  * @author Daniel DeGroff
@@ -41,7 +44,16 @@ public class DefaultScopeRetriever implements ScopeRetriever {
     if (actionInvocation.action != null && scopeFields != null && scopeFields.size() > 0) {
       for (ScopeField scopeField : scopeFields) {
         Scope scope = scopeProvider.lookup(scopeField.annotationType);
-        Object value = scope.get(scopeField.field.getName(), scopeField.annotation);
+
+        // Optionally resolve generic type
+        Type type = scopeField.field.getGenericType();
+        if (type instanceof TypeVariable<?>) {
+          type = TypeTools.resolveGenericType(scopeField.field.getDeclaringClass(), actionInvocation.action.getClass(), (TypeVariable<?>) type);
+        } else if (type instanceof ParameterizedType) {
+          type = ((ParameterizedType) type).getRawType();
+        }
+
+        Object value = scope.get(scopeField.field.getName(), (Class<?>) type, scopeField.annotation);
         if (value != null) {
           ReflectionUtils.setField(scopeField.field, actionInvocation.action, value);
         }

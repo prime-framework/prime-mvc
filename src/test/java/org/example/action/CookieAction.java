@@ -20,15 +20,19 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.inject.Inject;
+import org.example.action.BaseCookieAction.Foo;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.annotation.Status;
+import org.primeframework.mvc.scope.annotation.ActionCookie;
 
 /**
  * @author Daniel DeGroff
  */
 @Action
 @Status
-public class CookieAction {
+public class CookieAction extends BaseCookieAction<Foo> {
+  public boolean clearSaveMe;
+
   public Cookie[] cookies;
 
   public String name;
@@ -39,6 +43,9 @@ public class CookieAction {
   @Inject
   public HttpServletResponse response;
 
+  @ActionCookie
+  public String saveMe;
+
   public String value;
 
   public String get() {
@@ -47,8 +54,14 @@ public class CookieAction {
   }
 
   public String post() {
-    Cookie cookie = new Cookie(name, value);
-    response.addCookie(cookie);
+    if (value != null) {
+      Cookie cookie = new Cookie(name, value);
+      response.addCookie(cookie);
+    }
+
+    if (clearSaveMe) {
+      saveMe = null;
+    }
 
     return "success";
   }

@@ -20,23 +20,30 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.primeframework.mvc.scope.ActionSessionScope;
+import org.primeframework.mvc.scope.ActionCookieScope;
 
 /**
- * This annotation should be used to mark member fields of actions that should be fetched and stored in the HttpSession
+ * This annotation should be used to mark member fields of actions that should be fetched and stored in a secure Cookie
  * but only accessible by the current action.
  *
- * @author Brian Pontarelli
+ * @author Daniel DeGroff
  */
 @Retention(RetentionPolicy.RUNTIME)
-@ScopeAnnotation(ActionSessionScope.class)
+@ScopeAnnotation(ActionCookieScope.class)
 @Target(ElementType.FIELD)
-public @interface ActionSession {
+public @interface ActionCookie {
   /**
    * @return This attribute determines the action for which the action session is used. This allows an action to get and
    * set attributes inside another action's session.
    */
-  Class<?> action() default ActionSession.class;
+  Class<?> action() default ActionCookie.class;
+
+  /**
+   * When `true` the cookie value will be encrypted, this is the default.
+   *
+   * @return true if the cookie value should be encrypted.
+   */
+  boolean encrypt() default true;
 
   /**
    * @return This attribute determines the name under which that the value is stored in the action session. The default

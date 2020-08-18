@@ -23,12 +23,14 @@ import io.fusionauth.jwt.Verifier;
 import org.primeframework.mvc.security.AuthorizeMethodScheme;
 import org.primeframework.mvc.security.CipherProvider;
 import org.primeframework.mvc.security.DefaultCipherProvider;
+import org.primeframework.mvc.security.DefaultEncryptor;
 import org.primeframework.mvc.security.DefaultJWTConstraintsValidator;
 import org.primeframework.mvc.security.DefaultJWTRequestAdapter;
 import org.primeframework.mvc.security.DefaultJWTSecurityContext;
 import org.primeframework.mvc.security.DefaultSavedRequestWorkflow;
 import org.primeframework.mvc.security.DefaultSecurityWorkflow;
 import org.primeframework.mvc.security.DefaultUserLoginConstraintValidator;
+import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.security.ExplosiveVerifierProvider;
 import org.primeframework.mvc.security.JWTConstraintsValidator;
 import org.primeframework.mvc.security.JWTRequestAdapter;
@@ -66,6 +68,7 @@ public class SecurityModule extends AbstractModule {
 
     // Bind the Cipher/Encryption interfaces
     bind(CipherProvider.class).to(DefaultCipherProvider.class).asEagerSingleton();
+    bind(Encryptor.class).to(DefaultEncryptor.class);
 
     // Bind CSRF Provider
     bind(CSRFProvider.class).to(SynchronizerTokenCSRFProvider.class);

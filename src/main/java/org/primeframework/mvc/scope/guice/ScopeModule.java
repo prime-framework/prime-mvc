@@ -15,6 +15,7 @@
  */
 package org.primeframework.mvc.scope.guice;
 
+import com.google.inject.AbstractModule;
 import org.primeframework.mvc.scope.DefaultScopeProvider;
 import org.primeframework.mvc.scope.DefaultScopeRetrievalWorkflow;
 import org.primeframework.mvc.scope.DefaultScopeRetriever;
@@ -24,28 +25,26 @@ import org.primeframework.mvc.scope.ScopeRetrievalWorkflow;
 import org.primeframework.mvc.scope.ScopeRetriever;
 import org.primeframework.mvc.scope.ScopeStorageWorkflow;
 
-import com.google.inject.AbstractModule;
-
 /**
  * Scope bindings.
  *
  * @author Brian Pontarelli
  */
 public class ScopeModule extends AbstractModule {
-  @Override
-  protected void configure() {
-    bindScopeProvider();
-    bindScopeRetriever();
-    bindScopeRetrievalWorkflow();
-    bindScopeStorageWorkflow();
-  }
-
   protected void bindScopeRetrievalWorkflow() {
     bind(ScopeRetrievalWorkflow.class).to(DefaultScopeRetrievalWorkflow.class);
   }
 
   protected void bindScopeStorageWorkflow() {
     bind(ScopeStorageWorkflow.class).to(DefaultScopeStorageWorkflow.class);
+  }
+
+  @Override
+  protected void configure() {
+    bindScopeProvider();
+    bindScopeRetriever();
+    bindScopeRetrievalWorkflow();
+    bindScopeStorageWorkflow();
   }
 
   private void bindScopeProvider() {

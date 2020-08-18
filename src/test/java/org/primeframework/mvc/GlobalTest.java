@@ -999,19 +999,84 @@ public class GlobalTest extends PrimeBaseTest {
     test.simulate(() -> simulator.test("/cookie")
                                  .withParameter("name", "token")
                                  .withParameter("value", "secret")
+                                 .withParameter("saveMe", "save a value")
                                  .post()
                                  .assertStatusCode(200)
                                  .assertBodyIsEmpty()
                                  // Assert the cookie is set
-                                 .assertCookie("token", "secret"))
+                                 .assertCookie("token", "secret")
+                                 // Assert we dropped a cookie for the @ActionCookie
+                                 .assertContainsCookie("org.example.action.CookieAction$saveMe"))
 
         // Now make a GET request to the same action and verify the cookies were picked up on the request.
         .simulate(() -> simulator.test("/cookie")
                                  .get()
                                  .assertStatusCode(200)
                                  .assertBodyContains(
+                                     "Count:2",
+                                     "token:secret",
+                                     "org.example.action.CookieAction$saveMe:") // the value will be encoded
+                                 // Cookie is not written back on this response
+                                 .assertDoesNotContainsCookie("token"))
+
+        // Clear the value set by @CookieAction by asking the action to set the value to 'null'
+        .simulate(() -> simulator.test("/cookie")
+                                 .withParameter("clearSaveMe", true)
+                                 .post()
+                                 .assertStatusCode(200)
+                                 .assertBodyIsEmpty()
+                                 // Cookie is written out with a null
+                                 .assertContainsCookie("org.example.action.CookieAction$saveMe"))
+
+        // Retrieve again, value will be gone.
+        .simulate(() -> simulator.test("/cookie")
+                                 .get()
+                                 .assertBodyContains(
                                      "Count:1",
                                      "token:secret")
+                                 .assertBodyDoesNotContain(
+                                     "org.example.action.CookieAction$saveMe:") // the value will be encoded
+                                 // Cookie is not written back on this response
+                                 .assertDoesNotContainsCookie("org.example.action.CookieAction$saveMe"))
+
+        // Set a generic type
+        .simulate(() -> simulator.test("/cookie")
+                                 .withParameter("u.bar", "baz")
+                                 .post()
+                                 .assertStatusCode(200)
+                                 .assertBodyIsEmpty()
+                                 // Assert we dropped a cookie for the @ActionCookie
+                                 .assertContainsCookie("org.example.action.CookieAction$u"))
+
+        // Call get and see the value is set back into the action
+        .simulate(() -> simulator.test("/cookie")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertBodyContains(
+                                     "Count:2",
+                                     "token:secret",
+                                     "org.example.action.CookieAction$u:") // the value will be encoded
+                                 // Cookie is not written back on this response
+                                 .assertDoesNotContainsCookie("token"))
+
+        // Set a generic collection
+        .simulate(() -> simulator.test("/cookie")
+                                 .withParameter("list[0]bar", "bing")
+                                 .withParameter("list[1]bar", "boom")
+                                 .post()
+                                 .assertStatusCode(200)
+                                 .assertBodyIsEmpty()
+                                 // Assert we dropped a cookie for the @ActionCookie
+                                 .assertContainsCookie("org.example.action.CookieAction$list"))
+
+        .simulate(() -> simulator.test("/cookie")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertBodyContains(
+                                     "Count:3",
+                                     "token:secret",
+                                     "org.example.action.CookieAction$list:", // the value will be encoded
+                                     "org.example.action.CookieAction$u:") // the value will be encoded
                                  // Cookie is not written back on this response
                                  .assertDoesNotContainsCookie("token"));
   }

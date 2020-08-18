@@ -25,7 +25,6 @@ import org.primeframework.mvc.security.saved.SavedHttpRequest;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
-
 import static org.easymock.EasyMock.createStrictMock;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
@@ -40,8 +39,7 @@ import static org.testng.Assert.assertTrue;
 public class DefaultSavedRequestWorkflowTest extends PrimeBaseTest {
   @Test
   public void performNoSavedRequest() throws Exception {
-    CipherProvider cipherProvider = new DefaultCipherProvider(configuration);
-    container.getUserAgent().addCookie(request, SavedRequestTools.toCookie(new SavedHttpRequest(HTTPMethod.GET, "/secure?test=value&test2=value2", null), objectMapper, configuration, cipherProvider));
+    container.getUserAgent().addCookie(request, SavedRequestTools.toCookie(new SavedHttpRequest(HTTPMethod.GET, "/secure?test=value&test2=value2", null), configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper)));
 
     HttpServletRequestWrapper wrapper = new HttpServletRequestWrapper(request);
     DefaultSavedRequestWorkflow workflow = new DefaultSavedRequestWorkflow(wrapper);

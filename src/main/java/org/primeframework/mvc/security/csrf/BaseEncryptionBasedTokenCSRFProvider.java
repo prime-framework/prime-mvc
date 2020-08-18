@@ -15,16 +15,11 @@
  */
 package org.primeframework.mvc.security.csrf;
 
-import javax.crypto.Cipher;
 import javax.servlet.http.HttpServletRequest;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Base64;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.primeframework.mvc.ErrorException;
-import org.primeframework.mvc.security.CipherProvider;
 import org.primeframework.mvc.security.CookieConfig;
+import org.primeframework.mvc.security.Encryptor;
 
 /**
  * A CSRF Provider leveraging the Encryption based Token Pattern  as defined by OWASP.
@@ -36,17 +31,13 @@ import org.primeframework.mvc.security.CookieConfig;
  */
 @SuppressWarnings("unused")
 public abstract class BaseEncryptionBasedTokenCSRFProvider implements CSRFProvider {
-  private final CipherProvider cipherProvider;
-
   private final CookieConfig cookie;
 
-  private final ObjectMapper objectMapper;
+  private final Encryptor encryptor;
 
-  protected BaseEncryptionBasedTokenCSRFProvider(CipherProvider cipherProvider, CookieConfig cookie,
-                                                 ObjectMapper objectMapper) {
-    this.cipherProvider = cipherProvider;
+  protected BaseEncryptionBasedTokenCSRFProvider(CookieConfig cookie, Encryptor encryptor) {
     this.cookie = cookie;
-    this.objectMapper = objectMapper;
+    this.encryptor = encryptor;
   }
 
   @Override
@@ -77,12 +68,7 @@ public abstract class BaseEncryptionBasedTokenCSRFProvider implements CSRFProvid
 
   private CSRFToken decrypt(String s) {
     try {
-      byte[] bytes = Base64.getUrlDecoder().decode(s.getBytes(StandardCharsets.UTF_8));
-      Cipher cipher = cipherProvider.getDecryptor();
-      byte[] result = new byte[cipher.getOutputSize(bytes.length)];
-      int resultLength = cipher.update(bytes, 0, bytes.length, result, 0);
-      resultLength += cipher.doFinal(result, resultLength);
-      return objectMapper.readerFor(CSRFToken.class).readValue(Arrays.copyOfRange(result, 0, resultLength));
+      return encryptor.decrypt(CSRFToken.class, s);
     } catch (Exception e) {
       return null;
     }
@@ -94,14 +80,7 @@ public abstract class BaseEncryptionBasedTokenCSRFProvider implements CSRFProvid
       token.sid = sessionId;
       token.instant = System.currentTimeMillis();
 
-      String value = objectMapper.writer().writeValueAsString(token);
-      Cipher cipher = cipherProvider.getEncryptor();
-      byte[] input = value.getBytes(StandardCharsets.UTF_8);
-      byte[] result = new byte[cipher.getOutputSize(input.length)];
-      int resultLength = cipher.update(input, 0, input.length, result, 0);
-      resultLength += cipher.doFinal(result, resultLength);
-
-      return Base64.getUrlEncoder().encodeToString(Arrays.copyOfRange(result, 0, resultLength));
+      return encryptor.encrypt(token);
     } catch (Exception e) {
       throw new ErrorException("error", e);
     }

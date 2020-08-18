@@ -20,12 +20,11 @@ import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.scope.annotation.ActionSession;
-
-import com.google.inject.Inject;
 
 /**
  * This is the request scope which fetches and stores values in the HttpSession, but those values are associated with a
@@ -38,13 +37,47 @@ import com.google.inject.Inject;
 @SuppressWarnings("unchecked")
 public class ActionSessionScope implements Scope<ActionSession> {
   public static final String ACTION_SESSION_KEY = "primeActionSession";
+
   private final ActionInvocationStore actionInvocationStore;
+
   private final HttpServletRequest request;
 
   @Inject
   public ActionSessionScope(HttpServletRequest request, ActionInvocationStore actionInvocationStore) {
     this.actionInvocationStore = actionInvocationStore;
     this.request = request;
+  }
+
+  /**
+   * Helper method used when you may need to manually extract an action session value prior to the MVC workflow.
+   *
+   * @param request the HTTP servlet request
+   * @param key     the key
+   * @param action  the action class
+   * @param <T>     the type
+   * @return the value found in the session or null if no value is found.
+   */
+  public static <T> T get(HttpServletRequest request, String key, Class<?> action) {
+    HttpSession session = request.getSession(false);
+    if (session == null) {
+      return null;
+    }
+
+    try {
+      @SuppressWarnings("unchecked")
+      Map<String, Object> actionSession = (Map<String, Object>) session.getAttribute(ACTION_SESSION_KEY);
+      if (actionSession != null) {
+        @SuppressWarnings("unchecked")
+        Map<String, Object> requestedSession = (Map<String, Object>) actionSession.get(action.getName());
+        if (requestedSession != null) {
+          //noinspection unchecked
+          return (T) requestedSession.get(key);
+        }
+      }
+    } catch (Exception ignore) {
+    }
+
+    return null;
   }
 
   /**
@@ -118,7 +151,7 @@ public class ActionSessionScope implements Scope<ActionSession> {
       ActionInvocation ai = actionInvocationStore.getCurrent();
       if (ai.action == null) {
         throw new PrimeException("Attempting to store a value in the action session but the current request URL isn'" +
-          "t associated with an action class");
+            "t associated with an action class");
       }
       className = ai.action.getClass().getName();
     }
