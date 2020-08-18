@@ -76,7 +76,6 @@ public class CookieFlashScope implements FlashScope {
       messages.addAll(requestList);
     }
 
-    messages.addAll(cookie.get());
     return messages;
   }
 
