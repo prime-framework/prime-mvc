@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.primeframework.mvc.servlet.HTTPMethod;
+import org.primeframework.mvc.util.ObjectTools;
 
 /**
  * Stores the request information when a user accesses a resource that requires authentication and needs to be returned
@@ -54,9 +55,10 @@ public class SavedHttpRequest {
     if (!(o instanceof SavedHttpRequest)) {
       return false;
     }
-    final SavedHttpRequest that = (SavedHttpRequest) o;
+
+    SavedHttpRequest that = (SavedHttpRequest) o;
     return method == that.method &&
-        Objects.equals(parameters, that.parameters) &&
+        ObjectTools.equals(parameters, that.parameters) &&
         Objects.equals(uri, that.uri);
   }
 

@@ -15,8 +15,15 @@
  */
 package org.primeframework.mvc.action.result;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.ShortBufferException;
 import javax.servlet.http.Cookie;
 import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,7 +47,6 @@ import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.security.saved.SavedHttpRequest;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.testng.annotations.Test;
-import static java.util.Collections.singletonList;
 import static org.easymock.EasyMock.createStrictMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
@@ -60,7 +66,8 @@ public class SaveRequestResultTest extends PrimeBaseTest {
   @Inject public ObjectMapper objectMapper;
 
   @Test
-  public void saveRequestGET() throws IOException {
+  public void saveRequestGET()
+      throws IOException, NoSuchPaddingException, BadPaddingException, InvalidKeyException, NoSuchAlgorithmException, IllegalBlockSizeException, ShortBufferException, InvalidAlgorithmParameterException {
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/foo", "", null));
     replay(store);
@@ -75,17 +82,19 @@ public class SaveRequestResultTest extends PrimeBaseTest {
     SaveRequestResult result = new SaveRequestResult(messageStore, expressionEvaluator, response, request, store, configuration, encryptor);
     result.execute(annotation);
 
-    // Commit the response and ensure we have written the cookie to the User Agent.
-    container.getResponse().flushBuffer();
+    // The cookie value will be different each time because the initialization vector is unique per request. Decrypt the actual value to compare it to the expected.
+    SavedHttpRequest actual = encryptor.decrypt(SavedHttpRequest.class, (container.getUserAgent().getCookies(container.getRequest()).get(0)).getValue());
+    SavedHttpRequest expected = new SavedHttpRequest(HTTPMethod.GET, "/test?param1=value1&param2=value2", null);
+    assertEquals(actual, expected);
 
-    assertCookieEquals(container.getUserAgent().getCookies(container.getRequest()), singletonList(SavedRequestTools.toCookie(new SavedHttpRequest(HTTPMethod.GET, "/test?param1=value1&param2=value2", null), configuration, encryptor)));
     assertEquals(response.getRedirect(), "/login");
 
     verify(store);
   }
 
   @Test
-  public void saveRequestPOST() throws IOException {
+  public void saveRequestPOST()
+      throws IOException, NoSuchPaddingException, BadPaddingException, InvalidKeyException, NoSuchAlgorithmException, IllegalBlockSizeException, ShortBufferException, InvalidAlgorithmParameterException {
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/foo", "", null));
     replay(store);
@@ -100,10 +109,11 @@ public class SaveRequestResultTest extends PrimeBaseTest {
     SaveRequestResult result = new SaveRequestResult(messageStore, expressionEvaluator, response, request, store, configuration, encryptor);
     result.execute(annotation);
 
-    // Commit the response and ensure we have written the cookie to the User Agent.
-    container.getResponse().flushBuffer();
+    // The cookie value will be different each time because the initialization vector is unique per request. Decrypt the actual value to compare it to the expected.
+    SavedHttpRequest actual = encryptor.decrypt(SavedHttpRequest.class, (container.getUserAgent().getCookies(container.getRequest()).get(0)).getValue());
+    SavedHttpRequest expected = new SavedHttpRequest(HTTPMethod.POST, "/test", request.getParameterMap());
+    assertEquals(actual, expected);
 
-    assertCookieEquals(container.getUserAgent().getCookies(container.getRequest()), singletonList(SavedRequestTools.toCookie(new SavedHttpRequest(HTTPMethod.POST, "/test", request.getParameterMap()), configuration, encryptor)));
     assertEquals(response.getRedirect(), "/login");
 
     verify(store);

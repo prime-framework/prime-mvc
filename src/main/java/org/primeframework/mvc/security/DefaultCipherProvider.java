@@ -17,6 +17,7 @@ package org.primeframework.mvc.security;
 
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.IvParameterSpec;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
@@ -43,6 +44,14 @@ public class DefaultCipherProvider implements CipherProvider {
   }
 
   @Override
+  public Cipher getDecryptor(byte[] iv)
+      throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
+    Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+    cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(iv));
+    return cipher;
+  }
+
+  @Override
   public Cipher getDecryptor()
       throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
     Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
@@ -55,6 +64,14 @@ public class DefaultCipherProvider implements CipherProvider {
       throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
     Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
     cipher.init(Cipher.ENCRYPT_MODE, key, iv);
+    return cipher;
+  }
+
+  @Override
+  public Cipher getEncryptor(byte[] iv)
+      throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
+    Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+    cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(iv));
     return cipher;
   }
 }
