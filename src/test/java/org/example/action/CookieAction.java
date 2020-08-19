@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.inject.Inject;
 import org.example.action.BaseCookieAction.Foo;
+import org.primeframework.mvc.ErrorException;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.annotation.Status;
 import org.primeframework.mvc.scope.annotation.ActionCookie;
@@ -31,6 +32,8 @@ import org.primeframework.mvc.scope.annotation.ActionCookie;
 @Action
 @Status
 public class CookieAction extends BaseCookieAction<Foo> {
+  public boolean blowChunks;
+
   public boolean clearSaveMe;
 
   public Cookie[] cookies;
@@ -49,6 +52,10 @@ public class CookieAction extends BaseCookieAction<Foo> {
   public String value;
 
   public String get() {
+    if (blowChunks) {
+      throw new CookieErrorException();
+    }
+
     cookies = request.getCookies();
     return "input";
   }
@@ -64,5 +71,11 @@ public class CookieAction extends BaseCookieAction<Foo> {
     }
 
     return "success";
+  }
+
+  public static class CookieErrorException extends ErrorException {
+    public CookieErrorException() {
+      super("input");
+    }
   }
 }

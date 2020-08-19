@@ -1078,7 +1078,16 @@ public class GlobalTest extends PrimeBaseTest {
                                      "org.example.action.CookieAction$list:", // the value will be encoded
                                      "org.example.action.CookieAction$u:") // the value will be encoded
                                  // Cookie is not written back on this response
-                                 .assertDoesNotContainsCookie("token"));
+                                 .assertDoesNotContainsCookie("token"))
+
+        // Blow chunks and get an error in the message store that will use the cookie lash message scope.
+        .simulate(() -> simulator.test("/cookie")
+                                 .withParameter("blowChunks", true)
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertContainsGeneralErrorMessageCodes("[CookieErrorException]")
+                                 .assertBodyContainsMessagesFromKey("[CookieErrorException]")
+                                 .assertBodyContains("Error count:1"));
   }
 
   @Test

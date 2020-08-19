@@ -16,6 +16,7 @@
 package org.primeframework.mvc.security.csrf;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.concurrent.TimeUnit;
 
 import org.primeframework.mvc.ErrorException;
 import org.primeframework.mvc.security.CookieConfig;
@@ -34,6 +35,9 @@ public abstract class BaseEncryptionBasedTokenCSRFProvider implements CSRFProvid
   private final CookieConfig cookie;
 
   private final Encryptor encryptor;
+
+  // Default to 15 minutes;
+  private long nonceTimeout = TimeUnit.MINUTES.toMillis(15);
 
   protected BaseEncryptionBasedTokenCSRFProvider(CookieConfig cookie, Encryptor encryptor) {
     this.cookie = cookie;
@@ -59,11 +63,22 @@ public abstract class BaseEncryptionBasedTokenCSRFProvider implements CSRFProvid
       return false;
     }
 
-    // Token can be up to 15 minutes old. This is totally made up. But the OWASP guide suggests using a timestamp as a 'nonce'
-    // of sorts. So we could optionally ask the configuration for how long this should good for or just assume 10 minutes is long enough
-    // to prevent a replay attack.
+    // If the 'nonce' is expired fail.
     long now = System.currentTimeMillis();
-    return (token.instant + 900_000) >= now;
+    return (token.instant + nonceTimeout) >= now;
+  }
+
+  /**
+   * Optionally override the default nonce timeout. A longer duration is less secure but offers a potentially better
+   * user experience. A shorter value is more secure but may impact the user experience.
+   * <p>
+   * This duration is essentially how long you want a user to be able to sit on a form and wait before submitting the
+   * form.
+   *
+   * @param nonceTimeout the nonce timeout in milliseconds.
+   */
+  protected void setNonceTimeout(long nonceTimeout) {
+    this.nonceTimeout = nonceTimeout;
   }
 
   private CSRFToken decrypt(String s) {

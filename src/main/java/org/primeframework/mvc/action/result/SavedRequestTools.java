@@ -20,6 +20,8 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.ShortBufferException;
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -29,6 +31,8 @@ import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.security.SavedRequestException;
 import org.primeframework.mvc.security.saved.SavedHttpRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Toolkit to help with Saved Request stuff.
@@ -36,6 +40,34 @@ import org.primeframework.mvc.security.saved.SavedHttpRequest;
  * @author Brian Pontarelli
  */
 public class SavedRequestTools {
+  private static final Logger logger = LoggerFactory.getLogger(SavedRequestTools.class);
+
+  /**
+   * Retrieve the saved request from a cookie.
+   *
+   * @param configuration The MVC configuration used to determine the name of the cookie.
+   * @param encryptor     the encryptor used to decrypt the cookie
+   * @param request       the HTTP servlet request
+   * @return null if no save request was found.
+   */
+  public static SaveHttpRequestResult fromCookie(MVCConfiguration configuration, Encryptor encryptor,
+                                                 HttpServletRequest request) {
+    Cookie[] cookies = request.getCookies();
+    if (cookies != null) {
+      for (final Cookie cookie : cookies) {
+        if (cookie.getName().equals(configuration.savedRequestCookieName())) {
+          try {
+            return new SaveHttpRequestResult(cookie, encryptor.decrypt(SavedHttpRequest.class, cookie.getValue()));
+          } catch (IOException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | InvalidKeyException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | ShortBufferException e) {
+            logger.warn("Bad SavedRequest cookie [{}]. Error is [{}]", cookie.getValue(), e.getMessage());
+          }
+        }
+      }
+    }
+
+    return null;
+  }
+
   /**
    * Creates a Cookie Object for the given SavedHttpRequest object.
    *
@@ -58,6 +90,17 @@ public class SavedRequestTools {
       return cookie;
     } catch (JsonProcessingException | IllegalBlockSizeException | BadPaddingException | NoSuchPaddingException | InvalidAlgorithmParameterException | InvalidKeyException | NoSuchAlgorithmException | ShortBufferException e) {
       throw new SavedRequestException(e);
+    }
+  }
+
+  public static class SaveHttpRequestResult {
+    public Cookie cookie;
+
+    public SavedHttpRequest savedHttpRequest;
+
+    public SaveHttpRequestResult(Cookie cookie, SavedHttpRequest savedHttpRequest) {
+      this.cookie = cookie;
+      this.savedHttpRequest = savedHttpRequest;
     }
   }
 }

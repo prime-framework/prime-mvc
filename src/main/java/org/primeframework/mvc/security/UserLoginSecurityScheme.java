@@ -86,7 +86,7 @@ public class UserLoginSecurityScheme implements SecurityScheme {
         throw new UnauthorizedException();
       }
 
-      // Handle CSRF tokens (for POST only) and remove it from the parameter map
+      // Handle CSRF tokens (for POST only)
       if (!csrfProvider.validateRequest(request)) {
         throw new UnauthorizedException();
       }

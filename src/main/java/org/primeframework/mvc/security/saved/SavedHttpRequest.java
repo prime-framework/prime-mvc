@@ -28,8 +28,6 @@ import org.primeframework.mvc.servlet.HTTPMethod;
  * @author Brian Pontarelli
  */
 public class SavedHttpRequest {
-  public static final String LOGGED_IN_SESSION_KEY = "prime-mvc-security-saved-request-logged-in";
-
   public HTTPMethod method;
 
   public Map<String, String[]> parameters = new HashMap<>();
@@ -50,8 +48,12 @@ public class SavedHttpRequest {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (!(o instanceof SavedHttpRequest)) return false;
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof SavedHttpRequest)) {
+      return false;
+    }
     final SavedHttpRequest that = (SavedHttpRequest) o;
     return method == that.method &&
         Objects.equals(parameters, that.parameters) &&

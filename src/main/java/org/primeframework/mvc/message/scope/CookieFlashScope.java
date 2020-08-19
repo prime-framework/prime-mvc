@@ -17,7 +17,6 @@ package org.primeframework.mvc.message.scope;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -35,7 +34,6 @@ import org.primeframework.mvc.util.FlashMessageCookie;
  *
  * @author Daniel DeGroff
  */
-@SuppressWarnings("unchecked")
 public class CookieFlashScope implements FlashScope {
   private final FlashMessageCookie cookie;
 
@@ -70,13 +68,7 @@ public class CookieFlashScope implements FlashScope {
 
   @Override
   public List<Message> get() {
-    List<Message> messages = new ArrayList<>();
-    List<Message> requestList = (List<Message>) request.getAttribute(FlashScope.KEY);
-    if (requestList != null) {
-      messages.addAll(requestList);
-    }
-
-    return messages;
+    return cookie.get();
   }
 
   /**

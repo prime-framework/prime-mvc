@@ -92,9 +92,7 @@ public class ReexecuteSavedRequestResultTest extends PrimeBaseTest {
     replay(ee);
 
     SavedHttpRequest savedRequest = new SavedHttpRequest(HTTPMethod.GET, "/secure?test=value1&test2=value2", null);
-    HttpSession session = createStrictMock(HttpSession.class);
-    session.setAttribute(SavedHttpRequest.LOGGED_IN_SESSION_KEY, savedRequest);
-    replay(session);
+    container.getUserAgent().addCookie(request, SavedRequestTools.toCookie(savedRequest, configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper)));
 
     List<Message> messages = new ArrayList<>();
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
@@ -102,13 +100,11 @@ public class ReexecuteSavedRequestResultTest extends PrimeBaseTest {
     Cookie cookie = SavedRequestTools.toCookie(savedRequest, configuration, encryptor);
     expect(request.getAttribute(FlashScope.KEY)).andReturn(messages);
     expect(request.getCookies()).andReturn(new Cookie[]{cookie});
-    expect(request.getSession(true)).andReturn(session);
     expect(request.getContextPath()).andReturn("");
     expect(request.getRequestURI()).andReturn("/");
     replay(request);
 
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    response.addCookie(cookie);
     response.sendRedirect("/secure?test=value1&test2=value2");
     response.setStatus(301);
     replay(response);
@@ -127,6 +123,6 @@ public class ReexecuteSavedRequestResultTest extends PrimeBaseTest {
     ReexecuteSavedRequestResult result = new ReexecuteSavedRequestResult(messageStore, ee, response, request, store, configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper));
     result.execute(redirect);
 
-    verify(response, request, ee, store, messageStore, session);
+    verify(response, request, ee, store, messageStore);
   }
 }

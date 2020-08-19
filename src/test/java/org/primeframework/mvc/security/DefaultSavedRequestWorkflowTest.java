@@ -39,10 +39,8 @@ import static org.testng.Assert.assertTrue;
 public class DefaultSavedRequestWorkflowTest extends PrimeBaseTest {
   @Test
   public void performNoSavedRequest() throws Exception {
-    container.getUserAgent().addCookie(request, SavedRequestTools.toCookie(new SavedHttpRequest(HTTPMethod.GET, "/secure?test=value&test2=value2", null), configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper)));
-
     HttpServletRequestWrapper wrapper = new HttpServletRequestWrapper(request);
-    DefaultSavedRequestWorkflow workflow = new DefaultSavedRequestWorkflow(wrapper);
+    DefaultSavedRequestWorkflow workflow = new DefaultSavedRequestWorkflow(configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper), wrapper, response);
 
     WorkflowChain workflowChain = createStrictMock(WorkflowChain.class);
     workflowChain.continueWorkflow();
@@ -57,11 +55,11 @@ public class DefaultSavedRequestWorkflowTest extends PrimeBaseTest {
 
   @Test
   public void performSavedRequestGET() throws Exception {
-    container.getSession().setAttribute(SavedHttpRequest.LOGGED_IN_SESSION_KEY, new SavedHttpRequest(HTTPMethod.GET, "/secure?test=value&test2=value2", null));
+    container.getUserAgent().addCookie(request, SavedRequestTools.toCookie(new SavedHttpRequest(HTTPMethod.GET, "/secure?test=value&test2=value2", null), configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper)));
     request.setUri("/secure");
 
     HttpServletRequestWrapper wrapper = new HttpServletRequestWrapper(request);
-    DefaultSavedRequestWorkflow workflow = new DefaultSavedRequestWorkflow(wrapper);
+    DefaultSavedRequestWorkflow workflow = new DefaultSavedRequestWorkflow(configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper), wrapper, response);
 
     WorkflowChain workflowChain = createStrictMock(WorkflowChain.class);
     workflowChain.continueWorkflow();
@@ -82,11 +80,11 @@ public class DefaultSavedRequestWorkflowTest extends PrimeBaseTest {
     parameters.put("test", new String[]{"value"});
     parameters.put("test2", new String[]{"value2"});
 
-    container.getSession().setAttribute(SavedHttpRequest.LOGGED_IN_SESSION_KEY, new SavedHttpRequest(HTTPMethod.POST, "/secure", parameters));
+    container.getUserAgent().addCookie(request, SavedRequestTools.toCookie(new SavedHttpRequest(HTTPMethod.POST, "/secure", parameters), configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper)));
     request.setUri("/secure");
 
     HttpServletRequestWrapper wrapper = new HttpServletRequestWrapper(request);
-    DefaultSavedRequestWorkflow workflow = new DefaultSavedRequestWorkflow(wrapper);
+    DefaultSavedRequestWorkflow workflow = new DefaultSavedRequestWorkflow(configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper), wrapper, response);
 
     WorkflowChain workflowChain = createStrictMock(WorkflowChain.class);
     workflowChain.continueWorkflow();
