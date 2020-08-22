@@ -18,10 +18,10 @@ package org.primeframework.mvc.util;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -96,19 +96,18 @@ public class FlashMessageCookie {
 
   private List<Message> deserialize(String s) {
     try {
-      String decoded = URLDecoder.decode(s, "UTF-8");
+      byte[] decoded = Base64.getUrlDecoder().decode(s.getBytes(StandardCharsets.UTF_8));
       return objectMapper.readerFor(new TypeReference<List<Message>>() {
       }).readValue(decoded);
-    } catch (JsonProcessingException | UnsupportedEncodingException e) {
+    } catch (IOException e) {
       return null;
     }
   }
 
-
   private String serialize(List<Message> messages) {
     try {
-      return URLEncoder.encode(objectMapper.writeValueAsString(messages), "UTF-8");
-    } catch (JsonProcessingException | UnsupportedEncodingException e) {
+      return Base64.getUrlEncoder().withoutPadding().encodeToString(objectMapper.writeValueAsBytes(messages));
+    } catch (JsonProcessingException e) {
       throw new ErrorException(e);
     }
   }

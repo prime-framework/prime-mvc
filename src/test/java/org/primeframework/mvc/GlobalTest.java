@@ -1087,7 +1087,24 @@ public class GlobalTest extends PrimeBaseTest {
                                  .assertStatusCode(200)
                                  .assertContainsGeneralErrorMessageCodes("[CookieErrorException]")
                                  .assertBodyContainsMessagesFromKey("[CookieErrorException]")
-                                 .assertBodyContains("Error count:1"));
+                                 .assertBodyContains("Error count:1"))
+
+        // Add a message to the message store on a post / redirect and ensure we only end up with a single message in the store.
+        .simulate(() -> simulator.test("/cookie")
+                                 .withParameter("addMessage", true)
+                                 .post()
+                                 .assertStatusCode(302)
+                                 .assertRedirect("/cookie")
+                                 .assertContainsGeneralInfoMessageCodes("[NobodyDrinkTheBeer]")
+
+                                 // Execute the redirect and ensure we don't have duplicate messages
+                                 .executeRedirect(result -> result.assertStatusCode(200)
+                                                                  .assertBodyContains(
+                                                                      "Count:3",
+                                                                      "token:secret",
+                                                                      "org.example.action.CookieAction$list:", // the value will be encoded
+                                                                      "org.example.action.CookieAction$u:") // the value will be encoded
+                                                                  .assertContainsGeneralInfoMessageCodes("[NobodyDrinkTheBeer]")));
   }
 
   @Test

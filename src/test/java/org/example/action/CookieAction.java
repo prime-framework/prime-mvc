@@ -23,7 +23,11 @@ import com.google.inject.Inject;
 import org.example.action.BaseCookieAction.Foo;
 import org.primeframework.mvc.ErrorException;
 import org.primeframework.mvc.action.annotation.Action;
+import org.primeframework.mvc.action.result.annotation.Redirect;
 import org.primeframework.mvc.action.result.annotation.Status;
+import org.primeframework.mvc.message.MessageStore;
+import org.primeframework.mvc.message.MessageType;
+import org.primeframework.mvc.message.SimpleMessage;
 import org.primeframework.mvc.scope.annotation.ActionCookie;
 
 /**
@@ -31,7 +35,12 @@ import org.primeframework.mvc.scope.annotation.ActionCookie;
  */
 @Action
 @Status
+@Redirect(code = "redirect", uri = "/cookie")
 public class CookieAction extends BaseCookieAction<Foo> {
+  private final MessageStore messageStore;
+
+  public boolean addMessage;
+
   public boolean blowChunks;
 
   public boolean clearSaveMe;
@@ -51,6 +60,11 @@ public class CookieAction extends BaseCookieAction<Foo> {
 
   public String value;
 
+  @Inject
+  public CookieAction(MessageStore messageStore) {
+    this.messageStore = messageStore;
+  }
+
   public String get() {
     if (blowChunks) {
       throw new CookieErrorException();
@@ -68,6 +82,11 @@ public class CookieAction extends BaseCookieAction<Foo> {
 
     if (clearSaveMe) {
       saveMe = null;
+    }
+
+    if (addMessage) {
+      messageStore.add(new SimpleMessage(MessageType.INFO, "[NobodyDrinkTheBeer]", "Nobody drink the beer, the beer has gone bad!"));
+      return "redirect";
     }
 
     return "success";

@@ -68,7 +68,13 @@ public class CookieFlashScope implements FlashScope {
 
   @Override
   public List<Message> get() {
-    return cookie.get();
+    @SuppressWarnings("unchecked")
+    List<Message> requestList = (List<Message>) request.getAttribute(FlashScope.KEY);
+    if (requestList != null) {
+      return requestList;
+    } else {
+      return cookie.get();
+    }
   }
 
   /**
