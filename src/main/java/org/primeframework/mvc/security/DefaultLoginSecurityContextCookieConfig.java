@@ -42,10 +42,17 @@ public class DefaultLoginSecurityContextCookieConfig implements CookieConfig {
     cookie.setMaxAge(0);
     cookie.setPath("/");
     response.addCookie(cookie);
+    // Ensure we do not return the cookie again after it has been deleted within the same request.
+    request.setAttribute(name() + "Deleted", true);
   }
 
   @Override
   public String get(HttpServletRequest request) {
+    // Ensure we do not return the cookie again after it has been deleted within the same request.
+    if (request.getAttribute(name() + "Deleted") != null) {
+      return null;
+    }
+
     Cookie[] cookies = request.getCookies();
     if (cookies != null) {
       for (Cookie cookie : cookies) {

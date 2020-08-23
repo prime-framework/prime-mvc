@@ -91,10 +91,8 @@ public class DefaultMessageStore implements MessageStore {
 
   @Override
   public List<Message> get(MessageScope scope) {
-    List<Message> messages = new ArrayList<>();
     Scope s = scopes.get(scope);
-    messages.addAll(s.get());
-    return messages;
+    return new ArrayList<>(s.get());
   }
 
   @Override

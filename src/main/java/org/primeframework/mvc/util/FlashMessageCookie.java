@@ -56,9 +56,16 @@ public class FlashMessageCookie {
     cookie.setMaxAge(0);
     cookie.setPath("/");
     response.addCookie(cookie);
+    // Ensure we do not return the cookie again after it has been deleted within the same request.
+    request.setAttribute(name + "Deleted", true);
   }
 
   public List<Message> get() {
+    // Ensure we do not return the cookie again after it has been deleted within the same request.
+    if (request.getAttribute(name + "Deleted") != null) {
+      return new ArrayList<>(0);
+    }
+
     Cookie[] cookies = request.getCookies();
     if (cookies != null) {
       for (Cookie cookie : cookies) {
@@ -72,7 +79,7 @@ public class FlashMessageCookie {
     }
 
     try {
-      return new ArrayList<>();
+      return new ArrayList<>(0);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

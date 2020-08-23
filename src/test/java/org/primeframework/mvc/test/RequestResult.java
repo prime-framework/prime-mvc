@@ -529,6 +529,15 @@ public class RequestResult {
       }
     }
 
+    // Ensure we have accounted for every message in the store of this type.
+    long count = messages.stream().filter(m -> m.getType() == messageType).count();
+    if (count != errorCodes.length) {
+      StringBuilder sb = new StringBuilder("\n\tMessageStore contains:\n");
+      //noinspection StringConcatenationInsideStringBufferAppend
+      messages.stream().filter(m -> m.getType() == messageType).forEach(m -> sb.append("\t\t" + m.getType() + " " + m.getCode() + "\t" + ((m instanceof SimpleMessage) ? ((SimpleMessage) m).message : "") + "\n"));
+      throw new AssertionError("The MessageStore contains additional messages of type [" + messageType + "] that were not expected." + sb);
+    }
+
     return this;
   }
 
