@@ -317,12 +317,14 @@ public class GlobalTest extends PrimeBaseTest {
                                  .assertContainsGeneralMessageCodes(MessageType.INFO, "[INFO]")
                                  .assertContainsGeneralMessageCodes(MessageType.WARNING, "[WARNING]")
                                  .assertRedirect("temp-redirect-target")
+
                                  .executeRedirect(response -> response.assertStatusCode(302)
                                                                       // Message is still in the store
                                                                       .assertContainsGeneralMessageCodes(MessageType.ERROR, "[ERROR]")
                                                                       .assertContainsGeneralMessageCodes(MessageType.INFO, "[INFO]")
                                                                       .assertContainsGeneralMessageCodes(MessageType.WARNING, "[WARNING]")
                                                                       .assertRedirect("/temp-redirect-target-target")
+
                                                                       .executeRedirect(subResponse -> subResponse.assertStatusCode(200)
                                                                                                                  .assertBodyContains("Look Ma, I'm redirected.")
                                                                                                                  // Message is still in the store and also rendered on the page
@@ -1429,6 +1431,28 @@ public class GlobalTest extends PrimeBaseTest {
                                  .withFile("dataTextHtml", test.tempFile.toFile(), "text/html")
                                  .post()
                                  .assertStatusCode(200));
+  }
+
+  @Test
+  public void post_savedRequest() throws Exception {
+    // Post to a page that requires authentication
+    test.simulate(() -> simulator.test("/store/purchase")
+                                 .withParameter("item", "beer")
+                                 .post()
+                                 .assertStatusCode(302)
+                                 .assertRedirect("/store/login")
+
+                                 // Redirected to login
+                                 .executeRedirect(redirect1 -> redirect1.assertStatusCode(200)
+                                                                        .assertBodyContains("Login")
+
+                                                                        // Post on Login, get a session, and redirect back to the cart which completes the beer purchase
+                                                                        .executeFormPostInResponseBody("form", post -> post
+                                                                            .assertStatusCode(302)
+                                                                            .assertRedirect("/store/purchase")
+
+                                                                            .executeRedirect(redirect2 -> redirect2
+                                                                                .assertStatusCode(200).assertBodyContains("Buy:beer")))));
   }
 
   @Test

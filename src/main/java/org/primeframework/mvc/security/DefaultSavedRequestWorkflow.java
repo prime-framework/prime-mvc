@@ -54,15 +54,14 @@ public class DefaultSavedRequestWorkflow implements SavedRequestWorkflow {
 
   @Override
   public void perform(WorkflowChain workflowChain) throws IOException, ServletException {
-    SaveHttpRequestResult result = SavedRequestTools.fromCookie(configuration, encryptor, request);
-    if (result != null) {
-      // Delete the cookie
-      result.cookie.setMaxAge(0);
-      response.addCookie(result.cookie);
-
-      HttpServletRequestWrapper wrapper = (HttpServletRequestWrapper) request;
-      HttpServletRequest previous = (HttpServletRequest) wrapper.getRequest();
-      wrapper.setRequest(new SavedRequestHttpServletRequest(previous, result.savedHttpRequest));
+    if (SavedRequestTools.isExecuted(configuration, request, response)) {
+      SaveHttpRequestResult result = SavedRequestTools.fromCookie(configuration, encryptor, request);
+      if (result != null) {
+        SavedRequestTools.deleteCookie(configuration, response);
+        HttpServletRequestWrapper wrapper = (HttpServletRequestWrapper) request;
+        HttpServletRequest previous = (HttpServletRequest) wrapper.getRequest();
+        wrapper.setRequest(new SavedRequestHttpServletRequest(previous, result.savedHttpRequest));
+      }
     }
 
     workflowChain.continueWorkflow();

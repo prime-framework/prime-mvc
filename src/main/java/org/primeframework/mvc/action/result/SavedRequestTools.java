@@ -21,6 +21,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.ShortBufferException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -41,6 +42,19 @@ import org.slf4j.LoggerFactory;
  */
 public class SavedRequestTools {
   private static final Logger logger = LoggerFactory.getLogger(SavedRequestTools.class);
+
+  /**
+   * Delete the save request cookie.
+   *
+   * @param configuration the MVC configuration used to determine the name of the cookie.
+   * @param response      the HTTP servlet response
+   */
+  public static void deleteCookie(MVCConfiguration configuration, HttpServletResponse response) {
+    // Delete the cookie
+    Cookie cookie = new Cookie(configuration.savedRequestCookieName(), null);
+    cookie.setMaxAge(0);
+    response.addCookie(cookie);
+  }
 
   /**
    * Retrieve the saved request from a cookie.
@@ -66,6 +80,42 @@ public class SavedRequestTools {
     }
 
     return null;
+  }
+
+  /**
+   * Check to see if we can consume the Save Request Cookie.
+   *
+   * @param configuration the MVC configuration
+   * @param request       the HTTP servlet request
+   * @param response      the HTTP servlet response
+   * @return true if we are ready.
+   */
+  public static boolean isExecuted(MVCConfiguration configuration, HttpServletRequest request,
+                                   HttpServletResponse response) {
+    Cookie[] cookies = request.getCookies();
+    if (cookies != null) {
+      for (Cookie cookie : cookies) {
+        if (cookie.getName().equals(configuration.savedRequestCookieName() + "_executed")) {
+          cookie.setMaxAge(0);
+          response.addCookie(cookie);
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Mark this cookie as ready to be used during the re-execute workflow.
+   *
+   * @param configuration the MVC configuration
+   * @param response      the HTTP servlet response
+   */
+  public static void markExecuted(MVCConfiguration configuration, HttpServletResponse response) {
+    Cookie cookie = new Cookie(configuration.savedRequestCookieName() + "_executed", "true");
+    cookie.setMaxAge(-1);
+    response.addCookie(cookie);
   }
 
   /**
