@@ -84,6 +84,7 @@ public class CookieFlashScope implements FlashScope {
   /**
    * Moves the flash from the session to the request.
    */
+  @Override
   public void transferFlash() {
     List<Message> messages = cookie.get();
     if (messages.size() > 0) {

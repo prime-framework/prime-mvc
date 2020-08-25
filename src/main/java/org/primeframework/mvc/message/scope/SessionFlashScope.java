@@ -78,13 +78,13 @@ public class SessionFlashScope extends AbstractSessionScope implements FlashScop
       }
     }
 
-
     return messages;
   }
 
   /**
    * Moves the flash from the session to the request.
    */
+  @Override
   public void transferFlash() {
     HttpSession session = request.getSession(false);
     if (session != null) {
