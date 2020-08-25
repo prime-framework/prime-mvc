@@ -22,6 +22,7 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.easymock.internal.matchers.Any;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.annotation.Redirect;
@@ -33,6 +34,7 @@ import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.testng.annotations.Test;
 import static org.easymock.EasyMock.createStrictMock;
 import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 
@@ -52,6 +54,7 @@ public class RedirectResultTest {
     List<Message> messages = new ArrayList<>();
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
     expect(request.getAttribute(FlashScope.KEY)).andReturn(messages);
+    request.removeAttribute(FlashScope.KEY);
     expect(request.getContextPath()).andReturn("/");
     expect(request.getRequestURI()).andReturn("/");
     replay(request);
@@ -89,6 +92,7 @@ public class RedirectResultTest {
     List<Message> messages = new ArrayList<>();
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
     expect(request.getAttribute(FlashScope.KEY)).andReturn(messages);
+    request.removeAttribute(FlashScope.KEY);
     expect(request.getContextPath()).andReturn("");
     expect(request.getRequestURI()).andReturn("/");
     replay(request);
@@ -124,6 +128,7 @@ public class RedirectResultTest {
     List<Message> messages = new ArrayList<>();
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
     expect(request.getAttribute(FlashScope.KEY)).andReturn(messages);
+    request.removeAttribute(FlashScope.KEY);
     expect(request.getContextPath()).andReturn("");
     expect(request.getRequestURI()).andReturn("/");
     replay(request);
@@ -159,6 +164,7 @@ public class RedirectResultTest {
     List<Message> messages = new ArrayList<>();
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
     expect(request.getAttribute(FlashScope.KEY)).andReturn(messages);
+    request.removeAttribute(FlashScope.KEY);
     expect(request.getContextPath()).andReturn("");
     expect(request.getRequestURI()).andReturn("/");
     replay(request);
@@ -194,6 +200,7 @@ public class RedirectResultTest {
     List<Message> messages = new ArrayList<>();
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
     expect(request.getAttribute(FlashScope.KEY)).andReturn(messages);
+    request.removeAttribute(FlashScope.KEY);
     expect(request.getContextPath()).andReturn("/context-path");
     expect(request.getRequestURI()).andReturn("/");
     replay(request);
@@ -229,6 +236,7 @@ public class RedirectResultTest {
     List<Message> messages = new ArrayList<>();
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
     expect(request.getAttribute(FlashScope.KEY)).andReturn(messages);
+    request.removeAttribute(FlashScope.KEY);
     expect(request.getContextPath()).andReturn("/context-path");
     expect(request.getRequestURI()).andReturn("/");
     replay(request);

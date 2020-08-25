@@ -18,11 +18,11 @@ package org.primeframework.mvc.action.result;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.easymock.EasyMock;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
@@ -58,6 +58,7 @@ public class ReexecuteSavedRequestResultTest extends PrimeBaseTest {
     List<Message> messages = new ArrayList<>();
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
     expect(request.getAttribute(FlashScope.KEY)).andReturn(messages);
+    request.removeAttribute(FlashScope.KEY);
     expect(request.getCookies()).andReturn(null);
     expect(request.getContextPath()).andReturn("");
     expect(request.getRequestURI()).andReturn("/");
@@ -99,12 +100,14 @@ public class ReexecuteSavedRequestResultTest extends PrimeBaseTest {
     Encryptor encryptor = new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper);
     Cookie cookie = SavedRequestTools.toCookie(savedRequest, configuration, encryptor);
     expect(request.getAttribute(FlashScope.KEY)).andReturn(messages);
+    request.removeAttribute(FlashScope.KEY);
     expect(request.getCookies()).andReturn(new Cookie[]{cookie});
     expect(request.getContextPath()).andReturn("");
     expect(request.getRequestURI()).andReturn("/");
     replay(request);
 
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
+    response.addCookie(new Cookie(configuration.savedRequestCookieName + "_executed", EasyMock.anyString()));
     response.sendRedirect("/secure?test=value1&test2=value2");
     response.setStatus(301);
     replay(response);

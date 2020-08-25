@@ -56,6 +56,7 @@ public class DefaultSavedRequestWorkflowTest extends PrimeBaseTest {
   @Test
   public void performSavedRequestGET() throws Exception {
     container.getUserAgent().addCookie(request, SavedRequestTools.toCookie(new SavedHttpRequest(HTTPMethod.GET, "/secure?test=value&test2=value2", null), configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper)));
+    SavedRequestTools.markExecuted(configuration, response);
     request.setUri("/secure");
 
     HttpServletRequestWrapper wrapper = new HttpServletRequestWrapper(request);
@@ -81,6 +82,7 @@ public class DefaultSavedRequestWorkflowTest extends PrimeBaseTest {
     parameters.put("test2", new String[]{"value2"});
 
     container.getUserAgent().addCookie(request, SavedRequestTools.toCookie(new SavedHttpRequest(HTTPMethod.POST, "/secure", parameters), configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper)));
+    SavedRequestTools.markExecuted(configuration, response);
     request.setUri("/secure");
 
     HttpServletRequestWrapper wrapper = new HttpServletRequestWrapper(request);
