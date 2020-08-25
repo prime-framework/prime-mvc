@@ -92,12 +92,17 @@ public class SavedRequestTools {
    */
   public static boolean isExecuted(MVCConfiguration configuration, HttpServletRequest request,
                                    HttpServletResponse response) {
+    if (request.getAttribute(configuration.savedRequestCookieName() + "_executed") != null) {
+      return true;
+    }
+
     Cookie[] cookies = request.getCookies();
     if (cookies != null) {
       for (Cookie cookie : cookies) {
         if (cookie.getName().equals(configuration.savedRequestCookieName() + "_executed")) {
           cookie.setMaxAge(0);
           response.addCookie(cookie);
+          request.setAttribute(configuration.savedRequestCookieName() + "_executed", true);
           return true;
         }
       }
