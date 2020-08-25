@@ -40,6 +40,7 @@ public class DefaultSavedRequestWorkflowTest extends PrimeBaseTest {
   @Test
   public void performNoSavedRequest() throws Exception {
     HttpServletRequestWrapper wrapper = new HttpServletRequestWrapper(request);
+
     DefaultSavedRequestWorkflow workflow = new DefaultSavedRequestWorkflow(configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper), wrapper, response);
 
     WorkflowChain workflowChain = createStrictMock(WorkflowChain.class);

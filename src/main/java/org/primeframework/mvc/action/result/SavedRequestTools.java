@@ -53,6 +53,7 @@ public class SavedRequestTools {
     // Delete the cookie
     Cookie cookie = new Cookie(configuration.savedRequestCookieName(), null);
     cookie.setMaxAge(0);
+    cookie.setPath("/");
     response.addCookie(cookie);
   }
 
@@ -92,17 +93,13 @@ public class SavedRequestTools {
    */
   public static boolean isExecuted(MVCConfiguration configuration, HttpServletRequest request,
                                    HttpServletResponse response) {
-    if (request.getAttribute(configuration.savedRequestCookieName() + "_executed") != null) {
-      return true;
-    }
-
     Cookie[] cookies = request.getCookies();
     if (cookies != null) {
       for (Cookie cookie : cookies) {
         if (cookie.getName().equals(configuration.savedRequestCookieName() + "_executed")) {
           cookie.setMaxAge(0);
+          cookie.setPath("/");
           response.addCookie(cookie);
-          request.setAttribute(configuration.savedRequestCookieName() + "_executed", true);
           return true;
         }
       }
@@ -118,8 +115,9 @@ public class SavedRequestTools {
    * @param response      the HTTP servlet response
    */
   public static void markExecuted(MVCConfiguration configuration, HttpServletResponse response) {
-    Cookie cookie = new Cookie(configuration.savedRequestCookieName() + "_executed", "true");
+    Cookie cookie = new Cookie(configuration.savedRequestCookieName() + "_executed", "pending");
     cookie.setMaxAge(-1);
+    cookie.setPath("/");
     response.addCookie(cookie);
   }
 
@@ -141,7 +139,7 @@ public class SavedRequestTools {
       cookie.setVersion(1); // Be explicit
       cookie.setHttpOnly(true);
       // Set to secure when schema is 'https'
-      cookie.setSecure(savedRequest.uri.startsWith("https"));
+      cookie.setSecure(savedRequest.uri.startsWith("/") || savedRequest.uri.startsWith("https"));
       return cookie;
     } catch (JsonProcessingException | IllegalBlockSizeException | BadPaddingException | NoSuchPaddingException | InvalidAlgorithmParameterException | InvalidKeyException | NoSuchAlgorithmException | ShortBufferException e) {
       throw new SavedRequestException(e);
