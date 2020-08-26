@@ -56,11 +56,8 @@ public class ReexecuteSavedRequestResult extends AbstractRedirectResult<Reexecut
   public boolean execute(final ReexecuteSavedRequest reexecuteSavedRequest) throws IOException {
     moveMessagesToFlash();
 
-    SaveHttpRequestResult result = SavedRequestTools.fromCookie(configuration, encryptor, request);
+    SaveHttpRequestResult result = SavedRequestTools.getSaveRequestForExecution(configuration, encryptor, request, response);
     String uri = result == null || result.savedHttpRequest.uri == null ? null : result.savedHttpRequest.uri;
-    if (result != null) {
-      SavedRequestTools.markExecuted(configuration, response);
-    }
 
     sendRedirect(uri, reexecuteSavedRequest.uri(), reexecuteSavedRequest.encodeVariables(), reexecuteSavedRequest.perm());
     return true;

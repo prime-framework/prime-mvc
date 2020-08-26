@@ -44,17 +44,28 @@ public class SavedRequestTools {
   private static final Logger logger = LoggerFactory.getLogger(SavedRequestTools.class);
 
   /**
-   * Delete the save request cookie.
+   * Retrieve the saved request from a cookie.
    *
-   * @param configuration the MVC configuration used to determine the name of the cookie.
+   * @param configuration The MVC configuration used to determine the name of the cookie.
+   * @param encryptor     the encryptor used to decrypt the cookie
+   * @param request       the HTTP servlet request
    * @param response      the HTTP servlet response
+   * @return null if no save request was found.
    */
-  public static void deleteCookie(MVCConfiguration configuration, HttpServletResponse response) {
-    // Delete the cookie
-    Cookie cookie = new Cookie(configuration.savedRequestCookieName(), null);
-    cookie.setMaxAge(0);
-    cookie.setPath("/");
-    response.addCookie(cookie);
+  public static SaveHttpRequestResult getSaveRequestForExecution(MVCConfiguration configuration, Encryptor encryptor,
+                                                                 HttpServletRequest request,
+                                                                 HttpServletResponse response) {
+    SaveHttpRequestResult result = getSaveHttpRequestResult(configuration, encryptor, request);
+    if (result == null) {
+      return null;
+    }
+
+    result.cookie.setMaxAge(-1);
+    result.cookie.setPath("/");
+    result.cookie.setValue("executed_" + result.cookie.getValue());
+    response.addCookie(result.cookie);
+
+    return result;
   }
 
   /**
@@ -63,62 +74,25 @@ public class SavedRequestTools {
    * @param configuration The MVC configuration used to determine the name of the cookie.
    * @param encryptor     the encryptor used to decrypt the cookie
    * @param request       the HTTP servlet request
+   * @param response      the HTTP servlet response
    * @return null if no save request was found.
    */
-  public static SaveHttpRequestResult fromCookie(MVCConfiguration configuration, Encryptor encryptor,
-                                                 HttpServletRequest request) {
-    Cookie[] cookies = request.getCookies();
-    if (cookies != null) {
-      for (final Cookie cookie : cookies) {
-        if (cookie.getName().equals(configuration.savedRequestCookieName())) {
-          try {
-            return new SaveHttpRequestResult(cookie, encryptor.decrypt(SavedHttpRequest.class, cookie.getValue()));
-          } catch (IOException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | InvalidKeyException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | ShortBufferException e) {
-            logger.warn("Bad SavedRequest cookie [{}]. Error is [{}]", cookie.getValue(), e.getMessage());
-          }
-        }
-      }
+  public static SaveHttpRequestResult getSaveRequestForWorkflow(MVCConfiguration configuration, Encryptor encryptor,
+                                                                HttpServletRequest request,
+                                                                HttpServletResponse response) {
+    SaveHttpRequestResult result = getSaveHttpRequestResult(configuration, encryptor, request);
+    if (result == null) {
+      return null;
+    }
+
+    if (result.executed) {
+      result.cookie.setPath("/");
+      result.cookie.setMaxAge(0);
+      response.addCookie(result.cookie);
+      return result;
     }
 
     return null;
-  }
-
-  /**
-   * Check to see if we can consume the Save Request Cookie.
-   *
-   * @param configuration the MVC configuration
-   * @param request       the HTTP servlet request
-   * @param response      the HTTP servlet response
-   * @return true if we are ready.
-   */
-  public static boolean isExecuted(MVCConfiguration configuration, HttpServletRequest request,
-                                   HttpServletResponse response) {
-    Cookie[] cookies = request.getCookies();
-    if (cookies != null) {
-      for (Cookie cookie : cookies) {
-        if (cookie.getName().equals(configuration.savedRequestCookieName() + "_executed")) {
-          cookie.setMaxAge(0);
-          cookie.setPath("/");
-          response.addCookie(cookie);
-          return true;
-        }
-      }
-    }
-
-    return false;
-  }
-
-  /**
-   * Mark this cookie as ready to be used during the re-execute workflow.
-   *
-   * @param configuration the MVC configuration
-   * @param response      the HTTP servlet response
-   */
-  public static void markExecuted(MVCConfiguration configuration, HttpServletResponse response) {
-    Cookie cookie = new Cookie(configuration.savedRequestCookieName() + "_executed", "pending");
-    cookie.setMaxAge(-1);
-    cookie.setPath("/");
-    response.addCookie(cookie);
   }
 
   /**
@@ -146,13 +120,51 @@ public class SavedRequestTools {
     }
   }
 
+  private static Cookie getCookie(MVCConfiguration configuration, HttpServletRequest request) {
+    Cookie[] cookies = request.getCookies();
+    if (cookies != null) {
+      for (final Cookie cookie : cookies) {
+        if (cookie.getName().equals(configuration.savedRequestCookieName())) {
+          return cookie;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  private static SaveHttpRequestResult getSaveHttpRequestResult(MVCConfiguration configuration, Encryptor encryptor,
+                                                                HttpServletRequest request) {
+    Cookie cookie = getCookie(configuration, request);
+    if (cookie == null) {
+      return null;
+    }
+
+    try {
+      String value = cookie.getValue();
+      boolean executed = value.startsWith("executed_");
+      if (executed) {
+        value = value.substring("executed_".length());
+      }
+
+      return new SaveHttpRequestResult(cookie, executed, encryptor.decrypt(SavedHttpRequest.class, value));
+    } catch (IOException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | InvalidKeyException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | ShortBufferException e) {
+      logger.warn("Bad SavedRequest cookie [{}]. Error is [{}]", cookie.getValue(), e.getMessage());
+    }
+
+    return null;
+  }
+
   public static class SaveHttpRequestResult {
     public Cookie cookie;
 
+    public boolean executed;
+
     public SavedHttpRequest savedHttpRequest;
 
-    public SaveHttpRequestResult(Cookie cookie, SavedHttpRequest savedHttpRequest) {
+    public SaveHttpRequestResult(Cookie cookie, boolean executed, SavedHttpRequest savedHttpRequest) {
       this.cookie = cookie;
+      this.executed = executed;
       this.savedHttpRequest = savedHttpRequest;
     }
   }

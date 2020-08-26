@@ -43,7 +43,6 @@ public class DefaultSavedRequestWorkflow implements SavedRequestWorkflow {
 
   private final HttpServletResponse response;
 
-
   @Inject
   public DefaultSavedRequestWorkflow(MVCConfiguration configuration, Encryptor encryptor, HttpServletRequest request,
                                      HttpServletResponse response) {
@@ -55,14 +54,11 @@ public class DefaultSavedRequestWorkflow implements SavedRequestWorkflow {
 
   @Override
   public void perform(WorkflowChain workflowChain) throws IOException, ServletException {
-    if (SavedRequestTools.isExecuted(configuration, request, response)) {
-      SaveHttpRequestResult result = SavedRequestTools.fromCookie(configuration, encryptor, request);
-      if (result != null) {
-        SavedRequestTools.deleteCookie(configuration, response);
-        HttpServletRequestWrapper wrapper = (HttpServletRequestWrapper) request;
-        HttpServletRequest previous = (HttpServletRequest) wrapper.getRequest();
-        wrapper.setRequest(new SavedRequestHttpServletRequest(previous, result.savedHttpRequest));
-      }
+    SaveHttpRequestResult result = SavedRequestTools.getSaveRequestForWorkflow(configuration, encryptor, request, response);
+    if (result != null) {
+      HttpServletRequestWrapper wrapper = (HttpServletRequestWrapper) request;
+      HttpServletRequest previous = (HttpServletRequest) wrapper.getRequest();
+      wrapper.setRequest(new SavedRequestHttpServletRequest(previous, result.savedHttpRequest));
     }
 
     workflowChain.continueWorkflow();
