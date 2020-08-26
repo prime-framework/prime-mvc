@@ -28,10 +28,13 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.primeframework.mvc.action.result.annotation.ReexecuteSavedRequest;
 import org.primeframework.mvc.config.MVCConfiguration;
+import org.primeframework.mvc.security.DefaultSavedRequestWorkflow;
 import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.security.SavedRequestException;
 import org.primeframework.mvc.security.saved.SavedHttpRequest;
+import org.primeframework.mvc.workflow.WorkflowChain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +47,8 @@ public class SavedRequestTools {
   private static final Logger logger = LoggerFactory.getLogger(SavedRequestTools.class);
 
   /**
-   * Retrieve the saved request from a cookie.
+   * Retrieve the saved request from a cookie for use in the {@link ReexecuteSavedRequestResult#execute(ReexecuteSavedRequest)}
+   * phase.
    *
    * @param configuration The MVC configuration used to determine the name of the cookie.
    * @param encryptor     the encryptor used to decrypt the cookie
@@ -52,24 +56,26 @@ public class SavedRequestTools {
    * @param response      the HTTP servlet response
    * @return null if no save request was found.
    */
-  public static SaveHttpRequestResult getSaveRequestForExecution(MVCConfiguration configuration, Encryptor encryptor,
-                                                                 HttpServletRequest request,
-                                                                 HttpServletResponse response) {
+  public static SaveHttpRequestResult getSaveRequestForReExecution(MVCConfiguration configuration, Encryptor encryptor,
+                                                                   HttpServletRequest request,
+                                                                   HttpServletResponse response) {
     SaveHttpRequestResult result = getSaveHttpRequestResult(configuration, encryptor, request);
     if (result == null) {
       return null;
     }
 
+    // Mark the cookie as ready
     result.cookie.setMaxAge(-1);
     result.cookie.setPath("/");
-    result.cookie.setValue("executed_" + result.cookie.getValue());
+    result.cookie.setValue("ready_" + result.cookie.getValue());
     response.addCookie(result.cookie);
 
     return result;
   }
 
   /**
-   * Retrieve the saved request from a cookie.
+   * Retrieve the saved request from a cookie for use during the {@link DefaultSavedRequestWorkflow#perform(WorkflowChain)}
+   * step.
    *
    * @param configuration The MVC configuration used to determine the name of the cookie.
    * @param encryptor     the encryptor used to decrypt the cookie
@@ -85,7 +91,7 @@ public class SavedRequestTools {
       return null;
     }
 
-    if (result.executed) {
+    if (result.ready) {
       result.cookie.setPath("/");
       result.cookie.setMaxAge(0);
       response.addCookie(result.cookie);
@@ -142,12 +148,12 @@ public class SavedRequestTools {
 
     try {
       String value = cookie.getValue();
-      boolean executed = value.startsWith("executed_");
-      if (executed) {
-        value = value.substring("executed_".length());
+      boolean ready = value.startsWith("ready_");
+      if (ready) {
+        value = value.substring("ready_".length());
       }
 
-      return new SaveHttpRequestResult(cookie, executed, encryptor.decrypt(SavedHttpRequest.class, value));
+      return new SaveHttpRequestResult(cookie, ready, encryptor.decrypt(SavedHttpRequest.class, value));
     } catch (IOException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | InvalidKeyException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | ShortBufferException e) {
       logger.warn("Bad SavedRequest cookie [{}]. Error is [{}]", cookie.getValue(), e.getMessage());
     }
@@ -158,13 +164,13 @@ public class SavedRequestTools {
   public static class SaveHttpRequestResult {
     public Cookie cookie;
 
-    public boolean executed;
+    public boolean ready;
 
     public SavedHttpRequest savedHttpRequest;
 
-    public SaveHttpRequestResult(Cookie cookie, boolean executed, SavedHttpRequest savedHttpRequest) {
+    public SaveHttpRequestResult(Cookie cookie, boolean ready, SavedHttpRequest savedHttpRequest) {
       this.cookie = cookie;
-      this.executed = executed;
+      this.ready = ready;
       this.savedHttpRequest = savedHttpRequest;
     }
   }
