@@ -22,7 +22,6 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
-import java.security.spec.AlgorithmParameterSpec;
 
 import com.google.inject.Inject;
 import org.primeframework.mvc.config.MVCConfiguration;
@@ -33,13 +32,10 @@ import org.primeframework.mvc.config.MVCConfiguration;
  * @author Brian Pontarelli
  */
 public class DefaultCipherProvider implements CipherProvider {
-  private final AlgorithmParameterSpec iv;
-
   private final Key key;
 
   @Inject
   public DefaultCipherProvider(MVCConfiguration configuration) {
-    this.iv = configuration.cookieEncryptionIV();
     this.key = configuration.cookieEncryptionKey();
   }
 
@@ -48,22 +44,6 @@ public class DefaultCipherProvider implements CipherProvider {
       throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
     Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
     cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(iv));
-    return cipher;
-  }
-
-  @Override
-  public Cipher getDecryptor()
-      throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
-    Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-    cipher.init(Cipher.DECRYPT_MODE, key, iv);
-    return cipher;
-  }
-
-  @Override
-  public Cipher getEncryptor()
-      throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
-    Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-    cipher.init(Cipher.ENCRYPT_MODE, key, iv);
     return cipher;
   }
 

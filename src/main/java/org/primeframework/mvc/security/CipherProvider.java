@@ -41,35 +41,6 @@ public interface CipherProvider {
       throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException;
 
   /**
-   * Return a cipher used for decrypting.
-   *
-   * @return the Cipher object.
-   * @throws NoSuchPaddingException             when this happens.
-   * @throws NoSuchAlgorithmException           when this happens.
-   * @throws InvalidAlgorithmParameterException when this happens.
-   * @throws InvalidKeyException                when this happens.
-   * @deprecated Prefer the user of {@link #getDecryptor(byte[])}
-   */
-  @Deprecated
-  Cipher getDecryptor()
-      throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException;
-
-  /**
-   * Return a cipher used for encrypting.
-   *
-   * @return the Cipher object.
-   * @throws NoSuchPaddingException             when this happens.
-   * @throws NoSuchAlgorithmException           when this happens.
-   * @throws InvalidAlgorithmParameterException when this happens.
-   * @throws InvalidKeyException                when this happens.
-   * @deprecated Prefer the use of {@link #getEncryptor(byte[])}
-   */
-  @Deprecated
-  Cipher getEncryptor()
-      throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException;
-
-
-  /**
    * Return a cipher used for encrypting.
    *
    * @param iv the initialization vector
