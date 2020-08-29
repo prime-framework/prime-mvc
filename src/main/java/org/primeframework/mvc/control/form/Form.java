@@ -129,7 +129,8 @@ public class Form extends AbstractControl {
 
       ActionInvocation current = actionInvocationStore.getCurrent();
       ActionInvocation actionInvocation = actionConfigurationProvider.lookup(action);
-      if (current == null || current.action == null || current.action.getClass() != actionInvocation.configuration.actionClass) {
+      if (current == null || current.action == null || actionInvocation == null || actionInvocation.configuration == null ||
+          current.action.getClass() != actionInvocation.configuration.actionClass) {
         // - Now that we know we need it, map the action before setting it as the current value in the invocation store
         //   And we can now verify we can build the action. Not sure this is necessary?
         actionInvocation = actionMapper.map(httpMethod, action, false);
