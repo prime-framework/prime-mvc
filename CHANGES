@@ -1,5 +1,12 @@
 Prime MVC Changes
 
+Changes in 1.22.0
+
+  * Remove requirement for HTTP session when using saved request cookie
+  * Do not re-use AES IV when encrypting cookies
+  * Add Cookie Flash Scope
+  * Add Cookie Flash Message Scope
+
 Changes in 1.21.3
 
   * Publish the source jar for simulator. 
