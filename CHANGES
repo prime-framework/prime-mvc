@@ -1,5 +1,9 @@
 Prime MVC Changes
 
+Changes in 1.22.1
+
+ * Fix form submit handling to pick up selected values in RequestResult simulator.
+
 Changes in 1.22.0
 
   * Remove requirement for HTTP session when using saved request cookie
