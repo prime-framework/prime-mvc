@@ -30,6 +30,8 @@ public class TempRedirectFormAction {
 
   public String radio;
 
+  public String select;
+
   public String text;
 
   public String textarea;

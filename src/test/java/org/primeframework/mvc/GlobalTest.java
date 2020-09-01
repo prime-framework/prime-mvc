@@ -299,11 +299,13 @@ public class GlobalTest extends PrimeBaseTest {
                                                                                                                                      "hiddenValue",
                                                                                                                                      "radioValue2",
                                                                                                                                      "checkboxValue2",
+                                                                                                                                     "selectedValueOptionB",
                                                                                                                                      "textareaValue")
                                                                                                                                  .assertBodyDoesNotContain(
                                                                                                                                      "disabledValue",
                                                                                                                                      "radioValue1",
-                                                                                                                                     "checkboxValue1")))));
+                                                                                                                                     "checkboxValue1",
+                                                                                                                                     "selectEmpty")))));
   }
 
   @Test
