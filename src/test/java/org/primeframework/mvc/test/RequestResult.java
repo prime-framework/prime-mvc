@@ -1455,7 +1455,19 @@ public class RequestResult {
           throw new AssertionError("Expected at least one element to match the selector " + selector + ". Found [0] elements instead. Unable to set element value.\n\nActual body:\n" + body);
         }
 
-        element.val(value.toString());
+        // Handle a select element
+        if (element.is("select")) {
+          // Remove the selected attribute for each option, add it to the one that matches the requested value.
+          for (Element option : element.getElementsByTag("option")) {
+            if (option.attr("value").equals(value.toString())) {
+              option.attr("selected", "selected");
+            } else {
+              option.removeAttr("selected");
+            }
+          }
+        } else {
+          element.val(value.toString());
+        }
       }
 
       return this;
