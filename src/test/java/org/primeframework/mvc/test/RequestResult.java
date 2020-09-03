@@ -1299,22 +1299,17 @@ public class RequestResult {
 
     RequestBuilder rb = new RequestBuilder(uri, container, filter, injector);
 
-    // Handle input and textarea
-    for (Element element : form.select("input,textarea")) {
+    // Handle input, select and textarea
+    for (Element element : form.select("input,select,textarea")) {
       if (element.hasAttr("name") && !element.hasAttr("disabled")) {
-        if (!element.is("[type=radio],[type=checkbox]") || element.hasAttr("checked")) {
-          rb.withParameter(element.attr("name"), element.val());
-        }
-      }
-    }
-
-    // Handle selects
-    for (Element element : form.select("select")) {
-      if (!element.hasAttr("disabled")) {
-        for (Element option : element.select("option")) {
-          if (option.hasAttr("selected")) {
-            rb.withParameter(element.attr("name"), option.val());
+        if (element.is("select")) {
+          for (Element option : element.select("option")) {
+            if (option.hasAttr("selected")) {
+              rb.withParameter(element.attr("name"), option.val());
+            }
           }
+        } else if (!element.is("[type=radio],[type=checkbox]") || element.hasAttr("checked")) {
+          rb.withParameter(element.attr("name"), element.val());
         }
       }
     }

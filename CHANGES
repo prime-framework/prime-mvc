@@ -1,5 +1,9 @@
 Prime MVC Changes
 
+Changes in 1.22.4
+
+ * Fix form submit handling to properly ignore form elements without a name attribute in the RequestResult simulator.
+
 Changes in 1.22.3
 
  * Fix form submit handling to properly ignore form elements without a name attribute in the RequestResult simulator.
