@@ -297,6 +297,7 @@ public class GlobalTest extends PrimeBaseTest {
                                                                                                                                      "textValue",
                                                                                                                                      "disabledEmpty", // This will be missing so the 'Empty' value will be rendered
                                                                                                                                      "hiddenValue",
+                                                                                                                                     "noNameEmpty", // Missing because it has no name attribute
                                                                                                                                      "radioValue2",
                                                                                                                                      "checkboxValue2",
                                                                                                                                      "selectedValueOptionB",
@@ -305,6 +306,7 @@ public class GlobalTest extends PrimeBaseTest {
                                                                                                                                      "disabledValue",
                                                                                                                                      "radioValue1",
                                                                                                                                      "checkboxValue1",
+                                                                                                                                     "noNameValue",
                                                                                                                                      "selectEmpty")))));
   }
 
@@ -342,11 +344,14 @@ public class GlobalTest extends PrimeBaseTest {
                                                                                                                                  .assertBodyContains(
                                                                                                                                      "textValue",
                                                                                                                                      "disabledEmpty", // This will be missing so the 'Empty' value will be rendered
+                                                                                                                                     "noNameEmpty", // Missing because it has no name attribute
                                                                                                                                      "hiddenValue",
                                                                                                                                      "radioValue",
                                                                                                                                      "checkboxValue",
                                                                                                                                      "textareaValue")
-                                                                                                                                 .assertBodyDoesNotContain("disabledValue")))));
+                                                                                                                                 .assertBodyDoesNotContain(
+                                                                                                                                     "disabledValue",
+                                                                                                                                     "noNameValue")))));
   }
 
   @Test

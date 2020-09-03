@@ -17,4 +17,5 @@ Look Ma, I'm redirected.
     <option value="selectedValueOptionA">Option A</option>
     <option value="selectedValueOptionB" selected>Option B</option>
   </select>
+  <input type="text" value="noNameValue"/>
 </form>

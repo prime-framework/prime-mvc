@@ -1301,7 +1301,7 @@ public class RequestResult {
 
     // Handle input and textarea
     for (Element element : form.select("input,textarea")) {
-      if (!element.hasAttr("disabled")) {
+      if (element.hasAttr("name") && !element.hasAttr("disabled")) {
         if (!element.is("[type=radio],[type=checkbox]") || element.hasAttr("checked")) {
           rb.withParameter(element.attr("name"), element.val());
         }
