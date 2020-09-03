@@ -86,6 +86,6 @@ public class DefaultEncryptor implements Encryptor {
     System.arraycopy(iv, 0, combined, 0, iv.length);
     System.arraycopy(result, 0, combined, iv.length, resultLength);
 
-    return Base64.getUrlEncoder().encodeToString(combined);
+    return new String(Base64.getUrlEncoder().encode(combined), StandardCharsets.UTF_8);
   }
 }
