@@ -15,19 +15,10 @@
  */
 package org.primeframework.mvc.action.result;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.ShortBufferException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.primeframework.mvc.action.result.annotation.ReexecuteSavedRequest;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.security.DefaultSavedRequestWorkflow;
@@ -121,7 +112,7 @@ public class SavedRequestTools {
       // Set to secure when schema is 'https'
       cookie.setSecure(savedRequest.uri.startsWith("/") || savedRequest.uri.startsWith("https"));
       return cookie;
-    } catch (JsonProcessingException | IllegalBlockSizeException | BadPaddingException | NoSuchPaddingException | InvalidAlgorithmParameterException | InvalidKeyException | NoSuchAlgorithmException | ShortBufferException e) {
+    } catch (Exception e) {
       throw new SavedRequestException(e);
     }
   }
@@ -154,7 +145,7 @@ public class SavedRequestTools {
       }
 
       return new SaveHttpRequestResult(cookie, ready, encryptor.decrypt(SavedHttpRequest.class, value));
-    } catch (IOException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | InvalidKeyException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | ShortBufferException e) {
+    } catch (Exception e) {
       logger.warn("Bad SavedRequest cookie [{}]. Error is [{}]", cookie.getValue(), e.getMessage());
     }
 
