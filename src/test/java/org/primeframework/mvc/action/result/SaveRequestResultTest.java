@@ -15,8 +15,14 @@
  */
 package org.primeframework.mvc.action.result;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.ShortBufferException;
 import javax.servlet.http.Cookie;
 import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,6 +31,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.Inject;
 import org.primeframework.mock.servlet.MockHttpServletRequest.Method;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
@@ -33,15 +41,12 @@ import org.primeframework.mvc.action.result.SaveRequestResult.SaveRequestImpl;
 import org.primeframework.mvc.action.result.annotation.SaveRequest;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-import org.primeframework.mvc.security.CipherProvider;
 import org.primeframework.mvc.security.DefaultCipherProvider;
+import org.primeframework.mvc.security.DefaultEncryptor;
+import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.security.saved.SavedHttpRequest;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.testng.annotations.Test;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.inject.Inject;
-import static java.util.Collections.singletonList;
 import static org.easymock.EasyMock.createStrictMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
@@ -61,7 +66,8 @@ public class SaveRequestResultTest extends PrimeBaseTest {
   @Inject public ObjectMapper objectMapper;
 
   @Test
-  public void saveRequestGET() throws IOException, NoSuchAlgorithmException {
+  public void saveRequestGET()
+      throws IOException, NoSuchPaddingException, BadPaddingException, InvalidKeyException, NoSuchAlgorithmException, IllegalBlockSizeException, ShortBufferException, InvalidAlgorithmParameterException {
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/foo", "", null));
     replay(store);
@@ -71,19 +77,24 @@ public class SaveRequestResultTest extends PrimeBaseTest {
     request.setParameter("param1", "value1");
     request.setParameter("param2", "value2");
 
-    CipherProvider cipherProvider = new DefaultCipherProvider(configuration);
+    Encryptor encryptor = new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper);
     SaveRequest annotation = new SaveRequestImpl("/login", "unauthenticated", true, false);
-    SaveRequestResult result = new SaveRequestResult(messageStore, expressionEvaluator, response, request, store, configuration, objectMapper, cipherProvider);
+    SaveRequestResult result = new SaveRequestResult(messageStore, expressionEvaluator, response, request, store, configuration, encryptor);
     result.execute(annotation);
 
-    assertCookieEquals(response.getCookies(), singletonList(SavedRequestTools.toCookie(new SavedHttpRequest(HTTPMethod.GET, "/test?param1=value1&param2=value2", null), objectMapper, configuration, cipherProvider)));
+    // The cookie value will be different each time because the initialization vector is unique per request. Decrypt the actual value to compare it to the expected.
+    SavedHttpRequest actual = encryptor.decrypt(SavedHttpRequest.class, (container.getUserAgent().getCookies(container.getRequest()).get(0)).getValue());
+    SavedHttpRequest expected = new SavedHttpRequest(HTTPMethod.GET, "/test?param1=value1&param2=value2", null);
+    assertEquals(actual, expected);
+
     assertEquals(response.getRedirect(), "/login");
 
     verify(store);
   }
 
   @Test
-  public void saveRequestPOST() throws IOException, NoSuchAlgorithmException {
+  public void saveRequestPOST()
+      throws IOException, NoSuchPaddingException, BadPaddingException, InvalidKeyException, NoSuchAlgorithmException, IllegalBlockSizeException, ShortBufferException, InvalidAlgorithmParameterException {
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/foo", "", null));
     replay(store);
@@ -93,19 +104,23 @@ public class SaveRequestResultTest extends PrimeBaseTest {
     request.setParameter("param1", "value1");
     request.setParameter("param2", "value2");
 
-    CipherProvider cipherProvider = new DefaultCipherProvider(configuration);
+    Encryptor encryptor = new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper);
     SaveRequest annotation = new SaveRequestImpl("/login", "unauthenticated", true, false);
-    SaveRequestResult result = new SaveRequestResult(messageStore, expressionEvaluator, response, request, store, configuration, objectMapper, cipherProvider);
+    SaveRequestResult result = new SaveRequestResult(messageStore, expressionEvaluator, response, request, store, configuration, encryptor);
     result.execute(annotation);
 
-    assertCookieEquals(response.getCookies(), singletonList(SavedRequestTools.toCookie(new SavedHttpRequest(HTTPMethod.POST, "/test", request.getParameterMap()), objectMapper, configuration, cipherProvider)));
+    // The cookie value will be different each time because the initialization vector is unique per request. Decrypt the actual value to compare it to the expected.
+    SavedHttpRequest actual = encryptor.decrypt(SavedHttpRequest.class, (container.getUserAgent().getCookies(container.getRequest()).get(0)).getValue());
+    SavedHttpRequest expected = new SavedHttpRequest(HTTPMethod.POST, "/test", request.getParameterMap());
+    assertEquals(actual, expected);
+
     assertEquals(response.getRedirect(), "/login");
 
     verify(store);
   }
 
   @Test
-  public void saveRequestPOST_tooBig() throws IOException, NoSuchAlgorithmException {
+  public void saveRequestPOST_tooBig() throws IOException {
     // By default Tomcat limits the HTTP Header to 8 KB (see Tomcat maxHttpHeaderSize)
     // If we think we might be surpassing that size, we should skip the save request otherwise we'll return a 500 to the client
 
@@ -125,13 +140,13 @@ public class SaveRequestResultTest extends PrimeBaseTest {
     request.setParameter("largeParam3", parameters.get("largeParam3").get(0));
     request.setParameter("largeParam4", parameters.get("largeParam4").get(0));
 
-    CipherProvider cipherProvider = new DefaultCipherProvider(configuration);
+    Encryptor encryptor = new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper);
     SaveRequest annotation = new SaveRequestImpl("/login", "unauthenticated", true, false);
-    SaveRequestResult result = new SaveRequestResult(messageStore, expressionEvaluator, response, request, store, configuration, objectMapper, cipherProvider);
+    SaveRequestResult result = new SaveRequestResult(messageStore, expressionEvaluator, response, request, store, configuration, encryptor);
     result.execute(annotation);
 
     // Expect no cookies in the response, sadly, the cookie was just too big and we omitted it from the HTTP response.
-    assertCookieEquals(response.getCookies(), Collections.emptyList());
+    assertCookieEquals(container.getUserAgent().getCookies(container.getRequest()), Collections.emptyList());
     assertEquals(response.getRedirect(), "/login");
 
     verify(store);

@@ -18,7 +18,7 @@ package org.primeframework.mvc.parameter;
 import javax.servlet.http.HttpServletRequest;
 
 import org.primeframework.mvc.PrimeException;
-import org.primeframework.mvc.security.CSRF;
+import static org.primeframework.mvc.security.csrf.CSRFProvider.CSRF_PARAMETER_KEY;
 
 /**
  * This class handles all of the parameters that control the Prime MVC internal behavior like validation, result
@@ -74,7 +74,7 @@ public final class InternalParameters {
    * @return True if it is, false otherwise.
    */
   public static boolean isInternalParameter(String key) {
-    return key.equals(EXECUTE_RESULT) || key.equals(EXECUTE_VALIDATION) || key.equals(CSRF.CSRF_PARAMETER_KEY);
+    return key.equals(EXECUTE_RESULT) || key.equals(EXECUTE_VALIDATION) || key.equals(CSRF_PARAMETER_KEY);
   }
 
   private static boolean isValidBoolean(String str) {

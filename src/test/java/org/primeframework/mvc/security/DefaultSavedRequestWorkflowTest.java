@@ -15,6 +15,7 @@
  */
 package org.primeframework.mvc.security;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequestWrapper;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +26,6 @@ import org.primeframework.mvc.security.saved.SavedHttpRequest;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
-
 import static org.easymock.EasyMock.createStrictMock;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
@@ -40,11 +40,9 @@ import static org.testng.Assert.assertTrue;
 public class DefaultSavedRequestWorkflowTest extends PrimeBaseTest {
   @Test
   public void performNoSavedRequest() throws Exception {
-    CipherProvider cipherProvider = new DefaultCipherProvider(configuration);
-    request.addCookie(SavedRequestTools.toCookie(new SavedHttpRequest(HTTPMethod.GET, "/secure?test=value&test2=value2", null), objectMapper, configuration, cipherProvider));
-
     HttpServletRequestWrapper wrapper = new HttpServletRequestWrapper(request);
-    DefaultSavedRequestWorkflow workflow = new DefaultSavedRequestWorkflow(wrapper);
+
+    DefaultSavedRequestWorkflow workflow = new DefaultSavedRequestWorkflow(configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper), wrapper, response);
 
     WorkflowChain workflowChain = createStrictMock(WorkflowChain.class);
     workflowChain.continueWorkflow();
@@ -59,11 +57,13 @@ public class DefaultSavedRequestWorkflowTest extends PrimeBaseTest {
 
   @Test
   public void performSavedRequestGET() throws Exception {
-    container.getSession().setAttribute(SavedHttpRequest.LOGGED_IN_SESSION_KEY, new SavedHttpRequest(HTTPMethod.GET, "/secure?test=value&test2=value2", null));
+    Cookie cookie = SavedRequestTools.toCookie(new SavedHttpRequest(HTTPMethod.GET, "/secure?test=value&test2=value2", null), configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper));
+    cookie.setValue("ready_" + cookie.getValue());
+    container.getUserAgent().addCookie(request, cookie);
     request.setUri("/secure");
 
     HttpServletRequestWrapper wrapper = new HttpServletRequestWrapper(request);
-    DefaultSavedRequestWorkflow workflow = new DefaultSavedRequestWorkflow(wrapper);
+    DefaultSavedRequestWorkflow workflow = new DefaultSavedRequestWorkflow(configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper), wrapper, response);
 
     WorkflowChain workflowChain = createStrictMock(WorkflowChain.class);
     workflowChain.continueWorkflow();
@@ -84,11 +84,13 @@ public class DefaultSavedRequestWorkflowTest extends PrimeBaseTest {
     parameters.put("test", new String[]{"value"});
     parameters.put("test2", new String[]{"value2"});
 
-    container.getSession().setAttribute(SavedHttpRequest.LOGGED_IN_SESSION_KEY, new SavedHttpRequest(HTTPMethod.POST, "/secure", parameters));
+    Cookie cookie = SavedRequestTools.toCookie(new SavedHttpRequest(HTTPMethod.POST, "/secure", parameters), configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper));
+    cookie.setValue("ready_" + cookie.getValue());
+    container.getUserAgent().addCookie(request, cookie);
     request.setUri("/secure");
 
     HttpServletRequestWrapper wrapper = new HttpServletRequestWrapper(request);
-    DefaultSavedRequestWorkflow workflow = new DefaultSavedRequestWorkflow(wrapper);
+    DefaultSavedRequestWorkflow workflow = new DefaultSavedRequestWorkflow(configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper), wrapper, response);
 
     WorkflowChain workflowChain = createStrictMock(WorkflowChain.class);
     workflowChain.continueWorkflow();

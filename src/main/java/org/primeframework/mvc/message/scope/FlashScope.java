@@ -15,15 +15,6 @@
  */
 package org.primeframework.mvc.message.scope;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import com.google.inject.Inject;
-import org.primeframework.mvc.message.Message;
-
 /**
  * This is the flash scope which stores messages in the HttpSession under the flash key. It fetches values from the
  * HttpServletRequest under the same key as well as the HttpSession under that key. This allows for flash messages to be
@@ -32,68 +23,11 @@ import org.primeframework.mvc.message.Message;
  *
  * @author Brian Pontarelli
  */
-@SuppressWarnings("unchecked")
-public class FlashScope extends AbstractSessionScope implements Scope {
-  public static final String KEY = "primeFlashMessages";
-
-  @Inject
-  public FlashScope(HttpServletRequest request) {
-    super(request, KEY);
-  }
-
-  @Override
-  public void add(Message message) {
-    addMessage(message);
-  }
-
-  @Override
-  public void addAll(Collection<Message> messages) {
-    addAllMessages(messages);
-  }
-
-  @Override
-  public void clear() {
-    request.removeAttribute(KEY);
-    HttpSession session = request.getSession(false);
-    if (session != null) {
-      session.removeAttribute(KEY);
-    }
-  }
-
-  @Override
-  public List<Message> get() {
-    List<Message> messages = new ArrayList<>();
-    List<Message> requestList = (List<Message>) request.getAttribute(KEY);
-    if (requestList != null) {
-      messages.addAll(requestList);
-    }
-
-    HttpSession session = request.getSession(false);
-    if (session != null) {
-      synchronized (session) {
-        List<Message> sessionList = (List<Message>) session.getAttribute(KEY);
-        if (sessionList != null) {
-          messages.addAll(sessionList);
-        }
-      }
-    }
-
-    return messages;
-  }
+public interface FlashScope extends Scope {
+  String KEY = "primeFlashMessages";
 
   /**
    * Moves the flash from the session to the request.
    */
-  public void transferFlash() {
-    HttpSession session = request.getSession(false);
-    if (session != null) {
-      synchronized (session) {
-        List<Message> messages = (List<Message>) session.getAttribute(KEY);
-        if (messages != null) {
-          session.removeAttribute(KEY);
-          request.setAttribute(KEY, messages);
-        }
-      }
-    }
-  }
+  void transferFlash();
 }

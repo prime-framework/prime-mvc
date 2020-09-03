@@ -21,6 +21,7 @@ import java.util.Set;
 
 import com.google.inject.Inject;
 import org.primeframework.mvc.config.MVCConfiguration;
+import org.primeframework.mvc.security.csrf.CSRFProvider;
 
 /**
  * @author Daniel DeGroff
@@ -29,8 +30,9 @@ public class MockUserLoginSecurityContext extends BaseHttpSessionUserLoginSecuri
   public static Set<String> roles = new HashSet<>();
 
   @Inject
-  public MockUserLoginSecurityContext(MVCConfiguration configuration, HttpServletRequest request) {
-    super(configuration, request);
+  public MockUserLoginSecurityContext(MVCConfiguration configuration, CSRFProvider csrfProvider,
+                                      HttpServletRequest request) {
+    super(configuration, csrfProvider, request);
   }
 
   @Override

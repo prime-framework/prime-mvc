@@ -13,4 +13,9 @@ Look Ma, I'm redirected.
   <input name="checkbox" type="checkbox" value="checkboxValue1"/>
   <input name="checkbox" type="checkbox" value="checkboxValue2" checked/>
   <textarea cols="64" rows="4" name="textarea">textareaValue</textarea>
+  <select name="select">
+    <option value="selectedValueOptionA">Option A</option>
+    <option value="selectedValueOptionB" selected>Option B</option>
+  </select>
+  <input type="text" value="noNameValue"/>
 </form>

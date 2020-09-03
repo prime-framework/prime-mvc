@@ -1,5 +1,28 @@
 Prime MVC Changes
 
+Changes in 1.22.4
+
+ * Fix form submit handling to properly ignore form elements without a name attribute in the RequestResult simulator.
+
+Changes in 1.22.3
+
+ * Fix form submit handling to properly ignore form elements without a name attribute in the RequestResult simulator.
+
+Changes in 1.22.2
+
+ * Fix form submit handling in the RequestResult simulator.
+
+Changes in 1.22.1
+
+ * Fix form submit handling to pick up selected values in RequestResult simulator.
+
+Changes in 1.22.0
+
+  * Remove requirement for HTTP session when using saved request cookie
+  * Do not re-use AES IV when encrypting cookies
+  * Add Cookie Flash Scope
+  * Add Cookie Flash Message Scope
+
 Changes in 1.21.3
 
   * Publish the source jar for simulator. 

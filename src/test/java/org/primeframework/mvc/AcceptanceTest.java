@@ -33,7 +33,6 @@ public class AcceptanceTest extends PrimeBaseTest {
   @Test
   public void get_action_noTemplate() {
     simulator.test("/no-template")
-             .expectException(PrimeException.class)
              .get()
              .assertStatusCode(500)
              .assertBodyIsEmpty();
@@ -60,7 +59,6 @@ public class AcceptanceTest extends PrimeBaseTest {
   public void get_noAction_noTemplate() {
     // simulator doesn't support chain.continueWorkflow(), so we'll get UnsupportedOperationException
     simulator.test("/no-action-no-template")
-             .expectException(UnsupportedOperationException.class)
              .get()
              .assertStatusCode(500)
              .assertBodyIsEmpty();
@@ -78,7 +76,6 @@ public class AcceptanceTest extends PrimeBaseTest {
   public void get_nonPrimeResourceEndingWithSlash() {
     // simulator doesn't support chain.continueWorkflow(), so we'll get UnsupportedOperationException
     simulator.test("/potato/")
-             .expectException(UnsupportedOperationException.class)
              .get()
              .assertStatusCode(500)
              .assertBodyIsEmpty();

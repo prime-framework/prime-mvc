@@ -26,6 +26,11 @@ public class SimpleFieldMessage implements FieldMessage {
   public final String code;
   public final String message;
 
+  // Jackson constructor
+  public SimpleFieldMessage() {
+    this(null, null, null, null);
+  }
+
   public SimpleFieldMessage(MessageType type, String field, String code, String message) {
     this.type = type;
     this.field = field;

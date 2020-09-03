@@ -219,7 +219,7 @@ public class ActionSessionScopeTest {
   public void failedGetNoAction() {
     Object value = new Object();
     Map<String, Map<String, Object>> map = new HashMap<>();
-    Map<String, Object> as = new HashMap<String, Object>();
+    Map<String, Object> as = new HashMap<>();
     map.put("org.example.action.user.EditAction", as);
     as.put("test", value);
 

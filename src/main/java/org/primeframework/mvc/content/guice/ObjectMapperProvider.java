@@ -17,8 +17,6 @@ package org.primeframework.mvc.content.guice;
 
 import java.util.Set;
 
-import org.primeframework.mvc.config.MVCConfiguration;
-
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
@@ -27,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import org.primeframework.mvc.config.MVCConfiguration;
 
 /**
  * Guice provider for the Jackson {@link ObjectMapper}.
@@ -52,6 +51,9 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
     if (jacksonModules.size() > 0) {
       objectMapper.registerModules(jacksonModules);
     }
+
+    // Bind the Prime-MVC Jackson Module
+    objectMapper.registerModule(new JacksonModule());
 
     return configure(objectMapper);
   }

@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.primeframework.mvc.servlet.HTTPMethod;
+import org.primeframework.mvc.util.ObjectTools;
 
 /**
  * Stores the request information when a user accesses a resource that requires authentication and needs to be returned
@@ -28,8 +29,6 @@ import org.primeframework.mvc.servlet.HTTPMethod;
  * @author Brian Pontarelli
  */
 public class SavedHttpRequest {
-  public static final String LOGGED_IN_SESSION_KEY = "prime-mvc-security-saved-request-logged-in";
-
   public HTTPMethod method;
 
   public Map<String, String[]> parameters = new HashMap<>();
@@ -50,11 +49,16 @@ public class SavedHttpRequest {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (!(o instanceof SavedHttpRequest)) return false;
-    final SavedHttpRequest that = (SavedHttpRequest) o;
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof SavedHttpRequest)) {
+      return false;
+    }
+
+    SavedHttpRequest that = (SavedHttpRequest) o;
     return method == that.method &&
-        Objects.equals(parameters, that.parameters) &&
+        ObjectTools.equals(parameters, that.parameters) &&
         Objects.equals(uri, that.uri);
   }
 

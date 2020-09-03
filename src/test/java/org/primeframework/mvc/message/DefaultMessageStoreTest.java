@@ -48,7 +48,7 @@ public class DefaultMessageStoreTest {
   public void scoped() {
     Message message = new SimpleFieldMessage(MessageType.ERROR, "foo.bar", "code", "message");
 
-    FlashScope scope = createStrictMock(FlashScope.class);
+    SessionFlashScope scope = createStrictMock(SessionFlashScope.class);
     scope.add(message);
     replay(scope);
 
@@ -60,7 +60,7 @@ public class DefaultMessageStoreTest {
 
   @Test
   public void bulk() {
-    List<Message> messages = new ArrayList<Message>();
+    List<Message> messages = new ArrayList<>();
     messages.add(new SimpleFieldMessage(MessageType.ERROR, "foo.bar", "code", "message"));
     messages.add(new SimpleFieldMessage(MessageType.ERROR, "foo.baz", "code", "message"));
 
@@ -76,19 +76,19 @@ public class DefaultMessageStoreTest {
 
   @Test
   public void get() {
-    List<Message> requestMessages = new ArrayList<Message>();
+    List<Message> requestMessages = new ArrayList<>();
     requestMessages.add(new SimpleMessage(MessageType.ERROR, "code1", "request1"));
     requestMessages.add(new SimpleMessage(MessageType.ERROR, "code2", "request2"));
 
-    List<Message> flashMessages = new ArrayList<Message>();
+    List<Message> flashMessages = new ArrayList<>();
     flashMessages.add(new SimpleMessage(MessageType.ERROR, "code3", "flash1"));
     flashMessages.add(new SimpleMessage(MessageType.ERROR, "code4", "flash2"));
 
-    List<Message> sessionMessages = new ArrayList<Message>();
+    List<Message> sessionMessages = new ArrayList<>();
     sessionMessages.add(new SimpleMessage(MessageType.ERROR, "code5", "session1"));
     sessionMessages.add(new SimpleMessage(MessageType.ERROR, "code6", "session2"));
 
-    List<Message> applicationMessages = new ArrayList<Message>();
+    List<Message> applicationMessages = new ArrayList<>();
     applicationMessages.add(new SimpleMessage(MessageType.ERROR, "code7", "application1"));
     applicationMessages.add(new SimpleMessage(MessageType.ERROR, "code8", "application2"));
 
@@ -96,7 +96,7 @@ public class DefaultMessageStoreTest {
     expect(request.get()).andReturn(requestMessages);
     replay(request);
 
-    FlashScope flash = createStrictMock(FlashScope.class);
+    SessionFlashScope flash = createStrictMock(SessionFlashScope.class);
     expect(flash.get()).andReturn(flashMessages);
     replay(flash);
 
@@ -127,7 +127,7 @@ public class DefaultMessageStoreTest {
 
   @Test
   public void getScope() {
-    List<Message> requestMessages = new ArrayList<Message>();
+    List<Message> requestMessages = new ArrayList<>();
     requestMessages.add(new SimpleMessage(MessageType.ERROR, "code1", "request1"));
     requestMessages.add(new SimpleMessage(MessageType.ERROR, "code2", "request2"));
 

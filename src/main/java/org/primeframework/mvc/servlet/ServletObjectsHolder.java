@@ -29,9 +29,11 @@ import org.primeframework.mvc.PrimeException;
  * @author Brian Pontarelli
  */
 public final class ServletObjectsHolder {
+
   private static ServletContext servletContext;
-  private static ThreadLocal<HttpServletRequestWrapper> request = new ThreadLocal<>();
-  private static ThreadLocal<HttpServletResponse> response = new ThreadLocal<>();
+
+  private final static ThreadLocal<HttpServletRequestWrapper> request = new ThreadLocal<>();
+  private final static ThreadLocal<HttpServletResponse> response = new ThreadLocal<>();
 
   /**
    * Gets the servlet context.
@@ -79,7 +81,6 @@ public final class ServletObjectsHolder {
   public static void clearServletRequest() {
     request.remove();
   }
-
   /**
    * Gets the servlet response for the current thread (if any).
    *
@@ -101,7 +102,6 @@ public final class ServletObjectsHolder {
 
     response.set(servletResponse);
   }
-
   /**
    * Removes the servlet response for the current thread.
    */

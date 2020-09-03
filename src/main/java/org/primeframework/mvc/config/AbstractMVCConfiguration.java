@@ -57,7 +57,7 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
 
   public String localeCookieName = "prime-locale";
 
-  public boolean propagateRuntimeException = true;
+  public String messageFlashScopeCookieName = "prime-mvc-msg-flash";
 
   public String resourceDirectory = "/WEB-INF";
 
@@ -70,6 +70,8 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
   public boolean staticResourcesEnabled = true;
 
   public List<Class<? extends Annotation>> unwrapAnnotations = Collections.singletonList(FieldUnwrapped.class);
+
+  public boolean useCookieForFlashScope;
 
   @Override
   public boolean autoHTMLEscapingEnabled() {
@@ -112,8 +114,8 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
   }
 
   @Override
-  public boolean propagateRuntimeExceptions() {
-    return propagateRuntimeException;
+  public String messageFlashScopeCookieName() {
+    return messageFlashScopeCookieName;
   }
 
   @Override

@@ -36,7 +36,7 @@ public class FlashScopeTest {
   @Test
   public void getRequest() {
     Object value = new Object();
-    Map<String, Object> map = new HashMap<String, Object>();
+    Map<String, Object> map = new HashMap<>();
     map.put("test", value);
 
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
@@ -60,7 +60,7 @@ public class FlashScopeTest {
   @Test
   public void getRequestDifferentKey() {
     Object value = new Object();
-    Map<String, Object> map = new HashMap<String, Object>();
+    Map<String, Object> map = new HashMap<>();
     map.put("other", value);
 
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
@@ -84,7 +84,7 @@ public class FlashScopeTest {
   @Test
   public void getFromSession() {
     Object value = new Object();
-    Map<String, Object> map = new HashMap<String, Object>();
+    Map<String, Object> map = new HashMap<>();
     map.put("test", value);
 
     HttpSession session = EasyMock.createStrictMock(HttpSession.class);
@@ -134,7 +134,7 @@ public class FlashScopeTest {
   @Test
   public void getFromSessionDifferentKey() {
     Object value = new Object();
-    Map<String, Object> map = new HashMap<String, Object>();
+    Map<String, Object> map = new HashMap<>();
     map.put("other", value);
 
     HttpSession session = EasyMock.createStrictMock(HttpSession.class);
@@ -184,7 +184,7 @@ public class FlashScopeTest {
   @Test
   public void set() {
     Object value = new Object();
-    Map<String, Object> map = new HashMap<String, Object>();
+    Map<String, Object> map = new HashMap<>();
 
     HttpSession session = EasyMock.createStrictMock(HttpSession.class);
     EasyMock.expect(session.getAttribute("primeFlash")).andReturn(map);
@@ -211,7 +211,7 @@ public class FlashScopeTest {
 
   @Test
   public void setNull() {
-    Map<String, Object> map = new HashMap<String, Object>();
+    Map<String, Object> map = new HashMap<>();
     map.put("test", "value");
 
     HttpSession session = EasyMock.createStrictMock(HttpSession.class);
@@ -260,7 +260,7 @@ public class FlashScopeTest {
   @Test
   public void setDifferentkey() {
     Object value = new Object();
-    Map<String, Object> map = new HashMap<String, Object>();
+    Map<String, Object> map = new HashMap<>();
 
     HttpSession session = EasyMock.createStrictMock(HttpSession.class);
     EasyMock.expect(session.getAttribute("primeFlash")).andReturn(map);

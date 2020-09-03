@@ -529,6 +529,15 @@ public class RequestResult {
       }
     }
 
+    // Ensure we have accounted for every message in the store of this type.
+    long count = messages.stream().filter(m -> m.getType() == messageType).count();
+    if (count != errorCodes.length) {
+      StringBuilder sb = new StringBuilder("\n\tMessageStore contains:\n");
+      //noinspection StringConcatenationInsideStringBufferAppend
+      messages.stream().filter(m -> m.getType() == messageType).forEach(m -> sb.append("\t\t" + m.getType() + " " + m.getCode() + "\t" + ((m instanceof SimpleMessage) ? ((SimpleMessage) m).message : "") + "\n"));
+      throw new AssertionError("The MessageStore contains additional messages of type [" + messageType + "] that were not expected." + sb);
+    }
+
     return this;
   }
 
@@ -1290,9 +1299,16 @@ public class RequestResult {
 
     RequestBuilder rb = new RequestBuilder(uri, container, filter, injector);
 
-    for (Element element : form.select("input, textarea")) {
-      if (!element.hasAttr("disabled")) {
-        if (!element.is("[type=radio], [type=checkbox]") || element.hasAttr("checked")) {
+    // Handle input, select and textarea
+    for (Element element : form.select("input,select,textarea")) {
+      if (element.hasAttr("name") && !element.hasAttr("disabled")) {
+        if (element.is("select")) {
+          for (Element option : element.select("option")) {
+            if (option.hasAttr("selected")) {
+              rb.withParameter(element.attr("name"), option.val());
+            }
+          }
+        } else if (!element.is("[type=radio],[type=checkbox]") || element.hasAttr("checked")) {
           rb.withParameter(element.attr("name"), element.val());
         }
       }
@@ -1434,7 +1450,19 @@ public class RequestResult {
           throw new AssertionError("Expected at least one element to match the selector " + selector + ". Found [0] elements instead. Unable to set element value.\n\nActual body:\n" + body);
         }
 
-        element.val(value.toString());
+        // Handle a select element
+        if (element.is("select")) {
+          // Remove the selected attribute for each option, add it to the one that matches the requested value.
+          for (Element option : element.getElementsByTag("option")) {
+            if (option.attr("value").equals(value.toString())) {
+              option.attr("selected", "selected");
+            } else {
+              option.removeAttr("selected");
+            }
+          }
+        } else {
+          element.val(value.toString());
+        }
       }
 
       return this;

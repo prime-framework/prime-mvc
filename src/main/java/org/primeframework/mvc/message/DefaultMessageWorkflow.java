@@ -18,10 +18,9 @@ package org.primeframework.mvc.message;
 import javax.servlet.ServletException;
 import java.io.IOException;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.message.scope.FlashScope;
 import org.primeframework.mvc.workflow.WorkflowChain;
-
-import com.google.inject.Inject;
 
 /**
  * This is the default message workflow implementation. It removes all flash messages from the session and places them

@@ -25,18 +25,16 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.annotation.ReexecuteSavedRequest;
 import org.primeframework.mvc.action.result.annotation.SaveRequest;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-import org.primeframework.mvc.security.CipherProvider;
+import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.security.saved.SavedHttpRequest;
 import org.primeframework.mvc.servlet.HTTPMethod;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.inject.Inject;
 
 /**
  * This result stores the current request in a cookie and then performs a HTTP redirect to the login page.
@@ -44,20 +42,18 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 public class SaveRequestResult extends AbstractRedirectResult<SaveRequest> {
-  private final CipherProvider cipherProvider;
-
   private final MVCConfiguration configuration;
 
-  private final ObjectMapper objectMapper;
+  private final Encryptor encryptor;
 
   @Inject
-  public SaveRequestResult(MessageStore messageStore, ExpressionEvaluator expressionEvaluator, HttpServletResponse response,
-                           HttpServletRequest request, ActionInvocationStore actionInvocationStore, MVCConfiguration configuration,
-                           ObjectMapper objectMapper, CipherProvider cipherProvider) {
+  public SaveRequestResult(MessageStore messageStore, ExpressionEvaluator expressionEvaluator,
+                           HttpServletResponse response, HttpServletRequest request,
+                           ActionInvocationStore actionInvocationStore,
+                           MVCConfiguration configuration, Encryptor encryptor) {
     super(expressionEvaluator, actionInvocationStore, messageStore, request, response);
     this.configuration = configuration;
-    this.objectMapper = objectMapper;
-    this.cipherProvider = cipherProvider;
+    this.encryptor = encryptor;
   }
 
   public boolean execute(SaveRequest saveRequest) throws IOException {
@@ -75,7 +71,7 @@ public class SaveRequestResult extends AbstractRedirectResult<SaveRequest> {
     }
 
     // Build a saved request cookie
-    Cookie saveRequestCookie = SavedRequestTools.toCookie(new SavedHttpRequest(method, redirectURI, requestParameters), objectMapper, configuration, cipherProvider);
+    Cookie saveRequestCookie = SavedRequestTools.toCookie(new SavedHttpRequest(method, redirectURI, requestParameters), configuration, encryptor);
 
     // If the resulting cookie exceeds the maximum configured size in bytes, it would be bad.
     //
@@ -86,7 +82,7 @@ public class SaveRequestResult extends AbstractRedirectResult<SaveRequest> {
     //
     // Ok, not that bad, but Tomcat will exception and the user will receive a 500. See MVCConfiguration.savedRequestCookieMaximumSize for more information.
     if (saveRequestCookie.getValue().getBytes(StandardCharsets.UTF_8).length <= configuration.savedRequestCookieMaximumSize()) {
-      response.addCookie(SavedRequestTools.toCookie(new SavedHttpRequest(method, redirectURI, requestParameters), objectMapper, configuration, cipherProvider));
+      response.addCookie(saveRequestCookie);
     }
 
     sendRedirect(null, saveRequest.uri(), saveRequest.encodeVariables(), saveRequest.perm());

@@ -18,14 +18,16 @@ package org.primeframework.mvc.security;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import org.primeframework.mvc.security.saved.SavedRequestHttpServletRequest;
-import org.primeframework.mvc.security.saved.SavedHttpRequest;
-import org.primeframework.mvc.workflow.WorkflowChain;
-
 import com.google.inject.Inject;
+import org.primeframework.mvc.action.result.SavedRequestTools;
+import org.primeframework.mvc.action.result.SavedRequestTools.SaveHttpRequestResult;
+import org.primeframework.mvc.config.MVCConfiguration;
+import org.primeframework.mvc.security.saved.SavedHttpRequest;
+import org.primeframework.mvc.security.saved.SavedRequestHttpServletRequest;
+import org.primeframework.mvc.workflow.WorkflowChain;
 
 /**
  * Default saved request workflow that uses the {@link SavedHttpRequest} from the session to mock out the request.
@@ -33,25 +35,30 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 public class DefaultSavedRequestWorkflow implements SavedRequestWorkflow {
+  private final MVCConfiguration configuration;
+
+  private final Encryptor encryptor;
+
   private final HttpServletRequest request;
 
+  private final HttpServletResponse response;
+
   @Inject
-  public DefaultSavedRequestWorkflow(HttpServletRequest request) {
+  public DefaultSavedRequestWorkflow(MVCConfiguration configuration, Encryptor encryptor, HttpServletRequest request,
+                                     HttpServletResponse response) {
     this.request = request;
+    this.encryptor = encryptor;
+    this.configuration = configuration;
+    this.response = response;
   }
 
   @Override
   public void perform(WorkflowChain workflowChain) throws IOException, ServletException {
-    HttpSession httpSession = request.getSession(false);
-    if (httpSession != null) {
-      SavedHttpRequest savedHttpRequest = (SavedHttpRequest) httpSession.getAttribute(SavedHttpRequest.LOGGED_IN_SESSION_KEY);
-      if (savedHttpRequest != null) {
-        httpSession.removeAttribute(SavedHttpRequest.LOGGED_IN_SESSION_KEY);
-
-        HttpServletRequestWrapper wrapper = (HttpServletRequestWrapper) request;
-        HttpServletRequest previous = (HttpServletRequest) wrapper.getRequest();
-        wrapper.setRequest(new SavedRequestHttpServletRequest(previous, savedHttpRequest));
-      }
+    SaveHttpRequestResult result = SavedRequestTools.getSaveRequestForWorkflow(configuration, encryptor, request, response);
+    if (result != null) {
+      HttpServletRequestWrapper wrapper = (HttpServletRequestWrapper) request;
+      HttpServletRequest previous = (HttpServletRequest) wrapper.getRequest();
+      wrapper.setRequest(new SavedRequestHttpServletRequest(previous, result.savedHttpRequest));
     }
 
     workflowChain.continueWorkflow();

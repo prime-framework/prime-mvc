@@ -27,7 +27,29 @@ import java.security.NoSuchAlgorithmException;
  * @author Brian Pontarelli
  */
 public interface CipherProvider {
-  Cipher getDecryptor() throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException;
+  /**
+   * Return a cipher used for decrypting.
+   *
+   * @param iv the initialization vector
+   * @return the Cipher object.
+   * @throws NoSuchPaddingException             when this happens.
+   * @throws NoSuchAlgorithmException           when this happens.
+   * @throws InvalidAlgorithmParameterException when this happens.
+   * @throws InvalidKeyException                when this happens.
+   */
+  Cipher getDecryptor(byte[] iv)
+      throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException;
 
-  Cipher getEncryptor() throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException;
+  /**
+   * Return a cipher used for encrypting.
+   *
+   * @param iv the initialization vector
+   * @return the Cipher object.
+   * @throws NoSuchPaddingException             when this happens.
+   * @throws NoSuchAlgorithmException           when this happens.
+   * @throws InvalidAlgorithmParameterException when this happens.
+   * @throws InvalidKeyException                when this happens.
+   */
+  Cipher getEncryptor(byte[] iv)
+      throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException;
 }

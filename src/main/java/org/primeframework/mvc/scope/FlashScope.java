@@ -20,9 +20,8 @@ import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.primeframework.mvc.scope.annotation.Flash;
-
 import com.google.inject.Inject;
+import org.primeframework.mvc.scope.annotation.Flash;
 
 /**
  * This is the flash scope which stores values in the HttpSession inside a Map under the flash key
@@ -36,6 +35,7 @@ import com.google.inject.Inject;
 @SuppressWarnings("unchecked")
 public class FlashScope implements Scope<Flash> {
   public static final String FLASH_KEY = "primeFlash";
+
   private final HttpServletRequest request;
 
   @Inject
@@ -48,11 +48,13 @@ public class FlashScope implements Scope<Flash> {
    */
   public Object get(String fieldName, Flash scope) {
     Map<String, Object> flash = (Map<String, Object>) request.getAttribute(FLASH_KEY);
-
     String key = scope.value().equals("##field-name##") ? fieldName : scope.value();
+
+
     if (flash == null || !flash.containsKey(key)) {
       HttpSession session = request.getSession(false);
       if (session != null) {
+        //noinspection SynchronizationOnLocalVariableOrMethodParameter
         synchronized (session) {
           flash = (Map<String, Object>) session.getAttribute(FLASH_KEY);
         }
@@ -82,6 +84,7 @@ public class FlashScope implements Scope<Flash> {
     }
 
     Map<String, Object> flash;
+    //noinspection SynchronizationOnLocalVariableOrMethodParameter
     synchronized (session) {
       flash = (Map<String, Object>) session.getAttribute(FLASH_KEY);
       if (flash == null) {
@@ -98,12 +101,14 @@ public class FlashScope implements Scope<Flash> {
     }
   }
 
+
   /**
    * Moves the flash from the session to the request.
    */
   public void transferFlash() {
     HttpSession session = request.getSession(false);
     if (session != null) {
+      //noinspection SynchronizationOnLocalVariableOrMethodParameter
       synchronized (session) {
         Map<String, Object> flash = (Map<String, Object>) session.getAttribute(FLASH_KEY);
         if (flash != null) {

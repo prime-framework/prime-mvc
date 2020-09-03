@@ -24,10 +24,8 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 import com.google.inject.Injector;
-import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.workflow.MVCWorkflow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,11 +56,9 @@ public class PrimeFilter implements Filter {
    * @param request  Passed down chain.
    * @param response Passed down chain.
    * @param chain    The chain.
-   * @throws IOException      If the chain throws an exception.
    * @throws ServletException If the chain throws an exception.
    */
-  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-      throws IOException, ServletException {
+  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws ServletException {
     long start = System.currentTimeMillis();
 
     Injector injector = (Injector) context.getAttribute(PrimeServletContextListener.GUICE_INJECTOR_KEY);
@@ -73,19 +69,17 @@ public class PrimeFilter implements Filter {
 
     HttpServletRequest httpServletRequest = (HttpServletRequest) request;
     HttpServletResponse httpServletResponse = (HttpServletResponse) response;
-    MVCConfiguration configuration = injector.getInstance(MVCConfiguration.class);
     ServletObjectsHolder.setServletRequest(new HTTPMethodOverrideServletRequestWrapper(httpServletRequest));
     ServletObjectsHolder.setServletResponse(httpServletResponse);
 
+    boolean loggedError = false;
     try {
       FilterWorkflowChain workflowChain = new FilterWorkflowChain(chain, httpServletRequest, httpServletResponse, injector.getInstance(MVCWorkflow.class));
       workflowChain.continueWorkflow();
-    } catch (RuntimeException re) {
+    } catch (Throwable t) {
       ((HttpServletResponse) response).setStatus(500);
-      boolean propagate = configuration.propagateRuntimeExceptions();
-      if (propagate) {
-        throw re;
-      }
+      logger.error("Error encountered", t);
+      loggedError = true;
     } finally {
       if (logger.isDebugEnabled()) {
         long end = System.currentTimeMillis();
@@ -96,13 +90,15 @@ public class PrimeFilter implements Filter {
       ServletObjectsHolder.clearServletResponse();
 
       // Handle any extra logging for handling issues that might have occurred.
-      Throwable t = (Throwable) request.getAttribute("javax.servlet.error.exception");
-      if (t != null) {
-        logger.debug("Exception occurred during the request", t);
-      }
-      t = (Throwable) request.getAttribute("javax.servlet.jsp.jspException");
-      if (t != null) {
-        logger.debug("Exception occurred during the request", t);
+      if (!loggedError) {
+        Throwable t = (Throwable) request.getAttribute("javax.servlet.error.exception");
+        if (t != null) {
+          logger.debug("Exception occurred during the request", t);
+        }
+        t = (Throwable) request.getAttribute("javax.servlet.jsp.jspException");
+        if (t != null) {
+          logger.debug("Exception occurred during the request", t);
+        }
       }
     }
   }

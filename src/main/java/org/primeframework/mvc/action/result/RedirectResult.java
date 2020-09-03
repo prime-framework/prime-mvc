@@ -15,18 +15,16 @@
  */
 package org.primeframework.mvc.action.result;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.annotation.Redirect;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-
-import com.google.inject.Inject;
 
 /**
  * This result performs a HTTP redirect to a URL. This also transfers all messages from the request to the flash. If we
@@ -36,7 +34,8 @@ import com.google.inject.Inject;
  */
 public class RedirectResult extends AbstractRedirectResult<Redirect> {
   @Inject
-  public RedirectResult(MessageStore messageStore, ExpressionEvaluator expressionEvaluator, HttpServletResponse response,
+  public RedirectResult(MessageStore messageStore, ExpressionEvaluator expressionEvaluator,
+                        HttpServletResponse response,
                         HttpServletRequest request, ActionInvocationStore actionInvocationStore) {
     super(expressionEvaluator, actionInvocationStore, messageStore, request, response);
   }

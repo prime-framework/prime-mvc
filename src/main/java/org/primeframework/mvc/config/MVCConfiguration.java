@@ -17,7 +17,6 @@ package org.primeframework.mvc.config;
 
 import java.lang.annotation.Annotation;
 import java.security.Key;
-import java.security.spec.AlgorithmParameterSpec;
 import java.util.List;
 
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
@@ -38,11 +37,6 @@ public interface MVCConfiguration {
    * @return Whether or not auto HTML escaping will be enabled for all templates.
    */
   boolean autoHTMLEscapingEnabled();
-
-  /**
-   * @return The IV that is used to encrypt cookies.
-   */
-  AlgorithmParameterSpec cookieEncryptionIV();
 
   /**
    * @return The encryption key that is used to encrypt cookies.
@@ -92,9 +86,9 @@ public interface MVCConfiguration {
   String localeCookieName();
 
   /**
-   * @return Whether or not runtime exceptions should be re-thrown out of Prime MVC.
+   * @return The name of the message flash cookie.
    */
-  boolean propagateRuntimeExceptions();
+  String messageFlashScopeCookieName();
 
   /**
    * @return The resource directory where the templates, message bundles, emails, control templates, etc are loaded

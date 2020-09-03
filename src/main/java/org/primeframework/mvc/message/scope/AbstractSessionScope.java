@@ -37,26 +37,13 @@ public abstract class AbstractSessionScope {
   }
 
   @SuppressWarnings("unchecked")
-  protected void addMessage(Message message) {
-    HttpSession session = request.getSession(true);
-    synchronized (session) {
-      List<Message> messages = (List<Message>) session.getAttribute(sessionKey);
-      if (messages == null) {
-        messages = new ArrayList<>();
-        session.setAttribute(sessionKey, messages);
-      }
-
-      messages.add(message);
-    }
-  }
-
-  @SuppressWarnings("unchecked")
   protected void addAllMessages(Collection<Message> messages) {
     if (messages.isEmpty()) {
       return;
     }
 
     HttpSession session = request.getSession(true);
+    //noinspection SynchronizationOnLocalVariableOrMethodParameter
     synchronized (session) {
       List<Message> scopeMessages = (List<Message>) session.getAttribute(sessionKey);
       if (scopeMessages == null) {
@@ -65,6 +52,21 @@ public abstract class AbstractSessionScope {
       }
 
       scopeMessages.addAll(messages);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  protected void addMessage(Message message) {
+    HttpSession session = request.getSession(true);
+    //noinspection SynchronizationOnLocalVariableOrMethodParameter
+    synchronized (session) {
+      List<Message> messages = (List<Message>) session.getAttribute(sessionKey);
+      if (messages == null) {
+        messages = new ArrayList<>();
+        session.setAttribute(sessionKey, messages);
+      }
+
+      messages.add(message);
     }
   }
 }

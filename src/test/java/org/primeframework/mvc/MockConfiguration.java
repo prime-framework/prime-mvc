@@ -15,12 +15,9 @@
  */
 package org.primeframework.mvc;
 
-import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.security.spec.AlgorithmParameterSpec;
 
 import org.primeframework.mvc.config.AbstractMVCConfiguration;
 
@@ -35,8 +32,6 @@ public class MockConfiguration extends AbstractMVCConfiguration {
 
   public boolean autoHTMLEscapingEnabled = true;
 
-  public AlgorithmParameterSpec cookieEncryptionIV;
-
   public Key cookieEncryptionKey;
 
   public boolean csrfEnabled;
@@ -46,18 +41,9 @@ public class MockConfiguration extends AbstractMVCConfiguration {
   public int l10nReloadSeconds;
 
   public MockConfiguration() {
-    try {
-      SecureRandom randomSecureRandom = SecureRandom.getInstance("SHA1PRNG");
-      byte[] ivBytes = new byte[16];
-      randomSecureRandom.nextBytes(ivBytes);
-      this.cookieEncryptionIV = new IvParameterSpec(ivBytes);
-
-      byte[] keyBytes = new byte[16];
-      randomSecureRandom.nextBytes(keyBytes);
-      this.cookieEncryptionKey = new SecretKeySpec(keyBytes, "AES");
-    } catch (NoSuchAlgorithmException e) {
-      throw new IllegalStateException(e);
-    }
+    byte[] keyBytes = new byte[16];
+    new SecureRandom().nextBytes(keyBytes);
+    this.cookieEncryptionKey = new SecretKeySpec(keyBytes, "AES");
   }
 
   public MockConfiguration(int freemarkerCheckSeconds, int l10nReloadSeconds, boolean allowUnknownParameters,
@@ -77,11 +63,6 @@ public class MockConfiguration extends AbstractMVCConfiguration {
   @Override
   public boolean autoHTMLEscapingEnabled() {
     return autoHTMLEscapingEnabled;
-  }
-
-  @Override
-  public AlgorithmParameterSpec cookieEncryptionIV() {
-    return cookieEncryptionIV;
   }
 
   @Override

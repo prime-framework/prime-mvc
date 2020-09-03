@@ -36,11 +36,12 @@ import org.primeframework.mock.servlet.MockHttpServletRequest.Method;
 import org.primeframework.mock.servlet.MockHttpServletResponse;
 import org.primeframework.mock.servlet.MockServletInputStream;
 import org.primeframework.mvc.parameter.DefaultParameterParser;
-import org.primeframework.mvc.security.CSRF;
+import org.primeframework.mvc.security.csrf.CSRFProvider;
 import org.primeframework.mvc.servlet.PrimeFilter;
 import org.primeframework.mvc.servlet.ServletObjectsHolder;
 import org.primeframework.mvc.util.QueryStringTools;
 import org.primeframework.mvc.util.URITools;
+import static org.testng.Assert.fail;
 
 /**
  * This class is a builder that helps create a test HTTP request that is sent to the MVC.
@@ -58,8 +59,6 @@ public class RequestBuilder {
   public final MockHttpServletRequest request;
 
   public final MockHttpServletResponse response;
-
-  private Class<? extends Throwable> expectedException;
 
   public RequestBuilder(String uri, MockContainer container, PrimeFilter filter, Injector injector) {
     this.container = container;
@@ -89,19 +88,6 @@ public class RequestBuilder {
     request.setMethod(Method.DELETE);
     run();
     return new RequestResult(container, filter, request, response, injector);
-  }
-
-  /**
-   * Indicates then when the HTTP method is called an exception is expected to be thrown.
-   * <p>
-   * An {@link AssertionError} will be thrown if the exception is not thrown.
-   *
-   * @param expectedException The expected exception.
-   * @return This.
-   */
-  public RequestBuilder expectException(Class<? extends Throwable> expectedException) {
-    this.expectedException = expectedException;
-    return this;
   }
 
   /**
@@ -330,8 +316,8 @@ public class RequestBuilder {
    * @return This.
    */
   public RequestBuilder withCSRFToken(String token) {
-    request.removeParameter(CSRF.CSRF_PARAMETER_KEY);
-    return withParameter(CSRF.CSRF_PARAMETER_KEY, token);
+    request.removeParameter(CSRFProvider.CSRF_PARAMETER_KEY);
+    return withParameter(CSRFProvider.CSRF_PARAMETER_KEY, token);
   }
 
   /**
@@ -384,7 +370,7 @@ public class RequestBuilder {
    */
   public RequestBuilder withCookie(String name, String value) {
     if (name != null) {
-      request.addCookie(new Cookie(name, value));
+      container.getUserAgent().addCookie(request, new Cookie(name, value));
     }
     return this;
   }
@@ -397,7 +383,7 @@ public class RequestBuilder {
    */
   public RequestBuilder withCookie(Cookie cookie) {
     if (cookie != null) {
-      request.addCookie(cookie);
+      container.getUserAgent().addCookie(request, cookie);
     }
     return this;
   }
@@ -593,12 +579,16 @@ public class RequestBuilder {
     ServletObjectsHolder.clearServletResponse();
 
     // If the CSRF token is enabled and the parameter isn't set, we set it to be consistent.
-    if (CSRF.getParameterToken(request) == null) {
-      String token = CSRF.getSessionToken(request);
+    CSRFProvider csrfProvider = injector.getInstance(CSRFProvider.class);
+    if (csrfProvider.getTokenFromRequest(request) == null) {
+      String token = csrfProvider.getToken(request);
       if (token != null) {
-        request.setParameter(CSRF.CSRF_PARAMETER_KEY, token);
+        request.setParameter(CSRFProvider.CSRF_PARAMETER_KEY, token);
       }
     }
+
+    // Copy cookies from the response back to the request so we can be ready for the next request.
+    container.getRequest().copyCookiesFromUserAgent();
 
     try {
       // Build the request and response for this pass
@@ -606,16 +596,8 @@ public class RequestBuilder {
         throw new UnsupportedOperationException("The RequestSimulator class doesn't support testing " +
             "URIs that don't map to Prime resources");
       });
-    } catch (Throwable e) {
-      Class clazz = e.getClass();
-      if (expectedException == null || !expectedException.equals(clazz)) {
-        throw new AssertionError("\n\tUnexpected Exception thrown: [" + clazz.getCanonicalName() + "]", e);
-      }
-      expectedException = null;
-    }
-
-    if (expectedException != null) {
-      throw new AssertionError("Expected Exception were not thrown: [" + expectedException.getCanonicalName() + "]");
+    } catch (Throwable t) {
+      fail("The exception should have been caught by the PrimeFilter", t);
     }
 
     // Add these back so that anything that needs them can be retrieved from the Injector after

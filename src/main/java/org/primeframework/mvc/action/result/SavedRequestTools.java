@@ -15,25 +15,19 @@
  */
 package org.primeframework.mvc.action.result;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.ShortBufferException;
 import javax.servlet.http.Cookie;
-import java.nio.charset.StandardCharsets;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.Base64;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.primeframework.mvc.action.result.annotation.ReexecuteSavedRequest;
 import org.primeframework.mvc.config.MVCConfiguration;
-import org.primeframework.mvc.security.CipherProvider;
+import org.primeframework.mvc.security.DefaultSavedRequestWorkflow;
+import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.security.SavedRequestException;
 import org.primeframework.mvc.security.saved.SavedHttpRequest;
+import org.primeframework.mvc.workflow.WorkflowChain;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Toolkit to help with Saved Request stuff.
@@ -41,36 +35,134 @@ import org.primeframework.mvc.security.saved.SavedHttpRequest;
  * @author Brian Pontarelli
  */
 public class SavedRequestTools {
+  private static final Logger logger = LoggerFactory.getLogger(SavedRequestTools.class);
+
+  /**
+   * Retrieve the saved request from a cookie for use in the {@link ReexecuteSavedRequestResult#execute(ReexecuteSavedRequest)}
+   * phase.
+   *
+   * @param configuration The MVC configuration used to determine the name of the cookie.
+   * @param encryptor     the encryptor used to decrypt the cookie
+   * @param request       the HTTP servlet request
+   * @param response      the HTTP servlet response
+   * @return null if no save request was found.
+   */
+  public static SaveHttpRequestResult getSaveRequestForReExecution(MVCConfiguration configuration, Encryptor encryptor,
+                                                                   HttpServletRequest request,
+                                                                   HttpServletResponse response) {
+    SaveHttpRequestResult result = getSaveHttpRequestResult(configuration, encryptor, request);
+    if (result == null) {
+      return null;
+    }
+
+    // Mark the cookie as ready
+    result.cookie.setMaxAge(-1);
+    result.cookie.setPath("/");
+    result.cookie.setValue("ready_" + result.cookie.getValue());
+    response.addCookie(result.cookie);
+
+    return result;
+  }
+
+  /**
+   * Retrieve the saved request from a cookie for use during the {@link DefaultSavedRequestWorkflow#perform(WorkflowChain)}
+   * step.
+   *
+   * @param configuration The MVC configuration used to determine the name of the cookie.
+   * @param encryptor     the encryptor used to decrypt the cookie
+   * @param request       the HTTP servlet request
+   * @param response      the HTTP servlet response
+   * @return null if no save request was found.
+   */
+  public static SaveHttpRequestResult getSaveRequestForWorkflow(MVCConfiguration configuration, Encryptor encryptor,
+                                                                HttpServletRequest request,
+                                                                HttpServletResponse response) {
+    SaveHttpRequestResult result = getSaveHttpRequestResult(configuration, encryptor, request);
+    if (result == null) {
+      return null;
+    }
+
+    if (result.ready) {
+      result.cookie.setPath("/");
+      result.cookie.setMaxAge(0);
+      response.addCookie(result.cookie);
+      return result;
+    }
+
+    return null;
+  }
+
   /**
    * Creates a Cookie Object for the given SavedHttpRequest object.
    *
    * @param savedRequest  The Saved Request.
-   * @param objectMapper  The ObjectMapper that is used to create the JSON for the Saved Request.
    * @param configuration THe MVC Configuration that is used to determine the cookie name.
+   * @param encryptor     The encryptor used to encrypt the cookie
    * @return The cookie.
    */
-  public static Cookie toCookie(SavedHttpRequest savedRequest, ObjectMapper objectMapper,
-                                MVCConfiguration configuration,
-                                CipherProvider cipherProvider) {
+  public static Cookie toCookie(SavedHttpRequest savedRequest, MVCConfiguration configuration,
+                                Encryptor encryptor) {
     try {
-      String value = objectMapper.writer().writeValueAsString(savedRequest);
-      Cipher cipher = cipherProvider.getEncryptor();
-      byte[] input = value.getBytes(StandardCharsets.UTF_8);
-      byte[] result = new byte[cipher.getOutputSize(input.length)];
-      int resultLength = cipher.update(input, 0, input.length, result, 0);
-      resultLength += cipher.doFinal(result, resultLength);
-
-      String encoded = Base64.getEncoder().encodeToString(Arrays.copyOfRange(result, 0, resultLength));
-      Cookie cookie = new Cookie(configuration.savedRequestCookieName(), encoded);
+      String encrypted = encryptor.encrypt(savedRequest);
+      Cookie cookie = new Cookie(configuration.savedRequestCookieName(), encrypted);
       cookie.setPath("/"); // Turn the cookie on for everything since we have no clue what URI will Re-execute the Saved Request
       cookie.setMaxAge(-1); // Be explicit
       cookie.setVersion(1); // Be explicit
       cookie.setHttpOnly(true);
       // Set to secure when schema is 'https'
-      cookie.setSecure(savedRequest.uri.startsWith("https"));
+      cookie.setSecure(savedRequest.uri.startsWith("/") || savedRequest.uri.startsWith("https"));
       return cookie;
-    } catch (JsonProcessingException | IllegalBlockSizeException | BadPaddingException | NoSuchPaddingException | InvalidAlgorithmParameterException | InvalidKeyException | NoSuchAlgorithmException | ShortBufferException e) {
+    } catch (Exception e) {
       throw new SavedRequestException(e);
+    }
+  }
+
+  private static Cookie getCookie(MVCConfiguration configuration, HttpServletRequest request) {
+    Cookie[] cookies = request.getCookies();
+    if (cookies != null) {
+      for (final Cookie cookie : cookies) {
+        if (cookie.getName().equals(configuration.savedRequestCookieName())) {
+          return cookie;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  private static SaveHttpRequestResult getSaveHttpRequestResult(MVCConfiguration configuration, Encryptor encryptor,
+                                                                HttpServletRequest request) {
+    Cookie cookie = getCookie(configuration, request);
+    if (cookie == null) {
+      return null;
+    }
+
+    try {
+      String value = cookie.getValue();
+      boolean ready = value.startsWith("ready_");
+      if (ready) {
+        value = value.substring("ready_".length());
+      }
+
+      return new SaveHttpRequestResult(cookie, ready, encryptor.decrypt(SavedHttpRequest.class, value));
+    } catch (Exception e) {
+      logger.warn("Bad SavedRequest cookie [{}]. Error is [{}]", cookie.getValue(), e.getMessage());
+    }
+
+    return null;
+  }
+
+  public static class SaveHttpRequestResult {
+    public Cookie cookie;
+
+    public boolean ready;
+
+    public SavedHttpRequest savedHttpRequest;
+
+    public SaveHttpRequestResult(Cookie cookie, boolean ready, SavedHttpRequest savedHttpRequest) {
+      this.cookie = cookie;
+      this.ready = ready;
+      this.savedHttpRequest = savedHttpRequest;
     }
   }
 }

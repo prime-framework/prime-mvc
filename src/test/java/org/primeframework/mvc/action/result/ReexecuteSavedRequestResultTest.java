@@ -15,16 +15,14 @@
  */
 package org.primeframework.mvc.action.result;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.easymock.EasyMock;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
@@ -36,6 +34,8 @@ import org.primeframework.mvc.message.scope.FlashScope;
 import org.primeframework.mvc.message.scope.MessageScope;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.security.DefaultCipherProvider;
+import org.primeframework.mvc.security.DefaultEncryptor;
+import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.security.saved.SavedHttpRequest;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.testng.annotations.Test;
@@ -51,13 +51,14 @@ import static org.easymock.EasyMock.verify;
  */
 public class ReexecuteSavedRequestResultTest extends PrimeBaseTest {
   @Test
-  public void noSavedRequest() throws IOException, ServletException, NoSuchAlgorithmException {
+  public void noSavedRequest() throws IOException {
     ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
     replay(ee);
 
     List<Message> messages = new ArrayList<>();
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
     expect(request.getAttribute(FlashScope.KEY)).andReturn(messages);
+    request.removeAttribute(FlashScope.KEY);
     expect(request.getCookies()).andReturn(null);
     expect(request.getContextPath()).andReturn("");
     expect(request.getRequestURI()).andReturn("/");
@@ -80,35 +81,33 @@ public class ReexecuteSavedRequestResultTest extends PrimeBaseTest {
     replay(messageStore);
 
     ReexecuteSavedRequest redirect = new ReexecuteSavedRequestImpl("/", "success", true, false);
-    ReexecuteSavedRequestResult result = new ReexecuteSavedRequestResult(messageStore, ee, response, request, store, new DefaultCipherProvider(configuration), configuration, objectMapper);
+    ReexecuteSavedRequestResult result = new ReexecuteSavedRequestResult(messageStore, ee, response, request, store, configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper));
     result.execute(redirect);
 
     verify(response, request, ee, store, messageStore);
   }
 
   @Test
-  public void savedRequest() throws IOException, ServletException, NoSuchAlgorithmException {
+  public void savedRequest() throws IOException {
     ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
     replay(ee);
 
     SavedHttpRequest savedRequest = new SavedHttpRequest(HTTPMethod.GET, "/secure?test=value1&test2=value2", null);
-    HttpSession session = createStrictMock(HttpSession.class);
-    session.setAttribute(SavedHttpRequest.LOGGED_IN_SESSION_KEY, savedRequest);
-    replay(session);
+    container.getUserAgent().addCookie(request, SavedRequestTools.toCookie(savedRequest, configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper)));
 
     List<Message> messages = new ArrayList<>();
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    DefaultCipherProvider cipherProvider = new DefaultCipherProvider(configuration);
-    Cookie cookie = SavedRequestTools.toCookie(savedRequest, objectMapper, configuration, cipherProvider);
+    Encryptor encryptor = new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper);
+    Cookie cookie = SavedRequestTools.toCookie(savedRequest, configuration, encryptor);
     expect(request.getAttribute(FlashScope.KEY)).andReturn(messages);
+    request.removeAttribute(FlashScope.KEY);
     expect(request.getCookies()).andReturn(new Cookie[]{cookie});
-    expect(request.getSession(true)).andReturn(session);
     expect(request.getContextPath()).andReturn("");
     expect(request.getRequestURI()).andReturn("/");
     replay(request);
 
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    response.addCookie(cookie);
+    response.addCookie(new Cookie(configuration.savedRequestCookieName + "_executed", EasyMock.anyString()));
     response.sendRedirect("/secure?test=value1&test2=value2");
     response.setStatus(301);
     replay(response);
@@ -124,9 +123,9 @@ public class ReexecuteSavedRequestResultTest extends PrimeBaseTest {
     replay(messageStore);
 
     ReexecuteSavedRequest redirect = new ReexecuteSavedRequestImpl("/", "success", true, false);
-    ReexecuteSavedRequestResult result = new ReexecuteSavedRequestResult(messageStore, ee, response, request, store, cipherProvider, configuration, objectMapper);
+    ReexecuteSavedRequestResult result = new ReexecuteSavedRequestResult(messageStore, ee, response, request, store, configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper));
     result.execute(redirect);
 
-    verify(response, request, ee, store, messageStore, session);
+    verify(response, request, ee, store, messageStore);
   }
 }
