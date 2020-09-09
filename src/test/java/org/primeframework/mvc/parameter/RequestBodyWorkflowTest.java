@@ -81,9 +81,10 @@ public class RequestBodyWorkflowTest {
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
     EasyMock.expect(request.getParameterMap()).andReturn(new HashMap<>());
     EasyMock.expect(request.getContentType()).andReturn("multipart/form-data, boundary=AaB03x").times(2);
+    EasyMock.expect(request.getContentLength()).andReturn(body.length());
+    EasyMock.expect(request.getHeader("Content-length")).andReturn("" + body.length());
     EasyMock.expect(request.getInputStream()).andReturn(new MockServletInputStream(body.getBytes()));
     EasyMock.expect(request.getCharacterEncoding()).andReturn("UTF-8");
-    EasyMock.expect(request.getContentLength()).andReturn(body.length());
     final Capture<Map<String, List<FileInfo>>> capture = Capture.newInstance();
     request.setAttribute(eq(RequestKeys.FILE_ATTRIBUTE), capture(capture));
     EasyMock.replay(request);
@@ -233,9 +234,10 @@ public class RequestBodyWorkflowTest {
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
     EasyMock.expect(request.getParameterMap()).andReturn(new HashMap<>());
     EasyMock.expect(request.getContentType()).andReturn("multipart/form-data, boundary=AaB03x").times(2);
+    EasyMock.expect(request.getContentLength()).andReturn(body.length());
+    EasyMock.expect(request.getHeader("Content-length")).andReturn("" + body.length());
     EasyMock.expect(request.getInputStream()).andReturn(new MockServletInputStream(body.getBytes()));
     EasyMock.expect(request.getCharacterEncoding()).andReturn("UTF-8");
-    EasyMock.expect(request.getContentLength()).andReturn(body.length());
     final Capture<Map<String, List<FileInfo>>> capture = Capture.newInstance();
     request.setAttribute(eq(RequestKeys.FILE_ATTRIBUTE), capture(capture));
     EasyMock.replay(request);
