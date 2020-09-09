@@ -17,9 +17,17 @@ package org.primeframework.mvc.content.json;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
+import com.google.inject.Inject;
 import org.apache.commons.io.IOUtils;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
@@ -36,14 +44,6 @@ import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.validation.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
-import com.google.inject.Inject;
 
 /**
  * Uses the Jackson JSON processor to marshall JSON into Java objects and set them into the action.
@@ -67,7 +67,8 @@ public class JacksonContentHandler implements ContentHandler {
 
   @Inject
   public JacksonContentHandler(HttpServletRequest request, ActionInvocationStore store, ObjectMapper objectMapper,
-                               ExpressionEvaluator expressionEvaluator, MessageProvider messageProvider, MessageStore messageStore) {
+                               ExpressionEvaluator expressionEvaluator, MessageProvider messageProvider,
+                               MessageStore messageStore) {
     this.request = request;
     this.store = store;
     this.objectMapper = objectMapper;
@@ -117,7 +118,7 @@ public class JacksonContentHandler implements ContentHandler {
 
         Object jsonObject;
         if (logger.isDebugEnabled()) {
-          final String req = IOUtils.toString(request.getInputStream(), "UTF-8");
+          final String req = IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8);
           logger.debug("Request: (" + request.getMethod() + " " + request.getRequestURI() + ") " + req);
           jsonObject = reader.readValue(req);
         } else {

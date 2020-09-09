@@ -118,17 +118,6 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/apache/commons/commons-lang3/3.11.0/commons-lang3-3.11.0.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/apache/commons/commons-lang3/3.11.0/commons-lang3-3.11.0-src.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
           <root url="jar://$USER_HOME$/.savant/cache/org/freemarker/freemarker/2.3.30/freemarker-2.3.30.jar!/" />
         </CLASSES>
         <JAVADOC />

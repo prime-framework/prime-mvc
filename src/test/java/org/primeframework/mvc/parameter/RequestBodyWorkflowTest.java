@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -76,7 +77,7 @@ public class RequestBodyWorkflowTest {
 
   @Test
   public void multipleFiles() throws IOException, ServletException {
-    String body = FileUtils.readFileToString(new File("src/test/java/org/primeframework/mvc/servlet/http-test-body-multiple-files.txt"));
+    String body = FileUtils.readFileToString(new File("src/test/java/org/primeframework/mvc/servlet/http-test-body-multiple-files.txt"), StandardCharsets.UTF_8);
 
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
     EasyMock.expect(request.getParameterMap()).andReturn(new HashMap<>());
@@ -94,8 +95,8 @@ public class RequestBodyWorkflowTest {
       Map<String, List<FileInfo>> files = capture.getValue();
       assertEquals(files.size(), 1);
       try {
-        assertEquals(FileUtils.readFileToString(files.get("userfiles").get(0).file), "test");
-        assertEquals(FileUtils.readFileToString(files.get("userfiles").get(1).file), "test2");
+        assertEquals(FileUtils.readFileToString(files.get("userfiles").get(0).file, StandardCharsets.UTF_8), "test");
+        assertEquals(FileUtils.readFileToString(files.get("userfiles").get(1).file, StandardCharsets.UTF_8), "test2");
       } catch (IOException e) {
         throw new RuntimeException(e);
       }
@@ -229,7 +230,7 @@ public class RequestBodyWorkflowTest {
 
   @Test
   public void singleFiles() throws IOException, ServletException {
-    String body = FileUtils.readFileToString(new File("src/test/java/org/primeframework/mvc/servlet/http-test-body-single-file.txt"));
+    String body = FileUtils.readFileToString(new File("src/test/java/org/primeframework/mvc/servlet/http-test-body-single-file.txt"), StandardCharsets.UTF_8);
 
     HttpServletRequest request = EasyMock.createStrictMock(HttpServletRequest.class);
     EasyMock.expect(request.getParameterMap()).andReturn(new HashMap<>());
@@ -247,7 +248,7 @@ public class RequestBodyWorkflowTest {
       Map<String, List<FileInfo>> files = capture.getValue();
       assertEquals(files.size(), 1);
       try {
-        assertEquals(FileUtils.readFileToString(files.get("userfile").get(0).file), "test");
+        assertEquals(FileUtils.readFileToString(files.get("userfile").get(0).file, StandardCharsets.UTF_8), "test");
       } catch (IOException e) {
         throw new RuntimeException(e);
       }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2020, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,24 +13,14 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.example.action;
+package org.apache.commons.lang3;
 
-import javax.servlet.http.HttpServletRequest;
+public class ObjectUtils {
+  public static <T> T defaultIfNull(final T object, final T defaultValue) {
+    return object != null ? object : defaultValue;
+  }
 
-import com.google.inject.Inject;
-import org.primeframework.mvc.action.annotation.Action;
-
-/**
- * @author Brian Pontarelli
- */
-@Action
-public class ValueInRequest {
-  @Inject public HttpServletRequest request;
-
-  private String bar;
-
-  public String get() {
-    request.setAttribute("bar", "baz");
-    return "success";
+  public static String toString(Object obj) {
+    return obj == null ? "" : obj.toString();
   }
 }

@@ -212,11 +212,11 @@ public class ClassClasspathResolver<U> {
           continue;
         }
 
-          Testable<Class<U>> testable = test.prepare(f, jarFile, entry);
-          if (testable != null && testable.passes()) {
-            matches.add(testable.result());
-            break;
-          }
+        Testable<Class<U>> testable = test.prepare(f, jarFile, entry);
+        if (testable != null && testable.passes()) {
+          matches.add(testable.result());
+          break;
+        }
       }
     }
 

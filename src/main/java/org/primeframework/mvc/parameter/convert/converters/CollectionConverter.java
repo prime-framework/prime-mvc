@@ -17,17 +17,19 @@ package org.primeframework.mvc.parameter.convert.converters;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.primeframework.mvc.parameter.convert.AbstractGlobalConverter;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
@@ -133,7 +135,9 @@ public class CollectionConverter extends AbstractGlobalConverter {
   protected String objectToString(Object value, Type convertFrom, Map<String, String> dynamicAttributes,
                                   String expression)
       throws ConversionException, ConverterStateException {
-    throw new ConverterStateException("This operation is unsupported. You may not serialize a collection to a string. Expression[" + expression + "], values [" + StringUtils.join(value, ",") + "]");
+    Collection<?> collection = value.getClass().isArray() ? Arrays.asList((Object[]) value) : (Collection<?>) value;
+    String values = collection.stream().filter(Objects::nonNull).map(Object::toString).collect(Collectors.joining(","));
+    throw new ConverterStateException("This operation is unsupported. You may not serialize a collection to a string. Expression[" + expression + "], values [" + values + "]");
   }
 
   /**
