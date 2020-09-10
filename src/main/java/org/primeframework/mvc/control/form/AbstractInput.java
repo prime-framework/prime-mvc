@@ -19,13 +19,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.control.AbstractControl;
 import org.primeframework.mvc.message.FieldMessage;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.l10n.MessageProvider;
-
-import com.google.inject.Inject;
 
 /**
  * This class is an abstract control implementation for input tags. In addition to the abstract control, it also
@@ -35,8 +34,10 @@ import com.google.inject.Inject;
  */
 public abstract class AbstractInput extends AbstractControl {
   private final boolean labeled;
-  protected MessageStore messageStore;
+
   protected MessageProvider messageProvider;
+
+  protected MessageStore messageStore;
 
   protected AbstractInput(boolean labeled) {
     this.labeled = labeled;
@@ -76,7 +77,8 @@ public abstract class AbstractInput extends AbstractControl {
   }
 
   /**
-   * Overrides the parameter map cration from the AbstractControl and adds the label for input tags. This also moves the
+   * Overrides the parameter map creation from the AbstractControl and adds the label for input tags. This also moves
+   * the
    * <code>labelposition</code> attribute from the tag to the returned Map (removes it from the attributes).
    *
    * @return The parameter map.
@@ -87,22 +89,24 @@ public abstract class AbstractInput extends AbstractControl {
     if (labeled) {
       String name = (String) attributes.get("name");
       String labelKey = (String) attributes.remove("labelKey");
-      String label = null;
-      if (labelKey != null) {
-        label = messageProvider.getMessage(labelKey);
-      }
-
+      String label = (String) attributes.remove("labelValue");
       if (label == null) {
-        label = messageProvider.getMessage(name);
-      }
+        if (labelKey != null) {
+          label = messageProvider.getMessage(labelKey);
+        }
 
-      if (label == null) {
-        throw new PrimeException("Missing localized label for the field named [" +
-          name + "]. You must define the label in the resource bundle under under the " +
-          "key [" + name + "], which is the name of the field, or using the [labelKey] " +
-          "attribute " + (labelKey != null ? "(which is currently set to [" + labelKey + "] " +
-          "but there is no label in for that key in the resource bundle) " : "") + "to " +
-          "specify an alternate key into the resource bundle.");
+        if (label == null) {
+          label = messageProvider.getMessage(name);
+        }
+
+        if (label == null) {
+          throw new PrimeException("Missing localized label for the field named [" +
+              name + "]. You must define the label in the resource bundle under under the " +
+              "key [" + name + "], which is the name of the field, or using the [labelKey] " +
+              "attribute " + (labelKey != null ? "(which is currently set to [" + labelKey + "] " +
+              "but there is no label in for that key in the resource bundle) " : "") + "to " +
+              "specify an alternate key into the resource bundle.");
+        }
       }
 
       map.put("label", label);

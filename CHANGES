@@ -1,5 +1,25 @@
 Prime MVC Changes
 
+Changes in 1.23.0
+
+ * Allow for a new attributed named 'labelValue' on form controls to provide a translated value directly.
+
+Changes in 1.22.8
+
+ * Update deps, remove use of Apache Commons Lang
+
+Changes in 1.22.7
+
+ * Update deps
+
+Changes in 1.22.6
+
+ * Cookie fixes.
+
+Changes in 1.22.5
+
+ * Bug fixes.
+
 Changes in 1.22.4
 
  * Fix form submit handling to properly ignore form elements without a name attribute in the RequestResult simulator.
