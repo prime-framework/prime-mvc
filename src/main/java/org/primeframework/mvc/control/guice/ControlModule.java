@@ -27,6 +27,7 @@ import org.primeframework.mvc.control.form.Hidden;
 import org.primeframework.mvc.control.form.Image;
 import org.primeframework.mvc.control.form.LocaleSelect;
 import org.primeframework.mvc.control.form.MonthSelect;
+import org.primeframework.mvc.control.form.NumberInput;
 import org.primeframework.mvc.control.form.Password;
 import org.primeframework.mvc.control.form.RadioList;
 import org.primeframework.mvc.control.form.Reset;
@@ -58,7 +59,9 @@ public class ControlModule extends AbstractModule {
     ControlFactory.addControl(binder(), "control", "hidden", Hidden.class);
     ControlFactory.addControl(binder(), "control", "image", Image.class);
     ControlFactory.addControl(binder(), "control", "locale_select", LocaleSelect.class);
+    ControlFactory.addControl(binder(), "control", "message", Message.class);
     ControlFactory.addControl(binder(), "control", "month_select", MonthSelect.class);
+    ControlFactory.addControl(binder(), "control", "number", NumberInput.class);
     ControlFactory.addControl(binder(), "control", "password", Password.class);
     ControlFactory.addControl(binder(), "control", "radio_list", RadioList.class);
     ControlFactory.addControl(binder(), "control", "reset", Reset.class);
@@ -68,7 +71,6 @@ public class ControlModule extends AbstractModule {
     ControlFactory.addControl(binder(), "control", "text", Text.class);
     ControlFactory.addControl(binder(), "control", "textarea", Textarea.class);
     ControlFactory.addControl(binder(), "control", "year_select", YearSelect.class);
-    ControlFactory.addControl(binder(), "control", "message", Message.class);
 
     bindFormPreparer();
   }
