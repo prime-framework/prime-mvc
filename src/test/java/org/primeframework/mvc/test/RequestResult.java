@@ -1439,6 +1439,13 @@ public class RequestResult {
         throw new AssertionError("Expected at least one element to match the selector " + selector + ". Found [0] elements instead. Unable to set element value.\n\nActual body:\n" + body);
       }
 
+      if (element.is("input[type=radio]") && value) {
+        Elements elements = document.select(element.tagName().toLowerCase() + "[type=radio][name=" + element.attr("name") + "]");
+        for (Element e : elements) {
+          e.attr("checked", false);
+        }
+      }
+
       element.attr("checked", value);
       return this;
     }
