@@ -1,5 +1,9 @@
 Prime MVC Changes
 
+Changes in 1.23.1
+
+ * Fix DOMHelper.setChecked for radio buttons. JSOUP does not handle this automatically.
+
 Changes in 1.23.0
 
  * Allow for a new attributed named 'labelValue' on form controls to provide a translated value directly.
