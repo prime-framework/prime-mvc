@@ -1433,6 +1433,17 @@ public class RequestResult {
       this.document = document;
     }
 
+    /**
+     * Perform any custom modifications to the HTML document
+     *
+     * @param consumer the HTML document consumer
+     * @return this.
+     */
+    public DOMHelper custom(ThrowingConsumer<Document> consumer) throws Exception {
+      consumer.accept(document);
+      return this;
+    }
+
     public DOMHelper setChecked(String selector, boolean value) {
       Element element = document.selectFirst(selector);
       if (element == null) {
