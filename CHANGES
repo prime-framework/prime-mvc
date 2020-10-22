@@ -1,5 +1,9 @@
 Prime MVC Changes
 
+Changes in 1.23.2
+
+ * Add an overloaded method to take a runnable for DOMHelper.custom.
+
 Changes in 1.23.1
 
  * Fix DOMHelper.setChecked for radio buttons. JSOUP does not handle this automatically.

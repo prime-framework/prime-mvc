@@ -60,6 +60,7 @@ import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.servlet.PrimeFilter;
 import org.primeframework.mvc.util.QueryStringBuilder;
 import org.primeframework.mvc.util.QueryStringTools;
+import org.primeframework.mvc.util.ThrowingRunnable;
 import static java.util.Arrays.asList;
 
 /**
@@ -1431,6 +1432,16 @@ public class RequestResult {
     public DOMHelper(String body, Document document) {
       this.body = body;
       this.document = document;
+    }
+
+    /**
+     * Perform any custom modifications to the HTML document
+     *
+     * @return this.
+     */
+    public DOMHelper custom(ThrowingRunnable runnable) throws Exception {
+      runnable.run();
+      return this;
     }
 
     /**
