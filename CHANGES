@@ -1,5 +1,9 @@
 Prime MVC Changes
 
+Changes in 1.23.3
+
+ * Better support for setting collections using the expression evaluator.
+
 Changes in 1.23.2
 
  * Add an overloaded method to take a runnable for DOMHelper.custom.

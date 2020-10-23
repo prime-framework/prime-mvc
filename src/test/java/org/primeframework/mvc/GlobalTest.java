@@ -52,7 +52,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertSame;
 
 /**
- * This class tests the MVC from a high level perspective.
+ * This class tests the MVC from a (mile) high level perspective. (see what I did there?)
  *
  * @author Brian Pontarelli
  */

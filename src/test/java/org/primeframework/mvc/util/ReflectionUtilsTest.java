@@ -17,9 +17,15 @@ package org.primeframework.mvc.util;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.example.action.Extension;
 import org.example.action.ExtensionInheritanceAction;
@@ -29,6 +35,7 @@ import org.primeframework.mvc.parameter.annotation.PostParameterMethod;
 import org.testng.annotations.Test;
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNull;
 import static org.testng.Assert.fail;
 
 /**
@@ -93,6 +100,57 @@ public class ReflectionUtilsTest {
     assertEquals(methods, asList(Extension.class.getMethod("method"), Extension.class.getMethod("method1"), ExtensionInheritanceAction.class.getMethod("method2"), ExtensionInheritanceAction.class.getMethod("method3")));
   }
 
+  @Test
+  public void setNull() throws Exception {
+    Field field;
+    User user;
+
+    // Set a final SortedSet using a null
+    user = new User();
+    try {
+      field = User.class.getField("roles");
+      ReflectionUtils.setField(field, user, null);
+      fail("Should have thrown an exception, you can't set a final collection null!");
+    } catch (Exception ignore) {
+      // Expected
+    }
+
+    // Set a non final SortedSet using a null
+    field = User.class.getField("notFinalRoles");
+    ReflectionUtils.setField(field, user, null);
+    assertNull(user.notFinalRoles);
+  }
+
+  @Test
+  public void setSortedSet() throws Exception {
+    User user;
+    Field field = User.class.getField("roles");
+
+    // Set a SortedSet using a String array
+    user = new User();
+    ReflectionUtils.setField(field, user, new String[]{"admin"});
+    assertEquals(user.roles.size(), 1);
+    assertEquals(user.roles.iterator().next(), "admin");
+
+    // Set a SortedSet using an ArrayList
+    user = new User();
+    ReflectionUtils.setField(field, user, new ArrayList<>(Collections.singletonList("admin")));
+    assertEquals(user.roles.size(), 1);
+    assertEquals(user.roles.iterator().next(), "admin");
+
+    // Set a SortedSet using a HashSet
+    user = new User();
+    ReflectionUtils.setField(field, user, new HashSet<>(Collections.singletonList("admin")));
+    assertEquals(user.roles.size(), 1);
+    assertEquals(user.roles.iterator().next(), "admin");
+
+    // Set a SortedSet using a TreeSet
+    user = new User();
+    ReflectionUtils.setField(field, user, new TreeSet<>(Collections.singletonList("admin")));
+    assertEquals(user.roles.size(), 1);
+    assertEquals(user.roles.iterator().next(), "admin");
+  }
+
   @Retention(RetentionPolicy.RUNTIME)
   public @interface Foo {
   }
@@ -120,5 +178,11 @@ public class ReflectionUtilsTest {
   }
 
   public static class C2 implements I3 {
+  }
+
+  private static class User {
+    public final SortedSet<String> roles = new TreeSet<>();
+
+    public SortedSet<String> notFinalRoles = new TreeSet<>();
   }
 }

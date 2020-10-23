@@ -555,9 +555,16 @@ public class ReflectionUtils {
    * @throws ExpressionException If any mishap occurred whilst Reflecting sire. All the exceptions that could be thrown
    *                             whilst invoking will be wrapped inside the ReflectionException.
    */
+  @SuppressWarnings("rawtypes")
   public static void setField(Field field, Object object, Object value) throws ExpressionException {
-    Class type = field.getType();
-    if (!type.isInstance(value) && value instanceof Collection) {
+    Class<?> fieldType = field.getType();
+    boolean valueIsArray = value != null && value.getClass().isArray();
+    boolean fieldIsCollection = Collection.class.isAssignableFrom(field.getType());
+    boolean valueIsCollection = value != null && Collection.class.isAssignableFrom(value.getClass());
+
+    // If the fieldType is not an instance of the value, and the value IS a collection, but the field IS NOT and
+    // the collection is of size 1, we can handle this by retrieving the first value from the collection.
+    if (!fieldType.isInstance(value) && (valueIsCollection && !fieldIsCollection)) {
       // Handle the Collection special case
       Collection c = (Collection) value;
       if (c.size() == 1) {
@@ -568,12 +575,21 @@ public class ReflectionUtils {
       }
     }
 
-    // I think we have a winner
+    // If the field is final, or not the same type, we are eligible for the "brute force collection coercion technique"
+    // also referred to as the "BFCCT", patent pending. Check if we are eligible and if the field and the value are both
+    // collections more or less.
+    boolean coercionEligible = Modifier.isFinal(field.getModifiers()) || !fieldType.isInstance(value);
+    boolean fieldAndValueAreCollectionCompatible = fieldIsCollection && (valueIsArray || valueIsCollection);
     try {
-      // If we have a final collection we can't call field.set, clear the collection and the values
-      if (Modifier.isFinal(field.getModifiers()) && (Collection.class.isAssignableFrom(field.getType()) && (value.getClass().isArray() || Collection.class.isAssignableFrom(value.getClass())))) {
+      if (coercionEligible && fieldAndValueAreCollectionCompatible) {
         Collection collection = (Collection) field.get(object);
-        collection.clear();
+        // Non final fields may be null
+        if (collection == null) {
+          collection = (Collection) fieldType.newInstance();
+        } else {
+          collection.clear();
+        }
+
         if (value.getClass().isArray()) {
           collection.addAll(Arrays.asList((Object[]) value));
         } else {
@@ -582,10 +598,12 @@ public class ReflectionUtils {
       } else {
         field.set(object, value);
       }
-    } catch (IllegalAccessException iae) {
-      throw new UpdateExpressionException("Illegal access for field [" + field + "]", iae);
-    } catch (IllegalArgumentException iare) {
-      throw new UpdateExpressionException("Illegal argument for field [" + field + "]", iare);
+    } catch (IllegalAccessException e) {
+      throw new UpdateExpressionException("Illegal access for field [" + field + "]", e);
+    } catch (IllegalArgumentException e) {
+      throw new UpdateExpressionException("Illegal argument for field [" + field + "]", e);
+    } catch (InstantiationException e) {
+      throw new UpdateExpressionException("Instantiation exception for field [" + field + "]", e);
     }
   }
 
