@@ -113,11 +113,11 @@ public class PatchMergeTest extends PrimeBaseTest {
                 .configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, false);
     objectMapper.setSerializationInclusion(Include.ALWAYS);
 
-    // Currently 8 fail, 6 not equal, and 2 error.
     JsonNode original = objectMapper.readTree(serialize(o));
     JsonNode patch = p == null ? null : p instanceof String
         ? JsonNodeFactory.instance.textNode((String) p) : objectMapper.readTree(serialize(p));
 
+    // Merge the patch request
     JsonNode result = mergePatch(original, patch);
     JsonNode expected = r == null ? null : r instanceof String
         ? JsonNodeFactory.instance.textNode((String) r) : objectMapper.readTree(serialize(r));
