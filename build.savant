@@ -17,7 +17,7 @@
 savantVersion = "1.0.0"
 fusionAuthJWTVersion = "3.1.6"
 
-project(group: "org.primeframework", name: "prime-mvc", version: "1.23.3", licenses: ["ApacheV2_0"]) {
+project(group: "org.primeframework", name: "prime-mvc", version: "1.23.4", licenses: ["ApacheV2_0"]) {
   workflow {
     standard()
   }

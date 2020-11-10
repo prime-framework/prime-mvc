@@ -1,5 +1,11 @@
 Prime MVC Changes
 
+
+Changes in 1.23.4
+
+ * Handle double slashes by performing redirects similar to index handling.
+
+
 Changes in 1.23.3
 
  * Better support for setting collections using the expression evaluator.

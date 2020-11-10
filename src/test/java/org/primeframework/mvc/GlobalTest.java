@@ -162,6 +162,33 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void get_action_backed_template_slashes() throws Exception {
+    // Ok
+    simulator.test("/freemarker/action-backed")
+             .get()
+             .assertStatusCode(200)
+             .assertBodyContains("Yo, nice template, I have an action.");
+
+    // Double slash, redirect to the correct location
+    simulator.test("/freemarker//action-backed")
+             .get()
+             .assertStatusCode(301)
+             .assertRedirect("/freemarker/action-backed")
+             .executeRedirect(result -> result.assertStatusCode(200)
+                                              .assertBodyContains("Yo, nice template, I have an action."));
+
+    // Triple slashes, redirect to the correct location
+    simulator.test("/freemarker///action-backed")
+             .get()
+             .assertStatusCode(301)
+             .assertRedirect("/freemarker//action-backed")
+             .executeRedirect(result -> result.assertStatusCode(301)
+                                              .assertRedirect("/freemarker/action-backed")
+                                              .executeRedirect(subResult -> subResult.assertStatusCode(200)
+                                                                                     .assertBodyContains("Yo, nice template, I have an action.")));
+  }
+
+  @Test
   public void get_action_package_collision() throws Exception {
     test.simulate(() -> test.simulator.test("/foo/view/bar/baz")
                                       .withURLSegment("42")
