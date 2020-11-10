@@ -71,6 +71,16 @@ public class LocaleConverterTest {
     assertEquals(locale.getLanguage(), "en");
     assertEquals(locale.getCountry(), "US");
     assertEquals(locale.getVariant(), "UTF8");
+
+    locale = (Locale) converter.convertFromStrings(Locale.class, null, "testExpr", ArrayUtils.toArray("es", "419", "UTF8"));
+    assertEquals(locale.getLanguage(), "es");
+    assertEquals(locale.getCountry(), "419");
+    assertEquals(locale.getVariant(), "UTF8");
+
+    locale = (Locale) converter.convertFromStrings(Locale.class, null, "testExpr", ArrayUtils.toArray("es", "AR", "UTF8"));
+    assertEquals(locale.getLanguage(), "es");
+    assertEquals(locale.getCountry(), "AR");
+    assertEquals(locale.getVariant(), "UTF8");
   }
 
   @Test
