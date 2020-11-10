@@ -33,9 +33,9 @@ public class ResourceTools {
    */
   public static String findResource(ServletContext servletContext, String path) {
     try {
-      String classLoaderPath = path.substring(1, path.length());
+      String classLoaderPath = path.substring(1);
       if (servletContext.getResource(path) != null ||
-        Thread.currentThread().getContextClassLoader().getResource(classLoaderPath) != null) {
+          Thread.currentThread().getContextClassLoader().getResource(classLoaderPath) != null) {
         return path;
       }
     } catch (MalformedURLException e) {

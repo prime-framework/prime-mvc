@@ -15,11 +15,10 @@
  */
 package org.primeframework.mvc.action;
 
-import org.primeframework.mvc.action.config.ActionConfigurationProvider;
-import org.primeframework.mvc.servlet.HTTPMethod;
-
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import org.primeframework.mvc.action.config.ActionConfigurationProvider;
+import org.primeframework.mvc.servlet.HTTPMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +50,7 @@ public class DefaultActionMapper implements ActionMapper {
       ActionInvocation indexInvocation = actionConfigurationProvider.lookup(uri + "/index");
       if (indexInvocation.configuration != null) {
         indexInvocation.actionURI = indexInvocation.actionURI.substring(0, indexInvocation.actionURI.length() - 5); // Strip index but leave the slash
-        indexInvocation.redirectToIndex = true;
+        indexInvocation.redirect = true;
         return indexInvocation;
       }
     } else if (invocation.configuration != null) {
@@ -67,6 +66,15 @@ public class DefaultActionMapper implements ActionMapper {
       }
 
       invocation.method = invocation.configuration.executeMethods.get(httpMethod);
+    }
+
+    // If we have a double slash, redirect after normalizing the URI and then let the chips fall where they may.
+    // - We may or may not have an action invocation, so we don't care actually if the normalizedInvocation.configuration is null or not.
+    if (uri.contains("//")) {
+      String normalized = uri.replace("//", "/");
+      ActionInvocation normalizedInvocation = actionConfigurationProvider.lookup(normalized);
+      normalizedInvocation.redirect = true;
+      return normalizedInvocation;
     }
 
     return invocation;

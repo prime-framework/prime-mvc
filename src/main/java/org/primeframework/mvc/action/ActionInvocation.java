@@ -41,9 +41,10 @@ public class ActionInvocation {
 
   public boolean executeResult;
 
-  public boolean redirectToIndex;
+  public boolean redirect;
 
-  public ActionInvocation(Object action, ExecuteMethodConfiguration method, String uri, String extension, ActionConfiguration configuration) {
+  public ActionInvocation(Object action, ExecuteMethodConfiguration method, String uri, String extension,
+                          ActionConfiguration configuration) {
     this.action = action;
     this.method = method;
     this.actionURI = uri;
@@ -53,7 +54,8 @@ public class ActionInvocation {
     this.executeResult = true;
   }
 
-  public ActionInvocation(Object action, ExecuteMethodConfiguration method, String uri, String extension, Map<String, List<String>> uriParameters,
+  public ActionInvocation(Object action, ExecuteMethodConfiguration method, String uri, String extension,
+                          Map<String, List<String>> uriParameters,
                           ActionConfiguration configuration, boolean executeResult) {
     this.action = action;
     this.method = method;

@@ -752,6 +752,46 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void get_template_noAction() throws Exception {
+    // Ok
+    simulator.test("/freemarker/stand-alone-template")
+             .get()
+             .assertStatusCode(200)
+             .assertBodyContains("Yo, nice template.");
+
+    // Double slash, redirect to the correct location
+    simulator.test("/freemarker//stand-alone-template")
+             .get()
+             .assertStatusCode(301)
+             .assertRedirect("/freemarker/stand-alone-template")
+             .executeRedirect(result -> result.assertStatusCode(200)
+                                              .assertBodyContains("Yo, nice template."));
+
+    // Triple slashes, redirect to the correct location
+    simulator.test("/freemarker///stand-alone-template")
+             .get()
+             .assertStatusCode(301)
+             .assertRedirect("/freemarker//stand-alone-template")
+             .executeRedirect(result -> result.assertStatusCode(301)
+                                              .assertRedirect("/freemarker/stand-alone-template")
+                                              .executeRedirect(subResult -> subResult.assertStatusCode(200)
+                                                                                     .assertBodyContains("Yo, nice template.")));
+    // Double slash, on two paths, redirect to the correct location
+    simulator.test("/freemarker//sub//stand-alone-template")
+             .get()
+             .assertStatusCode(301)
+             .assertRedirect("/freemarker/sub/stand-alone-template")
+             .executeRedirect(result -> result.assertStatusCode(200)
+                                              .assertBodyContains("Yo, nice sub-directory template."));
+
+    // Invalid path, double slash, redirect, still invalid.
+    simulator.test("/freemarker//does-not-exist")
+             .get()
+             .assertStatusCode(301)
+             .assertRedirect("/freemarker/does-not-exist");
+  }
+
+  @Test
   public void get_underscore() {
     simulator.test("/test_underscore")
              .get()
