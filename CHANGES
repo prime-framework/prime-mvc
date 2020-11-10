@@ -1,6 +1,11 @@
 Prime MVC Changes
 
 
+Changes in 1.23.5
+
+ * Remove added /index during a redirect handling double slash.
+
+
 Changes in 1.23.4
 
  * Handle double slashes by performing redirects similar to index handling.

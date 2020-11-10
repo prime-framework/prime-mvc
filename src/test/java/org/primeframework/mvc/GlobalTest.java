@@ -816,6 +816,15 @@ public class GlobalTest extends PrimeBaseTest {
              .get()
              .assertStatusCode(301)
              .assertRedirect("/freemarker/does-not-exist");
+
+    // Index template, ensure we clean up the '/index/ suffix that will get added during action mapping
+    simulator.test("/freemarker/sub//")
+             .get()
+             .assertStatusCode(301)
+             .assertRedirect("/freemarker/sub/")
+             .executeRedirect(result -> result.assertStatusCode(200)
+                                              .assertBodyContains("Yo, nice sub-directory index template."));
+
   }
 
   @Test

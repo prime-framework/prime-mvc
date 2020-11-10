@@ -73,6 +73,10 @@ public class DefaultActionMapper implements ActionMapper {
     if (uri.contains("//")) {
       String normalized = uri.replace("//", "/");
       ActionInvocation normalizedInvocation = actionConfigurationProvider.lookup(normalized);
+      if (uri.endsWith("/") && normalizedInvocation.actionURI.endsWith("/index")) {
+        normalizedInvocation.actionURI = normalizedInvocation.actionURI.substring(0, normalizedInvocation.actionURI.length() - 5); // Strip index but leave the slash
+      }
+
       normalizedInvocation.redirect = true;
       return normalizedInvocation;
     }
