@@ -50,7 +50,7 @@ public class SavedRequestTools {
   public static SaveHttpRequestResult getSaveRequestForReExecution(MVCConfiguration configuration, Encryptor encryptor,
                                                                    HttpServletRequest request,
                                                                    HttpServletResponse response) {
-    SaveHttpRequestResult result = getSaveHttpRequestResult(configuration, encryptor, request);
+    SaveHttpRequestResult result = getSaveHttpRequestResult(configuration, encryptor, request, response);
     if (result == null) {
       return null;
     }
@@ -77,7 +77,7 @@ public class SavedRequestTools {
   public static SaveHttpRequestResult getSaveRequestForWorkflow(MVCConfiguration configuration, Encryptor encryptor,
                                                                 HttpServletRequest request,
                                                                 HttpServletResponse response) {
-    SaveHttpRequestResult result = getSaveHttpRequestResult(configuration, encryptor, request);
+    SaveHttpRequestResult result = getSaveHttpRequestResult(configuration, encryptor, request, response);
     if (result == null) {
       return null;
     }
@@ -131,7 +131,8 @@ public class SavedRequestTools {
   }
 
   private static SaveHttpRequestResult getSaveHttpRequestResult(MVCConfiguration configuration, Encryptor encryptor,
-                                                                HttpServletRequest request) {
+                                                                HttpServletRequest request,
+                                                                HttpServletResponse response) {
     Cookie cookie = getCookie(configuration, request);
     if (cookie == null) {
       return null;
@@ -147,6 +148,11 @@ public class SavedRequestTools {
       return new SaveHttpRequestResult(cookie, ready, encryptor.decrypt(SavedHttpRequest.class, value));
     } catch (Exception e) {
       logger.warn("Bad SavedRequest cookie [{}]. Error is [{}]", cookie.getValue(), e.getMessage());
+
+      // Delete the corrupted cookie.
+      cookie.setMaxAge(0);
+      cookie.setPath("/");
+      response.addCookie(cookie);
     }
 
     return null;

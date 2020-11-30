@@ -1,6 +1,10 @@
 Prime MVC Changes
 
 
+Changes in 1.23.6
+
+ * Delete save request cookie if we cannot decrypt them. This may occur in development when the encryption key is changing often.
+
 Changes in 1.23.5
 
  * Remove added /index during a redirect handling double slash.
