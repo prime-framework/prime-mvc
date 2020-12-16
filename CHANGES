@@ -1,5 +1,8 @@
 Prime MVC Changes
 
+Changes in 1.23.7
+
+ * Be more defensive when checking for a JWT using the Bearer scheme when the JWT has been omitted to avoid an exception.
 
 Changes in 1.23.6
 

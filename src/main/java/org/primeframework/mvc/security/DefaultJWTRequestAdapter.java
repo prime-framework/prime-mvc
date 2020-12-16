@@ -56,7 +56,7 @@ public class DefaultJWTRequestAdapter implements JWTRequestAdapter {
     String authorization = request.getHeader("Authorization");
     if (authorization != null) {
       // Support Bearer and JWT scheme
-      if (authorization.startsWith("Bearer")) {
+      if (authorization.startsWith("Bearer ")) {
         return authorization.substring("Bearer ".length());
       } else if (authorization.startsWith("JWT ")) {
         return authorization.substring("JWT ".length());

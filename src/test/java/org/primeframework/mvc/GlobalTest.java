@@ -481,6 +481,44 @@ public class GlobalTest extends PrimeBaseTest {
                                  .withHeader("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkifQ.qHdut1UR4-2FSAvh7U3YdeRR5r5boVqjIGQ16Ztp894")
                                  .get()
                                  .assertStatusCode(200));
+
+    // Missing JWT w/ Bearer scheme
+    test.simulate(() -> simulator.test("/jwt-authorized")
+                                 .withHeader("Authorization", "Bearer ")
+                                 .get()
+                                 .assertStatusCode(401));
+
+
+    // Missing JWT w/ Bearer scheme, no space after scheme
+    test.simulate(() -> simulator.test("/jwt-authorized")
+                                 .withHeader("Authorization", "Bearer")
+                                 .get()
+                                 .assertStatusCode(401));
+
+    // Bad JWT w/ Bearer scheme
+    test.simulate(() -> simulator.test("/jwt-authorized")
+                                 .withHeader("Authorization", "Bearer Foo")
+                                 .get()
+                                 .assertStatusCode(401));
+
+    // Missing JWT w/ JWT scheme
+    test.simulate(() -> simulator.test("/jwt-authorized")
+                                 .withHeader("Authorization", "JWT ")
+                                 .get()
+                                 .assertStatusCode(401));
+
+
+    // Missing JWT w/ JWT scheme, no space after scheme
+    test.simulate(() -> simulator.test("/jwt-authorized")
+                                 .withHeader("Authorization", "JWT")
+                                 .get()
+                                 .assertStatusCode(401));
+
+    // Bad JWT w/ JWT scheme
+    test.simulate(() -> simulator.test("/jwt-authorized")
+                                 .withHeader("Authorization", "JWT Foo")
+                                 .get()
+                                 .assertStatusCode(401));
   }
 
   @Test
