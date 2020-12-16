@@ -18,15 +18,22 @@ package org.primeframework.mvc.content.json;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Iterator;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.inject.Inject;
 import org.apache.commons.io.IOUtils;
 import org.primeframework.mvc.action.ActionInvocation;
@@ -100,6 +107,17 @@ public class JacksonContentHandler implements ContentHandler {
       return;
     }
 
+    ObjectMapper objectMapper1 = objectMapper;
+    String contentType = request.getContentType();
+    boolean patchMerge = contentType.equals("application/merge-patch+json");
+    if (patchMerge ) {
+      objectMapper1 = objectMapper.copy()
+                                      .configure(SerializationFeature.WRITE_NULL_MAP_VALUES, true)
+                                      .configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, false)
+                                      .configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, false)
+                                      .setSerializationInclusion(Include.ALWAYS);
+    }
+
     // Process JSON and set into the object
     JacksonActionConfiguration jacksonConfiguration = (JacksonActionConfiguration) config.additionalConfiguration.get(JacksonActionConfiguration.class);
     if (!jacksonConfiguration.requestMembers.isEmpty()) {
@@ -110,11 +128,12 @@ public class JacksonContentHandler implements ContentHandler {
         // Retrieve the current value from the action so we can see if it is non-null
         Object currentValue = expressionEvaluator.getValue(requestMember.name, action);
         ObjectReader reader;
-        if (currentValue != null) {
-          reader = objectMapper.readerForUpdating(currentValue);
+        if (currentValue != null && !patchMerge) {
+          reader = objectMapper1.readerForUpdating(currentValue);
         } else {
-          reader = objectMapper.readerFor(requestMember.type);
+          reader = objectMapper1.readerFor(requestMember.type);
         }
+
 
         Object jsonObject;
         if (logger.isDebugEnabled()) {
@@ -125,10 +144,33 @@ public class JacksonContentHandler implements ContentHandler {
           jsonObject = reader.readValue(request.getInputStream());
         }
 
-        // Set the value into the action if the currentValue from the action was null
-        if (currentValue == null) {
-          expressionEvaluator.setValue(requestMember.name, action, jsonObject);
+        // If we are merging, the jsonObject will represent the request, we can now merge into "existing"
+        if (patchMerge && currentValue != null) {
+
+          JsonNode targetNode = objectMapper1.readTree(objectMapper1.writeValueAsBytes(currentValue));
+          JsonNode patchNode = objectMapper1.readTree(objectMapper1.writeValueAsBytes(jsonObject));
+           mergePatch(targetNode, patchNode);
+//          System.out.println("here");
+          boolean overwtite = true;
+          if (overwtite) {
+
+            Object newObject = objectMapper1.readerFor(requestMember.type).readValue(targetNode);
+            expressionEvaluator.setValue(requestMember.name, action, newObject);
+          } else {
+            ObjectReader reader1= objectMapper1.readerForUpdating(currentValue);
+            reader1.readValue(targetNode);
+          }
+
+//          System.out.println("here1");
+//          Object mergedObject = objectMapper.readTree(objectMapper.writeValueAsBytes(merged));
+//          System.out.println(mergedObject.toString());
+        } else {
+          // Set the value into the action if the currentValue from the action was null
+          if (currentValue == null) {
+            expressionEvaluator.setValue(requestMember.name, action, jsonObject);
+          }
         }
+
       } catch (InvalidFormatException e) {
         logger.debug("Error parsing JSON request", e);
         addFieldError(e);
@@ -168,6 +210,37 @@ public class JacksonContentHandler implements ContentHandler {
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR, field, code, messageProvider.getMessage(code, field, "Possible conversion error", e.getMessage())));
   }
 
+  private JsonNode mergePatch(JsonNode target, JsonNode patch) {
+    if (patch == null) {
+      return null;
+    }
+
+    if (patch.isObject()) {
+      if (target == null || !target.isObject()) {
+        target = JsonNodeFactory.instance.objectNode();
+      }
+
+      Iterator<String> patchFields = patch.fieldNames();
+      while (patchFields.hasNext()) {
+        String patchField = patchFields.next();
+        JsonNode patchValue = patch.get(patchField);
+        if (patchValue.isNull()) {
+
+          JsonNode targetValue = target.get(patchField);
+          if (targetValue != null && !targetValue.isMissingNode()) {
+            ((ObjectNode) target).remove(patchField);
+          }
+
+        } else {
+          ((ObjectNode) target).set(patchField, mergePatch(target.get(patchField), patchValue));
+        }
+      }
+
+      return target;
+    } else {
+      return patch;
+    }
+  }
   private String buildField(JsonMappingException e) {
     StringBuilder fieldBuilder = new StringBuilder();
     List<JsonMappingException.Reference> references = e.getPath();

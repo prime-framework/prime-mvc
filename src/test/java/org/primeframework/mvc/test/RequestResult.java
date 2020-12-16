@@ -34,6 +34,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -845,6 +846,19 @@ public class RequestResult {
   }
 
   /**
+   * Verifies that the response body is equal to the given JSON text.
+   *
+   * @param objectMapperSupplier The Object Mapper supplier.
+   * @param json The JSON text.
+   * @return This.
+   * @throws IOException If the JSON marshalling failed.
+   */
+  public RequestResult assertJSON( Supplier<ObjectMapper> objectMapperSupplier, String json) throws IOException {
+    assertJSONEquals(objectMapperSupplier.get(), body, json);
+    return this;
+  }
+
+  /**
    * Verifies that the response body is equal to the given JSON text file.
    *
    * @param jsonFile The JSON file to load and compare to the JSON response.
@@ -854,6 +868,19 @@ public class RequestResult {
    */
   public RequestResult assertJSONFile(Path jsonFile, Object... values) throws IOException {
     return assertJSON(BodyTools.processTemplate(jsonFile, appendArray(values, "_to_milli", new ZonedDateTimeToMilliSeconds())));
+  }
+
+  /**
+   * Verifies that the response body is equal to the given JSON text file.
+   *
+   *  @param objectMapperSupplier The Object Mapper supplier.
+   * @param jsonFile The JSON file to load and compare to the JSON response.
+   * @param values   key value pairs of replacement values for use in the JSON file.
+   * @return This.
+   * @throws IOException If the JSON marshalling failed.
+   */
+  public RequestResult assertJSONFile(Supplier<ObjectMapper> objectMapperSupplier, Path jsonFile, Object... values) throws IOException {
+    return assertJSON(objectMapperSupplier, BodyTools.processTemplate(jsonFile, appendArray(values, "_to_milli", new ZonedDateTimeToMilliSeconds())));
   }
 
   /**

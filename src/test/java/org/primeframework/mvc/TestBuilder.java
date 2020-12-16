@@ -17,6 +17,7 @@ package org.primeframework.mvc;
 
 import javax.servlet.http.Cookie;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -113,7 +114,7 @@ public class TestBuilder {
 
   public TestBuilder createFile(String contents) throws IOException {
     String tmpdir = System.getProperty("java.io.tmpdir");
-    String unique = new String(Base64.getEncoder().encode(UUID.randomUUID().toString().getBytes()), "UTF-8").substring(0, 5);
+    String unique = new String(Base64.getEncoder().encode(UUID.randomUUID().toString().getBytes()), StandardCharsets.UTF_8).substring(0, 5);
     tempFile = Paths.get(tmpdir + "/" + "_prime_testFile_" + unique);
     tempFile.toFile().deleteOnExit();
 

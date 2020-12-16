@@ -20,6 +20,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.Inject;
 import org.example.action.KitchenSinkAction;
 import org.example.domain.UserField;
 import org.example.domain.UserType;
@@ -39,9 +41,6 @@ import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.validation.ValidationException;
 import org.testng.annotations.Test;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.inject.Inject;
 import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.createStrictMock;
 import static org.easymock.EasyMock.eq;
@@ -108,6 +107,7 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
         "  \"type\":\"COOL\"" +
         "}";
 
+    request.setContentType("application/json");
     request.setInputStream(new MockServletInputStream(expected.getBytes()));
 
     MessageProvider messageProvider = createStrictMock(MessageProvider.class);
@@ -159,6 +159,7 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
         "  }]" +
         "}";
 
+    request.setContentType("application/json");
     request.setInputStream(new MockServletInputStream(expected.getBytes()));
 
     MessageProvider messageProvider = createStrictMock(MessageProvider.class);
@@ -203,6 +204,7 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
         "  }" +
         "}";
 
+    request.setContentType("application/json");
     request.setInputStream(new MockServletInputStream(expected.getBytes()));
 
     MessageProvider messageProvider = createNiceMock(MessageProvider.class);
@@ -243,6 +245,7 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
         "  \"bad-active\":true" +
         "}";
 
+    request.setContentType("application/json");
     request.setInputStream(new MockServletInputStream(expected.getBytes()));
 
     MessageProvider messageProvider = createStrictMock(MessageProvider.class);
@@ -283,6 +286,7 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
         "  \"active\":\"bad\"" +
         "}";
 
+    request.setContentType("application/json");
     request.setInputStream(new MockServletInputStream(expected.getBytes()));
 
     MessageProvider messageProvider = createStrictMock(MessageProvider.class);
@@ -345,6 +349,7 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
         "  \"type\":\"COOL\"" +
         "}";
 
+    request.setContentType("application/json");
     request.setInputStream(new MockServletInputStream(expected.getBytes()));
 
     MessageProvider messageProvider = createStrictMock(MessageProvider.class);
@@ -402,6 +407,7 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
         "  \"type\":\"COOL\"" +
         "}";
 
+    request.setContentType("application/json");
     request.setInputStream(new MockServletInputStream(expected.getBytes()));
 
     MessageProvider messageProvider = createStrictMock(MessageProvider.class);

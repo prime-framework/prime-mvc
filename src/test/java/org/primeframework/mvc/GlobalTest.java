@@ -18,6 +18,7 @@ package org.primeframework.mvc;
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -30,12 +31,16 @@ import java.util.UUID;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.Timer;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import freemarker.template.Configuration;
 import org.example.action.JwtAuthorizedAction;
 import org.example.action.LotsOfMessagesAction;
+import org.example.action.patch.PatchData;
+import org.example.action.patch.TestAction;
 import org.example.domain.UserField;
 import org.primeframework.mvc.action.config.ActionConfigurationProvider;
 import org.primeframework.mvc.container.ContainerResolver;
@@ -972,36 +977,40 @@ public class GlobalTest extends PrimeBaseTest {
 
   @Test(dataProvider = "methodOverrides")
   public void patch_MethodOverride(String overrideHeaderName) throws Exception {
+    TestAction.InitialState = objectMapper.readerFor(PatchData.class).readValue(Files.readAllBytes(Paths.get("src/test/resources/json/patch/rfc7396/uc2-add-key-initial.json")));
+    TestAction.FinalState.reset();
+
     simulator.test("/patch/test")
-             .withJSONFile(Paths.get("src/test/resources/json/patch/test-patch.json"))
+             .withJSONFile(Paths.get("src/test/resources/json/patch/rfc7396/uc2-add-key-patch.json"))
              .withHeader(overrideHeaderName, "PATCH")
+             .withContentType("application/merge-patch+json")
              .post()
              .assertStatusCode(200)
-             .assertJSONFile(jsonDir.resolve("patch/test-response.json"), "config", "patched");
+             .assertJSONFile(Paths.get("src/test/resources/json/patch/rfc7396/uc2-add-key-result.json"));
   }
 
-  @Test
-  public void patch_testing() throws Exception {
-    // POST no big deal
-    simulator.test("/patch/test")
-             .withJSONFile(Paths.get("src/test/resources/json/patch/test.json"), "config", "post")
-             .post()
-             .assertStatusCode(200)
-             .assertJSONFile(jsonDir.resolve("patch/test-response.json"), "config", "post");
+  @Test(dataProvider = "rfc7396_useCases")
+  public void patch_rfc7396(String useCase) throws Exception {
+    // Setup an object mapper to ensure we can read the patches correctly.
+    test.configureObjectMapper(om -> om.configure(SerializationFeature.WRITE_NULL_MAP_VALUES, true)
+                                       .configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, false)
+                                       .configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, false)
+                                       .setSerializationInclusion(Include.NON_EMPTY));
 
-    // PUT no big deal
-    simulator.test("/patch/test")
-             .withJSONFile(Paths.get("src/test/resources/json/patch/test.json"), "config", "put")
-             .put()
-             .assertStatusCode(200)
-             .assertJSONFile(jsonDir.resolve("patch/test-response.json"), "config", "put");
+    TestAction.InitialState = objectMapper.copy()
+                                          .configure(SerializationFeature.WRITE_NULL_MAP_VALUES, true)
+                                          .configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, false)
+                                          .configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, false)
+                                          .setSerializationInclusion(Include.ALWAYS)
+                                          .readerFor(PatchData.class).readValue(Files.readAllBytes(Paths.get("src/test/resources/json/patch/rfc7396/" + useCase + "-initial.json")));
+    TestAction.FinalState.reset();
 
-    // PATCH damn that is cool
     simulator.test("/patch/test")
-             .withJSONFile(Paths.get("src/test/resources/json/patch/test-patch.json"))
+             .withJSONFile(Paths.get("src/test/resources/json/patch/rfc7396/" + useCase + "-patch.json"))
+             .withContentType("application/merge-patch+json")
              .patch()
              .assertStatusCode(200)
-             .assertJSONFile(jsonDir.resolve("patch/test-response.json"), "config", "patched");
+             .assertJSON(new String(Files.readAllBytes(Paths.get(("src/test/resources/json/patch/rfc7396/" + useCase + "-result.json")))));
   }
 
   @Test
@@ -1778,6 +1787,26 @@ public class GlobalTest extends PrimeBaseTest {
              .assertStatusCode(200)
              .assertContainsNoFieldMessages()
              .assertBodyContains("/api/no-action-value/index", "potato:null", "userId:null");
+  }
+
+  @DataProvider(name = "rfc7396_useCases")
+  public Object[][] rfc7396_useCases() {
+    return new Object[][]{
+        {"uc1-replace-value-string-to-string"},
+        {"uc2-add-key"},
+        {"uc3-remove-key"},
+        {"uc4-remove-key"},
+        {"uc5-replace-value-array-to-string"},
+        {"uc6-replace-value-string-to-array"},
+        {"uc7-replace-key-remove-non-exist-key"},
+        {"uc8-replace-value-object-to-array"},
+        {"uc9-replace-array-values"},
+        {"uc10-replace-value-object-to-array"},
+        {"uc11-remove-object"},
+        {"uc12-replace-value-object-to-string"},
+        {"uc14-replace-value-array-to-object"},
+        {"uc15-add-to-empty-object"},
+    };
   }
 
   @Test

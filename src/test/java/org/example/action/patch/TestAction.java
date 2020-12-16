@@ -15,7 +15,6 @@
  */
 package org.example.action.patch;
 
-import org.example.action.patch.PatchActionRequest.CoolObject;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.annotation.JSON;
 import org.primeframework.mvc.action.result.annotation.Status;
@@ -31,21 +30,26 @@ import org.primeframework.mvc.servlet.HTTPMethod;
 @JSON
 @Status(code = "input", status = 500)
 public class TestAction {
+  public static PatchData FinalState = new PatchData();
+
+  public static PatchData InitialState = new PatchData();
+
   @JSONRequest
-  public final PatchActionRequest request = new PatchActionRequest();
+  public PatchData request = new PatchData();
 
   @JSONResponse
-  public PatchActionResponse response;
+  public PatchData response;
 
   public String patch() {
     put();
+    // Set the final state
+    FinalState = request;
     return "success";
   }
 
   @PreParameterMethod(httpMethods = {HTTPMethod.PATCH})
   public void patchFetch() {
-    request.data = new CoolObject();
-    request.data.config = "patched";
+    request = InitialState;
   }
 
   public String post() {
@@ -53,8 +57,8 @@ public class TestAction {
   }
 
   public String put() {
-    response = new PatchActionResponse();
-    response.data = request.data;
+    response = new PatchData();
+    response = request;
     return "success";
   }
 }
