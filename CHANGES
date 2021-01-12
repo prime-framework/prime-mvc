@@ -1,5 +1,10 @@
 Prime MVC Changes
 
+Changes in 1.23.8
+
+ * Fix for locale handling.
+   https://github.com/prime-framework/prime-mvc/issues/4
+
 Changes in 1.23.7
 
  * Be more defensive when checking for a JWT using the Bearer scheme when the JWT has been omitted to avoid an exception.
