@@ -42,6 +42,12 @@ public class LocaleUtils {
    * length must be correct.
    * </p>
    *
+   * <br>
+   * <p>
+   * <strong>Updated on 01/12/2021</strong>
+   * See https://github.com/PascalSchumacher/commons-lang/blob/ce3e3e03e4d561dfae565186b431a879a9afa920/src/main/java/org/apache/commons/lang3/LocaleUtils.java
+   * </p>
+   * <br>
    * @param str the locale String to convert, null returns null
    * @return a Locale, null if null input
    * @throws IllegalArgumentException if the string is an invalid format
@@ -50,37 +56,67 @@ public class LocaleUtils {
     if (str == null) {
       return null;
     }
-    int len = str.length();
-    if (len != 2 && len != 5 && len < 7) {
+    if (str.isEmpty()) { // LANG-941 - JDK 8 introduced an empty locale where all fields are blank
+      return new Locale(StringUtils.EMPTY, StringUtils.EMPTY);
+    }
+    if (str.contains("#")) { // LANG-879 - Cannot handle Java 7 script & extensions
       throw new IllegalArgumentException("Invalid locale format: " + str);
     }
-    char ch0 = str.charAt(0);
-    char ch1 = str.charAt(1);
-    if (ch0 < 'a' || ch0 > 'z' || ch1 < 'a' || ch1 > 'z') {
+    final int len = str.length();
+    if (len < 2) {
       throw new IllegalArgumentException("Invalid locale format: " + str);
     }
-    if (len == 2) {
-      return new Locale(str, "");
-    } else {
-      if (str.charAt(2) != '_') {
+    final char ch0 = str.charAt(0);
+    if (ch0 == '_') {
+      if (len < 3) {
         throw new IllegalArgumentException("Invalid locale format: " + str);
       }
-      char ch3 = str.charAt(3);
-      if (ch3 == '_') {
-        return new Locale(str.substring(0, 2), "", str.substring(4));
-      }
-      char ch4 = str.charAt(4);
-      if (ch3 < 'A' || ch3 > 'Z' || ch4 < 'A' || ch4 > 'Z') {
+      final char ch1 = str.charAt(1);
+      final char ch2 = str.charAt(2);
+      if (!Character.isUpperCase(ch1) || !Character.isUpperCase(ch2)) {
         throw new IllegalArgumentException("Invalid locale format: " + str);
       }
-      if (len == 5) {
-        return new Locale(str.substring(0, 2), str.substring(3, 5));
-      } else {
-        if (str.charAt(5) != '_') {
-          throw new IllegalArgumentException("Invalid locale format: " + str);
+      if (len == 3) {
+        return new Locale(StringUtils.EMPTY, str.substring(1, 3));
+      }
+      if (len < 5) {
+        throw new IllegalArgumentException("Invalid locale format: " + str);
+      }
+      if (str.charAt(3) != '_') {
+        throw new IllegalArgumentException("Invalid locale format: " + str);
+      }
+      return new Locale(StringUtils.EMPTY, str.substring(1, 3), str.substring(4));
+    }
+
+    final String[] split = str.split("_", -1);
+    final int occurrences = split.length - 1;
+    switch (occurrences) {
+      case 0:
+        if (StringUtils.isAllLowerCase(str) && (len == 2 || len == 3)) {
+          return new Locale(str);
         }
-        return new Locale(str.substring(0, 2), str.substring(3, 5), str.substring(6));
-      }
+        throw new IllegalArgumentException("Invalid locale format: " + str);
+
+      case 1:
+        if (StringUtils.isAllLowerCase(split[0]) &&
+            (split[0].length() == 2 || split[0].length() == 3) &&
+            (split[1].length() == 2 && StringUtils.isAllUpperCase(split[1])) ||
+            (split[1].length() == 3 && StringUtils.isNumeric(split[1]))) {
+          return new Locale(split[0], split[1]);
+        }
+        throw new IllegalArgumentException("Invalid locale format: " + str);
+
+      case 2:
+        if (StringUtils.isAllLowerCase(split[0]) &&
+            (split[0].length() == 2 || split[0].length() == 3) &&
+            (split[1].length() == 0 || split[1].length() == 2 && StringUtils.isAllUpperCase(split[1])) &&
+            split[2].length() > 0) {
+          return new Locale(split[0], split[1], split[2]);
+        }
+
+        //$FALL-THROUGH$
+      default:
+        throw new IllegalArgumentException("Invalid locale format: " + str);
     }
   }
 

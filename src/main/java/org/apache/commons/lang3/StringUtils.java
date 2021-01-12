@@ -23,6 +23,32 @@ public class StringUtils {
 
   private static final int STRING_BUILDER_SIZE = 256;
 
+  public static boolean isAllLowerCase(final CharSequence cs) {
+    if (cs == null || isEmpty(cs)) {
+      return false;
+    }
+    final int sz = cs.length();
+    for (int i = 0; i < sz; i++) {
+      if (Character.isLowerCase(cs.charAt(i)) == false) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  public static boolean isAllUpperCase(final CharSequence cs) {
+    if (cs == null || isEmpty(cs)) {
+      return false;
+    }
+    final int sz = cs.length();
+    for (int i = 0; i < sz; i++) {
+      if (Character.isUpperCase(cs.charAt(i)) == false) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   public static boolean isBlank(final CharSequence cs) {
     final int strLen = length(cs);
     if (strLen == 0) {
@@ -42,6 +68,19 @@ public class StringUtils {
 
   public static boolean isNotBlank(final CharSequence cs) {
     return !isBlank(cs);
+  }
+
+  public static boolean isNumeric(final CharSequence cs) {
+    if (isEmpty(cs)) {
+      return false;
+    }
+    final int sz = cs.length();
+    for (int i = 0; i < sz; i++) {
+      if (!Character.isDigit(cs.charAt(i))) {
+        return false;
+      }
+    }
+    return true;
   }
 
   public static String join(final Iterator<?> iterator, final String separator) {
