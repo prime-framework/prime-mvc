@@ -31,9 +31,9 @@ project(group: "org.primeframework", name: "prime-mvc", version: "1.23.8", licen
       dependency(id: "javax.servlet:servlet-api:3.1.0", skipCompatibilityCheck: true)
     }
     group(name: "compile") {
-      dependency(id: "com.fasterxml.jackson.core:jackson-annotations:2.10.3")
-      dependency(id: "com.fasterxml.jackson.core:jackson-core:2.10.3")
-      dependency(id: "com.fasterxml.jackson.core:jackson-databind:2.10.3")
+      dependency(id: "com.fasterxml.jackson.core:jackson-annotations:2.12.1")
+      dependency(id: "com.fasterxml.jackson.core:jackson-core:2.12.1")
+      dependency(id: "com.fasterxml.jackson.core:jackson-databind:2.12.1")
       dependency(id: "com.google.inject:guice:4.2.3")
       dependency(id: "io.dropwizard.metrics:metrics-core:3.1.0")
       dependency(id: "io.fusionauth:fusionauth-jwt:${fusionAuthJWTVersion}")
