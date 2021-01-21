@@ -90,7 +90,7 @@ public class FlashMessageCookie {
     consumer.accept(messages);
     String value = serialize(messages);
     Cookie cookie = new Cookie(name, value);
-    cookie.setSecure("https".equals(defaultIfNull(request.getHeader("X-Forwarded-Proto"), request.getScheme()).toLowerCase()));
+    cookie.setSecure("https".equalsIgnoreCase(defaultIfNull(request.getHeader("X-Forwarded-Proto"), request.getScheme())));
     cookie.setHttpOnly(true);
     cookie.setMaxAge(-1); // session cookie
     cookie.setPath("/");
