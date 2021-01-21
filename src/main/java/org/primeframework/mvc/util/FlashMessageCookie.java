@@ -18,44 +18,33 @@ package org.primeframework.mvc.util;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import java.util.function.Consumer;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.primeframework.mvc.ErrorException;
 import org.primeframework.mvc.message.Message;
+import org.primeframework.mvc.security.Encryptor;
 
 /**
  * @author Daniel DeGroff
  */
-public class FlashMessageCookie {
+public class FlashMessageCookie extends AbstractCookie {
+  private final Encryptor encryptor;
+
   private final String name;
 
-  private final ObjectMapper objectMapper;
-
-  private final HttpServletRequest request;
-
-  private final HttpServletResponse response;
-
-  public FlashMessageCookie(String name, ObjectMapper objectMapper, HttpServletRequest request,
+  public FlashMessageCookie(Encryptor encryptor, String name, HttpServletRequest request,
                             HttpServletResponse response) {
+    super(request, response);
+    this.encryptor = encryptor;
     this.name = name;
-    this.objectMapper = objectMapper;
-    this.request = request;
-    this.response = response;
   }
 
   public void delete() {
-    Cookie cookie = new Cookie(name, null);
-    cookie.setMaxAge(0);
-    cookie.setPath("/");
-    response.addCookie(cookie);
+    deleteCookie(name);
+
     // Ensure we do not return the cookie again after it has been deleted within the same request.
     request.setAttribute(name + "Deleted", true);
   }
@@ -89,32 +78,23 @@ public class FlashMessageCookie {
     List<Message> messages = get();
     consumer.accept(messages);
     String value = serialize(messages);
-    Cookie cookie = new Cookie(name, value);
-    cookie.setSecure("https".equalsIgnoreCase(defaultIfNull(request.getHeader("X-Forwarded-Proto"), request.getScheme())));
-    cookie.setHttpOnly(true);
-    cookie.setMaxAge(-1); // session cookie
-    cookie.setPath("/");
-    response.addCookie(cookie);
-  }
 
-  private String defaultIfNull(String string, String defaultString) {
-    return string == null ? defaultString : string;
+    addSecureHttpOnlySessionCookie(name, value);
   }
 
   private List<Message> deserialize(String s) {
     try {
-      byte[] decoded = Base64.getUrlDecoder().decode(s.getBytes(StandardCharsets.UTF_8));
-      return objectMapper.readerFor(new TypeReference<List<Message>>() {
-      }).readValue(decoded);
-    } catch (IOException e) {
+      return encryptor.decrypt(new TypeReference<List<Message>>() {
+      }, s);
+    } catch (Exception e) {
       return null;
     }
   }
 
   private String serialize(List<Message> messages) {
     try {
-      return Base64.getUrlEncoder().withoutPadding().encodeToString(objectMapper.writeValueAsBytes(messages));
-    } catch (JsonProcessingException e) {
+      return encryptor.encrypt(messages);
+    } catch (Exception e) {
       throw new ErrorException(e);
     }
   }

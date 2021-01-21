@@ -21,10 +21,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.message.Message;
+import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.util.FlashMessageCookie;
 
 /**
@@ -41,9 +41,9 @@ public class CookieFlashScope implements FlashScope {
   private final HttpServletRequest request;
 
   @Inject
-  public CookieFlashScope(MVCConfiguration configuration, ObjectMapper objectMapper, HttpServletRequest request,
+  public CookieFlashScope(Encryptor encryptor, MVCConfiguration configuration, HttpServletRequest request,
                           HttpServletResponse response) {
-    cookie = new FlashMessageCookie(configuration.messageFlashScopeCookieName(), objectMapper, request, response);
+    cookie = new FlashMessageCookie(encryptor, configuration.messageFlashScopeCookieName(), request, response);
     this.request = request;
   }
 

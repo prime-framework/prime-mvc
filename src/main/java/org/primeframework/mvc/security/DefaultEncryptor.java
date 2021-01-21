@@ -30,6 +30,7 @@ import java.util.Arrays;
 import java.util.Base64;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 
@@ -50,20 +51,14 @@ public class DefaultEncryptor implements Encryptor {
   @Override
   public <T> T decrypt(Class<T> type, String s)
       throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException, ShortBufferException, BadPaddingException, IllegalBlockSizeException, IOException {
-    byte[] bytes = Base64.getUrlDecoder().decode(s.getBytes(StandardCharsets.UTF_8));
+    byte[] decrypted = decrypt(s);
+    return objectMapper.readerFor(type).readValue(decrypted);
+  }
 
-    // The first 16 bytes are the IV
-    byte[] iv = new byte[16];
-    System.arraycopy(bytes, 0, iv, 0, 16);
-
-    Cipher cipher = cipherProvider.getDecryptor(iv);
-
-    byte[] json = Arrays.copyOfRange(bytes, 16, bytes.length);
-    byte[] result = new byte[cipher.getOutputSize(json.length)];
-    int resultLength = cipher.update(json, 0, result.length, result, 0);
-    resultLength += cipher.doFinal(result, resultLength);
-
-    byte[] decrypted = Arrays.copyOfRange(result, 0, resultLength);
+  @Override
+  public <T> T decrypt(TypeReference<?> type, String s)
+      throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException, ShortBufferException, BadPaddingException, IllegalBlockSizeException, IOException {
+    byte[] decrypted = decrypt(s);
     return objectMapper.readerFor(type).readValue(decrypted);
   }
 
@@ -87,5 +82,23 @@ public class DefaultEncryptor implements Encryptor {
     System.arraycopy(result, 0, combined, iv.length, resultLength);
 
     return new String(Base64.getUrlEncoder().encode(combined), StandardCharsets.UTF_8);
+  }
+
+  private byte[] decrypt(String s)
+      throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException, ShortBufferException, BadPaddingException, IllegalBlockSizeException {
+    byte[] bytes = Base64.getUrlDecoder().decode(s.getBytes(StandardCharsets.UTF_8));
+
+    // The first 16 bytes are the IV
+    byte[] iv = new byte[16];
+    System.arraycopy(bytes, 0, iv, 0, 16);
+
+    Cipher cipher = cipherProvider.getDecryptor(iv);
+
+    byte[] json = Arrays.copyOfRange(bytes, 16, bytes.length);
+    byte[] result = new byte[cipher.getOutputSize(json.length)];
+    int resultLength = cipher.update(json, 0, result.length, result, 0);
+    resultLength += cipher.doFinal(result, resultLength);
+
+    return Arrays.copyOfRange(result, 0, resultLength);
   }
 }

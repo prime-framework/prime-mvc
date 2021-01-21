@@ -33,6 +33,7 @@ import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.scope.annotation.ActionCookie;
 import org.primeframework.mvc.security.Encryptor;
+import org.primeframework.mvc.util.AbstractCookie;
 import org.primeframework.mvc.util.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +45,7 @@ import static org.primeframework.mvc.servlet.PrimeServletContextListener.GUICE_I
  *
  * @author Daniel DeGroff
  */
-public class ActionCookieScope implements Scope<ActionCookie> {
+public class ActionCookieScope extends AbstractCookie implements Scope<ActionCookie> {
   private static final Logger logger = LoggerFactory.getLogger(ActionCookieScope.class);
 
   private final ActionInvocationStore actionInvocationStore;
@@ -53,18 +54,13 @@ public class ActionCookieScope implements Scope<ActionCookie> {
 
   private final ObjectMapper objectMapper;
 
-  private final HttpServletRequest request;
-
-  private final HttpServletResponse response;
-
   @Inject
   public ActionCookieScope(HttpServletRequest request, HttpServletResponse response,
                            ActionInvocationStore actionInvocationStore, Encryptor encryptor,
                            ObjectMapper objectMapper) {
+    super(request, response);
     this.actionInvocationStore = actionInvocationStore;
     this.encryptor = encryptor;
-    this.request = request;
-    this.response = response;
     this.objectMapper = objectMapper;
   }
 
@@ -167,10 +163,7 @@ public class ActionCookieScope implements Scope<ActionCookie> {
     if (value == null) {
       if (existingValue != null) {
         // Delete it if we had it.
-        Cookie cookie = new Cookie(cookieName, null);
-        cookie.setMaxAge(0);
-        cookie.setPath("/");
-        response.addCookie(cookie);
+        deleteCookie(cookieName);
       }
 
       return;
@@ -183,12 +176,7 @@ public class ActionCookieScope implements Scope<ActionCookie> {
       throw new ErrorException("error", e);
     }
 
-    Cookie cookie = new Cookie(cookieName, encoded);
-    cookie.setSecure("https".equals(defaultIfNull(request.getHeader("X-Forwarded-Proto"), request.getScheme()).toLowerCase()));
-    cookie.setHttpOnly(true);
-    cookie.setMaxAge(-1);  // session cookie
-    cookie.setPath("/");
-    response.addCookie(cookie);
+    addSecureHttpOnlySessionCookie(cookieName, encoded);
   }
 
   /**
@@ -218,10 +206,6 @@ public class ActionCookieScope implements Scope<ActionCookie> {
   private String decode(Class<?> type, String value) throws IOException {
     byte[] bytes = Base64.getUrlDecoder().decode(value);
     return objectMapper.readerFor(type).readValue(bytes);
-  }
-
-  private String defaultIfNull(String string, String defaultString) {
-    return string == null ? defaultString : string;
   }
 
   private String encode(Object value) throws JsonProcessingException {

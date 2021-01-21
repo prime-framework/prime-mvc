@@ -25,6 +25,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 
 /**
  * Encrypt and decrypt stuff.
@@ -49,6 +50,25 @@ public interface Encryptor {
    * @throws IOException                        thrown when this happens.
    */
   <T> T decrypt(Class<T> type, String s)
+      throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException, ShortBufferException, BadPaddingException, IllegalBlockSizeException, IOException;
+
+  /**
+   * Decrypt a string.
+   *
+   * @param type the type of object used for de-serialization.
+   * @param s    the encrypted string returned by the {{@link #encrypt(Object)}} method on this interface.
+   * @param <T>  the type
+   * @return a object of the provided type.
+   * @throws InvalidAlgorithmParameterException thrown when this happens.
+   * @throws NoSuchAlgorithmException           thrown when this happens.
+   * @throws InvalidKeyException                thrown when this happens.
+   * @throws NoSuchPaddingException             thrown when this happens.
+   * @throws ShortBufferException               thrown when this happens.
+   * @throws BadPaddingException                thrown when this happens.
+   * @throws IllegalBlockSizeException          thrown when this happens.
+   * @throws IOException                        thrown when this happens.
+   */
+  <T> T decrypt(TypeReference<?> type, String s)
       throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException, ShortBufferException, BadPaddingException, IllegalBlockSizeException, IOException;
 
   /**
