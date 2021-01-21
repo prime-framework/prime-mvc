@@ -51,6 +51,12 @@ import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.content.guice.ObjectMapperProvider;
 import org.primeframework.mvc.guice.MVCModule;
 import org.primeframework.mvc.jwt.MockVerifierProvider;
+import org.primeframework.mvc.message.scope.ApplicationScope;
+import org.primeframework.mvc.message.scope.CookieFlashScope;
+import org.primeframework.mvc.message.scope.FlashScope;
+import org.primeframework.mvc.message.scope.RequestScope;
+import org.primeframework.mvc.message.scope.SessionFlashScope;
+import org.primeframework.mvc.message.scope.SessionScope;
 import org.primeframework.mvc.security.MockUserLoginSecurityContext;
 import org.primeframework.mvc.security.UserLoginSecurityContext;
 import org.primeframework.mvc.security.csrf.CSRFProvider;
@@ -103,7 +109,7 @@ public abstract class PrimeBaseTest {
       }
     };
 
-    Module module = Modules.override(mvcModule).with(new TestContentModule(), new TestSecurityModule());
+    Module module = Modules.override(mvcModule).with(new TestContentModule(), new TestSecurityModule(), new TestScopeModule());
 
     container = new MockContainer();
     container.newServletContext(new File("src/test/web"));
@@ -139,6 +145,9 @@ public abstract class PrimeBaseTest {
 
     // Reset CSRF configuration
     configuration.csrfEnabled = false;
+
+    // Reset to default
+    configuration.useCookieForFlashScope = false;
   }
 
   @AfterMethod
@@ -271,6 +280,19 @@ public abstract class PrimeBaseTest {
       }
 
       return objectMapper;
+    }
+  }
+
+  public static class TestScopeModule extends AbstractModule {
+    @Override
+    protected void configure() {
+      bind(ApplicationScope.class).asEagerSingleton();
+      bind(SessionScope.class);
+      bind(RequestScope.class);
+
+      bind(FlashScope.class).toProvider(() -> configuration.useCookieForFlashScope
+          ? injector.getInstance(CookieFlashScope.class)
+          : injector.getInstance((SessionFlashScope.class)));
     }
   }
 

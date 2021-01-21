@@ -58,7 +58,7 @@ public class ReexecuteSavedRequestResultTest extends PrimeBaseTest {
     List<Message> messages = new ArrayList<>();
     HttpServletRequest request = createStrictMock(HttpServletRequest.class);
     expect(request.getAttribute(FlashScope.KEY)).andReturn(messages);
-    request.removeAttribute(FlashScope.KEY);
+    expect(request.getSession(false)).andReturn(null);
     expect(request.getCookies()).andReturn(null);
     expect(request.getContextPath()).andReturn("");
     expect(request.getRequestURI()).andReturn("/");
@@ -100,7 +100,7 @@ public class ReexecuteSavedRequestResultTest extends PrimeBaseTest {
     Encryptor encryptor = new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper);
     Cookie cookie = SavedRequestTools.toCookie(savedRequest, configuration, encryptor);
     expect(request.getAttribute(FlashScope.KEY)).andReturn(messages);
-    request.removeAttribute(FlashScope.KEY);
+    expect(request.getSession(false)).andReturn(null);
     expect(request.getCookies()).andReturn(new Cookie[]{cookie});
     expect(request.getContextPath()).andReturn("");
     expect(request.getRequestURI()).andReturn("/");

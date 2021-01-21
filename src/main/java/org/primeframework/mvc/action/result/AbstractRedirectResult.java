@@ -60,8 +60,12 @@ public abstract class AbstractRedirectResult<T extends Annotation> extends Abstr
     // Preserve previously flashed messages so they will survive redirect after redirect
     @SuppressWarnings("unchecked")
     List<Message> requestList = (List<Message>) request.getAttribute(FlashScope.KEY);
-    // Clear this from the request, in testing we may still use the request for additional assertions.
-    request.removeAttribute(FlashScope.KEY);
+    // If we have a session clear this from the request, in testing we may still use the request for additional assertions.
+    //  - And the session will be re-used in between tests.
+    if (request.getSession(false) != null) {
+      request.removeAttribute(FlashScope.KEY);
+    }
+
     if (requestList != null) {
       messageStore.addAll(MessageScope.FLASH, requestList);
     }
