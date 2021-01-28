@@ -69,6 +69,17 @@ public class RequestBuilder {
   }
 
   /**
+   * Allows the builder to be passed to other code to add parameters and set things up.
+   *
+   * @param consumer The consumer of this request builder.
+   * @return This.
+   */
+  public RequestBuilder build(Consumer<RequestBuilder> consumer) {
+    consumer.accept(this);
+    return this;
+  }
+
+  /**
    * Sends the HTTP request to the MVC as a CONNECT.
    *
    * @return The response.

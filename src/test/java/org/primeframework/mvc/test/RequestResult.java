@@ -1231,7 +1231,6 @@ public class RequestResult {
                                                            String key, boolean escape,
                                                            Object... values) {
     String message = messageProvider.getMessage(key, values);
-
     if (escape) {
       message = escape(message);
     }
