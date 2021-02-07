@@ -1,5 +1,10 @@
 Prime MVC Changes
 
+Changes in 1.23.9
+
+ * Encrypt flash message cookie.
+ * Add RequestBuilder.build helper
+
 Changes in 1.23.8
 
  * Fix for locale handling.
