@@ -1,5 +1,9 @@
 Prime MVC Changes
 
+Changes in 1.24.0
+
+  * Support conjoined request parameters
+
 Changes in 1.23.9
 
  * Encrypt flash message cookie.
