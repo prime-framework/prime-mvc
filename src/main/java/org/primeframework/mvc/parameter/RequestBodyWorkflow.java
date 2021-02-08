@@ -50,7 +50,6 @@ import com.google.inject.Inject;
  *
  * @author Brian Pontarelli
  */
-@SuppressWarnings("unchecked")
 public class RequestBodyWorkflow implements Workflow {
   private final HttpServletRequest request;
 
@@ -97,17 +96,13 @@ public class RequestBodyWorkflow implements Workflow {
     }
 
     String value = toParameterString(encoding, str, start, length, decode);
-    List<String> list = parsedParameters.get(key);
-    if (list == null) {
-      list = new ArrayList<String>();
-      parsedParameters.put(key, list);
-    }
+    List<String> list = parsedParameters.computeIfAbsent(key, k -> new ArrayList<>());
 
     list.add(value);
   }
 
   private Map<String, String[]> combine(Map<String, String[]> original, Map<String, List<String>> parsed) {
-    Map<String, String[]> map = new HashMap<String, String[]>();
+    Map<String, String[]> map = new HashMap<>();
     for (String key : original.keySet()) {
       String[] originalValues = original.get(key);
       List<String> parsedValues = parsed.remove(key);
@@ -127,7 +122,7 @@ public class RequestBodyWorkflow implements Workflow {
 
     for (String key : parsed.keySet()) {
       List<String> parsedValues = parsed.get(key);
-      map.put(key, parsedValues.toArray(new String[parsedValues.size()]));
+      map.put(key, parsedValues.toArray(new String[0]));
     }
 
     return map;
@@ -148,11 +143,7 @@ public class RequestBodyWorkflow implements Workflow {
         String name = item.getFieldName();
         if (item.isFormField()) {
           String value = item.getString();
-          List<String> list = filesAndParameters.parameters.get(name);
-          if (list == null) {
-            list = new ArrayList<>();
-            filesAndParameters.parameters.put(name, list);
-          }
+          List<String> list = filesAndParameters.parameters.computeIfAbsent(name, k -> new ArrayList<>());
 
           list.add(value);
         } else {
@@ -176,11 +167,7 @@ public class RequestBodyWorkflow implements Workflow {
             continue;
           }
 
-          List<FileInfo> list = filesAndParameters.files.get(name);
-          if (list == null) {
-            list = new ArrayList<>();
-            filesAndParameters.files.put(name, list);
-          }
+          List<FileInfo> list = filesAndParameters.files.computeIfAbsent(name, k -> new ArrayList<>());
 
           list.add(new FileInfo(file, fileName, contentType));
         }
@@ -232,7 +219,7 @@ public class RequestBodyWorkflow implements Workflow {
       return null;
     }
 
-    Map<String, List<String>> parsedParameters = new HashMap<String, List<String>>();
+    Map<String, List<String>> parsedParameters = new HashMap<>();
     int start = 0;
     int index = 0;
     String key = null;
@@ -294,13 +281,13 @@ public class RequestBodyWorkflow implements Workflow {
     }
 
     @Override
-    public Map getParameterMap() {
+    public Map<String, String[]> getParameterMap() {
       return parameters;
     }
 
     @Override
-    public Enumeration getParameterNames() {
-      return new IteratorEnumeration(parameters.keySet().iterator());
+    public Enumeration<String> getParameterNames() {
+      return new IteratorEnumeration<>(parameters.keySet().iterator());
     }
 
     @Override

@@ -16,18 +16,24 @@
 package org.primeframework.mvc.parameter;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.google.inject.Inject;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.parameter.ParameterParser.Parameters.Struct;
+import org.primeframework.mvc.parameter.RequestBodyWorkflow.ParameterHttpServletRequestWrapper;
+import org.primeframework.mvc.parameter.annotation.ConjoinedRequestParameters;
 import org.primeframework.mvc.parameter.fileupload.FileInfo;
+import org.primeframework.mvc.util.QueryStringTools;
 import org.primeframework.mvc.util.RequestKeys;
 
 /**
@@ -67,7 +73,7 @@ public class DefaultParameterParser implements ParameterParser {
 
   @Override
   public Parameters parse() {
-    Map<String, String[]> parameters = request.getParameterMap();
+    Map<String, String[]> parameters = getParameterMap();
     Parameters result = new Parameters();
 
     // Grab the files from the request
@@ -136,6 +142,42 @@ public class DefaultParameterParser implements ParameterParser {
     }
 
     return true;
+  }
+
+  private Map<String, String[]> getParameterMap() {
+    ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
+    ConjoinedRequestParameters conjoinedRequestParameters = (ConjoinedRequestParameters) actionInvocation.method.annotations.get(ConjoinedRequestParameters.class);
+
+    // If this is a conjoined request, extract the parameters.
+    if (conjoinedRequestParameters != null) {
+      // Please Note:
+      // A current limitation of this feature is that this is occurring in the ParameterWorkflow which is after the
+      // ScopeRetrievalWorkflow. This means if you were to use @Request annotation on a field in your action - AND
+      // you are using "conjoined" request parameters, the values will not be expanded prior to the scope retrieval. I
+      // don't know if this is a use case we want to support, but if we do, this code may need to be moved earlier in
+      // the workflow.
+      //
+      // Most ideally, this would be part of the RequestBodyWorkflow, but that occurs prior to the Action Mapping so we do
+      // not yet have the ActionInvocation to see if an annotation exists on the method handler.
+
+      // Request the conjoined string from the request, if it is not provided, the request will be processed normally.
+      String requestParametersValue = request.getParameter(conjoinedRequestParameters.value());
+      if (requestParametersValue != null) {
+        // Convert to a map of String[]
+        Map<String, String[]> parameters = QueryStringTools.parseQueryString(requestParametersValue)
+                                                           .entrySet()
+                                                           .stream()
+                                                           .collect(Collectors.toMap(Entry::getKey, entry -> entry.getValue().toArray(new String[]{})));
+
+        // Re-write the request to contain the re-constituted request parameters
+        HttpServletRequestWrapper wrapper = (HttpServletRequestWrapper) request;
+        HttpServletRequest previous = (HttpServletRequest) wrapper.getRequest();
+        HttpServletRequest newRequest = new ParameterHttpServletRequestWrapper(previous, parameters);
+        wrapper.setRequest(newRequest);
+      }
+    }
+
+    return request.getParameterMap();
   }
 
   private void preParameters(Parameters result) {

@@ -65,6 +65,54 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void conjoinedRequestParameters() throws Exception {
+    // Conjoining request parameters can let us work around the default 10k request parameter limit (Tomcat) on a GET and POST request.
+
+    // Use a GET request using the default parameter name of 'requestData'
+    test.simulate(() -> test.simulator.test("/conjoined-parameter")
+                                      .withParameter("requestData", "param1=foo&param2=true&param3=42&param4=boom&param4=dynamite")
+                                      .get()
+                                      .assertStatusCode(200)
+                                      .assertBodyContains(
+                                          "param1:foo",
+                                          "param2:true",
+                                          "param3:42",
+                                          "param4:size:2",
+                                          "param4:[0]:boom",
+                                          "param4:[1]:dynamite"));
+
+    // Use a POST request with  named parameter
+    test.simulate(() -> test.simulator.test("/conjoined-parameter")
+                                      .withParameter("conjoined", "param1=foo&param2=true&param3=42&param4=boom&param4=dynamite")
+                                      .post()
+                                      .assertStatusCode(200)
+                                      .assertBodyContains(
+                                          "param1:foo",
+                                          "param2:true",
+                                          "param3:42",
+                                          "param4:size:2",
+                                          "param4:[0]:boom",
+                                          "param4:[1]:dynamite"));
+
+    // No-op, just pass in the parameters normally, expect the same result.
+    test.simulate(() -> test.simulator.test("/conjoined-parameter")
+                                      .withParameter("param1", "foo")
+                                      .withParameter("param2", true)
+                                      .withParameter("param3", "42")
+                                      .withParameter("param4", "boom")
+                                      .withParameter("param4", "dynamite")
+                                      .post()
+                                      .assertStatusCode(200)
+                                      .assertBodyContains(
+                                          "param1:foo",
+                                          "param2:true",
+                                          "param3:42",
+                                          "param4:size:2",
+                                          "param4:[0]:boom",
+                                          "param4:[1]:dynamite"));
+  }
+
+  @Test
   public void embeddedFormHandling() throws Exception {
     // Ensure this 'required' parameter for PageOne does not mess up PageTwo which does not have an Id field.
     test.simulate(() -> simulator.test("/scope/page-one")
