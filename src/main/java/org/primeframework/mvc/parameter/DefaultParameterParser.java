@@ -22,14 +22,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.parameter.ParameterParser.Parameters.Struct;
 import org.primeframework.mvc.parameter.fileupload.FileInfo;
 import org.primeframework.mvc.util.RequestKeys;
-
-import com.google.inject.Inject;
 
 /**
  * This class is the default parameter parser. It pulls all of the parameters from the request and puts them into groups
@@ -46,12 +45,16 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 public class DefaultParameterParser implements ParameterParser {
-  public static final String CHECKBOX_PREFIX = "__cb_";
-  public static final String RADIOBUTTON_PREFIX = "__rb_";
   public static final String ACTION_PREFIX = "__a_";
 
-  private final MVCConfiguration configuration;
+  public static final String CHECKBOX_PREFIX = "__cb_";
+
+  public static final String RADIOBUTTON_PREFIX = "__rb_";
+
   private final ActionInvocationStore actionInvocationStore;
+
+  private final MVCConfiguration configuration;
+
   private final HttpServletRequest request;
 
   @Inject
@@ -98,6 +101,43 @@ public class DefaultParameterParser implements ParameterParser {
     return result;
   }
 
+  @SuppressWarnings("unchecked")
+  protected void addFiles(Parameters result) {
+    Map<String, List<FileInfo>> fileInfos = (Map<String, List<FileInfo>>) request.getAttribute(RequestKeys.FILE_ATTRIBUTE);
+    if (fileInfos != null) {
+      result.files.putAll(fileInfos);
+    }
+  }
+
+  protected void addUncheckedValues(Map<String, String[]> map, Parameters parameters) {
+    for (String key : map.keySet()) {
+      String[] values = map.get(key);
+      // Only add the values if there is a single one and it is empty, which denotes that they
+      // want to set null into the action, or the values are multiple and they is one non-empty
+      // value in the bunch. The second case occurs when they are using multiple checkboxes or
+      // radio buttons for the same name. This will cause multiple hidden inputs and they should
+      // all either have a unchecked value or should all be empty. If they are all empty, then
+      // null should be put into the object.
+      if ((values != null && values.length == 1 && values[0].equals("")) || empty(values)) {
+        parameters.required.put(key, new Struct());
+      } else {
+        parameters.required.put(key, new Struct(values));
+      }
+    }
+  }
+
+  protected boolean empty(String[] values) {
+    if (values != null && values.length > 0) {
+      for (String value : values) {
+        if (!value.equals("")) {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
+
   private void preParameters(Parameters result) {
     ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
     for (String name : actionInvocation.configuration.preParameterMembers.keySet()) {
@@ -112,7 +152,8 @@ public class DefaultParameterParser implements ParameterParser {
     }
   }
 
-  private void separateParameters(Map<String, String[]> parameters, Parameters result, Map<String, String[]> checkBoxes, Map<String, String[]> radioButtons, Set<String> actions) {
+  private void separateParameters(Map<String, String[]> parameters, Parameters result, Map<String, String[]> checkBoxes,
+                                  Map<String, String[]> radioButtons, Set<String> actions) {
     for (String key : parameters.keySet()) {
       if (InternalParameters.isInternalParameter(key)) {
         continue;
@@ -158,42 +199,5 @@ public class DefaultParameterParser implements ParameterParser {
         }
       }
     }
-  }
-
-  @SuppressWarnings("unchecked")
-  protected void addFiles(Parameters result) {
-    Map<String, List<FileInfo>> fileInfos = (Map<String, List<FileInfo>>) request.getAttribute(RequestKeys.FILE_ATTRIBUTE);
-    if (fileInfos != null) {
-      result.files.putAll(fileInfos);
-    }
-  }
-
-  protected void addUncheckedValues(Map<String, String[]> map, Parameters parameters) {
-    for (String key : map.keySet()) {
-      String[] values = map.get(key);
-      // Only add the values if there is a single one and it is empty, which denotes that they
-      // want to set null into the action, or the values are multiple and they is one non-empty
-      // value in the bunch. The second case occurs when they are using multiple checkboxes or
-      // radio buttons for the same name. This will cause multiple hidden inputs and they should
-      // all either have a unchecked value or should all be empty. If they are all empty, then
-      // null should be put into the object.
-      if ((values != null && values.length == 1 && values[0].equals("")) || empty(values)) {
-        parameters.required.put(key, new Struct());
-      } else {
-        parameters.required.put(key, new Struct(values));
-      }
-    }
-  }
-
-  protected boolean empty(String[] values) {
-    if (values != null && values.length > 0) {
-      for (String value : values) {
-        if (!value.equals("")) {
-          return false;
-        }
-      }
-    }
-
-    return true;
   }
 }
