@@ -1,3 +1,4 @@
+::urlSegment:${urlSegment}::
 ::param1:${param1}::
 ::param2:${param2?c}::
 ::param3:${param3}::

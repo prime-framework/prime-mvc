@@ -21,9 +21,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import com.google.inject.Inject;
 import org.primeframework.mvc.action.ActionInvocation;
@@ -33,6 +31,7 @@ import org.primeframework.mvc.parameter.ParameterParser.Parameters.Struct;
 import org.primeframework.mvc.parameter.RequestBodyWorkflow.ParameterHttpServletRequestWrapper;
 import org.primeframework.mvc.parameter.annotation.ConjoinedRequestParameters;
 import org.primeframework.mvc.parameter.fileupload.FileInfo;
+import org.primeframework.mvc.util.ParameterTools;
 import org.primeframework.mvc.util.QueryStringTools;
 import org.primeframework.mvc.util.RequestKeys;
 
@@ -164,15 +163,16 @@ public class DefaultParameterParser implements ParameterParser {
       String requestParametersValue = request.getParameter(conjoinedRequestParameters.value());
       if (requestParametersValue != null) {
         // Convert to a map of String[]
-        Map<String, String[]> parameters = QueryStringTools.parseQueryString(requestParametersValue)
-                                                           .entrySet()
-                                                           .stream()
-                                                           .collect(Collectors.toMap(Entry::getKey, entry -> entry.getValue().toArray(new String[]{})));
+        Map<String, List<String>> parameters = QueryStringTools.parseQueryString(requestParametersValue);
+
+        // Remove the conjoined value from the original request parameter map, keep everything else.
+        Map<String, String[]> original = request.getParameterMap();
+        original.remove(conjoinedRequestParameters.value());
 
         // Re-write the request to contain the re-constituted request parameters
         HttpServletRequestWrapper wrapper = (HttpServletRequestWrapper) request;
         HttpServletRequest previous = (HttpServletRequest) wrapper.getRequest();
-        HttpServletRequest newRequest = new ParameterHttpServletRequestWrapper(previous, parameters);
+        HttpServletRequest newRequest = new ParameterHttpServletRequestWrapper(previous, ParameterTools.combine(original, parameters));
         wrapper.setRequest(newRequest);
       }
     }

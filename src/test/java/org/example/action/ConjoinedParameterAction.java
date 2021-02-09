@@ -23,7 +23,7 @@ import org.primeframework.mvc.parameter.annotation.ConjoinedRequestParameters;
 /**
  * @author Daniel DeGroff
  */
-@Action
+@Action("{urlSegment}")
 public class ConjoinedParameterAction {
   public String param1;
 
@@ -32,6 +32,8 @@ public class ConjoinedParameterAction {
   public int param3;
 
   public List<String> param4;
+
+  public String urlSegment;
 
   // Use the default parameter name
   @ConjoinedRequestParameters

@@ -70,10 +70,12 @@ public class GlobalTest extends PrimeBaseTest {
 
     // Use a GET request using the default parameter name of 'requestData'
     test.simulate(() -> test.simulator.test("/conjoined-parameter")
+                                      .withURLSegment(12345)
                                       .withParameter("requestData", "param1=foo&param2=true&param3=42&param4=boom&param4=dynamite")
                                       .get()
                                       .assertStatusCode(200)
                                       .assertBodyContains(
+                                          "urlSegment:12345",
                                           "param1:foo",
                                           "param2:true",
                                           "param3:42",
@@ -83,10 +85,12 @@ public class GlobalTest extends PrimeBaseTest {
 
     // Use a POST request with  named parameter
     test.simulate(() -> test.simulator.test("/conjoined-parameter")
+                                      .withURLSegment(12345)
                                       .withParameter("conjoined", "param1=foo&param2=true&param3=42&param4=boom&param4=dynamite")
                                       .post()
                                       .assertStatusCode(200)
                                       .assertBodyContains(
+                                          "urlSegment:12345",
                                           "param1:foo",
                                           "param2:true",
                                           "param3:42",
@@ -96,6 +100,7 @@ public class GlobalTest extends PrimeBaseTest {
 
     // No-op, just pass in the parameters normally, expect the same result.
     test.simulate(() -> test.simulator.test("/conjoined-parameter")
+                                      .withURLSegment(12345)
                                       .withParameter("param1", "foo")
                                       .withParameter("param2", true)
                                       .withParameter("param3", "42")
@@ -104,6 +109,7 @@ public class GlobalTest extends PrimeBaseTest {
                                       .post()
                                       .assertStatusCode(200)
                                       .assertBodyContains(
+                                          "urlSegment:12345",
                                           "param1:foo",
                                           "param2:true",
                                           "param3:42",

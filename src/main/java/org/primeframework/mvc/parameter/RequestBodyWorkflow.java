@@ -42,6 +42,7 @@ import org.primeframework.mvc.workflow.Workflow;
 import org.primeframework.mvc.workflow.WorkflowChain;
 
 import com.google.inject.Inject;
+import static org.primeframework.mvc.util.ParameterTools.*;
 
 /**
  * This workflow handles providing access to parameters inside the request body when the container doesn't parse them.
@@ -99,33 +100,6 @@ public class RequestBodyWorkflow implements Workflow {
     List<String> list = parsedParameters.computeIfAbsent(key, k -> new ArrayList<>());
 
     list.add(value);
-  }
-
-  private Map<String, String[]> combine(Map<String, String[]> original, Map<String, List<String>> parsed) {
-    Map<String, String[]> map = new HashMap<>();
-    for (String key : original.keySet()) {
-      String[] originalValues = original.get(key);
-      List<String> parsedValues = parsed.remove(key);
-
-      String[] newValues = new String[originalValues.length + (parsedValues == null ? 0 : parsedValues.size())];
-      System.arraycopy(originalValues, 0, newValues, 0, originalValues.length);
-
-      if (parsedValues != null && parsedValues.size() > 0) {
-        int index = originalValues.length;
-        for (String parsedValue : parsedValues) {
-          newValues[index++] = parsedValue;
-        }
-      }
-
-      map.put(key, newValues);
-    }
-
-    for (String key : parsed.keySet()) {
-      List<String> parsedValues = parsed.get(key);
-      map.put(key, parsedValues.toArray(new String[0]));
-    }
-
-    return map;
   }
 
   /**
