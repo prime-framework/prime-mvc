@@ -1,6 +1,10 @@
 Prime MVC Changes
 
 
+Changes in 1.24.2
+
+  * Fix a bug with conjoined request parameters when using a URL segment that will become a request parameter. Add testing support.
+
 Changes in 1.24.1
 
   * Fix a bug with conjoined request parameters when using a URL segment that will become a request parameter.

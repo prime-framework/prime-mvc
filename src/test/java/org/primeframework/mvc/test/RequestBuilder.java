@@ -19,12 +19,17 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -76,6 +81,45 @@ public class RequestBuilder {
    */
   public RequestBuilder build(Consumer<RequestBuilder> consumer) {
     consumer.accept(this);
+    return this;
+  }
+
+  /**
+   * Support testing conjoined parameters. This simulate what will be expected to be on the request w/out having to
+   * re-write any tests.
+   *
+   * @return This.
+   */
+  public RequestBuilder conjoinParameters() {
+    // See default parameter name in ConjoinedRequestParameters
+    return conjoinParameters("requestData");
+  }
+
+  /**
+   * Support testing conjoined parameters. This simulate what will be expected to be on the request w/out having to
+   * re-write any tests.
+   *
+   * @param name the parameter name
+   * @return This.
+   */
+  public RequestBuilder conjoinParameters(String name) {
+    Map<String, String[]> parameterMap = request.getParameterMap();
+
+    List<String> parameters = new ArrayList<>();
+    for (String key : parameterMap.keySet()) {
+      String[] values = parameterMap.get(key);
+      for (String value : values) {
+        try {
+          parameters.add(URLEncoder.encode(key, "UTF-8") + "=" + URLEncoder.encode(value, "UTF-8"));
+        } catch (UnsupportedEncodingException ignore) {
+        }
+      }
+    }
+
+    // Clear the request parameters and add in the 'conjoined' value.
+    request.clearParameters();
+    withParameter(name, String.join("&", parameters));
+
     return this;
   }
 

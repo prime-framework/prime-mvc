@@ -166,7 +166,7 @@ public class DefaultParameterParser implements ParameterParser {
         Map<String, List<String>> parameters = QueryStringTools.parseQueryString(requestParametersValue);
 
         // Remove the conjoined value from the original request parameter map, keep everything else.
-        Map<String, String[]> original = request.getParameterMap();
+        Map<String, String[]> original = new HashMap<>(request.getParameterMap());
         original.remove(conjoinedRequestParameters.value());
 
         // Re-write the request to contain the re-constituted request parameters
