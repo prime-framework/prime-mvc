@@ -83,6 +83,26 @@ public class GlobalTest extends PrimeBaseTest {
                                           "param4:[0]:boom",
                                           "param4:[1]:dynamite"));
 
+    // Equal to the last, but using our "conjoined" helper
+    test.simulate(() -> test.simulator.test("/conjoined-parameter")
+                                      .withURLSegment(12345)
+                                      .withParameter("param1", "foo")
+                                      .withParameter("param2",true)
+                                      .withParameter("param3", 42)
+                                      .withParameter("param4", "boom")
+                                      .withParameter("param4", "dynamite")
+                                      .conjoinParameters()
+                                      .get()
+                                      .assertStatusCode(200)
+                                      .assertBodyContains(
+                                          "urlSegment:12345",
+                                          "param1:foo",
+                                          "param2:true",
+                                          "param3:42",
+                                          "param4:size:2",
+                                          "param4:[0]:boom",
+                                          "param4:[1]:dynamite"));
+
     // Use a POST request with  named parameter
     test.simulate(() -> test.simulator.test("/conjoined-parameter")
                                       .withURLSegment(12345)
