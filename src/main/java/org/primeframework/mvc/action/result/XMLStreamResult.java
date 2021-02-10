@@ -65,6 +65,9 @@ public class XMLStreamResult extends AbstractResult<XMLStream> {
     response.setContentType("application/xhtml+xml");
     response.setContentLength(xmlBytes.length);
 
+    // Handle setting cache controls
+    addCacheControlHeader(xmlStream, response);
+
     if (isHeadRequest(actionInvocation)) {
       return true;
     }
@@ -73,5 +76,15 @@ public class XMLStreamResult extends AbstractResult<XMLStream> {
     writeToOutputStream(is, response);
 
     return true;
+  }
+
+  @Override
+  protected String getCacheControl(XMLStream result) {
+    return result.cacheControl();
+  }
+
+  @Override
+  protected boolean getDisableCacheControl(XMLStream result) {
+    return result.disableCacheControl();
   }
 }

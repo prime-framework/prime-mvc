@@ -112,6 +112,9 @@ public class JSONResult extends AbstractResult<JSON> {
     response.setContentType("application/json");
     response.setContentLength(result.length);
 
+    // Handle setting cache controls
+    addCacheControlHeader(json, response);
+
     if (isHeadRequest(actionInvocation)) {
       return true;
     }
@@ -120,6 +123,16 @@ public class JSONResult extends AbstractResult<JSON> {
     outputStream.write(result);
     outputStream.flush();
     return true;
+  }
+
+  @Override
+  protected String getCacheControl(JSON result) {
+    return result.cacheControl();
+  }
+
+  @Override
+  protected boolean getDisableCacheControl(JSON result) {
+    return result.disableCacheControl();
   }
 
   private ErrorMessages convertErrors(List<Message> messages) {

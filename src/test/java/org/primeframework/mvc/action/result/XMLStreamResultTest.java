@@ -60,6 +60,7 @@ public class XMLStreamResultTest {
     response.setCharacterEncoding("UTF-8");
     response.setContentType(contentType);
     response.setContentLength(propertyBytesLen);
+    response.setHeader("Cache-Control", "no-store");
     if (httpMethod == HTTPMethod.GET) {
       expect(response.getOutputStream()).andReturn(sos);
     }
@@ -84,14 +85,20 @@ public class XMLStreamResultTest {
   }
 
   public class XMLStreamImpl implements XMLStream {
+    private final String cacheControl;
+
     private final String code;
+
+    private final boolean disableCacheControl;
 
     private final String property;
 
     private final int status;
 
     public XMLStreamImpl(String code, String property, int status) {
+      this.cacheControl = "no-store";
       this.code = code;
+      this.disableCacheControl = false;
       this.property = property;
       this.status = status;
     }
@@ -100,8 +107,18 @@ public class XMLStreamResultTest {
       return XMLStream.class;
     }
 
+    @Override
+    public String cacheControl() {
+      return cacheControl;
+    }
+
     public String code() {
       return code;
+    }
+
+    @Override
+    public boolean disableCacheControl() {
+      return disableCacheControl;
     }
 
     public String property() {

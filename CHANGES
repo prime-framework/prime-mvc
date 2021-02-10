@@ -1,5 +1,9 @@
 Prime MVC Changes
 
+Changes in 1.25.0
+
+ * Revert conjoined handling.
+ * Better Cache-Control support
 
 Changes in 1.24.2
 

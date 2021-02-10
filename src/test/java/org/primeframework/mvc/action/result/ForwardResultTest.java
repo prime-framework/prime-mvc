@@ -48,12 +48,13 @@ public class ForwardResultTest extends PrimeBaseTest {
   }
 
   @Test(dataProvider = "httpMethod")
-  public void fullyQualified(HTTPMethod httpMethod) throws IOException, ServletException {
+  public void fullyQualified(HTTPMethod httpMethod) throws IOException {
     PrintWriter writer = new PrintWriter(new StringWriter());
 
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
     response.setContentType("text/html; charset=UTF-8");
     response.setStatus(200);
+    response.setHeader("Cache-Control", "no-store");
     if (httpMethod == HTTPMethod.GET) {
       expect(response.getWriter()).andReturn(writer);
     }
@@ -88,12 +89,13 @@ public class ForwardResultTest extends PrimeBaseTest {
   }
 
   @Test
-  public void relative() throws IOException, ServletException {
+  public void relative() throws IOException {
     PrintWriter writer = new PrintWriter(new StringWriter());
 
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
     response.setContentType("text/html; charset=UTF-8");
     response.setStatus(200);
+    response.setHeader("Cache-Control", "no-store");
     expect(response.getWriter()).andReturn(writer);
     replay(response);
 
@@ -120,12 +122,13 @@ public class ForwardResultTest extends PrimeBaseTest {
   }
 
   @Test
-  public void relativeNested() throws IOException, ServletException {
+  public void relativeNested() throws IOException {
     PrintWriter writer = new PrintWriter(new StringWriter());
 
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
     response.setContentType("text/html; charset=UTF-8");
     response.setStatus(200);
+    response.setHeader("Cache-Control", "no-store");
     expect(response.getWriter()).andReturn(writer);
     replay(response);
 
@@ -158,6 +161,7 @@ public class ForwardResultTest extends PrimeBaseTest {
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
     response.setContentType("text/html; charset=UTF-8");
     response.setStatus(300);
+    response.setHeader("Cache-Control", "no-store");
     expect(response.getWriter()).andReturn(writer);
     replay(response);
 
@@ -184,12 +188,13 @@ public class ForwardResultTest extends PrimeBaseTest {
   }
 
   @Test
-  public void expansions() throws IOException, ServletException {
+  public void expansions() throws IOException {
     PrintWriter writer = new PrintWriter(new StringWriter());
 
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
     response.setContentType("text/xml; charset=UTF-8");
     response.setStatus(300);
+    response.setHeader("Cache-Control", "no-store");
     expect(response.getWriter()).andReturn(writer);
     replay(response);
 
@@ -218,12 +223,13 @@ public class ForwardResultTest extends PrimeBaseTest {
   }
 
   @Test
-  public void contentType() throws IOException, ServletException {
+  public void contentType() throws IOException {
     PrintWriter writer = new PrintWriter(new StringWriter());
 
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
     response.setContentType("text/javascript; charset=UTF-8");
     response.setStatus(200);
+    response.setHeader("Cache-Control", "no-store");
     expect(response.getWriter()).andReturn(writer);
     replay(response);
 
@@ -250,12 +256,13 @@ public class ForwardResultTest extends PrimeBaseTest {
   }
 
   @Test
-  public void search() throws IOException, ServletException {
+  public void search() throws IOException {
     PrintWriter writer = new PrintWriter(new PrintWriter(System.out));
 
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
     response.setContentType("text/html; charset=UTF-8");
     response.setStatus(200);
+    response.setHeader("Cache-Control", "no-store");
     expect(response.getWriter()).andReturn(writer);
     replay(response);
 

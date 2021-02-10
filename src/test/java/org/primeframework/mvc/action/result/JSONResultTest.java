@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.Inject;
 import org.example.action.PostAction;
 import org.example.domain.AddressField;
 import org.example.domain.UserField;
@@ -50,9 +52,6 @@ import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.inject.Inject;
 import static java.util.Arrays.asList;
 import static org.easymock.EasyMock.createStrictMock;
 import static org.easymock.EasyMock.expect;
@@ -74,22 +73,17 @@ public class JSONResultTest extends PrimeBaseTest {
     }
 
     @Override
-    public Class<?> view() {
-      return null;
+    public boolean prettyPrint() {
+      return false;
     }
 
     @Override
-    public boolean prettyPrint() {
-      return false;
+    public Class<?> view() {
+      return null;
     }
   };
 
   @Inject public ObjectMapper objectMapper;
-
-  @DataProvider(name = "httpMethod")
-  public Object[][] httpMethod() {
-    return new Object[][]{{HTTPMethod.GET}, {HTTPMethod.HEAD}};
-  }
 
   @Test(dataProvider = "httpMethod")
   public void all(HTTPMethod httpMethod) throws IOException {
@@ -128,6 +122,7 @@ public class JSONResultTest extends PrimeBaseTest {
     response.setCharacterEncoding("UTF-8");
     response.setContentType("application/json");
     response.setContentLength(538);
+    response.setHeader("Cache-Control", "no-store");
     if (httpMethod == HTTPMethod.GET) {
       expect(response.getOutputStream()).andReturn(sos);
     }
@@ -197,50 +192,6 @@ public class JSONResultTest extends PrimeBaseTest {
     verify(ee, messageStore, response);
   }
 
-  /**
-   * Using this test to ensure the JSONResult is fast enough even if we call writerWithDefaultPrettyPrinter or writerWithView which
-   * construct new Object Writers.
-   * <p>
-   * This seems to be fast as balls, and not worth worrying about.
-   * <p>
-   * Enable the test and see for yourself. Hopefully the JVM isn't so smart to see that I am not storing the
-   * references and then optimizing away the code.
-   */
-  @Test(enabled = false)
-  public void objectWriter_performance() {
-    long loopCount = 1_000_000;
-
-    // Test performance of constructing a new objectMapper for prettyPrint
-    Instant start = Instant.now();
-    for (int i = 0; i < loopCount; i++) {
-      objectMapper.writerWithDefaultPrettyPrinter();
-    }
-    Duration duration = Duration.between(start, Instant.now());
-    double avg = duration.toMillis() / loopCount;
-    System.out.println("Time: " + duration.toMillis());
-    System.out.println("Each iteration: " + avg);
-
-    // Test performance of constructing a new objectMapper for views
-    start = Instant.now();
-    for (int i = 0; i < loopCount; i++) {
-      objectMapper.writerWithView(Object.class);
-    }
-    duration = Duration.between(start, Instant.now());
-    avg = duration.toMillis() / loopCount;
-    System.out.println("Time: " + duration.toMillis());
-    System.out.println("Each iteration: " + avg);
-
-    // Test performance of constructing a new objectMapper for views with pretty print
-    start = Instant.now();
-    for (int i = 0; i < loopCount; i++) {
-      objectMapper.writerWithView(Object.class).withDefaultPrettyPrinter();
-    }
-    duration = Duration.between(start, Instant.now());
-    avg = duration.toMillis() / loopCount;
-    System.out.println("Time: " + duration.toMillis());
-    System.out.println("Each iteration: " + avg);
-  }
-
   @Test(dataProvider = "httpMethod")
   public void errors(HTTPMethod httpMethod) throws IOException {
     PostAction action = new PostAction();
@@ -253,6 +204,7 @@ public class JSONResultTest extends PrimeBaseTest {
     response.setCharacterEncoding("UTF-8");
     response.setContentType("application/json");
     response.setContentLength(359);
+    response.setHeader("Cache-Control", "no-store");
     if (httpMethod == HTTPMethod.GET) {
       expect(response.getOutputStream()).andReturn(sos);
     }
@@ -294,14 +246,79 @@ public class JSONResultTest extends PrimeBaseTest {
     verify(ee, messageStore, response);
   }
 
+  @DataProvider(name = "httpMethod")
+  public Object[][] httpMethod() {
+    return new Object[][]{{HTTPMethod.GET}, {HTTPMethod.HEAD}};
+  }
+
+  /**
+   * Using this test to ensure the JSONResult is fast enough even if we call writerWithDefaultPrettyPrinter or
+   * writerWithView which construct new Object Writers.
+   * <p>
+   * This seems to be fast as balls, and not worth worrying about.
+   * <p>
+   * Enable the test and see for yourself. Hopefully the JVM isn't so smart to see that I am not storing the references
+   * and then optimizing away the code.
+   */
+  @Test(enabled = false)
+  public void objectWriter_performance() {
+    long loopCount = 1_000_000;
+
+    // Test performance of constructing a new objectMapper for prettyPrint
+    Instant start = Instant.now();
+    for (int i = 0; i < loopCount; i++) {
+      objectMapper.writerWithDefaultPrettyPrinter();
+    }
+    Duration duration = Duration.between(start, Instant.now());
+    double avg = duration.toMillis() / loopCount;
+    System.out.println("Time: " + duration.toMillis());
+    System.out.println("Each iteration: " + avg);
+
+    // Test performance of constructing a new objectMapper for views
+    start = Instant.now();
+    for (int i = 0; i < loopCount; i++) {
+      objectMapper.writerWithView(Object.class);
+    }
+    duration = Duration.between(start, Instant.now());
+    avg = duration.toMillis() / loopCount;
+    System.out.println("Time: " + duration.toMillis());
+    System.out.println("Each iteration: " + avg);
+
+    // Test performance of constructing a new objectMapper for views with pretty print
+    start = Instant.now();
+    for (int i = 0; i < loopCount; i++) {
+      objectMapper.writerWithView(Object.class).withDefaultPrettyPrinter();
+    }
+    duration = Duration.between(start, Instant.now());
+    avg = duration.toMillis() / loopCount;
+    System.out.println("Time: " + duration.toMillis());
+    System.out.println("Each iteration: " + avg);
+  }
+
   public class JSONImpl implements JSON {
+    private final String cacheControl;
+
     private final String code;
+
+    private final boolean disableCacheControl;
 
     private final int status;
 
     public JSONImpl(String code, int status) {
+      this.cacheControl = "no-store";
       this.code = code;
+      this.disableCacheControl = false;
       this.status = status;
+    }
+
+    @Override
+    public Class<? extends Annotation> annotationType() {
+      return XMLStream.class;
+    }
+
+    @Override
+    public String cacheControl() {
+      return cacheControl;
     }
 
     @Override
@@ -310,13 +327,13 @@ public class JSONResultTest extends PrimeBaseTest {
     }
 
     @Override
-    public int status() {
-      return status;
+    public boolean disableCacheControl() {
+      return disableCacheControl;
     }
 
     @Override
-    public Class<? extends Annotation> annotationType() {
-      return XMLStream.class;
+    public int status() {
+      return status;
     }
   }
 }

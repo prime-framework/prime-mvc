@@ -83,6 +83,9 @@ public class BinaryResult extends AbstractResult<Binary> {
     response.setContentType(binary.type());
     response.setContentLength(bytes.length);
 
+    // Handle setting cache controls
+    addCacheControlHeader(binary, response);
+
     if (isHeadRequest(actionInvocation)) {
       return true;
     }
@@ -99,5 +102,15 @@ public class BinaryResult extends AbstractResult<Binary> {
     }
 
     return true;
+  }
+
+  @Override
+  protected String getCacheControl(Binary result) {
+    return result.cacheControl();
+  }
+
+  @Override
+  protected boolean getDisableCacheControl(Binary result) {
+    return result.disableCacheControl();
   }
 }

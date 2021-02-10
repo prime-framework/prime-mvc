@@ -59,12 +59,29 @@ public class ReexecuteSavedRequestResult extends AbstractRedirectResult<Reexecut
     SaveHttpRequestResult result = SavedRequestTools.getSaveRequestForReExecution(configuration, encryptor, request, response);
     String uri = result == null || result.savedHttpRequest.uri == null ? null : result.savedHttpRequest.uri;
 
+    // Handle setting cache controls
+    addCacheControlHeader(reexecuteSavedRequest, response);
+
     sendRedirect(uri, reexecuteSavedRequest.uri(), reexecuteSavedRequest.encodeVariables(), reexecuteSavedRequest.perm());
     return true;
   }
 
+  @Override
+  protected String getCacheControl(ReexecuteSavedRequest result) {
+    return result.cacheControl();
+  }
+
+  @Override
+  protected boolean getDisableCacheControl(ReexecuteSavedRequest result) {
+    return result.disableCacheControl();
+  }
+
   public static class ReexecuteSavedRequestImpl implements ReexecuteSavedRequest {
+    private final String cacheControl;
+
     private final String code;
+
+    private final boolean disableCacheControl;
 
     private final boolean encode;
 
@@ -73,18 +90,30 @@ public class ReexecuteSavedRequestResult extends AbstractRedirectResult<Reexecut
     private final String uri;
 
     public ReexecuteSavedRequestImpl(String uri, String code, boolean perm, boolean encode) {
-      this.uri = uri;
+      this.cacheControl = "no-store";
       this.code = code;
-      this.perm = perm;
+      this.disableCacheControl = false;
       this.encode = encode;
+      this.perm = perm;
+      this.uri = uri;
     }
 
     public Class<? extends Annotation> annotationType() {
       return ReexecuteSavedRequest.class;
     }
 
+    @Override
+    public String cacheControl() {
+      return cacheControl;
+    }
+
     public String code() {
       return code;
+    }
+
+    @Override
+    public boolean disableCacheControl() {
+      return disableCacheControl;
     }
 
     public boolean encodeVariables() {

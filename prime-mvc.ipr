@@ -350,10 +350,12 @@
           <fileSet type="namedScope" name="control-templates" pattern="file[prime-mvc]:src/main/ftl/WEB-INF/control-templates/*" />
         </list>
       </option>
-      <DB2CodeStyleSettings version="0">
-        <option name="myVersion" value="0" />
-        <option name="ALIAS_CASE" value="4" />
+      <DB2CodeStyleSettings version="5">
+        <option name="USE_GENERAL_STYLE" value="false" />
         <option name="TYPE_CASE" value="3" />
+        <option name="CUSTOM_TYPE_CASE" value="3" />
+        <option name="ALIAS_CASE" value="4" />
+        <option name="BUILT_IN_CASE" value="0" />
         <option name="QUERY_TRUE_INDENT" value="false" />
         <option name="QUERY_ALIGN_ELEMENTS" value="false" />
         <option name="QUERY_ALIGN_LINE_COMMENTS" value="false" />
@@ -385,10 +387,12 @@
         <option name="EXPR_CASE_THEN_WRAP" value="true" />
         <option name="PRIMARY_KEY_NAME_TEMPLATE" value="{table}_{columns}_pk" />
       </DB2CodeStyleSettings>
-      <DerbyCodeStyleSettings version="0">
-        <option name="myVersion" value="0" />
-        <option name="ALIAS_CASE" value="4" />
+      <DerbyCodeStyleSettings version="5">
+        <option name="USE_GENERAL_STYLE" value="false" />
         <option name="TYPE_CASE" value="3" />
+        <option name="CUSTOM_TYPE_CASE" value="3" />
+        <option name="ALIAS_CASE" value="4" />
+        <option name="BUILT_IN_CASE" value="0" />
         <option name="QUERY_TRUE_INDENT" value="false" />
         <option name="QUERY_ALIGN_ELEMENTS" value="false" />
         <option name="QUERY_ALIGN_LINE_COMMENTS" value="false" />
@@ -424,10 +428,12 @@
         <option name="CLASS_COUNT_TO_USE_IMPORT_ON_DEMAND" value="9999" />
         <option name="NAMES_COUNT_TO_USE_IMPORT_ON_DEMAND" value="9999" />
       </GroovyCodeStyleSettings>
-      <H2CodeStyleSettings version="0">
-        <option name="myVersion" value="0" />
-        <option name="ALIAS_CASE" value="4" />
+      <H2CodeStyleSettings version="5">
+        <option name="USE_GENERAL_STYLE" value="false" />
         <option name="TYPE_CASE" value="3" />
+        <option name="CUSTOM_TYPE_CASE" value="3" />
+        <option name="ALIAS_CASE" value="4" />
+        <option name="BUILT_IN_CASE" value="0" />
         <option name="QUERY_TRUE_INDENT" value="false" />
         <option name="QUERY_ALIGN_ELEMENTS" value="false" />
         <option name="QUERY_ALIGN_LINE_COMMENTS" value="false" />
@@ -459,10 +465,12 @@
         <option name="EXPR_CASE_THEN_WRAP" value="true" />
         <option name="PRIMARY_KEY_NAME_TEMPLATE" value="{table}_{columns}_pk" />
       </H2CodeStyleSettings>
-      <HSQLCodeStyleSettings version="0">
-        <option name="myVersion" value="0" />
-        <option name="ALIAS_CASE" value="4" />
+      <HSQLCodeStyleSettings version="5">
+        <option name="USE_GENERAL_STYLE" value="false" />
         <option name="TYPE_CASE" value="3" />
+        <option name="CUSTOM_TYPE_CASE" value="3" />
+        <option name="ALIAS_CASE" value="4" />
+        <option name="BUILT_IN_CASE" value="0" />
         <option name="QUERY_TRUE_INDENT" value="false" />
         <option name="QUERY_ALIGN_ELEMENTS" value="false" />
         <option name="QUERY_ALIGN_LINE_COMMENTS" value="false" />
@@ -509,29 +517,14 @@
             <package name="" withSubpackages="true" static="true" />
           </value>
         </option>
+        <option name="JD_INDENT_ON_CONTINUATION" value="true" />
       </JavaCodeStyleSettings>
-      <JetCodeStyleSettings>
-        <option name="PACKAGES_TO_USE_STAR_IMPORTS">
-          <value>
-            <package name="java.util" alias="false" withSubpackages="false" />
-            <package name="kotlinx.android.synthetic" alias="false" withSubpackages="true" />
-            <package name="io.ktor" alias="false" withSubpackages="true" />
-          </value>
-        </option>
-        <option name="PACKAGES_IMPORT_LAYOUT">
-          <value>
-            <package name="" alias="false" withSubpackages="true" />
-            <package name="java" alias="false" withSubpackages="true" />
-            <package name="javax" alias="false" withSubpackages="true" />
-            <package name="kotlin" alias="false" withSubpackages="true" />
-            <package name="" alias="true" withSubpackages="true" />
-          </value>
-        </option>
-      </JetCodeStyleSettings>
-      <MSSQLCodeStyleSettings version="0">
-        <option name="myVersion" value="0" />
-        <option name="ALIAS_CASE" value="4" />
+      <MSSQLCodeStyleSettings version="5">
+        <option name="USE_GENERAL_STYLE" value="false" />
         <option name="TYPE_CASE" value="3" />
+        <option name="CUSTOM_TYPE_CASE" value="3" />
+        <option name="ALIAS_CASE" value="4" />
+        <option name="BUILT_IN_CASE" value="0" />
         <option name="QUERY_TRUE_INDENT" value="false" />
         <option name="QUERY_ALIGN_ELEMENTS" value="false" />
         <option name="QUERY_ALIGN_LINE_COMMENTS" value="false" />
@@ -566,10 +559,12 @@
       <MarkdownNavigatorCodeStyleSettings>
         <option name="RIGHT_MARGIN" value="72" />
       </MarkdownNavigatorCodeStyleSettings>
-      <MySQLCodeStyleSettings version="0">
-        <option name="myVersion" value="0" />
-        <option name="ALIAS_CASE" value="4" />
+      <MySQLCodeStyleSettings version="5">
+        <option name="USE_GENERAL_STYLE" value="false" />
         <option name="TYPE_CASE" value="3" />
+        <option name="CUSTOM_TYPE_CASE" value="3" />
+        <option name="ALIAS_CASE" value="4" />
+        <option name="BUILT_IN_CASE" value="0" />
         <option name="QUERY_TRUE_INDENT" value="false" />
         <option name="QUERY_ALIGN_ELEMENTS" value="false" />
         <option name="QUERY_ALIGN_LINE_COMMENTS" value="false" />
@@ -601,10 +596,12 @@
         <option name="EXPR_CASE_THEN_WRAP" value="true" />
         <option name="PRIMARY_KEY_NAME_TEMPLATE" value="{table}_{columns}_pk" />
       </MySQLCodeStyleSettings>
-      <OracleCodeStyleSettings version="0">
-        <option name="myVersion" value="0" />
-        <option name="ALIAS_CASE" value="4" />
+      <OracleCodeStyleSettings version="5">
+        <option name="USE_GENERAL_STYLE" value="false" />
         <option name="TYPE_CASE" value="3" />
+        <option name="CUSTOM_TYPE_CASE" value="3" />
+        <option name="ALIAS_CASE" value="4" />
+        <option name="BUILT_IN_CASE" value="0" />
         <option name="QUERY_TRUE_INDENT" value="false" />
         <option name="QUERY_ALIGN_ELEMENTS" value="false" />
         <option name="QUERY_ALIGN_LINE_COMMENTS" value="false" />
@@ -636,10 +633,12 @@
         <option name="EXPR_CASE_THEN_WRAP" value="true" />
         <option name="PRIMARY_KEY_NAME_TEMPLATE" value="{table}_{columns}_pk" />
       </OracleCodeStyleSettings>
-      <PostgresCodeStyleSettings version="0">
-        <option name="myVersion" value="0" />
-        <option name="ALIAS_CASE" value="4" />
+      <PostgresCodeStyleSettings version="5">
+        <option name="USE_GENERAL_STYLE" value="false" />
         <option name="TYPE_CASE" value="3" />
+        <option name="CUSTOM_TYPE_CASE" value="3" />
+        <option name="ALIAS_CASE" value="4" />
+        <option name="BUILT_IN_CASE" value="0" />
         <option name="QUERY_TRUE_INDENT" value="false" />
         <option name="QUERY_ALIGN_ELEMENTS" value="false" />
         <option name="QUERY_ALIGN_LINE_COMMENTS" value="false" />
@@ -671,10 +670,12 @@
         <option name="EXPR_CASE_THEN_WRAP" value="true" />
         <option name="PRIMARY_KEY_NAME_TEMPLATE" value="{table}_{columns}_pk" />
       </PostgresCodeStyleSettings>
-      <SQLiteCodeStyleSettings version="0">
-        <option name="myVersion" value="0" />
-        <option name="ALIAS_CASE" value="4" />
+      <SQLiteCodeStyleSettings version="5">
+        <option name="USE_GENERAL_STYLE" value="false" />
         <option name="TYPE_CASE" value="3" />
+        <option name="CUSTOM_TYPE_CASE" value="3" />
+        <option name="ALIAS_CASE" value="4" />
+        <option name="BUILT_IN_CASE" value="0" />
         <option name="QUERY_TRUE_INDENT" value="false" />
         <option name="QUERY_ALIGN_ELEMENTS" value="false" />
         <option name="QUERY_ALIGN_LINE_COMMENTS" value="false" />
@@ -709,10 +710,11 @@
       <ScalaCodeStyleSettings>
         <option name="MULTILINE_STRING_CLOSING_QUOTES_ON_NEW_LINE" value="true" />
       </ScalaCodeStyleSettings>
-      <SqlCodeStyleSettings version="0">
-        <option name="myVersion" value="0" />
-        <option name="ALIAS_CASE" value="4" />
+      <SqlCodeStyleSettings version="5">
         <option name="TYPE_CASE" value="3" />
+        <option name="CUSTOM_TYPE_CASE" value="3" />
+        <option name="ALIAS_CASE" value="4" />
+        <option name="BUILT_IN_CASE" value="0" />
         <option name="QUERY_TRUE_INDENT" value="false" />
         <option name="QUERY_ALIGN_ELEMENTS" value="false" />
         <option name="QUERY_ALIGN_LINE_COMMENTS" value="false" />
@@ -749,10 +751,12 @@
         <option name="WRAP_INSIDE_WHERE" value="5" />
         <option name="WRAP_INSIDE_SET" value="5" />
       </SqlCodeStyleSettings>
-      <SybaseCodeStyleSettings version="0">
-        <option name="myVersion" value="0" />
-        <option name="ALIAS_CASE" value="4" />
+      <SybaseCodeStyleSettings version="5">
+        <option name="USE_GENERAL_STYLE" value="false" />
         <option name="TYPE_CASE" value="3" />
+        <option name="CUSTOM_TYPE_CASE" value="3" />
+        <option name="ALIAS_CASE" value="4" />
+        <option name="BUILT_IN_CASE" value="0" />
         <option name="QUERY_TRUE_INDENT" value="false" />
         <option name="QUERY_ALIGN_ELEMENTS" value="false" />
         <option name="QUERY_ALIGN_LINE_COMMENTS" value="false" />
@@ -1815,7 +1819,7 @@
   <component name="ProjectResources">
     <default-html-doctype>http://www.w3.org/1999/xhtml</default-html-doctype>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="false" project-jdk-name="Java 1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" project-jdk-name="Java 1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
   <component name="TemplateDataLanguageMappings">

@@ -21,6 +21,9 @@ import org.primeframework.mvc.security.MockUserLoginSecurityContext;
 import org.primeframework.mvc.security.UserLoginSecurityContext;
 import org.testng.annotations.Test;
 
+/**
+ * @author Daniel DeGroff
+ */
 public class CSRFTest extends PrimeBaseTest {
   @Inject public UserLoginSecurityContext securityContext;
 

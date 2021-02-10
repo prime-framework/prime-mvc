@@ -65,6 +65,7 @@ public class ReexecuteSavedRequestResultTest extends PrimeBaseTest {
     replay(request);
 
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
+    response.setHeader("Cache-Control", "no-store");
     response.sendRedirect("/");
     response.setStatus(301);
     replay(response);
@@ -108,6 +109,7 @@ public class ReexecuteSavedRequestResultTest extends PrimeBaseTest {
 
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
     response.addCookie(new Cookie(configuration.savedRequestCookieName + "_executed", EasyMock.anyString()));
+    response.setHeader("Cache-Control", "no-store");
     response.sendRedirect("/secure?test=value1&test2=value2");
     response.setStatus(301);
     replay(response);

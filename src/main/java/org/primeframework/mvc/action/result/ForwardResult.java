@@ -41,6 +41,11 @@ public class ForwardResult extends AbstractForwardResult<Forward> {
   }
 
   @Override
+  protected String getCacheControl(Forward forward) {
+    return forward.cacheControl();
+  }
+
+  @Override
   protected String getCode(Forward forward) {
     return forward.code();
   }
@@ -48,6 +53,11 @@ public class ForwardResult extends AbstractForwardResult<Forward> {
   @Override
   protected String getContentType(Forward forward) {
     return forward.contentType();
+  }
+
+  @Override
+  protected boolean getDisableCacheControl(Forward forward) {
+    return forward.disableCacheControl();
   }
 
   @Override
@@ -66,9 +76,13 @@ public class ForwardResult extends AbstractForwardResult<Forward> {
   }
 
   public static class ForwardImpl implements Forward {
+    private final String cacheControl;
+
     private final String code;
 
     private final String contentType;
+
+    private final boolean disableCacheControl;
 
     private final int status;
 
@@ -77,23 +91,32 @@ public class ForwardResult extends AbstractForwardResult<Forward> {
     private final String uri;
 
     public ForwardImpl(String uri, String code) {
-      this.uri = uri;
+      this.cacheControl = "no-store";
       this.code = code;
       this.contentType = "text/html; charset=UTF-8";
+      this.disableCacheControl = false;
       this.status = 200;
       this.statusStr = "";
+      this.uri = uri;
     }
 
     public ForwardImpl(String uri, String code, String contentType, int status) {
-      this.uri = uri;
+      this.cacheControl = "no-store";
       this.code = code;
       this.contentType = contentType;
+      this.disableCacheControl = false;
       this.status = status;
       this.statusStr = "";
+      this.uri = uri;
     }
 
     public Class<? extends Annotation> annotationType() {
       return Forward.class;
+    }
+
+    @Override
+    public String cacheControl() {
+      return cacheControl;
     }
 
     @Override
@@ -104,6 +127,11 @@ public class ForwardResult extends AbstractForwardResult<Forward> {
     @Override
     public String contentType() {
       return contentType;
+    }
+
+    @Override
+    public boolean disableCacheControl() {
+      return disableCacheControl;
     }
 
     @Override

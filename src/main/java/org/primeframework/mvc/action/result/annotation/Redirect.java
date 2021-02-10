@@ -18,8 +18,8 @@ package org.primeframework.mvc.action.result.annotation;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import static java.lang.annotation.ElementType.*;
-import static java.lang.annotation.RetentionPolicy.*;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * This annotation marks a result from an action as a redirect.
@@ -31,14 +31,28 @@ import static java.lang.annotation.RetentionPolicy.*;
 @Target(TYPE)
 public @interface Redirect {
   /**
+   * @return the value to use for the <code>Cache-Control</code> header.
+   */
+  String cacheControl() default "no-store";
+
+  /**
    * @return The result code from the action's execute method that this Result is associated with.
    */
   String code() default "success";
 
   /**
-   * @return The redirect URI.
+   * @return set to true to disable cache control and manage the headers on your own.
    */
-  String uri();
+  boolean disableCacheControl() default false;
+
+  /**
+   * @return Whether or not variable replacements inside the URI string should be encoded or not. In some cases, you
+   *     want to encode variables when they contain UTF-8 characters and are part of the URL query parameters. For
+   *     example, "/foo?user=${bar}" and the bar variable contains unicode characters. In other cases, you don't want to
+   *     encode the variables. For example, if they variable contains the entire URI such as "${uri}". This defaults to
+   *     false to maintain backwards compatibility.
+   */
+  boolean encodeVariables() default false;
 
   /**
    * @return Whether or not this is a permanent redirect (301) or a temporary redirect (302).
@@ -46,13 +60,9 @@ public @interface Redirect {
   boolean perm() default false;
 
   /**
-   * @return Whether or not variable replacements inside the URI string should be encoded or not. In some cases, you
-   *         want to encode variables when they contain UTF-8 characters and are part of the URL query parameters. For
-   *         example, "/foo?user=${bar}" and the bar variable contains unicode characters. In other cases, you don't
-   *         want to encode the variables. For example, if they variable contains the entire URI such as "${uri}". This
-   *         defaults to false to maintain backwards compatibility.
+   * @return The redirect URI.
    */
-  boolean encodeVariables() default false;
+  String uri();
 
   /**
    * A list of Redirect annotations.

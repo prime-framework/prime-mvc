@@ -33,9 +33,19 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target(TYPE)
 public @interface Binary {
   /**
+   * @return the value to use for the <code>Cache-Control</code> header.
+   */
+  String cacheControl() default "no-store";
+
+  /**
    * @return The result code from the action's execute method that this Result is associated with.
    */
   String code() default "success";
+
+  /**
+   * @return set to true to disable cache control and manage the headers on your own.
+   */
+  boolean disableCacheControl() default false;
 
   /**
    * @return The HTTP status code.
@@ -44,7 +54,7 @@ public @interface Binary {
 
   /**
    * @return The content type of the InputStream. This is used to set the HTTP header and disposition so that the
-   * browser can correctly handle the response.
+   *     browser can correctly handle the response.
    */
   String type() default "application/octet-stream";
 }

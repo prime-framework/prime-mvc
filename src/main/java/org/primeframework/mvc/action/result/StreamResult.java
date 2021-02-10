@@ -76,11 +76,24 @@ public class StreamResult extends AbstractResult<Stream> {
       response.setHeader("Content-Disposition", "attachment; filename=\"" + EncodingUtils.escapedQuotedString(name) + "\"; filename*=UTF-8''" + EncodingUtils.rfc5987_encode(name));
     }
 
+    // Handle setting cache controls
+    addCacheControlHeader(stream, response);
+
     if (isHeadRequest(actionInvocation)) {
       return true;
     }
 
     writeToOutputStream(is, response);
     return true;
+  }
+
+  @Override
+  protected String getCacheControl(Stream result) {
+    return result.cacheControl();
+  }
+
+  @Override
+  protected boolean getDisableCacheControl(Stream result) {
+    return result.disableCacheControl();
   }
 }

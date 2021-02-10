@@ -45,12 +45,30 @@ public class RedirectResult extends AbstractRedirectResult<Redirect> {
    */
   public boolean execute(Redirect redirect) throws IOException {
     moveMessagesToFlash();
+
+    // Handle setting cache controls
+    addCacheControlHeader(redirect, response);
+
     sendRedirect(null, redirect.uri(), redirect.encodeVariables(), redirect.perm());
     return true;
   }
 
+  @Override
+  protected String getCacheControl(Redirect result) {
+    return result.cacheControl();
+  }
+
+  @Override
+  protected boolean getDisableCacheControl(Redirect result) {
+    return result.disableCacheControl();
+  }
+
   public static class RedirectImpl implements Redirect {
+    private final String cacheControl;
+
     private final String code;
+
+    private final boolean disableCacheControl;
 
     private final boolean encode;
 
@@ -59,18 +77,30 @@ public class RedirectResult extends AbstractRedirectResult<Redirect> {
     private final String uri;
 
     public RedirectImpl(String uri, String code, boolean perm, boolean encode) {
-      this.uri = uri;
+      this.cacheControl = "no-store";
+      this.disableCacheControl = false;
+      this.encode = encode;
       this.code = code;
       this.perm = perm;
-      this.encode = encode;
+      this.uri = uri;
     }
 
     public Class<? extends Annotation> annotationType() {
       return Redirect.class;
     }
 
+    @Override
+    public String cacheControl() {
+      return cacheControl;
+    }
+
     public String code() {
       return code;
+    }
+
+    @Override
+    public boolean disableCacheControl() {
+      return disableCacheControl;
     }
 
     public boolean encodeVariables() {

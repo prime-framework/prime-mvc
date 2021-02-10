@@ -38,6 +38,14 @@ public abstract class AbstractResult<U extends Annotation> implements Result<U> 
     this.expressionEvaluator = expressionEvaluator;
   }
 
+  protected void addCacheControlHeader(U result, HttpServletResponse response) {
+    if (getDisableCacheControl(result)) {
+      return;
+    }
+
+    response.setHeader("Cache-Control", getCacheControl(result));
+  }
+
   /**
    * Expands any variables in the String.
    *
@@ -53,6 +61,24 @@ public abstract class AbstractResult<U extends Annotation> implements Result<U> 
 
     return str;
   }
+
+  /**
+   * return the cache control header if one is defined. If you wish to disable control and manage Cache-Control headers
+   * on your own, use the {@link #getDisableCacheControl(Annotation)} method.
+   *
+   * @param result the result
+   * @return the value of the <code>Cache-Control</code> header.
+   */
+  protected abstract String getCacheControl(U result);
+
+  /**
+   * Return a boolean value indicating if the <code>Cache-Control</code> and <code>Pragma</code> HTTP response headers
+   * will be set by this result. If you wish to manage these headers on your own, disable control.
+   *
+   * @param result the result
+   * @return true if you wish to disable Cache Control for this result.
+   */
+  protected abstract boolean getDisableCacheControl(U result);
 
   /**
    * Return true if the current invocation is for an HTTP HEAD request.

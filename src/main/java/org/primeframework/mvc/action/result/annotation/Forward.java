@@ -32,22 +32,32 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target(TYPE)
 public @interface Forward {
   /**
+   * @return the value to use for the <code>Cache-Control</code> header.
+   */
+  String cacheControl() default "no-store";
+
+  /**
    * @return The result code from the action's execute method that this Result is associated with.
    */
   String code() default "success";
 
   /**
-   * @return The location of the JSP or FreeMarker template (the extension of this attribute determines if Prime
-   *         forwards to a JSP or renders the FreeMarker template. Any page with .jsp on the end goes to a JSP and .ftl
-   *         goes to a FreeMarker template) If this isn't specified, then the default search method is used to find the
-   *         correct FTL or JSP page.
-   */
-  String page() default "";
-
-  /**
    * @return The content type of the FTL or JSP page. This defaults to "text/html; charset=UTF-8".
    */
   String contentType() default "text/html; charset=UTF-8";
+
+  /**
+   * @return set to true to disable cache control and manage the headers on your own.
+   */
+  boolean disableCacheControl() default false;
+
+  /**
+   * @return The location of the JSP or FreeMarker template (the extension of this attribute determines if Prime
+   *     forwards to a JSP or renders the FreeMarker template. Any page with .jsp on the end goes to a JSP and .ftl goes
+   *     to a FreeMarker template) If this isn't specified, then the default search method is used to find the correct
+   *     FTL or JSP page.
+   */
+  String page() default "";
 
   /**
    * @return The HTTP response status code. This defaults to 200.
@@ -56,10 +66,10 @@ public @interface Forward {
 
   /**
    * @return Overrides the status parameter. If this is set, Prime use the value of this parameter and first expand it.
-   *         It uses the <code>${variable}</code> notation that is common for variable expanders. After it has been
-   *         expanded, the result is converted into an int. Therefore, you can specify either a number as a String, or a
-   *         variable expansion. Here are some examples: <code>"${myStatus}"</code>, <code>"200"</code>,
-   * <code>"40${someField}"</code>
+   *     It uses the <code>${variable}</code> notation that is common for variable expanders. After it has been
+   *     expanded, the result is converted into an int. Therefore, you can specify either a number as a String, or a
+   *     variable expansion. Here are some examples: <code>"${myStatus}"</code>, <code>"200"</code>,
+   *     <code>"40${someField}"</code>
    */
   String statusStr() default "";
 

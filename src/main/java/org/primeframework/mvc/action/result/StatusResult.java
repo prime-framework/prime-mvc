@@ -19,12 +19,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.annotation.Status;
 import org.primeframework.mvc.action.result.annotation.Status.Header;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-
-import com.google.inject.Inject;
 
 /**
  * This result returns a status response.
@@ -32,11 +31,13 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 public class StatusResult extends AbstractResult<Status> {
-  private final HttpServletResponse response;
   private final ActionInvocationStore actionInvocationStore;
 
+  private final HttpServletResponse response;
+
   @Inject
-  public StatusResult(ExpressionEvaluator expressionEvaluator, HttpServletResponse response, ActionInvocationStore actionInvocationStore) {
+  public StatusResult(ExpressionEvaluator expressionEvaluator, HttpServletResponse response,
+                      ActionInvocationStore actionInvocationStore) {
     super(expressionEvaluator);
     this.response = response;
     this.actionInvocationStore = actionInvocationStore;
@@ -52,6 +53,20 @@ public class StatusResult extends AbstractResult<Status> {
     for (Header header : status.headers()) {
       response.setHeader(header.name(), header.value());
     }
+
+    // Handle setting cache controls
+    addCacheControlHeader(status, response);
+
     return true;
+  }
+
+  @Override
+  protected String getCacheControl(Status result) {
+    return result.cacheControl();
+  }
+
+  @Override
+  protected boolean getDisableCacheControl(Status result) {
+    return result.disableCacheControl();
   }
 }

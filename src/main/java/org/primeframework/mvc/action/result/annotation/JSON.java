@@ -15,11 +15,10 @@
  */
 package org.primeframework.mvc.action.result.annotation;
 
-import org.primeframework.mvc.content.json.annotation.JSONResponse;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import org.primeframework.mvc.content.json.annotation.JSONResponse;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
@@ -34,9 +33,19 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target(TYPE)
 public @interface JSON {
   /**
+   * @return the value to use for the <code>Cache-Control</code> header.
+   */
+  String cacheControl() default "no-store";
+
+  /**
    * @return The result code from the action's execute method that this Result is associated with.
    */
   String code() default "success";
+
+  /**
+   * @return set to true to disable cache control and manage the headers on your own.
+   */
+  boolean disableCacheControl() default false;
 
   /**
    * @return The HTTP status code.
@@ -49,7 +58,7 @@ public @interface JSON {
   @ResultContainerAnnotation
   @Retention(RUNTIME)
   @Target(TYPE)
-  public static @interface List {
+  @interface List {
     JSON[] value();
   }
 }

@@ -65,77 +65,21 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
-  public void conjoinedRequestParameters() throws Exception {
-    // Conjoining request parameters can let us work around the default 10k request parameter limit (Tomcat) on a GET and POST request.
+  public void cache_control_disabled() throws Exception {
+    // Disable cache control managed by the result handler.
+    test.simulate(() -> simulator.test("/cache-control-disabled")
+                                 .post()
+                                 .assertStatusCode(200)
+                                 .assertHeaderDoesNotContain("Cache-Control"));
+  }
 
-    // Use a GET request using the default parameter name of 'requestData'
-    test.simulate(() -> test.simulator.test("/conjoined-parameter")
-                                      .withURLSegment(12345)
-                                      .withParameter("requestData", "param1=foo&param2=true&param3=42&param4=boom&param4=dynamite")
-                                      .get()
-                                      .assertStatusCode(200)
-                                      .assertBodyContains(
-                                          "urlSegment:12345",
-                                          "param1:foo",
-                                          "param2:true",
-                                          "param3:42",
-                                          "param4:size:2",
-                                          "param4:[0]:boom",
-                                          "param4:[1]:dynamite"));
-
-    // Equal to the last, but using our "conjoined" helper
-    test.simulate(() -> test.simulator.test("/conjoined-parameter")
-                                      .withURLSegment(12345)
-                                      .withParameter("param1", "foo")
-                                      .withParameter("param2",true)
-                                      .withParameter("param3", 42)
-                                      .withParameter("param4", "boom")
-                                      .withParameter("param4", "dynamite")
-                                      .conjoinParameters()
-                                      .get()
-                                      .assertStatusCode(200)
-                                      .assertBodyContains(
-                                          "urlSegment:12345",
-                                          "param1:foo",
-                                          "param2:true",
-                                          "param3:42",
-                                          "param4:size:2",
-                                          "param4:[0]:boom",
-                                          "param4:[1]:dynamite"));
-
-    // Use a POST request with  named parameter
-    test.simulate(() -> test.simulator.test("/conjoined-parameter")
-                                      .withURLSegment(12345)
-                                      .withParameter("conjoined", "param1=foo&param2=true&param3=42&param4=boom&param4=dynamite")
-                                      .post()
-                                      .assertStatusCode(200)
-                                      .assertBodyContains(
-                                          "urlSegment:12345",
-                                          "param1:foo",
-                                          "param2:true",
-                                          "param3:42",
-                                          "param4:size:2",
-                                          "param4:[0]:boom",
-                                          "param4:[1]:dynamite"));
-
-    // No-op, just pass in the parameters normally, expect the same result.
-    test.simulate(() -> test.simulator.test("/conjoined-parameter")
-                                      .withURLSegment(12345)
-                                      .withParameter("param1", "foo")
-                                      .withParameter("param2", true)
-                                      .withParameter("param3", "42")
-                                      .withParameter("param4", "boom")
-                                      .withParameter("param4", "dynamite")
-                                      .post()
-                                      .assertStatusCode(200)
-                                      .assertBodyContains(
-                                          "urlSegment:12345",
-                                          "param1:foo",
-                                          "param2:true",
-                                          "param3:42",
-                                          "param4:size:2",
-                                          "param4:[0]:boom",
-                                          "param4:[1]:dynamite"));
+  @Test
+  public void cache_control_override() throws Exception {
+    // Override the default cache control settings, values are not validated to be valid.
+    test.simulate(() -> simulator.test("/cache-control-override")
+                                 .post()
+                                 .assertStatusCode(200)
+                                 .assertHeaderContains("Cache-Control", "no-cache"));
   }
 
   @Test
@@ -144,14 +88,16 @@ public class GlobalTest extends PrimeBaseTest {
     test.simulate(() -> simulator.test("/scope/page-one")
                                  .withURLSegment("IdOnlyForPageOne")
                                  .get()
-                                 .assertStatusCode(200));
+                                 .assertStatusCode(200)
+                                 .assertHeaderContains("Cache-Control", "no-store"));
 
     // Ensure the @FileUpload in the PageOneAction does not mess up PageTwo
     test.createFile()
         .simulate(() -> simulator.test("/scope/page-one")
                                  .withFile("file", test.tempFile.toFile(), "text/plain")
                                  .get()
-                                 .assertStatusCode(200));
+                                 .assertStatusCode(200)
+                                 .assertHeaderContains("Cache-Control", "no-store"));
   }
 
   @Test
@@ -163,6 +109,7 @@ public class GlobalTest extends PrimeBaseTest {
                                       .withURLSegment("foo@bar")
                                       .get()
                                       .assertStatusCode(200)
+                                      .assertHeaderContains("Cache-Control", "no-store")
                                       .assertBodyContains(
                                           "Success!",
                                           "parm=foo bar",
@@ -176,6 +123,7 @@ public class GlobalTest extends PrimeBaseTest {
                                       .withURLSegment("foo@bar")
                                       .get()
                                       .assertStatusCode(200)
+                                      .assertHeaderContains("Cache-Control", "no-store")
                                       .assertBodyContains(
                                           "Success!",
                                           "parm=&lt;foo&gt;",
@@ -188,6 +136,7 @@ public class GlobalTest extends PrimeBaseTest {
              .get()
              .setup(r -> r.container.getResponse().setHeader("Referer", "http://localhost"))
              .assertStatusCode(200)
+             .assertHeaderContains("Cache-Control", "no-store")
              // header name is not case sensitive
              .assertHeaderContains("referer", "http://localhost")
              .assertHeaderContains("Referer", "http://localhost")
@@ -200,11 +149,13 @@ public class GlobalTest extends PrimeBaseTest {
     test.simulate(() -> simulator.test("/views/entry/api")
                                  .get()
                                  .assertStatusCode(200)
+                                 .assertHeaderContains("Cache-Control", "no-store")
                                  .assertJSONFile(jsonDir.resolve("views/entry/entry-api.json")));
 
     test.simulate(() -> simulator.test("/views/entry/export")
                                  .get()
                                  .assertStatusCode(200)
+                                 .assertHeaderContains("Cache-Control", "no-store")
                                  .assertJSONFile(jsonDir.resolve("views/entry/entry-export.json")));
 
     // Serialize an object using @JSONResponse when no view is specified for an object that has only annotated fields
@@ -213,12 +164,14 @@ public class GlobalTest extends PrimeBaseTest {
         .simulate(() -> simulator.test("/views/entry/no-view-defined")
                                  .get()
                                  .assertStatusCode(200)
+                                 .assertHeaderContains("Cache-Control", "no-store")
                                  .assertJSONFile(jsonDir.resolve("views/entry/entry-no-view-defined.json")));
 
     // Default view inclusion is enabled and if we serialize a @JSONResponse with a view that has no fields in the object - empty response
     test.simulate(() -> simulator.test("/views/entry/wrong-view-defined")
                                  .get()
                                  .assertStatusCode(200)
+                                 .assertHeaderContains("Cache-Control", "no-store")
                                  .assertJSON("{}"));
 
     // Ensure we get a response even when we disable the default view inclusion if we do not specify a view
@@ -226,12 +179,14 @@ public class GlobalTest extends PrimeBaseTest {
         .simulate(() -> simulator.test("/views/entry/no-view-defined")
                                  .get()
                                  .assertStatusCode(200)
+                                 .assertHeaderContains("Cache-Control", "no-store")
                                  .assertJSONFile(jsonDir.resolve("views/entry/entry-no-view-defined.json")));
 
     // Default view inclusion is disabled and if we serialize a @JSONResponse with a view that has no fields in the object - empty response.
     test.simulate(() -> simulator.test("/views/entry/wrong-view-defined")
                                  .get()
                                  .assertStatusCode(200)
+                                 .assertHeaderContains("Cache-Control", "no-store")
                                  .assertJSON("{}"));
   }
 
@@ -241,6 +196,7 @@ public class GlobalTest extends PrimeBaseTest {
     simulator.test("/freemarker/action-backed")
              .get()
              .assertStatusCode(200)
+             .assertHeaderContains("Cache-Control", "no-store")
              .assertBodyContains("Yo, nice template, I have an action.");
 
     // Double slash, redirect to the correct location
@@ -248,7 +204,11 @@ public class GlobalTest extends PrimeBaseTest {
              .get()
              .assertStatusCode(301)
              .assertRedirect("/freemarker/action-backed")
+             // A 301 will not contain these headers
+             .assertHeaderDoesNotContain("Cache-Control")
+
              .executeRedirect(result -> result.assertStatusCode(200)
+                                              .assertHeaderContains("Cache-Control", "no-store")
                                               .assertBodyContains("Yo, nice template, I have an action."));
 
     // Triple slashes, redirect to the correct location
@@ -256,9 +216,16 @@ public class GlobalTest extends PrimeBaseTest {
              .get()
              .assertStatusCode(301)
              .assertRedirect("/freemarker//action-backed")
+             // A 301 will not contain these headers
+             .assertHeaderDoesNotContain("Cache-Control")
+
              .executeRedirect(result -> result.assertStatusCode(301)
                                               .assertRedirect("/freemarker/action-backed")
+                                              // A 301 will not contain these headers
+                                              .assertHeaderDoesNotContain("Cache-Control")
+
                                               .executeRedirect(subResult -> subResult.assertStatusCode(200)
+                                                                                     .assertHeaderContains("Cache-Control", "no-store")
                                                                                      .assertBodyContains("Yo, nice template, I have an action.")));
   }
 
@@ -268,6 +235,7 @@ public class GlobalTest extends PrimeBaseTest {
                                       .withURLSegment("42")
                                       .get()
                                       .assertStatusCode(200)
+                                      .assertHeaderContains("Cache-Control", "no-store")
                                       .assertBodyContains("/foo/view/bar/baz!", "42"))
 
         .simulate(() -> test.simulator.test("/foo/view/bar/baz")
@@ -321,6 +289,7 @@ public class GlobalTest extends PrimeBaseTest {
                                  .withParameter("string", "bar")
                                  .withParameter("string", "baz")
                                  .get()
+                                 .assertHeaderContains("Cache-Control", "no-store")
                                  .assertStatusCode(500));
 
     // It will work if we use a backing collection with an iterator in the form to build multiple form fields
@@ -369,6 +338,7 @@ public class GlobalTest extends PrimeBaseTest {
     test.simulate(() -> simulator.test("/temp-redirect")
                                  .get()
                                  .assertStatusCode(302)
+                                 .assertHeaderContains("Cache-Control", "no-store")
                                  // Messages are in the store
                                  .assertContainsGeneralMessageCodes(MessageType.ERROR, "[ERROR]")
                                  .assertContainsGeneralMessageCodes(MessageType.INFO, "[INFO]")
@@ -417,6 +387,7 @@ public class GlobalTest extends PrimeBaseTest {
     test.simulate(() -> simulator.test("/temp-relative-redirect")
                                  .get()
                                  .assertStatusCode(302)
+                                 .assertHeaderContains("Cache-Control", "no-store")
                                  // Messages are in the store
                                  .assertContainsGeneralMessageCodes(MessageType.ERROR, "[ERROR]")
                                  .assertContainsGeneralMessageCodes(MessageType.INFO, "[INFO]")
@@ -533,6 +504,7 @@ public class GlobalTest extends PrimeBaseTest {
     test.simulate(() -> simulator.test("/user/")
                                  .get()
                                  .assertStatusCode(200)
+                                 .assertHeaderContains("Cache-Control", "no-store")
                                  .assertBodyContains("Yeah!"));
     test.simulate(() -> simulator.test("/user")
                                  .get()
@@ -548,6 +520,7 @@ public class GlobalTest extends PrimeBaseTest {
     test.simulate(() -> simulator.test("/jwt-authorized")
                                  .withHeader("Authorization", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkifQ.qHdut1UR4-2FSAvh7U3YdeRR5r5boVqjIGQ16Ztp894")
                                  .get()
+                                 .assertHeaderContains("Cache-Control", "no-store")
                                  .assertStatusCode(200));
 
     // Test with Bearer scheme
@@ -689,6 +662,7 @@ public class GlobalTest extends PrimeBaseTest {
                                       .withURLSegment("foo")
                                       .withURLSegment("bar")
                                       .get()
+                                      .assertHeaderContains("Cache-Control", "no-store")
                                       .assertStatusCode(200)
                                       .assertBodyContains("Success!", "preParam1=42", "preParam2=99", "endParam1=foo", "endParam2=bar"));
   }
@@ -721,7 +695,8 @@ public class GlobalTest extends PrimeBaseTest {
                                  .withParameter("foo.bar", "baz")
                                  .withParameter("foo/0/bar/bam", "purple")
                                  .post()
-                                 .assertStatusCode(500));
+                                 .assertStatusCode(500)
+                                 .assertHeaderDoesNotContain("Cache-Control"));
   }
 
   @Test
@@ -730,6 +705,7 @@ public class GlobalTest extends PrimeBaseTest {
                                       .withURLSegment("<strong>foo</strong>")
                                       .get()
                                       .assertStatusCode(200)
+                                      .assertHeaderContains("Cache-Control", "no-store")
                                       .assertBodyContains("/foo/view!", "id=&lt;strong&gt;foo&lt;/strong&gt;"));
 
     test.simulate(() -> test.simulator.test("/foo/view/%3Cstrong%3Efoo%3C%2Fstrong%3E")
@@ -746,6 +722,7 @@ public class GlobalTest extends PrimeBaseTest {
     test.simulate(() -> simulator.test("/scope/page-two")
                                  .post()
                                  .assertStatusCode(200)
+                                 .assertHeaderContains("Cache-Control", "no-store")
                                  .assertBodyContains("postParameterMethodCalled:first")
                                  .assertBodyContains("formPrepareMethodCalled:second"))
 
@@ -764,6 +741,7 @@ public class GlobalTest extends PrimeBaseTest {
                                  .withParameter("redirectURI", "/foo")
                                  .get()
                                  .assertStatusCode(302)
+                                 .assertHeaderContains("Cache-Control", "no-store")
                                  .assertRedirect("/foo"));
 
     // Contains a single parameter, calling beginQuery is optional
@@ -828,6 +806,7 @@ public class GlobalTest extends PrimeBaseTest {
                                  .withParameter("redirectURI", "/foo?bar=baz&boom=dynamite#middle=out&not=hotdog")
                                  .get()
                                  .assertStatusCode(302)
+                                 .assertHeaderContains("Cache-Control", "no-store")
                                  .assertRedirect("/foo?bar=baz&boom=dynamite#middle=out&not=hotdog")
                                  .assertRedirect("/foo", params -> params.beginQuery()
                                                                          .with("bar", "baz")
@@ -855,6 +834,7 @@ public class GlobalTest extends PrimeBaseTest {
                                  .withParameter("redirectURI", "/foo?bing=bam&instant=" + System.currentTimeMillis())
                                  .get()
                                  .assertStatusCode(302)
+                                 .assertHeaderContains("Cache-Control", "no-store")
                                  .assertRedirect("/foo", params -> params.withActual("instant")
                                                                          .with("bing", "bam")));
   }
@@ -863,6 +843,7 @@ public class GlobalTest extends PrimeBaseTest {
   public void get_secure() throws Exception {
     test.simulate(() -> test.simulator.test("/secure")
                                       .get()
+                                      .assertHeaderContains("Cache-Control", "no-store")
                                       .assertStatusCode(401));
   }
 
@@ -876,6 +857,7 @@ public class GlobalTest extends PrimeBaseTest {
                                  .withParameter("searchText", "42") // @Session
                                  .withParameter("searchType", "meaning") // @ActionSession
                                  .post()
+                                 .assertHeaderContains("Cache-Control", "no-store")
                                  .assertStatusCode(200))
 
         .simulate(() -> simulator.test("/scope/page-two")
@@ -903,7 +885,11 @@ public class GlobalTest extends PrimeBaseTest {
              .get()
              .assertStatusCode(301)
              .assertRedirect("/freemarker/stand-alone-template")
+             // A 301 will not contain these headers
+             .assertHeaderDoesNotContain("Cache-Control")
+
              .executeRedirect(result -> result.assertStatusCode(200)
+                                              .assertHeaderContains("Cache-Control", "no-store")
                                               .assertBodyContains("Yo, nice template."));
 
     // Triple slashes, redirect to the correct location
@@ -934,6 +920,8 @@ public class GlobalTest extends PrimeBaseTest {
              .get()
              .assertStatusCode(301)
              .assertRedirect("/freemarker/sub/")
+             // A 301 will not contain these headers
+             .assertHeaderDoesNotContain("Cache-Control")
              .executeRedirect(result -> result.assertStatusCode(200)
                                               .assertBodyContains("Yo, nice sub-directory index template."));
 
@@ -977,15 +965,18 @@ public class GlobalTest extends PrimeBaseTest {
                                  .assertJSON("{\"called\": \"/.well-known/well-known/openid-configuration\"}"));
 
     // Testing two levels deep, but only the 1st and 3rd level have a package modifier.
-    // .well-known -> well-known -> .well-known. The package modifier caauses us to ignore the 'potato' package name.
+    // .well-known -> well-known -> .well-known. The package modifier causes us to ignore the 'potato' package name.
     test.simulate(() -> simulator.test("/.well-known/well-known/.well-known/openid-configuration")
                                  .get()
                                  .assertStatusCode(200)
+                                 .assertHeaderContains("Cache-Control", "no-store")
                                  .assertJSON("{\"called\": \"/.well-known/well-known/potato/openid-configuration\"}"));
 
     test.simulate(() -> simulator.test("/.well-known/.well-known/openid-configuration")
                                  .get()
-                                 .assertStatusCode(500));
+                                 .assertStatusCode(500)
+                                 // A 500 will not contain these headers
+                                 .assertHeaderDoesNotContain("Cache-Control"));
   }
 
   @Test
@@ -994,6 +985,7 @@ public class GlobalTest extends PrimeBaseTest {
     simulator.test("/hacked")
              .get()
              .assertStatusCode(500)
+             .assertHeaderContains("Cache-Control", "no-store")
              .assertBodyContains("Instantiating freemarker.template.utility.Execute is not allowed in the template for security reasons.");
   }
 
@@ -1002,6 +994,7 @@ public class GlobalTest extends PrimeBaseTest {
     simulator.test("/head")
              .head()
              .assertStatusCode(200)
+             .assertHeaderContains("Cache-Control", "no-store")
              .assertBodyIsEmpty();
   }
 
@@ -1012,6 +1005,7 @@ public class GlobalTest extends PrimeBaseTest {
     test.simulate(() -> simulator.test("/jwt-authorized")
                                  .withHeader("Authorization", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkifQ.qHdut1UR4-2FSAvh7U3YdeRR5r5boVqjIGQ16Ztp894")
                                  .head()
+                                 .assertHeaderContains("Cache-Control", "no-store")
                                  .assertStatusCode(200));
   }
 
@@ -1021,7 +1015,8 @@ public class GlobalTest extends PrimeBaseTest {
     test.simulate(() -> simulator.test("/jwt-authorized")
                                  .withHeader("Authorization", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkifQ.qHdut1UR4-2FSAvh7U3YdeRR5r5boVqjIGQ16Ztp894")
                                  .head()
-                                 .assertStatusCode(401));
+                                 .assertStatusCode(401)
+                                 .assertHeaderContains("Cache-Control", "no-store"));
   }
 
   @DataProvider(name = "methodOverrides")
@@ -1038,24 +1033,28 @@ public class GlobalTest extends PrimeBaseTest {
   public void multipleJSONRequestMembers() throws Exception {
     simulator.test("/multiple-json-request")
              .post()
-             .assertStatusCode(200);
+             .assertStatusCode(200)
+             .assertHeaderContains("Cache-Control", "no-store");
 
     simulator.test("/multiple-json-request")
              .withJSON(new Object())
              .post()
-             .assertStatusCode(201);
+             .assertStatusCode(201)
+             .assertHeaderContains("Cache-Control", "no-store");
 
     simulator.test("/multiple-json-request")
              .withJSON(new Object())
              .delete()
-             .assertStatusCode(202);
+             .assertStatusCode(202)
+             .assertHeaderContains("Cache-Control", "no-store");
   }
 
   @Test
   public void notAllowed() {
     simulator.test("/not-allowed")
              .get()
-             .assertStatusCode(405);
+             .assertStatusCode(405)
+             .assertHeaderContains("Cache-Control", "no-store");
 
     simulator.test("/not-allowed")
              .post()
@@ -1072,14 +1071,16 @@ public class GlobalTest extends PrimeBaseTest {
     // head is allowed
     simulator.test("/not-allowed")
              .head()
-             .assertStatusCode(200);
+             .assertStatusCode(200)
+             .assertHeaderContains("Cache-Control", "no-store");
   }
 
   @Test
   public void notImplemented() {
     simulator.test("/not-allowed")
              .method("POTATO")
-             .assertStatusCode(501);
+             .assertStatusCode(501)
+             .assertHeaderContains("Cache-Control", "no-store");
   }
 
   @Test(dataProvider = "methodOverrides")
@@ -1089,6 +1090,7 @@ public class GlobalTest extends PrimeBaseTest {
              .withHeader(overrideHeaderName, "PATCH")
              .post()
              .assertStatusCode(200)
+             .assertHeaderContains("Cache-Control", "no-store")
              .assertJSONFile(jsonDir.resolve("patch/test-response.json"), "config", "patched");
   }
 
@@ -1121,6 +1123,7 @@ public class GlobalTest extends PrimeBaseTest {
     simulator.test("/post")
              .post()
              .assertStatusCode(200)
+             .assertHeaderContains("Cache-Control", "no-store")
              .assertBodyContains("Brian Pontarelli", "35", "Broomfield", "CO");
   }
 
@@ -1129,6 +1132,7 @@ public class GlobalTest extends PrimeBaseTest {
     simulator.test("/api")
              .withJSONFile(Paths.get("src/test/resources/json/api-jsonWithActual-post.json"))
              .post()
+             .assertHeaderContains("Cache-Control", "no-store")
              .assertJSONFileWithActual(UserField.class, Paths.get("src/test/resources/json/api-jsonWithActual-post-response.ftl"));
 
     // Test a final field (the Jackson handler will put the JSON into the final field)
@@ -1144,15 +1148,19 @@ public class GlobalTest extends PrimeBaseTest {
         .simulate(() -> simulator.test("/file-upload")
                                  .withFile("dataAnyType", test.tempFile.toFile(), "text/plain")
                                  .post()
-                                 .assertStatusCode(200))
+                                 .assertStatusCode(200)
+                                 .assertHeaderContains("Cache-Control", "no-store"))
+
         .simulate(() -> simulator.test("/file-upload")
                                  .withFile("dataAnyType", test.tempFile.toFile(), "text/html")
                                  .post()
                                  .assertStatusCode(200))
+
         .simulate(() -> simulator.test("/file-upload")
                                  .withFile("dataAnyType", test.tempFile.toFile(), "application/octet-stream")
                                  .post()
-                                 .assertStatusCode(200));
+                                 .assertStatusCode(200)
+                                 .assertHeaderContains("Cache-Control", "no-store"));
   }
 
   @Test
@@ -1171,7 +1179,8 @@ public class GlobalTest extends PrimeBaseTest {
                                  .withBody("Hello World")
                                  .withContentType("application/octet-stream")
                                  .post()
-                                 .assertStatusCode(200));
+                                 .assertStatusCode(200)
+                                 .assertHeaderContains("Cache-Control", "no-store"));
   }
 
   @Test
@@ -1635,15 +1644,18 @@ public class GlobalTest extends PrimeBaseTest {
                                  .withParameter("item", "beer")
                                  .post()
                                  .assertStatusCode(302)
+                                 .assertHeaderContains("Cache-Control", "no-store")
                                  .assertRedirect("/store/login")
 
                                  // Redirected to login
                                  .executeRedirect(redirect1 -> redirect1.assertStatusCode(200)
+                                                                        .assertHeaderContains("Cache-Control", "no-store")
                                                                         .assertBodyContains("Login")
 
                                                                         // Post on Login, get a session, and redirect back to the cart which completes the beer purchase
                                                                         .executeFormPostInResponseBody("form", post -> post
                                                                             .assertStatusCode(302)
+                                                                            .assertHeaderContains("Cache-Control", "no-store")
                                                                             .assertRedirect("/store/purchase")
 
                                                                             .executeRedirect(redirect2 -> redirect2

@@ -81,6 +81,9 @@ public abstract class AbstractForwardResult<U extends Annotation> extends Abstra
     // Set the status code
     setStatus(getStatus(forward), getStatusStr(forward), action, response);
 
+    // Handle setting cache controls
+    addCacheControlHeader(forward, response);
+
     if (isHeadRequest(actionInvocation)) {
       return true;
     }

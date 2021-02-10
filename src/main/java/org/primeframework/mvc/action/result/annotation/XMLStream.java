@@ -31,9 +31,19 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target(TYPE)
 public @interface XMLStream {
   /**
+   * @return the value to use for the <code>Cache-Control</code> header.
+   */
+  String cacheControl() default "no-store";
+
+  /**
    * @return The result code from the action's execute method that this Result is associated with.
    */
   String code() default "success";
+
+  /**
+   * @return set to true to disable cache control and manage the headers on your own.
+   */
+  boolean disableCacheControl() default false;
 
   /**
    * @return The name of the property of the action that represents an XML string.

@@ -18,8 +18,8 @@ package org.primeframework.mvc.action.result.annotation;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import static java.lang.annotation.ElementType.*;
-import static java.lang.annotation.RetentionPolicy.*;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * This annotation marks a result from an action as a Status result. Status results can have a status code, status
@@ -32,9 +32,25 @@ import static java.lang.annotation.RetentionPolicy.*;
 @Target(TYPE)
 public @interface Status {
   /**
+   * @return the value to use for the <code>Cache-Control</code> header.
+   */
+  String cacheControl() default "no-store";
+
+  /**
    * @return The result code from the action's execute method that this Result is associated with.
    */
   String code() default "success";
+
+  /**
+   * @return set to true to disable cache control and manage the headers on your own.
+   */
+  boolean disableCacheControl() default false;
+
+  /**
+   * @return A list of headers to return as part of the HTTP response. See the W3 HTTP 1.1 specification for a list of
+   *     headers.
+   */
+  Header[] headers() default {};
 
   /**
    * @return The status code.
@@ -43,33 +59,17 @@ public @interface Status {
 
   /**
    * @return Overrides the status parameter. If this is set, Prime use the value of this parameter and first expand it.
-   *         It uses the <code>${variable}</code> notation that is common for variable expanders. After it has been
-   *         expanded, the result is converted into an int. Therefore, you can specify either a number as a String, or a
-   *         variable expansion. Here are some examples: <code>"${myStatus}"</code>, <code>"200"</code>,
-   *         <code>"40${someField}"</code>
+   *     It uses the <code>${variable}</code> notation that is common for variable expanders. After it has been
+   *     expanded, the result is converted into an int. Therefore, you can specify either a number as a String, or a
+   *     variable expansion. Here are some examples: <code>"${myStatus}"</code>, <code>"200"</code>,
+   *     <code>"40${someField}"</code>
    */
   String statusStr() default "";
 
   /**
-   * @return A list of headers to return as part of the HTTP response. See the W3 HTTP 1.1 specification for a list of
-   *         headers.
-   */
-  Header[] headers() default {};
-
-  /**
-   * A list of Status annotations.
-   */
-  @ResultContainerAnnotation
-  @Retention(RUNTIME)
-  @Target(TYPE)
-  public static @interface List {
-    Status[] value();
-  }
-
-  /**
    * A header that has a name and value.
    */
-  public static @interface Header {
+  @interface Header {
     /**
      * @return The name of the header.
      */
@@ -79,5 +79,15 @@ public @interface Status {
      * @return The value of the header.
      */
     String value();
+  }
+
+  /**
+   * A list of Status annotations.
+   */
+  @ResultContainerAnnotation
+  @Retention(RUNTIME)
+  @Target(TYPE)
+  @interface List {
+    Status[] value();
   }
 }

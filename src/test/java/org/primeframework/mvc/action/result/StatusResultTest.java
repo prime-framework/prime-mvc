@@ -32,8 +32,10 @@ import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.scope.MessageScope;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.testng.annotations.Test;
-
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.createStrictMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 
 /**
  * This class tests the status result.
@@ -41,37 +43,6 @@ import static org.easymock.EasyMock.*;
  * @author Brian Pontarelli
  */
 public class StatusResultTest {
-  @Test
-  public void noHeaders() throws IOException, ServletException {
-    ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
-    replay(ee);
-
-    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    expect(request.getContextPath()).andReturn("");
-    replay(request);
-
-    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    response.setStatus(200);
-    replay(response);
-
-    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/foo", "", null));
-    replay(store);
-
-    List<Message> messages = new ArrayList<Message>();
-    MessageStore messageStore = createStrictMock(MessageStore.class);
-    expect(messageStore.get(MessageScope.REQUEST)).andReturn(messages);
-    messageStore.clear(MessageScope.REQUEST);
-    messageStore.addAll(MessageScope.FLASH, messages);
-    replay(messageStore);
-
-    Status status = new StatusImpl("success", 200, "");
-    StatusResult result = new StatusResult(ee, response, store);
-    result.execute(status);
-
-    verify(response);
-  }
-
   @Test
   public void expansion() throws IOException, ServletException {
     Object action = new Object();
@@ -85,6 +56,7 @@ public class StatusResultTest {
 
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
     response.setStatus(200);
+    response.setHeader("Cache-Control", "no-store");
     replay(response);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
@@ -118,6 +90,7 @@ public class StatusResultTest {
     response.setStatus(200);
     response.setHeader("foo", "bar");
     response.setHeader("baz", "fred");
+    response.setHeader("Cache-Control", "no-store");
     replay(response);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
@@ -138,17 +111,103 @@ public class StatusResultTest {
     verify(response);
   }
 
+  @Test
+  public void noHeaders() throws IOException, ServletException {
+    ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
+    replay(ee);
+
+    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
+    expect(request.getContextPath()).andReturn("");
+    replay(request);
+
+    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
+    response.setStatus(200);
+    response.setHeader("Cache-Control", "no-store");
+    replay(response);
+
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/foo", "", null));
+    replay(store);
+
+    List<Message> messages = new ArrayList<Message>();
+    MessageStore messageStore = createStrictMock(MessageStore.class);
+    expect(messageStore.get(MessageScope.REQUEST)).andReturn(messages);
+    messageStore.clear(MessageScope.REQUEST);
+    messageStore.addAll(MessageScope.FLASH, messages);
+    replay(messageStore);
+
+    Status status = new StatusImpl("success", 200, "");
+    StatusResult result = new StatusResult(ee, response, store);
+    result.execute(status);
+
+    verify(response);
+  }
+
+  public class HeaderImpl implements Header {
+    private final String name;
+
+    private final String value;
+
+    public HeaderImpl(String name, String value) {
+      this.name = name;
+      this.value = value;
+    }
+
+    @Override
+    public Class<? extends Annotation> annotationType() {
+      return Header.class;
+    }
+
+    @Override
+    public String name() {
+      return name;
+    }
+
+    @Override
+    public String value() {
+      return value;
+    }
+  }
+
   public class StatusImpl implements Status {
+    private final String cacheControl;
+
     private final String code;
-    private final int status;
-    private final String statusStr;
+
+    private final boolean disableCacheControl;
+
     private final Header[] headers;
 
+    private final int status;
+
+    private final String statusStr;
+
     public StatusImpl(String code, int status, String statusStr, Header... headers) {
+      this.cacheControl = "no-store";
       this.code = code;
+      this.disableCacheControl = false;
+      this.headers = headers;
       this.status = status;
       this.statusStr = statusStr;
-      this.headers = headers;
+    }
+
+    @Override
+    public Class<? extends Annotation> annotationType() {
+      return Status.class;
+    }
+
+    @Override
+    public String cacheControl() {
+      return cacheControl;
+    }
+
+    public String code() {
+      return code;
+    }
+
+    @Override
+    public boolean disableCacheControl() {
+      return disableCacheControl;
     }
 
     @Override
@@ -164,40 +223,6 @@ public class StatusResultTest {
     @Override
     public String statusStr() {
       return statusStr;
-    }
-
-    public String code() {
-      return code;
-    }
-
-    @Override
-    public Class<? extends Annotation> annotationType() {
-      return Status.class;
-    }
-  }
-
-  public class HeaderImpl implements Header {
-    private final String name;
-    private final String value;
-
-    public HeaderImpl(String name, String value) {
-      this.name = name;
-      this.value = value;
-    }
-
-    @Override
-    public String name() {
-      return name;
-    }
-
-    @Override
-    public String value() {
-      return value;
-    }
-
-    @Override
-    public Class<? extends Annotation> annotationType() {
-      return Header.class;
     }
   }
 }

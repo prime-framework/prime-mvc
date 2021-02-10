@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,34 +15,16 @@
  */
 package org.example.action;
 
-import java.util.List;
-
 import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.parameter.annotation.ConjoinedRequestParameters;
+import org.primeframework.mvc.action.result.annotation.Status;
 
 /**
  * @author Daniel DeGroff
  */
-@Action("{urlSegment}")
-public class ConjoinedParameterAction {
-  public String param1;
-
-  public boolean param2;
-
-  public int param3;
-
-  public List<String> param4;
-
-  public String urlSegment;
-
-  // Use the default parameter name
-  @ConjoinedRequestParameters
-  public String get() {
-    return "input";
-  }
-
-  @ConjoinedRequestParameters(value = "conjoined")
+@Action
+@Status(cacheControl = "no-cache")
+public class CacheControlOverrideAction {
   public String post() {
-    return "input";
+    return "success";
   }
 }

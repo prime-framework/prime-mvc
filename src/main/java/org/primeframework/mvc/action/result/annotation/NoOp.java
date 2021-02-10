@@ -18,8 +18,8 @@ package org.primeframework.mvc.action.result.annotation;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import static java.lang.annotation.ElementType.*;
-import static java.lang.annotation.RetentionPolicy.*;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * This annotation marks a result from an action as a Streaming XML result using a xml string from the action.
@@ -41,7 +41,7 @@ public @interface NoOp {
   @ResultContainerAnnotation
   @Retention(RUNTIME)
   @Target(TYPE)
-  public static @interface List {
+  @interface List {
     NoOp[] value();
   }
 }

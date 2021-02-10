@@ -85,8 +85,21 @@ public class SaveRequestResult extends AbstractRedirectResult<SaveRequest> {
       response.addCookie(saveRequestCookie);
     }
 
+    // Handle setting cache controls
+    addCacheControlHeader(saveRequest, response);
+
     sendRedirect(null, saveRequest.uri(), saveRequest.encodeVariables(), saveRequest.perm());
     return true;
+  }
+
+  @Override
+  protected String getCacheControl(SaveRequest result) {
+    return result.cacheControl();
+  }
+
+  @Override
+  protected boolean getDisableCacheControl(SaveRequest result) {
+    return result.disableCacheControl();
   }
 
   private String makeQueryString(Map<String, String[]> parameters) {
@@ -113,7 +126,11 @@ public class SaveRequestResult extends AbstractRedirectResult<SaveRequest> {
   }
 
   public static class SaveRequestImpl implements SaveRequest {
+    private final String cacheControl;
+
     private final String code;
+
+    private final boolean disableCacheControl;
 
     private final boolean encode;
 
@@ -122,18 +139,30 @@ public class SaveRequestResult extends AbstractRedirectResult<SaveRequest> {
     private final String uri;
 
     public SaveRequestImpl(String uri, String code, boolean perm, boolean encode) {
-      this.uri = uri;
+      this.cacheControl = "no-store";
       this.code = code;
-      this.perm = perm;
+      this.disableCacheControl = false;
       this.encode = encode;
+      this.uri = uri;
+      this.perm = perm;
     }
 
     public Class<? extends Annotation> annotationType() {
       return ReexecuteSavedRequest.class;
     }
 
+    @Override
+    public String cacheControl() {
+      return cacheControl;
+    }
+
     public String code() {
       return code;
+    }
+
+    @Override
+    public boolean disableCacheControl() {
+      return disableCacheControl;
     }
 
     public boolean encodeVariables() {

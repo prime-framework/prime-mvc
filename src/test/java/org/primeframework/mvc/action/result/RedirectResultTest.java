@@ -61,6 +61,7 @@ public class RedirectResultTest {
     replay(request);
 
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
+    response.setHeader("Cache-Control", "no-store");
     response.sendRedirect("result");
     response.setStatus(302);
     replay(response);
@@ -99,6 +100,7 @@ public class RedirectResultTest {
     replay(request);
 
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
+    response.setHeader("Cache-Control", "no-store");
     response.sendRedirect("result");
     response.setStatus(302);
     replay(response);
@@ -135,6 +137,7 @@ public class RedirectResultTest {
     replay(request);
 
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
+    response.setHeader("Cache-Control", "no-store");
     response.sendRedirect("http://www.google.com");
     response.setStatus(301);
     replay(response);
@@ -171,6 +174,7 @@ public class RedirectResultTest {
     replay(request);
 
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
+    response.setHeader("Cache-Control", "no-store");
     response.sendRedirect("/foo/bar.jsp");
     response.setStatus(302);
     replay(response);
@@ -207,6 +211,7 @@ public class RedirectResultTest {
     replay(request);
 
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
+    response.setHeader("Cache-Control", "no-store");
     response.sendRedirect("/context-path/foo/bar.jsp");
     response.setStatus(302);
     replay(response);
@@ -243,6 +248,7 @@ public class RedirectResultTest {
     replay(request);
 
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
+    response.setHeader("Cache-Control", "no-store");
     response.sendRedirect("foo/bar.jsp");
     response.setStatus(302);
     replay(response);
@@ -266,7 +272,11 @@ public class RedirectResultTest {
   }
 
   public class RedirectImpl implements Redirect {
+    private final String cacheControl;
+
     private final String code;
+
+    private final boolean disableCacheControl;
 
     private final boolean encode;
 
@@ -275,18 +285,30 @@ public class RedirectResultTest {
     private final String uri;
 
     public RedirectImpl(String code, String uri, boolean perm, boolean encode) {
+      this.cacheControl = "no-store";
       this.code = code;
-      this.uri = uri;
-      this.perm = perm;
+      this.disableCacheControl = false;
       this.encode = encode;
+      this.perm = perm;
+      this.uri = uri;
     }
 
     public Class<? extends Annotation> annotationType() {
       return Redirect.class;
     }
 
+    @Override
+    public String cacheControl() {
+      return cacheControl;
+    }
+
     public String code() {
       return code;
+    }
+
+    @Override
+    public boolean disableCacheControl() {
+      return disableCacheControl;
     }
 
     public boolean encodeVariables() {
