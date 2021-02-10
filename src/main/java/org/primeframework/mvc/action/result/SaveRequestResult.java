@@ -139,7 +139,7 @@ public class SaveRequestResult extends AbstractRedirectResult<SaveRequest> {
     private final String uri;
 
     public SaveRequestImpl(String uri, String code, boolean perm, boolean encode) {
-      this.cacheControl = "no-store";
+      this.cacheControl = "no-cache";
       this.code = code;
       this.disableCacheControl = false;
       this.encode = encode;

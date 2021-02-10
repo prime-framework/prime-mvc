@@ -61,7 +61,7 @@ public class RedirectResultTest {
     replay(request);
 
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    response.setHeader("Cache-Control", "no-store");
+    response.setHeader("Cache-Control", "no-cache");
     response.sendRedirect("result");
     response.setStatus(302);
     replay(response);
@@ -100,7 +100,7 @@ public class RedirectResultTest {
     replay(request);
 
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    response.setHeader("Cache-Control", "no-store");
+    response.setHeader("Cache-Control", "no-cache");
     response.sendRedirect("result");
     response.setStatus(302);
     replay(response);
@@ -137,7 +137,7 @@ public class RedirectResultTest {
     replay(request);
 
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    response.setHeader("Cache-Control", "no-store");
+    response.setHeader("Cache-Control", "no-cache");
     response.sendRedirect("http://www.google.com");
     response.setStatus(301);
     replay(response);
@@ -174,7 +174,7 @@ public class RedirectResultTest {
     replay(request);
 
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    response.setHeader("Cache-Control", "no-store");
+    response.setHeader("Cache-Control", "no-cache");
     response.sendRedirect("/foo/bar.jsp");
     response.setStatus(302);
     replay(response);
@@ -211,7 +211,7 @@ public class RedirectResultTest {
     replay(request);
 
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    response.setHeader("Cache-Control", "no-store");
+    response.setHeader("Cache-Control", "no-cache");
     response.sendRedirect("/context-path/foo/bar.jsp");
     response.setStatus(302);
     replay(response);
@@ -248,7 +248,7 @@ public class RedirectResultTest {
     replay(request);
 
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    response.setHeader("Cache-Control", "no-store");
+    response.setHeader("Cache-Control", "no-cache");
     response.sendRedirect("foo/bar.jsp");
     response.setStatus(302);
     replay(response);
@@ -285,7 +285,7 @@ public class RedirectResultTest {
     private final String uri;
 
     public RedirectImpl(String code, String uri, boolean perm, boolean encode) {
-      this.cacheControl = "no-store";
+      this.cacheControl = "no-cache";
       this.code = code;
       this.disableCacheControl = false;
       this.encode = encode;

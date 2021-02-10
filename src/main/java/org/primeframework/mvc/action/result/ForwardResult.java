@@ -91,7 +91,7 @@ public class ForwardResult extends AbstractForwardResult<Forward> {
     private final String uri;
 
     public ForwardImpl(String uri, String code) {
-      this.cacheControl = "no-store";
+      this.cacheControl = "no-cache";
       this.code = code;
       this.contentType = "text/html; charset=UTF-8";
       this.disableCacheControl = false;
@@ -101,7 +101,7 @@ public class ForwardResult extends AbstractForwardResult<Forward> {
     }
 
     public ForwardImpl(String uri, String code, String contentType, int status) {
-      this.cacheControl = "no-store";
+      this.cacheControl = "no-cache";
       this.code = code;
       this.contentType = contentType;
       this.disableCacheControl = false;

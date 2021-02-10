@@ -33,7 +33,7 @@ public @interface Redirect {
   /**
    * @return the value to use for the <code>Cache-Control</code> header.
    */
-  String cacheControl() default "no-store";
+  String cacheControl() default "no-cache";
 
   /**
    * @return The result code from the action's execute method that this Result is associated with.

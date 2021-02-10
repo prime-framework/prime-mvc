@@ -122,7 +122,7 @@ public class JSONResultTest extends PrimeBaseTest {
     response.setCharacterEncoding("UTF-8");
     response.setContentType("application/json");
     response.setContentLength(538);
-    response.setHeader("Cache-Control", "no-store");
+    response.setHeader("Cache-Control", "no-cache");
     if (httpMethod == HTTPMethod.GET) {
       expect(response.getOutputStream()).andReturn(sos);
     }
@@ -204,7 +204,7 @@ public class JSONResultTest extends PrimeBaseTest {
     response.setCharacterEncoding("UTF-8");
     response.setContentType("application/json");
     response.setContentLength(359);
-    response.setHeader("Cache-Control", "no-store");
+    response.setHeader("Cache-Control", "no-cache");
     if (httpMethod == HTTPMethod.GET) {
       expect(response.getOutputStream()).andReturn(sos);
     }
@@ -305,7 +305,7 @@ public class JSONResultTest extends PrimeBaseTest {
     private final int status;
 
     public JSONImpl(String code, int status) {
-      this.cacheControl = "no-store";
+      this.cacheControl = "no-cache";
       this.code = code;
       this.disableCacheControl = false;
       this.status = status;

@@ -58,7 +58,7 @@ public class StreamResultTest {
     response.setContentType("application/octet-stream");
     response.setContentLength(10);
     response.setHeader("Content-Disposition", "attachment; filename=\"" + basicEncoded + "\"; filename*=UTF-8''" + utf8Encoded);
-    response.setHeader("Cache-Control", "no-store");
+    response.setHeader("Cache-Control", "no-cache");
     EasyMock.expect(response.getOutputStream()).andReturn(sos);
     EasyMock.replay(response);
 
@@ -114,7 +114,7 @@ public class StreamResultTest {
     private final String type;
 
     public StreamImpl(String code, String name, String length, String type, String property) {
-      this.cacheControl = "no-store";
+      this.cacheControl = "no-cache";
       this.code = code;
       this.disableCacheControl = false;
       this.length = length;

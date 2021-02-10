@@ -54,7 +54,7 @@ public class ForwardResultTest extends PrimeBaseTest {
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
     response.setContentType("text/html; charset=UTF-8");
     response.setStatus(200);
-    response.setHeader("Cache-Control", "no-store");
+    response.setHeader("Cache-Control", "no-cache");
     if (httpMethod == HTTPMethod.GET) {
       expect(response.getWriter()).andReturn(writer);
     }
@@ -95,7 +95,7 @@ public class ForwardResultTest extends PrimeBaseTest {
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
     response.setContentType("text/html; charset=UTF-8");
     response.setStatus(200);
-    response.setHeader("Cache-Control", "no-store");
+    response.setHeader("Cache-Control", "no-cache");
     expect(response.getWriter()).andReturn(writer);
     replay(response);
 
@@ -128,7 +128,7 @@ public class ForwardResultTest extends PrimeBaseTest {
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
     response.setContentType("text/html; charset=UTF-8");
     response.setStatus(200);
-    response.setHeader("Cache-Control", "no-store");
+    response.setHeader("Cache-Control", "no-cache");
     expect(response.getWriter()).andReturn(writer);
     replay(response);
 
@@ -161,7 +161,7 @@ public class ForwardResultTest extends PrimeBaseTest {
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
     response.setContentType("text/html; charset=UTF-8");
     response.setStatus(300);
-    response.setHeader("Cache-Control", "no-store");
+    response.setHeader("Cache-Control", "no-cache");
     expect(response.getWriter()).andReturn(writer);
     replay(response);
 
@@ -194,7 +194,7 @@ public class ForwardResultTest extends PrimeBaseTest {
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
     response.setContentType("text/xml; charset=UTF-8");
     response.setStatus(300);
-    response.setHeader("Cache-Control", "no-store");
+    response.setHeader("Cache-Control", "no-cache");
     expect(response.getWriter()).andReturn(writer);
     replay(response);
 
@@ -229,7 +229,7 @@ public class ForwardResultTest extends PrimeBaseTest {
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
     response.setContentType("text/javascript; charset=UTF-8");
     response.setStatus(200);
-    response.setHeader("Cache-Control", "no-store");
+    response.setHeader("Cache-Control", "no-cache");
     expect(response.getWriter()).andReturn(writer);
     replay(response);
 
@@ -262,7 +262,7 @@ public class ForwardResultTest extends PrimeBaseTest {
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
     response.setContentType("text/html; charset=UTF-8");
     response.setStatus(200);
-    response.setHeader("Cache-Control", "no-store");
+    response.setHeader("Cache-Control", "no-cache");
     expect(response.getWriter()).andReturn(writer);
     replay(response);
 

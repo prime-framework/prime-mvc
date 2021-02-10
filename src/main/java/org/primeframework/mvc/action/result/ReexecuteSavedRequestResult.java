@@ -90,7 +90,7 @@ public class ReexecuteSavedRequestResult extends AbstractRedirectResult<Reexecut
     private final String uri;
 
     public ReexecuteSavedRequestImpl(String uri, String code, boolean perm, boolean encode) {
-      this.cacheControl = "no-store";
+      this.cacheControl = "no-cache";
       this.code = code;
       this.disableCacheControl = false;
       this.encode = encode;

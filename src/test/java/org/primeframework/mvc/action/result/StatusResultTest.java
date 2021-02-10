@@ -56,7 +56,7 @@ public class StatusResultTest {
 
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
     response.setStatus(200);
-    response.setHeader("Cache-Control", "no-store");
+    response.setHeader("Cache-Control", "no-cache");
     replay(response);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
@@ -90,7 +90,7 @@ public class StatusResultTest {
     response.setStatus(200);
     response.setHeader("foo", "bar");
     response.setHeader("baz", "fred");
-    response.setHeader("Cache-Control", "no-store");
+    response.setHeader("Cache-Control", "no-cache");
     replay(response);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
@@ -122,7 +122,7 @@ public class StatusResultTest {
 
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
     response.setStatus(200);
-    response.setHeader("Cache-Control", "no-store");
+    response.setHeader("Cache-Control", "no-cache");
     replay(response);
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
@@ -183,7 +183,7 @@ public class StatusResultTest {
     private final String statusStr;
 
     public StatusImpl(String code, int status, String statusStr, Header... headers) {
-      this.cacheControl = "no-store";
+      this.cacheControl = "no-cache";
       this.code = code;
       this.disableCacheControl = false;
       this.headers = headers;

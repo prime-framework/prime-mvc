@@ -60,7 +60,7 @@ public class XMLStreamResultTest {
     response.setCharacterEncoding("UTF-8");
     response.setContentType(contentType);
     response.setContentLength(propertyBytesLen);
-    response.setHeader("Cache-Control", "no-store");
+    response.setHeader("Cache-Control", "no-cache");
     if (httpMethod == HTTPMethod.GET) {
       expect(response.getOutputStream()).andReturn(sos);
     }
@@ -96,7 +96,7 @@ public class XMLStreamResultTest {
     private final int status;
 
     public XMLStreamImpl(String code, String property, int status) {
-      this.cacheControl = "no-store";
+      this.cacheControl = "no-cache";
       this.code = code;
       this.disableCacheControl = false;
       this.property = property;

@@ -22,7 +22,7 @@ import org.primeframework.mvc.action.result.annotation.Status;
  * @author Daniel DeGroff
  */
 @Action
-@Status(cacheControl = "no-cache")
+@Status(cacheControl = "no-store")
 public class CacheControlOverrideAction {
   public String post() {
     return "success";

@@ -77,7 +77,7 @@ public class RedirectResult extends AbstractRedirectResult<Redirect> {
     private final String uri;
 
     public RedirectImpl(String uri, String code, boolean perm, boolean encode) {
-      this.cacheControl = "no-store";
+      this.cacheControl = "no-cache";
       this.disableCacheControl = false;
       this.encode = encode;
       this.code = code;
