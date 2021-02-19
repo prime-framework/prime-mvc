@@ -63,7 +63,7 @@ public abstract class AbstractResult<U extends Annotation> implements Result<U> 
   }
 
   /**
-   * return the cache control header if one is defined. If you wish to disable control and manage Cache-Control headers
+   * return the cache control header if one is defined. If you wish to disable control and manage Cache-Control header
    * on your own, use the {@link #getDisableCacheControl(Annotation)} method.
    *
    * @param result the result
@@ -72,8 +72,8 @@ public abstract class AbstractResult<U extends Annotation> implements Result<U> 
   protected abstract String getCacheControl(U result);
 
   /**
-   * Return a boolean value indicating if the <code>Cache-Control</code> and <code>Pragma</code> HTTP response headers
-   * will be set by this result. If you wish to manage these headers on your own, disable control.
+   * Return a boolean value indicating if the <code>Cache-Control</code> HTTP response header will be set by this
+   * result. If you wish to manage these headers on your own, disable control.
    *
    * @param result the result
    * @return true if you wish to disable Cache Control for this result.
