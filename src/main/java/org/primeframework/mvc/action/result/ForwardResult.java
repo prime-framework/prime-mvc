@@ -35,8 +35,7 @@ public class ForwardResult extends AbstractForwardResult<Forward> {
   @Inject
   public ForwardResult(ActionInvocationStore actionInvocationStore, ExpressionEvaluator expressionEvaluator,
                        ResourceLocator resourceLocator, FreeMarkerService freeMarkerService,
-                       HttpServletResponse response,
-                       FreeMarkerMap freeMarkerMap, MVCConfiguration configuration) {
+                       HttpServletResponse response, FreeMarkerMap freeMarkerMap, MVCConfiguration configuration) {
     super(actionInvocationStore, expressionEvaluator, resourceLocator, freeMarkerService, response, freeMarkerMap, configuration);
   }
 

@@ -17,7 +17,7 @@
 savantVersion = "1.0.0"
 fusionAuthJWTVersion = "3.1.6"
 
-project(group: "org.primeframework", name: "prime-mvc", version: "1.25.0", licenses: ["ApacheV2_0"]) {
+project(group: "org.primeframework", name: "prime-mvc", version: "1.26.0", licenses: ["ApacheV2_0"]) {
   workflow {
     standard()
   }
@@ -41,6 +41,7 @@ project(group: "org.primeframework", name: "prime-mvc", version: "1.25.0", licen
       // fileupload depends upon commons-io, so until we can ditch fileupload, may as well keep both.
       dependency(id: "org.apache.commons:commons-fileupload:1.4.0")
       dependency(id: "org.apache.commons:commons-io:2.7.0")
+      dependency(id: "org.apache.commons:commons-lang3:3.11.0")
       dependency(id: "org.freemarker:freemarker:2.3.30")
       dependency(id: "org.ow2.asm:asm:7.3.1")
       dependency(id: "org.slf4j:slf4j-api:1.7.7")
