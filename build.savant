@@ -13,8 +13,8 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-
 savantVersion = "1.0.0"
+
 fusionAuthJWTVersion = "3.1.6"
 
 project(group: "org.primeframework", name: "prime-mvc", version: "1.26.0", licenses: ["ApacheV2_0"]) {
@@ -80,8 +80,10 @@ idea = loadPlugin(id: "org.savantbuild.plugin:idea:1.0.1")
 release = loadPlugin(id: "org.savantbuild.plugin:release-git:${savantVersion}")
 
 // Plugin settings
-java.settings.javaVersion = "1.8"
-javaTestNG.settings.javaVersion = "1.8"
+java.settings.javaVersion = "14"
+java.settings.compilerArguments = "--enable-preview -source 14"
+javaTestNG.settings.javaVersion = "14"
+javaTestNG.settings.jvmArguments = "--enable-preview"
 
 target(name: "clean", description: "Cleans the project") {
   java.clean()
@@ -91,9 +93,9 @@ target(name: "compile", description: "Compiles the project") {
   java.compileMain()
 
   // allow the user of sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl in tests
-  java.settings.compilerArguments = "-XDignore.symbol.file"
+  java.settings.compilerArguments += " -XDignore.symbol.file"
   java.compileTest()
-  java.settings.compilerArguments = ""
+//  java.settings.compilerArguments = ""
 
   file.copy(to: "build/classes/main") {
     fileSet(dir: "src/main/ftl")

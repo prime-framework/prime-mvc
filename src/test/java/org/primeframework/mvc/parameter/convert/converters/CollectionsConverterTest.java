@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc.parameter.convert.converters;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -24,10 +23,10 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import com.google.inject.Inject;
+import com.google.inject.internal.MoreTypes;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.testng.annotations.Test;
-import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 import static org.testng.Assert.assertEquals;
 
 /**
@@ -72,7 +71,7 @@ public class CollectionsConverterTest extends PrimeBaseTest {
   @Test
   public void toStrings() {
     expectException(ConverterStateException.class,
-        () -> converter.convertToString(ParameterizedTypeImpl.make(Set.class, new Type[]{String.class}, null), null, "variations", new String[]{"foo", "bar"}));
+        () -> converter.convertToString(new MoreTypes.ParameterizedTypeImpl(null, Set.class, String.class), null, "variations", new String[]{"foo", "bar"}));
   }
 
   private Builder withValues(String... values) {
@@ -100,7 +99,7 @@ public class CollectionsConverterTest extends PrimeBaseTest {
       }
 
       // --> java.util.Set
-      Set<String> set = (Set<String>) converter.convertFromStrings(ParameterizedTypeImpl.make(Set.class, new Type[]{String.class}, null), null, "variations", values);
+      Set<String> set = (Set<String>) converter.convertFromStrings(new MoreTypes.ParameterizedTypeImpl(null, Set.class, String.class), null, "variations", values);
       assertEquals(new TreeSet<>(set), new TreeSet<>(Arrays.asList(expected)));
 
       // Without a parameterized type
@@ -108,7 +107,7 @@ public class CollectionsConverterTest extends PrimeBaseTest {
       assertEquals(new TreeSet<>(set), new TreeSet<>(Arrays.asList(expected)));
 
       // --> java.util.TreeSet
-      TreeSet<String> sortedSet = (TreeSet<String>) converter.convertFromStrings(ParameterizedTypeImpl.make(TreeSet.class, new Type[]{String.class}, null), null, "variations", values);
+      TreeSet<String> sortedSet = (TreeSet<String>) converter.convertFromStrings(new MoreTypes.ParameterizedTypeImpl(null, TreeSet.class, String.class), null, "variations", values);
       assertEquals(sortedSet, new TreeSet<>(Arrays.asList(expected)));
 
       // Without a parameterized type
@@ -116,11 +115,11 @@ public class CollectionsConverterTest extends PrimeBaseTest {
       assertEquals(sortedSet, new TreeSet<>(Arrays.asList(expected)));
 
       // --> java.util.List
-      List<String> list = (List<String>) converter.convertFromStrings(ParameterizedTypeImpl.make(List.class, new Type[]{String.class}, null), null, "variations", values);
+      List<String> list = (List<String>) converter.convertFromStrings(new MoreTypes.ParameterizedTypeImpl(null, List.class, String.class), null, "variations", values);
       assertEquals(list, new ArrayList<>(Arrays.asList(expected)));
 
       // Without a parameterized type
-      list = (List<String>) converter.convertFromStrings(ParameterizedTypeImpl.make(List.class, new Type[]{String.class}, null), null, "variations", values);
+      list = (List<String>) converter.convertFromStrings(new MoreTypes.ParameterizedTypeImpl(null, List.class, String.class), null, "variations", values);
       assertEquals(list, new ArrayList<>(Arrays.asList(expected)));
     }
   }
