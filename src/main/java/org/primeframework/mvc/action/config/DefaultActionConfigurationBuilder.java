@@ -456,7 +456,7 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
    */
   protected void verify(Method method) {
     if (method.getReturnType() != String.class || method.getParameterTypes().length != 0) {
-      throw new PrimeException("The action class [" + method.getDeclaringClass().getClass() + "] has defined an " +
+      throw new PrimeException("The action class [" + method.getDeclaringClass() + "] has defined an " +
           "execute method named [" + method.getName() + "] that is invalid. Execute methods must have zero parameters " +
           "and return a String like this:\n\n" +
           "public String execute() {\n" +
