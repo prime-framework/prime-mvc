@@ -23,13 +23,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
+import com.google.inject.Inject;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -40,9 +44,7 @@ import org.primeframework.mvc.util.IteratorEnumeration;
 import org.primeframework.mvc.util.RequestKeys;
 import org.primeframework.mvc.workflow.Workflow;
 import org.primeframework.mvc.workflow.WorkflowChain;
-
-import com.google.inject.Inject;
-import static org.primeframework.mvc.util.ParameterTools.*;
+import static org.primeframework.mvc.util.ParameterTools.combine;
 
 /**
  * This workflow handles providing access to parameters inside the request body when the container doesn't parse them.
@@ -133,7 +135,8 @@ public class RequestBodyWorkflow implements Workflow {
           }
 
           String contentType = item.getContentType();
-          File file = File.createTempFile("prime", "fileupload");
+          Path directory = Files.createTempDirectory("prime-fileuploads");
+          File file = directory.resolve(UUID.randomUUID().toString()).toFile(); // Temp file that doesn't exist
           item.write(file);
 
           // Handle when the user doesn't provide a file at all
@@ -142,7 +145,6 @@ public class RequestBodyWorkflow implements Workflow {
           }
 
           List<FileInfo> list = filesAndParameters.files.computeIfAbsent(name, k -> new ArrayList<>());
-
           list.add(new FileInfo(file, fileName, contentType));
         }
       }
@@ -235,12 +237,6 @@ public class RequestBodyWorkflow implements Workflow {
     return key;
   }
 
-  private static class FilesAndParameters {
-    public final Map<String, List<FileInfo>> files = new HashMap<>();
-
-    public final Map<String, List<String>> parameters = new HashMap<>();
-  }
-
   public static class ParameterHttpServletRequestWrapper extends HttpServletRequestWrapper {
     private final Map<String, String[]> parameters;
 
@@ -268,5 +264,11 @@ public class RequestBodyWorkflow implements Workflow {
     public String[] getParameterValues(String s) {
       return parameters.get(s);
     }
+  }
+
+  private static class FilesAndParameters {
+    public final Map<String, List<FileInfo>> files = new HashMap<>();
+
+    public final Map<String, List<String>> parameters = new HashMap<>();
   }
 }
