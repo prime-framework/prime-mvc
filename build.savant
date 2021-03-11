@@ -15,7 +15,10 @@
  */
 savantVersion = "1.0.0"
 
+dropWizardVersion = "3.2.6"
 fusionAuthJWTVersion = "3.1.6"
+guiceVersion = "4.2.3"
+jacksonVersion = "2.12.1"
 
 project(group: "org.primeframework", name: "prime-mvc", version: "1.26.0", licenses: ["ApacheV2_0"]) {
   workflow {
@@ -31,11 +34,11 @@ project(group: "org.primeframework", name: "prime-mvc", version: "1.26.0", licen
       dependency(id: "javax.servlet:servlet-api:3.1.0", skipCompatibilityCheck: true)
     }
     group(name: "compile") {
-      dependency(id: "com.fasterxml.jackson.core:jackson-annotations:2.12.1")
-      dependency(id: "com.fasterxml.jackson.core:jackson-core:2.12.1")
-      dependency(id: "com.fasterxml.jackson.core:jackson-databind:2.12.1")
-      dependency(id: "com.google.inject:guice:4.2.3")
-      dependency(id: "io.dropwizard.metrics:metrics-core:3.1.0")
+      dependency(id: "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}")
+      dependency(id: "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}")
+      dependency(id: "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}")
+      dependency(id: "com.google.inject:guice:${guiceVersion}")
+      dependency(id: "io.dropwizard.metrics:metrics-core:${dropWizardVersion}")
       dependency(id: "io.fusionauth:fusionauth-jwt:${fusionAuthJWTVersion}")
       dependency(id: "javax.inject:javax.inject:1.0.0")
       // fileupload depends upon commons-io, so until we can ditch fileupload, may as well keep both.

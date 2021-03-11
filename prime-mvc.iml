@@ -41,11 +41,11 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/io/dropwizard/metrics/metrics-core/3.1.0/metrics-core-3.1.0.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/io/dropwizard/metrics/metrics-core/4.1.18/metrics-core-4.1.18.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/io/dropwizard/metrics/metrics-core/3.1.0/metrics-core-3.1.0-src.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/io/dropwizard/metrics/metrics-core/4.1.18/metrics-core-4.1.18-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -377,3 +377,4 @@
     </orderEntry>
   </component>
 </module>
+
