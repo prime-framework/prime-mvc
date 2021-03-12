@@ -39,6 +39,7 @@ import org.primeframework.mvc.parameter.DefaultParameterParser;
 import org.primeframework.mvc.security.csrf.CSRFProvider;
 import org.primeframework.mvc.servlet.PrimeFilter;
 import org.primeframework.mvc.servlet.ServletObjectsHolder;
+import org.primeframework.mvc.test.RequestResult.ThrowingConsumer;
 import org.primeframework.mvc.util.QueryStringTools;
 import org.primeframework.mvc.util.URITools;
 import static org.testng.Assert.fail;
@@ -134,7 +135,7 @@ public class RequestBuilder {
    * @param consumer the consumer of this request builder
    * @return This.
    */
-  public RequestBuilder ifFalse(boolean test, Consumer<RequestBuilder> consumer) {
+  public RequestBuilder ifFalse(boolean test, ThrowingConsumer<RequestBuilder> consumer) throws Exception {
     return ifTrue(!test, consumer);
   }
 
@@ -145,7 +146,7 @@ public class RequestBuilder {
    * @param consumer the consumer of this request builder
    * @return This.
    */
-  public RequestBuilder ifTrue(boolean test, Consumer<RequestBuilder> consumer) {
+  public RequestBuilder ifTrue(boolean test, ThrowingConsumer<RequestBuilder> consumer) throws Exception {
     if (test) {
       consumer.accept(this);
     }
