@@ -129,6 +129,25 @@ public class RequestBuilder {
   }
 
   /**
+   * If the provided test is true invoke the <code>ifConsumer</code>, else.. you guessed it.
+   *
+   * @param test         the test
+   * @param ifConsumer   the consumer used if the test is true
+   * @param elseConsumer the consumer used if the test is false
+   * @return This.
+   */
+  public RequestBuilder ifElse(boolean test, ThrowingConsumer<RequestBuilder> ifConsumer,
+                               ThrowingConsumer<RequestBuilder> elseConsumer) throws Exception {
+    if (test) {
+      ifConsumer.accept(this);
+    } else {
+      elseConsumer.accept(this);
+    }
+
+    return this;
+  }
+
+  /**
    * If the provided test is false invoke the consumer.
    *
    * @param test     the test
