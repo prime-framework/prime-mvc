@@ -112,7 +112,7 @@ public class RequestResult {
    * @throws IOException If the ObjectMapper fails.
    */
   public static void assertJSONEquals(ObjectMapper objectMapper, String actual, String expected) throws IOException {
-    _assertJSONEquals(objectMapper, actual, expected, true);
+    _assertJSONEquals(objectMapper, actual, expected, true, null);
   }
 
   /**
@@ -127,10 +127,10 @@ public class RequestResult {
    */
   public static void assertSortedJSONEquals(ObjectMapper objectMapper, String actual, String expected)
       throws IOException {
-    _assertJSONEquals(objectMapper, actual, expected, false);
+    _assertJSONEquals(objectMapper, actual, expected, false, null);
   }
 
-  private static void _assertJSONEquals(ObjectMapper objectMapper, String actual, String expected, boolean sortArrays)
+  private static void _assertJSONEquals(ObjectMapper objectMapper, String actual, String expected, boolean sortArrays, Path jsonFile)
       throws IOException {
     if (actual == null || actual.equals("")) {
       throw new AssertionError("The actual response body is empty or is equal to an empty string without any JSON. This was "
@@ -141,6 +141,12 @@ public class RequestResult {
     Map<String, Object> file = new HashMap<>();
     if (expected != null && !expected.equals("{}")) {
       file = objectMapper.readerFor(Map.class).readValue(expected);
+    }
+
+    // We generated this file to assist with test building.
+    if (jsonFile != null && file.containsKey("prime-mvc-auto-generated")) {
+      file = objectMapper.readerFor(Map.class).readValue(actual);
+      Files.write(jsonFile.toAbsolutePath(), objectMapper.writeValueAsBytes(file));
     }
 
     if (response == null) {
@@ -355,9 +361,9 @@ public class RequestResult {
    */
   public RequestResult assertBodyFile(Path path, Object... values) throws IOException {
     if (values.length == 0) {
-      return assertBody(new String(Files.readAllBytes(path), StandardCharsets.UTF_8));
+      return assertBody(Files.readString(path));
     }
-    return assertBody(BodyTools.processTemplate(path, values));
+    return assertBody(BodyTools.processTemplateForAssertion(path, values));
   }
 
   /**
@@ -853,7 +859,10 @@ public class RequestResult {
    * @throws IOException If the JSON marshalling failed.
    */
   public RequestResult assertJSONFile(Path jsonFile, Object... values) throws IOException {
-    return assertJSON(BodyTools.processTemplate(jsonFile, appendArray(values, "_to_milli", new ZonedDateTimeToMilliSeconds())));
+    ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
+    String expected = BodyTools.processTemplateForAssertion(jsonFile, appendArray(values, "_to_milli", new ZonedDateTimeToMilliSeconds()));
+    _assertJSONEquals(objectMapper, body, expected, true, jsonFile);
+    return this;
   }
 
   /**
@@ -898,9 +907,9 @@ public class RequestResult {
    */
   public RequestResult assertNormalizedBodyFile(Path path, Object... values) throws IOException {
     if (values.length == 0) {
-      return assertNormalizedBody(normalize(new String(Files.readAllBytes(path), StandardCharsets.UTF_8)));
+      return assertNormalizedBody(normalize(Files.readString(path)));
     }
-    return assertNormalizedBody(normalize(BodyTools.processTemplate(path, values)));
+    return assertNormalizedBody(normalize(BodyTools.processTemplateForAssertion(path, values)));
   }
 
   /**

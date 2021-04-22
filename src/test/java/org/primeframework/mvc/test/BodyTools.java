@@ -18,7 +18,9 @@ package org.primeframework.mvc.test;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,6 +29,7 @@ import freemarker.ext.beans.BeansWrapperBuilder;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import freemarker.template.TemplateNotFoundException;
 
 /**
  * Helper methods for processing JSON files that contain replacement variables.
@@ -35,24 +38,6 @@ import freemarker.template.TemplateException;
  */
 public final class BodyTools {
   private static final Configuration config;
-
-  static {
-    BeansWrapperBuilder builder = new BeansWrapperBuilder(Configuration.VERSION_2_3_28);
-    builder.setExposeFields(true);
-    builder.setSimpleMapWrapper(true);
-
-    config = new Configuration(Configuration.VERSION_2_3_28);
-    config.setDefaultEncoding("UTF-8");
-    config.setNumberFormat("computer");
-    config.setTagSyntax(Configuration.SQUARE_BRACKET_TAG_SYNTAX);
-    config.setObjectWrapper(builder.build());
-    config.setNumberFormat("computer");
-    try {
-      config.setTemplateLoader(new FileTemplateLoader(new File("/")));
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-  }
 
   /**
    * Process the FreeMarker template (JSON) and return the rendered string. <p>Example usage when a single replacement
@@ -67,7 +52,23 @@ public final class BodyTools {
    * @throws IOException If the template could not be loaded, parsed or executed.
    */
   public static String processTemplate(Path path, Object... values) throws IOException {
-    return processTemplateWithMap(path, toMap(values));
+    return processTemplateWithMap(path, toMap(values), false);
+  }
+
+  /**
+   * Process the FreeMarker template (JSON) and return the rendered string. <p>Example usage when a single replacement
+   * value exists in the json named ${id} :</p>
+   * <pre>
+   *   BodyTools.processTemplate(Paths.get("/foo.json"), "id", "ffffffff-1e16-4b1d-88f3-ec68ad1200e2");
+   * </pre>
+   *
+   * @param path   Path to the FreeMarker template.
+   * @param values Key value pairs of replacement values.
+   * @return The result of executing the template.
+   * @throws IOException If the template could not be loaded, parsed or executed.
+   */
+  public static String processTemplateForAssertion(Path path, Object... values) throws IOException {
+    return processTemplateWithMap(path, toMap(values), true);
   }
 
   /**
@@ -79,14 +80,26 @@ public final class BodyTools {
    *     .done());
    * </pre>
    *
-   * @param path   Path to the FreeMarker template.
-   * @param values Map of key value pairs of replacement values.
+   * @param path                   Path to the FreeMarker template.
+   * @param values                 Map of key value pairs of replacement values.
+   * @param createMissingTemplates set true to create templates when they do not exists
    * @return The result of executing the template.
    * @throws IOException If the template could not be loaded, parsed or executed.
    */
-  public static String processTemplateWithMap(Path path, Map<String, Object> values) throws IOException {
+  public static String processTemplateWithMap(Path path, Map<String, Object> values, boolean createMissingTemplates)
+      throws IOException {
     StringWriter writer = new StringWriter();
-    Template template = config.getTemplate(path.toAbsolutePath().toString());
+    Template template = null;
+    try {
+      template = config.getTemplate(path.toAbsolutePath().toString());
+    } catch (TemplateNotFoundException e) {
+      if (Files.notExists(path.toAbsolutePath())) {
+        Files.writeString(path.toAbsolutePath(), "{\"prime-mvc-auto-generated\": true}", StandardOpenOption.SYNC, StandardOpenOption.DSYNC, StandardOpenOption.CREATE_NEW);
+        config.clearTemplateCache();
+        template = config.getTemplate(path.toAbsolutePath().toString());
+      }
+    }
+
     try {
       template.process(values, writer);
       return writer.toString();
@@ -113,5 +126,23 @@ public final class BodyTools {
     }
 
     return map;
+  }
+
+  static {
+    BeansWrapperBuilder builder = new BeansWrapperBuilder(Configuration.VERSION_2_3_28);
+    builder.setExposeFields(true);
+    builder.setSimpleMapWrapper(true);
+
+    config = new Configuration(Configuration.VERSION_2_3_28);
+    config.setDefaultEncoding("UTF-8");
+    config.setNumberFormat("computer");
+    config.setTagSyntax(Configuration.SQUARE_BRACKET_TAG_SYNTAX);
+    config.setObjectWrapper(builder.build());
+    config.setNumberFormat("computer");
+    try {
+      config.setTemplateLoader(new FileTemplateLoader(new File("/")));
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 }

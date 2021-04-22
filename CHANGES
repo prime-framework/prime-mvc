@@ -1,5 +1,11 @@
 Prime MVC Changes
 
+Changes in 1.27.0
+
+  * Enhance the RequestResult to create the JSON spec files automatically if they do not exist
+
+Changes in 1.26.0
+
 Changes in 1.25.0
 
  * Revert conjoined handling.
