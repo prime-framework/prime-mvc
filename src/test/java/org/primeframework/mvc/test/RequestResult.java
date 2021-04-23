@@ -131,7 +131,8 @@ public class RequestResult {
     _assertJSONEquals(objectMapper, actual, expected, false, null);
   }
 
-  private static void _assertJSONEquals(ObjectMapper objectMapper, String actual, String expected, boolean sortArrays, Path jsonFile)
+  private static void _assertJSONEquals(ObjectMapper objectMapper, String actual, String expected, boolean sortArrays,
+                                        Path jsonFile)
       throws IOException {
     if (actual == null || actual.equals("")) {
       throw new AssertionError("The actual response body is empty or is equal to an empty string without any JSON. This was "
@@ -1431,6 +1432,11 @@ public class RequestResult {
     // Sort the lists so we can check for equality
     map.values().forEach(l -> l.sort(Comparator.naturalOrder()));
     return map;
+  }
+
+  @FunctionalInterface
+  public interface ThrowingBiConsumer<T, U> {
+    void accept(T t, U u) throws Exception;
   }
 
   @FunctionalInterface

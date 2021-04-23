@@ -1,0 +1,169 @@
+/*
+ * Copyright (c) 2021, Inversoft Inc., All Rights Reserved
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific
+ * language governing permissions and limitations under the License.
+ */
+package org.primeframework.mvc.test;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.primeframework.mvc.test.RequestResult.ThrowingBiConsumer;
+import org.primeframework.mvc.test.RequestResult.ThrowingConsumer;
+import static org.testng.Assert.fail;
+
+/**
+ * @author Daniel DeGroff
+ */
+public class JSONRequestBuilder {
+  public ObjectMapper objectMapper;
+
+  public ObjectNode root;
+
+  public JSONRequestBuilder(ObjectMapper objectMapper) {
+    this.objectMapper = objectMapper;
+  }
+
+  public JSONRequestBuilder(JsonNode root) {
+    this.root = (ObjectNode) root;
+    objectMapper = new ObjectMapper();
+  }
+
+  public JSONRequestBuilder add(String field, Object value) throws Exception {
+    return addValue(field,
+        (node, name) -> node.put(name, value.toString()),
+        (node) -> node.add(value.toString()));
+  }
+
+  public JSONRequestBuilder add(String field, List<String> value) throws Exception {
+    return addValue(field,
+        (node, name) -> {
+          ArrayNode array = node.putArray(name);
+          value.forEach(v -> array.add(v));
+        },
+        (node) -> value.stream().forEach(node::add));
+  }
+
+  public JSONRequestBuilder add(String field, Map<String, Object> value) throws Exception {
+    byte[] bytes = objectMapper.writeValueAsBytes(value);
+    JsonNode valueNode = objectMapper.readTree(bytes);
+    return addValue(field,
+        (node, name) -> node.putObject(name).setAll((ObjectNode) valueNode),
+        (node) -> node.add(valueNode));
+  }
+
+  public JSONRequestBuilder add(String field, boolean value) throws Exception {
+    return addValue(field,
+        (node, name) -> node.put(name, value),
+        node -> node.add(value));
+  }
+
+  public JSONRequestBuilder add(String field, long value) throws Exception {
+    return addValue(field,
+        (node, name) -> node.put(name, value),
+        node -> node.add(value));
+  }
+
+  public JSONRequestBuilder add(String field, int value) throws Exception {
+    return addValue(field,
+        (node, name) -> node.put(name, value),
+        node -> node.add(value));
+  }
+
+  public String build() throws JsonProcessingException {
+    return objectMapper.writeValueAsString(root);
+  }
+
+  public JSONRequestBuilder remove(String... fields) {
+    for (String field : fields) {
+
+      JSONPointer pointer = parseFieldName(field);
+      JsonNode node = root.at(pointer.parent);
+
+      if (node.isObject()) {
+        ((ObjectNode) node).remove(pointer.field);
+      } else if (node.isArray()) {
+        int index = Integer.valueOf(pointer.field);
+        ((ArrayNode) node).remove(index);
+      }
+    }
+
+    return this;
+  }
+
+  public JSONRequestBuilder withJSON(Map<String, Object> json) throws IOException {
+    byte[] bytes = objectMapper.writeValueAsBytes(json);
+    root = (ObjectNode) objectMapper.readTree(bytes);
+    return this;
+  }
+
+  public JSONRequestBuilder withJSON(String json) throws IOException {
+    root = (ObjectNode) objectMapper.readTree(json);
+    return this;
+  }
+
+  public JSONRequestBuilder withJSONFile(Path jsonFile, Object... values) throws IOException {
+    root = (ObjectNode) objectMapper.readTree(BodyTools.processTemplate(jsonFile, values));
+    return this;
+  }
+
+  private JSONRequestBuilder addValue(String field, ThrowingBiConsumer<ObjectNode, String> objectConsumer,
+                                      ThrowingConsumer<ArrayNode> arrayConsumer) throws Exception {
+
+    JSONPointer pointer = parseFieldName(field);
+    JsonNode node = root.at(pointer.parent);
+    JsonNode child = node.path(pointer.field);
+
+    // If the field name is an array, we are adding to it I think? I think will have to do replace to modify the entire array
+    if (child instanceof ArrayNode arrayNode) {
+      arrayConsumer.accept(arrayNode);
+      return this;
+    }
+
+    if (node.isMissingNode()) {
+      fail("Node not found. [" + field + "]");
+    }
+
+    if (node instanceof ObjectNode objectNode) {
+      objectConsumer.accept(objectNode, pointer.field);
+    } else {
+      throw new UnsupportedOperationException("Not expecting this.");
+    }
+
+    return this;
+  }
+
+  private JSONPointer parseFieldName(String field) {
+    String pointer = "/" + field.replaceAll("\\.", "/").replaceAll("\\[(.*?)\\]", "/$1");
+    String fieldName = pointer.substring(pointer.lastIndexOf("/") + 1);
+    return new JSONPointer(fieldName, pointer.substring(0, pointer.indexOf(fieldName) - 1));
+  }
+
+  public static class JSONPointer {
+    public String field;
+
+    public String parent;
+
+    public JSONPointer(String field, String parent) {
+      this.field = field;
+      this.parent = parent;
+    }
+  }
+}

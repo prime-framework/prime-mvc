@@ -28,7 +28,6 @@ import java.util.Locale;
 import java.util.function.Consumer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Injector;
 import org.primeframework.mock.servlet.MockContainer;
@@ -331,30 +330,6 @@ public class RequestBuilder {
   }
 
   /**
-   * Sets the body content. This processes the file using FreeMarker. Use {@link #withBodyFileRaw(Path)} to skip
-   * FreeMarker processing.
-   *
-   * @param body     The body as a {@link Path} to the file.
-   * @param consumer an optional consumer of a JSON node used to mutate the JSON body
-   * @param values   key value pairs of replacement values for use in the file.
-   * @return This.
-   * @throws IOException If the file could not be loaded.
-   */
-  public RequestBuilder withBodyFile(Path body, Consumer<JSONBodyHelper> consumer, Object... values)
-      throws IOException {
-    String result = BodyTools.processTemplate(body, values);
-
-    if (consumer != null) {
-      ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
-      JsonNode node = objectMapper.readTree(result);
-      consumer.accept(new JSONBodyHelper(node));
-      result = objectMapper.writeValueAsString(node);
-    }
-
-    return withBody(result);
-  }
-
-  /**
    * Sets the body content.
    *
    * @param body The body as a {@link Path} to the raw file.
@@ -503,30 +478,25 @@ public class RequestBuilder {
     return withContentType("application/json").withBody(json);
   }
 
-  /**
-   * Uses the given {@link Path} object to a JSON file as the JSON body for the request.
-   *
-   * @param jsonFile The string representation of the JSON to send in the request.
-   * @param values   key value pairs of replacement values for use in the JSON file.
-   * @return This.
-   * @throws IOException If the file could not be loaded.
-   */
-  public RequestBuilder withJSONFile(Path jsonFile, Object... values) throws IOException {
-    return withJSONFile(jsonFile, null, values);
+  public RequestBuilder withJSONBuilder(ThrowingConsumer<JSONRequestBuilder> consumer) throws Exception {
+    ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
+    JSONRequestBuilder builder = new JSONRequestBuilder(objectMapper);
+    consumer.accept(builder);
+    withJSON(builder.build());
+    return this;
   }
 
   /**
    * Uses the given {@link Path} object to a JSON file as the JSON body for the request.
    *
    * @param jsonFile The string representation of the JSON to send in the request.
-   * @param consumer a JSON node consumer used to mutate the request before it is used.
    * @param values   key value pairs of replacement values for use in the JSON file.
    * @return This.
    * @throws IOException If the file could not be loaded.
    */
-  public RequestBuilder withJSONFile(Path jsonFile, Consumer<JSONBodyHelper> consumer, Object... values)
+  public RequestBuilder withJSONFile(Path jsonFile, Object... values)
       throws IOException {
-    return withContentType("application/json").withBodyFile(jsonFile, consumer, values);
+    return withContentType("application/json").withBodyFile(jsonFile, values);
   }
 
   /**

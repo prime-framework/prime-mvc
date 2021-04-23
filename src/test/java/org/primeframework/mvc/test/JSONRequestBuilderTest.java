@@ -29,14 +29,13 @@ import static org.testng.Assert.assertTrue;
 /**
  * @author Daniel DeGroff
  */
-public class JSONBodyHelperTest {
-
+public class JSONRequestBuilderTest {
   public Map<String, Object> json = Map.of(
       "user", Map.of(
           "email", "erlich@piedpiper.com",
           "mobilePhone", "555-555-5555"));
 
-  private JSONBodyHelper handler;
+  private JSONRequestBuilder handler;
 
   private ObjectMapper objectMapper;
 
@@ -46,7 +45,7 @@ public class JSONBodyHelperTest {
   public void beforeMethod() throws IOException {
     objectMapper = new ObjectMapper();
     root = objectMapper.readTree(objectMapper.writeValueAsBytes(json));
-    handler = new JSONBodyHelper(root);
+    handler = new JSONRequestBuilder(root);
   }
 
   @Test
@@ -73,6 +72,13 @@ public class JSONBodyHelperTest {
     assertEquals(handler.root.at("/user/roles/0").asText(), "admin", handler.root.toString());
     assertEquals(handler.root.at("/user/roles/1").asText(), "user", handler.root.toString());
 
+    // Add a value to an array
+    handler.add("user.roles", "manager");
+    assertTrue(handler.root.at("/user/roles").isArray(), handler.root.toString());
+    assertEquals(handler.root.at("/user/roles/0").asText(), "admin", handler.root.toString());
+    assertEquals(handler.root.at("/user/roles/1").asText(), "user", handler.root.toString());
+    assertEquals(handler.root.at("/user/roles/2").asText(), "manager", handler.root.toString());
+
     // Add an object
     handler.add("user.data", Map.of("foo", "bar"));
     assertTrue(handler.root.at("/user/data").isObject(), handler.root.toString());
@@ -81,6 +87,7 @@ public class JSONBodyHelperTest {
     // Remove a value from an array
     handler.remove("user.roles[1]");
     assertEquals(handler.root.at("/user/roles/0").asText(), "admin", handler.root.toString());
-    assertTrue(handler.root.at("/user/roles/1").isMissingNode());
+    assertEquals(handler.root.at("/user/roles/1").asText(), "manager", handler.root.toString());
+    assertTrue(handler.root.at("/user/roles/2").isMissingNode());
   }
 }
