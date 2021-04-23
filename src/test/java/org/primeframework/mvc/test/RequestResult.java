@@ -17,7 +17,6 @@ package org.primeframework.mvc.test;
 
 import javax.servlet.http.Cookie;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -37,6 +36,8 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.util.DefaultIndenter;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.inject.Injector;
@@ -146,7 +147,10 @@ public class RequestResult {
     // We generated this file to assist with test building.
     if (jsonFile != null && file.containsKey("prime-mvc-auto-generated")) {
       file = objectMapper.readerFor(Map.class).readValue(actual);
-      Files.write(jsonFile.toAbsolutePath(), objectMapper.writeValueAsBytes(file));
+      Files.write(jsonFile.toAbsolutePath(), objectMapper.writerWithDefaultPrettyPrinter()
+                                                         .withFeatures(SerializationFeature.INDENT_OUTPUT)
+                                                         .with(new DefaultPrettyPrinter().withArrayIndenter(new DefaultIndenter()))
+                                                         .writeValueAsBytes(file));
     }
 
     if (response == null) {
@@ -396,7 +400,7 @@ public class RequestResult {
       List<FieldMessage> fieldMessages = msgs.get(field);
       if (fieldMessages == null) {
         StringBuilder sb = new StringBuilder("\n\tMessageStore contains:\n");
-        msgs.keySet().forEach(f -> sb.append("\t\t" + f + "\n"));
+        msgs.keySet().stream().sorted().forEach(f -> sb.append("\t\t" + f + "\n"));
         throw new AssertionError("The MessageStore does not contain a error for the field [" + field + "]" + sb);
       }
 
@@ -407,6 +411,7 @@ public class RequestResult {
 
       if (!found) {
         StringBuilder sb = new StringBuilder("\n\tMessageStore contains:\n");
+        fieldMessages.sort(Comparator.comparing(FieldMessage::getField));
         fieldMessages.forEach(f -> sb.append("\t\t[" + f.getType() + "]\n"));
         throw new AssertionError("The MessageStore contains messages but no errors for the field [" + field + "]" + sb);
       }
@@ -470,11 +475,11 @@ public class RequestResult {
 
       // Fields you are missing
       sb.append("\nYou are missing the following field errors from your assertion:\n");
-      remaining.forEach(field -> sb.append("\t\tField: ").append(field).append("\n"));
+      remaining.stream().sorted().forEach(field -> sb.append("\t\tField: ").append(field).append("\n"));
 
       // The message store contains
       sb.append("\nThe MessageStore contains the following field errors:\n");
-      msgs.keySet().forEach(f -> {
+      msgs.keySet().stream().sorted().forEach(f -> {
         StringBuilder fieldMessages = new StringBuilder();
         msgs.get(f).forEach(fm -> fieldMessages.append("\t\t\t[" + fm.getType() + "] " + fm.getCode()));
         sb.append("\t\tField: " + f + "\n" + fieldMessages + "\n");
@@ -611,6 +616,7 @@ public class RequestResult {
 
     StringBuilder sb = new StringBuilder("\n\tMessageStore contains:\n");
     //noinspection StringConcatenationInsideStringBufferAppend
+    messages.sort(Comparator.comparing(FieldMessage::getField));
     messages.forEach(m -> sb.append("\t\t" + m.getType() + "\tField: " + m.getField() + " Code: " + m.getCode() + "\t" + ((m instanceof SimpleFieldMessage) ? ((SimpleFieldMessage) m).message : "") + "\n"));
     throw new AssertionError("The MessageStore contains the following field errors.]" + sb);
   }
