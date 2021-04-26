@@ -478,9 +478,9 @@ public class RequestBuilder {
     return withContentType("application/json").withBody(json);
   }
 
-  public RequestBuilder withJSONBuilder(ThrowingConsumer<JSONRequestBuilder> consumer) throws Exception {
+  public RequestBuilder withJSONBuilder(ThrowingConsumer<JSONBuilder> consumer) throws Exception {
     ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
-    JSONRequestBuilder builder = new JSONRequestBuilder(objectMapper);
+    JSONBuilder builder = new JSONBuilder(objectMapper);
     consumer.accept(builder);
     withJSON(builder.build());
     return this;

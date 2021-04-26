@@ -32,36 +32,36 @@ import static org.testng.Assert.fail;
 /**
  * @author Daniel DeGroff
  */
-public class JSONRequestBuilder {
+public class JSONBuilder {
   public ObjectMapper objectMapper;
 
   public ObjectNode root;
 
-  public JSONRequestBuilder(ObjectMapper objectMapper) {
+  public JSONBuilder(ObjectMapper objectMapper) {
     this.objectMapper = objectMapper;
   }
 
-  public JSONRequestBuilder(JsonNode root) {
+  public JSONBuilder(JsonNode root) {
     this.root = (ObjectNode) root;
     objectMapper = new ObjectMapper();
   }
 
-  public JSONRequestBuilder add(String field, Object value) throws Exception {
+  public JSONBuilder add(String field, Object value) throws Exception {
     return addValue(field,
         (node, name) -> node.put(name, value.toString()),
         (node) -> node.add(value.toString()));
   }
 
-  public JSONRequestBuilder add(String field, List<String> value) throws Exception {
+  public JSONBuilder add(String field, List<String> value) throws Exception {
     return addValue(field,
         (node, name) -> {
           ArrayNode array = node.putArray(name);
-          value.forEach(v -> array.add(v));
+          value.forEach(array::add);
         },
-        (node) -> value.stream().forEach(node::add));
+        (node) -> value.forEach(node::add));
   }
 
-  public JSONRequestBuilder add(String field, Map<String, Object> value) throws Exception {
+  public JSONBuilder add(String field, Map<String, Object> value) throws Exception {
     byte[] bytes = objectMapper.writeValueAsBytes(value);
     JsonNode valueNode = objectMapper.readTree(bytes);
     return addValue(field,
@@ -69,19 +69,19 @@ public class JSONRequestBuilder {
         (node) -> node.add(valueNode));
   }
 
-  public JSONRequestBuilder add(String field, boolean value) throws Exception {
+  public JSONBuilder add(String field, boolean value) throws Exception {
     return addValue(field,
         (node, name) -> node.put(name, value),
         node -> node.add(value));
   }
 
-  public JSONRequestBuilder add(String field, long value) throws Exception {
+  public JSONBuilder add(String field, long value) throws Exception {
     return addValue(field,
         (node, name) -> node.put(name, value),
         node -> node.add(value));
   }
 
-  public JSONRequestBuilder add(String field, int value) throws Exception {
+  public JSONBuilder add(String field, int value) throws Exception {
     return addValue(field,
         (node, name) -> node.put(name, value),
         node -> node.add(value));
@@ -91,7 +91,7 @@ public class JSONRequestBuilder {
     return objectMapper.writeValueAsString(root);
   }
 
-  public JSONRequestBuilder remove(String... fields) {
+  public JSONBuilder remove(String... fields) {
     for (String field : fields) {
 
       JSONPointer pointer = parseFieldName(field);
@@ -100,7 +100,7 @@ public class JSONRequestBuilder {
       if (node.isObject()) {
         ((ObjectNode) node).remove(pointer.field);
       } else if (node.isArray()) {
-        int index = Integer.valueOf(pointer.field);
+        int index = Integer.parseInt(pointer.field);
         ((ArrayNode) node).remove(index);
       }
     }
@@ -108,24 +108,24 @@ public class JSONRequestBuilder {
     return this;
   }
 
-  public JSONRequestBuilder withJSON(Map<String, Object> json) throws IOException {
+  public JSONBuilder withJSON(Map<String, Object> json) throws IOException {
     byte[] bytes = objectMapper.writeValueAsBytes(json);
     root = (ObjectNode) objectMapper.readTree(bytes);
     return this;
   }
 
-  public JSONRequestBuilder withJSON(String json) throws IOException {
+  public JSONBuilder withJSON(String json) throws IOException {
     root = (ObjectNode) objectMapper.readTree(json);
     return this;
   }
 
-  public JSONRequestBuilder withJSONFile(Path jsonFile, Object... values) throws IOException {
+  public JSONBuilder withJSONFile(Path jsonFile, Object... values) throws IOException {
     root = (ObjectNode) objectMapper.readTree(BodyTools.processTemplate(jsonFile, values));
     return this;
   }
 
-  private JSONRequestBuilder addValue(String field, ThrowingBiConsumer<ObjectNode, String> objectConsumer,
-                                      ThrowingConsumer<ArrayNode> arrayConsumer) throws Exception {
+  private JSONBuilder addValue(String field, ThrowingBiConsumer<ObjectNode, String> objectConsumer,
+                               ThrowingConsumer<ArrayNode> arrayConsumer) throws Exception {
 
     JSONPointer pointer = parseFieldName(field);
     JsonNode node = root.at(pointer.parent);

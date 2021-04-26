@@ -29,13 +29,13 @@ import static org.testng.Assert.assertTrue;
 /**
  * @author Daniel DeGroff
  */
-public class JSONRequestBuilderTest {
+public class JSONBuilderTest {
   public Map<String, Object> json = Map.of(
       "user", Map.of(
           "email", "erlich@piedpiper.com",
           "mobilePhone", "555-555-5555"));
 
-  private JSONRequestBuilder handler;
+  private JSONBuilder handler;
 
   private ObjectMapper objectMapper;
 
@@ -45,7 +45,7 @@ public class JSONRequestBuilderTest {
   public void beforeMethod() throws IOException {
     objectMapper = new ObjectMapper();
     root = objectMapper.readTree(objectMapper.writeValueAsBytes(json));
-    handler = new JSONRequestBuilder(root);
+    handler = new JSONBuilder(root);
   }
 
   @Test
