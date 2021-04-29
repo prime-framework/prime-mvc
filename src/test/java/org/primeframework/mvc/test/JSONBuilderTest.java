@@ -84,6 +84,11 @@ public class JSONBuilderTest {
     assertTrue(handler.root.at("/user/data").isObject(), handler.root.toString());
     assertEquals(handler.root.at("/user/data/foo").asText(), "bar", handler.root.toString());
 
+    // Add a nested object where the path does not yet exist
+    handler.add("user.foo.data", Map.of("foo", "bar"));
+    assertTrue(handler.root.at("/user/foo/data").isObject(), handler.root.toString());
+    assertEquals(handler.root.at("/user/foo/data/foo").asText(), "bar", handler.root.toString());
+
     // Remove a value from an array
     handler.remove("user.roles[1]");
     assertEquals(handler.root.at("/user/roles/0").asText(), "admin", handler.root.toString());

@@ -24,6 +24,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.primeframework.mvc.test.RequestResult.ThrowingBiConsumer;
 import org.primeframework.mvc.test.RequestResult.ThrowingConsumer;
@@ -128,7 +129,12 @@ public class JSONBuilder {
                                ThrowingConsumer<ArrayNode> arrayConsumer) throws Exception {
 
     JSONPointer pointer = parseFieldName(field);
+
+    // Create the path if it does not yet exist so we can create nexted values.
+    createNestedObjectPaths(pointer);
+
     JsonNode node = root.at(pointer.parent);
+
     JsonNode child = node.path(pointer.field);
 
     // If the field name is an array, we are adding to it I think? I think will have to do replace to modify the entire array
@@ -148,6 +154,19 @@ public class JSONBuilder {
     }
 
     return this;
+  }
+
+  private void createNestedObjectPaths(JSONPointer pointer) {
+    String path = "/";
+    JsonNode working = root;
+    for (String part : pointer.parent.substring(1).split("/")) {
+      path = path + (path.endsWith("/") ? "" : "/") + part;
+      if (root.at(path).isMissingNode()) {
+        ((ObjectNode) working).set(part, JsonNodeFactory.instance.objectNode());
+      } else {
+        working = root.at(path);
+      }
+    }
   }
 
   private JSONPointer parseFieldName(String field) {
