@@ -150,10 +150,15 @@ public abstract class AbstractListInput extends AbstractInput {
     }
 
     if (text == null && item instanceof Enum) {
+      // Try to use a fully qualified enum name first.
       try {
-        text = messageProvider.getMessage(item.toString());
+        text = messageProvider.getMessage(item.getClass().getSimpleName() + "." + item.toString());
       } catch (MissingMessageException e) {
-        // Smother this and continue to use the toString() for the text
+        try {
+          text = messageProvider.getMessage(item.toString());
+        } catch (MissingMessageException e1) {
+          // Smother this and continue to use the toString() for the text
+        }
       }
     }
 
