@@ -1,5 +1,9 @@
 Prime MVC Changes
 
+Changes in 1.28.0
+
+  * Support fully qualified enum names when building options in a select control
+
 Changes in 1.27.0
 
   * Enhance the RequestResult to create the JSON spec files automatically if they do not exist
