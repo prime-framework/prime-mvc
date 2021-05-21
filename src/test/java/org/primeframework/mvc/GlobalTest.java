@@ -102,32 +102,32 @@ public class GlobalTest extends PrimeBaseTest {
 
   @Test
   public void escapePathSegmentsWithWildCard() throws Exception {
-    test.simulate(() -> test.simulator.test("/escaped-path-segments")
-                                      .withURLSegment("foo bar")
-                                      .withURLSegment("foobar")
-                                      .withURLSegment("foo bar")
-                                      .withURLSegment("foo@bar")
-                                      .get()
-                                      .assertStatusCode(200)
-                                      .assertHeaderContains("Cache-Control", "no-cache")
-                                      .assertBodyContains(
-                                          "Success!",
-                                          "parm=foo bar",
-                                          "theRest=foobar,foo bar,foo@bar"));
+    test.simulate(() -> simulator.test("/escaped-path-segments")
+                                 .withURLSegment("foo bar")
+                                 .withURLSegment("foobar")
+                                 .withURLSegment("foo bar")
+                                 .withURLSegment("foo@bar")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertHeaderContains("Cache-Control", "no-cache")
+                                 .assertBodyContains(
+                                     "Success!",
+                                     "parm=foo bar",
+                                     "theRest=foobar,foo bar,foo@bar"));
 
-    test.simulate(() -> test.simulator.test("/escaped-path-segments")
-                                      .withURLSegment("<foo>")
-                                      .withURLSegment("foo bar")
-                                      .withURLSegment("foobar")
-                                      .withURLSegment("foo bar")
-                                      .withURLSegment("foo@bar")
-                                      .get()
-                                      .assertStatusCode(200)
-                                      .assertHeaderContains("Cache-Control", "no-cache")
-                                      .assertBodyContains(
-                                          "Success!",
-                                          "parm=&lt;foo&gt;",
-                                          "theRest=foo bar,foobar,foo bar,foo@bar"));
+    test.simulate(() -> simulator.test("/escaped-path-segments")
+                                 .withURLSegment("<foo>")
+                                 .withURLSegment("foo bar")
+                                 .withURLSegment("foobar")
+                                 .withURLSegment("foo bar")
+                                 .withURLSegment("foo@bar")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertHeaderContains("Cache-Control", "no-cache")
+                                 .assertBodyContains(
+                                     "Success!",
+                                     "parm=&lt;foo&gt;",
+                                     "theRest=foo bar,foobar,foo bar,foo@bar"));
   }
 
   @Test
@@ -231,50 +231,50 @@ public class GlobalTest extends PrimeBaseTest {
 
   @Test
   public void get_action_package_collision() throws Exception {
-    test.simulate(() -> test.simulator.test("/foo/view/bar/baz")
-                                      .withURLSegment("42")
-                                      .get()
-                                      .assertStatusCode(200)
-                                      .assertHeaderContains("Cache-Control", "no-cache")
-                                      .assertBodyContains("/foo/view/bar/baz!", "42"))
+    test.simulate(() -> simulator.test("/foo/view/bar/baz")
+                                 .withURLSegment("42")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertHeaderContains("Cache-Control", "no-cache")
+                                 .assertBodyContains("/foo/view/bar/baz!", "42"))
 
-        .simulate(() -> test.simulator.test("/foo/view/bar/baz")
-                                      .get()
-                                      .assertStatusCode(200)
-                                      .assertBodyContains("/foo/view/bar/baz!", "empty"))
+        .simulate(() -> simulator.test("/foo/view/bar/baz")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertBodyContains("/foo/view/bar/baz!", "empty"))
 
-        .simulate(() -> test.simulator.test("/foo/view/bar")
-                                      .withURLSegment("42")
-                                      .get()
-                                      .assertStatusCode(200)
-                                      .assertBodyContains("/foo/view/bar!", "42"))
+        .simulate(() -> simulator.test("/foo/view/bar")
+                                 .withURLSegment("42")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertBodyContains("/foo/view/bar!", "42"))
 
-        .simulate(() -> test.simulator.test("/foo/view/bar")
-                                      .get()
-                                      .assertStatusCode(200)
-                                      .assertBodyContains("/foo/view/bar!", "empty"))
+        .simulate(() -> simulator.test("/foo/view/bar")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertBodyContains("/foo/view/bar!", "empty"))
 
-        .simulate(() -> test.simulator.test("/foo/view")
-                                      .withURLSegment("42")
-                                      .get()
-                                      .assertStatusCode(200)
-                                      .assertBodyContains("/foo/view!", "42"))
+        .simulate(() -> simulator.test("/foo/view")
+                                 .withURLSegment("42")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertBodyContains("/foo/view!", "42"))
 
-        .simulate(() -> test.simulator.test("/foo/view")
-                                      .get()
-                                      .assertStatusCode(200)
-                                      .assertBodyContains("/foo/view!", "empty"))
+        .simulate(() -> simulator.test("/foo/view")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertBodyContains("/foo/view!", "empty"))
 
-        .simulate(() -> test.simulator.test("/foo")
-                                      .withURLSegment("42")
-                                      .get()
-                                      .assertStatusCode(200)
-                                      .assertBodyContains("/foo!", "42"))
+        .simulate(() -> simulator.test("/foo")
+                                 .withURLSegment("42")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertBodyContains("/foo!", "42"))
 
-        .simulate(() -> test.simulator.test("/foo")
-                                      .get()
-                                      .assertStatusCode(200)
-                                      .assertBodyContains("/foo!", "empty"));
+        .simulate(() -> simulator.test("/foo")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertBodyContains("/foo!", "empty"));
   }
 
   @Test
@@ -655,16 +655,16 @@ public class GlobalTest extends PrimeBaseTest {
 
   @Test
   public void get_nested_parameters() throws Exception {
-    test.simulate(() -> test.simulator.test("/nested")
-                                      .withURLSegment("42")
-                                      .withURLSegment("99")
-                                      .withURLSegment("parameter")
-                                      .withURLSegment("foo")
-                                      .withURLSegment("bar")
-                                      .get()
-                                      .assertHeaderContains("Cache-Control", "no-cache")
-                                      .assertStatusCode(200)
-                                      .assertBodyContains("Success!", "preParam1=42", "preParam2=99", "endParam1=foo", "endParam2=bar"));
+    test.simulate(() -> simulator.test("/nested")
+                                 .withURLSegment("42")
+                                 .withURLSegment("99")
+                                 .withURLSegment("parameter")
+                                 .withURLSegment("foo")
+                                 .withURLSegment("bar")
+                                 .get()
+                                 .assertHeaderContains("Cache-Control", "no-cache")
+                                 .assertStatusCode(200)
+                                 .assertBodyContains("Success!", "preParam1=42", "preParam2=99", "endParam1=foo", "endParam2=bar"));
   }
 
   @Test
@@ -701,17 +701,17 @@ public class GlobalTest extends PrimeBaseTest {
 
   @Test
   public void get_percent_encoded_segment() throws Exception {
-    test.simulate(() -> test.simulator.test("/foo/view")
-                                      .withURLSegment("<strong>foo</strong>")
-                                      .get()
-                                      .assertStatusCode(200)
-                                      .assertHeaderContains("Cache-Control", "no-cache")
-                                      .assertBodyContains("/foo/view!", "id=&lt;strong&gt;foo&lt;/strong&gt;"));
+    test.simulate(() -> simulator.test("/foo/view")
+                                 .withURLSegment("<strong>foo</strong>")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertHeaderContains("Cache-Control", "no-cache")
+                                 .assertBodyContains("/foo/view!", "id=&lt;strong&gt;foo&lt;/strong&gt;"));
 
-    test.simulate(() -> test.simulator.test("/foo/view/%3Cstrong%3Efoo%3C%2Fstrong%3E")
-                                      .get()
-                                      .assertStatusCode(200)
-                                      .assertBodyContains("/foo/view!", "id=&lt;strong&gt;foo&lt;/strong&gt;"));
+    test.simulate(() -> simulator.test("/foo/view/%3Cstrong%3Efoo%3C%2Fstrong%3E")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertBodyContains("/foo/view!", "id=&lt;strong&gt;foo&lt;/strong&gt;"));
   }
 
   @Test
@@ -841,10 +841,10 @@ public class GlobalTest extends PrimeBaseTest {
 
   @Test
   public void get_secure() throws Exception {
-    test.simulate(() -> test.simulator.test("/secure")
-                                      .get()
-                                      .assertHeaderContains("Cache-Control", "no-cache")
-                                      .assertStatusCode(401));
+    test.simulate(() -> simulator.test("/secure")
+                                 .get()
+                                 .assertHeaderContains("Cache-Control", "no-cache")
+                                 .assertStatusCode(401));
   }
 
   @Test
@@ -1540,16 +1540,16 @@ public class GlobalTest extends PrimeBaseTest {
 
   @Test
   public void post_invalidJSON() throws Exception {
-    test.simulate(() -> test.simulator.test("/invalid-json")
-                                      .withJSONFile(Paths.get("src/test/resources/json/InvalidJsonAction.json"))
-                                      .post()
-                                      .assertStatusCode(400)
-                                      .assertContainsFieldErrors("active")
-                                      // The actual exception seems to vary a bit, so instead we are asserting the content type and then that some specific info is in the body.
-                                      .assertContentType("application/json")
-                                      .assertBodyContains(
-                                          "[invalidJSON]",
-                                          "Unable to parse JSON. The property [active] was invalid. The error was [Possible conversion error]. The detailed exception was ["));
+    test.simulate(() -> simulator.test("/invalid-json")
+                                 .withJSONFile(Paths.get("src/test/resources/json/InvalidJsonAction.json"))
+                                 .post()
+                                 .assertStatusCode(400)
+                                 .assertContainsFieldErrors("active")
+                                 // The actual exception seems to vary a bit, so instead we are asserting the content type and then that some specific info is in the body.
+                                 .assertContentType("application/json")
+                                 .assertBodyContains(
+                                     "[invalidJSON]",
+                                     "Unable to parse JSON. The property [active] was invalid. The error was [Possible conversion error]. The detailed exception was ["));
   }
 
   @Test
@@ -1666,8 +1666,8 @@ public class GlobalTest extends PrimeBaseTest {
   public void post_scopeStorage() throws Exception {
     // Tests that the expression evaluator safely gets skipped while looking for values and Prime then checks the
     // HttpServletRequest and finds the value
-    test.simulate(() -> test.simulator.test("/scope-storage")
-                                      .post())
+    test.simulate(() -> simulator.test("/scope-storage")
+                                 .post())
         .assertContextAttributeNotNull("contextObject")
         .assertRequestAttributeNotNull("requestObject")
         .assertActionSessionAttributeNotNull("org.example.action.ScopeStorageAction", "actionSessionObject")
@@ -1677,24 +1677,24 @@ public class GlobalTest extends PrimeBaseTest {
   @Test
   public void post_scopeStorageInBaseClass() throws Exception {
     // Set values during POST - fields exist in base abstract class
-    test.simulate(() -> test.simulator.test("/extended-scope-storage")
-                                      .post())
+    test.simulate(() -> simulator.test("/extended-scope-storage")
+                                 .post())
         .assertContextAttributeNotNull("contextObject")
         .assertRequestAttributeNotNull("requestObject")
         .assertActionSessionAttributeNotNull("org.example.action.ExtendedScopeStorage", "actionSessionObject")
         .assertSessionAttributeNotNull("sessionObject")
 
         // Call [GET] -- assume everything is set from prior request except request attribute is null.
-        .simulate(() -> test.simulator.test("/extended-scope-storage")
-                                      .get())
+        .simulate(() -> simulator.test("/extended-scope-storage")
+                                 .get())
         .assertContextAttributeNotNull("contextObject")
         .assertRequestAttributeIsNull("requestObject")
         .assertActionSessionAttributeNotNull("org.example.action.ExtendedScopeStorage", "actionSessionObject")
         .assertSessionAttributeNotNull("sessionObject")
 
         // Call [GET] on a different action -- only action and context attributes come over, request and action session are null.
-        .simulate(() -> test.simulator.test("/another-extended-scope-storage")
-                                      .get())
+        .simulate(() -> simulator.test("/another-extended-scope-storage")
+                                 .get())
         .assertContextAttributeNotNull("contextObject")
         .assertRequestAttributeIsNull("requestObject")
         .assertActionSessionAttributeIsNull("org.example.action.AnotherExtendedScopeStorage", "actionSessionObject")
@@ -1936,10 +1936,10 @@ public class GlobalTest extends PrimeBaseTest {
 
   @Test
   public void uriParameters() throws Exception {
-    test.simulate(() -> test.simulator.test("/complex-rest/brian/static/pontarelli/then/a/bunch/of/stuff")
-                                      .post()
-                                      .assertStatusCode(200)
-                                      .assertBodyContains("firstName=brian", "lastName=pontarelli", "theRest=then,a,bunch,of,stuff"));
+    test.simulate(() -> simulator.test("/complex-rest/brian/static/pontarelli/then/a/bunch/of/stuff")
+                                 .post()
+                                 .assertStatusCode(200)
+                                 .assertBodyContains("firstName=brian", "lastName=pontarelli", "theRest=then,a,bunch,of,stuff"));
   }
 
   @DataProvider(name = "useCookieFlash")

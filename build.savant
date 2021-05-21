@@ -56,7 +56,7 @@ project(group: "org.primeframework", name: "prime-mvc", version: "1.28.1", licen
       dependency(id: "org.easymock:easymock:4.2.0")
       dependency(id: "org.testng:testng:7.1.0")
       dependency(id: "org.jsoup:jsoup:1.12.1")
-      dependency(id: "org.primeframework:prime-mock:0.7.4")
+      dependency(id: "org.primeframework:prime-mock:0.8.0")
     }
     group(name: "test-runtime") {
       dependency(id: "ch.qos.logback:logback-classic:1.0.11")
