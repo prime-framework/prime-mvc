@@ -345,11 +345,11 @@
     <orderEntry type="module-library" scope="TEST">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/primeframework/prime-mock/0.8.0-{integration}/prime-mock-0.8.0-{integration}.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/org/primeframework/prime-mock/0.8.0/prime-mock-0.8.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/primeframework/prime-mock/0.8.0-{integration}/prime-mock-0.8.0-{integration}-src.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/org/primeframework/prime-mock/0.8.0/prime-mock-0.8.0-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
