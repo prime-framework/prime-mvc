@@ -19,6 +19,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import io.fusionauth.jwt.Verifier;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
@@ -29,12 +32,9 @@ import org.primeframework.mvc.security.annotation.AuthorizeMethod;
 import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.util.ReflectionUtils;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import io.fusionauth.jwt.Verifier;
-
 /**
- * The scheme itself performs no authentication or authorization, it only calls the method(s) annotated with the {@link AuthorizeMethod}.
+ * The scheme itself performs no authentication or authorization, it only calls the method(s) annotated with the {@link
+ * AuthorizeMethod}.
  *
  * @author Daniel DeGroff
  */
@@ -46,7 +46,8 @@ public class AuthorizeMethodScheme implements SecurityScheme {
   protected final Provider<Map<String, Verifier>> verifierProvider;
 
   @Inject
-  public AuthorizeMethodScheme(ActionInvocationStore actionInvocationStore, HttpServletRequest request, Provider<Map<String, Verifier>> verifierProvider) {
+  public AuthorizeMethodScheme(ActionInvocationStore actionInvocationStore, HttpServletRequest request,
+                               Provider<Map<String, Verifier>> verifierProvider) {
     this.actionInvocationStore = actionInvocationStore;
     this.request = request;
     this.verifierProvider = verifierProvider;
@@ -60,21 +61,28 @@ public class AuthorizeMethodScheme implements SecurityScheme {
     ActionConfiguration actionConfiguration = actionInvocation.configuration;
 
     HTTPMethod method = HTTPMethod.valueOf(request.getMethod().toUpperCase());
-    if (actionConfiguration.authorizationMethods.containsKey(method)) {
-      for (AuthorizationMethodConfiguration methodConfig : actionConfiguration.authorizationMethods.get(method)) {
-        try {
+    // If this scheme is not configured for this method, throw UnauthenticatedException.
+    //
+    // - For example, using 'api' and 'authorize-method' schemes. The API key is omitted, so the next scheme used will be
+    //   the 'authorize-method' (this scheme). In this case, if the Authorize Method is only configured for POST and
+    //   this is a DELETE method, we need to throw an exception so we that we don't continue the current workflow.
+    // - Throwing UnauthenticatedException will allow an additional scheme to be executed if configured.
+    if (!actionConfiguration.authorizationMethods.containsKey(method)) {
+      throw new UnauthenticatedException();
+    }
 
-          if (methodConfig.method.getParameterCount() == 1) {
-            parameters = new Object[]{new AuthorizeSchemeData(Arrays.asList(constraints), method, request)};
-          }
-
-          Boolean authorized = ReflectionUtils.invoke(methodConfig.method, actionInvocation.action, parameters);
-          if (!authorized) {
-            throw new UnauthorizedException();
-          }
-        } catch (ExpressionException e) {
-          throw new PrimeException("Unable to invoke @AuthorizeMethod on the class [" + actionConfiguration.actionClass + "]", e);
+    for (AuthorizationMethodConfiguration methodConfig : actionConfiguration.authorizationMethods.get(method)) {
+      try {
+        if (methodConfig.method.getParameterCount() == 1) {
+          parameters = new Object[]{new AuthorizeSchemeData(Arrays.asList(constraints), method, request)};
         }
+
+        Boolean authorized = ReflectionUtils.invoke(methodConfig.method, actionInvocation.action, parameters);
+        if (!authorized) {
+          throw new UnauthorizedException();
+        }
+      } catch (ExpressionException e) {
+        throw new PrimeException("Unable to invoke @AuthorizeMethod on the class [" + actionConfiguration.actionClass + "]", e);
       }
     }
   }

@@ -20,7 +20,7 @@ import java.util.List;
 import org.primeframework.mvc.action.annotation.Action;
 
 /**
- * Action for testing the escaping / unescaping of path segments used as request parameters
+ * Action for testing the escaping / un-escaping of path segments used as request parameters
  *
  * @author Daniel DeGroff
  */
