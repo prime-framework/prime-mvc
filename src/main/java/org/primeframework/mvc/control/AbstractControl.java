@@ -227,7 +227,9 @@ public abstract class AbstractControl implements Control {
     for (ControlAttribute controlAttribute : controlAttributes) {
       Object value = attributes.get(controlAttribute.name());
       if (value == null && required) {
-        errors.addError("The control [" + controlName() + "] is missing the required attribute [" +
+        Object name = attributes.get("name");
+        String nameAttribute = name != null ? " with name [" + name + "]" : "";
+        errors.addError("The [" + controlName() + "] control" + nameAttribute + " is missing the required attribute [" +
             controlAttribute.name() + "]");
       } else if (value != null) {
         Class<?>[] attributeTypes = controlAttribute.types();
@@ -240,7 +242,9 @@ public abstract class AbstractControl implements Control {
         }
 
         if (!found) {
-          errors.addError("The control [" + controlName() + "] has an invalid attribute [" + controlAttribute.name() +
+          Object name = attributes.get("name");
+          String nameAttribute = name != null ? " with name [" + name + "]" : "";
+          errors.addError("The [" + controlName() + "] control" + nameAttribute + " has an invalid attribute [" + controlAttribute.name() +
               "] of type [" + value.getClass() + "]. It must be an instance of [" + toTypeListString(attributeTypes) + "]");
         }
       }
