@@ -149,8 +149,10 @@ public class JSONBuilder {
 
     if (node instanceof ObjectNode objectNode) {
       objectConsumer.accept(objectNode, pointer.field);
+    } else if (node instanceof ArrayNode arrayNode) {
+      arrayConsumer.accept(arrayNode);
     } else {
-      throw new UnsupportedOperationException("Not expecting this.");
+      throw new UnsupportedOperationException("Not expecting this. Node is [" + node.getClass().getSimpleName() + "]");
     }
 
     return this;
@@ -162,7 +164,11 @@ public class JSONBuilder {
     for (String part : pointer.parent.substring(1).split("/")) {
       path = path + (path.endsWith("/") ? "" : "/") + part;
       if (root.at(path).isMissingNode()) {
-        ((ObjectNode) working).set(part, JsonNodeFactory.instance.objectNode());
+        if (working instanceof ObjectNode objectNode) {
+          objectNode.set(part, JsonNodeFactory.instance.objectNode());
+        } else {
+          throw new UnsupportedOperationException("Not expecting this. Node is [" + working.getClass().getSimpleName() + "]");
+        }
       } else {
         working = root.at(path);
       }

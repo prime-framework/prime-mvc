@@ -33,7 +33,8 @@ public class JSONBuilderTest {
   public Map<String, Object> json = Map.of(
       "user", Map.of(
           "email", "erlich@piedpiper.com",
-          "mobilePhone", "555-555-5555"));
+          "mobilePhone", "555-555-5555",
+          "nested", List.of(Map.of("key1", "value1"))));
 
   private JSONBuilder handler;
 
@@ -94,5 +95,10 @@ public class JSONBuilderTest {
     assertEquals(handler.root.at("/user/roles/0").asText(), "admin", handler.root.toString());
     assertEquals(handler.root.at("/user/roles/1").asText(), "manager", handler.root.toString());
     assertTrue(handler.root.at("/user/roles/2").isMissingNode());
+
+    // Add a value in a nested array
+    handler.add("user.nested[1]", Map.of("key2", "value2"));
+    assertEquals(handler.root.at("/user/nested/0/key1").asText(), "value1", handler.root.toString());
+    assertEquals(handler.root.at("/user/nested/1/key2").asText(), "value2", handler.root.toString());
   }
 }
