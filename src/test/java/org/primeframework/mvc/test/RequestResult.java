@@ -1127,26 +1127,18 @@ public class RequestResult {
    * @return This.
    */
   public RequestResult executeRedirect(ThrowingConsumer<RequestResult> consumer) throws Exception {
-    String baseURI = redirect.contains("?") ? redirect.substring(0, redirect.indexOf("?")) : redirect;
-    String originalURI = baseURI;
-    String newRedirect = redirect;
-
-    // Handle a relative URI
-    if (!baseURI.startsWith("/")) {
-      int index = request.getRequestURI().lastIndexOf('/');
-      String baseURL = request.getRequestURI().substring(0, index);
-      baseURI = baseURL + "/" + baseURI;
-      newRedirect = redirect.replace(originalURI, baseURI);
-    }
-
-    RequestBuilder rb = new RequestBuilder(baseURI, container, filter, injector);
-    if (baseURI.length() != newRedirect.length()) {
-      String params = newRedirect.substring(newRedirect.indexOf("?") + 1);
-      QueryStringTools.parseQueryString(params).forEach(rb::withParameters);
-    }
-
-    consumer.accept(rb.get());
+    executeRedirectReturningResult(consumer);
     return this;
+  }
+
+  /**
+   * Execute the redirect and accept a consumer to assert on the response.
+   *
+   * @param consumer The request result from following the redirect.
+   * @return This.
+   */
+  public RequestResult executeRedirectReturnResult(ThrowingConsumer<RequestResult> consumer) throws Exception {
+    return executeRedirectReturningResult(consumer);
   }
 
   /**
@@ -1340,6 +1332,30 @@ public class RequestResult {
 
     result.accept(requestResult);
     return requestResult;
+  }
+
+  private RequestResult executeRedirectReturningResult(ThrowingConsumer<RequestResult> consumer) throws Exception {
+    String baseURI = redirect.contains("?") ? redirect.substring(0, redirect.indexOf("?")) : redirect;
+    String originalURI = baseURI;
+    String newRedirect = redirect;
+
+    // Handle a relative URI
+    if (!baseURI.startsWith("/")) {
+      int index = request.getRequestURI().lastIndexOf('/');
+      String baseURL = request.getRequestURI().substring(0, index);
+      baseURI = baseURL + "/" + baseURI;
+      newRedirect = redirect.replace(originalURI, baseURI);
+    }
+
+    RequestBuilder rb = new RequestBuilder(baseURI, container, filter, injector);
+    if (baseURI.length() != newRedirect.length()) {
+      String params = newRedirect.substring(newRedirect.indexOf("?") + 1);
+      QueryStringTools.parseQueryString(params).forEach(rb::withParameters);
+    }
+
+    RequestResult result = rb.get();
+    consumer.accept(result);
+    return result;
   }
 
   private MessageProvider getMessageProviderToLookupMessages() {
