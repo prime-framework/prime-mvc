@@ -19,6 +19,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 import org.easymock.EasyMock;
 import org.primeframework.mock.servlet.MockServletOutputStream;
@@ -45,11 +47,13 @@ public class StreamResultTest {
   public void explicit(HTTPMethod httpMethod, String fileName, String basicEncoded, String utf8Encoded)
       throws IOException {
     Object action = new Object();
+    ZonedDateTime lastModified = ZonedDateTime.of(2021, 7, 4, 12, 42, 42, 0, ZoneOffset.UTC);
     ExpressionEvaluator ee = EasyMock.createStrictMock(ExpressionEvaluator.class);
     EasyMock.expect(ee.expand("10", action, false)).andReturn("10");
     EasyMock.expect(ee.expand(fileName, action, false)).andReturn(fileName);
     EasyMock.expect(ee.expand("application/octet-stream", action, false)).andReturn("application/octet-stream");
     EasyMock.expect(ee.getValue("stream", action)).andReturn(new ByteArrayInputStream("test".getBytes()));
+    EasyMock.expect(ee.getValue("lastModified", action)).andReturn(lastModified);
     EasyMock.replay(ee);
 
     MockServletOutputStream sos = new MockServletOutputStream();
@@ -58,6 +62,7 @@ public class StreamResultTest {
     response.setContentType("application/octet-stream");
     response.setContentLength(10);
     response.setHeader("Content-Disposition", "attachment; filename=\"" + basicEncoded + "\"; filename*=UTF-8''" + utf8Encoded);
+    response.setHeader("Last-Modified", "Sun, 04 Jul 2021 12:42:42 GMT");
     response.setHeader("Cache-Control", "no-cache");
     EasyMock.expect(response.getOutputStream()).andReturn(sos);
     EasyMock.replay(response);
@@ -66,7 +71,7 @@ public class StreamResultTest {
     expect(store.getCurrent()).andReturn(new ActionInvocation(action, new ExecuteMethodConfiguration(httpMethod, null, null), "/foo", "", null));
     replay(store);
 
-    Stream stream = new StreamImpl("success", fileName, "10", "application/octet-stream", "stream");
+    Stream stream = new StreamImpl("success", fileName, "10", "application/octet-stream", "stream", "lastModified");
     StreamResult streamResult = new StreamResult(ee, response, store);
     streamResult.execute(stream);
 
@@ -103,6 +108,8 @@ public class StreamResultTest {
 
     private final boolean disableCacheControl;
 
+    private final String lastModifiedProperty;
+
     private final String length;
 
     private final String name;
@@ -113,10 +120,11 @@ public class StreamResultTest {
 
     private final String type;
 
-    public StreamImpl(String code, String name, String length, String type, String property) {
+    public StreamImpl(String code, String name, String length, String type, String property, String lastModifiedProperty) {
       this.cacheControl = "no-cache";
       this.code = code;
       this.disableCacheControl = false;
+      this.lastModifiedProperty = lastModifiedProperty;
       this.length = length;
       this.name = name;
       this.property = property;
@@ -139,6 +147,11 @@ public class StreamResultTest {
     @Override
     public boolean disableCacheControl() {
       return disableCacheControl;
+    }
+
+    @Override
+    public String lastModifiedProperty() {
+      return lastModifiedProperty;
     }
 
     public String length() {

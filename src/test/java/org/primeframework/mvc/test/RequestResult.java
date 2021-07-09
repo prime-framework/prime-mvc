@@ -816,6 +816,30 @@ public class RequestResult {
   }
 
   /**
+   * Verifies that the HTTP response contains the specified header.
+   *
+   * @param header the name of the HTTP response header
+   * @return This.
+   */
+  public RequestResult assertHeaderExists(String header) {
+    List<String> actual = null;
+    for (String key : response.getHeaders().keySet()) {
+      if (key.equalsIgnoreCase(header)) {
+        actual = response.getHeaders().get(key);
+        break;
+      }
+    }
+
+    if (actual == null) {
+      StringBuilder responseHeaders = new StringBuilder();
+      response.getHeaders().forEach((k, v) -> responseHeaders.append("\t").append(k).append(": ").append(v).append("\n"));
+      throw new AssertionError("Header [" + header + "] is missing from the response.\n\nResponse Headers:\n" + responseHeaders);
+    }
+
+    return this;
+  }
+
+  /**
    * Verifies that the response body is equal to the JSON created from the given object. The object is marshalled using
    * Jackson.
    *

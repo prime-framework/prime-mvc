@@ -46,6 +46,11 @@ public @interface Stream {
   boolean disableCacheControl() default false;
 
   /**
+   * @return The name of the property that contains a ZonedDateTime for the last modified header.
+   */
+  String lastModifiedProperty() default "lastModified";
+
+  /**
    * @return The content length sent back to the client. This is used to set the content length header so that the
    *     browser displays a progress bar when downloading the file. This defaults to <code>${length}</code>, which means
    *     that its value is set dynamically using the value from the <code>length</code> property of the action.

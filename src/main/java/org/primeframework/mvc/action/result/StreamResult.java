@@ -18,6 +18,7 @@ package org.primeframework.mvc.action.result;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.ZonedDateTime;
 
 import com.google.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +27,7 @@ import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.annotation.Stream;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
+import org.primeframework.mvc.util.DateTools;
 import org.primeframework.mvc.util.EncodingUtils;
 
 /**
@@ -53,6 +55,7 @@ public class StreamResult extends AbstractResult<Stream> {
     ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
     Object action = actionInvocation.action;
     String property = stream.property();
+    String lastModifiedProperty = stream.lastModifiedProperty();
     String length = expand(stream.length(), action, false);
     String name = expand(stream.name(), action, false);
     String type = expand(stream.type(), action, false);
@@ -62,8 +65,19 @@ public class StreamResult extends AbstractResult<Stream> {
       throw new PrimeException("Invalid property [" + property + "] for Stream result. This " +
           "property returned null or an Object that is not an InputStream.");
     }
-
     InputStream is = (InputStream) object;
+
+    ZonedDateTime lastModified = null;
+    try {
+      object = expressionEvaluator.getValue(lastModifiedProperty, action);
+      if (!(object instanceof ZonedDateTime)) {
+        throw new PrimeException("Invalid property [" + property + "] for Stream result. This " +
+            "property returned null or an Object that is not an InputStream.");
+      }
+      lastModified = (ZonedDateTime) object;
+    } catch (Exception e) {
+      // Ignore since this property isn't required
+    }
 
     response.setStatus(stream.status());
     response.setContentType(type);
@@ -74,6 +88,10 @@ public class StreamResult extends AbstractResult<Stream> {
 
     if (StringUtils.isNotBlank(name)) {
       response.setHeader("Content-Disposition", "attachment; filename=\"" + EncodingUtils.escapedQuotedString(name) + "\"; filename*=UTF-8''" + EncodingUtils.rfc5987_encode(name));
+    }
+
+    if (lastModified != null) {
+      response.setHeader("Last-Modified", lastModified.format(DateTools.RFC_5322_DATE_TIME));
     }
 
     // Handle setting cache controls
