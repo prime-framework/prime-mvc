@@ -34,6 +34,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.util.DefaultIndenter;
@@ -1218,6 +1219,24 @@ public class RequestResult {
     if (test) {
       consumer.accept(this);
     }
+    return this;
+  }
+
+  /**
+   * Repeat n times
+   *
+   * @param n        the number of times
+   * @param consumer the index consumer
+   * @return This.
+   */
+  public RequestResult repeat(int n, ThrowingConsumer<Integer> consumer) {
+    IntStream.rangeClosed(1, n).forEach(index -> {
+      try {
+        consumer.accept(index);
+      } catch (Throwable e) {
+        throw new AssertionError("Iteration [" + n + "]\n" + e.getMessage(), e.getCause());
+      }
+    });
     return this;
   }
 
