@@ -1206,6 +1206,25 @@ public class RequestResult {
   }
 
   /**
+   * If the test is true, apply the the <code>thenConsumer</code>, else apply the <code>elseConsumer</code>.
+   *
+   * @param test         the boolean test
+   * @param thenConsumer the consumer to run if the test is true
+   * @param elseConsumer the consumer to run if the test is false
+   * @return This.
+   */
+  public RequestResult ifThenElse(boolean test, ThrowingConsumer<RequestResult> thenConsumer,
+                                  ThrowingConsumer<RequestResult> elseConsumer) throws Exception {
+    if (test) {
+      thenConsumer.accept(this);
+    } else {
+      elseConsumer.accept(this);
+    }
+
+    return this;
+  }
+
+  /**
    * If the test is true, apply the consumer. Example:
    * <pre>
    *   .ifTrue(foo.isBar(), (requestResult) -> requestResult.assertBodyContains("bar"))
@@ -1219,6 +1238,7 @@ public class RequestResult {
     if (test) {
       consumer.accept(this);
     }
+
     return this;
   }
 
