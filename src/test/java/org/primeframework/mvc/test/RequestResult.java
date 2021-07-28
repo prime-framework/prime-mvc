@@ -39,6 +39,7 @@ import java.util.stream.IntStream;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.util.DefaultIndenter;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.inject.Injector;
@@ -912,6 +913,38 @@ public class RequestResult {
     T actual = objectMapper.readValue(body, type);
 
     return assertJSONFile(jsonFile, appendArray(values, "actual", actual, "_to_milli", new ZonedDateTimeToMilliSeconds()));
+  }
+
+  /**
+   * Verifies the the key of each pair which is a JSON pointer has a corresponding value.
+   *
+   * @param pairs the key pairs
+   * @return This.
+   * @throws IOException If the JSON marshalling failed.
+   */
+  public RequestResult assertJSONValues(Object... pairs) throws IOException {
+    if (pairs.length % 2 != 0) {
+      String key = pairs[pairs.length - 1].toString();
+      throw new IllegalArgumentException("Invalid mapping values. Must have a multiple of 2. Missing value for key [" + key + "]");
+    }
+
+    ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
+    JsonNode actual = objectMapper.readTree(body);
+
+    for (int i = 0; i < pairs.length; i = i + 2) {
+      String pointer = pairs[i].toString();
+      String expectedValue = pairs[i + 1].toString();
+      String actualValue = actual.at(pointer).asText();
+      if (Objects.equals(actualValue, expectedValue)) {
+        throw new AssertionError("Expected [" + expectedValue + "] but found [" + actualValue + "].\nActual JSON body:\n"
+            + objectMapper.writerWithDefaultPrettyPrinter()
+                          .withFeatures(SerializationFeature.INDENT_OUTPUT)
+                          .with(new DefaultPrettyPrinter().withArrayIndenter(new DefaultIndenter()))
+                          .writeValueAsString(actual));
+      }
+    }
+
+    return this;
   }
 
   /**
