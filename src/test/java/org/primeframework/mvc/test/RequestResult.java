@@ -922,7 +922,7 @@ public class RequestResult {
    * @return This.
    * @throws IOException If the JSON marshalling failed.
    */
-  public RequestResult assertJSONValues(Object... pairs) throws IOException {
+  public RequestResult assertJSONValuesAt(Object... pairs) throws IOException {
     if (pairs.length % 2 != 0) {
       String key = pairs[pairs.length - 1].toString();
       throw new IllegalArgumentException("Invalid mapping values. Must have a multiple of 2. Missing value for key [" + key + "]");
