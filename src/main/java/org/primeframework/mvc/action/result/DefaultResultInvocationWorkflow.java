@@ -18,6 +18,8 @@ package org.primeframework.mvc.action.result;
 import javax.servlet.ServletException;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.List;
 
 import com.google.inject.Inject;
 import org.primeframework.mvc.action.ActionInvocation;
@@ -25,6 +27,7 @@ import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.ForwardResult.ForwardImpl;
 import org.primeframework.mvc.action.result.RedirectResult.RedirectImpl;
 import org.primeframework.mvc.config.MVCConfiguration;
+import org.primeframework.mvc.util.ReflectionUtils;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,6 +93,14 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
 
         if (annotation == null) {
           annotation = new ForwardImpl("", resultCode);
+        }
+
+        // Call pre-render methods registered for this result
+        if (actionInvocation.action != null && actionInvocation.configuration.preRenderMethods != null) {
+          List<Method> preRenderMethods = actionInvocation.configuration.preRenderMethods.get(annotation.annotationType());
+          if (preRenderMethods != null) {
+            ReflectionUtils.invokeAll(actionInvocation.action, preRenderMethods);
+          }
         }
 
         long start = System.currentTimeMillis();

@@ -74,6 +74,8 @@ public class ActionConfiguration {
 
   public final Map<HTTPMethod, List<PreParameterMethodConfiguration>> preParameterMethods;
 
+  public final Map<Class<?>, List<Method>> preRenderMethods;
+
   public final List<Method> preValidationMethods;
 
   public final Map<String, Annotation> resultConfigurations;
@@ -98,7 +100,8 @@ public class ActionConfiguration {
                              List<Method> postValidationMethods,
                              Map<HTTPMethod, List<PreParameterMethodConfiguration>> preParameterMethods,
                              List<Method> postParameterMethods, Map<String, Annotation> resultConfigurations,
-                             Map<String, PreParameter> preParameterMembers, Map<String,
+                             Map<String, PreParameter> preParameterMembers,
+                             Map<Class<?>, List<Method>> preRenderMethods, Map<String,
       FileUpload> fileUploadMembers, Set<String> memberNames, List<String> securitySchemes,
                              List<ScopeField> scopeFields, Map<Class<?>, Object> additionalConfiguration, String uri,
                              List<Method> preValidationMethods, Field unknownParametersField) {
@@ -114,6 +117,7 @@ public class ActionConfiguration {
     this.preParameterMethods = preParameterMethods;
     this.postParameterMethods = postParameterMethods;
     this.preParameterMembers = preParameterMembers;
+    this.preRenderMethods = preRenderMethods;
     this.fileUploadMembers = fileUploadMembers;
     this.validationMethods = validationMethods;
     this.executeMethods = executeMethods;

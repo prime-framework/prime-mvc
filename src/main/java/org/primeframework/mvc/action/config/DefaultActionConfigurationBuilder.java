@@ -46,6 +46,7 @@ import org.primeframework.mvc.control.form.annotation.FormPrepareMethod;
 import org.primeframework.mvc.parameter.annotation.PostParameterMethod;
 import org.primeframework.mvc.parameter.annotation.PreParameter;
 import org.primeframework.mvc.parameter.annotation.PreParameterMethod;
+import org.primeframework.mvc.parameter.annotation.PreRenderMethod;
 import org.primeframework.mvc.parameter.annotation.UnknownParameters;
 import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
 import org.primeframework.mvc.scope.ScopeField;
@@ -95,6 +96,7 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
     Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods = findExecuteMethods(actionClass);
     List<Method> formPrepareMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, FormPrepareMethod.class);
     List<Method> postParameterMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, PostParameterMethod.class);
+    Map<Class<?>, List<Method>> preRenderMethodsMap = findAllPreRenderMethods(actionClass);
     List<Method> preValidationMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, PreValidationMethod.class);
     List<Method> postValidationMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, PostValidationMethod.class);
     Map<String, Annotation> resultAnnotations = findResultConfigurations(actionClass);
@@ -126,7 +128,7 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
 
     return new ActionConfiguration(actionClass, executeMethods, validationMethods, formPrepareMethods, authorizationMethods,
         jwtAuthorizationMethods, postValidationMethods, preParameterMethods, postParameterMethods, resultAnnotations, preParameterMembers,
-        fileUploadMembers, memberNames, securitySchemes, scopeFields, additionalConfiguration, uri, preValidationMethods, unknownParametersField);
+        preRenderMethodsMap, fileUploadMembers, memberNames, securitySchemes, scopeFields, additionalConfiguration, uri, preValidationMethods, unknownParametersField);
   }
 
   /**
@@ -463,6 +465,24 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
           "  return \"success\"\n" +
           "}");
     }
+  }
+
+  private Map<Class<?>, List<Method>> findAllPreRenderMethods(Class<?> actionClass) {
+    Map<Class<?>, List<Method>> result = new HashMap<>();
+    for (Method method : ReflectionUtils.findAllMethodsWithAnnotation(actionClass, PreRenderMethod.class)) {
+      for (Class<?> clazz : method.getAnnotation(PreRenderMethod.class).value()) {
+        // Ensure the requested result type is actually a result.
+        if (clazz.getAnnotation(ResultAnnotation.class) == null) {
+          throw new PrimeException(
+              "The request annotation [" + clazz.getSimpleName() + "] must also have " +
+                  "the @ResultAnnotation annotation to be properly considered as a result class type.");
+        }
+
+        result.computeIfAbsent(clazz, key -> new ArrayList<>()).add(method);
+      }
+    }
+
+    return result;
   }
 
   private List<String> findSecuritySchemes(Class<?> actionClass) {

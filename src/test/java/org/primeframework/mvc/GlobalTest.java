@@ -735,6 +735,30 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void get_preRender() {
+    simulator.test("/pre-render-method")
+             .withParameter("result", "forward")
+             .get()
+             .assertStatusCode(200)
+             .assertContentType("text/html; charset=UTF-8")
+             .assertBodyContains("Forward_Yep!", "JSON_Nope!", "Noop_Nope!");
+
+    simulator.test("/pre-render-method")
+             .withParameter("result", "json")
+             .get()
+             .assertStatusCode(200)
+             .assertContentType("application/json")
+             .assertBodyContains("trust me it is json");
+
+    simulator.test("/pre-render-method")
+             .withParameter("result", "noop")
+             .get()
+             .assertStatusCode(201)
+             .assertContentType("application/potato")
+             .assertBodyContains("You've been no-oped!");
+  }
+
+  @Test
   public void get_redirect() throws Exception {
     // Contains no parameters
     test.simulate(() -> simulator.test("/complex-redirect")
