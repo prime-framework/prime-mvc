@@ -55,6 +55,10 @@ public class JSONBuilderTest {
     assertTrue(handler.remove("user.email")
         .root.at("/user/email").isMissingNode(), handler.root.toString());
 
+    // Add a top level field
+    handler.add("hey!", "ho!");
+    assertEquals(handler.root.at("/hey!").asText(), "ho!");
+
     // Add a string
     handler.add("user.email", "erlich@piedpiper.com");
     assertEquals(handler.root.at("/user/email").asText(), "erlich@piedpiper.com");

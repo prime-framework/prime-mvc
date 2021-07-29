@@ -935,7 +935,7 @@ public class RequestResult {
       String pointer = pairs[i].toString();
       String expectedValue = pairs[i + 1].toString();
       String actualValue = actual.at(pointer).asText();
-      if (Objects.equals(actualValue, expectedValue)) {
+      if (!Objects.equals(actualValue, expectedValue)) {
         throw new AssertionError("Expected [" + expectedValue + "] but found [" + actualValue + "].\nActual JSON body:\n"
             + objectMapper.writerWithDefaultPrettyPrinter()
                           .withFeatures(SerializationFeature.INDENT_OUTPUT)

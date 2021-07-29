@@ -159,6 +159,10 @@ public class JSONBuilder {
   }
 
   private void createNestedObjectPaths(JSONPointer pointer) {
+    if (pointer.parent == null || pointer.parent.equals("")) {
+      return;
+    }
+
     String path = "/";
     JsonNode working = root;
     for (String part : pointer.parent.substring(1).split("/")) {
