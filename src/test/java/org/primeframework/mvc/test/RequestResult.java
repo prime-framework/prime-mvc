@@ -1600,6 +1600,13 @@ public class RequestResult {
         }
       }
 
+      // A checkbox or radio w/out a value should be serialized to "on"
+      // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/Input/checkbox
+      // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/radio
+      if (value && element.val().equals("")) {
+        element.val("on");
+      }
+
       element.attr("checked", value);
       return this;
     }
