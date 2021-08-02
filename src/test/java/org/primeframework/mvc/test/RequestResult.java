@@ -1412,8 +1412,12 @@ public class RequestResult {
               rb.withParameter(element.attr("name"), option.val());
             }
           }
-        } else if (!element.is("[type=radio],[type=checkbox]") || element.hasAttr("checked")) {
-          rb.withParameter(element.attr("name"), element.val().equals("") ? "on" : element.val());
+        } else if (element.is("[type=radio],[type=checkbox]")) {
+          if (element.hasAttr("checked")) {
+            rb.withParameter(element.attr("name"), element.val().equals("") ? "on" : element.val());
+          }
+        } else {
+          rb.withParameter(element.attr("name"), element.val());
         }
       }
     }
