@@ -1413,7 +1413,7 @@ public class RequestResult {
             }
           }
         } else if (!element.is("[type=radio],[type=checkbox]") || element.hasAttr("checked")) {
-          rb.withParameter(element.attr("name"), element.val());
+          rb.withParameter(element.attr("name"), element.val().equals("") ? "on" : element.val());
         }
       }
     }
