@@ -15,8 +15,6 @@
  */
 package org.primeframework.mvc.validation;
 
-import org.primeframework.mvc.validation.ValidationException;
-
 /**
  * This interface defines how Prime handles validation.
  *

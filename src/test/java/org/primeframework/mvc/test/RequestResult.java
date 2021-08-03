@@ -1414,7 +1414,11 @@ public class RequestResult {
           }
         } else if (element.is("[type=radio],[type=checkbox]")) {
           if (element.hasAttr("checked")) {
-            rb.withParameter(element.attr("name"), element.val().equals("") ? "on" : element.val());
+            if (element.hasAttr("value")) {
+              rb.withParameter(element.attr("name"), element.val());
+            } else {
+              rb.withParameter(element.attr("name"), "on");
+            }
           }
         } else {
           rb.withParameter(element.attr("name"), element.val());
@@ -1602,13 +1606,6 @@ public class RequestResult {
         for (Element e : elements) {
           e.attr("checked", false);
         }
-      }
-
-      // A checkbox or radio w/out a value should be serialized to "on"
-      // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/Input/checkbox
-      // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/radio
-      if (value && element.val().equals("")) {
-        element.val("on");
       }
 
       element.attr("checked", value);
