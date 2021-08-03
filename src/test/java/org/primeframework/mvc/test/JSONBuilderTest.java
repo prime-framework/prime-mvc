@@ -73,36 +73,40 @@ public class JSONBuilderTest {
 
     // Add an array
     handler.add("user.roles", List.of("admin", "user"));
-    assertTrue(handler.root.at("/user/roles").isArray(), handler.root.toString());
-    assertEquals(handler.root.at("/user/roles/0").asText(), "admin", handler.root.toString());
-    assertEquals(handler.root.at("/user/roles/1").asText(), "user", handler.root.toString());
+    assertTrue(handler.root.at("/user/roles").isArray(), handler.root.toPrettyString());
+    assertEquals(handler.root.at("/user/roles/0").asText(), "admin", handler.root.toPrettyString());
+    assertEquals(handler.root.at("/user/roles/1").asText(), "user", handler.root.toPrettyString());
 
     // Add a value to an array
     handler.add("user.roles", "manager");
-    assertTrue(handler.root.at("/user/roles").isArray(), handler.root.toString());
-    assertEquals(handler.root.at("/user/roles/0").asText(), "admin", handler.root.toString());
-    assertEquals(handler.root.at("/user/roles/1").asText(), "user", handler.root.toString());
-    assertEquals(handler.root.at("/user/roles/2").asText(), "manager", handler.root.toString());
+    assertTrue(handler.root.at("/user/roles").isArray(), handler.root.toPrettyString());
+    assertEquals(handler.root.at("/user/roles/0").asText(), "admin", handler.root.toPrettyString());
+    assertEquals(handler.root.at("/user/roles/1").asText(), "user", handler.root.toPrettyString());
+    assertEquals(handler.root.at("/user/roles/2").asText(), "manager", handler.root.toPrettyString());
 
     // Add an object
     handler.add("user.data", Map.of("foo", "bar"));
-    assertTrue(handler.root.at("/user/data").isObject(), handler.root.toString());
-    assertEquals(handler.root.at("/user/data/foo").asText(), "bar", handler.root.toString());
+    assertTrue(handler.root.at("/user/data").isObject(), handler.root.toPrettyString());
+    assertEquals(handler.root.at("/user/data/foo").asText(), "bar", handler.root.toPrettyString());
 
     // Add a nested object where the path does not yet exist
     handler.add("user.foo.data", Map.of("foo", "bar"));
-    assertTrue(handler.root.at("/user/foo/data").isObject(), handler.root.toString());
-    assertEquals(handler.root.at("/user/foo/data/foo").asText(), "bar", handler.root.toString());
+    assertTrue(handler.root.at("/user/foo/data").isObject(), handler.root.toPrettyString());
+    assertEquals(handler.root.at("/user/foo/data/foo").asText(), "bar", handler.root.toPrettyString());
+
+    handler.add("user.bar.data.foo", true);
+    assertTrue(handler.root.at("/user/bar/data/foo").isBoolean(), handler.root.toPrettyString());
+    assertEquals(handler.root.at("/user/bar/data/foo").asBoolean(), true, handler.root.toPrettyString());
 
     // Remove a value from an array
     handler.remove("user.roles[1]");
-    assertEquals(handler.root.at("/user/roles/0").asText(), "admin", handler.root.toString());
-    assertEquals(handler.root.at("/user/roles/1").asText(), "manager", handler.root.toString());
+    assertEquals(handler.root.at("/user/roles/0").asText(), "admin", handler.root.toPrettyString());
+    assertEquals(handler.root.at("/user/roles/1").asText(), "manager", handler.root.toPrettyString());
     assertTrue(handler.root.at("/user/roles/2").isMissingNode());
 
     // Add a value in a nested array
     handler.add("user.nested[1]", Map.of("key2", "value2"));
-    assertEquals(handler.root.at("/user/nested/0/key1").asText(), "value1", handler.root.toString());
-    assertEquals(handler.root.at("/user/nested/1/key2").asText(), "value2", handler.root.toString());
+    assertEquals(handler.root.at("/user/nested/0/key1").asText(), "value1", handler.root.toPrettyString());
+    assertEquals(handler.root.at("/user/nested/1/key2").asText(), "value2", handler.root.toPrettyString());
   }
 }

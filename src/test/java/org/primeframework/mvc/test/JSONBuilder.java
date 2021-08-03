@@ -170,6 +170,7 @@ public class JSONBuilder {
       if (root.at(path).isMissingNode()) {
         if (working instanceof ObjectNode objectNode) {
           objectNode.set(part, JsonNodeFactory.instance.objectNode());
+          working = root.at(path);
         } else {
           throw new UnsupportedOperationException("Not expecting this. Node is [" + working.getClass().getSimpleName() + "]");
         }
