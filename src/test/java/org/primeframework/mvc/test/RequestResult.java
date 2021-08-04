@@ -709,7 +709,7 @@ public class RequestResult {
     assertContainsCookie(name);
 
     Cookie actual = getCookie(name);
-    if (!actual.getValue().equals(value)) {
+    if (!value.equals(actual.getValue())) {
       throw new AssertionError("Cookie [" + name + "] with value [" + actual.getValue() + "] was not equal to the expected value [" + value + "]"
           + "\nActual cookie:\n"
           + cookieToString(actual));
@@ -1230,14 +1230,15 @@ public class RequestResult {
                                    .filter(c -> c.getName().equals(name))
                                    .collect(Collectors.toList());
 
-    if (cookies.size() > 1) {
+    if (cookies.size() == 0) {
+      return null;
+    } else if (cookies.size() > 1) {
       throw new AssertionError("Expected a single cookie with name [" + name + "] but found [" + cookies.size() + "]."
           + "\nCookies found:\n"
           + cookies.stream().map(this::cookieToString).collect(Collectors.joining("\n")));
-
     }
 
-    return cookies.size() == 0 ? null : cookies.get(0);
+    return cookies.get(0);
   }
 
   /**
