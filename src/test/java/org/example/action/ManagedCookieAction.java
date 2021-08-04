@@ -15,33 +15,32 @@
  */
 package org.example.action;
 
+import javax.servlet.http.Cookie;
+
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.annotation.Status;
-import org.primeframework.mvc.scope.annotation.BasicCookie;
+import org.primeframework.mvc.scope.annotation.ManagedCookie;
 
 /**
  * @author Daniel DeGroff
  */
 @Action
 @Status
-public class BasicCookieAction {
+public class ManagedCookieAction {
+  @ManagedCookie(encrypt = false)
+  public Cookie cookie1;
+
+  @ManagedCookie(encrypt = false)
+  public Cookie cookie2;
+
+  @ManagedCookie(value = "fusionauth.sso", encrypt = false)
+  public Cookie cookie3;
 
   public boolean deleteCookie1;
 
   public boolean deleteCookie2;
 
   public boolean deleteCookie3;
-
-  @BasicCookie(encrypt = false)
-
-  public String stringCookie1;
-
-  @BasicCookie(encrypt = false)
-
-  public String stringCookie2;
-
-  @BasicCookie(value = "fusionauth.sso", encrypt = false)
-  public String stringCookie3;
 
   public String writeCookie1;
 
@@ -51,28 +50,28 @@ public class BasicCookieAction {
 
   public String get() {
     if (writeCookie1 != null) {
-      stringCookie1 = writeCookie1;
+      cookie1.setValue(writeCookie1);
     }
 
     if (writeCookie2 != null) {
-      stringCookie2 = writeCookie2;
+      cookie2.setValue(writeCookie2);
     }
 
 
     if (writeCookie3 != null) {
-      stringCookie3 = writeCookie3;
+      cookie3.setValue(writeCookie3);
     }
 
     if (deleteCookie1) {
-      stringCookie1 = null;
+      cookie1 = null;
     }
 
     if (deleteCookie2) {
-      stringCookie2 = null;
+      cookie2 = null;
     }
 
     if (deleteCookie3) {
-      stringCookie3 = null;
+      cookie3 = null;
     }
 
     return "success";

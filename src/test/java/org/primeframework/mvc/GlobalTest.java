@@ -59,79 +59,6 @@ import static org.testng.Assert.assertSame;
 public class GlobalTest extends PrimeBaseTest {
   private Path jsonDir;
 
-  @Test
-  public void basic_cookie_scope() throws Exception {
-    // Values are not set, no cookies
-    test.simulate(() -> simulator.test("/basic-cookie")
-                                 .get()
-                                 .assertStatusCode(200)
-                                 .assertDoesNotContainsCookie("stringCookie1")
-                                 .assertDoesNotContainsCookie("stringCookie2")
-                                 .assertDoesNotContainsCookie("stringCookie3"))
-
-        // Write all three cookies
-        .simulate(() -> simulator.test("/basic-cookie")
-                                 .withParameter("writeCookie1", "foo")
-                                 .withParameter("writeCookie2", "bar")
-                                 .withParameter("writeCookie3", "baz")
-                                 .get()
-                                 .assertStatusCode(200)
-                                 .assertCookie("stringCookie1", "foo")
-                                 .assertCookie("stringCookie2", "bar")
-                                 .assertCookie("fusionauth.sso", "baz"))
-
-        // Cookies are persisted
-        .simulate(() -> simulator.test("/basic-cookie")
-                                 .get()
-                                 .assertStatusCode(200)
-                                 .assertCookie("stringCookie1", "foo")
-                                 .assertCookie("stringCookie2", "bar")
-                                 .assertCookie("fusionauth.sso", "baz"))
-
-        // Delete stringCookie2
-        .simulate(() -> simulator.test("/basic-cookie")
-                                 .withParameter("deleteCookie2", true)
-                                 .get()
-                                 .assertStatusCode(200)
-                                 .assertCookie("stringCookie1", "foo")
-                                 .assertCookieWasDeleted("stringCookie2")
-                                 .assertCookie("fusionauth.sso", "baz"))
-
-        // Next request stringCookie2 will be all the way gone
-        .simulate(() -> simulator.test("/basic-cookie")
-                                 .get()
-                                 .assertStatusCode(200)
-                                 .assertCookie("stringCookie1", "foo")
-                                 .assertDoesNotContainsCookie("stringCookie2")
-                                 .assertCookie("fusionauth.sso", "baz"))
-
-        // stringCookie1 and stringCookie3 holding strong after another request
-        .simulate(() -> simulator.test("/basic-cookie")
-                                 .get()
-                                 .assertStatusCode(200)
-                                 .assertCookie("stringCookie1", "foo")
-                                 .assertDoesNotContainsCookie("stringCookie2")
-                                 .assertCookie("fusionauth.sso", "baz"))
-
-        // Delete all of them!!! - 1 and 3
-        .simulate(() -> simulator.test("/basic-cookie")
-                                 .withParameter("deleteCookie1", true)
-                                 .withParameter("deleteCookie3", true)
-                                 .get()
-                                 .assertStatusCode(200)
-                                 .assertCookieWasDeleted("stringCookie1")
-                                 .assertDoesNotContainsCookie("stringCookie2")
-                                 .assertCookieWasDeleted("fusionauth.sso"))
-
-        // They are now all gone.
-        .simulate(() -> simulator.test("/basic-cookie")
-                                 .get()
-                                 .assertStatusCode(200)
-                                 .assertDoesNotContainsCookie("stringCookie1")
-                                 .assertDoesNotContainsCookie("stringCookie2")
-                                 .assertDoesNotContainsCookie("fusionauth.sso"));
-  }
-
   @BeforeClass
   public void beforeClass() {
     jsonDir = Paths.get("src/test/resources/json");
@@ -1116,6 +1043,81 @@ public class GlobalTest extends PrimeBaseTest {
                                  .assertHeaderContains("Cache-Control", "no-cache"));
   }
 
+  @Test
+  public void managed_cookie_scope() throws Exception {
+    // Values are not set, no cookies
+    test.simulate(() -> simulator.test("/managed-cookie")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertDoesNotContainsCookie("cookie1")
+                                 .assertDoesNotContainsCookie("cookie2")
+                                 // there should never be this one, it is named 'fusionauth.sso'
+                                 .assertDoesNotContainsCookie("cookie3")
+                                 .assertDoesNotContainsCookie("fusionauth.sso"))
+
+        // Write all three cookies
+        .simulate(() -> simulator.test("/managed-cookie")
+                                 .withParameter("writeCookie1", "foo")
+                                 .withParameter("writeCookie2", "bar")
+                                 .withParameter("writeCookie3", "baz")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertCookie("cookie1", "foo"))
+        .assertCookie("cookie2", "bar")
+        .assertCookie("fusionauth.sso", "baz")
+
+        // Cookies are persisted, hit the GET and they will still be there.
+        .simulate(() -> simulator.test("/managed-cookie")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertCookie("cookie1", "foo"))
+        .assertCookie("cookie2", "bar")
+        .assertCookie("fusionauth.sso", "baz")
+
+        // Delete stringCookie2
+        .simulate(() -> simulator.test("/managed-cookie")
+                                 .withParameter("deleteCookie2", true)
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertCookie("cookie1", "foo")
+                                 .assertCookieWasDeleted("cookie2")
+                                 .assertCookie("fusionauth.sso", "baz"))
+
+        // Next request stringCookie2 will be all the way gone
+        .simulate(() -> simulator.test("/managed-cookie")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertCookie("cookie1", "foo")
+                                 .assertDoesNotContainsCookie("cookie2")
+                                 .assertCookie("fusionauth.sso", "baz"))
+
+        // stringCookie1 and stringCookie3 holding strong after another request
+        .simulate(() -> simulator.test("/managed-cookie")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertCookie("cookie1", "foo")
+                                 .assertDoesNotContainsCookie("cookie2")
+                                 .assertCookie("fusionauth.sso", "baz"))
+
+        // Delete all of them!!! - 1 and 3
+        .simulate(() -> simulator.test("/managed-cookie")
+                                 .withParameter("deleteCookie1", true)
+                                 .withParameter("deleteCookie3", true)
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertCookieWasDeleted("cookie1")
+                                 .assertDoesNotContainsCookie("cookie2")
+                                 .assertCookieWasDeleted("fusionauth.sso"))
+
+        // They are now all gone.
+        .simulate(() -> simulator.test("/managed-cookie")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertDoesNotContainsCookie("cookie1")
+                                 .assertDoesNotContainsCookie("cookie2")
+                                 .assertDoesNotContainsCookie("fusionauth.sso"));
+  }
+
   @DataProvider(name = "methodOverrides")
   public Object[][] methodOverrides() {
     return new Object[][]{
@@ -2052,6 +2054,9 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   private void assertSingletonConverter(RequestSimulator simulator, Class<?> type) {
+    // Adding a noinspection, there is a bug in the JDK that is exposed when you take the suggestion of IJ and replace this TypeLiteral type info with <>
+    // Ask me how I know... see https://stackoverflow.com/questions/50885335/java-10-compilaton-null-pointer-exception
+    //noinspection Convert2Diamond
     Map<Class<?>, GlobalConverter> converters = simulator.injector.getInstance(Key.get(new TypeLiteral<Map<Class<?>, GlobalConverter>>() {
     }));
     assertSame(converters.get(type), converters.get(type));

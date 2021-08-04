@@ -133,13 +133,14 @@ public class ActionCookieScope extends AbstractCookie implements Scope<ActionCoo
   @Override
   public Object get(String fieldName, Class<?> type, ActionCookie scope) {
     String cookieName = getCookieName(fieldName, scope);
-    String value = getCookieValue(cookieName);
-    if (value == null) {
+    Cookie exitingCookie = getCookie(cookieName);
+    String existingValue = exitingCookie != null ? exitingCookie.getValue() : null;
+    if (existingValue == null) {
       return null;
     }
 
     try {
-      return scope.encrypt() ? encryptor.decrypt(type, value) : decode(type, value);
+      return scope.encrypt() ? encryptor.decrypt(type, existingValue) : decode(type, existingValue);
     } catch (Exception e) {
       String message = e.getClass().getCanonicalName() + " " + e.getMessage();
       if (scope.encrypt()) {
@@ -157,7 +158,8 @@ public class ActionCookieScope extends AbstractCookie implements Scope<ActionCoo
    */
   public void set(String fieldName, Object value, ActionCookie scope) {
     String cookieName = getCookieName(fieldName, scope);
-    String existingValue = getCookieValue(cookieName);
+    Cookie exitingCookie = getCookie(cookieName);
+    String existingValue = exitingCookie != null ? exitingCookie.getValue() : null;
 
     // If the value is null, delete it if it was previously non-null
     if (value == null) {
@@ -210,18 +212,5 @@ public class ActionCookieScope extends AbstractCookie implements Scope<ActionCoo
 
   private String encode(Object value) throws JsonProcessingException {
     return Base64.getUrlEncoder().encodeToString(objectMapper.writeValueAsBytes(value));
-  }
-
-  private String getCookieValue(String cookieName) {
-    Cookie[] cookies = request.getCookies();
-    if (cookies != null) {
-      for (Cookie cookie : cookies) {
-        if (cookie.getName().equals(cookieName)) {
-          return cookie.getValue();
-        }
-      }
-    }
-
-    return null;
   }
 }

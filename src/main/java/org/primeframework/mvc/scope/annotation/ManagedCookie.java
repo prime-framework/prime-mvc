@@ -20,7 +20,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.primeframework.mvc.scope.BasicCookieScope;
+import org.primeframework.mvc.scope.ManagedCookieScope;
 
 /**
  * Just your typical basic cookie. This annotation should be used to mark member fields of actions that should be
@@ -31,24 +31,17 @@ import org.primeframework.mvc.scope.BasicCookieScope;
  * @author Daniel DeGroff
  */
 @Retention(RetentionPolicy.RUNTIME)
-@ScopeAnnotation(BasicCookieScope.class)
+@ScopeAnnotation(ManagedCookieScope.class)
 @Target(ElementType.FIELD)
-public @interface BasicCookie {
-  /**
-   * When true, even if the value is a string, it will be base64 encoded. When false, if the value is a string it will
-   * not be encoded. This is ignored when encrypting because we will always encode then. Also if you annotate a field
-   * that is not a string, it will always be encoded after the object is serialized.
-   *
-   * @return true if plain strings should be encoded.
-   */
-  boolean encodeStrings() default false;
-
+public @interface ManagedCookie {
   /**
    * When `true` the cookie value will be encrypted, this is the default.
    *
    * @return true if the cookie value should be encrypted.
    */
   boolean encrypt() default true;
+
+  int maxAge() default Integer.MAX_VALUE;
 
   /**
    * @return This attribute determines the name under which that the value is stored in the action session. The default

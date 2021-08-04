@@ -32,13 +32,23 @@ public abstract class AbstractCookie {
     this.response = response;
   }
 
+  protected void addSecureHttpOnlyCookie(String name, String value, int maxAge) {
+    Cookie cookie = buildSecureHttpOnlyCookie(name, value, maxAge);
+    response.addCookie(cookie);
+  }
+
   protected void addSecureHttpOnlySessionCookie(String name, String value) {
+    Cookie cookie = buildSecureHttpOnlyCookie(name, value, -1);
+    response.addCookie(cookie);
+  }
+
+  protected Cookie buildSecureHttpOnlyCookie(String name, String value, int maxAge) {
     Cookie cookie = new Cookie(name, value);
     cookie.setSecure("https".equalsIgnoreCase(defaultIfNull(request.getHeader("X-Forwarded-Proto"), request.getScheme())));
     cookie.setHttpOnly(true);
-    cookie.setMaxAge(-1); // session cookie
+    cookie.setMaxAge(maxAge);
     cookie.setPath("/");
-    response.addCookie(cookie);
+    return cookie;
   }
 
   protected String defaultIfNull(String string, String defaultString) {
@@ -50,5 +60,18 @@ public abstract class AbstractCookie {
     cookie.setMaxAge(0);
     cookie.setPath("/");
     response.addCookie(cookie);
+  }
+
+  protected Cookie getCookie(String cookieName) {
+    Cookie[] cookies = request.getCookies();
+    if (cookies != null) {
+      for (Cookie cookie : cookies) {
+        if (cookie.getName().equals(cookieName)) {
+          return cookie;
+        }
+      }
+    }
+
+    return null;
   }
 }
