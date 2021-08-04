@@ -432,7 +432,9 @@ public class RequestResult {
   public RequestResult assertContainsCookie(String name) {
     Cookie actual = getCookie(name);
     if (actual == null) {
-      throw new AssertionError("Cookie [" + name + "] was not found in the response. Cookies found [" + response.getCookies().stream().map(Cookie::getName).collect(Collectors.joining(", ")) + "]");
+      throw new AssertionError("Cookie [" + name + "] was not found in the response.\n"
+          + "Cookies found:\n"
+          + response.getCookies().stream().map(this::cookieToString).collect(Collectors.joining("\n")));
     }
     return this;
   }
@@ -708,7 +710,9 @@ public class RequestResult {
 
     Cookie actual = getCookie(name);
     if (!actual.getValue().equals(value)) {
-      throw new AssertionError("Cookie [" + name + "] with value [" + actual.getValue() + "] was not equal to the expected value [" + value + "]");
+      throw new AssertionError("Cookie [" + name + "] with value [" + actual.getValue() + "] was not equal to the expected value [" + value + "]"
+          + "\nActual cookie:\n"
+          + cookieToString(actual));
     }
 
     return this;
@@ -725,7 +729,9 @@ public class RequestResult {
 
     Cookie actual = getCookie(name);
     if (actual.getValue() != null && actual.getMaxAge() != 0) {
-      throw new AssertionError("Cookie [" + name + "] was not deleted. The value is [" + actual.getValue() + "] and the maxAge is [" + actual.getMaxAge() + "]");
+      throw new AssertionError("Cookie [" + name + "] was not deleted. The value is [" + actual.getValue() + "] and the maxAge is [" + actual.getMaxAge() + "]"
+          + "\nActual cookie:\n"
+          + cookieToString(actual));
     }
 
     return this;
@@ -740,7 +746,9 @@ public class RequestResult {
   public RequestResult assertDoesNotContainsCookie(String name) {
     Cookie actual = getCookie(name);
     if (actual != null) {
-      throw new AssertionError("Cookie [" + name + "] was not expected to be found in the response. Cookies found [" + response.getCookies().stream().map(Cookie::getName).collect(Collectors.joining(", ")) + "]");
+      throw new AssertionError("Cookie [" + name + "] was not expected to be found in the response.\n"
+          + "Cookies found:\n"
+          + response.getCookies().stream().map(this::cookieToString).collect(Collectors.joining("\n")));
     }
     return this;
   }
@@ -1217,7 +1225,32 @@ public class RequestResult {
    * @return The Cookie or null.
    */
   public Cookie getCookie(String name) {
-    return response.getCookies().stream().filter(c -> c.getName().equals(name)).findFirst().orElse(null);
+    List<Cookie> cookies = response.getCookies()
+                                   .stream()
+                                   .filter(c -> c.getName().equals(name))
+                                   .collect(Collectors.toList());
+
+    if (cookies.size() > 1) {
+      throw new AssertionError("Expected a single cookie with name [" + name + "] but found [" + cookies.size() + "]."
+          + "\nCookies found:\n"
+          + cookies.stream().map(this::cookieToString).collect(Collectors.joining("\n")));
+
+    }
+
+    return cookies.size() == 0 ? null : cookies.get(0);
+  }
+
+  /**
+   * Retrieve cookies by name. If the cookie does not exist in the response, this returns null.
+   *
+   * @param name The name of the cookie.
+   * @return The list of cookies with this name, or an empty list.
+   */
+  public List<Cookie> getCookies(String name) {
+    return response.getCookies()
+                   .stream()
+                   .filter(c -> c.getName().equals(name))
+                   .collect(Collectors.toList());
   }
 
   /**
@@ -1364,6 +1397,17 @@ public class RequestResult {
         throw new AssertionError("Actual redirect not equal to the expected. expected [" + expectedUri + "] but found [" + redirect + "]");
       }
     }
+  }
+
+  private String cookieToString(Cookie cookie) {
+    return
+        "Set-Cookie: " + cookie.getName()
+            + "=" + cookie.getValue()
+            + "MaxAge=" + cookie.getMaxAge()
+            + (cookie.getDomain() != null ? ("; Domain=" + cookie.getDomain()) : "")
+            + (cookie.getPath() != null ? ("; Path=" + cookie.getPath()) : "")
+            + (cookie.getSecure() ? "; Secure" : "")
+            + (cookie.isHttpOnly() ? "; HttpOnly" : "");
   }
 
   private String escape(String s) {
