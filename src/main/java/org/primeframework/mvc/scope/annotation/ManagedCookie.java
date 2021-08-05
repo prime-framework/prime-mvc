@@ -49,6 +49,17 @@ public @interface ManagedCookie {
   int maxAge() default Integer.MAX_VALUE;
 
   /**
+   * By default the annotated field will always be set, and the value of the cookie will be <code>null</code> if the
+   * cookie was not found in the request.
+   * <p>
+   * Optionally set this to false if you want the field in the action to remain <code>null</code> when the cookie is not
+   * found in the action.
+   *
+   * @return true if the cookie object should never be null
+   */
+  boolean neverNull() default true;
+
+  /**
    * @return This attribute determines the name under which that the value is stored in the action session. The default
    *     name is the name of the field that the annotation is put on.
    */

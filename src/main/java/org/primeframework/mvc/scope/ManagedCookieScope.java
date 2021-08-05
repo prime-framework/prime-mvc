@@ -56,8 +56,10 @@ public class ManagedCookieScope extends AbstractCookie implements Scope<ManagedC
 
     javax.servlet.http.Cookie cookie = getCookie(cookieName);
     String value = cookie != null ? cookie.getValue() : null;
-    if (value == null || "".equals(value)) {
-      return cookie != null ? cookie : new Cookie(cookieName, null);
+    if (value == null || "" .equals(value)) {
+      return cookie != null
+          ? cookie
+          : (scope.neverNull() ? new Cookie(cookieName, null) : null);
     }
 
     try {
@@ -74,7 +76,7 @@ public class ManagedCookieScope extends AbstractCookie implements Scope<ManagedC
       }
     }
 
-    return cookie;
+    return scope.neverNull() ? cookie : null;
   }
 
   /**
@@ -117,6 +119,6 @@ public class ManagedCookieScope extends AbstractCookie implements Scope<ManagedC
    * @return The action class name.
    */
   protected String getCookieName(String fieldName, ManagedCookie scope) {
-    return "##field-name##".equals(scope.value()) ? fieldName : scope.value();
+    return "##field-name##" .equals(scope.value()) ? fieldName : scope.value();
   }
 }
