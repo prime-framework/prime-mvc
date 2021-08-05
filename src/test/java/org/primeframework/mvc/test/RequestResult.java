@@ -1712,25 +1712,6 @@ public class RequestResult {
     }
 
     /**
-     * Ensure a single element matches the provided selector and is "checked"
-     *
-     * @param selector the DOM selector
-     * @return this.
-     */
-    public HTMLAsserter assertChecked(String selector) {
-      Elements elements = document.select(selector);
-      if (elements.size() != 1) {
-        throw new AssertionError("Expected a single element to match the selector " + selector + ". Found [" + elements.size() + "] elements instead." + ((elements.size() == 0) ? "" : "\n\n" + elements) + "\n\nActual body:\n" + requestResult.body);
-      }
-
-      if (!elements.get(0).hasAttr("checked")) {
-        throw new AssertionError("Expected the element to be checked." + "\n\nActual body:\n" + requestResult.body);
-      }
-
-      return this;
-    }
-
-    /**
      * Ensure no elements match the provided selector.
      *
      * @param selector the DOM selector
@@ -1782,6 +1763,44 @@ public class RequestResult {
     }
 
     /**
+     * Ensure a single element matches the provided selector and is "checked"
+     *
+     * @param selector the DOM selector
+     * @return this.
+     */
+    public HTMLAsserter assertElementIsChecked(String selector) {
+      Elements elements = document.select(selector);
+      if (elements.size() != 1) {
+        throw new AssertionError("Expected a single element to match the selector " + selector + ". Found [" + elements.size() + "] elements instead." + ((elements.size() == 0) ? "" : "\n\n" + elements) + "\n\nActual body:\n" + requestResult.body);
+      }
+
+      if (!elements.get(0).hasAttr("checked")) {
+        throw new AssertionError("Expected the element to be checked." + "\n\nActual body:\n" + requestResult.body);
+      }
+
+      return this;
+    }
+
+    /**
+     * Ensure a single element matches the provided selector and is NOT "checked"
+     *
+     * @param selector the DOM selector
+     * @return this.
+     */
+    public HTMLAsserter assertElementIsNotChecked(String selector) {
+      Elements elements = document.select(selector);
+      if (elements.size() != 1) {
+        throw new AssertionError("Expected a single element to match the selector " + selector + ". Found [" + elements.size() + "] elements instead." + ((elements.size() == 0) ? "" : "\n\n" + elements) + "\n\nActual body:\n" + requestResult.body);
+      }
+
+      if (elements.get(0).hasAttr("checked")) {
+        throw new AssertionError("Expected the element NOT to be checked." + "\n\nActual body:\n" + requestResult.body);
+      }
+
+      return this;
+    }
+
+    /**
      * Ensure a single element matches the provided selector and equals the provided value.
      *
      * @param selector the DOM selector
@@ -1797,25 +1816,6 @@ public class RequestResult {
       Element element = elements.get(0);
       if (!element.val().equals(value.toString())) {
         throw new AssertionError("Using the selector [" + selector + "] expected [" + value.toString() + "] but found [" + element.val() + "]. Actual matched element: \n\n" + element + "\n\nActual body:\n" + requestResult.body);
-      }
-
-      return this;
-    }
-
-    /**
-     * Ensure a single element matches the provided selector and is NOT "checked"
-     *
-     * @param selector the DOM selector
-     * @return this.
-     */
-    public HTMLAsserter assertNotChecked(String selector) {
-      Elements elements = document.select(selector);
-      if (elements.size() != 1) {
-        throw new AssertionError("Expected a single element to match the selector " + selector + ". Found [" + elements.size() + "] elements instead." + ((elements.size() == 0) ? "" : "\n\n" + elements) + "\n\nActual body:\n" + requestResult.body);
-      }
-
-      if (elements.get(0).hasAttr("checked")) {
-        throw new AssertionError("Expected the element NOT to be checked." + "\n\nActual body:\n" + requestResult.body);
       }
 
       return this;
