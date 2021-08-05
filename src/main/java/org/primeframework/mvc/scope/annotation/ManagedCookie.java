@@ -41,6 +41,11 @@ public @interface ManagedCookie {
    */
   boolean encrypt() default true;
 
+  /**
+   * Optionally specify a value to set on the cookie for Max-Age
+   *
+   * @return the max age value
+   */
   int maxAge() default Integer.MAX_VALUE;
 
   /**

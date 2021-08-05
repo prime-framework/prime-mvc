@@ -57,14 +57,14 @@ public class ManagedCookieScope extends AbstractCookie implements Scope<ManagedC
     javax.servlet.http.Cookie cookie = getCookie(cookieName);
     String value = cookie != null ? cookie.getValue() : null;
     if (value == null || "".equals(value)) {
-      return new Cookie(cookieName, null);
+      return cookie != null ? cookie : new Cookie(cookieName, null);
     }
 
     try {
-      String cookieValue = scope.encrypt()
+      cookie.setValue(scope.encrypt()
           ? encryptor.decrypt(String.class, value)
-          : value;
-      return new Cookie(cookieName, cookieValue);
+          : value);
+      return cookie;
     } catch (Exception e) {
       String message = e.getClass().getCanonicalName() + " " + e.getMessage();
       if (scope.encrypt()) {
@@ -74,7 +74,7 @@ public class ManagedCookieScope extends AbstractCookie implements Scope<ManagedC
       }
     }
 
-    return new Cookie(cookieName, null);
+    return cookie;
   }
 
   /**
