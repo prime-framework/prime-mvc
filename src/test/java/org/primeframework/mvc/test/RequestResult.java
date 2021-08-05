@@ -636,6 +636,15 @@ public class RequestResult {
   }
 
   /**
+   * Verifies that the system has no general INFO messages.
+   *
+   * @return This.
+   */
+  public RequestResult assertContainsNoInfos() {
+    return assertContainsNoMessages(MessageType.INFO);
+  }
+
+  /**
    * Verifies that the system has no general messages of the specified type.
    *
    * @param messageType The message type
@@ -652,6 +661,15 @@ public class RequestResult {
     //noinspection StringConcatenationInsideStringBufferAppend
     messages.forEach(m -> sb.append("\t\t" + m.getType() + "\t" + m.getCode() + "\t" + ((m instanceof SimpleMessage) ? ((SimpleMessage) m).message : "") + "\n"));
     throw new AssertionError("The MessageStore contains the following general errors.]" + sb);
+  }
+
+  /**
+   * Verifies that the system has no general WARNING messages.
+   *
+   * @return This.
+   */
+  public RequestResult assertContainsNoWarnings() {
+    return assertContainsNoMessages(MessageType.WARNING);
   }
 
   /**
