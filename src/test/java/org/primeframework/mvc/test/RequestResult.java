@@ -60,6 +60,7 @@ import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.primeframework.mvc.message.SimpleMessage;
 import org.primeframework.mvc.message.l10n.MessageProvider;
+import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.servlet.PrimeFilter;
 import org.primeframework.mvc.util.QueryStringBuilder;
 import org.primeframework.mvc.util.QueryStringTools;
@@ -782,6 +783,50 @@ public class RequestResult {
     if (actual != null && !actual.equals(encoding)) {
       throw new AssertionError("Character Encoding [" + actual + "] is not equal to the expected value [" + encoding + "]");
     }
+    return this;
+  }
+
+  /**
+   * Assert the cookie exists by name and then pass it to the provided consumer to allow the caller to assert on
+   * anything they wish.
+   *
+   * @param name     The cookie name.
+   * @param consumer The consumer used to perform assertions.
+   * @return This.
+   */
+  public RequestResult assertEncryptedCookie(String name, ThrowingConsumer<Cookie> consumer) throws Exception {
+    assertContainsCookie(name);
+
+    Cookie actual = getCookie(name);
+    Encryptor encryptor = injector.getInstance(Encryptor.class);
+    String actualDecrypted = actual.getValue() != null ? encryptor.decrypt(String.class, actual.getValue()) : null;
+    actual.setValue(actualDecrypted);
+    if (consumer != null) {
+      consumer.accept(actual);
+    }
+
+    return this;
+  }
+
+  /**
+   * Assert the cookie exists by name and the value matches that of the provided value.
+   *
+   * @param name  The cookie name.
+   * @param value The cookie value.
+   * @return This.
+   */
+  public RequestResult assertEncryptedCookie(String name, String value) throws Exception {
+    assertContainsCookie(name);
+
+    Encryptor encryptor = injector.getInstance(Encryptor.class);
+    Cookie actual = getCookie(name);
+    String actualDecrypted = actual.getValue() != null ? encryptor.decrypt(String.class, actual.getValue()) : null;
+    if (!Objects.equals(value, actualDecrypted)) {
+      throw new AssertionError("Cookie [" + name + "] with decrypted value [" + actualDecrypted + "] was not equal to the expected value [" + value + "]"
+          + "\nActual cookie:\n"
+          + cookieToString(actual));
+    }
+
     return this;
   }
 
