@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,8 @@ import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
  * @author James Humphrey
  */
 public class ServletTools {
+  private static final Pattern DoubleSlash = Pattern.compile("/{2,}");
+
   private static final Logger logger = LoggerFactory.getLogger(ServletTools.class);
 
   /**
@@ -53,7 +56,7 @@ public class ServletTools {
     String serverName = defaultIfNull(request.getHeader("X-Forwarded-Host"), request.getServerName()).toLowerCase();
     int serverPort = request.getServerPort();
     // Ignore port 80 for http
-    if (request.getScheme().toLowerCase().equals("http") && serverPort == 80) {
+    if (request.getScheme().equalsIgnoreCase("http") && serverPort == 80) {
       serverPort = -1;
     }
 
@@ -149,7 +152,7 @@ public class ServletTools {
       return uri.substring(context.length());
     }
 
-    return uri;
+    return DoubleSlash.matcher(uri).replaceAll("/");
   }
 
   /**

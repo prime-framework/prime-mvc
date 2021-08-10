@@ -50,6 +50,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertSame;
+import static org.testng.FileAssert.fail;
 
 /**
  * This class tests the MVC from a (mile) high level perspective. (see what I did there?)
@@ -202,31 +203,25 @@ public class GlobalTest extends PrimeBaseTest {
     // Double slash, redirect to the correct location
     simulator.test("/freemarker//action-backed")
              .get()
-             .assertStatusCode(301)
-             .assertRedirect("/freemarker/action-backed")
-             // A 301 will not contain these headers
-             .assertHeaderDoesNotContain("Cache-Control")
-
-             .executeRedirect(result -> result.assertStatusCode(200)
-                                              .assertHeaderContains("Cache-Control", "no-cache")
-                                              .assertBodyContains("Yo, nice template, I have an action."));
+             .assertStatusCode(200)
+             .assertHeaderContains("Cache-Control", "no-cache")
+             .assertBodyContains("Yo, nice template, I have an action.");
 
     // Triple slashes, redirect to the correct location
     simulator.test("/freemarker///action-backed")
              .get()
-             .assertStatusCode(301)
-             .assertRedirect("/freemarker//action-backed")
-             // A 301 will not contain these headers
-             .assertHeaderDoesNotContain("Cache-Control")
+             .assertStatusCode(200)
+             .assertHeaderContains("Cache-Control", "no-cache")
+             .assertBodyContains("Yo, nice template, I have an action.");
 
-             .executeRedirect(result -> result.assertStatusCode(301)
-                                              .assertRedirect("/freemarker/action-backed")
-                                              // A 301 will not contain these headers
-                                              .assertHeaderDoesNotContain("Cache-Control")
-
-                                              .executeRedirect(subResult -> subResult.assertStatusCode(200)
-                                                                                     .assertHeaderContains("Cache-Control", "no-cache")
-                                                                                     .assertBodyContains("Yo, nice template, I have an action.")));
+    // Triple slashes, redirect to the correct location
+    try {
+      simulator.test("///bing.com")
+               .get();
+      fail("Whoa!! We should have failed so hard it isn't even funny.");
+    } catch (Throwable e) {
+      assertEquals(e.getClass(), AssertionError.class);
+    }
   }
 
   @Test
@@ -907,48 +902,47 @@ public class GlobalTest extends PrimeBaseTest {
     // Double slash, redirect to the correct location
     simulator.test("/freemarker//stand-alone-template")
              .get()
-             .assertStatusCode(301)
-             .assertRedirect("/freemarker/stand-alone-template")
-             // A 301 will not contain these headers
-             .assertHeaderDoesNotContain("Cache-Control")
-
-             .executeRedirect(result -> result.assertStatusCode(200)
-                                              .assertHeaderContains("Cache-Control", "no-cache")
-                                              .assertBodyContains("Yo, nice template."));
+             .assertStatusCode(200)
+             .assertHeaderContains("Cache-Control", "no-cache")
+             .assertBodyContains("Yo, nice template.");
 
     // Triple slashes, redirect to the correct location
     simulator.test("/freemarker///stand-alone-template")
              .get()
-             .assertStatusCode(301)
-             .assertRedirect("/freemarker//stand-alone-template")
-             .executeRedirect(result -> result.assertStatusCode(301)
-                                              .assertRedirect("/freemarker/stand-alone-template")
-                                              .executeRedirect(subResult -> subResult.assertStatusCode(200)
-                                                                                     .assertBodyContains("Yo, nice template.")));
+             .assertStatusCode(200)
+             .assertBodyContains("Yo, nice template.");
+
     // Double slash, on two paths, redirect to the correct location
     simulator.test("/freemarker//sub//stand-alone-template")
              .get()
-             .assertStatusCode(301)
-             .assertRedirect("/freemarker/sub/stand-alone-template")
-             .executeRedirect(result -> result.assertStatusCode(200)
-                                              .assertBodyContains("Yo, nice sub-directory template."));
+             .assertStatusCode(200)
+             .assertBodyContains("Yo, nice sub-directory template.");
 
-    // Invalid path, double slash, redirect, still invalid.
-    simulator.test("/freemarker//does-not-exist")
-             .get()
-             .assertStatusCode(301)
-             .assertRedirect("/freemarker/does-not-exist");
+    try {
+      // Invalid path, double slash, redirect, still invalid.
+      simulator.test("/freemarker//does-not-exist")
+               .get()
+               .assertStatusCode(301)
+               .assertRedirect("/freemarker/does-not-exist");
+      fail("Expected a failure.");
+    } catch (Error e) {
+      assertEquals(e.getClass(), AssertionError.class);
+    }
 
-    // Index template, ensure we clean up the '/index/ suffix that will get added during action mapping
-    simulator.test("/freemarker/sub//")
-             .get()
-             .assertStatusCode(301)
-             .assertRedirect("/freemarker/sub/")
-             // A 301 will not contain these headers
-             .assertHeaderDoesNotContain("Cache-Control")
-             .executeRedirect(result -> result.assertStatusCode(200)
-                                              .assertBodyContains("Yo, nice sub-directory index template."));
-
+    try {
+      // Index template, ensure we clean up the '/index/ suffix that will get added during action mapping
+      simulator.test("/freemarker/sub//")
+               .get()
+               .assertStatusCode(301)
+               .assertRedirect("/freemarker/sub/")
+               // A 301 will not contain these headers
+               .assertHeaderDoesNotContain("Cache-Control")
+               .executeRedirect(result -> result.assertStatusCode(200)
+                                                .assertBodyContains("Yo, nice sub-directory index template."));
+      fail("Expected a failure.");
+    } catch (Error e) {
+      assertEquals(e.getClass(), AssertionError.class);
+    }
   }
 
   @Test

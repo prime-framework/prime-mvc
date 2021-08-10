@@ -68,19 +68,6 @@ public class DefaultActionMapper implements ActionMapper {
       invocation.method = invocation.configuration.executeMethods.get(httpMethod);
     }
 
-    // If we have a double slash, redirect after normalizing the URI and then let the chips fall where they may.
-    // - We may or may not have an action invocation, so we don't care actually if the normalizedInvocation.configuration is null or not.
-    if (uri.contains("//")) {
-      String normalized = uri.replace("//", "/");
-      ActionInvocation normalizedInvocation = actionConfigurationProvider.lookup(normalized);
-      if (uri.endsWith("/") && normalizedInvocation.actionURI.endsWith("/index")) {
-        normalizedInvocation.actionURI = normalizedInvocation.actionURI.substring(0, normalizedInvocation.actionURI.length() - 5); // Strip index but leave the slash
-      }
-
-      normalizedInvocation.redirect = true;
-      return normalizedInvocation;
-    }
-
     return invocation;
   }
 }

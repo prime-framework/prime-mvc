@@ -20,7 +20,7 @@ fusionAuthJWTVersion = "3.1.6"
 guiceVersion = "4.2.3"
 jacksonVersion = "2.12.2"
 
-project(group: "org.primeframework", name: "prime-mvc", version: "1.30.2", licenses: ["ApacheV2_0"]) {
+project(group: "org.primeframework", name: "prime-mvc", version: "1.30.3", licenses: ["ApacheV2_0"]) {
   workflow {
     standard()
   }
