@@ -1407,7 +1407,7 @@ public class RequestResult {
    * @param runnable The runnable to stuff.
    * @return This.
    */
-  public RequestResult setup(Runnable runnable) {
+  public RequestResult setup(ThrowingRunnable runnable) throws Exception {
     runnable.run();
     return this;
   }
