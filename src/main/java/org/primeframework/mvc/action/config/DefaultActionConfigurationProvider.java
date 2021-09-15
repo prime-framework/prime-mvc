@@ -73,6 +73,7 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
 
       Node current = root;
       String[] uriParts = uri.substring(1).split("/");
+      processNamespaceParameter(actionConfiguration, root);
 
       for (int i = 0; i < uriParts.length; i++) {
         if (i == uriParts.length - 1) {
@@ -281,6 +282,30 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
   }
 
   /**
+   * Process namespace parameters.
+   * <p>
+   * Process an action that has defined a namespace parameter. Example : /{tenantId}/.well-known/openid-configuration
+   * <p>
+   * The {tenantId} parameter will be set on the root node node to identify the parameter as coming at the beginning the
+   * URI is processed later by {@link #lookup(String)}.
+   *
+   * @param actionConfiguration The action configuration.
+   * @param current             The current node.
+   * @return The new current node.
+   */
+  private Node processNamespaceParameter(ActionConfiguration actionConfiguration, Node current) {
+    String namespace = actionConfiguration.annotation.namespace();
+    if (!namespace.equals("")) {
+      String prefixName = namespace.substring(1, namespace.length() - 1);
+      Map<String, Node> currentActions = current.actions;
+      Map<String, Node> currentPackages = current.packages;
+      current = current.parameters.computeIfAbsent(prefixName, k -> new Node(prefixName, currentActions, currentPackages));
+    }
+
+    return current;
+  }
+
+  /**
    * Process prefix parameters.
    * <p>
    * Process an action that has defined a prefix parameter. Example : /api/application/{id}/oauth-configuration
@@ -321,6 +346,12 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
 
     public Node(String parameterName) {
       this.parameterName = parameterName;
+    }
+
+    public Node(String parameterName, Map<String, Node> actions, Map<String, Node> packages) {
+      this.parameterName = parameterName;
+      this.actions = actions;
+      this.packages = packages;
     }
 
     public Node(ActionConfiguration actionConfiguration) {

@@ -990,11 +990,12 @@ public class GlobalTest extends PrimeBaseTest {
                                  .assertHeaderContains("Cache-Control", "no-cache")
                                  .assertJSON("{\"called\": \"/.well-known/well-known/potato/openid-configuration\"}"));
 
-    test.simulate(() -> simulator.test("/.well-known/.well-known/openid-configuration")
+    // Use a namespace
+    test.simulate(() -> simulator.test("/a070429c-dab2-464f-9d53-2cad82b615c7/.well-known/openid-configuration")
                                  .get()
-                                 .assertStatusCode(500)
-                                 // A 500 will not contain these headers
-                                 .assertHeaderDoesNotContain("Cache-Control"));
+                                 .assertStatusCode(200)
+                                 .assertHeaderContains("Cache-Control", "no-cache")
+                                 .assertJSON("{\"called\": \"/a070429c-dab2-464f-9d53-2cad82b615c7/.well-known/openid-configuration\"}"));
   }
 
   @Test

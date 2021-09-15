@@ -44,6 +44,13 @@ public @interface Action {
   boolean jwtEnabled() default false;
 
   /**
+   * An optional namespace for this action. Similar to the prefixParameter, but this must be at the front of the URI.
+   *
+   * @return the namespace parameters.
+   */
+  String namespace() default "";
+
+  /**
    * Determines if the action can be overridden by another action that maps to the same URI. If a class that is marked
    * as overridable and another another class is found for the same URI but is not marked as overridable, that one is
    * used.

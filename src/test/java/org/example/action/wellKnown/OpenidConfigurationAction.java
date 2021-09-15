@@ -25,14 +25,18 @@ import org.primeframework.mvc.content.json.annotation.JSONResponse;
 /**
  * @author Daniel DeGroff
  */
-@Action
+@Action(namespace = "{tenantId}")
 @JSON
 public class OpenidConfigurationAction {
   @JSONResponse
   public Map<String, String> response = new HashMap<>();
 
+  public String tenantId;
+
   public String get() {
-    response.put("called", "/.well-known/openid-configuration");
+    response.put("called", tenantId == null
+        ? "/.well-known/openid-configuration"
+        : "/" + tenantId + "/.well-known/openid-configuration");
     return "success";
   }
 }
