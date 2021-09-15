@@ -634,7 +634,7 @@ public class RequestBuilder {
       // Build the request and response for this pass
       filter.doFilter(this.request, this.response, (req, resp) -> {
         throw new UnsupportedOperationException("The RequestSimulator class doesn't support testing " +
-            "URIs that don't map to Prime resources");
+            "URIs that don't map to Prime resources. Requested URL:\n" + this.request.getRequestURI());
       });
     } catch (Throwable t) {
       fail("The exception should have been caught by the PrimeFilter", t);
