@@ -60,11 +60,12 @@ public class LocaleSelect extends Select {
   protected Map<String, Object> makeParameters() {
     LinkedHashMap<Locale, String> locales = new LinkedHashMap<>();
     String preferred = (String) attributes.get("preferredLocales");
+    Locale userLocale = localeProvider.get();
     if (preferred != null) {
       String[] parts = preferred.split(",");
       for (String part : parts) {
         Locale locale = LocaleUtils.toLocale(part);
-        locales.put(locale, locale.getDisplayName(locale));
+        locales.put(locale, locale.getDisplayName(userLocale));
       }
     }
 
@@ -73,11 +74,11 @@ public class LocaleSelect extends Select {
     Collections.addAll(allLocales, Locale.getAvailableLocales());
     allLocales.removeIf((locale) -> locale.getLanguage().isEmpty() || locale.hasExtensions() || !locale.getScript().isEmpty() ||
         !locale.getVariant().isEmpty() || (!includeCountries && !locale.getCountry().isEmpty()));
-    allLocales.sort(Comparator.comparing(one -> one.getDisplayName(localeProvider.get())));
+    allLocales.sort(Comparator.comparing(one -> one.getDisplayName(userLocale)));
 
     for (Locale locale : allLocales) {
       if (!locales.containsKey(locale)) {
-        locales.put(locale, locale.getDisplayName(localeProvider.get()));
+        locales.put(locale, locale.getDisplayName(userLocale));
       }
     }
 
