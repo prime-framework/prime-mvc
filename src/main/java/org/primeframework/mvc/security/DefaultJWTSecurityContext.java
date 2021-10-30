@@ -49,7 +49,17 @@ public class DefaultJWTSecurityContext implements JWTSecurityContext {
         throw new UnauthenticatedException();
       }
 
-      return JWT.getDecoder().decode(encodedJWT, verifierProvider.get());
+      // If we do not have any verifiers, do not attempt to decode the JWT.
+      // - This is a fail-safe against validating a JWT with an alg of 'none'.
+      //   In practice, at least in FusionAuth, we'll always have at least one
+      //   verifier. But to protect other users of this library, do not attempt
+      //   a JWT unless we have a verifier.
+      Map<String, Verifier> verifiers = verifierProvider.get();
+      if (verifiers.isEmpty()) {
+        throw new UnauthenticatedException();
+      }
+
+      return JWT.getDecoder().decode(encodedJWT, verifiers);
     } catch (InvalidJWTException | InvalidJWTSignatureException | JWTExpiredException | JWTUnavailableForProcessingException e) {
       requestAdapter.invalidateJWT();
       throw new UnauthenticatedException();
