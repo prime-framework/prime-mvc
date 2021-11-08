@@ -16,10 +16,10 @@
 package org.primeframework.mvc.parameter.convert.converters;
 
 import java.lang.reflect.Type;
+import java.util.IllformedLocaleException;
 import java.util.Locale;
 import java.util.Map;
 
-import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primeframework.mvc.parameter.convert.AbstractGlobalConverter;
 import org.primeframework.mvc.parameter.convert.ConversionException;
@@ -33,6 +33,10 @@ import org.primeframework.mvc.parameter.convert.annotation.GlobalConverter;
  */
 @GlobalConverter
 public class LocaleConverter extends AbstractGlobalConverter {
+  // Mostly copied from jackson-databind version 2.13.0
+
+  protected final static String LOCALE_EXT_MARKER = "_#";
+
   protected String objectToString(Object value, Type convertFrom, Map<String, String> attributes, String expression)
       throws org.primeframework.mvc.parameter.convert.ConversionException, ConverterStateException {
     return value.toString();
@@ -49,7 +53,7 @@ public class LocaleConverter extends AbstractGlobalConverter {
     }
 
     try {
-      return LocaleUtils.toLocale(value);
+      return _deserializeLocale(value);
     } catch (Exception e) {
       throw new ConversionException("Invalid locale [" + value + "]", e);
     }
@@ -62,11 +66,83 @@ public class LocaleConverter extends AbstractGlobalConverter {
 
   private Locale toLocale(String[] parts) {
     if (parts.length == 1) {
-      return new Locale(parts[0]);
+      try {
+        return _deserializeLocale(parts[0]);
+      } catch (Exception e) {
+        throw new ConversionException("Invalid locale [" + parts[0] + "]", e);
+      }
     } else if (parts.length == 2) {
       return new Locale(parts[0], parts[1]);
     }
 
     return new Locale(parts[0], parts[1], parts[2]);
+  }
+
+  protected int _firstHyphenOrUnderscore(String str)
+  {
+    for (int i = 0, end = str.length(); i < end; ++i) {
+      char c = str.charAt(i);
+      if (c == '_' || c == '-') {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  private Locale _deserializeLocale(String value)
+  {
+    int ix = _firstHyphenOrUnderscore(value);
+    if (ix < 0) { // single argument
+      return new Locale(value);
+    }
+    String first = value.substring(0, ix);
+    value = value.substring(ix+1);
+    ix = _firstHyphenOrUnderscore(value);
+    if (ix < 0) { // two pieces
+      return new Locale(first, value);
+    }
+    String second = value.substring(0, ix);
+    // [databind#3259]: Support for BCP 47 java.util.Locale ser/deser
+    int extMarkerIx = value.indexOf(LOCALE_EXT_MARKER);
+    if (extMarkerIx < 0) {
+      return new Locale(first, second, value.substring(ix+1));
+    }
+    return _deSerializeBCP47Locale(value, ix, first, second, extMarkerIx);
+  }
+
+  private Locale _deSerializeBCP47Locale(String value, int ix, String first, String second,
+                                         int extMarkerIx)
+  {
+    String third = "";
+    try {
+      // Below condition checks if variant value is present to handle empty variant values such as
+      // en__#Latn_x-ext
+      // _US_#Latn
+      if (extMarkerIx > 0 && extMarkerIx > ix) {
+        third = value.substring(ix + 1, extMarkerIx);
+      }
+      value = value.substring(extMarkerIx + 2);
+
+      if (value.indexOf('_') < 0 && value.indexOf('-') < 0) {
+        return new Locale.Builder().setLanguage(first)
+                                   .setRegion(second).setVariant(third).setScript(value).build();
+      }
+      if (value.indexOf('_') < 0) {
+        ix = value.indexOf('-');
+        return new Locale.Builder().setLanguage(first)
+                                   .setRegion(second).setVariant(third)
+                                   .setExtension(value.charAt(0), value.substring(ix + 1))
+                                   .build();
+      }
+      ix = value.indexOf('_');
+      return new Locale.Builder().setLanguage(first)
+                                 .setRegion(second).setVariant(third)
+                                 .setScript(value.substring(0, ix))
+                                 .setExtension(value.charAt(ix + 1), value.substring(ix + 3))
+                                 .build();
+    } catch (IllformedLocaleException ex) {
+      // should we really just swallow the exception?
+      return new Locale(first, second, third);
+    }
   }
 }
