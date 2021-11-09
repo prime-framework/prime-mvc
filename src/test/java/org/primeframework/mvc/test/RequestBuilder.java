@@ -609,6 +609,7 @@ public class RequestBuilder {
    *
    * @deprecated
    */
+  @Deprecated
   public RequestBuilder withUrlSegment(Object value) {
     return withURLSegment(value);
   }

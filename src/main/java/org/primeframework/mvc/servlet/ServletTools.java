@@ -92,6 +92,7 @@ public class ServletTools {
    * @return a URL in the format of protocol://host[:port]/
    * @deprecated Use the URI method.
    */
+  @Deprecated
   public static URL getBaseUrl(ServletRequest request) {
     String scheme = request.getScheme();
     String serverName = request.getServerName();

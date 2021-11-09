@@ -346,7 +346,7 @@
           <fileSet type="namedScope" name="control-templates" pattern="file[prime-mvc]:src/main/ftl/WEB-INF/control-templates/*" />
         </list>
       </option>
-      <DB2CodeStyleSettings version="5">
+      <DB2CodeStyleSettings version="6">
         <option name="USE_GENERAL_STYLE" value="false" />
         <option name="TYPE_CASE" value="3" />
         <option name="CUSTOM_TYPE_CASE" value="3" />
@@ -383,7 +383,7 @@
         <option name="EXPR_CASE_THEN_WRAP" value="true" />
         <option name="PRIMARY_KEY_NAME_TEMPLATE" value="{table}_{columns}_pk" />
       </DB2CodeStyleSettings>
-      <DerbyCodeStyleSettings version="5">
+      <DerbyCodeStyleSettings version="6">
         <option name="USE_GENERAL_STYLE" value="false" />
         <option name="TYPE_CASE" value="3" />
         <option name="CUSTOM_TYPE_CASE" value="3" />
@@ -424,7 +424,7 @@
         <option name="CLASS_COUNT_TO_USE_IMPORT_ON_DEMAND" value="9999" />
         <option name="NAMES_COUNT_TO_USE_IMPORT_ON_DEMAND" value="9999" />
       </GroovyCodeStyleSettings>
-      <H2CodeStyleSettings version="5">
+      <H2CodeStyleSettings version="6">
         <option name="USE_GENERAL_STYLE" value="false" />
         <option name="TYPE_CASE" value="3" />
         <option name="CUSTOM_TYPE_CASE" value="3" />
@@ -461,7 +461,44 @@
         <option name="EXPR_CASE_THEN_WRAP" value="true" />
         <option name="PRIMARY_KEY_NAME_TEMPLATE" value="{table}_{columns}_pk" />
       </H2CodeStyleSettings>
-      <HSQLCodeStyleSettings version="5">
+      <H2CodeStyleSettings version="6">
+        <option name="USE_GENERAL_STYLE" value="false" />
+        <option name="TYPE_CASE" value="3" />
+        <option name="CUSTOM_TYPE_CASE" value="3" />
+        <option name="ALIAS_CASE" value="4" />
+        <option name="BUILT_IN_CASE" value="0" />
+        <option name="QUERY_TRUE_INDENT" value="false" />
+        <option name="QUERY_ALIGN_ELEMENTS" value="false" />
+        <option name="QUERY_ALIGN_LINE_COMMENTS" value="false" />
+        <option name="INSERT_EL_COMMA" value="2" />
+        <option name="SET_EL_WRAP" value="0" />
+        <option name="SET_EL_COMMA" value="0" />
+        <option name="WITH_EL_WRAP" value="0" />
+        <option name="WITH_EL_COMMA" value="0" />
+        <option name="SELECT_EL_WRAP" value="3" />
+        <option name="SELECT_EL_COMMA" value="2" />
+        <option name="FROM_EL_WRAP" value="2" />
+        <option name="FROM_EL_COMMA" value="2" />
+        <option name="FROM_PLACE_ON" value="10" />
+        <option name="WHERE_EL_WRAP" value="3" />
+        <option name="WHERE_EL_BOUND" value="2" />
+        <option name="ORDER_EL_COMMA" value="2" />
+        <option name="TABLE_OPENING" value="1" />
+        <option name="TABLE_CONTENT" value="2" />
+        <option name="TABLE_CLOSING" value="3" />
+        <option name="TABLE_ALTER_INSTRUCTION_ALIGN" value="false" />
+        <option name="POST_OPT_WRAP_1" value="true" />
+        <option name="POST_OPT_ALIGN" value="false" />
+        <option name="ROUTINE_ARG_COMMA" value="2" />
+        <option name="ROUTINE_ARG_ALIGN_TYPES" value="true" />
+        <option name="IMP_DECLARE_EL_WRAP" value="1" />
+        <option name="IMP_IF_THEN_WRAP_THEN" value="true" />
+        <option name="CORTEGE_SPACE_BEFORE_L_PAREN" value="false" />
+        <option name="EXPR_CASE_WHEN_WRAP" value="false" />
+        <option name="EXPR_CASE_THEN_WRAP" value="true" />
+        <option name="PRIMARY_KEY_NAME_TEMPLATE" value="{table}_{columns}_pk" />
+      </H2CodeStyleSettings>
+      <HSQLCodeStyleSettings version="6">
         <option name="USE_GENERAL_STYLE" value="false" />
         <option name="TYPE_CASE" value="3" />
         <option name="CUSTOM_TYPE_CASE" value="3" />
@@ -515,7 +552,7 @@
         </option>
         <option name="JD_INDENT_ON_CONTINUATION" value="true" />
       </JavaCodeStyleSettings>
-      <MSSQLCodeStyleSettings version="5">
+      <MSSQLCodeStyleSettings version="6">
         <option name="USE_GENERAL_STYLE" value="false" />
         <option name="TYPE_CASE" value="3" />
         <option name="CUSTOM_TYPE_CASE" value="3" />
@@ -555,7 +592,7 @@
       <MarkdownNavigatorCodeStyleSettings>
         <option name="RIGHT_MARGIN" value="72" />
       </MarkdownNavigatorCodeStyleSettings>
-      <MySQLCodeStyleSettings version="5">
+      <MySQLCodeStyleSettings version="6">
         <option name="USE_GENERAL_STYLE" value="false" />
         <option name="TYPE_CASE" value="3" />
         <option name="CUSTOM_TYPE_CASE" value="3" />
@@ -592,7 +629,7 @@
         <option name="EXPR_CASE_THEN_WRAP" value="true" />
         <option name="PRIMARY_KEY_NAME_TEMPLATE" value="{table}_{columns}_pk" />
       </MySQLCodeStyleSettings>
-      <OracleCodeStyleSettings version="5">
+      <OracleCodeStyleSettings version="6">
         <option name="USE_GENERAL_STYLE" value="false" />
         <option name="TYPE_CASE" value="3" />
         <option name="CUSTOM_TYPE_CASE" value="3" />
@@ -629,7 +666,7 @@
         <option name="EXPR_CASE_THEN_WRAP" value="true" />
         <option name="PRIMARY_KEY_NAME_TEMPLATE" value="{table}_{columns}_pk" />
       </OracleCodeStyleSettings>
-      <PostgresCodeStyleSettings version="5">
+      <PostgresCodeStyleSettings version="6">
         <option name="USE_GENERAL_STYLE" value="false" />
         <option name="TYPE_CASE" value="3" />
         <option name="CUSTOM_TYPE_CASE" value="3" />
@@ -666,7 +703,7 @@
         <option name="EXPR_CASE_THEN_WRAP" value="true" />
         <option name="PRIMARY_KEY_NAME_TEMPLATE" value="{table}_{columns}_pk" />
       </PostgresCodeStyleSettings>
-      <SQLiteCodeStyleSettings version="5">
+      <SQLiteCodeStyleSettings version="6">
         <option name="USE_GENERAL_STYLE" value="false" />
         <option name="TYPE_CASE" value="3" />
         <option name="CUSTOM_TYPE_CASE" value="3" />
@@ -706,7 +743,7 @@
       <ScalaCodeStyleSettings>
         <option name="MULTILINE_STRING_CLOSING_QUOTES_ON_NEW_LINE" value="true" />
       </ScalaCodeStyleSettings>
-      <SqlCodeStyleSettings version="5">
+      <SqlCodeStyleSettings version="6">
         <option name="TYPE_CASE" value="3" />
         <option name="CUSTOM_TYPE_CASE" value="3" />
         <option name="ALIAS_CASE" value="4" />
@@ -747,7 +784,7 @@
         <option name="WRAP_INSIDE_WHERE" value="5" />
         <option name="WRAP_INSIDE_SET" value="5" />
       </SqlCodeStyleSettings>
-      <SybaseCodeStyleSettings version="5">
+      <SybaseCodeStyleSettings version="6">
         <option name="USE_GENERAL_STYLE" value="false" />
         <option name="TYPE_CASE" value="3" />
         <option name="CUSTOM_TYPE_CASE" value="3" />
@@ -784,9 +821,6 @@
         <option name="EXPR_CASE_THEN_WRAP" value="true" />
         <option name="PRIMARY_KEY_NAME_TEMPLATE" value="{table}_{columns}_pk" />
       </SybaseCodeStyleSettings>
-      <XML>
-        <option name="XML_LEGACY_SETTINGS_IMPORTED" value="true" />
-      </XML>
       <codeStyleSettings language="CSS">
         <indentOptions>
           <option name="INDENT_SIZE" value="2" />
@@ -1815,7 +1849,7 @@
   <component name="ProjectResources">
     <default-html-doctype>http://www.w3.org/1999/xhtml</default-html-doctype>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_14_PREVIEW" project-jdk-name="Java 14" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_14" project-jdk-name="Java 14" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
   <component name="TemplateDataLanguageMappings">

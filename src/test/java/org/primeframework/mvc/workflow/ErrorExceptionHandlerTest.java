@@ -36,7 +36,6 @@ import static org.easymock.EasyMock.verify;
 /**
  * @author James Humphrey
  */
-@Test
 public class ErrorExceptionHandlerTest {
 
   @Test
