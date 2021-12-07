@@ -24,18 +24,13 @@ import java.util.*;
  * @author Brian Pontarelli
  */
 public class ErrorMessages {
-  public final Map<String, List<ErrorMessage>> fieldErrors = new LinkedHashMap<String, List<ErrorMessage>>();
+  public final Map<String, List<ErrorMessage>> fieldErrors = new LinkedHashMap<>();
 
-  public final List<ErrorMessage> generalErrors = new LinkedList<ErrorMessage>();
+  public final List<ErrorMessage> generalErrors = new LinkedList<>();
 
-  public ErrorMessages addFieldError(String field, String code, String message) {
-    List<ErrorMessage> errorMessages = fieldErrors.get(field);
-    if (errorMessages == null) {
-      errorMessages = new ArrayList<ErrorMessage>();
-      fieldErrors.put(field, errorMessages);
-    }
-
-    errorMessages.add(new ErrorMessage(code, message));
+  public ErrorMessages addFieldError(String field, String code, String message, Map<String, Object> data) {
+    List<ErrorMessage> errorMessages = fieldErrors.computeIfAbsent(field, k -> new ArrayList<>());
+    errorMessages.add(new ErrorMessage(code, message, data));
     return this;
   }
 }

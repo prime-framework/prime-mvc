@@ -15,23 +15,40 @@
  */
 package org.primeframework.mvc.message;
 
+import java.util.Map;
+import java.util.Objects;
+
 /**
  * A simple field message.
  *
  * @author Brian Pontarelli
  */
 public class SimpleFieldMessage implements FieldMessage {
-  public final MessageType type;
-  public final String field;
   public final String code;
+
+  public final Map<String, Object> data;
+
+  public final String field;
+
   public final String message;
+
+  public final MessageType type;
 
   // Jackson constructor
   public SimpleFieldMessage() {
-    this(null, null, null, null);
+    this(null, null, null, null, null);
+  }
+
+  public SimpleFieldMessage(MessageType type, String field, String code, String message, Map<String, Object> data) {
+    this.type = type;
+    this.field = field;
+    this.code = code;
+    this.message = message;
+    this.data = data;
   }
 
   public SimpleFieldMessage(MessageType type, String field, String code, String message) {
+    this.data = null;
     this.type = type;
     this.field = field;
     this.code = code;
@@ -39,13 +56,15 @@ public class SimpleFieldMessage implements FieldMessage {
   }
 
   @Override
-  public MessageType getType() {
-    return type;
-  }
-
-  @Override
-  public String getField() {
-    return field;
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    SimpleFieldMessage that = (SimpleFieldMessage) o;
+    return Objects.equals(type, that.type) && Objects.equals(field, that.field) && Objects.equals(code, that.code) && Objects.equals(message, that.message) && Objects.equals(data, that.data);
   }
 
   @Override
@@ -54,21 +73,23 @@ public class SimpleFieldMessage implements FieldMessage {
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+  public Map<String, Object> getData() {
+    return data;
+  }
 
-    final SimpleFieldMessage that = (SimpleFieldMessage) o;
-    return field.equals(that.field) && message.equals(that.message) && code.equals(that.code) && type.equals(that.type);
+  @Override
+  public String getField() {
+    return field;
+  }
+
+  @Override
+  public MessageType getType() {
+    return type;
   }
 
   @Override
   public int hashCode() {
-    int result = type.hashCode();
-    result = 31 * result + field.hashCode();
-    result = 31 * result + message.hashCode();
-    result = 31 * result + code.hashCode();
-    return result;
+    return Objects.hash(type, field, code, message, data);
   }
 
   @Override

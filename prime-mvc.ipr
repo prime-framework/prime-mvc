@@ -192,6 +192,12 @@
       <textMaps />
     </LinkMapSettings>
   </component>
+  <component name="MarkdownSettings">
+    <enabledExtensions>
+      <entry key="MermaidLanguageExtension" value="true" />
+      <entry key="PlantUMLLanguageExtension" value="true" />
+    </enabledExtensions>
+  </component>
   <component name="ModuleEditorState">
     <option name="LAST_EDITED_MODULE_NAME" />
     <option name="LAST_EDITED_TAB_NAME" />

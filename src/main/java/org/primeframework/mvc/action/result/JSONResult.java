@@ -140,9 +140,9 @@ public class JSONResult extends AbstractResult<JSON> {
     for (Message message : messages) {
       if (message instanceof FieldMessage) {
         FieldMessage fieldMessage = (FieldMessage) message;
-        errorMessages.addFieldError(fieldMessage.getField(), fieldMessage.getCode(), fieldMessage.toString());
+        errorMessages.addFieldError(fieldMessage.getField(), fieldMessage.getCode(), fieldMessage.toString(), fieldMessage.getData());
       } else {
-        errorMessages.generalErrors.add(new ErrorMessage(message.getCode(), message.toString()));
+        errorMessages.generalErrors.add(new ErrorMessage(message.getCode(), message.toString(), message.getData()));
       }
     }
 

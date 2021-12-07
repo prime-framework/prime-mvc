@@ -15,30 +15,52 @@
  */
 package org.primeframework.mvc.message;
 
+import java.util.Map;
+import java.util.Objects;
+
 /**
  * A simple message.
  *
  * @author Brian Pontarelli
  */
 public class SimpleMessage implements Message {
-  public final MessageType type;
   public final String code;
+
+  public final Map<String, Object> data;
+
   public final String message;
+
+  public final MessageType type;
 
   // Jackson constructor
   public SimpleMessage() {
-    this(null, null, null);
+    this(null, null, null, null);
+  }
+
+  public SimpleMessage(MessageType type, String code, String message, Map<String, Object> data) {
+    this.type = type;
+    this.code = code;
+    this.message = message;
+    this.data = data;
   }
 
   public SimpleMessage(MessageType type, String code, String message) {
     this.type = type;
     this.code = code;
     this.message = message;
+    this.data = null;
   }
 
   @Override
-  public MessageType getType() {
-    return type;
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    SimpleMessage that = (SimpleMessage) o;
+    return Objects.equals(type, that.type) && Objects.equals(code, that.code) && Objects.equals(message, that.message) && Objects.equals(data, that.data);
   }
 
   @Override
@@ -47,20 +69,18 @@ public class SimpleMessage implements Message {
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+  public Map<String, Object> getData() {
+    return data;
+  }
 
-    final SimpleMessage that = (SimpleMessage) o;
-    return message.equals(that.message) && code.equals(that.code) && type.equals(that.type);
+  @Override
+  public MessageType getType() {
+    return type;
   }
 
   @Override
   public int hashCode() {
-    int result = type.hashCode();
-    result = 31 * result + message.hashCode();
-    result = 31 * result + code.hashCode();
-    return result;
+    return Objects.hash(type, code, message, data);
   }
 
   @Override

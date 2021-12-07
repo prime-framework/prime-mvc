@@ -15,6 +15,8 @@
  */
 package org.primeframework.mvc.message;
 
+import java.util.Map;
+
 /**
  * A simple error message class.
  *
@@ -22,6 +24,8 @@ package org.primeframework.mvc.message;
  */
 public class ErrorMessage {
   public String code;
+
+  public Map<String, Object> data;
 
   public String message;
 
@@ -31,5 +35,11 @@ public class ErrorMessage {
   public ErrorMessage(String code, String message) {
     this.code = code;
     this.message = message;
+  }
+
+  public ErrorMessage(String code, String message, Map<String, Object> data) {
+    this.code = code;
+    this.message = message;
+    this.data = data;
   }
 }

@@ -15,6 +15,8 @@
  */
 package org.primeframework.mvc.message;
 
+import java.util.Map;
+
 /**
  * This is a marker interface for Prime messages.
  *
@@ -25,6 +27,11 @@ public interface Message {
    * @return The code of the message (this is the code that was used to lookup the message in the MessageStore).
    */
   String getCode();
+
+  /**
+   * @return the map of key value pairs serialized with this message. May be null.
+   */
+  Map<String, Object> getData();
 
   /**
    * @return The type of the message.
