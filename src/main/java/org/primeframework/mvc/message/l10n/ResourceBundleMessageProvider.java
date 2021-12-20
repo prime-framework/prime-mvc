@@ -93,7 +93,7 @@ public class ResourceBundleMessageProvider implements MessageProvider {
 
     if (template == null) {
       if (!"[ValidationException]".equals(key)) {
-        logger.debug("Message could not be found for the URI [" + actionInvocation.actionURI + "] and key [" + key + "]");
+        logger.debug("Message could not be found for the URI [{}] and key [{}]", actionInvocation.actionURI, key);
       }
 
       return null;

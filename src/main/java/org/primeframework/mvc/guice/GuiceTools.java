@@ -42,7 +42,7 @@ public class GuiceTools {
    */
   public static <T> List<Key<? extends T>> getKeys(Injector injector, Class<T> type) {
     Map<Key<?>, Binding<?>> bindings = injector.getBindings();
-    List<Key<? extends T>> results = new ArrayList<Key<? extends T>>();
+    List<Key<? extends T>> results = new ArrayList<>();
     for (Key<?> key : bindings.keySet()) {
       Type t = key.getTypeLiteral().getType();
       if (t instanceof ParameterizedType) {
@@ -70,7 +70,7 @@ public class GuiceTools {
    */
   public static <T> List<Class<? extends T>> getTypes(Injector injector, Class<T> type) {
     List<Key<? extends T>> keys = getKeys(injector, type);
-    List<Class<? extends T>> types = new ArrayList<Class<? extends T>>();
+    List<Class<? extends T>> types = new ArrayList<>();
     for (Key<? extends T> key : keys) {
       types.add((Class<? extends T>) key.getTypeLiteral().getType());
     }

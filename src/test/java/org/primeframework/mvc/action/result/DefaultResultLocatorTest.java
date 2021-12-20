@@ -15,7 +15,7 @@
  */
 package org.primeframework.mvc.action.result;
 
-import javax.servlet.ServletContext;
+import org.primeframework.mvc.http.HTTPContext;
 import java.net.URL;
 
 import org.primeframework.mvc.PrimeBaseTest;
@@ -44,7 +44,7 @@ public class DefaultResultLocatorTest extends PrimeBaseTest {
     expect(rs.get()).andReturn("failure");
     replay(rs);
 
-    ServletContext context = createStrictMock(ServletContext.class);
+    HTTPContext context = createStrictMock(HTTPContext.class);
     expect(context.getResource("/WEB-INF/templates/action-js-failure.ftl")).andReturn(null);
     expect(context.getResource("/WEB-INF/templates/action-js.ftl")).andReturn(null);
     expect(context.getResource("/WEB-INF/templates/action-failure.ftl")).andReturn(null);

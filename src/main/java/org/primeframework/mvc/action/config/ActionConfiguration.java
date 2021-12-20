@@ -30,10 +30,10 @@ import org.primeframework.mvc.action.JWTMethodConfiguration;
 import org.primeframework.mvc.action.PreParameterMethodConfiguration;
 import org.primeframework.mvc.action.ValidationMethodConfiguration;
 import org.primeframework.mvc.action.annotation.Action;
+import org.primeframework.mvc.http.HTTPMethod;
 import org.primeframework.mvc.parameter.annotation.PreParameter;
 import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
 import org.primeframework.mvc.scope.ScopeField;
-import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.validation.Validatable;
 
 /**

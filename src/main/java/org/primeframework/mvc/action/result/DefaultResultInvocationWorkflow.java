@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc.action.result;
 
-import javax.servlet.ServletException;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -76,11 +75,10 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
    * <li>Invoke the Result</li> </ul>
    *
    * @param chain The chain.
-   * @throws IOException      If the chain throws an IOException.
-   * @throws ServletException If the chain throws a ServletException or if the result can't be found.
+   * @throws IOException If the chain throws an IOException.
    */
   @SuppressWarnings("unchecked")
-  public void perform(WorkflowChain chain) throws IOException, ServletException {
+  public void perform(WorkflowChain chain) throws IOException {
     try {
       ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
       if (actionInvocation.executeResult) {
@@ -112,7 +110,7 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
         }
 
         if (!handled) {
-          handleContinueOrRedirect(actionInvocation, chain);
+          handleContinueOrRedirect(chain);
         }
       }
     } finally {
@@ -121,19 +119,17 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
   }
 
   @SuppressWarnings("unchecked")
-  private void handleContinueOrRedirect(ActionInvocation actionInvocation, WorkflowChain chain)
-      throws IOException, ServletException {
-    if (actionInvocation.actionURI.endsWith("/")) {
-      chain.continueWorkflow();
-    } else {
-      String uri = resourceLocator.locateIndex(configuration.resourceDirectory() + "/templates");
-      if (uri == null) {
-        chain.continueWorkflow();
-      } else {
-        Annotation annotation = new RedirectImpl(uri, "success", true, false);
-        Result redirectResult = factory.build(annotation.annotationType());
-        redirectResult.execute(annotation);
-      }
+  private void handleContinueOrRedirect(WorkflowChain chain) throws IOException {
+    String uri = resourceLocator.locateIndex(configuration.templateDirectory());
+    if (uri != null) {
+      Annotation annotation = new RedirectImpl(uri, "success", true, false);
+      Result redirectResult = factory.build(annotation.annotationType());
+      redirectResult.execute(annotation);
+      return;
     }
+
+    // The action either didn't have a result and the Forward template was missing, or there was no action and Forward template for the URI.
+    // In either case, this should be a 404 so we will let the Prime MVC workflow at the top level handle that
+    chain.continueWorkflow();
   }
 }

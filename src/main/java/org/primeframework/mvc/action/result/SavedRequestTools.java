@@ -15,12 +15,12 @@
  */
 package org.primeframework.mvc.action.result;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.primeframework.mvc.action.result.annotation.ReexecuteSavedRequest;
 import org.primeframework.mvc.config.MVCConfiguration;
+import org.primeframework.mvc.http.Cookie;
+import org.primeframework.mvc.http.HTTPMethod;
+import org.primeframework.mvc.http.HTTPRequest;
+import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.security.DefaultSavedRequestWorkflow;
 import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.security.SavedRequestException;
@@ -48,17 +48,23 @@ public class SavedRequestTools {
    * @return null if no save request was found.
    */
   public static SaveHttpRequestResult getSaveRequestForReExecution(MVCConfiguration configuration, Encryptor encryptor,
-                                                                   HttpServletRequest request,
-                                                                   HttpServletResponse response) {
+                                                                   HTTPRequest request, HTTPResponse response) {
     SaveHttpRequestResult result = getSaveHttpRequestResult(configuration, encryptor, request, response);
-    if (result == null) {
+    if (result == null || result.savedHttpRequest == null) {
       return null;
     }
 
-    // Mark the cookie as ready
-    result.cookie.setMaxAge(-1);
-    result.cookie.setPath("/");
-    result.cookie.setValue("ready_" + result.cookie.getValue());
+    if (result.savedHttpRequest.method == HTTPMethod.GET) {
+      // Delete the cookie because we will just be redirecting the browser to the original GET
+      result.cookie.maxAge = 0L;
+      result.cookie.path = "/";
+    } else {
+      // Mark the cookie as ready and session based
+      result.cookie.maxAge = null;
+      result.cookie.path = "/";
+      result.cookie.value = "ready_" + result.cookie.value;
+    }
+
     response.addCookie(result.cookie);
 
     return result;
@@ -75,21 +81,20 @@ public class SavedRequestTools {
    * @return null if no save request was found.
    */
   public static SaveHttpRequestResult getSaveRequestForWorkflow(MVCConfiguration configuration, Encryptor encryptor,
-                                                                HttpServletRequest request,
-                                                                HttpServletResponse response) {
+                                                                HTTPRequest request, HTTPResponse response) {
     SaveHttpRequestResult result = getSaveHttpRequestResult(configuration, encryptor, request, response);
     if (result == null) {
       return null;
     }
 
-    if (result.ready) {
-      result.cookie.setPath("/");
-      result.cookie.setMaxAge(0);
-      response.addCookie(result.cookie);
-      return result;
+    if (!result.ready) {
+      return null;
     }
 
-    return null;
+    result.cookie.path = "/";
+    result.cookie.maxAge = 0L;
+    response.addCookie(result.cookie);
+    return result;
   }
 
   /**
@@ -105,41 +110,28 @@ public class SavedRequestTools {
     try {
       String encrypted = encryptor.encrypt(savedRequest);
       Cookie cookie = new Cookie(configuration.savedRequestCookieName(), encrypted);
-      cookie.setPath("/"); // Turn the cookie on for everything since we have no clue what URI will Re-execute the Saved Request
-      cookie.setMaxAge(-1); // Be explicit
-      cookie.setVersion(1); // Be explicit
-      cookie.setHttpOnly(true);
-      // Set to secure when schema is 'https'
-      cookie.setSecure(savedRequest.uri.startsWith("/") || savedRequest.uri.startsWith("https"));
+      cookie.path = "/"; // Turn the cookie on for everything since we have no clue what URI will Re-execute the Saved Request
+      cookie.httpOnly = true; // No JavaScript hacking
+      cookie.secure = savedRequest.uri.startsWith("/") || savedRequest.uri.startsWith("https"); // Set to secure when schema is 'https'
       return cookie;
     } catch (Exception e) {
       throw new SavedRequestException(e);
     }
   }
 
-  private static Cookie getCookie(MVCConfiguration configuration, HttpServletRequest request) {
-    Cookie[] cookies = request.getCookies();
-    if (cookies != null) {
-      for (final Cookie cookie : cookies) {
-        if (cookie.getName().equals(configuration.savedRequestCookieName())) {
-          return cookie;
-        }
-      }
-    }
-
-    return null;
+  private static Cookie getCookie(MVCConfiguration configuration, HTTPRequest request) {
+    return request.getCookie(configuration.savedRequestCookieName());
   }
 
   private static SaveHttpRequestResult getSaveHttpRequestResult(MVCConfiguration configuration, Encryptor encryptor,
-                                                                HttpServletRequest request,
-                                                                HttpServletResponse response) {
+                                                                HTTPRequest request, HTTPResponse response) {
     Cookie cookie = getCookie(configuration, request);
     if (cookie == null) {
       return null;
     }
 
     try {
-      String value = cookie.getValue();
+      String value = cookie.value;
       boolean ready = value.startsWith("ready_");
       if (ready) {
         value = value.substring("ready_".length());
@@ -147,11 +139,11 @@ public class SavedRequestTools {
 
       return new SaveHttpRequestResult(cookie, ready, encryptor.decrypt(SavedHttpRequest.class, value));
     } catch (Exception e) {
-      logger.warn("Bad SavedRequest cookie [{}]. Error is [{}]", cookie.getValue(), e.getMessage());
+      logger.warn("Bad SavedRequest cookie [{}]. Error is [{}]", cookie.value, e.getMessage());
 
       // Delete the corrupted cookie.
-      cookie.setMaxAge(0);
-      cookie.setPath("/");
+      cookie.maxAge = 0L;
+      cookie.path = "/";
       response.addCookie(cookie);
     }
 

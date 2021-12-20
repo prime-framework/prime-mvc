@@ -50,7 +50,7 @@ public class GlobalConverterBinder {
     return new GlobalConverterTypeBinder(binder, converterType);
   }
 
-  public class GlobalConverterTypeBinder {
+  public static class GlobalConverterTypeBinder {
     private final Binder binder;
     private final Class<? extends GlobalConverter> converterType;
 
@@ -60,7 +60,7 @@ public class GlobalConverterBinder {
     }
 
     public void forTypes(Class<?> firstType, Class<?>... additionalTypes) {
-      MapBinder<Class<?>, GlobalConverter> mapBinder = MapBinder.newMapBinder(binder, new TypeLiteral<Class<?>>() {}, TypeLiteral.get(GlobalConverter.class));
+      MapBinder<Class<?>, GlobalConverter> mapBinder = MapBinder.newMapBinder(binder, new TypeLiteral<>() {}, TypeLiteral.get(GlobalConverter.class));
       mapBinder.addBinding(firstType).to(converterType);
       for (Class<?> type : additionalTypes) {
         mapBinder.addBinding(type).to(converterType);

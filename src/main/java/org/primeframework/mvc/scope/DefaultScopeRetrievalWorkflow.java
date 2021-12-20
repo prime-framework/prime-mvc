@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2021, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,12 @@
  */
 package org.primeframework.mvc.scope;
 
-import javax.servlet.ServletException;
 import java.io.IOException;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.workflow.WorkflowChain;
-
-import com.google.inject.Inject;
 
 /**
  * This class is the retrieval workflow that loads the scope values and puts them in the action at the start of the
@@ -33,14 +31,11 @@ import com.google.inject.Inject;
 public class DefaultScopeRetrievalWorkflow implements ScopeRetrievalWorkflow {
   private final ActionInvocationStore actionInvocationStore;
 
-  private final FlashScope flashScope;
-
   private final ScopeRetriever scopeRetriever;
 
   @Inject
-  public DefaultScopeRetrievalWorkflow(ActionInvocationStore actionInvocationStore, FlashScope flashScope, ScopeRetriever scopeRetriever) {
+  public DefaultScopeRetrievalWorkflow(ActionInvocationStore actionInvocationStore, ScopeRetriever scopeRetriever) {
     this.actionInvocationStore = actionInvocationStore;
-    this.flashScope = flashScope;
     this.scopeRetriever = scopeRetriever;
   }
 
@@ -49,12 +44,9 @@ public class DefaultScopeRetrievalWorkflow implements ScopeRetrievalWorkflow {
    *
    * @param chain The workflow chain.
    */
-  public void perform(WorkflowChain chain) throws IOException, ServletException {
-    flashScope.transferFlash();
-
+  public void perform(WorkflowChain chain) throws IOException {
     // Handle loading scoped members into the action
     loadScopedMembers(actionInvocationStore.getCurrent());
-
     chain.continueWorkflow();
   }
 
@@ -63,7 +55,6 @@ public class DefaultScopeRetrievalWorkflow implements ScopeRetrievalWorkflow {
    *
    * @param actionInvocation The action invocation
    */
-  @SuppressWarnings("unchecked")
   protected void loadScopedMembers(ActionInvocation actionInvocation) {
     scopeRetriever.setScopedValues(actionInvocation);
   }

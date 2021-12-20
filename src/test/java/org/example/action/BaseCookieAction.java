@@ -17,13 +17,13 @@ package org.example.action;
 
 import java.util.List;
 
-import org.primeframework.mvc.scope.annotation.ActionCookie;
+import org.primeframework.mvc.scope.annotation.BrowserActionSession;
 
 public abstract class BaseCookieAction<U> {
-  @ActionCookie
+  @BrowserActionSession
   public List<Foo> list;
 
-  @ActionCookie
+  @BrowserActionSession
   public U u;
 
   public static class Foo {

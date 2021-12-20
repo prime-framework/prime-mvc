@@ -17,7 +17,6 @@ package org.primeframework.mvc;
 
 import java.util.Locale;
 
-import org.primeframework.mock.servlet.MockHttpServletRequest;
 import org.testng.annotations.Test;
 
 /**
@@ -28,8 +27,7 @@ public class LocaleActionTest extends PrimeBaseTest {
   @Test
   public void getFromBrowser() {
     simulator.test("/locale")
-             .setup(MockHttpServletRequest::clearLocales)
-             .setup(request -> request.addLocale(Locale.CHINESE))
+             .withHeader("Accept-Language", Locale.CHINESE.toString())
              .get()
              .assertBodyContains("zh");
   }
@@ -38,8 +36,7 @@ public class LocaleActionTest extends PrimeBaseTest {
   public void getFromCookie() {
     // The cookie overrides the header
     simulator.test("/locale")
-             .setup(MockHttpServletRequest::clearLocales)
-             .setup(request -> request.addLocale(Locale.CHINESE))
+             .withHeader("Accept-Language", Locale.CHINESE.toString())
              .withCookie("prime-locale", "fr")
              .get()
              .assertBodyContains("fr");

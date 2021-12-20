@@ -15,18 +15,19 @@
  */
 package org.primeframework.mvc.action.result;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.annotation.Status;
 import org.primeframework.mvc.action.result.annotation.Status.Header;
+import org.primeframework.mvc.http.DefaultHTTPResponse;
+import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.scope.MessageScope;
@@ -35,30 +36,22 @@ import org.testng.annotations.Test;
 import static org.easymock.EasyMock.createStrictMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.testng.Assert.assertEquals;
 
 /**
  * This class tests the status result.
  *
  * @author Brian Pontarelli
  */
-public class StatusResultTest {
+public class StatusResultTest extends PrimeBaseTest {
   @Test
-  public void expansion() throws IOException, ServletException {
+  public void expansion() throws IOException {
     Object action = new Object();
     ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
     expect(ee.expand("someFieldName", action, false)).andReturn("200");
     replay(ee);
 
-    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    expect(request.getContextPath()).andReturn("");
-    replay(request);
-
-    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    response.setStatus(200);
-    response.setHeader("Cache-Control", "no-cache");
-    replay(response);
-
+    HTTPResponse response = new DefaultHTTPResponse(new ByteArrayOutputStream());
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(action, null, "/foo", "", null));
     replay(store);
@@ -74,25 +67,16 @@ public class StatusResultTest {
     StatusResult result = new StatusResult(ee, response, store);
     result.execute(status);
 
-    verify(response);
+    assertEquals(response.getStatus(), 200);
+    assertEquals(response.getHeader("Cache-Control"), "no-cache");
   }
 
   @Test
-  public void headers() throws IOException, ServletException {
+  public void headers() throws IOException {
     ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
     replay(ee);
 
-    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    expect(request.getContextPath()).andReturn("");
-    replay(request);
-
-    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    response.setStatus(200);
-    response.setHeader("foo", "bar");
-    response.setHeader("baz", "fred");
-    response.setHeader("Cache-Control", "no-cache");
-    replay(response);
-
+    HTTPResponse response = new DefaultHTTPResponse(new ByteArrayOutputStream());
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/foo", "", null));
     replay(store);
@@ -108,23 +92,18 @@ public class StatusResultTest {
     StatusResult result = new StatusResult(ee, response, store);
     result.execute(status);
 
-    verify(response);
+    assertEquals(response.getStatus(), 200);
+    assertEquals(response.getHeader("foo"), "bar");
+    assertEquals(response.getHeader("baz"), "fred");
+    assertEquals(response.getHeader("Cache-Control"), "no-cache");
   }
 
   @Test
-  public void noHeaders() throws IOException, ServletException {
+  public void noHeaders() throws IOException {
     ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
     replay(ee);
 
-    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    expect(request.getContextPath()).andReturn("");
-    replay(request);
-
-    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    response.setStatus(200);
-    response.setHeader("Cache-Control", "no-cache");
-    replay(response);
-
+    HTTPResponse response = new DefaultHTTPResponse(new ByteArrayOutputStream());
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/foo", "", null));
     replay(store);
@@ -140,7 +119,8 @@ public class StatusResultTest {
     StatusResult result = new StatusResult(ee, response, store);
     result.execute(status);
 
-    verify(response);
+    assertEquals(response.getStatus(), 200);
+    assertEquals(response.getHeader("Cache-Control"), "no-cache");
   }
 
   public class HeaderImpl implements Header {

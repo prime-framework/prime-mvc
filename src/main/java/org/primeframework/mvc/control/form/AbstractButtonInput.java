@@ -15,7 +15,7 @@
  */
 package org.primeframework.mvc.control.form;
 
-import javax.servlet.http.HttpServletRequest;
+import org.primeframework.mvc.http.HTTPRequest;
 import java.util.Map;
 
 import com.google.inject.Inject;
@@ -27,10 +27,10 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 public abstract class AbstractButtonInput extends AbstractInput {
-  protected final HttpServletRequest request;
+  protected final HTTPRequest request;
 
   @Inject
-  public AbstractButtonInput(HttpServletRequest request) {
+  public AbstractButtonInput(HTTPRequest request) {
     super(true);
     this.request = request;
   }

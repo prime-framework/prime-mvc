@@ -15,15 +15,15 @@
  */
 package org.primeframework.mvc.locale;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Locale;
 
 import com.google.inject.Inject;
-import org.apache.commons.lang3.LocaleUtils;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.guice.Nullable;
+import org.primeframework.mvc.http.Cookie;
+import org.primeframework.mvc.http.HTTPRequest;
+import org.primeframework.mvc.http.HTTPResponse;
+import org.primeframework.mvc.util.LocaleTools;
 
 /**
  * This is the default LocaleProvider implementation.
@@ -33,9 +33,9 @@ import org.primeframework.mvc.guice.Nullable;
 public class DefaultLocaleProvider implements LocaleProvider {
   private final MVCConfiguration configuration;
 
-  private final HttpServletRequest request;
+  private final HTTPRequest request;
 
-  private final HttpServletResponse response;
+  private final HTTPResponse response;
 
   /**
    * Optionally inject the request.
@@ -43,7 +43,7 @@ public class DefaultLocaleProvider implements LocaleProvider {
    * @param request The request.
    */
   @Inject
-  public DefaultLocaleProvider(@Nullable HttpServletRequest request, @Nullable HttpServletResponse response,
+  public DefaultLocaleProvider(@Nullable HTTPRequest request, @Nullable HTTPResponse response,
                                MVCConfiguration configuration) {
     this.request = request;
     this.response = response;
@@ -67,25 +67,14 @@ public class DefaultLocaleProvider implements LocaleProvider {
       return Locale.getDefault();
     }
 
-    String key = configuration.localeCookieName();
-
     // Try a persistent cookie first
-    Cookie[] cookies = request.getCookies();
-    if (cookies != null) {
-      String value = null;
-      for (Cookie cookie : cookies) {
-        if (cookie.getName().equals(key)) {
-          value = cookie.getValue();
-          break;
-        }
-      }
-
-      if (value != null) {
-        try {
-          return LocaleUtils.toLocale(value);
-        } catch (Exception e) {
-          // Ignore and keep going
-        }
+    String key = configuration.localeCookieName();
+    Cookie cookie = request.getCookie(key);
+    if (cookie != null && cookie.value != null) {
+      try {
+        return LocaleTools.toLocale(cookie.value);
+      } catch (Exception e) {
+        // Ignore and keep going
       }
     }
 
@@ -105,8 +94,8 @@ public class DefaultLocaleProvider implements LocaleProvider {
 
     String key = configuration.localeCookieName();
     Cookie cookie = new Cookie(key, locale != null ? locale.toString() : null);
-    cookie.setMaxAge(locale != null ? Integer.MAX_VALUE : 0);
-    cookie.setPath("/");
+    cookie.maxAge = locale != null ? Long.MAX_VALUE : 0L;
+    cookie.path = "/";
     response.addCookie(cookie);
   }
 }

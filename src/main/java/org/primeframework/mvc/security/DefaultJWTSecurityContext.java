@@ -33,10 +33,10 @@ import io.fusionauth.jwt.domain.JWT;
 public class DefaultJWTSecurityContext implements JWTSecurityContext {
   protected final JWTRequestAdapter requestAdapter;
 
-  protected final Provider<Map<String, Verifier>> verifierProvider;
+  protected final VerifierProvider verifierProvider;
 
   @Inject
-  public DefaultJWTSecurityContext(JWTRequestAdapter requestAdapter, Provider<Map<String, Verifier>> verifierProvider) {
+  public DefaultJWTSecurityContext(JWTRequestAdapter requestAdapter, VerifierProvider verifierProvider) {
     this.requestAdapter = requestAdapter;
     this.verifierProvider = verifierProvider;
   }

@@ -43,7 +43,7 @@ public final class BodyTools {
    * Process the FreeMarker template (JSON) and return the rendered string. <p>Example usage when a single replacement
    * value exists in the json named ${id} :</p>
    * <pre>
-   *   BodyTools.processTemplate(Paths.get("/foo.json"), "id", "ffffffff-1e16-4b1d-88f3-ec68ad1200e2");
+   *   BodyTools.processTemplate(Path.of("/foo.json"), "id", "ffffffff-1e16-4b1d-88f3-ec68ad1200e2");
    * </pre>
    *
    * @param path   Path to the FreeMarker template.
@@ -59,7 +59,7 @@ public final class BodyTools {
    * Process the FreeMarker template (JSON) and return the rendered string. <p>Example usage when a single replacement
    * value exists in the json named ${id} :</p>
    * <pre>
-   *   BodyTools.processTemplate(Paths.get("/foo.json"), "id", "ffffffff-1e16-4b1d-88f3-ec68ad1200e2");
+   *   BodyTools.processTemplate(Path.of("/foo.json"), "id", "ffffffff-1e16-4b1d-88f3-ec68ad1200e2");
    * </pre>
    *
    * @param path   Path to the FreeMarker template.
@@ -75,7 +75,7 @@ public final class BodyTools {
    * Process the FreeMarker template (JSON) and return the rendered string. <p>Example usage when a single replacement
    * value exists in the json named ${id} :</p>
    * <pre>
-   *   BodyTools.processTemplateWithMap(Paths.get("/foo.json"), MapBuilder.&lt;String, Object&gt;map()
+   *   BodyTools.processTemplateWithMap(Path.of("/foo.json"), MapBuilder.&lt;String, Object&gt;map()
    *     .put("id", "ffffffff-1e16-4b1d-88f3-ec68ad1200e2")
    *     .done());
    * </pre>

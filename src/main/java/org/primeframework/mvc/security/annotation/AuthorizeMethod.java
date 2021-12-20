@@ -19,21 +19,20 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import org.primeframework.mvc.action.annotation.Action;
+import org.primeframework.mvc.http.HTTPStrings.Methods;
 import org.primeframework.mvc.security.AuthorizeSchemeData;
-import org.primeframework.mvc.servlet.HTTPMethod;
-
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * HTTP Methods <code>POST</code>, <code>PUT</code>, <code>DELETE</code> and <code>GET</code> all need
- * to be authorized. This means the action needs to ensure coverage for all HTTP Methods. A single method may cover all four methods, or
+ * HTTP Methods <code>POST</code>, <code>PUT</code>, <code>DELETE</code> and <code>GET</code> all need to be authorized.
+ * This means the action needs to ensure coverage for all HTTP Methods. A single method may cover all four methods, or
  * they can be divided to simplify logic.
  * <p>
  * Required when {@link Action#scheme()} contains <code>authorize-method</code>scheme.
  * <p>
- * The method annotated with this annotation may have zero or one parameter, if a parameter is used it must be of type {@link
- * AuthorizeSchemeData}. This is enforced during prime-mvc startup.
+ * The method annotated with this annotation may have zero or one parameter, if a parameter is used it must be of type
+ * {@link AuthorizeSchemeData}. This is enforced during prime-mvc startup.
  *
  * @author Daniel DeGroff
  */
@@ -44,5 +43,5 @@ public @interface AuthorizeMethod {
   /**
    * @return The HTTP methods to execute the authorization method for. Defaults to POST, PUT, DELETE and GET.
    */
-  HTTPMethod[] httpMethods() default {HTTPMethod.POST, HTTPMethod.PUT, HTTPMethod.DELETE, HTTPMethod.GET};
+  String[] httpMethods() default {Methods.POST, Methods.PUT, Methods.DELETE, Methods.GET};
 }

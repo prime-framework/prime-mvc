@@ -15,24 +15,21 @@
  */
 package org.primeframework.mvc.security;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequestWrapper;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.result.SavedRequestTools;
+import org.primeframework.mvc.http.Cookie;
+import org.primeframework.mvc.http.HTTPMethod;
 import org.primeframework.mvc.security.saved.SavedHttpRequest;
-import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
 import static org.easymock.EasyMock.createStrictMock;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotSame;
-import static org.testng.Assert.assertSame;
-import static org.testng.Assert.assertTrue;
 
 /**
  * @author Brian Pontarelli
@@ -40,9 +37,7 @@ import static org.testng.Assert.assertTrue;
 public class DefaultSavedRequestWorkflowTest extends PrimeBaseTest {
   @Test
   public void performNoSavedRequest() throws Exception {
-    HttpServletRequestWrapper wrapper = new HttpServletRequestWrapper(request);
-
-    DefaultSavedRequestWorkflow workflow = new DefaultSavedRequestWorkflow(configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper), wrapper, response);
+    DefaultSavedRequestWorkflow workflow = new DefaultSavedRequestWorkflow(configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper), request, response);
 
     WorkflowChain workflowChain = createStrictMock(WorkflowChain.class);
     workflowChain.continueWorkflow();
@@ -51,46 +46,20 @@ public class DefaultSavedRequestWorkflowTest extends PrimeBaseTest {
     workflow.perform(workflowChain);
 
     verify(workflowChain);
-
-    assertSame(wrapper.getRequest(), request);
-  }
-
-  @Test
-  public void performSavedRequestGET() throws Exception {
-    Cookie cookie = SavedRequestTools.toCookie(new SavedHttpRequest(HTTPMethod.GET, "/secure?test=value&test2=value2", null), configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper));
-    cookie.setValue("ready_" + cookie.getValue());
-    container.getUserAgent().addCookie(request, cookie);
-    request.setUri("/secure");
-
-    HttpServletRequestWrapper wrapper = new HttpServletRequestWrapper(request);
-    DefaultSavedRequestWorkflow workflow = new DefaultSavedRequestWorkflow(configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper), wrapper, response);
-
-    WorkflowChain workflowChain = createStrictMock(WorkflowChain.class);
-    workflowChain.continueWorkflow();
-    replay(workflowChain);
-
-    workflow.perform(workflowChain);
-
-    verify(workflowChain);
-
-    assertNotSame(wrapper.getRequest(), request);
-    assertEquals(wrapper.getRequestURI(), "/secure");
-    assertTrue(wrapper.getParameterMap().isEmpty());
   }
 
   @Test
   public void performSavedRequestPOST() throws Exception {
-    Map<String, String[]> parameters = new HashMap<>();
-    parameters.put("test", new String[]{"value"});
-    parameters.put("test2", new String[]{"value2"});
+    Map<String, List<String>> parameters = new HashMap<>();
+    parameters.put("test", List.of("value"));
+    parameters.put("test2", List.of("value2"));
 
     Cookie cookie = SavedRequestTools.toCookie(new SavedHttpRequest(HTTPMethod.POST, "/secure", parameters), configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper));
     cookie.setValue("ready_" + cookie.getValue());
-    container.getUserAgent().addCookie(request, cookie);
-    request.setUri("/secure");
+    request.addCookies(cookie);
+    request.setPath("/secure");
 
-    HttpServletRequestWrapper wrapper = new HttpServletRequestWrapper(request);
-    DefaultSavedRequestWorkflow workflow = new DefaultSavedRequestWorkflow(configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper), wrapper, response);
+    DefaultSavedRequestWorkflow workflow = new DefaultSavedRequestWorkflow(configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper), request, response);
 
     WorkflowChain workflowChain = createStrictMock(WorkflowChain.class);
     workflowChain.continueWorkflow();
@@ -100,9 +69,8 @@ public class DefaultSavedRequestWorkflowTest extends PrimeBaseTest {
 
     verify(workflowChain);
 
-    assertNotSame(wrapper.getRequest(), request);
-    assertEquals(wrapper.getRequestURI(), "/secure");
-    assertEquals(wrapper.getParameterMap().get("test"), new String[]{"value"});
-    assertEquals(wrapper.getParameterMap().get("test2"), new String[]{"value2"});
+    assertEquals(request.getPath(), "/secure");
+    assertEquals(request.getParameters().get("test"), List.of("value"));
+    assertEquals(request.getParameters().get("test2"), List.of("value2"));
   }
 }

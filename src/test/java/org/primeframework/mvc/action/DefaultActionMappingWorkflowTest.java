@@ -27,7 +27,7 @@ import org.example.action.user.EditAction;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.config.ActionConfigurationProvider;
-import org.primeframework.mvc.servlet.HTTPMethod;
+import org.primeframework.mvc.http.HTTPMethod;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
 import static org.easymock.EasyMock.capture;
@@ -43,8 +43,8 @@ import static org.testng.Assert.assertTrue;
 public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
   @Test
   public void differentButtonClick() throws Exception {
-    request.setUri("/admin/user/edit");
-    request.setPost(true);
+    request.setPath("/admin/user/edit");
+    request.setMethod(HTTPMethod.POST);
     request.setParameter("__a_submit", "");
     request.setParameter("__a_cancel", "/admin/user/cancel");
     request.setParameter("cancel", "Cancel");
@@ -54,8 +54,8 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
 
   @Test
   public void differentButtonClickRelativeURI() throws Exception {
-    request.setUri("/admin/user/edit");
-    request.setPost(true);
+    request.setPath("/admin/user/edit");
+    request.setMethod(HTTPMethod.POST);
     request.setParameter("__a_submit", "");
     request.setParameter("__a_cancel", "cancel");
     request.setParameter("cancel", "Cancel");
@@ -65,8 +65,8 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
 
   @Test
   public void extension() throws Exception {
-    request.setUri("/admin/user/edit.xml");
-    request.setPost(true);
+    request.setPath("/admin/user/edit.xml");
+    request.setMethod(HTTPMethod.POST);
     request.setParameter("__a_submit", "");
     request.setParameter("__a_cancel", "cancel");
     request.setParameter("submit", "Submit");
@@ -76,8 +76,8 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
 
   @Test
   public void requestURI() throws Exception {
-    request.setUri("/admin/user/edit");
-    request.setPost(true);
+    request.setPath("/admin/user/edit");
+    request.setMethod(HTTPMethod.POST);
     request.setParameter("__a_submit", "");
     request.setParameter("__a_cancel", "cancel");
     request.setParameter("submit", "Submit");
@@ -87,9 +87,9 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
 
   @Test
   public void requestURIContext() throws Exception {
-    request.setUri("/context-path/admin/user/edit");
+    request.setPath("/context-path/admin/user/edit");
     request.setContextPath("/context-path");
-    request.setPost(true);
+    request.setMethod(HTTPMethod.POST);
     request.setParameter("__a_submit", "");
     request.setParameter("__a_cancel", "cancel");
     request.setParameter("submit", "Submit");

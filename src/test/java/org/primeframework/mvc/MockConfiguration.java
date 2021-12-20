@@ -16,6 +16,7 @@
 package org.primeframework.mvc;
 
 import javax.crypto.spec.SecretKeySpec;
+import java.nio.file.Path;
 import java.security.Key;
 import java.security.SecureRandom;
 
@@ -63,6 +64,11 @@ public class MockConfiguration extends AbstractMVCConfiguration {
   @Override
   public boolean autoHTMLEscapingEnabled() {
     return autoHTMLEscapingEnabled;
+  }
+
+  @Override
+  public Path baseDirectory() {
+    return Path.of("src/test/web");
   }
 
   @Override

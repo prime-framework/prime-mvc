@@ -15,11 +15,12 @@
  */
 package org.primeframework.mvc.message;
 
-import javax.servlet.ServletException;
 import java.io.IOException;
+import java.util.List;
 
 import com.google.inject.Inject;
 import org.primeframework.mvc.message.scope.FlashScope;
+import org.primeframework.mvc.message.scope.MessageScope;
 import org.primeframework.mvc.workflow.WorkflowChain;
 
 /**
@@ -31,16 +32,21 @@ import org.primeframework.mvc.workflow.WorkflowChain;
 public class DefaultMessageWorkflow implements MessageWorkflow {
   private final FlashScope flashScope;
 
+  private final MessageStore messageStore;
+
   @Inject
-  public DefaultMessageWorkflow(FlashScope flashScope) {
+  public DefaultMessageWorkflow(FlashScope flashScope, MessageStore messageStore) {
     this.flashScope = flashScope;
+    this.messageStore = messageStore;
   }
 
   /**
    * {@inheritDoc}
    */
-  public void perform(WorkflowChain chain) throws IOException, ServletException {
-    flashScope.transferFlash();
+  public void perform(WorkflowChain chain) throws IOException {
+    List<Message> messages = flashScope.get();
+    flashScope.clear();
+    messageStore.addAll(MessageScope.REQUEST, messages);
     chain.continueWorkflow();
   }
 }

@@ -15,11 +15,10 @@
  */
 package org.primeframework.mvc.container;
 
-import javax.servlet.ServletContext;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 import com.google.inject.Inject;
+import org.primeframework.mvc.http.HTTPContext;
 
 /**
  * This class implements the path resolver using the ServletContext and calling the getRealPath method on that.
@@ -27,15 +26,15 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 public class ServletContainerResolver implements ContainerResolver {
-  private ServletContext servletContext;
+  private final HTTPContext context;
 
   @Inject
-  public ServletContainerResolver(ServletContext servletContext) {
-    this.servletContext = servletContext;
+  public ServletContainerResolver(HTTPContext context) {
+    this.context = context;
   }
 
   public String getRealPath(String path) {
-    return servletContext.getRealPath(path);
+    return context.resolve(path).toString();
   }
 
   public URL getResource(String path) {
@@ -43,10 +42,6 @@ public class ServletContainerResolver implements ContainerResolver {
       path = "/" + path;
     }
 
-    try {
-      return servletContext.getResource(path);
-    } catch (MalformedURLException e) {
-      return null;
-    }
+    return context.getResource(path);
   }
 }

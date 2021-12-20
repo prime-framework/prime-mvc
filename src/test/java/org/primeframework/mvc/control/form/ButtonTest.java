@@ -15,12 +15,11 @@
  */
 package org.primeframework.mvc.control.form;
 
+import com.google.inject.Inject;
 import org.example.action.user.EditAction;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.control.ControlBaseTest;
 import org.testng.annotations.Test;
-
-import com.google.inject.Inject;
 
 /**
  * This tests the button control.
@@ -31,91 +30,91 @@ public class ButtonTest extends ControlBaseTest {
   @Inject Button button;
 
   @Test
-  public void actionLess() {
-    ais.setCurrent(new ActionInvocation(null, null, "/button", null, null));
-    new ControlTester(button).
-      attr("name", "button").
-      attr("value", "test-value").
-      go("<input type=\"hidden\" name=\"button@param\" value=\"param-value\"/>\n" +
-        "<div class=\"button-button button control\">\n" +
-        "<div class=\"label-container\"> </div>\n" +
-        "<div class=\"control-container\"><input type=\"button\" id=\"button\" name=\"button\" value=\"Button\"/></div>\n" +
-        "</div>\n");
-  }
-
-  @Test
-  public void css() {
-    ais.setCurrent(new ActionInvocation(new EditAction(), null, "/button", null, null));
-    new ControlTester(button).
-      attr("name", "button").
-      attr("value", "test-value").
-      attr("class", "css-class").
-      go("<input type=\"hidden\" name=\"button@param\" value=\"param-value\"/>\n" +
-        "<div class=\"css-class-button-button css-class-button css-class-control button-button button control\">\n" +
-        "<div class=\"label-container\"> </div>\n" +
-        "<div class=\"control-container\"><input type=\"button\" class=\"css-class\" id=\"button\" name=\"button\" value=\"Button\"/></div>\n" +
-        "</div>\n");
-  }
-
-  @Test
   public void action() {
     ais.setCurrent(new ActionInvocation(new EditAction(), null, "/button", null, null));
-    new ControlTester(button).
-      attr("name", "button").
-      attr("action", "/foo").
-      attr("value", "test-value").
-      go("<input type=\"hidden\" name=\"button@param\" value=\"param-value\"/>\n" +
-        "<input type=\"hidden\" name=\"__a_button\" value=\"/foo\"/>\n" +
-        "<div class=\"button-button button control\">\n" +
-        "<div class=\"label-container\"> </div>\n" +
-        "<div class=\"control-container\"><input type=\"button\" id=\"button\" name=\"button\" value=\"Button\"/></div>\n" +
-        "</div>\n");
-  }
-
-  @Test
-  public void html() {
-    ais.setCurrent(new ActionInvocation(new EditAction(), null, "/button", null, null));
-    new ControlTester(button).
-      attr("name", "html").
-      attr("action", "/foo").
-      attr("value", "test-value").
-      go("<input type=\"hidden\" name=\"html@param\" value=\"param-value\"/>\n" +
-        "<input type=\"hidden\" name=\"__a_html\" value=\"/foo\"/>\n" +
-        "<div class=\"button-button button control\">\n" +
-        "<div class=\"label-container\"> </div>\n" +
-        "<div class=\"control-container\"><input type=\"button\" id=\"html\" name=\"html\" value=\"&lt;Button&gt;\"/></div>\n" +
-        "</div>\n");
+    new ControlTester(button)
+        .attr("name", "button")
+        .attr("action", "/foo")
+        .attr("value", "test-value")
+        .go("<input type=\"hidden\" name=\"button@param\" value=\"param-value\"/>\n" +
+            "<input type=\"hidden\" name=\"__a_button\" value=\"/foo\"/>\n" +
+            "<div class=\"button-button button control\">\n" +
+            "<div class=\"label-container\"> </div>\n" +
+            "<div class=\"control-container\"><input type=\"button\" id=\"button\" name=\"button\" value=\"Button\"/></div>\n" +
+            "</div>\n");
   }
 
   @Test
   public void actionContext() {
     request.setContextPath("/context");
     ais.setCurrent(new ActionInvocation(new EditAction(), null, "/button", null, null));
-    new ControlTester(button).
-      attr("name", "button").
-      attr("action", "/foo").
-      attr("value", "test-value").
-      go("<input type=\"hidden\" name=\"button@param\" value=\"param-value\"/>\n" +
-        "<input type=\"hidden\" name=\"__a_button\" value=\"/context/foo\"/>\n" +
-        "<div class=\"button-button button control\">\n" +
-        "<div class=\"label-container\"> </div>\n" +
-        "<div class=\"control-container\"><input type=\"button\" id=\"button\" name=\"button\" value=\"Button\"/></div>\n" +
-        "</div>\n");
+    new ControlTester(button)
+        .attr("name", "button")
+        .attr("action", "/foo")
+        .attr("value", "test-value")
+        .go("<input type=\"hidden\" name=\"button@param\" value=\"param-value\"/>\n" +
+            "<input type=\"hidden\" name=\"__a_button\" value=\"/context/foo\"/>\n" +
+            "<div class=\"button-button button control\">\n" +
+            "<div class=\"label-container\"> </div>\n" +
+            "<div class=\"control-container\"><input type=\"button\" id=\"button\" name=\"button\" value=\"Button\"/></div>\n" +
+            "</div>\n");
   }
 
   @Test
   public void actionContextRelative() {
     request.setContextPath("/context");
     ais.setCurrent(new ActionInvocation(new EditAction(), null, "/button", null, null));
-    new ControlTester(button).
-      attr("name", "button").
-      attr("action", "foo").
-      attr("value", "test-value").
-      go("<input type=\"hidden\" name=\"button@param\" value=\"param-value\"/>\n" +
-        "<input type=\"hidden\" name=\"__a_button\" value=\"foo\"/>\n" +
-        "<div class=\"button-button button control\">\n" +
-        "<div class=\"label-container\"> </div>\n" +
-        "<div class=\"control-container\"><input type=\"button\" id=\"button\" name=\"button\" value=\"Button\"/></div>\n" +
-        "</div>\n");
+    new ControlTester(button)
+        .attr("name", "button")
+        .attr("action", "foo")
+        .attr("value", "test-value")
+        .go("<input type=\"hidden\" name=\"button@param\" value=\"param-value\"/>\n" +
+            "<input type=\"hidden\" name=\"__a_button\" value=\"foo\"/>\n" +
+            "<div class=\"button-button button control\">\n" +
+            "<div class=\"label-container\"> </div>\n" +
+            "<div class=\"control-container\"><input type=\"button\" id=\"button\" name=\"button\" value=\"Button\"/></div>\n" +
+            "</div>\n");
+  }
+
+  @Test
+  public void actionLess() {
+    ais.setCurrent(new ActionInvocation(null, null, "/button", null, null));
+    new ControlTester(button)
+        .attr("name", "button")
+        .attr("value", "test-value")
+        .go("<input type=\"hidden\" name=\"button@param\" value=\"param-value\"/>\n" +
+            "<div class=\"button-button button control\">\n" +
+            "<div class=\"label-container\"> </div>\n" +
+            "<div class=\"control-container\"><input type=\"button\" id=\"button\" name=\"button\" value=\"Button\"/></div>\n" +
+            "</div>\n");
+  }
+
+  @Test
+  public void css() {
+    ais.setCurrent(new ActionInvocation(new EditAction(), null, "/button", null, null));
+    new ControlTester(button)
+        .attr("name", "button")
+        .attr("value", "test-value")
+        .attr("class", "css-class")
+        .go("<input type=\"hidden\" name=\"button@param\" value=\"param-value\"/>\n" +
+            "<div class=\"css-class-button-button css-class-button css-class-control button-button button control\">\n" +
+            "<div class=\"label-container\"> </div>\n" +
+            "<div class=\"control-container\"><input type=\"button\" class=\"css-class\" id=\"button\" name=\"button\" value=\"Button\"/></div>\n" +
+            "</div>\n");
+  }
+
+  @Test
+  public void html() {
+    ais.setCurrent(new ActionInvocation(new EditAction(), null, "/button", null, null));
+    new ControlTester(button)
+        .attr("name", "html")
+        .attr("action", "/foo")
+        .attr("value", "test-value")
+        .go("<input type=\"hidden\" name=\"html@param\" value=\"param-value\"/>\n" +
+            "<input type=\"hidden\" name=\"__a_html\" value=\"/foo\"/>\n" +
+            "<div class=\"button-button button control\">\n" +
+            "<div class=\"label-container\"> </div>\n" +
+            "<div class=\"control-container\"><input type=\"button\" id=\"html\" name=\"html\" value=\"&lt;Button&gt;\"/></div>\n" +
+            "</div>\n");
   }
 }

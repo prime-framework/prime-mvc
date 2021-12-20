@@ -20,11 +20,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.primeframework.mvc.servlet.HTTPMethod;
+import org.primeframework.mvc.http.HTTPStrings.Methods;
 
 /**
- * This annotation defines a method that is invoked prior to the parameters being set into the action. This is useful
- * if you need to setup objects so that the parameters can be set into them.
+ * This annotation defines a method that is invoked prior to the parameters being set into the action. This is useful if
+ * you need to setup objects so that the parameters can be set into them.
  *
  * @author Brian Pontarelli
  */
@@ -32,9 +32,9 @@ import org.primeframework.mvc.servlet.HTTPMethod;
 @Target(ElementType.METHOD)
 public @interface PreParameterMethod {
   /**
-   * The HTTP methods that this is called for. THe default is all of the methods.
+   * The HTTP methods that this is called for. The default is every method.
    *
    * @return All methods are the default.
    */
-  HTTPMethod[] httpMethods() default {HTTPMethod.CONNECT, HTTPMethod.DELETE, HTTPMethod.GET, HTTPMethod.HEAD, HTTPMethod.OPTIONS, HTTPMethod.PATCH, HTTPMethod.POST, HTTPMethod.PUT, HTTPMethod.TRACE};
+  String[] httpMethods() default {Methods.CONNECT, Methods.DELETE, Methods.GET, Methods.HEAD, Methods.OPTIONS, Methods.PATCH, Methods.POST, Methods.PUT, Methods.TRACE};
 }

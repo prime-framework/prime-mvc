@@ -50,12 +50,7 @@ public class ControlFactory {
    */
   public static void addControl(Binder binder, String prefix, String name, Class<? extends Control> controlType) {
     binder.bind(controlType);
-    Map<String, Class<? extends Control>> controls = bindings.get(prefix);
-    if (controls == null) {
-      controls = new HashMap<>();
-      bindings.put(prefix, controls);
-    }
-
+    Map<String, Class<? extends Control>> controls = bindings.computeIfAbsent(prefix, k -> new HashMap<>());
     controls.put(name, controlType);
   }
 

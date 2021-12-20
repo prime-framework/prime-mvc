@@ -15,10 +15,8 @@
  */
 package org.primeframework.mvc.action.result;
 
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -29,6 +27,7 @@ import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.result.annotation.Binary;
 import org.primeframework.mvc.content.binary.BinaryActionConfiguration;
+import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 
 /**
@@ -41,11 +40,11 @@ import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 public class BinaryResult extends AbstractResult<Binary> {
   private final ActionInvocationStore actionInvocationStore;
 
-  private final HttpServletResponse response;
+  private final HTTPResponse response;
 
   @Inject
   public BinaryResult(ExpressionEvaluator expressionEvaluator, ActionInvocationStore actionInvocationStore,
-                      HttpServletResponse response) {
+                      HTTPResponse response) {
     super(expressionEvaluator);
     this.actionInvocationStore = actionInvocationStore;
     this.response = response;
@@ -54,7 +53,7 @@ public class BinaryResult extends AbstractResult<Binary> {
   /**
    * {@inheritDoc}
    */
-  public boolean execute(Binary binary) throws IOException, ServletException {
+  public boolean execute(Binary binary) throws IOException {
     ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
     Object action = actionInvocation.action;
     if (action == null) {
@@ -66,22 +65,19 @@ public class BinaryResult extends AbstractResult<Binary> {
       throw new PrimeException("The action [" + action.getClass() + "] has no configuration. This should be impossible!");
     }
 
-    Path object;
+    Path file;
     BinaryActionConfiguration binaryFileActionConfiguration = (BinaryActionConfiguration) configuration.additionalConfiguration.get(BinaryActionConfiguration.class);
     if (binaryFileActionConfiguration == null || binaryFileActionConfiguration.responseMember == null) {
       throw new PrimeException("The action [" + action.getClass() + "] is missing a field annotated with @BinaryResponse. This is used to figure out what to send back in the response.");
     }
 
-    object = expressionEvaluator.getValue(binaryFileActionConfiguration.responseMember, action);
-    if (object == null) {
+    file = expressionEvaluator.getValue(binaryFileActionConfiguration.responseMember, action);
+    if (file == null) {
       throw new PrimeException("The @BinaryResponse field [" + binaryFileActionConfiguration.responseMember + "] in the action [" + action.getClass() + "] is null. It cannot be null!");
     }
 
-    byte[] bytes = Files.readAllBytes(object);
     response.setStatus(binary.status());
-    response.setCharacterEncoding("UTF-8");
-    response.setContentType(binary.type());
-    response.setContentLength(bytes.length);
+    response.setContentType(binary.contentType());
 
     // Handle setting cache controls
     addCacheControlHeader(binary, response);
@@ -90,13 +86,14 @@ public class BinaryResult extends AbstractResult<Binary> {
       return true;
     }
 
-    ServletOutputStream outputStream = response.getOutputStream();
-    outputStream.write(bytes);
+    // Stream the file out
+    OutputStream outputStream = response.getOutputStream();
+    Files.copy(file, outputStream);
 
     // Delete the file if instructed by the @BinaryResponse
     if (binaryFileActionConfiguration.deleteResponseMemberUponCompletion) {
       try {
-        Files.deleteIfExists(object);
+        Files.deleteIfExists(file);
       } catch (IOException ignore) {
       }
     }

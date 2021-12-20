@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc.workflow;
 
-import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.List;
 
@@ -41,7 +40,7 @@ public class DefaultErrorWorkflow implements ErrorWorkflow {
   }
 
   @Override
-  public void perform(WorkflowChain workflowChain) throws IOException, ServletException {
+  public void perform(WorkflowChain workflowChain) throws IOException {
     WorkflowChain chain = new SubWorkflowChain(errorWorkflows, workflowChain);
     chain.continueWorkflow();
   }

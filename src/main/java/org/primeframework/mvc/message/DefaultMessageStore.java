@@ -28,7 +28,6 @@ import org.primeframework.mvc.message.scope.FlashScope;
 import org.primeframework.mvc.message.scope.MessageScope;
 import org.primeframework.mvc.message.scope.RequestScope;
 import org.primeframework.mvc.message.scope.Scope;
-import org.primeframework.mvc.message.scope.SessionScope;
 
 /**
  * This is the default message workflow implementation. It removes all flash messages from the session and places them
@@ -37,47 +36,56 @@ import org.primeframework.mvc.message.scope.SessionScope;
  * @author Brian Pontarelli
  */
 public class DefaultMessageStore implements MessageStore {
-  private final RequestScope requestScope;
-
   private final Map<MessageScope, Scope> scopes = new LinkedHashMap<>();
 
+  private MessageObserver observer;
+
   @Inject
-  public DefaultMessageStore(ApplicationScope applicationScope, SessionScope sessionScope, FlashScope flashScope,
-                             RequestScope requestScope) {
+  public DefaultMessageStore(ApplicationScope applicationScope, FlashScope flashScope, RequestScope requestScope) {
     scopes.put(MessageScope.REQUEST, requestScope);
     scopes.put(MessageScope.FLASH, flashScope);
-    scopes.put(MessageScope.SESSION, sessionScope);
     scopes.put(MessageScope.APPLICATION, applicationScope);
-    this.requestScope = requestScope;
   }
 
   @Override
   public void add(Message message) {
-    requestScope.add(message);
+    add(MessageScope.REQUEST, message);
   }
 
   @Override
   public void add(MessageScope scope, Message message) {
     Scope s = scopes.get(scope);
     s.add(message);
+
+    if (observer != null) {
+      observer.added(scope, message);
+    }
   }
 
   @Override
   public void addAll(MessageScope scope, Collection<Message> messages) {
     Scope s = scopes.get(scope);
     s.addAll(messages);
+
+    if (observer != null) {
+      messages.forEach(m -> observer.added(scope, m));
+    }
   }
 
   @Override
   public void clear() {
-    for (Scope scope : scopes.values()) {
-      scope.clear();
+    for (MessageScope scope : scopes.keySet()) {
+      clear(scope);
     }
   }
 
   @Override
   public void clear(MessageScope scope) {
     scopes.get(scope).clear();
+
+    if (observer != null) {
+      observer.cleared(scope);
+    }
   }
 
   @Override
@@ -126,5 +134,10 @@ public class DefaultMessageStore implements MessageStore {
     }
 
     return list;
+  }
+
+  @Inject(optional = true)
+  public void setObserver(MessageObserver observer) {
+    this.observer = observer;
   }
 }

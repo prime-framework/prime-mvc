@@ -38,7 +38,7 @@ import freemarker.template.TemplateModelException;
  */
 @ControlAttributes(
     required = {
-        @ControlAttribute(name = "key")
+        @ControlAttribute(name = "key", types = {String.class})
     },
     optional = {
         @ControlAttribute(name = "values", types = List.class)
@@ -74,12 +74,13 @@ public class Message extends AbstractControl implements TemplateMethodModelEx {
    * Determines the bundle and then gets the message and puts it into the attributes.
    */
   @Override
+  @SuppressWarnings("unchecked")
   protected void addAdditionalAttributes() {
     String key = (String) attributes.remove("key");
     final String defaultMesg = (String) attributes.remove("default");
-    List values = (List) attributes.remove("values");
+    List<Object> values = (List<Object>) attributes.remove("values");
     if (values == null) {
-      values = new ArrayList();
+      values = new ArrayList<>();
     }
 
     String message;

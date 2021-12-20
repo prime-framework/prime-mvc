@@ -15,7 +15,7 @@
  */
 package org.primeframework.mvc.message.scope;
 
-import javax.servlet.http.HttpServletRequest;
+import org.primeframework.mvc.http.HTTPRequest;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -33,10 +33,10 @@ import com.google.inject.Inject;
 @SuppressWarnings("unchecked")
 public class RequestScope implements Scope {
   public static final String KEY = "primeMessages";
-  private final HttpServletRequest request;
+  private final HTTPRequest request;
 
   @Inject
-  public RequestScope(HttpServletRequest request) {
+  public RequestScope(HTTPRequest request) {
     this.request = request;
   }
 

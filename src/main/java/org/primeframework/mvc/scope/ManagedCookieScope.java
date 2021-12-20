@@ -15,110 +15,40 @@
  */
 package org.primeframework.mvc.scope;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import com.google.inject.Inject;
-import org.primeframework.mvc.ErrorException;
+import org.primeframework.mvc.http.HTTPRequest;
+import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.scope.annotation.ManagedCookie;
 import org.primeframework.mvc.security.Encryptor;
-import org.primeframework.mvc.util.AbstractCookie;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This is the request scope which fetches and stores values in a cookie.
  *
  * @author Daniel DeGroff
  */
-public class ManagedCookieScope extends AbstractCookie implements Scope<ManagedCookie> {
-  private static final Logger logger = LoggerFactory.getLogger(ManagedCookieScope.class);
-
-  private final Encryptor encryptor;
-
+public class ManagedCookieScope extends BaseManagedCookieScope<ManagedCookie> {
   @Inject
-  public ManagedCookieScope(HttpServletRequest request, HttpServletResponse response, Encryptor encryptor) {
-    super(request, response);
-    this.encryptor = encryptor;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public Object get(String fieldName, ManagedCookie scope) {
-    throw new UnsupportedOperationException("The ManagedCookieScope cannot be called with this method.");
+  public ManagedCookieScope(HTTPRequest request, HTTPResponse response, Encryptor encryptor) {
+    super(request, response, encryptor);
   }
 
   @Override
-  public Cookie get(String fieldName, Class<?> type, ManagedCookie scope) {
-    String cookieName = getCookieName(fieldName, scope);
-
-    javax.servlet.http.Cookie cookie = getCookie(cookieName);
-    String value = cookie != null ? cookie.getValue() : null;
-    if (value == null || "".equals(value)) {
-      return cookie != null
-          ? cookie
-          : (scope.neverNull() ? new Cookie(cookieName, null) : null);
-    }
-
-    try {
-      cookie.setValue(scope.encrypt()
-          ? encryptor.decrypt(String.class, value)
-          : value);
-      return cookie;
-    } catch (Exception e) {
-      String message = e.getClass().getCanonicalName() + " " + e.getMessage();
-      if (scope.encrypt()) {
-        logger.warn("Failed to decrypt cookie. This may be expected if the cookie was encrypted using a different key.\n\tCause: " + message);
-      } else {
-        logger.warn("Failed to decode cookie. This is not expected.\n\tCause: " + message);
-      }
-    }
-
-    return scope.neverNull() ? cookie : null;
+  protected void addCookie(String name, String value, ManagedCookie scope) {
+    addSecureHTTPOnlyCookie(name, value, scope.maxAge());
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  public void set(String fieldName, Object value, ManagedCookie scope) {
-    String cookieName = getCookieName(fieldName, scope);
-    javax.servlet.http.Cookie existing = getCookie(cookieName);
-
-    Cookie actual = (Cookie) value;
-
-    // If the value is null, delete it if it was previously non-null
-    if (actual == null || actual.getValue() == null) {
-      if (existing != null) {
-        // Delete it if we had it.
-        deleteCookie(cookieName);
-      }
-
-      return;
-    }
-
-    String encoded;
-    try {
-      encoded = scope.encrypt()
-          ? encryptor.encrypt(actual.getValue())
-          : actual.getValue();
-    } catch (Exception e) {
-      throw new ErrorException("error", e);
-    }
-
-    addSecureHttpOnlyCookie(cookieName, encoded, scope.maxAge());
+  @Override
+  protected boolean encrypt(ManagedCookie scope) {
+    return scope.encrypt();
   }
 
-  /**
-   * Using the annotation or the current action invocation, this determines the name of the action used to get the
-   * action session.
-   *
-   * @param fieldName the field name
-   * @param scope     The scope annotation.
-   * @return The action class name.
-   */
+  @Override
   protected String getCookieName(String fieldName, ManagedCookie scope) {
-    return "##field-name##".equals(scope.value()) ? fieldName : scope.value();
+    return "##field-name##".equals(scope.name()) ? fieldName : scope.name();
+  }
+
+  @Override
+  protected boolean neverNull(ManagedCookie scope) {
+    return scope.neverNull();
   }
 }

@@ -15,8 +15,7 @@
  */
 package org.primeframework.mvc.content;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
+import org.primeframework.mvc.http.HTTPRequest;
 import java.io.IOException;
 
 import org.primeframework.mvc.content.guice.ContentHandlerFactory;
@@ -33,16 +32,16 @@ import com.google.inject.Inject;
 public class DefaultContentWorkflow implements ContentWorkflow {
   private final ContentHandlerFactory factory;
 
-  private final HttpServletRequest request;
+  private final HTTPRequest request;
 
   @Inject
-  public DefaultContentWorkflow(HttpServletRequest request, ContentHandlerFactory factory) {
+  public DefaultContentWorkflow(HTTPRequest request, ContentHandlerFactory factory) {
     this.request = request;
     this.factory = factory;
   }
 
   @Override
-  public void perform(WorkflowChain workflowChain) throws IOException, ServletException {
+  public void perform(WorkflowChain workflowChain) throws IOException {
     String contentType = request.getContentType();
     ContentHandler handler = factory.build(contentType);
     if (handler != null) {

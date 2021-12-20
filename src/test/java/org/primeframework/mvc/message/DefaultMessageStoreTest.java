@@ -15,13 +15,18 @@
  */
 package org.primeframework.mvc.message;
 
-import org.primeframework.mvc.message.scope.*;
-import org.testng.annotations.Test;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.easymock.EasyMock.*;
+import org.primeframework.mvc.message.scope.ApplicationScope;
+import org.primeframework.mvc.message.scope.FlashScope;
+import org.primeframework.mvc.message.scope.MessageScope;
+import org.primeframework.mvc.message.scope.RequestScope;
+import org.testng.annotations.Test;
+import static org.easymock.EasyMock.createStrictMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 import static org.testng.Assert.assertEquals;
 
 /**
@@ -31,45 +36,17 @@ import static org.testng.Assert.assertEquals;
  */
 public class DefaultMessageStoreTest {
   @Test
-  public void request() {
-    Message message = new SimpleFieldMessage(MessageType.ERROR, "foo.bar", "code", "message");
-
-    RequestScope scope = createStrictMock(RequestScope.class);
-    scope.add(message);
-    replay(scope);
-
-    DefaultMessageStore store = new DefaultMessageStore(null, null, null, scope);
-    store.add(message);
-
-    verify(scope);
-  }
-
-  @Test
-  public void scoped() {
-    Message message = new SimpleFieldMessage(MessageType.ERROR, "foo.bar", "code", "message");
-
-    SessionFlashScope scope = createStrictMock(SessionFlashScope.class);
-    scope.add(message);
-    replay(scope);
-
-    DefaultMessageStore store = new DefaultMessageStore(null, null, scope, null);
-    store.add(MessageScope.FLASH, message);
-
-    verify(scope);
-  }
-
-  @Test
   public void bulk() {
     List<Message> messages = new ArrayList<>();
     messages.add(new SimpleFieldMessage(MessageType.ERROR, "foo.bar", "code", "message"));
     messages.add(new SimpleFieldMessage(MessageType.ERROR, "foo.baz", "code", "message"));
 
-    SessionScope scope = createStrictMock(SessionScope.class);
+    RequestScope scope = createStrictMock(RequestScope.class);
     scope.addAll(messages);
     replay(scope);
 
-    DefaultMessageStore store = new DefaultMessageStore(null, scope, null, null);
-    store.addAll(MessageScope.SESSION, messages);
+    DefaultMessageStore store = new DefaultMessageStore(null, null, scope);
+    store.addAll(MessageScope.REQUEST, messages);
 
     verify(scope);
   }
@@ -84,10 +61,6 @@ public class DefaultMessageStoreTest {
     flashMessages.add(new SimpleMessage(MessageType.ERROR, "code3", "flash1"));
     flashMessages.add(new SimpleMessage(MessageType.ERROR, "code4", "flash2"));
 
-    List<Message> sessionMessages = new ArrayList<>();
-    sessionMessages.add(new SimpleMessage(MessageType.ERROR, "code5", "session1"));
-    sessionMessages.add(new SimpleMessage(MessageType.ERROR, "code6", "session2"));
-
     List<Message> applicationMessages = new ArrayList<>();
     applicationMessages.add(new SimpleMessage(MessageType.ERROR, "code7", "application1"));
     applicationMessages.add(new SimpleMessage(MessageType.ERROR, "code8", "application2"));
@@ -96,33 +69,27 @@ public class DefaultMessageStoreTest {
     expect(request.get()).andReturn(requestMessages);
     replay(request);
 
-    SessionFlashScope flash = createStrictMock(SessionFlashScope.class);
+    FlashScope flash = createStrictMock(FlashScope.class);
     expect(flash.get()).andReturn(flashMessages);
     replay(flash);
-
-    SessionScope session = createStrictMock(SessionScope.class);
-    expect(session.get()).andReturn(sessionMessages);
-    replay(session);
 
     ApplicationScope application = createStrictMock(ApplicationScope.class);
     expect(application.get()).andReturn(applicationMessages);
     replay(application);
 
-    DefaultMessageStore store = new DefaultMessageStore(application, session, flash, request);
+    DefaultMessageStore store = new DefaultMessageStore(application, flash, request);
     List<Message> messages = store.get();
-    assertEquals(messages.size(), 8);
-    
+    assertEquals(messages.size(), 6);
+
     int index = 0;
     assertEquals(messages.get(index++).toString(), "request1");
     assertEquals(messages.get(index++).toString(), "request2");
     assertEquals(messages.get(index++).toString(), "flash1");
     assertEquals(messages.get(index++).toString(), "flash2");
-    assertEquals(messages.get(index++).toString(), "session1");
-    assertEquals(messages.get(index++).toString(), "session2");
     assertEquals(messages.get(index++).toString(), "application1");
     assertEquals(messages.get(index).toString(), "application2");
 
-    verify(request, flash, session, application);
+    verify(request, flash, application);
   }
 
   @Test
@@ -135,7 +102,7 @@ public class DefaultMessageStoreTest {
     expect(request.get()).andReturn(requestMessages);
     replay(request);
 
-    DefaultMessageStore store = new DefaultMessageStore(null, null, null, request);
+    DefaultMessageStore store = new DefaultMessageStore(null, null, request);
     List<Message> messages = store.get(MessageScope.REQUEST);
     assertEquals(messages.size(), 2);
 
@@ -144,5 +111,33 @@ public class DefaultMessageStoreTest {
     assertEquals(messages.get(index).toString(), "request2");
 
     verify(request);
+  }
+
+  @Test
+  public void request() {
+    Message message = new SimpleFieldMessage(MessageType.ERROR, "foo.bar", "code", "message");
+
+    RequestScope scope = createStrictMock(RequestScope.class);
+    scope.add(message);
+    replay(scope);
+
+    DefaultMessageStore store = new DefaultMessageStore(null, null, scope);
+    store.add(message);
+
+    verify(scope);
+  }
+
+  @Test
+  public void scoped() {
+    Message message = new SimpleFieldMessage(MessageType.ERROR, "foo.bar", "code", "message");
+
+    FlashScope scope = createStrictMock(FlashScope.class);
+    scope.add(message);
+    replay(scope);
+
+    DefaultMessageStore store = new DefaultMessageStore(null, scope, null);
+    store.add(MessageScope.FLASH, message);
+
+    verify(scope);
   }
 }

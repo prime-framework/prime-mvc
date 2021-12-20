@@ -26,12 +26,17 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 /**
  * Marks a member as the recipient of a {@link Path} object.</p>
  * <p>
- * The object is written to a temporary file from reading bytes from the HTTP request body when the request is made
- * with <code>Content-Type: application/octet-stream</code>.
+ * The object is written to a temporary file from reading bytes from the HTTP request body when the request is made with
+ * <code>Content-Type: application/octet-stream</code>.
  *
  * @author Daniel DeGroff
  */
 @Retention(RUNTIME)
 @Target({FIELD, METHOD})
 public @interface BinaryRequest {
+  /**
+   * @return True if you want the temp file to be deleted after the action completes. False if you want the file to
+   *     stick around. Keeping the file might be necessary if it will be processed later.
+   */
+  boolean deleteUponCompletion() default true;
 }

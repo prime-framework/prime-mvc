@@ -16,11 +16,11 @@
 package org.primeframework.mvc.security.saved;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.primeframework.mvc.servlet.HTTPMethod;
-import org.primeframework.mvc.util.ObjectTools;
+import org.primeframework.mvc.http.HTTPMethod;
 
 /**
  * Stores the request information when a user accesses a resource that requires authentication and needs to be returned
@@ -31,7 +31,7 @@ import org.primeframework.mvc.util.ObjectTools;
 public class SavedHttpRequest {
   public HTTPMethod method;
 
-  public Map<String, String[]> parameters = new HashMap<>();
+  public Map<String, List<String>> parameters = new HashMap<>();
 
   public String uri;
 
@@ -39,7 +39,7 @@ public class SavedHttpRequest {
   public SavedHttpRequest() {
   }
 
-  public SavedHttpRequest(HTTPMethod method, String uri, Map<String, String[]> parameters) {
+  public SavedHttpRequest(HTTPMethod method, String uri, Map<String, List<String>> parameters) {
     this.method = method;
     this.uri = uri;
     if (parameters != null) {
@@ -52,14 +52,11 @@ public class SavedHttpRequest {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof SavedHttpRequest)) {
+    if (o == null || getClass() != o.getClass()) {
       return false;
     }
-
     SavedHttpRequest that = (SavedHttpRequest) o;
-    return method == that.method &&
-        ObjectTools.equals(parameters, that.parameters) &&
-        Objects.equals(uri, that.uri);
+    return method == that.method && Objects.equals(parameters, that.parameters) && Objects.equals(uri, that.uri);
   }
 
   @Override

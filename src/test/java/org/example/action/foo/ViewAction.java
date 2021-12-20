@@ -22,7 +22,6 @@ import org.primeframework.mvc.action.annotation.Action;
  */
 @Action("{id}")
 public class ViewAction {
-
   public String id;
 
   public String execute() {

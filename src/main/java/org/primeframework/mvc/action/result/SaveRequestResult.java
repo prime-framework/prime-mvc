@@ -15,26 +15,27 @@
  */
 package org.primeframework.mvc.action.result;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.google.inject.Inject;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.annotation.ReexecuteSavedRequest;
 import org.primeframework.mvc.action.result.annotation.SaveRequest;
 import org.primeframework.mvc.config.MVCConfiguration;
+import org.primeframework.mvc.http.Cookie;
+import org.primeframework.mvc.http.HTTPMethod;
+import org.primeframework.mvc.http.HTTPRequest;
+import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.security.saved.SavedHttpRequest;
-import org.primeframework.mvc.servlet.HTTPMethod;
 
 /**
  * This result stores the current request in a cookie and then performs a HTTP redirect to the login page.
@@ -48,7 +49,7 @@ public class SaveRequestResult extends AbstractRedirectResult<SaveRequest> {
 
   @Inject
   public SaveRequestResult(MessageStore messageStore, ExpressionEvaluator expressionEvaluator,
-                           HttpServletResponse response, HttpServletRequest request,
+                           HTTPResponse response, HTTPRequest request,
                            ActionInvocationStore actionInvocationStore,
                            MVCConfiguration configuration, Encryptor encryptor) {
     super(expressionEvaluator, actionInvocationStore, messageStore, request, response);
@@ -59,15 +60,15 @@ public class SaveRequestResult extends AbstractRedirectResult<SaveRequest> {
   public boolean execute(SaveRequest saveRequest) throws IOException {
     moveMessagesToFlash();
 
-    Map<String, String[]> requestParameters = null;
+    Map<String, List<String>> requestParameters = null;
     String redirectURI;
-    HTTPMethod method = HTTPMethod.valueOf(request.getMethod().toUpperCase());
-    if (method == HTTPMethod.GET) {
-      Map<String, String[]> params = request.getParameterMap();
-      redirectURI = request.getRequestURI() + makeQueryString(params);
+    HTTPMethod method = request.getMethod();
+    if (HTTPMethod.GET.is(request.getMethod())) {
+      Map<String, List<String>> params = request.getParameters();
+      redirectURI = request.getPath() + makeQueryString(params);
     } else {
-      requestParameters = request.getParameterMap();
-      redirectURI = request.getRequestURI();
+      requestParameters = request.getParameters();
+      redirectURI = request.getPath();
     }
 
     // Build a saved request cookie
@@ -81,7 +82,7 @@ public class SaveRequestResult extends AbstractRedirectResult<SaveRequest> {
     // Peter:  Right. That's bad. Okay. All right. Important safety tip. Thanks, Egon.
     //
     // Ok, not that bad, but Tomcat will exception and the user will receive a 500. See MVCConfiguration.savedRequestCookieMaximumSize for more information.
-    if (saveRequestCookie.getValue().getBytes(StandardCharsets.UTF_8).length <= configuration.savedRequestCookieMaximumSize()) {
+    if (saveRequestCookie.value.getBytes(StandardCharsets.UTF_8).length <= configuration.savedRequestCookieMaximumSize()) {
       response.addCookie(saveRequestCookie);
     }
 
@@ -102,23 +103,19 @@ public class SaveRequestResult extends AbstractRedirectResult<SaveRequest> {
     return result.disableCacheControl();
   }
 
-  private String makeQueryString(Map<String, String[]> parameters) {
+  private String makeQueryString(Map<String, List<String>> parameters) {
     if (parameters.size() == 0) {
       return "";
     }
 
     StringBuilder build = new StringBuilder();
-    for (Map.Entry<String, String[]> entry : parameters.entrySet()) {
+    for (Entry<String, List<String>> entry : parameters.entrySet()) {
       for (String value : entry.getValue()) {
         if (build.length() > 0) {
           build.append("&");
         }
 
-        try {
-          build.append(URLEncoder.encode(entry.getKey(), "UTF-8")).append("=").append(URLEncoder.encode(value, "UTF-8"));
-        } catch (UnsupportedEncodingException e) {
-          throw new RuntimeException(e);
-        }
+        build.append(URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8)).append("=").append(URLEncoder.encode(value, StandardCharsets.UTF_8));
       }
     }
 

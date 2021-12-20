@@ -41,17 +41,10 @@ public class ScopeModule extends AbstractModule {
 
   @Override
   protected void configure() {
-    bindScopeProvider();
-    bindScopeRetriever();
+    bind(ScopeRetriever.class).to(DefaultScopeRetriever.class);
+    bind(ScopeProvider.class).to(DefaultScopeProvider.class);
+
     bindScopeRetrievalWorkflow();
     bindScopeStorageWorkflow();
-  }
-
-  private void bindScopeProvider() {
-    bind(ScopeProvider.class).to(DefaultScopeProvider.class);
-  }
-
-  private void bindScopeRetriever() {
-    bind(ScopeRetriever.class).to(DefaultScopeRetriever.class);
   }
 }

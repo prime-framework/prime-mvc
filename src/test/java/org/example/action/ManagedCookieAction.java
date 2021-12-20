@@ -15,10 +15,9 @@
  */
 package org.example.action;
 
-import javax.servlet.http.Cookie;
-
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.annotation.Status;
+import org.primeframework.mvc.http.Cookie;
 import org.primeframework.mvc.scope.annotation.ManagedCookie;
 
 /**
@@ -33,7 +32,7 @@ public class ManagedCookieAction {
   @ManagedCookie(encrypt = false)
   public Cookie cookie2;
 
-  @ManagedCookie(value = "fusionauth.sso", encrypt = false)
+  @ManagedCookie(name = "fusionauth.sso", encrypt = false)
   public Cookie cookie3;
 
   public boolean deleteCookie1;
@@ -50,16 +49,16 @@ public class ManagedCookieAction {
 
   public String get() {
     if (writeCookie1 != null) {
-      cookie1.setValue(writeCookie1);
+      cookie1.value = writeCookie1;
     }
 
     if (writeCookie2 != null) {
-      cookie2.setValue(writeCookie2);
+      cookie2.value = writeCookie2;
     }
 
 
     if (writeCookie3 != null) {
-      cookie3.setValue(writeCookie3);
+      cookie3.value = writeCookie3;
     }
 
     if (deleteCookie1) {

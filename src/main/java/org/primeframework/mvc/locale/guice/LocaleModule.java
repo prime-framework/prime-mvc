@@ -15,12 +15,9 @@
  */
 package org.primeframework.mvc.locale.guice;
 
-import java.util.Locale;
-
+import com.google.inject.AbstractModule;
 import org.primeframework.mvc.locale.DefaultLocaleProvider;
 import org.primeframework.mvc.locale.LocaleProvider;
-
-import com.google.inject.AbstractModule;
 
 /**
  * This class is a Guice module for the Prime MVC Locale handling.

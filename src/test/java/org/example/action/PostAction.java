@@ -26,8 +26,9 @@ import org.primeframework.mvc.action.annotation.Action;
  */
 @Action
 public class PostAction {
+  public static boolean invoked = false;
+
   public UserField user;
-  public boolean invoked = false;
 
   public String post() {
     invoked = true;

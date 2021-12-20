@@ -15,7 +15,11 @@
  */
 package org.primeframework.mvc.message;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A simple error message container. This is used when the messages in the MessageStore are converted to JSON. It can

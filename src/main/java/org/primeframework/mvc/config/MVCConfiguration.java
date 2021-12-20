@@ -16,8 +16,10 @@
 package org.primeframework.mvc.config;
 
 import java.lang.annotation.Annotation;
+import java.nio.file.Path;
 import java.security.Key;
 import java.util.List;
+import java.util.Set;
 
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 
@@ -37,6 +39,16 @@ public interface MVCConfiguration {
    * @return Whether or not auto HTML escaping will be enabled for all templates.
    */
   boolean autoHTMLEscapingEnabled();
+
+  /**
+   * @return The base directory of the entire web application.
+   */
+  Path baseDirectory();
+
+  /**
+   * @return The directory where the control templates are stored.
+   */
+  String controlTemplateDirectory();
 
   /**
    * @return The encryption key that is used to encrypt cookies.
@@ -61,7 +73,7 @@ public interface MVCConfiguration {
   /**
    * @return The types of files that are allowed to be uploaded.
    */
-  String[] fileUploadAllowedTypes();
+  Set<String> fileUploadAllowedTypes();
 
   /**
    * @return The maximum size for an uploaded file.
@@ -86,15 +98,19 @@ public interface MVCConfiguration {
   String localeCookieName();
 
   /**
+   * @return The directory where the messages are stored.
+   */
+  String messageDirectory();
+
+  /**
    * @return The name of the message flash cookie.
    */
   String messageFlashScopeCookieName();
 
   /**
-   * @return The resource directory where the templates, message bundles, emails, control templates, etc are loaded
-   * from.
+   * @return The path of the action/result that handle missing requests (i.e. 404s).
    */
-  String resourceDirectory();
+  String missingPath();
 
   /**
    * Tomcat limits the header size to 8192 bytes (8 KB). See maxHttpHeaderSize on https://tomcat.apache.org/tomcat-8.5-doc/config/http.html
@@ -121,24 +137,24 @@ public interface MVCConfiguration {
   String savedRequestCookieName();
 
   /**
-   * @return The static resource prefixes.
+   * @return The name of the static directory in the webapp.
    */
-  String[] staticResourcePrefixes();
-
-  /**
-   * @return Whether or not static resource loading is enabled.
-   */
-  boolean staticResourcesEnabled();
+  String staticDirectory();
 
   /**
    * @return The number of seconds to check for Freemarker template updates (max integer means never and 0 means
-   * always).
+   *     always).
    */
   int templateCheckSeconds();
 
   /**
+   * @return The directory where the templates are stored.
+   */
+  String templateDirectory();
+
+  /**
    * @return The annotations that identify a field to be un-wrapped - or be considered transparent by the {@link
-   * ExpressionEvaluator}.
+   *     ExpressionEvaluator}.
    */
   List<Class<? extends Annotation>> unwrapAnnotations();
 }

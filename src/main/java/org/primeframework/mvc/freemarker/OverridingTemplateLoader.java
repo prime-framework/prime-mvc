@@ -69,7 +69,7 @@ public class OverridingTemplateLoader implements TemplateLoader {
       // we skip this lookup and move to the classpath and other lookups.
     }
 
-    // If it fails, try to open it with servletContext.getResource.
+    // If it fails, try to open it with context.getResource.
     URL url = containerResolver.getResource(name);
     if (url == null) {
       // If that fails, finally try looking it up in the class path

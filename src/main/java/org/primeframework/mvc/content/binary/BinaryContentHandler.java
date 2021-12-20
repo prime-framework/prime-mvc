@@ -15,30 +15,19 @@
  */
 package org.primeframework.mvc.content.binary;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Base64;
-import java.util.UUID;
+import java.util.List;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.content.ContentHandler;
-import org.primeframework.mvc.message.MessageStore;
-import org.primeframework.mvc.message.MessageType;
-import org.primeframework.mvc.message.SimpleMessage;
-import org.primeframework.mvc.message.l10n.MessageProvider;
+import org.primeframework.mvc.http.HTTPRequest;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.inject.Inject;
+import org.primeframework.mvc.parameter.fileupload.FileInfo;
 
 /**
  * Set a binary file into the action as a {@link Path} object.
@@ -46,42 +35,36 @@ import com.google.inject.Inject;
  * @author Daniel DeGroff
  */
 public class BinaryContentHandler implements ContentHandler {
-  private static final Logger logger = LoggerFactory.getLogger(BinaryContentHandler.class);
-
   private final ExpressionEvaluator expressionEvaluator;
 
-  private final MessageProvider messageProvider;
-
-  private final MessageStore messageStore;
-
-  private final HttpServletRequest request;
+  private final HTTPRequest request;
 
   private final ActionInvocationStore store;
 
-  private Path tempFile;
-
   @Inject
-  public BinaryContentHandler(ExpressionEvaluator expressionEvaluator, MessageProvider messageProvider, MessageStore messageStore,
-                              HttpServletRequest request, ActionInvocationStore store) {
+  public BinaryContentHandler(ExpressionEvaluator expressionEvaluator, HTTPRequest request,
+                              ActionInvocationStore store) {
     this.expressionEvaluator = expressionEvaluator;
-    this.messageProvider = messageProvider;
-    this.messageStore = messageStore;
     this.request = request;
     this.store = store;
   }
 
   @Override
   public void cleanup() {
-    if (tempFile != null) {
-      try {
-        Files.deleteIfExists(tempFile);
-      } catch (IOException ignore) {
-      }
-    }
+    handle(false);
   }
 
   @Override
-  public void handle() throws IOException, ServletException {
+  public void handle() throws IOException {
+    // Only run this handler if the request is NOT multipart
+    if (request.isMultipart()) {
+      return;
+    }
+
+    handle(true);
+  }
+
+  private void handle(boolean set) {
     ActionInvocation actionInvocation = store.getCurrent();
     Object action = actionInvocation.action;
     if (action == null) {
@@ -93,35 +76,35 @@ public class BinaryContentHandler implements ContentHandler {
       return;
     }
 
-    int contentLength = request.getContentLength();
+    long contentLength = request.getContentLength();
     if (contentLength == 0) {
       return;
     }
 
-    BinaryActionConfiguration binaryFileActionConfiguration = (BinaryActionConfiguration) config.additionalConfiguration.get(BinaryActionConfiguration.class);
-    if (binaryFileActionConfiguration.requestMember != null) {
-      setupTemporaryFile();
-      try (InputStream inputStream = request.getInputStream()) {
-        Files.copy(inputStream, tempFile);
-        // Leave the requestMember null if no bytes were read from the inputStream.
-        if (tempFile.toFile().length() > 0) {
-          expressionEvaluator.setValue(binaryFileActionConfiguration.requestMember, action, tempFile);
-        }
-      } catch (IOException e) {
-        logger.error("Failed to write out binary stream to a file. [" + tempFile.getFileName() + "]", e);
-        messageStore.add(new SimpleMessage(MessageType.ERROR, "[couldNotWriteToFile]", messageProvider.getMessage("[couldNotWriteToFile]", e.getMessage())));
-      }
+    List<FileInfo> files = request.getFiles();
+    if (files.isEmpty()) {
+      return;
     }
-  }
 
-  private void setupTemporaryFile() {
-    try {
-      String tmpdir = System.getProperty("java.io.tmpdir");
-      String unique = new String(Base64.getEncoder().encode(UUID.randomUUID().toString().getBytes()), "UTF-8").substring(0, 5);
-      tempFile = Paths.get(tmpdir + "/" + "_prime_binaryContent_" + unique);
-      tempFile.toFile().deleteOnExit();
-    } catch (UnsupportedEncodingException e) {
-      throw new RuntimeException(e);
+    BinaryActionConfiguration binaryConfig = (BinaryActionConfiguration) config.additionalConfiguration.get(BinaryActionConfiguration.class);
+    if (binaryConfig.requestMember == null) {
+      return;
+    }
+
+    FileInfo fileInfo = files.get(0);
+
+    if (fileInfo == null) {
+      return;
+    }
+
+    if (set) {
+      expressionEvaluator.setValue(binaryConfig.requestMember, action, fileInfo.file);
+    } else {
+      try {
+        Files.deleteIfExists(fileInfo.file);
+      } catch (IOException e) {
+        // Ignore
+      }
     }
   }
 }

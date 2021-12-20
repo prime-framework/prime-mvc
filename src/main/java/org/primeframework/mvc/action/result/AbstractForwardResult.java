@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc.action.result;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 
@@ -25,6 +24,7 @@ import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.freemarker.FreeMarkerMap;
 import org.primeframework.mvc.freemarker.FreeMarkerService;
+import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 
 /**
@@ -43,12 +43,11 @@ public abstract class AbstractForwardResult<U extends Annotation> extends Abstra
 
   private final ResourceLocator resourceLocator;
 
-  private final HttpServletResponse response;
+  private final HTTPResponse response;
 
   protected AbstractForwardResult(ActionInvocationStore actionInvocationStore, ExpressionEvaluator expressionEvaluator,
                                   ResourceLocator resourceLocator, FreeMarkerService freeMarkerService,
-                                  HttpServletResponse response,
-                                  FreeMarkerMap freeMarkerMap, MVCConfiguration configuration) {
+                                  HTTPResponse response, FreeMarkerMap freeMarkerMap, MVCConfiguration configuration) {
     super(expressionEvaluator);
     this.resourceLocator = resourceLocator;
     this.response = response;
@@ -68,7 +67,7 @@ public abstract class AbstractForwardResult<U extends Annotation> extends Abstra
     String page;
     if (action == null) {
       // No action, no template. Return false to allow the workflow chain to continue
-      page = resourceLocator.locate(configuration.resourceDirectory() + "/templates");
+      page = resourceLocator.locate(configuration.templateDirectory());
       if (page == null) {
         return false;
       }
@@ -122,15 +121,15 @@ public abstract class AbstractForwardResult<U extends Annotation> extends Abstra
       page = locateDefault(actionInvocation, forward);
     } else if (page.startsWith("/")) {
       // Adjust absolute path to be relative to the configuration resource directory
-      page = configuration.resourceDirectory() + page;
+      page = configuration.templateDirectory() + page;
     } else {
       // Strip off the last part of the URI since it is relative
       String uri = actionInvocation.actionURI;
-      int index = uri.lastIndexOf("/");
+      int index = uri.lastIndexOf('/');
       if (index >= 0) {
         uri = uri.substring(0, index);
       }
-      page = configuration.resourceDirectory() + "/templates" + uri + "/" + page;
+      page = configuration.templateDirectory() + uri + "/" + page;
     }
 
     return expandPage(page, actionInvocation);
@@ -140,11 +139,8 @@ public abstract class AbstractForwardResult<U extends Annotation> extends Abstra
    * Locate the default template if one was not specified. Checks for results using this search order:
    * <p>
    * <ol>
-   * <li>${configuration.resourceDirectory}/templates/&lt;uri&gt;-&lt;resultCode&gt;.jsp</li>
    * <li>${configuration.resourceDirectory}/templates/&lt;uri&gt;-&lt;resultCode&gt;.ftl</li>
-   * <li>${configuration.resourceDirectory}/templates/&lt;uri&gt;.jsp</li>
    * <li>${configuration.resourceDirectory}/templates/&lt;uri&gt;.ftl</li>
-   * <li>${configuration.resourceDirectory}/templates/&lt;uri&gt;/index.jsp</li>
    * <li>${configuration.resourceDirectory}/templates/&lt;uri&gt;/index.ftl</li>
    * </ol>
    * <p>
@@ -155,7 +151,7 @@ public abstract class AbstractForwardResult<U extends Annotation> extends Abstra
    * @return The default page.
    */
   private String locateDefault(ActionInvocation actionInvocation, U forward) {
-    String page = resourceLocator.locate(configuration.resourceDirectory() + "/templates");
+    String page = resourceLocator.locate(configuration.templateDirectory());
     if (page == null) {
       throw new PrimeException("Missing result for action class [" + actionInvocation.configuration.actionClass + "] URI [" +
           actionInvocation.uri() + "] and result code [" + getCode(forward) + "]");

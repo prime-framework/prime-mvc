@@ -17,6 +17,7 @@ package org.primeframework.mvc.control.form;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 
 import org.primeframework.mvc.control.annotation.ControlAttribute;
 import org.primeframework.mvc.control.annotation.ControlAttributes;
@@ -28,7 +29,7 @@ import org.primeframework.mvc.control.annotation.ControlAttributes;
  */
 @ControlAttributes(
     required = {
-        @ControlAttribute(name = "name"),
+        @ControlAttribute(name = "name", types = {String.class}),
         @ControlAttribute(name = "items", types = {Collection.class, Map.class, Object[].class})
     },
     optional = {
@@ -64,12 +65,7 @@ public class RadioList extends AbstractListInput {
   protected Map<String, Object> makeParameters() {
     Map<String, Object> params = super.makeParameters();
     String uncheckedValue = (String) attributes.remove("uncheckedValue");
-    if (uncheckedValue != null) {
-      params.put("uncheckedValue", uncheckedValue);
-    } else {
-      params.put("uncheckedValue", "");
-    }
-
+    params.put("uncheckedValue", Objects.requireNonNullElse(uncheckedValue, ""));
     return params;
   }
 }

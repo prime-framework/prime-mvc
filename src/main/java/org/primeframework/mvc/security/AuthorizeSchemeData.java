@@ -15,11 +15,11 @@
  */
 package org.primeframework.mvc.security;
 
-import javax.servlet.http.HttpServletRequest;
+import org.primeframework.mvc.http.HTTPRequest;
 import java.util.List;
 
 import org.primeframework.mvc.security.annotation.AuthorizeMethod;
-import org.primeframework.mvc.servlet.HTTPMethod;
+import org.primeframework.mvc.http.HTTPMethod;
 
 /**
  * A container to pass to methods annotated with {@link AuthorizeMethod}.
@@ -31,9 +31,9 @@ public class AuthorizeSchemeData {
 
   HTTPMethod httpMethod;
 
-  HttpServletRequest request;
+  HTTPRequest request;
 
-  public AuthorizeSchemeData(List<String> constraints, HTTPMethod httpMethod, HttpServletRequest request) {
+  public AuthorizeSchemeData(List<String> constraints, HTTPMethod httpMethod, HTTPRequest request) {
     this.constraints = constraints;
     this.httpMethod = httpMethod;
     this.request = request;

@@ -15,9 +15,7 @@
  */
 package org.example.action;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 import com.google.inject.Inject;
 import org.example.action.BaseCookieAction.Foo;
@@ -25,10 +23,13 @@ import org.primeframework.mvc.ErrorException;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.annotation.Redirect;
 import org.primeframework.mvc.action.result.annotation.Status;
+import org.primeframework.mvc.http.Cookie;
+import org.primeframework.mvc.http.HTTPRequest;
+import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleMessage;
-import org.primeframework.mvc.scope.annotation.ActionCookie;
+import org.primeframework.mvc.scope.annotation.BrowserActionSession;
 
 /**
  * @author Daniel DeGroff
@@ -45,17 +46,17 @@ public class CookieAction extends BaseCookieAction<Foo> {
 
   public boolean clearSaveMe;
 
-  public Cookie[] cookies;
+  public List<Cookie> cookies;
 
   public String name;
 
   @Inject
-  public HttpServletRequest request;
+  public HTTPRequest request;
 
   @Inject
-  public HttpServletResponse response;
+  public HTTPResponse response;
 
-  @ActionCookie
+  @BrowserActionSession
   public String saveMe;
 
   public String value;

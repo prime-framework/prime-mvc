@@ -15,18 +15,16 @@
  */
 package org.primeframework.mvc.security;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 import com.google.inject.Inject;
 import org.primeframework.mvc.action.result.SavedRequestTools;
 import org.primeframework.mvc.action.result.SavedRequestTools.SaveHttpRequestResult;
 import org.primeframework.mvc.config.MVCConfiguration;
+import org.primeframework.mvc.http.HTTPRequest;
+import org.primeframework.mvc.http.HTTPResponse;
+import org.primeframework.mvc.http.MutableHTTPRequest;
 import org.primeframework.mvc.security.saved.SavedHttpRequest;
-import org.primeframework.mvc.security.saved.SavedRequestHttpServletRequest;
 import org.primeframework.mvc.workflow.WorkflowChain;
 
 /**
@@ -39,26 +37,26 @@ public class DefaultSavedRequestWorkflow implements SavedRequestWorkflow {
 
   private final Encryptor encryptor;
 
-  private final HttpServletRequest request;
+  private final MutableHTTPRequest request;
 
-  private final HttpServletResponse response;
+  private final HTTPResponse response;
 
   @Inject
-  public DefaultSavedRequestWorkflow(MVCConfiguration configuration, Encryptor encryptor, HttpServletRequest request,
-                                     HttpServletResponse response) {
-    this.request = request;
+  public DefaultSavedRequestWorkflow(MVCConfiguration configuration, Encryptor encryptor, HTTPRequest request,
+                                     HTTPResponse response) {
+    this.request = (MutableHTTPRequest) request;
     this.encryptor = encryptor;
     this.configuration = configuration;
     this.response = response;
   }
 
   @Override
-  public void perform(WorkflowChain workflowChain) throws IOException, ServletException {
+  public void perform(WorkflowChain workflowChain) throws IOException {
     SaveHttpRequestResult result = SavedRequestTools.getSaveRequestForWorkflow(configuration, encryptor, request, response);
     if (result != null) {
-      HttpServletRequestWrapper wrapper = (HttpServletRequestWrapper) request;
-      HttpServletRequest previous = (HttpServletRequest) wrapper.getRequest();
-      wrapper.setRequest(new SavedRequestHttpServletRequest(previous, result.savedHttpRequest));
+      request.setPath(result.savedHttpRequest.uri);
+      request.setMethod(result.savedHttpRequest.method);
+      request.setParameters(result.savedHttpRequest.parameters);
     }
 
     workflowChain.continueWorkflow();

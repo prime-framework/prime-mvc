@@ -15,9 +15,6 @@
  */
 package org.example.action.store;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
 import com.google.inject.Inject;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.annotation.ReexecuteSavedRequest;
@@ -27,29 +24,17 @@ import org.primeframework.mvc.action.result.annotation.ReexecuteSavedRequest;
  */
 @Action
 @ReexecuteSavedRequest(uri = "/store/")
-public class LoginAction {
-  private final HttpServletRequest request;
-
+public class LoginAction extends BaseStoreAction {
   @Inject
-  public LoginAction(HttpServletRequest request) {
-    this.request = request;
+  public LoginAction() {
   }
 
   public String get() {
-    HttpSession session = request.getSession(false);
-    if (session != null) {
-      Boolean isLoggedIn = (Boolean) session.getAttribute("LoggedIn");
-      if (isLoggedIn != null) {
-        return "success";
-      }
-    }
-
     return "input";
   }
 
   public String post() {
-    HttpSession session = request.getSession(true);
-    session.setAttribute("LoggedIn", true);
+    BaseStoreAction.loggedIn = true;
     return "success";
   }
 }

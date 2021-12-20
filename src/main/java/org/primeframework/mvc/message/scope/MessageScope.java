@@ -33,12 +33,7 @@ public interface MessageScope {
   MessageScope FLASH = new PrimeMessageScope(){};
 
   /**
-   * The session scope, when messages are stored in the session.
-   */
-  MessageScope SESSION = new PrimeMessageScope(){};
-
-  /**
-   * The servlet context (application) scope, when messages are stored in the servlet context. Useful for messages that
+   * The HTTP context (application) scope, when messages are stored in the HTTPContext. Useful for messages that
    * should be displayed to all users.
    */
   MessageScope APPLICATION = new PrimeMessageScope(){};

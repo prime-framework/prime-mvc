@@ -15,8 +15,10 @@
  */
 package org.primeframework.mvc.test;
 
-import javax.servlet.http.Cookie;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -43,25 +45,31 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.inject.Injector;
+import com.inversoft.http.Cookie;
+import com.inversoft.http.HTTPStrings;
+import com.inversoft.http.HTTPStrings.Headers;
+import com.inversoft.rest.ClientResponse;
+import io.netty.handler.codec.http.HttpUtil;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.primeframework.mock.servlet.MockContainer;
-import org.primeframework.mock.servlet.MockHttpServletRequest;
-import org.primeframework.mock.servlet.MockHttpServletResponse;
+import org.primeframework.mock.MockUserAgent;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.ActionMapper;
+import org.primeframework.mvc.http.DefaultHTTPResponse;
+import org.primeframework.mvc.http.HTTPObjectsHolder;
+import org.primeframework.mvc.http.HTTPRequest;
+import org.primeframework.mvc.http.HTTPStrings.Methods;
 import org.primeframework.mvc.message.FieldMessage;
 import org.primeframework.mvc.message.Message;
-import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.primeframework.mvc.message.SimpleMessage;
+import org.primeframework.mvc.message.TestMessageObserver;
 import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.security.Encryptor;
-import org.primeframework.mvc.servlet.PrimeFilter;
 import org.primeframework.mvc.util.QueryStringBuilder;
 import org.primeframework.mvc.util.QueryStringTools;
 import org.primeframework.mvc.util.ThrowingRunnable;
@@ -74,35 +82,29 @@ import static java.util.Arrays.asList;
  */
 @SuppressWarnings({"unused", "UnusedReturnValue"})
 public class RequestResult {
-  public final String body;
-
-  public final MockContainer container;
-
-  public final PrimeFilter filter;
-
   public final Injector injector;
 
-  public final byte[] rawBody;
+  public final TestMessageObserver messageObserver;
 
-  public final String redirect;
+  public final HTTPRequest request;
 
-  public final MockHttpServletRequest request;
+  public final ClientResponse<byte[], byte[]> response;
 
-  public final MockHttpServletResponse response;
+  public final MockUserAgent userAgent;
 
-  public final int statusCode;
-
-  public RequestResult(MockContainer container, PrimeFilter filter, MockHttpServletRequest request,
-                       MockHttpServletResponse response, Injector injector) {
-    this.container = container;
-    this.filter = filter;
+  public RequestResult(Injector injector, HTTPRequest request, ClientResponse<byte[], byte[]> response,
+                       MockUserAgent userAgent, TestMessageObserver messageObserver) {
     this.request = request;
-    this.response = response;
     this.injector = injector;
-    this.body = response.getStream().toString();
-    this.rawBody = response.getStream().toByteArray();
-    this.redirect = response.getRedirect();
-    this.statusCode = response.getCode();
+    this.response = response;
+    this.userAgent = userAgent;
+    this.messageObserver = messageObserver;
+
+    // Set the request & response into the thread local so that they can be used when asserting
+    HTTPObjectsHolder.clearRequest();
+    HTTPObjectsHolder.setRequest(request);
+    HTTPObjectsHolder.clearResponse();
+    HTTPObjectsHolder.setResponse(new DefaultHTTPResponse(new ByteArrayOutputStream()));
   }
 
   /**
@@ -230,6 +232,7 @@ public class RequestResult {
    * @return This.
    */
   public RequestResult assertBody(String string) {
+    String body = bodyAsString();
     if (!body.equals(string)) {
       throw new AssertionError("The body doesn't match the expected output. expected [" + string + "] but found [" + body + "]");
     }
@@ -322,9 +325,10 @@ public class RequestResult {
    * @return This.
    */
   public RequestResult assertBodyDoesNotContain(String... strings) {
+    String body = bodyAsString();
     for (String string : strings) {
       if (body.contains(string)) {
-        throw new AssertionError("Body shouldn't contain [" + string + "]\nRedirect: [" + redirect + "]\nBody:\n" + body);
+        throw new AssertionError("Body shouldn't contain [" + string + "]\nRedirect: [" + response.getHeader(HTTPStrings.Headers.Location) + "]\nBody:\n" + body);
       }
     }
 
@@ -380,6 +384,7 @@ public class RequestResult {
    * @return This
    */
   public RequestResult assertBodyIsEmpty() {
+    String body = bodyAsString();
     if (!body.isEmpty()) {
       throw new AssertionError("Body is not empty.\nBody:\n" + body);
     }
@@ -398,8 +403,7 @@ public class RequestResult {
    */
   @SuppressWarnings("StringConcatenationInsideStringBufferAppend")
   public RequestResult assertContainsAtLeastTheseFieldErrors(String... fields) {
-    MessageStore messageStore = get(MessageStore.class);
-    Map<String, List<FieldMessage>> msgs = messageStore.getFieldMessages();
+    Map<String, List<FieldMessage>> msgs = messageObserver.getFieldMessages();
     for (String field : fields) {
       List<FieldMessage> fieldMessages = msgs.get(field);
       if (fieldMessages == null) {
@@ -466,8 +470,7 @@ public class RequestResult {
     // First check to see if all of the field errors exist that were requested
     assertContainsAtLeastTheseFieldErrors(fields);
 
-    MessageStore messageStore = get(MessageStore.class);
-    Map<String, List<FieldMessage>> msgs = messageStore.getFieldMessages();
+    Map<String, List<FieldMessage>> msgs = messageObserver.getFieldMessages();
 
     // Now Ensure that all fields have been accounted for, if there are more field errors than were requested fail
     Set<String> requestedFields = new HashSet<>(Arrays.asList(fields));
@@ -528,8 +531,7 @@ public class RequestResult {
    * @return This.
    */
   public RequestResult assertContainsGeneralMessageCodes(MessageType messageType, String... errorCodes) {
-    MessageStore messageStore = get(MessageStore.class);
-    List<Message> messages = messageStore.getGeneralMessages();
+    List<Message> messages = messageObserver.getGeneralMessages();
     for (String errorCode : errorCodes) {
       Message message = messages.stream().filter(m -> m.getCode().equals(errorCode)).findFirst().orElse(null);
       if (message == null) {
@@ -580,8 +582,7 @@ public class RequestResult {
    */
   public RequestResult assertContainsMessages(MessageType type, String... messages) {
     Set<String> inMessageStore = new HashSet<>();
-    MessageStore messageStore = get(MessageStore.class);
-    List<Message> msgs = messageStore.getGeneralMessages();
+    List<Message> msgs = messageObserver.getGeneralMessages();
     for (Message msg : msgs) {
       if (msg.getType() == type) {
         inMessageStore.add(msg.toString());
@@ -614,16 +615,14 @@ public class RequestResult {
    * @return This.
    */
   public RequestResult assertContainsNoFieldMessages(MessageType messageType) {
-    MessageStore messageStore = get(MessageStore.class);
-    List<FieldMessage> messages = messageStore.getFieldMessages().values().stream().flatMap(Collection::stream).filter(m -> m.getType() == messageType).collect(Collectors.toList());
+    List<FieldMessage> messages = messageObserver.getFieldMessages().values().stream().flatMap(Collection::stream).filter(m -> m.getType() == messageType).collect(Collectors.toList());
     if (messages.isEmpty()) {
       return this;
     }
 
     StringBuilder sb = new StringBuilder("\n\tMessageStore contains:\n");
-    //noinspection StringConcatenationInsideStringBufferAppend
     messages.sort(Comparator.comparing(FieldMessage::getField));
-    messages.forEach(m -> sb.append("\t\t" + m.getType() + "\tField: " + m.getField() + " Code: " + m.getCode() + "\t" + ((m instanceof SimpleFieldMessage) ? ((SimpleFieldMessage) m).message : "") + "\n"));
+    messages.forEach(m -> sb.append("\t\t").append(m.getType()).append("\tField: ").append(m.getField()).append(" Code: ").append(m.getCode()).append("\t").append((m instanceof SimpleFieldMessage) ? ((SimpleFieldMessage) m).message : "").append("\n"));
     throw new AssertionError("The MessageStore contains the following field errors.]" + sb);
   }
 
@@ -652,8 +651,7 @@ public class RequestResult {
    * @return This.
    */
   public RequestResult assertContainsNoMessages(MessageType messageType) {
-    MessageStore messageStore = get(MessageStore.class);
-    List<Message> messages = messageStore.getGeneralMessages().stream().filter(m -> m.getType() == messageType).collect(Collectors.toList());
+    List<Message> messages = messageObserver.getGeneralMessages().stream().filter(m -> m.getType() == messageType).collect(Collectors.toList());
     if (messages.isEmpty()) {
       return this;
     }
@@ -691,7 +689,7 @@ public class RequestResult {
    * @return This.
    */
   public RequestResult assertContentType(String contentType) {
-    String actual = response.getContentType();
+    String actual = response.getHeader(Headers.ContentType);
     if (actual != null && !actual.equals(contentType)) {
       throw new AssertionError("Content-Type [" + actual + "] is not equal to the expected value [" + contentType + "]");
     }
@@ -728,8 +726,8 @@ public class RequestResult {
     assertContainsCookie(name);
 
     Cookie actual = getCookie(name);
-    if (!value.equals(actual.getValue())) {
-      throw new AssertionError("Cookie [" + name + "] with value [" + actual.getValue() + "] was not equal to the expected value [" + value + "]"
+    if (!value.equals(actual.value)) {
+      throw new AssertionError("Cookie [" + name + "] with value [" + actual.value + "] was not equal to the expected value [" + value + "]"
           + "\nActual cookie:\n"
           + cookieToString(actual));
     }
@@ -747,8 +745,8 @@ public class RequestResult {
     assertContainsCookie(name);
 
     Cookie actual = getCookie(name);
-    if (actual.getValue() != null && actual.getMaxAge() != 0) {
-      throw new AssertionError("Cookie [" + name + "] was not deleted. The value is [" + actual.getValue() + "] and the maxAge is [" + actual.getMaxAge() + "]"
+    if (actual.value != null && actual.maxAge != 0) {
+      throw new AssertionError("Cookie [" + name + "] was not deleted. The value is [" + actual.value + "] and the maxAge is [" + actual.maxAge + "]"
           + "\nActual cookie:\n"
           + cookieToString(actual));
     }
@@ -778,8 +776,8 @@ public class RequestResult {
    * @param encoding The expected content-type
    * @return This.
    */
-  public RequestResult assertEncoding(String encoding) {
-    String actual = response.getEncoding();
+  public RequestResult assertEncoding(Charset encoding) {
+    Charset actual = HttpUtil.getCharset(response.getHeader(Headers.ContentType), null);
     if (actual != null && !actual.equals(encoding)) {
       throw new AssertionError("Character Encoding [" + actual + "] is not equal to the expected value [" + encoding + "]");
     }
@@ -799,8 +797,7 @@ public class RequestResult {
 
     Cookie actual = getCookie(name);
     Encryptor encryptor = injector.getInstance(Encryptor.class);
-    String actualDecrypted = actual.getValue() != null ? encryptor.decrypt(String.class, actual.getValue()) : null;
-    actual.setValue(actualDecrypted);
+    actual.value = actual.value != null ? encryptor.decrypt(String.class, actual.value) : null;
     if (consumer != null) {
       consumer.accept(actual);
     }
@@ -820,7 +817,7 @@ public class RequestResult {
 
     Encryptor encryptor = injector.getInstance(Encryptor.class);
     Cookie actual = getCookie(name);
-    String actualDecrypted = actual.getValue() != null ? encryptor.decrypt(String.class, actual.getValue()) : null;
+    String actualDecrypted = actual.value != null ? encryptor.decrypt(String.class, actual.value) : null;
     if (!Objects.equals(value, actualDecrypted)) {
       throw new AssertionError("Cookie [" + name + "] with decrypted value [" + actualDecrypted + "] was not equal to the expected value [" + value + "]"
           + "\nActual cookie:\n"
@@ -843,23 +840,16 @@ public class RequestResult {
   /**
    * Verifies that the HTTP response contains the specified header.
    *
-   * @param header the name of the HTTP response header
-   * @param value  the value of the header
+   * @param name     the name of the HTTP response header
+   * @param expected the value of the header
    * @return This.
    */
-  public RequestResult assertHeaderContains(String header, String value) {
-    List<String> actual = null;
-    for (String key : response.getHeaders().keySet()) {
-      if (key.equalsIgnoreCase(header)) {
-        actual = response.getHeaders().get(key);
-        break;
-      }
-    }
-
-    if ((actual == null && value != null) || (actual != null && !actual.contains((value)))) {
+  public RequestResult assertHeaderContains(String name, String expected) {
+    String actual = response.getHeader(name);
+    if ((actual == null && expected != null) || (actual != null && !actual.contains((expected)))) {
       StringBuilder responseHeaders = new StringBuilder();
-      response.getHeaders().forEach((k, v) -> responseHeaders.append("\t").append(k).append(": ").append(v).append("\n"));
-      throw new AssertionError("Header [" + header + "] with value [" + (actual == null ? null : String.join(", ", actual)) + "] was not equal to the expected value [" + value + "].\n\nResponse Headers:\n" + responseHeaders);
+      response.headers.forEach((k, v) -> responseHeaders.append("\t").append(k).append(": ").append(v).append("\n"));
+      throw new AssertionError("Header [" + name + "] with value [" + (actual == null ? null : String.join(", ", actual)) + "] was not equal to the expected value [" + expected + "].\n\nResponse Headers:\n" + responseHeaders);
     }
     return this;
   }
@@ -872,16 +862,16 @@ public class RequestResult {
    */
   public RequestResult assertHeaderDoesNotContain(String header) {
     List<String> actual = null;
-    for (String key : response.getHeaders().keySet()) {
+    for (String key : response.headers.keySet()) {
       if (key.equalsIgnoreCase(header)) {
-        actual = response.getHeaders().get(key);
+        actual = response.headers.get(key);
         break;
       }
     }
 
     if (actual != null && !actual.isEmpty()) {
       StringBuilder responseHeaders = new StringBuilder();
-      response.getHeaders().forEach((k, v) -> responseHeaders.append("\t").append(k).append(": ").append(v).append("\n"));
+      response.headers.forEach((k, v) -> responseHeaders.append("\t").append(k).append(": ").append(v).append("\n"));
       throw new AssertionError("Header [" + header + "] with value [" + String.join(", ", actual) + "] was not expected in the HTTP response.\n\nResponse Headers:\n" + responseHeaders);
     }
 
@@ -896,16 +886,16 @@ public class RequestResult {
    */
   public RequestResult assertHeaderExists(String header) {
     List<String> actual = null;
-    for (String key : response.getHeaders().keySet()) {
+    for (String key : response.headers.keySet()) {
       if (key.equalsIgnoreCase(header)) {
-        actual = response.getHeaders().get(key);
+        actual = response.headers.get(key);
         break;
       }
     }
 
     if (actual == null) {
       StringBuilder responseHeaders = new StringBuilder();
-      response.getHeaders().forEach((k, v) -> responseHeaders.append("\t").append(k).append(": ").append(v).append("\n"));
+      response.headers.forEach((k, v) -> responseHeaders.append("\t").append(k).append(": ").append(v).append("\n"));
       throw new AssertionError("Header [" + header + "] is missing from the response.\n\nResponse Headers:\n" + responseHeaders);
     }
 
@@ -936,7 +926,7 @@ public class RequestResult {
    */
   public <T> RequestResult assertJSON(Class<T> type, Consumer<T> consumer) throws IOException {
     ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
-    T response = objectMapper.readValue(body, type);
+    T response = objectMapper.readValue(bodyAsString(), type);
     consumer.accept(response);
     return this;
   }
@@ -950,7 +940,7 @@ public class RequestResult {
    */
   public RequestResult assertJSON(String json) throws IOException {
     ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
-    assertJSONEquals(objectMapper, body, json);
+    assertJSONEquals(objectMapper, bodyAsString(), json);
     return this;
   }
 
@@ -965,7 +955,7 @@ public class RequestResult {
   public RequestResult assertJSONFile(Path jsonFile, Object... values) throws IOException {
     ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
     String expected = BodyTools.processTemplateForAssertion(jsonFile, appendArray(values, "_to_milli", new ZonedDateTimeToMilliSeconds()));
-    _assertJSONEquals(objectMapper, body, expected, true, jsonFile);
+    _assertJSONEquals(objectMapper, bodyAsString(), expected, true, jsonFile);
     return this;
   }
 
@@ -981,7 +971,7 @@ public class RequestResult {
    */
   public <T> RequestResult assertJSONFileWithActual(Class<T> type, Path jsonFile, Object... values) throws IOException {
     ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
-    T actual = objectMapper.readValue(body, type);
+    T actual = objectMapper.readValue(bodyAsString(), type);
 
     return assertJSONFile(jsonFile, appendArray(values, "actual", actual, "_to_milli", new ZonedDateTimeToMilliSeconds()));
   }
@@ -1000,7 +990,7 @@ public class RequestResult {
     }
 
     ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
-    JsonNode actual = objectMapper.readTree(body);
+    JsonNode actual = objectMapper.readTree(bodyAsString());
 
     for (int i = 0; i < pairs.length; i = i + 2) {
       String pointer = pairs[i].toString();
@@ -1025,6 +1015,7 @@ public class RequestResult {
    * @return This.
    */
   public RequestResult assertNormalizedBody(String string) {
+    String body = bodyAsString();
     if (!normalize(body).equals(string)) {
       throw new AssertionError("The body doesn't match the expected output. expected [" + string + "] but found [" + body.trim().replace("\r\n", "\n").replace("\r", "\n") + "]");
     }
@@ -1057,8 +1048,9 @@ public class RequestResult {
    * @return This.
    */
   public RequestResult assertRedirect(String uri, Consumer<TestURIBuilder> consumer) {
+    String redirect = response.getHeader(Headers.Location);
     if (redirect == null) {
-      throw new AssertionError("\nActual redirect was null. Why do you want to assert on it? Status code was [" + statusCode + "]");
+      throw new AssertionError("\nActual redirect was null. Why do you want to assert on it? Status code was [" + response.getStatus() + "]");
     }
 
     TestURIBuilder builder = TestURIBuilder.builder(uri);
@@ -1076,30 +1068,12 @@ public class RequestResult {
    * @return This.
    */
   public RequestResult assertRedirect(String expectedUri) {
+    String redirect = response.getHeader(Headers.Location);
     if (redirect == null) {
       throw new AssertionError("\nActual redirect was null. \nExpected:\t" + expectedUri);
     }
 
     assertRedirectEquality(expectedUri);
-    return this;
-  }
-
-  /**
-   * Verifies that the request contains the attribute and the value is equal.
-   *
-   * @param name  the attribute name.
-   * @param value the attribute value.
-   * @return This.
-   */
-  public RequestResult assertRequestContainsAttribute(String name, Object value) {
-    if (request.getAttribute(name) == null) {
-      throw new AssertionError("Attribute [" + name + "] was not found in the request.");
-    }
-
-    if (!request.getAttribute(name).equals(value)) {
-      throw new AssertionError("Attribute [" + name + "] was not equal to the expected value.\n\tActual: " + value + "\n\tExpected: " + request.getAttribute(name) + "\n");
-    }
-
     return this;
   }
 
@@ -1126,7 +1100,7 @@ public class RequestResult {
    */
   public RequestResult assertSortedJSON(String json) throws IOException {
     ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
-    assertSortedJSONEquals(objectMapper, body, json);
+    assertSortedJSONEquals(objectMapper, bodyAsString(), json);
     return this;
   }
 
@@ -1155,7 +1129,7 @@ public class RequestResult {
   public <T> RequestResult assertSortedJSONFileWithActual(Class<T> type, Path jsonFile, Object... values)
       throws IOException {
     ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
-    T actual = objectMapper.readValue(body, type);
+    T actual = objectMapper.readValue(bodyAsString(), type);
 
     return assertSortedJSONFile(jsonFile, appendArray(values, "actual", actual, "_to_milli", new ZonedDateTimeToMilliSeconds()));
   }
@@ -1167,26 +1141,26 @@ public class RequestResult {
    * @return This.
    */
   public RequestResult assertStatusCode(int statusCode) {
-    if (this.statusCode != statusCode) {
-      StringBuilder sb = new StringBuilder("Status code [" + this.statusCode + "] was not equal to [" + statusCode + "]\n");
-      MessageStore messageStore = get(MessageStore.class);
+    if (response.getStatus() != statusCode) {
+      StringBuilder sb = new StringBuilder("Status code [" + response.getStatus() + "] was not equal to [" + statusCode + "]\n");
 
       // Append any General Messages to the error message to aid in debug
-      List<Message> generatorMessages = messageStore.getGeneralMessages();
+      List<Message> generatorMessages = messageObserver.getGeneralMessages();
       if (!generatorMessages.isEmpty()) {
         sb.append("\nThe following general error messages were returned in the message store:\n\n");
       }
       generatorMessages.forEach(m -> sb.append("\t\t").append(m.getType()).append("\t").append(m.getCode()).append("\t").append((m instanceof SimpleMessage) ? ((SimpleMessage) m).message : "").append("\n"));
 
       // Append any Field Messages to the error message to aid in debug
-      List<FieldMessage> fieldMessages = messageStore.getFieldMessages().values().stream().flatMap(Collection::stream).collect(Collectors.toList());
+      List<FieldMessage> fieldMessages = messageObserver.getFieldMessages().values().stream().flatMap(Collection::stream).collect(Collectors.toList());
       if (!fieldMessages.isEmpty()) {
         sb.append("\nThe following field error messages were returned in the message store:\n\n");
       }
       //noinspection StringConcatenationInsideStringBufferAppend
       fieldMessages.forEach(m -> sb.append("\t\t" + m.getType() + "\tField: " + m.getField() + " Code: " + m.getCode() + "\t" + ((m instanceof SimpleFieldMessage) ? ((SimpleFieldMessage) m).message : "") + "\n"));
 
-      sb.append("\nRedirect: [").append(redirect).append("]\n").append("Response body: \n").append(body);
+      String redirect = response.getHeader(Headers.Location);
+      sb.append("\nRedirect: [").append(redirect).append("]\n").append("Response body: \n").append(bodyAsString());
       throw new AssertionError(sb.toString());
     }
 
@@ -1290,7 +1264,7 @@ public class RequestResult {
   public Cookie getCookie(String name) {
     List<Cookie> cookies = response.getCookies()
                                    .stream()
-                                   .filter(c -> c.getName().equals(name))
+                                   .filter(c -> c.name.equals(name))
                                    .collect(Collectors.toList());
 
     if (cookies.size() == 0) {
@@ -1313,7 +1287,7 @@ public class RequestResult {
   public List<Cookie> getCookies(String name) {
     return response.getCookies()
                    .stream()
-                   .filter(c -> c.getName().equals(name))
+                   .filter(c -> c.name.equals(name))
                    .collect(Collectors.toList());
   }
 
@@ -1419,6 +1393,8 @@ public class RequestResult {
       }
     }
 
+    String redirect = response.getHeader(Headers.Location);
+    String body = bodyAsString();
     for (String string : strings) {
       if (!body.contains(string)) {
         throw new AssertionError("Body didn't contain [" + string + "]\nRedirect: [" + redirect + "]\nBody:\n" + body);
@@ -1436,6 +1412,8 @@ public class RequestResult {
       message = escape(message);
     }
 
+    String redirect = response.getHeader(Headers.Location);
+    String body = bodyAsString();
     if (contains != body.contains(message)) {
       String text = contains ? "didn't" : "does";
       throw new AssertionError("Body " + text + " contain [" + message + "] for the key [" + key + "]\nRedirect: [" + redirect + "]\nBody:\n" + body);
@@ -1451,6 +1429,7 @@ public class RequestResult {
   }
 
   private void assertRedirectEquality(String expectedUri) {
+    String redirect = response.getHeader(Headers.Location);
     SortedMap<String, List<String>> actual = uriToMap(redirect);
     SortedMap<String, List<String>> expected = uriToMap(expectedUri);
 
@@ -1463,15 +1442,18 @@ public class RequestResult {
     }
   }
 
-  private String cookieToString(Cookie cookie) {
-    return
-        "Set-Cookie: " + cookie.getName()
-            + "=" + cookie.getValue()
-            + "MaxAge=" + cookie.getMaxAge()
-            + (cookie.getDomain() != null ? ("; Domain=" + cookie.getDomain()) : "")
-            + (cookie.getPath() != null ? ("; Path=" + cookie.getPath()) : "")
-            + (cookie.getSecure() ? "; Secure" : "")
-            + (cookie.isHttpOnly() ? "; HttpOnly" : "");
+  private String bodyAsString() {
+    byte[] body = response.wasSuccessful() ? response.successResponse : response.errorResponse;
+    if (body != null && body.length > 0) {
+      Charset encoding = HttpUtil.getCharset(response.getHeader(Headers.ContentType), StandardCharsets.UTF_8);
+      return new String(body, encoding);
+    }
+
+    return "";
+  }
+
+  private String cookieToString(com.inversoft.http.Cookie cookie) {
+    return "Set-Cookie: " + cookie.toResponseHeader();
   }
 
   private String escape(String s) {
@@ -1487,6 +1469,7 @@ public class RequestResult {
   private RequestResult executeFormPost(String selector, ThrowingConsumer<DOMHelper> domHelper,
                                         ThrowingConsumer<RequestResult> result)
       throws Exception {
+    String body = bodyAsString();
     Document document = Jsoup.parse(body);
     Element form = document.selectFirst(selector);
 
@@ -1502,14 +1485,14 @@ public class RequestResult {
     // Try to handle relative URLs, assuming they are relative to the current request. Maybe a naive assumption, but it our use cases it works ok.
     // - We could also just allow the caller to pass in the URI
     if (!uri.startsWith("/")) {
-      String baseURI = request.getRequestURI();
+      String baseURI = request.getPath();
       if (baseURI.contains("/")) {
-        baseURI = request.getRequestURI().substring(0, baseURI.lastIndexOf("/") + 1);
+        baseURI = request.getPath().substring(0, baseURI.lastIndexOf('/') + 1);
         uri = baseURI + uri;
       }
     }
 
-    RequestBuilder rb = new RequestBuilder(uri, container, filter, injector);
+    RequestBuilder rb = new RequestBuilder(request.getPort(), uri, injector, userAgent, messageObserver);
 
     // Handle input, select and textarea
     for (Element element : form.select("input,select,textarea")) {
@@ -1536,9 +1519,9 @@ public class RequestResult {
 
     String method = form.attr("method");
     RequestResult requestResult = null;
-    if (method == null || method.equalsIgnoreCase("GET")) {
+    if (method == null || method.equalsIgnoreCase(Methods.GET)) {
       requestResult = rb.get();
-    } else if (method.equalsIgnoreCase("POST")) {
+    } else if (method.equalsIgnoreCase(Methods.POST)) {
       requestResult = rb.post();
     }
 
@@ -1547,21 +1530,22 @@ public class RequestResult {
   }
 
   private RequestResult executeRedirectReturningResult(ThrowingConsumer<RequestResult> consumer) throws Exception {
-    String baseURI = redirect.contains("?") ? redirect.substring(0, redirect.indexOf("?")) : redirect;
+    String redirect = response.getHeader(Headers.Location);
+    String baseURI = redirect.contains("?") ? redirect.substring(0, redirect.indexOf('?')) : redirect;
     String originalURI = baseURI;
     String newRedirect = redirect;
 
     // Handle a relative URI
     if (!baseURI.startsWith("/")) {
-      int index = request.getRequestURI().lastIndexOf('/');
-      String baseURL = request.getRequestURI().substring(0, index);
+      int index = request.getPath().lastIndexOf('/');
+      String baseURL = request.getPath().substring(0, index);
       baseURI = baseURL + "/" + baseURI;
       newRedirect = redirect.replace(originalURI, baseURI);
     }
 
-    RequestBuilder rb = new RequestBuilder(baseURI, container, filter, injector);
+    RequestBuilder rb = new RequestBuilder(request.getPort(), baseURI, injector, userAgent, messageObserver);
     if (baseURI.length() != newRedirect.length()) {
-      String params = newRedirect.substring(newRedirect.indexOf("?") + 1);
+      String params = newRedirect.substring(newRedirect.indexOf('?') + 1);
       QueryStringTools.parseQueryString(params).forEach(rb::withParameters);
     }
 
@@ -1571,16 +1555,15 @@ public class RequestResult {
   }
 
   private MessageProvider getMessageProviderToLookupMessages() {
-    // TODO Since prime has already injected the action, can we just get the message provider that prime already built ?
-    // - Or is that already GC'd because the action is toast? Maybe the request result could obtain a reference to the last
-    //  action invocation that came off the stack and use that?
-
+    // Now that we are going across the wire, this likely will never be able to fetch the action that was just used.
+    // Therefore, we just try to build a valid action invocation so at least the messages are correct, but the values
+    // won't exist.
     MessageProvider messageProvider = get(MessageProvider.class);
     ActionInvocationStore actionInvocationStore = get(ActionInvocationStore.class);
     ActionMapper actionMapper = get(ActionMapper.class);
 
     // Using the ActionMapper so that URL segments are properly handled and the correct URL is used for message lookups.
-    ActionInvocation actionInvocation = actionMapper.map(null, request.getRequestURI(), true);
+    ActionInvocation actionInvocation = actionMapper.map(null, request.getPath(), true);
     actionInvocationStore.setCurrent(actionInvocation);
 
     return messageProvider;
@@ -1619,8 +1602,8 @@ public class RequestResult {
 
   private SortedMap<String, List<String>> uriToMap(String uri) {
     SortedMap<String, List<String>> map = new TreeMap<>();
-    int queryIndex = uri.indexOf("?");
-    int fragmentIndex = uri.indexOf("#");
+    int queryIndex = uri.indexOf('?');
+    int fragmentIndex = uri.indexOf('#');
     if (fragmentIndex != -1) {
       // If the fragment is followed by a '/' then ignore it.
       if ((fragmentIndex + 1) < uri.length() && uri.charAt(fragmentIndex + 1) == '/') {
@@ -1753,7 +1736,7 @@ public class RequestResult {
 
     public HTMLAsserter(RequestResult requestResult) {
       this.requestResult = requestResult;
-      document = Jsoup.parse(requestResult.body);
+      document = Jsoup.parse(requestResult.bodyAsString());
     }
 
     /**
@@ -1765,7 +1748,7 @@ public class RequestResult {
     public HTMLAsserter assertElementDoesNotExist(String selector) {
       Elements elements = document.select(selector);
       if (elements.size() > 0) {
-        throw new AssertionError("Expected 0 elements to match the selector " + selector + ". Found [" + (elements.size() + "] elements.\n" + elements) + "\n\nActual body:\n" + requestResult.body);
+        throw new AssertionError("Expected 0 elements to match the selector " + selector + ". Found [" + (elements.size() + "] elements.\n" + elements) + "\n\nActual body:\n" + requestResult.bodyAsString());
       }
 
       return this;
@@ -1780,7 +1763,7 @@ public class RequestResult {
     public HTMLAsserter assertElementExists(String selector) {
       Elements elements = document.select(selector);
       if (elements.size() != 1) {
-        throw new AssertionError("Expected a single element to match the selector " + selector + ". Found [" + elements.size() + "] elements instead." + ((elements.size() == 0) ? "" : "\n\n" + elements) + "\n\nActual body:\n" + requestResult.body);
+        throw new AssertionError("Expected a single element to match the selector " + selector + ". Found [" + elements.size() + "] elements instead." + ((elements.size() == 0) ? "" : "\n\n" + elements) + "\n\nActual body:\n" + requestResult.bodyAsString());
       }
 
       return this;
@@ -1796,12 +1779,12 @@ public class RequestResult {
     public HTMLAsserter assertElementInnerHTML(String selector, String expectedInnerHTML) {
       Elements elements = document.select(selector);
       if (elements.size() != 1) {
-        throw new AssertionError("Expected a single element to match the selector " + selector + ". Found [" + elements.size() + "] elements instead." + ((elements.size() == 0) ? "" : "\n\n" + elements) + "\n\nActual body:\n" + requestResult.body);
+        throw new AssertionError("Expected a single element to match the selector " + selector + ". Found [" + elements.size() + "] elements instead." + ((elements.size() == 0) ? "" : "\n\n" + elements) + "\n\nActual body:\n" + requestResult.bodyAsString());
       }
 
       Element element = elements.get(0);
       if (!expectedInnerHTML.equals(element.html())) {
-        throw new AssertionError("Expected a value of [" + expectedInnerHTML + "] to match the selector " + selector + ". Found [" + element.html() + "] instead." + "\n\nActual body:\n" + requestResult.body);
+        throw new AssertionError("Expected a value of [" + expectedInnerHTML + "] to match the selector " + selector + ". Found [" + element.html() + "] instead." + "\n\nActual body:\n" + requestResult.bodyAsString());
       }
 
       return this;
@@ -1816,11 +1799,11 @@ public class RequestResult {
     public HTMLAsserter assertElementIsChecked(String selector) {
       Elements elements = document.select(selector);
       if (elements.size() != 1) {
-        throw new AssertionError("Expected a single element to match the selector " + selector + ". Found [" + elements.size() + "] elements instead." + ((elements.size() == 0) ? "" : "\n\n" + elements) + "\n\nActual body:\n" + requestResult.body);
+        throw new AssertionError("Expected a single element to match the selector " + selector + ". Found [" + elements.size() + "] elements instead." + ((elements.size() == 0) ? "" : "\n\n" + elements) + "\n\nActual body:\n" + requestResult.bodyAsString());
       }
 
       if (!elements.get(0).hasAttr("checked")) {
-        throw new AssertionError("Expected the element to be checked." + "\n\nActual body:\n" + requestResult.body);
+        throw new AssertionError("Expected the element to be checked." + "\n\nActual body:\n" + requestResult.bodyAsString());
       }
 
       return this;
@@ -1835,11 +1818,11 @@ public class RequestResult {
     public HTMLAsserter assertElementIsNotChecked(String selector) {
       Elements elements = document.select(selector);
       if (elements.size() != 1) {
-        throw new AssertionError("Expected a single element to match the selector " + selector + ". Found [" + elements.size() + "] elements instead." + ((elements.size() == 0) ? "" : "\n\n" + elements) + "\n\nActual body:\n" + requestResult.body);
+        throw new AssertionError("Expected a single element to match the selector " + selector + ". Found [" + elements.size() + "] elements instead." + ((elements.size() == 0) ? "" : "\n\n" + elements) + "\n\nActual body:\n" + requestResult.bodyAsString());
       }
 
       if (elements.get(0).hasAttr("checked")) {
-        throw new AssertionError("Expected the element NOT to be checked." + "\n\nActual body:\n" + requestResult.body);
+        throw new AssertionError("Expected the element NOT to be checked." + "\n\nActual body:\n" + requestResult.bodyAsString());
       }
 
       return this;
@@ -1855,12 +1838,12 @@ public class RequestResult {
     public HTMLAsserter assertElementValue(String selector, Object value) {
       Elements elements = document.select(selector);
       if (elements.size() != 1) {
-        throw new AssertionError("Expected a single element to match the selector " + selector + ". Found [" + elements.size() + "] instead." + ((elements.size() == 0) ? "" : "\n\n" + elements) + "\n\nActual body:\n" + requestResult.body);
+        throw new AssertionError("Expected a single element to match the selector " + selector + ". Found [" + elements.size() + "] instead." + ((elements.size() == 0) ? "" : "\n\n" + elements) + "\n\nActual body:\n" + requestResult.bodyAsString());
       }
 
       Element element = elements.get(0);
       if (!element.val().equals(value.toString())) {
-        throw new AssertionError("Using the selector [" + selector + "] expected [" + value.toString() + "] but found [" + element.val() + "]. Actual matched element: \n\n" + element + "\n\nActual body:\n" + requestResult.body);
+        throw new AssertionError("Using the selector [" + selector + "] expected [" + value + "] but found [" + element.val() + "]. Actual matched element: \n\n" + element + "\n\nActual body:\n" + requestResult.bodyAsString());
       }
 
       return this;

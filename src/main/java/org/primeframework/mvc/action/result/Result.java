@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc.action.result;
 
-import javax.servlet.ServletException;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 
@@ -31,7 +30,6 @@ public interface Result<T extends Annotation> {
    * @param annotation The annotation that caused the result to be invoked.
    * @return true if the result was handled, false if it was not.
    * @throws IOException If there is any IO error rendering the result.
-   * @throws ServletException If there is any servlet error rendering the result.
    */
-  boolean execute(T annotation) throws IOException, ServletException;
+  boolean execute(T annotation) throws IOException;
 }

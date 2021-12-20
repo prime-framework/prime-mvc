@@ -15,20 +15,16 @@
  */
 package org.primeframework.mvc.parameter;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
+import org.primeframework.mvc.http.HTTPRequest;
 import org.primeframework.mvc.workflow.WorkflowChain;
-
-import com.google.inject.Inject;
 
 /**
  * This class implements the URIParameterWorkflow using patterns derived from the WADL specification.
@@ -67,10 +63,10 @@ import com.google.inject.Inject;
 public class DefaultURIParameterWorkflow implements URIParameterWorkflow {
   private final ActionInvocationStore actionInvocationStore;
 
-  private final HttpServletRequest request;
+  private final HTTPRequest request;
 
   @Inject
-  public DefaultURIParameterWorkflow(HttpServletRequest request, ActionInvocationStore actionInvocationStore) {
+  public DefaultURIParameterWorkflow(HTTPRequest request, ActionInvocationStore actionInvocationStore) {
     this.request = request;
     this.actionInvocationStore = actionInvocationStore;
   }
@@ -83,20 +79,14 @@ public class DefaultURIParameterWorkflow implements URIParameterWorkflow {
    *
    * @param workflowChain Called after processing.
    * @throws IOException If the WorkflowChain throws this exception.
-   * @throws ServletException If the WorkflowChain throws this exception.
    */
-  public void perform(WorkflowChain workflowChain) throws IOException, ServletException {
+  public void perform(WorkflowChain workflowChain) throws IOException {
     ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
     if (actionInvocation.uriParameters.size() > 0) {
-      HttpServletRequestWrapper wrapper = (HttpServletRequestWrapper) request;
-      HttpServletRequest old = (HttpServletRequest) wrapper.getRequest();
       Map<String, List<String>> params = actionInvocation.uriParameters;
-      Map<String, String[]> fixed = new HashMap<>();
       for (Entry<String, List<String>> entry : params.entrySet()) {
-        fixed.put(entry.getKey(), entry.getValue().toArray(new String[entry.getValue().size()]));
+        request.getParameters().put(entry.getKey(), entry.getValue());
       }
-
-      wrapper.setRequest(new ParameterHttpServletRequest(old, fixed));
     }
 
     workflowChain.continueWorkflow();

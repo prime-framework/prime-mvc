@@ -25,7 +25,7 @@ public interface ResourceLocator {
    * Locates a resource in the web application under the given root directory.
    *
    * @param directory The directory.
-   * @return The location of the result or null if the resource doesn't exist.
+   * @return The location of the resource or null if the resource doesn't exist.
    */
   String locate(String directory);
 
@@ -33,7 +33,7 @@ public interface ResourceLocator {
    * Locates an index resource in the web application under the given root directory.
    *
    * @param directory The directory.
-   * @return The location of the result or null if the resource doesn't exist.
+   * @return The location of the resource or null if the resource doesn't exist.
    */
   String locateIndex(String directory);
 }

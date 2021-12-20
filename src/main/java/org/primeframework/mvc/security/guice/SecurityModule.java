@@ -15,11 +15,7 @@
  */
 package org.primeframework.mvc.security.guice;
 
-import java.util.Map;
-
 import com.google.inject.AbstractModule;
-import com.google.inject.TypeLiteral;
-import io.fusionauth.jwt.Verifier;
 import org.primeframework.mvc.security.AuthorizeMethodScheme;
 import org.primeframework.mvc.security.CipherProvider;
 import org.primeframework.mvc.security.DefaultCipherProvider;
@@ -40,8 +36,9 @@ import org.primeframework.mvc.security.SavedRequestWorkflow;
 import org.primeframework.mvc.security.SecurityWorkflow;
 import org.primeframework.mvc.security.UserLoginConstraintsValidator;
 import org.primeframework.mvc.security.UserLoginSecurityScheme;
+import org.primeframework.mvc.security.VerifierProvider;
 import org.primeframework.mvc.security.csrf.CSRFProvider;
-import org.primeframework.mvc.security.csrf.SynchronizerTokenCSRFProvider;
+import org.primeframework.mvc.security.csrf.DefaultEncryptionBasedTokenCSRFProvider;
 
 /**
  * A Guice modules for the Security classes.
@@ -51,15 +48,15 @@ import org.primeframework.mvc.security.csrf.SynchronizerTokenCSRFProvider;
 public class SecurityModule extends AbstractModule {
   @Override
   protected void configure() {
+    bind(CSRFProvider.class).to(DefaultEncryptionBasedTokenCSRFProvider.class);
     bind(SecurityWorkflow.class).to(DefaultSecurityWorkflow.class);
     bind(SavedRequestWorkflow.class).to(DefaultSavedRequestWorkflow.class);
 
     bind(JWTConstraintsValidator.class).to(DefaultJWTConstraintsValidator.class);
     bind(JWTRequestAdapter.class).to(DefaultJWTRequestAdapter.class);
     bind(JWTSecurityContext.class).to(DefaultJWTSecurityContext.class);
-    bind(new TypeLiteral<Map<String, Verifier>>() {
-    }).toProvider(ExplosiveVerifierProvider.class);
     bind(UserLoginConstraintsValidator.class).to(DefaultUserLoginConstraintValidator.class);
+    bind(VerifierProvider.class).to(ExplosiveVerifierProvider.class);
 
     // Binds the user login scheme
     SecuritySchemeFactory.addSecurityScheme(binder(), "jwt", JWTSecurityScheme.class);
@@ -69,8 +66,5 @@ public class SecurityModule extends AbstractModule {
     // Bind the Cipher/Encryption interfaces
     bind(CipherProvider.class).to(DefaultCipherProvider.class).asEagerSingleton();
     bind(Encryptor.class).to(DefaultEncryptor.class);
-
-    // Bind CSRF Provider
-    bind(CSRFProvider.class).to(SynchronizerTokenCSRFProvider.class);
   }
 }

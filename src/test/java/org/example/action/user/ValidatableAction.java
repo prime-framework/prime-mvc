@@ -18,7 +18,7 @@ package org.example.action.user;
 import com.google.inject.Inject;
 import org.example.domain.User;
 import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.servlet.HTTPMethod;
+import org.primeframework.mvc.http.HTTPMethod;
 
 /**
  * @author Brian Pontarelli
@@ -36,7 +36,7 @@ public class ValidatableAction implements org.primeframework.mvc.validation.Vali
 
   @Override
   public void validate() {
-    if (method == HTTPMethod.POST) {
+    if (HTTPMethod.POST.is(method)) {
     }
   }
 

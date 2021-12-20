@@ -15,57 +15,58 @@
  */
 package org.primeframework.mvc.workflow;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URLDecoder;
-import java.util.Calendar;
+import java.io.OutputStream;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Set;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.config.MVCConfiguration;
-import org.primeframework.mvc.servlet.ServletTools;
+import org.primeframework.mvc.http.HTTPContext;
+import org.primeframework.mvc.http.HTTPRequest;
+import org.primeframework.mvc.http.HTTPResponse;
+import org.primeframework.mvc.http.HTTPTools;
+import org.primeframework.mvc.http.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.inject.Inject;
-
 /**
- * This class handles static resources via the Prime workflow chain. In order to handle resources that will be coming
- * from JAR files and the web application directories, this first checks the incoming request URI against a configured
- * set of prefixes. This set of prefixes is controlled using the configuration interface. The default list of prefixes
- * is:
- * <p/>
- * <pre>
- * /static
- * </pre>
- * <p/>
- * This workflow can also be turned off completely using the configuration interface.
+ * This class handles static resources via the Prime workflow chain. Static resources can either be files in the
+ * `static` directory of the web application or they can be located inside JAR files in the classpath. This workflow
+ * will attempt to load the files from both locations and will properly handle the expiration, last modified instant,
+ * and other components of the HTTP request to try and ensure that browsers cache as much as possible to reduce load on
+ * the server.
  *
  * @author Brian Pontarelli
  */
 public class StaticResourceWorkflow implements Workflow {
   private static final Logger logger = LoggerFactory.getLogger(StaticResourceWorkflow.class);
-  private final ServletContext context;
-  private final HttpServletRequest request;
-  private final HttpServletResponse response;
-  private final String[] staticPrefixes;
-  private final boolean enabled;
+
   private final Set<ClassLoader> additionalClassLoaders;
 
+  private final MVCConfiguration configuration;
+
+  private final HTTPContext context;
+
+  private final HTTPRequest request;
+
+  private final HTTPResponse response;
+
   @Inject
-  public StaticResourceWorkflow(ServletContext context, HttpServletRequest request,
-                                HttpServletResponse response, MVCConfiguration configuration,
-                                Set<ClassLoader> additionalClassLoaders) {
+  public StaticResourceWorkflow(HTTPContext context, HTTPRequest request, HTTPResponse response,
+                                Set<ClassLoader> additionalClassLoaders, MVCConfiguration configuration) {
     this.context = context;
     this.request = request;
     this.response = response;
-    this.staticPrefixes = configuration.staticResourcePrefixes();
-    this.enabled = configuration.staticResourcesEnabled();
     this.additionalClassLoaders = additionalClassLoaders;
+    this.configuration = configuration;
   }
 
   /**
@@ -73,24 +74,16 @@ public class StaticResourceWorkflow implements Workflow {
    * it passes control down the chain.
    *
    * @param workflowChain The workflow chain to use if the request is not a static resource.
-   * @throws IOException      If the request is a static resource and sending it failed or if the chain throws an
-   *                          IOException.
-   * @throws ServletException If the chain throws.
+   * @throws IOException If the request is a static resource and sending it failed or if the chain throws an
+   *                     IOException.
    */
-  public void perform(WorkflowChain workflowChain) throws IOException, ServletException {
+  public void perform(WorkflowChain workflowChain) throws IOException {
     boolean handled = false;
-    if (enabled) {
-      // Ensure that this is a request for a resource like foo.jpg
-      String uri = ServletTools.getRequestURI(request);
-      int dot = uri.lastIndexOf('.');
-      int slash = dot >= 0 ? uri.indexOf('/', dot) : 1;
-      if (slash == -1 && !uri.endsWith(".class")) {
-        for (String staticPrefix : staticPrefixes) {
-          if (uri.startsWith(staticPrefix)) {
-            handled = findStaticResource(uri, request, response);
-          }
-        }
-      }
+
+    // Ensure that this is a request for a resource and not a class
+    String uri = HTTPTools.getRequestURI(request);
+    if (!uri.endsWith(".class")) {
+      handled = findStaticResource(uri, request, response);
     }
 
     if (!handled) {
@@ -105,124 +98,92 @@ public class StaticResourceWorkflow implements Workflow {
    * @param request  The request
    * @param response The response
    * @return True if the resource was found in the classpath and if it was successfully written back to the output
-   *         stream. Otherwise, this returns false if the resource doesn't exist in the classpath.
+   *     stream. Otherwise, this returns false if the resource doesn't exist in the classpath.
    * @throws IOException If anything goes wrong
    */
-  protected boolean findStaticResource(String uri, HttpServletRequest request, HttpServletResponse response)
-    throws IOException {
-    if (context.getResource(uri) != null) {
-      // It is in the webapp, just return false and let the container deal with it
-      return false;
-    }
-
-    // check for if-modified-since, prior to any other headers
-    long ifModifiedSince = 0;
+  protected boolean findStaticResource(String uri, HTTPRequest request, HTTPResponse response) throws IOException {
+    // Retrieve the modified header (defaults to null)
+    Instant ifModifiedSince = null;
     try {
       ifModifiedSince = request.getDateHeader("If-Modified-Since");
     } catch (Exception e) {
-      logger.warn("Invalid If-Modified-Since header value [" + request.getHeader("If-Modified-Since") + "], ignoring");
+      logger.warn("Invalid If-Modified-Since header value [{}], ignoring", request.getHeader("If-Modified-Since"));
     }
 
-    if (ifModifiedSince > 0) {
-      // not modified, content is not sent - only basic headers and status SC_NOT_MODIFIED
-      response.setDateHeader("Expires", Long.MAX_VALUE);
-      response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+    // See if a file exists in the static directory
+    String staticDirectory = configuration.staticDirectory();
+    Path file = context.resolve(staticDirectory + uri);
+    if (Files.isRegularFile(file) && Files.isReadable(file)) {
+      Instant modified = Files.getLastModifiedTime(file).toInstant();
+      if (ifModifiedSince == null || modified.isAfter(ifModifiedSince)) {
+        try (InputStream is = Files.newInputStream(file)) {
+          writeResponse(response, is, modified);
+        }
+
+        String contentType = Files.probeContentType(file);
+        response.setHeader("Content-Type", contentType);
+      } else {
+        addHeaders(response, modified);
+        response.setStatus(Status.SC_NOT_MODIFIED);
+      }
+
       return true;
     }
 
-    InputStream is = findInputStream(uri);
-    if (is == null) {
-      return false;
-    }
-
-    // Set the content-type header
-    String contentType = getContentType(uri);
-    if (contentType != null) {
-      response.setContentType(contentType);
-    }
-
-    // Components manage caching based on version numbers, so we can cache forever
-    Calendar now = Calendar.getInstance();
-    response.setDateHeader("Date", now.getTimeInMillis());
-    response.setDateHeader("Expires", Long.MAX_VALUE);
-    response.setDateHeader("Retry-After", Long.MAX_VALUE);
-    response.setHeader("Cache-Control", "public");
-    response.setDateHeader("Last-Modified", 0);
-
-    try {
-      ServletOutputStream sos = response.getOutputStream();
-
-      // Then output the file
-      byte[] b = new byte[8192];
-      int len;
-      do {
-        len = is.read(b);
-        if (len > 0) {
-          sos.write(b, 0, len);
-        }
-      } while (len != -1);
-
-      sos.flush();
-    } finally {
-      is.close();
-    }
-
-    return true;
-  }
-
-  /**
-   * Look for a static resource in the classpath.
-   *
-   * @param uri The resource URI.
-   * @return The inputstream of the resource.
-   * @throws IOException If there is a problem locating the resource.
-   */
-  protected InputStream findInputStream(String uri) throws IOException {
-    uri = URLDecoder.decode(uri, "UTF-8");
-    if (uri.startsWith("/")) {
-      uri = uri.substring(1);
-    }
-
-    InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(uri);
-    if (is == null) {
+    // See if there is a classpath entry
+    URL url = HTTPContext.class.getResource(uri);
+    if (url == null) {
       for (ClassLoader classLoader : additionalClassLoaders) {
-        is = classLoader.getResourceAsStream(uri);
-        if (is != null) {
+        url = classLoader.getResource(uri);
+        if (url != null) {
           break;
         }
       }
     }
 
-    return is;
+    if (url != null) {
+      URLConnection connection = url.openConnection();
+      Instant modified = Instant.ofEpochSecond(connection.getLastModified());
+      if (ifModifiedSince == null || modified.isAfter(ifModifiedSince)) {
+        try (InputStream is = connection.getInputStream()) {
+          writeResponse(response, is, modified);
+        }
+
+        response.setHeader("Content-Type", connection.getContentType());
+      } else {
+        addHeaders(response, modified);
+        response.setStatus(Status.SC_NOT_MODIFIED);
+      }
+
+      return true;
+    }
+
+    return false;
   }
 
-  /**
-   * Determine the content type for the resource name.
-   *
-   * @param name The resource name.
-   * @return The mime type.
-   */
-  protected String getContentType(String name) {
-    // NOT using the code provided activation.jar to avoid adding yet another dependency
-    // this is generally OK, since these are the main files we server up
-    if (name.endsWith(".js")) {
-      return "text/javascript";
-    } else if (name.endsWith(".css")) {
-      return "text/css";
-    } else if (name.endsWith(".html")) {
-      return "text/html";
-    } else if (name.endsWith(".txt")) {
-      return "text/plain";
-    } else if (name.endsWith(".gif")) {
-      return "image/gif";
-    } else if (name.endsWith(".jpg") || name.endsWith(".jpeg")) {
-      return "image/jpeg";
-    } else if (name.endsWith(".png")) {
-      return "image/png";
-    } else if (name.endsWith(".svg")) {
-      return "image/svg+xml";
-    } else {
-      return null;
+  private void addHeaders(HTTPResponse response, Instant modified) {
+    ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+    ZonedDateTime expiry = now.plusDays(7);
+    response.setHeader("Cache-Control", "public");
+    response.setDateHeader("Date", now);
+    response.setDateHeader("Expires", expiry); // 7 days
+    response.setDateHeader("Last-Modified", ZonedDateTime.ofInstant(modified, ZoneOffset.UTC));
+    response.setDateHeader("Retry-After", expiry); // 7 days
+  }
+
+  private void writeResponse(HTTPResponse response, InputStream is, Instant modified) throws IOException {
+    addHeaders(response, modified);
+    response.setStatus(200);
+
+    OutputStream os = response.getOutputStream();
+
+    // Then output the file
+    byte[] b = new byte[8192];
+    int len;
+    while ((len = is.read(b)) > 0) {
+      os.write(b, 0, len);
     }
+
+    os.flush();
   }
 }

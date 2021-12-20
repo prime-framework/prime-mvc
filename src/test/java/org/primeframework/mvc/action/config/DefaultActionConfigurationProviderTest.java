@@ -36,7 +36,7 @@ import org.primeframework.mvc.content.binary.BinaryActionConfiguration;
 import org.primeframework.mvc.content.binary.BinaryActionConfigurator;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration;
 import org.primeframework.mvc.content.json.JacksonActionConfigurator;
-import org.primeframework.mvc.servlet.HTTPMethod;
+import org.primeframework.mvc.http.HTTPMethod;
 import org.primeframework.mvc.util.DefaultURIBuilder;
 import org.testng.annotations.Test;
 

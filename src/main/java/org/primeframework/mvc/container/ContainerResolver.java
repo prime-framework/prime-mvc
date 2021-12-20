@@ -20,7 +20,7 @@ import java.net.URL;
 /**
  * This interface determines path locations within the bounds of a container. The container might be a J2EE container or
  * a scheduler or just a simple stand-alone JVM. This abstraction allows the application to find paths without depending
- * directly on container objects like the ServletContext.
+ * directly on container objects like the Context
  *
  * @author Brian Pontarelli
  */

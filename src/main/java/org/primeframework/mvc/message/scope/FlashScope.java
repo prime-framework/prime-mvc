@@ -24,10 +24,4 @@ package org.primeframework.mvc.message.scope;
  * @author Brian Pontarelli
  */
 public interface FlashScope extends Scope {
-  String KEY = "primeFlashMessages";
-
-  /**
-   * Moves the flash from the session to the request.
-   */
-  void transferFlash();
 }

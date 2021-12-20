@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc.workflow;
 
-import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.Iterator;
 
@@ -38,7 +37,7 @@ public class DefaultWorkflowChain implements WorkflowChain {
    * {@inheritDoc}
    */
   @Override
-  public void continueWorkflow() throws IOException, ServletException {
+  public void continueWorkflow() throws IOException {
     if (iterator.hasNext()) {
       Workflow workflow = iterator.next();
       workflow.perform(this);

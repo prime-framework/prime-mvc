@@ -15,8 +15,8 @@
  */
 package org.primeframework.mvc.action.result;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import org.primeframework.mvc.http.HTTPRequest;
+import org.primeframework.mvc.http.HTTPResponse;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 
@@ -35,8 +35,8 @@ import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 public class RedirectResult extends AbstractRedirectResult<Redirect> {
   @Inject
   public RedirectResult(MessageStore messageStore, ExpressionEvaluator expressionEvaluator,
-                        HttpServletResponse response,
-                        HttpServletRequest request, ActionInvocationStore actionInvocationStore) {
+                        HTTPResponse response,
+                        HTTPRequest request, ActionInvocationStore actionInvocationStore) {
     super(expressionEvaluator, actionInvocationStore, messageStore, request, response);
   }
 

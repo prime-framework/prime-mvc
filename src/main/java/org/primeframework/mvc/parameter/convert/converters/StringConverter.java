@@ -51,7 +51,7 @@ public class StringConverter extends AbstractGlobalConverter {
 
   protected Object stringsToObject(String[] values, Type convertTo, Map<String, String> attributes, String expression)
     throws org.primeframework.mvc.parameter.convert.ConversionException, ConverterStateException {
-    return StringUtils.join(values, ",");
+    return String.join(",", values);
   }
 
   protected String objectToString(Object value, Type convertFrom, Map<String, String> attributes, String expression)

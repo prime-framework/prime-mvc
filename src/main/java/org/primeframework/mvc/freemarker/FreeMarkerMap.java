@@ -15,24 +15,23 @@
  */
 package org.primeframework.mvc.freemarker;
 
-import javax.servlet.GenericServlet;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.inject.Inject;
+import freemarker.ext.beans.BeansWrapper;
+import freemarker.ext.beans.CollectionModel;
+import freemarker.template.Configuration;
+import freemarker.template.TemplateCollectionModel;
+import freemarker.template.TemplateHashModelEx;
+import freemarker.template.TemplateModel;
+import freemarker.template.TemplateModelException;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
@@ -40,25 +39,17 @@ import org.primeframework.mvc.action.result.ControlsHashModel;
 import org.primeframework.mvc.action.result.ModelsHashModel;
 import org.primeframework.mvc.control.guice.ControlFactory;
 import org.primeframework.mvc.freemarker.guice.TemplateModelFactory;
+import org.primeframework.mvc.freemarker.http.ContextModel;
+import org.primeframework.mvc.freemarker.http.HTTPRequestModel;
+import org.primeframework.mvc.http.HTTPContext;
+import org.primeframework.mvc.http.HTTPRequest;
+import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.message.FieldMessage;
 import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.parameter.el.MissingPropertyExpressionException;
-
-import com.google.inject.Inject;
-import freemarker.ext.beans.BeansWrapper;
-import freemarker.ext.beans.CollectionModel;
-import freemarker.ext.jsp.TaglibFactory;
-import freemarker.ext.servlet.HttpRequestHashModel;
-import freemarker.ext.servlet.HttpSessionHashModel;
-import freemarker.ext.servlet.ServletContextHashModel;
-import freemarker.template.Configuration;
-import freemarker.template.TemplateCollectionModel;
-import freemarker.template.TemplateHashModelEx;
-import freemarker.template.TemplateModel;
-import freemarker.template.TemplateModelException;
 
 /**
  * This class is a FreeMarker model that provides access in the templates to the request, session and context attributes
@@ -69,9 +60,9 @@ import freemarker.template.TemplateModelException;
 public class FreeMarkerMap implements TemplateHashModelEx {
   public static final String ALL_MESSAGES = "allMessages";
 
-  public static final String APPLICATION = "application";
+  public static final String CONTEXT = "context";
 
-  public static final String APPLICATION_MODEL = "Application";
+  public static final String CONTEXT_MODEL = "Context";
 
   public static final String ERROR_MESSAGES = "errorMessages";
 
@@ -79,15 +70,9 @@ public class FreeMarkerMap implements TemplateHashModelEx {
 
   public static final String INFO_MESSAGES = "infoMessages";
 
-  public static final String JSP_TAGLIBS = "JspTaglibs";
-
   public static final String REQUEST = "request";
 
   public static final String REQUEST_MODEL = "Request";
-
-  public static final String SESSION = "session";
-
-  public static final String SESSION_MODEL = "Session";
 
   public static final String WARNING_MESSAGES = "warningMessages";
 
@@ -95,54 +80,30 @@ public class FreeMarkerMap implements TemplateHashModelEx {
 
   protected final Configuration configuration;
 
-  protected final ServletContext context;
+  protected final HTTPContext context;
 
   protected final ExpressionEvaluator expressionEvaluator;
 
   protected final Map<String, Object> objects = new HashMap<>();
 
-  protected final HttpServletRequest request;
-
-  protected final TaglibFactory taglibFactory;
+  protected final HTTPRequest request;
 
   @Inject
-  public FreeMarkerMap(ServletContext context, HttpServletRequest request, HttpServletResponse response,
+  public FreeMarkerMap(HTTPContext context, HTTPRequest request, HTTPResponse response,
                        ExpressionEvaluator expressionEvaluator, ActionInvocationStore actionInvocationStore,
-                       MessageStore messageStore, ControlFactory controlFactory, TemplateModelFactory templateModelFactory,
+                       MessageStore messageStore, ControlFactory controlFactory,
+                       TemplateModelFactory templateModelFactory,
                        Configuration configuration) {
     this.context = context;
-    this.taglibFactory = new TaglibFactory(context);
     this.request = request;
     this.expressionEvaluator = expressionEvaluator;
     this.actionInvocationStore = actionInvocationStore;
     this.configuration = configuration;
 
-    objects.put(REQUEST_MODEL, new HttpRequestHashModel(request, response, configuration.getObjectWrapper()));
+    objects.put(REQUEST_MODEL, new HTTPRequestModel(request, response, configuration.getObjectWrapper()));
     objects.put(REQUEST, request);
-    HttpSession session = request.getSession(false);
-    if (session != null) {
-      objects.put(SESSION_MODEL, new HttpSessionHashModel(session, configuration.getObjectWrapper()));
-      objects.put(SESSION, session);
-    }
-
-    objects.put(APPLICATION_MODEL, new ServletContextHashModel(new GenericServlet() {
-      @Override
-      public ServletConfig getServletConfig() {
-        return this;
-      }
-
-      @Override
-      public ServletContext getServletContext() {
-        return FreeMarkerMap.this.context;
-      }
-
-      public void service(ServletRequest servletRequest, ServletResponse servletResponse) {
-      }
-
-
-    }, configuration.getObjectWrapper()));
-    objects.put(APPLICATION, context);
-    objects.put(JSP_TAGLIBS, new TaglibFactory(context));
+    objects.put(CONTEXT_MODEL, new ContextModel(context, configuration.getObjectWrapper()));
+    objects.put(CONTEXT, context);
 
     List<Message> allMessages = messageStore.get();
     Map<String, List<FieldMessage>> fieldMessages = messageStore.getFieldMessages();
@@ -212,14 +173,6 @@ public class FreeMarkerMap implements TemplateHashModelEx {
       value = request.getAttribute(key);
     }
 
-    // Next, check the session
-    if (value == null) {
-      HttpSession session = request.getSession(false);
-      if (session != null) {
-        value = session.getAttribute(key);
-      }
-    }
-
     // Next, check the context
     if (value == null) {
       value = context.getAttribute(key);
@@ -240,14 +193,8 @@ public class FreeMarkerMap implements TemplateHashModelEx {
   @Override
   public TemplateCollectionModel keys() {
     Set<String> keys = new HashSet<>(objects.keySet());
-    keys.addAll(enumToSet(request.getAttributeNames()));
-
-    HttpSession session = request.getSession(false);
-    if (session != null) {
-      keys.addAll(enumToSet(session.getAttributeNames()));
-    }
-
-    keys.addAll(enumToSet(context.getAttributeNames()));
+    keys.addAll(request.getAttributes().keySet());
+    keys.addAll(context.getAttributes().keySet());
 
     Deque<ActionInvocation> actionInvocations = actionInvocationStore.getDeque();
     if (actionInvocations != null) {
@@ -258,21 +205,12 @@ public class FreeMarkerMap implements TemplateHashModelEx {
       }
     }
 
-    keys.add(JSP_TAGLIBS);
-
     return new CollectionModel(keys, (BeansWrapper) configuration.getObjectWrapper());
   }
 
   @Override
   public int size() {
-    int size = objects.size() + count(request.getAttributeNames());
-
-    HttpSession session = request.getSession(false);
-    if (session != null) {
-      size += count(session.getAttributeNames());
-    }
-
-    size += count(context.getAttributeNames());
+    int size = objects.size() + request.getAttributes().size() + context.getAttributes().size();
 
     Deque<ActionInvocation> actionInvocations = actionInvocationStore.getDeque();
     if (actionInvocations != null) {
@@ -298,48 +236,8 @@ public class FreeMarkerMap implements TemplateHashModelEx {
       }
     }
 
-    Enumeration<String> en = request.getAttributeNames();
-    while (en.hasMoreElements()) {
-      String name = en.nextElement();
-      values.add(request.getAttribute(name));
-    }
-
-    HttpSession session = request.getSession(false);
-    if (session != null) {
-      en = session.getAttributeNames();
-      while (en.hasMoreElements()) {
-        String name = en.nextElement();
-        values.add(session.getAttribute(name));
-      }
-    }
-
-    en = context.getAttributeNames();
-    while (en.hasMoreElements()) {
-      String name = en.nextElement();
-      values.add(context.getAttribute(name));
-    }
-
-    values.add(taglibFactory);
-
+    values.addAll(request.getAttributes().values());
+    values.addAll(context.getAttributes().values());
     return new CollectionModel(values, (BeansWrapper) configuration.getObjectWrapper());
-  }
-
-  private int count(Enumeration<String> enumeration) {
-    int count = 0;
-    while (enumeration.hasMoreElements()) {
-      count++;
-      enumeration.nextElement();
-    }
-
-    return count;
-  }
-
-  private Set<String> enumToSet(Enumeration<String> enumeration) {
-    Set<String> set = new HashSet<>();
-    while (enumeration.hasMoreElements()) {
-      set.add(enumeration.nextElement());
-    }
-
-    return set;
   }
 }

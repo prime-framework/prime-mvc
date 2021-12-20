@@ -16,8 +16,8 @@
 package org.primeframework.mvc.control.form;
 
 import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import freemarker.template.ObjectWrapper;
 import freemarker.template.TemplateMethodModelEx;
@@ -47,6 +47,11 @@ public class JoinMethod implements TemplateMethodModelEx {
       return objectWrapper.wrap("");
     }
 
-    return objectWrapper.wrap(StringUtils.join(arguments.subList(1, arguments.size()), first.toString()));
+    @SuppressWarnings("unchecked")
+    Object result = arguments.subList(1, arguments.size())
+                             .stream()
+                             .map(Objects::toString)
+                             .collect(Collectors.joining(first.toString()));
+    return objectWrapper.wrap(result);
   }
 }

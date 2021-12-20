@@ -15,11 +15,10 @@
  */
 package org.primeframework.mvc.security;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import com.google.inject.Inject;
+import org.primeframework.mvc.http.Cookie;
+import org.primeframework.mvc.http.HTTPRequest;
+import org.primeframework.mvc.http.HTTPResponse;
 
 /**
  * Default JWT Extractor. Assumes the Authorization header looks like the following:
@@ -40,13 +39,12 @@ import com.google.inject.Inject;
  * @author Daniel DeGroff
  */
 public class DefaultJWTRequestAdapter implements JWTRequestAdapter {
+  protected final HTTPRequest request;
 
-  protected final HttpServletRequest request;
-
-  protected final HttpServletResponse response;
+  protected final HTTPResponse response;
 
   @Inject
-  public DefaultJWTRequestAdapter(HttpServletRequest request, HttpServletResponse response) {
+  public DefaultJWTRequestAdapter(HTTPRequest request, HTTPResponse response) {
     this.request = request;
     this.response = response;
   }
@@ -63,16 +61,8 @@ public class DefaultJWTRequestAdapter implements JWTRequestAdapter {
       }
     }
 
-    Cookie[] cookies = request.getCookies();
-    if (cookies != null) {
-      for (Cookie cookie : cookies) {
-        if (cookie.getName().equals("access_token")) {
-          return cookie.getValue();
-        }
-      }
-    }
-
-    return null;
+    Cookie cookie = request.getCookie("access_token");
+    return cookie != null ? cookie.value : null;
   }
 
   /**
@@ -80,17 +70,13 @@ public class DefaultJWTRequestAdapter implements JWTRequestAdapter {
    */
   @Override
   public String invalidateJWT() {
-    Cookie[] cookies = request.getCookies();
-    if (cookies != null) {
-      for (Cookie cookie : cookies) {
-        if (cookie.getName().equals("access_token")) {
-          String token = cookie.getValue();
-          cookie.setValue(null);
-          cookie.setMaxAge(0);
-          response.addCookie(cookie);
-          return token;
-        }
-      }
+    Cookie cookie = request.getCookie("access_token");
+    if (cookie != null) {
+      String token = cookie.value;
+      cookie.value = null;
+      cookie.maxAge = 0L;
+      response.addCookie(cookie);
+      return token;
     }
 
     return null;

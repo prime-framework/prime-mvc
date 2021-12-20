@@ -15,21 +15,23 @@
  */
 package org.primeframework.mvc.action.result;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
 import org.easymock.EasyMock;
-import org.primeframework.mock.servlet.MockServletOutputStream;
+import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.ExecuteMethodConfiguration;
 import org.primeframework.mvc.action.result.annotation.Stream;
+import org.primeframework.mvc.http.DefaultHTTPResponse;
+import org.primeframework.mvc.http.HTTPMethod;
+import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-import org.primeframework.mvc.servlet.HTTPMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import static org.easymock.EasyMock.createStrictMock;
@@ -42,7 +44,7 @@ import static org.testng.Assert.assertEquals;
  *
  * @author Brian Pontarelli
  */
-public class StreamResultTest {
+public class StreamResultTest extends PrimeBaseTest {
   @Test(dataProvider = "httpMethod")
   public void explicit(HTTPMethod httpMethod, String fileName, String basicEncoded, String utf8Encoded)
       throws IOException {
@@ -56,17 +58,7 @@ public class StreamResultTest {
     EasyMock.expect(ee.getValue("lastModified", action)).andReturn(lastModified);
     EasyMock.replay(ee);
 
-    MockServletOutputStream sos = new MockServletOutputStream();
-    HttpServletResponse response = EasyMock.createStrictMock(HttpServletResponse.class);
-    response.setStatus(200);
-    response.setContentType("application/octet-stream");
-    response.setContentLength(10);
-    response.setHeader("Content-Disposition", "attachment; filename=\"" + basicEncoded + "\"; filename*=UTF-8''" + utf8Encoded);
-    response.setHeader("Last-Modified", "Sun, 04 Jul 2021 12:42:42 GMT");
-    response.setHeader("Cache-Control", "no-cache");
-    EasyMock.expect(response.getOutputStream()).andReturn(sos);
-    EasyMock.replay(response);
-
+    HTTPResponse response = new DefaultHTTPResponse(new ByteArrayOutputStream());
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(action, new ExecuteMethodConfiguration(httpMethod, null, null), "/foo", "", null));
     replay(store);
@@ -76,10 +68,17 @@ public class StreamResultTest {
     streamResult.execute(stream);
 
     if (httpMethod == HTTPMethod.GET) {
-      assertEquals(sos.toString(), "test");
-      EasyMock.verify(ee, response);
+      assertEquals(response.getOutputStream().toString(), "test");
+      EasyMock.verify(ee);
+
+      assertEquals(response.getStatus(), 200);
+      assertEquals(response.getContentType(), "application/octet-stream");
+      assertEquals(response.getContentLength().longValue(), 10L);
+      assertEquals(response.getHeader("Content-Disposition"), "attachment; filename=\"" + basicEncoded + "\"; filename*=UTF-8''" + utf8Encoded);
+      assertEquals(response.getHeader("Cache-Control"), "no-cache");
+      assertEquals(response.getHeader("Last-Modified"), "Sun, 04 Jul 2021 12:42:42 GMT");
     } else {
-      assertEquals(sos.toString(), "");
+      assertEquals(response.getOutputStream().toString(), "");
     }
   }
 
@@ -101,7 +100,7 @@ public class StreamResultTest {
     };
   }
 
-  public class StreamImpl implements Stream {
+  public static class StreamImpl implements Stream {
     private final String cacheControl;
 
     private final String code;
@@ -120,7 +119,8 @@ public class StreamResultTest {
 
     private final String type;
 
-    public StreamImpl(String code, String name, String length, String type, String property, String lastModifiedProperty) {
+    public StreamImpl(String code, String name, String length, String type, String property,
+                      String lastModifiedProperty) {
       this.cacheControl = "no-cache";
       this.code = code;
       this.disableCacheControl = false;

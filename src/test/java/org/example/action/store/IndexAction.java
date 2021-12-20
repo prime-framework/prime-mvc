@@ -15,9 +15,6 @@
  */
 package org.example.action.store;
 
-import javax.servlet.http.HttpServletRequest;
-
-import com.google.inject.Inject;
 import org.primeframework.mvc.action.annotation.Action;
 
 /**
@@ -26,11 +23,6 @@ import org.primeframework.mvc.action.annotation.Action;
 @Action
 public class IndexAction extends BaseStoreAction {
   public boolean isLoggedIn;
-
-  @Inject
-  public IndexAction(HttpServletRequest request) {
-    super(request);
-  }
 
   public String get() {
     isLoggedIn = isLoggedIn();

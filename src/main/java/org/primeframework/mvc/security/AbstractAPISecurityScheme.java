@@ -15,7 +15,7 @@
  */
 package org.primeframework.mvc.security;
 
-import javax.servlet.http.HttpServletRequest;
+import org.primeframework.mvc.http.HTTPRequest;
 import java.util.Set;
 
 import org.primeframework.mvc.action.ActionInvocation;
@@ -30,9 +30,9 @@ import org.primeframework.mvc.action.ActionInvocationStore;
 public abstract class AbstractAPISecurityScheme implements SecurityScheme {
   protected final ActionInvocationStore actionInvocationStore;
 
-  protected final HttpServletRequest request;
+  protected final HTTPRequest request;
 
-  protected AbstractAPISecurityScheme(ActionInvocationStore actionInvocationStore, HttpServletRequest request) {
+  protected AbstractAPISecurityScheme(ActionInvocationStore actionInvocationStore, HTTPRequest request) {
     this.actionInvocationStore = actionInvocationStore;
     this.request = request;
   }

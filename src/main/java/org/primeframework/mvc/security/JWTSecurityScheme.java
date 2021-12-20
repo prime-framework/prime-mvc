@@ -15,19 +15,17 @@
  */
 package org.primeframework.mvc.security;
 
-import javax.servlet.http.HttpServletRequest;
-
+import com.google.inject.Inject;
+import io.fusionauth.jwt.domain.JWT;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.JWTMethodConfiguration;
 import org.primeframework.mvc.action.config.ActionConfiguration;
+import org.primeframework.mvc.http.HTTPMethod;
+import org.primeframework.mvc.http.HTTPRequest;
 import org.primeframework.mvc.parameter.el.ExpressionException;
-import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.util.ReflectionUtils;
-
-import com.google.inject.Inject;
-import io.fusionauth.jwt.domain.JWT;
 
 /**
  * Default implementation of the JWT security scheme.
@@ -39,12 +37,13 @@ public class JWTSecurityScheme implements SecurityScheme {
 
   protected final JWTConstraintsValidator constraintsValidator;
 
-  protected final HttpServletRequest request;
+  protected final HTTPRequest request;
 
-  private JWTSecurityContext jwtSecurityContext;
+  private final JWTSecurityContext jwtSecurityContext;
 
   @Inject
-  public JWTSecurityScheme(ActionInvocationStore actionInvocationStore, JWTConstraintsValidator constraintsValidator, JWTSecurityContext jwtSecurityContext, HttpServletRequest request) {
+  public JWTSecurityScheme(ActionInvocationStore actionInvocationStore, JWTConstraintsValidator constraintsValidator,
+                           JWTSecurityContext jwtSecurityContext, HTTPRequest request) {
     this.actionInvocationStore = actionInvocationStore;
     this.constraintsValidator = constraintsValidator;
     this.jwtSecurityContext = jwtSecurityContext;
@@ -63,7 +62,7 @@ public class JWTSecurityScheme implements SecurityScheme {
     // The JWT has a valid signature and is not expired, further authorization is delegated to the action.
     ActionConfiguration actionConfiguration = actionInvocation.configuration;
 
-    HTTPMethod method = HTTPMethod.valueOf(request.getMethod().toUpperCase());
+    HTTPMethod method = request.getMethod();
     if (actionConfiguration.jwtAuthorizationMethods.containsKey(method)) {
       for (JWTMethodConfiguration methodConfig : actionConfiguration.jwtAuthorizationMethods.get(method)) {
         try {

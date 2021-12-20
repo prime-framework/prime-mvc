@@ -15,34 +15,36 @@
  */
 package org.primeframework.mvc;
 
-import javax.servlet.http.Cookie;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collection;
-import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.primeframework.mock.MockUserAgent;
+import org.primeframework.mvc.http.Cookie;
+import org.primeframework.mvc.http.HTTPContext;
 import org.primeframework.mvc.test.RequestResult;
 import org.primeframework.mvc.test.RequestResult.ThrowingConsumer;
 import org.primeframework.mvc.test.RequestSimulator;
 import org.primeframework.mvc.util.ThrowingCallable;
 import org.primeframework.mvc.util.ThrowingRunnable;
 import org.testng.Assert;
-import static org.primeframework.mvc.scope.ActionSessionScope.ACTION_SESSION_KEY;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertNull;
 
 /**
  * @author Daniel DeGroff
  */
 public class TestBuilder {
+  public HTTPContext context;
+
   public Function<ObjectMapper, ObjectMapper> objectMapperFunction;
 
   public RequestResult requestResult;
@@ -51,54 +53,21 @@ public class TestBuilder {
 
   public Path tempFile;
 
-  @SuppressWarnings("unchecked")
-  public TestBuilder assertActionSessionAttributeIsNull(String actionName, String attributeName) {
-    Object object = simulator.container.getSession().getAttribute(ACTION_SESSION_KEY);
-    assertNotNull(object);
-    Map<String, Map<String, Object>> map = (Map<String, Map<String, Object>>) object;
-    Object actionAttributes = map.get(actionName);
-    assertNotNull(actionAttributes);
-    Map<String, Object> actionAttributesMap = (Map<String, Object>) actionAttributes;
-    assertNull(actionAttributesMap.get(attributeName));
-    return this;
-  }
-
-  @SuppressWarnings("unchecked")
-  public TestBuilder assertActionSessionAttributeNotNull(String actionName, String attributeName) {
-    Object object = simulator.container.getSession().getAttribute(ACTION_SESSION_KEY);
-    assertNotNull(object);
-    Map<String, Map<String, Object>> map = (Map<String, Map<String, Object>>) object;
-    Object actionAttributes = map.get(actionName);
-    assertNotNull(actionAttributes);
-    Map<String, Object> actionAttributesMap = (Map<String, Object>) actionAttributes;
-    assertNotNull(actionAttributesMap.get(attributeName));
-    return this;
-  }
+  public MockUserAgent userAgent;
 
   public TestBuilder assertContextAttributeNotNull(String attributeName) {
-    assertNotNull(simulator.container.getContext().getAttribute(attributeName));
+    assertNotNull(context.getAttribute(attributeName));
     return this;
   }
 
   public TestBuilder assertCookie(String name, String value) {
-    Cookie actual = requestResult.container.getUserAgent().getCookies(requestResult.container.getRequest()).stream().filter(c -> c.getName().equals(name)).findFirst().orElse(null);
+    Cookie actual = userAgent.getCookies(requestResult.request)
+                             .stream()
+                             .filter(c -> c.name.equals(name))
+                             .findFirst()
+                             .orElse(null);
     assertNotNull(actual);
-    assertEquals(actual.getValue(), value);
-    return this;
-  }
-
-  public TestBuilder assertRequestAttributeIsNull(String attributeName) {
-    assertNull(requestResult.request.getAttribute(attributeName));
-    return this;
-  }
-
-  public TestBuilder assertRequestAttributeNotNull(String attributeName) {
-    assertNotNull(requestResult.request.getAttribute(attributeName));
-    return this;
-  }
-
-  public TestBuilder assertSessionAttributeNotNull(String attributeName) {
-    assertNotNull(simulator.container.getSession().getAttribute(attributeName));
+    assertEquals(actual.value, value);
     return this;
   }
 
@@ -113,8 +82,8 @@ public class TestBuilder {
 
   public TestBuilder createFile(String contents) throws IOException {
     String tmpdir = System.getProperty("java.io.tmpdir");
-    String unique = new String(Base64.getEncoder().encode(UUID.randomUUID().toString().getBytes()), "UTF-8").substring(0, 5);
-    tempFile = Paths.get(tmpdir + "/" + "_prime_testFile_" + unique);
+    String unique = new String(Base64.getEncoder().encode(UUID.randomUUID().toString().getBytes()), StandardCharsets.UTF_8).substring(0, 5);
+    tempFile = Path.of(tmpdir + "/" + "_prime_testFile_" + unique);
     tempFile.toFile().deleteOnExit();
 
     Files.write(tempFile, contents.getBytes());
@@ -151,7 +120,7 @@ public class TestBuilder {
     return this;
   }
 
-  public class TestIterator<T> {
+  public static class TestIterator<T> {
     public Collection<T> collection;
 
     public TestBuilder testBuilder;

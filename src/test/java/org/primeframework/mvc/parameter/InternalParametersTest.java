@@ -17,25 +17,26 @@ package org.primeframework.mvc.parameter;
 
 import org.primeframework.mvc.PrimeBaseTest;
 import org.testng.annotations.Test;
-
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 /**
- * @author jhumphrey
+ * @author Brian Pontarelli
  */
 public class InternalParametersTest extends PrimeBaseTest {
   @Test
-  public void stringTrue() {
-    request.setParameter(InternalParameters.EXECUTE_VALIDATION, "true");
+  public void booleanFalse() {
+    request.setAttribute(InternalParameters.EXECUTE_VALIDATION, false);
     boolean keyState = InternalParameters.is(request, InternalParameters.EXECUTE_VALIDATION);
-    assertTrue(keyState);
+    assertFalse(keyState);
   }
 
   @Test
-  public void stringFalse() {
-    request.setParameter(InternalParameters.EXECUTE_VALIDATION, "false");
+  public void booleanTrue() {
+    request.setAttribute(InternalParameters.EXECUTE_VALIDATION, true);
     boolean keyState = InternalParameters.is(request, InternalParameters.EXECUTE_VALIDATION);
-    assertFalse(keyState);
+    assertTrue(keyState);
   }
 
   @Test
@@ -50,16 +51,16 @@ public class InternalParametersTest extends PrimeBaseTest {
   }
 
   @Test
-  public void booleanTrue() {
-    request.setAttribute(InternalParameters.EXECUTE_VALIDATION, true);
+  public void stringFalse() {
+    request.setParameter(InternalParameters.EXECUTE_VALIDATION, "false");
     boolean keyState = InternalParameters.is(request, InternalParameters.EXECUTE_VALIDATION);
-    assertTrue(keyState);
+    assertFalse(keyState);
   }
 
   @Test
-  public void booleanFalse() {
-    request.setAttribute(InternalParameters.EXECUTE_VALIDATION, false);
+  public void stringTrue() {
+    request.setParameter(InternalParameters.EXECUTE_VALIDATION, "true");
     boolean keyState = InternalParameters.is(request, InternalParameters.EXECUTE_VALIDATION);
-    assertFalse(keyState);
+    assertTrue(keyState);
   }
 }

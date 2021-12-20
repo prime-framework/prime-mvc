@@ -17,18 +17,15 @@ package org.primeframework.mvc.security;
 
 import java.util.Map;
 
-import org.primeframework.mvc.PrimeException;
-
-import com.google.inject.Provider;
 import io.fusionauth.jwt.Verifier;
+import org.primeframework.mvc.PrimeException;
 
 /**
  * This provider will explode nicely if you try to use it. Users of JWT should bind their own Verifier Provider.
  *
  * @author Daniel DeGroff
  */
-public class ExplosiveVerifierProvider implements Provider<Map<String, Verifier>> {
-
+public class ExplosiveVerifierProvider implements VerifierProvider {
   @Override
   public Map<String, Verifier> get() {
     throw new PrimeException("In order to use the JWT authorization scheme you must bind a Verifier Provider.");

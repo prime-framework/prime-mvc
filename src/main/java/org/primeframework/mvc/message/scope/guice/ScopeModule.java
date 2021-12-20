@@ -17,10 +17,9 @@ package org.primeframework.mvc.message.scope.guice;
 
 import com.google.inject.AbstractModule;
 import org.primeframework.mvc.message.scope.ApplicationScope;
+import org.primeframework.mvc.message.scope.CookieFlashScope;
 import org.primeframework.mvc.message.scope.FlashScope;
 import org.primeframework.mvc.message.scope.RequestScope;
-import org.primeframework.mvc.message.scope.SessionFlashScope;
-import org.primeframework.mvc.message.scope.SessionScope;
 
 /**
  * Scope module.
@@ -31,10 +30,7 @@ public class ScopeModule extends AbstractModule {
   @Override
   protected void configure() {
     bind(ApplicationScope.class).asEagerSingleton();
-    bind(SessionScope.class);
     bind(RequestScope.class);
-
-    // Defaults to Session based Flash Scope
-    bind(FlashScope.class).to(SessionFlashScope.class);
+    bind(FlashScope.class).to(CookieFlashScope.class);
   }
 }

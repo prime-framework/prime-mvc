@@ -18,8 +18,7 @@ package org.primeframework.mvc.content.json.annotation;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import org.primeframework.mvc.servlet.HTTPMethod;
-
+import org.primeframework.mvc.http.HTTPStrings.Methods;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
@@ -35,5 +34,5 @@ public @interface JSONRequest {
   /**
    * @return The HTTP methods that this request object is utilized for.
    */
-  HTTPMethod[] httpMethods() default {HTTPMethod.POST, HTTPMethod.PUT, HTTPMethod.GET, HTTPMethod.DELETE, HTTPMethod.PATCH};
+  String[] httpMethods() default {Methods.POST, Methods.PUT, Methods.GET, Methods.DELETE, Methods.PATCH};
 }

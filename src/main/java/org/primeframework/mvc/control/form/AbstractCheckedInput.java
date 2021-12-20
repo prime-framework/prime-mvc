@@ -17,6 +17,7 @@ package org.primeframework.mvc.control.form;
 
 import java.lang.reflect.Array;
 import java.util.Map;
+import java.util.Objects;
 
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 
@@ -95,12 +96,7 @@ public abstract class AbstractCheckedInput extends AbstractInput {
   protected Map<String, Object> makeParameters() {
     Map<String, Object> params = super.makeParameters();
     String uncheckedValue = (String) attributes.remove("uncheckedValue");
-    if (uncheckedValue != null) {
-      params.put("uncheckedValue", uncheckedValue);
-    } else {
-      params.put("uncheckedValue", "");
-    }
-
+    params.put("uncheckedValue", Objects.requireNonNullElse(uncheckedValue, ""));
     return params;
   }
 }

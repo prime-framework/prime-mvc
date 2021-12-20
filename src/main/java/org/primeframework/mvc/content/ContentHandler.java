@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc.content;
 
-import javax.servlet.ServletException;
 import java.io.IOException;
 
 /**
@@ -34,7 +33,6 @@ public interface ContentHandler {
    * Handles the content (HTTP request body) however is needed.
    *
    * @throws IOException If an IO error occurs.
-   * @throws ServletException If a Servlet error occurs.
    */
-  void handle() throws IOException, ServletException;
+  void handle() throws IOException;
 }

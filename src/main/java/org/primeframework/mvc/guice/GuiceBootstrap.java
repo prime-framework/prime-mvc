@@ -23,10 +23,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.primeframework.mvc.PrimeException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.inject.Binding;
 import com.google.inject.CreationException;
 import com.google.inject.Guice;
@@ -35,6 +31,9 @@ import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.Scopes;
 import com.google.inject.spi.Message;
+import org.primeframework.mvc.PrimeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class bootstraps Guice.
@@ -49,13 +48,13 @@ public class GuiceBootstrap {
    * so that synchronization is not used. This is called by the PrimeServletContextListener when the context is created
    * and should cover all cases.
    *
-   * @param mainModule The main module for the application.
+   * @param modules The modules;
    * @return The Guice injector.
    */
-  public static Injector initialize(Module mainModule) {
+  public static Injector initialize(Module... modules) {
     logger.debug("Initializing Guice");
     try {
-      return Guice.createInjector(mainModule);
+      return Guice.createInjector(modules);
     } catch (CreationException e) {
       logger.debug("Unable to create Guice injector", e);
 
@@ -70,8 +69,9 @@ public class GuiceBootstrap {
       });
       logger.error(
           "\n\n===================================================================================================\n\n" +
-              "  Unable to start the server. Here's why: \n\n\n" + String.join("\n", errorMessages) +
-              "\n\n===================================================================================================\n\n"
+              "  Unable to start the server. Here's why: \n\n\n{}" +
+              "\n\n===================================================================================================\n\n",
+          String.join("\n", errorMessages)
       );
       logger.error("Unable to start the server. Exception: \n", e);
       throw new PrimeException();

@@ -15,8 +15,6 @@
  */
 package org.primeframework.mvc.action.result;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,6 +25,7 @@ import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.annotation.XMLStream;
+import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 
 /**
@@ -38,17 +37,17 @@ import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 public class XMLStreamResult extends AbstractResult<XMLStream> {
   private final ActionInvocationStore actionInvocationStore;
 
-  private final HttpServletResponse response;
+  private final HTTPResponse response;
 
   @Inject
-  public XMLStreamResult(ExpressionEvaluator expressionEvaluator, HttpServletResponse response,
+  public XMLStreamResult(ExpressionEvaluator expressionEvaluator, HTTPResponse response,
                          ActionInvocationStore actionInvocationStore) {
     super(expressionEvaluator);
     this.response = response;
     this.actionInvocationStore = actionInvocationStore;
   }
 
-  public boolean execute(XMLStream xmlStream) throws IOException, ServletException {
+  public boolean execute(XMLStream xmlStream) throws IOException {
     String xml = xmlStream.property();
 
     ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
@@ -61,9 +60,8 @@ public class XMLStreamResult extends AbstractResult<XMLStream> {
     byte[] xmlBytes = ((String) object).getBytes(StandardCharsets.UTF_8);
 
     response.setStatus(xmlStream.status());
-    response.setCharacterEncoding("UTF-8");
-    response.setContentType("application/xhtml+xml");
-    response.setContentLength(xmlBytes.length);
+    response.setContentType("application/xhtml+xml; charset=UTF-8");
+    response.setContentLength((long) xmlBytes.length);
 
     // Handle setting cache controls
     addCacheControlHeader(xmlStream, response);

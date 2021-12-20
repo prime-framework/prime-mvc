@@ -15,9 +15,6 @@
  */
 package org.example.action.store;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
 import org.primeframework.mvc.action.result.annotation.SaveRequest;
 
 /**
@@ -25,22 +22,9 @@ import org.primeframework.mvc.action.result.annotation.SaveRequest;
  */
 @SaveRequest(uri = "/store/login")
 public abstract class BaseStoreAction {
-
-  protected HttpServletRequest request;
-
-  protected BaseStoreAction(HttpServletRequest request) {
-    this.request = request;
-  }
+  public static boolean loggedIn;
 
   protected boolean isLoggedIn() {
-    HttpSession session = request.getSession(false);
-    if (session != null) {
-      Boolean isLoggedIn = (Boolean) session.getAttribute("LoggedIn");
-      if (isLoggedIn != null) {
-        return true;
-      }
-    }
-
-    return false;
+    return loggedIn;
   }
 }

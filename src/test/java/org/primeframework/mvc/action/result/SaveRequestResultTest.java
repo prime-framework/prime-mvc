@@ -15,37 +15,31 @@
  */
 package org.primeframework.mvc.action.result;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.ShortBufferException;
-import javax.servlet.http.Cookie;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
-import org.primeframework.mock.servlet.MockHttpServletRequest.Method;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.SaveRequestResult.SaveRequestImpl;
 import org.primeframework.mvc.action.result.annotation.SaveRequest;
+import org.primeframework.mvc.http.DefaultHTTPRequest;
+import org.primeframework.mvc.http.DefaultHTTPResponse;
+import org.primeframework.mvc.http.HTTPMethod;
+import org.primeframework.mvc.http.HTTPResponse;
+import org.primeframework.mvc.http.MutableHTTPRequest;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.security.DefaultCipherProvider;
 import org.primeframework.mvc.security.DefaultEncryptor;
 import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.security.saved.SavedHttpRequest;
-import org.primeframework.mvc.servlet.HTTPMethod;
 import org.testng.annotations.Test;
 import static org.easymock.EasyMock.createStrictMock;
 import static org.easymock.EasyMock.expect;
@@ -66,16 +60,17 @@ public class SaveRequestResultTest extends PrimeBaseTest {
   @Inject public ObjectMapper objectMapper;
 
   @Test
-  public void saveRequestGET()
-      throws IOException, NoSuchPaddingException, BadPaddingException, InvalidKeyException, NoSuchAlgorithmException, IllegalBlockSizeException, ShortBufferException, InvalidAlgorithmParameterException {
+  public void saveRequestGET() throws Exception {
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/foo", "", null));
     replay(store);
 
-    request.setUri("/test");
-    request.setMethod(Method.GET);
-    request.setParameter("param1", "value1");
-    request.setParameter("param2", "value2");
+    MutableHTTPRequest request = new DefaultHTTPRequest();
+    HTTPResponse response = new DefaultHTTPResponse(new ByteArrayOutputStream());
+    request.setPath("/test");
+    request.setMethod(HTTPMethod.GET);
+    request.addParameter("param1", "value1");
+    request.addParameter("param2", "value2");
 
     Encryptor encryptor = new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper);
     SaveRequest annotation = new SaveRequestImpl("/login", "unauthenticated", true, false);
@@ -83,7 +78,7 @@ public class SaveRequestResultTest extends PrimeBaseTest {
     result.execute(annotation);
 
     // The cookie value will be different each time because the initialization vector is unique per request. Decrypt the actual value to compare it to the expected.
-    SavedHttpRequest actual = encryptor.decrypt(SavedHttpRequest.class, (container.getUserAgent().getCookies(container.getRequest()).get(0)).getValue());
+    SavedHttpRequest actual = encryptor.decrypt(SavedHttpRequest.class, response.getCookies().get(0).value);
     SavedHttpRequest expected = new SavedHttpRequest(HTTPMethod.GET, "/test?param1=value1&param2=value2", null);
     assertEquals(actual, expected);
 
@@ -93,16 +88,17 @@ public class SaveRequestResultTest extends PrimeBaseTest {
   }
 
   @Test
-  public void saveRequestPOST()
-      throws IOException, NoSuchPaddingException, BadPaddingException, InvalidKeyException, NoSuchAlgorithmException, IllegalBlockSizeException, ShortBufferException, InvalidAlgorithmParameterException {
+  public void saveRequestPOST() throws Exception {
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/foo", "", null));
     replay(store);
 
-    request.setUri("/test");
-    request.setMethod(Method.POST);
-    request.setParameter("param1", "value1");
-    request.setParameter("param2", "value2");
+    MutableHTTPRequest request = new DefaultHTTPRequest();
+    HTTPResponse response = new DefaultHTTPResponse(new ByteArrayOutputStream());
+    request.setPath("/test");
+    request.setMethod(HTTPMethod.POST);
+    request.addParameter("param1", "value1");
+    request.addParameter("param2", "value2");
 
     Encryptor encryptor = new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper);
     SaveRequest annotation = new SaveRequestImpl("/login", "unauthenticated", true, false);
@@ -110,8 +106,8 @@ public class SaveRequestResultTest extends PrimeBaseTest {
     result.execute(annotation);
 
     // The cookie value will be different each time because the initialization vector is unique per request. Decrypt the actual value to compare it to the expected.
-    SavedHttpRequest actual = encryptor.decrypt(SavedHttpRequest.class, (container.getUserAgent().getCookies(container.getRequest()).get(0)).getValue());
-    SavedHttpRequest expected = new SavedHttpRequest(HTTPMethod.POST, "/test", request.getParameterMap());
+    SavedHttpRequest actual = encryptor.decrypt(SavedHttpRequest.class, response.getCookies().get(0).value);
+    SavedHttpRequest expected = new SavedHttpRequest(HTTPMethod.POST, "/test", request.getParameters());
     assertEquals(actual, expected);
 
     assertEquals(response.getRedirect(), "/login");
@@ -126,19 +122,21 @@ public class SaveRequestResultTest extends PrimeBaseTest {
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     Map<String, List<String>> parameters = new HashMap<>();
-    parameters.put("largeParam1", new ArrayList<>(Arrays.asList(new String(new char[2048]).replace('\0', 'a'))));
-    parameters.put("largeParam2", new ArrayList<>(Arrays.asList(new String(new char[2048]).replace('\0', 'b'))));
-    parameters.put("largeParam3", new ArrayList<>(Arrays.asList(new String(new char[2048]).replace('\0', 'c'))));
-    parameters.put("largeParam4", new ArrayList<>(Arrays.asList(new String(new char[2048]).replace('\0', 'd'))));
+    parameters.put("largeParam1", new ArrayList<>(List.of(new String(new char[2048]).replace('\0', 'a'))));
+    parameters.put("largeParam2", new ArrayList<>(List.of(new String(new char[2048]).replace('\0', 'b'))));
+    parameters.put("largeParam3", new ArrayList<>(List.of(new String(new char[2048]).replace('\0', 'c'))));
+    parameters.put("largeParam4", new ArrayList<>(List.of(new String(new char[2048]).replace('\0', 'd'))));
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/foo", "", parameters, null, true));
     replay(store);
 
-    request.setUri("/test");
-    request.setMethod(Method.POST);
-    request.setParameter("largeParam1", parameters.get("largeParam1").get(0));
-    request.setParameter("largeParam2", parameters.get("largeParam2").get(0));
-    request.setParameter("largeParam3", parameters.get("largeParam3").get(0));
-    request.setParameter("largeParam4", parameters.get("largeParam4").get(0));
+    MutableHTTPRequest request = new DefaultHTTPRequest();
+    HTTPResponse response = new DefaultHTTPResponse(new ByteArrayOutputStream());
+    request.setPath("/test");
+    request.setMethod(HTTPMethod.POST);
+    request.addParameter("largeParam1", parameters.get("largeParam1").get(0));
+    request.addParameter("largeParam2", parameters.get("largeParam2").get(0));
+    request.addParameter("largeParam3", parameters.get("largeParam3").get(0));
+    request.addParameter("largeParam4", parameters.get("largeParam4").get(0));
 
     Encryptor encryptor = new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper);
     SaveRequest annotation = new SaveRequestImpl("/login", "unauthenticated", true, false);
@@ -146,23 +144,9 @@ public class SaveRequestResultTest extends PrimeBaseTest {
     result.execute(annotation);
 
     // Expect no cookies in the response, sadly, the cookie was just too big and we omitted it from the HTTP response.
-    assertCookieEquals(container.getUserAgent().getCookies(container.getRequest()), Collections.emptyList());
+    assertEquals(simulator.userAgent.getCookies(request), List.of());
     assertEquals(response.getRedirect(), "/login");
 
     verify(store);
-  }
-
-  private void assertCookieEquals(List<Cookie> actual, List<Cookie> expected) {
-    assertEquals(actual.size(), expected.size(), "Lists are not the same length");
-    for (int i = 0; i < actual.size(); i++) {
-      assertEquals(actual.get(i).getComment(), expected.get(i).getComment());
-      assertEquals(actual.get(i).getDomain(), expected.get(i).getDomain());
-      assertEquals(actual.get(i).getMaxAge(), expected.get(i).getMaxAge());
-      assertEquals(actual.get(i).getName(), expected.get(i).getName());
-      assertEquals(actual.get(i).getPath(), expected.get(i).getPath());
-      assertEquals(actual.get(i).getSecure(), expected.get(i).getSecure());
-      assertEquals(actual.get(i).getValue(), expected.get(i).getValue());
-      assertEquals(actual.get(i).getVersion(), expected.get(i).getVersion());
-    }
   }
 }

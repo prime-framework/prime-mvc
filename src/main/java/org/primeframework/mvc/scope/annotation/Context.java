@@ -24,7 +24,7 @@ import org.primeframework.mvc.scope.ContextScope;
 
 /**
  * This annotation should be used to mark member fields of actions that should be fetched and stored in the
- * ServletContext.
+ * Context
  *
  * @author Brian Pontarelli
  */

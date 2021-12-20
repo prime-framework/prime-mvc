@@ -15,26 +15,25 @@
  */
 package org.example.action;
 
+import io.fusionauth.jwt.domain.JWT;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.annotation.Status;
+import org.primeframework.mvc.http.HTTPStrings.Methods;
 import org.primeframework.mvc.security.annotation.JWTAuthorizeMethod;
-import org.primeframework.mvc.servlet.HTTPMethod;
-
-import io.fusionauth.jwt.domain.JWT;
 
 /**
  * @author Daniel DeGroff
  */
 @Action(requiresAuthentication = true, jwtEnabled = true)
 @Status.List({
-    @Status(code = "success", status = 200),
+    @Status(),
     @Status(code = "unauthenticated", status = 401),
     @Status(code = "unauthorized", status = 401)
 })
 public class JwtAuthorizedAction {
   public static boolean authorized;
 
-  @JWTAuthorizeMethod(httpMethods = {HTTPMethod.GET})
+  @JWTAuthorizeMethod(httpMethods = {Methods.GET})
   public boolean authorize(JWT jwt) {
     return authorized;
   }

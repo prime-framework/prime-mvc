@@ -15,7 +15,7 @@
  */
 package org.example.action;
 
-import javax.servlet.http.HttpServletResponse;
+import org.primeframework.mvc.http.HTTPResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
@@ -42,7 +42,7 @@ public class PreRenderMethodAction {
 
   public static boolean noopCalled;
 
-  private final HttpServletResponse response;
+  private final HTTPResponse response;
 
   @JSONResponse
   public String json;
@@ -50,7 +50,7 @@ public class PreRenderMethodAction {
   public String result;
 
   @Inject
-  public PreRenderMethodAction(HttpServletResponse response) {
+  public PreRenderMethodAction(HTTPResponse response) {
     this.response = response;
   }
 
@@ -76,7 +76,7 @@ public class PreRenderMethodAction {
     response.setContentType("application/potato");
     OutputStream os = response.getOutputStream();
     byte[] bytes = "You've been no-oped!".getBytes(StandardCharsets.UTF_8);
-    response.setContentLength(bytes.length);
+    response.setContentLength((long) bytes.length);
     os.write(bytes);
     os.flush();
   }

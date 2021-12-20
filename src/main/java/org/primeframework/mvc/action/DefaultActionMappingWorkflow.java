@@ -15,26 +15,24 @@
  */
 package org.primeframework.mvc.action;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Set;
-
-import org.primeframework.mvc.NotAllowedException;
-import org.primeframework.mvc.NotImplementedException;
-import org.primeframework.mvc.parameter.DefaultParameterParser;
-import org.primeframework.mvc.parameter.InternalParameters;
-import org.primeframework.mvc.servlet.HTTPMethod;
-import org.primeframework.mvc.servlet.ServletTools;
-import org.primeframework.mvc.workflow.WorkflowChain;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.inject.Inject;
+import org.primeframework.mvc.NotAllowedException;
+import org.primeframework.mvc.http.HTTPMethod;
+import org.primeframework.mvc.http.HTTPRequest;
+import org.primeframework.mvc.http.HTTPResponse;
+import org.primeframework.mvc.http.HTTPTools;
+import org.primeframework.mvc.http.Status;
+import org.primeframework.mvc.parameter.DefaultParameterParser;
+import org.primeframework.mvc.parameter.InternalParameters;
+import org.primeframework.mvc.workflow.WorkflowChain;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is the default implementation of the ActionMappingWorkflow. During the perform method, this class
@@ -49,14 +47,14 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
 
   private final ActionMapper actionMapper;
 
-  private final HttpServletRequest request;
+  private final HTTPRequest request;
 
-  private final HttpServletResponse response;
+  private final HTTPResponse response;
 
   @Inject(optional = true) private MetricRegistry metricRegistry;
 
   @Inject
-  public DefaultActionMappingWorkflow(HttpServletRequest request, HttpServletResponse response,
+  public DefaultActionMappingWorkflow(HTTPRequest request, HTTPResponse response,
                                       ActionInvocationStore actionInvocationStore, ActionMapper actionMapper) {
     this.request = request;
     this.response = response;
@@ -70,24 +68,15 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
    *
    * @param chain The workflow chain.
    * @throws IOException If the chain throws an exception.
-   * @throws ServletException If the chain throws an exception.
    */
-  public void perform(WorkflowChain chain) throws IOException, ServletException {
+  public void perform(WorkflowChain chain) throws IOException {
     // First, see if they hit a different button
     String uri = determineURI();
     if (logger.isDebugEnabled()) {
-      logger.debug("METHOD: " + request.getMethod() + "; URI: " + uri);
+      logger.debug("METHOD: [{}]; URI: [{}]" + uri, request.getMethod(), uri);
     }
 
-    HTTPMethod method = null;
-    boolean notImplemented = false;
-
-    try {
-      method = HTTPMethod.valueOf(request.getMethod().toUpperCase());
-    } catch (IllegalArgumentException e) {
-      notImplemented = true;
-    }
-
+    HTTPMethod method = request.getMethod();
     boolean executeResult = InternalParameters.is(request, InternalParameters.EXECUTE_RESULT);
     ActionInvocation actionInvocation = actionMapper.map(method, uri, executeResult);
 
@@ -95,22 +84,17 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
     // example, this is how the index handling works.
     if (actionInvocation.redirect) {
       response.sendRedirect(actionInvocation.uri());
-      response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
+      response.setStatus(Status.MOVED_PERMANENTLY);
       return;
     }
 
     // Keep the current action in the store if an exception is thrown so that it can be used from the error workflow
     actionInvocationStore.setCurrent(actionInvocation);
 
-    // Throw this after we've set the current action invocation
-    if (notImplemented) {
-      throw new NotImplementedException();
-    }
-
     // Anyone downstream should understand it is possible for the method to be null in the ActionInvocation
     if (actionInvocation.action != null && actionInvocation.method == null) {
       Class<?> actionClass = actionInvocation.configuration.actionClass;
-      logger.warn("The action class [" + actionClass.getCanonicalName() + "] does not have a valid execute method for the HTTP method [" + method + "]");
+      logger.warn("The action class [{}] does not have a valid execute method for the HTTP method [{}]", actionClass.getCanonicalName(), method);
       throw new NotAllowedException();
     }
 
@@ -127,7 +111,7 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
 
       // We need to leave the action in the store because it might be used by the Error Workflow
       actionInvocationStore.removeCurrent();
-    } catch (ServletException | IOException | RuntimeException | Error e) {
+    } catch (IOException | RuntimeException | Error e) {
       if (errorMeter != null) {
         errorMeter.mark();
       }
@@ -140,21 +124,20 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
     }
   }
 
-  @SuppressWarnings("unchecked")
   private String determineURI() {
     String uri = null;
-    Set<String> keys = request.getParameterMap().keySet();
+    Set<String> keys = request.getParameters().keySet();
     for (String key : keys) {
       if (key.startsWith(DefaultParameterParser.ACTION_PREFIX)) {
         String actionParameterName = key.substring(4);
-        String actionParameterValue = request.getParameter(key);
-        if (request.getParameter(actionParameterName) != null && actionParameterValue.trim().length() > 0) {
+        String actionParameterValue = request.getParameterValue(key);
+        if (request.getParameterValue(actionParameterName) != null && actionParameterValue.trim().length() > 0) {
           uri = actionParameterValue;
 
           // Handle relative URIs
           if (!uri.startsWith("/")) {
-            String requestURI = ServletTools.getRequestURI(request);
-            int index = requestURI.lastIndexOf("/");
+            String requestURI = HTTPTools.getRequestURI(request);
+            int index = requestURI.lastIndexOf('/');
             if (index >= 0) {
               uri = requestURI.substring(0, index) + "/" + uri;
             }
@@ -164,7 +147,7 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
     }
 
     if (uri == null) {
-      uri = ServletTools.getRequestURI(request);
+      uri = HTTPTools.getRequestURI(request);
       if (!uri.startsWith("/")) {
         uri = "/" + uri;
       }

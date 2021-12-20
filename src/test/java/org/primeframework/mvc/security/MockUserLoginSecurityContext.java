@@ -15,28 +15,69 @@
  */
 package org.primeframework.mvc.security;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashSet;
 import java.util.Set;
 
 import com.google.inject.Inject;
-import org.primeframework.mvc.config.MVCConfiguration;
-import org.primeframework.mvc.security.csrf.CSRFProvider;
+import org.primeframework.mvc.http.HTTPRequest;
+import org.primeframework.mvc.http.HTTPResponse;
 
 /**
  * @author Daniel DeGroff
  */
-public class MockUserLoginSecurityContext extends BaseHttpSessionUserLoginSecurityContext {
+public class MockUserLoginSecurityContext extends BaseCookieSessionUserLoginSecurityContext {
+  public static Object currentUser;
+
   public static Set<String> roles = new HashSet<>();
 
   @Inject
-  public MockUserLoginSecurityContext(MVCConfiguration configuration, CSRFProvider csrfProvider,
-                                      HttpServletRequest request) {
-    super(configuration, csrfProvider, request);
+  public MockUserLoginSecurityContext(HTTPRequest request, HTTPResponse response) {
+    super(request, response);
+  }
+
+  @Override
+  public Object getCurrentUser() {
+    return currentUser;
   }
 
   @Override
   public Set<String> getCurrentUsersRoles() {
     return roles;
+  }
+
+  @Override
+  public String getSessionId() {
+    return currentUser != null ? Integer.toString(currentUser.hashCode()) : null;
+  }
+
+  @Override
+  public void login(Object user) {
+    super.login(user);
+    currentUser = user;
+  }
+
+  @Override
+  public void updateUser(Object user) {
+    currentUser = user;
+  }
+
+  @Override
+  protected Long cookieDuration() {
+    return null;
+  }
+
+  @Override
+  protected String cookieName() {
+    return "prime-session";
+  }
+
+  @Override
+  protected String getSessionIdFromUser(Object user) {
+    return Integer.toString(user.hashCode());
+  }
+
+  @Override
+  protected Object getUserFromSessionId(String sessionId) {
+    return currentUser != null && Integer.toString(currentUser.hashCode()).equals(sessionId) ? currentUser : null;
   }
 }

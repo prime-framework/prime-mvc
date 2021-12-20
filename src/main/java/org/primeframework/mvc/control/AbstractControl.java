@@ -15,7 +15,7 @@
  */
 package org.primeframework.mvc.control;
 
-import javax.servlet.http.HttpServletRequest;
+import org.primeframework.mvc.http.HTTPRequest;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
@@ -64,7 +64,7 @@ public abstract class AbstractControl implements Control {
 
   protected MessageProvider messageProvider;
 
-  protected HttpServletRequest request;
+  protected HTTPRequest request;
 
   protected Object root;
 
@@ -88,7 +88,7 @@ public abstract class AbstractControl implements Control {
    */
   public void renderEnd(Writer writer) {
     if (endTemplateName() != null) {
-      String templateName = configuration.resourceDirectory() + "/control-templates/" + endTemplateName();
+      String templateName = configuration.controlTemplateDirectory() + "/" + endTemplateName();
       freeMarkerService.render(writer, templateName, root);
     }
   }
@@ -117,13 +117,13 @@ public abstract class AbstractControl implements Control {
     this.root = makeRoot();
 
     if (startTemplateName() != null) {
-      String templateName = configuration.resourceDirectory() + "/control-templates/" + startTemplateName();
+      String templateName = configuration.controlTemplateDirectory() + "/" + startTemplateName();
       freeMarkerService.render(writer, templateName, root);
     }
   }
 
   @Inject
-  public void setServices(LocaleProvider localeProvider, HttpServletRequest request,
+  public void setServices(LocaleProvider localeProvider, HTTPRequest request,
                           ActionInvocationStore actionInvocationStore, FreeMarkerService freeMarkerService,
                           MVCConfiguration configuration, Configuration freeMarkerConfig,
                           MessageProvider messageProvider, CSRFProvider csrfProvider) {

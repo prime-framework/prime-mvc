@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc.workflow;
 
-import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.Iterator;
 
@@ -30,9 +29,9 @@ import org.slf4j.LoggerFactory;
 public class SubWorkflowChain implements WorkflowChain {
   private static final Logger logger = LoggerFactory.getLogger(SubWorkflowChain.class);
 
-  private final WorkflowChain outer;
-
   private final Iterator<Workflow> iterator;
+
+  private final WorkflowChain outer;
 
   public SubWorkflowChain(Iterable<Workflow> workflows, WorkflowChain outer) {
     this.outer = outer;
@@ -43,7 +42,7 @@ public class SubWorkflowChain implements WorkflowChain {
    * {@inheritDoc}
    */
   @Override
-  public void continueWorkflow() throws IOException, ServletException {
+  public void continueWorkflow() throws IOException {
     if (iterator.hasNext()) {
       long start = System.currentTimeMillis();
 
@@ -54,7 +53,9 @@ public class SubWorkflowChain implements WorkflowChain {
         logger.debug("Workflow [{}]] took [{}]", workflow.getClass(), (System.currentTimeMillis() - start));
       }
     } else {
-      outer.continueWorkflow();
+      if (outer != null) {
+        outer.continueWorkflow();
+      }
     }
   }
 }

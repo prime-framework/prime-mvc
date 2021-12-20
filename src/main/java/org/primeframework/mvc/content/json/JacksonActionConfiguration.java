@@ -18,7 +18,7 @@ package org.primeframework.mvc.content.json;
 import java.util.Map;
 
 import org.primeframework.mvc.content.json.annotation.JSONResponse;
-import org.primeframework.mvc.servlet.HTTPMethod;
+import org.primeframework.mvc.http.HTTPMethod;
 
 /**
  * Jackson action configuration.
@@ -55,9 +55,9 @@ public class JacksonActionConfiguration {
   }
 
   public static class ResponseMember {
-    public String name;
-
     public JSONResponse annotation;
+
+    public String name;
 
     public ResponseMember(JSONResponse annotation, String name) {
       this.annotation = annotation;

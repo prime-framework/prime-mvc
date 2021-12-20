@@ -17,6 +17,9 @@ package org.primeframework.mvc.parameter.convert;
 
 import java.util.Map;
 
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.guice.GuiceBootstrap;
 import org.primeframework.mvc.guice.MVCModule;
@@ -24,12 +27,11 @@ import org.primeframework.mvc.parameter.convert.converters.BooleanConverter;
 import org.primeframework.mvc.parameter.convert.converters.CharacterConverter;
 import org.primeframework.mvc.parameter.convert.converters.NumberConverter;
 import org.primeframework.mvc.parameter.convert.converters.StringConverter;
+import org.primeframework.mvc.security.MockUserLoginSecurityContext;
+import org.primeframework.mvc.security.UserLoginSecurityContext;
 import org.testng.annotations.Test;
-
-import com.google.inject.Injector;
-import com.google.inject.Key;
-import com.google.inject.TypeLiteral;
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertSame;
 
 /**
  * This class tests the converter registry.
@@ -47,9 +49,11 @@ public class DefaultConverterProviderTest extends PrimeBaseTest {
       protected void configure() {
         super.configure();
         install(new TestMVCConfigurationModule());
+        bind(UserLoginSecurityContext.class).to(MockUserLoginSecurityContext.class);
       }
     });
-    ConverterProvider provider = new DefaultConverterProvider(injector, injector.getInstance(Key.get(new TypeLiteral<Map<Class<?>, GlobalConverter>>(){})));
+    ConverterProvider provider = new DefaultConverterProvider(injector, injector.getInstance(Key.get(new TypeLiteral<Map<Class<?>, GlobalConverter>>() {
+    })));
     GlobalConverter tc = provider.lookup(Character.class);
     assertSame(CharacterConverter.class, tc.getClass());
     tc = provider.lookup(Character.TYPE);

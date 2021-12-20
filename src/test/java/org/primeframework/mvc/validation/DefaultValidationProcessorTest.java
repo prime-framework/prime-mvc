@@ -15,21 +15,18 @@
  */
 package org.primeframework.mvc.validation;
 
-import java.util.Arrays;
+import java.util.List;
 
+import com.google.inject.Inject;
 import org.example.action.ValidationMethods;
-import org.primeframework.mock.servlet.MockHttpServletRequest.Method;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocationStore;
+import org.primeframework.mvc.http.HTTPMethod;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.primeframework.mvc.message.SimpleMessage;
-import org.primeframework.mvc.servlet.HTTPMethod;
 import org.testng.annotations.Test;
-
-import com.google.inject.Inject;
-import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -41,15 +38,13 @@ import static org.testng.Assert.fail;
  * @author Brian Pontarelli
  */
 public class DefaultValidationProcessorTest extends PrimeBaseTest {
-  @Inject
-  public MessageStore messageStore;
+  @Inject public MessageStore messageStore;
 
-  @Inject
-  public ActionInvocationStore store;
+  @Inject public ActionInvocationStore store;
 
   @Test
-  public void disabled() throws Exception {
-    request.setMethod(Method.POST);
+  public void disabled() {
+    request.setMethod(HTTPMethod.POST);
 
     ValidationMethods action = new ValidationMethods(messageStore);
     assertFalse(action.preValidation);
@@ -64,8 +59,8 @@ public class DefaultValidationProcessorTest extends PrimeBaseTest {
   }
 
   @Test
-  public void failureFromPrevious() throws Exception {
-    request.setMethod(Method.PUT);
+  public void failureFromPrevious() {
+    request.setMethod(HTTPMethod.PUT);
 
     ValidationMethods action = new ValidationMethods(messageStore);
     store.setCurrent(makeActionInvocation(action, HTTPMethod.PUT, ""));
@@ -78,13 +73,13 @@ public class DefaultValidationProcessorTest extends PrimeBaseTest {
       processor.validate();
       fail("Should have failed");
     } catch (ValidationException e) {
-      assertEquals(messageStore.get(), asList(new SimpleFieldMessage(MessageType.ERROR, "test", "code", "failure")));
+      assertEquals(messageStore.get(), List.of(new SimpleFieldMessage(MessageType.ERROR, "test", "code", "failure")));
     }
   }
 
   @Test
   public void success() throws Exception {
-    request.setMethod(Method.PUT);
+    request.setMethod(HTTPMethod.PUT);
 
     ValidationMethods action = new ValidationMethods(messageStore);
     store.setCurrent(makeActionInvocation(action, HTTPMethod.PUT, ""));
@@ -94,8 +89,8 @@ public class DefaultValidationProcessorTest extends PrimeBaseTest {
   }
 
   @Test
-  public void validatable() throws Exception {
-    request.setMethod(Method.PUT);
+  public void validatable() {
+    request.setMethod(HTTPMethod.PUT);
 
     ValidationMethods action = new ValidationMethods(messageStore);
     action.addInterfaceErrors = true;
@@ -107,15 +102,15 @@ public class DefaultValidationProcessorTest extends PrimeBaseTest {
       fail("Should have failed");
     } catch (ValidationException e) {
       // Assert the message store
-      assertEquals(messageStore.get(), asList(
+      assertEquals(messageStore.get(), List.of(
           new SimpleMessage(MessageType.ERROR, "interface-general-code", "interface-general-message"),
           new SimpleFieldMessage(MessageType.ERROR, "interface-field", "interface-field-code", "interface-field-message")));
     }
   }
 
   @Test
-  public void validateGet() throws Exception {
-    for (Method method : Arrays.asList(Method.GET, Method.HEAD)) {
+  public void validateGet() {
+    for (HTTPMethod method : List.of(HTTPMethod.GET, HTTPMethod.HEAD)) {
       request.setMethod(method);
 
       ValidationMethods action = new ValidationMethods(messageStore);
@@ -129,8 +124,8 @@ public class DefaultValidationProcessorTest extends PrimeBaseTest {
   }
 
   @Test
-  public void validationMethod() throws Exception {
-    request.setMethod(Method.PUT);
+  public void validationMethod() {
+    request.setMethod(HTTPMethod.PUT);
 
     ValidationMethods action = new ValidationMethods(messageStore);
     action.addMethodErrors = true;
@@ -142,15 +137,15 @@ public class DefaultValidationProcessorTest extends PrimeBaseTest {
       fail("Should have failed");
     } catch (ValidationException e) {
       // Assert the message store
-      assertEquals(messageStore.get(), asList(
+      assertEquals(messageStore.get(), List.of(
           new SimpleMessage(MessageType.ERROR, "method-general-code", "method-general-message"),
           new SimpleFieldMessage(MessageType.ERROR, "method-field", "method-field-code", "method-field-message")));
     }
   }
 
   @Test
-  public void validationMethodNotExecutedForGET() throws Exception {
-    request.setMethod(Method.GET);
+  public void validationMethodNotExecutedForGET() {
+    request.setMethod(HTTPMethod.GET);
 
     ValidationMethods action = new ValidationMethods(messageStore);
     action.addMethodErrors = true;
@@ -161,8 +156,8 @@ public class DefaultValidationProcessorTest extends PrimeBaseTest {
   }
 
   @Test
-  public void validationMethods() throws Exception {
-    request.setMethod(Method.GET);
+  public void validationMethods() {
+    request.setMethod(HTTPMethod.GET);
 
     ValidationMethods action = new ValidationMethods(messageStore);
     assertFalse(action.preValidation);

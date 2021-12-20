@@ -27,13 +27,13 @@ import org.primeframework.mvc.action.config.ActionConfigurationProvider;
 import org.primeframework.mvc.control.AbstractControl;
 import org.primeframework.mvc.control.annotation.ControlAttribute;
 import org.primeframework.mvc.control.annotation.ControlAttributes;
+import org.primeframework.mvc.http.HTTPMethod;
+import org.primeframework.mvc.http.HTTPStrings.Methods;
 import org.primeframework.mvc.parameter.ParameterHandler;
 import org.primeframework.mvc.parameter.ParameterParser;
 import org.primeframework.mvc.parameter.ParameterParser.Parameters;
 import org.primeframework.mvc.parameter.PostParameterHandler;
 import org.primeframework.mvc.scope.ScopeRetriever;
-import org.primeframework.mvc.servlet.HTTPMethod;
-import org.primeframework.mvc.servlet.ServletTools;
 import org.primeframework.mvc.workflow.DefaultMVCWorkflow;
 
 /**
@@ -42,7 +42,7 @@ import org.primeframework.mvc.workflow.DefaultMVCWorkflow;
  * @author Brian Pontarelli
  */
 @ControlAttributes(required = {
-    @ControlAttribute(name = "action")
+    @ControlAttribute(name = "action", types = {String.class})
 })
 public class Form extends AbstractControl {
   private final ActionConfigurationProvider actionConfigurationProvider;
@@ -110,7 +110,7 @@ public class Form extends AbstractControl {
     // a new URI of '/user/delete'
     if (!action.startsWith("/") && !fullyQualified) {
       String currentURI = currentInvocation().uri();
-      int index = currentURI.lastIndexOf("/");
+      int index = currentURI.lastIndexOf('/');
       if (index >= 0) {
         action = currentURI.substring(0, index) + "/" + action;
       } else if (currentURI.equals("")) {
@@ -121,10 +121,11 @@ public class Form extends AbstractControl {
     if (!fullyQualified) {
       String method = (String) attributes.get("method");
       HTTPMethod httpMethod = HTTPMethod.GET;
-      if (method != null && !method.toUpperCase().equals("GET") && !method.toUpperCase().equals("POST")) {
+      // TODO : Daniel : Call a method here
+      if (method != null && !method.equalsIgnoreCase(Methods.GET) && !method.equalsIgnoreCase(Methods.POST)) {
         throw new PrimeException("Invalid method [" + method + "] for form. Only standard GET and POST methods are allowed.");
       } else if (method != null) {
-        httpMethod = HTTPMethod.valueOf(method.toUpperCase());
+        httpMethod = HTTPMethod.of(method);
       }
 
       ActionInvocation current = actionInvocationStore.getCurrent();
@@ -154,7 +155,6 @@ public class Form extends AbstractControl {
       action = contextPath + action;
     }
 
-    action += ServletTools.getSessionId(request);
     attributes.put("action", action);
 
     // Render

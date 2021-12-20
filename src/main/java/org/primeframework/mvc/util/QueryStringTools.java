@@ -16,6 +16,7 @@
 package org.primeframework.mvc.util;
 
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,8 +41,8 @@ public class QueryStringTools {
       String[] parts = query.split("&");
       for (String part : parts) {
         String[] pieces = part.split("=");
-        String name = URLDecoder.decode(pieces[0], "UTF-8");
-        String value = pieces.length > 1 ? URLDecoder.decode(pieces[1], "UTF-8") : "";
+        String name = URLDecoder.decode(pieces[0], StandardCharsets.UTF_8);
+        String value = pieces.length > 1 ? URLDecoder.decode(pieces[1], StandardCharsets.UTF_8) : "";
         parameters.computeIfAbsent(name, k -> new ArrayList<>()).add(value);
       }
     } catch (Exception e) {

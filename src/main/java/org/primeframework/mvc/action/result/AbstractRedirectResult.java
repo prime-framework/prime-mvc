@@ -15,19 +15,18 @@
  */
 package org.primeframework.mvc.action.result;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.List;
 
 import org.primeframework.mvc.action.ActionInvocationStore;
+import org.primeframework.mvc.http.HTTPRequest;
+import org.primeframework.mvc.http.HTTPResponse;
+import org.primeframework.mvc.http.Status;
 import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.scope.FlashScope;
 import org.primeframework.mvc.message.scope.MessageScope;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-import org.primeframework.mvc.servlet.ServletTools;
 
 /**
  * @author Brian Pontarelli
@@ -37,13 +36,13 @@ public abstract class AbstractRedirectResult<T extends Annotation> extends Abstr
 
   protected final MessageStore messageStore;
 
-  protected final HttpServletRequest request;
+  protected final HTTPRequest request;
 
-  protected final HttpServletResponse response;
+  protected final HTTPResponse response;
 
   protected AbstractRedirectResult(ExpressionEvaluator expressionEvaluator, ActionInvocationStore actionInvocationStore,
-                                   MessageStore messageStore, HttpServletRequest request,
-                                   HttpServletResponse response) {
+                                   MessageStore messageStore, HTTPRequest request,
+                                   HTTPResponse response) {
     super(expressionEvaluator);
     this.actionInvocationStore = actionInvocationStore;
     this.messageStore = messageStore;
@@ -56,22 +55,9 @@ public abstract class AbstractRedirectResult<T extends Annotation> extends Abstr
     List<Message> messages = messageStore.get(MessageScope.REQUEST);
     messageStore.clear(MessageScope.REQUEST);
     messageStore.addAll(MessageScope.FLASH, messages);
-
-    // Preserve previously flashed messages so they will survive redirect after redirect
-    @SuppressWarnings("unchecked")
-    List<Message> requestList = (List<Message>) request.getAttribute(FlashScope.KEY);
-    // If we have a session clear this from the request, in testing we may still use the request for additional assertions.
-    //  - And the session will be re-used in between tests.
-    if (request.getSession(false) != null) {
-      request.removeAttribute(FlashScope.KEY);
-    }
-
-    if (requestList != null) {
-      messageStore.addAll(MessageScope.FLASH, requestList);
-    }
   }
 
-  protected void sendRedirect(String uri, String defaultURI, boolean encodeVariables, boolean perm) throws IOException {
+  protected void sendRedirect(String uri, String defaultURI, boolean encodeVariables, boolean perm) {
     if (uri == null) {
       uri = expand(defaultURI, actionInvocationStore.getCurrent().action, encodeVariables);
     }
@@ -81,9 +67,7 @@ public abstract class AbstractRedirectResult<T extends Annotation> extends Abstr
       uri = context + uri;
     }
 
-    uri += ServletTools.getSessionId(request);
-
     response.sendRedirect(uri);
-    response.setStatus(perm ? HttpServletResponse.SC_MOVED_PERMANENTLY : HttpServletResponse.SC_MOVED_TEMPORARILY);
+    response.setStatus(perm ? Status.MOVED_PERMANENTLY : Status.MOVED_TEMPORARILY);
   }
 }

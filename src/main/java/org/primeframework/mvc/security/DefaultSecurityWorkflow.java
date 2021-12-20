@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc.security;
 
-import javax.servlet.ServletException;
 import java.io.IOException;
 
 import org.primeframework.mvc.PrimeException;
@@ -48,7 +47,7 @@ public class DefaultSecurityWorkflow implements SecurityWorkflow {
   }
 
   @Override
-  public void perform(WorkflowChain workflowChain) throws IOException, ServletException {
+  public void perform(WorkflowChain workflowChain) throws IOException {
     ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
     if (actionInvocation == null || actionInvocation.configuration == null) {
       workflowChain.continueWorkflow();
@@ -67,9 +66,7 @@ public class DefaultSecurityWorkflow implements SecurityWorkflow {
     }
 
     String[] constraints = getConstraints(actionInvocation);
-
     for (String scheme : actionInvocation.configuration.securitySchemes) {
-
       SecurityScheme securityScheme = factory.build(scheme);
       if (securityScheme == null) {
         throw new PrimeException("You have specified an invalid security scheme named [" + scheme + "]");

@@ -22,7 +22,7 @@ import org.primeframework.mvc.action.result.annotation.Status;
 import org.primeframework.mvc.content.json.annotation.JSONRequest;
 import org.primeframework.mvc.content.json.annotation.JSONResponse;
 import org.primeframework.mvc.parameter.annotation.PreParameterMethod;
-import org.primeframework.mvc.servlet.HTTPMethod;
+import org.primeframework.mvc.http.HTTPMethod;
 
 /**
  * @author Daniel DeGroff
@@ -42,7 +42,7 @@ public class TestAction {
     return "success";
   }
 
-  @PreParameterMethod(httpMethods = {HTTPMethod.PATCH})
+  @PreParameterMethod(httpMethods = "PATCH")
   public void patchFetch() {
     request.data = new CoolObject();
     request.data.config = "patched";

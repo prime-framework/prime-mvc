@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc.validation;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.function.Predicate;
 
 import com.google.inject.Inject;
@@ -24,12 +23,13 @@ import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.ValidationMethodConfiguration;
 import org.primeframework.mvc.action.config.ActionConfiguration;
+import org.primeframework.mvc.http.HTTPMethod;
+import org.primeframework.mvc.http.HTTPRequest;
 import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.scope.MessageScope;
 import org.primeframework.mvc.parameter.el.ExpressionException;
-import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.util.ReflectionUtils;
 
 /**
@@ -42,12 +42,12 @@ public class DefaultValidationProcessor implements ValidationProcessor {
 
   private final MessageStore messageStore;
 
-  private final HttpServletRequest request;
+  private final HTTPRequest request;
 
   private final ActionInvocationStore store;
 
   @Inject
-  public DefaultValidationProcessor(HttpServletRequest request, ActionInvocationStore store,
+  public DefaultValidationProcessor(HTTPRequest request, ActionInvocationStore store,
                                     MessageStore messageStore) {
     this.request = request;
     this.store = store;
@@ -70,7 +70,7 @@ public class DefaultValidationProcessor implements ValidationProcessor {
       ((Validatable) action).validate();
     }
 
-    HTTPMethod method = HTTPMethod.valueOf(request.getMethod().toUpperCase());
+    HTTPMethod method = request.getMethod();
     if (actionConfiguration.validationMethods.containsKey(method)) {
       for (ValidationMethodConfiguration methodConfig : actionConfiguration.validationMethods.get(method)) {
         try {

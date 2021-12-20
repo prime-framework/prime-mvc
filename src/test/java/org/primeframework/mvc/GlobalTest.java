@@ -19,7 +19,6 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.Collection;
@@ -36,20 +35,24 @@ import com.google.inject.TypeLiteral;
 import freemarker.template.Configuration;
 import org.example.action.JwtAuthorizedAction;
 import org.example.action.LotsOfMessagesAction;
+import org.example.action.store.BaseStoreAction;
+import org.example.action.user.EditAction;
 import org.example.domain.UserField;
 import org.primeframework.mvc.action.config.ActionConfigurationProvider;
 import org.primeframework.mvc.container.ContainerResolver;
+import org.primeframework.mvc.http.HTTPStrings.Headers;
+import org.primeframework.mvc.http.HTTPStrings.Methods;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-import org.primeframework.mvc.test.RequestSimulator;
 import org.primeframework.mvc.util.URIBuilder;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertSame;
+import static org.testng.Assert.assertTrue;
 import static org.testng.FileAssert.fail;
 
 /**
@@ -62,7 +65,7 @@ public class GlobalTest extends PrimeBaseTest {
 
   @BeforeClass
   public void beforeClass() {
-    jsonDir = Paths.get("src/test/resources/json");
+    jsonDir = Path.of("src/test/resources/json");
   }
 
   @Test
@@ -95,7 +98,7 @@ public class GlobalTest extends PrimeBaseTest {
     // Ensure the @FileUpload in the PageOneAction does not mess up PageTwo
     test.createFile()
         .simulate(() -> simulator.test("/scope/page-one")
-                                 .withFile("file", test.tempFile.toFile(), "text/plain")
+                                 .withFile("file", test.tempFile, "text/plain")
                                  .get()
                                  .assertStatusCode(200)
                                  .assertHeaderContains("Cache-Control", "no-cache"));
@@ -135,14 +138,21 @@ public class GlobalTest extends PrimeBaseTest {
   public void get() throws Exception {
     simulator.test("/user/edit")
              .get()
-             .setup(r -> r.container.getResponse().setHeader("Referer", "http://localhost"))
              .assertStatusCode(200)
-             .assertHeaderContains("Cache-Control", "no-cache")
              // header name is not case sensitive
-             .assertHeaderContains("referer", "http://localhost")
-             .assertHeaderContains("Referer", "http://localhost")
+             .assertHeaderContains("Cache-Control", "no-cache")
+             .assertHeaderContains("cache-control", "no-cache")
              .assertHeaderDoesNotContain("Potato")
-             .assertBodyFile(Paths.get("src/test/resources/html/edit.html"));
+             .assertBodyFile(Path.of("src/test/resources/html/edit.html"));
+
+    EditAction.getCalled = false;
+    simulator.test("/user/edit")
+             .withBody("testing")
+             .withHeader(Headers.MethodOverride, Methods.GET)
+             .get()
+             .assertStatusCode(200);
+
+    assertTrue(EditAction.getCalled);
   }
 
   @Test
@@ -192,7 +202,7 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
-  public void get_action_backed_template_slashes() throws Exception {
+  public void get_action_backed_template_slashes() {
     // Ok
     simulator.test("/freemarker/action-backed")
              .get()
@@ -326,10 +336,9 @@ public class GlobalTest extends PrimeBaseTest {
              .assertStatusCode(500);
   }
 
-  @Test(dataProvider = "useCookieFlash")
-  public void get_execute_redirect(boolean useCookieFlash) throws Exception {
+  @Test
+  public void get_execute_redirect() throws Exception {
     // Follow the redirect and another redirect and assert on that response as well - and ensure a message set in the first redirect gets all the way to the end
-    configuration.useCookieForFlashScope = useCookieFlash;
     test.simulate(() -> simulator.test("/temp-redirect")
                                  .get()
                                  .assertStatusCode(302)
@@ -427,8 +436,7 @@ public class GlobalTest extends PrimeBaseTest {
     // HttpServletRequest and finds the value
     simulator.test("/value-in-request")
              .get()
-             .assertBodyContains("baz")
-             .assertRequestContainsAttribute("bar", "baz");
+             .assertBodyContains("baz");
   }
 
   @Test
@@ -491,7 +499,7 @@ public class GlobalTest extends PrimeBaseTest {
   public void get_fullFormWithAllAttributes() throws Exception {
     simulator.test("/user/full-form")
              .get()
-             .assertBodyFile(Paths.get("src/test/resources/html/full-form.html"));
+             .assertBodyFile(Path.of("src/test/resources/html/full-form.html"));
   }
 
   @Test
@@ -626,10 +634,18 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void get_largeFTL() {
+    simulator.test("/large-ftl")
+             .get()
+             .assertStatusCode(200)
+             .assertBodyContains("large FTL");
+  }
+
+  @Test
   public void get_metrics() throws Exception {
     simulator.test("/user/full-form")
              .get()
-             .assertBodyFile(Paths.get("src/test/resources/html/full-form.html"));
+             .assertBodyFile(Path.of("src/test/resources/html/full-form.html"));
 
     Map<String, Timer> timers = metricRegistry.getTimers();
     assertEquals(timers.get("prime-mvc.[/user/full-form].requests").getCount(), 1);
@@ -666,7 +682,7 @@ public class GlobalTest extends PrimeBaseTest {
   public void get_nonFormFields() throws Exception {
     simulator.test("/user/details-fields")
              .get()
-             .assertBodyFile(Paths.get("src/test/resources/html/details-fields.html"));
+             .assertBodyFile(Path.of("src/test/resources/html/details-fields.html"));
   }
 
   @Test
@@ -742,7 +758,7 @@ public class GlobalTest extends PrimeBaseTest {
              .withParameter("result", "json")
              .get()
              .assertStatusCode(200)
-             .assertContentType("application/json")
+             .assertContentType("application/json; charset=UTF-8")
              .assertBodyContains("trust me it is json");
 
     simulator.test("/pre-render-method")
@@ -859,36 +875,20 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void get_resource_noAction() {
+    simulator.test("/js/test.js")
+             .get()
+             .assertStatusCode(200)
+             .assertContentType("text/javascript")
+             .assertBodyContains("{};");
+  }
+
+  @Test
   public void get_secure() throws Exception {
     test.simulate(() -> simulator.test("/secure")
                                  .get()
                                  .assertHeaderContains("Cache-Control", "no-cache")
                                  .assertStatusCode(401));
-  }
-
-  @Test
-  public void get_sessionStorageInFormTag() throws Exception {
-    // Ensure we fill out scope storage in an action when we build a new action based upon hitting a
-    // form tag that has a different action then the current action invocation.
-
-    // Page2 has a session variable and a form, set it, assert it stays in the session.
-    test.simulate(() -> simulator.test("/scope/page-two")
-                                 .withParameter("searchText", "42") // @Session
-                                 .withParameter("searchType", "meaning") // @ActionSession
-                                 .post()
-                                 .assertHeaderContains("Cache-Control", "no-cache")
-                                 .assertStatusCode(200))
-
-        .simulate(() -> simulator.test("/scope/page-two")
-                                 .get()
-                                 .assertStatusCode(200)
-                                 .assertBodyContains("42", "meaning"))
-
-        // Now hit /api/page-one which contains a form tag with an action of /scope/page-two
-        .simulate(() -> simulator.test("/scope/page-one")
-                                 .get()
-                                 .assertStatusCode(200)
-                                 .assertBodyContains("42", "meaning"));
   }
 
   @Test
@@ -990,11 +990,10 @@ public class GlobalTest extends PrimeBaseTest {
                                  .assertHeaderContains("Cache-Control", "no-cache")
                                  .assertJSON("{\"called\": \"/.well-known/well-known/potato/openid-configuration\"}"));
 
+    // This is an invalid mapping, so it will result in a 404
     test.simulate(() -> simulator.test("/.well-known/.well-known/openid-configuration")
                                  .get()
-                                 .assertStatusCode(500)
-                                 // A 500 will not contain these headers
-                                 .assertHeaderDoesNotContain("Cache-Control"));
+                                 .assertStatusCode(404));
   }
 
   @Test
@@ -1123,6 +1122,21 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void missing() {
+    // Direct action invocation
+    simulator.test("/missing")
+             .get()
+             .assertStatusCode(404)
+             .assertBodyContains("The page is missing!");
+
+    // A traditional 404
+    simulator.test("/also-missing")
+             .get()
+             .assertStatusCode(404)
+             .assertBodyContains("The page is missing!");
+  }
+
+  @Test
   public void multipleJSONRequestMembers() throws Exception {
     simulator.test("/multiple-json-request")
              .post()
@@ -1172,14 +1186,14 @@ public class GlobalTest extends PrimeBaseTest {
   public void notImplemented() {
     simulator.test("/not-allowed")
              .method("POTATO")
-             .assertStatusCode(501)
+             .assertStatusCode(405) // Not allowed since we can handle any name but the action doesn't have that method
              .assertHeaderContains("Cache-Control", "no-cache");
   }
 
   @Test(dataProvider = "methodOverrides")
   public void patch_MethodOverride(String overrideHeaderName) throws Exception {
     simulator.test("/patch/test")
-             .withJSONFile(Paths.get("src/test/resources/json/patch/test-patch.json"))
+             .withJSONFile(Path.of("src/test/resources/json/patch/test-patch.json"))
              .withHeader(overrideHeaderName, "PATCH")
              .post()
              .assertStatusCode(200)
@@ -1191,21 +1205,21 @@ public class GlobalTest extends PrimeBaseTest {
   public void patch_testing() throws Exception {
     // POST no big deal
     simulator.test("/patch/test")
-             .withJSONFile(Paths.get("src/test/resources/json/patch/test.json"), "config", "post")
+             .withJSONFile(Path.of("src/test/resources/json/patch/test.json"), "config", "post")
              .post()
              .assertStatusCode(200)
              .assertJSONFile(jsonDir.resolve("patch/test-response.json"), "config", "post");
 
     // PUT no big deal
     simulator.test("/patch/test")
-             .withJSONFile(Paths.get("src/test/resources/json/patch/test.json"), "config", "put")
+             .withJSONFile(Path.of("src/test/resources/json/patch/test.json"), "config", "put")
              .put()
              .assertStatusCode(200)
              .assertJSONFile(jsonDir.resolve("patch/test-response.json"), "config", "put");
 
     // PATCH damn that is cool
     simulator.test("/patch/test")
-             .withJSONFile(Paths.get("src/test/resources/json/patch/test-patch.json"))
+             .withJSONFile(Path.of("src/test/resources/json/patch/test-patch.json"))
              .patch()
              .assertStatusCode(200)
              .assertJSONFile(jsonDir.resolve("patch/test-response.json"), "config", "patched");
@@ -1223,34 +1237,34 @@ public class GlobalTest extends PrimeBaseTest {
   @Test
   public void post_JSONWithActual() throws Exception {
     simulator.test("/api")
-             .withJSONFile(Paths.get("src/test/resources/json/api-jsonWithActual-post.json"))
+             .withJSONFile(Path.of("src/test/resources/json/api-jsonWithActual-post.json"))
              .post()
              .assertHeaderContains("Cache-Control", "no-cache")
-             .assertJSONFileWithActual(UserField.class, Paths.get("src/test/resources/json/api-jsonWithActual-post-response.ftl"));
+             .assertJSONFileWithActual(UserField.class, Path.of("src/test/resources/json/api-jsonWithActual-post-response.ftl"));
 
     // Test a final field (the Jackson handler will put the JSON into the final field)
     simulator.test("/api-final")
-             .withJSONFile(Paths.get("src/test/resources/json/api-jsonWithActual-post.json"))
+             .withJSONFile(Path.of("src/test/resources/json/api-jsonWithActual-post.json"))
              .post()
-             .assertJSONFileWithActual(UserField.class, Paths.get("src/test/resources/json/api-jsonWithActual-post-response.ftl"));
+             .assertJSONFileWithActual(UserField.class, Path.of("src/test/resources/json/api-jsonWithActual-post-response.ftl"));
   }
 
   @Test
   public void post_anyContentType() throws Exception {
     test.createFile("Hello World")
         .simulate(() -> simulator.test("/file-upload")
-                                 .withFile("dataAnyType", test.tempFile.toFile(), "text/plain")
+                                 .withFile("dataAnyType", test.tempFile, "text/plain")
                                  .post()
                                  .assertStatusCode(200)
                                  .assertHeaderContains("Cache-Control", "no-cache"))
 
         .simulate(() -> simulator.test("/file-upload")
-                                 .withFile("dataAnyType", test.tempFile.toFile(), "text/html")
+                                 .withFile("dataAnyType", test.tempFile, "text/html")
                                  .post()
                                  .assertStatusCode(200))
 
         .simulate(() -> simulator.test("/file-upload")
-                                 .withFile("dataAnyType", test.tempFile.toFile(), "application/octet-stream")
+                                 .withFile("dataAnyType", test.tempFile, "application/octet-stream")
                                  .post()
                                  .assertStatusCode(200)
                                  .assertHeaderContains("Cache-Control", "no-cache"));
@@ -1258,7 +1272,7 @@ public class GlobalTest extends PrimeBaseTest {
 
   @Test
   public void post_apiJSONBothWays() throws Exception {
-    Path jsonFile = Paths.get("src/test/resources/json/api-jsonBothWays-post.json");
+    Path jsonFile = Path.of("src/test/resources/json/api-jsonBothWays-post.json");
     simulator.test("/api")
              .withJSONFile(jsonFile)
              .post()
@@ -1304,7 +1318,7 @@ public class GlobalTest extends PrimeBaseTest {
                                  .assertBodyIsEmpty()
                                  // Assert the cookie is set
                                  .assertCookie("token", "secret")
-                                 // Assert we dropped a cookie for the @ActionCookie
+                                 // Assert we dropped a cookie for the @BrowserActionSession
                                  .assertContainsCookie("org.example.action.CookieAction$saveMe"))
 
         // Now make a GET request to the same action and verify the cookies were picked up on the request.
@@ -1344,7 +1358,7 @@ public class GlobalTest extends PrimeBaseTest {
                                  .post()
                                  .assertStatusCode(200)
                                  .assertBodyIsEmpty()
-                                 // Assert we dropped a cookie for the @ActionCookie
+                                 // Assert we dropped a cookie for the @BrowserActionSession
                                  .assertContainsCookie("org.example.action.CookieAction$u"))
 
         // Call get and see the value is set back into the action
@@ -1365,7 +1379,7 @@ public class GlobalTest extends PrimeBaseTest {
                                  .post()
                                  .assertStatusCode(200)
                                  .assertBodyIsEmpty()
-                                 // Assert we dropped a cookie for the @ActionCookie
+                                 // Assert we dropped a cookie for the @BrowserActionSession
                                  .assertContainsCookie("org.example.action.CookieAction$list"))
 
         .simulate(() -> simulator.test("/cookie")
@@ -1488,11 +1502,11 @@ public class GlobalTest extends PrimeBaseTest {
   public void post_dateConversion() throws Exception {
     // Multiple LocalDate formats
     test.forEach(
-        "01-01-2018",
-        "01-01-2018",
-        "1-1-2018",
-        "1/01/2018",
-        "01/1/2018")
+            "01-01-2018",
+            "01-01-2018",
+            "1-1-2018",
+            "1/01/2018",
+            "01/1/2018")
         .test(date -> simulator.test("/date-time-converter")
                                .withParameter("localDate", date)
                                .withParameter("localDate@dateTimeFormat", "[MM/dd/yyyy][M/dd/yyyy][M/d/yyyy][MM-dd-yyyy][M-dd-yyyy][M-d-yyyy]")
@@ -1510,10 +1524,10 @@ public class GlobalTest extends PrimeBaseTest {
 
     // Multiple ZonedDateTime formats
     test.forEach(
-        "07-08-2008 10:13:34 AM -0800",
-        "07/08/2008 10:13:34 AM -0800",
-        "7-8-2008 10:13:34 AM -0800",
-        "7/8/2008 10:13:34 AM -0800")
+            "07-08-2008 10:13:34 AM -0800",
+            "07/08/2008 10:13:34 AM -0800",
+            "7-8-2008 10:13:34 AM -0800",
+            "7/8/2008 10:13:34 AM -0800")
         .test(zoneDateTime -> simulator.test("/date-time-converter")
                                        .withParameter("zonedDateTime", zoneDateTime)
                                        .withParameter("zonedDateTime@dateTimeFormat", "[MM-dd-yyyy hh:mm:ss a Z][MM/dd/yyyy hh:mm:ss a Z][M/d/yyyy hh:mm:ss a Z][M-d-yyyy hh:mm:ss a Z]")
@@ -1634,12 +1648,12 @@ public class GlobalTest extends PrimeBaseTest {
   @Test
   public void post_invalidJSON() throws Exception {
     test.simulate(() -> simulator.test("/invalid-json")
-                                 .withJSONFile(Paths.get("src/test/resources/json/InvalidJsonAction.json"))
+                                 .withJSONFile(Path.of("src/test/resources/json/InvalidJsonAction.json"))
                                  .post()
                                  .assertStatusCode(400)
                                  .assertContainsFieldErrors("active")
                                  // The actual exception seems to vary a bit, so instead we are asserting the content type and then that some specific info is in the body.
-                                 .assertContentType("application/json")
+                                 .assertContentType("application/json; charset=UTF-8")
                                  .assertBodyContains(
                                      "[invalidJSON]",
                                      "Unable to parse JSON. The property [active] was invalid. The error was [Possible conversion error]. The detailed exception was ["));
@@ -1721,11 +1735,11 @@ public class GlobalTest extends PrimeBaseTest {
   public void post_onlyAllowTextHTML() throws Exception {
     test.createFile("<strong>Hello World</strong>")
         .simulate(() -> simulator.test("/file-upload")
-                                 .withFile("dataTextHtml", test.tempFile.toFile(), "text/plain")
+                                 .withFile("dataTextHtml", test.tempFile, "text/plain")
                                  .post()
                                  .assertStatusCode(400))
         .simulate(() -> simulator.test("/file-upload")
-                                 .withFile("dataTextHtml", test.tempFile.toFile(), "text/html")
+                                 .withFile("dataTextHtml", test.tempFile, "text/html")
                                  .post()
                                  .assertStatusCode(200));
   }
@@ -1733,6 +1747,7 @@ public class GlobalTest extends PrimeBaseTest {
   @Test
   public void post_savedRequest() throws Exception {
     // Post to a page that requires authentication
+    BaseStoreAction.loggedIn = false;
     test.simulate(() -> simulator.test("/store/purchase")
                                  .withParameter("item", "beer")
                                  .post()
@@ -1741,18 +1756,19 @@ public class GlobalTest extends PrimeBaseTest {
                                  .assertRedirect("/store/login")
 
                                  // Redirected to login
-                                 .executeRedirect(redirect1 -> redirect1.assertStatusCode(200)
-                                                                        .assertHeaderContains("Cache-Control", "no-cache")
-                                                                        .assertBodyContains("Login")
+                                 .executeRedirect(
+                                     req -> req.assertStatusCode(200)
+                                               .assertHeaderContains("Cache-Control", "no-cache")
+                                               .assertBodyContains("Login")
 
-                                                                        // Post on Login, get a session, and redirect back to the cart which completes the beer purchase
-                                                                        .executeFormPostInResponseBody("form", post -> post
-                                                                            .assertStatusCode(302)
-                                                                            .assertHeaderContains("Cache-Control", "no-cache")
-                                                                            .assertRedirect("/store/purchase")
+                                               // Post on Login, get a session, and redirect back to the cart which completes the beer purchase
+                                               .executeFormPostInResponseBody("form",
+                                                   postReq -> postReq.assertStatusCode(302)
+                                                                     .assertHeaderContains("Cache-Control", "no-cache")
+                                                                     .assertRedirect("/store/purchase")
 
-                                                                            .executeRedirect(redirect2 -> redirect2
-                                                                                .assertStatusCode(200).assertBodyContains("Buy:beer")))));
+                                                                     .executeRedirect(
+                                                                         redirReq -> redirReq.assertStatusCode(200).assertBodyContains("Buy:beer")))));
   }
 
   @Test
@@ -1761,10 +1777,7 @@ public class GlobalTest extends PrimeBaseTest {
     // HttpServletRequest and finds the value
     test.simulate(() -> simulator.test("/scope-storage")
                                  .post())
-        .assertContextAttributeNotNull("contextObject")
-        .assertRequestAttributeNotNull("requestObject")
-        .assertActionSessionAttributeNotNull("org.example.action.ScopeStorageAction", "actionSessionObject")
-        .assertSessionAttributeNotNull("sessionObject");
+        .assertContextAttributeNotNull("contextObject");
   }
 
   @Test
@@ -1773,25 +1786,16 @@ public class GlobalTest extends PrimeBaseTest {
     test.simulate(() -> simulator.test("/extended-scope-storage")
                                  .post())
         .assertContextAttributeNotNull("contextObject")
-        .assertRequestAttributeNotNull("requestObject")
-        .assertActionSessionAttributeNotNull("org.example.action.ExtendedScopeStorage", "actionSessionObject")
-        .assertSessionAttributeNotNull("sessionObject")
 
         // Call [GET] -- assume everything is set from prior request except request attribute is null.
         .simulate(() -> simulator.test("/extended-scope-storage")
                                  .get())
         .assertContextAttributeNotNull("contextObject")
-        .assertRequestAttributeIsNull("requestObject")
-        .assertActionSessionAttributeNotNull("org.example.action.ExtendedScopeStorage", "actionSessionObject")
-        .assertSessionAttributeNotNull("sessionObject")
 
         // Call [GET] on a different action -- only action and context attributes come over, request and action session are null.
         .simulate(() -> simulator.test("/another-extended-scope-storage")
                                  .get())
-        .assertContextAttributeNotNull("contextObject")
-        .assertRequestAttributeIsNull("requestObject")
-        .assertActionSessionAttributeIsNull("org.example.action.AnotherExtendedScopeStorage", "actionSessionObject")
-        .assertSessionAttributeNotNull("sessionObject");
+        .assertContextAttributeNotNull("contextObject");
   }
 
   @Test
@@ -1999,32 +2003,32 @@ public class GlobalTest extends PrimeBaseTest {
 
   @Test
   public void singletons() {
-    assertSingleton(simulator, ActionConfigurationProvider.class);
-    assertSingleton(simulator, Configuration.class);
-    assertSingleton(simulator, ResourceBundle.Control.class);
-    assertSingleton(simulator, ResourceBundle.Control.class);
-    assertSingleton(simulator, ContainerResolver.class);
-    assertSingleton(simulator, ConverterProvider.class);
-    assertSingleton(simulator, ExpressionEvaluator.class);
-    assertSingleton(simulator, URIBuilder.class);
-    assertSingletonConverter(simulator, Boolean.class);
-    assertSingletonConverter(simulator, boolean.class);
-    assertSingletonConverter(simulator, Character.class);
-    assertSingletonConverter(simulator, char.class);
-    assertSingletonConverter(simulator, Number.class);
-    assertSingletonConverter(simulator, int.class);
-    assertSingletonConverter(simulator, long.class);
-    assertSingletonConverter(simulator, double.class);
-    assertSingletonConverter(simulator, float.class);
-    assertSingletonConverter(simulator, BigDecimal.class);
-    assertSingletonConverter(simulator, BigInteger.class);
-    assertSingletonConverter(simulator, Collection.class);
-    assertSingletonConverter(simulator, ZonedDateTime.class);
-    assertSingletonConverter(simulator, Enum.class);
-    assertSingletonConverter(simulator, File.class);
-    assertSingletonConverter(simulator, LocalDate.class);
-    assertSingletonConverter(simulator, Locale.class);
-    assertSingletonConverter(simulator, String.class);
+    assertSingleton(ActionConfigurationProvider.class);
+    assertSingleton(Configuration.class);
+    assertSingleton(ResourceBundle.Control.class);
+    assertSingleton(ResourceBundle.Control.class);
+    assertSingleton(ContainerResolver.class);
+    assertSingleton(ConverterProvider.class);
+    assertSingleton(ExpressionEvaluator.class);
+    assertSingleton(URIBuilder.class);
+    assertSingletonConverter(Boolean.class);
+    assertSingletonConverter(boolean.class);
+    assertSingletonConverter(Character.class);
+    assertSingletonConverter(char.class);
+    assertSingletonConverter(Number.class);
+    assertSingletonConverter(int.class);
+    assertSingletonConverter(long.class);
+    assertSingletonConverter(double.class);
+    assertSingletonConverter(float.class);
+    assertSingletonConverter(BigDecimal.class);
+    assertSingletonConverter(BigInteger.class);
+    assertSingletonConverter(Collection.class);
+    assertSingletonConverter(ZonedDateTime.class);
+    assertSingletonConverter(Enum.class);
+    assertSingletonConverter(File.class);
+    assertSingletonConverter(LocalDate.class);
+    assertSingletonConverter(Locale.class);
+    assertSingletonConverter(String.class);
   }
 
   @Test
@@ -2035,23 +2039,15 @@ public class GlobalTest extends PrimeBaseTest {
                                  .assertBodyContains("firstName=brian", "lastName=pontarelli", "theRest=then,a,bunch,of,stuff"));
   }
 
-  @DataProvider(name = "useCookieFlash")
-  public Object[][] useCookieFlash() {
-    return new Object[][]{
-        {true},
-        {false}
-    };
+  private void assertSingleton(Class<?> type) {
+    assertSame(injector.getInstance(type), injector.getInstance(type));
   }
 
-  private void assertSingleton(RequestSimulator simulator, Class<?> type) {
-    assertSame(simulator.injector.getInstance(type), simulator.injector.getInstance(type));
-  }
-
-  private void assertSingletonConverter(RequestSimulator simulator, Class<?> type) {
+  private void assertSingletonConverter(Class<?> type) {
     // Adding a noinspection, there is a bug in the JDK that is exposed when you take the suggestion of IJ and replace this TypeLiteral type info with <>
     // Ask me how I know... see https://stackoverflow.com/questions/50885335/java-10-compilaton-null-pointer-exception
     //noinspection Convert2Diamond
-    Map<Class<?>, GlobalConverter> converters = simulator.injector.getInstance(Key.get(new TypeLiteral<Map<Class<?>, GlobalConverter>>() {
+    Map<Class<?>, GlobalConverter> converters = injector.getInstance(Key.get(new TypeLiteral<Map<Class<?>, GlobalConverter>>() {
     }));
     assertSame(converters.get(type), converters.get(type));
   }

@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc.content;
 
-import javax.servlet.ServletException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Collections;
@@ -26,7 +25,6 @@ import com.google.inject.Inject;
 import org.example.action.KitchenSinkAction;
 import org.example.domain.UserField;
 import org.example.domain.UserType;
-import org.primeframework.mock.servlet.MockServletInputStream;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
@@ -36,9 +34,11 @@ import org.primeframework.mvc.content.binary.BinaryActionConfiguration;
 import org.primeframework.mvc.content.guice.ContentHandlerFactory;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration.RequestMember;
-import org.primeframework.mvc.servlet.HTTPMethod;
+import org.primeframework.mvc.http.DefaultHTTPRequest;
+import org.primeframework.mvc.http.HTTPMethod;
+import org.primeframework.mvc.http.MutableHTTPRequest;
+import org.primeframework.mvc.parameter.fileupload.FileInfo;
 import org.primeframework.mvc.workflow.WorkflowChain;
-import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import static org.easymock.EasyMock.createStrictMock;
 import static org.easymock.EasyMock.replay;
@@ -59,7 +59,8 @@ public class DefaultContentWorkflowTest extends PrimeBaseTest {
   @Test
   public void binary() throws Exception {
     test.createFile("Binary File!");
-    request.setInputStream(new MockServletInputStream(Files.readAllBytes(test.tempFile)));
+    request.addFile(new FileInfo(test.tempFile, "temp", "temp", "text/plain"));
+    request.setContentLength(Files.size(test.tempFile));
     request.setContentType("application/octet-stream");
 
     Map<Class<?>, Object> additionalConfig = new HashMap<>();
@@ -80,8 +81,8 @@ public class DefaultContentWorkflowTest extends PrimeBaseTest {
     assertFalse(Files.exists(action.binaryRequest));
   }
 
-  @Test(dataProvider = "jsonContentTypes")
-  public void callJSON(String contentType) throws IOException, ServletException {
+  @Test
+  public void callJSON() throws IOException {
     String expected = "{" +
         "  \"active\":true," +
         "  \"addresses\":{" +
@@ -115,8 +116,8 @@ public class DefaultContentWorkflowTest extends PrimeBaseTest {
         "  \"type\":\"COOL\"" +
         "}";
 
-    request.setInputStream(new MockServletInputStream(expected.getBytes()));
-    request.setContentType(contentType);
+    request.setBody(expected.getBytes());
+    request.setContentType("application/json");
 
     Map<Class<?>, Object> additionalConfig = new HashMap<>();
     Map<HTTPMethod, RequestMember> requestMembers = new HashMap<>();
@@ -152,17 +153,9 @@ public class DefaultContentWorkflowTest extends PrimeBaseTest {
     assertEquals(action.jsonRequest.type, UserType.COOL);
   }
 
-  @DataProvider(name = "jsonContentTypes")
-  public Object[][] contentTypes() {
-    return new Object[][]{
-        {"application/json"},
-        {"application/json; charset=UTF-8"},
-        {"application/json; charset=utf-8"}
-    };
-  }
-
   @Test
-  public void missing() throws IOException, ServletException {
+  public void missing() throws IOException {
+    MutableHTTPRequest request = new DefaultHTTPRequest();
     request.setContentType("application/missing");
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);

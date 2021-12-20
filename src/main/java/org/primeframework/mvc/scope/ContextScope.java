@@ -15,22 +15,21 @@
  */
 package org.primeframework.mvc.scope;
 
-import javax.servlet.ServletContext;
-
+import org.primeframework.mvc.http.HTTPContext;
 import org.primeframework.mvc.scope.annotation.Context;
 
 import com.google.inject.Inject;
 
 /**
- * This is the request scope which fetches and stores values in the ServletContext.
+ * This is the request scope which fetches and stores values in the Context
  *
  * @author Brian Pontarelli
  */
 public class ContextScope implements Scope<Context> {
-  private final ServletContext context;
+  private final HTTPContext context;
 
   @Inject
-  public ContextScope(ServletContext context) {
+  public ContextScope(HTTPContext context) {
     this.context = context;
   }
 

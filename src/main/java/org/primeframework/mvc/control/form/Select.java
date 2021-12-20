@@ -28,7 +28,7 @@ import org.primeframework.mvc.control.annotation.ControlAttributes;
  */
 @ControlAttributes(
     required = {
-        @ControlAttribute(name = "name"),
+        @ControlAttribute(name = "name", types = {String.class}),
         @ControlAttribute(name = "items", types = {Collection.class, Map.class, Object[].class})
     },
     optional = {

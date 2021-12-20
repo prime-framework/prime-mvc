@@ -28,7 +28,6 @@ import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
 @Status
 @JSON(code = "input", status = 400)
 public class FileUploadAction {
-
   @FileUpload(contentTypes = {"*"})
   public FileInfo dataAnyType;
 

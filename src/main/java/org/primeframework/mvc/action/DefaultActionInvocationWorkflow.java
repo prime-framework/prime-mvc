@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc.action;
 
-import javax.servlet.ServletException;
 import java.io.IOException;
 
 import com.google.inject.Inject;
@@ -54,9 +53,8 @@ public class DefaultActionInvocationWorkflow implements ActionInvocationWorkflow
    *
    * @param chain The chain.
    * @throws IOException      If the chain throws an IOException.
-   * @throws ServletException If the chain throws a ServletException or if the result can't be found.
    */
-  public void perform(WorkflowChain chain) throws IOException, ServletException {
+  public void perform(WorkflowChain chain) throws IOException {
     ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
     if (actionInvocation.action != null) {
       String resultCode = execute(actionInvocation);

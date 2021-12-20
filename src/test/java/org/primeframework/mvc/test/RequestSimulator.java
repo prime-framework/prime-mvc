@@ -15,109 +15,51 @@
  */
 package org.primeframework.mvc.test;
 
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import java.util.Enumeration;
-
-import com.google.inject.Injector;
-import com.google.inject.Module;
-import org.primeframework.mock.servlet.MockContainer;
-import org.primeframework.mock.servlet.MockHttpServletResponse;
-import org.primeframework.mvc.guice.GuiceBootstrap;
-import org.primeframework.mvc.servlet.PrimeFilter;
-import org.primeframework.mvc.servlet.PrimeServletContextListener;
-import org.primeframework.mvc.servlet.ServletObjectsHolder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.primeframework.mock.MockUserAgent;
+import org.primeframework.mvc.BasePrimeMain;
+import org.primeframework.mvc.message.TestMessageObserver;
 
 /**
  * This class provides a method for testing a full invocation of Prime. This simulates the JEE web objects
- * (HttpServletRequest, etc.) and an invocation of the PrimeFilter. You can also simulate multiple invocations across a
- * single session by using the same instance of this class multiple times.
+ * (HttpServletRequest, etc.) and an invocation of the PrimeMVCRequestHandler. You can also simulate multiple
+ * invocations across a single session by using the same instance of this class multiple times.
  *
  * @author Brian Pontarelli
  */
 public class RequestSimulator {
-  private final static Logger logger = LoggerFactory.getLogger(RequestSimulator.class);
+  public final TestMessageObserver messageObserver;
 
-  public final MockContainer container;
+  public final MockUserAgent userAgent;
 
-  public final PrimeFilter filter = new PrimeFilter();
-
-  public Injector injector;
-
-  // the response of the last request, deprecated, Do Not use, only added for CS
-  public MockHttpServletResponse response;
+  private final BasePrimeMain main;
 
   /**
    * Creates a new request simulator that can be used to simulate requests to a Prime application.
    *
-   * @param container  The application container to use for this simulator.
-   * @param mainModule The main module.
-   * @throws ServletException If the initialization of the PrimeServletContextListener failed.
+   * @param main            The PrimeMain that is used to start an HTTP server.
+   * @param messageObserver Used to observe messages from within the HTTP server so that they can be asserted on.
    */
-  public RequestSimulator(final MockContainer container, Module mainModule) throws ServletException {
-    ServletObjectsHolder.setServletContext(container.getContext());
-    this.container = container;
-    this.injector = GuiceBootstrap.initialize(mainModule);
-    init();
+  public RequestSimulator(BasePrimeMain main, TestMessageObserver messageObserver) {
+    this.main = main;
+    this.messageObserver = messageObserver;
+    this.userAgent = new MockUserAgent();
+
+    // Start the server
+    this.main.start();
+  }
+
+  public void shutdown() {
+    main.stop();
   }
 
   /**
-   * Creates a new request simulator that can be used to simulate requests to a Prime application.
-   * <p>
-   * This constructor can be used if you already have an injector built through a test framework.
+   * Starts a test for the given path. This returns a RequestBuilder that you can use to set the request up correctly
+   * for the test and then execute the GET or POST.
    *
-   * @param container The application container to use for this simulator.
-   * @param injector  The Guice injector.
-   * @throws ServletException If the initialization of the PrimeServletContextListener failed.
-   */
-  public RequestSimulator(final MockContainer container, Injector injector) throws ServletException {
-    // This isn't necessary if you override the ServletModule. Leaving in case anyone wishes to use this.
-    ServletObjectsHolder.setServletContext(container.getContext());
-    this.container = container;
-    this.injector = injector;
-    init();
-  }
-
-  /**
-   * Starts a test for the given URL. This returns a RequestBuilder that you can use to set the request up correctly for
-   * the test and then execute the GET or POST.
-   *
-   * @param uri The URI to test.
+   * @param path The path to test.
    * @return The RequestBuilder.
    */
-  public RequestBuilder test(String uri) {
-    // cache the response of the last request
-    RequestBuilder rb = new RequestBuilder(uri, container, filter, injector);
-    response = rb.response;
-    return rb;
-  }
-
-  private void init() throws ServletException {
-    this.container.getContext().setAttribute(PrimeServletContextListener.GUICE_INJECTOR_KEY, this.injector);
-    logger.debug("Built RequestSimulator with context webDir " + container.getContext().webDir.getAbsolutePath());
-    this.filter.init(new FilterConfig() {
-      @Override
-      public String getFilterName() {
-        return "prime";
-      }
-
-      @Override
-      public String getInitParameter(String s) {
-        return null;
-      }
-
-      @Override
-      public Enumeration<String> getInitParameterNames() {
-        return null;
-      }
-
-      @Override
-      public ServletContext getServletContext() {
-        return container.getContext();
-      }
-    });
+  public RequestBuilder test(String path) {
+    return new RequestBuilder(main.determinePort(), path, main.getInjector(), userAgent, messageObserver);
   }
 }

@@ -18,7 +18,6 @@ package org.example.action;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.annotation.Status;
 import org.primeframework.mvc.content.json.annotation.JSONRequest;
-import org.primeframework.mvc.servlet.HTTPMethod;
 
 /**
  * Multiple JSON Request fields
@@ -27,15 +26,15 @@ import org.primeframework.mvc.servlet.HTTPMethod;
  */
 @Action
 @Status.List({
-    @Status(code = "success", status = 200),
+    @Status(),
     @Status(code = "foo", status = 201),
     @Status(code = "bar", status = 202)
 })
 public class MultipleJSONRequestAction {
-  @JSONRequest(httpMethods = {HTTPMethod.DELETE})
+  @JSONRequest(httpMethods = "DELETE")
   public Object bar;
 
-  @JSONRequest(httpMethods = {HTTPMethod.POST})
+  @JSONRequest(httpMethods = "POST")
   public Object foo;
 
   public String delete() {

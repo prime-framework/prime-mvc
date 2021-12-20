@@ -15,7 +15,7 @@
  */
 package org.primeframework.mvc.parameter;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -26,9 +26,9 @@ import com.google.inject.Inject;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.config.MVCConfiguration;
+import org.primeframework.mvc.http.HTTPRequest;
 import org.primeframework.mvc.parameter.ParameterParser.Parameters.Struct;
 import org.primeframework.mvc.parameter.fileupload.FileInfo;
-import org.primeframework.mvc.util.RequestKeys;
 
 /**
  * This class is the default parameter parser. It pulls all of the parameters from the request and puts them into groups
@@ -55,11 +55,11 @@ public class DefaultParameterParser implements ParameterParser {
 
   private final MVCConfiguration configuration;
 
-  private final HttpServletRequest request;
+  private final HTTPRequest request;
 
   @Inject
   public DefaultParameterParser(MVCConfiguration configuration, ActionInvocationStore actionInvocationStore,
-                                HttpServletRequest request) {
+                                HTTPRequest request) {
     this.configuration = configuration;
     this.actionInvocationStore = actionInvocationStore;
     this.request = request;
@@ -67,7 +67,7 @@ public class DefaultParameterParser implements ParameterParser {
 
   @Override
   public Parameters parse() {
-    Map<String, String[]> parameters = request.getParameterMap();
+    Map<String, List<String>> parameters = request.getParameters();
     Parameters result = new Parameters();
 
     // Grab the files from the request
@@ -75,8 +75,8 @@ public class DefaultParameterParser implements ParameterParser {
 
     // Pull out the check box, radio button and action parameter
     if (!parameters.isEmpty()) {
-      Map<String, String[]> checkBoxes = new HashMap<>();
-      Map<String, String[]> radioButtons = new HashMap<>();
+      Map<String, List<String>> checkBoxes = new HashMap<>();
+      Map<String, List<String>> radioButtons = new HashMap<>();
       Set<String> actions = new HashSet<>();
 
       separateParameters(parameters, result, checkBoxes, radioButtons, actions);
@@ -101,24 +101,23 @@ public class DefaultParameterParser implements ParameterParser {
     return result;
   }
 
-  @SuppressWarnings("unchecked")
   protected void addFiles(Parameters result) {
-    Map<String, List<FileInfo>> fileInfos = (Map<String, List<FileInfo>>) request.getAttribute(RequestKeys.FILE_ATTRIBUTE);
-    if (fileInfos != null) {
-      result.files.putAll(fileInfos);
+    List<FileInfo> files = request.getFiles();
+    for (FileInfo file : files) {
+      result.files.computeIfAbsent(file.name, key -> new ArrayList<>()).add(file);
     }
   }
 
-  protected void addUncheckedValues(Map<String, String[]> map, Parameters parameters) {
+  protected void addUncheckedValues(Map<String, List<String>> map, Parameters parameters) {
     for (String key : map.keySet()) {
-      String[] values = map.get(key);
+      List<String> values = map.get(key);
       // Only add the values if there is a single one and it is empty, which denotes that they
       // want to set null into the action, or the values are multiple and they is one non-empty
       // value in the bunch. The second case occurs when they are using multiple checkboxes or
       // radio buttons for the same name. This will cause multiple hidden inputs and they should
       // all either have a unchecked value or should all be empty. If they are all empty, then
       // null should be put into the object.
-      if ((values != null && values.length == 1 && values[0].equals("")) || empty(values)) {
+      if ((values != null && values.size() == 1 && values.get(0).equals("")) || empty(values)) {
         parameters.required.put(key, new Struct());
       } else {
         parameters.required.put(key, new Struct(values));
@@ -126,13 +125,9 @@ public class DefaultParameterParser implements ParameterParser {
     }
   }
 
-  protected boolean empty(String[] values) {
-    if (values != null && values.length > 0) {
-      for (String value : values) {
-        if (!value.equals("")) {
-          return false;
-        }
-      }
+  protected boolean empty(List<String> values) {
+    if (values != null && values.size() > 0) {
+      return values.stream().allMatch(value -> value.equals(""));
     }
 
     return true;
@@ -152,8 +147,9 @@ public class DefaultParameterParser implements ParameterParser {
     }
   }
 
-  private void separateParameters(Map<String, String[]> parameters, Parameters result, Map<String, String[]> checkBoxes,
-                                  Map<String, String[]> radioButtons, Set<String> actions) {
+  private void separateParameters(Map<String, List<String>> parameters, Parameters result,
+                                  Map<String, List<String>> checkBoxes,
+                                  Map<String, List<String>> radioButtons, Set<String> actions) {
     for (String key : parameters.keySet()) {
       if (InternalParameters.isInternalParameter(key)) {
         continue;
@@ -168,7 +164,7 @@ public class DefaultParameterParser implements ParameterParser {
       } else if (key.startsWith(ACTION_PREFIX)) {
         actions.add(key.substring(ACTION_PREFIX.length()));
       } else {
-        int index = key.indexOf("@");
+        int index = key.indexOf('@');
         String parameter = (index > 0) ? key.substring(0, index) : key;
         Struct s;
         if (optional) {
@@ -187,12 +183,12 @@ public class DefaultParameterParser implements ParameterParser {
         }
 
         if (index > 0) {
-          s.attributes.put(key.substring(index + 1), parameters.get(key)[0]);
+          s.attributes.put(key.substring(index + 1), parameters.get(key).get(0));
         } else {
           // If the ignore empty parameters flag is set, which IS NOT the default, this
           // block will only ever add the values to the structure if they contain at least
           // one non-empty String.
-          String[] values = parameters.get(parameter);
+          List<String> values = parameters.get(parameter);
           if (!configuration.ignoreEmptyParameters() || !empty(values)) {
             s.values = values;
           }

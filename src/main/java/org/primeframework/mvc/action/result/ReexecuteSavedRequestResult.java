@@ -15,8 +15,6 @@
  */
 package org.primeframework.mvc.action.result;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 
@@ -25,6 +23,8 @@ import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.SavedRequestTools.SaveHttpRequestResult;
 import org.primeframework.mvc.action.result.annotation.ReexecuteSavedRequest;
 import org.primeframework.mvc.config.MVCConfiguration;
+import org.primeframework.mvc.http.HTTPRequest;
+import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.security.Encryptor;
@@ -42,7 +42,7 @@ public class ReexecuteSavedRequestResult extends AbstractRedirectResult<Reexecut
 
   @Inject
   public ReexecuteSavedRequestResult(MessageStore messageStore, ExpressionEvaluator expressionEvaluator,
-                                     HttpServletResponse response, HttpServletRequest request,
+                                     HTTPResponse response, HTTPRequest request,
                                      ActionInvocationStore actionInvocationStore,
                                      MVCConfiguration configuration, Encryptor encryptor) {
     super(expressionEvaluator, actionInvocationStore, messageStore, request, response);
@@ -57,7 +57,7 @@ public class ReexecuteSavedRequestResult extends AbstractRedirectResult<Reexecut
     moveMessagesToFlash();
 
     SaveHttpRequestResult result = SavedRequestTools.getSaveRequestForReExecution(configuration, encryptor, request, response);
-    String uri = result == null || result.savedHttpRequest.uri == null ? null : result.savedHttpRequest.uri;
+    String uri = result != null && result.savedHttpRequest.uri != null ? result.savedHttpRequest.uri : null;
 
     // Handle setting cache controls
     addCacheControlHeader(reexecuteSavedRequest, response);

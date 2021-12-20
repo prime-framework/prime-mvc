@@ -18,7 +18,6 @@ package org.primeframework.mvc.validation;
 import com.google.inject.Inject;
 import org.primeframework.mvc.workflow.WorkflowChain;
 
-import javax.servlet.ServletException;
 import java.io.IOException;
 
 /**
@@ -40,9 +39,8 @@ public class DefaultValidationWorkflow implements ValidationWorkflow {
    *
    * @param chain The chain.
    * @throws IOException      If the chain throws.
-   * @throws ServletException If the chain throws.
    */
-  public void perform(WorkflowChain chain) throws IOException, ServletException {
+  public void perform(WorkflowChain chain) throws IOException {
     validationProcessor.validate();
     chain.continueWorkflow();
   }

@@ -32,17 +32,29 @@ import org.primeframework.mvc.parameter.annotation.PreParameterMethod;
 public class EditAction {
   public static final SomeEnum[] values = SomeEnum.values();
 
+  public static boolean getCalled;
+
   public SomeEnum enumValue = SomeEnum.VALUE1;
 
-  public User user;
+  public boolean formPrepared = false;
 
   public String id;
 
   public boolean preParameter = false;
 
-  public boolean formPrepared = false;
+  public User user;
 
   public String execute() {
+    return "success";
+  }
+
+  @FormPrepareMethod
+  public void formPrepare() {
+    formPrepared = true;
+  }
+
+  public String get() {
+    getCalled = true;
     return "success";
   }
 
@@ -53,10 +65,5 @@ public class EditAction {
   @PreParameterMethod
   public void prepare() {
     preParameter = true;
-  }
-
-  @FormPrepareMethod
-  public void formPrepare() {
-    formPrepared = true;
   }
 }

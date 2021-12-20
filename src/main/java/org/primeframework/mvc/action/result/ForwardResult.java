@@ -15,7 +15,7 @@
  */
 package org.primeframework.mvc.action.result;
 
-import javax.servlet.http.HttpServletResponse;
+import org.primeframework.mvc.http.HTTPResponse;
 import java.lang.annotation.Annotation;
 
 import com.google.inject.Inject;
@@ -35,7 +35,7 @@ public class ForwardResult extends AbstractForwardResult<Forward> {
   @Inject
   public ForwardResult(ActionInvocationStore actionInvocationStore, ExpressionEvaluator expressionEvaluator,
                        ResourceLocator resourceLocator, FreeMarkerService freeMarkerService,
-                       HttpServletResponse response, FreeMarkerMap freeMarkerMap, MVCConfiguration configuration) {
+                       HTTPResponse response, FreeMarkerMap freeMarkerMap, MVCConfiguration configuration) {
     super(actionInvocationStore, expressionEvaluator, resourceLocator, freeMarkerService, response, freeMarkerMap, configuration);
   }
 

@@ -15,7 +15,7 @@
  */
 package org.primeframework.mvc.scope;
 
-import javax.servlet.http.HttpServletRequest;
+import org.primeframework.mvc.http.HTTPRequest;
 
 import org.primeframework.mvc.scope.annotation.Request;
 
@@ -27,10 +27,10 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 public class RequestScope implements Scope<Request> {
-  private final HttpServletRequest request;
+  private final HTTPRequest request;
 
   @Inject
-  public RequestScope(HttpServletRequest request) {
+  public RequestScope(HTTPRequest request) {
     this.request = request;
   }
 

@@ -15,7 +15,7 @@
  */
 package org.primeframework.mvc.control.form;
 
-import javax.servlet.http.HttpServletRequest;
+import org.primeframework.mvc.http.HTTPRequest;
 
 import org.primeframework.mvc.control.annotation.ControlAttribute;
 import org.primeframework.mvc.control.annotation.ControlAttributes;
@@ -29,7 +29,7 @@ import com.google.inject.Inject;
  */
 @ControlAttributes(
   required = {
-    @ControlAttribute(name = "name")
+    @ControlAttribute(name = "name", types = {String.class})
   },
   optional = {
     @ControlAttribute(name = "disabled", types = {boolean.class, Boolean.class}),
@@ -38,7 +38,7 @@ import com.google.inject.Inject;
 )
 public class Reset extends AbstractButtonInput {
   @Inject
-  public Reset(HttpServletRequest request) {
+  public Reset(HTTPRequest request) {
     super(request);
   }
 

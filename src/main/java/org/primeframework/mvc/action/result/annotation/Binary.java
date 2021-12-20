@@ -43,6 +43,12 @@ public @interface Binary {
   String code() default "success";
 
   /**
+   * @return The content type of the InputStream. This is used to set the HTTP header and disposition so that the
+   *     browser can correctly handle the response.
+   */
+  String contentType() default "application/octet-stream; charset=UTF-8";
+
+  /**
    * @return set to true to disable cache control and manage the headers on your own.
    */
   boolean disableCacheControl() default false;
@@ -51,10 +57,4 @@ public @interface Binary {
    * @return The HTTP status code.
    */
   int status() default 200;
-
-  /**
-   * @return The content type of the InputStream. This is used to set the HTTP header and disposition so that the
-   *     browser can correctly handle the response.
-   */
-  String type() default "application/octet-stream";
 }

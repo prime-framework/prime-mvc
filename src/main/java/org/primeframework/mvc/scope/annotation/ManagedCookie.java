@@ -26,7 +26,7 @@ import org.primeframework.mvc.scope.ManagedCookieScope;
  * Just your typical basic cookie. This annotation should be used to mark member fields of actions that should be
  * fetched and stored in a secure Cookie.
  * <p>
- * This cookie will be written as an HTTP only Persistent, Secure cookie.
+ * This cookie will be written as an HTTP-only, Persistent cookie that is Secure based on the scheme of the request.
  *
  * @author Daniel DeGroff
  */
@@ -46,10 +46,16 @@ public @interface ManagedCookie {
    *
    * @return the max age value
    */
-  int maxAge() default Integer.MAX_VALUE;
+  long maxAge() default Long.MAX_VALUE;
 
   /**
-   * By default the annotated field will always be set, and the value of the cookie will be <code>null</code> if the
+   * @return This attribute determines the name under which that the value is stored in the action session. The default
+   *     name is the name of the field that the annotation is put on.
+   */
+  String name() default "##field-name##";
+
+  /**
+   * By default, the annotated field will always be set, and the value of the cookie will be <code>null</code> if the
    * cookie was not found in the request.
    * <p>
    * Optionally set this to false if you want the field in the action to remain <code>null</code> when the cookie is not
@@ -58,10 +64,4 @@ public @interface ManagedCookie {
    * @return true if the cookie object should never be null
    */
   boolean neverNull() default true;
-
-  /**
-   * @return This attribute determines the name under which that the value is stored in the action session. The default
-   *     name is the name of the field that the annotation is put on.
-   */
-  String value() default "##field-name##";
 }

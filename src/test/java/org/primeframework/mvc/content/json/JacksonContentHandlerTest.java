@@ -25,20 +25,21 @@ import com.google.inject.Inject;
 import org.example.action.KitchenSinkAction;
 import org.example.domain.UserField;
 import org.example.domain.UserType;
-import org.primeframework.mock.servlet.MockServletInputStream;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.ExecuteMethodConfiguration;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration.RequestMember;
+import org.primeframework.mvc.http.DefaultHTTPRequest;
+import org.primeframework.mvc.http.HTTPMethod;
+import org.primeframework.mvc.http.MutableHTTPRequest;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.primeframework.mvc.message.SimpleMessage;
 import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.validation.ValidationException;
 import org.testng.annotations.Test;
 import static org.easymock.EasyMock.createNiceMock;
@@ -107,7 +108,7 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
         "  \"type\":\"COOL\"" +
         "}";
 
-    request.setInputStream(new MockServletInputStream(expected.getBytes()));
+    request.setBody(expected.getBytes());
 
     MessageProvider messageProvider = createStrictMock(MessageProvider.class);
     replay(messageProvider);
@@ -158,7 +159,8 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
         "  }]" +
         "}";
 
-    request.setInputStream(new MockServletInputStream(expected.getBytes()));
+    MutableHTTPRequest request = new DefaultHTTPRequest();
+    request.setBody(expected.getBytes());
 
     MessageProvider messageProvider = createStrictMock(MessageProvider.class);
     expect(messageProvider.getMessage(eq("[invalidJSON]"), eq("siblings.age"), eq("Possible conversion error"), isA(String.class))).andReturn("Bad sibling age");
@@ -202,7 +204,8 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
         "  }" +
         "}";
 
-    request.setInputStream(new MockServletInputStream(expected.getBytes()));
+    MutableHTTPRequest request = new DefaultHTTPRequest();
+    request.setBody(expected.getBytes());
 
     MessageProvider messageProvider = createNiceMock(MessageProvider.class);
     expect(messageProvider.getMessage(eq("[invalidJSON]"), eq("addresses.home.age"), eq("Possible conversion error"), isA(String.class))).andReturn("Bad age");
@@ -242,7 +245,8 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
         "  \"bad-active\":true" +
         "}";
 
-    request.setInputStream(new MockServletInputStream(expected.getBytes()));
+    MutableHTTPRequest request = new DefaultHTTPRequest();
+    request.setBody(expected.getBytes());
 
     MessageProvider messageProvider = createStrictMock(MessageProvider.class);
     expect(messageProvider.getMessage(eq("[invalidJSON]"), eq("bad-active"), eq("Unrecognized property"), isA(String.class))).andReturn("foo");
@@ -282,7 +286,8 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
         "  \"active\":\"bad\"" +
         "}";
 
-    request.setInputStream(new MockServletInputStream(expected.getBytes()));
+    MutableHTTPRequest request = new DefaultHTTPRequest();
+    request.setBody(expected.getBytes());
 
     MessageProvider messageProvider = createStrictMock(MessageProvider.class);
     expect(messageProvider.getMessage(eq("[invalidJSON]"), eq("active"), eq("Possible conversion error"), isA(String.class))).andReturn("Bad active");
@@ -344,7 +349,8 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
         "  \"type\":\"COOL\"" +
         "}";
 
-    request.setInputStream(new MockServletInputStream(expected.getBytes()));
+    MutableHTTPRequest request = new DefaultHTTPRequest();
+    request.setBody(expected.getBytes());
 
     MessageProvider messageProvider = createStrictMock(MessageProvider.class);
     replay(messageProvider);
@@ -401,7 +407,8 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
         "  \"type\":\"COOL\"" +
         "}";
 
-    request.setInputStream(new MockServletInputStream(expected.getBytes()));
+    MutableHTTPRequest request = new DefaultHTTPRequest();
+    request.setBody(expected.getBytes());
 
     MessageProvider messageProvider = createStrictMock(MessageProvider.class);
     replay(messageProvider);

@@ -15,7 +15,7 @@
  */
 package org.primeframework.mvc.parameter.fileupload;
 
-import java.io.File;
+import java.nio.file.Path;
 
 /**
  * This class provides file info for multipart requests.
@@ -23,29 +23,30 @@ import java.io.File;
  * @author Brian Pontarelli
  */
 public class FileInfo {
-  public final File file;
-  public final String name;
   public final String contentType;
 
-  public FileInfo(File file, String name, String contentType) {
+  public final Path file;
+
+  public final String fileName;
+
+  public final String name;
+
+  public FileInfo(Path file, String fileName, String name, String contentType) {
     this.file = file;
+    this.fileName = fileName;
     this.name = name;
     this.contentType = contentType;
-  }
-
-  public File getFile() {
-    return file;
-  }
-
-  public String getName() {
-    return name;
   }
 
   public String getContentType() {
     return contentType;
   }
 
-  public boolean deleteTempFile() {
-    return file.delete();
+  public Path getFile() {
+    return file;
+  }
+
+  public String getName() {
+    return name;
   }
 }

@@ -17,12 +17,26 @@ package org.primeframework.mvc.util;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
  * @author Daniel DeGroff
  */
 public class ObjectTools {
+
+  /**
+   * Helper method to get a value or a default. Both can be null so this is preferred when null values are okay.
+   * Otherwise, use {@link Objects#requireNonNullElse(Object, Object)}
+   *
+   * @param value        The value.
+   * @param defaultValue The default value.
+   * @param <T>          The type (to prevent casting).
+   * @return The value or the default.
+   */
+  public static <T> T defaultIfNull(T value, T defaultValue) {
+    return value != null ? value : defaultValue;
+  }
 
   /**
    * Compare the equality of a map of String arrays. This can perform an equality check on an HTTP request parameter

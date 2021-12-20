@@ -15,63 +15,63 @@
  */
 package org.primeframework.mvc.util;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import org.primeframework.mvc.http.Cookie;
+import org.primeframework.mvc.http.HTTPRequest;
+import org.primeframework.mvc.http.HTTPResponse;
 
 /**
  * @author Daniel DeGroff
  */
 public abstract class AbstractCookie {
-  protected final HttpServletRequest request;
+  protected final HTTPRequest request;
 
-  protected final HttpServletResponse response;
+  protected final HTTPResponse response;
 
-  protected AbstractCookie(HttpServletRequest request, HttpServletResponse response) {
+  protected AbstractCookie(HTTPRequest request, HTTPResponse response) {
     this.request = request;
     this.response = response;
   }
 
-  protected void addSecureHttpOnlyCookie(String name, String value, int maxAge) {
-    Cookie cookie = buildSecureHttpOnlyCookie(name, value, maxAge);
+  protected void addSecureHTTPOnlyCookie(String name, String value, Long maxAge) {
+    // Delete any existing version of the cookie and add the new version
+    response.removeCookie(name);
+
+    Cookie cookie = buildSecureHTTPOnlyCookie(name, value, maxAge);
     response.addCookie(cookie);
   }
 
-  protected void addSecureHttpOnlySessionCookie(String name, String value) {
-    Cookie cookie = buildSecureHttpOnlyCookie(name, value, -1);
+  protected void addSecureHTTPOnlySessionCookie(String name, String value) {
+    // Delete any existing version of the cookie and add the new version
+    response.removeCookie(name);
+
+    Cookie cookie = buildSecureHTTPOnlyCookie(name, value, null);
     response.addCookie(cookie);
-  }
-
-  protected Cookie buildSecureHttpOnlyCookie(String name, String value, int maxAge) {
-    Cookie cookie = new Cookie(name, value);
-    cookie.setSecure("https".equalsIgnoreCase(defaultIfNull(request.getHeader("X-Forwarded-Proto"), request.getScheme())));
-    cookie.setHttpOnly(true);
-    cookie.setMaxAge(maxAge);
-    cookie.setPath("/");
-    return cookie;
-  }
-
-  protected String defaultIfNull(String string, String defaultString) {
-    return string == null ? defaultString : string;
   }
 
   protected void deleteCookie(String name) {
+    // Delete any existing version of the cookie and add the new version with a 0 MaxAge
+    response.removeCookie(name);
+
     Cookie cookie = new Cookie(name, null);
-    cookie.setMaxAge(0);
-    cookie.setPath("/");
+    cookie.maxAge = 0L;
+    cookie.path = "/";
     response.addCookie(cookie);
   }
 
   protected Cookie getCookie(String cookieName) {
-    Cookie[] cookies = request.getCookies();
-    if (cookies != null) {
-      for (Cookie cookie : cookies) {
-        if (cookie.getName().equals(cookieName)) {
-          return cookie;
-        }
-      }
-    }
+    return request.getCookie(cookieName);
+  }
 
-    return null;
+  private Cookie buildSecureHTTPOnlyCookie(String name, String value, Long maxAge) {
+    Cookie cookie = new Cookie(name, value);
+    cookie.secure = "https".equalsIgnoreCase(defaultIfNull(request.getHeader("X-Forwarded-Proto"), request.getScheme()));
+    cookie.httpOnly = true;
+    cookie.maxAge = maxAge;
+    cookie.path = "/";
+    return cookie;
+  }
+
+  private String defaultIfNull(String string, String defaultString) {
+    return string == null ? defaultString : string;
   }
 }

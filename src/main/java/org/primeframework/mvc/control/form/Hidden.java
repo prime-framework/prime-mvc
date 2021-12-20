@@ -28,7 +28,7 @@ import com.google.inject.Inject;
  */
 @ControlAttributes(
   required = {
-    @ControlAttribute(name = "name")
+    @ControlAttribute(name = "name", types = {String.class})
   }
 )
 public class Hidden extends AbstractValueInput {

@@ -15,20 +15,23 @@
  */
 package org.primeframework.mvc.parameter;
 
-import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.inject.Inject;
-import org.apache.commons.lang3.ArrayUtils;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.PreParameterMethodConfiguration;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.config.MVCConfiguration;
+import org.primeframework.mvc.http.HTTPMethod;
+import org.primeframework.mvc.http.HTTPRequest;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
@@ -43,7 +46,6 @@ import org.primeframework.mvc.parameter.el.ExpressionException;
 import org.primeframework.mvc.parameter.el.ReadExpressionException;
 import org.primeframework.mvc.parameter.fileupload.FileInfo;
 import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
-import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.util.ArrayBuilder;
 import org.primeframework.mvc.util.ReflectionUtils;
 import org.slf4j.Logger;
@@ -77,12 +79,12 @@ public class DefaultParameterHandler implements ParameterHandler {
 
   private final MessageStore messageStore;
 
-  private final HttpServletRequest request;
+  private final HTTPRequest request;
 
   @Inject
   public DefaultParameterHandler(MVCConfiguration configuration, ActionInvocationStore actionInvocationStore,
                                  ExpressionEvaluator expressionEvaluator, MessageProvider messageProvider,
-                                 MessageStore messageStore, HttpServletRequest request) {
+                                 MessageStore messageStore, HTTPRequest request) {
     this.configuration = configuration;
     this.actionInvocationStore = actionInvocationStore;
     this.expressionEvaluator = expressionEvaluator;
@@ -94,7 +96,7 @@ public class DefaultParameterHandler implements ParameterHandler {
   @Override
   public void handle(Parameters parameters) {
     if (logger.isDebugEnabled()) {
-      logger.debug("Parameters found: " + parameters);
+      logger.debug("Parameters found [{}] ", parameters);
     }
 
     ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
@@ -106,7 +108,7 @@ public class DefaultParameterHandler implements ParameterHandler {
     // Next, invoke pre methods
     ActionConfiguration actionConfiguration = actionInvocation.configuration;
     if (actionConfiguration.preParameterMethods.size() > 0) {
-      HTTPMethod method = HTTPMethod.valueOf(request.getMethod().toUpperCase());
+      HTTPMethod method = request.getMethod();
       if (actionConfiguration.preParameterMethods.containsKey(method)) {
         for (PreParameterMethodConfiguration methodConfig : actionConfiguration.preParameterMethods.get(method)) {
           ReflectionUtils.invoke(methodConfig.method, action);
@@ -134,8 +136,13 @@ public class DefaultParameterHandler implements ParameterHandler {
    */
   protected void handleFiles(Map<String, List<FileInfo>> fileInfos, ActionConfiguration actionConfiguration,
                              Object action) {
+    // Only set the files into the object if this is a multipart request
+    if (!request.isMultipart()) {
+      return;
+    }
+
     long maxSize = configuration.fileUploadMaxSize();
-    String[] allowedContentTypes = configuration.fileUploadAllowedTypes();
+    final Set<String> allowedContentTypes = configuration.fileUploadAllowedTypes();
 
     // Set the files into the action
     for (String key : fileInfos.keySet()) {
@@ -150,28 +157,38 @@ public class DefaultParameterHandler implements ParameterHandler {
           maxSize = fileUpload.maxSize();
         }
 
-        long fileSize = info.file.length();
-        if (fileSize > maxSize) {
-          String code = "[fileUploadTooBig]" + key;
-          String message = messageProvider.getMessage(code, key, fileSize, maxSize);
-          messageStore.add(new SimpleFieldMessage(MessageType.ERROR, key, code, message));
-          i.remove();
-        }
-
-        // Check the content type
-        if (fileUpload != null && fileUpload.contentTypes().length > 0) {
-          allowedContentTypes = fileUpload.contentTypes();
-        }
-
-        // If a single allowed content type of '*' is specified, skip this check, all Content Types are allowed.
-        if (allowedContentTypes.length > 1 || !allowedContentTypes[0].equals("*")) {
-          String contentType = info.contentType;
-          if (!ArrayUtils.contains(allowedContentTypes, contentType)) {
-            String code = "[fileUploadBadContentType]" + key;
-            String message = messageProvider.getMessage(code, key, contentType, allowedContentTypes);
+        try {
+          long fileSize = Files.size(info.file);
+          if (fileSize > maxSize) {
+            String code = "[fileUploadTooBig]" + key;
+            String message = messageProvider.getMessage(code, key, fileSize, maxSize);
             messageStore.add(new SimpleFieldMessage(MessageType.ERROR, key, code, message));
             i.remove();
           }
+
+          // Check the content type
+          Set<String> contentTypesToCheck = allowedContentTypes;
+          if (fileUpload != null && fileUpload.contentTypes().length > 0) {
+            String[] override = fileUpload.contentTypes();
+            if (override.length > 0) {
+              contentTypesToCheck = Set.of(override);
+            }
+          }
+
+          // If a single allowed content type of '*' is specified, skip this check, all Content Types are allowed.
+          if (!contentTypesToCheck.contains("*")) {
+            String contentType = info.contentType;
+            if (!contentTypesToCheck.contains(contentType)) {
+              String code = "[fileUploadBadContentType]" + key;
+              String message = messageProvider.getMessage(code, key, contentType, contentTypesToCheck.toArray(new String[0]));
+              messageStore.add(new SimpleFieldMessage(MessageType.ERROR, key, code, message));
+              i.remove();
+            }
+          }
+        } catch (IOException e) {
+          String code = "[fileUploadFailed]" + key;
+          String message = messageProvider.getMessage(code, key);
+          messageStore.add(new SimpleFieldMessage(MessageType.ERROR, key, code, message));
         }
       }
 
@@ -202,7 +219,7 @@ public class DefaultParameterHandler implements ParameterHandler {
       }
 
       try {
-        expressionEvaluator.setValue(key, action, struct.values, struct.attributes);
+        expressionEvaluator.setValue(key, action, struct.values.toArray(new String[0]), struct.attributes);
       } catch (ConversionException ce) {
         addCouldNotConvertMessage(key, struct, ce);
       } catch (BeanExpressionException ee) {
@@ -248,7 +265,7 @@ public class DefaultParameterHandler implements ParameterHandler {
     try {
       @SuppressWarnings("unchecked")
       Map<String, String[]> unknownParameters = (Map<String, String[]>) field.get(actionInvocation.action);
-      unknownParameters.put(key, struct.values);
+      unknownParameters.put(key, struct.values.toArray(new String[0]));
     } catch (IllegalAccessException e) {
       throw new ReadExpressionException("Illegal access for field [" + field + "]", e);
     }

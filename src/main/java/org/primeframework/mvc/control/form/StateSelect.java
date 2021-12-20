@@ -28,7 +28,7 @@ import org.primeframework.mvc.control.annotation.ControlAttributes;
  */
 @ControlAttributes(
     required = {
-        @ControlAttribute(name = "name")
+        @ControlAttribute(name = "name", types = {String.class})
     },
     optional = {
         @ControlAttribute(name = "disabled", types = {boolean.class, Boolean.class}),

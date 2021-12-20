@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc.workflow;
 
-import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.List;
 
@@ -28,7 +27,6 @@ import org.primeframework.mvc.content.ContentWorkflow;
 import org.primeframework.mvc.message.MessageWorkflow;
 import org.primeframework.mvc.parameter.ParameterWorkflow;
 import org.primeframework.mvc.parameter.PostParameterWorkflow;
-import org.primeframework.mvc.parameter.RequestBodyWorkflow;
 import org.primeframework.mvc.parameter.URIParameterWorkflow;
 import org.primeframework.mvc.scope.ScopeRetrievalWorkflow;
 import org.primeframework.mvc.scope.ScopeStorageWorkflow;
@@ -50,14 +48,13 @@ public class DefaultMVCWorkflow implements MVCWorkflow {
 
   private final ExceptionHandler exceptionHandler;
 
+  private final MissingWorkflow missingWorkflow;
+
   private final List<Workflow> workflows;
 
   @Inject
   public DefaultMVCWorkflow(SavedRequestWorkflow savedRequestWorkflow,
-                            RequestBodyWorkflow requestBodyWorkflow,
-                            StaticResourceWorkflow staticResourceWorkflow,
                             ActionMappingWorkflow actionMappingWorkflow,
-                            MessageWorkflow messageWorkflow,
                             ScopeRetrievalWorkflow scopeRetrievalWorkflow,
                             URIParameterWorkflow uriParameterWorkflow,
                             ParameterWorkflow parameterWorkflow,
@@ -65,29 +62,43 @@ public class DefaultMVCWorkflow implements MVCWorkflow {
                             PostParameterWorkflow postParameterWorkflow,
                             SecurityWorkflow securityWorkflow,
                             ValidationWorkflow validationWorkflow,
+                            MessageWorkflow messageWorkflow,
                             ActionInvocationWorkflow actionInvocationWorkflow,
                             ScopeStorageWorkflow scopeStorageWorkflow,
                             ResultInvocationWorkflow resultInvocationWorkflow,
+                            StaticResourceWorkflow staticResourceWorkflow,
+                            MissingWorkflow missingWorkflow,
                             ErrorWorkflow errorWorkflow,
                             ExceptionHandler exceptionHandler) {
     this.exceptionHandler = exceptionHandler;
     this.errorWorkflow = errorWorkflow;
-    this.workflows = asList(savedRequestWorkflow, requestBodyWorkflow, staticResourceWorkflow, actionMappingWorkflow,
-        messageWorkflow, scopeRetrievalWorkflow, uriParameterWorkflow, parameterWorkflow,
-        contentWorkflow, postParameterWorkflow, securityWorkflow, validationWorkflow, actionInvocationWorkflow,
-        scopeStorageWorkflow, resultInvocationWorkflow);
+    this.missingWorkflow = missingWorkflow;
+    this.workflows = asList(
+        savedRequestWorkflow,
+        actionMappingWorkflow,
+        scopeRetrievalWorkflow,
+        uriParameterWorkflow,
+        parameterWorkflow,
+        contentWorkflow,
+        postParameterWorkflow,
+        securityWorkflow,
+        validationWorkflow,
+        messageWorkflow,
+        actionInvocationWorkflow,
+        scopeStorageWorkflow,
+        resultInvocationWorkflow,
+        staticResourceWorkflow);
   }
 
   /**
    * Creates a sub-chain of the MVC workflows and invokes it.
    *
-   * @param workflowChain The chain.
-   * @throws IOException      If the sub-chain throws an IOException
-   * @throws ServletException If the sub-chain throws an ServletException
+   * @param workflowChain Not used because there is no outer workflow outside of the MVC.
+   * @throws IOException If the sub-chain throws an IOException
    */
-  public void perform(WorkflowChain workflowChain) throws IOException, ServletException {
+  public void perform(WorkflowChain workflowChain) throws IOException {
     try {
-      WorkflowChain chain = new SubWorkflowChain(workflows, workflowChain);
+      WorkflowChain chain = new SubWorkflowChain(workflows, new SubWorkflowChain(List.of(missingWorkflow), workflowChain));
       chain.continueWorkflow();
     } catch (RuntimeException | Error e) {
       exceptionHandler.handle(e);

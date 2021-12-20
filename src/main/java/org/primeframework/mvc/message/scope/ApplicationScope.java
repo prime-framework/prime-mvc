@@ -15,29 +15,29 @@
  */
 package org.primeframework.mvc.message.scope;
 
-import javax.servlet.ServletContext;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import com.google.inject.Inject;
+import org.primeframework.mvc.http.HTTPContext;
 import org.primeframework.mvc.message.Message;
 
-import com.google.inject.Inject;
-
 /**
- * This is the message scope which fetches and stores values in the ServletContext. The values are stored in the servlet
- * context using a variety of different keys.
+ * This is the message scope which fetches and stores values in the Context The values are stored in the servlet context
+ * using a variety of different keys.
  *
  * @author Brian Pontarelli
  */
 @SuppressWarnings("unchecked")
 public class ApplicationScope implements Scope {
   public static final String KEY = "primeMessages";
-  private final ServletContext context;
+
+  private final HTTPContext context;
 
   @Inject
-  public ApplicationScope(ServletContext context) {
+  public ApplicationScope(HTTPContext context) {
     this.context = context;
   }
 
@@ -48,7 +48,7 @@ public class ApplicationScope implements Scope {
       messages = new ArrayList<>();
       context.setAttribute(KEY, messages);
     }
-    
+
     messages.add(message);
   }
 
@@ -64,6 +64,11 @@ public class ApplicationScope implements Scope {
   }
 
   @Override
+  public void clear() {
+    context.getAttributes().remove(KEY);
+  }
+
+  @Override
   public List<Message> get() {
     List<Message> messages = (List<Message>) context.getAttribute(KEY);
     if (messages != null) {
@@ -71,10 +76,5 @@ public class ApplicationScope implements Scope {
     }
 
     return Collections.emptyList();
-  }
-
-  @Override
-  public void clear() {
-    context.removeAttribute(KEY);
   }
 }

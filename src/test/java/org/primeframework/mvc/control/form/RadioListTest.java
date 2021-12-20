@@ -17,7 +17,6 @@ package org.primeframework.mvc.control.form;
 
 import com.google.inject.Inject;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.example.action.user.EditAction;
 import org.example.domain.Address;
 import org.example.domain.User;
@@ -100,8 +99,8 @@ public class RadioListTest extends ControlBaseTest {
 
     ais.setCurrent(new ActionInvocation(action, null, "/radio-list", null, null));
 
-    Pair<String, String> us = Pair.of("US", "United States");
-    Pair<String, String> de = Pair.of("DE", "Germany");
+    Pair us = new Pair("US", "United States");
+    Pair de = new Pair("DE", "Germany");
 
     new ControlTester(radioList)
         .attr("name", "user.addresses['work'].country")

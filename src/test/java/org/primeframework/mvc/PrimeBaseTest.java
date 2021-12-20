@@ -15,9 +15,7 @@
  */
 package org.primeframework.mvc;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequestWrapper;
-import java.io.File;
+import java.io.ByteArrayOutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -25,7 +23,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -35,13 +32,8 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Module;
-import com.google.inject.TypeLiteral;
 import com.google.inject.util.Modules;
-import io.fusionauth.jwt.Verifier;
 import org.example.action.user.EditAction;
-import org.primeframework.mock.servlet.MockContainer;
-import org.primeframework.mock.servlet.MockHttpServletRequest;
-import org.primeframework.mock.servlet.MockHttpServletResponse;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ExecuteMethodConfiguration;
 import org.primeframework.mvc.action.ValidationMethodConfiguration;
@@ -50,23 +42,28 @@ import org.primeframework.mvc.action.config.DefaultActionConfigurationBuilder;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.content.guice.ObjectMapperProvider;
 import org.primeframework.mvc.guice.MVCModule;
+import org.primeframework.mvc.http.DefaultHTTPRequest;
+import org.primeframework.mvc.http.DefaultHTTPResponse;
+import org.primeframework.mvc.http.HTTPContext;
+import org.primeframework.mvc.http.HTTPMethod;
+import org.primeframework.mvc.http.HTTPObjectsHolder;
 import org.primeframework.mvc.jwt.MockVerifierProvider;
+import org.primeframework.mvc.message.MessageObserver;
+import org.primeframework.mvc.message.TestMessageObserver;
 import org.primeframework.mvc.message.scope.ApplicationScope;
 import org.primeframework.mvc.message.scope.CookieFlashScope;
 import org.primeframework.mvc.message.scope.FlashScope;
 import org.primeframework.mvc.message.scope.RequestScope;
-import org.primeframework.mvc.message.scope.SessionFlashScope;
-import org.primeframework.mvc.message.scope.SessionScope;
 import org.primeframework.mvc.security.MockUserLoginSecurityContext;
 import org.primeframework.mvc.security.UserLoginSecurityContext;
+import org.primeframework.mvc.security.VerifierProvider;
 import org.primeframework.mvc.security.csrf.CSRFProvider;
-import org.primeframework.mvc.servlet.HTTPMethod;
-import org.primeframework.mvc.servlet.ServletObjectsHolder;
 import org.primeframework.mvc.test.RequestSimulator;
 import org.primeframework.mvc.util.ThrowingRunnable;
 import org.primeframework.mvc.validation.Validation;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 
@@ -77,9 +74,11 @@ import org.testng.annotations.BeforeSuite;
  * @author Brian Pontarelli and James Humphrey
  */
 public abstract class PrimeBaseTest {
+  protected final static TestMessageObserver messageObserver = new TestMessageObserver();
+
   public static MockConfiguration configuration = new MockConfiguration();
 
-  protected static MockContainer container;
+  protected static HTTPContext context;
 
   protected static Injector injector;
 
@@ -91,69 +90,86 @@ public abstract class PrimeBaseTest {
 
   @Inject public ObjectMapper objectMapper;
 
+  public DefaultHTTPRequest request;
+
+  public DefaultHTTPResponse response;
+
   @Inject public TestBuilder test;
 
-  protected MockHttpServletRequest request;
-
-  protected MockHttpServletResponse response;
-
   @BeforeSuite
-  public static void init() throws ServletException {
+  public static void init() {
     Module mvcModule = new MVCModule() {
       @Override
       protected void configure() {
         super.configure();
         install(new TestMVCConfigurationModule());
+        bind(MessageObserver.class).toInstance(messageObserver);
         bind(MetricRegistry.class).toInstance(metricRegistry);
         bind(UserLoginSecurityContext.class).to(MockUserLoginSecurityContext.class);
       }
     };
 
     Module module = Modules.override(mvcModule).with(new TestContentModule(), new TestSecurityModule(), new TestScopeModule());
+    BasePrimeMain main = new BasePrimeMain() {
+      @Override
+      public int determinePort() {
+        return 8080;
+      }
 
-    container = new MockContainer();
-    container.newServletContext(new File("src/test/web"));
+      @Override
+      protected Module[] modules() {
+        return new Module[]{module};
+      }
+    };
+    simulator = new RequestSimulator(main, messageObserver);
+    injector = main.getInjector();
+    context = injector.getInstance(HTTPContext.class);
+  }
 
-    simulator = new RequestSimulator(container, module);
-    injector = simulator.injector;
-    container.contextSavePoint();
+  @AfterSuite
+  public static void shutdown() {
+    simulator.shutdown();
+  }
+
+  @AfterMethod
+  public void afterMethod() {
+    HTTPObjectsHolder.clearRequest();
+    HTTPObjectsHolder.clearResponse();
   }
 
   /**
    * Sets up the servlet objects and injects the test.
    */
   @BeforeMethod
-  public void setUp() {
-    request = container.newServletRequest("/", Locale.getDefault(), false, "UTF-8");
-    response = container.newServletResponse();
-    container.resetSession();
-    container.resetUserAgent();
-
-    ServletObjectsHolder.setServletRequest(new HttpServletRequestWrapper(request));
-    ServletObjectsHolder.setServletResponse(response);
+  public void beforeMethod() {
+    request = new DefaultHTTPRequest();
+    response = new DefaultHTTPResponse(new ByteArrayOutputStream());
+    HTTPObjectsHolder.setRequest(request);
+    HTTPObjectsHolder.setResponse(response);
 
     injector.injectMembers(this);
+
+    test.context = context;
     test.simulator = simulator;
+    test.userAgent = simulator.userAgent;
     TestObjectMapperProvider.test = test;
 
-    metricRegistry = injector.getInstance(MetricRegistry.class);
+    // Clear the user agent (cookies)
+    simulator.userAgent.reset();
+
     // clear the metric registry before each test
+    metricRegistry = injector.getInstance(MetricRegistry.class);
     metricRegistry.getNames().forEach(metricRegistry::remove);
 
-    // Clear the roles
+    // Clear the message observer
+    messageObserver.clear();
+
+    // Clear the roles and logged in user
     MockUserLoginSecurityContext.roles.clear();
+    MockUserLoginSecurityContext.currentUser = null;
 
     // Reset CSRF configuration
     configuration.csrfEnabled = false;
-
-    // Reset to default
-    configuration.useCookieForFlashScope = false;
-  }
-
-  @AfterMethod
-  public void tearDown() {
-    ServletObjectsHolder.clearServletRequest();
-    ServletObjectsHolder.clearServletResponse();
   }
 
   @SuppressWarnings("Duplicates")
@@ -184,26 +200,9 @@ public abstract class PrimeBaseTest {
    * @param httpMethod The HTTP method.
    * @param extension  The extension.
    * @return The action invocation.
-   * @throws Exception If the construction fails.
-   */
-  protected ActionInvocation makeActionInvocation(Object action, HTTPMethod httpMethod, String extension)
-      throws Exception {
-    DefaultActionConfigurationBuilder builder = injector.getInstance(DefaultActionConfigurationBuilder.class);
-    ActionConfiguration actionConfiguration = builder.build(action.getClass());
-    return new ActionInvocation(action, actionConfiguration.executeMethods.get(httpMethod), actionConfiguration.uri, extension, actionConfiguration);
-  }
-
-  /**
-   * Makes an action invocation and configuration.
-   *
-   * @param action     The action object.
-   * @param httpMethod The HTTP method.
-   * @param extension  The extension.
-   * @return The action invocation.
-   * @throws Exception If the construction fails.
    */
   protected ActionInvocation makeActionInvocation(Object action, HTTPMethod httpMethod, String extension,
-                                                  Map<String, List<String>> uriParameters) throws Exception {
+                                                  Map<String, List<String>> uriParameters) {
     DefaultActionConfigurationBuilder builder = injector.getInstance(DefaultActionConfigurationBuilder.class);
     ActionConfiguration actionConfiguration = builder.build(action.getClass());
     return new ActionInvocation(action, actionConfiguration.executeMethods.get(httpMethod), actionConfiguration.uri, extension, uriParameters, actionConfiguration, true);
@@ -237,6 +236,20 @@ public abstract class PrimeBaseTest {
         new ActionConfiguration(EditAction.class, executeMethods, validationMethods, new ArrayList<>(), null, null,
             new ArrayList<>(), new HashMap<>(), new ArrayList<>(), resultConfigurations, new HashMap<>(), null, new HashMap<>(),
             new HashSet<>(), Collections.emptyList(), new ArrayList<>(), new HashMap<>(), uri, new ArrayList<>(), null));
+  }
+
+  /**
+   * Makes an action invocation and configuration.
+   *
+   * @param action     The action object.
+   * @param httpMethod The HTTP method.
+   * @param extension  The extension.
+   * @return The action invocation.
+   */
+  protected ActionInvocation makeActionInvocation(Object action, HTTPMethod httpMethod, String extension) {
+    DefaultActionConfigurationBuilder builder = injector.getInstance(DefaultActionConfigurationBuilder.class);
+    ActionConfiguration actionConfiguration = builder.build(action.getClass());
+    return new ActionInvocation(action, actionConfiguration.executeMethods.get(httpMethod), actionConfiguration.uri, extension, actionConfiguration);
   }
 
   @SuppressWarnings("unchecked")
@@ -287,20 +300,15 @@ public abstract class PrimeBaseTest {
     @Override
     protected void configure() {
       bind(ApplicationScope.class).asEagerSingleton();
-      bind(SessionScope.class);
       bind(RequestScope.class);
-
-      bind(FlashScope.class).toProvider(() -> configuration.useCookieForFlashScope
-          ? injector.getInstance(CookieFlashScope.class)
-          : injector.getInstance((SessionFlashScope.class)));
+      bind(FlashScope.class).toProvider(() -> injector.getInstance(CookieFlashScope.class));
     }
   }
 
   public static class TestSecurityModule extends AbstractModule {
     @Override
     protected void configure() {
-      bind(new TypeLiteral<Map<String, Verifier>>() {
-      }).toProvider(MockVerifierProvider.class);
+      bind(VerifierProvider.class).to(MockVerifierProvider.class);
     }
   }
 }

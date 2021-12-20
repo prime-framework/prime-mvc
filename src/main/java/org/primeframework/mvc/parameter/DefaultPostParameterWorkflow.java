@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc.parameter;
 
-import javax.servlet.ServletException;
 import java.io.IOException;
 
 import org.primeframework.mvc.action.ActionInvocation;
@@ -43,7 +42,7 @@ public class DefaultPostParameterWorkflow implements PostParameterWorkflow {
   }
 
   @Override
-  public void perform(WorkflowChain workflowChain) throws IOException, ServletException {
+  public void perform(WorkflowChain workflowChain) throws IOException {
     ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
     invokeMethods(actionInvocation);
 

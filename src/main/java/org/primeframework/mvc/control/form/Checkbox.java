@@ -28,7 +28,7 @@ import com.google.inject.Inject;
  */
 @ControlAttributes(
   required = {
-    @ControlAttribute(name = "name")
+    @ControlAttribute(name = "name", types = {String.class})
   },
   optional = {
     @ControlAttribute(name = "checked", types = {boolean.class, Boolean.class}),

@@ -15,18 +15,19 @@
  */
 package org.primeframework.mvc.action.result;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 
-import org.primeframework.mock.servlet.MockServletOutputStream;
+import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.ExecuteMethodConfiguration;
 import org.primeframework.mvc.action.result.annotation.XMLStream;
+import org.primeframework.mvc.http.DefaultHTTPResponse;
+import org.primeframework.mvc.http.HTTPMethod;
+import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-import org.primeframework.mvc.servlet.HTTPMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import static org.easymock.EasyMock.createStrictMock;
@@ -40,32 +41,21 @@ import static org.testng.Assert.assertEquals;
  *
  * @author jhumphrey
  */
-public class XMLStreamResultTest {
+public class XMLStreamResultTest extends PrimeBaseTest {
   @Test(dataProvider = "httpMethod")
-  public void explicit(HTTPMethod httpMethod) throws IOException, ServletException {
+  public void explicit(HTTPMethod httpMethod) throws IOException {
     String property = "xml";
     String propertyValue = "<xml/>";
     byte[] propertyBytes = propertyValue.getBytes();
-    int propertyBytesLen = propertyBytes.length;
-    String contentType = "application/xhtml+xml";
+    long propertyBytesLen = propertyBytes.length;
+    String contentType = "application/xhtml+xml; charset=UTF-8";
 
     Object action = new Object();
     ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
     expect(ee.getValue(property, action)).andReturn(propertyValue);
     replay(ee);
 
-    MockServletOutputStream sos = new MockServletOutputStream();
-    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    response.setStatus(200);
-    response.setCharacterEncoding("UTF-8");
-    response.setContentType(contentType);
-    response.setContentLength(propertyBytesLen);
-    response.setHeader("Cache-Control", "no-cache");
-    if (httpMethod == HTTPMethod.GET) {
-      expect(response.getOutputStream()).andReturn(sos);
-    }
-    replay(response);
-
+    HTTPResponse response = new DefaultHTTPResponse(new ByteArrayOutputStream());
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(action, new ExecuteMethodConfiguration(httpMethod, null, null), "/foo", "", null));
     replay(store);
@@ -74,9 +64,14 @@ public class XMLStreamResultTest {
     XMLStreamResult streamResult = new XMLStreamResult(ee, response, store);
     streamResult.execute(xmlStream);
 
-    assertEquals(sos.toString(), httpMethod == HTTPMethod.GET ? "<xml/>" : "");
+    assertEquals(response.getOutputStream().toString(), httpMethod == HTTPMethod.GET ? "<xml/>" : "");
 
-    verify(ee, response);
+    verify(ee);
+
+    assertEquals(response.getStatus(), 200);
+    assertEquals(response.getContentType(), contentType);
+    assertEquals(response.getContentLength().longValue(), propertyBytesLen);
+    assertEquals(response.getHeader("Cache-Control"), "no-cache");
   }
 
   @DataProvider(name = "httpMethod")

@@ -15,7 +15,7 @@
  */
 package org.example.action;
 
-import javax.servlet.http.HttpServletRequest;
+import org.primeframework.mvc.http.HTTPRequest;
 
 import com.google.inject.Inject;
 import org.primeframework.mvc.action.annotation.Action;
@@ -25,7 +25,7 @@ import org.primeframework.mvc.action.annotation.Action;
  */
 @Action
 public class ValueInRequest {
-  @Inject public HttpServletRequest request;
+  @Inject public HTTPRequest request;
 
   private String bar;
 

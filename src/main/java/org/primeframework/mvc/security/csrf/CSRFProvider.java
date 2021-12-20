@@ -15,7 +15,7 @@
  */
 package org.primeframework.mvc.security.csrf;
 
-import javax.servlet.http.HttpServletRequest;
+import org.primeframework.mvc.http.HTTPRequest;
 
 /**
  * @author Daniel DeGroff
@@ -30,7 +30,7 @@ public interface CSRFProvider {
    * @param request the HTTP request.
    * @return a CSRF token that can be sent to the client to be set into a hidden field on a form.
    */
-  String getToken(HttpServletRequest request);
+  String getToken(HTTPRequest request);
 
   /**
    * Return the CSRF token provided on the HTTP request. This is generally going to be due to a form POST request.
@@ -38,8 +38,8 @@ public interface CSRFProvider {
    * @param request the HTTP request
    * @return the CSRF token value if found in the HTTP request.
    */
-  default String getTokenFromRequest(HttpServletRequest request) {
-    return request.getParameter(CSRF_PARAMETER_KEY);
+  default String getTokenFromRequest(HTTPRequest request) {
+    return request.getParameterValue(CSRF_PARAMETER_KEY);
   }
 
   /**
@@ -48,5 +48,5 @@ public interface CSRFProvider {
    * @param request the HTTP request
    * @return true if the request is valid, false if not.
    */
-  boolean validateRequest(HttpServletRequest request);
+  boolean validateRequest(HTTPRequest request);
 }

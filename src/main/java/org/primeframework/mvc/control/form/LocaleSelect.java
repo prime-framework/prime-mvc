@@ -35,13 +35,13 @@ import org.primeframework.mvc.control.annotation.ControlAttributes;
  */
 @ControlAttributes(
     required = {
-        @ControlAttribute(name = "name")
+        @ControlAttribute(name = "name", types = {String.class})
     },
     optional = {
         @ControlAttribute(name = "disabled", types = {boolean.class, Boolean.class}),
         @ControlAttribute(name = "includeCountries", types = {boolean.class, Boolean.class}),
         @ControlAttribute(name = "multiple", types = {boolean.class, Boolean.class}),
-        @ControlAttribute(name = "preferredLocales"),
+        @ControlAttribute(name = "preferredLocales", types = {String.class}),
         @ControlAttribute(name = "readonly", types = {boolean.class, Boolean.class}),
         @ControlAttribute(name = "required", types = {boolean.class, Boolean.class}),
         @ControlAttribute(name = "size", types = {int.class, Number.class}),

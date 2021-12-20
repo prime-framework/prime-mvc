@@ -15,7 +15,7 @@
  */
 package org.primeframework.mvc.parameter;
 
-import javax.servlet.http.HttpServletRequestWrapper;
+import java.util.List;
 
 import org.example.action.ComplexRestAction;
 import org.example.action.user.EditAction;
@@ -23,12 +23,9 @@ import org.example.action.user.RESTEdit;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
-import org.primeframework.mvc.servlet.HTTPMethod;
+import org.primeframework.mvc.http.HTTPMethod;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
-
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
 import static org.easymock.EasyMock.createStrictMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
@@ -41,6 +38,31 @@ import static org.testng.Assert.assertEquals;
  * @author Brian Pontarelli
  */
 public class DefaultURIParameterWorkflowTest extends PrimeBaseTest {
+  @Test
+  public void complexParameters() throws Exception {
+    ComplexRestAction action = new ComplexRestAction();
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    ActionInvocation ai = makeActionInvocation(action, HTTPMethod.POST, "", map("firstName", List.of("brian"), "lastName", List.of("pontarelli"), "theRest", List.of("then", "a", "bunch", "of", "stuff")));
+    expect(store.getCurrent()).andReturn(ai);
+    replay(store);
+
+    WorkflowChain chain = createStrictMock(WorkflowChain.class);
+    chain.continueWorkflow();
+    replay(chain);
+
+    DefaultURIParameterWorkflow workflow = new DefaultURIParameterWorkflow(request, store);
+    workflow.perform(chain);
+
+    assertEquals(request.getParameterValue("firstName"), "brian");
+    assertEquals(request.getParameterValue("lastName"), "pontarelli");
+    assertEquals(request.getParameterValues("theRest").get(0), "then");
+    assertEquals(request.getParameterValues("theRest").get(1), "a");
+    assertEquals(request.getParameterValues("theRest").get(2), "bunch");
+    assertEquals(request.getParameterValues("theRest").get(3), "of");
+    assertEquals(request.getParameterValues("theRest").get(4), "stuff");
+
+    verify(store, chain);
+  }
 
   @Test
   public void noParameters() throws Exception {
@@ -53,7 +75,7 @@ public class DefaultURIParameterWorkflowTest extends PrimeBaseTest {
     chain.continueWorkflow();
     replay(chain);
 
-    DefaultURIParameterWorkflow workflow = new DefaultURIParameterWorkflow(new HttpServletRequestWrapper(request), store);
+    DefaultURIParameterWorkflow workflow = new DefaultURIParameterWorkflow(request, store);
     workflow.perform(chain);
 
     verify(store, chain);
@@ -63,7 +85,7 @@ public class DefaultURIParameterWorkflowTest extends PrimeBaseTest {
   public void singleIDParameters() throws Exception {
     RESTEdit action = new RESTEdit();
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    ActionInvocation ai = makeActionInvocation(action, HTTPMethod.POST, "", map("id", singletonList("12")));
+    ActionInvocation ai = makeActionInvocation(action, HTTPMethod.POST, "", map("id", List.of("12")));
     expect(store.getCurrent()).andReturn(ai);
     replay(store);
 
@@ -71,38 +93,10 @@ public class DefaultURIParameterWorkflowTest extends PrimeBaseTest {
     chain.continueWorkflow();
     replay(chain);
 
-    HttpServletRequestWrapper wrapper = new HttpServletRequestWrapper(request);
-    DefaultURIParameterWorkflow workflow = new DefaultURIParameterWorkflow(wrapper, store);
+    DefaultURIParameterWorkflow workflow = new DefaultURIParameterWorkflow(request, store);
     workflow.perform(chain);
 
-    assertEquals(wrapper.getParameter("id"), "12");
-
-    verify(store, chain);
-  }
-
-  @Test
-  public void complexParameters() throws Exception {
-    ComplexRestAction action = new ComplexRestAction();
-    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    ActionInvocation ai = makeActionInvocation(action, HTTPMethod.POST, "", map("firstName", singletonList("brian"), "lastName", singletonList("pontarelli"), "theRest", asList("then", "a", "bunch", "of", "stuff")));
-    expect(store.getCurrent()).andReturn(ai);
-    replay(store);
-
-    WorkflowChain chain = createStrictMock(WorkflowChain.class);
-    chain.continueWorkflow();
-    replay(chain);
-
-    HttpServletRequestWrapper wrapper = new HttpServletRequestWrapper(request);
-    DefaultURIParameterWorkflow workflow = new DefaultURIParameterWorkflow(wrapper, store);
-    workflow.perform(chain);
-
-    assertEquals(wrapper.getParameter("firstName"), "brian");
-    assertEquals(wrapper.getParameter("lastName"), "pontarelli");
-    assertEquals(wrapper.getParameterValues("theRest")[0], "then");
-    assertEquals(wrapper.getParameterValues("theRest")[1], "a");
-    assertEquals(wrapper.getParameterValues("theRest")[2], "bunch");
-    assertEquals(wrapper.getParameterValues("theRest")[3], "of");
-    assertEquals(wrapper.getParameterValues("theRest")[4], "stuff");
+    assertEquals(request.getParameterValue("id"), "12");
 
     verify(store, chain);
   }

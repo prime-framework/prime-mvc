@@ -15,10 +15,9 @@
  */
 package org.primeframework.mvc.action.result;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,6 +33,7 @@ import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.result.annotation.JSON;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration;
+import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.message.ErrorMessage;
 import org.primeframework.mvc.message.ErrorMessages;
 import org.primeframework.mvc.message.FieldMessage;
@@ -55,12 +55,12 @@ public class JSONResult extends AbstractResult<JSON> {
 
   private final ObjectMapper objectMapper;
 
-  private final HttpServletResponse response;
+  private final HTTPResponse response;
 
   @Inject
   public JSONResult(ExpressionEvaluator expressionEvaluator, ActionInvocationStore actionInvocationStore,
                     MessageStore messageStore,
-                    ObjectMapper objectMapper, HttpServletResponse response) {
+                    ObjectMapper objectMapper, HTTPResponse response) {
     super(expressionEvaluator);
     this.messageStore = messageStore;
     this.response = response;
@@ -108,9 +108,8 @@ public class JSONResult extends AbstractResult<JSON> {
 
     byte[] result = os.toByteArray();
     response.setStatus(json.status());
-    response.setCharacterEncoding("UTF-8");
-    response.setContentType("application/json");
-    response.setContentLength(result.length);
+    response.setContentType("application/json; charset=UTF-8");
+    response.setContentLength((long) result.length);
 
     // Handle setting cache controls
     addCacheControlHeader(json, response);
@@ -119,9 +118,8 @@ public class JSONResult extends AbstractResult<JSON> {
       return true;
     }
 
-    ServletOutputStream outputStream = response.getOutputStream();
-    outputStream.write(result);
-    outputStream.flush();
+    response.getOutputStream().write(result);
+
     return true;
   }
 
@@ -158,7 +156,7 @@ public class JSONResult extends AbstractResult<JSON> {
                        .with(prettyPrinter);
   }
 
-  private void writeValue(ByteArrayOutputStream os, Object jacksonObject, Class<?> serializationView,
+  private void writeValue(OutputStream os, Object jacksonObject, Class<?> serializationView,
                           boolean prettyPrint) throws IOException {
     // Most common path
     if (!prettyPrint && serializationView == void.class) {

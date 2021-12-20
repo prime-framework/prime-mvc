@@ -15,12 +15,18 @@
  */
 package org.primeframework.mvc.content.binary;
 
+import org.primeframework.mvc.content.binary.annotation.BinaryRequest;
 import org.primeframework.mvc.content.binary.annotation.BinaryResponse;
 
 /**
  * @author Daniel DeGroff
  */
 public class BinaryActionConfiguration {
+  /**
+   * Indicates if Prime should delete the file annotated with {@link BinaryRequest} once the action has completed.
+   */
+  public boolean deleteRequestMemberUponCompletion;
+
   /**
    * Indicates if Prime should delete the file annotated with {@link BinaryResponse} once it has been successfully
    * written to the output stream.

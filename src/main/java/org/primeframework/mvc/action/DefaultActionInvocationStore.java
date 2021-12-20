@@ -15,7 +15,7 @@
  */
 package org.primeframework.mvc.action;
 
-import javax.servlet.http.HttpServletRequest;
+import org.primeframework.mvc.http.HTTPRequest;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
@@ -32,10 +32,10 @@ public class DefaultActionInvocationStore implements ActionInvocationStore {
 
   public static final String ACTION_INVOCATION_KEY = "primeActionInvocation";
 
-  private final HttpServletRequest request;
+  private final HTTPRequest request;
 
   @Inject
-  public DefaultActionInvocationStore(HttpServletRequest request) {
+  public DefaultActionInvocationStore(HTTPRequest request) {
     this.request = request;
   }
 

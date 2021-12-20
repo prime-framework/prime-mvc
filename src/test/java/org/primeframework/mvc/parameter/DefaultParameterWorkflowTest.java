@@ -15,18 +15,16 @@
  */
 package org.primeframework.mvc.parameter;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.inject.Inject;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.easymock.IArgumentMatcher;
 import org.example.action.user.EditAction;
@@ -38,6 +36,8 @@ import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.config.AbstractMVCConfiguration;
 import org.primeframework.mvc.config.MVCConfiguration;
+import org.primeframework.mvc.http.HTTPMethod;
+import org.primeframework.mvc.http.HTTPRequest;
 import org.primeframework.mvc.message.FieldMessage;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
@@ -48,12 +48,9 @@ import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.parameter.el.ExpressionException;
 import org.primeframework.mvc.parameter.fileupload.FileInfo;
 import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
-import org.primeframework.mvc.servlet.HTTPMethod;
-import org.primeframework.mvc.util.MapBuilder;
-import org.primeframework.mvc.util.RequestKeys;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
-import static java.util.Arrays.asList;
+import org.testng.reporters.Files;
 import static org.easymock.EasyMock.aryEq;
 import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.createStrictMock;
@@ -90,12 +87,15 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
         assertEquals(list.size(), 1);
         assertNotNull(list.get(0));
         assertEquals(list.get(0).contentType, "text/plain");
-        assertEquals(list.get(0).name, "test-file-upload.txt");
+        assertEquals(list.get(0).fileName, "test-file-upload.txt");
+        assertEquals(list.get(0).name, "userfile");
+
         try {
-          assertEquals(FileUtils.readFileToString(list.get(0).file, StandardCharsets.UTF_8), "1234\n");
+          assertEquals(Files.readFile(list.get(0).file.toFile()), "1234\n");
         } catch (IOException e) {
           throw new RuntimeException(e);
         }
+
         return true;
       }
     });
@@ -117,11 +117,13 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
         assertNotNull(list.get(1));
         assertEquals(list.get(0).contentType, "text/plain");
         assertEquals(list.get(1).contentType, "text/plain");
-        assertEquals(list.get(0).name, "test-file-upload.txt");
-        assertEquals(list.get(1).name, "test-file-upload2.txt");
+        assertEquals(list.get(0).fileName, "test-file-upload.txt");
+        assertEquals(list.get(1).fileName, "test-file-upload2.txt");
+        assertEquals(list.get(0).name, "userfiles");
+        assertEquals(list.get(1).name, "userfiles");
         try {
-          assertEquals(FileUtils.readFileToString(list.get(0).file, StandardCharsets.UTF_8), "1234\n");
-          assertEquals(FileUtils.readFileToString(list.get(1).file, StandardCharsets.UTF_8), "1234\n");
+          assertEquals(Files.readFile(list.get(0).file.toFile()), "1234\n");
+          assertEquals(Files.readFile(list.get(1).file.toFile()), "1234\n");
         } catch (IOException e) {
           throw new RuntimeException(e);
         }
@@ -134,13 +136,13 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
   @Test
   public void filesAnnotationContentTypeError() throws Exception {
-    Map<String, List<FileInfo>> files = new HashMap<>();
-    files.put("userfile", new ArrayList<>(asList(new FileInfo(new java.io.File("src/test/java/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain"))));
+    List<FileInfo> files = List.of(new FileInfo(Paths.get("src/test/java/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "userfile", "text/plain"));
 
-    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    expect(request.getParameterMap()).andReturn(new HashMap<>());
-    expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(files);
-    expect(request.getMethod()).andReturn("GET");
+    HTTPRequest request = createStrictMock(HTTPRequest.class);
+    expect(request.getParameters()).andReturn(new HashMap<>());
+    expect(request.getFiles()).andReturn(files);
+    expect(request.getMethod()).andReturn(HTTPMethod.GET);
+    expect(request.isMultipart()).andReturn(true);
     replay(request);
 
     MVCConfiguration config = createStrictMock(MVCConfiguration.class);
@@ -195,13 +197,13 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
   @Test
   public void filesAnnotationSizeError() throws Exception {
-    Map<String, List<FileInfo>> files = new HashMap<>();
-    files.put("userfile", new ArrayList<>(asList(new FileInfo(new java.io.File("src/test/java/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain"))));
+    List<FileInfo> files = List.of(new FileInfo(Paths.get("src/test/java/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "userfile", "text/plain"));
 
-    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    expect(request.getParameterMap()).andReturn(new HashMap<>());
-    expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(files);
-    expect(request.getMethod()).andReturn("GET");
+    HTTPRequest request = createStrictMock(HTTPRequest.class);
+    expect(request.getParameters()).andReturn(new HashMap<>());
+    expect(request.getFiles()).andReturn(files);
+    expect(request.getMethod()).andReturn(HTTPMethod.GET);
+    expect(request.isMultipart()).andReturn(true);
     replay(request);
 
     MVCConfiguration config = createStrictMock(MVCConfiguration.class);
@@ -237,7 +239,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(chain);
 
     MessageProvider provider = createStrictMock(MessageProvider.class);
-    expect(provider.getMessage("[fileUploadTooBig]userfile", "userfile", 5l, 1l)).andReturn("bar");
+    expect(provider.getMessage("[fileUploadTooBig]userfile", "userfile", 5L, 1L)).andReturn("bar");
     replay(provider);
 
     FieldMessage message = new SimpleFieldMessage(MessageType.ERROR, "userfile", "[fileUploadTooBig]userfile", "bar");
@@ -255,19 +257,19 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
   @Test
   public void filesNoAnnotation() throws Exception {
-    Map<String, List<FileInfo>> files = new HashMap<>();
-    files.put("userfile", asList(new FileInfo(new java.io.File("src/test/java/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain")));
+    List<FileInfo> files = List.of(new FileInfo(Paths.get("src/test/java/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "userfile", "text/plain"));
 
-    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    expect(request.getParameterMap()).andReturn(new HashMap<>());
-    expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(files);
-    expect(request.getMethod()).andReturn("GET");
+    HTTPRequest request = createStrictMock(HTTPRequest.class);
+    expect(request.getParameters()).andReturn(new HashMap<>());
+    expect(request.getFiles()).andReturn(files);
+    expect(request.getMethod()).andReturn(HTTPMethod.GET);
+    expect(request.isMultipart()).andReturn(true);
     replay(request);
 
     MVCConfiguration config = createStrictMock(MVCConfiguration.class);
     expect(config.allowUnknownParameters()).andReturn(false);
-    expect(config.fileUploadMaxSize()).andReturn(1024000l);
-    expect(config.fileUploadAllowedTypes()).andReturn(new String[]{"text/plain"});
+    expect(config.fileUploadMaxSize()).andReturn(1024000L);
+    expect(config.fileUploadAllowedTypes()).andReturn(Set.of("text/plain"));
     replay(config);
 
     EditAction action = new EditAction();
@@ -300,19 +302,19 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
   @Test
   public void filesNoAnnotationContentTypeError() throws Exception {
-    Map<String, List<FileInfo>> files = new HashMap<>();
-    files.put("userfile", new ArrayList<>(asList(new FileInfo(new java.io.File("src/test/java/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain"))));
+    List<FileInfo> files = List.of(new FileInfo(Paths.get("src/test/java/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "userfile", "text/plain"));
 
-    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    expect(request.getParameterMap()).andReturn(new HashMap<>());
-    expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(files);
-    expect(request.getMethod()).andReturn("GET");
+    HTTPRequest request = createStrictMock(HTTPRequest.class);
+    expect(request.getParameters()).andReturn(new HashMap<>());
+    expect(request.getFiles()).andReturn(files);
+    expect(request.getMethod()).andReturn(HTTPMethod.POST);
+    expect(request.isMultipart()).andReturn(true);
     replay(request);
 
-    String[] contentTypes = new String[]{"test/xml"};
+    Set<String> contentTypes = Set.of("test/xml");
     MVCConfiguration config = createStrictMock(MVCConfiguration.class);
     expect(config.allowUnknownParameters()).andReturn(false);
-    expect(config.fileUploadMaxSize()).andReturn(10l);
+    expect(config.fileUploadMaxSize()).andReturn(10L);
     expect(config.fileUploadAllowedTypes()).andReturn(contentTypes);
     replay(config);
 
@@ -330,7 +332,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(chain);
 
     MessageProvider provider = createStrictMock(MessageProvider.class);
-    expect(provider.getMessage("[fileUploadBadContentType]userfile", "userfile", "text/plain", contentTypes)).andReturn("bar");
+    expect(provider.getMessage("[fileUploadBadContentType]userfile", "userfile", "text/plain", contentTypes.toArray(new String[0]))).andReturn("bar");
     replay(provider);
 
     FieldMessage message = new SimpleFieldMessage(MessageType.ERROR, "userfile", "[fileUploadBadContentType]userfile", "bar");
@@ -348,18 +350,18 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
   @Test
   public void filesNoAnnotationSizeError() throws Exception {
-    Map<String, List<FileInfo>> files = new HashMap<>();
-    files.put("userfile", new ArrayList<>(asList(new FileInfo(new java.io.File("src/test/java/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain"))));
+    List<FileInfo> files = List.of(new FileInfo(Paths.get("src/test/java/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "userfile", "text/plain"));
 
-    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    expect(request.getParameterMap()).andReturn(new HashMap<>());
-    expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(files);
-    expect(request.getMethod()).andReturn("GET");
+    HTTPRequest request = createStrictMock(HTTPRequest.class);
+    expect(request.getParameters()).andReturn(new HashMap<>());
+    expect(request.getFiles()).andReturn(files);
+    expect(request.getMethod()).andReturn(HTTPMethod.GET);
+    expect(request.isMultipart()).andReturn(true);
     replay(request);
 
     MVCConfiguration config = createStrictMock(MVCConfiguration.class);
     expect(config.allowUnknownParameters()).andReturn(false);
-    expect(config.fileUploadMaxSize()).andReturn(1l);
+    expect(config.fileUploadMaxSize()).andReturn(1L);
     expect(config.fileUploadAllowedTypes()).andReturn(AbstractMVCConfiguration.ALLOWED_TYPES);
     replay(config);
 
@@ -377,7 +379,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(chain);
 
     MessageProvider provider = createStrictMock(MessageProvider.class);
-    expect(provider.getMessage("[fileUploadTooBig]userfile", "userfile", 5l, 1l)).andReturn("bar");
+    expect(provider.getMessage("[fileUploadTooBig]userfile", "userfile", 5L, 1L)).andReturn("bar");
     replay(provider);
 
     FieldMessage message = new SimpleFieldMessage(MessageType.ERROR, "userfile", "[fileUploadTooBig]userfile", "bar");
@@ -397,13 +399,13 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
   public void imageSubmitButton() throws Exception {
     Action action = new Action();
 
-    Map<String, String[]> values = new HashMap<>();
-    values.put("submit.x", ArrayUtils.toArray("1"));
-    values.put("submit.y", ArrayUtils.toArray("2"));
+    Map<String, List<String>> values = new HashMap<>();
+    values.put("submit.x", List.of("1"));
+    values.put("submit.y", List.of("2"));
 
-    final HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    expect(request.getParameterMap()).andReturn(values);
-    expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(null);
+    final HTTPRequest request = createStrictMock(HTTPRequest.class);
+    expect(request.getParameters()).andReturn(values);
+    expect(request.getFiles()).andReturn(List.of());
     replay(request);
 
     ExpressionEvaluator expressionEvaluator = createNiceMock(ExpressionEvaluator.class);
@@ -445,12 +447,12 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
   public void invalidParametersDev() throws Exception {
     Action action = new Action();
 
-    Map<String, String[]> values = new LinkedHashMap<>();
-    values.put("user.age", ArrayUtils.toArray("32"));
+    Map<String, List<String>> values = new LinkedHashMap<>();
+    values.put("user.age", List.of("32"));
 
-    final HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    expect(request.getParameterMap()).andReturn(values);
-    expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(null);
+    final HTTPRequest request = createStrictMock(HTTPRequest.class);
+    expect(request.getParameters()).andReturn(values);
+    expect(request.getFiles()).andReturn(List.of());
     replay(request);
 
     ExpressionEvaluator expressionEvaluator = createStrictMock(ExpressionEvaluator.class);
@@ -494,12 +496,12 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
   public void invalidParametersProduction() throws Exception {
     Action action = new Action();
 
-    Map<String, String[]> values = new LinkedHashMap<>();
-    values.put("user.age", ArrayUtils.toArray("32"));
+    Map<String, List<String>> values = new LinkedHashMap<>();
+    values.put("user.age", List.of("32"));
 
-    final HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    expect(request.getParameterMap()).andReturn(values);
-    expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(null);
+    final HTTPRequest request = createStrictMock(HTTPRequest.class);
+    expect(request.getParameters()).andReturn(values);
+    expect(request.getFiles()).andReturn(List.of());
     replay(request);
 
     ExpressionEvaluator expressionEvaluator = createStrictMock(ExpressionEvaluator.class);
@@ -537,21 +539,22 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
 
   @Test
   public void multipleFilesNoAnnotation() throws Exception {
-    Map<String, List<FileInfo>> files = new HashMap<>();
-    files.put("userfiles", asList(
-        new FileInfo(new java.io.File("src/test/java/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "text/plain"),
-        new FileInfo(new java.io.File("src/test/java/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload2.txt", "text/plain")));
+    List<FileInfo> files = List.of(
+        new FileInfo(Paths.get("src/test/java/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload.txt", "userfiles", "text/plain"),
+        new FileInfo(Paths.get("src/test/java/org/primeframework/mvc/parameter/test-file-upload.txt"), "test-file-upload2.txt", "userfiles", "text/plain")
+    );
 
-    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    expect(request.getParameterMap()).andReturn(new HashMap<>());
-    expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(files);
-    expect(request.getMethod()).andReturn("GET");
+    HTTPRequest request = createStrictMock(HTTPRequest.class);
+    expect(request.getParameters()).andReturn(new HashMap<>());
+    expect(request.getFiles()).andReturn(files);
+    expect(request.getMethod()).andReturn(HTTPMethod.GET);
+    expect(request.isMultipart()).andReturn(true);
     replay(request);
 
     MVCConfiguration config = createStrictMock(MVCConfiguration.class);
     expect(config.allowUnknownParameters()).andReturn(false);
-    expect(config.fileUploadMaxSize()).andReturn(1024000l);
-    expect(config.fileUploadAllowedTypes()).andReturn(new String[]{"text/plain"});
+    expect(config.fileUploadMaxSize()).andReturn(1024000L);
+    expect(config.fileUploadAllowedTypes()).andReturn(Set.of("text/plain"));
     replay(config);
 
     EditAction action = new EditAction();
@@ -589,15 +592,15 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
   public void preAndPost() throws Exception {
     PreAndPostAction action = new PreAndPostAction();
 
-    Map<String, String[]> values = new HashMap<>();
-    values.put("preField", ArrayUtils.toArray("1"));
-    values.put("preProperty", ArrayUtils.toArray("Pre property"));
-    values.put("notPre", ArrayUtils.toArray("Not pre"));
+    Map<String, List<String>> values = new HashMap<>();
+    values.put("preField", List.of("1"));
+    values.put("preProperty", List.of("Pre property"));
+    values.put("notPre", List.of("Not pre"));
 
-    final HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    expect(request.getParameterMap()).andReturn(values);
-    expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(null);
-    expect(request.getMethod()).andReturn("GET");
+    final HTTPRequest request = createStrictMock(HTTPRequest.class);
+    expect(request.getParameters()).andReturn(values);
+    expect(request.getFiles()).andReturn(List.of());
+    expect(request.getMethod()).andReturn(HTTPMethod.GET);
     replay(request);
 
     ActionInvocation ai = makeActionInvocation(action, HTTPMethod.POST, "");
@@ -642,15 +645,15 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
   public void radioButtonsCheckBoxes() throws Exception {
     Action action = new Action();
 
-    Map<String, String[]> values = new HashMap<>();
-    values.put("__cb_user.checkbox['null']", ArrayUtils.toArray(""));
-    values.put("__cb_user.checkbox['default']", ArrayUtils.toArray("false"));
-    values.put("__rb_user.radio['null']", ArrayUtils.toArray(""));
-    values.put("__rb_user.radio['default']", ArrayUtils.toArray("false"));
+    Map<String, List<String>> values = new HashMap<>();
+    values.put("__cb_user.checkbox['null']", List.of(""));
+    values.put("__cb_user.checkbox['default']", List.of("false"));
+    values.put("__rb_user.radio['null']", List.of(""));
+    values.put("__rb_user.radio['default']", List.of("false"));
 
-    final HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    expect(request.getParameterMap()).andReturn(values);
-    expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(null);
+    final HTTPRequest request = createStrictMock(HTTPRequest.class);
+    expect(request.getParameters()).andReturn(values);
+    expect(request.getFiles()).andReturn(List.of());
     replay(request);
 
     ExpressionEvaluator expressionEvaluator = createNiceMock(ExpressionEvaluator.class);
@@ -689,13 +692,13 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
   public void simpleParameter_boolean() throws Exception {
     ActionField action = new ActionField();
 
-    Map<String, String[]> values = new LinkedHashMap<>();
-    values.put("foo", ArrayUtils.toArray("true"));
-    values.put("bar", ArrayUtils.toArray("false"));
+    Map<String, List<String>> values = new LinkedHashMap<>();
+    values.put("foo", List.of("true"));
+    values.put("bar", List.of("false"));
 
-    final HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    expect(request.getParameterMap()).andReturn(values);
-    expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(null);
+    final HTTPRequest request = createStrictMock(HTTPRequest.class);
+    expect(request.getParameters()).andReturn(values);
+    expect(request.getFiles()).andReturn(List.of());
     replay(request);
 
     ActionInvocation ai = makeActionInvocation(action, HTTPMethod.POST, "");
@@ -733,11 +736,11 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
   public void simpleParameter_boolean_default() throws Exception {
     ActionField action = new ActionField();
 
-    Map<String, String[]> values = new LinkedHashMap<>();
+    Map<String, List<String>> values = new LinkedHashMap<>();
 
-    final HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    expect(request.getParameterMap()).andReturn(values);
-    expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(null);
+    final HTTPRequest request = createStrictMock(HTTPRequest.class);
+    expect(request.getParameters()).andReturn(values);
+    expect(request.getFiles()).andReturn(List.of());
     replay(request);
 
     ActionInvocation ai = makeActionInvocation(action, HTTPMethod.POST, "");
@@ -773,13 +776,13 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
   public void simpleParameter_boolean_in_baseClass() throws Exception {
     ActionField action = new ActionField();
 
-    Map<String, String[]> values = new LinkedHashMap<>();
-    values.put("superFoo", ArrayUtils.toArray("true"));
-    values.put("superBar", ArrayUtils.toArray("false"));
+    Map<String, List<String>> values = new LinkedHashMap<>();
+    values.put("superFoo", List.of("true"));
+    values.put("superBar", List.of("false"));
 
-    final HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    expect(request.getParameterMap()).andReturn(values);
-    expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(null);
+    final HTTPRequest request = createStrictMock(HTTPRequest.class);
+    expect(request.getParameters()).andReturn(values);
+    expect(request.getFiles()).andReturn(List.of());
     replay(request);
 
     ActionInvocation ai = makeActionInvocation(action, HTTPMethod.POST, "");
@@ -816,14 +819,14 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
   public void simpleParameter_boolean_model_object() throws Exception {
     ActionField action = new ActionField();
 
-    Map<String, String[]> values = new LinkedHashMap<>();
-    values.put("user.active", ArrayUtils.toArray("true"));
-    values.put("user.bar", ArrayUtils.toArray("false"));
+    Map<String, List<String>> values = new LinkedHashMap<>();
+    values.put("user.active", List.of("true"));
+    values.put("user.bar", List.of("false"));
 
 
-    final HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    expect(request.getParameterMap()).andReturn(values);
-    expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(null);
+    final HTTPRequest request = createStrictMock(HTTPRequest.class);
+    expect(request.getParameters()).andReturn(values);
+    expect(request.getFiles()).andReturn(List.of());
     replay(request);
 
     ActionInvocation ai = makeActionInvocation(action, HTTPMethod.POST, "");
@@ -860,21 +863,21 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
   public void simpleParameters() throws Exception {
     Action action = new Action();
 
-    Map<String, String[]> values = new LinkedHashMap<>();
-    values.put("user.addresses['home'].city", ArrayUtils.toArray("Boulder"));
-    values.put("user.age", ArrayUtils.toArray("32"));
-    values.put("user.age@dateFormat", ArrayUtils.toArray("MM/dd/yyyy"));
-    values.put("user.inches", ArrayUtils.toArray("tall"));
-    values.put("user.name", ArrayUtils.toArray(""));
+    Map<String, List<String>> values = new LinkedHashMap<>();
+    values.put("user.addresses['home'].city", List.of("Boulder"));
+    values.put("user.age", List.of("32"));
+    values.put("user.age@dateFormat", List.of("MM/dd/yyyy"));
+    values.put("user.inches", List.of("tall"));
+    values.put("user.name", List.of(""));
 
-    final HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    expect(request.getParameterMap()).andReturn(values);
-    expect(request.getAttribute(RequestKeys.FILE_ATTRIBUTE)).andReturn(null);
+    final HTTPRequest request = createStrictMock(HTTPRequest.class);
+    expect(request.getParameters()).andReturn(values);
+    expect(request.getFiles()).andReturn(List.of());
     replay(request);
 
     ExpressionEvaluator expressionEvaluator = createStrictMock(ExpressionEvaluator.class);
     expressionEvaluator.setValue(eq("user.addresses['home'].city"), same(action), aryEq(ArrayUtils.toArray("Boulder")), eq(new HashMap<>()));
-    expressionEvaluator.setValue(eq("user.age"), same(action), aryEq(ArrayUtils.toArray("32")), eq(MapBuilder.asMap("dateFormat", "MM/dd/yyyy")));
+    expressionEvaluator.setValue(eq("user.age"), same(action), aryEq(ArrayUtils.toArray("32")), eq(Map.of("dateFormat", "MM/dd/yyyy")));
     expressionEvaluator.setValue(eq("user.inches"), same(action), aryEq(ArrayUtils.toArray("tall")), eq(new HashMap<>()));
     expectLastCall().andThrow(new ConversionException());
     expressionEvaluator.setValue(eq("user.name"), same(action), aryEq(ArrayUtils.toArray("")), eq(new HashMap<>()));

@@ -19,6 +19,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import com.google.inject.Inject;
 import org.example.action.user.EditAction;
 import org.example.action.user.IndexAction;
 import org.primeframework.mvc.action.ActionInvocation;
@@ -26,8 +27,6 @@ import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.control.ControlBaseTest;
 import org.primeframework.mvc.util.MapBuilder;
 import org.testng.annotations.Test;
-
-import com.google.inject.Inject;
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertSame;
@@ -42,138 +41,8 @@ public class FormTest extends ControlBaseTest {
   @Inject Form form;
 
   @Test
-  public void noPrepare() {
-    request.setUri("/user/");
-    IndexAction index = new IndexAction();
-    ais.setCurrent(new ActionInvocation(index, null, "/user/", null,
-      new ActionConfiguration(IndexAction.class, null, null, new ArrayList<>(), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null)));
-
-    new ControlTester(form).
-      attr("action", "/user/").
-      attr("method", "POST").
-      go("<div class=\"form\">\n" +
-      "<form action=\"/user/\" method=\"POST\">\n" +
-      "</form>\n" +
-      "</div>\n");
-  }
-
-  @Test
-  public void jsessionid() {
-    request.setUri("/user/;jsessionid=C35A2D9557C051F2854845305B1AB911");
-    IndexAction index = new IndexAction();
-    ais.setCurrent(new ActionInvocation(index, null, "/user/", null,
-      new ActionConfiguration(IndexAction.class, null, null, new ArrayList<>(), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null)));
-
-    new ControlTester(form).
-      attr("action", "/user/").
-      attr("method", "POST").
-      go("<div class=\"form\">\n" +
-      "<form action=\"/user/;jsessionid=C35A2D9557C051F2854845305B1AB911\" method=\"POST\">\n" +
-      "</form>\n" +
-      "</div>\n");
-  }
-
-  @Test
-  public void noPrepareRelative() {
-    request.setUri("/user/");
-    IndexAction index = new IndexAction();
-    ais.setCurrent(new ActionInvocation(index, null, "/user/", null, null));
-
-    new ControlTester(form).
-      attr("action", "edit").
-      attr("method", "POST").
-      go("<div class=\"form\">\n" +
-      "<form action=\"/user/edit\" method=\"POST\">\n" +
-      "</form>\n" +
-      "</div>\n");
-  }
-
-  @Test
-  public void noPrepareFullyQualified() {
-    request.setUri("/user/");
-    IndexAction index = new IndexAction();
-    ais.setCurrent(new ActionInvocation(index, null, "/user/", null,
-      new ActionConfiguration(IndexAction.class, null, null, new ArrayList<>(), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null)));
-
-    new ControlTester(form).
-      attr("action", "https://www.google.com").
-      attr("method", "POST").
-      go("<div class=\"form\">\n" +
-      "<form action=\"https://www.google.com\" method=\"POST\">\n" +
-      "</form>\n" +
-      "</div>\n");
-  }
-
-  @Test
-  public void noPrepareContextPath() {
-    request.setUri("/context/user/");
-    request.setContextPath("/context");
-    IndexAction index = new IndexAction();
-    ais.setCurrent(new ActionInvocation(index, null, "/user/", null,
-      new ActionConfiguration(IndexAction.class, null, null, new ArrayList<>(), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null)));
-
-    new ControlTester(form).
-      attr("action", "/user/").
-      attr("method", "POST").
-      go("<div class=\"form\">\n" +
-      "<form action=\"/context/user/\" method=\"POST\">\n" +
-      "</form>\n" +
-      "</div>\n");
-  }
-
-  @Test
-  public void relativeContextPath() {
-    request.setUri("/context/user/");
-    request.setContextPath("/context");
-    IndexAction index = new IndexAction();
-    ais.setCurrent(new ActionInvocation(index, null, "/user/", null, null));
-
-    new ControlTester(form).
-      attr("action", "edit").
-      attr("method", "POST").
-      go("<div class=\"form\">\n" +
-      "<form action=\"/context/user/edit\" method=\"POST\">\n" +
-      "</form>\n" +
-      "</div>\n");
-  }
-
-  @Test
-  public void fullyQualifiedContextPath() {
-    request.setUri("/context/user/");
-    request.setContextPath("/context");
-    IndexAction index = new IndexAction();
-    ais.setCurrent(new ActionInvocation(index, null, "/user/", null,
-      new ActionConfiguration(IndexAction.class, null, null, new ArrayList<>(), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null)));
-
-    new ControlTester(form).
-      attr("action", "https://www.google.com").
-      attr("method", "POST").
-      go("<div class=\"form\">\n" +
-      "<form action=\"https://www.google.com\" method=\"POST\">\n" +
-      "</form>\n" +
-      "</div>\n");
-  }
-
-  @Test
-  public void prepare() throws NoSuchMethodException {
-    request.setUri("/user/edit");
-    EditAction edit = new EditAction();
-    ais.setCurrent(new ActionInvocation(edit, null, "/user/edit", null,
-      new ActionConfiguration(IndexAction.class, null, null, asList(EditAction.class.getMethod("formPrepare")), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null)));
-
-    new ControlTester(form).
-      attr("action", "/user/edit").
-      attr("method", "POST").
-      go("<div class=\"form\">\n" +
-      "<form action=\"/user/edit\" method=\"POST\">\n" +
-      "</form>\n" +
-      "</div>\n");
-    assertTrue(edit.formPrepared);
-  }
-
-  @Test
   public void actionIsDifferentURI() {
-    request.setUri("/user/");
+    request.setPath("/user/");
     IndexAction index = new IndexAction();
     ais.setCurrent(new ActionInvocation(index, null, "/user/", null, null));
 
@@ -186,9 +55,123 @@ public class FormTest extends ControlBaseTest {
     form.renderEnd(writer);
     assertSame(IndexAction.class, ais.getCurrent().action.getClass());
     assertEquals(
-      "<div class=\"form\">\n" +
-        "<form action=\"/user/edit\" method=\"POST\">\n" +
-        "</form>\n" +
-        "</div>\n", writer.toString());
+        "<div class=\"form\">\n" +
+            "<form action=\"/user/edit\" method=\"POST\">\n" +
+            "</form>\n" +
+            "</div>\n", writer.toString());
+  }
+
+  @Test
+  public void fullyQualifiedContextPath() {
+    request.setPath("/context/user/");
+    request.setContextPath("/context");
+    IndexAction index = new IndexAction();
+    ais.setCurrent(new ActionInvocation(index, null, "/user/", null,
+        new ActionConfiguration(IndexAction.class, null, null, new ArrayList<>(), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null)));
+
+    new ControlTester(form).
+        attr("action", "https://www.google.com").
+        attr("method", "POST").
+        go("<div class=\"form\">\n" +
+            "<form action=\"https://www.google.com\" method=\"POST\">\n" +
+            "</form>\n" +
+            "</div>\n");
+  }
+
+  @Test
+  public void noPrepare() {
+    request.setPath("/user/");
+    IndexAction index = new IndexAction();
+    ais.setCurrent(new ActionInvocation(index, null, "/user/", null,
+        new ActionConfiguration(IndexAction.class, null, null, new ArrayList<>(), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null)));
+
+    new ControlTester(form).
+        attr("action", "/user/").
+        attr("method", "POST").
+        go("<div class=\"form\">\n" +
+            "<form action=\"/user/\" method=\"POST\">\n" +
+            "</form>\n" +
+            "</div>\n");
+  }
+
+  @Test
+  public void noPrepareContextPath() {
+    request.setPath("/context/user/");
+    request.setContextPath("/context");
+    IndexAction index = new IndexAction();
+    ais.setCurrent(new ActionInvocation(index, null, "/user/", null,
+        new ActionConfiguration(IndexAction.class, null, null, new ArrayList<>(), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null)));
+
+    new ControlTester(form).
+        attr("action", "/user/").
+        attr("method", "POST").
+        go("<div class=\"form\">\n" +
+            "<form action=\"/context/user/\" method=\"POST\">\n" +
+            "</form>\n" +
+            "</div>\n");
+  }
+
+  @Test
+  public void noPrepareFullyQualified() {
+    request.setPath("/user/");
+    IndexAction index = new IndexAction();
+    ais.setCurrent(new ActionInvocation(index, null, "/user/", null,
+        new ActionConfiguration(IndexAction.class, null, null, new ArrayList<>(), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null)));
+
+    new ControlTester(form).
+        attr("action", "https://www.google.com").
+        attr("method", "POST").
+        go("<div class=\"form\">\n" +
+            "<form action=\"https://www.google.com\" method=\"POST\">\n" +
+            "</form>\n" +
+            "</div>\n");
+  }
+
+  @Test
+  public void noPrepareRelative() {
+    request.setPath("/user/");
+    IndexAction index = new IndexAction();
+    ais.setCurrent(new ActionInvocation(index, null, "/user/", null, null));
+
+    new ControlTester(form).
+        attr("action", "edit").
+        attr("method", "POST").
+        go("<div class=\"form\">\n" +
+            "<form action=\"/user/edit\" method=\"POST\">\n" +
+            "</form>\n" +
+            "</div>\n");
+  }
+
+  @Test
+  public void prepare() throws NoSuchMethodException {
+    request.setPath("/user/edit");
+    EditAction edit = new EditAction();
+    ais.setCurrent(new ActionInvocation(edit, null, "/user/edit", null,
+        new ActionConfiguration(IndexAction.class, null, null, asList(EditAction.class.getMethod("formPrepare")), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null)));
+
+    new ControlTester(form).
+        attr("action", "/user/edit").
+        attr("method", "POST").
+        go("<div class=\"form\">\n" +
+            "<form action=\"/user/edit\" method=\"POST\">\n" +
+            "</form>\n" +
+            "</div>\n");
+    assertTrue(edit.formPrepared);
+  }
+
+  @Test
+  public void relativeContextPath() {
+    request.setPath("/context/user/");
+    request.setContextPath("/context");
+    IndexAction index = new IndexAction();
+    ais.setCurrent(new ActionInvocation(index, null, "/user/", null, null));
+
+    new ControlTester(form).
+        attr("action", "edit").
+        attr("method", "POST").
+        go("<div class=\"form\">\n" +
+            "<form action=\"/context/user/edit\" method=\"POST\">\n" +
+            "</form>\n" +
+            "</div>\n");
   }
 }

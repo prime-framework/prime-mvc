@@ -15,7 +15,7 @@
  */
 package org.primeframework.mvc.action.guice;
 
-import javax.servlet.http.HttpServletRequest;
+import org.primeframework.mvc.http.HTTPRequest;
 
 import org.primeframework.mvc.util.URITools;
 
@@ -28,16 +28,16 @@ import com.google.inject.Provider;
  * @author Brian Pontarelli
  */
 public class ExtensionProvider implements Provider<String> {
-  private final HttpServletRequest request;
+  private final HTTPRequest request;
 
   @Inject
-  public ExtensionProvider(HttpServletRequest request) {
+  public ExtensionProvider(HTTPRequest request) {
     this.request = request;
   }
 
   @Override
   public String get() {
-    String uri = request.getRequestURI();
+    String uri = request.getPath();
     String extension = URITools.determineExtension(uri);
     if (extension == null) {
       return "";

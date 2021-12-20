@@ -43,6 +43,7 @@ import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.annotation.ResultAnnotation;
 import org.primeframework.mvc.action.result.annotation.ResultContainerAnnotation;
 import org.primeframework.mvc.control.form.annotation.FormPrepareMethod;
+import org.primeframework.mvc.http.HTTPMethod;
 import org.primeframework.mvc.parameter.annotation.PostParameterMethod;
 import org.primeframework.mvc.parameter.annotation.PreParameter;
 import org.primeframework.mvc.parameter.annotation.PreParameterMethod;
@@ -55,7 +56,6 @@ import org.primeframework.mvc.security.AuthorizeSchemeData;
 import org.primeframework.mvc.security.annotation.AnonymousAccess;
 import org.primeframework.mvc.security.annotation.AuthorizeMethod;
 import org.primeframework.mvc.security.annotation.JWTAuthorizeMethod;
-import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.util.ReflectionUtils;
 import org.primeframework.mvc.util.URIBuilder;
 import org.primeframework.mvc.validation.Validation;
@@ -108,12 +108,12 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
         actionClass,
         PreParameterMethod.class,
         (annotation, method) -> new PreParameterMethodConfiguration(method, annotation),
-        config -> config.annotation.httpMethods());
+        config -> Arrays.stream(config.annotation.httpMethods()).map(HTTPMethod::of).collect(Collectors.toList()));
     Map<HTTPMethod, List<ValidationMethodConfiguration>> validationMethods = findAnnotatedMethods(
         actionClass,
         ValidationMethod.class,
         (annotation, method) -> new ValidationMethodConfiguration(method, annotation),
-        config -> config.annotation.httpMethods());
+        config -> Arrays.stream(config.annotation.httpMethods()).map(HTTPMethod::of).collect(Collectors.toList()));
 
     List<String> securitySchemes = findSecuritySchemes(actionClass);
     Map<HTTPMethod, List<AuthorizationMethodConfiguration>> authorizationMethods = findAuthorizationMethods(actionClass, securitySchemes, executeMethods);
@@ -206,15 +206,15 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
   protected <T extends Annotation, U> Map<HTTPMethod, List<U>> findAnnotatedMethods(Class<?> actionClass,
                                                                                     Class<T> annotationType,
                                                                                     BiFunction<T, Method, U> constructor,
-                                                                                    Function<U, HTTPMethod[]> methodFunction) {
+                                                                                    Function<U, List<HTTPMethod>> methodFunction) {
     List<Method> methods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, annotationType);
 
     // Map HTTP method to a list of Validation Methods.
     Map<HTTPMethod, List<U>> map = new HashMap<>();
     methods.stream()
            .map(m -> constructor.apply(m.getAnnotation(annotationType), m))
-           .forEach(c -> Arrays.asList(methodFunction.apply(c))
-                               .forEach(m -> map.computeIfAbsent(m, k -> new ArrayList<>()).add(c)));
+           .forEach(c -> methodFunction.apply(c)
+                                       .forEach(m -> map.computeIfAbsent(m, k -> new ArrayList<>()).add(c)));
 
 
     // Ensure we're calling the GET Validation Method for a HEAD request
@@ -262,7 +262,7 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
     Map<HTTPMethod, List<AuthorizationMethodConfiguration>> authorizationMethods = new HashMap<>();
     methods.stream()
            .map(m -> new AuthorizationMethodConfiguration(m, m.getAnnotation(AuthorizeMethod.class)))
-           .forEach(c -> Arrays.asList(c.annotation.httpMethods())
+           .forEach(c -> Arrays.stream(c.annotation.httpMethods()).map(HTTPMethod::of).collect(Collectors.toList())
                                .forEach(m -> authorizationMethods.computeIfAbsent(m, k -> new ArrayList<>()).add(c)));
 
     // Ensure we're calling the Authorize GET method for a HEAD request
@@ -300,16 +300,16 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
     }
 
     Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods = new HashMap<>();
-    for (HTTPMethod httpMethod : HTTPMethod.values()) {
+    for (HTTPMethod httpMethod : HTTPMethod.StandardMethods.values()) {
       Method method = null;
       try {
-        method = actionClass.getMethod(httpMethod.name().toLowerCase());
+        method = actionClass.getMethod(httpMethod.methodName());
       } catch (NoSuchMethodException e) {
         // Ignore
       }
 
       // Handle HEAD requests using a GET
-      if (method == null && httpMethod == HTTPMethod.HEAD) {
+      if (method == null && HTTPMethod.HEAD.is(httpMethod)) {
         try {
           method = actionClass.getMethod("get");
         } catch (NoSuchMethodException e) {
@@ -371,7 +371,7 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
     Map<HTTPMethod, List<JWTMethodConfiguration>> jwtMethods = new HashMap<>();
     methods.stream()
            .map(m -> new JWTMethodConfiguration(m, m.getAnnotation(JWTAuthorizeMethod.class)))
-           .forEach(c -> Arrays.asList(c.annotation.httpMethods())
+           .forEach(c -> Arrays.stream(c.annotation.httpMethods()).map(HTTPMethod::of).collect(Collectors.toList())
                                .forEach(m -> jwtMethods.computeIfAbsent(m, k -> new ArrayList<>()).add(c)));
 
     // Ensure we're calling the JWT Authorize GET method for a HEAD request

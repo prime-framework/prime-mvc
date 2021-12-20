@@ -16,17 +16,14 @@
 package org.example.action;
 
 import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.scope.annotation.ActionSession;
 import org.primeframework.mvc.scope.annotation.Context;
 import org.primeframework.mvc.scope.annotation.Request;
-import org.primeframework.mvc.scope.annotation.Session;
 
 /**
  * @author Brian Pontarelli
  */
 @Action
 public class ScopeStorageAction {
-  @Session
   public Object sessionObject;
 
   @Context
@@ -35,7 +32,6 @@ public class ScopeStorageAction {
   @Request
   public Object requestObject;
 
-  @ActionSession
   public Object actionSessionObject;
 
   public String post() {

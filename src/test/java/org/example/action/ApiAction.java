@@ -39,7 +39,7 @@ public class ApiAction {
     return "success";
   }
 
-  public static enum ActionType {
+  public enum ActionType {
     ADD,
     EDIT
   }

@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc.parameter;
 
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +29,6 @@ import org.primeframework.mvc.parameter.fileupload.FileInfo;
  * @author Brian Pontarelli
  */
 public interface ParameterParser {
-
   /**
    * Parses the parameters.
    *
@@ -39,13 +37,13 @@ public interface ParameterParser {
   Parameters parse();
 
   class Parameters {
-    public final Map<String, Struct> required = new LinkedHashMap<>();
+    public final Map<String, List<FileInfo>> files = new LinkedHashMap<>();
 
     public final Map<String, Struct> optional = new LinkedHashMap<>();
 
     public final Map<String, Struct> pre = new LinkedHashMap<>();
 
-    public final Map<String, List<FileInfo>> files = new LinkedHashMap<>();
+    public final Map<String, Struct> required = new LinkedHashMap<>();
 
     @Override
     public String toString() {
@@ -60,12 +58,12 @@ public interface ParameterParser {
     public static class Struct {
       public Map<String, String> attributes = new LinkedHashMap<>();
 
-      public String[] values;
+      public List<String> values;
 
       public Struct() {
       }
 
-      public Struct(String[] values) {
+      public Struct(List<String> values) {
         this.values = values;
       }
 
@@ -73,7 +71,7 @@ public interface ParameterParser {
       public String toString() {
         return "Struct{" +
             "attributes=" + attributes +
-            ", values=" + Arrays.toString(values) +
+            ", values=" + values.toString() +
             '}';
       }
     }

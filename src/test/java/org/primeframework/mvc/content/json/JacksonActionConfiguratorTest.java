@@ -22,7 +22,7 @@ import org.example.action.KitchenSinkAction;
 import org.example.domain.UserField;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration.RequestMember;
-import org.primeframework.mvc.servlet.HTTPMethod;
+import org.primeframework.mvc.http.HTTPMethod;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;

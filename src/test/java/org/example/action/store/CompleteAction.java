@@ -15,9 +15,6 @@
  */
 package org.example.action.store;
 
-import javax.servlet.http.HttpServletRequest;
-
-import com.google.inject.Inject;
 import org.primeframework.mvc.action.annotation.Action;
 
 /**
@@ -26,11 +23,6 @@ import org.primeframework.mvc.action.annotation.Action;
 @Action
 public class CompleteAction extends BaseStoreAction {
   public String item;
-
-  @Inject
-  public CompleteAction(HttpServletRequest request) {
-    super(request);
-  }
 
   public String get() {
     if (isLoggedIn()) {

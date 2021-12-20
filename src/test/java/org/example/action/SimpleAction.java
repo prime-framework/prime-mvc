@@ -24,7 +24,7 @@ import org.primeframework.mvc.action.annotation.Action;
  */
 @Action
 public class SimpleAction {
-  public boolean invoked = false;
+  public static boolean invoked = false;
 
   public String execute() {
     invoked = true;

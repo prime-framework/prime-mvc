@@ -88,7 +88,7 @@ public class ZonedDateTimeConverter extends AbstractGlobalConverter {
 
     // Multiple formats are supported using a bracket syntax [M/dd/yyyy][MM/dd/yyyy]
     // Use the first pattern if multiple exists for displaying the value
-    DateTimeFormatter formatter = format.indexOf("[") == 0
+    DateTimeFormatter formatter = format.indexOf('[') == 0
         ? DateTimeFormatter.ofPattern(format.substring(1, format.indexOf("]", 1)))
         : DateTimeFormatter.ofPattern(format);
 

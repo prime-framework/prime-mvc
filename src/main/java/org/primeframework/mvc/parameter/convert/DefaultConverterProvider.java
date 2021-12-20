@@ -88,7 +88,7 @@ public class DefaultConverterProvider implements ConverterProvider {
     }
 
     localType = type;
-    Queue<Class<?>> interfaces = new LinkedList<Class<?>>(asList(type.getInterfaces()));
+    Queue<Class<?>> interfaces = new LinkedList<>(asList(type.getInterfaces()));
     Class<?> inter;
     while ((inter = interfaces.poll()) != null) {
       // First, check the interface

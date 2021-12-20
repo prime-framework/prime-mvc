@@ -15,14 +15,14 @@
  */
 package org.primeframework.mvc.message.scope;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import com.google.inject.Inject;
 import org.primeframework.mvc.config.MVCConfiguration;
+import org.primeframework.mvc.http.HTTPRequest;
+import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.util.FlashMessageCookie;
@@ -38,13 +38,10 @@ import org.primeframework.mvc.util.FlashMessageCookie;
 public class CookieFlashScope implements FlashScope {
   private final FlashMessageCookie cookie;
 
-  private final HttpServletRequest request;
-
   @Inject
-  public CookieFlashScope(Encryptor encryptor, MVCConfiguration configuration, HttpServletRequest request,
-                          HttpServletResponse response) {
-    cookie = new FlashMessageCookie(encryptor, configuration.messageFlashScopeCookieName(), request, response);
-    this.request = request;
+  public CookieFlashScope(Encryptor encryptor, MVCConfiguration configuration, HTTPRequest request,
+                          HTTPResponse response) {
+    this.cookie = new FlashMessageCookie(encryptor, configuration.messageFlashScopeCookieName(), request, response);
   }
 
   @Override
@@ -63,33 +60,11 @@ public class CookieFlashScope implements FlashScope {
 
   @Override
   public void clear() {
-    request.removeAttribute(FlashScope.KEY);
     cookie.delete();
   }
 
   @Override
   public List<Message> get() {
-    List<Message> messages = new ArrayList<>();
-    @SuppressWarnings("unchecked")
-    List<Message> requestList = (List<Message>) request.getAttribute(KEY);
-    if (requestList != null) {
-      messages.addAll(requestList);
-    }
-
-    messages.addAll(cookie.get());
-
-    return messages;
-  }
-
-  /**
-   * Moves the flash from the session to the request.
-   */
-  @Override
-  public void transferFlash() {
-    List<Message> messages = cookie.get();
-    if (messages.size() > 0) {
-      cookie.delete();
-      request.setAttribute(FlashScope.KEY, messages);
-    }
+    return new ArrayList<>(cookie.get());
   }
 }

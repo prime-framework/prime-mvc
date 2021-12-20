@@ -28,7 +28,7 @@ import com.google.inject.Inject;
  */
 @ControlAttributes(
   required = {
-    @ControlAttribute(name = "name")
+    @ControlAttribute(name = "name", types = {String.class})
   },
   optional = {
     @ControlAttribute(name = "cols", types = {int.class, Number.class}),

@@ -29,24 +29,26 @@ import com.google.inject.Injector;
  * @author Brian Pontarelli
  */
 public class ResultFactory {
-  private final static Map<Class<? extends Annotation>, Class<? extends Result>> bindings = new HashMap<>();
+  private final static Map<Class<? extends Annotation>, Class<? extends Result<? extends Annotation>>> bindings = new HashMap<>();
+
   private final Injector injector;
+
+  @Inject
+  public ResultFactory(Injector injector) {
+    this.injector = injector;
+  }
 
   /**
    * Binds the given result type for the given annotation type.
    *
    * @param annotationType The result annotation.
-   * @param resultType The result type.
-   * @param <T> The annotation type.
+   * @param resultType     The result type.
+   * @param <T>            The annotation type.
    */
-  public static <T extends Annotation> void addResult(Binder binder, Class<T> annotationType, Class<? extends Result<T>> resultType) {
+  public static <T extends Annotation> void addResult(Binder binder, Class<T> annotationType,
+                                                      Class<? extends Result<T>> resultType) {
     binder.bind(resultType);
     bindings.put(annotationType, resultType);
-  }
-
-  @Inject
-  public ResultFactory(Injector injector) {
-    this.injector = injector;
   }
 
   /**
@@ -55,7 +57,7 @@ public class ResultFactory {
    * @param annotationType The annotation type.
    * @return The Result instance.
    */
-  public Result<?> build(Class<? extends Annotation> annotationType) {
+  public Result<? extends Annotation> build(Class<? extends Annotation> annotationType) {
     return injector.getInstance(bindings.get(annotationType));
   }
 }

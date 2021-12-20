@@ -53,6 +53,7 @@ public class FreeMarkerControlProxy implements TemplateDirectiveModel {
    * @param loopVars Loop variables (not really used).
    * @param body     The body of the directive.
    */
+  @SuppressWarnings("unchecked")
   public void execute(Environment env, Map params, TemplateModel[] loopVars, TemplateDirectiveBody body)
       throws TemplateException {
     Map<String, String> dynamicAttributes = makeDynamicAttributes(params);
@@ -85,10 +86,9 @@ public class FreeMarkerControlProxy implements TemplateDirectiveModel {
    * @return The attributes.
    * @throws freemarker.template.TemplateModelException If the unwrapping fails.
    */
-  protected Map<String, Object> makeAttributes(Map params) throws TemplateModelException {
+  protected Map<String, Object> makeAttributes(Map<Object, Object> params) throws TemplateModelException {
     Map<String, Object> attributes = new HashMap<>(params.size());
-    for (Object o : params.entrySet()) {
-      Map.Entry entry = (Map.Entry) o;
+    for (Map.Entry<Object, Object> entry : params.entrySet()) {
       Object value = entry.getValue();
       if (value != null) {
         attributes.put((String) entry.getKey(), ((BeansWrapper) objectWrapper).unwrap((TemplateModel) value));
@@ -104,8 +104,7 @@ public class FreeMarkerControlProxy implements TemplateDirectiveModel {
    * @param params The parameters passed to this control in the FTL file.
    * @return The dynamic attributes.
    */
-  @SuppressWarnings("unchecked")
-  protected Map<String, String> makeDynamicAttributes(Map params) {
+  protected Map<String, String> makeDynamicAttributes(Map<String, Object> params) {
     Map<String, String> dynamicAttributes = new HashMap<>();
     for (Iterator<String> i = params.keySet().iterator(); i.hasNext(); ) {
       String key = i.next();

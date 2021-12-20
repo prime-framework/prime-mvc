@@ -18,9 +18,9 @@ package org.primeframework.mvc.config;
 import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.primeframework.mvc.parameter.annotation.FieldUnwrapped;
-
 
 /**
  * This class is an abstract implementation of the {@link MVCConfiguration} interface. It provides good default values
@@ -31,17 +31,17 @@ import org.primeframework.mvc.parameter.annotation.FieldUnwrapped;
  * @author Brian Pontarelli
  */
 public abstract class AbstractMVCConfiguration implements MVCConfiguration {
-  public static final String[] ALLOWED_TYPES = new String[]{
+  public static final Set<String> ALLOWED_TYPES = Set.of(
       "text/plain", "text/xml", "text/rtf", "text/richtext", "text/html", "text/css",
       "image/jpeg", "image/gif", "image/png", "image/pjpeg", "image/tiff",
       "video/dv", "video/h261", "video/h262", "video/h263", "video/h264", "video/jpeg", "video/mp4", "video/mpeg", "video/mpv", "video/ogg", "video/quicktime", "video/x-flv",
-      "application/msword", "application/pdf", "application/msword", "application/msexcel", "application/mspowerpoint"};
+      "application/octet-stream", "application/pdf", "application/msword", "application/msexcel", "application/mspowerpoint");
 
   public static final long MAX_SIZE = 1024000;
 
-  public static final String[] STATIC_PREFIXES = new String[]{"/static"};
-
   public boolean autoHTMLEscapingEnabled = true;
+
+  public String controlTemplateDirectory = "control-templates";
 
   public boolean csrfEnabled = false;
 
@@ -49,7 +49,7 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
 
   public String exceptionResultCode = "error";
 
-  public String[] fileUploadAllowedTypes = ALLOWED_TYPES;
+  public Set<String> fileUploadAllowedTypes = ALLOWED_TYPES;
 
   public long fileUploadMaxSize = MAX_SIZE;
 
@@ -57,25 +57,30 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
 
   public String localeCookieName = "prime-locale";
 
+  public String messageDirectory = "messages";
+
   public String messageFlashScopeCookieName = "prime-mvc-msg-flash";
 
-  public String resourceDirectory = "/WEB-INF";
+  public String missingPath = "/missing";
 
   public int savedRequestCookieMaximumSize = 6 * 1024; // 6 KB
 
   public String savedRequestCookieName = "prime-mvc-saved-request";
 
-  public String[] staticResourcePrefixes = STATIC_PREFIXES;
+  public String staticDirectory = "static";
 
-  public boolean staticResourcesEnabled = true;
+  public String templateDirectory = "templates";
 
   public List<Class<? extends Annotation>> unwrapAnnotations = Collections.singletonList(FieldUnwrapped.class);
-
-  public boolean useCookieForFlashScope;
 
   @Override
   public boolean autoHTMLEscapingEnabled() {
     return autoHTMLEscapingEnabled;
+  }
+
+  @Override
+  public String controlTemplateDirectory() {
+    return controlTemplateDirectory;
   }
 
   @Override
@@ -94,7 +99,7 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
   }
 
   @Override
-  public String[] fileUploadAllowedTypes() {
+  public Set<String> fileUploadAllowedTypes() {
     return fileUploadAllowedTypes;
   }
 
@@ -114,13 +119,18 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
   }
 
   @Override
+  public String messageDirectory() {
+    return messageDirectory;
+  }
+
+  @Override
   public String messageFlashScopeCookieName() {
     return messageFlashScopeCookieName;
   }
 
   @Override
-  public String resourceDirectory() {
-    return resourceDirectory;
+  public String missingPath() {
+    return missingPath;
   }
 
   @Override
@@ -134,13 +144,13 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
   }
 
   @Override
-  public String[] staticResourcePrefixes() {
-    return staticResourcePrefixes;
+  public String staticDirectory() {
+    return staticDirectory;
   }
 
   @Override
-  public boolean staticResourcesEnabled() {
-    return staticResourcesEnabled;
+  public String templateDirectory() {
+    return templateDirectory;
   }
 
   @Override

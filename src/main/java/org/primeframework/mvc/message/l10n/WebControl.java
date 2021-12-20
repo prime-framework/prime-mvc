@@ -27,11 +27,10 @@ import java.util.Locale;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.container.ContainerResolver;
-
-import com.google.inject.Inject;
 import static java.util.Collections.singletonList;
 
 /**
@@ -103,7 +102,8 @@ public class WebControl extends ResourceBundle.Control {
    * @return True if the file needs a reload.
    */
   @Override
-  public boolean needsReload(String uri, Locale locale, String format, ClassLoader loader, ResourceBundle bundle, long loadTime) {
+  public boolean needsReload(String uri, Locale locale, String format, ClassLoader loader, ResourceBundle bundle,
+                             long loadTime) {
     // Create the bundle from the WEB-INF/messages folder. basename is the uri
     String name = name(uri, locale);
     String realPath = containerResolver.getRealPath(name);
@@ -117,8 +117,8 @@ public class WebControl extends ResourceBundle.Control {
   }
 
   /**
-   * First tries to load the bundle using the getRealPath method on the ServletContext. If that doesn't work because
-   * the application is a WAR, this uses the getResourceAsStream method on the ServletContext.
+   * First tries to load the bundle using the getRealPath method on the Context If that doesn't work because the
+   * application is a WAR, this uses the getResourceAsStream method on the Context
    *
    * @param uri    The current URI.
    * @param locale The locale used to find the properties file.
@@ -126,7 +126,7 @@ public class WebControl extends ResourceBundle.Control {
    * @param loader Used to lookup the resource if the ContainerResolver can't find it.
    * @param reload Not used.
    * @return The property resource bundle and never null.
-   * @throws IOException If the file couldn't be read.
+   * @throws IOException              If the file couldn't be read.
    * @throws IllegalArgumentException If the bundle doesn't exist.
    */
   @Override
@@ -168,6 +168,6 @@ public class WebControl extends ResourceBundle.Control {
       uri = uri + "index";
     }
 
-    return configuration.resourceDirectory() + "/messages" + toBundleName(uri, locale) + ".properties";
+    return configuration.messageDirectory() + toBundleName(uri, locale) + ".properties";
   }
 }

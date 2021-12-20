@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc.parameter;
 
-import javax.servlet.ServletException;
 import java.io.IOException;
 
 import org.primeframework.mvc.action.ActionInvocationStore;
@@ -48,7 +47,7 @@ public class DefaultParameterWorkflow implements ParameterWorkflow {
    *
    * @param chain The workflow chain.
    */
-  public void perform(WorkflowChain chain) throws IOException, ServletException {
+  public void perform(WorkflowChain chain) throws IOException {
     if (actionInvocationStore.getCurrent().action != null) {
       Parameters params = parser.parse();
       handler.handle(params);

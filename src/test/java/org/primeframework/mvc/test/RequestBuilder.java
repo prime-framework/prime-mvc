@@ -15,58 +15,71 @@
  */
 package org.primeframework.mvc.test;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequestWrapper;
-import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Base64;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Injector;
-import org.primeframework.mock.servlet.MockContainer;
-import org.primeframework.mock.servlet.MockHttpServletRequest;
-import org.primeframework.mock.servlet.MockHttpServletRequest.Method;
-import org.primeframework.mock.servlet.MockHttpServletResponse;
-import org.primeframework.mock.servlet.MockServletInputStream;
+import com.inversoft.http.Cookie.SameSite;
+import com.inversoft.http.FileUpload;
+import com.inversoft.rest.ByteArrayBodyHandler;
+import com.inversoft.rest.ByteArrayResponseHandler;
+import com.inversoft.rest.ClientResponse;
+import com.inversoft.rest.FormDataBodyHandler;
+import com.inversoft.rest.MultipartBodyHandler;
+import com.inversoft.rest.MultipartBodyHandler.Multiparts;
+import com.inversoft.rest.RESTClient;
+import com.inversoft.rest.RESTClient.BodyHandler;
+import org.primeframework.mock.MockUserAgent;
+import org.primeframework.mvc.http.Cookie;
+import org.primeframework.mvc.http.DefaultHTTPRequest;
+import org.primeframework.mvc.http.HTTPMethod;
+import org.primeframework.mvc.http.HTTPObjectsHolder;
+import org.primeframework.mvc.http.HTTPRequest;
+import org.primeframework.mvc.http.MutableHTTPRequest;
+import org.primeframework.mvc.message.TestMessageObserver;
 import org.primeframework.mvc.parameter.DefaultParameterParser;
+import org.primeframework.mvc.parameter.fileupload.FileInfo;
 import org.primeframework.mvc.security.csrf.CSRFProvider;
-import org.primeframework.mvc.servlet.PrimeFilter;
-import org.primeframework.mvc.servlet.ServletObjectsHolder;
 import org.primeframework.mvc.test.RequestResult.ThrowingConsumer;
 import org.primeframework.mvc.util.QueryStringTools;
 import org.primeframework.mvc.util.URITools;
-import static org.testng.Assert.fail;
 
 /**
  * This class is a builder that helps create a test HTTP request that is sent to the MVC.
  *
  * @author Brian Pontarelli
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "UnusedReturnValue"})
 public class RequestBuilder {
-  public final MockContainer container;
-
-  public final PrimeFilter filter;
-
   public final Injector injector;
 
-  public final MockHttpServletRequest request;
+  public final TestMessageObserver messageObserver;
 
-  public final MockHttpServletResponse response;
+  public final MutableHTTPRequest request;
 
-  public RequestBuilder(String uri, MockContainer container, PrimeFilter filter, Injector injector) {
-    this.container = container;
-    this.filter = filter;
+  public final MockUserAgent userAgent;
+
+  public RequestBuilder(int port, String path, Injector injector, MockUserAgent userAgent,
+                        TestMessageObserver messageObserver) {
     this.injector = injector;
-    this.request = container.newServletRequest(uri, Locale.getDefault(), false, "UTF-8");
-    this.response = container.newServletResponse();
+    this.userAgent = userAgent;
+    this.messageObserver = messageObserver;
+    this.request = new DefaultHTTPRequest().with(r -> r.addLocales(Locale.US))
+                                           .with(r -> r.setPath(path))
+                                           .with(r -> r.setPort(port));
   }
 
   /**
@@ -86,9 +99,9 @@ public class RequestBuilder {
    * @return The response.
    */
   public RequestResult connect() {
-    request.setMethod(Method.CONNECT);
-    run();
-    return new RequestResult(container, filter, request, response, injector);
+    request.setMethod(HTTPMethod.CONNECT);
+    ClientResponse<byte[], byte[]> response = run();
+    return new RequestResult(injector, request, response, userAgent, messageObserver);
   }
 
   /**
@@ -97,9 +110,9 @@ public class RequestBuilder {
    * @return The response.
    */
   public RequestResult delete() {
-    request.setMethod(Method.DELETE);
-    run();
-    return new RequestResult(container, filter, request, response, injector);
+    request.setMethod(HTTPMethod.DELETE);
+    ClientResponse<byte[], byte[]> response = run();
+    return new RequestResult(injector, request, response, userAgent, messageObserver);
   }
 
   /**
@@ -108,12 +121,12 @@ public class RequestBuilder {
    * @return The response.
    */
   public RequestResult get() {
-    request.setPost(false);
-    run();
-    return new RequestResult(container, filter, request, response, injector);
+    request.setMethod(HTTPMethod.GET);
+    ClientResponse<byte[], byte[]> response = run();
+    return new RequestResult(injector, request, response, userAgent, messageObserver);
   }
 
-  public MockHttpServletRequest getRequest() {
+  public HTTPRequest getRequest() {
     return request;
   }
 
@@ -123,9 +136,9 @@ public class RequestBuilder {
    * @return The response.
    */
   public RequestResult head() {
-    request.setMethod(Method.HEAD);
-    run();
-    return new RequestResult(container, filter, request, response, injector);
+    request.setMethod(HTTPMethod.HEAD);
+    ClientResponse<byte[], byte[]> response = run();
+    return new RequestResult(injector, request, response, userAgent, messageObserver);
   }
 
   /**
@@ -180,9 +193,9 @@ public class RequestBuilder {
    * @return This.
    */
   public RequestResult method(String method) {
-    request.setOverrideMethod(method);
-    run();
-    return new RequestResult(container, filter, request, response, injector);
+    request.setMethod(HTTPMethod.of(method));
+    ClientResponse<byte[], byte[]> response = run();
+    return new RequestResult(injector, request, response, userAgent, messageObserver);
   }
 
   /**
@@ -191,9 +204,9 @@ public class RequestBuilder {
    * @return The response.
    */
   public RequestResult options() {
-    request.setMethod(Method.OPTIONS);
-    run();
-    return new RequestResult(container, filter, request, response, injector);
+    request.setMethod(HTTPMethod.OPTIONS);
+    ClientResponse<byte[], byte[]> response = run();
+    return new RequestResult(injector, request, response, userAgent, messageObserver);
   }
 
   /**
@@ -202,9 +215,9 @@ public class RequestBuilder {
    * @return The response.
    */
   public RequestResult patch() {
-    request.setMethod(Method.PATCH);
-    run();
-    return new RequestResult(container, filter, request, response, injector);
+    request.setMethod(HTTPMethod.PATCH);
+    ClientResponse<byte[], byte[]> response = run();
+    return new RequestResult(injector, request, response, userAgent, messageObserver);
   }
 
   /**
@@ -213,9 +226,9 @@ public class RequestBuilder {
    * @return The response.
    */
   public RequestResult post() {
-    request.setPost(true);
-    run();
-    return new RequestResult(container, filter, request, response, injector);
+    request.setMethod(HTTPMethod.POST);
+    ClientResponse<byte[], byte[]> response = run();
+    return new RequestResult(injector, request, response, userAgent, messageObserver);
   }
 
   /**
@@ -224,9 +237,9 @@ public class RequestBuilder {
    * @return The response.
    */
   public RequestResult put() {
-    request.setMethod(Method.PUT);
-    run();
-    return new RequestResult(container, filter, request, response, injector);
+    request.setMethod(HTTPMethod.PUT);
+    ClientResponse<byte[], byte[]> response = run();
+    return new RequestResult(injector, request, response, userAgent, messageObserver);
   }
 
   /**
@@ -235,7 +248,7 @@ public class RequestBuilder {
    * @param consumer A consumer that takes the MockHttpServletRequest.
    * @return This.
    */
-  public RequestBuilder setup(Consumer<MockHttpServletRequest> consumer) {
+  public RequestBuilder setup(Consumer<HTTPRequest> consumer) {
     consumer.accept(request);
     return this;
   }
@@ -246,9 +259,9 @@ public class RequestBuilder {
    * @return The response.
    */
   public RequestResult trace() {
-    request.setMethod(Method.TRACE);
-    run();
-    return new RequestResult(container, filter, request, response, injector);
+    request.setMethod(HTTPMethod.TRACE);
+    ClientResponse<byte[], byte[]> response = run();
+    return new RequestResult(injector, request, response, userAgent, messageObserver);
   }
 
   /**
@@ -257,9 +270,7 @@ public class RequestBuilder {
    * @return This.
    */
   public RequestBuilder usingHTTPS() {
-    request.setScheme("HTTPS");
-    request.setServerPort(443);
-    return this;
+    throw new IllegalStateException("This handling is not implemented yet");
   }
 
   /**
@@ -273,7 +284,7 @@ public class RequestBuilder {
    * @return This.
    */
   public RequestBuilder withAuthorizationHeader(Object value) {
-    request.addHeader("Authorization", value.toString());
+    request.setHeader("Authorization", value.toString());
     return this;
   }
 
@@ -291,7 +302,7 @@ public class RequestBuilder {
    */
   public RequestBuilder withBasicAuthorizationHeader(String username, String password) {
     String basic = username + (password != null ? ":" + password : "");
-    request.addHeader("Authorization", "Basic " + Base64.getEncoder().encodeToString(basic.getBytes()));
+    request.setHeader("Authorization", "Basic " + Base64.getEncoder().encodeToString(basic.getBytes()));
     return this;
   }
 
@@ -302,7 +313,7 @@ public class RequestBuilder {
    * @return This.
    */
   public RequestBuilder withBody(byte[] bytes) {
-    request.setInputStream(new MockServletInputStream(bytes));
+    request.setBody(bytes);
     return this;
   }
 
@@ -347,8 +358,8 @@ public class RequestBuilder {
    * @return This.
    */
   public RequestBuilder withCSRFToken(String token) {
-    request.removeParameter(CSRFProvider.CSRF_PARAMETER_KEY);
-    return withParameter(CSRFProvider.CSRF_PARAMETER_KEY, token);
+    request.setParameter(CSRFProvider.CSRF_PARAMETER_KEY, token);
+    return this;
   }
 
   /**
@@ -401,7 +412,8 @@ public class RequestBuilder {
    */
   public RequestBuilder withCookie(String name, String value) {
     if (name != null) {
-      container.getUserAgent().addCookie(request, new Cookie(name, value));
+      Cookie cookie = new Cookie(name, value);
+      request.addCookies(cookie);
     }
     return this;
   }
@@ -414,7 +426,7 @@ public class RequestBuilder {
    */
   public RequestBuilder withCookie(Cookie cookie) {
     if (cookie != null) {
-      container.getUserAgent().addCookie(request, cookie);
+      request.addCookies(cookie);
     }
     return this;
   }
@@ -425,8 +437,8 @@ public class RequestBuilder {
    * @param encoding The encoding.
    * @return This.
    */
-  public RequestBuilder withEncoding(String encoding) {
-    request.setEncoding(encoding);
+  public RequestBuilder withEncoding(Charset encoding) {
+    request.setCharacterEncoding(encoding);
     return this;
   }
 
@@ -438,8 +450,8 @@ public class RequestBuilder {
    * @param contentType The content type.
    * @return This.
    */
-  public RequestBuilder withFile(String name, File file, String contentType) {
-    request.addFile(name, file, contentType);
+  public RequestBuilder withFile(String name, Path file, String contentType) {
+    request.addFile(new FileInfo(file, null, name, contentType));
     return this;
   }
 
@@ -506,7 +518,7 @@ public class RequestBuilder {
    * @return This.
    */
   public RequestBuilder withLocale(Locale locale) {
-    request.addLocale(locale);
+    request.addLocales(locale);
     return this;
   }
 
@@ -519,7 +531,7 @@ public class RequestBuilder {
    * @return This.
    */
   public RequestBuilder withParameter(String name, Object value) {
-    request.setParameter(name, value.toString());
+    request.addParameter(name, value.toString());
     return this;
   }
 
@@ -532,9 +544,7 @@ public class RequestBuilder {
    * @return This.
    */
   public RequestBuilder withParameters(String name, Collection<?> values) {
-    for (Object value : values) {
-      request.setParameter(name, value.toString());
-    }
+    request.addParameters(name, values.stream().map(Object::toString).collect(Collectors.toList()));
     return this;
   }
 
@@ -571,8 +581,7 @@ public class RequestBuilder {
   }
 
   public RequestBuilder withSingleHeader(String name, String value) {
-    request.removeHeader(name);
-    request.addHeader(name, value);
+    request.setHeader(name, value);
     return this;
   }
 
@@ -594,12 +603,12 @@ public class RequestBuilder {
    */
   public RequestBuilder withURLSegment(Object value) {
     if (value != null) {
-      String uri = request.getRequestURI();
+      String uri = request.getPath();
       if (uri.charAt(uri.length() - 1) != '/') {
         uri += ('/');
       }
 
-      request.setUri(uri + URITools.encodeURIPathSegment(value));
+      request.setPath(uri + URITools.encodeURIPathSegment(value));
     }
     return this;
   }
@@ -614,12 +623,39 @@ public class RequestBuilder {
     return withURLSegment(value);
   }
 
-  void run() {
-    // Remove the web objects if this instance is being used across multiple invocations
-    ServletObjectsHolder.clearServletRequest();
-    ServletObjectsHolder.clearServletResponse();
+  ClientResponse<byte[], byte[]> run() {
+    // Set the new request in so we can inject things below
+    HTTPObjectsHolder.clearRequest();
+    HTTPObjectsHolder.setRequest(request);
 
-    // If the CSRF token is enabled and the parameter isn't set, we set it to be consistent.
+    // Clear the messages for each run
+    messageObserver.clear();
+
+    // New cookies were added to the request and not the user-agent, so we need to sync them to the user-agent here.
+    // Then we can add all cookies form the user-agent to the request.
+    userAgent.addCookies(request.getCookies());
+    request.getCookies().clear();
+    request.addCookies(userAgent.getCookies(request));
+    var restCookies = request.getCookies()
+                             .stream()
+                             .map(c -> new com.inversoft.http.Cookie().with(c1 -> c1.domain = c.domain)
+                                                                      .with(c1 -> c1.expires = c.expires)
+                                                                      .with(c1 -> c1.httpOnly = c.httpOnly)
+                                                                      .with(c1 -> c1.maxAge = c.maxAge)
+                                                                      .with(c1 -> c1.name = c.name)
+                                                                      .with(c1 -> c1.path = c.path)
+                                                                      .with(c1 -> c1.sameSite = c.sameSite != null ? SameSite.valueOf(c.sameSite.name()) : null)
+                                                                      .with(c1 -> c1.secure = c.secure)
+                                                                      .with(c1 -> c1.value = c.value))
+                             .collect(Collectors.toList());
+
+    // Referer for CSRF checks must be provided
+    if (request.getHeader("Referer") == null) {
+      request.setHeader("Referer", "http://localhost:" + request.getPort() + request.getPath());
+    }
+
+    // Now that the cookies are ready, if the CSRF token is enabled and the parameter isn't set, we set it to be consistent
+    // since the [@control.form] would normally set that into the form and into the request.
     CSRFProvider csrfProvider = injector.getInstance(CSRFProvider.class);
     if (csrfProvider.getTokenFromRequest(request) == null) {
       String token = csrfProvider.getToken(request);
@@ -628,22 +664,68 @@ public class RequestBuilder {
       }
     }
 
-    // Copy cookies from the response back to the request so we can be ready for the next request.
-    container.getRequest().copyCookiesFromUserAgent();
+    List<Locale> locales = request.getLocales();
+    String contentType = request.getContentType();
+    Charset characterEncoding = request.getCharacterEncoding();
+    HTTPMethod method = request.getMethod();
 
-    try {
-      // Build the request and response for this pass
-      filter.doFilter(this.request, this.response, (req, resp) -> {
-        throw new UnsupportedOperationException("The RequestSimulator class doesn't support testing " +
-            "URIs that don't map to Prime resources. Requested URL:\n" + this.request.getRequestURI());
-      });
-    } catch (Throwable t) {
-      fail("The exception should have been caught by the PrimeFilter", t);
+    // Handle URL parameters and body
+    Map<String, List<String>> parameters = request.getParameters();
+    List<FileInfo> files = request.getFiles();
+    byte[] body = request.getBody();
+    Map<String, Object> urlParameters = null;
+    BodyHandler bodyHandler = null;
+    if (files != null && files.size() > 0) {
+      List<FileUpload> fileUploads = files.stream()
+                                          .map(fi -> new FileUpload(fi.contentType, fi.file, fi.fileName, fi.name))
+                                          .collect(Collectors.toList());
+      bodyHandler = new MultipartBodyHandler(new Multiparts(fileUploads, parameters));
+    } else if (body != null) {
+      bodyHandler = new ByteArrayBodyHandler(body);
+
+      // Send these are URL parameters
+      if (parameters.size() > 0) {
+        urlParameters = new HashMap<>(parameters);
+      }
+    } else if (parameters.size() > 0) {
+      // Making the assumption here that the parameters are on the URL for GET, HEAD and DELETE and in the body for everything else
+      if (HTTPMethod.GET.is(method) || HTTPMethod.HEAD.is(method) || HTTPMethod.DELETE.is(method)) {
+        urlParameters = new HashMap<>(parameters);
+      } else {
+        bodyHandler = new FormDataBodyHandler(parameters);
+      }
     }
 
-    // Add these back so that anything that needs them can be retrieved from the Injector after
-    // the run has completed (i.e. MessageStore for the MVC and such)
-    ServletObjectsHolder.setServletRequest(new HttpServletRequestWrapper(this.request));
-    ServletObjectsHolder.setServletResponse(this.response);
+    ClientResponse<byte[], byte[]> response = new RESTClient<>(byte[].class, byte[].class)
+        .bodyHandler(bodyHandler)
+        .connectTimeout(0)
+        .cookies(restCookies)
+        .errorResponseHandler(new ByteArrayResponseHandler())
+        .followRedirects(false)
+        .header("Accept-Language", locales.size() > 0 ? locales.stream().map(Locale::toLanguageTag).collect(Collectors.joining(", ")) : null)
+        .header("Content-Type", contentType != null ? (contentType + (characterEncoding != null ? "; charset=" + characterEncoding : "")) : null)
+        .headersMap(request.getHeadersMap())
+        .method(request.getMethod().name())
+        .readTimeout(0)
+        .successResponseHandler(new ByteArrayResponseHandler())
+        .url("http://localhost:" + request.getPort() + request.getPath())
+        .urlParameters(urlParameters)
+        .go();
+
+    // Extract the cookies and put them in the UserAgent
+    userAgent.addCookies(response.getCookies()
+                                 .stream()
+                                 .map(c -> new Cookie().with(c1 -> c1.domain = c.domain)
+                                                       .with(c1 -> c1.expires = c.expires)
+                                                       .with(c1 -> c1.httpOnly = c.httpOnly)
+                                                       .with(c1 -> c1.maxAge = c.maxAge)
+                                                       .with(c1 -> c1.name = c.name)
+                                                       .with(c1 -> c1.path = c.path)
+                                                       .with(c1 -> c1.sameSite = c.sameSite != null ? Cookie.SameSite.valueOf(c.sameSite.name()) : null)
+                                                       .with(c1 -> c1.secure = c.secure)
+                                                       .with(c1 -> c1.value = c.value))
+                                 .collect(Collectors.toList()));
+
+    return response;
   }
 }

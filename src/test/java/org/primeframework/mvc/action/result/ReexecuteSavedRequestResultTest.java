@@ -15,34 +15,37 @@
  */
 package org.primeframework.mvc.action.result;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.easymock.EasyMock;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.ReexecuteSavedRequestResult.ReexecuteSavedRequestImpl;
 import org.primeframework.mvc.action.result.annotation.ReexecuteSavedRequest;
+import org.primeframework.mvc.http.Cookie;
+import org.primeframework.mvc.http.DefaultHTTPRequest;
+import org.primeframework.mvc.http.DefaultHTTPResponse;
+import org.primeframework.mvc.http.HTTPMethod;
+import org.primeframework.mvc.http.HTTPRequest;
+import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;
-import org.primeframework.mvc.message.scope.FlashScope;
 import org.primeframework.mvc.message.scope.MessageScope;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.security.DefaultCipherProvider;
 import org.primeframework.mvc.security.DefaultEncryptor;
 import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.security.saved.SavedHttpRequest;
-import org.primeframework.mvc.servlet.HTTPMethod;
 import org.testng.annotations.Test;
 import static org.easymock.EasyMock.createStrictMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 
 /**
  * This class tests the Saved Request result.
@@ -56,20 +59,8 @@ public class ReexecuteSavedRequestResultTest extends PrimeBaseTest {
     replay(ee);
 
     List<Message> messages = new ArrayList<>();
-    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    expect(request.getAttribute(FlashScope.KEY)).andReturn(messages);
-    expect(request.getSession(false)).andReturn(null);
-    expect(request.getCookies()).andReturn(null);
-    expect(request.getContextPath()).andReturn("");
-    expect(request.getRequestURI()).andReturn("/");
-    replay(request);
-
-    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    response.setHeader("Cache-Control", "no-cache");
-    response.sendRedirect("/");
-    response.setStatus(301);
-    replay(response);
-
+    HTTPRequest request = new DefaultHTTPRequest();
+    HTTPResponse response = new DefaultHTTPResponse(new ByteArrayOutputStream());
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/foo", "", null));
     replay(store);
@@ -78,14 +69,17 @@ public class ReexecuteSavedRequestResultTest extends PrimeBaseTest {
     expect(messageStore.get(MessageScope.REQUEST)).andReturn(messages);
     messageStore.clear(MessageScope.REQUEST);
     messageStore.addAll(MessageScope.FLASH, messages);
-    messageStore.addAll(MessageScope.FLASH, messages);
     replay(messageStore);
 
     ReexecuteSavedRequest redirect = new ReexecuteSavedRequestImpl("/", "success", true, false);
     ReexecuteSavedRequestResult result = new ReexecuteSavedRequestResult(messageStore, ee, response, request, store, configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper));
     result.execute(redirect);
 
-    verify(response, request, ee, store, messageStore);
+    verify(ee, store, messageStore);
+
+    assertEquals(response.getStatus(), 301);
+    assertEquals(response.getRedirect(), "/");
+    assertEquals(response.getHeader("Cache-Control"), "no-cache");
   }
 
   @Test
@@ -94,26 +88,15 @@ public class ReexecuteSavedRequestResultTest extends PrimeBaseTest {
     replay(ee);
 
     SavedHttpRequest savedRequest = new SavedHttpRequest(HTTPMethod.GET, "/secure?test=value1&test2=value2", null);
-    container.getUserAgent().addCookie(request, SavedRequestTools.toCookie(savedRequest, configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper)));
+    simulator.userAgent.addCookie(SavedRequestTools.toCookie(savedRequest, configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper)));
 
     List<Message> messages = new ArrayList<>();
-    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
     Encryptor encryptor = new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper);
     Cookie cookie = SavedRequestTools.toCookie(savedRequest, configuration, encryptor);
-    expect(request.getAttribute(FlashScope.KEY)).andReturn(messages);
-    expect(request.getSession(false)).andReturn(null);
-    expect(request.getCookies()).andReturn(new Cookie[]{cookie});
-    expect(request.getContextPath()).andReturn("");
-    expect(request.getRequestURI()).andReturn("/");
-    replay(request);
 
-    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    response.addCookie(new Cookie(configuration.savedRequestCookieName + "_executed", EasyMock.anyString()));
-    response.setHeader("Cache-Control", "no-cache");
-    response.sendRedirect("/secure?test=value1&test2=value2");
-    response.setStatus(301);
-    replay(response);
+    HTTPRequest request = new DefaultHTTPRequest().with(r -> r.cookies.put(cookie.name, cookie));
 
+    HTTPResponse response = new DefaultHTTPResponse(new ByteArrayOutputStream());
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     replay(store);
 
@@ -121,13 +104,20 @@ public class ReexecuteSavedRequestResultTest extends PrimeBaseTest {
     expect(messageStore.get(MessageScope.REQUEST)).andReturn(messages);
     messageStore.clear(MessageScope.REQUEST);
     messageStore.addAll(MessageScope.FLASH, messages);
-    messageStore.addAll(MessageScope.FLASH, messages);
     replay(messageStore);
 
     ReexecuteSavedRequest redirect = new ReexecuteSavedRequestImpl("/", "success", true, false);
     ReexecuteSavedRequestResult result = new ReexecuteSavedRequestResult(messageStore, ee, response, request, store, configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper));
     result.execute(redirect);
 
-    verify(response, request, ee, store, messageStore);
+    verify(ee, store, messageStore);
+
+    assertEquals(response.getCookies().size(), 1);
+    assertEquals(response.getCookies().get(0).name, configuration.savedRequestCookieName);
+    assertEquals(response.getCookies().get(0).maxAge.longValue(), 0);
+    assertFalse(response.getCookies().get(0).value.startsWith("ready_"));
+    assertEquals(response.getStatus(), 301);
+    assertEquals(response.getRedirect(), "/secure?test=value1&test2=value2");
+    assertEquals(response.getHeader("Cache-Control"), "no-cache");
   }
 }

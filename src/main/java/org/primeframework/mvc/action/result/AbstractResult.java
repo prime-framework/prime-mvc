@@ -15,15 +15,15 @@
  */
 package org.primeframework.mvc.action.result;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 
 import org.primeframework.mvc.action.ActionInvocation;
+import org.primeframework.mvc.http.HTTPMethod;
+import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-import org.primeframework.mvc.servlet.HTTPMethod;
 
 /**
  * This result performs a servlet forward to a JSP or renders a FreeMarker template depending on the extension of the
@@ -38,7 +38,7 @@ public abstract class AbstractResult<U extends Annotation> implements Result<U> 
     this.expressionEvaluator = expressionEvaluator;
   }
 
-  protected void addCacheControlHeader(U result, HttpServletResponse response) {
+  protected void addCacheControlHeader(U result, HTTPResponse response) {
     if (getDisableCacheControl(result)) {
       return;
     }
@@ -87,7 +87,7 @@ public abstract class AbstractResult<U extends Annotation> implements Result<U> 
    * @return true if the current action invocation is a HTTP HEAD request
    */
   protected boolean isHeadRequest(ActionInvocation actionInvocation) {
-    return actionInvocation.method != null && actionInvocation.method.httpMethod == HTTPMethod.HEAD;
+    return actionInvocation.method != null && HTTPMethod.HEAD.is(actionInvocation.method.httpMethod);
   }
 
   /**
@@ -98,7 +98,7 @@ public abstract class AbstractResult<U extends Annotation> implements Result<U> 
    * @param action    The action to use for expansion.
    * @param response  The response to set the status into.
    */
-  protected void setStatus(int status, String statusStr, Object action, HttpServletResponse response) {
+  protected void setStatus(int status, String statusStr, Object action, HTTPResponse response) {
     int code = status;
     if (!statusStr.isEmpty()) {
       code = Integer.parseInt(expand(statusStr, action, false));
@@ -114,7 +114,7 @@ public abstract class AbstractResult<U extends Annotation> implements Result<U> 
    * @param response the HTTP Servlet Response
    * @throws IOException if #@#! goes south
    */
-  protected void writeToOutputStream(InputStream is, HttpServletResponse response) throws IOException {
+  protected void writeToOutputStream(InputStream is, HTTPResponse response) throws IOException {
     OutputStream os = response.getOutputStream();
     try {
       // Then output the file

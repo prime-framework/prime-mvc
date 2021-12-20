@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc.action.result;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.ZonedDateTime;
@@ -26,6 +25,7 @@ import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.annotation.Stream;
+import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.util.DateTools;
 import org.primeframework.mvc.util.EncodingUtils;
@@ -38,10 +38,10 @@ import org.primeframework.mvc.util.EncodingUtils;
 public class StreamResult extends AbstractResult<Stream> {
   private final ActionInvocationStore actionInvocationStore;
 
-  private final HttpServletResponse response;
+  private final HTTPResponse response;
 
   @Inject
-  public StreamResult(ExpressionEvaluator expressionEvaluator, HttpServletResponse response,
+  public StreamResult(ExpressionEvaluator expressionEvaluator, HTTPResponse response,
                       ActionInvocationStore actionInvocationStore) {
     super(expressionEvaluator);
     this.response = response;
@@ -83,7 +83,7 @@ public class StreamResult extends AbstractResult<Stream> {
     response.setContentType(type);
 
     if (StringUtils.isNotBlank(length)) {
-      response.setContentLength(Integer.parseInt(length));
+      response.setContentLength(Long.parseLong(length));
     }
 
     if (StringUtils.isNotBlank(name)) {

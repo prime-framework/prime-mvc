@@ -48,14 +48,21 @@ public interface UserLoginSecurityContext {
   boolean isLoggedIn();
 
   /**
-   * Logs the given user in so that future requests within the same session will be logged in.
+   * Logs the current user (via the context) so that future requests within the same session will be logged in.
    *
-   * @param user The user object.
+   * @param context The context object. This could be the user, a session object, various tokens, etc.
    */
-  void login(Object user);
+  void login(Object context);
 
   /**
    * Logs the user out. The user's session will be invalidated.
    */
   void logout();
+
+  /**
+   * Allows implementations to update the user object, which might be different from the context object.
+   *
+   * @param user The user.
+   */
+  void updateUser(Object user);
 }

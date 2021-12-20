@@ -59,11 +59,6 @@ public class ContentHandlerFactory {
   public ContentHandler build(String contentType) {
     Class<? extends ContentHandler> handlerType = bindings.get(contentType);
     if (handlerType == null && contentType != null) {
-      int index = contentType.indexOf(';');
-      if (index > 0) {
-        contentType = contentType.substring(0, index);
-      }
-
       handlerType = bindings.get(contentType);
     }
 

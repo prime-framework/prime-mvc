@@ -84,7 +84,7 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
       }
 
       if (logger.isDebugEnabled()) {
-        logger.debug("Added action configuration for [" + actionClass + "] and the uri [" + uri + "]");
+        logger.debug("Added action configuration for [{}] and the uri [{}]", actionClass, actionConfiguration.uri);
       }
     }
   }

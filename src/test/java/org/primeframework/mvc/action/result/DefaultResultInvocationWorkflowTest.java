@@ -15,20 +15,32 @@
  */
 package org.primeframework.mvc.action.result;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+
+import com.google.inject.Binder;
+import com.google.inject.Injector;
 import org.example.action.user.EditAction;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
+import org.primeframework.mvc.action.ExecuteMethodConfiguration;
+import org.primeframework.mvc.action.ValidationMethodConfiguration;
+import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.result.ForwardResult.ForwardImpl;
 import org.primeframework.mvc.action.result.annotation.Forward;
 import org.primeframework.mvc.action.result.annotation.Redirect;
-import org.primeframework.mvc.servlet.HTTPMethod;
+import org.primeframework.mvc.http.HTTPMethod;
+import org.primeframework.mvc.validation.Validation;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
-
-import com.google.inject.Binder;
-import com.google.inject.Injector;
 import static org.easymock.EasyMock.createStrictMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.isA;
@@ -92,7 +104,7 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
     replay(resultStore);
 
     ResourceLocator resourceLocator = createStrictMock(ResourceLocator.class);
-    expect(resourceLocator.locateIndex(configuration.resourceDirectory() + "/templates")).andReturn("/foo/bar/");
+    expect(resourceLocator.locateIndex(configuration.templateDirectory())).andReturn("/foo/bar/");
     replay(resourceLocator);
 
     ForwardResult forwardResult = createStrictMock(ForwardResult.class);
@@ -137,7 +149,7 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
     replay(resultStore);
 
     ResourceLocator resourceLocator = createStrictMock(ResourceLocator.class);
-    expect(resourceLocator.locateIndex(configuration.resourceDirectory() + "/templates")).andReturn(null);
+    expect(resourceLocator.locateIndex(configuration.templateDirectory)).andReturn(null);
     replay(resourceLocator);
 
     ForwardResult result = createStrictMock(ForwardResult.class);
@@ -168,7 +180,7 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
   @Test
   public void actionMissingResult() throws Exception {
     ForwardImpl annotation = new ForwardImpl("/user/edit", "success");
-    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, new EditAction(), "post", "/user/edit", "", "success", annotation);
+    ActionInvocation ai = makeActionInvocation(new EditAction(), annotation);
     ActionInvocationStore ais = createStrictMock(ActionInvocationStore.class);
     expect(ais.getCurrent()).andReturn(ai);
     replay(ais);
@@ -245,7 +257,7 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
   @Test
   public void actionWithResult() throws Exception {
     ForwardImpl annotation = new ForwardImpl("/user/edit", "success");
-    ActionInvocation ai = makeActionInvocation(HTTPMethod.POST, new EditAction(), "post", "/user/edit", "", "success", annotation);
+    ActionInvocation ai = makeActionInvocation(new EditAction(), annotation);
     ActionInvocationStore ais = createStrictMock(ActionInvocationStore.class);
     expect(ais.getCurrent()).andReturn(ai);
     replay(ais);
@@ -280,5 +292,29 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
     workflow.perform(chain);
 
     verify(ais, resultStore, resourceLocator, injector, chain, binder);
+  }
+
+  /**
+   * Makes an action invocation and configuration.
+   *
+   * @param action The action object.
+   * @return The action invocation.
+   * @throws Exception If the construction fails.
+   */
+  protected ActionInvocation makeActionInvocation(Object action, Annotation annotation) throws Exception {
+    Method method = action.getClass().getMethod("post");
+    ExecuteMethodConfiguration executeMethod = new ExecuteMethodConfiguration(HTTPMethod.POST, method, method.getAnnotation(Validation.class));
+    Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods = new HashMap<>();
+    executeMethods.put(HTTPMethod.POST, executeMethod);
+
+    Map<HTTPMethod, List<ValidationMethodConfiguration>> validationMethods = new HashMap<>();
+
+    Map<String, Annotation> resultConfigurations = new HashMap<>();
+    resultConfigurations.put("success", annotation);
+
+    return new ActionInvocation(action, executeMethod, "/user/edit", "",
+        new ActionConfiguration(EditAction.class, executeMethods, validationMethods, new ArrayList<>(), null, null,
+            new ArrayList<>(), new HashMap<>(), new ArrayList<>(), resultConfigurations, new HashMap<>(), null, new HashMap<>(),
+            new HashSet<>(), Collections.emptyList(), new ArrayList<>(), new HashMap<>(), "/user/edit", new ArrayList<>(), null));
   }
 }

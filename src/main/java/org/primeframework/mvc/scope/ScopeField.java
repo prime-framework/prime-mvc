@@ -24,9 +24,11 @@ import java.lang.reflect.Field;
  * @author Brian Pontarelli
  */
 public class ScopeField {
-  public final Field field;
   public final Annotation annotation;
+
   public final Class<? extends Annotation> annotationType;
+
+  public final Field field;
 
   public ScopeField(Field field, Annotation annotation) {
     this.annotation = annotation;

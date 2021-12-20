@@ -15,17 +15,18 @@
  */
 package org.primeframework.mvc.workflow.guice;
 
+import com.google.inject.AbstractModule;
 import org.primeframework.mvc.ErrorException;
 import org.primeframework.mvc.workflow.DefaultErrorWorkflow;
 import org.primeframework.mvc.workflow.DefaultExceptionHandler;
 import org.primeframework.mvc.workflow.DefaultMVCWorkflow;
+import org.primeframework.mvc.workflow.DefaultMissingWorkflow;
 import org.primeframework.mvc.workflow.ErrorExceptionHandler;
 import org.primeframework.mvc.workflow.ErrorWorkflow;
 import org.primeframework.mvc.workflow.ExceptionHandler;
 import org.primeframework.mvc.workflow.MVCWorkflow;
+import org.primeframework.mvc.workflow.MissingWorkflow;
 import org.primeframework.mvc.workflow.TypedExceptionHandlerFactory;
-
-import com.google.inject.AbstractModule;
 
 /**
  * Guice Module for mapping exception handler to exception types
@@ -33,16 +34,6 @@ import com.google.inject.AbstractModule;
  * @author James Humphrey
  */
 public class WorkflowModule extends AbstractModule {
-  @Override
-  protected void configure() {
-    bind(TypedExceptionHandlerFactory.class);
-    TypedExceptionHandlerFactory.addExceptionHandler(binder(), ErrorException.class, ErrorExceptionHandler.class);
-
-    bindErrorWorkflow();
-    bindExceptionHandler();
-    bindMVCWorkflow();
-  }
-
   protected void bindErrorWorkflow() {
     bind(ErrorWorkflow.class).to(DefaultErrorWorkflow.class);
   }
@@ -53,5 +44,20 @@ public class WorkflowModule extends AbstractModule {
 
   protected void bindMVCWorkflow() {
     bind(MVCWorkflow.class).to(DefaultMVCWorkflow.class);
+  }
+
+  protected void bindMissingWorkflow() {
+    bind(MissingWorkflow.class).to(DefaultMissingWorkflow.class);
+  }
+
+  @Override
+  protected void configure() {
+    bind(TypedExceptionHandlerFactory.class);
+    TypedExceptionHandlerFactory.addExceptionHandler(binder(), ErrorException.class, ErrorExceptionHandler.class);
+
+    bindErrorWorkflow();
+    bindExceptionHandler();
+    bindMissingWorkflow();
+    bindMVCWorkflow();
   }
 }

@@ -15,19 +15,18 @@
  */
 package org.example.action;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.action.annotation.Action;
+import org.primeframework.mvc.http.HTTPStrings.Methods;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.primeframework.mvc.message.SimpleMessage;
-import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.validation.Validatable;
 import org.primeframework.mvc.validation.Validation;
 import org.primeframework.mvc.validation.ValidationMethod;
 import org.primeframework.mvc.validation.annotation.PostValidationMethod;
 import org.primeframework.mvc.validation.annotation.PreValidationMethod;
-
-import com.google.inject.Inject;
 
 /**
  * Action for testing the PreValidationMethod and PostValidationMethod annotations
@@ -84,12 +83,12 @@ public class ValidationMethods implements Validatable {
     }
   }
 
-  @ValidationMethod(httpMethods = HTTPMethod.GET)
+  @ValidationMethod(httpMethods = Methods.GET)
   public void validateGet() {
     getValidationCalled = true;
   }
 
-  @ValidationMethod(httpMethods = HTTPMethod.PUT)
+  @ValidationMethod(httpMethods = Methods.PUT)
   public void validateMethod() {
     if (addMethodErrors) {
       messageStore.add(new SimpleMessage(MessageType.ERROR, "method-general-code", "method-general-message"));

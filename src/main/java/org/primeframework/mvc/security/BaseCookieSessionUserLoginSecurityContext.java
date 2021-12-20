@@ -15,32 +15,34 @@
  */
 package org.primeframework.mvc.security;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import org.primeframework.mvc.http.HTTPRequest;
+import org.primeframework.mvc.http.HTTPResponse;
 
 /**
  * Uses a cookie to manage the user session.
  *
  * @author Daniel DeGroff
  */
-@SuppressWarnings("unused")
 public abstract class BaseCookieSessionUserLoginSecurityContext implements UserLoginSecurityContext {
-  protected final HttpServletRequest request;
+  protected final CookieProxy cookie;
 
-  protected final HttpServletResponse response;
+  protected final HTTPRequest request;
 
-  private final CookieConfig cookie;
+  protected final HTTPResponse response;
 
-  protected BaseCookieSessionUserLoginSecurityContext(CookieConfig cookie, HttpServletRequest request,
-                                                      HttpServletResponse response) {
-    this.cookie = cookie;
+  protected BaseCookieSessionUserLoginSecurityContext(HTTPRequest request, HTTPResponse response) {
     this.request = request;
     this.response = response;
+    this.cookie = new CookieProxy(cookieName(), cookieDuration());
   }
 
   @Override
   public Object getCurrentUser() {
     String sessionId = getSessionId();
+    if (sessionId == null) {
+      return null;
+    }
+
     return getUserFromSessionId(sessionId);
   }
 
@@ -56,12 +58,12 @@ public abstract class BaseCookieSessionUserLoginSecurityContext implements UserL
 
   @Override
   public void login(Object user) {
-    Object sessionId = getSessionIdFromUser(user);
+    String sessionId = getSessionIdFromUser(user);
     if (sessionId == null) {
       return;
     }
 
-    cookie.add(request, response, (String) sessionId);
+    cookie.add(request, response, sessionId);
   }
 
   @Override
@@ -70,22 +72,32 @@ public abstract class BaseCookieSessionUserLoginSecurityContext implements UserL
   }
 
   /**
-   * Return the sessionId for the provider user.
+   * Allows subclasses to specify a cookie duration. If null is returned, then the cookie is a session cookie.
    *
-   * @param user the user
-   * @return the session Id or null if no session is found for this user.
+   * @return The duration of the cookie.
    */
-  protected abstract Object getSessionIdFromUser(Object user);
+  protected abstract Long cookieDuration();
 
   /**
-   * Return the User for the given sessionId
+   * Allows subclasses to specify the name of the cookie used by this security context to store the session id.
    *
-   * @param sessionId the sessionId
-   * @return the user or null if no user was found.
+   * @return The cookie name.
    */
-  protected abstract Object getUserFromSessionId(Object sessionId);
+  protected abstract String cookieName();
 
-  private String defaultIfNull(String string, String defaultString) {
-    return string == null ? defaultString : string;
-  }
+  /**
+   * Return the session id for the provider user.
+   *
+   * @param user The application specific user object.
+   * @return The session id or null if no session is found for this user.
+   */
+  protected abstract String getSessionIdFromUser(Object user);
+
+  /**
+   * Return the User for the given session id.
+   *
+   * @param sessionId The session id that was previously generated for a user.
+   * @return The application specific user object based on the session id or null if no user was found.
+   */
+  protected abstract Object getUserFromSessionId(String sessionId);
 }

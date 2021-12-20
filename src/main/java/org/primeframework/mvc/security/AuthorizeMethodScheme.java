@@ -15,21 +15,18 @@
  */
 package org.primeframework.mvc.security;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
-import java.util.Map;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
-import io.fusionauth.jwt.Verifier;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.AuthorizationMethodConfiguration;
 import org.primeframework.mvc.action.config.ActionConfiguration;
+import org.primeframework.mvc.http.HTTPMethod;
+import org.primeframework.mvc.http.HTTPRequest;
 import org.primeframework.mvc.parameter.el.ExpressionException;
 import org.primeframework.mvc.security.annotation.AuthorizeMethod;
-import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.util.ReflectionUtils;
 
 /**
@@ -41,13 +38,13 @@ import org.primeframework.mvc.util.ReflectionUtils;
 public class AuthorizeMethodScheme implements SecurityScheme {
   protected final ActionInvocationStore actionInvocationStore;
 
-  protected final HttpServletRequest request;
+  protected final HTTPRequest request;
 
-  protected final Provider<Map<String, Verifier>> verifierProvider;
+  protected final VerifierProvider verifierProvider;
 
   @Inject
-  public AuthorizeMethodScheme(ActionInvocationStore actionInvocationStore, HttpServletRequest request,
-                               Provider<Map<String, Verifier>> verifierProvider) {
+  public AuthorizeMethodScheme(ActionInvocationStore actionInvocationStore, HTTPRequest request,
+                               VerifierProvider verifierProvider) {
     this.actionInvocationStore = actionInvocationStore;
     this.request = request;
     this.verifierProvider = verifierProvider;
@@ -60,7 +57,7 @@ public class AuthorizeMethodScheme implements SecurityScheme {
     Object[] parameters = new Object[]{};
     ActionConfiguration actionConfiguration = actionInvocation.configuration;
 
-    HTTPMethod method = HTTPMethod.valueOf(request.getMethod().toUpperCase());
+    HTTPMethod method = request.getMethod();
     // If this scheme is not configured for this method, throw UnauthenticatedException.
     //
     // - For example, using 'api' and 'authorize-method' schemes. The API key is omitted, so the next scheme used will be

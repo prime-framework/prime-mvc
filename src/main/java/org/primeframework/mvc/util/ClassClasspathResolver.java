@@ -32,7 +32,6 @@ import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
@@ -143,7 +142,7 @@ public class ClassClasspathResolver<U> {
   private Set<File> findDirectories(File dir, String locator) {
     // Loop over the files using tail-recursion
     Set<File> directories = new HashSet<>();
-    Queue<File> files = new LinkedList<>(safeListFiles(dir, DirectoryFileFilter.INSTANCE));
+    Queue<File> files = new LinkedList<>(safeListFiles(dir, File::isDirectory));
     while (!files.isEmpty()) {
       File file = files.poll();
       if (file.isDirectory() && file.getName().equals(locator)) {

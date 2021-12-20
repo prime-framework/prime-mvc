@@ -15,8 +15,7 @@
  */
 package org.primeframework.mvc.action.result;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletResponse;
+import org.primeframework.mvc.http.HTTPResponse;
 import java.io.IOException;
 
 import com.google.inject.Inject;
@@ -33,10 +32,10 @@ import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 public class StatusResult extends AbstractResult<Status> {
   private final ActionInvocationStore actionInvocationStore;
 
-  private final HttpServletResponse response;
+  private final HTTPResponse response;
 
   @Inject
-  public StatusResult(ExpressionEvaluator expressionEvaluator, HttpServletResponse response,
+  public StatusResult(ExpressionEvaluator expressionEvaluator, HTTPResponse response,
                       ActionInvocationStore actionInvocationStore) {
     super(expressionEvaluator);
     this.response = response;
@@ -46,7 +45,7 @@ public class StatusResult extends AbstractResult<Status> {
   /**
    * {@inheritDoc}
    */
-  public boolean execute(Status status) throws IOException, ServletException {
+  public boolean execute(Status status) throws IOException {
     Object action = actionInvocationStore.getCurrent().action;
     setStatus(status.status(), status.statusStr(), action, response);
 

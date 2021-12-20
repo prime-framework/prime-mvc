@@ -57,11 +57,10 @@ public class AcceptanceTest extends PrimeBaseTest {
 
   @Test
   public void get_noAction_noTemplate() {
-    // simulator doesn't support chain.continueWorkflow(), so we'll get UnsupportedOperationException
     simulator.test("/no-action-no-template")
              .get()
-             .assertStatusCode(500)
-             .assertBodyIsEmpty();
+             .assertStatusCode(404)
+             .assertBody("The page is missing!");
   }
 
   @Test
@@ -74,11 +73,10 @@ public class AcceptanceTest extends PrimeBaseTest {
 
   @Test
   public void get_nonPrimeResourceEndingWithSlash() {
-    // simulator doesn't support chain.continueWorkflow(), so we'll get UnsupportedOperationException
     simulator.test("/potato/")
              .get()
-             .assertStatusCode(500)
-             .assertBodyIsEmpty();
+             .assertStatusCode(404)
+             .assertBody("The page is missing!");
   }
 
   @Test

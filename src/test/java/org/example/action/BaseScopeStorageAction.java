@@ -15,16 +15,13 @@
  */
 package org.example.action;
 
-import org.primeframework.mvc.scope.annotation.ActionSession;
 import org.primeframework.mvc.scope.annotation.Context;
 import org.primeframework.mvc.scope.annotation.Request;
-import org.primeframework.mvc.scope.annotation.Session;
 
 /**
  * @author Daniel DeGroff
  */
 public abstract class BaseScopeStorageAction {
-  @Session
   public Object sessionObject;
 
   @Context
@@ -33,6 +30,5 @@ public abstract class BaseScopeStorageAction {
   @Request
   public Object requestObject;
 
-  @ActionSession
   public Object actionSessionObject;
 }

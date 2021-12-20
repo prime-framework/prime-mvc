@@ -22,28 +22,20 @@ import java.net.URL;
 import java.net.URLConnection;
 
 /**
- * Encapsulates a URL to a FreeMaker template and also maintains access to the URLConnection and also the
- * InputStream.
+ * Encapsulates a URL to a FreeMaker template and also maintains access to the URLConnection and also the InputStream.
  *
  * @author Brian Pontarelli
  */
 public class URLTemplateSource {
   private final URL url;
+
   private URLConnection conn;
+
   private InputStream inputStream;
 
   URLTemplateSource(URL url) throws IOException {
     this.url = url;
     this.conn = url.openConnection();
-  }
-
-  public long lastModified() {
-    return conn.getLastModified();
-  }
-
-  public InputStream getInputStream() throws IOException {
-    inputStream = conn.getInputStream();
-    return inputStream;
   }
 
   public void close() throws IOException {
@@ -61,8 +53,17 @@ public class URLTemplateSource {
     return (o instanceof URLTemplateSource) && url.equals(((URLTemplateSource) o).url);
   }
 
+  public InputStream getInputStream() throws IOException {
+    inputStream = conn.getInputStream();
+    return inputStream;
+  }
+
   public int hashCode() {
     return url.hashCode();
+  }
+
+  public long lastModified() {
+    return conn.getLastModified();
   }
 
   public String toString() {

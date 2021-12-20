@@ -15,15 +15,14 @@
  */
 package org.primeframework.mvc.message.l10n;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Locale;
 
-import org.primeframework.mock.servlet.MockContainer;
-import org.primeframework.mock.servlet.MockServletContext;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.container.ServletContainerResolver;
+import org.primeframework.mvc.http.HTTPContext;
 import org.primeframework.mvc.locale.LocaleProvider;
 import org.testng.annotations.Test;
 import static org.easymock.EasyMock.createStrictMock;
@@ -40,9 +39,34 @@ import static org.testng.Assert.fail;
  */
 public class ResourceBundleMessageProviderTest extends PrimeBaseTest {
   @Test
-  public void format() {
-    MockServletContext context = new MockContainer().newServletContext(new File("src/test/java"));
+  public void defaultMessages() {
+    HTTPContext context = new HTTPContext(Path.of("src/test/java"));
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/l10n/", null, null)).times(4);
+    replay(store);
 
+    LocaleProvider localeProvider = createStrictMock(LocaleProvider.class);
+    expect(localeProvider.get()).andReturn(Locale.US).times(15);
+    replay(localeProvider);
+
+    ResourceBundleMessageProvider provider = new ResourceBundleMessageProvider(localeProvider, new WebControl(new ServletContainerResolver(context), configuration), store);
+    assertEquals(provider.getMessage("[blank]foo.bar"), "Required (foo.bar)");
+    assertEquals(provider.getMessage("[blank]baz"), "Required (default)");
+
+    // Really missing
+    try {
+      provider.getMessage("[not_found]bar");
+      fail("Should have failed");
+    } catch (MissingMessageException e) {
+      // Expected
+    }
+
+    verify(store);
+  }
+
+  @Test
+  public void format() {
+    HTTPContext context = new HTTPContext(Path.of("src/test/java"));
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/l10n/Test", null, null));
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/l10n/NonExistent", null, null));
@@ -68,8 +92,7 @@ public class ResourceBundleMessageProviderTest extends PrimeBaseTest {
 
   @Test
   public void missing() {
-    MockServletContext context = new MockContainer().newServletContext(new File("src/test/java"));
-
+    HTTPContext context = new HTTPContext(Path.of("src/test/java"));
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/l10n/Test", null, null)).times(2);
     replay(store);
@@ -90,36 +113,8 @@ public class ResourceBundleMessageProviderTest extends PrimeBaseTest {
   }
 
   @Test
-  public void defaultMessages() {
-    MockServletContext context = new MockContainer().newServletContext(new File("src/test/java"));
-
-    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/l10n/", null, null)).times(4);
-    replay(store);
-
-    LocaleProvider localeProvider = createStrictMock(LocaleProvider.class);
-    expect(localeProvider.get()).andReturn(Locale.US).times(15);
-    replay(localeProvider);
-
-    ResourceBundleMessageProvider provider = new ResourceBundleMessageProvider(localeProvider, new WebControl(new ServletContainerResolver(context), configuration), store);
-    assertEquals(provider.getMessage("[blank]foo.bar"), "Required (foo.bar)");
-    assertEquals(provider.getMessage("[blank]baz"), "Required (default)");
-
-    // Really missing
-    try {
-      provider.getMessage("[not_found]bar");
-      fail("Should have failed");
-    } catch (MissingMessageException e) {
-      // Expected
-    }
-
-    verify(store);
-  }
-
-  @Test
   public void search() {
-    MockServletContext context = new MockContainer().newServletContext(new File("src/test/java"));
-
+    HTTPContext context = new HTTPContext(Path.of("src/test/java"));
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/l10n/Test", null, null));
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/l10n/NonExistent", null, null));

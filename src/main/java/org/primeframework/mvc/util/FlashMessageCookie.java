@@ -15,15 +15,16 @@
  */
 package org.primeframework.mvc.util;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.primeframework.mvc.ErrorException;
+import org.primeframework.mvc.http.Cookie;
+import org.primeframework.mvc.http.HTTPRequest;
+import org.primeframework.mvc.http.HTTPResponse;
+import org.primeframework.mvc.http.MutableHTTPRequest;
 import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.security.Encryptor;
 
@@ -33,53 +34,45 @@ import org.primeframework.mvc.security.Encryptor;
 public class FlashMessageCookie extends AbstractCookie {
   private final Encryptor encryptor;
 
+  private final List<Message> messages;
+
   private final String name;
 
-  public FlashMessageCookie(Encryptor encryptor, String name, HttpServletRequest request,
-                            HttpServletResponse response) {
+  public FlashMessageCookie(Encryptor encryptor, String name, HTTPRequest request, HTTPResponse response) {
     super(request, response);
     this.encryptor = encryptor;
     this.name = name;
+
+    Cookie cookie = request.getCookie(name);
+    if (cookie != null) {
+      messages = deserialize(cookie.value);
+    } else {
+      messages = new ArrayList<>();
+    }
   }
 
+  /**
+   * Sends a cookie delete message back in the HTTP response and clears the local list of messages. Any future calls to
+   * {@link #get()} will return an empty list to indicate that the flash has been cleared. Similarly, the cookie is
+   * completely removed from the request so that it isn't reloaded.
+   */
   public void delete() {
     deleteCookie(name);
-
-    // Ensure we do not return the cookie again after it has been deleted within the same request.
-    request.setAttribute(name + "Deleted", true);
+    ((MutableHTTPRequest) request).deleteCookie(name);
+    messages.clear();
   }
 
+  /**
+   * @return A copy of the messages from this request.
+   */
   public List<Message> get() {
-    // Ensure we do not return the cookie again after it has been deleted within the same request.
-    if (request.getAttribute(name + "Deleted") != null) {
-      return new ArrayList<>(0);
-    }
-
-    Cookie[] cookies = request.getCookies();
-    if (cookies != null) {
-      for (Cookie cookie : cookies) {
-        if (cookie.getName().equals(name)) {
-          List<Message> flash = deserialize(cookie.getValue());
-          if (flash != null) {
-            return flash;
-          }
-        }
-      }
-    }
-
-    try {
-      return new ArrayList<>(0);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
+    return new ArrayList<>(messages);
   }
 
   public void update(Consumer<List<Message>> consumer) {
-    List<Message> messages = get();
     consumer.accept(messages);
     String value = serialize(messages);
-
-    addSecureHttpOnlySessionCookie(name, value);
+    addSecureHTTPOnlySessionCookie(name, value);
   }
 
   private List<Message> deserialize(String s) {

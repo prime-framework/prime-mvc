@@ -15,9 +15,7 @@
  */
 package org.primeframework.mvc.content.json;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -28,19 +26,19 @@ import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import com.google.inject.Inject;
-import org.apache.commons.io.IOUtils;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.content.ContentHandler;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration.RequestMember;
+import org.primeframework.mvc.http.HTTPMethod;
+import org.primeframework.mvc.http.HTTPRequest;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.primeframework.mvc.message.SimpleMessage;
 import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-import org.primeframework.mvc.servlet.HTTPMethod;
 import org.primeframework.mvc.validation.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,12 +59,12 @@ public class JacksonContentHandler implements ContentHandler {
 
   private final ObjectMapper objectMapper;
 
-  private final HttpServletRequest request;
+  private final HTTPRequest request;
 
   private final ActionInvocationStore store;
 
   @Inject
-  public JacksonContentHandler(HttpServletRequest request, ActionInvocationStore store, ObjectMapper objectMapper,
+  public JacksonContentHandler(HTTPRequest request, ActionInvocationStore store, ObjectMapper objectMapper,
                                ExpressionEvaluator expressionEvaluator, MessageProvider messageProvider,
                                MessageStore messageStore) {
     this.request = request;
@@ -95,7 +93,7 @@ public class JacksonContentHandler implements ContentHandler {
       return;
     }
 
-    int contentLength = request.getContentLength();
+    long contentLength = request.getContentLength();
     if (contentLength == 0) {
       return;
     }
@@ -116,14 +114,11 @@ public class JacksonContentHandler implements ContentHandler {
           reader = objectMapper.readerFor(requestMember.type);
         }
 
-        Object jsonObject;
         if (logger.isDebugEnabled()) {
-          final String req = IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8);
-          logger.debug("Request: (" + request.getMethod() + " " + request.getRequestURI() + ") " + req);
-          jsonObject = reader.readValue(req);
-        } else {
-          jsonObject = reader.readValue(request.getInputStream());
+          logger.debug("Request: ({} {}) {}", request.getMethod(), request.getPath(), request.getBody());
         }
+
+        Object jsonObject = reader.readValue(request.getBody());
 
         // Set the value into the action if the currentValue from the action was null
         if (currentValue == null) {

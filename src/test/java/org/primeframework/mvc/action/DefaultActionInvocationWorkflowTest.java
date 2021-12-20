@@ -25,11 +25,12 @@ import org.example.action.HeadAction;
 import org.example.action.PostAction;
 import org.example.action.SimpleAction;
 import org.primeframework.mvc.PrimeBaseTest;
+import org.primeframework.mvc.action.config.ActionConfiguration;
+import org.primeframework.mvc.action.config.DefaultActionConfigurationBuilder;
 import org.primeframework.mvc.action.result.ResultStore;
-import org.primeframework.mvc.servlet.HTTPMethod;
+import org.primeframework.mvc.http.HTTPMethod;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
-
 import static org.easymock.EasyMock.createStrictMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
@@ -47,6 +48,7 @@ public class DefaultActionInvocationWorkflowTest extends PrimeBaseTest {
   @Test
   public void action() throws Exception {
     SimpleAction simple = new SimpleAction();
+    SimpleAction.invoked = false;
     ActionInvocation actionInvocation = makeActionInvocation(simple, HTTPMethod.POST, null);
 
     ActionInvocationStore ais = createStrictMock(ActionInvocationStore.class);
@@ -64,7 +66,7 @@ public class DefaultActionInvocationWorkflowTest extends PrimeBaseTest {
     DefaultActionInvocationWorkflow workflow = new DefaultActionInvocationWorkflow(ais, resultStore);
     workflow.perform(chain);
 
-    assertTrue(simple.invoked);
+    assertTrue(SimpleAction.invoked);
 
     verify(ais, chain);
   }
@@ -222,6 +224,7 @@ public class DefaultActionInvocationWorkflowTest extends PrimeBaseTest {
   @Test
   public void httpMethod() throws Exception {
     PostAction action = new PostAction();
+    PostAction.invoked = false;
     ActionInvocation actionInvocation = makeActionInvocation(action, HTTPMethod.POST, null);
     ActionInvocationStore ais = createStrictMock(ActionInvocationStore.class);
     expect(ais.getCurrent()).andReturn(actionInvocation);
@@ -238,8 +241,22 @@ public class DefaultActionInvocationWorkflowTest extends PrimeBaseTest {
     DefaultActionInvocationWorkflow workflow = new DefaultActionInvocationWorkflow(ais, resultStore);
     workflow.perform(chain);
 
-    assertTrue(action.invoked);
+    assertTrue(PostAction.invoked);
 
     verify(ais, chain);
+  }
+
+  /**
+   * Makes an action invocation and configuration.
+   *
+   * @param action     The action object.
+   * @param httpMethod The HTTP method.
+   * @param extension  The extension.
+   * @return The action invocation.
+   */
+  protected ActionInvocation makeActionInvocation(Object action, HTTPMethod httpMethod, String extension) {
+    DefaultActionConfigurationBuilder builder = injector.getInstance(DefaultActionConfigurationBuilder.class);
+    ActionConfiguration actionConfiguration = builder.build(action.getClass());
+    return new ActionInvocation(action, actionConfiguration.executeMethods.get(httpMethod), actionConfiguration.uri, extension, actionConfiguration);
   }
 }

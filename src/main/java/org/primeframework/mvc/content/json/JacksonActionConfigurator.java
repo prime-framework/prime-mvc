@@ -23,7 +23,7 @@ import org.primeframework.mvc.content.json.JacksonActionConfiguration.RequestMem
 import org.primeframework.mvc.content.json.JacksonActionConfiguration.ResponseMember;
 import org.primeframework.mvc.content.json.annotation.JSONRequest;
 import org.primeframework.mvc.content.json.annotation.JSONResponse;
-import org.primeframework.mvc.servlet.HTTPMethod;
+import org.primeframework.mvc.http.HTTPMethod;
 import org.primeframework.mvc.util.ReflectionUtils;
 
 /**
@@ -45,8 +45,9 @@ public class JacksonActionConfigurator implements ActionConfigurator {
     Map<HTTPMethod, RequestMember> configuredMembers = new HashMap<>(4);
     for (Map.Entry<String, JSONRequest> requestMember : jsonRequestMember.entrySet()) {
       String memberName = requestMember.getKey();
-      HTTPMethod[] httpMethods = requestMember.getValue().httpMethods();
-      for (HTTPMethod httpMethod : httpMethods) {
+      String[] httpMethods = requestMember.getValue().httpMethods();
+      for (String method : httpMethods) {
+        HTTPMethod httpMethod = HTTPMethod.of(method);
         if (configuredMembers.containsKey(httpMethod)) {
           throw new IllegalArgumentException("Action class [" + actionClass + "] contains multiple fields with the @JSONRequest annotation and they are not distinct for HTTPMethod [ " + httpMethod + "]."
               + " This annotation should only exist on a single field for a particular HTTP Method.");

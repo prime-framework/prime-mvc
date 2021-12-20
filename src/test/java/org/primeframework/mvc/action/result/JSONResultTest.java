@@ -15,7 +15,7 @@
  */
 package org.primeframework.mvc.action.result;
 
-import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.time.Duration;
@@ -23,6 +23,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -32,7 +33,6 @@ import org.example.action.PostAction;
 import org.example.domain.AddressField;
 import org.example.domain.UserField;
 import org.example.domain.UserType;
-import org.primeframework.mock.servlet.MockServletOutputStream;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
@@ -43,16 +43,17 @@ import org.primeframework.mvc.action.result.annotation.XMLStream;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration.ResponseMember;
 import org.primeframework.mvc.content.json.annotation.JSONResponse;
+import org.primeframework.mvc.http.DefaultHTTPResponse;
+import org.primeframework.mvc.http.HTTPMethod;
+import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.primeframework.mvc.message.SimpleMessage;
 import org.primeframework.mvc.message.scope.MessageScope;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-import org.primeframework.mvc.servlet.HTTPMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-import static java.util.Arrays.asList;
 import static org.easymock.EasyMock.createStrictMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
@@ -65,7 +66,7 @@ import static org.testng.Assert.assertEquals;
  * @author Brian Pontarelli
  */
 public class JSONResultTest extends PrimeBaseTest {
-  private static JSONResponse JSON_RESPONSE_ANNOTATION = new JSONResponse() {
+  private static final JSONResponse JSON_RESPONSE_ANNOTATION = new JSONResponse() {
 
     @Override
     public Class<? extends Annotation> annotationType() {
@@ -116,18 +117,7 @@ public class JSONResultTest extends PrimeBaseTest {
     expect(ee.getValue("user", action)).andReturn(userField);
     replay(ee);
 
-    MockServletOutputStream sos = new MockServletOutputStream();
-    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    response.setStatus(200);
-    response.setCharacterEncoding("UTF-8");
-    response.setContentType("application/json");
-    response.setContentLength(538);
-    response.setHeader("Cache-Control", "no-cache");
-    if (httpMethod == HTTPMethod.GET) {
-      expect(response.getOutputStream()).andReturn(sos);
-    }
-    replay(response);
-
+    HTTPResponse response = new DefaultHTTPResponse(new ByteArrayOutputStream());
     Map<Class<?>, Object> additionalConfiguration = new HashMap<>();
     additionalConfiguration.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(null, new ResponseMember(JSON_RESPONSE_ANNOTATION, "user")));
     ActionConfiguration config = new ActionConfiguration(PostAction.class, null, null, null, null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, additionalConfiguration, null, null, null);
@@ -187,9 +177,13 @@ public class JSONResultTest extends PrimeBaseTest {
         "  }]," +
         "  \"type\":\"COOL\"" +
         "}";
-    assertEquals(sos.toString(), httpMethod == HTTPMethod.GET ? expected.replace("  ", "") : ""); // Un-indent
+    assertEquals(response.getOutputStream().toString(), httpMethod == HTTPMethod.GET ? expected.replace("  ", "") : ""); // Un-indent
+    assertEquals(response.getStatus(), 200);
+    assertEquals(response.getContentLength().longValue(), 538L);
+    assertEquals(response.getContentType(), "application/json; charset=UTF-8");
+    assertEquals(response.getHeader("Cache-Control"), "no-cache");
 
-    verify(ee, messageStore, response);
+    verify(ee, messageStore);
   }
 
   @Test(dataProvider = "httpMethod")
@@ -198,18 +192,7 @@ public class JSONResultTest extends PrimeBaseTest {
     ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
     replay(ee);
 
-    MockServletOutputStream sos = new MockServletOutputStream();
-    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    response.setStatus(400);
-    response.setCharacterEncoding("UTF-8");
-    response.setContentType("application/json");
-    response.setContentLength(359);
-    response.setHeader("Cache-Control", "no-cache");
-    if (httpMethod == HTTPMethod.GET) {
-      expect(response.getOutputStream()).andReturn(sos);
-    }
-    replay(response);
-
+    HTTPResponse response = new DefaultHTTPResponse(new ByteArrayOutputStream());
     Map<Class<?>, Object> additionalConfiguration = new HashMap<>();
     additionalConfiguration.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(null, new ResponseMember(JSON_RESPONSE_ANNOTATION, "user")));
     ActionConfiguration config = new ActionConfiguration(PostAction.class, null, null, null, null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, additionalConfiguration, null, null, null);
@@ -219,7 +202,7 @@ public class JSONResultTest extends PrimeBaseTest {
     replay(store);
 
     MessageStore messageStore = createStrictMock(MessageStore.class);
-    expect(messageStore.get(MessageScope.REQUEST)).andReturn(asList(
+    expect(messageStore.get(MessageScope.REQUEST)).andReturn(List.of(
         new SimpleMessage(MessageType.ERROR, "[invalid]", "Invalid request"),
         new SimpleMessage(MessageType.ERROR, "[bad]", "Bad request"),
         new SimpleFieldMessage(MessageType.ERROR, "user.age", "[required]user.age", "Age is required"),
@@ -241,9 +224,13 @@ public class JSONResultTest extends PrimeBaseTest {
         "    {\"code\":\"[invalid]\",\"message\":\"Invalid request\"},{\"code\":\"[bad]\",\"message\":\"Bad request\"}" +
         "  ]" +
         "}";
-    assertEquals(sos.toString(), httpMethod == HTTPMethod.GET ? expected.replace("  ", "") : ""); // Un-indent
+    assertEquals(response.getOutputStream().toString(), httpMethod == HTTPMethod.GET ? expected.replace("  ", "") : ""); // Un-indent
+    assertEquals(response.getStatus(), 400);
+    assertEquals(response.getContentLength().longValue(), 359L);
+    assertEquals(response.getContentType(), "application/json; charset=UTF-8");
+    assertEquals(response.getHeader("Cache-Control"), "no-cache");
 
-    verify(ee, messageStore, response);
+    verify(ee, messageStore);
   }
 
   @DataProvider(name = "httpMethod")
@@ -270,7 +257,7 @@ public class JSONResultTest extends PrimeBaseTest {
       objectMapper.writerWithDefaultPrettyPrinter();
     }
     Duration duration = Duration.between(start, Instant.now());
-    double avg = duration.toMillis() / loopCount;
+    long avg = duration.toMillis() / loopCount;
     System.out.println("Time: " + duration.toMillis());
     System.out.println("Each iteration: " + avg);
 
@@ -295,7 +282,7 @@ public class JSONResultTest extends PrimeBaseTest {
     System.out.println("Each iteration: " + avg);
   }
 
-  public class JSONImpl implements JSON {
+  public static class JSONImpl implements JSON {
     private final String cacheControl;
 
     private final String code;

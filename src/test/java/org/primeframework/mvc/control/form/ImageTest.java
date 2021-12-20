@@ -15,12 +15,11 @@
  */
 package org.primeframework.mvc.control.form;
 
+import com.google.inject.Inject;
 import org.example.action.user.EditAction;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.control.ControlBaseTest;
 import org.testng.annotations.Test;
-
-import com.google.inject.Inject;
 
 /**
  * This tests the image control.
@@ -31,110 +30,103 @@ public class ImageTest extends ControlBaseTest {
   @Inject public Image image;
 
   @Test
-  public void actionLess() {
-    ais.setCurrent(new ActionInvocation(null, null, "/image", null, null));
-    new ControlTester(image).
-      attr("name", "image").
-      attr("value", "test-value").
-      attr("class", "css-class").
-      attr("src", "foo.gif").
-      go("<input type=\"hidden\" name=\"image@param\" value=\"param-value\"/>\n" +
-        "<div class=\"css-class-image-button css-class-button css-class-control image-button button control\">\n" +
-        "<div class=\"label-container\"> </div>\n" +
-        "<div class=\"control-container\"><input type=\"image\" class=\"css-class\" id=\"image\" name=\"image\" src=\"foo.gif\" value=\"Image\"/></div>\n" +
-        "</div>\n");
-  }
-
-  @Test
   public void action() {
     ais.setCurrent(new ActionInvocation(new EditAction(), null, "/image", null, null));
-    new ControlTester(image).
-      attr("name", "image").
-      attr("value", "test-value").
-      attr("src", "foo.gif").
-      go("<input type=\"hidden\" name=\"image@param\" value=\"param-value\"/>\n" +
-        "<div class=\"image-button button control\">\n" +
-        "<div class=\"label-container\"> </div>\n" +
-        "<div class=\"control-container\"><input type=\"image\" id=\"image\" name=\"image\" src=\"foo.gif\" value=\"Image\"/></div>\n" +
-        "</div>\n");
-  }
-
-  @Test
-  public void html() {
-    ais.setCurrent(new ActionInvocation(new EditAction(), null, "/image", null, null));
-    new ControlTester(image).
-      attr("name", "html").
-      attr("value", "test-value").
-      attr("src", "foo.gif").
-      go("<input type=\"hidden\" name=\"html@param\" value=\"param-value\"/>\n" +
-        "<div class=\"image-button button control\">\n" +
-        "<div class=\"label-container\"> </div>\n" +
-        "<div class=\"control-container\"><input type=\"image\" id=\"html\" name=\"html\" src=\"foo.gif\" value=\"&lt;Image&gt;\"/></div>\n" +
-        "</div>\n");
+    new ControlTester(image).attr("name", "image")
+                            .attr("value", "test-value")
+                            .attr("src", "foo.gif")
+                            .go("<input type=\"hidden\" name=\"image@param\" value=\"param-value\"/>\n" +
+                                "<div class=\"image-button button control\">\n" +
+                                "<div class=\"label-container\"> </div>\n" +
+                                "<div class=\"control-container\"><input type=\"image\" id=\"image\" name=\"image\" src=\"foo.gif\" value=\"Image\"/></div>\n" +
+                                "</div>\n");
   }
 
   @Test
   public void actionAttribute() {
     ais.setCurrent(new ActionInvocation(new EditAction(), null, "/image", null, null));
-    new ControlTester(image).
-      attr("name", "image").
-      attr("action", "/foo").
-      attr("value", "test-value").
-      attr("src", "foo.gif").
-      go("<input type=\"hidden\" name=\"image@param\" value=\"param-value\"/>\n" +
-        "<input type=\"hidden\" name=\"__a_image\" value=\"/foo\"/>\n" +
-        "<div class=\"image-button button control\">\n" +
-        "<div class=\"label-container\"> </div>\n" +
-        "<div class=\"control-container\"><input type=\"image\" id=\"image\" name=\"image\" src=\"foo.gif\" value=\"Image\"/></div>\n" +
-        "</div>\n");
-  }
-
-  @Test
-  public void ismap() {
-    ais.setCurrent(new ActionInvocation(new EditAction(), null, "/image", null, null));
-    new ControlTester(image).
-      attr("name", "image").
-      attr("value", "test-value").
-      attr("ismap", true).
-      attr("src", "foo.gif").
-      go("<input type=\"hidden\" name=\"image@param\" value=\"param-value\"/>\n" +
-        "<div class=\"image-button button control\">\n" +
-        "<div class=\"label-container\"> </div>\n" +
-        "<div class=\"control-container\"><input type=\"image\" id=\"image\" ismap=\"ismap\" name=\"image\" src=\"foo.gif\" value=\"Image\"/></div>\n" +
-        "</div>\n");
+    new ControlTester(image).attr("name", "image")
+                            .attr("action", "/foo")
+                            .attr("value", "test-value")
+                            .attr("src", "foo.gif")
+                            .go("<input type=\"hidden\" name=\"image@param\" value=\"param-value\"/>\n" +
+                                "<input type=\"hidden\" name=\"__a_image\" value=\"/foo\"/>\n" +
+                                "<div class=\"image-button button control\">\n" +
+                                "<div class=\"label-container\"> </div>\n" +
+                                "<div class=\"control-container\"><input type=\"image\" id=\"image\" name=\"image\" src=\"foo.gif\" value=\"Image\"/></div>\n" +
+                                "</div>\n");
   }
 
   @Test
   public void actionContext() {
     request.setContextPath("/context");
     ais.setCurrent(new ActionInvocation(new EditAction(), null, "/image", null, null));
-    new ControlTester(image).
-      attr("name", "image").
-      attr("value", "test-value").
-      attr("action", "/foo").
-      attr("src", "foo.gif").
-      go("<input type=\"hidden\" name=\"image@param\" value=\"param-value\"/>\n" +
-        "<input type=\"hidden\" name=\"__a_image\" value=\"/context/foo\"/>\n" +
-        "<div class=\"image-button button control\">\n" +
-        "<div class=\"label-container\"> </div>\n" +
-        "<div class=\"control-container\"><input type=\"image\" id=\"image\" name=\"image\" src=\"foo.gif\" value=\"Image\"/></div>\n" +
-        "</div>\n");
+    new ControlTester(image).attr("name", "image")
+                            .attr("value", "test-value")
+                            .attr("action", "/foo")
+                            .attr("src", "foo.gif")
+                            .go("<input type=\"hidden\" name=\"image@param\" value=\"param-value\"/>\n" +
+                                "<input type=\"hidden\" name=\"__a_image\" value=\"/context/foo\"/>\n" +
+                                "<div class=\"image-button button control\">\n" +
+                                "<div class=\"label-container\"> </div>\n" +
+                                "<div class=\"control-container\"><input type=\"image\" id=\"image\" name=\"image\" src=\"foo.gif\" value=\"Image\"/></div>\n" +
+                                "</div>\n");
   }
 
   @Test
   public void actionContextRelative() {
     request.setContextPath("/context");
     ais.setCurrent(new ActionInvocation(new EditAction(), null, "/image", null, null));
-    new ControlTester(image).
-      attr("name", "image").
-      attr("value", "test-value").
-      attr("action", "foo").
-      attr("src", "foo.gif").
-      go("<input type=\"hidden\" name=\"image@param\" value=\"param-value\"/>\n" +
-        "<input type=\"hidden\" name=\"__a_image\" value=\"foo\"/>\n" +
-        "<div class=\"image-button button control\">\n" +
-        "<div class=\"label-container\"> </div>\n" +
-        "<div class=\"control-container\"><input type=\"image\" id=\"image\" name=\"image\" src=\"foo.gif\" value=\"Image\"/></div>\n" +
-        "</div>\n");
+    new ControlTester(image).attr("name", "image")
+                            .attr("value", "test-value")
+                            .attr("action", "foo")
+                            .attr("src", "foo.gif")
+                            .go("<input type=\"hidden\" name=\"image@param\" value=\"param-value\"/>\n" +
+                                "<input type=\"hidden\" name=\"__a_image\" value=\"foo\"/>\n" +
+                                "<div class=\"image-button button control\">\n" +
+                                "<div class=\"label-container\"> </div>\n" +
+                                "<div class=\"control-container\"><input type=\"image\" id=\"image\" name=\"image\" src=\"foo.gif\" value=\"Image\"/></div>\n" +
+                                "</div>\n");
+  }
+
+  @Test
+  public void actionLess() {
+    ais.setCurrent(new ActionInvocation(null, null, "/image", null, null));
+    new ControlTester(image).attr("name", "image")
+                            .attr("value", "test-value")
+                            .attr("class", "css-class")
+                            .attr("src", "foo.gif")
+                            .go("<input type=\"hidden\" name=\"image@param\" value=\"param-value\"/>\n" +
+                                "<div class=\"css-class-image-button css-class-button css-class-control image-button button control\">\n" +
+                                "<div class=\"label-container\"> </div>\n" +
+                                "<div class=\"control-container\"><input type=\"image\" class=\"css-class\" id=\"image\" name=\"image\" src=\"foo.gif\" value=\"Image\"/></div>\n" +
+                                "</div>\n");
+  }
+
+  @Test
+  public void html() {
+    ais.setCurrent(new ActionInvocation(new EditAction(), null, "/image", null, null));
+    new ControlTester(image).attr("name", "html")
+                            .attr("value", "test-value")
+                            .attr("src", "foo.gif")
+                            .go("<input type=\"hidden\" name=\"html@param\" value=\"param-value\"/>\n" +
+                                "<div class=\"image-button button control\">\n" +
+                                "<div class=\"label-container\"> </div>\n" +
+                                "<div class=\"control-container\"><input type=\"image\" id=\"html\" name=\"html\" src=\"foo.gif\" value=\"&lt;Image&gt;\"/></div>\n" +
+                                "</div>\n");
+  }
+
+  @Test
+  public void ismap() {
+    ais.setCurrent(new ActionInvocation(new EditAction(), null, "/image", null, null));
+    new ControlTester(image).attr("name", "image")
+                            .attr("value", "test-value")
+                            .attr("ismap", true)
+                            .attr("src", "foo.gif")
+                            .go("<input type=\"hidden\" name=\"image@param\" value=\"param-value\"/>\n" +
+                                "<div class=\"image-button button control\">\n" +
+                                "<div class=\"label-container\"> </div>\n" +
+                                "<div class=\"control-container\"><input type=\"image\" id=\"image\" ismap=\"ismap\" name=\"image\" src=\"foo.gif\" value=\"Image\"/></div>\n" +
+                                "</div>\n");
   }
 }

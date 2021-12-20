@@ -30,7 +30,7 @@ import com.google.inject.Inject;
  */
 @ControlAttributes(
     required = {
-        @ControlAttribute(name = "name"),
+        @ControlAttribute(name = "name", types = {String.class}),
         @ControlAttribute(name = "items", types = {Collection.class, Map.class, Object[].class})
     },
     optional = {

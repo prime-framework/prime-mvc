@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc.action.result;
 
-import javax.servlet.ServletException;
 import java.io.IOException;
 
 import org.primeframework.mvc.action.result.annotation.NoOp;
@@ -27,7 +26,7 @@ import org.primeframework.mvc.action.result.annotation.NoOp;
  */
 public class NoOpResult implements Result<NoOp> {
   @Override
-  public boolean execute(NoOp annotation) throws IOException, ServletException {
+  public boolean execute(NoOp annotation) throws IOException {
     // No-op
     return true;
   }

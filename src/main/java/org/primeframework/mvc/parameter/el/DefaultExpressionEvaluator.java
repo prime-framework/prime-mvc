@@ -17,6 +17,7 @@ package org.primeframework.mvc.parameter.el;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -55,6 +56,8 @@ public class DefaultExpressionEvaluator implements ExpressionEvaluator {
   @Override
   public String expand(final String str, final Object object, final boolean encode)
       throws ExpressionException {
+
+
     return new StrSubstitutor(new StrLookup<String>() {
       public String lookup(String name) {
         String value = getValue(name, object, Collections.emptyMap());
@@ -62,11 +65,7 @@ public class DefaultExpressionEvaluator implements ExpressionEvaluator {
           return "";
         }
         if (encode) {
-          try {
-            value = URLEncoder.encode(value, "UTF-8");
-          } catch (UnsupportedEncodingException e) {
-            // Impossible
-          }
+          value = URLEncoder.encode(value, StandardCharsets.UTF_8);
         }
 
         return value;

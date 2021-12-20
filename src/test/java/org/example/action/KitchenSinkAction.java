@@ -36,7 +36,6 @@ import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.primeframework.mvc.parameter.annotation.PostParameterMethod;
 import org.primeframework.mvc.parameter.annotation.PreParameterMethod;
-import org.primeframework.mvc.scope.annotation.Session;
 import org.primeframework.mvc.validation.Validatable;
 import org.primeframework.mvc.validation.ValidationMethod;
 import org.primeframework.mvc.validation.annotation.PostValidationMethod;
@@ -61,7 +60,6 @@ import org.primeframework.mvc.validation.annotation.PreValidationMethod;
 public class KitchenSinkAction extends KitchenSinkSuperclass implements Validatable {
   private final MessageStore messageStore;
 
-  @Session
   public Object sessionObject;
 
   @JSONRequest

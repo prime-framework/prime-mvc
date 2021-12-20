@@ -15,15 +15,13 @@
  */
 package org.primeframework.mvc.action.result;
 
-import javax.servlet.ServletContext;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
-import org.primeframework.mvc.util.ResourceTools;
-
-import com.google.inject.Inject;
+import org.primeframework.mvc.http.HTTPContext;
 
 /**
  * Uses a lookup methodology for finding resources based on the action URI, extension, and result code.
@@ -32,13 +30,17 @@ import com.google.inject.Inject;
  */
 public class DefaultResourceLocator implements ResourceLocator {
   private static final Map<String, String> resourceCache = new WeakHashMap<>();
+
   private final ActionInvocationStore actionInvocationStore;
+
+  private final HTTPContext context;
+
   private final ResultStore resultStore;
-  private final ServletContext servletContext;
 
   @Inject
-  public DefaultResourceLocator(ActionInvocationStore actionInvocationStore, ResultStore resultStore, ServletContext servletContext) {
-    this.servletContext = servletContext;
+  public DefaultResourceLocator(ActionInvocationStore actionInvocationStore, ResultStore resultStore,
+                                HTTPContext context) {
+    this.context = context;
     this.resultStore = resultStore;
     this.actionInvocationStore = actionInvocationStore;
   }
@@ -58,23 +60,23 @@ public class DefaultResourceLocator implements ResourceLocator {
       }
 
       if (actionURI.endsWith("/")) {
-        resource = ResourceTools.findResource(servletContext, directory + actionURI + "index.ftl");
+        resource = findResource(directory + actionURI + "index.ftl");
       } else {
         if (extension != null) {
           if (resultCode != null) {
-            resource = ResourceTools.findResource(servletContext, directory + actionURI + "-" + extension + "-" + resultCode + ".ftl");
+            resource = findResource(directory + actionURI + "-" + extension + "-" + resultCode + ".ftl");
           }
           if (resource == null) {
-            resource = ResourceTools.findResource(servletContext, directory + actionURI + "-" + extension + ".ftl");
+            resource = findResource(directory + actionURI + "-" + extension + ".ftl");
           }
         }
 
         // Look for FTL results to forward to
         if (resource == null && resultCode != null) {
-          resource = ResourceTools.findResource(servletContext, directory + actionURI + "-" + resultCode + ".ftl");
+          resource = findResource(directory + actionURI + "-" + resultCode + ".ftl");
         }
         if (resource == null) {
-          resource = ResourceTools.findResource(servletContext, directory + actionURI + ".ftl");
+          resource = findResource(directory + actionURI + ".ftl");
         }
       }
 
@@ -97,7 +99,7 @@ public class DefaultResourceLocator implements ResourceLocator {
         return resource;
       }
 
-      resource = ResourceTools.findResource(servletContext, directory + actionURI + "/index.ftl");
+      resource = findResource(directory + actionURI + "/index.ftl");
 
       // Return the redirect portion of the URI
       if (resource != null) {
@@ -107,5 +109,9 @@ public class DefaultResourceLocator implements ResourceLocator {
 
       return resource;
     }
+  }
+
+  private String findResource(String path) {
+    return context.getResource(path) != null ? path : null;
   }
 }

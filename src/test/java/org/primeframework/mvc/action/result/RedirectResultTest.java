@@ -15,34 +15,36 @@
  */
 package org.primeframework.mvc.action.result;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.annotation.Redirect;
+import org.primeframework.mvc.http.DefaultHTTPRequest;
+import org.primeframework.mvc.http.DefaultHTTPResponse;
+import org.primeframework.mvc.http.HTTPRequest;
+import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;
-import org.primeframework.mvc.message.scope.FlashScope;
 import org.primeframework.mvc.message.scope.MessageScope;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.testng.annotations.Test;
 import static org.easymock.EasyMock.createStrictMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.testng.Assert.assertEquals;
 
 /**
  * This class tests the redirect result.
  *
  * @author Brian Pontarelli
  */
-public class RedirectResultTest {
+public class RedirectResultTest extends PrimeBaseTest {
   @Test
   public void encode() throws IOException {
     Object action = new Object();
@@ -51,21 +53,10 @@ public class RedirectResultTest {
     replay(ee);
 
     List<Message> messages = new ArrayList<>();
-    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    expect(request.getAttribute(FlashScope.KEY)).andReturn(messages);
-    // If we return a session from getSession(false), then removeAttribute will be called once.
-    expect(request.getSession(false)).andReturn(createStrictMock(HttpSession.class));
-    request.removeAttribute(FlashScope.KEY);
-    expect(request.getContextPath()).andReturn("/");
-    expect(request.getRequestURI()).andReturn("/");
-    replay(request);
+    HTTPRequest request = new DefaultHTTPRequest().with(r -> r.contextPath = "/")
+                                                  .with(r -> r.path = "/");
 
-    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    response.setHeader("Cache-Control", "no-cache");
-    response.sendRedirect("result");
-    response.setStatus(302);
-    replay(response);
-
+    HTTPResponse response = new DefaultHTTPResponse(new ByteArrayOutputStream());
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(action, null, "foo", "", null));
     replay(store);
@@ -74,14 +65,15 @@ public class RedirectResultTest {
     expect(messageStore.get(MessageScope.REQUEST)).andReturn(messages);
     messageStore.clear(MessageScope.REQUEST);
     messageStore.addAll(MessageScope.FLASH, messages);
-    messageStore.addAll(MessageScope.FLASH, messages);
     replay(messageStore);
 
     Redirect redirect = new RedirectImpl("success", "${foo}", false, true);
     RedirectResult result = new RedirectResult(messageStore, ee, response, request, store);
     result.execute(redirect);
 
-    verify(response);
+    assertEquals(response.getStatus(), 302);
+    assertEquals(response.getRedirect(), "result");
+    assertEquals(response.getHeader("Cache-Control"), "no-cache");
   }
 
   @Test
@@ -92,19 +84,8 @@ public class RedirectResultTest {
     replay(ee);
 
     List<Message> messages = new ArrayList<>();
-    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    expect(request.getAttribute(FlashScope.KEY)).andReturn(messages);
-    expect(request.getSession(false)).andReturn(null);
-    expect(request.getContextPath()).andReturn("");
-    expect(request.getRequestURI()).andReturn("/");
-    replay(request);
-
-    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    response.setHeader("Cache-Control", "no-cache");
-    response.sendRedirect("result");
-    response.setStatus(302);
-    replay(response);
-
+    HTTPRequest request = new DefaultHTTPRequest();
+    HTTPResponse response = new DefaultHTTPResponse(new ByteArrayOutputStream());
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(action, null, "foo", "", null));
     replay(store);
@@ -113,14 +94,15 @@ public class RedirectResultTest {
     expect(messageStore.get(MessageScope.REQUEST)).andReturn(messages);
     messageStore.clear(MessageScope.REQUEST);
     messageStore.addAll(MessageScope.FLASH, messages);
-    messageStore.addAll(MessageScope.FLASH, messages);
     replay(messageStore);
 
     Redirect redirect = new RedirectImpl("success", "${foo}", false, false);
     RedirectResult result = new RedirectResult(messageStore, ee, response, request, store);
     result.execute(redirect);
 
-    verify(response);
+    assertEquals(response.getStatus(), 302);
+    assertEquals(response.getRedirect(), "result");
+    assertEquals(response.getHeader("Cache-Control"), "no-cache");
   }
 
   @Test
@@ -129,19 +111,8 @@ public class RedirectResultTest {
     replay(ee);
 
     List<Message> messages = new ArrayList<>();
-    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    expect(request.getAttribute(FlashScope.KEY)).andReturn(messages);
-    expect(request.getSession(false)).andReturn(null);
-    expect(request.getContextPath()).andReturn("");
-    expect(request.getRequestURI()).andReturn("/");
-    replay(request);
-
-    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    response.setHeader("Cache-Control", "no-cache");
-    response.sendRedirect("http://www.google.com");
-    response.setStatus(301);
-    replay(response);
-
+    HTTPRequest request = new DefaultHTTPRequest();
+    HTTPResponse response = new DefaultHTTPResponse(new ByteArrayOutputStream());
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/foo", "", null));
     replay(store);
@@ -150,14 +121,15 @@ public class RedirectResultTest {
     expect(messageStore.get(MessageScope.REQUEST)).andReturn(messages);
     messageStore.clear(MessageScope.REQUEST);
     messageStore.addAll(MessageScope.FLASH, messages);
-    messageStore.addAll(MessageScope.FLASH, messages);
     replay(messageStore);
 
     Redirect redirect = new RedirectImpl("success", "http://www.google.com", true, false);
     RedirectResult forwardResult = new RedirectResult(messageStore, ee, response, request, store);
     forwardResult.execute(redirect);
 
-    verify(response);
+    assertEquals(response.getStatus(), 301);
+    assertEquals(response.getRedirect(), "http://www.google.com");
+    assertEquals(response.getHeader("Cache-Control"), "no-cache");
   }
 
   @Test
@@ -166,19 +138,8 @@ public class RedirectResultTest {
     replay(ee);
 
     List<Message> messages = new ArrayList<>();
-    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    expect(request.getAttribute(FlashScope.KEY)).andReturn(messages);
-    expect(request.getSession(false)).andReturn(null);
-    expect(request.getContextPath()).andReturn("");
-    expect(request.getRequestURI()).andReturn("/");
-    replay(request);
-
-    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    response.setHeader("Cache-Control", "no-cache");
-    response.sendRedirect("/foo/bar.jsp");
-    response.setStatus(302);
-    replay(response);
-
+    HTTPRequest request = new DefaultHTTPRequest();
+    HTTPResponse response = new DefaultHTTPResponse(new ByteArrayOutputStream());
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "foo", "", null));
     replay(store);
@@ -187,14 +148,15 @@ public class RedirectResultTest {
     expect(messageStore.get(MessageScope.REQUEST)).andReturn(messages);
     messageStore.clear(MessageScope.REQUEST);
     messageStore.addAll(MessageScope.FLASH, messages);
-    messageStore.addAll(MessageScope.FLASH, messages);
     replay(messageStore);
 
     Redirect redirect = new RedirectImpl("success", "/foo/bar.jsp", false, false);
     RedirectResult forwardResult = new RedirectResult(messageStore, ee, response, request, store);
     forwardResult.execute(redirect);
 
-    verify(response);
+    assertEquals(response.getStatus(), 302);
+    assertEquals(response.getRedirect(), "/foo/bar.jsp");
+    assertEquals(response.getHeader("Cache-Control"), "no-cache");
   }
 
   @Test
@@ -203,19 +165,8 @@ public class RedirectResultTest {
     replay(ee);
 
     List<Message> messages = new ArrayList<>();
-    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    expect(request.getAttribute(FlashScope.KEY)).andReturn(messages);
-    expect(request.getSession(false)).andReturn(null);
-    expect(request.getContextPath()).andReturn("/context-path");
-    expect(request.getRequestURI()).andReturn("/");
-    replay(request);
-
-    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    response.setHeader("Cache-Control", "no-cache");
-    response.sendRedirect("/context-path/foo/bar.jsp");
-    response.setStatus(302);
-    replay(response);
-
+    HTTPRequest request = new DefaultHTTPRequest().with(r -> r.contextPath = "/context-path");
+    HTTPResponse response = new DefaultHTTPResponse(new ByteArrayOutputStream());
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "foo", "", null));
     replay(store);
@@ -224,14 +175,15 @@ public class RedirectResultTest {
     expect(messageStore.get(MessageScope.REQUEST)).andReturn(messages);
     messageStore.clear(MessageScope.REQUEST);
     messageStore.addAll(MessageScope.FLASH, messages);
-    messageStore.addAll(MessageScope.FLASH, messages);
     replay(messageStore);
 
     Redirect redirect = new RedirectImpl("success", "/foo/bar.jsp", false, false);
     RedirectResult forwardResult = new RedirectResult(messageStore, ee, response, request, store);
     forwardResult.execute(redirect);
 
-    verify(response);
+    assertEquals(response.getStatus(), 302);
+    assertEquals(response.getRedirect(), "/context-path/foo/bar.jsp");
+    assertEquals(response.getHeader("Cache-Control"), "no-cache");
   }
 
   @Test
@@ -240,19 +192,8 @@ public class RedirectResultTest {
     replay(ee);
 
     List<Message> messages = new ArrayList<>();
-    HttpServletRequest request = createStrictMock(HttpServletRequest.class);
-    expect(request.getAttribute(FlashScope.KEY)).andReturn(messages);
-    expect(request.getSession(false)).andReturn(null);
-    expect(request.getContextPath()).andReturn("/context-path");
-    expect(request.getRequestURI()).andReturn("/");
-    replay(request);
-
-    HttpServletResponse response = createStrictMock(HttpServletResponse.class);
-    response.setHeader("Cache-Control", "no-cache");
-    response.sendRedirect("foo/bar.jsp");
-    response.setStatus(302);
-    replay(response);
-
+    HTTPRequest request = new DefaultHTTPRequest().with(r -> r.contextPath = "/context-path");
+    HTTPResponse response = new DefaultHTTPResponse(new ByteArrayOutputStream());
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "foo", "", null));
     replay(store);
@@ -261,14 +202,15 @@ public class RedirectResultTest {
     expect(messageStore.get(MessageScope.REQUEST)).andReturn(messages);
     messageStore.clear(MessageScope.REQUEST);
     messageStore.addAll(MessageScope.FLASH, messages);
-    messageStore.addAll(MessageScope.FLASH, messages);
     replay(messageStore);
 
     Redirect redirect = new RedirectImpl("success", "foo/bar.jsp", false, false);
     RedirectResult forwardResult = new RedirectResult(messageStore, ee, response, request, store);
     forwardResult.execute(redirect);
 
-    verify(response);
+    assertEquals(response.getStatus(), 302);
+    assertEquals(response.getRedirect(), "foo/bar.jsp");
+    assertEquals(response.getHeader("Cache-Control"), "no-cache");
   }
 
   public class RedirectImpl implements Redirect {

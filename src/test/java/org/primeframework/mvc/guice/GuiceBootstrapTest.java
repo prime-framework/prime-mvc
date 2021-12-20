@@ -15,25 +15,24 @@
  */
 package org.primeframework.mvc.guice;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-
 import java.io.IOException;
-
-import org.easymock.EasyMock;
-import org.primeframework.mvc.CloseableModule;
-import org.primeframework.mvc.MockConfiguration;
-import org.primeframework.mvc.PrimeBaseTest;
-import org.primeframework.mvc.config.MVCConfiguration;
-import org.primeframework.mvc.servlet.ServletObjectsHolder;
-import org.primeframework.mvc.workflow.MVCWorkflow;
-import org.primeframework.mvc.workflow.WorkflowChain;
-import org.testng.annotations.Test;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 import com.google.inject.util.Modules;
-import static org.testng.Assert.*;
+import org.primeframework.mvc.CloseableModule;
+import org.primeframework.mvc.MockConfiguration;
+import org.primeframework.mvc.PrimeBaseTest;
+import org.primeframework.mvc.config.MVCConfiguration;
+import org.primeframework.mvc.security.MockUserLoginSecurityContext;
+import org.primeframework.mvc.security.UserLoginSecurityContext;
+import org.primeframework.mvc.workflow.MVCWorkflow;
+import org.primeframework.mvc.workflow.WorkflowChain;
+import org.testng.annotations.Test;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertSame;
+import static org.testng.Assert.assertTrue;
 
 /**
  * This class tests the GuiceBootstrap.
@@ -42,6 +41,20 @@ import static org.testng.Assert.*;
  */
 public class GuiceBootstrapTest extends PrimeBaseTest {
   @Test
+  public void overrideModules() {
+    Injector injector = GuiceBootstrap.initialize(Modules.override(new MVCModule()).with(new AbstractModule() {
+      @Override
+      protected void configure() {
+        bind(MVCWorkflow.class).to(TestMVCWorkflow.class);
+        bind(MVCConfiguration.class).to(MockConfiguration.class);
+        bind(UserLoginSecurityContext.class).to(MockUserLoginSecurityContext.class);
+      }
+    }));
+
+    assertSame(injector.getInstance(MVCWorkflow.class).getClass(), TestMVCWorkflow.class);
+  }
+
+  @Test
   public void shutdownAndExplicitModules() {
     Injector injector = GuiceBootstrap.initialize(new MVCModule() {
       @Override
@@ -49,6 +62,7 @@ public class GuiceBootstrapTest extends PrimeBaseTest {
         super.configure();
 
         bind(MVCConfiguration.class).toInstance(new MockConfiguration(2, 1, false, false));
+        bind(UserLoginSecurityContext.class).to(MockUserLoginSecurityContext.class);
 
         install(new CloseableModule());
       }
@@ -60,26 +74,9 @@ public class GuiceBootstrapTest extends PrimeBaseTest {
     assertFalse(injector.getInstance(TestClosable.class).open);
   }
 
-  @Test
-  public void overrideModules() {
-    ServletContext context = EasyMock.createStrictMock(ServletContext.class);
-    EasyMock.replay(context);
-    ServletObjectsHolder.setServletContext(context);
-
-    Injector injector = GuiceBootstrap.initialize(Modules.override(new MVCModule()).with(new AbstractModule() {
-      @Override
-      protected void configure() {
-        bind(MVCWorkflow.class).to(TestMVCWorkflow.class);
-        bind(MVCConfiguration.class).to(MockConfiguration.class);
-      }
-    }));
-
-    assertSame(injector.getInstance(MVCWorkflow.class).getClass(), TestMVCWorkflow.class);
-  }
-
   public static class TestMVCWorkflow implements MVCWorkflow {
     @Override
-    public void perform(WorkflowChain workflowChain) throws IOException, ServletException {
+    public void perform(WorkflowChain workflowChain) throws IOException {
     }
   }
 }

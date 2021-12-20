@@ -18,15 +18,14 @@ package org.primeframework.mvc.jwt;
 import java.util.Collections;
 import java.util.Map;
 
-import com.google.inject.Provider;
 import io.fusionauth.jwt.Verifier;
 import io.fusionauth.jwt.hmac.HMACVerifier;
+import org.primeframework.mvc.security.VerifierProvider;
 
 /**
  * @author Daniel DeGroff
  */
-public class MockVerifierProvider implements Provider<Map<String, Verifier>> {
-
+public class MockVerifierProvider implements VerifierProvider {
   @Override
   public Map<String, Verifier> get() {
     return Collections.singletonMap(null, HMACVerifier.newVerifier("secret"));

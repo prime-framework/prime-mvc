@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc.scope;
 
-import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.List;
 
@@ -48,7 +47,7 @@ public class DefaultScopeStorageWorkflow implements ScopeStorageWorkflow {
    *
    * @param chain The workflow chain.
    */
-  public void perform(WorkflowChain chain) throws IOException, ServletException {
+  public void perform(WorkflowChain chain) throws IOException {
     ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
     Object action = actionInvocation.action;
 

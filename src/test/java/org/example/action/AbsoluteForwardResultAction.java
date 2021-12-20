@@ -22,7 +22,7 @@ import org.primeframework.mvc.action.result.annotation.Forward;
  * @author Daniel DeGroff
  */
 @Action
-@Forward(page = "/templates/absolute-forward.ftl")
+@Forward(page = "/absolute-forward.ftl")
 public class AbsoluteForwardResultAction {
 
   public String get() {

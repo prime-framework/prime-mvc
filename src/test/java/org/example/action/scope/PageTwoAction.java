@@ -18,8 +18,6 @@ package org.example.action.scope;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.control.form.annotation.FormPrepareMethod;
 import org.primeframework.mvc.parameter.annotation.PostParameterMethod;
-import org.primeframework.mvc.scope.annotation.ActionSession;
-import org.primeframework.mvc.scope.annotation.Session;
 
 /**
  * This action does NOT take the URL segment and sets it to 'id' field.
@@ -28,14 +26,12 @@ import org.primeframework.mvc.scope.annotation.Session;
  */
 @Action
 public class PageTwoAction {
-  @Session
   public String searchText;
 
   public String postParameterMethodCalled;
 
   public String formPrepareMethodCalled;
 
-  @ActionSession
   public String searchType;
 
   public String get() {

@@ -15,14 +15,14 @@
  */
 package org.primeframework.mvc.security;
 
-import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 
 import com.google.inject.Inject;
 import org.primeframework.mvc.config.MVCConfiguration;
+import org.primeframework.mvc.http.HTTPMethod;
+import org.primeframework.mvc.http.HTTPRequest;
+import org.primeframework.mvc.http.HTTPTools;
 import org.primeframework.mvc.security.csrf.CSRFProvider;
-import org.primeframework.mvc.servlet.HTTPMethod;
-import org.primeframework.mvc.servlet.ServletTools;
 
 /**
  * A security scheme that authenticates and authorizes users using a UserLoginSecurityContext implementation.
@@ -38,13 +38,13 @@ public class UserLoginSecurityScheme implements SecurityScheme {
 
   private final HTTPMethod method;
 
-  private final HttpServletRequest request;
+  private final HTTPRequest request;
 
   private UserLoginSecurityContext userLoginSecurityContext;
 
   @Inject
   public UserLoginSecurityScheme(MVCConfiguration configuration, UserLoginConstraintsValidator constraintsValidator,
-                                 CSRFProvider csrfProvider, HttpServletRequest request, HTTPMethod method) {
+                                 CSRFProvider csrfProvider, HTTPRequest request, HTTPMethod method) {
     this.configuration = configuration;
     this.constraintsValidator = constraintsValidator;
     this.csrfProvider = csrfProvider;
@@ -73,21 +73,22 @@ public class UserLoginSecurityScheme implements SecurityScheme {
     }
 
     // CSRF on POST only
-    if (method == HTTPMethod.POST) {
+    if (HTTPMethod.POST.is(method)) {
       // Check for CSRF request origins
-      String source = ServletTools.getOriginHeader(request);
+      String source = HTTPTools.getOriginHeader(request);
       if (source == null) {
         throw new UnauthorizedException();
       }
 
-      URI uri = ServletTools.getBaseURI(request);
+      URI uri = HTTPTools.getBaseURI(request);
       URI sourceURI = URI.create(source);
-      if (!uri.getScheme().equalsIgnoreCase(sourceURI.getScheme()) || uri.getPort() != sourceURI.getPort() || !uri.getHost().equalsIgnoreCase(sourceURI.getHost())) {
+      if (uri.getPort() != sourceURI.getPort() || !uri.getScheme().equalsIgnoreCase(sourceURI.getScheme()) || !uri.getHost().equalsIgnoreCase(sourceURI.getHost())) {
         throw new UnauthorizedException();
       }
 
       // Handle CSRF tokens (for POST only)
       if (!csrfProvider.validateRequest(request)) {
+        // TODO : Should we do something less brute force here?
         throw new UnauthorizedException();
       }
     }
