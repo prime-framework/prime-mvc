@@ -673,7 +673,7 @@ public class RequestBuilder {
     Map<String, List<String>> parameters = request.getParameters();
     List<FileInfo> files = request.getFiles();
     byte[] body = request.getBody();
-    Map<String, Object> urlParameters = null;
+    Map<String, List<String>> urlParameters = null;
     BodyHandler bodyHandler = null;
     if (files != null && files.size() > 0) {
       List<FileUpload> fileUploads = files.stream()
@@ -702,14 +702,14 @@ public class RequestBuilder {
         .cookies(restCookies)
         .errorResponseHandler(new ByteArrayResponseHandler())
         .followRedirects(false)
-        .header("Accept-Language", locales.size() > 0 ? locales.stream().map(Locale::toLanguageTag).collect(Collectors.joining(", ")) : null)
-        .header("Content-Type", contentType != null ? (contentType + (characterEncoding != null ? "; charset=" + characterEncoding : "")) : null)
-        .headersMap(request.getHeadersMap())
+        .setHeader("Accept-Language", locales.size() > 0 ? locales.stream().map(Locale::toLanguageTag).collect(Collectors.joining(", ")) : null)
+        .setHeader("Content-Type", contentType != null ? (contentType + (characterEncoding != null ? "; charset=" + characterEncoding : "")) : null)
+        .setHeaders(request.getHeadersMap())
         .method(request.getMethod().name())
         .readTimeout(0)
         .successResponseHandler(new ByteArrayResponseHandler())
         .url("http://localhost:" + request.getPort() + request.getPath())
-        .urlParameters(urlParameters)
+        .addURLParameters(urlParameters)
         .go();
 
     // Extract the cookies and put them in the UserAgent

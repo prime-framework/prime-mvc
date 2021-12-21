@@ -81,7 +81,7 @@ public class PrimeHTTPServerTest extends PrimeBaseTest {
         for (int j = 0; j < 10_000; j++) {
           var response = new RESTClient<>(String.class, String.class)
               .url("http://localhost:8080/echo")
-              .urlParameter("message", name)
+              .addURLParameter("message", name)
               .successResponseHandler(new TextResponseHandler())
               .errorResponseHandler(new TextResponseHandler())
               .get()
