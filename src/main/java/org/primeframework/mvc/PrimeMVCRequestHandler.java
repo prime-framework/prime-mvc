@@ -15,9 +15,6 @@
  */
 package org.primeframework.mvc;
 
-import java.io.Closeable;
-import java.io.IOException;
-
 import com.google.inject.Injector;
 import org.primeframework.mvc.guice.GuiceBootstrap;
 import org.primeframework.mvc.http.HTTPMethod;
@@ -31,7 +28,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Brian Pontarelli
  */
-public class PrimeMVCRequestHandler implements Closeable {
+public class PrimeMVCRequestHandler {
   private static final Logger logger = LoggerFactory.getLogger(PrimeMVCRequestHandler.class);
 
   protected volatile Injector injector;
@@ -39,12 +36,6 @@ public class PrimeMVCRequestHandler implements Closeable {
   public PrimeMVCRequestHandler(Injector injector) {
     logger.info("Initializing Prime");
     this.injector = injector;
-  }
-
-  @Override
-  public void close() throws IOException {
-    logger.info("Shutting down Prime");
-    GuiceBootstrap.shutdown(injector);
   }
 
   /**
@@ -79,6 +70,11 @@ public class PrimeMVCRequestHandler implements Closeable {
       HTTPObjectsHolder.clearRequest();
       HTTPObjectsHolder.clearResponse();
     }
+  }
+
+  public void shutdown() {
+    logger.info("Shutting down Prime MVC");
+    GuiceBootstrap.shutdown(injector);
   }
 
   public void updateInjector(Injector injector) {

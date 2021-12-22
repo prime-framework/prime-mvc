@@ -15,14 +15,13 @@
  */
 package org.primeframework.mvc.test;
 
+import com.google.inject.Injector;
 import org.primeframework.mock.MockUserAgent;
-import org.primeframework.mvc.BasePrimeMain;
 import org.primeframework.mvc.message.TestMessageObserver;
 
 /**
- * This class provides a method for testing a full invocation of Prime. This simulates the JEE web objects
- * (HttpServletRequest, etc.) and an invocation of the PrimeMVCRequestHandler. You can also simulate multiple
- * invocations across a single session by using the same instance of this class multiple times.
+ * This class provides a method for testing a full invocation of Prime. This makes full requests to a running Prime HTTP
+ * server and an instance of the PrimeMVCRequestHandler.
  *
  * @author Brian Pontarelli
  */
@@ -31,25 +30,22 @@ public class RequestSimulator {
 
   public final MockUserAgent userAgent;
 
-  private final BasePrimeMain main;
+  private final Injector injector;
+
+  private final int port;
 
   /**
    * Creates a new request simulator that can be used to simulate requests to a Prime application.
    *
-   * @param main            The PrimeMain that is used to start an HTTP server.
+   * @param port            The port that the server is running on.
+   * @param injector        The Guice injector.
    * @param messageObserver Used to observe messages from within the HTTP server so that they can be asserted on.
    */
-  public RequestSimulator(BasePrimeMain main, TestMessageObserver messageObserver) {
-    this.main = main;
+  public RequestSimulator(int port, Injector injector, TestMessageObserver messageObserver) {
+    this.port = port;
+    this.injector = injector;
     this.messageObserver = messageObserver;
     this.userAgent = new MockUserAgent();
-
-    // Start the server
-    this.main.start();
-  }
-
-  public void shutdown() {
-    main.stop();
   }
 
   /**
@@ -60,6 +56,6 @@ public class RequestSimulator {
    * @return The RequestBuilder.
    */
   public RequestBuilder test(String path) {
-    return new RequestBuilder(main.determinePort(), path, main.getInjector(), userAgent, messageObserver);
+    return new RequestBuilder(port, path, injector, userAgent, messageObserver);
   }
 }

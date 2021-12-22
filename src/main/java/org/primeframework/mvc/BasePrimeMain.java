@@ -15,11 +15,9 @@
  */
 package org.primeframework.mvc;
 
-import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import org.primeframework.mvc.guice.GuiceBootstrap;
-import org.primeframework.mvc.http.HTTPContext;
 import org.primeframework.mvc.netty.PrimeHTTPServer;
 
 /**
@@ -46,10 +44,7 @@ import org.primeframework.mvc.netty.PrimeHTTPServer;
  * @author Brian Pontarelli
  */
 public abstract class BasePrimeMain {
-  @Inject
-  protected HTTPContext context;
-
-  protected volatile Injector injector;
+  protected Injector injector;
 
   protected PrimeMVCRequestHandler requestHandler;
 
@@ -71,23 +66,39 @@ public abstract class BasePrimeMain {
     requestHandler.updateInjector(injector);
   }
 
-  public void restart() {
-    stop();
-    start();
-  }
-
   public void start() {
-    requestHandler = new PrimeMVCRequestHandler(null);
-    hup();
-
     int port = determinePort();
     server = new PrimeHTTPServer(port, requestHandler);
+    requestHandler = new PrimeMVCRequestHandler(null);
+
+    Runtime.getRuntime().addShutdownHook(new PrimeHTTPServerShutdown(server, requestHandler));
+
+    // Load the injector
+    hup();
+
+    // Start the server
     server.start();
   }
 
   public void stop() {
-    server.stop();
+    server.shutdown();
   }
 
   protected abstract Module[] modules();
+
+  private static class PrimeHTTPServerShutdown extends Thread {
+    private final PrimeMVCRequestHandler requestHandler;
+
+    private final PrimeHTTPServer server;
+
+    public PrimeHTTPServerShutdown(PrimeHTTPServer server, PrimeMVCRequestHandler requestHandler) {
+      this.server = server;
+      this.requestHandler = requestHandler;
+    }
+
+    public void run() {
+      server.shutdown();
+      requestHandler.shutdown();
+    }
+  }
 }

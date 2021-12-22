@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc.netty;
 
-import java.net.Socket;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -34,7 +33,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Brian Pontarelli
  */
-public class PrimeHTTPServer implements Runnable {
+public class PrimeHTTPServer {
   private static final Logger logger = LoggerFactory.getLogger(PrimeHTTPServer.class);
 
   private final PrimeMVCRequestHandler main;
@@ -52,7 +51,26 @@ public class PrimeHTTPServer implements Runnable {
     return port;
   }
 
-  public void run() {
+  public void shutdown() {
+    logger.info("Stopping down Prime HTTP server");
+    if (channel != null) {
+      logger.info("Channel exists. Closing");
+      ChannelFuture future = channel.close();
+
+      try {
+        future.get(10_000, TimeUnit.SECONDS);
+      } catch (InterruptedException e) {
+        logger.error("Interrupted while shutting down the server.", e);
+      } catch (ExecutionException e) {
+        logger.error("Error while shutting down the server.", e);
+      } catch (TimeoutException e) {
+        logger.error("Timed out after 10 seconds while shutting down the server.", e);
+      }
+    }
+  }
+
+  public void start() {
+    logger.info("Starting Prime HTTP server on port [{}]", port);
     NioEventLoopGroup bossGroup = new NioEventLoopGroup();
     NioEventLoopGroup workerGroup = new NioEventLoopGroup();
 
@@ -68,45 +86,18 @@ public class PrimeHTTPServer implements Runnable {
       logger.error("Unable to start Prime HTTP server", e);
       throw new IllegalStateException(e);
     } finally {
-      bossGroup.shutdownGracefully();
-      workerGroup.shutdownGracefully();
-    }
-  }
-
-  public void start() {
-    logger.info("Starting Prime HTTP server on port [{}]", port);
-    Thread thread = new Thread(this, "Prime HTTP Server");
-    thread.start();
-
-    // Wait for startup
-    long start = System.currentTimeMillis();
-    while (System.currentTimeMillis() - start < 10_000) {
-      try (Socket socket = new Socket("localhost", port)) {
-        if (socket.isConnected()) {
-          logger.info("Prime HTTP server started");
-          break;
-        }
-
-        Thread.sleep(500);
+      logger.info("Shutting down Prime HTTP server");
+      try {
+        bossGroup.shutdownGracefully();
+        workerGroup.shutdownGracefully();
       } catch (Exception e) {
-        // Ignore
+        e.printStackTrace();
       }
-    }
-  }
-
-  public void stop() {
-    logger.info("Stopping down Prime HTTP server");
-    if (channel != null) {
-      ChannelFuture future = channel.close();
 
       try {
-        future.get(10_000, TimeUnit.SECONDS);
-      } catch (InterruptedException e) {
-        logger.error("Interrupted while shutting down the server.", e);
-      } catch (ExecutionException e) {
-        logger.error("Error while shutting down the server.", e);
-      } catch (TimeoutException e) {
-        logger.error("Timed out after 10 seconds while shutting down the server.", e);
+        main.shutdown();
+      } catch (Exception e) {
+        e.printStackTrace();
       }
     }
   }
