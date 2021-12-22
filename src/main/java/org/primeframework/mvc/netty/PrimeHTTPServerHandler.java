@@ -72,9 +72,9 @@ public class PrimeHTTPServerHandler extends SimpleChannelInboundHandler<HttpObje
 
   private final byte[] buf = new byte[65536];
 
-  private final PrimeMVCRequestHandler main;
-
   private final int port;
+
+  private final PrimeMVCRequestHandler requestHandler;
 
   private final String scheme;
 
@@ -88,10 +88,10 @@ public class PrimeHTTPServerHandler extends SimpleChannelInboundHandler<HttpObje
 
   private HttpRequest request;
 
-  public PrimeHTTPServerHandler(int port, String scheme, PrimeMVCRequestHandler main) {
+  public PrimeHTTPServerHandler(int port, String scheme, PrimeMVCRequestHandler requestHandler) {
     this.port = port;
     this.scheme = scheme;
-    this.main = main;
+    this.requestHandler = requestHandler;
   }
 
   @Override
@@ -131,7 +131,7 @@ public class PrimeHTTPServerHandler extends SimpleChannelInboundHandler<HttpObje
           HTTPOutputStream outputStream = new HTTPOutputStream(context, buf);
           DefaultHTTPResponse primeResponse = new DefaultHTTPResponse(outputStream);
           outputStream.setResponse(primeResponse);
-          main.handleRequest(primeRequest, primeResponse);
+          requestHandler.handleRequest(primeRequest, primeResponse);
           primeResponse.getOutputStream().close();
 
           ChannelFuture future = context.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);

@@ -17,6 +17,8 @@ package org.primeframework.mvc.test;
 
 import com.google.inject.Injector;
 import org.primeframework.mock.MockUserAgent;
+import org.primeframework.mvc.BasePrimeMain;
+import org.primeframework.mvc.TestPrimeMainThread;
 import org.primeframework.mvc.message.TestMessageObserver;
 
 /**
@@ -30,22 +32,31 @@ public class RequestSimulator {
 
   public final MockUserAgent userAgent;
 
-  private final Injector injector;
+  private final BasePrimeMain main;
 
-  private final int port;
+  private final TestPrimeMainThread thread;
 
   /**
    * Creates a new request simulator that can be used to simulate requests to a Prime application.
    *
-   * @param port            The port that the server is running on.
-   * @param injector        The Guice injector.
+   * @param main            The main application entry point for the app being tested (or a test entry point). This
+   *                        starts the HTTP server and is blocking, but we'll start a thread for it and manage the
+   *                        lifecycle in this class.
    * @param messageObserver Used to observe messages from within the HTTP server so that they can be asserted on.
    */
-  public RequestSimulator(int port, Injector injector, TestMessageObserver messageObserver) {
-    this.port = port;
-    this.injector = injector;
+  public RequestSimulator(BasePrimeMain main, TestMessageObserver messageObserver) {
+    this.main = main;
+    this.thread = new TestPrimeMainThread(main);
     this.messageObserver = messageObserver;
     this.userAgent = new MockUserAgent();
+  }
+
+  public Injector getInjector() {
+    return main.getInjector();
+  }
+
+  public void shutdown() {
+    this.thread.shutdown();
   }
 
   /**
@@ -56,6 +67,6 @@ public class RequestSimulator {
    * @return The RequestBuilder.
    */
   public RequestBuilder test(String path) {
-    return new RequestBuilder(port, path, injector, userAgent, messageObserver);
+    return new RequestBuilder(main.determinePort(), path, main.getInjector(), userAgent, messageObserver);
   }
 }

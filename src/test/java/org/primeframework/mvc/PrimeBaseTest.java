@@ -41,7 +41,6 @@ import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.config.DefaultActionConfigurationBuilder;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.content.guice.ObjectMapperProvider;
-import org.primeframework.mvc.guice.GuiceBootstrap;
 import org.primeframework.mvc.guice.MVCModule;
 import org.primeframework.mvc.http.DefaultHTTPRequest;
 import org.primeframework.mvc.http.DefaultHTTPResponse;
@@ -55,7 +54,6 @@ import org.primeframework.mvc.message.scope.ApplicationScope;
 import org.primeframework.mvc.message.scope.CookieFlashScope;
 import org.primeframework.mvc.message.scope.FlashScope;
 import org.primeframework.mvc.message.scope.RequestScope;
-import org.primeframework.mvc.netty.PrimeHTTPServer;
 import org.primeframework.mvc.security.MockUserLoginSecurityContext;
 import org.primeframework.mvc.security.UserLoginSecurityContext;
 import org.primeframework.mvc.security.VerifierProvider;
@@ -86,8 +84,6 @@ public abstract class PrimeBaseTest {
 
   protected static MetricRegistry metricRegistry = new MetricRegistry();
 
-  protected static PrimeHTTPServer server;
-
   protected static RequestSimulator simulator;
 
   @Inject public CSRFProvider csrfProvider;
@@ -114,17 +110,15 @@ public abstract class PrimeBaseTest {
     };
 
     Module module = Modules.override(mvcModule).with(new TestContentModule(), new TestSecurityModule(), new TestScopeModule());
-    injector = GuiceBootstrap.initialize(module);
-    server = new PrimeHTTPServer(8080, new PrimeMVCRequestHandler(injector));
-    new PrimeHTTPServerThread(server);
-
-    simulator = new RequestSimulator(8080, injector, messageObserver);
+    TestPrimeMain main = new TestPrimeMain(8080, module);
+    simulator = new RequestSimulator(main, messageObserver);
+    injector = simulator.getInjector();
     context = injector.getInstance(HTTPContext.class);
   }
 
   @AfterSuite
   public static void shutdown() {
-    server.shutdown();
+    simulator.shutdown();
   }
 
   @AfterMethod

@@ -67,14 +67,18 @@ public abstract class BasePrimeMain {
   }
 
   public void start() {
-    int port = determinePort();
-    server = new PrimeHTTPServer(port, requestHandler);
-    requestHandler = new PrimeMVCRequestHandler(null);
+    // Add the shutdown hook (which will do nothing for testing purposes)
+    Runtime.getRuntime().addShutdownHook(new PrimeHTTPServerShutdown());
 
-    Runtime.getRuntime().addShutdownHook(new PrimeHTTPServerShutdown(server, requestHandler));
+    // Make the request handler
+    requestHandler = new PrimeMVCRequestHandler(null);
 
     // Load the injector
     hup();
+
+    // Create the server
+    int port = determinePort();
+    server = new PrimeHTTPServer(port, requestHandler);
 
     // Start the server
     server.start();
@@ -86,16 +90,7 @@ public abstract class BasePrimeMain {
 
   protected abstract Module[] modules();
 
-  private static class PrimeHTTPServerShutdown extends Thread {
-    private final PrimeMVCRequestHandler requestHandler;
-
-    private final PrimeHTTPServer server;
-
-    public PrimeHTTPServerShutdown(PrimeHTTPServer server, PrimeMVCRequestHandler requestHandler) {
-      this.server = server;
-      this.requestHandler = requestHandler;
-    }
-
+  private class PrimeHTTPServerShutdown extends Thread {
     public void run() {
       server.shutdown();
       requestHandler.shutdown();

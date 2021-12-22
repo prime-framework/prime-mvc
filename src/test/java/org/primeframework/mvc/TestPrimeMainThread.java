@@ -17,7 +17,6 @@ package org.primeframework.mvc;
 
 import java.net.Socket;
 
-import org.primeframework.mvc.netty.PrimeHTTPServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,21 +26,21 @@ import org.slf4j.LoggerFactory;
  *
  * @author Brian Pontarelli
  */
-public class PrimeHTTPServerThread extends Thread {
-  private static final Logger logger = LoggerFactory.getLogger(PrimeHTTPServerThread.class);
+public class TestPrimeMainThread extends Thread {
+  private static final Logger logger = LoggerFactory.getLogger(TestPrimeMainThread.class);
 
-  private final PrimeHTTPServer server;
+  private final BasePrimeMain main;
 
-  public PrimeHTTPServerThread(PrimeHTTPServer server) {
-    super("Prime HTTP Server");
-    this.server = server;
-    setDaemon(false);
+  public TestPrimeMainThread(BasePrimeMain main) {
+    super("Prime HTTP server thread for testing");
+    this.main = main;
+    setDaemon(true);
     start();
 
     // Wait for startup
     long start = System.currentTimeMillis();
     while (System.currentTimeMillis() - start < 10_000) {
-      try (Socket socket = new Socket("localhost", server.getPort())) {
+      try (Socket socket = new Socket("localhost", main.determinePort())) {
         if (socket.isConnected()) {
           logger.info("Prime HTTP server started");
           break;
@@ -55,6 +54,10 @@ public class PrimeHTTPServerThread extends Thread {
   }
 
   public void run() {
-    server.start();
+    main.start();
+  }
+
+  public void shutdown() {
+    main.stop();
   }
 }

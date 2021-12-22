@@ -24,7 +24,6 @@ import com.google.inject.Module;
 import com.google.inject.util.Modules;
 import org.primeframework.mvc.PrimeBaseTest.TestContentModule;
 import org.primeframework.mvc.PrimeBaseTest.TestMVCConfigurationModule;
-import org.primeframework.mvc.guice.GuiceBootstrap;
 import org.primeframework.mvc.guice.MVCModule;
 import org.primeframework.mvc.http.DefaultHTTPRequest;
 import org.primeframework.mvc.http.DefaultHTTPResponse;
@@ -36,7 +35,6 @@ import org.primeframework.mvc.message.scope.ApplicationScope;
 import org.primeframework.mvc.message.scope.CookieFlashScope;
 import org.primeframework.mvc.message.scope.FlashScope;
 import org.primeframework.mvc.message.scope.RequestScope;
-import org.primeframework.mvc.netty.PrimeHTTPServer;
 import org.primeframework.mvc.security.MockOAuthUserLoginSecurityContext;
 import org.primeframework.mvc.security.UserLoginSecurityContext;
 import org.primeframework.mvc.security.VerifierProvider;
@@ -58,13 +56,11 @@ public class JWTRefreshTokenLoginTest {
 
   public DefaultHTTPResponse response;
 
-  public PrimeHTTPServer server;
-
   public RequestSimulator simulator;
 
   @AfterClass
   public void afterClass() {
-    server.shutdown();
+    simulator.shutdown();
   }
 
   @AfterMethod
@@ -87,10 +83,9 @@ public class JWTRefreshTokenLoginTest {
     };
 
     Module module = Modules.override(mvcModule).with(new TestContentModule(), new TestSecurityModule(), new TestScopeModule());
-    injector = GuiceBootstrap.initialize(module);
-    server = new PrimeHTTPServer(8081, new PrimeMVCRequestHandler(injector));
-    new PrimeHTTPServerThread(server);
-    simulator = new RequestSimulator(8081, injector, messageObserver);
+    TestPrimeMain main = new TestPrimeMain(8081, module);
+    simulator = new RequestSimulator(main, messageObserver);
+    injector = simulator.getInjector();
   }
 
   /**

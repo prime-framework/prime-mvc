@@ -52,9 +52,8 @@ public class PrimeHTTPServer {
   }
 
   public void shutdown() {
-    logger.info("Stopping down Prime HTTP server");
+    logger.info("Shutting down Prime HTTP server");
     if (channel != null) {
-      logger.info("Channel exists. Closing");
       ChannelFuture future = channel.close();
 
       try {
