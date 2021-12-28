@@ -183,6 +183,9 @@
       <inspection_tool class="scwbasic-protection-set_InjectionAvoidCodeInjectionUseSafeConstructornoarguments" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
       <inspection_tool class="scwbasic-protection-set_InjectionAvoidSQLInjectionUseParameterizedQueriesPreparedStatement" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
       <inspection_tool class="scwbasic-protection-set_InjectionAvoidSQLInjectionUseParameterizedQueriesStatement" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+      <inspection_tool class="scwbasic-protection-set_VulnerableLog4jdependency-Log4ShellCVE-2021-44228CVE-2021-45046CVE-2021-45105" enabled="true" level="WARNING" enabled_by_default="true" />
+      <inspection_tool class="scwbasic-protection-set_VulnerableLog4jversion-Log4ShellCVE-2021-44228CVE-2021-45046CVE-2021-45105" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+      <inspection_tool class="scwbasic-protection-set_VulnerableLog4jversionproperty-Log4ShellCVE-2021-44228CVE-2021-45046CVE-2021-45105" enabled="true" level="WARNING" enabled_by_default="true" />
       <inspection_tool class="scwbasic-protection-set_XMLInjectionSetmissingsecureprocessingfeature" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
       <inspection_tool class="scwbasic-protection-set_XMLInjectionSetsecureprocessingfeaturetotrue" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
       <inspection_tool class="scwbasic-protection-set_XXEDocumentBuilderFactoryAddmissingfeaturedissallow-doctype-decl" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
@@ -287,11 +290,8 @@
       <inspection_tool class="scwowasp-top-10_TLSWeakEncryptionOutdatedVersion" enabled="true" level="SENSEI WARNING" enabled_by_default="true" />
       <inspection_tool class="scwowasp-top-10_Untrustedinputinlogging" enabled="true" level="SENSEI INFO" enabled_by_default="true" />
       <inspection_tool class="scwowasp-top-10_VulnerableLog4jdependency-Log4ShellCVE-2021-44228" enabled="true" level="WARNING" enabled_by_default="true" />
-      <inspection_tool class="scwowasp-top-10_VulnerableLog4jdependency-Log4ShellCVE-2021-44228CVE-2021-45046CVE-2021-45105" enabled="true" level="WARNING" enabled_by_default="true" />
       <inspection_tool class="scwowasp-top-10_VulnerableLog4jversion-Log4ShellCVE-2021-44228" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
-      <inspection_tool class="scwowasp-top-10_VulnerableLog4jversion-Log4ShellCVE-2021-44228CVE-2021-45046CVE-2021-45105" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
       <inspection_tool class="scwowasp-top-10_VulnerableLog4jversionproperty-Log4ShellCVE-2021-44228" enabled="true" level="WARNING" enabled_by_default="true" />
-      <inspection_tool class="scwowasp-top-10_VulnerableLog4jversionproperty-Log4ShellCVE-2021-44228CVE-2021-45046CVE-2021-45105" enabled="true" level="WARNING" enabled_by_default="true" />
       <inspection_tool class="scwowasp-top-10_X509DisabledvalidationinTrustManager" enabled="true" level="SENSEI WARNING" enabled_by_default="true" />
     </profile>
     <version value="1.0" />
