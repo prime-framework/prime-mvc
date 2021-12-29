@@ -52,7 +52,7 @@ public class PrimeHTTPServer {
   }
 
   public void shutdown() {
-    logger.info("Shutting down Prime HTTP server");
+    logger.info("Shutting down the Prime HTTP server");
     if (channel != null) {
       ChannelFuture future = channel.close();
 
@@ -85,16 +85,10 @@ public class PrimeHTTPServer {
       logger.error("Unable to start Prime HTTP server", e);
       throw new IllegalStateException(e);
     } finally {
-      logger.info("Shutting down Prime HTTP server");
+      logger.info("Gracefully closing the server resources");
       try {
         bossGroup.shutdownGracefully();
         workerGroup.shutdownGracefully();
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-
-      try {
-        main.shutdown();
       } catch (Exception e) {
         e.printStackTrace();
       }

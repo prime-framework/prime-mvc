@@ -43,6 +43,9 @@ import org.slf4j.LoggerFactory;
 public class GuiceBootstrap {
   private static final Logger logger = LoggerFactory.getLogger(GuiceBootstrap.class);
 
+  private GuiceBootstrap() {
+  }
+
   /**
    * Please do not invoke this method unless you know what you are doing. This initializes Guice and does it once only
    * so that synchronization is not used. This is called by the PrimeServletContextListener when the context is created
@@ -86,6 +89,7 @@ public class GuiceBootstrap {
    */
   public static void shutdown(Injector injector) {
     Map<Key<?>, Binding<?>> bindings = injector.getBindings();
+    Set<Class<?>> closed = new HashSet<>();
     for (Key<?> key : bindings.keySet()) {
       Type type = key.getTypeLiteral().getType();
       if (type instanceof ParameterizedType) {
@@ -96,10 +100,16 @@ public class GuiceBootstrap {
         Class<?> bindingType = (Class<?>) type;
         if (Closeable.class.isAssignableFrom(bindingType) && Scopes.isSingleton(bindings.get(key))) {
           Closeable closable = (Closeable) injector.getInstance(key);
+          if (closable == null || closed.contains(closable.getClass())) {
+            continue;
+          }
+
           try {
             closable.close();
           } catch (Throwable t) {
-            logger.error("Unable to shutdown Closeable [" + key + "]");
+            logger.error("Unable to shutdown Closeable [{}]", key);
+          } finally {
+            closed.add(closable.getClass());
           }
         }
       }

@@ -58,6 +58,6 @@ public class TestPrimeMainThread extends Thread {
   }
 
   public void shutdown() {
-    main.stop();
+    main.shutdown();
   }
 }

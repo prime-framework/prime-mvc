@@ -66,10 +66,25 @@ public abstract class BasePrimeMain {
     requestHandler.updateInjector(injector);
   }
 
-  public void start() {
+  /**
+   * Registers the shutdown hook when Prime is started as an app rather than for testing (usually in a separate
+   * thread).
+   */
+  public void registerShutdownHook() {
     // Add the shutdown hook (which will do nothing for testing purposes)
     Runtime.getRuntime().addShutdownHook(new PrimeHTTPServerShutdown());
+  }
 
+  /**
+   * Shuts down the entire Prime system (HTTP server and MVC). This can be called from tests. It is also called by the
+   * shutdown hook if it has been registered.
+   */
+  public void shutdown() {
+    server.shutdown();
+    requestHandler.shutdown();
+  }
+
+  public void start() {
     // Make the request handler
     requestHandler = new PrimeMVCRequestHandler(null);
 
@@ -84,16 +99,11 @@ public abstract class BasePrimeMain {
     server.start();
   }
 
-  public void stop() {
-    server.shutdown();
-  }
-
   protected abstract Module[] modules();
 
   private class PrimeHTTPServerShutdown extends Thread {
     public void run() {
-      server.shutdown();
-      requestHandler.shutdown();
+      BasePrimeMain.this.shutdown();
     }
   }
 }
