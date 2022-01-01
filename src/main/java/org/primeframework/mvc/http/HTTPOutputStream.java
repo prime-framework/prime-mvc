@@ -43,6 +43,8 @@ public class HTTPOutputStream extends OutputStream {
 
   private int index;
 
+  private boolean oneByteWritten;
+
   private DefaultHTTPResponse response;
 
   private State state = State.None;
@@ -65,6 +67,10 @@ public class HTTPOutputStream extends OutputStream {
 
   public void setResponse(DefaultHTTPResponse response) {
     this.response = response;
+  }
+
+  public boolean wasOneByteWritten() {
+    return oneByteWritten;
   }
 
   @Override
@@ -133,6 +139,7 @@ public class HTTPOutputStream extends OutputStream {
             .forEach(cookie -> headers.add("Set-Cookie", ServerCookieEncoder.LAX.encode(toNettyCookie(cookie))));
     DefaultHttpResponse nettyResponse = new DefaultHttpResponse(HttpVersion.HTTP_1_1, status, headers);
     context.writeAndFlush(nettyResponse);
+    oneByteWritten = true;
   }
 
   enum BufferResult {

@@ -16,11 +16,13 @@
 package org.example.action;
 
 import org.primeframework.mvc.action.annotation.Action;
+import org.primeframework.mvc.action.result.annotation.Forward;
 
 /**
  * @author Daniel DeGroff
  */
 @Action
+@Forward(code = "error", status = 500)
 public class OnlyKnownParametersAction {
   public String post() {
     return "input";

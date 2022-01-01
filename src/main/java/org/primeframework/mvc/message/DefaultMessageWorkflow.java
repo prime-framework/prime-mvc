@@ -24,8 +24,8 @@ import org.primeframework.mvc.message.scope.MessageScope;
 import org.primeframework.mvc.workflow.WorkflowChain;
 
 /**
- * This is the default message workflow implementation. It removes all flash messages from the session and places them
- * in the request.
+ * This is the default message workflow implementation. It removes all flash messages from the flash scope and places
+ * them in the request.
  *
  * @author Brian Pontarelli
  */

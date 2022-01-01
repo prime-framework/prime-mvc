@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2021, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,25 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.workflow;
+package org.example.action;
+
+import org.primeframework.mvc.action.annotation.Action;
+import org.primeframework.mvc.action.result.annotation.Forward;
 
 /**
- * Interface for handling {@link Throwable}s that occur in Prime. This allows us to handle both RuntimeExceptions and
- * Errors (or any other type of unchecked exceptions).
+ * Test for errors (500s).
  *
- * @author James Humphrey
+ * @author Brian Pontarelli
  */
-public interface ExceptionHandler {
-  /**
-   * Handles exceptions that occur in prime.
-   *
-   * @param e the exception
-   */
-  void handle(Throwable e);
+@Action
+@Forward(code = "error", status = 500, page = "/error.ftl")
+public class ThrowsExceptionAction {
+  public String message;
+
+  public boolean errorCalled;
+  
+  public String execute() {
+    errorCalled = true;
+    throw new IllegalStateException();
+  }
 }

@@ -180,5 +180,10 @@ public class DefaultHTTPResponse implements HTTPResponse {
 
     addHeader(name, value);
   }
+
+  @Override
+  public boolean wasOneByteWritten() {
+    return !(outputStream instanceof HTTPOutputStream) || ((HTTPOutputStream) outputStream).wasOneByteWritten();
+  }
 }
 

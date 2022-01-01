@@ -16,40 +16,52 @@
 package org.primeframework.mvc.workflow;
 
 import com.google.inject.Inject;
+import org.primeframework.mvc.action.result.ResultStore;
+import org.primeframework.mvc.config.MVCConfiguration;
+import org.primeframework.mvc.http.HTTPResponse;
 
 /**
  * @author James Humphrey
  */
 public class DefaultExceptionHandler implements ExceptionHandler {
+  private final MVCConfiguration configuration;
+
   private final TypedExceptionHandlerFactory factory;
 
+  private final HTTPResponse response;
+
+  private final ResultStore resultStore;
+
   @Inject
-  public DefaultExceptionHandler(TypedExceptionHandlerFactory factory) {
+  public DefaultExceptionHandler(MVCConfiguration configuration, TypedExceptionHandlerFactory factory,
+                                 HTTPResponse response, ResultStore resultStore) {
+    this.configuration = configuration;
     this.factory = factory;
+    this.response = response;
+    this.resultStore = resultStore;
   }
 
   @Override
-  @SuppressWarnings(value = "unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public void handle(Throwable exception) {
     Class<? extends Throwable> klass = exception.getClass();
     boolean handled = false;
     while (klass != Throwable.class) {
       TypedExceptionHandler handler = factory.build(klass);
-      if (handler != null) {
-        handler.handle(exception);
-        handled = true;
-        break;
-      } else {
+      if (handler == null) {
         klass = (Class<? extends Throwable>) klass.getSuperclass();
+        continue;
       }
+
+      handler.handle(exception);
+      handled = true;
+      break;
     }
 
     if (!handled) {
-      if (exception instanceof RuntimeException) {
-        throw (RuntimeException) exception;
-      } else {
-        throw (Error) exception;
-      }
+      // Set the result code to the default so that the ErrorWorkflow can handle it
+      resultStore.set(configuration.exceptionResultCode());
+      response.setStatus(500);
     }
   }
 }

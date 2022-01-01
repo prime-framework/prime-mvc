@@ -24,6 +24,7 @@ import org.primeframework.mvc.action.ActionInvocationWorkflow;
 import org.primeframework.mvc.action.ActionMappingWorkflow;
 import org.primeframework.mvc.action.result.ResultInvocationWorkflow;
 import org.primeframework.mvc.content.ContentWorkflow;
+import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.message.MessageWorkflow;
 import org.primeframework.mvc.parameter.ParameterWorkflow;
 import org.primeframework.mvc.parameter.PostParameterWorkflow;
@@ -48,7 +49,7 @@ public class DefaultMVCWorkflow implements MVCWorkflow {
 
   private final ExceptionHandler exceptionHandler;
 
-  private final MissingWorkflow missingWorkflow;
+  private final HTTPResponse response;
 
   private final List<Workflow> workflows;
 
@@ -69,10 +70,11 @@ public class DefaultMVCWorkflow implements MVCWorkflow {
                             StaticResourceWorkflow staticResourceWorkflow,
                             MissingWorkflow missingWorkflow,
                             ErrorWorkflow errorWorkflow,
-                            ExceptionHandler exceptionHandler) {
+                            ExceptionHandler exceptionHandler,
+                            HTTPResponse response) {
     this.exceptionHandler = exceptionHandler;
     this.errorWorkflow = errorWorkflow;
-    this.missingWorkflow = missingWorkflow;
+    this.response = response;
     this.workflows = asList(
         savedRequestWorkflow,
         actionMappingWorkflow,
@@ -87,7 +89,8 @@ public class DefaultMVCWorkflow implements MVCWorkflow {
         actionInvocationWorkflow,
         scopeStorageWorkflow,
         resultInvocationWorkflow,
-        staticResourceWorkflow);
+        staticResourceWorkflow,
+        missingWorkflow);
   }
 
   /**
@@ -98,9 +101,16 @@ public class DefaultMVCWorkflow implements MVCWorkflow {
    */
   public void perform(WorkflowChain workflowChain) throws IOException {
     try {
-      WorkflowChain chain = new SubWorkflowChain(workflows, new SubWorkflowChain(List.of(missingWorkflow), workflowChain));
+      WorkflowChain chain = new SubWorkflowChain(workflows, workflowChain);
       chain.continueWorkflow();
     } catch (RuntimeException | Error e) {
+      // If any bytes were written, we are screwed and can't do anything here. Re-throw
+      if (response.wasOneByteWritten()) {
+        throw e;
+      }
+
+      // Otherwise, we can handle the exception. If there was an action class for this request, then it should have
+      // defined the results for each type of exception. If there wasn't, we can use the error path.
       exceptionHandler.handle(e);
 
       WorkflowChain errorChain = new SubWorkflowChain(singletonList(errorWorkflow), workflowChain);

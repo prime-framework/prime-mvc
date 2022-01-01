@@ -99,7 +99,7 @@ public class GlobalTest extends PrimeBaseTest {
     test.createFile()
         .simulate(() -> simulator.test("/scope/page-one")
                                  .withFile("file", test.tempFile, "text/plain")
-                                 .get()
+                                 .post()
                                  .assertStatusCode(200)
                                  .assertHeaderContains("Cache-Control", "no-cache"));
   }
@@ -707,7 +707,7 @@ public class GlobalTest extends PrimeBaseTest {
                                  .withParameter("foo/0/bar/bam", "purple")
                                  .post()
                                  .assertStatusCode(500)
-                                 .assertHeaderDoesNotContain("Cache-Control"));
+                                 .assertHeaderContains("Cache-Control", "no-cache"));
   }
 
   @Test

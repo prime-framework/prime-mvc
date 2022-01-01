@@ -35,4 +35,8 @@ public class PageOneAction {
   public String get() {
     return "input";
   }
+
+  public String post() {
+    return "input";
+  }
 }

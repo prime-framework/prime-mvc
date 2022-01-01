@@ -18,11 +18,10 @@ package org.primeframework.mvc.workflow;
 import java.io.IOException;
 import java.util.List;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.action.result.ResultInvocationWorkflow;
 import org.primeframework.mvc.message.MessageWorkflow;
 import org.primeframework.mvc.scope.ScopeStorageWorkflow;
-
-import com.google.inject.Inject;
 import static java.util.Arrays.asList;
 
 /**

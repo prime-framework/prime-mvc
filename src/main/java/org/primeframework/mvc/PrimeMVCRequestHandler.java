@@ -61,8 +61,6 @@ public class PrimeMVCRequestHandler {
     try {
       injector.getInstance(MVCWorkflow.class).perform(null);
     } catch (Throwable t) {
-      // TODO : Netty : If the response has already been partially flushed and the headers have been written back, this
-      //  won't do anything. We need to figure out if that is okay, or if we want to handle it some how.
       response.setStatus(500);
 
       logger.error("Error encountered", t);

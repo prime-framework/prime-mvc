@@ -116,4 +116,9 @@ public interface HTTPResponse {
   void setDateHeader(String name, ZonedDateTime value);
 
   void setHeader(String name, String value);
+
+  /**
+   * @return If a single byte (or more) has been written to the client.
+   */
+  boolean wasOneByteWritten();
 }
