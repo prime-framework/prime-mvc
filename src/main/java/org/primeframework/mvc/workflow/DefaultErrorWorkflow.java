@@ -40,6 +40,7 @@ public class DefaultErrorWorkflow implements ErrorWorkflow {
 
   @Override
   public void perform(WorkflowChain workflowChain) throws IOException {
+    // TODO : Netty : Should this handle when a request is just for an FTL file with an action and the FTL file explodes?
     WorkflowChain chain = new SubWorkflowChain(errorWorkflows, workflowChain);
     chain.continueWorkflow();
   }

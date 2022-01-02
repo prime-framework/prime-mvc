@@ -109,8 +109,7 @@ public class DefaultMVCWorkflow implements MVCWorkflow {
         throw e;
       }
 
-      // Otherwise, we can handle the exception. If there was an action class for this request, then it should have
-      // defined the results for each type of exception. If there wasn't, we can use the error path.
+      // Otherwise, we can handle the exception and then invoke the error workflow
       exceptionHandler.handle(e);
 
       WorkflowChain errorChain = new SubWorkflowChain(singletonList(errorWorkflow), workflowChain);
