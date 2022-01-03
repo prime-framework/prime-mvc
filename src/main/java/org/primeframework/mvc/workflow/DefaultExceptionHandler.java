@@ -19,11 +19,15 @@ import com.google.inject.Inject;
 import org.primeframework.mvc.action.result.ResultStore;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.http.HTTPResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author James Humphrey
  */
 public class DefaultExceptionHandler implements ExceptionHandler {
+  private static final Logger logger = LoggerFactory.getLogger(DefaultExceptionHandler.class);
+
   private final MVCConfiguration configuration;
 
   private final TypedExceptionHandlerFactory factory;
@@ -59,6 +63,8 @@ public class DefaultExceptionHandler implements ExceptionHandler {
     }
 
     if (!handled) {
+      logger.error("Unhandled exception occurred", exception);
+
       // Set the result code to the default so that the ErrorWorkflow can handle it
       resultStore.set(configuration.exceptionResultCode());
       response.setStatus(500);
