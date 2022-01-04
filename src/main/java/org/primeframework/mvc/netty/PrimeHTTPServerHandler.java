@@ -102,6 +102,16 @@ public class PrimeHTTPServerHandler extends SimpleChannelInboundHandler<HttpObje
   }
 
   @Override
+  public void exceptionCaught(ChannelHandlerContext context, Throwable cause) {
+    if (logger.isDebugEnabled()) {
+      logger.debug("Unhandled exception.", cause);
+    }
+
+    reset();
+    context.close();
+  }
+
+  @Override
   protected void channelRead0(ChannelHandlerContext context, HttpObject msg) {
     try {
       if (msg instanceof HttpRequest) {
