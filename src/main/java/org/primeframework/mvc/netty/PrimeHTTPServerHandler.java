@@ -106,7 +106,14 @@ public class PrimeHTTPServerHandler extends SimpleChannelInboundHandler<HttpObje
     try {
       if (msg instanceof HttpRequest) {
         request = (HttpRequest) msg;
-        parseRequest(request, context);
+
+        // Parse the request and if it is invalid, bail with a 400 status code
+        if (!parseRequest(request, context)) {
+          FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.BAD_REQUEST);
+          ChannelFuture future = context.writeAndFlush(response);
+          future.addListener(ChannelFutureListener.CLOSE);
+          reset();
+        }
       } else if (msg instanceof HttpContent) {
         HttpContent chunk = (HttpContent) msg;
         if (decoder != null) {
@@ -168,6 +175,10 @@ public class PrimeHTTPServerHandler extends SimpleChannelInboundHandler<HttpObje
   }
 
   private String parseHostHeader(String host) {
+    if (host == null) {
+      return null;
+    }
+
     int index = host.indexOf(':');
     if (index > 0) {
       return host.substring(0, index);
@@ -176,7 +187,7 @@ public class PrimeHTTPServerHandler extends SimpleChannelInboundHandler<HttpObje
     return host;
   }
 
-  private void parseRequest(HttpRequest msg, ChannelHandlerContext context) throws IOException {
+  private boolean parseRequest(HttpRequest msg, ChannelHandlerContext context) throws IOException {
     primeRequest = new DefaultHTTPRequest();
 
     // Handle the networking pieces
@@ -227,6 +238,11 @@ public class PrimeHTTPServerHandler extends SimpleChannelInboundHandler<HttpObje
     primeRequest.setPort(port);
     primeRequest.setScheme(scheme);
 
+    // Validate the request before reading the body and processing everything via the MVC
+    if (requestInvalid(primeRequest)) {
+      return false;
+    }
+
     // Setup the body handler
     String contentType = primeRequest.getContentType();
     contentType = contentType != null ? contentType : "";
@@ -240,6 +256,12 @@ public class PrimeHTTPServerHandler extends SimpleChannelInboundHandler<HttpObje
       // TODO : Netty : Should we make a custom OutputStream that prevents large requests from blowing out RAM?
       outputStream = new ByteArrayOutputStream();
     }
+
+    return true;
+  }
+
+  private boolean requestInvalid(DefaultHTTPRequest primeRequest) {
+    return primeRequest.getHost() == null || primeRequest.getHost().isBlank();
   }
 
   private void reset() {
