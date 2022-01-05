@@ -42,7 +42,7 @@ public class PrimeHTTPServerTest extends PrimeBaseTest {
 //      assertEquals(response.statusCode(), 200);
 //      assertTrue(response.body().contains("Brian Pontarelli"));
       var response = new RESTClient<>(String.class, String.class)
-          .url("http://localhost:8080/post")
+          .url("http://localhost:" + simulator.getPort() + "/post")
           .successResponseHandler(new TextResponseHandler())
           .errorResponseHandler(new TextResponseHandler())
           .post()
@@ -60,7 +60,7 @@ public class PrimeHTTPServerTest extends PrimeBaseTest {
     PostAction.invoked = false;
     HttpResponse<String> response = HttpClient.newHttpClient()
                                               .send(HttpRequest.newBuilder()
-                                                               .uri(URI.create("http://localhost:8080/post"))
+                                                               .uri(URI.create("http://localhost:" + simulator.getPort() + "/post"))
                                                                .POST(BodyPublishers.noBody())
                                                                .build(),
                                                   info -> BodySubscribers.ofString(StandardCharsets.UTF_8)
@@ -80,7 +80,7 @@ public class PrimeHTTPServerTest extends PrimeBaseTest {
       Thread thread = new Thread(() -> {
         for (int j = 0; j < 10_000; j++) {
           var response = new RESTClient<>(String.class, String.class)
-              .url("http://localhost:8080/echo")
+              .url("http://localhost:" + simulator.getPort() + "/echo")
               .addURLParameter("message", name)
               .successResponseHandler(new TextResponseHandler())
               .errorResponseHandler(new TextResponseHandler())

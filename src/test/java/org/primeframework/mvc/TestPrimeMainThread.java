@@ -40,7 +40,7 @@ public class TestPrimeMainThread extends Thread {
     // Wait for startup
     long start = System.currentTimeMillis();
     while (System.currentTimeMillis() - start < 10_000) {
-      try (Socket socket = new Socket("localhost", main.determinePort())) {
+      try (Socket socket = new Socket("localhost", main.configuration().port)) {
         if (socket.isConnected()) {
           logger.info("Prime HTTP server started");
           break;

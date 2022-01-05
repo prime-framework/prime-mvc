@@ -16,6 +16,7 @@
 package org.primeframework.mvc;
 
 import com.google.inject.Module;
+import org.primeframework.mvc.netty.PrimeHTTPServerConfiguration;
 
 /**
  * A test implementation of the BasePrimeMain.
@@ -23,18 +24,18 @@ import com.google.inject.Module;
  * @author Brian Pontarelli
  */
 public class TestPrimeMain extends BasePrimeMain {
+  private final PrimeHTTPServerConfiguration configuration;
+
   private final Module[] modules;
 
-  private final int port;
-
-  public TestPrimeMain(int port, Module... modules) {
-    this.port = port;
+  public TestPrimeMain(PrimeHTTPServerConfiguration configuration, Module... modules) {
+    this.configuration = configuration;
     this.modules = modules;
   }
 
   @Override
-  public int determinePort() {
-    return port;
+  public PrimeHTTPServerConfiguration configuration() {
+    return configuration;
   }
 
   @Override

@@ -36,19 +36,19 @@ import org.slf4j.LoggerFactory;
 public class PrimeHTTPServer {
   private static final Logger logger = LoggerFactory.getLogger(PrimeHTTPServer.class);
 
-  private final PrimeMVCRequestHandler main;
+  private final PrimeHTTPServerConfiguration configuration;
 
-  private final int port;
+  private final PrimeMVCRequestHandler main;
 
   private Channel channel;
 
-  public PrimeHTTPServer(int port, PrimeMVCRequestHandler main) {
-    this.port = port;
+  public PrimeHTTPServer(PrimeHTTPServerConfiguration configuration, PrimeMVCRequestHandler main) {
+    this.configuration = configuration;
     this.main = main;
   }
 
   public int getPort() {
-    return port;
+    return configuration.port;
   }
 
   public void shutdown() {
@@ -69,7 +69,7 @@ public class PrimeHTTPServer {
   }
 
   public void start() {
-    logger.info("Starting Prime HTTP server on port [{}]", port);
+    logger.info("Starting Prime HTTP server on port [{}]", configuration.port);
     NioEventLoopGroup bossGroup = new NioEventLoopGroup();
     NioEventLoopGroup workerGroup = new NioEventLoopGroup();
 
@@ -77,9 +77,10 @@ public class PrimeHTTPServer {
       ServerBootstrap bootstrap = new ServerBootstrap();
       bootstrap.group(bossGroup, workerGroup);
       bootstrap.channel(NioServerSocketChannel.class);
-      bootstrap.childHandler(new PrimeHTTPServerInitializer(port, "http", main));
+      bootstrap.handler(new PrimeMainChannelExceptionHandler());
+      bootstrap.childHandler(new PrimeHTTPServerInitializer(configuration, main));
 
-      channel = bootstrap.bind(port).sync().channel();
+      channel = bootstrap.bind(configuration.port).sync().channel();
       channel.closeFuture().sync();
     } catch (InterruptedException e) {
       logger.error("Unable to start Prime HTTP server", e);

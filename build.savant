@@ -59,6 +59,7 @@ project(group: "org.primeframework", name: "prime-mvc", version: "2.0.5", licens
       dependency(id: "io.netty:netty-codec:${nettyVersion}")
       dependency(id: "io.netty:netty-codec-http:${nettyVersion}")
       dependency(id: "io.netty:netty-common:${nettyVersion}")
+      dependency(id: "io.netty:netty-handler:${nettyVersion}")
       dependency(id: "io.netty:netty-transport:${nettyVersion}")
       dependency(id: "javax.inject:javax.inject:1.0.0")
       dependency(id: "org.freemarker:freemarker:${freemarkerVersion}")

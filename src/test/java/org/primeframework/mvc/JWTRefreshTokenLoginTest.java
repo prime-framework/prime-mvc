@@ -35,6 +35,7 @@ import org.primeframework.mvc.message.scope.ApplicationScope;
 import org.primeframework.mvc.message.scope.CookieFlashScope;
 import org.primeframework.mvc.message.scope.FlashScope;
 import org.primeframework.mvc.message.scope.RequestScope;
+import org.primeframework.mvc.netty.PrimeHTTPServerConfiguration;
 import org.primeframework.mvc.security.MockOAuthUserLoginSecurityContext;
 import org.primeframework.mvc.security.UserLoginSecurityContext;
 import org.primeframework.mvc.security.VerifierProvider;
@@ -83,7 +84,7 @@ public class JWTRefreshTokenLoginTest {
     };
 
     Module module = Modules.override(mvcModule).with(new TestContentModule(), new TestSecurityModule(), new TestScopeModule());
-    TestPrimeMain main = new TestPrimeMain(8081, module);
+    TestPrimeMain main = new TestPrimeMain(new PrimeHTTPServerConfiguration(9081, 0, "http"), module);
     simulator = new RequestSimulator(main, messageObserver);
     injector = simulator.getInjector();
   }
@@ -147,7 +148,7 @@ public class JWTRefreshTokenLoginTest {
 
   @Test
   public void refreshTokenEndpointUp() {
-    MockOAuthUserLoginSecurityContext.TokenEndpoint = "http://localhost:8081/oauth/token";
+    MockOAuthUserLoginSecurityContext.TokenEndpoint = "http://localhost:" + simulator.getPort() + "/oauth/token";
 
     simulator.test("/oauth/login")
              .withParameter("expired", "true")

@@ -104,6 +104,17 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
+          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-handler/4.1.70/netty-handler-4.1.70.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-handler/4.1.70/netty-handler-4.1.70-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
           <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-codec/4.1.70/netty-codec-4.1.70.jar!/" />
         </CLASSES>
         <JAVADOC />
@@ -424,17 +435,6 @@
         <JAVADOC />
         <SOURCES>
           <root url="jar://$USER_HOME$/.savant/cache/com/inversoft/jackson5/3.0.0/jackson5-3.0.0-src.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" scope="RUNTIME">
-      <library>
-        <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-handler/4.1.70/netty-handler-4.1.70.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-handler/4.1.70/netty-handler-4.1.70-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>

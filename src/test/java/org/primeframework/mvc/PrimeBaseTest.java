@@ -54,6 +54,7 @@ import org.primeframework.mvc.message.scope.ApplicationScope;
 import org.primeframework.mvc.message.scope.CookieFlashScope;
 import org.primeframework.mvc.message.scope.FlashScope;
 import org.primeframework.mvc.message.scope.RequestScope;
+import org.primeframework.mvc.netty.PrimeHTTPServerConfiguration;
 import org.primeframework.mvc.security.MockUserLoginSecurityContext;
 import org.primeframework.mvc.security.UserLoginSecurityContext;
 import org.primeframework.mvc.security.VerifierProvider;
@@ -110,7 +111,7 @@ public abstract class PrimeBaseTest {
     };
 
     Module module = Modules.override(mvcModule).with(new TestContentModule(), new TestSecurityModule(), new TestScopeModule());
-    TestPrimeMain main = new TestPrimeMain(8080, module);
+    TestPrimeMain main = new TestPrimeMain(new PrimeHTTPServerConfiguration(9080, 0, "http"), module);
     simulator = new RequestSimulator(main, messageObserver);
     injector = simulator.getInjector();
     context = injector.getInstance(HTTPContext.class);

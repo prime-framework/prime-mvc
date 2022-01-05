@@ -19,6 +19,7 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import org.primeframework.mvc.guice.GuiceBootstrap;
 import org.primeframework.mvc.netty.PrimeHTTPServer;
+import org.primeframework.mvc.netty.PrimeHTTPServerConfiguration;
 
 /**
  * An abstract class that is used to create the main entry point for Prime (HTTP server and MVC).
@@ -50,7 +51,7 @@ public abstract class BasePrimeMain {
 
   protected PrimeHTTPServer server;
 
-  public abstract int determinePort();
+  public abstract PrimeHTTPServerConfiguration configuration();
 
   public Injector getInjector() {
     return injector;
@@ -92,8 +93,7 @@ public abstract class BasePrimeMain {
     hup();
 
     // Create the server
-    int port = determinePort();
-    server = new PrimeHTTPServer(port, requestHandler);
+    server = new PrimeHTTPServer(configuration(), requestHandler);
 
     // Start the server
     server.start();

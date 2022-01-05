@@ -16,8 +16,12 @@
 package org.primeframework.mvc;
 
 import java.io.File;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
@@ -1109,6 +1113,46 @@ public class GlobalTest extends PrimeBaseTest {
                                  .assertDoesNotContainsCookie("cookie1")
                                  .assertDoesNotContainsCookie("cookie2")
                                  .assertDoesNotContainsCookie("fusionauth.sso"));
+  }
+
+  @Test(enabled = false)
+  public void manual_tooManyOpenFiles() throws Exception {
+    // Cause a connection reset to the HTTP server, and only close every 100th connection.
+    // - This will cause the connection reset and eventually also cause a 'Too many open files' exception.
+    for (int i = 0; i < 250_000; i++) {
+      if (i % 5_000 == 0) {
+        System.out.println("Iteration [" + i + "]....");
+      }
+
+      try {
+        Socket socket = new Socket();
+        socket.setSoLinger(true, 0);
+        socket.connect(new InetSocketAddress("localhost", 8080));
+        OutputStream os = socket.getOutputStream();
+        // Build an HTTP request body
+        os.write((
+            "POST /inform HTTP/1.1\r\n" +
+                "Host: 192.168.1.44:8080\r\n" +
+                "Accept: */*\r\n" +
+                "Content-Length: 8588\r\n" +
+                "\r\n"
+        ).getBytes(StandardCharsets.UTF_8));
+
+        os.flush();
+        if (i % 100 == 0) {
+          socket.close();
+        }
+
+      } catch (Exception e) {
+        System.out.println("[Test Exception] [" + e.getMessage() + "]");
+      }
+    }
+
+    boolean finish = false;
+    while (!finish) {
+      System.out.println("Waiting.... kill the test, or pause the debugger and set finish = true.");
+      Thread.sleep(10_000);
+    }
   }
 
   @DataProvider(name = "methodOverrides")

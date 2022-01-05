@@ -55,6 +55,10 @@ public class RequestSimulator {
     return main.getInjector();
   }
 
+  public int getPort() {
+    return main.configuration().port;
+  }
+
   public void shutdown() {
     this.thread.shutdown();
   }
@@ -67,6 +71,6 @@ public class RequestSimulator {
    * @return The RequestBuilder.
    */
   public RequestBuilder test(String path) {
-    return new RequestBuilder(main.determinePort(), path, main.getInjector(), userAgent, messageObserver);
+    return new RequestBuilder(getPort(), path, main.getInjector(), userAgent, messageObserver);
   }
 }

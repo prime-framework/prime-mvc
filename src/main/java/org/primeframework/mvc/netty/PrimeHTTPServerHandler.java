@@ -72,11 +72,9 @@ public class PrimeHTTPServerHandler extends SimpleChannelInboundHandler<HttpObje
 
   private final byte[] buf = new byte[65536];
 
-  private final int port;
+  private final PrimeHTTPServerConfiguration configuration;
 
   private final PrimeMVCRequestHandler requestHandler;
-
-  private final String scheme;
 
   private Path binaryFile;
 
@@ -88,9 +86,8 @@ public class PrimeHTTPServerHandler extends SimpleChannelInboundHandler<HttpObje
 
   private HttpRequest request;
 
-  public PrimeHTTPServerHandler(int port, String scheme, PrimeMVCRequestHandler requestHandler) {
-    this.port = port;
-    this.scheme = scheme;
+  public PrimeHTTPServerHandler(PrimeHTTPServerConfiguration configuration, PrimeMVCRequestHandler requestHandler) {
+    this.configuration = configuration;
     this.requestHandler = requestHandler;
   }
 
@@ -99,16 +96,6 @@ public class PrimeHTTPServerHandler extends SimpleChannelInboundHandler<HttpObje
     if (decoder != null) {
       decoder.cleanFiles();
     }
-  }
-
-  @Override
-  public void exceptionCaught(ChannelHandlerContext context, Throwable cause) {
-    if (logger.isDebugEnabled()) {
-      logger.debug("Unhandled exception.", cause);
-    }
-
-    reset();
-    context.close();
   }
 
   @Override
@@ -245,8 +232,8 @@ public class PrimeHTTPServerHandler extends SimpleChannelInboundHandler<HttpObje
     primeRequest.setMultipart(HttpPostRequestDecoder.isMultipart(request));
     primeRequest.setPath(query.rawPath());
     primeRequest.addParameters(query.parameters());
-    primeRequest.setPort(port);
-    primeRequest.setScheme(scheme);
+    primeRequest.setPort(configuration.port);
+    primeRequest.setScheme(configuration.scheme);
 
     // Validate the request before reading the body and processing everything via the MVC
     if (requestInvalid(primeRequest)) {

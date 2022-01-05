@@ -76,7 +76,7 @@ public class CSRFTest extends PrimeBaseTest {
 
     configuration.csrfEnabled = true;
     simulator.test("/secure")
-             .withSingleHeader("Referer", "http://localhost:8080/secure")
+             .withSingleHeader("Referer", "http://localhost:" + simulator.getPort() + "/secure")
              .withCSRFToken(csrfProvider.getToken(request))
              .post()
              .assertStatusCode(200)

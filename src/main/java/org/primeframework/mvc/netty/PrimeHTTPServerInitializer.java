@@ -15,21 +15,22 @@
  */
 package org.primeframework.mvc.netty;
 
+import java.util.concurrent.TimeUnit;
+
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.HttpServerCodec;
+import io.netty.handler.codec.http.HttpServerKeepAliveHandler;
+import io.netty.handler.timeout.ReadTimeoutHandler;
 import org.primeframework.mvc.PrimeMVCRequestHandler;
 
 public class PrimeHTTPServerInitializer extends ChannelInitializer<SocketChannel> {
+  private final PrimeHTTPServerConfiguration configuration;
+
   private final PrimeMVCRequestHandler main;
 
-  private final int port;
-
-  private final String scheme;
-
-  public PrimeHTTPServerInitializer(int port, String scheme, PrimeMVCRequestHandler main) {
-    this.port = port;
-    this.scheme = scheme;
+  public PrimeHTTPServerInitializer(PrimeHTTPServerConfiguration configuration, PrimeMVCRequestHandler main) {
+    this.configuration = configuration;
     this.main = main;
   }
 
@@ -37,6 +38,9 @@ public class PrimeHTTPServerInitializer extends ChannelInitializer<SocketChannel
   public void initChannel(SocketChannel ch) {
     ch.pipeline()
       .addLast(new HttpServerCodec())
-      .addLast(new PrimeHTTPServerHandler(port, scheme, main));
+      .addLast(new ReadTimeoutHandler(configuration.readTimeout, TimeUnit.SECONDS))
+      .addLast(new HttpServerKeepAliveHandler())
+      .addLast(new PrimeHTTPServerHandler(configuration, main))
+      .addLast(new PrimeChannelFinalExceptionHandler());
   }
 }
