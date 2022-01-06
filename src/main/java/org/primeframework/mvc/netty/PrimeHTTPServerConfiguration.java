@@ -27,7 +27,7 @@ public class PrimeHTTPServerConfiguration {
   /**
    * HTTP connection read timeout in seconds.
    */
-  public final int readTimeout;
+  public final long readTimeout;
 
   /**
    * The scheme used by the channel handler.
