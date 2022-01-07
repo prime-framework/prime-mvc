@@ -86,9 +86,10 @@
     <file url="PROJECT" charset="UTF-8" />
   </component>
   <component name="EntryPointsManager">
-    <list size="2">
-      <item index="0" class="java.lang.String" itemvalue="org.primeframework.mvc.action.annotation.Action" />
-      <item index="1" class="java.lang.String" itemvalue="org.primeframework.mvc.parameter.annotation.UnknownParameters" />
+    <list size="3">
+      <item index="0" class="java.lang.String" itemvalue="com.google.inject.Inject" />
+      <item index="1" class="java.lang.String" itemvalue="org.primeframework.mvc.action.annotation.Action" />
+      <item index="2" class="java.lang.String" itemvalue="org.primeframework.mvc.parameter.annotation.UnknownParameters" />
     </list>
   </component>
   <component name="IdProvider" IDEtalkID="FAFCC8F55516B0FC710A9E287F066E00" />
@@ -2050,6 +2051,22 @@
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_14" project-jdk-name="Java 14" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
+  </component>
+  <component name="ProjectRunConfigurationManager">
+    <configuration default="false" name="Localhost" type="Remote">
+      <module name="prime-mvc" />
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="5005" />
+      <option name="AUTO_RESTART" value="false" />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="5005" />
+        <option name="LOCAL" value="false" />
+      </RunnerSettings>
+      <method v="2" />
+    </configuration>
   </component>
   <component name="TemplateDataLanguageMappings">
     <file url="file://$PROJECT_DIR$/src/test/resources/json" dialect="JSON" />

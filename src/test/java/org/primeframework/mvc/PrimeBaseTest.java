@@ -32,6 +32,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import com.google.inject.Singleton;
 import com.google.inject.util.Modules;
 import org.example.action.user.EditAction;
 import org.primeframework.mvc.action.ActionInvocation;
@@ -41,8 +42,8 @@ import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.config.DefaultActionConfigurationBuilder;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.content.guice.ObjectMapperProvider;
+import org.primeframework.mvc.cors.CORSConfiguration;
 import org.primeframework.mvc.cors.CORSConfigurationProvider;
-import org.primeframework.mvc.cors.NoCORSConfigurationProvider;
 import org.primeframework.mvc.guice.MVCModule;
 import org.primeframework.mvc.http.DefaultHTTPRequest;
 import org.primeframework.mvc.http.DefaultHTTPResponse;
@@ -81,6 +82,8 @@ public abstract class PrimeBaseTest {
 
   public static MockConfiguration configuration = new MockConfiguration();
 
+  public static CORSConfiguration corsConfiguration;
+
   protected static HTTPContext context;
 
   protected static Injector injector;
@@ -106,10 +109,10 @@ public abstract class PrimeBaseTest {
       protected void configure() {
         super.configure();
         install(new TestMVCConfigurationModule());
+        bind(CORSConfigurationProvider.class).to(TestCORSConfigurationProvider.class).in(Singleton.class);
         bind(MessageObserver.class).toInstance(messageObserver);
         bind(MetricRegistry.class).toInstance(metricRegistry);
         bind(UserLoginSecurityContext.class).to(MockUserLoginSecurityContext.class);
-        bind(CORSConfigurationProvider.class).to(NoCORSConfigurationProvider.class);
       }
     };
 
@@ -253,6 +256,13 @@ public abstract class PrimeBaseTest {
       map.put(params[i].toString(), (List<String>) params[i + 1]);
     }
     return map;
+  }
+
+  public static class TestCORSConfigurationProvider implements CORSConfigurationProvider {
+    @Override
+    public CORSConfiguration get() {
+      return corsConfiguration;
+    }
   }
 
   public static class TestContentModule extends AbstractModule {

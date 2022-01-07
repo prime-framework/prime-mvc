@@ -56,6 +56,7 @@ public class CORSRequestWorkflow implements MVCWorkflow {
           .withAllowedOrigins(corsConfiguration.allowedOrigins)
           .withDebugEnabled(corsConfiguration.debug)
           .withDebugger(debugger)
+          .withExcludedPathPattern(corsConfiguration.excludedPathPattern)
           .withExposedHeaders(corsConfiguration.exposedHeaders)
           .withPreflightMaxAge(corsConfiguration.preflightMaxAgeInSeconds);
 

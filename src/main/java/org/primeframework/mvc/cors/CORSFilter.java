@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 import org.primeframework.mvc.http.HTTPMethod;
 import org.primeframework.mvc.http.HTTPRequest;
 import org.primeframework.mvc.http.HTTPResponse;
+import org.primeframework.mvc.http.HTTPStrings.Headers;
 import org.primeframework.mvc.http.HTTPTools;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.slf4j.Logger;
@@ -54,95 +55,18 @@ import org.slf4j.LoggerFactory;
  * @author Daniel DeGroff
  * @see <a href="http://www.w3.org/TR/cors/">CORS specification</a>
  */
-//@SuppressWarnings({"WeakerAccess", "unused", "JavaDoc", "SameParameterValue", "ConstantConditions"})
 public final class CORSFilter {
-  // ----------------------------------------------------- Instance variables
-
   /**
    * {@link Collection} of non-simple HTTP methods. Case-sensitive.
    */
-  private static final Collection<HTTPMethod> COMPLEX_HTTP_METHODS = Set.of(HTTPMethod.PATCH, HTTPMethod.PUT, HTTPMethod.DELETE, HTTPMethod.TRACE, HTTPMethod.CONNECT);
+  private static final Collection<HTTPMethod> ComplexHTTPMethods = Set.of(HTTPMethod.PATCH, HTTPMethod.PUT, HTTPMethod.DELETE, HTTPMethod.TRACE, HTTPMethod.CONNECT);
 
   /**
-   * Regex for excluding URI patterns from CORS filter processing
-   */
-  private static final Pattern EXCLUDED_URI_PATTERN = Pattern.compile("^/account.*|^/admin.*|^/support.*|^/ajax.*|^/css/.*|^/fonts/.*|^/images/.*|^/js/.*");
-
-
-  // -------------------------------------------------------- Request Headers
-
-  /**
-   * {@link Collection} of HTTP methods. Case-sensitive.
-   *
-   * @see <a href="http://tools.ietf.org/html/rfc2616#section-5.1.1">http://tools.ietf.org/html/rfc2616#section-5.1.1</a>
-   */
-  private static final Collection<HTTPMethod> HTTP_METHODS = Set.of(HTTPMethod.OPTIONS, HTTPMethod.GET, HTTPMethod.HEAD,
-      HTTPMethod.POST, HTTPMethod.PATCH, HTTPMethod.PUT, HTTPMethod.DELETE, HTTPMethod.TRACE, HTTPMethod.CONNECT);
-
-  /**
-   * The Access-Control-Request-Headers header indicates which headers will be used in the actual request as part of the
-   * preflight request.
-   */
-  private static final String REQUEST_HEADER_ACCESS_CONTROL_REQUEST_HEADERS = "Access-Control-Request-Headers";
-
-  /**
-   * The Access-Control-Request-Method header indicates which method will be used in the actual request as part of the
-   * preflight request.
-   */
-  private static final String REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD = "Access-Control-Request-Method";
-
-  // -------------------------------------------------------- Response Headers
-
-  /**
-   * The Origin header indicates where the cross-origin request or preflight request originates from.
-   */
-  private static final String REQUEST_HEADER_ORIGIN = "Origin";
-
-  /**
-   * The Access-Control-Allow-Credentials header indicates whether the response to request can be exposed when the omit
-   * credentials flag is unset. When part of the response to a preflight request it indicates that the actual request
-   * can include user credentials.
-   */
-  private static final String RESPONSE_HEADER_ACCESS_CONTROL_ALLOW_CREDENTIALS = "Access-Control-Allow-Credentials";
-
-  /**
-   * The Access-Control-Allow-Headers header indicates, as part of the response to a preflight request, which header
-   * field names can be used during the actual request.
-   */
-  private static final String RESPONSE_HEADER_ACCESS_CONTROL_ALLOW_HEADERS = "Access-Control-Allow-Headers";
-
-  /**
-   * The Access-Control-Allow-Methods header indicates, as part of the response to a preflight request, which methods
-   * can be used during the actual request.
-   */
-  private static final String RESPONSE_HEADER_ACCESS_CONTROL_ALLOW_METHODS = "Access-Control-Allow-Methods";
-
-  /**
-   * The Access-Control-Allow-Origin header indicates whether a resource can be shared based by returning the value of
-   * the Origin request header in the response.
-   */
-  private static final String RESPONSE_HEADER_ACCESS_CONTROL_ALLOW_ORIGIN = "Access-Control-Allow-Origin";
-
-  /**
-   * The Access-Control-Expose-Headers header indicates which headers are safe to expose to the API of a CORS API
-   * specification
-   */
-  private static final String RESPONSE_HEADER_ACCESS_CONTROL_EXPOSE_HEADERS = "Access-Control-Expose-Headers";
-
-  /**
-   * The Access-Control-Max-Age header indicates how long the results of a preflight request can be cached in a
-   * preflight result cache.
-   */
-  private static final String RESPONSE_HEADER_ACCESS_CONTROL_MAX_AGE = "Access-Control-Max-Age";
-
-  // -------------------------------------------------- CORSFilter private data attributes
-
-  /**
-   * {@link Collection} of Simple HTTP request headers. Case in-sensitive.
+   * {@link Collection} of Simple HTTP request headers. Case-insensitive.
    *
    * @see <a href="http://www.w3.org/TR/cors/#terminology"></a>
    */
-  private static final Collection<String> SIMPLE_HTTP_REQUEST_CONTENT_TYPE_VALUES = Set.of("application/x-www-form-urlencoded", "multipart/form-data", "text/plain");
+  private static final Collection<String> SimpleHTTPRequestContentTypes = Set.of("application/x-www-form-urlencoded", "multipart/form-data", "text/plain");
 
   private static final Logger logger = LoggerFactory.getLogger(CORSFilter.class);
 
@@ -189,6 +113,11 @@ public final class CORSFilter {
   private CORSDebugger debugger;
 
   /**
+   * Regex for excluding URI patterns from CORS filter processing
+   */
+  private Pattern excludedPathPattern;
+
+  /**
    * Indicates (in seconds) how long the results of a pre-flight request can be cached in a pre-flight result cache.
    */
   private long preflightMaxAge;
@@ -213,14 +142,14 @@ public final class CORSFilter {
       throws IOException {
     // Allow a same site request with an origin header. This means that FusionAuth can make requests to itself w/out going through the CORS filter.
     // - For example, regardless of the CORS configuration we want to be able to POST to the /oauth2/authorize endpoint
-    String origin = request.getHeader(REQUEST_HEADER_ORIGIN);
+    String origin = request.getHeader(Headers.Origin);
     if (origin != null && isSameOrigin(origin, request)) {
       workflowChain.continueWorkflow();
       return;
     }
 
     // Determines the CORS request type, Skip the CORS filter if this is an excluded URI
-    CORSFilter.CORSRequestType requestType = checkRequestType(request);
+    CORSFilter.CORSRequestType requestType = checkRequestType(request, origin);
 
     // If this URI should be excluded from the CORS filter and this is a pre-flight check, return 403, else mark as Not CORS.
     String requestURI = request.getPath();
@@ -243,22 +172,6 @@ public final class CORSFilter {
       case NOT_CORS -> workflowChain.continueWorkflow();
       default -> handleInvalidCORS(request, response, InvalidCORSReason.UnhandledCORSRequestType, requestType);
     }
-  }
-
-  /**
-   * Determines if any origin is allowed to make CORS request.
-   *
-   * @return <code>true</code> if it's enabled; false otherwise.
-   */
-  public boolean isAnyOriginAllowed() {
-    return anyOriginAllowed;
-  }
-
-  /**
-   * @return True if the CORS filter should support credentials
-   */
-  public boolean isSupportsCredentials() {
-    return supportsCredentials;
   }
 
   public CORSFilter withAllowCredentials(boolean allow) {
@@ -309,6 +222,18 @@ public final class CORSFilter {
     return this;
   }
 
+  /**
+   * Specifies a regex that matches paths that should be ignored for CORS (meaning they will always fail CORS and the
+   * browser will not load them). This effectively protects these resources.
+   *
+   * @param pattern The pattern.
+   * @return This.
+   */
+  public CORSFilter withExcludedPathPattern(Pattern pattern) {
+    this.excludedPathPattern = pattern;
+    return this;
+  }
+
   public CORSFilter withExposedHeaders(List<String> headers) {
     if (headers != null) {
       this.exposedHeaders.clear();
@@ -326,28 +251,28 @@ public final class CORSFilter {
    * Determines the request type.
    *
    * @param request The HTTP request.
+   * @param origin  The origin header.
    * @return The CORS type.
    */
-  private CORSRequestType checkRequestType(HTTPRequest request) {
+  private CORSRequestType checkRequestType(HTTPRequest request, String origin) {
     if (request == null) {
       throw new IllegalArgumentException("HttpServletRequest object is null");
     }
 
     // Section 6.1.1 and Section 6.2.1
-    String originHeader = request.getHeader(REQUEST_HEADER_ORIGIN);
-    if (originHeader == null) {
+    if (origin == null) {
       return CORSRequestType.NOT_CORS;
     }
 
-    if (originHeader.isBlank() || !isValidOrigin(originHeader)) {
+    if (origin.isBlank() || !isValidOrigin(origin)) {
       return CORSRequestType.INVALID_CORS;
     }
 
     CORSRequestType requestType = CORSRequestType.INVALID_CORS;
     HTTPMethod method = request.getMethod();
-    if (method != null && HTTP_METHODS.contains(method)) {
+    if (method != null) {
       if (HTTPMethod.OPTIONS.is(method)) {
-        String accessControlRequestMethodHeader = request.getHeader(REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD);
+        String accessControlRequestMethodHeader = request.getHeader(Headers.AccessControlRequestMethod);
         if (accessControlRequestMethodHeader != null && !accessControlRequestMethodHeader.isBlank()) {
           requestType = CORSRequestType.PRE_FLIGHT;
         } else if (accessControlRequestMethodHeader == null) {
@@ -359,13 +284,13 @@ public final class CORSFilter {
         String contentType = request.getContentType();
         if (contentType != null) {
           contentType = contentType.toLowerCase().trim();
-          if (SIMPLE_HTTP_REQUEST_CONTENT_TYPE_VALUES.contains(contentType)) {
+          if (SimpleHTTPRequestContentTypes.contains(contentType)) {
             requestType = CORSRequestType.SIMPLE;
           } else {
             requestType = CORSRequestType.ACTUAL;
           }
         }
-      } else if (COMPLEX_HTTP_METHODS.contains(method)) {
+      } else if (ComplexHTTPMethods.contains(method)) {
         requestType = CORSRequestType.ACTUAL;
       }
     }
@@ -380,7 +305,7 @@ public final class CORSFilter {
    * @return true if this request should be excluded from CORS
    */
   private boolean excludedRequestURI(final String requestURI) {
-    return EXCLUDED_URI_PATTERN.matcher(requestURI).find();
+    return excludedPathPattern != null && excludedPathPattern.matcher(requestURI).find();
   }
 
   /**
@@ -408,12 +333,7 @@ public final class CORSFilter {
    * @param response The {@link HTTPResponse} object.
    */
   private void handlePreflightCORS(HTTPRequest request, HTTPResponse response) {
-    CORSRequestType requestType = checkRequestType(request);
-    if (requestType != CORSRequestType.PRE_FLIGHT) {
-      throw new IllegalArgumentException("Expects a HttpServletRequest object of type " + CORSRequestType.PRE_FLIGHT.name().toLowerCase());
-    }
-
-    final String origin = request.getHeader(CORSFilter.REQUEST_HEADER_ORIGIN);
+    final String origin = request.getHeader(Headers.Origin);
 
     // Section 6.2.2
     if (!isOriginAllowed(origin)) {
@@ -422,15 +342,15 @@ public final class CORSFilter {
     }
 
     // Section 6.2.3
-    String accessControlRequestMethodValue = request.getHeader(CORSFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD);
+    String accessControlRequestMethodValue = request.getHeader(Headers.AccessControlRequestMethod);
     HTTPMethod accessControlRequestMethod = accessControlRequestMethodValue != null ? HTTPMethod.of(accessControlRequestMethodValue.trim()) : null;
-    if (accessControlRequestMethod == null || !HTTP_METHODS.contains(accessControlRequestMethod)) {
-      handleInvalidCORS(request, response, InvalidCORSReason.PreFlightMethodNotRecognized, accessControlRequestMethod);
+    if (accessControlRequestMethod == null) {
+      handleInvalidCORS(request, response, InvalidCORSReason.PreFlightMethodNotRecognized, null);
       return;
     }
 
     // Section 6.2.4
-    String accessControlRequestHeadersHeader = request.getHeader(CORSFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_HEADERS);
+    String accessControlRequestHeadersHeader = request.getHeader(Headers.AccessControlRequestHeaders);
     List<String> accessControlRequestHeaders = new LinkedList<>();
     if (accessControlRequestHeadersHeader != null && !accessControlRequestHeadersHeader.trim().isEmpty()) {
       String[] headers = accessControlRequestHeadersHeader.trim().split(",");
@@ -457,16 +377,16 @@ public final class CORSFilter {
 
     // Section 6.2.7
     if (supportsCredentials) {
-      response.addHeader(CORSFilter.RESPONSE_HEADER_ACCESS_CONTROL_ALLOW_ORIGIN, origin);
-      response.addHeader(CORSFilter.RESPONSE_HEADER_ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
+      response.addHeader(Headers.AccessControlAllowOrigin, origin);
+      response.addHeader(Headers.AccessControlAllowCredentials, "true");
       // See https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin
       // - Indicate to the browser that the server response can differ based on the value of the Origin request header.
       response.addHeader("Vary", "Origin");
     } else {
       if (anyOriginAllowed) {
-        response.addHeader(CORSFilter.RESPONSE_HEADER_ACCESS_CONTROL_ALLOW_ORIGIN, "*");
+        response.addHeader(Headers.AccessControlAllowOrigin, "*");
       } else {
-        response.addHeader(CORSFilter.RESPONSE_HEADER_ACCESS_CONTROL_ALLOW_ORIGIN, origin);
+        response.addHeader(Headers.AccessControlAllowOrigin, origin);
         // See https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin
         // - Indicate to the browser that the server response can differ based on the value of the Origin request header.
         response.addHeader("Vary", "Origin");
@@ -475,15 +395,15 @@ public final class CORSFilter {
 
     // Section 6.2.8
     if (preflightMaxAge > 0) {
-      response.addHeader(CORSFilter.RESPONSE_HEADER_ACCESS_CONTROL_MAX_AGE, String.valueOf(preflightMaxAge));
+      response.addHeader(Headers.AccessControlMaxAge, String.valueOf(preflightMaxAge));
     }
 
     // Section 6.2.9
-    response.addHeader(CORSFilter.RESPONSE_HEADER_ACCESS_CONTROL_ALLOW_METHODS, accessControlRequestMethod.toString());
+    response.addHeader(Headers.AccessControlAllowMethods, accessControlRequestMethod.toString());
 
     // Section 6.2.10
     if (!allowedHttpHeaders.isEmpty()) {
-      response.addHeader(CORSFilter.RESPONSE_HEADER_ACCESS_CONTROL_ALLOW_HEADERS, String.join(",", allowedHttpHeadersOriginal));
+      response.addHeader(Headers.AccessControlAllowHeaders, String.join(",", allowedHttpHeadersOriginal));
     }
 
     response.setStatus(204);
@@ -501,7 +421,7 @@ public final class CORSFilter {
    */
   private void handleSimpleCORS(HTTPRequest request, HTTPResponse response, WorkflowChain workflowChain)
       throws IOException {
-    String origin = request.getHeader(CORSFilter.REQUEST_HEADER_ORIGIN);
+    String origin = request.getHeader(Headers.Origin);
     HTTPMethod method = request.getMethod();
 
     // Section 6.1.2
@@ -519,10 +439,10 @@ public final class CORSFilter {
     // Add a single Access-Control-Allow-Origin header.
     if (anyOriginAllowed && !supportsCredentials) {
       // If resource doesn't support credentials and if any origin is allowed to make CORS request, return header with '*'.
-      response.addHeader(CORSFilter.RESPONSE_HEADER_ACCESS_CONTROL_ALLOW_ORIGIN, "*");
+      response.addHeader(Headers.AccessControlAllowOrigin, "*");
     } else {
       // If the resource supports credentials add a single Access-Control-Allow-Origin header, with the value of the Origin header as value.
-      response.addHeader(CORSFilter.RESPONSE_HEADER_ACCESS_CONTROL_ALLOW_ORIGIN, origin);
+      response.addHeader(Headers.AccessControlAllowOrigin, origin);
       // See https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin
       // - Indicate to the browser that the server response can differ based on the value of the Origin request header.
       response.addHeader("Vary", "Origin");
@@ -531,14 +451,14 @@ public final class CORSFilter {
     // Section 6.1.3
     // If the resource supports credentials, add a single Access-Control-Allow-Credentials header with the case-sensitive string "true" as value.
     if (supportsCredentials) {
-      response.addHeader(CORSFilter.RESPONSE_HEADER_ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
+      response.addHeader(Headers.AccessControlAllowCredentials, "true");
     }
 
     // Section 6.1.4
     // If the list of exposed headers is not empty add one or more Access-Control-Expose-Headers headers, with as values the header field names given in the list of exposed headers.
     if (exposedHeaders.size() > 0) {
       String exposedHeadersString = String.join(",", exposedHeaders);
-      response.addHeader(CORSFilter.RESPONSE_HEADER_ACCESS_CONTROL_EXPOSE_HEADERS, exposedHeadersString);
+      response.addHeader(Headers.AccessControlExposeHeaders, exposedHeadersString);
     }
 
     // Forward the request down the chain.

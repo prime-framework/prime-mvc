@@ -17,10 +17,9 @@ package org.primeframework.mvc.cors;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.primeframework.mvc.http.HTTPMethod;
 import org.primeframework.mvc.util.Buildable;
@@ -38,6 +37,8 @@ public class CORSConfiguration implements Buildable<CORSConfiguration> {
   public List<URI> allowedOrigins = new ArrayList<>();
 
   public boolean debug;
+
+  public Pattern excludedPathPattern;
 
   public List<String> exposedHeaders = new ArrayList<>();
 
@@ -69,28 +70,25 @@ public class CORSConfiguration implements Buildable<CORSConfiguration> {
     return Objects.hash(super.hashCode(), allowCredentials, allowedHeaders, allowedMethods, allowedOrigins, debug, exposedHeaders, preflightMaxAgeInSeconds);
   }
 
-  public void normalize() {
-    Set<HTTPMethod> methods = new HashSet<>(allowedMethods);
-    allowedMethods.clear();
-    allowedMethods.addAll(methods);
-  }
-
   public CORSConfiguration withAllowCredentials(boolean allowCredentials) {
     this.allowCredentials = allowCredentials;
     return this;
   }
 
   public CORSConfiguration withAllowedHeaders(String... headers) {
+    this.allowedHeaders.clear();
     this.allowedHeaders.addAll(List.of(headers));
     return this;
   }
 
   public CORSConfiguration withAllowedMethods(HTTPMethod... methods) {
+    this.allowedMethods.clear();
     this.allowedMethods.addAll(List.of(methods));
     return this;
   }
 
   public CORSConfiguration withAllowedOrigins(URI... origins) {
+    this.allowedOrigins.clear();
     this.allowedOrigins.addAll(List.of(origins));
     return this;
   }
@@ -100,7 +98,13 @@ public class CORSConfiguration implements Buildable<CORSConfiguration> {
     return this;
   }
 
+  public CORSConfiguration withExcludedPathPattern(Pattern pattern) {
+    this.excludedPathPattern = pattern;
+    return this;
+  }
+
   public CORSConfiguration withExposedHeaders(String... headers) {
+    this.exposedHeaders.clear();
     this.exposedHeaders.addAll(List.of(headers));
     return this;
   }

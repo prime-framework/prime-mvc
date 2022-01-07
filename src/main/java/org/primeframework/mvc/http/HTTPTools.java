@@ -74,7 +74,7 @@ public class HTTPTools {
    * @return null if no value can be found for the Origin or Referer header.
    */
   public static String getOriginHeader(HTTPRequest request) {
-    String value = defaultIfNull(request.getHeader("Origin"), request.getHeader("Referer"));
+    String value = defaultIfNull(request.getHeader(HTTPStrings.Headers.Origin), request.getHeader(HTTPStrings.Headers.Referer));
     if (value == null || value.equals("null")) {
       return null;
     }
@@ -105,19 +105,19 @@ public class HTTPTools {
 
   private static String toBaseURI(HTTPRequest request) {
     // Setting the wrong value in the X-Forwarded-Proto header seems to be a common issue that causes an exception during URI.create. Assuming request.getScheme() is not the problem and it is related to the proxy configuration.
-    String scheme = defaultIfNull(request.getHeader("X-Forwarded-Proto"), request.getScheme()).toLowerCase();
+    String scheme = defaultIfNull(request.getHeader(HTTPStrings.Headers.XForwardedProto), request.getScheme()).toLowerCase();
     if (!scheme.equalsIgnoreCase("http") && !scheme.equalsIgnoreCase("https")) {
       throw new IllegalArgumentException("The request scheme is invalid. Only http or https are valid schemes. The X-Forwarded-Proto header has a value of [" + request.getHeader("X-Forwarded-Proto") + "], this is likely an issue in your proxy configuration.");
     }
 
-    String serverName = defaultIfNull(request.getHeader("X-Forwarded-Host"), request.getHost()).toLowerCase();
+    String serverName = defaultIfNull(request.getHeader(HTTPStrings.Headers.XForwardedHost), request.getHost()).toLowerCase();
     int serverPort = request.getPort();
     // Ignore port 80 for http
     if (request.getScheme().equalsIgnoreCase("http") && serverPort == 80) {
       serverPort = -1;
     }
 
-    String forwardedPort = request.getHeader("X-Forwarded-Port");
+    String forwardedPort = request.getHeader(HTTPStrings.Headers.XForwardedPort);
     if (forwardedPort != null) {
       serverPort = Integer.parseInt(forwardedPort);
     }
