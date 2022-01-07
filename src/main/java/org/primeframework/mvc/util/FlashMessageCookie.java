@@ -80,7 +80,7 @@ public class FlashMessageCookie extends AbstractCookie {
       return encryptor.decrypt(new TypeReference<List<Message>>() {
       }, s);
     } catch (Exception e) {
-      return null;
+      return List.of();
     }
   }
 
