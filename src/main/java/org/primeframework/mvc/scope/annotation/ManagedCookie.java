@@ -42,11 +42,12 @@ public @interface ManagedCookie {
   boolean encrypt() default true;
 
   /**
-   * Optionally specify a value to set on the cookie for Max-Age
+   * Optionally specify a value to set on the cookie for Max-Age. Defaults to 70 years because Firefox has issues with
+   * Long.MAX_VALUE.
    *
    * @return the max age value
    */
-  long maxAge() default Long.MAX_VALUE;
+  long maxAge() default Integer.MAX_VALUE;
 
   /**
    * @return This attribute determines the name under which that the value is stored in the action session. The default

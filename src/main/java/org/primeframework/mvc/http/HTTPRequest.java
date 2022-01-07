@@ -81,6 +81,8 @@ public interface HTTPRequest {
 
   String getRemoteAddress();
 
+  String getRemoteHost();
+
   String getScheme();
 
   boolean isMultipart();

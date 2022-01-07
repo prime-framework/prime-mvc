@@ -15,12 +15,12 @@
  */
 package org.primeframework.mvc.parameter.convert;
 
-import java.util.Map;
-
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import org.primeframework.mvc.PrimeBaseTest;
+import org.primeframework.mvc.cors.CORSConfigurationProvider;
+import org.primeframework.mvc.cors.NoCORSConfigurationProvider;
 import org.primeframework.mvc.guice.GuiceBootstrap;
 import org.primeframework.mvc.guice.MVCModule;
 import org.primeframework.mvc.parameter.convert.converters.BooleanConverter;
@@ -50,9 +50,10 @@ public class DefaultConverterProviderTest extends PrimeBaseTest {
         super.configure();
         install(new TestMVCConfigurationModule());
         bind(UserLoginSecurityContext.class).to(MockUserLoginSecurityContext.class);
+        bind(CORSConfigurationProvider.class).to(NoCORSConfigurationProvider.class);
       }
     });
-    ConverterProvider provider = new DefaultConverterProvider(injector, injector.getInstance(Key.get(new TypeLiteral<Map<Class<?>, GlobalConverter>>() {
+    ConverterProvider provider = new DefaultConverterProvider(injector, injector.getInstance(Key.get(new TypeLiteral<>() {
     })));
     GlobalConverter tc = provider.lookup(Character.class);
     assertSame(CharacterConverter.class, tc.getClass());

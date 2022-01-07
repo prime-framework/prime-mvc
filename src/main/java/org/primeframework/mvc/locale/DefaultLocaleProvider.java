@@ -92,9 +92,10 @@ public class DefaultLocaleProvider implements LocaleProvider {
       return;
     }
 
+    // The cookie for the Locale has an expiration of 70 years to allow it to work with Firefox
     String key = configuration.localeCookieName();
     Cookie cookie = new Cookie(key, locale != null ? locale.toString() : null);
-    cookie.maxAge = locale != null ? Long.MAX_VALUE : 0L;
+    cookie.maxAge = locale != null ? Integer.MAX_VALUE : 0L;
     cookie.path = "/";
     response.addCookie(cookie);
   }

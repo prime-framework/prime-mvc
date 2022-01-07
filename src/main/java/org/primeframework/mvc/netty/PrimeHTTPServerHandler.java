@@ -189,6 +189,7 @@ public class PrimeHTTPServerHandler extends SimpleChannelInboundHandler<HttpObje
 
     // Handle the networking pieces
     InetSocketAddress remoteAddress = (InetSocketAddress) context.channel().remoteAddress();
+    primeRequest.setRemoteHost(remoteAddress != null ? remoteAddress.getHostString() : null);
     primeRequest.setRemoteAddress(remoteAddress != null ? remoteAddress.getAddress().getHostAddress() : null);
 
     // Handle cookies

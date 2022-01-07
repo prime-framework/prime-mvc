@@ -24,6 +24,7 @@ import org.primeframework.mvc.action.ActionInvocationWorkflow;
 import org.primeframework.mvc.action.ActionMappingWorkflow;
 import org.primeframework.mvc.action.result.ResultInvocationWorkflow;
 import org.primeframework.mvc.content.ContentWorkflow;
+import org.primeframework.mvc.cors.CORSRequestWorkflow;
 import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.message.MessageWorkflow;
 import org.primeframework.mvc.parameter.ParameterWorkflow;
@@ -54,7 +55,8 @@ public class DefaultMVCWorkflow implements MVCWorkflow {
   private final List<Workflow> workflows;
 
   @Inject
-  public DefaultMVCWorkflow(SavedRequestWorkflow savedRequestWorkflow,
+  public DefaultMVCWorkflow(CORSRequestWorkflow corsRequestWorkflow,
+                            SavedRequestWorkflow savedRequestWorkflow,
                             ActionMappingWorkflow actionMappingWorkflow,
                             ScopeRetrievalWorkflow scopeRetrievalWorkflow,
                             URIParameterWorkflow uriParameterWorkflow,
@@ -76,6 +78,7 @@ public class DefaultMVCWorkflow implements MVCWorkflow {
     this.errorWorkflow = errorWorkflow;
     this.response = response;
     this.workflows = asList(
+        corsRequestWorkflow,
         savedRequestWorkflow,
         actionMappingWorkflow,
         scopeRetrievalWorkflow,

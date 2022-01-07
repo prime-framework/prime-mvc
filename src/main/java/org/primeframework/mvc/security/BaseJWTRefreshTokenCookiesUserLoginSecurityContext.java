@@ -60,8 +60,10 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
     this.request = request;
     this.response = response;
     this.verifierProvider = verifierProvider;
-    this.jwtCookie = new CookieProxy(jwtCookieName(), Long.MAX_VALUE);
-    this.refreshTokenCookie = new CookieProxy(refreshTokenCookieName(), Long.MAX_VALUE);
+
+    // The cookies for the tokens has an expiration of 70 years to allow it to work with Firefox
+    this.jwtCookie = new CookieProxy(jwtCookieName(), (long) Integer.MAX_VALUE);
+    this.refreshTokenCookie = new CookieProxy(refreshTokenCookieName(), (long) Integer.MAX_VALUE);
   }
 
   @Override

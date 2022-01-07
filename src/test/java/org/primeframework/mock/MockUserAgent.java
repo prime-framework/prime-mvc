@@ -40,7 +40,7 @@ public class MockUserAgent {
     existing.remove(cookie.name);
 
     // A Max-Age of 0 is a delete
-    if ((cookie.maxAge == null || cookie.maxAge > 0) && (cookie.expires == null || cookie.expires.isBefore(ZonedDateTime.now(ZoneOffset.UTC)))) {
+    if ((cookie.maxAge == null || cookie.maxAge > 0) && (cookie.expires == null || cookie.expires.isAfter(ZonedDateTime.now(ZoneOffset.UTC)))) {
       existing.put(cookie.name, cookie);
     }
   }

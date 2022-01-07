@@ -24,6 +24,8 @@ import org.primeframework.mvc.CloseableModule;
 import org.primeframework.mvc.MockConfiguration;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.config.MVCConfiguration;
+import org.primeframework.mvc.cors.CORSConfigurationProvider;
+import org.primeframework.mvc.cors.NoCORSConfigurationProvider;
 import org.primeframework.mvc.security.MockUserLoginSecurityContext;
 import org.primeframework.mvc.security.UserLoginSecurityContext;
 import org.primeframework.mvc.workflow.MVCWorkflow;
@@ -63,6 +65,7 @@ public class GuiceBootstrapTest extends PrimeBaseTest {
 
         bind(MVCConfiguration.class).toInstance(new MockConfiguration(2, 1, false, false));
         bind(UserLoginSecurityContext.class).to(MockUserLoginSecurityContext.class);
+        bind(CORSConfigurationProvider.class).to(NoCORSConfigurationProvider.class);
 
         install(new CloseableModule());
       }

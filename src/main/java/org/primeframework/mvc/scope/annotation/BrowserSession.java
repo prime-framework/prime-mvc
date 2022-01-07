@@ -26,7 +26,8 @@ import org.primeframework.mvc.scope.BrowserSessionScope;
  * Just your typical basic cookie. This annotation should be used to mark member fields of actions that should be
  * fetched and stored in a secure Cookie by marshalling and unmarshalling the field to and from JSON.
  * <p>
- * This cookie will be written as an HTTP only Persistent, Secure cookie.
+ * This cookie will be written as an HTTP only Persistent, Secure cookie. If the default maxAge is used, then the value
+ * will be stored in a session cookie, which is deleted when the browser is closed.
  *
  * @author Brian Pontarelli
  */
@@ -42,11 +43,12 @@ public @interface BrowserSession {
   boolean encrypt() default true;
 
   /**
-   * Optionally specify a value to set on the cookie for Max-Age
+   * Optionally specify a value to set on the cookie for Max-Age. Defaults to unspecified (Netty uses Long.MIN_VALUE for
+   * that) so that the cookie is a session cookie.
    *
-   * @return the max age value
+   * @return The max age value.
    */
-  long maxAge() default Long.MAX_VALUE;
+  long maxAge() default Long.MIN_VALUE;
 
   /**
    * @return This attribute determines the name of the cookie. The default name is the name of the field that the

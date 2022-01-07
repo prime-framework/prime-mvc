@@ -69,6 +69,8 @@ public class DefaultHTTPRequest implements MutableHTTPRequest, Buildable<Default
 
   public String remoteAddress;
 
+  public String remoteHost;
+
   public String scheme;
 
   @Override
@@ -336,6 +338,16 @@ public class DefaultHTTPRequest implements MutableHTTPRequest, Buildable<Default
   @Override
   public void setRemoteAddress(String remoteAddress) {
     this.remoteAddress = remoteAddress;
+  }
+
+  @Override
+  public String getRemoteHost() {
+    return remoteHost;
+  }
+
+  @Override
+  public void setRemoteHost(String remoteHost) {
+    this.remoteHost = remoteHost;
   }
 
   @Override

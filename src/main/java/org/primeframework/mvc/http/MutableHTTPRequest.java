@@ -64,8 +64,6 @@ public interface MutableHTTPRequest extends HTTPRequest {
 
   void setCharacterEncoding(Charset encoding);
 
-  void setRemoteAddress(String remoteAddress);
-
   void setContentLength(long contentLength);
 
   void setContentType(String contentType);
@@ -97,6 +95,10 @@ public interface MutableHTTPRequest extends HTTPRequest {
   void setPath(String path);
 
   void setPort(int port);
+
+  void setRemoteAddress(String remoteAddress);
+
+  void setRemoteHost(String remoteHost);
 
   void setScheme(String scheme);
 }

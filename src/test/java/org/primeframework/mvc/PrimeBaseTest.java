@@ -41,6 +41,8 @@ import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.config.DefaultActionConfigurationBuilder;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.content.guice.ObjectMapperProvider;
+import org.primeframework.mvc.cors.CORSConfigurationProvider;
+import org.primeframework.mvc.cors.NoCORSConfigurationProvider;
 import org.primeframework.mvc.guice.MVCModule;
 import org.primeframework.mvc.http.DefaultHTTPRequest;
 import org.primeframework.mvc.http.DefaultHTTPResponse;
@@ -69,7 +71,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 
 /**
- * This class is a base test for testing the Prime framework. It isn't recommended to use it outside of the Prime
+ * This class is a base test for testing the Prime framework. It isn't recommended that you use it outside the Prime
  * project.
  *
  * @author Brian Pontarelli and James Humphrey
@@ -107,6 +109,7 @@ public abstract class PrimeBaseTest {
         bind(MessageObserver.class).toInstance(messageObserver);
         bind(MetricRegistry.class).toInstance(metricRegistry);
         bind(UserLoginSecurityContext.class).to(MockUserLoginSecurityContext.class);
+        bind(CORSConfigurationProvider.class).to(NoCORSConfigurationProvider.class);
       }
     };
 

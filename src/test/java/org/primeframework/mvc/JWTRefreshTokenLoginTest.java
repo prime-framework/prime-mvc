@@ -24,6 +24,8 @@ import com.google.inject.Module;
 import com.google.inject.util.Modules;
 import org.primeframework.mvc.PrimeBaseTest.TestContentModule;
 import org.primeframework.mvc.PrimeBaseTest.TestMVCConfigurationModule;
+import org.primeframework.mvc.cors.CORSConfigurationProvider;
+import org.primeframework.mvc.cors.NoCORSConfigurationProvider;
 import org.primeframework.mvc.guice.MVCModule;
 import org.primeframework.mvc.http.DefaultHTTPRequest;
 import org.primeframework.mvc.http.DefaultHTTPResponse;
@@ -80,6 +82,7 @@ public class JWTRefreshTokenLoginTest {
         bind(MessageObserver.class).toInstance(messageObserver);
         bind(MetricRegistry.class).toInstance(metricRegistry);
         bind(UserLoginSecurityContext.class).to(MockOAuthUserLoginSecurityContext.class);
+        bind(CORSConfigurationProvider.class).to(NoCORSConfigurationProvider.class);
       }
     };
 
