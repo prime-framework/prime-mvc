@@ -74,4 +74,39 @@ public class CORSConfiguration implements Buildable<CORSConfiguration> {
     allowedMethods.clear();
     allowedMethods.addAll(methods);
   }
+
+  public CORSConfiguration withAllowCredentials(boolean allowCredentials) {
+    this.allowCredentials = allowCredentials;
+    return this;
+  }
+
+  public CORSConfiguration withAllowedHeaders(String... headers) {
+    this.allowedHeaders.addAll(List.of(headers));
+    return this;
+  }
+
+  public CORSConfiguration withAllowedMethods(HTTPMethod... methods) {
+    this.allowedMethods.addAll(List.of(methods));
+    return this;
+  }
+
+  public CORSConfiguration withAllowedOrigins(URI... origins) {
+    this.allowedOrigins.addAll(List.of(origins));
+    return this;
+  }
+
+  public CORSConfiguration withDebug(boolean debug) {
+    this.debug = debug;
+    return this;
+  }
+
+  public CORSConfiguration withExposedHeaders(String... headers) {
+    this.exposedHeaders.addAll(List.of(headers));
+    return this;
+  }
+
+  public CORSConfiguration withPreflightMaxAgeInSeconds(int maxAge) {
+    this.preflightMaxAgeInSeconds = maxAge;
+    return this;
+  }
 }

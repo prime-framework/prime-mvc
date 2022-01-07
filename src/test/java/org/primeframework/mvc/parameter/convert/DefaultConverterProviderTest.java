@@ -15,6 +15,8 @@
  */
 package org.primeframework.mvc.parameter.convert;
 
+import java.util.Map;
+
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
@@ -53,7 +55,7 @@ public class DefaultConverterProviderTest extends PrimeBaseTest {
         bind(CORSConfigurationProvider.class).to(NoCORSConfigurationProvider.class);
       }
     });
-    ConverterProvider provider = new DefaultConverterProvider(injector, injector.getInstance(Key.get(new TypeLiteral<>() {
+    ConverterProvider provider = new DefaultConverterProvider(injector, injector.getInstance(Key.get(new TypeLiteral<Map<Class<?>, GlobalConverter>>() {
     })));
     GlobalConverter tc = provider.lookup(Character.class);
     assertSame(CharacterConverter.class, tc.getClass());

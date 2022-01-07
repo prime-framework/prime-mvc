@@ -18,9 +18,7 @@ package org.primeframework.mvc.cors;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -144,9 +142,7 @@ public final class CORSFilter {
    *
    * @see <a href="http://www.w3.org/TR/cors/#terminology"></a>
    */
-  private static final Collection<String> SIMPLE_HTTP_REQUEST_CONTENT_TYPE_VALUES = new HashSet<>(Arrays.asList("application/x-www-form-urlencoded",
-      "multipart/form-data",
-      "text/plain"));
+  private static final Collection<String> SIMPLE_HTTP_REQUEST_CONTENT_TYPE_VALUES = Set.of("application/x-www-form-urlencoded", "multipart/form-data", "text/plain");
 
   private static final Logger logger = LoggerFactory.getLogger(CORSFilter.class);
 
@@ -531,6 +527,7 @@ public final class CORSFilter {
       // - Indicate to the browser that the server response can differ based on the value of the Origin request header.
       response.addHeader("Vary", "Origin");
     }
+
     // Section 6.1.3
     // If the resource supports credentials, add a single Access-Control-Allow-Credentials header with the case-sensitive string "true" as value.
     if (supportsCredentials) {
@@ -632,7 +629,6 @@ public final class CORSFilter {
     }
     // If scheme for URI is null, return false. Return true otherwise.
     return originURI.getScheme() != null;
-
   }
 
   private void logRequest(HTTPRequest request, final InvalidCORSReason reason, final Object reasonValue) {
