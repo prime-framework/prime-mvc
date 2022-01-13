@@ -29,6 +29,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -1686,6 +1687,43 @@ public class RequestResult {
       return this;
     }
 
+    /**
+     * Remove an attribute from a DOM element.
+     *
+     * @param selector the DOM selector
+     * @param name     the name of the attribute to remove
+     * @return this.
+     */
+    public DOMHelper removeAttribute(String selector, String name) {
+      Element element = document.selectFirst(selector);
+      if (element == null) {
+        throw new AssertionError("Expected at least one element to match the selector " + selector + ". Found [0] elements instead. Unable to set element value.\n\nActual body:\n" + body);
+      }
+
+      element.removeAttr(name);
+
+      return this;
+    }
+
+    /**
+     * Set an attribute w/ value on a DOM element.
+     *
+     * @param selector the DOM selector
+     * @param name     the name of the attribute
+     * @param value    the value of the attribute
+     * @return this.
+     */
+    public DOMHelper setAttribute(String selector, String name, String value) {
+      Element element = document.selectFirst(selector);
+      if (element == null) {
+        throw new AssertionError("Expected at least one element to match the selector " + selector + ". Found [0] elements instead. Unable to set element value.\n\nActual body:\n" + body);
+      }
+
+      element.attr(name, value);
+
+      return this;
+    }
+
     public DOMHelper setChecked(String selector, boolean value) {
       Element element = document.selectFirst(selector);
       if (element == null) {
@@ -1761,9 +1799,45 @@ public class RequestResult {
      * @return this.
      */
     public HTMLAsserter assertElementExists(String selector) {
-      Elements elements = document.select(selector);
-      if (elements.size() != 1) {
-        throw new AssertionError("Expected a single element to match the selector " + selector + ". Found [" + elements.size() + "] elements instead." + ((elements.size() == 0) ? "" : "\n\n" + elements) + "\n\nActual body:\n" + requestResult.bodyAsString());
+      selectExpectOne(selector);
+      return this;
+    }
+
+    /**
+     * Assert an element has an attribute. The value is not checked.
+     *
+     * @param selector  the DOM selector
+     * @param attribute the attribute you expect
+     * @return this.
+     */
+    public HTMLAsserter assertElementHasAttribute(String selector, String attribute) {
+      Element element = selectExpectOne(selector);
+
+      if (!element.hasAttr(attribute)) {
+        throw new AssertionError("Expected the element to have attribute [" + attribute + "]." + "\n\nActual body:\n" + requestResult.bodyAsString());
+      }
+
+      return this;
+    }
+
+    /**
+     * Assert the element has an attribute with a specific value.
+     *
+     * @param selector  the DOM selector
+     * @param attribute the name of the attribute you expect
+     * @param value     the value of the attribute you expect
+     * @return this.
+     */
+    public HTMLAsserter assertElementHasAttributeValue(String selector, String attribute, String value) {
+      Element element = selectExpectOne(selector);
+
+      if (!element.hasAttr(attribute)) {
+        throw new AssertionError("Expected the element to have attribute [" + attribute + "]." + "\n\nActual body:\n" + requestResult.bodyAsString());
+      }
+
+      String actual = element.attr(attribute);
+      if (!value.equals(actual)) {
+        throw new AssertionError("Expected the element attribute [" + attribute + "] value to be equal to [" + value + "] but found [" + actual + "]." + "\n\nActual body:\n" + requestResult.bodyAsString());
       }
 
       return this;
@@ -1850,6 +1924,59 @@ public class RequestResult {
     }
 
     /**
+     * Allow for custom assertions on an element.
+     *
+     * @param selector the DOM selector
+     * @param consumer a consumer that will take the element found by the selector
+     * @return this.
+     */
+    public HTMLAsserter assertOnElement(String selector, Consumer<Element> consumer) {
+      Element element = selectExpectOne(selector);
+      consumer.accept(element);
+      return this;
+    }
+
+    /**
+     * Assert that a Select option is not selected.
+     *
+     * @param selector the DOM selector
+     * @return this.
+     */
+    public HTMLAsserter assertOptionIsNotSelected(String selector) {
+      Element element = selectExpectOne(selector);
+
+      if (!element.is("option")) {
+        throw new AssertionError("Expected the element not be an [option] but found [" + element.tagName().toLowerCase(Locale.ROOT) + "].\n\nActual body:\n" + requestResult.bodyAsString());
+      }
+
+      if (element.hasAttr("selected")) {
+        throw new AssertionError("Expected the element not to be selected." + "\n\nActual body:\n" + requestResult.bodyAsString());
+      }
+
+      return this;
+    }
+
+    /**
+     * Assert that an option is selected.
+     *
+     * @param selector the DOM selector
+     * @return this.
+     */
+    public HTMLAsserter assertOptionIsSelected(String selector) {
+      Element element = selectExpectOne(selector);
+
+      if (!element.is("option")) {
+        throw new AssertionError("Expected the element not be an [option] but found [" + element.tagName().toLowerCase(Locale.ROOT) + "].\n\nActual body:\n" + requestResult.bodyAsString());
+      }
+
+      if (!element.hasAttr("selected")) {
+        throw new AssertionError("Expected the element to be selected." + "\n\nActual body:\n" + requestResult.bodyAsString());
+      }
+
+      return this;
+    }
+
+    /**
      * Perform any custom assertions on the parsed HTML document.
      *
      * @param consumer the HTML document consumer
@@ -1858,6 +1985,15 @@ public class RequestResult {
     public HTMLAsserter custom(ThrowingConsumer<Document> consumer) throws Exception {
       consumer.accept(document);
       return this;
+    }
+
+    private Element selectExpectOne(String selector) {
+      Elements elements = document.select(selector);
+      if (elements.size() != 1) {
+        throw new AssertionError("Expected a single element to match the selector " + selector + ". Found [" + elements.size() + "] elements instead." + ((elements.size() == 0) ? "" : "\n\n" + elements) + "\n\nActual body:\n" + requestResult.bodyAsString());
+      }
+
+      return elements.get(0);
     }
   }
 
