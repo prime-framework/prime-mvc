@@ -80,7 +80,7 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
     boolean executeResult = InternalParameters.is(request, InternalParameters.EXECUTE_RESULT);
     ActionInvocation actionInvocation = actionMapper.map(method, uri, executeResult);
 
-    // This case is a redirect because they URI maps to something new and there isn't an action associated with it. For
+    // This case is a redirect because the URI maps to something new and there isn't an action associated with it. For
     // example, this is how the index handling works.
     if (actionInvocation.redirect) {
       response.sendRedirect(actionInvocation.uri());
@@ -94,7 +94,7 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
     // Anyone downstream should understand it is possible for the method to be null in the ActionInvocation
     if (actionInvocation.action != null && actionInvocation.method == null) {
       Class<?> actionClass = actionInvocation.configuration.actionClass;
-      logger.warn("The action class [{}] does not have a valid execute method for the HTTP method [{}]", actionClass.getCanonicalName(), method);
+      logger.debug("The action class [{}] does not have a valid execute method for the HTTP method [{}]", actionClass.getCanonicalName(), method);
       throw new NotAllowedException();
     }
 
