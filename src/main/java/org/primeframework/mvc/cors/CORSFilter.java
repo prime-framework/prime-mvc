@@ -73,18 +73,18 @@ public final class CORSFilter {
   /**
    * A {@link Collection} of headers consisting of zero or more header field names that are supported by the resource.
    */
-  private final Collection<String> allowedHttpHeaders = new LinkedHashSet<>();
+  private final Collection<String> allowedHTTPHeaders = new LinkedHashSet<>();
 
   /**
    * A {@link Collection} of headers consisting of zero or more header field names that are supported by the resource,
    * preserved with original formatting.
    */
-  private final Collection<String> allowedHttpHeadersOriginal = new LinkedHashSet<>();
+  private final Collection<String> allowedHTTPHeadersOriginal = new LinkedHashSet<>();
 
   /**
    * A {@link Collection} of methods consisting of zero or more methods that are supported by the resource.
    */
-  private final Collection<HTTPMethod> allowedHttpMethods = new LinkedHashSet<>();
+  private final Collection<HTTPMethod> allowedHTTPMethods = new LinkedHashSet<>();
 
   /**
    * A {@link Collection} of origins consisting of zero or more origins that are allowed access to the resource.
@@ -181,11 +181,11 @@ public final class CORSFilter {
 
   public CORSFilter withAllowedHTTPHeaders(List<String> headers) {
     if (headers != null) {
-      this.allowedHttpHeaders.clear();
-      this.allowedHttpHeadersOriginal.clear();
+      this.allowedHTTPHeaders.clear();
+      this.allowedHTTPHeadersOriginal.clear();
       for (String header : headers) {
-        this.allowedHttpHeaders.add(header.toLowerCase());
-        this.allowedHttpHeadersOriginal.add(header);
+        this.allowedHTTPHeaders.add(header.toLowerCase());
+        this.allowedHTTPHeadersOriginal.add(header);
       }
     }
     return this;
@@ -193,8 +193,8 @@ public final class CORSFilter {
 
   public CORSFilter withAllowedHTTPMethods(List<HTTPMethod> methods) {
     if (methods != null) {
-      this.allowedHttpMethods.clear();
-      this.allowedHttpMethods.addAll(methods);
+      this.allowedHTTPMethods.clear();
+      this.allowedHTTPMethods.addAll(methods);
     }
     return this;
   }
@@ -360,7 +360,7 @@ public final class CORSFilter {
     }
 
     // Section 6.2.5
-    if (!allowedHttpMethods.contains(accessControlRequestMethod)) {
+    if (!allowedHTTPMethods.contains(accessControlRequestMethod)) {
       handleInvalidCORS(request, response, InvalidCORSReason.PreFlightMethodNotAllowed, accessControlRequestMethod);
       return;
     }
@@ -368,7 +368,7 @@ public final class CORSFilter {
     // Section 6.2.6
     if (!accessControlRequestHeaders.isEmpty()) {
       for (String header : accessControlRequestHeaders) {
-        if (!allowedHttpHeaders.contains(header)) {
+        if (!allowedHTTPHeaders.contains(header)) {
           handleInvalidCORS(request, response, InvalidCORSReason.PreFlightHeaderNotAllowed, header);
           return;
         }
@@ -402,8 +402,8 @@ public final class CORSFilter {
     response.addHeader(Headers.AccessControlAllowMethods, accessControlRequestMethod.toString());
 
     // Section 6.2.10
-    if (!allowedHttpHeaders.isEmpty()) {
-      response.addHeader(Headers.AccessControlAllowHeaders, String.join(",", allowedHttpHeadersOriginal));
+    if (!allowedHTTPHeaders.isEmpty()) {
+      response.addHeader(Headers.AccessControlAllowHeaders, String.join(",", allowedHTTPHeadersOriginal));
     }
 
     response.setStatus(204);
@@ -430,7 +430,7 @@ public final class CORSFilter {
       return;
     }
 
-    if (!allowedHttpMethods.contains(method)) {
+    if (!allowedHTTPMethods.contains(method)) {
       handleInvalidCORS(request, response, InvalidCORSReason.SimpleMethodNotAllowed, method);
       return;
     }

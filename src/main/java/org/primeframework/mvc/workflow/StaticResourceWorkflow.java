@@ -83,7 +83,12 @@ public class StaticResourceWorkflow implements Workflow {
     // Ensure that this is a request for a resource and not a class
     String uri = HTTPTools.getRequestURI(request);
     if (!uri.endsWith(".class")) {
-      handled = findStaticResource(uri, request, response);
+      try {
+        handled = findStaticResource(uri, request, response);
+      } catch (RuntimeException | IOException e) {
+        logger.error("Unable to load static resource at uri [{}]", uri);
+        throw e;
+      }
     }
 
     if (!handled) {
