@@ -77,10 +77,9 @@ public class FlashMessageCookie extends AbstractCookie {
 
   private List<Message> deserialize(String s) {
     try {
-      return encryptor.decrypt(new TypeReference<List<Message>>() {
-      }, s);
+      return new ArrayList<>(encryptor.decrypt(new TypeReference<List<Message>>() {}, s));
     } catch (Exception e) {
-      return List.of();
+      return new ArrayList<>();
     }
   }
 
