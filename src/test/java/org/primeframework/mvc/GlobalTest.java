@@ -146,6 +146,15 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void get_ContentTypeOverride() throws Exception {
+    simulator.test("/content-type-override")
+             .get()
+             .setup(r -> r.container.getResponse().setHeader("Referer", "http://localhost"))
+             .assertStatusCode(200)
+             .assertContentType("application/json+scim");
+  }
+
+  @Test
   public void get_JSONView() throws Exception {
     test.simulate(() -> simulator.test("/views/entry/api")
                                  .get()
@@ -192,7 +201,7 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
-  public void get_action_backed_template_slashes() throws Exception {
+  public void get_action_backed_template_slashes() {
     // Ok
     simulator.test("/freemarker/action-backed")
              .get()

@@ -86,6 +86,7 @@ public class JSONResult extends AbstractResult<JSON> {
     List<Message> errorMessages = messageStore.get(MessageScope.REQUEST).stream()
                                               .filter(m -> m.getType() == MessageType.ERROR)
                                               .collect(Collectors.toList());
+    String contentType = "application/json";
     // If there are ERROR messages, put them in a well known container and render that instead of looking for the @JSONResponse annotation
     if (errorMessages.size() > 0) {
       jacksonObject = convertErrors(errorMessages);
@@ -101,6 +102,7 @@ public class JSONResult extends AbstractResult<JSON> {
       }
 
       prettyPrint = jacksonActionConfiguration.responseMember.annotation.prettyPrint();
+      contentType = jacksonActionConfiguration.responseMember.annotation.contentType();
     }
 
     ByteArrayOutputStream os = new ByteArrayOutputStream(1024);
@@ -109,7 +111,7 @@ public class JSONResult extends AbstractResult<JSON> {
     byte[] result = os.toByteArray();
     response.setStatus(json.status());
     response.setCharacterEncoding("UTF-8");
-    response.setContentType("application/json");
+    response.setContentType(contentType);
     response.setContentLength(result.length);
 
     // Handle setting cache controls

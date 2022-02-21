@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 import org.example.action.KitchenSinkAction;
+import org.example.action.OverrideMeAction;
 import org.example.action.SimpleAction;
 import org.example.action.TestAnnotation;
 import org.example.action.nested.FooAction;
@@ -43,6 +44,7 @@ import org.testng.annotations.Test;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertSame;
@@ -188,6 +190,20 @@ public class DefaultActionConfigurationProviderTest {
     assertEquals(invocation.uriParameters.get("preParam2"), singletonList("preParam2"));
     assertEquals(invocation.uriParameters.get("endParam1"), singletonList("42"));
     assertEquals(invocation.uriParameters.get("endParam2"), singletonList("postParam2"));
+  }
+
+  @Test
+  public void lookupOverrideClassUri() {
+    DefaultActionConfigurationProvider provider = new DefaultActionConfigurationProvider(
+        new DefaultActionConfigurationBuilder(new DefaultURIBuilder(), new HashSet<>(Arrays.asList(new JacksonActionConfigurator(),
+            new BinaryActionConfigurator())))
+    );
+
+    ActionInvocation invocation = provider.lookup("/OverrideMe");
+    assertEquals(invocation.configuration.actionClass, OverrideMeAction.class);
+
+    ActionInvocation invocation2 = provider.lookup("/override-me\"");
+    assertNull(invocation2.configuration);
   }
 
   @Test

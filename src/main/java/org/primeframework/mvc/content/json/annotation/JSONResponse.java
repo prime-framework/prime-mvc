@@ -39,4 +39,7 @@ public @interface JSONResponse {
    * Set to true to 'pretty print' the JSON to the HTTP response.
    */
   boolean prettyPrint() default false;
+
+
+  String contentType() default "application/json";
 }
