@@ -15,8 +15,6 @@
  */
 package org.example.action;
 
-import org.example.domain.AddressField;
-import org.example.domain.UserField;
 import org.primeframework.mvc.action.annotation.Action;
 
 /**
@@ -24,10 +22,10 @@ import org.primeframework.mvc.action.annotation.Action;
  *
  * @author Rob Davis
  */
-@Action(classUri="OverrideMe")
+@Action(classURI ="OverrideMe")
 public class OverrideMeAction {
   // Default behavior would be to parse this into /override-me.
-  // The classUri allows to override that behavior to match the class name as is.
+  // The classURI allows to override that behavior to match the class name as is.
   public boolean invoked = false;
 
   public String execute() {

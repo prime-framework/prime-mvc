@@ -857,6 +857,10 @@ public class ReflectionUtils {
     @Override
     public Type determineGenericType(Method method) {
       Type[] types = method.getGenericParameterTypes();
+      if (types.length == 0) {
+        throw new ExpressionException("Unable to call method [" + method + "] because while the name indicates it is a setter, the method has 0 arguments. You need to add 1 or more arguments, or rename this method.");
+      }
+
       if (types.length == 1) {
         return types[0];
       }

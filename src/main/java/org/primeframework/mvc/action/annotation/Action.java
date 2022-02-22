@@ -29,6 +29,20 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface Action {
   /**
+   * @return The class URI for the action can be overridden here if the derived name from the class is not desired. The
+   *     pattern is like this:
+   *     <p>
+   *     {@code {id}}
+   *     <p>
+   *     If the class name is EditAction, but the classURI is editUsers, the full specification for the URI that action
+   *     can handle would be:
+   *     <p>
+   *     {@code {/admin/user/editUsers/{id}}
+   *     <p>
+   */
+  String classURI() default "";
+
+  /**
    * @return the required roles for this action to be executed.
    */
   String[] constraints() default {};
@@ -88,17 +102,4 @@ public @interface Action {
    * it could also be used as a {@link org.primeframework.mvc.parameter.annotation.PreParameter}.
    */
   String value() default "";
-
-  /**
-   * @return The class URI for the action can be overridden here if the derived name from the class is not desired.
-   * The pattern is like this:
-   * <p>
-   * {@code {id}}
-   * <p>
-   * If the class name is EditAction, but the classURI is editUsers, the full specification for the URI that action can handle would be:
-   * <p>
-   * {@code {/admin/user/editUsers/{id}}
-   * <p>
-   */
-  String classUri() default "";
 }
