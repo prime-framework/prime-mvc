@@ -71,8 +71,8 @@ public class DefaultURIBuilder implements URIBuilder {
 
     // Handle classURI override
     Action action = type.getAnnotation(Action.class);
-    if (!action.classURI().equals("")) {
-      int index = uri.indexOf("/");
+    if (action != null && !action.classURI().equals("")) {
+      int index = uri.lastIndexOf("/");
       uri = (index == 0 ? "" : uri.substring(0, index)) + "/" + action.classURI();
     }
 

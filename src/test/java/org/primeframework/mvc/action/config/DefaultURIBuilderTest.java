@@ -15,10 +15,10 @@
  */
 package org.primeframework.mvc.action.config;
 
+import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.util.DefaultURIBuilder;
 import org.testng.annotations.Test;
-
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
 
 /**
  * This class tests the default action URI builder.
@@ -34,9 +34,35 @@ public class DefaultURIBuilderTest {
     DefaultURIBuilder builder = new DefaultURIBuilder();
     assertEquals(builder.build(DefaultURIBuilderTest.class), "/config/default-uri-builder-test");
     assertEquals(builder.build(MyCustomAction.class), "/config/my-custom");
+    assertEquals(builder.build(MyCustomActionWithoutAnnotation.class), "/config/my-custom-action-without-annotation");
+    assertEquals(builder.build(MyCustomOverride.class), "/config/AwesomeSauce");
+    assertEquals(builder.build(MyCustomOverrideRandomName.class), "/config/Random-Name");
+    assertEquals(builder.build(MyCustomOverrideStrangeName.class), "/config/Strange_name");
+    assertEquals(builder.build(org.example.action.nested.treeCollisions.SecondAction.class), "/nested/tree-collisions/second");
   }
 }
 
+@Action
 class MyCustomAction {
+
+}
+
+class MyCustomActionWithoutAnnotation {
+
+}
+
+@Action(classURI = "AwesomeSauce")
+class MyCustomOverride {
+
+}
+
+
+@Action(classURI = "Random-Name")
+class MyCustomOverrideRandomName {
+
+}
+
+@Action(classURI = "Strange_name")
+class MyCustomOverrideStrangeName {
 
 }
