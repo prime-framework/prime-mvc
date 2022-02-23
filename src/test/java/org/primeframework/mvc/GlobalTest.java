@@ -717,13 +717,19 @@ public class GlobalTest extends PrimeBaseTest {
     // Reset
     OverrideMeAction.invoked = false;
 
+    boolean succeeded = false;
+
     try {
       test.simulate(() -> simulator.test("/override-me")
                                    .get()
-                                   .assertStatusCode(405)
+                                   .assertStatusCode(404)
                                    .assertBodyIsEmpty());
-      fail("Expected a failure!");
+      succeeded = true;
     } catch (Error expected) {
+    }
+
+    if (succeeded) {
+      fail("Expected a failure!");
     }
   }
 

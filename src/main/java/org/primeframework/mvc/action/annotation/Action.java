@@ -61,7 +61,7 @@ public @interface Action {
 
   /**
    * Determines if the action can be overridden by another action that maps to the same URI. If a class that is marked
-   * as overridable and another another class is found for the same URI but is not marked as overridable, that one is
+   * as overridable and another class is found for the same URI but is not marked as overridable, that one is
    * used.
    *
    * @return True of false.
@@ -87,7 +87,7 @@ public @interface Action {
   String[] scheme() default {"user"};
 
   /**
-   * @return The value of the action annotation is used to determines the URI suffix patterns that the action class can
+   * @return The value of the action annotation is used to determine if the URI suffix patterns that the action class can
    * handle. This is also known as RESTful URI handling. The pattern is derived from the current WADL specification
    * from Sun. The base URI for the action is fixed based on the package and class name. However, everything after the
    * base can be set into properties or fields of the action class using the WADL pattern here. The pattern is like
