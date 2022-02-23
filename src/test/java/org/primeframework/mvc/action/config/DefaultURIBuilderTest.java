@@ -45,6 +45,10 @@ public class DefaultURIBuilderTest {
 @Action
 class MyCustomAction {
 
+  public String get() {
+    return "input";
+  }
+
 }
 
 class MyCustomActionWithoutAnnotation {
@@ -53,16 +57,22 @@ class MyCustomActionWithoutAnnotation {
 
 @Action(classURI = "AwesomeSauce")
 class MyCustomOverride {
-
+  public String get() {
+    return "input";
+  }
 }
 
 
 @Action(classURI = "Random-Name")
 class MyCustomOverrideRandomName {
-
+  public String get() {
+    return "input";
+  }
 }
 
 @Action(classURI = "Strange_name")
 class MyCustomOverrideStrangeName {
-
+  public String get() {
+    return "input";
+  }
 }
