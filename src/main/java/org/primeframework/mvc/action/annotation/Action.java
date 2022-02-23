@@ -40,6 +40,8 @@ public @interface Action {
    *     {@code {/admin/user/editUsers/{id}}
    *     <p>
    */
+  // TODO : SCIM : Should we just call this "uri" and then allow this configuration to override the entire
+  //        action mapping? See DefaultURIBuilder.build
   String classURI() default "";
 
   /**
