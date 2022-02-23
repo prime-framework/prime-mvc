@@ -16,17 +16,19 @@
 package org.example.action;
 
 import org.primeframework.mvc.action.annotation.Action;
+import org.primeframework.mvc.action.result.annotation.Status;
 
 /**
  * This is a simple test action.
  *
  * @author Rob Davis
  */
-@Action(classURI ="OverrideMe")
+@Action(classURI = "OverrideMe")
+@Status
 public class OverrideMeAction {
   // Default behavior would be to parse this into /override-me.
   // The classURI allows to override that behavior to match the class name as is.
-  public boolean invoked = false;
+  public static boolean invoked = false;
 
   public String execute() {
     invoked = true;

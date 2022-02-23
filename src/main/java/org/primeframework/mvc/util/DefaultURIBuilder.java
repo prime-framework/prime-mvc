@@ -18,7 +18,9 @@ package org.primeframework.mvc.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
+import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.annotation.URIModifier;
 
 /**
@@ -65,7 +67,16 @@ public class DefaultURIBuilder implements URIBuilder {
       previousWasCharacter = Character.isJavaIdentifierPart(c);
     }
 
-    return build.toString().toLowerCase();
+    String uri = build.toString().toLowerCase(Locale.ROOT);
+
+    // Handle classURI override
+    Action action = type.getAnnotation(Action.class);
+    if (!action.classURI().equals("")) {
+      int index = uri.indexOf("/");
+      uri = (index == 0 ? "" : uri.substring(0, index)) + "/" + action.classURI();
+    }
+
+    return uri;
   }
 
   private String getURIFromActionClass(Class<?> type) {

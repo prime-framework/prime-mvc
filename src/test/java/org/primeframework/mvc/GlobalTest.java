@@ -36,6 +36,7 @@ import com.google.inject.TypeLiteral;
 import freemarker.template.Configuration;
 import org.example.action.JwtAuthorizedAction;
 import org.example.action.LotsOfMessagesAction;
+import org.example.action.OverrideMeAction;
 import org.example.domain.UserField;
 import org.primeframework.mvc.action.config.ActionConfigurationProvider;
 import org.primeframework.mvc.container.ContainerResolver;
@@ -50,6 +51,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertSame;
+import static org.testng.Assert.assertTrue;
 import static org.testng.FileAssert.fail;
 
 /**
@@ -701,6 +703,28 @@ public class GlobalTest extends PrimeBaseTest {
                                  .post()
                                  .assertStatusCode(500)
                                  .assertHeaderDoesNotContain("Cache-Control"));
+  }
+
+  @Test
+  public void get_overrideClassNameForURI() throws Exception {
+    test.simulate(() -> simulator.test("/OverrideMe")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertBodyIsEmpty());
+
+    assertTrue(OverrideMeAction.invoked);
+
+    // Reset
+    OverrideMeAction.invoked = false;
+
+    try {
+      test.simulate(() -> simulator.test("/override-me")
+                                   .get()
+                                   .assertStatusCode(405)
+                                   .assertBodyIsEmpty());
+      fail("Expected a failure!");
+    } catch (Error expected) {
+    }
   }
 
   @Test
@@ -1497,11 +1521,11 @@ public class GlobalTest extends PrimeBaseTest {
   public void post_dateConversion() throws Exception {
     // Multiple LocalDate formats
     test.forEach(
-        "01-01-2018",
-        "01-01-2018",
-        "1-1-2018",
-        "1/01/2018",
-        "01/1/2018")
+            "01-01-2018",
+            "01-01-2018",
+            "1-1-2018",
+            "1/01/2018",
+            "01/1/2018")
         .test(date -> simulator.test("/date-time-converter")
                                .withParameter("localDate", date)
                                .withParameter("localDate@dateTimeFormat", "[MM/dd/yyyy][M/dd/yyyy][M/d/yyyy][MM-dd-yyyy][M-dd-yyyy][M-d-yyyy]")
@@ -1519,10 +1543,10 @@ public class GlobalTest extends PrimeBaseTest {
 
     // Multiple ZonedDateTime formats
     test.forEach(
-        "07-08-2008 10:13:34 AM -0800",
-        "07/08/2008 10:13:34 AM -0800",
-        "7-8-2008 10:13:34 AM -0800",
-        "7/8/2008 10:13:34 AM -0800")
+            "07-08-2008 10:13:34 AM -0800",
+            "07/08/2008 10:13:34 AM -0800",
+            "7-8-2008 10:13:34 AM -0800",
+            "7/8/2008 10:13:34 AM -0800")
         .test(zoneDateTime -> simulator.test("/date-time-converter")
                                        .withParameter("zonedDateTime", zoneDateTime)
                                        .withParameter("zonedDateTime@dateTimeFormat", "[MM-dd-yyyy hh:mm:ss a Z][MM/dd/yyyy hh:mm:ss a Z][M/d/yyyy hh:mm:ss a Z][M-d-yyyy hh:mm:ss a Z]")

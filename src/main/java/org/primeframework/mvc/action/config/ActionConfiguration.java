@@ -86,8 +86,6 @@ public class ActionConfiguration {
 
   public final Field unknownParametersField;
 
-  // TODO : SCIM : Should I take into account the 'classURI' annotation override so that this returns the correct
-  //        URI that will be used at runtime lookup using the ActionMapper.
   public final String uri;
 
   public final boolean validatable;

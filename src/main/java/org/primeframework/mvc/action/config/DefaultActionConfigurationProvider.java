@@ -77,11 +77,7 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
       for (int i = 0; i < uriParts.length; i++) {
         if (i == uriParts.length - 1) {
           current = processPrefixParameters(actionConfiguration, current);
-          if(!actionConfiguration.annotation.classURI().equals("")) {
-            current = current.actions.compute(actionConfiguration.annotation.classURI(), (k, v) -> new Node(actionConfiguration));
-          } else {
-            current = current.actions.compute(uriParts[i], (k, v) -> new Node(actionConfiguration));
-          }
+          current = current.actions.compute(uriParts[i], (k, v) -> new Node(actionConfiguration));
         } else {
           current = current.packages.computeIfAbsent(uriParts[i], k -> new Node());
         }

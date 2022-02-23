@@ -193,7 +193,7 @@ public class DefaultActionConfigurationProviderTest {
   }
 
   @Test
-  public void lookupOverrideClassUri() {
+  public void lookupOverrideClassURI() {
     DefaultActionConfigurationProvider provider = new DefaultActionConfigurationProvider(
         new DefaultActionConfigurationBuilder(new DefaultURIBuilder(), new HashSet<>(Arrays.asList(new JacksonActionConfigurator(),
             new BinaryActionConfigurator())))
