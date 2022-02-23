@@ -79,31 +79,6 @@ public class DefaultURIBuilder implements URIBuilder {
     return uri;
   }
 
-  private String getURIFromActionClass(Class<?> type) {
-    String fullName = type.getName();
-    if (fullName.endsWith("Action")) {
-      fullName = fullName.substring(0, fullName.length() - 6);
-    }
-
-    int index = fullName.indexOf("action");
-    String lessPackage = fullName.substring(index + 6).replace('.', '/');
-
-    List<String> parts = new ArrayList<>(Arrays.asList(lessPackage.substring(1).split("/")));
-    int startIndex = parts.size() - 2; // last part is the Action name, subtract 2 instead of 1
-
-    for (int partIndex = startIndex; partIndex >= 0; partIndex--) {
-      int packageIndex = startIndex - partIndex; // starts at 0 and increments each iteration
-      String packageName = getPackageName(fullName, packageIndex);
-      Package pkg = ReflectionUtils.findPackageWithAnnotation(packageName, URIModifier.class);
-      if (pkg != null) {
-        URIModifier packageModifier = pkg.getAnnotation(URIModifier.class);
-        parts.set(partIndex, packageModifier.value());
-      }
-    }
-
-    return "/" + String.join("/", parts);
-  }
-
   /**
    * Return the package name given a fully qualified class name. The index is from right to left.
    * <p>
@@ -128,5 +103,30 @@ public class DefaultURIBuilder implements URIBuilder {
     }
 
     return lastDot == -1 ? null : fqClassName.substring(0, lastDot);
+  }
+
+  private String getURIFromActionClass(Class<?> type) {
+    String fullName = type.getName();
+    if (fullName.endsWith("Action")) {
+      fullName = fullName.substring(0, fullName.length() - 6);
+    }
+
+    int index = fullName.indexOf("action");
+    String lessPackage = fullName.substring(index + 6).replace('.', '/');
+
+    List<String> parts = new ArrayList<>(Arrays.asList(lessPackage.substring(1).split("/")));
+    int startIndex = parts.size() - 2; // last part is the Action name, subtract 2 instead of 1
+
+    for (int partIndex = startIndex; partIndex >= 0; partIndex--) {
+      int packageIndex = startIndex - partIndex; // starts at 0 and increments each iteration
+      String packageName = getPackageName(fullName, packageIndex);
+      Package pkg = ReflectionUtils.findPackageWithAnnotation(packageName, URIModifier.class);
+      if (pkg != null) {
+        URIModifier packageModifier = pkg.getAnnotation(URIModifier.class);
+        parts.set(partIndex, packageModifier.value());
+      }
+    }
+
+    return "/" + String.join("/", parts);
   }
 }
