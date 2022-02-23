@@ -31,15 +31,18 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({FIELD, METHOD})
 public @interface JSONResponse {
   /**
-   * View to utilize when serializing the field. The default value of <code>void</code> indicates no view has been defined.
+   * @return the value to be written as the Content-Type for the HTTP response.
    */
-  Class<?> view() default void.class;
+  String contentType() default "application/json";
 
   /**
    * Set to true to 'pretty print' the JSON to the HTTP response.
    */
   boolean prettyPrint() default false;
 
-
-  String contentType() default "application/json";
+  /**
+   * View to utilize when serializing the field. The default value of <code>void</code> indicates no view has been
+   * defined.
+   */
+  Class<?> view() default void.class;
 }

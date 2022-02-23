@@ -86,7 +86,10 @@ public class JSONResult extends AbstractResult<JSON> {
     List<Message> errorMessages = messageStore.get(MessageScope.REQUEST).stream()
                                               .filter(m -> m.getType() == MessageType.ERROR)
                                               .collect(Collectors.toList());
+
+    // Default Content-Type
     String contentType = "application/json";
+
     // If there are ERROR messages, put them in a well known container and render that instead of looking for the @JSONResponse annotation
     if (errorMessages.size() > 0) {
       jacksonObject = convertErrors(errorMessages);
@@ -101,8 +104,9 @@ public class JSONResult extends AbstractResult<JSON> {
         throw new PrimeException("The @JSONResponse field [" + jacksonActionConfiguration.responseMember.name + "] in the action [" + action.getClass() + "] is null. It cannot be null!");
       }
 
-      prettyPrint = jacksonActionConfiguration.responseMember.annotation.prettyPrint();
+      // Allow the JSONResponse annotation to override the contentType.
       contentType = jacksonActionConfiguration.responseMember.annotation.contentType();
+      prettyPrint = jacksonActionConfiguration.responseMember.annotation.prettyPrint();
     }
 
     ByteArrayOutputStream os = new ByteArrayOutputStream(1024);
