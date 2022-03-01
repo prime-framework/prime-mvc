@@ -92,7 +92,8 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
           "abstract. You can only annotate concrete action classes");
     }
 
-    String uri = uriBuilder.build(actionClass);
+    Action action = actionClass.getAnnotation(Action.class);
+    String uri = !action.baseURI().equals("") ? action.baseURI() : uriBuilder.build(actionClass);
     Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods = findExecuteMethods(actionClass);
     List<Method> formPrepareMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, FormPrepareMethod.class);
     List<Method> postParameterMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, PostParameterMethod.class);

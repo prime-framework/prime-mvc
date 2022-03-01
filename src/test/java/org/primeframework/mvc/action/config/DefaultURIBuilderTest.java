@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,44 +34,11 @@ public class DefaultURIBuilderTest {
     DefaultURIBuilder builder = new DefaultURIBuilder();
     assertEquals(builder.build(DefaultURIBuilderTest.class), "/config/default-uri-builder-test");
     assertEquals(builder.build(MyCustomAction.class), "/config/my-custom");
-    assertEquals(builder.build(MyCustomActionWithoutAnnotation.class), "/config/my-custom-action-without-annotation");
-    assertEquals(builder.build(MyCustomOverride.class), "/config/AwesomeSauce");
-    assertEquals(builder.build(MyCustomOverrideRandomName.class), "/config/Random-Name");
-    assertEquals(builder.build(MyCustomOverrideStrangeName.class), "/config/Strange_name");
-    assertEquals(builder.build(org.example.action.nested.treeCollisions.SecondAction.class), "/nested/tree-collisions/second");
   }
 }
 
 @Action
 class MyCustomAction {
-
-  public String get() {
-    return "input";
-  }
-
-}
-
-class MyCustomActionWithoutAnnotation {
-
-}
-
-@Action(classURI = "AwesomeSauce")
-class MyCustomOverride {
-  public String get() {
-    return "input";
-  }
-}
-
-
-@Action(classURI = "Random-Name")
-class MyCustomOverrideRandomName {
-  public String get() {
-    return "input";
-  }
-}
-
-@Action(classURI = "Strange_name")
-class MyCustomOverrideStrangeName {
   public String get() {
     return "input";
   }

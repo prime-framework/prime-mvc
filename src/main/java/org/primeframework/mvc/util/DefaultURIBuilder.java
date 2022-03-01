@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.annotation.URIModifier;
 
 /**
@@ -67,16 +66,7 @@ public class DefaultURIBuilder implements URIBuilder {
       previousWasCharacter = Character.isJavaIdentifierPart(c);
     }
 
-    String uri = build.toString().toLowerCase(Locale.ROOT);
-
-    // Handle classURI override
-    Action action = type.getAnnotation(Action.class);
-    if (action != null && !action.classURI().equals("")) {
-      int index = uri.lastIndexOf("/");
-      uri = (index == 0 ? "" : uri.substring(0, index)) + "/" + action.classURI();
-    }
-
-    return uri;
+    return build.toString().toLowerCase(Locale.ROOT);
   }
 
   /**

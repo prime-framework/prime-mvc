@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import org.primeframework.mvc.action.result.annotation.Status;
  *
  * @author Rob Davis
  */
-@Action(classURI = "OverrideMe")
+@Action(baseURI = "/OverrideMe")
 @Status
 public class OverrideMeAction {
   // Default behavior would be to parse this into /override-me.

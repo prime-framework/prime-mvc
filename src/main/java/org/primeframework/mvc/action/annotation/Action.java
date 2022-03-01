@@ -29,20 +29,17 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface Action {
   /**
-   * @return The class URI for the action can be overridden here if the derived name from the class is not desired. The
-   *     pattern is like this:
+   * @return The base URI for the action can be overridden. For example, if you do not want to use the convention based
+   *     URL built from the Java package and class name, you override the entire URI here. For example:
    *     <p>
-   *     {@code {id}}
+   *     {@code {/path/to/my/action}}
    *     <p>
-   *     If the class name is EditAction, but the classURI is editUsers, the full specification for the URI that action
-   *     can handle would be:
-   *     <p>
-   *     {@code {/admin/user/editUsers/{id}}
-   *     <p>
+   *     Note this is called baseURI because it will not handle replacement values such as /{tenantId}/foo/bar. In the
+   *     future we may support that, and then we will add another value called uri. So because this will just be used as
+   *     the prefix, or base just like the resolved package name and class name would be with an optional {value}
+   *     parameter, we'll call this base.
    */
-  // TODO : SCIM : Should we just call this "uri" and then allow this configuration to override the entire
-  //        action mapping? See DefaultURIBuilder.build
-  String classURI() default "";
+  String baseURI() default "";
 
   /**
    * @return the required roles for this action to be executed.
@@ -50,8 +47,8 @@ public @interface Action {
   String[] constraints() default {};
 
   /**
-   * Set this to true to enable JWT authorization. If JWT is enabled and a JWT Authorization header is sent in on the request the JWT
-   * Security Scheme will be utilized instead of the specified security scheme.
+   * Set this to true to enable JWT authorization. If JWT is enabled and a JWT Authorization header is sent in on the
+   * request the JWT Security Scheme will be utilized instead of the specified security scheme.
    *
    * @return true if this action allows JWT authorization.
    * @deprecated Use "jwt" as a security scheme. For example: <code>scheme = {"jwt", "api"}</code>.
@@ -61,8 +58,7 @@ public @interface Action {
 
   /**
    * Determines if the action can be overridden by another action that maps to the same URI. If a class that is marked
-   * as overridable and another class is found for the same URI but is not marked as overridable, that one is
-   * used.
+   * as overridable and another class is found for the same URI but is not marked as overridable, that one is used.
    *
    * @return True of false.
    */
@@ -81,27 +77,28 @@ public @interface Action {
   boolean requiresAuthentication() default false;
 
   /**
-   * @return The security scheme(s) that handle authentication and authorization for this action. These are applied in order and the
-   * constraints are offered to each scheme.
+   * @return The security scheme(s) that handle authentication and authorization for this action. These are applied in
+   *     order and the constraints are offered to each scheme.
    */
   String[] scheme() default {"user"};
 
   /**
-   * @return The value of the action annotation is used to determine if the URI suffix patterns that the action class can
-   * handle. This is also known as RESTful URI handling. The pattern is derived from the current WADL specification
-   * from Sun. The base URI for the action is fixed based on the package and class name. However, everything after the
-   * base can be set into properties or fields of the action class using the WADL pattern here. The pattern is like
-   * this:
-   * <p>
-   * {@code {id}}
-   * <p>
-   * If the classes base URI is /admin/user/edit, the full specification for the URI that action can handle would be:
-   * <p>
-   * {@code {/admin/user/edit/{id}}
-   * <p>
-   * If the URI is <strong>/admin/user/edit/42</strong>, the value of 42 would be added to the HTTP request parameters
-   * under the key <strong>id</strong>. In most cases this means that the value will also be set into the action, but
-   * it could also be used as a {@link org.primeframework.mvc.parameter.annotation.PreParameter}.
+   * @return The value of the action annotation is used to determine if the URI suffix patterns that the action class
+   *     can handle. This is also known as RESTful URI handling. The pattern is derived from the current WADL
+   *     specification from Sun. The base URI for the action is fixed based on the package and class name. However,
+   *     everything after the base can be set into properties or fields of the action class using the WADL pattern here.
+   *     The pattern is like this:
+   *     <p>
+   *     {@code {id}}
+   *     <p>
+   *     If the classes base URI is /admin/user/edit, the full specification for the URI that action can handle would
+   *     be:
+   *     <p>
+   *     {@code {/admin/user/edit/{id}}
+   *     <p>
+   *     If the URI is <strong>/admin/user/edit/42</strong>, the value of 42 would be added to the HTTP request
+   *     parameters under the key <strong>id</strong>. In most cases this means that the value will also be set into the
+   *     action, but it could also be used as a {@link org.primeframework.mvc.parameter.annotation.PreParameter}.
    */
   String value() default "";
 }
