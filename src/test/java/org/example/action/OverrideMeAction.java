@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +15,23 @@
  */
 package org.example.action;
 
-import com.google.inject.Inject;
 import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.http.HTTPRequest;
+import org.primeframework.mvc.action.result.annotation.Status;
 
 /**
- * @author Brian Pontarelli
+ * This is a simple test action.
+ *
+ * @author Rob Davis
  */
-@Action
-public class ValueInRequest {
-  @Inject public HTTPRequest request;
+@Action(baseURI = "/OverrideMe")
+@Status
+public class OverrideMeAction {
+  // Default behavior would be to parse this into /override-me.
+  // The classURI allows to override that behavior to match the class name as is.
+  public static boolean invoked = false;
 
-  private String bar;
-
-  public String get() {
-    request.setAttribute("bar", "baz");
+  public String execute() {
+    invoked = true;
     return "success";
   }
 }

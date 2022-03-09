@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2019, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,6 +86,10 @@ public class JSONResult extends AbstractResult<JSON> {
     List<Message> errorMessages = messageStore.get(MessageScope.REQUEST).stream()
                                               .filter(m -> m.getType() == MessageType.ERROR)
                                               .collect(Collectors.toList());
+
+    // Default Content-Type
+    String contentType = "application/json; charset=UTF-8";
+
     // If there are ERROR messages, put them in a well known container and render that instead of looking for the @JSONResponse annotation
     if (errorMessages.size() > 0) {
       jacksonObject = convertErrors(errorMessages);
@@ -100,6 +104,8 @@ public class JSONResult extends AbstractResult<JSON> {
         throw new PrimeException("The @JSONResponse field [" + jacksonActionConfiguration.responseMember.name + "] in the action [" + action.getClass() + "] is null. It cannot be null!");
       }
 
+      // Allow the JSONResponse annotation to override the contentType.
+      contentType = jacksonActionConfiguration.responseMember.annotation.contentType();
       prettyPrint = jacksonActionConfiguration.responseMember.annotation.prettyPrint();
     }
 
@@ -108,7 +114,7 @@ public class JSONResult extends AbstractResult<JSON> {
 
     byte[] result = os.toByteArray();
     response.setStatus(json.status());
-    response.setContentType("application/json; charset=UTF-8");
+    response.setContentType(contentType);
     response.setContentLength((long) result.length);
 
     // Handle setting cache controls

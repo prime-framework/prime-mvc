@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2018, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,6 +71,11 @@ public class JSONResultTest extends PrimeBaseTest {
     @Override
     public Class<? extends Annotation> annotationType() {
       return null;
+    }
+
+    @Override
+    public String contentType() {
+      return "application/json; charset=UTF-8";
     }
 
     @Override

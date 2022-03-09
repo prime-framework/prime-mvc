@@ -1,1 +1,2 @@
-IsLoggedIn:${isLoggedIn}
+/store/index
+IsLoggedIn:${isLoggedIn?c}

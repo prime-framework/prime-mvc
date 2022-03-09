@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2018, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,7 +92,8 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
           "abstract. You can only annotate concrete action classes");
     }
 
-    String uri = uriBuilder.build(actionClass);
+    Action action = actionClass.getAnnotation(Action.class);
+    String uri = !action.baseURI().equals("") ? action.baseURI() : uriBuilder.build(actionClass);
     Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods = findExecuteMethods(actionClass);
     List<Method> formPrepareMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, FormPrepareMethod.class);
     List<Method> postParameterMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, PostParameterMethod.class);

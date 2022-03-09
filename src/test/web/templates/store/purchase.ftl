@@ -1,1 +1,2 @@
+/store/purchase
 Buy:${item}

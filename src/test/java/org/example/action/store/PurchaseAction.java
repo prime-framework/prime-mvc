@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2020-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,25 @@
  */
 package org.example.action.store;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.action.annotation.Action;
+import org.primeframework.mvc.message.MessageStore;
+import org.primeframework.mvc.message.MessageType;
+import org.primeframework.mvc.message.SimpleMessage;
 
 /**
  * @author Daniel DeGroff
  */
 @Action
 public class PurchaseAction extends BaseStoreAction {
+  private final MessageStore messageStore;
+
   public String item;
+
+  @Inject
+  public PurchaseAction(MessageStore messageStore) {
+    this.messageStore = messageStore;
+  }
 
   public String get() {
     if (isLoggedIn()) {
@@ -37,6 +48,7 @@ public class PurchaseAction extends BaseStoreAction {
       return "success";
     }
 
+    messageStore.add(new SimpleMessage(MessageType.INFO, "[Unauthorized]", "You must login to complete your purchase."));
     return "unauthenticated";
   }
 }

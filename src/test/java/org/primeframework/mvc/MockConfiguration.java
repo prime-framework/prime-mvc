@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2020, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,9 +42,7 @@ public class MockConfiguration extends AbstractMVCConfiguration {
   public int l10nReloadSeconds;
 
   public MockConfiguration() {
-    byte[] keyBytes = new byte[16];
-    new SecureRandom().nextBytes(keyBytes);
-    this.cookieEncryptionKey = new SecretKeySpec(keyBytes, "AES");
+    regenerateCookieEncryptionKey();
   }
 
   public MockConfiguration(int freemarkerCheckSeconds, int l10nReloadSeconds, boolean allowUnknownParameters,
@@ -89,6 +87,13 @@ public class MockConfiguration extends AbstractMVCConfiguration {
   @Override
   public String localeCookieName() {
     return localeCookieName;
+  }
+
+  public MockConfiguration regenerateCookieEncryptionKey() {
+    byte[] keyBytes = new byte[16];
+    new SecureRandom().nextBytes(keyBytes);
+    this.cookieEncryptionKey = new SecretKeySpec(keyBytes, "AES");
+    return this;
   }
 
   @Override

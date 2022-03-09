@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.primeframework.mvc.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import org.primeframework.mvc.action.annotation.URIModifier;
 
@@ -65,32 +66,7 @@ public class DefaultURIBuilder implements URIBuilder {
       previousWasCharacter = Character.isJavaIdentifierPart(c);
     }
 
-    return build.toString().toLowerCase();
-  }
-
-  private String getURIFromActionClass(Class<?> type) {
-    String fullName = type.getName();
-    if (fullName.endsWith("Action")) {
-      fullName = fullName.substring(0, fullName.length() - 6);
-    }
-
-    int index = fullName.indexOf("action");
-    String lessPackage = fullName.substring(index + 6).replace('.', '/');
-
-    List<String> parts = new ArrayList<>(Arrays.asList(lessPackage.substring(1).split("/")));
-    int startIndex = parts.size() - 2; // last part is the Action name, subtract 2 instead of 1
-
-    for (int partIndex = startIndex; partIndex >= 0; partIndex--) {
-      int packageIndex = startIndex - partIndex; // starts at 0 and increments each iteration
-      String packageName = getPackageName(fullName, packageIndex);
-      Package pkg = ReflectionUtils.findPackageWithAnnotation(packageName, URIModifier.class);
-      if (pkg != null) {
-        URIModifier packageModifier = pkg.getAnnotation(URIModifier.class);
-        parts.set(partIndex, packageModifier.value());
-      }
-    }
-
-    return "/" + String.join("/", parts);
+    return build.toString().toLowerCase(Locale.ROOT);
   }
 
   /**
@@ -117,5 +93,30 @@ public class DefaultURIBuilder implements URIBuilder {
     }
 
     return lastDot == -1 ? null : fqClassName.substring(0, lastDot);
+  }
+
+  private String getURIFromActionClass(Class<?> type) {
+    String fullName = type.getName();
+    if (fullName.endsWith("Action")) {
+      fullName = fullName.substring(0, fullName.length() - 6);
+    }
+
+    int index = fullName.indexOf("action");
+    String lessPackage = fullName.substring(index + 6).replace('.', '/');
+
+    List<String> parts = new ArrayList<>(Arrays.asList(lessPackage.substring(1).split("/")));
+    int startIndex = parts.size() - 2; // last part is the Action name, subtract 2 instead of 1
+
+    for (int partIndex = startIndex; partIndex >= 0; partIndex--) {
+      int packageIndex = startIndex - partIndex; // starts at 0 and increments each iteration
+      String packageName = getPackageName(fullName, packageIndex);
+      Package pkg = ReflectionUtils.findPackageWithAnnotation(packageName, URIModifier.class);
+      if (pkg != null) {
+        URIModifier packageModifier = pkg.getAnnotation(URIModifier.class);
+        parts.set(partIndex, packageModifier.value());
+      }
+    }
+
+    return "/" + String.join("/", parts);
   }
 }

@@ -1,1 +1,2 @@
+/store/complete
 Bought:${item}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2018, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,12 +31,18 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({FIELD, METHOD})
 public @interface JSONResponse {
   /**
-   * View to utilize when serializing the field. The default value of <code>void</code> indicates no view has been defined.
+   * @return the value to be written as the Content-Type for the HTTP response.
    */
-  Class<?> view() default void.class;
+  String contentType() default "application/json; charset=UTF-8";
 
   /**
    * Set to true to 'pretty print' the JSON to the HTTP response.
    */
   boolean prettyPrint() default false;
+
+  /**
+   * View to utilize when serializing the field. The default value of <code>void</code> indicates no view has been
+   * defined.
+   */
+  Class<?> view() default void.class;
 }

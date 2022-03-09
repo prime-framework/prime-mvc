@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2018, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,6 +58,8 @@ import org.primeframework.mvc.message.scope.CookieFlashScope;
 import org.primeframework.mvc.message.scope.FlashScope;
 import org.primeframework.mvc.message.scope.RequestScope;
 import org.primeframework.mvc.netty.PrimeHTTPServerConfiguration;
+import org.primeframework.mvc.security.CipherProvider;
+import org.primeframework.mvc.security.DefaultCipherProvider;
 import org.primeframework.mvc.security.MockUserLoginSecurityContext;
 import org.primeframework.mvc.security.UserLoginSecurityContext;
 import org.primeframework.mvc.security.VerifierProvider;
@@ -312,6 +314,8 @@ public abstract class PrimeBaseTest {
   public static class TestSecurityModule extends AbstractModule {
     @Override
     protected void configure() {
+      // Don't bind as a singleton in tests so that I can change the key during a test
+      bind(CipherProvider.class).to(DefaultCipherProvider.class);
       bind(VerifierProvider.class).to(MockVerifierProvider.class);
     }
   }

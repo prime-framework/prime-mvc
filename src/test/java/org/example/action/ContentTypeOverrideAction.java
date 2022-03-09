@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +15,25 @@
  */
 package org.example.action;
 
-import com.google.inject.Inject;
+import org.example.domain.Entry;
 import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.http.HTTPRequest;
+import org.primeframework.mvc.action.result.annotation.JSON;
+import org.primeframework.mvc.content.json.annotation.JSONResponse;
 
 /**
- * @author Brian Pontarelli
+ * This is a simple test action.
+ *
+ * @author Rob Davis
  */
 @Action
-public class ValueInRequest {
-  @Inject public HTTPRequest request;
+@JSON
+public class ContentTypeOverrideAction {
+  // Override the contenttype header value.
+  @JSONResponse(contentType = "application/json+scim")
+  public Entry response;
 
-  private String bar;
-
-  public String get() {
-    request.setAttribute("bar", "baz");
+  public String execute() {
+    response = new Entry();
     return "success";
   }
 }

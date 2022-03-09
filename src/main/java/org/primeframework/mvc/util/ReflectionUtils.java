@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2019, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -857,6 +857,10 @@ public class ReflectionUtils {
     @Override
     public Type determineGenericType(Method method) {
       Type[] types = method.getGenericParameterTypes();
+      if (types.length == 0) {
+        throw new ExpressionException("Unable to call method [" + method + "] because while the name indicates it is a setter, the method has 0 arguments. You need to add 1 or more arguments, or rename this method.");
+      }
+
       if (types.length == 1) {
         return types[0];
       }
