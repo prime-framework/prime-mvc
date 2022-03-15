@@ -120,7 +120,7 @@ public class JSONResultTest extends PrimeBaseTest {
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
     response.setStatus(200);
     response.setCharacterEncoding("UTF-8");
-    response.setContentType("application/json");
+    response.setContentType("application/json; charset=UTF-8");
     response.setContentLength(538);
     response.setHeader("Cache-Control", "no-cache");
     if (httpMethod == HTTPMethod.GET) {
@@ -202,7 +202,7 @@ public class JSONResultTest extends PrimeBaseTest {
     HttpServletResponse response = createStrictMock(HttpServletResponse.class);
     response.setStatus(400);
     response.setCharacterEncoding("UTF-8");
-    response.setContentType("application/json");
+    response.setContentType("application/json; charset=UTF-8");
     response.setContentLength(359);
     response.setHeader("Cache-Control", "no-cache");
     if (httpMethod == HTTPMethod.GET) {
@@ -307,7 +307,7 @@ public class JSONResultTest extends PrimeBaseTest {
     private final int status;
 
     public JSONImpl(String code, int status) {
-      this.contentType = "";
+      this.contentType = "application/json; charset=UTF-8";
       this.cacheControl = "no-cache";
       this.code = code;
       this.disableCacheControl = false;
