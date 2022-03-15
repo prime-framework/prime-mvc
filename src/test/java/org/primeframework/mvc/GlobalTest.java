@@ -789,7 +789,7 @@ public class GlobalTest extends PrimeBaseTest {
              .withParameter("result", "json")
              .get()
              .assertStatusCode(200)
-             .assertContentType("application/json")
+             .assertContentType("application/json; charset=UTF-8")
              .assertBodyContains("trust me it is json");
 
     simulator.test("/pre-render-method")
@@ -1686,7 +1686,7 @@ public class GlobalTest extends PrimeBaseTest {
                                  .assertStatusCode(400)
                                  .assertContainsFieldErrors("active")
                                  // The actual exception seems to vary a bit, so instead we are asserting the content type and then that some specific info is in the body.
-                                 .assertContentType("application/json")
+                                 .assertContentType("application/json; charset=UTF-8")
                                  .assertBodyContains(
                                      "[invalidJSON]",
                                      "Unable to parse JSON. The property [active] was invalid. The error was [Possible conversion error]. The detailed exception was ["));

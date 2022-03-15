@@ -87,9 +87,6 @@ public class JSONResult extends AbstractResult<JSON> {
                                               .filter(m -> m.getType() == MessageType.ERROR)
                                               .collect(Collectors.toList());
 
-    // Default Content-Type
-    String contentType = "application/json";
-
     // If there are ERROR messages, put them in a well known container and render that instead of looking for the @JSONResponse annotation
     if (errorMessages.size() > 0) {
       jacksonObject = convertErrors(errorMessages);
@@ -105,7 +102,6 @@ public class JSONResult extends AbstractResult<JSON> {
       }
 
       // Allow the JSONResponse annotation to override the contentType.
-      contentType = jacksonActionConfiguration.responseMember.annotation.contentType();
       prettyPrint = jacksonActionConfiguration.responseMember.annotation.prettyPrint();
     }
 
@@ -115,8 +111,7 @@ public class JSONResult extends AbstractResult<JSON> {
     byte[] result = os.toByteArray();
     response.setStatus(json.status());
     response.setCharacterEncoding("UTF-8");
-    // Allow the JSON annotation to override the otherwise requested Content-Type header
-    response.setContentType(json.contentType().equals("") ? contentType : json.contentType());
+    response.setContentType(json.contentType());
     response.setContentLength(result.length);
 
     // Handle setting cache controls

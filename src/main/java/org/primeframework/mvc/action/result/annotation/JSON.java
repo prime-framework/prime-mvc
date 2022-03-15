@@ -43,12 +43,11 @@ public @interface JSON {
   String code() default "success";
 
   /**
-   * Optionally override the Content-Type that is either already set or defaulted based upon the Result handler. Leave
-   * the default value if you do not wish to override the Content-Type header.
+   * Set the Content-Type of the HTTP response.
    *
    * @return the value to be written as the Content-Type for the HTTP response.
    */
-  String contentType() default "";
+  String contentType() default "application/json; charset=UTF-8";
 
   /**
    * @return set to true to disable cache control and manage the headers on your own.

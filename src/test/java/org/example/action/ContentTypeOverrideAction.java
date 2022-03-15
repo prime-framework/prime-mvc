@@ -28,12 +28,11 @@ import org.primeframework.mvc.content.json.annotation.JSONResponse;
 @Action
 
 @JSON.List({
-    @JSON,
+    @JSON(contentType = "application/json+scim"),
     @JSON(code = "error", contentType = "application/json+error", status = 400)
 })
 public class ContentTypeOverrideAction {
-  // Override the contenttype header value.
-  @JSONResponse(contentType = "application/json+scim")
+  @JSONResponse
   public Entry response;
 
   public String status;

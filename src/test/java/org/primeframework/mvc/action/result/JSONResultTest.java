@@ -73,11 +73,6 @@ public class JSONResultTest extends PrimeBaseTest {
     }
 
     @Override
-    public String contentType() {
-      return "application/json";
-    }
-
-    @Override
     public boolean prettyPrint() {
       return false;
     }
