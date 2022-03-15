@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2018, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2013-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,13 +73,13 @@ public class JSONResultTest extends PrimeBaseTest {
     }
 
     @Override
-    public boolean prettyPrint() {
-      return false;
+    public String contentType() {
+      return "application/json";
     }
 
     @Override
-    public String contentType() {
-      return "application/json";
+    public boolean prettyPrint() {
+      return false;
     }
 
     @Override
@@ -305,11 +305,14 @@ public class JSONResultTest extends PrimeBaseTest {
 
     private final String code;
 
+    private final String contentType;
+
     private final boolean disableCacheControl;
 
     private final int status;
 
     public JSONImpl(String code, int status) {
+      this.contentType = "";
       this.cacheControl = "no-cache";
       this.code = code;
       this.disableCacheControl = false;
@@ -329,6 +332,11 @@ public class JSONResultTest extends PrimeBaseTest {
     @Override
     public String code() {
       return code;
+    }
+
+    @Override
+    public String contentType() {
+      return contentType;
     }
 
     @Override

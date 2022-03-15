@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,14 +26,25 @@ import org.primeframework.mvc.content.json.annotation.JSONResponse;
  * @author Rob Davis
  */
 @Action
-@JSON
+
+@JSON.List({
+    @JSON,
+    @JSON(code = "error", contentType = "application/json+error", status = 400)
+})
 public class ContentTypeOverrideAction {
   // Override the contenttype header value.
   @JSONResponse(contentType = "application/json+scim")
   public Entry response;
 
+  public String status;
+
   public String execute() {
     response = new Entry();
+
+    if (status != null && status.equals("400")) {
+      return "error";
+    }
+
     return "success";
   }
 }

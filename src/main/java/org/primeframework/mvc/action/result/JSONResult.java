@@ -88,7 +88,7 @@ public class JSONResult extends AbstractResult<JSON> {
                                               .collect(Collectors.toList());
 
     // Default Content-Type
-    String contentType = "application/json; charset=UTF-8";
+    String contentType = "application/json";
 
     // If there are ERROR messages, put them in a well known container and render that instead of looking for the @JSONResponse annotation
     if (errorMessages.size() > 0) {

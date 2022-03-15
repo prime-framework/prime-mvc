@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2020, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -154,6 +154,14 @@ public class GlobalTest extends PrimeBaseTest {
              .setup(r -> r.container.getResponse().setHeader("Referer", "http://localhost"))
              .assertStatusCode(200)
              .assertContentType("application/json+scim");
+
+    // Override from the JSON annotation
+    simulator.test("/content-type-override")
+             .withParameter("status", 400)
+             .get()
+             .setup(r -> r.container.getResponse().setHeader("Referer", "http://localhost"))
+             .assertStatusCode(400)
+             .assertContentType("application/json+error");
   }
 
   @Test
@@ -1678,7 +1686,7 @@ public class GlobalTest extends PrimeBaseTest {
                                  .assertStatusCode(400)
                                  .assertContainsFieldErrors("active")
                                  // The actual exception seems to vary a bit, so instead we are asserting the content type and then that some specific info is in the body.
-                                 .assertContentType("application/json")
+                                 .assertContentType("application/json;")
                                  .assertBodyContains(
                                      "[invalidJSON]",
                                      "Unable to parse JSON. The property [active] was invalid. The error was [Possible conversion error]. The detailed exception was ["));

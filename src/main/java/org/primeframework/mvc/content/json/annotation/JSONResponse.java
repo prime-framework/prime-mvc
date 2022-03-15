@@ -33,7 +33,7 @@ public @interface JSONResponse {
   /**
    * @return the value to be written as the Content-Type for the HTTP response.
    */
-  String contentType() default "application/json; charset=UTF-8";
+  String contentType() default "application/json";
 
   /**
    * Set to true to 'pretty print' the JSON to the HTTP response.
