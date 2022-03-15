@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2019, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,7 +88,7 @@ public class JSONResult extends AbstractResult<JSON> {
                                               .collect(Collectors.toList());
 
     // Default Content-Type
-    String contentType = "application/json";
+    String contentType = "application/json; charset=UTF-8";
 
     // If there are ERROR messages, put them in a well known container and render that instead of looking for the @JSONResponse annotation
     if (errorMessages.size() > 0) {
@@ -115,7 +115,8 @@ public class JSONResult extends AbstractResult<JSON> {
     byte[] result = os.toByteArray();
     response.setStatus(json.status());
     response.setCharacterEncoding("UTF-8");
-    response.setContentType(contentType);
+    // Allow the JSON annotation to override the otherwise requested Content-Type header
+    response.setContentType(json.contentType().equals("") ? contentType : json.contentType());
     response.setContentLength(result.length);
 
     // Handle setting cache controls

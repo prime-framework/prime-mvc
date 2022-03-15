@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,14 @@ public @interface JSON {
    * @return The result code from the action's execute method that this Result is associated with.
    */
   String code() default "success";
+
+  /**
+   * Optionally override the Content-Type that is either already set or defaulted based upon the Result handler. Leave
+   * the default value if you do not wish to override the Content-Type header.
+   *
+   * @return the value to be written as the Content-Type for the HTTP response.
+   */
+  String contentType() default "";
 
   /**
    * @return set to true to disable cache control and manage the headers on your own.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2018, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ public @interface JSONResponse {
   /**
    * @return the value to be written as the Content-Type for the HTTP response.
    */
-  String contentType() default "application/json";
+  String contentType() default "application/json; charset=UTF-8";
 
   /**
    * Set to true to 'pretty print' the JSON to the HTTP response.
