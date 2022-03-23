@@ -26,14 +26,24 @@ import org.primeframework.mvc.content.json.annotation.JSONResponse;
  * @author Rob Davis
  */
 @Action
-@JSON
+
+@JSON.List({
+    @JSON(contentType = "application/json+scim"),
+    @JSON(code = "error", contentType = "application/json+error", status = 400)
+})
 public class ContentTypeOverrideAction {
-  // Override the contenttype header value.
-  @JSONResponse(contentType = "application/json+scim")
+  @JSONResponse
   public Entry response;
+
+  public String status;
 
   public String execute() {
     response = new Entry();
+
+    if (status != null && status.equals("400")) {
+      return "error";
+    }
+
     return "success";
   }
 }

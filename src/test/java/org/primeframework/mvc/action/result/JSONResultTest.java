@@ -74,11 +74,6 @@ public class JSONResultTest extends PrimeBaseTest {
     }
 
     @Override
-    public String contentType() {
-      return "application/json; charset=UTF-8";
-    }
-
-    @Override
     public boolean prettyPrint() {
       return false;
     }
@@ -292,11 +287,14 @@ public class JSONResultTest extends PrimeBaseTest {
 
     private final String code;
 
+    private final String contentType;
+
     private final boolean disableCacheControl;
 
     private final int status;
 
     public JSONImpl(String code, int status) {
+      this.contentType = "application/json; charset=UTF-8";
       this.cacheControl = "no-cache";
       this.code = code;
       this.disableCacheControl = false;
@@ -316,6 +314,11 @@ public class JSONResultTest extends PrimeBaseTest {
     @Override
     public String code() {
       return code;
+    }
+
+    @Override
+    public String contentType() {
+      return contentType;
     }
 
     @Override

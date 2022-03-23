@@ -26,7 +26,6 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.Collection;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -165,9 +164,15 @@ public class GlobalTest extends PrimeBaseTest {
   public void get_ContentTypeOverride() throws Exception {
     simulator.test("/content-type-override")
              .get()
-             .setup(r -> r.response.headers.put("Referer", List.of("http://localhost")))
              .assertStatusCode(200)
              .assertContentType("application/json+scim");
+
+    // Override from the JSON annotation
+    simulator.test("/content-type-override")
+             .withParameter("status", 400)
+             .get()
+             .assertStatusCode(400)
+             .assertContentType("application/json+error");
   }
 
   @Test
