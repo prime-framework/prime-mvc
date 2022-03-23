@@ -20,12 +20,12 @@ dropWizardVersion = "3.2.6"
 fusionAuthJWTVersion = "3.1.6"
 guavaVersion = "30.1.0-jre"
 guiceVersion = "5.0.1"
-jacksonVersion = "2.13.0"
+jacksonVersion = "2.13.2"
 logbackVersion = "1.3.0-alpha10"
 primeMockVersion = "0.9.0"
 slf4jVersion = "2.0.0-alpha5"
 
-project(group: "org.primeframework", name: "prime-mvc", version: "1.31.4", licenses: ["ApacheV2_0"]) {
+project(group: "org.primeframework", name: "prime-mvc", version: "1.32.0", licenses: ["ApacheV2_0"]) {
   workflow {
     fetch {
       cache()
