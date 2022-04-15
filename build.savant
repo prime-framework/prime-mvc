@@ -100,6 +100,7 @@ release = loadPlugin(id: "org.savantbuild.plugin:release-git:${savantVersion}")
 // Plugin settings
 // Note: Pending support from EasyMock to move to 17. The following issue should be fixed in 4.4, waiting for that release.
 // https://github.com/easymock/easymock/issues/274
+// https://github.com/easymock/easymock/milestone/25
 // https://github.com/easymock/easymock/releases
 java.settings.javaVersion = "14"
 javaTestNG.settings.javaVersion = "14"
