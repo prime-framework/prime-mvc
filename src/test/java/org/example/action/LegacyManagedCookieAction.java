@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2021, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,27 +13,28 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.security;
+package org.example.action;
+
+import org.primeframework.mvc.action.annotation.Action;
+import org.primeframework.mvc.http.Cookie;
+import org.primeframework.mvc.scope.annotation.ManagedCookie;
 
 /**
- * Encrypt and decrypt stuff.
- *
- * @author Daniel DeGroff
+ * @author Brian Pontarelli
  */
-public interface Encryptor {
-  /**
-   * Decrypt a set of bytes.
-   *
-   * @param bytes The bytes to decrypt.
-   * @return The decrypted bytes.
-   */
-  byte[] decrypt(byte[] bytes) throws Exception;
+@Action
+public class LegacyManagedCookieAction {
+  @ManagedCookie
+  public Cookie cookie;
 
-  /**
-   * Encrypt a set of bytes.
-   *
-   * @param bytes The bytes to encrypt.
-   * @return The encrypted bytes.
-   */
-  byte[] encrypt(byte[] bytes) throws Exception;
+  public String value;
+
+  public String get() {
+    return "input";
+  }
+
+  public String post() {
+    cookie.value = value;
+    return "input";
+  }
 }

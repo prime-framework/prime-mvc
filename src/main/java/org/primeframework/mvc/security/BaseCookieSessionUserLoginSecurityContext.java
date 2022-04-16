@@ -15,6 +15,7 @@
  */
 package org.primeframework.mvc.security;
 
+import org.primeframework.mvc.http.Cookie.SameSite;
 import org.primeframework.mvc.http.HTTPRequest;
 import org.primeframework.mvc.http.HTTPResponse;
 
@@ -33,7 +34,7 @@ public abstract class BaseCookieSessionUserLoginSecurityContext implements UserL
   protected BaseCookieSessionUserLoginSecurityContext(HTTPRequest request, HTTPResponse response) {
     this.request = request;
     this.response = response;
-    this.cookie = new CookieProxy(cookieName(), cookieDuration());
+    this.cookie = new CookieProxy(cookieName(), cookieDuration(), SameSite.Strict);
   }
 
   @Override

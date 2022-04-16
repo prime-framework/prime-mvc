@@ -17,6 +17,7 @@ package org.primeframework.mvc.security;
 
 import java.io.IOException;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import org.primeframework.mvc.action.result.SavedRequestTools;
 import org.primeframework.mvc.action.result.SavedRequestTools.SaveHttpRequestResult;
@@ -37,13 +38,16 @@ public class DefaultSavedRequestWorkflow implements SavedRequestWorkflow {
 
   private final Encryptor encryptor;
 
+  private final ObjectMapper objectMapper;
+
   private final MutableHTTPRequest request;
 
   private final HTTPResponse response;
 
   @Inject
-  public DefaultSavedRequestWorkflow(MVCConfiguration configuration, Encryptor encryptor, HTTPRequest request,
-                                     HTTPResponse response) {
+  public DefaultSavedRequestWorkflow(MVCConfiguration configuration, Encryptor encryptor, ObjectMapper objectMapper,
+                                     HTTPRequest request, HTTPResponse response) {
+    this.objectMapper = objectMapper;
     this.request = (MutableHTTPRequest) request;
     this.encryptor = encryptor;
     this.configuration = configuration;
@@ -52,7 +56,7 @@ public class DefaultSavedRequestWorkflow implements SavedRequestWorkflow {
 
   @Override
   public void perform(WorkflowChain workflowChain) throws IOException {
-    SaveHttpRequestResult result = SavedRequestTools.getSaveRequestForWorkflow(configuration, encryptor, request, response);
+    SaveHttpRequestResult result = SavedRequestTools.getSaveRequestForWorkflow(configuration, encryptor, objectMapper, request, response);
     if (result != null) {
       request.setPath(result.savedHttpRequest.uri);
       request.setMethod(result.savedHttpRequest.method);

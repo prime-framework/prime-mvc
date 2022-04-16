@@ -16,13 +16,17 @@
 package org.primeframework.mvc.scope;
 
 import java.lang.annotation.Annotation;
+import java.nio.charset.StandardCharsets;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.primeframework.mvc.ErrorException;
 import org.primeframework.mvc.http.Cookie;
 import org.primeframework.mvc.http.HTTPRequest;
 import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.util.AbstractCookie;
+import org.primeframework.mvc.util.CookieTools;
+import org.primeframework.mvc.util.ThrowingFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,9 +40,13 @@ public abstract class BaseManagedCookieScope<T extends Annotation> extends Abstr
 
   protected final Encryptor encryptor;
 
-  protected BaseManagedCookieScope(HTTPRequest request, HTTPResponse response, Encryptor encryptor) {
+  protected final ObjectMapper objectMapper;
+
+  protected BaseManagedCookieScope(HTTPRequest request, HTTPResponse response, Encryptor encryptor,
+                                   ObjectMapper objectMapper) {
     super(request, response);
     this.encryptor = encryptor;
+    this.objectMapper = objectMapper;
   }
 
   /**
@@ -53,8 +61,9 @@ public abstract class BaseManagedCookieScope<T extends Annotation> extends Abstr
    */
   @Override
   public Cookie get(String fieldName, Class<?> type, T scope) {
-    boolean neverNull = neverNull(scope);
+    boolean compress = compress(scope);
     boolean encrypt = encrypt(scope);
+    boolean neverNull = neverNull(scope);
 
     String cookieName = getCookieName(fieldName, scope);
     Cookie cookie = getCookie(cookieName);
@@ -64,7 +73,18 @@ public abstract class BaseManagedCookieScope<T extends Annotation> extends Abstr
     }
 
     try {
-      cookie.value = encrypt ? encryptor.decrypt(String.class, value) : value;
+      ThrowingFunction<byte[], String> oldFunction = r -> objectMapper.readerFor(String.class).readValue(r);
+      ThrowingFunction<byte[], String> newFunction = r -> new String(r, StandardCharsets.UTF_8);
+      if (compress || encrypt) {
+        cookie.value = CookieTools.fromCookie(value, true, encryptor, oldFunction, newFunction);
+      } else {
+        try {
+          cookie.value = CookieTools.fromCookie(value, false, encryptor, oldFunction, newFunction);
+        } catch (Throwable t) {
+          // Smother because the cookie already has the value in it
+        }
+      }
+
       return cookie;
     } catch (Exception e) {
       String message = e.getClass().getCanonicalName() + " " + e.getMessage();
@@ -82,8 +102,8 @@ public abstract class BaseManagedCookieScope<T extends Annotation> extends Abstr
    * {@inheritDoc}
    */
   public void set(String fieldName, Object value, T scope) {
+    boolean compress = compress(scope);
     boolean encrypt = encrypt(scope);
-
     String cookieName = getCookieName(fieldName, scope);
     Cookie existing = getCookie(cookieName);
     Cookie actual = (Cookie) value;
@@ -98,14 +118,17 @@ public abstract class BaseManagedCookieScope<T extends Annotation> extends Abstr
       return;
     }
 
-    String encoded;
-    try {
-      encoded = encrypt ? encryptor.encrypt(actual.value) : actual.value;
-    } catch (Exception e) {
-      throw new ErrorException("error", e);
+    String cookieValue = actual.value;
+    if (compress || encrypt) {
+      byte[] result = cookieValue.getBytes(StandardCharsets.UTF_8);
+      try {
+        cookieValue = CookieTools.toCookie(result, compress, encrypt, encryptor);
+      } catch (Exception e) {
+        throw new ErrorException("error", e);
+      }
     }
 
-    addCookie(cookieName, encoded, scope);
+    addCookie(cookieName, cookieValue, scope);
   }
 
   /**
@@ -116,6 +139,14 @@ public abstract class BaseManagedCookieScope<T extends Annotation> extends Abstr
    * @param scope The scope annotation.
    */
   protected abstract void addCookie(String name, String value, T scope);
+
+  /**
+   * User the annotation or the current action invocation, this determines if the cookie should be compressed or not.
+   *
+   * @param scope The scope annotation.
+   * @return True or false based on the annotation.
+   */
+  protected abstract boolean compress(T scope);
 
   /**
    * Using the annotation, determines if the cookie should be encrypted.

@@ -15,6 +15,7 @@
  */
 package org.primeframework.mvc.scope;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import org.primeframework.mvc.http.HTTPRequest;
 import org.primeframework.mvc.http.HTTPResponse;
@@ -28,13 +29,19 @@ import org.primeframework.mvc.security.Encryptor;
  */
 public class ManagedSessionCookieScope extends BaseManagedCookieScope<ManagedSessionCookie> {
   @Inject
-  public ManagedSessionCookieScope(HTTPRequest request, HTTPResponse response, Encryptor encryptor) {
-    super(request, response, encryptor);
+  public ManagedSessionCookieScope(HTTPRequest request, HTTPResponse response, Encryptor encryptor,
+                                   ObjectMapper objectMapper) {
+    super(request, response, encryptor, objectMapper);
   }
 
   @Override
   protected void addCookie(String name, String value, ManagedSessionCookie scope) {
     addSecureHTTPOnlySessionCookie(name, value);
+  }
+
+  @Override
+  protected boolean compress(ManagedSessionCookie scope) {
+    return scope.compress();
   }
 
   @Override

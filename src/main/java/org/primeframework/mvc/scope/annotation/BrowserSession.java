@@ -36,6 +36,13 @@ import org.primeframework.mvc.scope.BrowserSessionScope;
 @Target(ElementType.FIELD)
 public @interface BrowserSession {
   /**
+   * When `true` the cookie value will be compressed, this is the default.
+   *
+   * @return true if the cookie value should be compressed.
+   */
+  boolean compress() default true;
+
+  /**
    * When `true` the cookie value will be encrypted, this is the default.
    *
    * @return true if the cookie value should be encrypted.

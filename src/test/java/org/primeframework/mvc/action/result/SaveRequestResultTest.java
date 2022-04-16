@@ -40,6 +40,7 @@ import org.primeframework.mvc.security.DefaultCipherProvider;
 import org.primeframework.mvc.security.DefaultEncryptor;
 import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.security.saved.SavedHttpRequest;
+import org.primeframework.mvc.util.CookieTools;
 import org.testng.annotations.Test;
 import static org.easymock.EasyMock.createStrictMock;
 import static org.easymock.EasyMock.expect;
@@ -72,13 +73,13 @@ public class SaveRequestResultTest extends PrimeBaseTest {
     request.addParameter("param1", "value1");
     request.addParameter("param2", "value2");
 
-    Encryptor encryptor = new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper);
+    Encryptor encryptor = new DefaultEncryptor(new DefaultCipherProvider(configuration));
     SaveRequest annotation = new SaveRequestImpl("/login", "unauthenticated", true, false);
-    SaveRequestResult result = new SaveRequestResult(messageStore, expressionEvaluator, response, request, store, configuration, encryptor);
+    SaveRequestResult result = new SaveRequestResult(messageStore, expressionEvaluator, response, request, store, configuration, encryptor, objectMapper);
     result.execute(annotation);
 
     // The cookie value will be different each time because the initialization vector is unique per request. Decrypt the actual value to compare it to the expected.
-    SavedHttpRequest actual = encryptor.decrypt(SavedHttpRequest.class, response.getCookies().get(0).value);
+    SavedHttpRequest actual = CookieTools.fromJSONCookie(response.getCookies().get(0).value, SavedHttpRequest.class, true, encryptor, objectMapper);
     SavedHttpRequest expected = new SavedHttpRequest(HTTPMethod.GET, "/test?param1=value1&param2=value2", null);
     assertEquals(actual, expected);
 
@@ -100,13 +101,13 @@ public class SaveRequestResultTest extends PrimeBaseTest {
     request.addParameter("param1", "value1");
     request.addParameter("param2", "value2");
 
-    Encryptor encryptor = new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper);
+    Encryptor encryptor = new DefaultEncryptor(new DefaultCipherProvider(configuration));
     SaveRequest annotation = new SaveRequestImpl("/login", "unauthenticated", true, false);
-    SaveRequestResult result = new SaveRequestResult(messageStore, expressionEvaluator, response, request, store, configuration, encryptor);
+    SaveRequestResult result = new SaveRequestResult(messageStore, expressionEvaluator, response, request, store, configuration, encryptor, objectMapper);
     result.execute(annotation);
 
     // The cookie value will be different each time because the initialization vector is unique per request. Decrypt the actual value to compare it to the expected.
-    SavedHttpRequest actual = encryptor.decrypt(SavedHttpRequest.class, response.getCookies().get(0).value);
+    SavedHttpRequest actual = CookieTools.fromJSONCookie(response.getCookies().get(0).value, SavedHttpRequest.class, true, encryptor, objectMapper);
     SavedHttpRequest expected = new SavedHttpRequest(HTTPMethod.POST, "/test", request.getParameters());
     assertEquals(actual, expected);
 
@@ -138,9 +139,9 @@ public class SaveRequestResultTest extends PrimeBaseTest {
     request.addParameter("largeParam3", parameters.get("largeParam3").get(0));
     request.addParameter("largeParam4", parameters.get("largeParam4").get(0));
 
-    Encryptor encryptor = new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper);
+    Encryptor encryptor = new DefaultEncryptor(new DefaultCipherProvider(configuration));
     SaveRequest annotation = new SaveRequestImpl("/login", "unauthenticated", true, false);
-    SaveRequestResult result = new SaveRequestResult(messageStore, expressionEvaluator, response, request, store, configuration, encryptor);
+    SaveRequestResult result = new SaveRequestResult(messageStore, expressionEvaluator, response, request, store, configuration, encryptor, objectMapper);
     result.execute(annotation);
 
     // Expect no cookies in the response, sadly, the cookie was just too big and we omitted it from the HTTP response.

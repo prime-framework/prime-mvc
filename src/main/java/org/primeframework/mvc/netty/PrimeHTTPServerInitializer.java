@@ -23,6 +23,8 @@ import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.HttpServerKeepAliveHandler;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import org.primeframework.mvc.PrimeMVCRequestHandler;
+import static io.netty.handler.codec.http.HttpObjectDecoder.DEFAULT_MAX_CHUNK_SIZE;
+import static io.netty.handler.codec.http.HttpObjectDecoder.DEFAULT_MAX_INITIAL_LINE_LENGTH;
 
 public class PrimeHTTPServerInitializer extends ChannelInitializer<SocketChannel> {
   private final PrimeHTTPServerConfiguration configuration;
@@ -37,7 +39,7 @@ public class PrimeHTTPServerInitializer extends ChannelInitializer<SocketChannel
   @Override
   public void initChannel(SocketChannel ch) {
     ch.pipeline()
-      .addLast(new HttpServerCodec())
+      .addLast(new HttpServerCodec(65_536, 65_536, 65_536))
       .addLast(new ReadTimeoutHandler(configuration.readTimeout, TimeUnit.SECONDS))
       .addLast(new HttpServerKeepAliveHandler())
       .addLast(new PrimeHTTPServerHandler(configuration, main))

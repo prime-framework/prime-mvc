@@ -51,6 +51,10 @@ public class MockUserAgent {
     }
   }
 
+  public void clearAllCookies() {
+    cookies.clear();
+  }
+
   public void clearCookies(String path) {
     cookies.remove(path);
   }

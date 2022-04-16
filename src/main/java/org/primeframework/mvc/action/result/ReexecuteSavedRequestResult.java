@@ -18,6 +18,7 @@ package org.primeframework.mvc.action.result;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.SavedRequestTools.SaveHttpRequestResult;
@@ -40,14 +41,17 @@ public class ReexecuteSavedRequestResult extends AbstractRedirectResult<Reexecut
 
   private final Encryptor encryptor;
 
+  private final ObjectMapper objectMapper;
+
   @Inject
   public ReexecuteSavedRequestResult(MessageStore messageStore, ExpressionEvaluator expressionEvaluator,
                                      HTTPResponse response, HTTPRequest request,
-                                     ActionInvocationStore actionInvocationStore,
-                                     MVCConfiguration configuration, Encryptor encryptor) {
+                                     ActionInvocationStore actionInvocationStore, MVCConfiguration configuration,
+                                     Encryptor encryptor, ObjectMapper objectMapper) {
     super(expressionEvaluator, actionInvocationStore, messageStore, request, response);
     this.configuration = configuration;
     this.encryptor = encryptor;
+    this.objectMapper = objectMapper;
   }
 
   /**
@@ -56,7 +60,7 @@ public class ReexecuteSavedRequestResult extends AbstractRedirectResult<Reexecut
   public boolean execute(final ReexecuteSavedRequest reexecuteSavedRequest) throws IOException {
     moveMessagesToFlash();
 
-    SaveHttpRequestResult result = SavedRequestTools.getSaveRequestForReExecution(configuration, encryptor, request, response);
+    SaveHttpRequestResult result = SavedRequestTools.getSaveRequestForReExecution(configuration, encryptor, objectMapper, request, response);
     String uri = result != null && result.savedHttpRequest.uri != null ? result.savedHttpRequest.uri : null;
 
     // Handle setting cache controls

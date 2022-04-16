@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,27 +13,9 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.security;
+package org.primeframework.mvc.util;
 
-/**
- * Encrypt and decrypt stuff.
- *
- * @author Daniel DeGroff
- */
-public interface Encryptor {
-  /**
-   * Decrypt a set of bytes.
-   *
-   * @param bytes The bytes to decrypt.
-   * @return The decrypted bytes.
-   */
-  byte[] decrypt(byte[] bytes) throws Exception;
-
-  /**
-   * Encrypt a set of bytes.
-   *
-   * @param bytes The bytes to encrypt.
-   * @return The encrypted bytes.
-   */
-  byte[] encrypt(byte[] bytes) throws Exception;
+@FunctionalInterface
+public interface ThrowingFunction<T, U> {
+  U apply(T t) throws Exception;
 }

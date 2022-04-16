@@ -27,6 +27,7 @@ import com.inversoft.rest.RESTClient;
 import io.fusionauth.jwt.JWTExpiredException;
 import io.fusionauth.jwt.Verifier;
 import io.fusionauth.jwt.domain.JWT;
+import org.primeframework.mvc.http.Cookie.SameSite;
 import org.primeframework.mvc.http.HTTPRequest;
 import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.security.oauth.OAuthConfiguration;
@@ -62,8 +63,8 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
     this.verifierProvider = verifierProvider;
 
     // The cookies for the tokens has an expiration of 70 years to allow it to work with Firefox
-    this.jwtCookie = new CookieProxy(jwtCookieName(), (long) Integer.MAX_VALUE);
-    this.refreshTokenCookie = new CookieProxy(refreshTokenCookieName(), (long) Integer.MAX_VALUE);
+    this.jwtCookie = new CookieProxy(jwtCookieName(), (long) Integer.MAX_VALUE, SameSite.Strict);
+    this.refreshTokenCookie = new CookieProxy(refreshTokenCookieName(), (long) Integer.MAX_VALUE, SameSite.Strict);
   }
 
   @Override

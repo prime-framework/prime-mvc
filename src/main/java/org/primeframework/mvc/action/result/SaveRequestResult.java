@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.annotation.ReexecuteSavedRequest;
@@ -47,14 +48,16 @@ public class SaveRequestResult extends AbstractRedirectResult<SaveRequest> {
 
   private final Encryptor encryptor;
 
+  private final ObjectMapper objectMapper;
+
   @Inject
   public SaveRequestResult(MessageStore messageStore, ExpressionEvaluator expressionEvaluator,
-                           HTTPResponse response, HTTPRequest request,
-                           ActionInvocationStore actionInvocationStore,
-                           MVCConfiguration configuration, Encryptor encryptor) {
+                           HTTPResponse response, HTTPRequest request, ActionInvocationStore actionInvocationStore,
+                           MVCConfiguration configuration, Encryptor encryptor, ObjectMapper objectMapper) {
     super(expressionEvaluator, actionInvocationStore, messageStore, request, response);
     this.configuration = configuration;
     this.encryptor = encryptor;
+    this.objectMapper = objectMapper;
   }
 
   public boolean execute(SaveRequest saveRequest) throws IOException {
@@ -72,7 +75,7 @@ public class SaveRequestResult extends AbstractRedirectResult<SaveRequest> {
     }
 
     // Build a saved request cookie
-    Cookie saveRequestCookie = SavedRequestTools.toCookie(new SavedHttpRequest(method, redirectURI, requestParameters), configuration, encryptor);
+    Cookie saveRequestCookie = SavedRequestTools.toCookie(new SavedHttpRequest(method, redirectURI, requestParameters), configuration, encryptor, objectMapper);
 
     // If the resulting cookie exceeds the maximum configured size in bytes, it would be bad.
     //
@@ -119,7 +122,7 @@ public class SaveRequestResult extends AbstractRedirectResult<SaveRequest> {
       }
     }
 
-    return "?" + build.toString();
+    return "?" + build;
   }
 
   public static class SaveRequestImpl implements SaveRequest {

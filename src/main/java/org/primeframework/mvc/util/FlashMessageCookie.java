@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.primeframework.mvc.ErrorException;
 import org.primeframework.mvc.http.Cookie;
 import org.primeframework.mvc.http.HTTPRequest;
@@ -38,10 +39,14 @@ public class FlashMessageCookie extends AbstractCookie {
 
   private final String name;
 
-  public FlashMessageCookie(Encryptor encryptor, String name, HTTPRequest request, HTTPResponse response) {
+  private final ObjectMapper objectMapper;
+
+  public FlashMessageCookie(Encryptor encryptor, String name, ObjectMapper objectMapper, HTTPRequest request,
+                            HTTPResponse response) {
     super(request, response);
     this.encryptor = encryptor;
     this.name = name;
+    this.objectMapper = objectMapper;
 
     Cookie cookie = request.getCookie(name);
     if (cookie != null) {
@@ -77,7 +82,13 @@ public class FlashMessageCookie extends AbstractCookie {
 
   private List<Message> deserialize(String s) {
     try {
-      return new ArrayList<>(encryptor.decrypt(new TypeReference<List<Message>>() {}, s));
+      List<Message> messages = CookieTools.fromJSONCookie(s, new TypeReference<List<Message>>() {
+      }, true, encryptor, objectMapper);
+      if (messages == null) {
+        return new ArrayList<>();
+      }
+
+      return new ArrayList<>(messages);
     } catch (Exception e) {
       return new ArrayList<>();
     }
@@ -85,7 +96,7 @@ public class FlashMessageCookie extends AbstractCookie {
 
   private String serialize(List<Message> messages) {
     try {
-      return encryptor.encrypt(messages);
+      return CookieTools.toJSONCookie(messages, true, true, encryptor, objectMapper);
     } catch (Exception e) {
       throw new ErrorException(e);
     }

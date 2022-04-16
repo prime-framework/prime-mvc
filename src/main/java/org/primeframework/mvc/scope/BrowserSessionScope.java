@@ -18,13 +18,13 @@ package org.primeframework.mvc.scope;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import org.primeframework.mvc.ErrorException;
-import org.primeframework.mvc.content.guice.ObjectMapperProvider;
 import org.primeframework.mvc.http.Cookie;
 import org.primeframework.mvc.http.HTTPRequest;
 import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.scope.annotation.BrowserSession;
 import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.util.AbstractCookie;
+import org.primeframework.mvc.util.CookieTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,14 +38,14 @@ public class BrowserSessionScope extends AbstractCookie implements Scope<Browser
 
   private final Encryptor encryptor;
 
-  private final ObjectMapperProvider objectMapperProvider;
+  private final ObjectMapper objectMapper;
 
   @Inject
   public BrowserSessionScope(HTTPRequest request, HTTPResponse response, Encryptor encryptor,
-                             ObjectMapperProvider objectMapperProvider) {
+                             ObjectMapper objectMapper) {
     super(request, response);
     this.encryptor = encryptor;
-    this.objectMapperProvider = objectMapperProvider;
+    this.objectMapper = objectMapper;
   }
 
   /**
@@ -65,9 +65,7 @@ public class BrowserSessionScope extends AbstractCookie implements Scope<Browser
     }
 
     try {
-      String json = scope.encrypt() ? encryptor.decrypt(String.class, value) : value;
-      ObjectMapper objectMapper = objectMapperProvider.get();
-      return objectMapper.readerFor(type).readValue(json);
+      return CookieTools.fromJSONCookie(value, type, scope.encrypt(), encryptor, objectMapper);
     } catch (Exception e) {
       String message = e.getClass().getCanonicalName() + " " + e.getMessage();
       if (scope.encrypt()) {
@@ -98,10 +96,8 @@ public class BrowserSessionScope extends AbstractCookie implements Scope<Browser
     }
 
     try {
-      ObjectMapper objectMapper = objectMapperProvider.get();
-      String json = objectMapper.writeValueAsString(value);
-      String encoded = scope.encrypt() ? encryptor.encrypt(json) : json;
-      addSecureHTTPOnlyCookie(cookieName, encoded, scope.maxAge());
+      String cookieValue = CookieTools.toJSONCookie(value, scope.compress(), scope.encrypt(), encryptor, objectMapper);
+      addSecureHTTPOnlyCookie(cookieName, cookieValue, scope.maxAge());
     } catch (Exception e) {
       throw new ErrorException("error", e);
     }

@@ -71,8 +71,10 @@ import org.primeframework.mvc.message.SimpleMessage;
 import org.primeframework.mvc.message.TestMessageObserver;
 import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.security.Encryptor;
+import org.primeframework.mvc.util.CookieTools;
 import org.primeframework.mvc.util.QueryStringBuilder;
 import org.primeframework.mvc.util.QueryStringTools;
+import org.primeframework.mvc.util.ThrowingFunction;
 import org.primeframework.mvc.util.ThrowingRunnable;
 import static java.util.Arrays.asList;
 
@@ -796,9 +798,12 @@ public class RequestResult {
   public RequestResult assertEncryptedCookie(String name, ThrowingConsumer<Cookie> consumer) throws Exception {
     assertContainsCookie(name);
 
-    Cookie actual = getCookie(name);
     Encryptor encryptor = injector.getInstance(Encryptor.class);
-    actual.value = actual.value != null ? encryptor.decrypt(String.class, actual.value) : null;
+    ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
+    ThrowingFunction<byte[], String> oldFunction = r -> objectMapper.readerFor(String.class).readValue(r);
+    ThrowingFunction<byte[], String> newFunction = r -> new String(r, StandardCharsets.UTF_8);
+    Cookie actual = getCookie(name);
+    actual.value = CookieTools.fromCookie(actual.value, true, encryptor, oldFunction, newFunction);
     if (consumer != null) {
       consumer.accept(actual);
     }
@@ -817,8 +822,11 @@ public class RequestResult {
     assertContainsCookie(name);
 
     Encryptor encryptor = injector.getInstance(Encryptor.class);
+    ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
+    ThrowingFunction<byte[], String> oldFunction = r -> objectMapper.readerFor(String.class).readValue(r);
+    ThrowingFunction<byte[], String> newFunction = r -> new String(r, StandardCharsets.UTF_8);
     Cookie actual = getCookie(name);
-    String actualDecrypted = actual.value != null ? encryptor.decrypt(String.class, actual.value) : null;
+    String actualDecrypted = CookieTools.fromCookie(actual.value, true, encryptor, oldFunction, newFunction);
     if (!Objects.equals(value, actualDecrypted)) {
       throw new AssertionError("Cookie [" + name + "] with decrypted value [" + actualDecrypted + "] was not equal to the expected value [" + value + "]"
           + "\nActual cookie:\n"

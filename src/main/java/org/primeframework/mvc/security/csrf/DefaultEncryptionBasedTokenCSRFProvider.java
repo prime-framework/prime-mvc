@@ -17,23 +17,25 @@ package org.primeframework.mvc.security.csrf;
 
 import java.util.concurrent.TimeUnit;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import org.primeframework.mvc.ErrorException;
 import org.primeframework.mvc.http.HTTPRequest;
 import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.security.UserLoginSecurityContext;
+import org.primeframework.mvc.util.CookieTools;
 
 /**
  * A CSRF Provider leveraging the Encryption based Token Pattern as defined by OWASP.
  *
  * @author Daniel DeGroff
- * @see <a href="https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#encryption-based-token-pattern">
- *     OWASP CSRF Cheat Sheet - Encryption based Token Pattern
- *     </a>
+ * @see <a href="https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#encryption-based-token-pattern">OWASP CSRF Cheat Sheet - Encryption based Token Pattern</a>
  */
 @SuppressWarnings("unused")
 public class DefaultEncryptionBasedTokenCSRFProvider implements CSRFProvider {
   private final Encryptor encryptor;
+
+  private final ObjectMapper objectMapper;
 
   private final UserLoginSecurityContext securityContext;
 
@@ -41,8 +43,10 @@ public class DefaultEncryptionBasedTokenCSRFProvider implements CSRFProvider {
   private long nonceTimeout = TimeUnit.MINUTES.toMillis(15);
 
   @Inject
-  public DefaultEncryptionBasedTokenCSRFProvider(Encryptor encryptor, UserLoginSecurityContext securityContext) {
+  public DefaultEncryptionBasedTokenCSRFProvider(Encryptor encryptor, ObjectMapper objectMapper,
+                                                 UserLoginSecurityContext securityContext) {
     this.encryptor = encryptor;
+    this.objectMapper = objectMapper;
     this.securityContext = securityContext;
   }
 
@@ -85,7 +89,7 @@ public class DefaultEncryptionBasedTokenCSRFProvider implements CSRFProvider {
 
   private CSRFToken decrypt(String s) {
     try {
-      return encryptor.decrypt(CSRFToken.class, s);
+      return CookieTools.fromJSONCookie(s, CSRFToken.class, true, encryptor, objectMapper);
     } catch (Exception e) {
       return null;
     }
@@ -97,7 +101,7 @@ public class DefaultEncryptionBasedTokenCSRFProvider implements CSRFProvider {
       token.sid = sessionId;
       token.instant = System.currentTimeMillis();
 
-      return encryptor.encrypt(token);
+      return CookieTools.toJSONCookie(token, false, true, encryptor, objectMapper);
     } catch (Exception e) {
       throw new ErrorException("error", e);
     }

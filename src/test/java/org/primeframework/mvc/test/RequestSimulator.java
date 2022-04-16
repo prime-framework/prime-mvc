@@ -59,6 +59,10 @@ public class RequestSimulator {
     return main.configuration().port;
   }
 
+  public void reset() {
+    userAgent.clearAllCookies();
+  }
+
   public void shutdown() {
     this.thread.shutdown();
   }

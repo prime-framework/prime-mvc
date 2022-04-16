@@ -72,7 +72,7 @@ public class ReexecuteSavedRequestResultTest extends PrimeBaseTest {
     replay(messageStore);
 
     ReexecuteSavedRequest redirect = new ReexecuteSavedRequestImpl("/", "success", true, false);
-    ReexecuteSavedRequestResult result = new ReexecuteSavedRequestResult(messageStore, ee, response, request, store, configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper));
+    ReexecuteSavedRequestResult result = new ReexecuteSavedRequestResult(messageStore, ee, response, request, store, configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration)), objectMapper);
     result.execute(redirect);
 
     verify(ee, store, messageStore);
@@ -88,11 +88,11 @@ public class ReexecuteSavedRequestResultTest extends PrimeBaseTest {
     replay(ee);
 
     SavedHttpRequest savedRequest = new SavedHttpRequest(HTTPMethod.GET, "/secure?test=value1&test2=value2", null);
-    simulator.userAgent.addCookie(SavedRequestTools.toCookie(savedRequest, configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper)));
+    simulator.userAgent.addCookie(SavedRequestTools.toCookie(savedRequest, configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration)), objectMapper));
 
     List<Message> messages = new ArrayList<>();
-    Encryptor encryptor = new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper);
-    Cookie cookie = SavedRequestTools.toCookie(savedRequest, configuration, encryptor);
+    Encryptor encryptor = new DefaultEncryptor(new DefaultCipherProvider(configuration));
+    Cookie cookie = SavedRequestTools.toCookie(savedRequest, configuration, encryptor, objectMapper);
 
     HTTPRequest request = new DefaultHTTPRequest().with(r -> r.cookies.put(cookie.name, cookie));
 
@@ -107,7 +107,7 @@ public class ReexecuteSavedRequestResultTest extends PrimeBaseTest {
     replay(messageStore);
 
     ReexecuteSavedRequest redirect = new ReexecuteSavedRequestImpl("/", "success", true, false);
-    ReexecuteSavedRequestResult result = new ReexecuteSavedRequestResult(messageStore, ee, response, request, store, configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration), objectMapper));
+    ReexecuteSavedRequestResult result = new ReexecuteSavedRequestResult(messageStore, ee, response, request, store, configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration)), objectMapper);
     result.execute(redirect);
 
     verify(ee, store, messageStore);

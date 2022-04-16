@@ -16,6 +16,7 @@
 package org.primeframework.mvc.security;
 
 import org.primeframework.mvc.http.Cookie;
+import org.primeframework.mvc.http.Cookie.SameSite;
 import org.primeframework.mvc.http.HTTPRequest;
 import org.primeframework.mvc.http.HTTPResponse;
 import static org.primeframework.mvc.util.ObjectTools.defaultIfNull;
@@ -30,26 +31,31 @@ public class CookieProxy {
 
   private final String name;
 
-  public CookieProxy(String name, Long maxAge) {
+  private final SameSite sameSite;
+
+  public CookieProxy(String name, Long maxAge, SameSite sameSite) {
     this.name = name;
     this.maxAge = maxAge;
+    this.sameSite = sameSite;
   }
 
   public void add(HTTPRequest request, HTTPResponse response, String value) {
     Cookie cookie = new Cookie(name, value);
-    cookie.secure = "https".equalsIgnoreCase(defaultIfNull(request.getHeader("X-Forwarded-Proto"), request.getScheme()));
     cookie.httpOnly = true;
     cookie.maxAge = maxAge;
     cookie.path = "/";
+    cookie.sameSite = sameSite;
+    cookie.secure = "https".equalsIgnoreCase(defaultIfNull(request.getHeader("X-Forwarded-Proto"), request.getScheme()));
     response.addCookie(cookie);
   }
 
   public void delete(HTTPRequest request, HTTPResponse response) {
     Cookie cookie = new Cookie(name, null);
-    cookie.secure = "https".equalsIgnoreCase(defaultIfNull(request.getHeader("X-Forwarded-Proto"), request.getScheme()));
     cookie.httpOnly = true;
     cookie.maxAge = 0L;
     cookie.path = "/";
+    cookie.sameSite = sameSite;
+    cookie.secure = "https".equalsIgnoreCase(defaultIfNull(request.getHeader("X-Forwarded-Proto"), request.getScheme()));
     response.addCookie(cookie);
 
     // Ensure we do not return the cookie again after it has been deleted within the same request.

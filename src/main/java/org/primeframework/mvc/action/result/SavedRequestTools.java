@@ -15,6 +15,7 @@
  */
 package org.primeframework.mvc.action.result;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.primeframework.mvc.action.result.annotation.ReexecuteSavedRequest;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.http.Cookie;
@@ -25,6 +26,7 @@ import org.primeframework.mvc.security.DefaultSavedRequestWorkflow;
 import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.security.SavedRequestException;
 import org.primeframework.mvc.security.saved.SavedHttpRequest;
+import org.primeframework.mvc.util.CookieTools;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,18 +40,20 @@ public class SavedRequestTools {
   private static final Logger logger = LoggerFactory.getLogger(SavedRequestTools.class);
 
   /**
-   * Retrieve the saved request from a cookie for use in the {@link ReexecuteSavedRequestResult#execute(ReexecuteSavedRequest)}
-   * phase.
+   * Retrieve the saved request from a cookie for use in the
+   * {@link ReexecuteSavedRequestResult#execute(ReexecuteSavedRequest)} phase.
    *
    * @param configuration The MVC configuration used to determine the name of the cookie.
    * @param encryptor     the encryptor used to decrypt the cookie
+   * @param objectMapper  The ObjectMapper used to convert the objects to JSON.
    * @param request       the HTTP servlet request
    * @param response      the HTTP servlet response
    * @return null if no save request was found.
    */
   public static SaveHttpRequestResult getSaveRequestForReExecution(MVCConfiguration configuration, Encryptor encryptor,
-                                                                   HTTPRequest request, HTTPResponse response) {
-    SaveHttpRequestResult result = getSaveHttpRequestResult(configuration, encryptor, request, response);
+                                                                   ObjectMapper objectMapper, HTTPRequest request,
+                                                                   HTTPResponse response) {
+    SaveHttpRequestResult result = getSaveHttpRequestResult(configuration, encryptor, objectMapper, request, response);
     if (result == null || result.savedHttpRequest == null) {
       return null;
     }
@@ -71,18 +75,20 @@ public class SavedRequestTools {
   }
 
   /**
-   * Retrieve the saved request from a cookie for use during the {@link DefaultSavedRequestWorkflow#perform(WorkflowChain)}
-   * step.
+   * Retrieve the saved request from a cookie for use during the
+   * {@link DefaultSavedRequestWorkflow#perform(WorkflowChain)} step.
    *
    * @param configuration The MVC configuration used to determine the name of the cookie.
    * @param encryptor     the encryptor used to decrypt the cookie
+   * @param objectMapper  The ObjectMapper used to convert the objects to JSON.
    * @param request       the HTTP servlet request
    * @param response      the HTTP servlet response
    * @return null if no save request was found.
    */
   public static SaveHttpRequestResult getSaveRequestForWorkflow(MVCConfiguration configuration, Encryptor encryptor,
-                                                                HTTPRequest request, HTTPResponse response) {
-    SaveHttpRequestResult result = getSaveHttpRequestResult(configuration, encryptor, request, response);
+                                                                ObjectMapper objectMapper, HTTPRequest request,
+                                                                HTTPResponse response) {
+    SaveHttpRequestResult result = getSaveHttpRequestResult(configuration, encryptor, objectMapper, request, response);
     if (result == null) {
       return null;
     }
@@ -106,10 +112,10 @@ public class SavedRequestTools {
    * @return The cookie.
    */
   public static Cookie toCookie(SavedHttpRequest savedRequest, MVCConfiguration configuration,
-                                Encryptor encryptor) {
+                                Encryptor encryptor, ObjectMapper objectMapper) {
     try {
-      String encrypted = encryptor.encrypt(savedRequest);
-      Cookie cookie = new Cookie(configuration.savedRequestCookieName(), encrypted);
+      String value = CookieTools.toJSONCookie(savedRequest, true, true, encryptor, objectMapper);
+      Cookie cookie = new Cookie(configuration.savedRequestCookieName(), value);
       cookie.path = "/"; // Turn the cookie on for everything since we have no clue what URI will Re-execute the Saved Request
       cookie.httpOnly = true; // No JavaScript hacking
       cookie.secure = savedRequest.uri.startsWith("/") || savedRequest.uri.startsWith("https"); // Set to secure when schema is 'https'
@@ -124,7 +130,8 @@ public class SavedRequestTools {
   }
 
   private static SaveHttpRequestResult getSaveHttpRequestResult(MVCConfiguration configuration, Encryptor encryptor,
-                                                                HTTPRequest request, HTTPResponse response) {
+                                                                ObjectMapper objectMapper, HTTPRequest request,
+                                                                HTTPResponse response) {
     Cookie cookie = getCookie(configuration, request);
     if (cookie == null) {
       return null;
@@ -137,7 +144,8 @@ public class SavedRequestTools {
         value = value.substring("ready_".length());
       }
 
-      return new SaveHttpRequestResult(cookie, ready, encryptor.decrypt(SavedHttpRequest.class, value));
+      SavedHttpRequest savedRequest = CookieTools.fromJSONCookie(value, SavedHttpRequest.class, true, encryptor, objectMapper);
+      return new SaveHttpRequestResult(cookie, ready, savedRequest);
     } catch (Exception e) {
       logger.warn("Bad SavedRequest cookie [{}]. Error is [{}]", cookie.value, e.getMessage());
 

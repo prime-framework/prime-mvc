@@ -15,23 +15,10 @@
  */
 package org.primeframework.mvc.security;
 
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.ShortBufferException;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
-import java.util.Base64;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 
 /**
@@ -40,54 +27,13 @@ import com.google.inject.Inject;
 public class DefaultEncryptor implements Encryptor {
   private final CipherProvider cipherProvider;
 
-  private final ObjectMapper objectMapper;
-
   @Inject
-  public DefaultEncryptor(CipherProvider cipherProvider, ObjectMapper objectMapper) {
+  public DefaultEncryptor(CipherProvider cipherProvider) {
     this.cipherProvider = cipherProvider;
-    this.objectMapper = objectMapper;
   }
 
   @Override
-  public <T> T decrypt(Class<T> type, String s)
-      throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException, ShortBufferException, BadPaddingException, IllegalBlockSizeException, IOException {
-    byte[] decrypted = decrypt(s);
-    return objectMapper.readerFor(type).readValue(decrypted);
-  }
-
-  @Override
-  public <T> T decrypt(TypeReference<?> type, String s)
-      throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException, ShortBufferException, BadPaddingException, IllegalBlockSizeException, IOException {
-    byte[] decrypted = decrypt(s);
-    return objectMapper.readerFor(type).readValue(decrypted);
-  }
-
-  @Override
-  public String encrypt(Object o)
-      throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException, JsonProcessingException, ShortBufferException, BadPaddingException, IllegalBlockSizeException {
-    byte[] input = objectMapper.writer().writeValueAsBytes(o);
-
-    // The first 16 bytes are the IV
-    byte[] iv = new byte[16];
-    new SecureRandom().nextBytes(iv);
-
-    Cipher cipher = cipherProvider.getEncryptor(iv);
-    byte[] result = new byte[cipher.getOutputSize(input.length)];
-    int resultLength = cipher.update(input, 0, input.length, result, 0);
-    resultLength += cipher.doFinal(result, resultLength);
-
-    // Combine the IV + encrypted result
-    byte[] combined = new byte[resultLength + iv.length];
-    System.arraycopy(iv, 0, combined, 0, iv.length);
-    System.arraycopy(result, 0, combined, iv.length, resultLength);
-
-    return new String(Base64.getUrlEncoder().encode(combined), StandardCharsets.UTF_8);
-  }
-
-  private byte[] decrypt(String s)
-      throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException, ShortBufferException, BadPaddingException, IllegalBlockSizeException {
-    byte[] bytes = Base64.getUrlDecoder().decode(s.getBytes(StandardCharsets.UTF_8));
-
+  public byte[] decrypt(byte[] bytes) throws Exception {
     // The first 16 bytes are the IV
     byte[] iv = new byte[16];
     System.arraycopy(bytes, 0, iv, 0, 16);
@@ -98,7 +44,25 @@ public class DefaultEncryptor implements Encryptor {
     byte[] result = new byte[cipher.getOutputSize(json.length)];
     int resultLength = cipher.update(json, 0, result.length, result, 0);
     resultLength += cipher.doFinal(result, resultLength);
-
     return Arrays.copyOfRange(result, 0, resultLength);
+  }
+
+  @Override
+  public byte[] encrypt(byte[] bytes) throws Exception {
+    // The first 16 bytes are the IV
+    byte[] iv = new byte[16];
+    new SecureRandom().nextBytes(iv);
+
+    Cipher cipher = cipherProvider.getEncryptor(iv);
+    byte[] result = new byte[cipher.getOutputSize(bytes.length)];
+    int resultLength = cipher.update(bytes, 0, bytes.length, result, 0);
+    resultLength += cipher.doFinal(result, resultLength);
+
+    // Combine the IV + encrypted result
+    byte[] combined = new byte[resultLength + iv.length];
+    System.arraycopy(iv, 0, combined, 0, iv.length);
+    System.arraycopy(result, 0, combined, iv.length, resultLength);
+
+    return combined;
   }
 }

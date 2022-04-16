@@ -15,12 +15,9 @@
  */
 package org.primeframework.mvc.scope;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.Base64;
 import java.util.List;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
@@ -34,6 +31,7 @@ import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.scope.annotation.BrowserActionSession;
 import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.util.AbstractCookie;
+import org.primeframework.mvc.util.CookieTools;
 import org.primeframework.mvc.util.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +52,8 @@ public class BrowserActionSessionScope extends AbstractCookie implements Scope<B
   private final ObjectMapper objectMapper;
 
   @Inject
-  public BrowserActionSessionScope(HTTPRequest request, HTTPResponse response, ActionInvocationStore actionInvocationStore,
+  public BrowserActionSessionScope(HTTPRequest request, HTTPResponse response,
+                                   ActionInvocationStore actionInvocationStore,
                                    Encryptor encryptor, ObjectMapper objectMapper) {
     super(request, response);
     this.actionInvocationStore = actionInvocationStore;
@@ -97,14 +96,9 @@ public class BrowserActionSessionScope extends AbstractCookie implements Scope<B
 
     String value = cookie.value;
     try {
-      if (encrypted) {
-        Encryptor encryptor = injector.getInstance(Encryptor.class);
-        return encryptor.decrypt(type, value);
-      } else {
-        byte[] bytes = Base64.getUrlDecoder().decode(value);
-        ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
-        return objectMapper.readerFor(type).readValue(bytes);
-      }
+      Encryptor encryptor = injector.getInstance(Encryptor.class);
+      ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
+      return CookieTools.fromJSONCookie(value, type, encrypted, encryptor, objectMapper);
     } catch (Exception e) {
       String message = e.getClass().getCanonicalName() + " " + e.getMessage();
       if (scope.encrypt()) {
@@ -134,7 +128,7 @@ public class BrowserActionSessionScope extends AbstractCookie implements Scope<B
     }
 
     try {
-      return scope.encrypt() ? encryptor.decrypt(type, existingValue) : decode(type, existingValue);
+      return CookieTools.fromJSONCookie(existingValue, type, scope.encrypt(), encryptor, objectMapper);
     } catch (Exception e) {
       String message = e.getClass().getCanonicalName() + " " + e.getMessage();
       if (scope.encrypt()) {
@@ -165,14 +159,14 @@ public class BrowserActionSessionScope extends AbstractCookie implements Scope<B
       return;
     }
 
-    String encoded;
+    String cookieValue;
     try {
-      encoded = scope.encrypt() ? encryptor.encrypt(value) : encode(value);
+      cookieValue = CookieTools.toJSONCookie(value, scope.compress(), scope.encrypt(), encryptor, objectMapper);
     } catch (Exception e) {
       throw new ErrorException("error", e);
     }
 
-    addSecureHTTPOnlySessionCookie(cookieName, encoded);
+    addSecureHTTPOnlySessionCookie(cookieName, cookieValue);
   }
 
   /**
@@ -197,14 +191,5 @@ public class BrowserActionSessionScope extends AbstractCookie implements Scope<B
     }
 
     return className + "$" + ("##field-name##".equals(scope.value()) ? fieldName : scope.value());
-  }
-
-  private String decode(Class<?> type, String value) throws IOException {
-    byte[] bytes = Base64.getUrlDecoder().decode(value);
-    return objectMapper.readerFor(type).readValue(bytes);
-  }
-
-  private String encode(Object value) throws JsonProcessingException {
-    return Base64.getUrlEncoder().encodeToString(objectMapper.writeValueAsBytes(value));
   }
 }

@@ -35,6 +35,13 @@ import org.primeframework.mvc.scope.ManagedSessionCookieScope;
 @Target(ElementType.FIELD)
 public @interface ManagedSessionCookie {
   /**
+   * When `true` the cookie value will be compressed. The default is false.
+   *
+   * @return True if the cookie value should be compressed.
+   */
+  boolean compress() default false;
+
+  /**
    * When `true` the cookie value will be encrypted, this is the default.
    *
    * @return true if the cookie value should be encrypted.
