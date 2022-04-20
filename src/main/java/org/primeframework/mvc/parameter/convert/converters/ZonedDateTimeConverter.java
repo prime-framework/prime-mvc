@@ -23,14 +23,13 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Map;
 
+import com.google.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.parameter.convert.AbstractGlobalConverter;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.convert.annotation.GlobalConverter;
-
-import com.google.inject.Inject;
 
 /**
  * This converts to and from ZonedDateTime.
@@ -46,27 +45,46 @@ public class ZonedDateTimeConverter extends AbstractGlobalConverter {
     this.emptyIsNull = configuration.emptyParametersAreNull();
   }
 
+  protected String objectToString(Object value, Type convertFrom, Map<String, String> attributes, String expression)
+      throws ConversionException, ConverterStateException {
+    DateTimeFormatter formatter;
+    String format = attributes.get("dateTimeFormat");
+    if (format != null) {
+      // Multiple formats are supported using a bracket syntax [M/dd/yyyy][MM/dd/yyyy]
+      // Use the first pattern if multiple exists for displaying the value
+      formatter = format.indexOf('[') == 0
+          ? DateTimeFormatter.ofPattern(format.substring(1, format.indexOf("]", 1)))
+          : DateTimeFormatter.ofPattern(format);
+    } else {
+      // Using the HTML standard (https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/datetime-local)
+      formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+    }
+
+    return ((ZonedDateTime) value).format(formatter);
+  }
+
   protected Object stringToObject(String value, Type convertTo, Map<String, String> attributes, String expression)
       throws ConversionException, ConverterStateException {
     if (emptyIsNull && StringUtils.isBlank(value)) {
       return null;
     }
 
+    DateTimeFormatter formatter;
     String format = attributes.get("dateTimeFormat");
-    if (format == null) {
+    if (format != null) {
+      formatter = DateTimeFormatter.ofPattern(format);
+    } else {
       // Try checking if this is an instant
       try {
         long instant = Long.parseLong(value);
         return ZonedDateTime.ofInstant(Instant.ofEpochMilli(instant), ZoneOffset.UTC);
       } catch (NumberFormatException e) {
-        throw new ConverterStateException("You must provide the dateTimeFormat dynamic attribute for " +
-            "the form fields [" + expression + "] that maps to DateTime properties in the action. " +
-            "If you are using a text field it will look like this: [@jc.text _dateTimeFormat=\"MM/dd/yyyy hh:mm:ss aa Z\"]\n\n" +
-            "NOTE: The format must include the time and a timezone. Otherwise, it will be unparseable");
+        // Using the HTML standard (https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/datetime-local)
+        formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
       }
     }
 
-    return toDateTime(value, format);
+    return toDateTime(value, formatter);
   }
 
   protected Object stringsToObject(String[] values, Type convertTo, Map<String, String> attributes, String expression)
@@ -76,30 +94,11 @@ public class ZonedDateTimeConverter extends AbstractGlobalConverter {
         "allowed.");
   }
 
-  protected String objectToString(Object value, Type convertFrom, Map<String, String> attributes, String expression)
-      throws ConversionException, ConverterStateException {
-    String format = attributes.get("dateTimeFormat");
-    if (format == null) {
-      throw new ConverterStateException("You must provide the dateTimeFormat dynamic attribute for " +
-          "the form fields [" + expression + "] that maps to DateTime properties in the action. " +
-          "If you are using a text field it will look like this: [@jc.text _dateTimeFormat=\"MM/dd/yyyy hh:mm:ss aa Z\"]\n\n" +
-          "NOTE: The format must include the time and a timezone. Otherwise, it will be unparseable");
-    }
-
-    // Multiple formats are supported using a bracket syntax [M/dd/yyyy][MM/dd/yyyy]
-    // Use the first pattern if multiple exists for displaying the value
-    DateTimeFormatter formatter = format.indexOf('[') == 0
-        ? DateTimeFormatter.ofPattern(format.substring(1, format.indexOf("]", 1)))
-        : DateTimeFormatter.ofPattern(format);
-
-    return ((ZonedDateTime) value).format(formatter);
-  }
-
-  private ZonedDateTime toDateTime(String value, String format) {
+  private ZonedDateTime toDateTime(String value, DateTimeFormatter formatter) {
     try {
-      return ZonedDateTime.parse(value, DateTimeFormatter.ofPattern(format));
+      return ZonedDateTime.parse(value, formatter);
     } catch (DateTimeParseException e) {
-      throw new ConversionException("Invalid date [" + value + "] for format [" + format + "]", e);
+      throw new ConversionException("Invalid date [" + value + "] for format [" + formatter + "]", e);
     }
   }
 }

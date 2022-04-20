@@ -45,18 +45,18 @@ public class LocalDateConverter extends AbstractGlobalConverter {
 
   protected String objectToString(Object value, Type convertFrom, Map<String, String> attributes, String expression)
       throws ConversionException, ConverterStateException {
+    DateTimeFormatter formatter;
     String format = attributes.get("dateTimeFormat");
-    if (format == null) {
-      throw new ConverterStateException("You must provide the dateTimeFormat dynamic attribute for " +
-          "the form fields [" + expression + "] that maps to LocalDate properties in the action. " +
-          "If you are using a text field it will look like this: [@jc.text _dateTimeFormat=\"MM/dd/yyyy\"]");
+    if (format != null) {
+      // Multiple formats are supported using a bracket syntax [M/dd/yyyy][MM/dd/yyyy]
+      // Use the first pattern if multiple exists for displaying the value
+      formatter = format.indexOf('[') == 0
+          ? DateTimeFormatter.ofPattern(format.substring(1, format.indexOf("]", 1)))
+          : DateTimeFormatter.ofPattern(format);
+    } else {
+      // Using the HTML standard (https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/date)
+      formatter = DateTimeFormatter.ISO_LOCAL_DATE;
     }
-
-    // Multiple formats are supported using a bracket syntax [M/dd/yyyy][MM/dd/yyyy]
-    // Use the first pattern if multiple exists for displaying the value
-    DateTimeFormatter formatter = format.indexOf('[') == 0
-        ? DateTimeFormatter.ofPattern(format.substring(1, format.indexOf("]", 1)))
-        : DateTimeFormatter.ofPattern(format);
 
     return ((LocalDate) value).format(formatter);
   }
@@ -67,14 +67,16 @@ public class LocalDateConverter extends AbstractGlobalConverter {
       return null;
     }
 
+    DateTimeFormatter formatter;
     String format = attributes.get("dateTimeFormat");
-    if (format == null) {
-      throw new ConverterStateException("You must provide the dateTimeFormat dynamic attribute for " +
-          "the form fields [" + expression + "] that maps to LocalDate properties in the action. " +
-          "If you are using a text field it will look like this: [@jc.text _dateTimeFormat=\"MM/dd/yyyy\"]");
+    if (format != null) {
+      formatter = DateTimeFormatter.ofPattern(format);
+    } else {
+      // Using the HTML standard (https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/date)
+      formatter = DateTimeFormatter.ISO_LOCAL_DATE;
     }
 
-    return toLocalDate(value, format);
+    return toLocalDate(value, formatter);
   }
 
   protected Object stringsToObject(String[] values, Type convertTo, Map<String, String> attributes, String expression)
@@ -84,11 +86,11 @@ public class LocalDateConverter extends AbstractGlobalConverter {
         "allowed.");
   }
 
-  private LocalDate toLocalDate(String value, String format) {
+  private LocalDate toLocalDate(String value, DateTimeFormatter formatter) {
     try {
-      return LocalDate.parse(value, DateTimeFormatter.ofPattern(format));
+      return LocalDate.parse(value, formatter);
     } catch (DateTimeParseException e) {
-      throw new ConversionException("Invalid date [" + value + "] for format [" + format + "]", e);
+      throw new ConversionException("Invalid date [" + value + "] for format [" + formatter + "]", e);
     }
   }
 }
