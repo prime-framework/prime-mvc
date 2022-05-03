@@ -351,6 +351,23 @@ public class DefaultHTTPRequest implements MutableHTTPRequest, Buildable<Default
   }
 
   @Override
+  public String getRemoteIPAddress() {
+    String ipAddress = getHeader("X-Forwarded-For");
+    if (ipAddress == null) {
+      ipAddress = getRemoteAddress();
+    } else {
+      String[] ips = ipAddress.split(",");
+      if (ips.length < 1) {
+        return null;
+      }
+
+      ipAddress = ips[0].trim();
+    }
+
+    return ipAddress;
+  }
+
+  @Override
   public String getScheme() {
     return scheme;
   }

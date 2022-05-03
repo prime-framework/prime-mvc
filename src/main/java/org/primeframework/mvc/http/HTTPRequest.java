@@ -83,6 +83,11 @@ public interface HTTPRequest {
 
   String getRemoteHost();
 
+  /**
+   * @return The remote IP address that might be from the network layer or from an HTTP X-Forwarded-For header.
+   */
+  String getRemoteIPAddress();
+
   String getScheme();
 
   boolean isMultipart();
