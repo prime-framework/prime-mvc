@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2021-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.primeframework.mvc.http.Cookie.SameSite;
 import org.primeframework.mvc.scope.BrowserSessionScope;
 
 /**
@@ -50,16 +51,13 @@ public @interface BrowserSession {
   boolean encrypt() default true;
 
   /**
-   * Optionally specify a value to set on the cookie for Max-Age. Defaults to unspecified (Netty uses Long.MIN_VALUE for
-   * that) so that the cookie is a session cookie.
-   *
-   * @return The max age value.
-   */
-  long maxAge() default Long.MIN_VALUE;
-
-  /**
    * @return This attribute determines the name of the cookie. The default name is the name of the field that the
    *     annotation is put on.
    */
-  String value() default "##field-name##";
+  String name() default "##field-name##";
+
+  /**
+   * @return The SameSite setting for the cookie. Defaults to Lax.
+   */
+  SameSite sameSite() default SameSite.Lax;
 }

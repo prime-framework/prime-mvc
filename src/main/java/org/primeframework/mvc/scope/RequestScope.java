@@ -37,7 +37,8 @@ public class RequestScope implements Scope<Request> {
   /**
    * {@inheritDoc}
    */
-  public Object get(String fieldName, Request scope) {
+  @Override
+  public Object get(String fieldName, Class<?> type, Request scope) {
     String key = scope.value().equals("##field-name##") ? fieldName : scope.value();
     return request.getAttribute(key);
   }
@@ -45,6 +46,7 @@ public class RequestScope implements Scope<Request> {
   /**
    * {@inheritDoc}
    */
+  @Override
   public void set(String fieldName, Object value, Request scope) {
     String key = scope.value().equals("##field-name##") ? fieldName : scope.value();
     if (value != null) {

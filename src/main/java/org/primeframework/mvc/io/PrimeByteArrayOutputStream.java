@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,28 +13,26 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.security.oauth;
+package org.primeframework.mvc.io;
 
-import io.fusionauth.jwt.domain.JWT;
-import org.primeframework.mvc.security.UserLoginSecurityContext;
+import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
 
 /**
- * The login context that is used for OAuth systems to login using the {@link UserLoginSecurityContext}.
+ * An internal only output stream that removes the need to make a copy of the byte array in order to use it.
  *
  * @author Brian Pontarelli
  */
-public class Tokens {
-  public JWT decodedJWT;
-
-  public String jwt;
-
-  public String refreshToken;
-
-  public Tokens() {
+public class PrimeByteArrayOutputStream extends ByteArrayOutputStream {
+  public PrimeByteArrayOutputStream() {
+    super();
   }
 
-  public Tokens(String jwt, String refreshToken) {
-    this.jwt = jwt;
-    this.refreshToken = refreshToken;
+  public PrimeByteArrayOutputStream(int size) {
+    super(size);
+  }
+
+  public ByteBuffer toByteBuffer() {
+    return ByteBuffer.wrap(buf, 0, count);
   }
 }

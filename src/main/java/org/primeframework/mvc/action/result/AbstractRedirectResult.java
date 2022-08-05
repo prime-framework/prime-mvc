@@ -24,7 +24,6 @@ import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.http.Status;
 import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;
-import org.primeframework.mvc.message.scope.FlashScope;
 import org.primeframework.mvc.message.scope.MessageScope;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 

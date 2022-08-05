@@ -24,30 +24,6 @@ import org.testng.annotations.Test;
  */
 public class BrowserSessionTest extends PrimeBaseTest {
   @Test
-  public void maxAgeCookie() throws Exception {
-    test.simulate(() -> simulator.test("/browser-session/first-max-age")
-                                 .get()
-                                 .assertStatusCode(302)
-                                 .assertRedirect("/browser-session/second-max-age")
-                                 .assertContainsCookie("user"))
-        .simulate(() -> simulator.test("/browser-session/second-max-age")
-                                 .get()
-                                 .assertStatusCode(200)
-                                 .assertBodyContains("The user is Brian Pontarelli")
-                                 .assertContainsCookie("user"))
-        .simulate(() -> simulator.test("/browser-session/second-max-age")
-                                 .post()
-                                 .assertStatusCode(302)
-                                 .assertRedirect("/browser-session/second-max-age")
-                                 .assertContainsCookie("user")) // Delete the cookie
-        .simulate(() -> simulator.test("/browser-session/second-max-age")
-                                 .get()
-                                 .assertStatusCode(200)
-                                 .assertBodyContains("The user is missing")
-                                 .assertDoesNotContainsCookie("user")); // Should be deleted
-  }
-
-  @Test
   public void sessionCookie() throws Exception {
     test.simulate(() -> simulator.test("/browser-session/first")
                                  .get()

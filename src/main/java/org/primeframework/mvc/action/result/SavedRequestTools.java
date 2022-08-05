@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2020, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2016-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,6 +69,7 @@ public class SavedRequestTools {
       result.cookie.value = "ready_" + result.cookie.value;
     }
 
+    result.cookie.sameSite = configuration.savedRequestCookieSameSite();
     response.addCookie(result.cookie);
 
     return result;
@@ -118,6 +119,7 @@ public class SavedRequestTools {
       Cookie cookie = new Cookie(configuration.savedRequestCookieName(), value);
       cookie.path = "/"; // Turn the cookie on for everything since we have no clue what URI will Re-execute the Saved Request
       cookie.httpOnly = true; // No JavaScript hacking
+      cookie.sameSite = configuration.savedRequestCookieSameSite();
       cookie.secure = savedRequest.uri.startsWith("/") || savedRequest.uri.startsWith("https"); // Set to secure when schema is 'https'
       return cookie;
     } catch (Exception e) {

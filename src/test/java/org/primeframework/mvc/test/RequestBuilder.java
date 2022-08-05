@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2020, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,10 @@
  */
 package org.primeframework.mvc.test;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.URI;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -26,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -43,13 +47,16 @@ import com.inversoft.rest.MultipartBodyHandler.Multiparts;
 import com.inversoft.rest.RESTClient;
 import com.inversoft.rest.RESTClient.BodyHandler;
 import org.primeframework.mock.MockUserAgent;
+import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.http.Cookie;
 import org.primeframework.mvc.http.DefaultHTTPRequest;
+import org.primeframework.mvc.http.DefaultHTTPResponse;
 import org.primeframework.mvc.http.HTTPMethod;
 import org.primeframework.mvc.http.HTTPObjectsHolder;
 import org.primeframework.mvc.http.HTTPRequest;
 import org.primeframework.mvc.http.MutableHTTPRequest;
 import org.primeframework.mvc.message.TestMessageObserver;
+import org.primeframework.mvc.netty.PrimeHTTPListenerConfiguration;
 import org.primeframework.mvc.parameter.DefaultParameterParser;
 import org.primeframework.mvc.parameter.fileupload.FileInfo;
 import org.primeframework.mvc.security.csrf.CSRFProvider;
@@ -66,20 +73,24 @@ import org.primeframework.mvc.util.URITools;
 public class RequestBuilder {
   public final Injector injector;
 
+  public final PrimeHTTPListenerConfiguration listenerConfiguration;
+
   public final TestMessageObserver messageObserver;
 
   public final MutableHTTPRequest request;
 
   public final MockUserAgent userAgent;
 
-  public RequestBuilder(int port, String path, Injector injector, MockUserAgent userAgent,
-                        TestMessageObserver messageObserver) {
+  public boolean useTLS;
+
+  public RequestBuilder(String path, Injector injector, MockUserAgent userAgent,
+                        PrimeHTTPListenerConfiguration listenerConfiguration, TestMessageObserver messageObserver) {
     this.injector = injector;
+    this.listenerConfiguration = listenerConfiguration;
     this.userAgent = userAgent;
     this.messageObserver = messageObserver;
     this.request = new DefaultHTTPRequest().with(r -> r.addLocales(Locale.US))
-                                           .with(r -> r.setPath(path))
-                                           .with(r -> r.setPort(port));
+                                           .with(r -> r.setPath(path));
   }
 
   /**
@@ -101,7 +112,7 @@ public class RequestBuilder {
   public RequestResult connect() {
     request.setMethod(HTTPMethod.CONNECT);
     ClientResponse<byte[], byte[]> response = run();
-    return new RequestResult(injector, request, response, userAgent, messageObserver);
+    return new RequestResult(injector, request, response, userAgent, listenerConfiguration, messageObserver);
   }
 
   /**
@@ -112,7 +123,7 @@ public class RequestBuilder {
   public RequestResult delete() {
     request.setMethod(HTTPMethod.DELETE);
     ClientResponse<byte[], byte[]> response = run();
-    return new RequestResult(injector, request, response, userAgent, messageObserver);
+    return new RequestResult(injector, request, response, userAgent, listenerConfiguration, messageObserver);
   }
 
   /**
@@ -123,7 +134,7 @@ public class RequestBuilder {
   public RequestResult get() {
     request.setMethod(HTTPMethod.GET);
     ClientResponse<byte[], byte[]> response = run();
-    return new RequestResult(injector, request, response, userAgent, messageObserver);
+    return new RequestResult(injector, request, response, userAgent, listenerConfiguration, messageObserver);
   }
 
   public HTTPRequest getRequest() {
@@ -138,7 +149,7 @@ public class RequestBuilder {
   public RequestResult head() {
     request.setMethod(HTTPMethod.HEAD);
     ClientResponse<byte[], byte[]> response = run();
-    return new RequestResult(injector, request, response, userAgent, messageObserver);
+    return new RequestResult(injector, request, response, userAgent, listenerConfiguration, messageObserver);
   }
 
   /**
@@ -195,7 +206,7 @@ public class RequestBuilder {
   public RequestResult method(String method) {
     request.setMethod(HTTPMethod.of(method));
     ClientResponse<byte[], byte[]> response = run();
-    return new RequestResult(injector, request, response, userAgent, messageObserver);
+    return new RequestResult(injector, request, response, userAgent, listenerConfiguration, messageObserver);
   }
 
   /**
@@ -206,7 +217,7 @@ public class RequestBuilder {
   public RequestResult options() {
     request.setMethod(HTTPMethod.OPTIONS);
     ClientResponse<byte[], byte[]> response = run();
-    return new RequestResult(injector, request, response, userAgent, messageObserver);
+    return new RequestResult(injector, request, response, userAgent, listenerConfiguration, messageObserver);
   }
 
   /**
@@ -217,7 +228,7 @@ public class RequestBuilder {
   public RequestResult patch() {
     request.setMethod(HTTPMethod.PATCH);
     ClientResponse<byte[], byte[]> response = run();
-    return new RequestResult(injector, request, response, userAgent, messageObserver);
+    return new RequestResult(injector, request, response, userAgent, listenerConfiguration, messageObserver);
   }
 
   /**
@@ -228,7 +239,7 @@ public class RequestBuilder {
   public RequestResult post() {
     request.setMethod(HTTPMethod.POST);
     ClientResponse<byte[], byte[]> response = run();
-    return new RequestResult(injector, request, response, userAgent, messageObserver);
+    return new RequestResult(injector, request, response, userAgent, listenerConfiguration, messageObserver);
   }
 
   /**
@@ -239,16 +250,20 @@ public class RequestBuilder {
   public RequestResult put() {
     request.setMethod(HTTPMethod.PUT);
     ClientResponse<byte[], byte[]> response = run();
-    return new RequestResult(injector, request, response, userAgent, messageObserver);
+    return new RequestResult(injector, request, response, userAgent, listenerConfiguration, messageObserver);
+  }
+
+  public int resolveSimulatorPort() {
+    return useTLS ? listenerConfiguration.httpsPort : listenerConfiguration.httpPort;
   }
 
   /**
-   * Provides the ability to setup the MockHttpServletRequest object before making the request.
+   * Provides the ability to set up the HTTPRequest object before making the request.
    *
-   * @param consumer A consumer that takes the MockHttpServletRequest.
+   * @param consumer A consumer that takes the MutableHTTPRequest.
    * @return This.
    */
-  public RequestBuilder setup(Consumer<HTTPRequest> consumer) {
+  public RequestBuilder setup(Consumer<MutableHTTPRequest> consumer) {
     consumer.accept(request);
     return this;
   }
@@ -261,7 +276,7 @@ public class RequestBuilder {
   public RequestResult trace() {
     request.setMethod(HTTPMethod.TRACE);
     ClientResponse<byte[], byte[]> response = run();
-    return new RequestResult(injector, request, response, userAgent, messageObserver);
+    return new RequestResult(injector, request, response, userAgent, listenerConfiguration, messageObserver);
   }
 
   /**
@@ -313,7 +328,7 @@ public class RequestBuilder {
    * @return This.
    */
   public RequestBuilder withBody(byte[] bytes) {
-    request.setBody(bytes);
+    request.setBody(ByteBuffer.wrap(bytes));
     return this;
   }
 
@@ -363,8 +378,8 @@ public class RequestBuilder {
   }
 
   /**
-   * Sets an HTTP request parameter as a Prime MVC checkbox widget. This can be called multiple times with the same name
-   * it it will create a list of values for the HTTP parameter.
+   * Sets an HTTP request parameter as a Prime MVC checkbox widget. This can be called multiple times with the same
+   * name, and it will create a list of values for the HTTP parameter.
    *
    * @param name           The name of the parameter.
    * @param checkedValue   The checked value of the checkbox.
@@ -374,10 +389,10 @@ public class RequestBuilder {
    */
   public RequestBuilder withCheckbox(String name, String checkedValue, String uncheckedValue, boolean checked) {
     if (checked) {
-      request.setParameter(name, checkedValue);
+      request.addParameter(name, checkedValue);
     }
 
-    request.setParameter(DefaultParameterParser.CHECKBOX_PREFIX + name, uncheckedValue);
+    request.addParameter(DefaultParameterParser.CHECKBOX_PREFIX + name, uncheckedValue);
     return this;
   }
 
@@ -560,7 +575,6 @@ public class RequestBuilder {
     return this;
   }
 
-
   /**
    * Sets an HTTP request parameter as a Prime MVC radio button widget. This can be called multiple times with the same
    * name it it will create a list of values for the HTTP parameter.
@@ -580,6 +594,14 @@ public class RequestBuilder {
     return this;
   }
 
+  /**
+   * Add a single request header. Calling this sequentially will just overwrite the previous value. If you wish to add a
+   * header multiple times, use {@link #withHeader(String, Object)} instead.
+   *
+   * @param name  The name of the header.
+   * @param value The value of the header.
+   * @return This.
+   */
   public RequestBuilder withSingleHeader(String name, String value) {
     request.setHeader(name, value);
     return this;
@@ -624,12 +646,16 @@ public class RequestBuilder {
   }
 
   ClientResponse<byte[], byte[]> run() {
-    // Set the new request in so we can inject things below
+    // Set the new request & response so that we can inject things below
     HTTPObjectsHolder.clearRequest();
     HTTPObjectsHolder.setRequest(request);
+    HTTPObjectsHolder.clearResponse();
+    HTTPObjectsHolder.setResponse(new DefaultHTTPResponse(new ByteArrayOutputStream()));
 
-    // Clear the messages for each run
-    messageObserver.clear();
+    // Add a unique Id so that we can identify messages for this request in the observer.
+    String messageStoreId = UUID.randomUUID().toString();
+    messageObserver.setMessageStoreId(messageStoreId);
+    request.addHeader(TestMessageObserver.ObserverMessageStoreId, messageStoreId);
 
     // New cookies were added to the request and not the user-agent, so we need to sync them to the user-agent here.
     // Then we can add all cookies form the user-agent to the request.
@@ -649,18 +675,29 @@ public class RequestBuilder {
                                                                       .with(c1 -> c1.value = c.value))
                              .collect(Collectors.toList());
 
+    int port = resolveSimulatorPort();
+    String schema = useTLS ? "https" : "http";
+    URI requestURI = URI.create(schema + "://localhost:" + port + request.getPath());
+
     // Referer for CSRF checks must be provided
     if (request.getHeader("Referer") == null) {
-      request.setHeader("Referer", "http://localhost:" + request.getPort() + request.getPath());
+      request.setHeader("Referer", requestURI.toString());
     }
+
+    request.setPort(port);
+    request.setHost(requestURI.getHost());
+    request.setScheme(requestURI.getScheme());
 
     // Now that the cookies are ready, if the CSRF token is enabled and the parameter isn't set, we set it to be consistent
     // since the [@control.form] would normally set that into the form and into the request.
-    CSRFProvider csrfProvider = injector.getInstance(CSRFProvider.class);
-    if (csrfProvider.getTokenFromRequest(request) == null) {
-      String token = csrfProvider.getToken(request);
-      if (token != null) {
-        request.setParameter(CSRFProvider.CSRF_PARAMETER_KEY, token);
+    MVCConfiguration configuration = injector.getInstance(MVCConfiguration.class);
+    if (configuration.csrfEnabled()) {
+      CSRFProvider csrfProvider = injector.getInstance(CSRFProvider.class);
+      if (csrfProvider.getTokenFromRequest(request) == null) {
+        String token = csrfProvider.getToken(request);
+        if (token != null) {
+          request.setParameter(CSRFProvider.CSRF_PARAMETER_KEY, token);
+        }
       }
     }
 
@@ -670,9 +707,15 @@ public class RequestBuilder {
     HTTPMethod method = request.getMethod();
 
     // Handle URL parameters and body
+    ByteBuffer bodyBuf = request.getBody();
+    byte[] body = null;
+    if (bodyBuf != null) {
+      body = new byte[bodyBuf.limit()];
+      System.arraycopy(bodyBuf.array(), bodyBuf.position(), body, 0, bodyBuf.limit());
+    }
+
     Map<String, List<String>> parameters = request.getParameters();
     List<FileInfo> files = request.getFiles();
-    byte[] body = request.getBody();
     Map<String, List<String>> urlParameters = null;
     BodyHandler bodyHandler = null;
     if (files != null && files.size() > 0) {
@@ -708,7 +751,7 @@ public class RequestBuilder {
         .method(request.getMethod().name())
         .readTimeout(0)
         .successResponseHandler(new ByteArrayResponseHandler())
-        .url("http://localhost:" + request.getPort() + request.getPath())
+        .url(requestURI.toString())
         .addURLParameters(urlParameters)
         .go();
 
@@ -727,5 +770,11 @@ public class RequestBuilder {
                                  .collect(Collectors.toList()));
 
     return response;
+  }
+
+  static {
+    // Do not restrict the HTTP request headers that can be set by the REST client.
+    // - Used by HttpURLConnection
+    System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
   }
 }

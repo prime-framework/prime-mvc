@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2021-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc.http;
 
-import java.net.URI;
 import java.util.regex.Pattern;
 
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
@@ -27,37 +26,6 @@ import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
  */
 public class HTTPTools {
   private static final Pattern DoubleSlash = Pattern.compile("/{2,}");
-
-  /**
-   * Returns the base URI in the following format:
-   * <p/>
-   * protocol://host[:port]
-   * <p/>
-   * This handles proxies, ports, schemes, everything.
-   *
-   * @param request the ServletRequest
-   * @return A URI in the format of protocol://host[:port]
-   */
-  public static URI getBaseURI(HTTPRequest request) {
-    return URI.create(toBaseURI(request));
-  }
-
-  /**
-   * Returns the full URL based on the information in the request.
-   *
-   * @param request The request.
-   * @return The full URL (as a URI).
-   */
-  public static URI getFullURI(HTTPRequest request) {
-    String uri = toBaseURI(request);
-    if (request.getContextPath() != null) {
-      uri += request.getContextPath();
-    }
-    if (request.getPath() != null) {
-      uri += request.getPath();
-    }
-    return URI.create(uri);
-  }
 
   /**
    * Return the <code>Origin</code> header or as a fall back, the value of the <code>Referer</code> header will be
@@ -101,34 +69,5 @@ public class HTTPTools {
     }
 
     return DoubleSlash.matcher(uri).replaceAll("/");
-  }
-
-  private static String toBaseURI(HTTPRequest request) {
-    // Setting the wrong value in the X-Forwarded-Proto header seems to be a common issue that causes an exception during URI.create. Assuming request.getScheme() is not the problem and it is related to the proxy configuration.
-    String scheme = defaultIfNull(request.getHeader(HTTPStrings.Headers.XForwardedProto), request.getScheme()).toLowerCase();
-    if (!scheme.equalsIgnoreCase("http") && !scheme.equalsIgnoreCase("https")) {
-      throw new IllegalArgumentException("The request scheme is invalid. Only http or https are valid schemes. The X-Forwarded-Proto header has a value of [" + request.getHeader("X-Forwarded-Proto") + "], this is likely an issue in your proxy configuration.");
-    }
-
-    String serverName = defaultIfNull(request.getHeader(HTTPStrings.Headers.XForwardedHost), request.getHost()).toLowerCase();
-    int serverPort = request.getPort();
-    // Ignore port 80 for http
-    if (request.getScheme().equalsIgnoreCase("http") && serverPort == 80) {
-      serverPort = -1;
-    }
-
-    String forwardedPort = request.getHeader(HTTPStrings.Headers.XForwardedPort);
-    if (forwardedPort != null) {
-      serverPort = Integer.parseInt(forwardedPort);
-    }
-
-    String uri = scheme + "://" + serverName;
-    if (serverPort > 0) {
-      if ((scheme.equalsIgnoreCase("http") && serverPort != 80) || (scheme.equalsIgnoreCase("https") && serverPort != 443)) {
-        uri += ":" + serverPort;
-      }
-    }
-
-    return uri;
   }
 }

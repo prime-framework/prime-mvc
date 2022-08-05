@@ -27,24 +27,11 @@ public interface Scope<T extends Annotation> {
    * Retrieve the value from the scope based on the name given.
    *
    * @param fieldName The name of the field.
-   * @param scope     The scope annotation from the field.
-   * @return The value or null if it doesn't exist in the scope.
-   * @deprecated Prefer {{@link #get(String, Class, Annotation)}}
-   */
-  @Deprecated
-  Object get(String fieldName, T scope);
-
-  /**
-   * Retrieve the value from the scope based on the name given.
-   *
-   * @param fieldName The name of the field.
    * @param type      The type of the field.
    * @param scope     The scope annotation from the field.
    * @return The value or null if it doesn't exist in the scope.
    */
-  default Object get(String fieldName, Class<?> type, T scope) {
-    return get(fieldName, scope);
-  }
+  Object get(String fieldName, Class<?> type, T scope);
 
   /**
    * Sets the value into the scope.

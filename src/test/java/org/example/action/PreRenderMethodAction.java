@@ -15,7 +15,6 @@
  */
 package org.example.action;
 
-import org.primeframework.mvc.http.HTTPResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
@@ -26,6 +25,7 @@ import org.primeframework.mvc.action.result.annotation.Forward;
 import org.primeframework.mvc.action.result.annotation.JSON;
 import org.primeframework.mvc.action.result.annotation.NoOp;
 import org.primeframework.mvc.content.json.annotation.JSONResponse;
+import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.parameter.annotation.PreRenderMethod;
 
 /**
@@ -36,6 +36,8 @@ import org.primeframework.mvc.parameter.annotation.PreRenderMethod;
 @JSON(code = "json")
 @NoOp(code = "noop")
 public class PreRenderMethodAction {
+  public static final String BODY = "You've been no-oped!";
+
   public static boolean forwardCalled;
 
   public static boolean jsonCalled;
@@ -59,7 +61,7 @@ public class PreRenderMethodAction {
   }
 
   @PreRenderMethod(Forward.class)
-  public void preFoward() {
+  public void preForward() {
     forwardCalled = true;
   }
 
@@ -75,7 +77,7 @@ public class PreRenderMethodAction {
     response.setStatus(201);
     response.setContentType("application/potato");
     OutputStream os = response.getOutputStream();
-    byte[] bytes = "You've been no-oped!".getBytes(StandardCharsets.UTF_8);
+    byte[] bytes = BODY.getBytes(StandardCharsets.UTF_8);
     response.setContentLength((long) bytes.length);
     os.write(bytes);
     os.flush();

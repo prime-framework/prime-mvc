@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2021-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,22 @@ public class Cookie implements Buildable<Cookie> {
   public Cookie(String name, String value) {
     this.name = name;
     this.value = value;
+  }
+
+  public Cookie(Cookie other) {
+    if (other == null) {
+      return;
+    }
+
+    this.domain = other.domain;
+    this.expires = other.expires;
+    this.httpOnly = other.httpOnly;
+    this.maxAge = other.maxAge;
+    this.name = other.name;
+    this.path = other.path;
+    this.sameSite = other.sameSite;
+    this.secure = other.secure;
+    this.value = other.value;
   }
 
   @Override
@@ -141,6 +157,18 @@ public class Cookie implements Buildable<Cookie> {
 
   public void setSecure(boolean secure) {
     this.secure = secure;
+  }
+
+  public com.inversoft.http.Cookie toRESTify() {
+    return new com.inversoft.http.Cookie().with(c -> c.domain = domain)
+                                          .with(c -> c.expires = expires)
+                                          .with(c -> c.httpOnly = httpOnly)
+                                          .with(c -> c.maxAge = maxAge)
+                                          .with(c -> c.name = name)
+                                          .with(c -> c.path = path)
+                                          .with(c -> c.sameSite = sameSite != null ? com.inversoft.http.Cookie.SameSite.valueOf(sameSite.name()) : null)
+                                          .with(c -> c.secure = secure)
+                                          .with(c -> c.value = value);
   }
 
   public enum SameSite {

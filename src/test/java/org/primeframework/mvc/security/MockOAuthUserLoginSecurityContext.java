@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2016-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,11 @@ public class MockOAuthUserLoginSecurityContext extends BaseJWTRefreshTokenCookie
   @Override
   public Set<String> getCurrentUsersRoles() {
     return Roles;
+  }
+
+  @Override
+  public String getSessionId() {
+    return CurrentUser != null ? Integer.toString(CurrentUser.hashCode()) : null;
   }
 
   @Override

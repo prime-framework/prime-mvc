@@ -21,5 +21,8 @@ package org.primeframework.mvc.cors;
  * @author Brian Pontarelli
  */
 public interface CORSConfigurationProvider {
+  /**
+   * @return the CORS configuration.
+   */
   CORSConfiguration get();
 }

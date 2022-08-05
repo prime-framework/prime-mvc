@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2019, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2015-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,7 +80,7 @@ public class UserLoginSecurityScheme implements SecurityScheme {
         throw new UnauthorizedException();
       }
 
-      URI uri = HTTPTools.getBaseURI(request);
+      URI uri = URI.create(request.getBaseURL());
       URI sourceURI = URI.create(source);
       if (uri.getPort() != sourceURI.getPort() || !uri.getScheme().equalsIgnoreCase(sourceURI.getScheme()) || !uri.getHost().equalsIgnoreCase(sourceURI.getHost())) {
         throw new UnauthorizedException();

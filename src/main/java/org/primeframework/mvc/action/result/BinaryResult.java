@@ -32,7 +32,7 @@ import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 
 /**
  * This result writes bytes to the response output stream with <code>Content-Type</code> set to
- * <code>application/octet-stream</code>. The default <code>Content-Type</code> can modified in the {@link Binary}
+ * <code>application/octet-stream</code>. The default <code>Content-Type</code> can be modified in the {@link Binary}
  * annotation.
  *
  * @author Daniel DeGroff

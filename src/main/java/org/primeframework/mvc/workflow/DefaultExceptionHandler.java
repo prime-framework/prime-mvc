@@ -48,8 +48,11 @@ public class DefaultExceptionHandler implements ExceptionHandler {
   @Override
   @SuppressWarnings({"unchecked", "rawtypes"})
   public void handle(Throwable exception) {
+    // Add the exception to the response so that handles and templates can get it
+    response.setException(exception);
+
+    // Find a handler
     Class<? extends Throwable> klass = exception.getClass();
-    boolean handled = false;
     while (klass != Throwable.class) {
       TypedExceptionHandler handler = factory.build(klass);
       if (handler == null) {
@@ -57,17 +60,14 @@ public class DefaultExceptionHandler implements ExceptionHandler {
         continue;
       }
 
+      // Handle and exit method
       handler.handle(exception);
-      handled = true;
-      break;
+      return;
     }
 
-    if (!handled) {
-      logger.error("Unhandled exception occurred", exception);
-
-      // Set the result code to the default so that the ErrorWorkflow can handle it
-      resultStore.set(configuration.exceptionResultCode());
-      response.setStatus(500);
-    }
+    // Set the result code to the default so that the ErrorWorkflow can handle it
+    logger.error("Unhandled exception occurred", exception);
+    resultStore.set(configuration.exceptionResultCode());
+    response.setStatus(500);
   }
 }

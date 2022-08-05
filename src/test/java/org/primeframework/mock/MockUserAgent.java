@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2020, Inversoft, All Rights Reserved
+ * Copyright (c) 2001-2022, Inversoft, All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,19 +55,49 @@ public class MockUserAgent {
     cookies.clear();
   }
 
+  public void clearCookie(String cookieName) {
+    clearCookie("/", cookieName);
+  }
+
+  public void clearCookie(String path, String cookieName) {
+    if (cookies.containsKey(path)) {
+      cookies.get(path).keySet().removeIf(name -> name.equals(cookieName));
+    }
+  }
+
   public void clearCookies(String path) {
     cookies.remove(path);
   }
 
-  public List<Cookie> getCookies(HTTPRequest request) {
+  public Cookie getCookie(String name) {
+    return getCookie("/", name);
+  }
+
+  public Cookie getCookie(String path, String name) {
+    return getCookies(path).stream().filter(c -> c.name.equals(name)).findFirst().orElse(null);
+  }
+
+  public Cookie getCookie(HTTPRequest request, String name) {
+    return getCookie(request.getPath(), name);
+  }
+
+  public List<Cookie> getCookies() {
+    return getCookies("/");
+  }
+
+  public List<Cookie> getCookies(String path) {
     List<Cookie> cookies = new ArrayList<>();
-    this.cookies.forEach((path, map) -> {
-      if (request.getPath().startsWith(path)) {
+    this.cookies.forEach((p, map) -> {
+      if (path.startsWith(p)) {
         cookies.addAll(map.values());
       }
     });
 
     return cookies;
+  }
+
+  public List<Cookie> getCookies(HTTPRequest request) {
+    return getCookies(request.getPath());
   }
 
   public void reset() {

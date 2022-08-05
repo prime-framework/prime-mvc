@@ -21,11 +21,25 @@ package org.primeframework.mvc.cors;
  * @author Brian Pontarelli
  */
 public interface CORSDebugger {
+  /**
+   * Turn off the timestamp for this debugger.
+   *
+   * @return this.
+   */
   CORSDebugger disableTimestamp();
 
+  /**
+   * Call this one you are done with the debugger.
+   */
   void done();
 
-  CORSDebugger log(String message);
-
-  CORSDebugger logValueDefaultIfNull(String message, Object... values);
+  /**
+   * Log a message allowing for replacement values. Each replacement value will be null safe and a default value will be
+   * used in place of a null.
+   *
+   * @param message the message to log.
+   * @param values  the values to use as replacement values in the message.
+   * @return this.
+   */
+  CORSDebugger log(String message, Object... values);
 }

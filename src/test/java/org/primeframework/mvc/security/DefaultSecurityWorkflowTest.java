@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2015-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
     store.setCurrent(actionInvocation);
 
     MockUserLoginSecurityContext.roles.clear();
-    MockUserLoginSecurityContext securityContext = new MockUserLoginSecurityContext(request, response);
+    MockUserLoginSecurityContext securityContext = new MockUserLoginSecurityContext();
     DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, new TestSecuritySchemeFactory(PrimeBaseTest.configuration, securityContext, request, csrfProvider));
     WorkflowChain workflowChain = createStrictMock(WorkflowChain.class);
     workflowChain.continueWorkflow();
@@ -76,7 +76,7 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
 
     MockUserLoginSecurityContext.roles.clear();
     MockUserLoginSecurityContext.roles.add("bad");
-    MockUserLoginSecurityContext securityContext = new MockUserLoginSecurityContext(request, response);
+    MockUserLoginSecurityContext securityContext = new MockUserLoginSecurityContext();
     securityContext.login("user");
 
     // Copy the cookies back from the response to the request because the request cookies are used below
@@ -110,7 +110,7 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
     request.addParameter("test2", "value2");
 
     MockUserLoginSecurityContext.roles.clear();
-    MockUserLoginSecurityContext securityContext = new MockUserLoginSecurityContext(request, response);
+    MockUserLoginSecurityContext securityContext = new MockUserLoginSecurityContext();
     DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, new TestSecuritySchemeFactory(PrimeBaseTest.configuration, securityContext, request, csrfProvider));
     WorkflowChain workflowChain = createStrictMock(WorkflowChain.class);
     replay(workflowChain);
@@ -139,7 +139,7 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
     request.addParameter("test2", "value2");
 
     MockUserLoginSecurityContext.roles.clear();
-    MockUserLoginSecurityContext securityContext = new MockUserLoginSecurityContext(request, response);
+    MockUserLoginSecurityContext securityContext = new MockUserLoginSecurityContext();
     DefaultSecurityWorkflow workflow = new DefaultSecurityWorkflow(store, new TestSecuritySchemeFactory(PrimeBaseTest.configuration, securityContext, request, csrfProvider));
     WorkflowChain workflowChain = createStrictMock(WorkflowChain.class);
     replay(workflowChain);
@@ -164,7 +164,7 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
 
     MockUserLoginSecurityContext.roles.clear();
     MockUserLoginSecurityContext.roles.add("admin");
-    MockUserLoginSecurityContext securityContext = new MockUserLoginSecurityContext(request, response);
+    MockUserLoginSecurityContext securityContext = new MockUserLoginSecurityContext();
     securityContext.login("user");
 
     // Copy the cookies back from the response to the request because the request cookies are used below
@@ -194,7 +194,7 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
 
     MockUserLoginSecurityContext.roles.clear();
     MockUserLoginSecurityContext.roles.add("bad");
-    MockUserLoginSecurityContext securityContext = new MockUserLoginSecurityContext(request, response);
+    MockUserLoginSecurityContext securityContext = new MockUserLoginSecurityContext();
     securityContext.login("user");
 
     // Copy the cookies back from the response to the request because the request cookies are used below

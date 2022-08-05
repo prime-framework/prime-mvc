@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.inject.Inject;
+import org.primeframework.mvc.http.HTTPRequest;
 import org.primeframework.mvc.message.scope.ApplicationScope;
 import org.primeframework.mvc.message.scope.FlashScope;
 import org.primeframework.mvc.message.scope.MessageScope;
@@ -36,15 +37,19 @@ import org.primeframework.mvc.message.scope.Scope;
  * @author Brian Pontarelli
  */
 public class DefaultMessageStore implements MessageStore {
+  private final HTTPRequest httpRequest;
+
   private final Map<MessageScope, Scope> scopes = new LinkedHashMap<>();
 
   private MessageObserver observer;
 
   @Inject
-  public DefaultMessageStore(ApplicationScope applicationScope, FlashScope flashScope, RequestScope requestScope) {
+  public DefaultMessageStore(ApplicationScope applicationScope, FlashScope flashScope, RequestScope requestScope,
+                             HTTPRequest httpRequest) {
     scopes.put(MessageScope.REQUEST, requestScope);
     scopes.put(MessageScope.FLASH, flashScope);
     scopes.put(MessageScope.APPLICATION, applicationScope);
+    this.httpRequest = httpRequest;
   }
 
   @Override
@@ -58,7 +63,7 @@ public class DefaultMessageStore implements MessageStore {
     s.add(message);
 
     if (observer != null) {
-      observer.added(scope, message);
+      observer.messageAdded(httpRequest, scope, message);
     }
   }
 
@@ -68,7 +73,7 @@ public class DefaultMessageStore implements MessageStore {
     s.addAll(messages);
 
     if (observer != null) {
-      messages.forEach(m -> observer.added(scope, m));
+      messages.forEach(m -> observer.messageAdded(httpRequest, scope, m));
     }
   }
 
@@ -84,7 +89,7 @@ public class DefaultMessageStore implements MessageStore {
     scopes.get(scope).clear();
 
     if (observer != null) {
-      observer.cleared(scope);
+      observer.scopeCleared(httpRequest, scope);
     }
   }
 

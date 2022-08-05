@@ -20,6 +20,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.primeframework.mvc.http.Cookie.SameSite;
 import org.primeframework.mvc.scope.BrowserActionSessionScope;
 
 /**
@@ -34,7 +35,7 @@ import org.primeframework.mvc.scope.BrowserActionSessionScope;
 public @interface BrowserActionSession {
   /**
    * @return This attribute determines the action for which the action session is used. This allows an action to get and
-   * set attributes inside another action's session.
+   *     set attributes inside another action's session.
    */
   Class<?> action() default BrowserActionSession.class;
 
@@ -54,7 +55,12 @@ public @interface BrowserActionSession {
 
   /**
    * @return This attribute determines the name under which that the value is stored in the action session. The default
-   * name is the name of the field that the annotation is put on.
+   *     name is the name of the field that the annotation is put on.
    */
-  String value() default "##field-name##";
+  String name() default "##field-name##";
+
+  /**
+   * @return The SameSite setting for the cookie. Defaults to Lax.
+   */
+  SameSite sameSite() default SameSite.Lax;
 }

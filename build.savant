@@ -17,20 +17,20 @@ savantVersion = "1.0.0"
 
 asmVersion = "9.2.0"
 dropWizardVersion = "3.2.6"
-easyMockVersion = "4.2.0"
+easyMockVersion = "4.4.0-20220601"
 freemarkerVersion = "2.3.30"
 fusionAuthJWTVersion = "5.1.0"
 guavaVersion = "30.1.0-jre"
-guiceVersion = "5.0.1"
+guiceVersion = "5.1.0"
 jacksonVersion = "2.13.2"
 jsoupVersion = "1.12.1"
-logbackVersion = "1.3.0-alpha12"
-nettyVersion = "4.1.70"
+logbackVersion = "1.3.0-alpha16"
+nettyVersion = "4.1.79"
 restifyVersion = "4.0.0"
-slf4jVersion = "2.0.0-alpha5"
+slf4jVersion = "2.0.0-alpha7"
 testngVersion = "7.3.0"
 
-project(group: "org.primeframework", name: "prime-mvc", version: "2.2.0", licenses: ["ApacheV2_0"]) {
+project(group: "org.primeframework", name: "prime-mvc", version: "2.3.0", licenses: ["ApacheV2_0"]) {
   workflow {
     fetch {
       cache()
@@ -69,6 +69,12 @@ project(group: "org.primeframework", name: "prime-mvc", version: "2.2.0", licens
       dependency(id: "com.google.guava:guava:${guavaVersion}", skipCompatibilityCheck: true)
     }
     group(name: "test-compile", export: false) {
+      // Note, I just built master and published the jar into Savant, named it 4.4.0+20220601 since I built it on Jun 1 2022.
+      // Once 4.4 is officially released, we should use it.
+
+      // https://github.com/easymock/easymock/issues/274
+      // https://github.com/easymock/easymock/milestone/25
+      // https://github.com/easymock/easymock/releases
       dependency(id: "org.easymock:easymock:${easyMockVersion}")
       dependency(id: "org.testng:testng:${testngVersion}")
       dependency(id: "org.jsoup:jsoup:${jsoupVersion}")
@@ -92,18 +98,14 @@ project(group: "org.primeframework", name: "prime-mvc", version: "2.2.0", licens
 // Plugins
 file = loadPlugin(id: "org.savantbuild.plugin:file:1.0.2")
 dependency = loadPlugin(id: "org.savantbuild.plugin:dependency:1.0.2")
-java = loadPlugin(id: "org.savantbuild.plugin:java:1.0.2")
-javaTestNG = loadPlugin(id: "org.savantbuild.plugin:java-testng:1.0.9")
+java = loadPlugin(id: "org.savantbuild.plugin:java:1.2.0")
+javaTestNG = loadPlugin(id: "org.savantbuild.plugin:java-testng:1.0.12")
 idea = loadPlugin(id: "org.savantbuild.plugin:idea:1.0.1")
 release = loadPlugin(id: "org.savantbuild.plugin:release-git:${savantVersion}")
 
 // Plugin settings
-// Note: Pending support from EasyMock to move to 17. The following issue should be fixed in 4.4, waiting for that release.
-// https://github.com/easymock/easymock/issues/274
-// https://github.com/easymock/easymock/milestone/25
-// https://github.com/easymock/easymock/releases
-java.settings.javaVersion = "14"
-javaTestNG.settings.javaVersion = "14"
+java.settings.javaVersion = "17"
+javaTestNG.settings.javaVersion = "17"
 
 target(name: "clean", description: "Cleans the project") {
   java.clean()
@@ -113,7 +115,9 @@ target(name: "compile", description: "Compiles the project") {
   java.compileMain()
 
   // allow the user of sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl in tests
-  java.settings.compilerArguments += " -XDignore.symbol.file"
+  java
+      .settings
+      .compilerArguments += " -XDignore.symbol.file --add-exports java.base/sun.security.x509=ALL-UNNAMED --add-exports java.base/sun.security.util=ALL-UNNAMED"
   java.compileTest()
 
   file.copy(to: "build/classes/main") {
@@ -145,7 +149,9 @@ target(name: "jar", description: "JARs the project", dependsOn: ["compile"]) {
 
 target(name: "test", description: "Runs the project's tests", dependsOn: ["jar"]) {
 //  May be needed for Java 17
-//  javaTestNG.settings.jvmArguments = "--add-opens=java.base/java.lang=ALL-UNNAMED"
+  javaTestNG
+      .settings
+      .jvmArguments = "--add-exports java.base/sun.security.x509=ALL-UNNAMED --add-exports java.base/sun.security.util=ALL-UNNAMED"
   javaTestNG.test()
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2015-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import java.util.Set;
  */
 public interface UserLoginSecurityContext {
   /**
-   * @return The currently logged in user or null.
+   * @return The currently logged-in user or null.
    */
   Object getCurrentUser();
 
@@ -58,6 +58,15 @@ public interface UserLoginSecurityContext {
    * Logs the user out. The user's session will be invalidated.
    */
   void logout();
+
+  /**
+   * Logs the user out. The user's session will be invalidated.
+   *
+   * @param context an implementation specific context
+   */
+  default void logout(Object context) {
+    logout();
+  }
 
   /**
    * Allows implementations to update the user object, which might be different from the context object.

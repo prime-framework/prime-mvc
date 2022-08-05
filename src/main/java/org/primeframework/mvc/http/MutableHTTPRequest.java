@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2021-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.primeframework.mvc.http;
 
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.List;
@@ -60,11 +61,15 @@ public interface MutableHTTPRequest extends HTTPRequest {
 
   void deleteCookie(String name);
 
-  void setBody(byte[] body);
+  void removeHeader(String name);
+
+  void removeHeader(String name, String... values);
+
+  void setBody(ByteBuffer body);
 
   void setCharacterEncoding(Charset encoding);
 
-  void setContentLength(long contentLength);
+  void setContentLength(Long contentLength);
 
   void setContentType(String contentType);
 
@@ -79,6 +84,8 @@ public interface MutableHTTPRequest extends HTTPRequest {
   void setHeaders(Map<String, List<String>> parameters);
 
   void setHost(String host);
+
+  void setIPAddress(String ipAddress);
 
   void setMethod(HTTPMethod method);
 
@@ -96,9 +103,7 @@ public interface MutableHTTPRequest extends HTTPRequest {
 
   void setPort(int port);
 
-  void setRemoteAddress(String remoteAddress);
-
-  void setRemoteHost(String remoteHost);
+  void setQueryString(String queryString);
 
   void setScheme(String scheme);
 }

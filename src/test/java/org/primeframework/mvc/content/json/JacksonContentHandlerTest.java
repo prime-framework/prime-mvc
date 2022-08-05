@@ -16,6 +16,7 @@
 package org.primeframework.mvc.content.json;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -108,7 +109,9 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
         "  \"type\":\"COOL\"" +
         "}";
 
-    request.setBody(expected.getBytes());
+    request.setBody(ByteBuffer.wrap(expected.getBytes()));
+    request.setContentLength((long) expected.getBytes().length);
+    request.setContentType("application/json");
 
     MessageProvider messageProvider = createStrictMock(MessageProvider.class);
     replay(messageProvider);
@@ -160,7 +163,9 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
         "}";
 
     MutableHTTPRequest request = new DefaultHTTPRequest();
-    request.setBody(expected.getBytes());
+    request.setBody(ByteBuffer.wrap(expected.getBytes()));
+    request.setContentLength((long) expected.getBytes().length);
+    request.setContentType("application/json");
 
     MessageProvider messageProvider = createStrictMock(MessageProvider.class);
     expect(messageProvider.getMessage(eq("[invalidJSON]"), eq("siblings.age"), eq("Possible conversion error"), isA(String.class))).andReturn("Bad sibling age");
@@ -205,7 +210,9 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
         "}";
 
     MutableHTTPRequest request = new DefaultHTTPRequest();
-    request.setBody(expected.getBytes());
+    request.setBody(ByteBuffer.wrap(expected.getBytes()));
+    request.setContentLength((long) expected.getBytes().length);
+    request.setContentType("application/json");
 
     MessageProvider messageProvider = createNiceMock(MessageProvider.class);
     expect(messageProvider.getMessage(eq("[invalidJSON]"), eq("addresses.home.age"), eq("Possible conversion error"), isA(String.class))).andReturn("Bad age");
@@ -246,7 +253,9 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
         "}";
 
     MutableHTTPRequest request = new DefaultHTTPRequest();
-    request.setBody(expected.getBytes());
+    request.setBody(ByteBuffer.wrap(expected.getBytes()));
+    request.setContentLength((long) expected.getBytes().length);
+    request.setContentType("application/json");
 
     MessageProvider messageProvider = createStrictMock(MessageProvider.class);
     expect(messageProvider.getMessage(eq("[invalidJSON]"), eq("bad-active"), eq("Unrecognized property"), isA(String.class))).andReturn("foo");
@@ -287,7 +296,9 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
         "}";
 
     MutableHTTPRequest request = new DefaultHTTPRequest();
-    request.setBody(expected.getBytes());
+    request.setBody(ByteBuffer.wrap(expected.getBytes()));
+    request.setContentLength((long) expected.getBytes().length);
+    request.setContentType("application/json");
 
     MessageProvider messageProvider = createStrictMock(MessageProvider.class);
     expect(messageProvider.getMessage(eq("[invalidJSON]"), eq("active"), eq("Possible conversion error"), isA(String.class))).andReturn("Bad active");
@@ -350,7 +361,9 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
         "}";
 
     MutableHTTPRequest request = new DefaultHTTPRequest();
-    request.setBody(expected.getBytes());
+    request.setBody(ByteBuffer.wrap(expected.getBytes()));
+    request.setContentLength((long) expected.getBytes().length);
+    request.setContentType("application/json");
 
     MessageProvider messageProvider = createStrictMock(MessageProvider.class);
     replay(messageProvider);
@@ -408,7 +421,9 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
         "}";
 
     MutableHTTPRequest request = new DefaultHTTPRequest();
-    request.setBody(expected.getBytes());
+    request.setBody(ByteBuffer.wrap(expected.getBytes()));
+    request.setContentLength((long) expected.getBytes().length);
+    request.setContentType("application/json");
 
     MessageProvider messageProvider = createStrictMock(MessageProvider.class);
     replay(messageProvider);

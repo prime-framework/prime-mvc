@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2021-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import java.io.OutputStream;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.DefaultHttpContent;
 import io.netty.handler.codec.http.DefaultHttpHeaders;
 import io.netty.handler.codec.http.DefaultHttpResponse;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -29,6 +30,7 @@ import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.cookie.CookieHeaderNames.SameSite;
 import io.netty.handler.codec.http.cookie.DefaultCookie;
 import io.netty.handler.codec.http.cookie.ServerCookieEncoder;
+import org.primeframework.mvc.http.HTTPStrings.Headers;
 
 /**
  * Defines an OutputStream that can handle writing an HTTP response back to the client without having to maintain the
@@ -93,7 +95,6 @@ public class HTTPOutputStream extends OutputStream {
         response.setContentLength((long) index);
       }
 
-      // TODO : Netty : Should this be chunked response because we might not know the Content-Length?
       writeHeaders();
       writeBuffer();
       state = State.BodyInProgress;
@@ -125,7 +126,8 @@ public class HTTPOutputStream extends OutputStream {
 
   private void writeBuffer() {
     ByteBuf nettyBuf = Unpooled.wrappedBuffer(buf, 0, index);
-    context.writeAndFlush(nettyBuf);
+    // Note, you have to wrap this buffer to get Netty to chunk it.
+    context.writeAndFlush(new DefaultHttpContent(nettyBuf));
     index = 0;
   }
 
@@ -136,7 +138,7 @@ public class HTTPOutputStream extends OutputStream {
     response.getCookies()
             .stream()
             .filter(c -> c.name != null)
-            .forEach(cookie -> headers.add("Set-Cookie", ServerCookieEncoder.LAX.encode(toNettyCookie(cookie))));
+            .forEach(cookie -> headers.add(Headers.SetCookie, ServerCookieEncoder.LAX.encode(toNettyCookie(cookie))));
     DefaultHttpResponse nettyResponse = new DefaultHttpResponse(HttpVersion.HTTP_1_1, status, headers);
     context.writeAndFlush(nettyResponse);
     oneByteWritten = true;

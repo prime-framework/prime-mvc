@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,22 +13,34 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.example.action.browserSession;
+package org.example.action;
 
-import org.example.domain.User;
+
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.annotation.Redirect;
-import org.primeframework.mvc.scope.annotation.BrowserSession;
 
-@Action
-@Redirect(code = "next", uri = "/browser-session/second-max-age")
-public class FirstMaxAgeAction {
-  @BrowserSession(maxAge = Integer.MAX_VALUE)
-  public User user;
+/**
+ * @author Daniel DeGroff
+ */
+@Action("{path}")
+@Redirect(uri = "${uri}")
+public class ValidCharactersAction {
+  public String path;
+
+  public String q;
+
+  public String uri;
 
   public String get() {
-    user = new User();
-    user.setName("Brian Pontarelli");
-    return "next";
+    uri = "/";
+
+    if (path != null) {
+      uri += path;
+    }
+
+    if (q != null) {
+      uri += "q=" + q;
+    }
+    return "success";
   }
 }

@@ -29,7 +29,6 @@ import org.primeframework.mvc.http.HTTPMethod;
 import org.primeframework.mvc.http.HTTPRequest;
 import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.http.HTTPStrings.Headers;
-import org.primeframework.mvc.http.HTTPTools;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -502,9 +501,9 @@ public final class CORSFilter {
       return false;
     }
 
-    // Be a little defensive, if we exception this is not "us"
+    // Be a little defensive, if we throw an exception this is not "us"
     try {
-      URI uri = HTTPTools.getBaseURI(request);
+      URI uri = URI.create(request.getBaseURL());
       URI originURI = URI.create(origin);
       return uri.getScheme().equalsIgnoreCase(originURI.getScheme()) & uri.getPort() == originURI.getPort() && uri.getHost().equalsIgnoreCase(originURI.getHost());
     } catch (Exception ignore) {
@@ -561,30 +560,33 @@ public final class CORSFilter {
       case PreFlightUnexpected -> "Invalid request. Not expecting a preflight request from URI [" + reasonValue + "].";
       case SimpleMethodNotAllowed -> "Invalid Simple CORS request. HTTP method not allowed. [" + reasonValue + "]";
       case SimpleOriginNotAllowed -> "Invalid Simple CORS request. Origin not allowed. [" + reasonValue + "]";
-      case PreFlightHeaderNotAllowed -> "Invalid CORS pre-flight request. HTTP header not allowed. [" + reasonValue + "]";
-      case PreFlightMethodNotAllowed -> "Invalid CORS pre-flight request. HTTP method not allowed. [" + reasonValue + "]";
-      case PreFlightMethodNotRecognized -> "Invalid CORS pre-flight request. HTTP method not recognized. [" + reasonValue + "]";
+      case PreFlightHeaderNotAllowed ->
+          "Invalid CORS pre-flight request. HTTP header not allowed. [" + reasonValue + "]";
+      case PreFlightMethodNotAllowed ->
+          "Invalid CORS pre-flight request. HTTP method not allowed. [" + reasonValue + "]";
+      case PreFlightMethodNotRecognized ->
+          "Invalid CORS pre-flight request. HTTP method not recognized. [" + reasonValue + "]";
       case PreFlightOriginNotAllowed -> "Invalid CORS pre-flight request. Origin not allowed. [" + reasonValue + "]";
       case UnhandledCORSRequestType -> "Invalid request. Unhandled CORS request type [" + reasonValue + "].";
     };
 
-    // Using defaultIfNull to handle the difference between null and "null". "null" is a valid origin but I want to be able to tell the difference.
+    // Using defaultIfNull to handle the difference between null and "null". "null" is a valid origin, but I want to be able to tell the difference.
     debugger.disableTimestamp()
             .log(message)
             .log("")
-            .logValueDefaultIfNull("Base URI: ", HTTPTools.getBaseURI(request))
-            .logValueDefaultIfNull("HTTP Method: ", request.getMethod())
-            .logValueDefaultIfNull("URI: ", request.getPath())
+            .log("Base URI: %s", URI.create(request.getBaseURL()))
+            .log("HTTP Method: %s", request.getMethod())
+            .log("URI: %s", request.getPath())
             .log("")
-            .logValueDefaultIfNull("Content-Type header: ", request.getHeader("Content-Type"))
-            .logValueDefaultIfNull("Host header: ", request.getHeader("Host"))
-            .logValueDefaultIfNull("Origin header: ", request.getHeader("Origin"))
-            .logValueDefaultIfNull("Referer header: ", request.getHeader("Referer"))
+            .log("Content-Type header: %s", request.getHeader("Content-Type"))
+            .log("Host header: %s", request.getHeader("Host"))
+            .log("Origin header: %s", request.getHeader("Origin"))
+            .log("Referer header: %s", request.getHeader("Referer"))
             .log("")
-            .logValueDefaultIfNull("Remote host: ", request.getRemoteHost())
-            .logValueDefaultIfNull("IP address: ", request.getRemoteAddress())
+            .log("Remote host: %s", request.getHost())
+            .log("IP address: %s", request.getIPAddress())
             .log("")
-            .logValueDefaultIfNull("Header names: ", String.join(",", request.getHeadersMap().keySet()));
+            .log("Header names: %s", String.join(",", request.getHeadersMap().keySet()));
 
     // One edge case we've seen in the field. If using POST w/out a Content-Type header, this will be considered an Invalid CORS request.
     // - This will show up as an UnhandledCORSRequestType. We could optionally re-factor a few things and then pass that all the way here, but

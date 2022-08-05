@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,6 +74,8 @@ public class FreeMarkerMap implements TemplateHashModelEx {
 
   public static final String REQUEST_MODEL = "Request";
 
+  public static final String RESPONSE = "response";
+
   public static final String WARNING_MESSAGES = "warningMessages";
 
   protected final ActionInvocationStore actionInvocationStore;
@@ -92,18 +94,18 @@ public class FreeMarkerMap implements TemplateHashModelEx {
   public FreeMarkerMap(HTTPContext context, HTTPRequest request, HTTPResponse response,
                        ExpressionEvaluator expressionEvaluator, ActionInvocationStore actionInvocationStore,
                        MessageStore messageStore, ControlFactory controlFactory,
-                       TemplateModelFactory templateModelFactory,
-                       Configuration configuration) {
+                       TemplateModelFactory templateModelFactory, Configuration configuration) {
     this.context = context;
     this.request = request;
     this.expressionEvaluator = expressionEvaluator;
     this.actionInvocationStore = actionInvocationStore;
     this.configuration = configuration;
 
-    objects.put(REQUEST_MODEL, new HTTPRequestModel(request, response, configuration.getObjectWrapper()));
-    objects.put(REQUEST, request);
     objects.put(CONTEXT_MODEL, new ContextModel(context, configuration.getObjectWrapper()));
     objects.put(CONTEXT, context);
+    objects.put(REQUEST_MODEL, new HTTPRequestModel(request, response, configuration.getObjectWrapper()));
+    objects.put(REQUEST, request);
+    objects.put(RESPONSE, response);
 
     List<Message> allMessages = messageStore.get();
     Map<String, List<FieldMessage>> fieldMessages = messageStore.getFieldMessages();
@@ -206,6 +208,18 @@ public class FreeMarkerMap implements TemplateHashModelEx {
     }
 
     return new CollectionModel(keys, (BeansWrapper) configuration.getObjectWrapper());
+  }
+
+  /**
+   * Add an object to the map. If the object already exists by this key it will be replaced.
+   *
+   * @param key   the key
+   * @param value the value
+   * @return the previous value associated with key, or null if there was no mapping for key. (A null return can also
+   *     indicate that the map previously associated null with key, if the implementation supports null values.)
+   */
+  public Object put(String key, Object value) {
+    return objects.put(key, value);
   }
 
   @Override

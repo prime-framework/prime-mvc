@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2016-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,22 +18,13 @@ package org.primeframework.mvc.security;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.google.inject.Inject;
-import org.primeframework.mvc.http.HTTPRequest;
-import org.primeframework.mvc.http.HTTPResponse;
-
 /**
  * @author Daniel DeGroff
  */
-public class MockUserLoginSecurityContext extends BaseCookieSessionUserLoginSecurityContext {
+public class MockUserLoginSecurityContext implements UserLoginSecurityContext {
   public static Object currentUser;
 
   public static Set<String> roles = new HashSet<>();
-
-  @Inject
-  public MockUserLoginSecurityContext(HTTPRequest request, HTTPResponse response) {
-    super(request, response);
-  }
 
   @Override
   public Object getCurrentUser() {
@@ -51,33 +42,22 @@ public class MockUserLoginSecurityContext extends BaseCookieSessionUserLoginSecu
   }
 
   @Override
+  public boolean isLoggedIn() {
+    return currentUser != null;
+  }
+
+  @Override
   public void login(Object user) {
-    super.login(user);
     currentUser = user;
+  }
+
+  @Override
+  public void logout() {
+    currentUser = null;
   }
 
   @Override
   public void updateUser(Object user) {
     currentUser = user;
-  }
-
-  @Override
-  protected Long cookieDuration() {
-    return null;
-  }
-
-  @Override
-  protected String cookieName() {
-    return "prime-session";
-  }
-
-  @Override
-  protected String getSessionIdFromUser(Object user) {
-    return Integer.toString(user.hashCode());
-  }
-
-  @Override
-  protected Object getUserFromSessionId(String sessionId) {
-    return currentUser != null && Integer.toString(currentUser.hashCode()).equals(sessionId) ? currentUser : null;
   }
 }

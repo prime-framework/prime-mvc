@@ -93,8 +93,8 @@ public class JacksonContentHandler implements ContentHandler {
       return;
     }
 
-    long contentLength = request.getContentLength();
-    if (contentLength == 0) {
+    Long contentLength = request.getContentLength();
+    if (contentLength == null || contentLength == 0) {
       return;
     }
 
@@ -105,7 +105,7 @@ public class JacksonContentHandler implements ContentHandler {
       RequestMember requestMember = jacksonConfiguration.requestMembers.get(httpMethod);
 
       try {
-        // Retrieve the current value from the action so we can see if it is non-null
+        // Retrieve the current value from the action, so we can see if it is non-null
         Object currentValue = expressionEvaluator.getValue(requestMember.name, action);
         ObjectReader reader;
         if (currentValue != null) {
@@ -115,10 +115,11 @@ public class JacksonContentHandler implements ContentHandler {
         }
 
         if (logger.isDebugEnabled()) {
-          logger.debug("Request: ({} {}) {}", request.getMethod(), request.getPath(), request.getBody());
+          String body = new String(request.getBody().array(), 0, contentLength.intValue());
+          logger.debug("Request: ({} {}) {}", request.getMethod(), request.getPath(), body);
         }
 
-        Object jsonObject = reader.readValue(request.getBody());
+        Object jsonObject = reader.readValue(request.getBody().array(), 0, contentLength.intValue());
 
         // Set the value into the action if the currentValue from the action was null
         if (currentValue == null) {
@@ -160,7 +161,12 @@ public class JacksonContentHandler implements ContentHandler {
     String field = buildField(e);
     String code = "[invalidJSON]";
 
-    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, field, code, messageProvider.getMessage(code, field, "Possible conversion error", e.getMessage())));
+    // If we cannot find the field, make this a general error.
+    if (field.equals("")) {
+      messageStore.add(new SimpleMessage(MessageType.ERROR, code, messageProvider.getMessage(code, "unknown", "Possible conversion error", e.getMessage())));
+    } else {
+      messageStore.add(new SimpleFieldMessage(MessageType.ERROR, field, code, messageProvider.getMessage(code, field, "Possible conversion error", e.getMessage())));
+    }
   }
 
   private String buildField(JsonMappingException e) {

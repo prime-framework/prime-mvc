@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2020-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,9 @@ import org.primeframework.mvc.util.CookieTools;
  * A CSRF Provider leveraging the Encryption based Token Pattern as defined by OWASP.
  *
  * @author Daniel DeGroff
- * @see <a href="https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#encryption-based-token-pattern">OWASP CSRF Cheat Sheet - Encryption based Token Pattern</a>
+ * @see <a
+ *     href="https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#encryption-based-token-pattern">OWASP
+ *     CSRF Cheat Sheet - Encryption based Token Pattern</a>
  */
 @SuppressWarnings("unused")
 public class DefaultEncryptionBasedTokenCSRFProvider implements CSRFProvider {
@@ -63,7 +65,7 @@ public class DefaultEncryptionBasedTokenCSRFProvider implements CSRFProvider {
       return false;
     }
 
-    // The sessionId must match.
+    // The sessionId must match the value provided in the HTTP request.
     String sessionId = securityContext.getSessionId();
     if (!token.sid.equals(sessionId)) {
       return false;
@@ -95,6 +97,18 @@ public class DefaultEncryptionBasedTokenCSRFProvider implements CSRFProvider {
     }
   }
 
+  /**
+   * Generate an encrypted anti-CSRF token.
+   * <p>
+   * Note that the token value contains the current sessionId. This means that this token is strongly associated with
+   * the user's current sessionId. This is important because it means this token is only valid or usable for a
+   * particular user session.
+   * <p>
+   * Encrypting this cookie means it is functionally immutable on the client side.
+   *
+   * @param sessionId the user's sessionId
+   * @return a new token
+   */
   private String generateToken(String sessionId) {
     try {
       CSRFToken token = new CSRFToken();

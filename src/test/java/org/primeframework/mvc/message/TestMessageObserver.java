@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2021-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,14 @@ package org.primeframework.mvc.message;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.primeframework.mvc.http.HTTPRequest;
 import org.primeframework.mvc.message.scope.MessageScope;
 
 /**
@@ -30,29 +33,25 @@ import org.primeframework.mvc.message.scope.MessageScope;
  * @author Brian Pontarelli
  */
 public class TestMessageObserver implements MessageObserver {
-  public final Map<MessageScope, List<Message>> messages = new HashMap<>();
+  public final static String ObserverMessageStoreId = "X-Observer-MessageStoreId";
 
-  @Override
-  public void added(MessageScope scope, Message message) {
-    messages.computeIfAbsent(scope, key -> new ArrayList<>()).add(message);
-  }
+  public final Map<String, Map<MessageScope, List<Message>>> messages = new LinkedHashMap<>();
 
-  public void clear() {
-    messages.clear();
-  }
-
-  @Override
-  public void cleared(MessageScope scope) {
-    messages.remove(scope);
-  }
+  private String messageStoreId;
 
   public Map<String, List<FieldMessage>> getFieldMessages() {
-    List<FieldMessage> fieldMessages = messages.values()
+    if (messageStoreId == null || !messages.containsKey(messageStoreId)) {
+      return Collections.emptyMap();
+    }
+
+    List<FieldMessage> fieldMessages = messages.get(messageStoreId)
+                                               .values()
                                                .stream()
                                                .flatMap(Collection::stream)
                                                .filter(m -> m instanceof FieldMessage)
                                                .map(m -> (FieldMessage) m)
-                                               .collect(Collectors.toList());
+                                               .toList();
+
     Map<String, List<FieldMessage>> result = new HashMap<>();
     for (FieldMessage fieldMessage : fieldMessages) {
       result.computeIfAbsent(fieldMessage.getField(), key -> new ArrayList<>()).add(fieldMessage);
@@ -62,10 +61,43 @@ public class TestMessageObserver implements MessageObserver {
   }
 
   public List<Message> getGeneralMessages() {
-    return messages.values()
+    if (messageStoreId == null || !messages.containsKey(messageStoreId)) {
+      return Collections.emptyList();
+    }
+
+    return messages.get(messageStoreId)
+                   .values()
                    .stream()
                    .flatMap(Collection::stream)
                    .filter(m -> !(m instanceof FieldMessage))
                    .collect(Collectors.toList());
+  }
+
+  @Override
+  public void messageAdded(HTTPRequest httpRequest, MessageScope scope, Message message) {
+    String messageStoreId = httpRequest.getHeader(ObserverMessageStoreId);
+    if (messageStoreId != null) {
+      messages.computeIfAbsent(messageStoreId, key -> new HashMap<>())
+              .computeIfAbsent(scope, key -> new ArrayList<>()).add(message);
+    }
+  }
+
+  @Override
+  public void reset() {
+    messages.clear();
+  }
+
+  @Override
+  public void scopeCleared(HTTPRequest httpRequest, MessageScope scope) {
+    String messageStoreId = httpRequest.getHeader(ObserverMessageStoreId);
+    if (messageStoreId != null) {
+      if (messages.containsKey(messageStoreId)) {
+        messages.get(messageStoreId).remove(scope);
+      }
+    }
+  }
+
+  public void setMessageStoreId(String messageStoreId) {
+    this.messageStoreId = messageStoreId;
   }
 }

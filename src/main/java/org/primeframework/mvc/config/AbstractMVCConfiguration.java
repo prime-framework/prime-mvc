@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2020, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import org.primeframework.mvc.http.Cookie.SameSite;
 import org.primeframework.mvc.parameter.annotation.FieldUnwrapped;
 
 /**
@@ -63,9 +64,11 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
 
   public String missingPath = "/missing";
 
-  public int savedRequestCookieMaximumSize = 6 * 1024; // 6 KB
+  public int savedRequestCookieMaximumSize = 16 * 1024; // 6 KB
 
   public String savedRequestCookieName = "prime-mvc-saved-request";
+
+  public SameSite savedRequestSameSite = SameSite.Strict;
 
   public String staticDirectory = "static";
 
@@ -141,6 +144,11 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
   @Override
   public String savedRequestCookieName() {
     return savedRequestCookieName;
+  }
+
+  @Override
+  public SameSite savedRequestCookieSameSite() {
+    return savedRequestSameSite;
   }
 
   @Override

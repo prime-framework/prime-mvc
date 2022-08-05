@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2021-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.primeframework.mvc.http;
 
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
@@ -30,6 +31,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 
+import org.primeframework.mvc.http.HTTPStrings.Headers;
 import org.primeframework.mvc.parameter.fileupload.FileInfo;
 import org.primeframework.mvc.util.Buildable;
 
@@ -47,9 +49,9 @@ public class DefaultHTTPRequest implements MutableHTTPRequest, Buildable<Default
 
   public final Map<String, List<String>> parameters = new HashMap<>(0);
 
-  public byte[] body;
+  public ByteBuffer body;
 
-  public long contentLength;
+  public Long contentLength;
 
   public String contentType;
 
@@ -59,6 +61,8 @@ public class DefaultHTTPRequest implements MutableHTTPRequest, Buildable<Default
 
   public String host;
 
+  public String ipAddress;
+
   public HTTPMethod method;
 
   public boolean multipart;
@@ -67,9 +71,7 @@ public class DefaultHTTPRequest implements MutableHTTPRequest, Buildable<Default
 
   public int port = -1;
 
-  public String remoteAddress;
-
-  public String remoteHost;
+  public String queryString;
 
   public String scheme;
 
@@ -162,18 +164,43 @@ public class DefaultHTTPRequest implements MutableHTTPRequest, Buildable<Default
 
   @Override
   public Map<String, Object> getAttributes() {
-    return null;
+    return attributes;
   }
 
   @Override
-  public byte[] getBody() {
+  public String getBaseURL() {
+    // Setting the wrong value in the X-Forwarded-Proto header seems to be a common issue that causes an exception during URI.create. Assuming request.getScheme() is not the problem and it is related to the proxy configuration.
+    String scheme = getScheme().toLowerCase();
+    if (!scheme.equalsIgnoreCase("http") && !scheme.equalsIgnoreCase("https")) {
+      throw new IllegalArgumentException("The request scheme is invalid. Only http or https are valid schemes. The X-Forwarded-Proto header has a value of [" + getHeader(Headers.XForwardedProto) + "], this is likely an issue in your proxy configuration.");
+    }
+
+    String serverName = getHost().toLowerCase();
+    int serverPort = getPort();
+    // Ignore port 80 for http
+    if (getScheme().equalsIgnoreCase("http") && serverPort == 80) {
+      serverPort = -1;
+    }
+
+    String uri = scheme + "://" + serverName;
+    if (serverPort > 0) {
+      if ((scheme.equalsIgnoreCase("http") && serverPort != 80) || (scheme.equalsIgnoreCase("https") && serverPort != 443)) {
+        uri += ":" + serverPort;
+      }
+    }
+
+    return uri;
+  }
+
+  @Override
+  public ByteBuffer getBody() {
     return body;
   }
 
   @Override
-  public void setBody(byte[] body) {
+  public void setBody(ByteBuffer body) {
     this.body = body;
-    this.contentLength = body.length;
+    this.contentLength = (long) body.position();
   }
 
   @Override
@@ -187,12 +214,12 @@ public class DefaultHTTPRequest implements MutableHTTPRequest, Buildable<Default
   }
 
   @Override
-  public long getContentLength() {
+  public Long getContentLength() {
     return contentLength;
   }
 
   @Override
-  public void setContentLength(long contentLength) {
+  public void setContentLength(Long contentLength) {
     this.contentLength = contentLength;
   }
 
@@ -260,12 +287,33 @@ public class DefaultHTTPRequest implements MutableHTTPRequest, Buildable<Default
 
   @Override
   public String getHost() {
-    return host;
+    String xHost = getHeader(Headers.XForwardedHost);
+    return xHost == null ? host : xHost;
   }
 
   @Override
   public void setHost(String host) {
     this.host = host;
+  }
+
+  @Override
+  public String getIPAddress() {
+    String xIPAddress = getHeader(Headers.XForwardedFor);
+    if (xIPAddress == null || xIPAddress.trim().length() == 0) {
+      return ipAddress;
+    }
+
+    String[] ips = xIPAddress.split(",");
+    if (ips.length < 1) {
+      return xIPAddress.trim();
+    }
+
+    return ips[0].trim();
+  }
+
+  @Override
+  public void setIPAddress(String ipAddress) {
+    this.ipAddress = ipAddress;
   }
 
   @Override
@@ -322,7 +370,8 @@ public class DefaultHTTPRequest implements MutableHTTPRequest, Buildable<Default
 
   @Override
   public int getPort() {
-    return port;
+    String xPort = getHeader(Headers.XForwardedPort);
+    return xPort == null ? port : Integer.parseInt(xPort);
   }
 
   @Override
@@ -331,50 +380,38 @@ public class DefaultHTTPRequest implements MutableHTTPRequest, Buildable<Default
   }
 
   @Override
-  public String getRemoteAddress() {
-    return remoteAddress;
+  public String getQueryString() {
+    return queryString;
   }
 
   @Override
-  public void setRemoteAddress(String remoteAddress) {
-    this.remoteAddress = remoteAddress;
-  }
-
-  @Override
-  public String getRemoteHost() {
-    return remoteHost;
-  }
-
-  @Override
-  public void setRemoteHost(String remoteHost) {
-    this.remoteHost = remoteHost;
-  }
-
-  @Override
-  public String getRemoteIPAddress() {
-    String ipAddress = getHeader("X-Forwarded-For");
-    if (ipAddress == null) {
-      ipAddress = getRemoteAddress();
-    } else {
-      String[] ips = ipAddress.split(",");
-      if (ips.length < 1) {
-        return null;
-      }
-
-      ipAddress = ips[0].trim();
-    }
-
-    return ipAddress;
+  public void setQueryString(String queryString) {
+    this.queryString = queryString;
   }
 
   @Override
   public String getScheme() {
-    return scheme;
+    String xScheme = getHeader(Headers.XForwardedProto);
+    return xScheme == null ? scheme : xScheme;
   }
 
   @Override
   public void setScheme(String scheme) {
     this.scheme = scheme;
+  }
+
+  @Override
+  public String getURL() {
+    String url = getBaseURL();
+    if (contextPath != null) {
+      url += contextPath;
+    }
+
+    if (path != null) {
+      url += path;
+    }
+
+    return url;
   }
 
   @Override
@@ -390,6 +427,19 @@ public class DefaultHTTPRequest implements MutableHTTPRequest, Buildable<Default
   @Override
   public void removeAttribute(String key) {
     attributes.remove(key);
+  }
+
+  @Override
+  public void removeHeader(String name) {
+    headers.remove(name);
+  }
+
+  @Override
+  public void removeHeader(String name, String... values) {
+    List<String> actual = headers.get(name);
+    if (actual != null) {
+      actual.removeAll(List.of(values));
+    }
   }
 
   @Override

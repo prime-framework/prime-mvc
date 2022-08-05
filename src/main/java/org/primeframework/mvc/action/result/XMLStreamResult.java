@@ -32,7 +32,7 @@ import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
  * This result writes bytes which represent xml to the response output stream and sets the content type to
  * "application/xhtml+xml"
  *
- * @author jhumphrey
+ * @author James Humphrey
  */
 public class XMLStreamResult extends AbstractResult<XMLStream> {
   private final ActionInvocationStore actionInvocationStore;
@@ -53,8 +53,7 @@ public class XMLStreamResult extends AbstractResult<XMLStream> {
     ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
     Object object = expressionEvaluator.getValue(xml, actionInvocation.action);
     if (!(object instanceof String)) {
-      throw new PrimeException("Invalid property [" + xml + "] for XMLStream result. This " +
-          "property returned null or an Object that is not a String.");
+      throw new PrimeException("Invalid property [" + xml + "] for XMLStream result. This property returned null or an Object that is not a String.");
     }
 
     byte[] xmlBytes = ((String) object).getBytes(StandardCharsets.UTF_8);
@@ -71,7 +70,7 @@ public class XMLStreamResult extends AbstractResult<XMLStream> {
     }
 
     InputStream is = new ByteArrayInputStream(xmlBytes);
-    writeToOutputStream(is, response);
+    is.transferTo(response.getOutputStream());
 
     return true;
   }

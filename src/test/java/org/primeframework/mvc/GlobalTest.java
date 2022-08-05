@@ -144,7 +144,7 @@ public class GlobalTest extends PrimeBaseTest {
     simulator.test("/user/edit")
              .get()
              .assertStatusCode(200)
-             // header name is not case sensitive
+             // header name is not case-sensitive
              .assertHeaderContains("Cache-Control", "no-cache")
              .assertHeaderContains("cache-control", "no-cache")
              .assertHeaderDoesNotContain("Potato")
@@ -668,6 +668,17 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void get_message_callback() throws Exception {
+    // call an action that adds messages that calls another action that adds messages to ensure we can assert on the message store properly.
+    test.simulate(() -> simulator.test("/callback")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertContainsGeneralMessageCodes(MessageType.ERROR, "[ERROR]")
+                                 .assertContainsGeneralMessageCodes(MessageType.INFO, "[INFO]")
+                                 .assertContainsGeneralMessageCodes(MessageType.WARNING, "[WARNING]"));
+  }
+
+  @Test
   public void get_metrics() throws Exception {
     simulator.test("/user/full-form")
              .get()
@@ -1022,7 +1033,7 @@ public class GlobalTest extends PrimeBaseTest {
                                      "foo/0/bar/bam => [purple]"
                                  ));
   }
-
+  
   @Test
   public void get_wellKnownDotPrefixed() throws Exception {
     test.simulate(() -> simulator.test("/.well-known/openid-configuration")

@@ -20,6 +20,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.primeframework.mvc.http.Cookie.SameSite;
 import org.primeframework.mvc.scope.ManagedCookieScope;
 
 /**
@@ -72,4 +73,9 @@ public @interface ManagedCookie {
    * @return true if the cookie object should never be null
    */
   boolean neverNull() default true;
+
+  /**
+   * @return The SameSite setting for the cookie. Defaults to Lax.
+   */
+  SameSite sameSite() default SameSite.Lax;
 }

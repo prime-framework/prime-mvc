@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2019, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,10 @@ public class RequestSimulator {
 
   private final TestPrimeMainThread thread;
 
+  private RequestBuilder builder;
+
+  private boolean useTLS;
+
   /**
    * Creates a new request simulator that can be used to simulate requests to a Prime application.
    *
@@ -56,15 +60,19 @@ public class RequestSimulator {
   }
 
   public int getPort() {
-    return main.configuration().port;
+    return builder.resolveSimulatorPort();
   }
 
   public void reset() {
     userAgent.clearAllCookies();
+    this.builder = null;
+    useTLS = false;
   }
 
   public void shutdown() {
     this.thread.shutdown();
+    this.builder = null;
+    useTLS = false;
   }
 
   /**
@@ -75,6 +83,13 @@ public class RequestSimulator {
    * @return The RequestBuilder.
    */
   public RequestBuilder test(String path) {
-    return new RequestBuilder(getPort(), path, main.getInjector(), userAgent, messageObserver);
+    builder = new RequestBuilder(path, main.getInjector(), userAgent, main.configuration().listenerConfigurations.get(0), messageObserver);
+    builder.useTLS = useTLS;
+    return builder;
+  }
+
+  public RequestSimulator withTLS(boolean useTLS) {
+    this.useTLS = useTLS;
+    return this;
   }
 }

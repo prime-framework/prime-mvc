@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2021-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -132,6 +132,8 @@ public final class HTTPStrings {
      */
     public static final String AccessControlRequestMethod = "Access-Control-Request-Method";
 
+    public static final String CacheControl = "Cache-Control";
+
     public static final String ContentLength = "Content-Length";
 
     public static final String ContentType = "Content-Type";
@@ -139,6 +141,8 @@ public final class HTTPStrings {
     public static final String Cookie = "Cookie";
 
     public static final String Date = "Date";
+
+    public static final String Expires = "Expires";
 
     public static final String LastModified = "Last-Modified";
 
@@ -151,17 +155,25 @@ public final class HTTPStrings {
      */
     public static final String Origin = "Origin";
 
+    public static final String Referer = "Referer";
+
+    public static final String RetryAfter = "Retry-After";
+
     public static final String SetCookie = "Set-Cookie";
 
     public static final String UserAgent = "User-Agent";
 
-    public static String Referer = "Referer";
+    public static final String XForwardedFor = "X-Forwarded-For";
 
-    public static String XForwardedHost = "X-Forwarded-Host";
+    public static final String IfModifiedSince = "If-Modified-Since";
 
-    public static String XForwardedPort = "X-Forwarded-Port";
+    public static final String TransferEncoding = "Transfer-Encoding";
 
-    public static String XForwardedProto = "X-Forwarded-Proto";
+    public static final String XForwardedHost = "X-Forwarded-Host";
+
+    public static final String XForwardedPort = "X-Forwarded-Port";
+
+    public static final String XForwardedProto = "X-Forwarded-Proto";
 
     private Headers() {
     }
@@ -185,5 +197,15 @@ public final class HTTPStrings {
     public static final String PUT = "PUT";
 
     public static final String TRACE = "TRACE";
+  }
+
+  public static final class TransferEncodings {
+    public static final String Chunked = "chunked";
+
+    public static final String Compress = "compress";
+
+    public static final String Deflate = "deflate";
+
+    public static final String Gzip = "gzip";
   }
 }

@@ -99,7 +99,7 @@ public class DefaultMVCWorkflow implements MVCWorkflow {
   /**
    * Creates a sub-chain of the MVC workflows and invokes it.
    *
-   * @param workflowChain Not used because there is no outer workflow outside of the MVC.
+   * @param workflowChain Not used because there is no outer workflow outside the MVC.
    * @throws IOException If the sub-chain throws an IOException
    */
   public void perform(WorkflowChain workflowChain) throws IOException {

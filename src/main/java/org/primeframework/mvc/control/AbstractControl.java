@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc.control;
 
-import org.primeframework.mvc.http.HTTPRequest;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,6 +31,7 @@ import org.primeframework.mvc.control.annotation.ControlAttributes;
 import org.primeframework.mvc.control.form.JoinMethod;
 import org.primeframework.mvc.control.message.Message;
 import org.primeframework.mvc.freemarker.FreeMarkerService;
+import org.primeframework.mvc.http.HTTPRequest;
 import org.primeframework.mvc.locale.LocaleProvider;
 import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.security.csrf.CSRFProvider;
@@ -184,7 +184,9 @@ public abstract class AbstractControl implements Control {
    */
   protected Map<String, Object> makeParameters() {
     Map<String, Object> parameters = new HashMap<>();
-    parameters.put("csrfToken", csrfProvider.getToken(request));
+    if (configuration.csrfEnabled()) {
+      parameters.put("csrfToken", csrfProvider.getToken(request));
+    }
     parameters.put("attributes", attributes);
     parameters.put("dynamicAttributes", dynamicAttributes);
     parameters.put("join", new JoinMethod(freeMarkerConfig.getObjectWrapper()));

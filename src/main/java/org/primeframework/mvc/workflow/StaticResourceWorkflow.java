@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ package org.primeframework.mvc.workflow;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Files;
@@ -32,6 +31,7 @@ import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.http.HTTPContext;
 import org.primeframework.mvc.http.HTTPRequest;
 import org.primeframework.mvc.http.HTTPResponse;
+import org.primeframework.mvc.http.HTTPStrings.Headers;
 import org.primeframework.mvc.http.HTTPTools;
 import org.primeframework.mvc.http.Status;
 import org.slf4j.Logger;
@@ -110,9 +110,9 @@ public class StaticResourceWorkflow implements Workflow {
     // Retrieve the modified header (defaults to null)
     Instant ifModifiedSince = null;
     try {
-      ifModifiedSince = request.getDateHeader("If-Modified-Since");
+      ifModifiedSince = request.getDateHeader(Headers.IfModifiedSince);
     } catch (Exception e) {
-      logger.warn("Invalid If-Modified-Since header value [{}], ignoring", request.getHeader("If-Modified-Since"));
+      logger.warn("Invalid If-Modified-Since header value [{}], ignoring", request.getHeader(Headers.IfModifiedSince));
     }
 
     // See if a file exists in the static directory
@@ -126,7 +126,7 @@ public class StaticResourceWorkflow implements Workflow {
         }
 
         String contentType = Files.probeContentType(file);
-        response.setHeader("Content-Type", contentType);
+        response.setContentType(contentType);
       } else {
         addHeaders(response, modified);
         response.setStatus(Status.SC_NOT_MODIFIED);
@@ -148,13 +148,13 @@ public class StaticResourceWorkflow implements Workflow {
 
     if (url != null) {
       URLConnection connection = url.openConnection();
-      Instant modified = Instant.ofEpochSecond(connection.getLastModified());
+      Instant modified = Instant.ofEpochMilli(connection.getLastModified());
       if (ifModifiedSince == null || modified.isAfter(ifModifiedSince)) {
         try (InputStream is = connection.getInputStream()) {
           writeResponse(response, is, modified);
         }
 
-        response.setHeader("Content-Type", connection.getContentType());
+        response.setContentType(connection.getContentType());
       } else {
         addHeaders(response, modified);
         response.setStatus(Status.SC_NOT_MODIFIED);
@@ -169,26 +169,16 @@ public class StaticResourceWorkflow implements Workflow {
   private void addHeaders(HTTPResponse response, Instant modified) {
     ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
     ZonedDateTime expiry = now.plusDays(7);
-    response.setHeader("Cache-Control", "public");
-    response.setDateHeader("Date", now);
-    response.setDateHeader("Expires", expiry); // 7 days
-    response.setDateHeader("Last-Modified", ZonedDateTime.ofInstant(modified, ZoneOffset.UTC));
-    response.setDateHeader("Retry-After", expiry); // 7 days
+    response.setHeader(Headers.CacheControl, "public");
+    response.setDateHeader(Headers.Date, now);
+    response.setDateHeader(Headers.Expires, expiry); // 7 days
+    response.setDateHeader(Headers.LastModified, ZonedDateTime.ofInstant(modified, ZoneOffset.UTC));
+    response.setDateHeader(Headers.RetryAfter, expiry); // 7 days
   }
 
   private void writeResponse(HTTPResponse response, InputStream is, Instant modified) throws IOException {
     addHeaders(response, modified);
     response.setStatus(200);
-
-    OutputStream os = response.getOutputStream();
-
-    // Then output the file
-    byte[] b = new byte[8192];
-    int len;
-    while ((len = is.read(b)) > 0) {
-      os.write(b, 0, len);
-    }
-
-    os.flush();
+    is.transferTo(response.getOutputStream());
   }
 }

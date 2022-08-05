@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2015-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,7 +91,11 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
   @Override
   public String getSessionId() {
     Tokens tokens = resolveContext();
-    return defaultIfNull(tokens.refreshToken, tokens.jwt);
+    if (tokens.decodedJWT != null) {
+      return tokens.decodedJWT.getString("sid");
+    }
+
+    return null;
   }
 
   @Override
@@ -101,7 +105,10 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
 
   @Override
   public void login(Object context) {
-    Tokens tokens = (Tokens) context;
+    if (!(context instanceof Tokens tokens)) {
+      throw new IllegalArgumentException("The login context for [BaseJWTRefreshTokenCookiesUserLoginSecurityContext] is expected to be of type [" + Tokens.class.getCanonicalName() + "] but an object of type [" + context.getClass().getCanonicalName() + "] was provided. This is a development time error.");
+    }
+
     if (tokens.jwt != null) {
       jwtCookie.add(request, response, tokens.jwt);
     }
@@ -144,6 +151,12 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
    */
   protected abstract String refreshTokenCookieName();
 
+  /**
+   * Retrieve a user given an encoded JWT string.
+   *
+   * @param jwt the encoded JWT string
+   * @return a user object.
+   */
   protected abstract Object retrieveUserForJWT(String jwt);
 
   /**
@@ -218,7 +231,7 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
       return tokens;
     }
 
-    // Add the new tokens to the request and then we fill them out below
+    // Add the new tokens to the request, and then we fill them out below
     tokens = new Tokens();
     request.setAttribute(ContextKey, tokens);
 
@@ -239,8 +252,8 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
     }
 
     try {
-      JWT jwt = JWT.getDecoder().decode(tokens.jwt, verifiers);
-      if (!validateJWTClaims(jwt)) {
+      tokens.decodedJWT = JWT.getDecoder().decode(tokens.jwt, verifiers);
+      if (!validateJWTClaims(tokens.decodedJWT)) {
         return refreshJWT(tokens);
       }
 

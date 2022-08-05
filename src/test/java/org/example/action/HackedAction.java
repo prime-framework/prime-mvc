@@ -16,11 +16,13 @@
 package org.example.action;
 
 import org.primeframework.mvc.action.annotation.Action;
+import org.primeframework.mvc.action.result.annotation.Forward;
 
 /**
  * @author Daniel DeGroff
  */
 @Action
+@Forward(code = "error", status = 500, page = "hacked-error.ftl")
 public class HackedAction {
   public String get() {
     return "input";

@@ -58,6 +58,18 @@ public interface HTTPResponse {
 
   List<Cookie> getCookies();
 
+  /**
+   * @return The exception that was thrown during processing or null if the request was handled without exceptions.
+   */
+  Throwable getException();
+
+  /**
+   * Sets the exception that occurred during processing of the request.
+   *
+   * @param exception The exception.
+   */
+  void setException(Throwable exception);
+
   String getHeader(String name);
 
   List<String> getHeaders(String name);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2021-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
 package org.primeframework.mvc.netty;
 
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
+import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,6 +32,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
+import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -63,20 +65,28 @@ import org.primeframework.mvc.http.DefaultHTTPRequest;
 import org.primeframework.mvc.http.DefaultHTTPResponse;
 import org.primeframework.mvc.http.HTTPMethod;
 import org.primeframework.mvc.http.HTTPOutputStream;
+import org.primeframework.mvc.io.PrimeByteArrayOutputStream;
 import org.primeframework.mvc.parameter.fileupload.FileInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Let's go ahead and handle some HTTP messages shall we?
+ *
+ * @author Brian Pontarelli
+ */
 public class PrimeHTTPServerHandler extends SimpleChannelInboundHandler<HttpObject> {
   private static final Logger logger = LoggerFactory.getLogger(PrimeHTTPServerHandler.class);
 
   private final byte[] buf = new byte[65536];
 
-  private final PrimeHTTPServerConfiguration configuration;
+  private final PrimeHTTPListenerConfiguration listenerConfiguration;
 
   private final PrimeMVCRequestHandler requestHandler;
 
   private Path binaryFile;
+
+  private long bytesRead = 0;
 
   private HttpPostRequestDecoder decoder;
 
@@ -86,8 +96,9 @@ public class PrimeHTTPServerHandler extends SimpleChannelInboundHandler<HttpObje
 
   private HttpRequest request;
 
-  public PrimeHTTPServerHandler(PrimeHTTPServerConfiguration configuration, PrimeMVCRequestHandler requestHandler) {
-    this.configuration = configuration;
+  public PrimeHTTPServerHandler(PrimeHTTPListenerConfiguration listenerConfiguration,
+                                PrimeMVCRequestHandler requestHandler) {
+    this.listenerConfiguration = listenerConfiguration;
     this.requestHandler = requestHandler;
   }
 
@@ -106,19 +117,26 @@ public class PrimeHTTPServerHandler extends SimpleChannelInboundHandler<HttpObje
 
         // Parse the request and if it is invalid, bail with a 400 status code
         if (!parseRequest(request, context)) {
-          FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.BAD_REQUEST);
-          ChannelFuture future = context.writeAndFlush(response);
-          future.addListener(ChannelFutureListener.CLOSE);
-          reset();
+          sendErrorResponse(context, HttpResponseStatus.BAD_REQUEST, "Unable to parse request");
         }
-      } else if (msg instanceof HttpContent) {
-        HttpContent chunk = (HttpContent) msg;
+      } else if (msg instanceof HttpContent chunk) {
         if (decoder != null) {
           decoder.offer(chunk);
         } else {
-          // TODO : Netty : If this is in RAM, we could prevent OOME if we want
+          if (primeRequest.getContentLength() == null) {
+            sendErrorResponse(context, HttpResponseStatus.LENGTH_REQUIRED, "Missing Content-Length header");
+            return;
+          }
+
           ByteBuf content = chunk.content();
-          content.getBytes(0, outputStream, content.readableBytes());
+          int length = content.readableBytes();
+          if (length + bytesRead > listenerConfiguration.maxBodySize) {
+            sendErrorResponse(context, HttpResponseStatus.REQUEST_ENTITY_TOO_LARGE, null);
+            return;
+          }
+
+          content.getBytes(0, outputStream, length);
+          bytesRead += length;
         }
 
         if (chunk instanceof LastHttpContent) {
@@ -129,12 +147,14 @@ public class PrimeHTTPServerHandler extends SimpleChannelInboundHandler<HttpObje
             outputStream.close();
             primeRequest.addFile(new FileInfo(binaryFile, null, "body", "application/octet-stream"));
           } else {
-            primeRequest.body = ((ByteArrayOutputStream) outputStream).toByteArray();
+            primeRequest.body = ((PrimeByteArrayOutputStream) outputStream).toByteBuffer();
           }
 
           HTTPOutputStream outputStream = new HTTPOutputStream(context, buf);
           DefaultHTTPResponse primeResponse = new DefaultHTTPResponse(outputStream);
           outputStream.setResponse(primeResponse);
+
+          // Call Prime MVC - FTW!
           requestHandler.handleRequest(primeRequest, primeResponse);
           primeResponse.getOutputStream().close();
 
@@ -188,9 +208,10 @@ public class PrimeHTTPServerHandler extends SimpleChannelInboundHandler<HttpObje
     primeRequest = new DefaultHTTPRequest();
 
     // Handle the networking pieces
+    InetSocketAddress localAddress = (InetSocketAddress) context.channel().localAddress();
     InetSocketAddress remoteAddress = (InetSocketAddress) context.channel().remoteAddress();
-    primeRequest.setRemoteHost(remoteAddress != null ? remoteAddress.getHostString() : null);
-    primeRequest.setRemoteAddress(remoteAddress != null ? remoteAddress.getAddress().getHostAddress() : null);
+    primeRequest.setPort(localAddress.getPort());
+    primeRequest.setIPAddress(remoteAddress.getAddress().getHostAddress());
 
     // Handle cookies
     Set<Cookie> cookies;
@@ -219,7 +240,7 @@ public class PrimeHTTPServerHandler extends SimpleChannelInboundHandler<HttpObje
 
     // Handle the request pieces
     QueryStringDecoder query = new QueryStringDecoder(msg.uri());
-    primeRequest.setContentLength(HttpUtil.getContentLength(msg, 0));
+    primeRequest.setContentLength((long) HttpUtil.getContentLength(msg, 0));
     primeRequest.setContentType(HttpUtil.getMimeType(msg) != null ? HttpUtil.getMimeType(msg).toString() : null);
     primeRequest.setCharacterEncoding(HttpUtil.getCharset(msg, StandardCharsets.UTF_8));
     primeRequest.setHost(parseHostHeader(msg.headers().get("Host")));
@@ -233,15 +254,15 @@ public class PrimeHTTPServerHandler extends SimpleChannelInboundHandler<HttpObje
     primeRequest.setMultipart(HttpPostRequestDecoder.isMultipart(request));
     primeRequest.setPath(query.rawPath());
     primeRequest.addParameters(query.parameters());
-    primeRequest.setPort(configuration.port);
-    primeRequest.setScheme(configuration.scheme);
+    primeRequest.setQueryString(query.rawQuery());
+    primeRequest.setScheme(listenerConfiguration.getScheme(primeRequest.getPort()));
 
     // Validate the request before reading the body and processing everything via the MVC
     if (requestInvalid(primeRequest)) {
       return false;
     }
 
-    // Setup the body handler
+    // Set up the body handler
     String contentType = primeRequest.getContentType();
     contentType = contentType != null ? contentType : "";
     if (primeRequest.isMultipart() || contentType.equalsIgnoreCase(HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED.toString())) {
@@ -251,8 +272,7 @@ public class PrimeHTTPServerHandler extends SimpleChannelInboundHandler<HttpObje
       binaryFile = Files.createTempFile("prime-mvc-binary-upload", null);
       outputStream = new BufferedOutputStream(Files.newOutputStream(binaryFile));
     } else {
-      // TODO : Netty : Should we make a custom OutputStream that prevents large requests from blowing out RAM?
-      outputStream = new ByteArrayOutputStream();
+      outputStream = new PrimeByteArrayOutputStream();
     }
 
     return true;
@@ -263,6 +283,7 @@ public class PrimeHTTPServerHandler extends SimpleChannelInboundHandler<HttpObje
   }
 
   private void reset() {
+    bytesRead = 0;
     outputStream = null;
     primeRequest = null;
 
@@ -270,5 +291,19 @@ public class PrimeHTTPServerHandler extends SimpleChannelInboundHandler<HttpObje
       decoder.destroy();
       decoder = null;
     }
+  }
+
+  private void sendErrorResponse(ChannelHandlerContext context, HttpResponseStatus status, String message) {
+    FullHttpResponse response;
+    if (message != null) {
+      ByteBuf content = ByteBufUtil.encodeString(ByteBufAllocator.DEFAULT, CharBuffer.wrap(message), StandardCharsets.UTF_8);
+      response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status, content);
+    } else {
+      response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status);
+    }
+
+    ChannelFuture future = context.writeAndFlush(response);
+    future.addListener(ChannelFutureListener.CLOSE);
+    reset();
   }
 }

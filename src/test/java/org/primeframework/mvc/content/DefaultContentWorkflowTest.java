@@ -16,6 +16,7 @@
 package org.primeframework.mvc.content;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.util.Collections;
 import java.util.HashMap;
@@ -116,7 +117,8 @@ public class DefaultContentWorkflowTest extends PrimeBaseTest {
         "  \"type\":\"COOL\"" +
         "}";
 
-    request.setBody(expected.getBytes());
+    request.setBody(ByteBuffer.wrap(expected.getBytes()));
+    request.setContentLength((long) expected.getBytes().length);
     request.setContentType("application/json");
 
     Map<Class<?>, Object> additionalConfig = new HashMap<>();

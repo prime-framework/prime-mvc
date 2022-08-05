@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
-import org.primeframework.mvc.ErrorException;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
@@ -30,7 +29,6 @@ import org.primeframework.mvc.http.HTTPRequest;
 import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.scope.annotation.BrowserActionSession;
 import org.primeframework.mvc.security.Encryptor;
-import org.primeframework.mvc.util.AbstractCookie;
 import org.primeframework.mvc.util.CookieTools;
 import org.primeframework.mvc.util.ReflectionUtils;
 import org.slf4j.Logger;
@@ -42,23 +40,17 @@ import org.slf4j.LoggerFactory;
  *
  * @author Daniel DeGroff
  */
-public class BrowserActionSessionScope extends AbstractCookie implements Scope<BrowserActionSession> {
+public class BrowserActionSessionScope extends BaseBrowserSessionScope<BrowserActionSession> {
   private static final Logger logger = LoggerFactory.getLogger(BrowserActionSessionScope.class);
 
   private final ActionInvocationStore actionInvocationStore;
-
-  private final Encryptor encryptor;
-
-  private final ObjectMapper objectMapper;
 
   @Inject
   public BrowserActionSessionScope(HTTPRequest request, HTTPResponse response,
                                    ActionInvocationStore actionInvocationStore,
                                    Encryptor encryptor, ObjectMapper objectMapper) {
-    super(request, response);
+    super(request, response, encryptor, objectMapper);
     this.actionInvocationStore = actionInvocationStore;
-    this.encryptor = encryptor;
-    this.objectMapper = objectMapper;
   }
 
   /**
@@ -111,62 +103,14 @@ public class BrowserActionSessionScope extends AbstractCookie implements Scope<B
     return null;
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  public Object get(String fieldName, BrowserActionSession scope) {
-    throw new UnsupportedOperationException("The BrowserActionSessionScope cannot be called with this method.");
+  @Override
+  protected boolean compress(BrowserActionSession scope) {
+    return scope.compress();
   }
 
   @Override
-  public Object get(String fieldName, Class<?> type, BrowserActionSession scope) {
-    String cookieName = getCookieName(fieldName, scope);
-    Cookie exitingCookie = getCookie(cookieName);
-    String existingValue = exitingCookie != null ? exitingCookie.value : null;
-    if (existingValue == null) {
-      return null;
-    }
-
-    try {
-      return CookieTools.fromJSONCookie(existingValue, type, scope.encrypt(), encryptor, objectMapper);
-    } catch (Exception e) {
-      String message = e.getClass().getCanonicalName() + " " + e.getMessage();
-      if (scope.encrypt()) {
-        logger.warn("Failed to decrypt cookie. This may be expected if the cookie was encrypted using a different key.\n\tCause: {}", message);
-      } else {
-        logger.warn("Failed to decode cookie. This is not expected.\n\tCause: {}", message);
-      }
-    }
-
-    return null;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public void set(String fieldName, Object value, BrowserActionSession scope) {
-    String cookieName = getCookieName(fieldName, scope);
-    Cookie exitingCookie = getCookie(cookieName);
-    String existingValue = exitingCookie != null ? exitingCookie.value : null;
-
-    // If the value is null, delete it if it was previously non-null
-    if (value == null) {
-      if (existingValue != null) {
-        // Delete it if we had it.
-        deleteCookie(cookieName);
-      }
-
-      return;
-    }
-
-    String cookieValue;
-    try {
-      cookieValue = CookieTools.toJSONCookie(value, scope.compress(), scope.encrypt(), encryptor, objectMapper);
-    } catch (Exception e) {
-      throw new ErrorException("error", e);
-    }
-
-    addSecureHTTPOnlySessionCookie(cookieName, cookieValue);
+  protected boolean encrypt(BrowserActionSession scope) {
+    return scope.encrypt();
   }
 
   /**
@@ -177,6 +121,7 @@ public class BrowserActionSessionScope extends AbstractCookie implements Scope<B
    * @param scope     The scope annotation.
    * @return The action class name.
    */
+  @Override
   protected String getCookieName(String fieldName, BrowserActionSession scope) {
     String className;
     if (scope.action() != BrowserActionSession.class) {
@@ -190,6 +135,11 @@ public class BrowserActionSessionScope extends AbstractCookie implements Scope<B
       className = ai.action.getClass().getName();
     }
 
-    return className + "$" + ("##field-name##".equals(scope.value()) ? fieldName : scope.value());
+    return className + "$" + ("##field-name##".equals(scope.name()) ? fieldName : scope.name());
+  }
+
+  @Override
+  protected void setCookieValues(Cookie cookie, BrowserActionSession scope) {
+    cookie.sameSite = scope.sameSite();
   }
 }

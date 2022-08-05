@@ -15,14 +15,12 @@
  */
 package org.primeframework.mvc.action.result;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.http.HTTPMethod;
 import org.primeframework.mvc.http.HTTPResponse;
+import org.primeframework.mvc.http.HTTPStrings.Headers;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 
 /**
@@ -43,7 +41,7 @@ public abstract class AbstractResult<U extends Annotation> implements Result<U> 
       return;
     }
 
-    response.setHeader("Cache-Control", getCacheControl(result));
+    response.setHeader(Headers.CacheControl, getCacheControl(result));
   }
 
   /**
@@ -51,7 +49,7 @@ public abstract class AbstractResult<U extends Annotation> implements Result<U> 
    *
    * @param str    The String to expand.
    * @param action The action used to expand.
-   * @param encode Whether or not variable replacements are URL encoded.
+   * @param encode Whether the variable replacements are URL encoded.
    * @return The result.
    */
   protected String expand(String str, Object action, boolean encode) {
@@ -105,26 +103,5 @@ public abstract class AbstractResult<U extends Annotation> implements Result<U> 
     }
 
     response.setStatus(code);
-  }
-
-  /**
-   * Write the provided {@link InputStream} to the HTTP Servlet Output Stream.
-   *
-   * @param is       the input stream
-   * @param response the HTTP Servlet Response
-   * @throws IOException if #@#! goes south
-   */
-  protected void writeToOutputStream(InputStream is, HTTPResponse response) throws IOException {
-    OutputStream os = response.getOutputStream();
-    try {
-      // Then output the file
-      byte[] b = new byte[8192];
-      int len;
-      while ((len = is.read(b)) != -1) {
-        os.write(b, 0, len);
-      }
-    } finally {
-      os.flush();
-    }
   }
 }

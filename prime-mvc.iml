@@ -16,11 +16,11 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/com/google/inject/guice/5.0.1/guice-5.0.1.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/com/google/inject/guice/5.1.0/guice-5.1.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/com/google/inject/guice/5.0.1/guice-5.0.1-src.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/com/google/inject/guice/5.1.0/guice-5.1.0-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -49,11 +49,11 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/io/fusionauth/fusionauth-jwt/3.1.6/fusionauth-jwt-3.1.6.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/io/fusionauth/fusionauth-jwt/5.1.0/fusionauth-jwt-5.1.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/io/fusionauth/fusionauth-jwt/3.1.6/fusionauth-jwt-3.1.6-src.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/io/fusionauth/fusionauth-jwt/5.1.0/fusionauth-jwt-5.1.0-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -93,66 +93,66 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-codec-http/4.1.70/netty-codec-http-4.1.70.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-codec-http/4.1.79/netty-codec-http-4.1.79.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-codec-http/4.1.70/netty-codec-http-4.1.70-src.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-codec-http/4.1.79/netty-codec-http-4.1.79-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-handler/4.1.70/netty-handler-4.1.70.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-handler/4.1.79/netty-handler-4.1.79.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-handler/4.1.70/netty-handler-4.1.70-src.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-handler/4.1.79/netty-handler-4.1.79-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-codec/4.1.70/netty-codec-4.1.70.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-codec/4.1.79/netty-codec-4.1.79.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-codec/4.1.70/netty-codec-4.1.70-src.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-codec/4.1.79/netty-codec-4.1.79-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-transport/4.1.70/netty-transport-4.1.70.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-transport/4.1.79/netty-transport-4.1.79.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-transport/4.1.70/netty-transport-4.1.70-src.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-transport/4.1.79/netty-transport-4.1.79-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-buffer/4.1.70/netty-buffer-4.1.70.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-buffer/4.1.79/netty-buffer-4.1.79.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-buffer/4.1.70/netty-buffer-4.1.70-src.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-buffer/4.1.79/netty-buffer-4.1.79-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-common/4.1.70/netty-common-4.1.70.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-common/4.1.79/netty-common-4.1.79.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-common/4.1.70/netty-common-4.1.70-src.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-common/4.1.79/netty-common-4.1.79-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -181,6 +181,17 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
+          <root url="jar://$USER_HOME$/.savant/cache/org/slf4j/slf4j-api/2.0.0-alpha7/slf4j-api-2.0.0-alpha7.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.savant/cache/org/slf4j/slf4j-api/2.0.0-alpha7/slf4j-api-2.0.0-alpha7-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
           <root url="jar://$USER_HOME$/.savant/cache/javax/inject/javax.inject/1.0.0/javax.inject-1.0.0.jar!/" />
         </CLASSES>
         <JAVADOC />
@@ -189,54 +200,10 @@
         </SOURCES>
       </library>
     </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/slf4j/slf4j-api/2.0.0-alpha5/slf4j-api-2.0.0-alpha5.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/slf4j/slf4j-api/2.0.0-alpha5/slf4j-api-2.0.0-alpha5-src.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
     <orderEntry type="module-library" scope="TEST">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/easymock/easymock/4.2.0/easymock-4.2.0.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/easymock/easymock/4.2.0/easymock-4.2.0-src.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" scope="TEST">
-      <library>
-        <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/objenesis/objenesis/3.1.0/objenesis-3.1.0.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/objenesis/objenesis/3.1.0/objenesis-3.1.0-src.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" scope="TEST">
-      <library>
-        <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/testng/testng/7.3.0/testng-7.3.0.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/testng/testng/7.3.0/testng-7.3.0-src.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" scope="TEST">
-      <library>
-        <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/com/google/inject/guice/4.2.2/guice-no_aop-4.2.2.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/org/easymock/easymock/4.4.0-20220601/easymock-4.4.0-20220601.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -245,97 +212,33 @@
     <orderEntry type="module-library" scope="TEST">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/aopalliance/aopalliance/1.0.0/aopalliance-1.0.0.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/org/objenesis/objenesis/3.2.0/objenesis-3.2.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/aopalliance/aopalliance/1.0.0/aopalliance-1.0.0-src.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/org/objenesis/objenesis/3.2.0/objenesis-3.2.0-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library" scope="TEST">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/com/google/guava/guava/30.1.0-jre/guava-30.1.0-jre.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/org/testng/testng/7.4.0/testng-7.4.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/com/google/guava/guava/30.1.0-jre/guava-30.1.0-jre-src.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/org/testng/testng/7.4.0/testng-7.4.0-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library" scope="TEST">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/com/google/guava/listenablefuture/9999.0.0-empty-to-avoid-conflict-with-guava/listenablefuture-9999.0.0-empty-to-avoid-conflict-with-guava.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" scope="TEST">
-      <library>
-        <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/org/webjars/jquery/3.5.1/jquery-3.5.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2-src.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" scope="TEST">
-      <library>
-        <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/com/google/j2objc/j2objc-annotations/1.3.0/j2objc-annotations-1.3.0.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/com/google/j2objc/j2objc-annotations/1.3.0/j2objc-annotations-1.3.0-src.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" scope="TEST">
-      <library>
-        <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/checkerframework/checker-qual/3.5.0/checker-qual-3.5.0.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/checkerframework/checker-qual/3.5.0/checker-qual-3.5.0-src.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" scope="TEST">
-      <library>
-        <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/com/google/guava/failureaccess/1.0.1/failureaccess-1.0.1.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/com/google/guava/failureaccess/1.0.1/failureaccess-1.0.1-src.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" scope="TEST">
-      <library>
-        <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/com/google/errorprone/error_prone_annotations/2.3.4/error_prone_annotations-2.3.4.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/com/google/errorprone/error_prone_annotations/2.3.4/error_prone_annotations-2.3.4-src.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" scope="TEST">
-      <library>
-        <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/yaml/snakeyaml/1.21.0/snakeyaml-1.21.0.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/yaml/snakeyaml/1.21.0/snakeyaml-1.21.0-src.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/org/webjars/jquery/3.5.1/jquery-3.5.1-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -353,50 +256,6 @@
     <orderEntry type="module-library" scope="TEST">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/apache/ant/ant/1.10.3/ant-1.10.3.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/apache/ant/ant/1.10.3/ant-1.10.3-src.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" scope="TEST">
-      <library>
-        <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/apache/ant/ant-launcher/1.10.3/ant-launcher-1.10.3.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/apache/ant/ant-launcher/1.10.3/ant-launcher-1.10.3-src.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" scope="TEST">
-      <library>
-        <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/junit/junit/4.13.0/junit-4.13.0.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/junit/junit/4.13.0/junit-4.13.0-src.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" scope="TEST">
-      <library>
-        <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/hamcrest/hamcrest-core/1.3.0/hamcrest-core-1.3.0.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/hamcrest/hamcrest-core/1.3.0/hamcrest-core-1.3.0-src.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" scope="TEST">
-      <library>
-        <CLASSES>
           <root url="jar://$USER_HOME$/.savant/cache/org/jsoup/jsoup/1.12.1/jsoup-1.12.1.jar!/" />
         </CLASSES>
         <JAVADOC />
@@ -408,22 +267,108 @@
     <orderEntry type="module-library" scope="TEST">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/ch/qos/logback/logback-classic/1.3.0-alpha12/logback-classic-1.3.0-alpha12.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/ch/qos/logback/logback-classic/1.3.0-alpha16/logback-classic-1.3.0-alpha16.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/ch/qos/logback/logback-classic/1.3.0-alpha12/logback-classic-1.3.0-alpha12-src.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/ch/qos/logback/logback-classic/1.3.0-alpha16/logback-classic-1.3.0-alpha16-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library" scope="TEST">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/ch/qos/logback/logback-core/1.3.0-alpha12/logback-core-1.3.0-alpha12.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/ch/qos/logback/logback-core/1.3.0-alpha16/logback-core-1.3.0-alpha16.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/ch/qos/logback/logback-core/1.3.0-alpha12/logback-core-1.3.0-alpha12-src.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/ch/qos/logback/logback-core/1.3.0-alpha16/logback-core-1.3.0-alpha16-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="RUNTIME">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.savant/cache/com/google/guava/guava/30.1.0-jre/guava-30.1.0-jre.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.savant/cache/com/google/guava/guava/30.1.0-jre/guava-30.1.0-jre-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="RUNTIME">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.savant/cache/com/google/guava/failureaccess/1.0.1/failureaccess-1.0.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.savant/cache/com/google/guava/failureaccess/1.0.1/failureaccess-1.0.1-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="RUNTIME">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.savant/cache/org/checkerframework/checker-qual/3.5.0/checker-qual-3.5.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.savant/cache/org/checkerframework/checker-qual/3.5.0/checker-qual-3.5.0-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="RUNTIME">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.savant/cache/com/google/j2objc/j2objc-annotations/1.3.0/j2objc-annotations-1.3.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.savant/cache/com/google/j2objc/j2objc-annotations/1.3.0/j2objc-annotations-1.3.0-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="RUNTIME">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.savant/cache/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.savant/cache/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="RUNTIME">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.savant/cache/com/google/guava/listenablefuture/9999.0.0-empty-to-avoid-conflict-with-guava/listenablefuture-9999.0.0-empty-to-avoid-conflict-with-guava.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="RUNTIME">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.savant/cache/com/google/errorprone/error_prone_annotations/2.3.4/error_prone_annotations-2.3.4.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.savant/cache/com/google/errorprone/error_prone_annotations/2.3.4/error_prone_annotations-2.3.4-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="RUNTIME">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.savant/cache/org/aopalliance/aopalliance/1.0.0/aopalliance-1.0.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.savant/cache/org/aopalliance/aopalliance/1.0.0/aopalliance-1.0.0-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -441,11 +386,22 @@
     <orderEntry type="module-library" scope="RUNTIME">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-resolver/4.1.70/netty-resolver-4.1.70.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-resolver/4.1.79/netty-resolver-4.1.79.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-resolver/4.1.70/netty-resolver-4.1.70-src.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-resolver/4.1.79/netty-resolver-4.1.79-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="RUNTIME">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-transport-native-unix-common/4.1.79/netty-transport-native-unix-common-4.1.79.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-transport-native-unix-common/4.1.79/netty-transport-native-unix-common-4.1.79-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>

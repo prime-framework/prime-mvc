@@ -15,28 +15,17 @@
  */
 package org.primeframework.mvc.netty;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * @author Daniel DeGroff
  */
 public class PrimeHTTPServerConfiguration {
-  /**
-   * The port to bind to the HTTP server.
-   */
-  public final int port;
+  public List<PrimeHTTPListenerConfiguration> listenerConfigurations = new ArrayList<>();
 
-  /**
-   * HTTP connection read timeout in seconds.
-   */
-  public final long readTimeout;
-
-  /**
-   * The scheme used by the channel handler.
-   */
-  public final String scheme;
-
-  public PrimeHTTPServerConfiguration(int port, int readTimeout, String scheme) {
-    this.port = port;
-    this.readTimeout = readTimeout;
-    this.scheme = scheme;
+  public PrimeHTTPServerConfiguration(PrimeHTTPListenerConfiguration... listenerConfigurations) {
+    this.listenerConfigurations.addAll(Arrays.asList(listenerConfigurations));
   }
 }

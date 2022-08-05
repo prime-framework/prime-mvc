@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2021-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,10 @@
  */
 package org.primeframework.mvc;
 
+import java.net.InetSocketAddress;
 import java.net.Socket;
 
+import org.primeframework.mvc.netty.PrimeHTTPListenerConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,16 +42,36 @@ public class TestPrimeMainThread extends Thread {
     // Wait for startup
     long start = System.currentTimeMillis();
     while (System.currentTimeMillis() - start < 10_000) {
-      try (Socket socket = new Socket("localhost", main.configuration().port)) {
+      // Check if the Injector has been created and has injected the BasePrimeMain. This happens in the hup() method, which
+      // is called in a separate thread, so it's a timing issue
+      if (main.injector == null) {
+        sleep();
+        continue;
+      }
+
+      // Pause for good measure to let the injector inject the main instance itself
+      sleep();
+
+      // Assume we want the first configured port
+      PrimeHTTPListenerConfiguration listenerConfiguration = main.configuration().listenerConfigurations.get(0);
+      try (Socket socket = new Socket()) {
+        socket.connect(new InetSocketAddress("localhost", listenerConfiguration.httpPort), 5);
         if (socket.isConnected()) {
           logger.info("Prime HTTP server started");
           break;
         }
 
-        Thread.sleep(500);
-      } catch (Exception e) {
-        // Ignore
+        sleep();
+      } catch (Exception ignore) {
       }
+    }
+  }
+
+  private static void sleep() {
+    try {
+      Thread.sleep(250);
+    } catch (InterruptedException e) {
+      // Ignore
     }
   }
 

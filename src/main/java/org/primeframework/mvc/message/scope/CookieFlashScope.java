@@ -19,14 +19,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
+import org.primeframework.mvc.ErrorException;
 import org.primeframework.mvc.config.MVCConfiguration;
+import org.primeframework.mvc.http.Cookie;
 import org.primeframework.mvc.http.HTTPRequest;
 import org.primeframework.mvc.http.HTTPResponse;
+import org.primeframework.mvc.http.MutableHTTPRequest;
 import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.security.Encryptor;
-import org.primeframework.mvc.util.FlashMessageCookie;
+import org.primeframework.mvc.util.CookieTools;
 
 /**
  * This is the flash scope which stores messages in a Cookie under the flash key. It fetches values from the
@@ -37,35 +41,90 @@ import org.primeframework.mvc.util.FlashMessageCookie;
  * @author Daniel DeGroff
  */
 public class CookieFlashScope implements FlashScope {
-  private final FlashMessageCookie cookie;
+  private final Encryptor encryptor;
+
+  private final List<Message> messages;
+
+  private final String name;
+
+  private final ObjectMapper objectMapper;
+
+  private final HTTPRequest request;
+
+  private final HTTPResponse response;
 
   @Inject
   public CookieFlashScope(Encryptor encryptor, MVCConfiguration configuration, ObjectMapper objectMapper,
                           HTTPRequest request, HTTPResponse response) {
-    this.cookie = new FlashMessageCookie(encryptor, configuration.messageFlashScopeCookieName(), objectMapper, request, response);
+    this.encryptor = encryptor;
+    this.name = configuration.messageFlashScopeCookieName();
+    this.objectMapper = objectMapper;
+    this.request = request;
+    this.response = response;
+
+    Cookie cookie = request.getCookie(name);
+    if (cookie != null) {
+      messages = deserialize(cookie.value);
+    } else {
+      messages = new ArrayList<>();
+    }
   }
 
   @Override
   public void add(Message message) {
-    cookie.update(c -> c.add(message));
+    addAll(List.of(message));
   }
 
   @Override
-  public void addAll(Collection<Message> messages) {
-    if (messages.isEmpty()) {
+  public void addAll(Collection<Message> newMessages) {
+    // Don't write the cookie if the messages are empty
+    if (newMessages == null || newMessages.isEmpty()) {
       return;
     }
 
-    cookie.update(c -> c.addAll(messages));
+    messages.addAll(newMessages);
+
+    try {
+      String value = CookieTools.toJSONCookie(messages, true, true, encryptor, objectMapper);
+      Cookie cookie = new Cookie(name, value);
+      cookie.httpOnly = true;
+      cookie.path = "/";
+      cookie.secure = "https".equalsIgnoreCase(request.getScheme());
+      response.addCookie(cookie);
+    } catch (Exception e) {
+      throw new ErrorException(e);
+    }
   }
 
   @Override
   public void clear() {
-    cookie.delete();
+    Cookie cookie = new Cookie(name, null);
+    cookie.maxAge = 0L;
+    cookie.path = "/";
+    response.addCookie(cookie);
+
+    ((MutableHTTPRequest) request).deleteCookie(name);
+    messages.clear();
   }
 
   @Override
   public List<Message> get() {
-    return new ArrayList<>(cookie.get());
+    return new ArrayList<>(messages);
+  }
+
+  private List<Message> deserialize(String s) {
+    try {
+      // @formatter:off
+      List<Message> messages = CookieTools.fromJSONCookie(s, new TypeReference<List<Message>>() {}, true, encryptor, objectMapper);
+      // @formatter:on
+
+      if (messages == null) {
+        return new ArrayList<>();
+      }
+
+      return new ArrayList<>(messages);
+    } catch (Exception e) {
+      return new ArrayList<>();
+    }
   }
 }

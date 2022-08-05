@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc.action.result;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
@@ -105,13 +104,8 @@ public class JSONResult extends AbstractResult<JSON> {
       prettyPrint = jacksonActionConfiguration.responseMember.annotation.prettyPrint();
     }
 
-    ByteArrayOutputStream os = new ByteArrayOutputStream(1024);
-    writeValue(os, jacksonObject, serializationView, prettyPrint);
-
-    byte[] result = os.toByteArray();
     response.setStatus(json.status());
     response.setContentType(json.contentType());
-    response.setContentLength((long) result.length);
 
     // Handle setting cache controls
     addCacheControlHeader(json, response);
@@ -120,8 +114,7 @@ public class JSONResult extends AbstractResult<JSON> {
       return true;
     }
 
-    response.getOutputStream().write(result);
-
+    writeValue(response.getOutputStream(), jacksonObject, serializationView, prettyPrint);
     return true;
   }
 

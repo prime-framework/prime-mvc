@@ -36,7 +36,8 @@ public class ContextScope implements Scope<Context> {
   /**
    * {@inheritDoc}
    */
-  public Object get(String fieldName, Context scope) {
+  @Override
+  public Object get(String fieldName, Class<?> type, Context scope) {
     String key = scope.value().equals("##field-name##") ? fieldName : scope.value();
     return context.getAttribute(key);
   }
@@ -44,6 +45,7 @@ public class ContextScope implements Scope<Context> {
   /**
    * {@inheritDoc}
    */
+  @Override
   public void set(String fieldName, Object value, Context scope) {
     String key = scope.value().equals("##field-name##") ? fieldName : scope.value();
     context.setAttribute(key, value);

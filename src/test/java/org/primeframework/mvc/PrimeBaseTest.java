@@ -57,6 +57,7 @@ import org.primeframework.mvc.message.scope.ApplicationScope;
 import org.primeframework.mvc.message.scope.CookieFlashScope;
 import org.primeframework.mvc.message.scope.FlashScope;
 import org.primeframework.mvc.message.scope.RequestScope;
+import org.primeframework.mvc.netty.PrimeHTTPListenerConfiguration;
 import org.primeframework.mvc.netty.PrimeHTTPServerConfiguration;
 import org.primeframework.mvc.security.CipherProvider;
 import org.primeframework.mvc.security.DefaultCipherProvider;
@@ -119,7 +120,7 @@ public abstract class PrimeBaseTest {
     };
 
     Module module = Modules.override(mvcModule).with(new TestContentModule(), new TestSecurityModule(), new TestScopeModule());
-    TestPrimeMain main = new TestPrimeMain(new PrimeHTTPServerConfiguration(9080, 0, "http"), module);
+    TestPrimeMain main = new TestPrimeMain(new PrimeHTTPServerConfiguration(new PrimeHTTPListenerConfiguration(9080)), module);
     simulator = new RequestSimulator(main, messageObserver);
     injector = simulator.getInjector();
     context = injector.getInstance(HTTPContext.class);
@@ -161,7 +162,7 @@ public abstract class PrimeBaseTest {
     metricRegistry.getNames().forEach(metricRegistry::remove);
 
     // Clear the message observer
-    messageObserver.clear();
+    messageObserver.reset();
 
     // Clear the roles and logged in user
     MockUserLoginSecurityContext.roles.clear();

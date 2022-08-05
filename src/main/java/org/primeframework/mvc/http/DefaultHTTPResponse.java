@@ -42,6 +42,8 @@ public class DefaultHTTPResponse implements HTTPResponse {
 
   private final OutputStream outputStream;
 
+  private Throwable exception;
+
   private int status;
 
   public DefaultHTTPResponse(OutputStream outputStream) {
@@ -108,6 +110,16 @@ public class DefaultHTTPResponse implements HTTPResponse {
                   .stream()
                   .flatMap(map -> map.values().stream())
                   .collect(Collectors.toList());
+  }
+
+  @Override
+  public Throwable getException() {
+    return exception;
+  }
+
+  @Override
+  public void setException(Throwable exception) {
+    this.exception = exception;
   }
 
   @Override

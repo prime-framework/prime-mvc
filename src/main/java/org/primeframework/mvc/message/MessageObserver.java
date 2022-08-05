@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2021-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.primeframework.mvc.message;
 
+import org.primeframework.mvc.http.HTTPRequest;
 import org.primeframework.mvc.message.scope.MessageScope;
 
 /**
@@ -26,15 +27,22 @@ public interface MessageObserver {
   /**
    * Called when a new message is added.
    *
-   * @param scope   The scope of the message.
-   * @param message The message.
+   * @param httpRequest The current HTTP request.
+   * @param scope       The scope of the message.
+   * @param message     The message.
    */
-  void added(MessageScope scope, Message message);
+  void messageAdded(HTTPRequest httpRequest, MessageScope scope, Message message);
+
+  /**
+   * Reset the message observer.
+   */
+  void reset();
 
   /**
    * Called when messages are cleared from the store.
    *
-   * @param scope The scope being cleared.
+   * @param httpRequest The current HTTP request.
+   * @param scope       The scope being cleared.
    */
-  void cleared(MessageScope scope);
+  void scopeCleared(HTTPRequest httpRequest, MessageScope scope);
 }

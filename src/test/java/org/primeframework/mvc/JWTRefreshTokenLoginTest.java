@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2021-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ import org.primeframework.mvc.message.scope.ApplicationScope;
 import org.primeframework.mvc.message.scope.CookieFlashScope;
 import org.primeframework.mvc.message.scope.FlashScope;
 import org.primeframework.mvc.message.scope.RequestScope;
+import org.primeframework.mvc.netty.PrimeHTTPListenerConfiguration;
 import org.primeframework.mvc.netty.PrimeHTTPServerConfiguration;
 import org.primeframework.mvc.security.MockOAuthUserLoginSecurityContext;
 import org.primeframework.mvc.security.UserLoginSecurityContext;
@@ -87,7 +88,7 @@ public class JWTRefreshTokenLoginTest {
     };
 
     Module module = Modules.override(mvcModule).with(new TestContentModule(), new TestSecurityModule(), new TestScopeModule());
-    TestPrimeMain main = new TestPrimeMain(new PrimeHTTPServerConfiguration(9081, 0, "http"), module);
+    TestPrimeMain main = new TestPrimeMain(new PrimeHTTPServerConfiguration(new PrimeHTTPListenerConfiguration(9081)), module);
     simulator = new RequestSimulator(main, messageObserver);
     injector = simulator.getInjector();
   }
@@ -106,7 +107,7 @@ public class JWTRefreshTokenLoginTest {
     simulator.userAgent.reset();
 
     // Clear the message observer
-    messageObserver.clear();
+    messageObserver.reset();
 
     // Clear the roles and logged in user
     MockOAuthUserLoginSecurityContext.Roles.clear();

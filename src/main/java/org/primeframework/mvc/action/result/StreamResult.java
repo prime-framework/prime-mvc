@@ -101,7 +101,7 @@ public class StreamResult extends AbstractResult<Stream> {
       return true;
     }
 
-    writeToOutputStream(is, response);
+    is.transferTo(response.getOutputStream());
     return true;
   }
 
