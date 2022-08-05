@@ -173,8 +173,20 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
     return true;
   }
 
+  private Map<String, Verifier> getVerifiersOrNull() {
+    // If we do not have any verifiers, do not attempt to decode the JWT.
+    // - This is a fail-safe against validating a JWT with an alg of 'none'.
+    //   In practice, at least in FusionAuth, we'll always have at least one
+    //   verifier. But to protect other users of this library, do not attempt
+    //   a JWT unless we have a verifier.
+    // - By returning null, we ensure that the JWT decoder will explode because the 'verifiers' is a non-null parameter.
+    Map<String, Verifier> verifiers = verifierProvider.get();
+    return verifiers.isEmpty() ? null : verifiers;
+  }
+
   private Tokens refreshJWT(Tokens tokens) {
     tokens.jwt = null;
+    tokens.decodedJWT = null;
 
     if (tokens.refreshToken == null) {
       jwtCookie.delete(request, response);
@@ -214,6 +226,11 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
     tokens.jwt = rr.access_token;
     tokens.refreshToken = defaultIfNull(rr.refresh_token, tokens.refreshToken);
 
+    Map<String, Verifier> verifiers = getVerifiersOrNull();
+    if (verifiers != null) {
+      tokens.decodedJWT = JWT.getDecoder().decode(tokens.jwt, verifiers);
+    }
+
     if (tokens.jwt != null) {
       jwtCookie.add(request, response, tokens.jwt);
     }
@@ -235,13 +252,8 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
     tokens = new Tokens();
     request.setAttribute(ContextKey, tokens);
 
-    // If we do not have any verifiers, do not attempt to decode the JWT.
-    // - This is a fail-safe against validating a JWT with an alg of 'none'.
-    //   In practice, at least in FusionAuth, we'll always have at least one
-    //   verifier. But to protect other users of this library, do not attempt
-    //   a JWT unless we have a verifier.
-    Map<String, Verifier> verifiers = verifierProvider.get();
-    if (verifiers.isEmpty()) {
+    Map<String, Verifier> verifiers = getVerifiersOrNull();
+    if (verifiers == null) {
       return tokens;
     }
 

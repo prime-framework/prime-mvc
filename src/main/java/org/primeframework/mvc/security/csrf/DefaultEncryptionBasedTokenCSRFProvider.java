@@ -54,8 +54,19 @@ public class DefaultEncryptionBasedTokenCSRFProvider implements CSRFProvider {
 
   @Override
   public String getToken(HTTPRequest request) {
-    String sessionId = securityContext.getSessionId();
-    return sessionId != null ? generateToken(sessionId) : null;
+    // Check to see if we have already generated the token, we store it in the request attribute.
+    String csrfToken = (String) request.getAttribute(CSRF_PARAMETER_KEY);
+    if (csrfToken == null) {
+      String sessionId = securityContext.getSessionId();
+      if (sessionId == null) {
+        return null;
+      }
+
+      csrfToken = generateToken(sessionId);
+      request.setAttribute(CSRF_PARAMETER_KEY, csrfToken);
+    }
+
+    return csrfToken;
   }
 
   @Override
@@ -107,7 +118,7 @@ public class DefaultEncryptionBasedTokenCSRFProvider implements CSRFProvider {
    * Encrypting this cookie means it is functionally immutable on the client side.
    *
    * @param sessionId the user's sessionId
-   * @return a new token
+   * @return a new token, never null.
    */
   private String generateToken(String sessionId) {
     try {
