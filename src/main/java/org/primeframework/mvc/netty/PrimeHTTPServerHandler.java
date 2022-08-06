@@ -157,13 +157,7 @@ public class PrimeHTTPServerHandler extends SimpleChannelInboundHandler<HttpObje
           // Call Prime MVC - FTW!
           requestHandler.handleRequest(primeRequest, primeResponse);
           primeResponse.getOutputStream().close();
-
-          ChannelFuture future = context.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
-
-          // Close the connection if this is not Keep-Alive or was a failure
-          if (!HttpUtil.isKeepAlive(request) || primeResponse.failure() || primeResponse.getContentLength() == null) {
-            future.addListener(ChannelFutureListener.CLOSE);
-          }
+          context.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
 
           reset();
         }
