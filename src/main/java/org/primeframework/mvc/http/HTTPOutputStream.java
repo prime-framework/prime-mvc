@@ -59,7 +59,7 @@ public class HTTPOutputStream extends OutputStream {
   @Override
   public void close() throws IOException {
     if (index > 0) {
-      _flush(true);
+      _flush();
     } else if (state == State.None) {
       writeHeaders();
     }
@@ -82,19 +82,15 @@ public class HTTPOutputStream extends OutputStream {
       return;
     }
 
-    _flush(false);
+    _flush();
   }
 
-  private void _flush(boolean closing) {
+  private void _flush() {
     if (index == 0) {
       return;
     }
 
     if (state == State.None) {
-      if (closing && response.getContentLength() == null) {
-        response.setContentLength((long) index);
-      }
-
       writeHeaders();
       writeBuffer();
       state = State.BodyInProgress;
