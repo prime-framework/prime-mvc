@@ -69,7 +69,7 @@ public class PrimeHTTPListenerConfiguration implements Buildable<PrimeHTTPListen
   public PrivateKey privateKey;
 
   /**
-   * HTTP connection read timeout in seconds.
+   * HTTP connection read timeout in milliseconds.
    */
   public long readTimeout = 0;
 

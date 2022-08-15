@@ -56,7 +56,7 @@ public class PrimeHTTPServerInitializer extends ChannelInitializer<SocketChannel
     ch.pipeline()
       .addLast(new HttpServerCodec(listenerConfiguration.maxInitialLineLength, listenerConfiguration.maxHeaderSize, listenerConfiguration.maxChunkSize))
       .addLast(new HttpContentCompressor())
-      .addLast(new ReadTimeoutHandler(listenerConfiguration.readTimeout, TimeUnit.SECONDS))
+      .addLast(new ReadTimeoutHandler(listenerConfiguration.readTimeout, TimeUnit.MILLISECONDS))
       .addLast(new HttpServerKeepAliveHandler())
       .addLast(new PrimeHTTPServerHandler(listenerConfiguration, main))
       .addLast(new PrimeChannelFinalExceptionHandler());
