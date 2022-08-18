@@ -45,7 +45,7 @@ public class JacksonActionConfiguration {
   }
 
   public static class RequestMember {
-    public Set<String> contentType;
+    public Set<String> allowedContentTypes;
 
     public String name;
 
@@ -53,13 +53,13 @@ public class JacksonActionConfiguration {
 
     public RequestMember(String name, Class<?> type) {
       this.name = name;
-      this.contentType = Set.of("application/json");
+      this.allowedContentTypes = Set.of("application/json");
       this.type = type;
     }
 
     public RequestMember(String name, Set<String> contentTYpe, Class<?> type) {
       this.name = name;
-      this.contentType = contentTYpe;
+      this.allowedContentTypes = contentTYpe;
       this.type = type;
     }
   }

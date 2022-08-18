@@ -104,9 +104,9 @@ public class JacksonContentHandler implements ContentHandler {
       HTTPMethod httpMethod = actionInvocation.method.httpMethod;
       RequestMember requestMember = jacksonConfiguration.requestMembers.get(httpMethod);
 
-      if (!requestMember.contentType.contains(request.getContentType())) {
-        messageStore.add(new SimpleMessage(MessageType.ERROR, "[contentType]",
-            messageProvider.getMessage("[contentType]", request.getContentType(), String.join(", ", requestMember.contentType))));
+      if (!requestMember.allowedContentTypes.contains(request.getContentType())) {
+        messageStore.add(new SimpleMessage(MessageType.ERROR, "[InvalidContentType]",
+            messageProvider.getMessage("[InvalidContentType]", request.getContentType(), String.join(", ", requestMember.allowedContentTypes))));
         throw new ValidationException();
       }
 

@@ -54,7 +54,7 @@ public class JacksonActionConfigurator implements ActionConfigurator {
               + " This annotation should only exist on a single field for a particular HTTP Method.");
         }
 
-        configuredMembers.put(httpMethod, new RequestMember(memberName, Set.of(requestMember.getValue().contentType()), ReflectionUtils.getMemberType(actionClass, memberName)));
+        configuredMembers.put(httpMethod, new RequestMember(memberName, Set.of(requestMember.getValue().allowedContentTypes()), ReflectionUtils.getMemberType(actionClass, memberName)));
       }
     }
 

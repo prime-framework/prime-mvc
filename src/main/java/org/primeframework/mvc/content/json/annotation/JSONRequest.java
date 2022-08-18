@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ public @interface JSONRequest {
   /**
    * @return The supported values for the Content-Type request header.
    */
-  String[] contentType() default {"application/json"};
+  String[] allowedContentTypes() default {"application/json"};
 
   /**
    * @return The HTTP methods that this request object is utilized for.

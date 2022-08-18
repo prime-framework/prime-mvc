@@ -27,7 +27,7 @@ import org.primeframework.mvc.content.json.annotation.JSONRequest;
 @Status
 @JSON(code = "input", status = 400)
 public class ScimContentTypeAction {
-  @JSONRequest(contentType = {"application/json", "application/scim+json"})
+  @JSONRequest(allowedContentTypes = {"application/json", "application/scim+json"})
   public Object object;
 
   public String post() {

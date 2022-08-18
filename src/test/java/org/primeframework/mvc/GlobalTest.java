@@ -1717,10 +1717,51 @@ public class GlobalTest extends PrimeBaseTest {
                  {
                    "fieldErrors" : { },
                    "generalErrors" : [ {
-                     "code" : "[contentType]",
-                     "message" : "Unsupported [Content-Type] HTTP request header value of [application/scim+json]. Supported values include [application/json]."
+                     "code" : "[InvalidContentType]",
+                     "message" : "Invalid [Content-Type] HTTP request header value of [application/scim+json]. Supported values for this request include [application/json]."
                    } ]
                  }
+                 """);
+
+    // Missing Content-Type Header
+    simulator.test("/json-content-type")
+             .withContentType("")
+             .withBody("""
+                 {
+                   "foo": "bar"
+                 }
+                 """)
+             .post()
+             .assertStatusCode(400)
+             .assertJSON("""
+                  {
+                    "fieldErrors" : { },
+                    "generalErrors" : [ {
+                      "code" : "[MissingContentType]",
+                      "message" : "Missing required [Content-Type] HTTP request header."
+                    } ]
+                  }
+                 """);
+
+
+    // Not supported in general
+    simulator.test("/json-content-type")
+             .withContentType("application/klingon")
+             .withBody("""
+                 {
+                   "foo": "bar"
+                 }
+                 """)
+             .post()
+             .assertStatusCode(400)
+             .assertJSON("""
+                  {
+                    "fieldErrors" : { },
+                    "generalErrors" : [ {
+                      "code" : "[UnsupportedContentType]",
+                          "message" : "Unsupported [Content-Type] HTTP request header value of [application/klingon]."
+                    } ]
+                  }
                  """);
   }
 

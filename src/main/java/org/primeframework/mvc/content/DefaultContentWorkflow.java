@@ -15,13 +15,12 @@
  */
 package org.primeframework.mvc.content;
 
-import org.primeframework.mvc.http.HTTPRequest;
 import java.io.IOException;
 
-import org.primeframework.mvc.content.guice.ContentHandlerFactory;
-import org.primeframework.mvc.workflow.WorkflowChain;
-
 import com.google.inject.Inject;
+import org.primeframework.mvc.content.guice.ContentHandlerFactory;
+import org.primeframework.mvc.http.HTTPRequest;
+import org.primeframework.mvc.workflow.WorkflowChain;
 
 /**
  * Default content workflow. This uses the Content-Type header and {@link ContentHandler} implementations to handle the
@@ -46,6 +45,14 @@ public class DefaultContentWorkflow implements ContentWorkflow {
     ContentHandler handler = factory.build(contentType);
     if (handler != null) {
       handler.handle();
+    } else {
+      if (contentType != null && !contentType.equals("")) {
+        // Use the default handler so that we can throw a validation error.
+        handler = factory.build("");
+        if (handler != null) {
+          handler.handle();
+        }
+      }
     }
 
     workflowChain.continueWorkflow();
