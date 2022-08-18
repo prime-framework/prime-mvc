@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2018, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2013-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package org.primeframework.mvc.content.json;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.primeframework.mvc.content.json.annotation.JSONResponse;
 import org.primeframework.mvc.http.HTTPMethod;
@@ -44,12 +45,21 @@ public class JacksonActionConfiguration {
   }
 
   public static class RequestMember {
+    public Set<String> contentType;
+
     public String name;
 
     public Class<?> type;
 
     public RequestMember(String name, Class<?> type) {
       this.name = name;
+      this.contentType = Set.of("application/json");
+      this.type = type;
+    }
+
+    public RequestMember(String name, Set<String> contentTYpe, Class<?> type) {
+      this.name = name;
+      this.contentType = contentTYpe;
       this.type = type;
     }
   }

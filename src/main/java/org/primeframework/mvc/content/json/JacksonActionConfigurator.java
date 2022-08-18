@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2018, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2013-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package org.primeframework.mvc.content.json;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.primeframework.mvc.action.config.ActionConfigurator;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration.RequestMember;
@@ -53,7 +54,7 @@ public class JacksonActionConfigurator implements ActionConfigurator {
               + " This annotation should only exist on a single field for a particular HTTP Method.");
         }
 
-        configuredMembers.put(httpMethod, new RequestMember(memberName, ReflectionUtils.getMemberType(actionClass, memberName)));
+        configuredMembers.put(httpMethod, new RequestMember(memberName, Set.of(requestMember.getValue().contentType()), ReflectionUtils.getMemberType(actionClass, memberName)));
       }
     }
 
