@@ -63,7 +63,8 @@ public class ContentHandlerFactory {
     }
 
     if (handlerType == null) {
-      return null;
+      // Use the default handler
+      handlerType = bindings.get("");
     }
 
     return injector.getInstance(handlerType);

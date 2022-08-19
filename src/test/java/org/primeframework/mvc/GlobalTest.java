@@ -1743,7 +1743,6 @@ public class GlobalTest extends PrimeBaseTest {
                   }
                  """);
 
-
     // Not supported in general
     simulator.test("/json-content-type")
              .withContentType("application/klingon")

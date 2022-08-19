@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2016, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2013-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,14 +45,6 @@ public class DefaultContentWorkflow implements ContentWorkflow {
     ContentHandler handler = factory.build(contentType);
     if (handler != null) {
       handler.handle();
-    } else {
-      if (contentType != null && !contentType.equals("")) {
-        // Use the default handler so that we can throw a validation error.
-        handler = factory.build("");
-        if (handler != null) {
-          handler.handle();
-        }
-      }
     }
 
     workflowChain.continueWorkflow();
