@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2013-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -103,6 +103,12 @@ public class JacksonContentHandler implements ContentHandler {
     if (!jacksonConfiguration.requestMembers.isEmpty()) {
       HTTPMethod httpMethod = actionInvocation.method.httpMethod;
       RequestMember requestMember = jacksonConfiguration.requestMembers.get(httpMethod);
+
+      if (!requestMember.allowedContentTypes.contains(request.getContentType())) {
+        messageStore.add(new SimpleMessage(MessageType.ERROR, "[InvalidContentType]",
+            messageProvider.getMessage("[InvalidContentType]", request.getContentType(), String.join(", ", requestMember.allowedContentTypes))));
+        throw new ValidationException();
+      }
 
       try {
         // Retrieve the current value from the action, so we can see if it is non-null

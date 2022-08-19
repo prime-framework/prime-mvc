@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,13 @@
  */
 package org.primeframework.mvc.content.guice;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.google.inject.Binder;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import org.primeframework.mvc.content.ContentHandler;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Builds {@link ContentHandler}s on demand.
@@ -29,7 +29,7 @@ import java.util.Map;
  * @author Brian Pontarelli
  */
 public class ContentHandlerFactory {
-  private static final Map<String, Class<? extends ContentHandler>> bindings = new HashMap<String, Class<? extends ContentHandler>>();
+  private static final Map<String, Class<? extends ContentHandler>> bindings = new HashMap<>();
 
   private final Injector injector;
 

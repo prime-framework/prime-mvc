@@ -1033,7 +1033,7 @@ public class GlobalTest extends PrimeBaseTest {
                                      "foo/0/bar/bam => [purple]"
                                  ));
   }
-  
+
   @Test
   public void get_wellKnownDotPrefixed() throws Exception {
     test.simulate(() -> simulator.test("/.well-known/openid-configuration")
@@ -1687,6 +1687,82 @@ public class GlobalTest extends PrimeBaseTest {
                                  .assertBodyContains(
                                      "[invalidJSON]",
                                      "Unable to parse JSON. The property [active] was invalid. The error was [Possible conversion error]. The detailed exception was ["));
+  }
+
+  @Test
+  public void post_jsonContentType() throws Exception {
+    // Content-Type: application/scim+json
+    simulator.test("/scim-content-type")
+             .withContentType("application/scim+json")
+             .withBody("""
+                 {
+                   "foo": "bar"
+                 }
+                 """)
+             .post()
+             .assertStatusCode(200)
+             .assertBodyIsEmpty();
+
+    // Not supported on this endpoint
+    simulator.test("/json-content-type")
+             .withContentType("application/scim+json")
+             .withBody("""
+                 {
+                   "foo": "bar"
+                 }
+                 """)
+             .post()
+             .assertStatusCode(400)
+             .assertJSON("""
+                 {
+                   "fieldErrors" : { },
+                   "generalErrors" : [ {
+                     "code" : "[InvalidContentType]",
+                     "message" : "Invalid [Content-Type] HTTP request header value of [application/scim+json]. Supported values for this request include [application/json]."
+                   } ]
+                 }
+                 """);
+
+    // Missing Content-Type Header
+    simulator.test("/json-content-type")
+             .withContentType("")
+             .withBody("""
+                 {
+                   "foo": "bar"
+                 }
+                 """)
+             .post()
+             .assertStatusCode(400)
+             .assertJSON("""
+                  {
+                    "fieldErrors" : { },
+                    "generalErrors" : [ {
+                      "code" : "[MissingContentType]",
+                      "message" : "Missing required [Content-Type] HTTP request header."
+                    } ]
+                  }
+                 """);
+
+
+    // Not supported in general
+    simulator.test("/json-content-type")
+             .withContentType("application/klingon")
+             .withBody("""
+                 {
+                   "foo": "bar"
+                 }
+                 """)
+             .post()
+             .assertStatusCode(400)
+             .assertJSON("""
+                  {
+                    "fieldErrors" : { },
+                    "generalErrors" : [ {
+                      "code" : "[UnsupportedContentType]",
+                          "message" : "Unsupported [Content-Type] HTTP request header value of [application/klingon]."
+                    } ]
+                  }
+                 """);
   }
 
   @Test

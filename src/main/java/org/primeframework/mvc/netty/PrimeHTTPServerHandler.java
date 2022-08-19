@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.ByteBufUtil;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -69,6 +70,7 @@ import org.primeframework.mvc.io.PrimeByteArrayOutputStream;
 import org.primeframework.mvc.parameter.fileupload.FileInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import static org.primeframework.mvc.http.HTTPStrings.Headers.ContentLength;
 
 /**
  * Let's go ahead and handle some HTTP messages shall we?
@@ -117,27 +119,43 @@ public class PrimeHTTPServerHandler extends SimpleChannelInboundHandler<HttpObje
 
         // Parse the request and if it is invalid, bail with a 400 status code
         if (!parseRequest(request, context)) {
-          sendErrorResponse(context, HttpResponseStatus.BAD_REQUEST, "Unable to parse request");
+          sendFullResponse(context, HttpResponseStatus.BAD_REQUEST, "Unable to parse request", true);
+          return;
+        }
+
+        // Content-Length too large.
+        if (primeRequest.getContentLength() != null && primeRequest.getContentLength() > listenerConfiguration.maxBodySize) {
+          sendFullResponse(context, HttpResponseStatus.REQUEST_ENTITY_TOO_LARGE, null, false);
+          return;
+        }
+
+        // Handle Expect: 100-Continue
+        if (HttpUtil.is100ContinueExpected(request)) {
+          sendFullResponse(context, HttpResponseStatus.CONTINUE, null, false);
         }
       } else if (msg instanceof HttpContent chunk) {
+
+        // Keep track of the total bytes read so that we know when we exceed the maximum body size.
+        ByteBuf content = chunk.content();
+        int length = content.readableBytes();
+        if (length + bytesRead > listenerConfiguration.maxBodySize) {
+          sendFullResponse(context, HttpResponseStatus.REQUEST_ENTITY_TOO_LARGE, null, false);
+          return;
+        }
+
         if (decoder != null) {
           decoder.offer(chunk);
         } else {
           if (primeRequest.getContentLength() == null) {
-            sendErrorResponse(context, HttpResponseStatus.LENGTH_REQUIRED, "Missing Content-Length header");
-            return;
-          }
-
-          ByteBuf content = chunk.content();
-          int length = content.readableBytes();
-          if (length + bytesRead > listenerConfiguration.maxBodySize) {
-            sendErrorResponse(context, HttpResponseStatus.REQUEST_ENTITY_TOO_LARGE, null);
+            sendFullResponse(context, HttpResponseStatus.LENGTH_REQUIRED, "Missing Content-Length header", true);
             return;
           }
 
           content.getBytes(0, outputStream, length);
-          bytesRead += length;
         }
+
+        // Accumulate the number of bytes read.
+        bytesRead += length;
 
         if (chunk instanceof LastHttpContent) {
           if (decoder != null) {
@@ -287,17 +305,24 @@ public class PrimeHTTPServerHandler extends SimpleChannelInboundHandler<HttpObje
     }
   }
 
-  private void sendErrorResponse(ChannelHandlerContext context, HttpResponseStatus status, String message) {
+  private void sendFullResponse(ChannelHandlerContext context, HttpResponseStatus status, String message,
+                                boolean closeAndReset) {
     FullHttpResponse response;
     if (message != null) {
       ByteBuf content = ByteBufUtil.encodeString(ByteBufAllocator.DEFAULT, CharBuffer.wrap(message), StandardCharsets.UTF_8);
       response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status, content);
     } else {
-      response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status);
+      response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status, Unpooled.EMPTY_BUFFER);
+    }
+
+    if (status.equals(HttpResponseStatus.REQUEST_ENTITY_TOO_LARGE)) {
+      response.headers().set(ContentLength, 0);
     }
 
     ChannelFuture future = context.writeAndFlush(response);
-    future.addListener(ChannelFutureListener.CLOSE);
-    reset();
+    if (closeAndReset) {
+      future.addListener(ChannelFutureListener.CLOSE);
+      reset();
+    }
   }
 }
