@@ -161,7 +161,7 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
-  public void get_ContentTypeOverride() throws Exception {
+  public void get_ContentTypeOverride() {
     simulator.test("/content-type-override")
              .get()
              .assertStatusCode(200)
@@ -937,15 +937,6 @@ public class GlobalTest extends PrimeBaseTest {
                                  .assertHeaderContains("Cache-Control", "no-cache")
                                  .assertRedirect("/foo", params -> params.withActual("instant")
                                                                          .with("bing", "bam")));
-  }
-
-  @Test
-  public void get_resource_noAction() {
-    simulator.test("/js/test.js")
-             .get()
-             .assertStatusCode(200)
-             .assertContentType("text/javascript")
-             .assertBodyContains("{};");
   }
 
   @Test

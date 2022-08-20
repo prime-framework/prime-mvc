@@ -694,6 +694,21 @@ public class RequestResult {
   }
 
   /**
+   * Verifies the response Content-Length.
+   *
+   * @param expected The expeted Content-Length.
+   * @return This.
+   */
+  public RequestResult assertContentLength(long expected) {
+    String actual = response.getHeader(Headers.ContentLength);
+    if (actual == null || Long.parseLong(actual) != expected) {
+      throw new AssertionError("Content-Length [" + actual + "] is not equal to the expected value [" + expected + "]");
+    }
+
+    return this;
+  }
+
+  /**
    * Verifies the response Content-Type.
    *
    * @param contentType The expected content-type
@@ -701,7 +716,7 @@ public class RequestResult {
    */
   public RequestResult assertContentType(String contentType) {
     String actual = response.getHeader(Headers.ContentType);
-    if (actual != null && !actual.equals(contentType)) {
+    if (actual == null || !actual.equals(contentType)) {
       throw new AssertionError("Content-Type [" + actual + "] is not equal to the expected value [" + contentType + "]");
     }
     return this;

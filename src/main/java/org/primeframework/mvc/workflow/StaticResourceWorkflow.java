@@ -119,14 +119,19 @@ public class StaticResourceWorkflow implements Workflow {
     String staticDirectory = configuration.staticDirectory();
     Path file = context.resolve(staticDirectory + uri);
     if (Files.isRegularFile(file) && Files.isReadable(file)) {
+      // Guess the content type
+      String contentType = Files.probeContentType(file);
+      response.setContentType(contentType);
+
+      // Write if modified
       Instant modified = Files.getLastModifiedTime(file).toInstant();
       if (ifModifiedSince == null || modified.isAfter(ifModifiedSince)) {
+        // Set the content-length since we know it. This will keep-alive the connection for faster processing
+        response.setContentLength(Files.size(file));
+
         try (InputStream is = Files.newInputStream(file)) {
           writeResponse(response, is, modified);
         }
-
-        String contentType = Files.probeContentType(file);
-        response.setContentType(contentType);
       } else {
         addHeaders(response, modified);
         response.setStatus(Status.SC_NOT_MODIFIED);
@@ -148,13 +153,22 @@ public class StaticResourceWorkflow implements Workflow {
 
     if (url != null) {
       URLConnection connection = url.openConnection();
+
+      // Guess the content type
+      response.setContentType(connection.getContentType());
+
+      // Write if modified
       Instant modified = Instant.ofEpochMilli(connection.getLastModified());
       if (ifModifiedSince == null || modified.isAfter(ifModifiedSince)) {
+        // Set the content-length if we know it. This will keep-alive the connection for faster processing
+        long length = connection.getContentLengthLong();
+        if (length > 0) {
+          response.setContentLength(length);
+        }
+
         try (InputStream is = connection.getInputStream()) {
           writeResponse(response, is, modified);
         }
-
-        response.setContentType(connection.getContentType());
       } else {
         addHeaders(response, modified);
         response.setStatus(Status.SC_NOT_MODIFIED);
