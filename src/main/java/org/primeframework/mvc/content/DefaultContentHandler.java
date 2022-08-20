@@ -58,10 +58,9 @@ public class DefaultContentHandler implements ContentHandler {
   @Override
   public void handle() throws IOException {
     // If you send a request body, you must have a Content-Type header
-    // - We won't always have a Content-Length request header, and the default body is an empty 32 bytes initialized to 0
-    // - When we wrap the OutputStream with this ByteBuffer we do know the byte count, so we could preserve that somehow, and then just check that for > 0.
     ByteBuffer body = request.getBody();
-    if (body != null && body.array().length > 0 && body.array()[0] != 0x00 && body.array()[1] != 0x00) {
+    // Limit is the number of bytes left within the current capacity. If > 0, we have at least one byte written.
+    if (body != null && body.limit() > 0) {
       String contentType = request.getContentType();
       if (contentType == null || contentType.equals("")) {
         messageStore.add(new SimpleMessage(MessageType.ERROR, "[MissingContentType]", messageProvider.getMessage("[MissingContentType]")));
