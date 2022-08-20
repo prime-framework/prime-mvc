@@ -21,8 +21,8 @@ import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 import org.primeframework.mvc.action.config.ActionConfigurator;
 import org.primeframework.mvc.content.ContentWorkflow;
+import org.primeframework.mvc.content.DefaultContentHandler;
 import org.primeframework.mvc.content.DefaultContentWorkflow;
-import org.primeframework.mvc.content.ExplodingContentHandler;
 import org.primeframework.mvc.content.binary.BinaryActionConfigurator;
 import org.primeframework.mvc.content.binary.BinaryContentHandler;
 import org.primeframework.mvc.content.json.JacksonActionConfigurator;
@@ -40,7 +40,7 @@ public class ContentModule extends AbstractModule {
     ContentHandlerFactory.addContentHandler(binder(), "application/scim+json", JacksonContentHandler.class);
     ContentHandlerFactory.addContentHandler(binder(), "application/octet-stream", BinaryContentHandler.class);
     // Default exploding handler to handle missing Content-Type header, or un-supported values.
-    ContentHandlerFactory.addContentHandler(binder(), "", ExplodingContentHandler.class);
+    ContentHandlerFactory.addContentHandler(binder(), "", DefaultContentHandler.class);
 
     Multibinder<ActionConfigurator> multiBinder = Multibinder.newSetBinder(binder(), ActionConfigurator.class);
     multiBinder.addBinding().to(JacksonActionConfigurator.class);

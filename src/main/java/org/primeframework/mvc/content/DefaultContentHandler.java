@@ -16,6 +16,7 @@
 package org.primeframework.mvc.content;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import com.google.inject.Inject;
 import org.primeframework.mvc.action.ActionInvocationStore;
@@ -33,7 +34,7 @@ import org.primeframework.mvc.validation.ValidationException;
  *
  * @author Daniel DeGroff
  */
-public class ExplodingContentHandler implements ContentHandler {
+public class DefaultContentHandler implements ContentHandler {
   private final MessageProvider messageProvider;
 
   private final MessageStore messageStore;
@@ -41,9 +42,9 @@ public class ExplodingContentHandler implements ContentHandler {
   private final HTTPRequest request;
 
   @Inject
-  public ExplodingContentHandler(ExpressionEvaluator expressionEvaluator, HTTPRequest request,
-                                 ActionInvocationStore store, MessageProvider messageProvider,
-                                 MessageStore messageStore) {
+  public DefaultContentHandler(ExpressionEvaluator expressionEvaluator, HTTPRequest request,
+                               ActionInvocationStore store, MessageProvider messageProvider,
+                               MessageStore messageStore) {
     this.request = request;
     this.messageProvider = messageProvider;
     this.messageStore = messageStore;
@@ -57,9 +58,10 @@ public class ExplodingContentHandler implements ContentHandler {
   @Override
   public void handle() throws IOException {
     // If you send a request body, you must have a Content-Type header
-    boolean hasBody = request.getBody() != null && request.getBody().array().length > 0;
-
-    if (hasBody) {
+    // - We won't always have a Content-Length request header, and the default body is an empty 32 bytes initialized to 0
+    // - When we wrap the OutputStream with this ByteBuffer we do know the byte count, so we could preserve that somehow, and then just check that for > 0.
+    ByteBuffer body = request.getBody();
+    if (body != null && body.array().length > 0 && body.array()[0] != 0x00 && body.array()[1] != 0x00) {
       String contentType = request.getContentType();
       if (contentType == null || contentType.equals("")) {
         messageStore.add(new SimpleMessage(MessageType.ERROR, "[MissingContentType]", messageProvider.getMessage("[MissingContentType]")));
