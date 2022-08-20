@@ -30,7 +30,7 @@ restifyVersion = "4.1.2"
 slf4jVersion = "2.0.0-alpha7"
 testngVersion = "7.3.0"
 
-project(group: "org.primeframework", name: "prime-mvc", version: "2.3.5", licenses: ["ApacheV2_0"]) {
+project(group: "org.primeframework", name: "prime-mvc", version: "2.3.6", licenses: ["ApacheV2_0"]) {
   workflow {
     fetch {
       cache()
