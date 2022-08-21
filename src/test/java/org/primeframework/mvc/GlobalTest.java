@@ -1132,16 +1132,6 @@ public class GlobalTest extends PrimeBaseTest {
     }
   }
 
-  @DataProvider(name = "methodOverrides")
-  public Object[][] methodOverrides() {
-    return new Object[][]{
-        {"X-HTTP-Method-Override"},
-        {"x-http-method-override"},
-        {"X-Method-Override"},
-        {"x-method-override"}
-    };
-  }
-
   @Test
   public void missing() {
     // Direct action invocation
@@ -1209,41 +1199,6 @@ public class GlobalTest extends PrimeBaseTest {
              .method("POTATO")
              .assertStatusCode(405) // Not allowed since we can handle any name but the action doesn't have that method
              .assertHeaderContains("Cache-Control", "no-cache");
-  }
-
-  @Test(dataProvider = "methodOverrides")
-  public void patch_MethodOverride(String overrideHeaderName) throws Exception {
-    simulator.test("/patch/test")
-             .withJSONFile(Path.of("src/test/resources/json/patch/test-patch.json"))
-             .withHeader(overrideHeaderName, "PATCH")
-             .post()
-             .assertStatusCode(200)
-             .assertHeaderContains("Cache-Control", "no-cache")
-             .assertJSONFile(jsonDir.resolve("patch/test-response.json"), "config", "patched");
-  }
-
-  @Test
-  public void patch_testing() throws Exception {
-    // POST no big deal
-    simulator.test("/patch/test")
-             .withJSONFile(Path.of("src/test/resources/json/patch/test.json"), "config", "post")
-             .post()
-             .assertStatusCode(200)
-             .assertJSONFile(jsonDir.resolve("patch/test-response.json"), "config", "post");
-
-    // PUT no big deal
-    simulator.test("/patch/test")
-             .withJSONFile(Path.of("src/test/resources/json/patch/test.json"), "config", "put")
-             .put()
-             .assertStatusCode(200)
-             .assertJSONFile(jsonDir.resolve("patch/test-response.json"), "config", "put");
-
-    // PATCH damn that is cool
-    simulator.test("/patch/test")
-             .withJSONFile(Path.of("src/test/resources/json/patch/test-patch.json"))
-             .patch()
-             .assertStatusCode(200)
-             .assertJSONFile(jsonDir.resolve("patch/test-response.json"), "config", "patched");
   }
 
   @Test
@@ -1709,7 +1664,7 @@ public class GlobalTest extends PrimeBaseTest {
                    "fieldErrors" : { },
                    "generalErrors" : [ {
                      "code" : "[InvalidContentType]",
-                     "message" : "Invalid [Content-Type] HTTP request header value of [application/scim+json]. Supported values for this request include [application/json]."
+                     "message" : "Invalid [Content-Type] HTTP request header value of [application/scim+json]. Supported values for this request include [application/json, application/json-patch+json, application/merge-patch+json]."
                    } ]
                  }
                  """);

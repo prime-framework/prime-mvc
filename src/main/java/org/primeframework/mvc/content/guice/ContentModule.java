@@ -37,6 +37,10 @@ public class ContentModule extends AbstractModule {
   protected void bindContentHandlers() {
     // Bind the Jackson objects and content handler
     ContentHandlerFactory.addContentHandler(binder(), "application/json", JacksonContentHandler.class);
+    // RFC 6902 JSON Patch
+    ContentHandlerFactory.addContentHandler(binder(), "application/json-patch+json", JacksonContentHandler.class);
+    // RFC 7386 JSON Merge Patch
+    ContentHandlerFactory.addContentHandler(binder(), "application/merge-patch+json", JacksonContentHandler.class);
     ContentHandlerFactory.addContentHandler(binder(), "application/scim+json", JacksonContentHandler.class);
     ContentHandlerFactory.addContentHandler(binder(), "application/octet-stream", BinaryContentHandler.class);
     // Default exploding handler to handle missing Content-Type header, or un-supported values.

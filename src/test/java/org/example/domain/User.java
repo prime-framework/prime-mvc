@@ -28,60 +28,42 @@ import java.util.Set;
  * @author Brian Pontarelli
  */
 public class User {
-  private String name;
-
-  private Integer age;
-
-  private boolean male;
+  private boolean active;
 
   private Map<String, Address> addresses = new HashMap<>();
 
-  private List<User> siblings = new ArrayList<>();
+  private Integer age;
 
-  private String[] securityQuestions;
-
-  private int month;
-
-  private int year;
-
-  private File profile;
-
-  private String password;
-
-  private int[] intIDs;
-
-  private Set<String> setIDs;
-
-  private List<Integer> listIDs;
-
-  private Boolean maleWrapper;
-
-  private boolean active;
+  private String email;
 
   private Map<Integer, Integer> ids = new HashMap<>();
 
-  public String getName() {
-    return name;
-  }
+  private int[] intIDs;
 
-  public void setName(String name) {
-    this.name = name;
-  }
+  private List<Integer> listIDs;
 
-  public Integer getAge() {
-    return age;
-  }
+  private boolean male;
 
-  public void setAge(Integer age) {
-    this.age = age;
-  }
+  private Boolean maleWrapper;
 
-  public boolean isMale() {
-    return male;
-  }
+  private int month;
 
-  public void setMale(boolean male) {
-    this.male = male;
+  private String name;
+
+  private String password;
+
+  private File profile;
+
+  private String[] securityQuestions;
+
+  private Set<String> setIDs;
+
+  private List<User> siblings = new ArrayList<>();
+
+  private int year;
+
+  public Address getAddress(String type) {
+    return addresses.get(type);
   }
 
   public Map<String, Address> getAddresses() {
@@ -92,53 +74,28 @@ public class User {
     this.addresses = addresses;
   }
 
-  public Address getAddress(String type) {
-    return addresses.get(type);
+  public Integer getAge() {
+    return age;
   }
 
-  public void setAddress(String type, Address address) {
-    this.addresses.put(type, address);
+  public void setAge(Integer age) {
+    this.age = age;
   }
 
-  public List<User> getSiblings() {
-    return siblings;
+  public String getEmail() {
+    return email;
   }
 
-  public void setSiblings(List<User> siblings) {
-    this.siblings = siblings;
+  private void setEmail(String email) {
+    this.email = email;
   }
 
-  public User getSibling(int index) {
-    if (index >= this.siblings.size()) {
-      return null;
-    }
-
-    return siblings.get(index);
+  public Map<Integer, Integer> getIds() {
+    return ids;
   }
 
-  public void setSibling(int index, User sibling) {
-    if (index >= this.siblings.size()) {
-      for (int i = this.siblings.size(); i <= index; i++) {
-        this.siblings.add(null);
-      }
-    }
-    this.siblings.set(index, sibling);
-  }
-
-  public String[] getSecurityQuestions() {
-    return securityQuestions;
-  }
-
-  public void setSecurityQuestions(String... securityQuestions) {
-    this.securityQuestions = securityQuestions;
-  }
-
-  public boolean isActive() {
-    return active;
-  }
-
-  public void setActive(boolean active) {
-    this.active = active;
+  public void setIds(Map<Integer, Integer> ids) {
+    this.ids = ids;
   }
 
   public int[] getIntIDs() {
@@ -147,14 +104,6 @@ public class User {
 
   public void setIntIDs(int[] intIDs) {
     this.intIDs = intIDs;
-  }
-
-  public Set<String> getSetIDs() {
-    return setIDs;
-  }
-
-  public void setSetIDs(Set<String> setIDs) {
-    this.setIDs = setIDs;
   }
 
   public List<Integer> getListIDs() {
@@ -173,20 +122,20 @@ public class User {
     this.maleWrapper = maleWrapper;
   }
 
-  public File getProfile() {
-    return profile;
-  }
-
-  public void setProfile(File profile) {
-    this.profile = profile;
-  }
-
   public int getMonth() {
     return month;
   }
 
   public void setMonth(int month) {
     this.month = month;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
   }
 
   public String getPassword() {
@@ -197,6 +146,46 @@ public class User {
     this.password = password;
   }
 
+  public File getProfile() {
+    return profile;
+  }
+
+  public void setProfile(File profile) {
+    this.profile = profile;
+  }
+
+  public String[] getSecurityQuestions() {
+    return securityQuestions;
+  }
+
+  public void setSecurityQuestions(String... securityQuestions) {
+    this.securityQuestions = securityQuestions;
+  }
+
+  public Set<String> getSetIDs() {
+    return setIDs;
+  }
+
+  public void setSetIDs(Set<String> setIDs) {
+    this.setIDs = setIDs;
+  }
+
+  public User getSibling(int index) {
+    if (index >= this.siblings.size()) {
+      return null;
+    }
+
+    return siblings.get(index);
+  }
+
+  public List<User> getSiblings() {
+    return siblings;
+  }
+
+  public void setSiblings(List<User> siblings) {
+    this.siblings = siblings;
+  }
+
   public int getYear() {
     return year;
   }
@@ -205,11 +194,32 @@ public class User {
     this.year = year;
   }
 
-  public Map<Integer, Integer> getIds() {
-    return ids;
+  public boolean isActive() {
+    return active;
   }
 
-  public void setIds(Map<Integer, Integer> ids) {
-    this.ids = ids;
+  public void setActive(boolean active) {
+    this.active = active;
+  }
+
+  public boolean isMale() {
+    return male;
+  }
+
+  public void setMale(boolean male) {
+    this.male = male;
+  }
+
+  public void setAddress(String type, Address address) {
+    this.addresses.put(type, address);
+  }
+
+  public void setSibling(int index, User sibling) {
+    if (index >= this.siblings.size()) {
+      for (int i = this.siblings.size(); i <= index; i++) {
+        this.siblings.add(null);
+      }
+    }
+    this.siblings.set(index, sibling);
   }
 }

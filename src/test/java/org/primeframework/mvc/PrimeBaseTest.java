@@ -73,6 +73,7 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.DataProvider;
 
 /**
  * This class is a base test for testing the Prime framework. It isn't recommended that you use it outside the Prime
@@ -170,6 +171,16 @@ public abstract class PrimeBaseTest {
 
     // Reset CSRF configuration
     configuration.csrfEnabled = false;
+  }
+
+  @DataProvider(name = "methodOverrides")
+  public Object[][] methodOverrides() {
+    return new Object[][]{
+        {"X-HTTP-Method-Override"},
+        {"x-http-method-override"},
+        {"X-Method-Override"},
+        {"x-method-override"}
+    };
   }
 
   @SuppressWarnings("Duplicates")

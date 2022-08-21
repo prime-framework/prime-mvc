@@ -22,7 +22,6 @@ import org.primeframework.mvc.action.result.annotation.Status;
 import org.primeframework.mvc.content.json.annotation.JSONRequest;
 import org.primeframework.mvc.content.json.annotation.JSONResponse;
 import org.primeframework.mvc.parameter.annotation.PreParameterMethod;
-import org.primeframework.mvc.http.HTTPMethod;
 
 /**
  * @author Daniel DeGroff
@@ -31,6 +30,9 @@ import org.primeframework.mvc.http.HTTPMethod;
 @JSON
 @Status(code = "input", status = 500)
 public class TestAction {
+  // Persisted state;
+  public static CoolObject db;
+
   @JSONRequest
   public final PatchActionRequest request = new PatchActionRequest();
 
@@ -44,8 +46,11 @@ public class TestAction {
 
   @PreParameterMethod(httpMethods = "PATCH")
   public void patchFetch() {
-    request.data = new CoolObject();
-    request.data.config = "patched";
+    request.data = db;
+    if (request.data == null) {
+      request.data = new CoolObject();
+      request.data.config = "patched";
+    }
   }
 
   public String post() {

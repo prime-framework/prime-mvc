@@ -16,15 +16,21 @@
 package org.primeframework.mvc.content.json;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.List;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
+import com.github.fge.jsonpatch.JsonPatch;
+import com.github.fge.jsonpatch.JsonPatchException;
+import com.github.fge.jsonpatch.Patch;
+import com.github.fge.jsonpatch.mergepatch.JsonMergePatch;
 import com.google.inject.Inject;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
@@ -104,32 +110,68 @@ public class JacksonContentHandler implements ContentHandler {
       HTTPMethod httpMethod = actionInvocation.method.httpMethod;
       RequestMember requestMember = jacksonConfiguration.requestMembers.get(httpMethod);
 
-      if (!requestMember.allowedContentTypes.contains(request.getContentType())) {
+      String contentType = request.getContentType();
+
+      // Validate the Content-Type, ensure it is valid.
+      if (!requestMember.allowedContentTypes.contains(contentType)) {
+        String allowedContentTypes = String.join(", ", requestMember.allowedContentTypes.stream().sorted().toList());
         messageStore.add(new SimpleMessage(MessageType.ERROR, "[InvalidContentType]",
-            messageProvider.getMessage("[InvalidContentType]", request.getContentType(), String.join(", ", requestMember.allowedContentTypes))));
+            messageProvider.getMessage("[InvalidContentType]", contentType, allowedContentTypes)));
         throw new ValidationException();
       }
 
       try {
-        // Retrieve the current value from the action, so we can see if it is non-null
-        Object currentValue = expressionEvaluator.getValue(requestMember.name, action);
-        ObjectReader reader;
-        if (currentValue != null) {
-          reader = objectMapper.readerForUpdating(currentValue);
-        } else {
-          reader = objectMapper.readerFor(requestMember.type);
-        }
-
         if (logger.isDebugEnabled()) {
           String body = new String(request.getBody().array(), 0, contentLength.intValue());
           logger.debug("Request: ({} {}) {}", request.getMethod(), request.getPath(), body);
         }
 
-        Object jsonObject = reader.readValue(request.getBody().array(), 0, contentLength.intValue());
+        // Retrieve the current value from the action, so we can see if it is non-null
+        Object currentValue = expressionEvaluator.getValue(requestMember.name, action);
 
-        // Set the value into the action if the currentValue from the action was null
-        if (currentValue == null) {
-          expressionEvaluator.setValue(requestMember.name, action, jsonObject);
+        // RFC 6902: application/json-patch+json, and RFC 7386: application/merge-patch+json
+        if (contentType.equals("application/json-patch+json") || contentType.equals("application/merge-patch+json")) {
+          Patch patch = objectMapper.readerFor(contentType.equals("application/json-patch+json")
+                                        ? JsonPatch.class
+                                        : JsonMergePatch.class)
+                                    .readValue(request.getBody().array(), 0, contentLength.intValue());
+
+          // Patch the current object
+          JsonNode patched = patch.apply(objectMapper.valueToTree(currentValue));
+          Object jsonObject = objectMapper.readerFor(requestMember.type).readValue(patched);
+
+          // The request object itself may be final, try and set all fields in the requestMember.
+          if (currentValue == null) {
+            expressionEvaluator.setValue(requestMember.name, action, jsonObject);
+          } else {
+            // Note, we can't use readerForUpdate because that essentially does a standard JSON merge which is not what
+            // we want to do. We really just want to do set the value like we do when currentValue is null, and we have
+            // instantiated a new object using readerFor.
+            //
+            // However, the requestMember field may be final, which will cause a set to fail. In order to be safe,
+            // just set each field individually. Assuming missing target fields will be handled by prime-mvc configuration.
+
+            // Set each field individually because the requestMember field is likely final
+            for (Field patchedField : jsonObject.getClass().getDeclaredFields()) {
+              Object newValue = expressionEvaluator.getValue(patchedField.getName(), jsonObject);
+              expressionEvaluator.setValue(patchedField.getName(), currentValue, newValue);
+            }
+          }
+        } else {
+          // Normal boring application/json or something equivalently supported
+          ObjectReader reader;
+          if (currentValue != null) {
+            reader = objectMapper.readerForUpdating(currentValue);
+          } else {
+            reader = objectMapper.readerFor(requestMember.type);
+          }
+
+          Object jsonObject = reader.readValue(request.getBody().array(), 0, contentLength.intValue());
+
+          // Set the value into the action if the currentValue from the action was null
+          if (currentValue == null) {
+            expressionEvaluator.setValue(requestMember.name, action, jsonObject);
+          }
         }
       } catch (InvalidFormatException e) {
         logger.debug("Error parsing JSON request", e);
@@ -151,6 +193,10 @@ public class JacksonContentHandler implements ContentHandler {
         throw new ValidationException(e);
       } catch (JsonProcessingException e) {
         logger.debug("Error parsing JSON request", e);
+        messageStore.add(new SimpleMessage(MessageType.ERROR, "[invalidJSON]", messageProvider.getMessage("[invalidJSON]", "unknown", "Unexpected processing exception", e.getMessage())));
+        throw new ValidationException(e);
+      } catch (JsonPatchException e) {
+        logger.debug("Error parsing JSON Patch request", e);
         messageStore.add(new SimpleMessage(MessageType.ERROR, "[invalidJSON]", messageProvider.getMessage("[invalidJSON]", "unknown", "Unexpected processing exception", e.getMessage())));
         throw new ValidationException(e);
       }
