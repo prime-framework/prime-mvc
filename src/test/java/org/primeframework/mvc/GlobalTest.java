@@ -1638,20 +1638,8 @@ public class GlobalTest extends PrimeBaseTest {
   @Test
   public void post_jsonContentType() throws Exception {
     // Content-Type: application/scim+json
-    simulator.test("/scim-content-type")
-             .withContentType("application/scim+json")
-             .withBody("""
-                 {
-                   "foo": "bar"
-                 }
-                 """)
-             .post()
-             .assertStatusCode(200)
-             .assertBodyIsEmpty();
-
-    // Not supported on this endpoint
     simulator.test("/json-content-type")
-             .withContentType("application/scim+json")
+             .withContentType("application/test+json")
              .withBody("""
                  {
                    "foo": "bar"
@@ -1664,10 +1652,30 @@ public class GlobalTest extends PrimeBaseTest {
                    "fieldErrors" : { },
                    "generalErrors" : [ {
                      "code" : "[InvalidContentType]",
-                     "message" : "Invalid [Content-Type] HTTP request header value of [application/scim+json]. Supported values for this request include [application/json]."
+                     "message" : "Invalid [Content-Type] HTTP request header value of [application/test+json]. Supported values for this request include [application/json]."
                    } ]
                  }
-                 """);
+                  """);
+
+    // Patch not supported on this endpoint
+    simulator.test("/json-content-type")
+             .withContentType("application/json-patch+json")
+             .withBody("""
+                 {
+                   "foo": "bar"
+                 }
+                 """)
+             .post()
+             .assertStatusCode(400)
+             .assertJSON("""
+                 {
+                   "fieldErrors" : { },
+                   "generalErrors" : [ {
+                     "code" : "[PatchNotSupported]",
+                     "message" : "The [Content-Type] HTTP request header value of [application/json-patch+json] is not supported for this request."
+                   } ]
+                 }
+                  """);
 
     // Missing Content-Type Header
     simulator.test("/json-content-type")

@@ -41,7 +41,9 @@ import org.primeframework.mvc.action.ValidationMethodConfiguration;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.config.DefaultActionConfigurationBuilder;
 import org.primeframework.mvc.config.MVCConfiguration;
+import org.primeframework.mvc.content.guice.ContentHandlerFactory;
 import org.primeframework.mvc.content.guice.ObjectMapperProvider;
+import org.primeframework.mvc.content.json.JacksonContentHandler;
 import org.primeframework.mvc.cors.CORSConfiguration;
 import org.primeframework.mvc.cors.CORSConfigurationProvider;
 import org.primeframework.mvc.guice.MVCModule;
@@ -117,6 +119,9 @@ public abstract class PrimeBaseTest {
         bind(MessageObserver.class).toInstance(messageObserver);
         bind(MetricRegistry.class).toInstance(metricRegistry);
         bind(UserLoginSecurityContext.class).to(MockUserLoginSecurityContext.class);
+
+        // Test Content-Type
+        ContentHandlerFactory.addContentHandler(binder(), "application/test+json", JacksonContentHandler.class);
       }
     };
 
