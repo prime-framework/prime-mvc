@@ -13,26 +13,21 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.example.action;
+package org.primeframework.mvc.content.json.annotation;
 
-import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.action.result.annotation.JSON;
-import org.primeframework.mvc.action.result.annotation.Status;
-import org.primeframework.mvc.content.ContentType;
-import org.primeframework.mvc.content.json.annotation.JSONRequest;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
+ * Augments a {@link JSONRequest} annotation indicating it also supports JSON Patch.
+ *
  * @author Daniel DeGroff
  */
-@Action
-@Status
-@JSON(code = "input", status = 400)
-public class ScimContentTypeAction {
-  @ContentType({"application/json", "application/scim+json"})
-  @JSONRequest
-  public Object object;
-
-  public String post() {
-    return "success";
-  }
+@Retention(RUNTIME)
+@Target({FIELD, METHOD})
+public @interface JSONPatch {
 }

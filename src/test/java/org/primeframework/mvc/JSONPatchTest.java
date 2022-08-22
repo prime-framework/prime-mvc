@@ -59,9 +59,10 @@ public class JSONPatchTest extends PrimeBaseTest {
     TestAction.db.name = "Jim Bob";
     TestAction.db.addresses = new ArrayList<>();
 
-    // Change email
-    test.simulate(() -> simulator.test("/patch/test")
-                                 .withJSON("""
+    // Patch not enabled
+    test.simulate(() -> simulator.test("/patch/test-disabled")
+                                 .withContentType("application/json-patch+json")
+                                 .withBody("""
                                      [
                                        {
                                          "op": "replace",
@@ -70,7 +71,30 @@ public class JSONPatchTest extends PrimeBaseTest {
                                        }
                                      ]
                                      """)
+                                 .patch()
+                                 .assertStatusCode(400)
+                                 .assertJSON("""
+                                     {
+                                       "fieldErrors" : { },
+                                       "generalErrors" : [ {
+                                         "code" : "[PatchNotSupported]",
+                                         "message" : "The [Content-Type] HTTP request header value of [application/json-patch+json] is not supported for this request."
+                                       } ]
+                                     }
+                                      """));
+
+    // Change email
+    test.simulate(() -> simulator.test("/patch/test")
                                  .withContentType("application/json-patch+json")
+                                 .withBody("""
+                                     [
+                                       {
+                                         "op": "replace",
+                                         "path": "/data/email",
+                                         "value": "robotdan@fusionauth.io"
+                                       }
+                                     ]
+                                     """)
                                  .patch()
                                  .assertStatusCode(200)
                                  .assertJSON("""
@@ -85,7 +109,8 @@ public class JSONPatchTest extends PrimeBaseTest {
 
         // Remove email
         .simulate(() -> simulator.test("/patch/test")
-                                 .withJSON("""
+                                 .withContentType("application/json-patch+json")
+                                 .withBody("""
                                      [
                                        {
                                          "op": "remove",
@@ -93,7 +118,6 @@ public class JSONPatchTest extends PrimeBaseTest {
                                        }
                                      ]
                                      """)
-                                 .withContentType("application/json-patch+json")
                                  .patch()
                                  .assertStatusCode(200)
                                  .assertJSON("""
@@ -107,7 +131,8 @@ public class JSONPatchTest extends PrimeBaseTest {
 
         // Add email
         .simulate(() -> simulator.test("/patch/test")
-                                 .withJSON("""
+                                 .withContentType("application/json-patch+json")
+                                 .withBody("""
                                      [
                                        {
                                          "op": "add",
@@ -116,7 +141,6 @@ public class JSONPatchTest extends PrimeBaseTest {
                                        }
                                      ]
                                      """)
-                                 .withContentType("application/json-patch+json")
                                  .patch()
                                  .assertStatusCode(200)
                                  .assertJSON("""
@@ -158,7 +182,8 @@ public class JSONPatchTest extends PrimeBaseTest {
 
     // Change city in nested address
     test.simulate(() -> simulator.test("/patch/test")
-                                 .withJSON("""
+                                 .withContentType("application/json-patch+json")
+                                 .withBody("""
                                      [
                                        {
                                          "op": "replace",
@@ -172,7 +197,6 @@ public class JSONPatchTest extends PrimeBaseTest {
                                        }
                                      ]
                                      """)
-                                 .withContentType("application/json-patch+json")
                                  .patch()
                                  .assertStatusCode(200)
                                  .assertJSON("""
@@ -203,16 +227,40 @@ public class JSONPatchTest extends PrimeBaseTest {
     TestAction.db.name = "Jim Bob";
     TestAction.db.addresses = new ArrayList<>();
 
+    // Patch not enabled
+    test.simulate(() -> simulator.test("/patch/test-disabled")
+                                 .withContentType("application/merge-patch+json")
+                                 .withBody("""
+                                     [
+                                       {
+                                         "op": "replace",
+                                         "path": "/data/email",
+                                         "value": "robotdan@fusionauth.io"
+                                       }
+                                     ]
+                                     """)
+                                 .patch()
+                                 .assertStatusCode(400)
+                                 .assertJSON("""
+                                     {
+                                       "fieldErrors" : { },
+                                       "generalErrors" : [ {
+                                         "code" : "[PatchNotSupported]",
+                                         "message" : "The [Content-Type] HTTP request header value of [application/merge-patch+json] is not supported for this request."
+                                       } ]
+                                     }
+                                      """));
+
     // Change email
     test.simulate(() -> simulator.test("/patch/test")
-                                 .withJSON("""
+                                 .withContentType("application/merge-patch+json")
+                                 .withBody("""
                                      {
                                         "data" : {
                                           "email" : "robotdan@fusionauth.io"
                                         }
                                       }
                                       """)
-                                 .withContentType("application/merge-patch+json")
                                  .patch()
                                  .assertStatusCode(200)
                                  .assertJSON("""
@@ -227,14 +275,14 @@ public class JSONPatchTest extends PrimeBaseTest {
 
         // Remove email
         .simulate(() -> simulator.test("/patch/test")
-                                 .withJSON("""
+                                 .withContentType("application/merge-patch+json")
+                                 .withBody("""
                                        {
                                          "data" : {
                                            "email" : null
                                          }
                                        }
                                      """)
-                                 .withContentType("application/merge-patch+json")
                                  .patch()
                                  .assertStatusCode(200)
                                  .assertJSON("""
@@ -248,14 +296,14 @@ public class JSONPatchTest extends PrimeBaseTest {
 
         // Add email
         .simulate(() -> simulator.test("/patch/test")
-                                 .withJSON("""
+                                 .withContentType("application/merge-patch+json")
+                                 .withBody("""
                                      {
                                         "data" : {
                                           "email" : "robotdan@fusionauth.io"
                                         }
                                       }
                                       """)
-                                 .withContentType("application/merge-patch+json")
                                  .patch()
                                  .assertStatusCode(200)
                                  .assertJSON("""

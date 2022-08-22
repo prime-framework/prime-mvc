@@ -32,11 +32,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({FIELD, METHOD})
 public @interface JSONRequest {
   /**
-   * @return The supported values for the Content-Type request header.
-   */
-  String[] allowedContentTypes() default {"application/json", "application/merge-patch+json", "application/json-patch+json"};
-
-  /**
    * @return The HTTP methods that this request object is utilized for.
    */
   String[] httpMethods() default {Methods.POST, Methods.PUT, Methods.GET, Methods.DELETE, Methods.PATCH};

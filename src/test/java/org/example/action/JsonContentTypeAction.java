@@ -18,6 +18,7 @@ package org.example.action;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.annotation.JSON;
 import org.primeframework.mvc.action.result.annotation.Status;
+import org.primeframework.mvc.content.ContentType;
 import org.primeframework.mvc.content.json.annotation.JSONRequest;
 
 /**
@@ -28,6 +29,7 @@ import org.primeframework.mvc.content.json.annotation.JSONRequest;
 @JSON(code = "input", status = 400)
 public class JsonContentTypeAction {
   // Only application/json supported
+  @ContentType("application/json")
   @JSONRequest
   public Object object;
 

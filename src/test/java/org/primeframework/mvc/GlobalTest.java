@@ -1664,7 +1664,7 @@ public class GlobalTest extends PrimeBaseTest {
                    "fieldErrors" : { },
                    "generalErrors" : [ {
                      "code" : "[InvalidContentType]",
-                     "message" : "Invalid [Content-Type] HTTP request header value of [application/scim+json]. Supported values for this request include [application/json, application/json-patch+json, application/merge-patch+json]."
+                     "message" : "Invalid [Content-Type] HTTP request header value of [application/scim+json]. Supported values for this request include [application/json]."
                    } ]
                  }
                  """);

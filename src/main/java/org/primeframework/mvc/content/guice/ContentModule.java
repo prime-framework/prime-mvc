@@ -27,6 +27,7 @@ import org.primeframework.mvc.content.binary.BinaryActionConfigurator;
 import org.primeframework.mvc.content.binary.BinaryContentHandler;
 import org.primeframework.mvc.content.json.JacksonActionConfigurator;
 import org.primeframework.mvc.content.json.JacksonContentHandler;
+import org.primeframework.mvc.content.json.JacksonPatchContentHandler;
 
 /**
  * This class is a Guice module that configures the ContentHandlerFactory and the default ContentHandlers.
@@ -37,11 +38,9 @@ public class ContentModule extends AbstractModule {
   protected void bindContentHandlers() {
     // Bind the Jackson objects and content handler
     ContentHandlerFactory.addContentHandler(binder(), "application/json", JacksonContentHandler.class);
-    // RFC 6902 JSON Patch
-    ContentHandlerFactory.addContentHandler(binder(), "application/json-patch+json", JacksonContentHandler.class);
-    // RFC 7386 JSON Merge Patch
-    ContentHandlerFactory.addContentHandler(binder(), "application/merge-patch+json", JacksonContentHandler.class);
     ContentHandlerFactory.addContentHandler(binder(), "application/scim+json", JacksonContentHandler.class);
+    ContentHandlerFactory.addContentHandler(binder(), "application/json-patch+json", JacksonPatchContentHandler.class);
+    ContentHandlerFactory.addContentHandler(binder(), "application/merge-patch+json", JacksonPatchContentHandler.class);
     ContentHandlerFactory.addContentHandler(binder(), "application/octet-stream", BinaryContentHandler.class);
     // Default exploding handler to handle missing Content-Type header, or un-supported values.
     ContentHandlerFactory.addContentHandler(binder(), "", DefaultContentHandler.class);
