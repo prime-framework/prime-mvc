@@ -16,10 +16,19 @@
 package org.primeframework.mvc.content;
 
 import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.util.Set;
 
 import com.google.inject.Inject;
+import org.primeframework.mvc.action.ActionInvocation;
+import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.content.guice.ContentHandlerFactory;
 import org.primeframework.mvc.http.HTTPRequest;
+import org.primeframework.mvc.message.MessageStore;
+import org.primeframework.mvc.message.MessageType;
+import org.primeframework.mvc.message.SimpleMessage;
+import org.primeframework.mvc.message.l10n.MessageProvider;
+import org.primeframework.mvc.validation.ValidationException;
 import org.primeframework.mvc.workflow.WorkflowChain;
 
 /**
@@ -31,17 +40,30 @@ import org.primeframework.mvc.workflow.WorkflowChain;
 public class DefaultContentWorkflow implements ContentWorkflow {
   private final ContentHandlerFactory factory;
 
+  private final MessageProvider messageProvider;
+
+  private final MessageStore messageStore;
+
   private final HTTPRequest request;
 
+  private final ActionInvocationStore store;
+
   @Inject
-  public DefaultContentWorkflow(HTTPRequest request, ContentHandlerFactory factory) {
-    this.request = request;
+  public DefaultContentWorkflow(MessageStore messageStore, ContentHandlerFactory factory,
+                                MessageProvider messageProvider, HTTPRequest request,
+                                ActionInvocationStore store) {
     this.factory = factory;
+    this.messageProvider = messageProvider;
+    this.messageStore = messageStore;
+    this.request = request;
+    this.store = store;
   }
 
   @Override
   public void perform(WorkflowChain workflowChain) throws IOException {
     String contentType = request.getContentType();
+    validateContentType(contentType);
+
     ContentHandler handler = factory.build(contentType);
     if (handler != null) {
       handler.handle();
@@ -51,6 +73,25 @@ public class DefaultContentWorkflow implements ContentWorkflow {
 
     if (handler != null) {
       handler.cleanup();
+    }
+  }
+
+  private void validateContentType(String contentType) {
+    // If we are missing a contentType or the value is empty, it will get handled elsewhere.
+    if (contentType != null && !contentType.equals("")) {
+      ActionInvocation actionInvocation = store.getCurrent();
+      if (actionInvocation != null && actionInvocation.configuration != null) {
+        Set<String> validContentTypes = actionInvocation.configuration.validContentTypes;
+        Annotation annotation = actionInvocation.method != null ? actionInvocation.method.annotations.get(ValidContentTypes.class) : null;
+        if (annotation != null) {
+          validContentTypes = Set.of(((ValidContentTypes) annotation).value());
+        }
+
+        if (!validContentTypes.isEmpty() && !validContentTypes.contains(contentType)) {
+          messageStore.add(new SimpleMessage(MessageType.ERROR, "[InvalidContentType]", messageProvider.getMessage("[InvalidContentType]", contentType, String.join(", ", validContentTypes.stream().sorted().toList()))));
+          throw new ValidationException();
+        }
+      }
     }
   }
 }

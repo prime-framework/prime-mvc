@@ -200,9 +200,14 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
   }
 
   protected Set<String> findAllowedContentTypes(Class<?> actionClass) {
-    ValidContentTypes annotation = actionClass.getAnnotation(ValidContentTypes.class);
-    if (annotation != null) {
-      return Set.of(annotation.value());
+    Class<?> currentClass = actionClass;
+    while (!currentClass.equals(Object.class)) {
+      ValidContentTypes annotation = currentClass.getAnnotation(ValidContentTypes.class);
+      if (annotation != null) {
+        return Set.of(annotation.value());
+      }
+
+      currentClass = currentClass.getSuperclass();
     }
 
     return Set.of();

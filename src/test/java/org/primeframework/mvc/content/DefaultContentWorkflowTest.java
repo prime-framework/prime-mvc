@@ -81,7 +81,7 @@ public class DefaultContentWorkflowTest extends PrimeBaseTest {
     chain.continueWorkflow();
     replay(chain);
 
-    new DefaultContentWorkflow(request, new ContentHandlerFactory(store, injector, messageProvider, messageStore)).perform(chain);
+    new DefaultContentWorkflow(messageStore, new ContentHandlerFactory(injector), messageProvider, request, store).perform(chain);
 
     // By the time the action is complete the file should have been deleted
     assertNotNull(action.binaryRequest);
@@ -140,7 +140,7 @@ public class DefaultContentWorkflowTest extends PrimeBaseTest {
     chain.continueWorkflow();
     replay(chain);
 
-    new DefaultContentWorkflow(request, new ContentHandlerFactory(store, injector, messageProvider, messageStore)).perform(chain);
+    new DefaultContentWorkflow(messageStore, new ContentHandlerFactory(injector), messageProvider, request, store).perform(chain);
 
     assertEquals(action.jsonRequest.addresses.get("work").city, "Denver");
     assertEquals(action.jsonRequest.addresses.get("work").state, "Colorado");
@@ -170,7 +170,7 @@ public class DefaultContentWorkflowTest extends PrimeBaseTest {
     chain.continueWorkflow();
     replay(chain);
 
-    new DefaultContentWorkflow(request, new ContentHandlerFactory(store, injector, messageProvider, messageStore)).perform(chain);
+    new DefaultContentWorkflow(messageStore, new ContentHandlerFactory(injector), messageProvider, request, store).perform(chain);
 
     verify(chain);
   }
