@@ -18,8 +18,8 @@ package org.primeframework.mvc.content;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
@@ -28,7 +28,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * @author Daniel DeGroff
  */
 @Retention(RUNTIME)
-@Target({FIELD, METHOD})
-public @interface ContentType {
+@Target({TYPE, METHOD})
+public @interface ValidContentTypes {
   String[] value();
 }

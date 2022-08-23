@@ -18,10 +18,8 @@ package org.primeframework.mvc.content.json;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import org.primeframework.mvc.action.config.ActionConfigurator;
-import org.primeframework.mvc.content.ContentType;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration.RequestMember;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration.ResponseMember;
 import org.primeframework.mvc.content.json.annotation.JSONPatch;
@@ -40,7 +38,6 @@ public class JacksonActionConfigurator implements ActionConfigurator {
   public Object configure(Class<?> actionClass) {
     Map<String, JSONRequest> jsonRequestMember = ReflectionUtils.findAllMembersWithAnnotation(actionClass, JSONRequest.class);
     Map<String, JSONPatch> jsonPatchRequestMember = ReflectionUtils.findAllMembersWithAnnotation(actionClass, JSONPatch.class);
-    Map<String, ContentType> contentTypeMember = ReflectionUtils.findAllMembersWithAnnotation(actionClass, ContentType.class);
     Map<String, JSONResponse> jsonResponseMembers = ReflectionUtils.findAllMembersWithAnnotation(actionClass, JSONResponse.class);
     if (jsonResponseMembers.size() > 1) {
       throw new IllegalArgumentException("Action class [" + actionClass + "] contains multiple fields with the @JSONResponse annotation. This annotation should only exist on a single field.");
@@ -64,12 +61,7 @@ public class JacksonActionConfigurator implements ActionConfigurator {
             ? jsonPatchRequestMember.get(memberName)
             : null;
 
-        // A null set means no restriction by this annotation. Limited only by the available content-types supported by the content handler.
-        Set<String> allowedContentTypes = contentTypeMember.get(memberName) != null
-            ? Set.of(contentTypeMember.get(memberName).value())
-            : null;
-
-        configuredMembers.put(httpMethod, new RequestMember(memberName, ReflectionUtils.getMemberType(actionClass, memberName), allowedContentTypes, jsonPatch));
+        configuredMembers.put(httpMethod, new RequestMember(memberName, ReflectionUtils.getMemberType(actionClass, memberName), jsonPatch));
       }
 
       // If PATCH is not enabled, you can't have JSONPatch on this annotation

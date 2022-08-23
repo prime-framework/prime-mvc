@@ -1658,7 +1658,7 @@ public class GlobalTest extends PrimeBaseTest {
                   """);
 
     // Patch not supported on this endpoint
-    simulator.test("/json-content-type")
+    simulator.test("/json-content-type-no-restriction")
              .withContentType("application/json-patch+json")
              .withBody("""
                  {
@@ -1697,8 +1697,28 @@ public class GlobalTest extends PrimeBaseTest {
                   }
                  """);
 
-    // Not supported in general
+    // Not supported in general, but this action has restrictions, so we'll get a validation error.
     simulator.test("/json-content-type")
+             .withContentType("application/klingon")
+             .withBody("""
+                 {
+                   "foo": "bar"
+                 }
+                 """)
+             .post()
+             .assertStatusCode(400)
+             .assertJSON("""
+                 {
+                   "fieldErrors" : { },
+                   "generalErrors" : [ {
+                     "code" : "[InvalidContentType]",
+                     "message" : "Invalid [Content-Type] HTTP request header value of [application/klingon]. Supported values for this request include [application/json]."
+                   } ]
+                 }
+                  """);
+
+    // Not supported in general
+    simulator.test("/json-content-type-no-restriction")
              .withContentType("application/klingon")
              .withBody("""
                  {

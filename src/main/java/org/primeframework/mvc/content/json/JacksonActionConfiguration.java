@@ -16,7 +16,6 @@
 package org.primeframework.mvc.content.json;
 
 import java.util.Map;
-import java.util.Set;
 
 import org.primeframework.mvc.content.json.annotation.JSONPatch;
 import org.primeframework.mvc.content.json.annotation.JSONResponse;
@@ -46,8 +45,6 @@ public class JacksonActionConfiguration {
   }
 
   public static class RequestMember {
-    public Set<String> allowedContentTypes;
-
     public JSONPatch jsonPatch;
 
     public String name;
@@ -56,14 +53,12 @@ public class JacksonActionConfiguration {
 
     public RequestMember(String name, Class<?> type) {
       this.name = name;
-      this.allowedContentTypes = Set.of("application/json");
       this.type = type;
     }
 
-    public RequestMember(String name, Class<?> type, Set<String> allowedContentTypes, JSONPatch jsonPatch) {
+    public RequestMember(String name, Class<?> type, JSONPatch jsonPatch) {
       this.name = name;
       this.type = type;
-      this.allowedContentTypes = allowedContentTypes;
       this.jsonPatch = jsonPatch;
     }
   }

@@ -24,11 +24,8 @@ import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration.RequestMember;
 import org.primeframework.mvc.http.HTTPRequest;
 import org.primeframework.mvc.message.MessageStore;
-import org.primeframework.mvc.message.MessageType;
-import org.primeframework.mvc.message.SimpleMessage;
 import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-import org.primeframework.mvc.validation.ValidationException;
 
 /**
  * Uses the Jackson JSON processor to marshall JSON into Java objects and set them into the action.
@@ -47,14 +44,6 @@ public class JacksonContentHandler extends BaseJacksonContentHandler {
   protected void handle(Object action, Object currentValue, Long contentLength, String contentType,
                         RequestMember requestMember)
       throws IOException {
-
-    // Validate the Content-Type, ensure it is valid.
-    if (requestMember.allowedContentTypes != null && !requestMember.allowedContentTypes.contains(contentType)) {
-      String allowedContentTypes = String.join(", ", requestMember.allowedContentTypes.stream().sorted().toList());
-      messageStore.add(new SimpleMessage(MessageType.ERROR, "[InvalidContentType]",
-          messageProvider.getMessage("[InvalidContentType]", contentType, allowedContentTypes)));
-      throw new ValidationException();
-    }
 
     ObjectReader reader;
     if (currentValue != null) {

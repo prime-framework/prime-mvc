@@ -15,13 +15,23 @@
  */
 package org.primeframework.mvc.content.guice;
 
+import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.inject.Binder;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import org.primeframework.mvc.action.ActionInvocation;
+import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.content.ContentHandler;
+import org.primeframework.mvc.content.ValidContentTypes;
+import org.primeframework.mvc.message.MessageStore;
+import org.primeframework.mvc.message.MessageType;
+import org.primeframework.mvc.message.SimpleMessage;
+import org.primeframework.mvc.message.l10n.MessageProvider;
+import org.primeframework.mvc.validation.ValidationException;
 
 /**
  * Builds {@link ContentHandler}s on demand.
@@ -31,11 +41,21 @@ import org.primeframework.mvc.content.ContentHandler;
 public class ContentHandlerFactory {
   private static final Map<String, Class<? extends ContentHandler>> bindings = new HashMap<>();
 
+  protected final ActionInvocationStore store;
+
   private final Injector injector;
 
+  private final MessageProvider messageProvider;
+
+  private final MessageStore messageStore;
+
   @Inject
-  public ContentHandlerFactory(Injector injector) {
+  public ContentHandlerFactory(ActionInvocationStore store, Injector injector, MessageProvider messageProvider,
+                               MessageStore messageStore) {
+    this.store = store;
     this.injector = injector;
+    this.messageProvider = messageProvider;
+    this.messageStore = messageStore;
   }
 
   /**
@@ -57,6 +77,8 @@ public class ContentHandlerFactory {
    * @return The ContentHandler or null.
    */
   public ContentHandler build(String contentType) {
+    validateContentType(contentType);
+
     Class<? extends ContentHandler> handlerType = bindings.get(contentType);
     if (handlerType == null && contentType != null) {
       handlerType = bindings.get(contentType);
@@ -68,5 +90,24 @@ public class ContentHandlerFactory {
     }
 
     return injector.getInstance(handlerType);
+  }
+
+  private void validateContentType(String contentType) {
+    // If we are missing a contentType or the value is empty, it will get handled elsewhere.
+    if (contentType != null && !contentType.equals("")) {
+      ActionInvocation actionInvocation = store.getCurrent();
+      if (actionInvocation != null && actionInvocation.configuration != null) {
+        Set<String> validContentTypes = actionInvocation.configuration.validContentTypes;
+        Annotation annotation = actionInvocation.method != null ? actionInvocation.method.annotations.get(ValidContentTypes.class) : null;
+        if (annotation != null) {
+          validContentTypes = Set.of(((ValidContentTypes) annotation).value());
+        }
+
+        if (!validContentTypes.isEmpty() && !validContentTypes.contains(contentType)) {
+          messageStore.add(new SimpleMessage(MessageType.ERROR, "[InvalidContentType]", messageProvider.getMessage("[InvalidContentType]", contentType, String.join(", ", validContentTypes.stream().sorted().toList()))));
+          throw new ValidationException();
+        }
+      }
+    }
   }
 }
