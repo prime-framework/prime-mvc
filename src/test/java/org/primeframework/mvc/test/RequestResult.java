@@ -1614,7 +1614,7 @@ public class RequestResult {
     RequestBuilder rb = new RequestBuilder(baseURI, injector, userAgent, listenerConfiguration, messageObserver);
     if (baseURI.length() != newRedirect.length()) {
       String params = newRedirect.substring(newRedirect.indexOf('?') + 1);
-      QueryStringTools.parseQueryString(params).forEach(rb::withParameters);
+      QueryStringTools.parseQueryString(params).forEach(rb::withURLParameters);
     }
 
     RequestResult result = rb.get();

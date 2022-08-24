@@ -623,6 +623,18 @@ public class RequestBuilder {
   }
 
   /**
+   * Add all URL query string parameters.
+   *
+   * @param name   the name of the parameter.
+   * @param values The collection of parameter values.
+   * @return This.
+   */
+  public RequestBuilder withURLParameters(String name, Collection<?> values) {
+    request.addParameters(name, values.stream().map(Object::toString).collect(Collectors.toList()));
+    return this;
+  }
+
+  /**
    * Append a url path segment to the current request URI.
    * <p>
    * For Example:
