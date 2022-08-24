@@ -23,9 +23,10 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -78,6 +79,8 @@ public class RequestBuilder {
   public final TestMessageObserver messageObserver;
 
   public final MutableHTTPRequest request;
+
+  public final Map<String, List<String>> requestBodyParameters = new LinkedHashMap<>();
 
   public final MockUserAgent userAgent;
 
@@ -378,7 +381,7 @@ public class RequestBuilder {
   }
 
   /**
-   * Sets an HTTP request parameter as a Prime MVC checkbox widget. This can be called multiple times with the same
+   * Sets an HTTP request body parameter as a Prime MVC checkbox widget. This can be called multiple times with the same
    * name, and it will create a list of values for the HTTP parameter.
    *
    * @param name           The name of the parameter.
@@ -389,10 +392,10 @@ public class RequestBuilder {
    */
   public RequestBuilder withCheckbox(String name, String checkedValue, String uncheckedValue, boolean checked) {
     if (checked) {
-      request.addParameter(name, checkedValue);
+      withParameter(name, checkedValue);
     }
 
-    request.addParameter(DefaultParameterParser.CHECKBOX_PREFIX + name, uncheckedValue);
+    withParameter(DefaultParameterParser.CHECKBOX_PREFIX + name, uncheckedValue);
     return this;
   }
 
@@ -538,7 +541,7 @@ public class RequestBuilder {
   }
 
   /**
-   * Sets an HTTP request parameter. This can be called multiple times with the same name it it will create a list of
+   * Sets an HTTP request body parameter. This can be called multiple times with the same name it will create a list of
    * values for the HTTP parameter.
    *
    * @param name  The name of the parameter.
@@ -546,20 +549,20 @@ public class RequestBuilder {
    * @return This.
    */
   public RequestBuilder withParameter(String name, Object value) {
-    request.addParameter(name, value.toString());
+    requestBodyParameters.computeIfAbsent(name, key -> new ArrayList<>()).add(value.toString());
     return this;
   }
 
   /**
-   * Sets HTTP request parameters. This takes the provided collection and adds a request parameter for each item in the
-   * collection.
+   * Sets HTTP request body parameters. This takes the provided collection and adds a request parameter for each item in
+   * the collection.
    *
    * @param name   The name of the parameter.
    * @param values The collection of parameter values.
    * @return This.
    */
   public RequestBuilder withParameters(String name, Collection<?> values) {
-    request.addParameters(name, values.stream().map(Object::toString).collect(Collectors.toList()));
+    requestBodyParameters.computeIfAbsent(name, key -> new ArrayList<>()).addAll(values.stream().map(Object::toString).toList());
     return this;
   }
 
@@ -571,13 +574,13 @@ public class RequestBuilder {
    * @return This.
    */
   public RequestBuilder withQueryString(String query) {
-    QueryStringTools.parseQueryString(query).forEach(this::withParameters);
+    QueryStringTools.parseQueryString(query).forEach(this::withURLParameter);
     return this;
   }
 
   /**
-   * Sets an HTTP request parameter as a Prime MVC radio button widget. This can be called multiple times with the same
-   * name it it will create a list of values for the HTTP parameter.
+   * Sets an HTTP request body parameter as a Prime MVC radio button widget. This can be called multiple times with the
+   * same name it will create a list of values for the HTTP parameter.
    *
    * @param name           The name of the parameter.
    * @param checkedValue   The checked value of the checkbox.
@@ -587,10 +590,10 @@ public class RequestBuilder {
    */
   public RequestBuilder withRadio(String name, String checkedValue, String uncheckedValue, boolean checked) {
     if (checked) {
-      request.setParameter(name, checkedValue);
+      setRequestBodyParameter(name, checkedValue);
     }
 
-    request.setParameter(DefaultParameterParser.RADIOBUTTON_PREFIX + name, uncheckedValue);
+    setRequestBodyParameter(DefaultParameterParser.RADIOBUTTON_PREFIX + name, uncheckedValue);
     return this;
   }
 
@@ -604,6 +607,18 @@ public class RequestBuilder {
    */
   public RequestBuilder withSingleHeader(String name, String value) {
     request.setHeader(name, value);
+    return this;
+  }
+
+  /**
+   * Add a single URL query string parameter.
+   *
+   * @param name  the name of the parameter.
+   * @param value the value of the parameter.
+   * @return This.
+   */
+  public RequestBuilder withURLParameter(String name, Object value) {
+    request.addParameter(name, value.toString());
     return this;
   }
 
@@ -714,29 +729,18 @@ public class RequestBuilder {
       System.arraycopy(bodyBuf.array(), bodyBuf.position(), body, 0, bodyBuf.limit());
     }
 
-    Map<String, List<String>> parameters = request.getParameters();
+    Map<String, List<String>> urlParameters = request.getParameters();
     List<FileInfo> files = request.getFiles();
-    Map<String, List<String>> urlParameters = null;
     BodyHandler bodyHandler = null;
     if (files != null && files.size() > 0) {
       List<FileUpload> fileUploads = files.stream()
                                           .map(fi -> new FileUpload(fi.contentType, fi.file, fi.fileName, fi.name))
                                           .collect(Collectors.toList());
-      bodyHandler = new MultipartBodyHandler(new Multiparts(fileUploads, parameters));
+      bodyHandler = new MultipartBodyHandler(new Multiparts(fileUploads, urlParameters));
     } else if (body != null) {
       bodyHandler = new ByteArrayBodyHandler(body);
-
-      // Send these are URL parameters
-      if (parameters.size() > 0) {
-        urlParameters = new HashMap<>(parameters);
-      }
-    } else if (parameters.size() > 0) {
-      // Making the assumption here that the parameters are on the URL for GET, HEAD and DELETE and in the body for everything else
-      if (HTTPMethod.GET.is(method) || HTTPMethod.HEAD.is(method) || HTTPMethod.DELETE.is(method)) {
-        urlParameters = new HashMap<>(parameters);
-      } else {
-        bodyHandler = new FormDataBodyHandler(parameters);
-      }
+    } else if (!requestBodyParameters.isEmpty()) {
+      bodyHandler = new FormDataBodyHandler(requestBodyParameters);
     }
 
     ClientResponse<byte[], byte[]> response = new RESTClient<>(byte[].class, byte[].class)
@@ -770,6 +774,12 @@ public class RequestBuilder {
                                  .collect(Collectors.toList()));
 
     return response;
+  }
+
+  private void setRequestBodyParameter(String name, Object value) {
+    List<String> values = new ArrayList<>();
+    values.add(value.toString());
+    requestBodyParameters.put(name, values);
   }
 
   static {

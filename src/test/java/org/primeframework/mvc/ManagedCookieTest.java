@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2020, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,16 +97,16 @@ public class ManagedCookieTest extends PrimeBaseTest {
 
         // Write all three cookies
         .simulate(() -> simulator.test("/managed-cookie")
-                                 .withParameter("writeCookie1", "foo")
-                                 .withParameter("writeCookie2", "bar")
-                                 .withParameter("writeCookie3", "baz")
+                                 .withURLParameter("writeCookie1", "foo")
+                                 .withURLParameter("writeCookie2", "bar")
+                                 .withURLParameter("writeCookie3", "baz")
                                  .get()
                                  .assertStatusCode(200)
                                  .assertCookie("cookie1", "foo"))
         .assertCookie("cookie2", "bar")
         .assertCookie("fusionauth.sso", "baz")
 
-        // Cookies are persisted, hit the GET and they will still be there.
+        // Cookies are persisted, hit the GET, and they will still be there.
         .simulate(() -> simulator.test("/managed-cookie")
                                  .get()
                                  .assertStatusCode(200)
@@ -116,7 +116,7 @@ public class ManagedCookieTest extends PrimeBaseTest {
 
         // Delete stringCookie2
         .simulate(() -> simulator.test("/managed-cookie")
-                                 .withParameter("deleteCookie2", true)
+                                 .withURLParameter("deleteCookie2", true)
                                  .get()
                                  .assertStatusCode(200)
                                  .assertCookie("cookie1", "foo")
@@ -141,8 +141,8 @@ public class ManagedCookieTest extends PrimeBaseTest {
 
         // Delete all of them!!! - 1 and 3
         .simulate(() -> simulator.test("/managed-cookie")
-                                 .withParameter("deleteCookie1", true)
-                                 .withParameter("deleteCookie3", true)
+                                 .withURLParameter("deleteCookie1", true)
+                                 .withURLParameter("deleteCookie3", true)
                                  .get()
                                  .assertStatusCode(200)
                                  .assertCookieWasDeleted("cookie1")
