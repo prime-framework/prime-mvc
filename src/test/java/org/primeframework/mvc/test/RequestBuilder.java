@@ -549,7 +549,7 @@ public class RequestBuilder {
    * @return This.
    */
   public RequestBuilder withParameter(String name, Object value) {
-    requestBodyParameters.computeIfAbsent(name, key -> new ArrayList<>()).add(value.toString());
+    requestBodyParameters.computeIfAbsent(name, key -> new ArrayList<>()).add(value != null ? value.toString() : null);
     return this;
   }
 
