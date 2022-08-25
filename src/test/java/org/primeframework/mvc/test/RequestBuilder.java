@@ -751,9 +751,20 @@ public class RequestBuilder {
       bodyHandler = new MultipartBodyHandler(new Multiparts(fileUploads, urlParameters));
     } else if (body != null) {
       bodyHandler = new ByteArrayBodyHandler(body);
+
+      // The HttpURLConnection will set the Content-Type to application/w-www-url-encoded if you
+      // provide a body w/out a Content-Type set. Set to empty string to keep this from happening.
+      // - Remove if we ever get rid of the HttpURLConnection in Restify.
+      // - Only doing this here because the other two body handlers will set a Content-Type later
+      //   when invoked by Restify.
+      if (contentType == null) {
+        contentType = "";
+      }
+
     } else if (!requestBodyParameters.isEmpty()) {
       bodyHandler = new FormDataBodyHandler(requestBodyParameters);
     }
+
 
     ClientResponse<byte[], byte[]> response = new RESTClient<>(byte[].class, byte[].class)
         .bodyHandler(bodyHandler)

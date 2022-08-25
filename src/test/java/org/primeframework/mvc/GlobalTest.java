@@ -152,7 +152,6 @@ public class GlobalTest extends PrimeBaseTest {
 
     EditAction.getCalled = false;
     simulator.test("/user/edit")
-             .withBody("testing")
              .withHeader(Headers.MethodOverride, Methods.GET)
              .get()
              .assertStatusCode(200);

@@ -166,7 +166,6 @@ public class TLSTest {
     EditAction.getCalled = false;
     simulator.withTLS(true)
              .test("/user/edit")
-             .withBody("testing")
              .withHeader(Headers.MethodOverride, Methods.GET)
              .get()
              .assertStatusCode(200);
