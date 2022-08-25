@@ -574,7 +574,7 @@ public class RequestBuilder {
    * @return This.
    */
   public RequestBuilder withQueryString(String query) {
-    QueryStringTools.parseQueryString(query).forEach(this::withURLParameter);
+    QueryStringTools.parseQueryString(query).forEach(this::withURLParameters);
     return this;
   }
 
