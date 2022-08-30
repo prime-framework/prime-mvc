@@ -42,6 +42,7 @@ import org.primeframework.mvc.action.ValidationMethodConfiguration;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.annotation.ResultAnnotation;
 import org.primeframework.mvc.action.result.annotation.ResultContainerAnnotation;
+import org.primeframework.mvc.content.ValidContentTypes;
 import org.primeframework.mvc.control.form.annotation.FormPrepareMethod;
 import org.primeframework.mvc.http.HTTPMethod;
 import org.primeframework.mvc.parameter.annotation.PostParameterMethod;
@@ -126,10 +127,10 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
 
     // Unknown parameters field
     Field unknownParametersField = findUnknownParametersField(actionClass);
+    Set<String> validContentTypes = findAllowedContentTypes(actionClass);
 
-    return new ActionConfiguration(actionClass, executeMethods, validationMethods, formPrepareMethods, authorizationMethods,
-        jwtAuthorizationMethods, postValidationMethods, preParameterMethods, postParameterMethods, resultAnnotations, preParameterMembers,
-        preRenderMethodsMap, fileUploadMembers, memberNames, securitySchemes, scopeFields, additionalConfiguration, uri, preValidationMethods, unknownParametersField);
+    return new ActionConfiguration(actionClass, executeMethods, validationMethods, formPrepareMethods, authorizationMethods, jwtAuthorizationMethods, postValidationMethods, preParameterMethods, postParameterMethods, resultAnnotations, preParameterMembers, preRenderMethodsMap, fileUploadMembers, memberNames, securitySchemes, scopeFields, additionalConfiguration, uri, preValidationMethods, unknownParametersField, validContentTypes
+    );
   }
 
   /**
@@ -196,6 +197,20 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
     }
 
     return resultConfigurations;
+  }
+
+  protected Set<String> findAllowedContentTypes(Class<?> actionClass) {
+    Class<?> currentClass = actionClass;
+    while (!currentClass.equals(Object.class)) {
+      ValidContentTypes annotation = currentClass.getAnnotation(ValidContentTypes.class);
+      if (annotation != null) {
+        return Set.of(annotation.value());
+      }
+
+      currentClass = currentClass.getSuperclass();
+    }
+
+    return Set.of();
   }
 
   /**

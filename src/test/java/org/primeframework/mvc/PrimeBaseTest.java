@@ -41,7 +41,9 @@ import org.primeframework.mvc.action.ValidationMethodConfiguration;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.config.DefaultActionConfigurationBuilder;
 import org.primeframework.mvc.config.MVCConfiguration;
+import org.primeframework.mvc.content.guice.ContentHandlerFactory;
 import org.primeframework.mvc.content.guice.ObjectMapperProvider;
+import org.primeframework.mvc.content.json.JacksonContentHandler;
 import org.primeframework.mvc.cors.CORSConfiguration;
 import org.primeframework.mvc.cors.CORSConfigurationProvider;
 import org.primeframework.mvc.guice.MVCModule;
@@ -73,6 +75,7 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.DataProvider;
 
 /**
  * This class is a base test for testing the Prime framework. It isn't recommended that you use it outside the Prime
@@ -116,6 +119,9 @@ public abstract class PrimeBaseTest {
         bind(MessageObserver.class).toInstance(messageObserver);
         bind(MetricRegistry.class).toInstance(metricRegistry);
         bind(UserLoginSecurityContext.class).to(MockUserLoginSecurityContext.class);
+
+        // Test Content-Type
+        ContentHandlerFactory.addContentHandler(binder(), "application/test+json", JacksonContentHandler.class);
       }
     };
 
@@ -170,6 +176,16 @@ public abstract class PrimeBaseTest {
 
     // Reset CSRF configuration
     configuration.csrfEnabled = false;
+  }
+
+  @DataProvider(name = "methodOverrides")
+  public Object[][] methodOverrides() {
+    return new Object[][]{
+        {"X-HTTP-Method-Override"},
+        {"x-http-method-override"},
+        {"X-Method-Override"},
+        {"x-method-override"}
+    };
   }
 
   @SuppressWarnings("Duplicates")
@@ -233,9 +249,8 @@ public abstract class PrimeBaseTest {
     resultConfigurations.put(resultCode, annotation);
 
     return new ActionInvocation(action, executeMethod, uri, extension,
-        new ActionConfiguration(EditAction.class, executeMethods, validationMethods, new ArrayList<>(), null, null,
-            new ArrayList<>(), new HashMap<>(), new ArrayList<>(), resultConfigurations, new HashMap<>(), null, new HashMap<>(),
-            new HashSet<>(), Collections.emptyList(), new ArrayList<>(), new HashMap<>(), uri, new ArrayList<>(), null));
+        new ActionConfiguration(EditAction.class, executeMethods, validationMethods, new ArrayList<>(), null, null, new ArrayList<>(), new HashMap<>(), new ArrayList<>(), resultConfigurations, new HashMap<>(), null, new HashMap<>(), new HashSet<>(), Collections.emptyList(), new ArrayList<>(), new HashMap<>(), uri, new ArrayList<>(), null, null
+        ));
   }
 
   /**

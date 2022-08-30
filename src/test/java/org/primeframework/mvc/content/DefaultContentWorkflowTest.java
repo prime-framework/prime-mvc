@@ -38,6 +38,8 @@ import org.primeframework.mvc.content.json.JacksonActionConfiguration.RequestMem
 import org.primeframework.mvc.http.DefaultHTTPRequest;
 import org.primeframework.mvc.http.HTTPMethod;
 import org.primeframework.mvc.http.MutableHTTPRequest;
+import org.primeframework.mvc.message.MessageStore;
+import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.parameter.fileupload.FileInfo;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
@@ -55,6 +57,10 @@ import static org.testng.AssertJUnit.assertNotNull;
  * @author Brian Pontarelli
  */
 public class DefaultContentWorkflowTest extends PrimeBaseTest {
+  @Inject public MessageProvider messageProvider;
+
+  @Inject public MessageStore messageStore;
+
   @Inject public ActionInvocationStore store;
 
   @Test
@@ -68,14 +74,14 @@ public class DefaultContentWorkflowTest extends PrimeBaseTest {
     additionalConfig.put(BinaryActionConfiguration.class, new BinaryActionConfiguration("binaryRequest", null));
 
     KitchenSinkAction action = new KitchenSinkAction(null);
-    ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, null, null, null, null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, additionalConfig, null, null, null);
+    ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, null, null, null, null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, additionalConfig, null, null, null, null);
     store.setCurrent(new ActionInvocation(action, null, null, null, config));
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
     chain.continueWorkflow();
     replay(chain);
 
-    new DefaultContentWorkflow(request, new ContentHandlerFactory(injector)).perform(chain);
+    new DefaultContentWorkflow(messageStore, new ContentHandlerFactory(injector), messageProvider, request, store).perform(chain);
 
     // By the time the action is complete the file should have been deleted
     assertNotNull(action.binaryRequest);
@@ -127,14 +133,14 @@ public class DefaultContentWorkflowTest extends PrimeBaseTest {
     additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(requestMembers, null));
 
     KitchenSinkAction action = new KitchenSinkAction(null);
-    ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, null, null, null, null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, additionalConfig, null, null, null);
+    ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, null, null, null, null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, additionalConfig, null, null, null, null);
     store.setCurrent(new ActionInvocation(action, new ExecuteMethodConfiguration(HTTPMethod.POST, null, null), null, null, config));
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
     chain.continueWorkflow();
     replay(chain);
 
-    new DefaultContentWorkflow(request, new ContentHandlerFactory(injector)).perform(chain);
+    new DefaultContentWorkflow(messageStore, new ContentHandlerFactory(injector), messageProvider, request, store).perform(chain);
 
     assertEquals(action.jsonRequest.addresses.get("work").city, "Denver");
     assertEquals(action.jsonRequest.addresses.get("work").state, "Colorado");
@@ -164,7 +170,7 @@ public class DefaultContentWorkflowTest extends PrimeBaseTest {
     chain.continueWorkflow();
     replay(chain);
 
-    new DefaultContentWorkflow(request, new ContentHandlerFactory(injector)).perform(chain);
+    new DefaultContentWorkflow(messageStore, new ContentHandlerFactory(injector), messageProvider, request, store).perform(chain);
 
     verify(chain);
   }

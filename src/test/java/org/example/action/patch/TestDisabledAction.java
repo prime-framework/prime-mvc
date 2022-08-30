@@ -18,7 +18,6 @@ package org.example.action.patch;
 import org.example.action.patch.PatchActionRequest.CoolObject;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.annotation.JSON;
-import org.primeframework.mvc.content.json.annotation.JSONPatch;
 import org.primeframework.mvc.content.json.annotation.JSONRequest;
 import org.primeframework.mvc.content.json.annotation.JSONResponse;
 import org.primeframework.mvc.parameter.annotation.PreParameterMethod;
@@ -31,11 +30,10 @@ import org.primeframework.mvc.parameter.annotation.PreParameterMethod;
     @JSON,
     @JSON(code = "input", status = 400)
 })
-public class TestAction {
+public class TestDisabledAction {
   // Persisted state;
   public static CoolObject db;
 
-  @JSONPatch
   @JSONRequest
   public PatchActionRequest request = new PatchActionRequest();
 

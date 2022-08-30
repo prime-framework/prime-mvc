@@ -13,27 +13,22 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.example.action;
+package org.primeframework.mvc.content;
 
-import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.action.result.annotation.JSON;
-import org.primeframework.mvc.action.result.annotation.Status;
-import org.primeframework.mvc.content.ValidContentTypes;
-import org.primeframework.mvc.content.json.annotation.JSONRequest;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
+ * Optionally restrict the supported Content-Type values
+ *
  * @author Daniel DeGroff
  */
-@Action
-@Status
-@JSON(code = "input", status = 400)
-@ValidContentTypes({"application/json"})
-public class ScimContentTypeAction {
-  @JSONRequest
-  public Object object;
-
-  @ValidContentTypes({"application/json", "application/scim+json"})
-  public String post() {
-    return "success";
-  }
+@Retention(RUNTIME)
+@Target({TYPE, METHOD})
+public @interface ValidContentTypes {
+  String[] value();
 }

@@ -1614,7 +1614,7 @@ public class RequestResult {
     RequestBuilder rb = new RequestBuilder(baseURI, injector, userAgent, listenerConfiguration, messageObserver);
     if (baseURI.length() != newRedirect.length()) {
       String params = newRedirect.substring(newRedirect.indexOf('?') + 1);
-      QueryStringTools.parseQueryString(params).forEach(rb::withParameters);
+      QueryStringTools.parseQueryString(params).forEach(rb::withURLParameters);
     }
 
     RequestResult result = rb.get();
@@ -1958,7 +1958,7 @@ public class RequestResult {
 
       String actual = element.attr(attribute);
       if (!value.equals(actual)) {
-        throw new AssertionError("Expected the element attribute [" + attribute + "] value to be equal to [" + value + "] but found [" + actual + "]." + "\n\nActual body:\n" + requestResult.getBodyAsString());
+        throw new AssertionError("Attribute [" + attribute + "] value not equal to expected.\nExpected [" + value + "] but found [" + actual + "]" + "\n\nActual body:\n" + requestResult.getBodyAsString());
       }
 
       return this;

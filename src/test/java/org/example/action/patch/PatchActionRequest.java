@@ -15,14 +15,39 @@
  */
 package org.example.action.patch;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author Daniel DeGroff
  */
 public class PatchActionRequest {
   public CoolObject data;
 
+  public static class Address {
+    public String city;
+
+    public String state;
+
+    public String street;
+
+    public String type;
+
+    public int zipCode;
+  }
+
   public static class CoolObject {
+    public List<Address> addresses;
+
+    public Map<String, String> attributes;
+
     public String config;
+
+    public String email;
+
+    public String name;
+
+    public List<String> preferences;
 
     public String type;
   }

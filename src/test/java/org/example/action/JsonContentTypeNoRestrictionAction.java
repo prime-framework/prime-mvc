@@ -18,7 +18,6 @@ package org.example.action;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.annotation.JSON;
 import org.primeframework.mvc.action.result.annotation.Status;
-import org.primeframework.mvc.content.ValidContentTypes;
 import org.primeframework.mvc.content.json.annotation.JSONRequest;
 
 /**
@@ -27,12 +26,10 @@ import org.primeframework.mvc.content.json.annotation.JSONRequest;
 @Action
 @Status
 @JSON(code = "input", status = 400)
-@ValidContentTypes({"application/json"})
-public class ScimContentTypeAction {
+public class JsonContentTypeNoRestrictionAction {
   @JSONRequest
   public Object object;
 
-  @ValidContentTypes({"application/json", "application/scim+json"})
   public String post() {
     return "success";
   }

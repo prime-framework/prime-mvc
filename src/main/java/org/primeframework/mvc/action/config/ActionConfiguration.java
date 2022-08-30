@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -88,6 +89,8 @@ public class ActionConfiguration {
 
   public final String uri;
 
+  public final Set<String> validContentTypes = new HashSet<>(0);
+
   public final boolean validatable;
 
   public final Map<HTTPMethod, List<ValidationMethodConfiguration>> validationMethods;
@@ -104,7 +107,8 @@ public class ActionConfiguration {
                              Map<Class<?>, List<Method>> preRenderMethods, Map<String,
       FileUpload> fileUploadMembers, Set<String> memberNames, List<String> securitySchemes,
                              List<ScopeField> scopeFields, Map<Class<?>, Object> additionalConfiguration, String uri,
-                             List<Method> preValidationMethods, Field unknownParametersField) {
+                             List<Method> preValidationMethods, Field unknownParametersField,
+                             Set<String> validContentTypes) {
 
     Objects.requireNonNull(actionClass);
 
@@ -130,6 +134,9 @@ public class ActionConfiguration {
     this.uri = uri;
     this.annotation = actionClass.getAnnotation(Action.class);
     this.unknownParametersField = unknownParametersField;
+    if (validContentTypes != null) {
+      this.validContentTypes.addAll(validContentTypes);
+    }
 
     // Load the annotations on the class
     Annotation[] annotations = actionClass.getAnnotations();

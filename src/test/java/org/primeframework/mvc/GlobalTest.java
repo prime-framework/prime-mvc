@@ -152,7 +152,6 @@ public class GlobalTest extends PrimeBaseTest {
 
     EditAction.getCalled = false;
     simulator.test("/user/edit")
-             .withBody("testing")
              .withHeader(Headers.MethodOverride, Methods.GET)
              .get()
              .assertStatusCode(200);
@@ -306,21 +305,21 @@ public class GlobalTest extends PrimeBaseTest {
   public void get_collectionConverter() throws Exception {
     // Both of these will fail because the action has a List<String> as the backing values for this form, and the input field is a text field.
     test.simulate(() -> simulator.test("/collection-converter")
-                                 .withParameter("string", "foo,bar,baz")
+                                 .withURLParameter("string", "foo,bar,baz")
                                  .get()
                                  .assertStatusCode(500));
 
     test.simulate(() -> simulator.test("/collection-converter")
-                                 .withParameter("string", "bar")
-                                 .withParameter("string", "baz")
+                                 .withURLParameter("string", "bar")
+                                 .withURLParameter("string", "baz")
                                  .get()
                                  .assertHeaderContains("Cache-Control", "no-cache")
                                  .assertStatusCode(500));
 
     // It will work if we use a backing collection with an iterator in the form to build multiple form fields
     test.simulate(() -> simulator.test("/collection-converter")
-                                 .withParameter("strings", "bar")
-                                 .withParameter("strings", "baz")
+                                 .withURLParameter("strings", "bar")
+                                 .withURLParameter("strings", "baz")
                                  .get()
                                  .assertStatusCode(200)
                                  .assertBodyDoesNotContain("__empty2__', '__empty3__")
@@ -332,7 +331,7 @@ public class GlobalTest extends PrimeBaseTest {
 
     // Single string containing commas, output contains the same string
     test.simulate(() -> simulator.test("/collection-converter")
-                                 .withParameter("strings", "foo,bar,baz")
+                                 .withURLParameter("strings", "foo,bar,baz")
                                  .get()
                                  .assertStatusCode(200)
                                  .assertBodyDoesNotContain("__empty2__', '__empty3__")
@@ -601,14 +600,14 @@ public class GlobalTest extends PrimeBaseTest {
   public void get_jwtDisabledJwtAuthentication() throws Exception {
     // Send in a JWT Authorization header when the Action has JWT disabled. Should always get a 401. When a JWT is provided, the action expects JWT to be enabled.
     test.simulate(() -> simulator.test("/jwt-authorized-disabled")
-                                 .withParameter("authorized", true)
+                                 .withURLParameter("authorized", true)
                                  .withHeader("Authorization", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkifQ.qHdut1UR4-2FSAvh7U3YdeRR5r5boVqjIGQ16Ztp894")
                                  .get()
                                  .assertStatusCode(401));
 
     // Same, use Bearer scheme
     test.simulate(() -> simulator.test("/jwt-authorized-disabled")
-                                 .withParameter("authorized", true)
+                                 .withURLParameter("authorized", true)
                                  .withHeader("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkifQ.qHdut1UR4-2FSAvh7U3YdeRR5r5boVqjIGQ16Ztp894")
                                  .get()
                                  .assertStatusCode(401));
@@ -617,7 +616,7 @@ public class GlobalTest extends PrimeBaseTest {
   @Test
   public void get_jwtExpired() throws Exception {
     test.simulate(() -> simulator.test("/jwt-authorized")
-                                 .withParameter("authorized", true)
+                                 .withURLParameter("authorized", true)
                                  .withHeader("Authorization", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0NDUxMDA3MzF9.K18gIegEBfxgj8rU4D2WDh3CzEmRUmy8qBS7SWAcG9w")
                                  .get()
                                  .assertStatusCode(401));
@@ -626,7 +625,7 @@ public class GlobalTest extends PrimeBaseTest {
   @Test
   public void get_jwtInvalidSignature() throws Exception {
     test.simulate(() -> simulator.test("/jwt-authorized")
-                                 .withParameter("authorized", true)
+                                 .withURLParameter("authorized", true)
                                  .withHeader("Authorization", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkifQ.aaabbbcccddd")
                                  .get()
                                  .assertStatusCode(401));
@@ -820,14 +819,14 @@ public class GlobalTest extends PrimeBaseTest {
              .assertBodyContains("Forward_Yep!", "JSON_Nope!", "Noop_Nope!");
 
     simulator.test("/pre-render-method")
-             .withParameter("result", "json")
+             .withURLParameter("result", "json")
              .get()
              .assertStatusCode(200)
              .assertContentType("application/json; charset=UTF-8")
              .assertBodyContains("trust me it is json");
 
     simulator.test("/pre-render-method")
-             .withParameter("result", "noop")
+             .withURLParameter("result", "noop")
              .get()
              .assertStatusCode(201)
              .assertContentType("application/potato")
@@ -838,7 +837,7 @@ public class GlobalTest extends PrimeBaseTest {
   public void get_redirect() throws Exception {
     // Contains no parameters
     test.simulate(() -> simulator.test("/complex-redirect")
-                                 .withParameter("redirectURI", "/foo")
+                                 .withURLParameter("redirectURI", "/foo")
                                  .get()
                                  .assertStatusCode(302)
                                  .assertHeaderContains("Cache-Control", "no-cache")
@@ -846,7 +845,7 @@ public class GlobalTest extends PrimeBaseTest {
 
     // Contains a single parameter, calling beginQuery is optional
     test.simulate(() -> simulator.test("/complex-redirect")
-                                 .withParameter("redirectURI", "/foo?bar=baz")
+                                 .withURLParameter("redirectURI", "/foo?bar=baz")
                                  .get()
                                  .assertStatusCode(302)
                                  .assertRedirect("/foo?bar=baz")
@@ -854,7 +853,7 @@ public class GlobalTest extends PrimeBaseTest {
 
     // Contains a single parameter with calling beginQuery()
     test.simulate(() -> simulator.test("/complex-redirect")
-                                 .withParameter("redirectURI", "/foo?bar=baz")
+                                 .withURLParameter("redirectURI", "/foo?bar=baz")
                                  .get()
                                  .assertStatusCode(302)
                                  .assertRedirect("/foo?bar=baz")
@@ -863,7 +862,7 @@ public class GlobalTest extends PrimeBaseTest {
 
     // Contains multiple parameters
     test.simulate(() -> simulator.test("/complex-redirect")
-                                 .withParameter("redirectURI", "/foo?bar=baz&boom=dynamite")
+                                 .withURLParameter("redirectURI", "/foo?bar=baz&boom=dynamite")
                                  .get()
                                  .assertStatusCode(302)
                                  .assertRedirect("/foo?bar=baz&boom=dynamite")
@@ -873,7 +872,7 @@ public class GlobalTest extends PrimeBaseTest {
 
     // Contains a single parameter after a fragment
     test.simulate(() -> simulator.test("/complex-redirect")
-                                 .withParameter("redirectURI", "/foo#bar=baz")
+                                 .withURLParameter("redirectURI", "/foo#bar=baz")
                                  .get()
                                  .assertStatusCode(302)
                                  .assertRedirect("/foo#bar=baz")
@@ -882,7 +881,7 @@ public class GlobalTest extends PrimeBaseTest {
 
     // Contains multiple parameters after a fragment
     test.simulate(() -> simulator.test("/complex-redirect")
-                                 .withParameter("redirectURI", "/foo#bar=baz&boom=dynamite")
+                                 .withURLParameter("redirectURI", "/foo#bar=baz&boom=dynamite")
                                  .get()
                                  .assertStatusCode(302)
                                  .assertRedirect("/foo#bar=baz&boom=dynamite")
@@ -892,7 +891,7 @@ public class GlobalTest extends PrimeBaseTest {
 
     // Contains a single parameter and a single parameter after a fragment
     test.simulate(() -> simulator.test("/complex-redirect")
-                                 .withParameter("redirectURI", "/foo?bar=baz#middle=out")
+                                 .withURLParameter("redirectURI", "/foo?bar=baz#middle=out")
                                  .get()
                                  .assertStatusCode(302)
                                  .assertRedirect("/foo?bar=baz#middle=out")
@@ -903,7 +902,7 @@ public class GlobalTest extends PrimeBaseTest {
 
     // Contains multiple parameters and multiple parameters after a fragment
     test.simulate(() -> simulator.test("/complex-redirect")
-                                 .withParameter("redirectURI", "/foo?bar=baz&boom=dynamite#middle=out&not=hotdog")
+                                 .withURLParameter("redirectURI", "/foo?bar=baz&boom=dynamite#middle=out&not=hotdog")
                                  .get()
                                  .assertStatusCode(302)
                                  .assertHeaderContains("Cache-Control", "no-cache")
@@ -917,7 +916,7 @@ public class GlobalTest extends PrimeBaseTest {
 
     // URL has multiple parameters
     test.simulate(() -> simulator.test("/complex-redirect")
-                                 .withParameter("redirectURI", "/foo?bar=baz&q=foo&code=bar")
+                                 .withURLParameter("redirectURI", "/foo?bar=baz&q=foo&code=bar")
                                  .get()
                                  .assertStatusCode(302)
                                  .assertRedirect("/foo?bar=baz&q=foo&code=bar")
@@ -931,7 +930,7 @@ public class GlobalTest extends PrimeBaseTest {
   public void get_redirect_withActual() throws Exception {
     // Contains no parameters
     test.simulate(() -> simulator.test("/complex-redirect")
-                                 .withParameter("redirectURI", "/foo?bing=bam&instant=" + System.currentTimeMillis())
+                                 .withURLParameter("redirectURI", "/foo?bing=bam&instant=" + System.currentTimeMillis())
                                  .get()
                                  .assertStatusCode(302)
                                  .assertHeaderContains("Cache-Control", "no-cache")
@@ -1132,16 +1131,6 @@ public class GlobalTest extends PrimeBaseTest {
     }
   }
 
-  @DataProvider(name = "methodOverrides")
-  public Object[][] methodOverrides() {
-    return new Object[][]{
-        {"X-HTTP-Method-Override"},
-        {"x-http-method-override"},
-        {"X-Method-Override"},
-        {"x-method-override"}
-    };
-  }
-
   @Test
   public void missing() {
     // Direct action invocation
@@ -1211,41 +1200,6 @@ public class GlobalTest extends PrimeBaseTest {
              .assertHeaderContains("Cache-Control", "no-cache");
   }
 
-  @Test(dataProvider = "methodOverrides")
-  public void patch_MethodOverride(String overrideHeaderName) throws Exception {
-    simulator.test("/patch/test")
-             .withJSONFile(Path.of("src/test/resources/json/patch/test-patch.json"))
-             .withHeader(overrideHeaderName, "PATCH")
-             .post()
-             .assertStatusCode(200)
-             .assertHeaderContains("Cache-Control", "no-cache")
-             .assertJSONFile(jsonDir.resolve("patch/test-response.json"), "config", "patched");
-  }
-
-  @Test
-  public void patch_testing() throws Exception {
-    // POST no big deal
-    simulator.test("/patch/test")
-             .withJSONFile(Path.of("src/test/resources/json/patch/test.json"), "config", "post")
-             .post()
-             .assertStatusCode(200)
-             .assertJSONFile(jsonDir.resolve("patch/test-response.json"), "config", "post");
-
-    // PUT no big deal
-    simulator.test("/patch/test")
-             .withJSONFile(Path.of("src/test/resources/json/patch/test.json"), "config", "put")
-             .put()
-             .assertStatusCode(200)
-             .assertJSONFile(jsonDir.resolve("patch/test-response.json"), "config", "put");
-
-    // PATCH damn that is cool
-    simulator.test("/patch/test")
-             .withJSONFile(Path.of("src/test/resources/json/patch/test-patch.json"))
-             .patch()
-             .assertStatusCode(200)
-             .assertJSONFile(jsonDir.resolve("patch/test-response.json"), "config", "patched");
-  }
-
   @Test
   public void post() {
     simulator.test("/post")
@@ -1303,7 +1257,7 @@ public class GlobalTest extends PrimeBaseTest {
   @Test
   public void post_binary() throws Exception {
     test.simulate(() -> simulator.test("/binary")
-                                 .withParameter("expected", "Hello World")
+                                 .withURLParameter("expected", "Hello World")
                                  .withBody("Hello World")
                                  .withContentType("application/octet-stream")
                                  .post()
@@ -1416,7 +1370,7 @@ public class GlobalTest extends PrimeBaseTest {
 
         // Blow chunks and get an error in the message store that will use the cookie lash message scope.
         .simulate(() -> simulator.test("/cookie")
-                                 .withParameter("blowChunks", true)
+                                 .withURLParameter("blowChunks", true)
                                  .get()
                                  .assertStatusCode(200)
                                  .assertContainsGeneralErrorMessageCodes("[CookieErrorException]")
@@ -1425,7 +1379,7 @@ public class GlobalTest extends PrimeBaseTest {
 
         // Add a message to the message store on a post / redirect and ensure we only end up with a single message in the store.
         .simulate(() -> simulator.test("/cookie")
-                                 .withParameter("addMessage", true)
+                                 .withURLParameter("addMessage", true)
                                  .post()
                                  .assertStatusCode(302)
                                  .assertRedirect("/cookie")
@@ -1683,20 +1637,8 @@ public class GlobalTest extends PrimeBaseTest {
   @Test
   public void post_jsonContentType() throws Exception {
     // Content-Type: application/scim+json
-    simulator.test("/scim-content-type")
-             .withContentType("application/scim+json")
-             .withBody("""
-                 {
-                   "foo": "bar"
-                 }
-                 """)
-             .post()
-             .assertStatusCode(200)
-             .assertBodyIsEmpty();
-
-    // Not supported on this endpoint
     simulator.test("/json-content-type")
-             .withContentType("application/scim+json")
+             .withContentType("application/test+json")
              .withBody("""
                  {
                    "foo": "bar"
@@ -1709,10 +1651,30 @@ public class GlobalTest extends PrimeBaseTest {
                    "fieldErrors" : { },
                    "generalErrors" : [ {
                      "code" : "[InvalidContentType]",
-                     "message" : "Invalid [Content-Type] HTTP request header value of [application/scim+json]. Supported values for this request include [application/json]."
+                     "message" : "Invalid [Content-Type] HTTP request header value of [application/test+json]. Supported values for this request include [application/json]."
                    } ]
                  }
-                 """);
+                  """);
+
+    // Patch not supported on this endpoint
+    simulator.test("/json-content-type-no-restriction")
+             .withContentType("application/json-patch+json")
+             .withBody("""
+                 {
+                   "foo": "bar"
+                 }
+                 """)
+             .post()
+             .assertStatusCode(400)
+             .assertJSON("""
+                 {
+                   "fieldErrors" : { },
+                   "generalErrors" : [ {
+                     "code" : "[PatchNotSupported]",
+                     "message" : "The [Content-Type] HTTP request header value of [application/json-patch+json] is not supported for this request."
+                   } ]
+                 }
+                  """);
 
     // Missing Content-Type Header
     simulator.test("/json-content-type")
@@ -1734,8 +1696,28 @@ public class GlobalTest extends PrimeBaseTest {
                   }
                  """);
 
-    // Not supported in general
+    // Not supported in general, but this action has restrictions, so we'll get a validation error.
     simulator.test("/json-content-type")
+             .withContentType("application/klingon")
+             .withBody("""
+                 {
+                   "foo": "bar"
+                 }
+                 """)
+             .post()
+             .assertStatusCode(400)
+             .assertJSON("""
+                 {
+                   "fieldErrors" : { },
+                   "generalErrors" : [ {
+                     "code" : "[InvalidContentType]",
+                     "message" : "Invalid [Content-Type] HTTP request header value of [application/klingon]. Supported values for this request include [application/json]."
+                   } ]
+                 }
+                  """);
+
+    // Not supported in general
+    simulator.test("/json-content-type-no-restriction")
              .withContentType("application/klingon")
              .withBody("""
                  {
