@@ -15,6 +15,7 @@
  */
 package org.primeframework.mvc.content.json;
 
+import java.lang.reflect.Method;
 import java.util.Map;
 
 import org.primeframework.mvc.content.json.annotation.JSONPatch;
@@ -27,11 +28,15 @@ import org.primeframework.mvc.http.HTTPMethod;
  * @author Brian Pontarelli
  */
 public class JacksonActionConfiguration {
+  public final JSONPropertyFilterConfig jsonPropertyFilterConfig;
+
   public final Map<HTTPMethod, RequestMember> requestMembers;
 
   public final ResponseMember responseMember;
 
-  public JacksonActionConfiguration(Map<HTTPMethod, RequestMember> requestMembers, ResponseMember responseMember) {
+  public JacksonActionConfiguration(Map<HTTPMethod, RequestMember> requestMembers, ResponseMember responseMember,
+                                    JSONPropertyFilterConfig jsonPropertyFilterConfig) {
+    this.jsonPropertyFilterConfig = jsonPropertyFilterConfig;
     this.requestMembers = requestMembers;
     this.responseMember = responseMember;
   }
@@ -42,6 +47,17 @@ public class JacksonActionConfiguration {
     }
 
     return responseMember.annotation.view();
+  }
+
+  public static class JSONPropertyFilterConfig {
+    public final Method method;
+
+    public final String name;
+
+    public JSONPropertyFilterConfig(Method method, String name) {
+      this.method = method;
+      this.name = name;
+    }
   }
 
   public static class RequestMember {

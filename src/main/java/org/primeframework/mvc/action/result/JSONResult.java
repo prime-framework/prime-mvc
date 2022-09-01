@@ -25,6 +25,9 @@ import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.databind.ser.PropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.google.inject.Inject;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
@@ -32,6 +35,7 @@ import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.result.annotation.JSON;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration;
+import org.primeframework.mvc.content.json.JacksonActionConfiguration.JSONPropertyFilterConfig;
 import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.message.ErrorMessage;
 import org.primeframework.mvc.message.ErrorMessages;
@@ -41,6 +45,7 @@ import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.scope.MessageScope;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
+import org.primeframework.mvc.util.ReflectionUtils;
 
 /**
  * This result writes out Java objects to JSON using Jackson. The content type is set to 'application/json'.
@@ -82,6 +87,7 @@ public class JSONResult extends AbstractResult<JSON> {
     Object jacksonObject;
     boolean prettyPrint = false;
     Class<?> serializationView = void.class;
+    JSONPropertyFilterConfig jsonPropertyFilterConfig = null;
     List<Message> errorMessages = messageStore.get(MessageScope.REQUEST).stream()
                                               .filter(m -> m.getType() == MessageType.ERROR)
                                               .collect(Collectors.toList());
@@ -102,6 +108,9 @@ public class JSONResult extends AbstractResult<JSON> {
 
       // Allow the JSONResponse annotation to override the contentType.
       prettyPrint = jacksonActionConfiguration.responseMember.annotation.prettyPrint();
+
+      // Capture a jsonFilterConfig method if defined.
+      jsonPropertyFilterConfig = jacksonActionConfiguration.jsonPropertyFilterConfig;
     }
 
     response.setStatus(json.status());
@@ -114,7 +123,13 @@ public class JSONResult extends AbstractResult<JSON> {
       return true;
     }
 
-    writeValue(response.getOutputStream(), jacksonObject, serializationView, prettyPrint);
+    FilterProvider filterProvider = null;
+    if (jsonPropertyFilterConfig != null) {
+      PropertyFilter propertyFilter = ReflectionUtils.invoke(jsonPropertyFilterConfig.method, action);
+      filterProvider = new SimpleFilterProvider().addFilter(jsonPropertyFilterConfig.name, propertyFilter);
+    }
+
+    writeValue(response.getOutputStream(), jacksonObject, serializationView, prettyPrint, filterProvider);
     return true;
   }
 
@@ -152,25 +167,30 @@ public class JSONResult extends AbstractResult<JSON> {
   }
 
   private void writeValue(OutputStream os, Object jacksonObject, Class<?> serializationView,
-                          boolean prettyPrint) throws IOException {
+                          boolean prettyPrint, FilterProvider filterProvider) throws IOException {
+
+    ObjectMapper mapper = filterProvider != null
+        ? objectMapper.setFilterProvider(filterProvider)
+        : objectMapper;
+
     // Most common path
     if (!prettyPrint && serializationView == void.class) {
-      objectMapper.writeValue(os, jacksonObject);
+      mapper.writeValue(os, jacksonObject);
       return;
     }
 
     if (prettyPrint && serializationView != void.class) {
-      getPrettyWriter(objectMapper).withView(serializationView).writeValue(os, jacksonObject);
+      getPrettyWriter(mapper).withView(serializationView).writeValue(os, jacksonObject);
       return;
     }
 
     if (prettyPrint) {
-      getPrettyWriter(objectMapper).writeValue(os, jacksonObject);
+      getPrettyWriter(mapper).writeValue(os, jacksonObject);
       return;
     }
 
     // serializationView is always non-null here
-    objectMapper.writerWithView(serializationView).writeValue(os, jacksonObject);
+    mapper.writerWithView(serializationView).writeValue(os, jacksonObject);
   }
 
 }

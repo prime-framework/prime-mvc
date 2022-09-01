@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2013-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -130,7 +130,7 @@ public class DefaultContentWorkflowTest extends PrimeBaseTest {
     Map<Class<?>, Object> additionalConfig = new HashMap<>();
     Map<HTTPMethod, RequestMember> requestMembers = new HashMap<>();
     requestMembers.put(HTTPMethod.POST, new RequestMember("jsonRequest", UserField.class));
-    additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(requestMembers, null));
+    additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(requestMembers, null, null));
 
     KitchenSinkAction action = new KitchenSinkAction(null);
     ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, null, null, null, null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, additionalConfig, null, null, null, null);

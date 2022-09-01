@@ -15,14 +15,18 @@
  */
 package org.primeframework.mvc.content.json;
 
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.primeframework.mvc.action.config.ActionConfigurator;
+import org.primeframework.mvc.content.json.JacksonActionConfiguration.JSONPropertyFilterConfig;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration.RequestMember;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration.ResponseMember;
 import org.primeframework.mvc.content.json.annotation.JSONPatch;
+import org.primeframework.mvc.content.json.annotation.JSONPropertyFilter;
 import org.primeframework.mvc.content.json.annotation.JSONRequest;
 import org.primeframework.mvc.content.json.annotation.JSONResponse;
 import org.primeframework.mvc.http.HTTPMethod;
@@ -36,11 +40,16 @@ import org.primeframework.mvc.util.ReflectionUtils;
 public class JacksonActionConfigurator implements ActionConfigurator {
   @Override
   public Object configure(Class<?> actionClass) {
+    List<Method> jsonFilterMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, JSONPropertyFilter.class);
     Map<String, JSONRequest> jsonRequestMember = ReflectionUtils.findAllMembersWithAnnotation(actionClass, JSONRequest.class);
     Map<String, JSONPatch> jsonPatchRequestMember = ReflectionUtils.findAllMembersWithAnnotation(actionClass, JSONPatch.class);
     Map<String, JSONResponse> jsonResponseMembers = ReflectionUtils.findAllMembersWithAnnotation(actionClass, JSONResponse.class);
     if (jsonResponseMembers.size() > 1) {
       throw new IllegalArgumentException("Action class [" + actionClass + "] contains multiple fields with the @JSONResponse annotation. This annotation should only exist on a single field.");
+    }
+
+    if (jsonFilterMethods.size() > 1) {
+      throw new IllegalArgumentException("Action class [" + actionClass + "] contains multiple fields with the @JSONPropertyFilter annotation. This annotation should only exist on a single method.");
     }
 
     // @JSONRequest members, more than one is allowed, up to one per HTTP Method
@@ -77,8 +86,14 @@ public class JacksonActionConfigurator implements ActionConfigurator {
       responseMember = new ResponseMember(entry.getValue(), entry.getKey());
     }
 
+    JSONPropertyFilterConfig jsonFilterConfig = null;
+    if (jsonFilterMethods.size() > 0) {
+      Method method = jsonFilterMethods.get(0);
+      jsonFilterConfig = new JSONPropertyFilterConfig(method, method.getAnnotation(JSONPropertyFilter.class).value());
+    }
+
     if (!configuredMembers.isEmpty() || responseMember != null) {
-      return new JacksonActionConfiguration(configuredMembers, responseMember);
+      return new JacksonActionConfiguration(configuredMembers, responseMember, jsonFilterConfig);
     }
 
     return null;
