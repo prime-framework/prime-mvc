@@ -32,6 +32,16 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({METHOD})
 public @interface JSONPropertyFilter {
   /**
+   * @return the optional class for the mixin source.
+   */
+  Class<?> mixinSource() default Object.class;
+
+  /**
+   * @return the optional class for the mixin target.
+   */
+  Class<?> mixinTarget() default Object.class;
+
+  /**
    * @return the name of the filter to bind to a filter provider. <br>For example, when setting the value to
    *     <code>"namedFilter"</code>, the domain object to filter needs to be annotated with
    *     <code>@JsonFilter("namedFilter")</code>.

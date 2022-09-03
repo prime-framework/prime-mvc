@@ -52,10 +52,16 @@ public class JacksonActionConfiguration {
   public static class JSONPropertyFilterConfig {
     public final Method method;
 
+    public final Class<?> mixinSource;
+
+    public final Class<?> mixinTarget;
+
     public final String name;
 
-    public JSONPropertyFilterConfig(Method method, String name) {
+    public JSONPropertyFilterConfig(Method method, String name, Class<?> mixinSource, Class<?> mixinTarget) {
       this.method = method;
+      this.mixinSource = mixinSource == Object.class ? null : mixinSource;
+      this.mixinTarget = mixinTarget == Object.class ? null : mixinTarget;
       this.name = name;
     }
   }

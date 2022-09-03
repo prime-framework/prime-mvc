@@ -124,12 +124,18 @@ public class JSONResult extends AbstractResult<JSON> {
     }
 
     FilterProvider filterProvider = null;
+    ObjectMapper mapper = objectMapper;
     if (jsonPropertyFilterConfig != null) {
       PropertyFilter propertyFilter = ReflectionUtils.invoke(jsonPropertyFilterConfig.method, action);
       filterProvider = new SimpleFilterProvider().addFilter(jsonPropertyFilterConfig.name, propertyFilter);
+
+      // When the mixin is specified on the annotation do not mutate the global objectMapper
+      if (jsonPropertyFilterConfig.mixinSource != null && jsonPropertyFilterConfig.mixinTarget != null) {
+        mapper = mapper.copy().addMixIn(jsonPropertyFilterConfig.mixinTarget, jsonPropertyFilterConfig.mixinSource);
+      }
     }
 
-    writeValue(response.getOutputStream(), jacksonObject, serializationView, prettyPrint, filterProvider);
+    writeValue(mapper, response.getOutputStream(), jacksonObject, serializationView, prettyPrint, filterProvider);
     return true;
   }
 
@@ -157,40 +163,45 @@ public class JSONResult extends AbstractResult<JSON> {
     return errorMessages;
   }
 
-  private ObjectWriter getPrettyWriter(ObjectMapper objectMapper) {
+  private ObjectWriter getPrettyWriter(ObjectMapper objectMapper, FilterProvider filterProvider) {
     DefaultPrettyPrinter prettyPrinter = new DefaultPrettyPrinter();
     prettyPrinter.indentArraysWith(new DefaultIndenter());
 
     return objectMapper.writerWithDefaultPrettyPrinter()
                        .withFeatures(SerializationFeature.INDENT_OUTPUT)
+                       .with(filterProvider)
                        .with(prettyPrinter);
   }
 
-  private void writeValue(OutputStream os, Object jacksonObject, Class<?> serializationView,
+  private void writeValue(ObjectMapper mapper, OutputStream os, Object jacksonObject, Class<?> serializationView,
                           boolean prettyPrint, FilterProvider filterProvider) throws IOException {
-
-    ObjectMapper mapper = filterProvider != null
-        ? objectMapper.setFilterProvider(filterProvider)
-        : objectMapper;
 
     // Most common path
     if (!prettyPrint && serializationView == void.class) {
-      mapper.writeValue(os, jacksonObject);
+      if (filterProvider != null) {
+        mapper.writer(filterProvider).writeValue(os, jacksonObject);
+      } else {
+        mapper.writeValue(os, jacksonObject);
+      }
+
       return;
     }
 
     if (prettyPrint && serializationView != void.class) {
-      getPrettyWriter(mapper).withView(serializationView).writeValue(os, jacksonObject);
+      getPrettyWriter(mapper, filterProvider).with(filterProvider).withView(serializationView).writeValue(os, jacksonObject);
       return;
     }
 
     if (prettyPrint) {
-      getPrettyWriter(mapper).writeValue(os, jacksonObject);
+      getPrettyWriter(mapper, filterProvider).writeValue(os, jacksonObject);
       return;
     }
 
     // serializationView is always non-null here
-    mapper.writerWithView(serializationView).writeValue(os, jacksonObject);
+    if (filterProvider != null) {
+      mapper.writerWithView(serializationView).with(filterProvider).writeValue(os, jacksonObject);
+    } else {
+      mapper.writerWithView(serializationView).writeValue(os, jacksonObject);
+    }
   }
-
 }

@@ -89,7 +89,8 @@ public class JacksonActionConfigurator implements ActionConfigurator {
     JSONPropertyFilterConfig jsonFilterConfig = null;
     if (jsonFilterMethods.size() > 0) {
       Method method = jsonFilterMethods.get(0);
-      jsonFilterConfig = new JSONPropertyFilterConfig(method, method.getAnnotation(JSONPropertyFilter.class).value());
+      JSONPropertyFilter annotation = method.getAnnotation(JSONPropertyFilter.class);
+      jsonFilterConfig = new JSONPropertyFilterConfig(method, annotation.value(), annotation.mixinSource(), annotation.mixinTarget());
     }
 
     if (!configuredMembers.isEmpty() || responseMember != null) {
