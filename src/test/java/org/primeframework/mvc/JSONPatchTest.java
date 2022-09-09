@@ -151,6 +151,54 @@ public class JSONPatchTest extends PrimeBaseTest {
                                          "name" : "Jim Bob"
                                        }
                                      }
+                                      """))
+
+        // test - ok
+        .simulate(() -> simulator.test("/patch/test")
+                                 .withContentType("application/json-patch+json")
+                                 .withBody("""
+                                     [
+                                       {
+                                         "op": "test",
+                                         "path": "/data/email",
+                                         "value": "jim@example.com"
+                                       }
+                                     ]
+                                     """)
+                                 .patch()
+                                 .assertStatusCode(200)
+                                 .assertJSON("""
+                                      {
+                                       "data" : {
+                                         "addresses" : [ ],
+                                         "email" : "jim@example.com",
+                                         "name" : "Jim Bob"
+                                       }
+                                     }
+                                      """))
+
+        // test - fail.
+        .simulate(() -> simulator.test("/patch/test")
+                                 .withContentType("application/json-patch+json")
+                                 .withBody("""
+                                     [
+                                       {
+                                         "op": "test",
+                                         "path": "/data/email",
+                                         "value": "james@example.com"
+                                       }
+                                     ]
+                                     """)
+                                 .patch()
+                                 .assertStatusCode(400)
+                                 .assertJSON("""
+                                     {
+                                       "fieldErrors" : { },
+                                       "generalErrors" : [ {
+                                         "code" : "[JSONPatchTestFailed]",
+                                         "message" : "A requested test operation has failed. The value is not equal to the expected value. No changes were made to the requested resource."
+                                       } ]
+                                     }
                                       """));
   }
 

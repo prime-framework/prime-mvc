@@ -137,8 +137,15 @@ public abstract class BaseJacksonContentHandler implements ContentHandler {
         messageStore.add(new SimpleMessage(MessageType.ERROR, "[invalidJSON]", messageProvider.getMessage("[invalidJSON]", "unknown", "Unexpected processing exception", e.getMessage())));
         throw new ValidationException(e);
       } catch (JsonPatchException e) {
-        logger.debug("Error parsing JSON Patch request", e);
-        messageStore.add(new SimpleMessage(MessageType.ERROR, "[invalidJSON]", messageProvider.getMessage("[invalidJSON]", "unknown", "Unexpected processing exception", e.getMessage())));
+        // This isn't ideal, but they do not have any hierarchy in their exception structure and no cause.
+        // - We have tests for this in various products to ensure if the assumption changes we'll catch it.
+        if ("value differs from expectations".equals(e.getMessage())) {
+          messageStore.add(new SimpleMessage(MessageType.ERROR, "[JSONPatchTestFailed]", messageProvider.getMessage("[JSONPatchTestFailed]")));
+        } else {
+          logger.debug("Error parsing JSON Patch request", e);
+          messageStore.add(new SimpleMessage(MessageType.ERROR, "[invalidJSON]", messageProvider.getMessage("[invalidJSON]", "unknown", "Unexpected processing exception", e.getMessage())));
+        }
+
         throw new ValidationException(e);
       }
     }
