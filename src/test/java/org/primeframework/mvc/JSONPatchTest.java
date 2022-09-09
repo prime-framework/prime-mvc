@@ -218,7 +218,8 @@ public class JSONPatchTest extends PrimeBaseTest {
   @Test
   public void json_patch_rfc7386() throws Exception {
     // JSON Merge Patch RFC 7386
-    // https://www.rfc-editor.org/rfc/rfc7386
+    // https://www.rfc-editor.org/rfc/rfc7398
+    // https://www.rfc-editor.org/rfc/rfc7396
     // application/merge-patch+json
 
     // Initial state

@@ -38,7 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A JSON content handler for RFC 6902 application/json-patch+json and RFC 7386 application/merge-patch+json.
+ * A JSON content handler for RFC 6902 application/json-patch+json and RFC 7386/7396 application/merge-patch+json.
  *
  * @author Daniel DeGroff
  */
