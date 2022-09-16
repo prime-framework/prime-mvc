@@ -1459,10 +1459,10 @@ public class RequestResult {
       }
     }
 
-    String redirect = response.getHeader(Headers.Location);
     String body = getBodyAsString();
     for (String string : strings) {
       if (!body.contains(string)) {
+        String redirect = response.getHeader(Headers.Location);
         throw new AssertionError("Body didn't contain [" + string + "]\nRedirect: [" + redirect + "]\nBody:\n" + body);
       }
     }
@@ -1478,9 +1478,9 @@ public class RequestResult {
       message = escape(message);
     }
 
-    String redirect = response.getHeader(Headers.Location);
     String body = getBodyAsString();
     if (contains != body.contains(message)) {
+      String redirect = response.getHeader(Headers.Location);
       String text = contains ? "didn't" : "does";
       throw new AssertionError("Body " + text + " contain [" + message + "] for the key [" + key + "]\nRedirect: [" + redirect + "]\nBody:\n" + body);
     }
