@@ -446,12 +446,7 @@ public class RequestResult {
    * @return This.
    */
   public RequestResult assertContainsCookie(String name) {
-    Cookie actual = getCookie(name);
-    if (actual == null) {
-      throw new AssertionError("Cookie [" + name + "] was not found in the response.\n"
-          + "Cookies found:\n"
-          + response.getCookies().stream().map(this::convert).map(this::cookieToString).collect(Collectors.joining("\n")));
-    }
+    getCookieOrThrow(name);
     return this;
   }
 
@@ -730,13 +725,11 @@ public class RequestResult {
    * @param consumer The consumer used to perform assertions.
    * @return This.
    */
-  public RequestResult assertCookie(String name, ThrowingConsumer<org.primeframework.mvc.http.Cookie> consumer)
+  public RequestResult assertCookie(String name, ThrowingConsumer<CookieAsserter> consumer)
       throws Exception {
-    assertContainsCookie(name);
-
-    Cookie actual = getCookie(name);
+    Cookie actual = getCookieOrThrow(name);
     if (consumer != null) {
-      consumer.accept(actual);
+      consumer.accept(new CookieAsserter(actual));
     }
 
     return this;
@@ -750,9 +743,7 @@ public class RequestResult {
    * @return This.
    */
   public RequestResult assertCookie(String name, String value) {
-    assertContainsCookie(name);
-
-    Cookie actual = getCookie(name);
+    Cookie actual = getCookieOrThrow(name);
     if (!value.equals(actual.value)) {
       throw new AssertionError("Cookie [" + name + "] with value [" + actual.value + "] was not equal to the expected value [" + value + "]"
           + "\nActual cookie:\n"
@@ -769,9 +760,7 @@ public class RequestResult {
    * @return This.
    */
   public RequestResult assertCookieWasDeleted(String name) {
-    assertContainsCookie(name);
-
-    Cookie actual = getCookie(name);
+    Cookie actual = getCookieOrThrow(name);
     if (actual.value != null && actual.maxAge != 0) {
       throw new AssertionError("Cookie [" + name + "] was not deleted. The value is [" + actual.value + "] and the maxAge is [" + actual.maxAge + "]"
           + "\nActual cookie:\n"
@@ -820,13 +809,12 @@ public class RequestResult {
    * @return This.
    */
   public RequestResult assertEncryptedCookie(String name, ThrowingConsumer<Cookie> consumer) throws Exception {
-    assertContainsCookie(name);
+    Cookie actual = getCookieOrThrow(name);
 
     Encryptor encryptor = injector.getInstance(Encryptor.class);
     ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
     ThrowingFunction<byte[], String> oldFunction = r -> objectMapper.readerFor(String.class).readValue(r);
     ThrowingFunction<byte[], String> newFunction = r -> new String(r, StandardCharsets.UTF_8);
-    Cookie actual = getCookie(name);
     actual.value = CookieTools.fromCookie(actual.value, true, encryptor, oldFunction, newFunction);
     if (consumer != null) {
       consumer.accept(actual);
@@ -843,13 +831,12 @@ public class RequestResult {
    * @return This.
    */
   public RequestResult assertEncryptedCookie(String name, String value) throws Exception {
-    assertContainsCookie(name);
+    Cookie actual = getCookieOrThrow(name);
 
     Encryptor encryptor = injector.getInstance(Encryptor.class);
     ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
     ThrowingFunction<byte[], String> oldFunction = r -> objectMapper.readerFor(String.class).readValue(r);
     ThrowingFunction<byte[], String> newFunction = r -> new String(r, StandardCharsets.UTF_8);
-    Cookie actual = getCookie(name);
     String actualDecrypted = CookieTools.fromCookie(actual.value, true, encryptor, oldFunction, newFunction);
     if (!Objects.equals(value, actualDecrypted)) {
       throw new AssertionError("Cookie [" + name + "] with decrypted value [" + actualDecrypted + "] was not equal to the expected value [" + value + "]"
@@ -1620,6 +1607,16 @@ public class RequestResult {
     RequestResult result = rb.get();
     consumer.accept(result);
     return result;
+  }
+
+  private Cookie getCookieOrThrow(String name) {
+    Cookie actual = getCookie(name);
+    if (actual == null) {
+      throw new AssertionError("Cookie [" + name + "] was not found in the response.\n"
+          + "Cookies found:\n"
+          + response.getCookies().stream().map(this::convert).map(this::cookieToString).collect(Collectors.joining("\n")));
+    }
+    return actual;
   }
 
   private MessageProvider getMessageProviderToLookupMessages() {
