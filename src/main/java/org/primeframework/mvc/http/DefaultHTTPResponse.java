@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import io.netty.handler.codec.http.HttpUtil;
 
@@ -35,7 +36,7 @@ import io.netty.handler.codec.http.HttpUtil;
  * @author Brian Pontarelli
  */
 public class DefaultHTTPResponse implements HTTPResponse {
-  private final List<Cookie> cookies = new ArrayList<>();
+  private final Map<String, Map<String, Cookie>> cookies = new HashMap<>(); // <Path, <Name, Cookie>>
 
   private final Map<String, List<String>> headers = new HashMap<>();
 
@@ -51,7 +52,8 @@ public class DefaultHTTPResponse implements HTTPResponse {
 
   @Override
   public void addCookie(Cookie cookie) {
-    cookies.add(cookie);
+    String path = cookie.path != null ? cookie.path : "/";
+    cookies.computeIfAbsent(path, key -> new HashMap<>()).put(cookie.name, cookie);
   }
 
   @Override
@@ -104,7 +106,10 @@ public class DefaultHTTPResponse implements HTTPResponse {
 
   @Override
   public List<Cookie> getCookies() {
-    return cookies;
+    return cookies.values()
+                  .stream()
+                  .flatMap(map -> map.values().stream())
+                  .collect(Collectors.toList());
   }
 
   @Override
@@ -165,7 +170,7 @@ public class DefaultHTTPResponse implements HTTPResponse {
 
   @Override
   public void removeCookie(String name) {
-    cookies.removeIf(c -> c.name.equals(name));
+    cookies.values().forEach(map -> map.remove(name));
   }
 
   @Override
