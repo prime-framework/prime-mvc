@@ -1735,6 +1735,18 @@ public class GlobalTest extends PrimeBaseTest {
                     } ]
                   }
                  """);
+
+    // Not supported in general, URL does not exist, a fuzzer. Expect a 404
+    simulator.test("/hack-the-planet")
+             .withContentType("application/klingon")
+             .withBody("""
+                 {
+                   "foo": "bar"
+                 }
+                 """)
+             .post()
+             .assertStatusCode(404)
+             .assertBodyContains("The page is missing!");
   }
 
   @Test

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,8 +34,8 @@ public class DefaultErrorWorkflow implements ErrorWorkflow {
 
   @Inject
   public DefaultErrorWorkflow(ScopeStorageWorkflow scopeStorageWorkflow, MessageWorkflow messageWorkflow,
-                              ResultInvocationWorkflow resultInvocationWorkflow) {
-    errorWorkflows = asList(scopeStorageWorkflow, messageWorkflow, resultInvocationWorkflow);
+                              ResultInvocationWorkflow resultInvocationWorkflow, MissingWorkflow missingWorkflow) {
+    errorWorkflows = asList(scopeStorageWorkflow, messageWorkflow, resultInvocationWorkflow, missingWorkflow);
   }
 
   @Override

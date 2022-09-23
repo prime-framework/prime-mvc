@@ -19,13 +19,13 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import com.google.inject.Inject;
+import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.http.HTTPRequest;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleMessage;
 import org.primeframework.mvc.message.l10n.MessageProvider;
-import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.validation.ValidationException;
 
 /**
@@ -41,13 +41,15 @@ public class DefaultContentHandler implements ContentHandler {
 
   private final HTTPRequest request;
 
+  private final ActionInvocationStore store;
+
   @Inject
-  public DefaultContentHandler(ExpressionEvaluator expressionEvaluator, HTTPRequest request,
-                               ActionInvocationStore store, MessageProvider messageProvider,
+  public DefaultContentHandler(HTTPRequest request, ActionInvocationStore store, MessageProvider messageProvider,
                                MessageStore messageStore) {
     this.request = request;
     this.messageProvider = messageProvider;
     this.messageStore = messageStore;
+    this.store = store;
   }
 
   @Override
@@ -57,17 +59,22 @@ public class DefaultContentHandler implements ContentHandler {
 
   @Override
   public void handle() throws IOException {
-    // If you send a request body, you must have a Content-Type header
-    ByteBuffer body = request.getBody();
-    // Limit is the number of bytes left within the current capacity. If > 0, we have at least one byte written.
-    if (body != null && body.limit() > 0) {
-      String contentType = request.getContentType();
-      if (contentType == null || contentType.equals("")) {
-        messageStore.add(new SimpleMessage(MessageType.ERROR, "[MissingContentType]", messageProvider.getMessage("[MissingContentType]")));
-      } else {
-        messageStore.add(new SimpleMessage(MessageType.ERROR, "[UnsupportedContentType]", messageProvider.getMessage("[UnsupportedContentType]", contentType)));
+    // Only validate if we have an action, otherwise this is just a 404
+    ActionInvocation actionInvocation = store.getCurrent();
+    if (actionInvocation != null && actionInvocation.configuration != null) {
+      // If you send a request body, you must have a Content-Type header
+      ByteBuffer body = request.getBody();
+      // Limit is the number of bytes left within the current capacity. If > 0, we have at least one byte written.
+      if (body != null && body.limit() > 0) {
+        String contentType = request.getContentType();
+        if (contentType == null || contentType.equals("")) {
+          messageStore.add(new SimpleMessage(MessageType.ERROR, "[MissingContentType]", messageProvider.getMessage("[MissingContentType]")));
+        } else {
+          messageStore.add(new SimpleMessage(MessageType.ERROR, "[UnsupportedContentType]", messageProvider.getMessage("[UnsupportedContentType]", contentType)));
+        }
+
+        throw new ValidationException();
       }
-      throw new ValidationException();
     }
   }
 }
