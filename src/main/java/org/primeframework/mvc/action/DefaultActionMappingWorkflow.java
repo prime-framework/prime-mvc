@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2019, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -101,12 +101,15 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
     // Start the timer and grab a meter for errors
     Timer.Context timer = null;
     Meter errorMeter = null;
-    if (metricRegistry != null && actionInvocation.action != null) {
-      timer = metricRegistry.timer("prime-mvc.[" + actionInvocation.uri() + "].requests").time();
-      errorMeter = metricRegistry.meter("prime-mvc.[" + actionInvocation.uri() + "].errors");
-    }
 
     try {
+      if (metricRegistry != null && actionInvocation.action != null) {
+        // Ignore try/resource inspection, we are closing this in the finally block already
+        //noinspection resource
+        timer = metricRegistry.timer("prime-mvc.[" + actionInvocation.uri() + "].requests").time();
+        errorMeter = metricRegistry.meter("prime-mvc.[" + actionInvocation.uri() + "].errors");
+      }
+
       chain.continueWorkflow();
 
       // We need to leave the action in the store because it might be used by the Error Workflow
