@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2015-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,11 +51,8 @@ public class CookieProxy {
 
   public void delete(HTTPRequest request, HTTPResponse response) {
     Cookie cookie = new Cookie(name, null);
-    cookie.httpOnly = true;
     cookie.maxAge = 0L;
     cookie.path = "/";
-    cookie.sameSite = sameSite;
-    cookie.secure = "https".equalsIgnoreCase(defaultIfNull(request.getHeader("X-Forwarded-Proto"), request.getScheme()));
     response.addCookie(cookie);
 
     // Ensure we do not return the cookie again after it has been deleted within the same request.
