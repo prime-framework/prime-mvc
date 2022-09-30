@@ -138,8 +138,7 @@ public class JSONBuilder {
     JsonNode child = node.path(pointer.field);
 
     // If the field name is an array, we are adding to it I think? I think will have to do replace to modify the entire array
-    if (child instanceof ArrayNode) {
-      ArrayNode arrayNode = (ArrayNode) child;
+    if (child instanceof ArrayNode arrayNode) {
       arrayConsumer.accept(arrayNode);
       return this;
     }
@@ -148,11 +147,9 @@ public class JSONBuilder {
       fail("Node not found. [" + field + "]");
     }
 
-    if (node instanceof ObjectNode) {
-      ObjectNode objectNode = (ObjectNode) node;
+    if (node instanceof ObjectNode objectNode) {
       objectConsumer.accept(objectNode, pointer.field);
-    } else if (node instanceof ArrayNode) {
-      ArrayNode arrayNode = (ArrayNode) node;
+    } else if (node instanceof ArrayNode arrayNode) {
       arrayConsumer.accept(arrayNode);
     } else {
       throw new UnsupportedOperationException("Not expecting this. Node is [" + node.getClass().getSimpleName() + "]");
@@ -171,8 +168,7 @@ public class JSONBuilder {
     for (String part : pointer.parent.substring(1).split("/")) {
       path = path + (path.endsWith("/") ? "" : "/") + part;
       if (root.at(path).isMissingNode()) {
-        if (working instanceof ObjectNode) {
-          ObjectNode objectNode = (ObjectNode) working;
+        if (working instanceof ObjectNode objectNode) {
           objectNode.set(part, JsonNodeFactory.instance.objectNode());
           working = root.at(path);
         } else {

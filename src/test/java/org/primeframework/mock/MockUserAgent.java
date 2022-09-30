@@ -23,8 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.primeframework.mvc.http.Cookie;
-import org.primeframework.mvc.http.HTTPRequest;
+import io.fusionauth.http.Cookie;
+import io.fusionauth.http.server.HTTPRequest;
 
 /**
  * @author Daniel DeGroff

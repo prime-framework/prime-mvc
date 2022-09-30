@@ -15,7 +15,7 @@
  */
 package org.primeframework.mvc.message;
 
-import org.primeframework.mvc.http.HTTPRequest;
+import io.fusionauth.http.server.HTTPRequest;
 import org.primeframework.mvc.message.scope.MessageScope;
 
 /**

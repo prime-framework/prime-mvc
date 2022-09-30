@@ -18,10 +18,10 @@ package org.primeframework.mvc.scope;
 import java.lang.annotation.Annotation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.fusionauth.http.Cookie;
+import io.fusionauth.http.server.HTTPRequest;
+import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.ErrorException;
-import org.primeframework.mvc.http.Cookie;
-import org.primeframework.mvc.http.HTTPRequest;
-import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.util.CookieTools;
 import org.slf4j.Logger;

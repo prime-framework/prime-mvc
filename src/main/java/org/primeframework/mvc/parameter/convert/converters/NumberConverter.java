@@ -19,12 +19,11 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Map;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.convert.annotation.GlobalConverter;
-
-import com.google.inject.Inject;
 
 /**
  * This is the type converter for primitives and wrapper classes of numbers.
@@ -42,7 +41,7 @@ public class NumberConverter extends AbstractPrimitiveConverter {
    * Returns 0 for everything but in the correct wrapper classes.
    */
   protected Object defaultPrimitive(Class convertTo, Map<String, String> attributes)
-    throws ConversionException, ConverterStateException {
+      throws ConversionException, ConverterStateException {
     if (convertTo == Byte.TYPE || convertTo == Byte.class) {
       return (byte) 0;
     } else if (convertTo == Short.TYPE || convertTo == Short.class) {
@@ -50,13 +49,13 @@ public class NumberConverter extends AbstractPrimitiveConverter {
     } else if (convertTo == Integer.TYPE || convertTo == Integer.class) {
       return 0;
     } else if (convertTo == Long.TYPE || convertTo == Long.class) {
-      return 0l;
+      return 0L;
     } else if (convertTo == Float.TYPE || convertTo == Float.class) {
       return 0.0f;
     } else if (convertTo == BigInteger.class) {
       return BigInteger.ZERO;
     } else if (convertTo == BigDecimal.class) {
-      return new BigDecimal(0.0d);
+      return new BigDecimal("0.0");
     } else if (convertTo == Double.TYPE || convertTo == Double.class) {
       return 0.0d;
     }
@@ -64,11 +63,31 @@ public class NumberConverter extends AbstractPrimitiveConverter {
     throw new ConverterStateException("Invalid type for NumberConverter [" + convertTo + "]");
   }
 
+  protected String primitiveToString(Object value, Class convertFrom, Map<String, String> attributes)
+      throws ConversionException, ConverterStateException {
+    return value.toString();
+
+    // TODO add precision support
+//        if (convertFrom == Byte.TYPE || convertFrom == Byte.class ||
+//                convertFrom == Short.TYPE || convertFrom == Short.class ||
+//                convertFrom == Integer.TYPE || convertFrom == Integer.class ||
+//                convertFrom == Long.TYPE || convertFrom == Long.class) {
+//            return value.toString();
+//        } else if (convertFrom == Float.TYPE || convertFrom == Float.class ||
+//                convertFrom == Double.TYPE || convertFrom == Double.class) {
+//            return Double.valueOf(value);
+//        } else if (convertFrom == BigInteger.class) {
+//            return new BigInteger(value);
+//        } else if (convertFrom == BigDecimal.class) {
+//            return new BigDecimal(value);
+//        }
+  }
+
   /**
    * Uses the valueOf methods in the wrapper classes based on the convertTo type.
    */
   protected Object stringToPrimitive(String value, Class convertTo, Map<String, String> attributes)
-    throws ConversionException, ConverterStateException {
+      throws ConversionException, ConverterStateException {
     try {
       if (convertTo == Byte.TYPE || convertTo == Byte.class) {
         return Byte.valueOf(value);
@@ -92,25 +111,5 @@ public class NumberConverter extends AbstractPrimitiveConverter {
     } catch (NumberFormatException e) {
       throw new ConversionException(e);
     }
-  }
-
-  protected String primitiveToString(Object value, Class convertFrom, Map<String, String> attributes)
-    throws ConversionException, ConverterStateException {
-    return value.toString();
-
-    // TODO add precision support
-//        if (convertFrom == Byte.TYPE || convertFrom == Byte.class ||
-//                convertFrom == Short.TYPE || convertFrom == Short.class ||
-//                convertFrom == Integer.TYPE || convertFrom == Integer.class ||
-//                convertFrom == Long.TYPE || convertFrom == Long.class) {
-//            return value.toString();
-//        } else if (convertFrom == Float.TYPE || convertFrom == Float.class ||
-//                convertFrom == Double.TYPE || convertFrom == Double.class) {
-//            return Double.valueOf(value);
-//        } else if (convertFrom == BigInteger.class) {
-//            return new BigInteger(value);
-//        } else if (convertFrom == BigDecimal.class) {
-//            return new BigDecimal(value);
-//        }
   }
 }

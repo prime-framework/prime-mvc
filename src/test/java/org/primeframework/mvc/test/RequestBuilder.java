@@ -15,10 +15,8 @@
  */
 package org.primeframework.mvc.test;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
-import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -47,19 +45,18 @@ import com.inversoft.rest.MultipartBodyHandler;
 import com.inversoft.rest.MultipartBodyHandler.Multiparts;
 import com.inversoft.rest.RESTClient;
 import com.inversoft.rest.RESTClient.BodyHandler;
+import io.fusionauth.http.Cookie;
+import io.fusionauth.http.FileInfo;
+import io.fusionauth.http.HTTPMethod;
+import io.fusionauth.http.io.NonBlockingByteBufferOutputStream;
+import io.fusionauth.http.server.HTTPRequest;
+import io.fusionauth.http.server.HTTPResponse;
+import io.fusionauth.http.server.HTTPServerConfiguration;
 import org.primeframework.mock.MockUserAgent;
 import org.primeframework.mvc.config.MVCConfiguration;
-import org.primeframework.mvc.http.Cookie;
-import org.primeframework.mvc.http.DefaultHTTPRequest;
-import org.primeframework.mvc.http.DefaultHTTPResponse;
-import org.primeframework.mvc.http.HTTPMethod;
 import org.primeframework.mvc.http.HTTPObjectsHolder;
-import org.primeframework.mvc.http.HTTPRequest;
-import org.primeframework.mvc.http.MutableHTTPRequest;
 import org.primeframework.mvc.message.TestMessageObserver;
-import org.primeframework.mvc.netty.PrimeHTTPListenerConfiguration;
 import org.primeframework.mvc.parameter.DefaultParameterParser;
-import org.primeframework.mvc.parameter.fileupload.FileInfo;
 import org.primeframework.mvc.security.csrf.CSRFProvider;
 import org.primeframework.mvc.test.RequestResult.ThrowingConsumer;
 import org.primeframework.mvc.util.QueryStringTools;
@@ -72,13 +69,13 @@ import org.primeframework.mvc.util.URITools;
  */
 @SuppressWarnings({"unused", "UnusedReturnValue"})
 public class RequestBuilder {
-  public final Injector injector;
+  public final HTTPServerConfiguration configuration;
 
-  public final PrimeHTTPListenerConfiguration listenerConfiguration;
+  public final Injector injector;
 
   public final TestMessageObserver messageObserver;
 
-  public final MutableHTTPRequest request;
+  public final HTTPRequest request;
 
   public final Map<String, List<String>> requestBodyParameters = new LinkedHashMap<>();
 
@@ -86,14 +83,16 @@ public class RequestBuilder {
 
   public boolean useTLS;
 
+  private byte[] body;
+
   public RequestBuilder(String path, Injector injector, MockUserAgent userAgent,
-                        PrimeHTTPListenerConfiguration listenerConfiguration, TestMessageObserver messageObserver) {
+                        HTTPServerConfiguration configuration, TestMessageObserver messageObserver) {
     this.injector = injector;
-    this.listenerConfiguration = listenerConfiguration;
+    this.configuration = configuration;
     this.userAgent = userAgent;
     this.messageObserver = messageObserver;
-    this.request = new DefaultHTTPRequest().with(r -> r.addLocales(Locale.US))
-                                           .with(r -> r.setPath(path));
+    this.request = new HTTPRequest().with(r -> r.addLocales(Locale.US))
+                                    .with(r -> r.setPath(path));
   }
 
   /**
@@ -115,7 +114,7 @@ public class RequestBuilder {
   public RequestResult connect() {
     request.setMethod(HTTPMethod.CONNECT);
     ClientResponse<byte[], byte[]> response = run();
-    return new RequestResult(injector, request, response, userAgent, listenerConfiguration, messageObserver);
+    return new RequestResult(injector, request, response, userAgent, configuration, messageObserver);
   }
 
   /**
@@ -126,7 +125,7 @@ public class RequestBuilder {
   public RequestResult delete() {
     request.setMethod(HTTPMethod.DELETE);
     ClientResponse<byte[], byte[]> response = run();
-    return new RequestResult(injector, request, response, userAgent, listenerConfiguration, messageObserver);
+    return new RequestResult(injector, request, response, userAgent, configuration, messageObserver);
   }
 
   /**
@@ -137,7 +136,7 @@ public class RequestBuilder {
   public RequestResult get() {
     request.setMethod(HTTPMethod.GET);
     ClientResponse<byte[], byte[]> response = run();
-    return new RequestResult(injector, request, response, userAgent, listenerConfiguration, messageObserver);
+    return new RequestResult(injector, request, response, userAgent, configuration, messageObserver);
   }
 
   public HTTPRequest getRequest() {
@@ -152,7 +151,7 @@ public class RequestBuilder {
   public RequestResult head() {
     request.setMethod(HTTPMethod.HEAD);
     ClientResponse<byte[], byte[]> response = run();
-    return new RequestResult(injector, request, response, userAgent, listenerConfiguration, messageObserver);
+    return new RequestResult(injector, request, response, userAgent, configuration, messageObserver);
   }
 
   /**
@@ -209,7 +208,7 @@ public class RequestBuilder {
   public RequestResult method(String method) {
     request.setMethod(HTTPMethod.of(method));
     ClientResponse<byte[], byte[]> response = run();
-    return new RequestResult(injector, request, response, userAgent, listenerConfiguration, messageObserver);
+    return new RequestResult(injector, request, response, userAgent, configuration, messageObserver);
   }
 
   /**
@@ -220,7 +219,7 @@ public class RequestBuilder {
   public RequestResult options() {
     request.setMethod(HTTPMethod.OPTIONS);
     ClientResponse<byte[], byte[]> response = run();
-    return new RequestResult(injector, request, response, userAgent, listenerConfiguration, messageObserver);
+    return new RequestResult(injector, request, response, userAgent, configuration, messageObserver);
   }
 
   /**
@@ -231,7 +230,7 @@ public class RequestBuilder {
   public RequestResult patch() {
     request.setMethod(HTTPMethod.PATCH);
     ClientResponse<byte[], byte[]> response = run();
-    return new RequestResult(injector, request, response, userAgent, listenerConfiguration, messageObserver);
+    return new RequestResult(injector, request, response, userAgent, configuration, messageObserver);
   }
 
   /**
@@ -242,7 +241,7 @@ public class RequestBuilder {
   public RequestResult post() {
     request.setMethod(HTTPMethod.POST);
     ClientResponse<byte[], byte[]> response = run();
-    return new RequestResult(injector, request, response, userAgent, listenerConfiguration, messageObserver);
+    return new RequestResult(injector, request, response, userAgent, configuration, messageObserver);
   }
 
   /**
@@ -253,11 +252,11 @@ public class RequestBuilder {
   public RequestResult put() {
     request.setMethod(HTTPMethod.PUT);
     ClientResponse<byte[], byte[]> response = run();
-    return new RequestResult(injector, request, response, userAgent, listenerConfiguration, messageObserver);
+    return new RequestResult(injector, request, response, userAgent, configuration, messageObserver);
   }
 
   public int resolveSimulatorPort() {
-    return useTLS ? listenerConfiguration.httpsPort : listenerConfiguration.httpPort;
+    return configuration.getListeners().get(0).getPort();
   }
 
   /**
@@ -266,7 +265,7 @@ public class RequestBuilder {
    * @param consumer A consumer that takes the MutableHTTPRequest.
    * @return This.
    */
-  public RequestBuilder setup(Consumer<MutableHTTPRequest> consumer) {
+  public RequestBuilder setup(Consumer<HTTPRequest> consumer) {
     consumer.accept(request);
     return this;
   }
@@ -279,7 +278,7 @@ public class RequestBuilder {
   public RequestResult trace() {
     request.setMethod(HTTPMethod.TRACE);
     ClientResponse<byte[], byte[]> response = run();
-    return new RequestResult(injector, request, response, userAgent, listenerConfiguration, messageObserver);
+    return new RequestResult(injector, request, response, userAgent, configuration, messageObserver);
   }
 
   /**
@@ -331,7 +330,7 @@ public class RequestBuilder {
    * @return This.
    */
   public RequestBuilder withBody(byte[] bytes) {
-    request.setBody(ByteBuffer.wrap(bytes));
+    this.body = bytes;
     return this;
   }
 
@@ -376,7 +375,7 @@ public class RequestBuilder {
    * @return This.
    */
   public RequestBuilder withCSRFToken(String token) {
-    request.setParameter(CSRFProvider.CSRF_PARAMETER_KEY, token);
+    request.addURLParameter(CSRFProvider.CSRF_PARAMETER_KEY, token);
     return this;
   }
 
@@ -469,7 +468,7 @@ public class RequestBuilder {
    * @return This.
    */
   public RequestBuilder withFile(String name, Path file, String contentType) {
-    request.addFile(new FileInfo(file, null, name, contentType));
+    request.getFiles().add(new FileInfo(file, null, name, contentType, StandardCharsets.UTF_8));
     return this;
   }
 
@@ -618,7 +617,7 @@ public class RequestBuilder {
    * @return This.
    */
   public RequestBuilder withURLParameter(String name, Object value) {
-    request.addParameter(name, value.toString());
+    request.addURLParameter(name, value.toString());
     return this;
   }
 
@@ -630,7 +629,7 @@ public class RequestBuilder {
    * @return This.
    */
   public RequestBuilder withURLParameters(String name, Collection<?> values) {
-    request.addParameters(name, values.stream().map(Object::toString).collect(Collectors.toList()));
+    request.addURLParameters(name, values.stream().map(Object::toString).collect(Collectors.toList()));
     return this;
   }
 
@@ -677,7 +676,7 @@ public class RequestBuilder {
     HTTPObjectsHolder.clearRequest();
     HTTPObjectsHolder.setRequest(request);
     HTTPObjectsHolder.clearResponse();
-    HTTPObjectsHolder.setResponse(new DefaultHTTPResponse(new ByteArrayOutputStream()));
+    HTTPObjectsHolder.setResponse(new HTTPResponse(new NonBlockingByteBufferOutputStream(null, 1024), request));
 
     // Add a unique Id so that we can identify messages for this request in the observer.
     String messageStoreId = UUID.randomUUID().toString();
@@ -703,8 +702,8 @@ public class RequestBuilder {
                              .collect(Collectors.toList());
 
     int port = resolveSimulatorPort();
-    String schema = useTLS ? "https" : "http";
-    URI requestURI = URI.create(schema + "://localhost:" + port + request.getPath());
+    String base = useTLS ? "https://local.fusionauth.io" : "http://localhost";
+    URI requestURI = URI.create(base + ":" + port + request.getPath());
 
     // Referer for CSRF checks must be provided
     if (request.getHeader("Referer") == null) {
@@ -723,7 +722,7 @@ public class RequestBuilder {
       if (csrfProvider.getTokenFromRequest(request) == null) {
         String token = csrfProvider.getToken(request);
         if (token != null) {
-          request.setParameter(CSRFProvider.CSRF_PARAMETER_KEY, token);
+          request.addURLParameter(CSRFProvider.CSRF_PARAMETER_KEY, token);
         }
       }
     }
@@ -732,14 +731,6 @@ public class RequestBuilder {
     String contentType = request.getContentType();
     Charset characterEncoding = request.getCharacterEncoding();
     HTTPMethod method = request.getMethod();
-
-    // Handle URL parameters and body
-    ByteBuffer bodyBuf = request.getBody();
-    byte[] body = null;
-    if (bodyBuf != null) {
-      body = new byte[bodyBuf.limit()];
-      System.arraycopy(bodyBuf.array(), bodyBuf.position(), body, 0, bodyBuf.limit());
-    }
 
     Map<String, List<String>> urlParameters = request.getParameters();
     List<FileInfo> files = request.getFiles();
@@ -774,7 +765,7 @@ public class RequestBuilder {
         .followRedirects(false)
         .setHeader("Accept-Language", locales.size() > 0 ? locales.stream().map(Locale::toLanguageTag).collect(Collectors.joining(", ")) : null)
         .setHeader("Content-Type", contentType != null ? (contentType + (characterEncoding != null ? "; charset=" + characterEncoding : "")) : null)
-        .setHeaders(request.getHeadersMap())
+        .setHeaders(request.getHeaders())
         .method(request.getMethod().name())
         .readTimeout(0)
         .successResponseHandler(new ByteArrayResponseHandler())

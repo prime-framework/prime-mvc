@@ -49,8 +49,7 @@ public class GuiceTools {
         t = ((ParameterizedType) t).getRawType();
       }
 
-      if (t instanceof Class) {
-        Class<?> bindingType = (Class<?>) t;
+      if (t instanceof Class<?> bindingType) {
         if (type.isAssignableFrom(bindingType)) {
           results.add((Key<? extends T>) key);
         }

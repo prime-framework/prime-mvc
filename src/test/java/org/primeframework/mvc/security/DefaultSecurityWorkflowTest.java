@@ -16,6 +16,9 @@
 package org.primeframework.mvc.security;
 
 import com.google.inject.Inject;
+import io.fusionauth.http.HTTPMethod;
+import io.fusionauth.http.server.HTTPContext;
+import io.fusionauth.http.server.HTTPRequest;
 import org.example.action.PostAction;
 import org.example.action.SecureAction;
 import org.example.action.SecureNoRolesAction;
@@ -26,9 +29,6 @@ import org.primeframework.mvc.action.ExecuteMethodConfiguration;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.config.DefaultActionConfigurationBuilder;
 import org.primeframework.mvc.config.MVCConfiguration;
-import org.primeframework.mvc.http.HTTPContext;
-import org.primeframework.mvc.http.HTTPMethod;
-import org.primeframework.mvc.http.HTTPRequest;
 import org.primeframework.mvc.security.csrf.CSRFProvider;
 import org.primeframework.mvc.security.guice.SecuritySchemeFactory;
 import org.primeframework.mvc.workflow.WorkflowChain;
@@ -106,8 +106,8 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
 
     request.setMethod(HTTPMethod.GET);
     request.setPath("/secure");
-    request.addParameter("test", "value");
-    request.addParameter("test2", "value2");
+    request.addURLParameter("test", "value");
+    request.addURLParameter("test2", "value2");
 
     MockUserLoginSecurityContext.roles.clear();
     MockUserLoginSecurityContext securityContext = new MockUserLoginSecurityContext();
@@ -135,8 +135,8 @@ public class DefaultSecurityWorkflowTest extends PrimeBaseTest {
 
     request.setMethod(HTTPMethod.POST);
     request.setPath("/secure");
-    request.addParameter("test", "value");
-    request.addParameter("test2", "value2");
+    request.addURLParameter("test", "value");
+    request.addURLParameter("test2", "value2");
 
     MockUserLoginSecurityContext.roles.clear();
     MockUserLoginSecurityContext securityContext = new MockUserLoginSecurityContext();

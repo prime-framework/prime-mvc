@@ -14,10 +14,9 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 
-import org.primeframework.mvc.container.ContainerResolver;
-
 import com.google.inject.Inject;
 import freemarker.cache.TemplateLoader;
+import org.primeframework.mvc.container.ContainerResolver;
 
 /**
  * This class is a free marker template loader that uses the {@link ContainerResolver} interface and the current context
@@ -38,6 +37,16 @@ public class OverridingTemplateLoader implements TemplateLoader {
   @Inject
   public OverridingTemplateLoader(ContainerResolver containerResolver) {
     this.containerResolver = containerResolver;
+  }
+
+  /**
+   * Calls close on the URLTemplateSource.
+   *
+   * @param templateSource The URLTemplateSource.
+   * @throws IOException If the close fails.
+   */
+  public void closeTemplateSource(Object templateSource) throws IOException {
+    ((URLTemplateSource) templateSource).close();
   }
 
   /**
@@ -100,15 +109,5 @@ public class OverridingTemplateLoader implements TemplateLoader {
    */
   public Reader getReader(Object templateSource, String encoding) throws IOException {
     return new InputStreamReader(((URLTemplateSource) templateSource).getInputStream(), encoding);
-  }
-
-  /**
-   * Calls close on the URLTemplateSource.
-   *
-   * @param templateSource The URLTemplateSource.
-   * @throws IOException If the close fails.
-   */
-  public void closeTemplateSource(Object templateSource) throws IOException {
-    ((URLTemplateSource) templateSource).close();
   }
 }

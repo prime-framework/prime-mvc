@@ -22,7 +22,6 @@ import java.io.IOException;
 import org.easymock.EasyMock;
 import org.primeframework.mvc.container.ContainerResolver;
 import org.testng.annotations.Test;
-
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
@@ -33,6 +32,23 @@ import static org.testng.Assert.assertTrue;
  * @author Brian Pontarelli
  */
 public class OverridingTemplateLoaderTest {
+  @Test
+  public void classPath() throws IOException {
+    ContainerResolver resolver = EasyMock.createStrictMock(ContainerResolver.class);
+    EasyMock.expect(resolver.getRealPath("logging.properties")).andReturn("build/classes/test/logging.properties");
+    EasyMock.replay(resolver);
+
+    OverridingTemplateLoader loader = new OverridingTemplateLoader(resolver);
+    URLTemplateSource source = (URLTemplateSource) loader.findTemplateSource("logging.properties");
+    File file = new File("src/test/resources/logging.properties");
+    assertTrue(loader.getLastModified(source) > file.lastModified());
+    assertEquals(loader.getLastModified(source), loader.getLastModified(source));
+    assertNotNull(loader.getReader(source, "UTF-8"));
+    loader.closeTemplateSource(source);
+
+    EasyMock.verify(resolver);
+  }
+
   @Test
   public void realPath() throws IOException {
     ContainerResolver resolver = EasyMock.createStrictMock(ContainerResolver.class);
@@ -60,23 +76,6 @@ public class OverridingTemplateLoaderTest {
     URLTemplateSource source = (URLTemplateSource) loader.findTemplateSource("build.savant");
     File file = new File("build.savant");
     assertEquals(loader.getLastModified(source), file.lastModified());
-    assertNotNull(loader.getReader(source, "UTF-8"));
-    loader.closeTemplateSource(source);
-
-    EasyMock.verify(resolver);
-  }
-
-  @Test
-  public void classPath() throws IOException {
-    ContainerResolver resolver = EasyMock.createStrictMock(ContainerResolver.class);
-    EasyMock.expect(resolver.getRealPath("logging.properties")).andReturn("build/classes/test/logging.properties");
-    EasyMock.replay(resolver);
-
-    OverridingTemplateLoader loader = new OverridingTemplateLoader(resolver);
-    URLTemplateSource source = (URLTemplateSource) loader.findTemplateSource("logging.properties");
-    File file = new File("src/test/resources/logging.properties");
-    assertTrue(loader.getLastModified(source) > file.lastModified());
-    assertEquals(loader.getLastModified(source), loader.getLastModified(source));
     assertNotNull(loader.getReader(source, "UTF-8"));
     loader.closeTemplateSource(source);
 

@@ -18,7 +18,8 @@ package org.primeframework.mvc.workflow;
 import java.io.IOException;
 
 /**
- * This interface defines how {@link Workflow} instances pass control to the next Workflow or back to the PrimeMVCRequestHandler.
+ * This interface defines how {@link Workflow} instances pass control to the next Workflow or back to the
+ * PrimeMVCRequestHandler.
  *
  * @author Brian Pontarelli
  */
@@ -27,7 +28,7 @@ public interface WorkflowChain {
    * Invokes the next {@link Workflow} in the chain, or if all the workflows have been invoked this should pass control
    * back to the PrimeMVCRequestHandler to continue processing the HTTP request down the filter chain.
    *
-   * @throws IOException      If the workflows or filters throw IOException.
+   * @throws IOException If the workflows or filters throw IOException.
    */
   void continueWorkflow() throws IOException;
 }

@@ -38,64 +38,27 @@ public abstract class AbstractPrimitiveConverter extends AbstractGlobalConverter
     this.emptyIsNull = configuration.emptyParametersAreNull();
   }
 
-  protected Object stringToObject(String value, Type convertTo, Map<String, String> attributes, String expression)
-    throws ConversionException, ConverterStateException {
-    if (emptyIsNull && StringUtils.isBlank(value)) {
-      value = null;
-    }
-
-    Class<?> rawType = TypeTools.rawType(convertTo);
-    if (value == null && rawType.isPrimitive()) {
-      return defaultPrimitive(rawType, attributes);
-    } else if (value == null) {
-      return null;
-    }
-
-    return stringToPrimitive(value, rawType, attributes);
-  }
-
-  protected Object stringsToObject(String[] values, Type convertTo, Map<String, String> attributes, String expression)
-    throws ConversionException, ConverterStateException {
-    throw new ConverterStateException("The primitive converter doesn't support String[] to Object conversion.");
-  }
-
-  protected String objectToString(Object value, Type convertFrom, Map<String, String> attributes, String expression)
-    throws ConversionException, ConverterStateException {
-    Class<?> rawType = TypeTools.rawType(convertFrom);
-    return primitiveToString(value, rawType, attributes);
-  }
-
   /**
    * Returns the default primitive value for the given primitive type. This must use the wrapper classes as return
    * types.
    *
-   * @param convertTo The type of primitive to return the default value for.
+   * @param convertTo  The type of primitive to return the default value for.
    * @param attributes Any attributes associated with the parameter being converted. Parameter attributes are described
    *                   in the {@link org.primeframework.mvc.parameter.ParameterWorkflow} class comment.
    * @return The wrapper that contains the default value for the primitive.
-   * @throws ConversionException If the default value could not be determined.
+   * @throws ConversionException     If the default value could not be determined.
    * @throws ConverterStateException If the state of the request, response, locale or attributes was such that
    *                                 conversion could not occur. This is normally a fatal exception that is fixable
    *                                 during development but not in production.
    */
   protected abstract Object defaultPrimitive(Class convertTo, Map<String, String> attributes)
-    throws ConversionException, ConverterStateException;
+      throws ConversionException, ConverterStateException;
 
-  /**
-   * Converts the given String (always non-null) to a primitive denoted by the convertTo parameter.
-   *
-   * @param value      The value to convert.
-   * @param convertTo  The type to convert the value to.
-   * @param attributes Any attributes associated with the parameter being converted. Parameter attributes are described
-   *                   in the {@link org.primeframework.mvc.parameter.ParameterWorkflow} class comment.
-   * @return The converted value.
-   * @throws ConversionException     If there was a problem converting the given value to the given type.
-   * @throws ConverterStateException If the state of the request, response, locale or attributes was such that
-   *                                 conversion could not occur. This is normally a fatal exception that is fixable
-   *                                 during development but not in production.
-   */
-  protected abstract Object stringToPrimitive(String value, Class convertTo, Map<String, String> attributes)
-    throws ConversionException, ConverterStateException;
+  protected String objectToString(Object value, Type convertFrom, Map<String, String> attributes, String expression)
+      throws ConversionException, ConverterStateException {
+    Class<?> rawType = TypeTools.rawType(convertFrom);
+    return primitiveToString(value, rawType, attributes);
+  }
 
   /**
    * Converts the given String (always non-null) to a primitive denoted by the convertTo parameter.
@@ -111,5 +74,42 @@ public abstract class AbstractPrimitiveConverter extends AbstractGlobalConverter
    *                                 during development but not in production.
    */
   protected abstract String primitiveToString(Object value, Class convertFrom, Map<String, String> attributes)
-    throws ConversionException, ConverterStateException;
+      throws ConversionException, ConverterStateException;
+
+  protected Object stringToObject(String value, Type convertTo, Map<String, String> attributes, String expression)
+      throws ConversionException, ConverterStateException {
+    if (emptyIsNull && StringUtils.isBlank(value)) {
+      value = null;
+    }
+
+    Class<?> rawType = TypeTools.rawType(convertTo);
+    if (value == null && rawType.isPrimitive()) {
+      return defaultPrimitive(rawType, attributes);
+    } else if (value == null) {
+      return null;
+    }
+
+    return stringToPrimitive(value, rawType, attributes);
+  }
+
+  /**
+   * Converts the given String (always non-null) to a primitive denoted by the convertTo parameter.
+   *
+   * @param value      The value to convert.
+   * @param convertTo  The type to convert the value to.
+   * @param attributes Any attributes associated with the parameter being converted. Parameter attributes are described
+   *                   in the {@link org.primeframework.mvc.parameter.ParameterWorkflow} class comment.
+   * @return The converted value.
+   * @throws ConversionException     If there was a problem converting the given value to the given type.
+   * @throws ConverterStateException If the state of the request, response, locale or attributes was such that
+   *                                 conversion could not occur. This is normally a fatal exception that is fixable
+   *                                 during development but not in production.
+   */
+  protected abstract Object stringToPrimitive(String value, Class convertTo, Map<String, String> attributes)
+      throws ConversionException, ConverterStateException;
+
+  protected Object stringsToObject(String[] values, Type convertTo, Map<String, String> attributes, String expression)
+      throws ConversionException, ConverterStateException {
+    throw new ConverterStateException("The primitive converter doesn't support String[] to Object conversion.");
+  }
 }

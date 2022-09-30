@@ -18,9 +18,9 @@ package org.primeframework.mvc.security;
 import java.net.URI;
 
 import com.google.inject.Inject;
+import io.fusionauth.http.HTTPMethod;
+import io.fusionauth.http.server.HTTPRequest;
 import org.primeframework.mvc.config.MVCConfiguration;
-import org.primeframework.mvc.http.HTTPMethod;
-import org.primeframework.mvc.http.HTTPRequest;
 import org.primeframework.mvc.http.HTTPTools;
 import org.primeframework.mvc.security.csrf.CSRFProvider;
 

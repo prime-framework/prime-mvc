@@ -40,25 +40,25 @@ public class NumberInputTest extends ControlBaseTest {
 
     ais.setCurrent(new ActionInvocation(action, null, "/number", null, null));
     new ControlTester(number).
-                                 attr("name", "user.age").
-                                 go("<input type=\"hidden\" name=\"user.age@param\" value=\"param-value\"/>\n" +
-                                     "<div class=\"text input control\">\n" +
-                                     "<div class=\"label-container\"><label for=\"user_age\" class=\"label\">Your age</label></div>\n" +
-                                     "<div class=\"control-container\"><input type=\"number\" id=\"user_age\" name=\"user.age\" value=\"42\"/></div>\n" +
-                                     "</div>\n");
+        attr("name", "user.age").
+        go("<input type=\"hidden\" name=\"user.age@param\" value=\"param-value\"/>\n" +
+            "<div class=\"text input control\">\n" +
+            "<div class=\"label-container\"><label for=\"user_age\" class=\"label\">Your age</label></div>\n" +
+            "<div class=\"control-container\"><input type=\"number\" id=\"user_age\" name=\"user.age\" value=\"42\"/></div>\n" +
+            "</div>\n");
   }
 
   @Test
   public void actionLess() {
     ais.setCurrent(new ActionInvocation(null, null, "/number", null, null));
     new ControlTester(number).
-                                 attr("name", "test").
-                                 attr("class", "css-class").
-                                 go("<input type=\"hidden\" name=\"test@param\" value=\"param-value\"/>\n" +
-                                     "<div class=\"css-class-text css-class-input css-class-control text input control\">\n" +
-                                     "<div class=\"label-container\"><label for=\"test\" class=\"label\">Test</label></div>\n" +
-                                     "<div class=\"control-container\"><input type=\"number\" class=\"css-class\" id=\"test\" name=\"test\"/></div>\n" +
-                                     "</div>\n");
+        attr("name", "test").
+        attr("class", "css-class").
+        go("<input type=\"hidden\" name=\"test@param\" value=\"param-value\"/>\n" +
+            "<div class=\"css-class-text css-class-input css-class-control text input control\">\n" +
+            "<div class=\"label-container\"><label for=\"test\" class=\"label\">Test</label></div>\n" +
+            "<div class=\"control-container\"><input type=\"number\" class=\"css-class\" id=\"test\" name=\"test\"/></div>\n" +
+            "</div>\n");
   }
 
   @Test
@@ -68,13 +68,13 @@ public class NumberInputTest extends ControlBaseTest {
     ais.setCurrent(new ActionInvocation(action, null, "/number", null, null));
 
     new ControlTester(number).
-                                 attr("name", "user.age").
-                                 attr("defaultValue", "0").
-                                 go("<input type=\"hidden\" name=\"user.age@param\" value=\"param-value\"/>\n" +
-                                     "<div class=\"text input control\">\n" +
-                                     "<div class=\"label-container\"><label for=\"user_age\" class=\"label\">Your age</label></div>\n" +
-                                     "<div class=\"control-container\"><input type=\"number\" id=\"user_age\" name=\"user.age\" value=\"0\"/></div>\n" +
-                                     "</div>\n");
+        attr("name", "user.age").
+        attr("defaultValue", "0").
+        go("<input type=\"hidden\" name=\"user.age@param\" value=\"param-value\"/>\n" +
+            "<div class=\"text input control\">\n" +
+            "<div class=\"label-container\"><label for=\"user_age\" class=\"label\">Your age</label></div>\n" +
+            "<div class=\"control-container\"><input type=\"number\" id=\"user_age\" name=\"user.age\" value=\"0\"/></div>\n" +
+            "</div>\n");
   }
 
   @Test
@@ -89,12 +89,12 @@ public class NumberInputTest extends ControlBaseTest {
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.age", "code2", "fieldError2"));
 
     new ControlTester(number).
-                                 attr("name", "user.age").
-                                 go("<input type=\"hidden\" name=\"user.age@param\" value=\"param-value\"/>\n" +
-                                     "<div class=\"text input control\">\n" +
-                                     "<div class=\"label-container\"><label for=\"user_age\" class=\"label\"><span class=\"error\">Your age (fieldError1, fieldError2)</span></label></div>\n" +
-                                     "<div class=\"control-container\"><input type=\"number\" id=\"user_age\" name=\"user.age\" value=\"42\"/></div>\n" +
-                                     "</div>\n");
+        attr("name", "user.age").
+        go("<input type=\"hidden\" name=\"user.age@param\" value=\"param-value\"/>\n" +
+            "<div class=\"text input control\">\n" +
+            "<div class=\"label-container\"><label for=\"user_age\" class=\"label\"><span class=\"error\">Your age (fieldError1, fieldError2)</span></label></div>\n" +
+            "<div class=\"control-container\"><input type=\"number\" id=\"user_age\" name=\"user.age\" value=\"42\"/></div>\n" +
+            "</div>\n");
   }
 
   @Test
@@ -106,12 +106,12 @@ public class NumberInputTest extends ControlBaseTest {
     ais.setCurrent(new ActionInvocation(action, null, "/number", null, null));
 
     new ControlTester(number).
-                                 attr("name", "user.age").
-                                 attr("labelKey", "label-key").
-                                 go("<input type=\"hidden\" name=\"user.age@param\" value=\"param-value\"/>\n" +
-                                     "<div class=\"text input control\">\n" +
-                                     "<div class=\"label-container\"><label for=\"user_age\" class=\"label\">Foo bar</label></div>\n" +
-                                     "<div class=\"control-container\"><input type=\"number\" id=\"user_age\" name=\"user.age\" value=\"42\"/></div>\n" +
-                                     "</div>\n");
+        attr("name", "user.age").
+        attr("labelKey", "label-key").
+        go("<input type=\"hidden\" name=\"user.age@param\" value=\"param-value\"/>\n" +
+            "<div class=\"text input control\">\n" +
+            "<div class=\"label-container\"><label for=\"user_age\" class=\"label\">Foo bar</label></div>\n" +
+            "<div class=\"control-container\"><input type=\"number\" id=\"user_age\" name=\"user.age\" value=\"42\"/></div>\n" +
+            "</div>\n");
   }
 }

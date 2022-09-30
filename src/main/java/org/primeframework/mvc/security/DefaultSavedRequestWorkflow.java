@@ -19,12 +19,11 @@ import java.io.IOException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
+import io.fusionauth.http.server.HTTPRequest;
+import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.action.result.SavedRequestTools;
 import org.primeframework.mvc.action.result.SavedRequestTools.SaveHttpRequestResult;
 import org.primeframework.mvc.config.MVCConfiguration;
-import org.primeframework.mvc.http.HTTPRequest;
-import org.primeframework.mvc.http.HTTPResponse;
-import org.primeframework.mvc.http.MutableHTTPRequest;
 import org.primeframework.mvc.security.saved.SavedHttpRequest;
 import org.primeframework.mvc.workflow.WorkflowChain;
 
@@ -40,7 +39,7 @@ public class DefaultSavedRequestWorkflow implements SavedRequestWorkflow {
 
   private final ObjectMapper objectMapper;
 
-  private final MutableHTTPRequest request;
+  private final HTTPRequest request;
 
   private final HTTPResponse response;
 
@@ -48,7 +47,7 @@ public class DefaultSavedRequestWorkflow implements SavedRequestWorkflow {
   public DefaultSavedRequestWorkflow(MVCConfiguration configuration, Encryptor encryptor, ObjectMapper objectMapper,
                                      HTTPRequest request, HTTPResponse response) {
     this.objectMapper = objectMapper;
-    this.request = (MutableHTTPRequest) request;
+    this.request = request;
     this.encryptor = encryptor;
     this.configuration = configuration;
     this.response = response;
@@ -60,7 +59,7 @@ public class DefaultSavedRequestWorkflow implements SavedRequestWorkflow {
     if (result != null) {
       request.setPath(result.savedHttpRequest.uri);
       request.setMethod(result.savedHttpRequest.method);
-      request.setParameters(result.savedHttpRequest.parameters);
+      request.getParameters().putAll(result.savedHttpRequest.parameters);
     }
 
     workflowChain.continueWorkflow();

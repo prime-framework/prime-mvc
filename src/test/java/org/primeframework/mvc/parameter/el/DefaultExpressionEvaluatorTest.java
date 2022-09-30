@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 
 import com.google.inject.Inject;
@@ -272,7 +273,7 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
   public void fieldSettingWithCollectionSingleValue() {
     // Test nested property set and type conversion
     ActionField action = new ActionField();
-    evaluator.setValue("user.name", action, asList("Brian"));
+    evaluator.setValue("user.name", action, List.of("Brian"));
     evaluator.setValue("user.active", action, ArrayUtils.toArray("true"), null);
     assertEquals(action.user.name, "Brian");
   }

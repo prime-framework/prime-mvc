@@ -23,6 +23,7 @@ import org.primeframework.mvc.action.config.ActionConfigurator;
 import org.primeframework.mvc.content.ContentWorkflow;
 import org.primeframework.mvc.content.DefaultContentHandler;
 import org.primeframework.mvc.content.DefaultContentWorkflow;
+import org.primeframework.mvc.content.ServerHandledContentHandler;
 import org.primeframework.mvc.content.binary.BinaryActionConfigurator;
 import org.primeframework.mvc.content.binary.BinaryContentHandler;
 import org.primeframework.mvc.content.json.JacksonActionConfigurator;
@@ -41,6 +42,8 @@ public class ContentModule extends AbstractModule {
     ContentHandlerFactory.addContentHandler(binder(), "application/json-patch+json", JacksonPatchContentHandler.class);
     ContentHandlerFactory.addContentHandler(binder(), "application/merge-patch+json", JacksonPatchContentHandler.class);
     ContentHandlerFactory.addContentHandler(binder(), "application/octet-stream", BinaryContentHandler.class);
+    ContentHandlerFactory.addContentHandler(binder(), "multipart/form-data", ServerHandledContentHandler.class);
+    ContentHandlerFactory.addContentHandler(binder(), "application/x-www-form-urlencoded", ServerHandledContentHandler.class);
     // Default exploding handler to handle missing Content-Type header, or un-supported values.
     ContentHandlerFactory.addContentHandler(binder(), "", DefaultContentHandler.class);
 

@@ -22,7 +22,7 @@ import org.primeframework.mvc.scope.annotation.Request;
  * @author Daniel DeGroff
  */
 public abstract class BaseScopeStorageAction {
-  public Object sessionObject;
+  public Object actionSessionObject;
 
   @Context
   public Object contextObject;
@@ -30,5 +30,5 @@ public abstract class BaseScopeStorageAction {
   @Request
   public Object requestObject;
 
-  public Object actionSessionObject;
+  public Object sessionObject;
 }

@@ -18,11 +18,11 @@ package org.primeframework.mvc.message.l10n;
 import java.nio.file.Path;
 import java.util.Locale;
 
+import io.fusionauth.http.server.HTTPContext;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.container.ServletContainerResolver;
-import org.primeframework.mvc.http.HTTPContext;
 import org.primeframework.mvc.locale.LocaleProvider;
 import org.testng.annotations.Test;
 import static org.easymock.EasyMock.createStrictMock;

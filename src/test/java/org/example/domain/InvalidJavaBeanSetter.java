@@ -21,10 +21,10 @@ package org.example.domain;
 public class InvalidJavaBeanSetter {
   public String foo;
 
-  public void setFoo() {
-  }
-
   public String get() {
     return "success";
+  }
+
+  public void setFoo() {
   }
 }

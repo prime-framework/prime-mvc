@@ -22,8 +22,8 @@ import freemarker.template.TemplateCollectionModel;
 import freemarker.template.TemplateHashModelEx;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
-import org.primeframework.mvc.http.HTTPRequest;
-import org.primeframework.mvc.http.HTTPResponse;
+import io.fusionauth.http.server.HTTPRequest;
+import io.fusionauth.http.server.HTTPResponse;
 
 /**
  * TemplateHashModel wrapper for a HTTPRequest attributes.

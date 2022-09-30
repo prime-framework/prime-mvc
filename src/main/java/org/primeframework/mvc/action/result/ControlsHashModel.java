@@ -20,17 +20,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.primeframework.mvc.control.Control;
-import org.primeframework.mvc.control.FreeMarkerControlProxy;
-import org.primeframework.mvc.control.guice.ControlFactory;
-import org.primeframework.mvc.freemarker.FreeMarkerRenderException;
-
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.ext.beans.CollectionModel;
 import freemarker.template.ObjectWrapper;
 import freemarker.template.TemplateCollectionModel;
 import freemarker.template.TemplateHashModelEx;
 import freemarker.template.TemplateModelException;
+import org.primeframework.mvc.control.Control;
+import org.primeframework.mvc.control.FreeMarkerControlProxy;
+import org.primeframework.mvc.control.guice.ControlFactory;
+import org.primeframework.mvc.freemarker.FreeMarkerRenderException;
 
 /**
  * This class is a hash that stores the {@link Control} classes so that they can be used from the FreeMarker templates.

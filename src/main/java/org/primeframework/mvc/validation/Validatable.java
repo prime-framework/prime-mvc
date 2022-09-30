@@ -23,8 +23,8 @@ package org.primeframework.mvc.validation;
 public interface Validatable {
   /**
    * Called by Prime instead of using the default handling and group determination. This allows an action to handle
-   * validation however it wants. Validation errors should be put into the {@link org.primeframework.mvc.message.MessageStore}
-   * by implementers.
+   * validation however it wants. Validation errors should be put into the
+   * {@link org.primeframework.mvc.message.MessageStore} by implementers.
    */
   void validate();
 }

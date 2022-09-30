@@ -20,7 +20,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.primeframework.mvc.http.HTTPStrings.Methods;
+import io.fusionauth.http.HTTPValues.Methods;
 
 /**
  * This annotation defines a method that is invoked prior to the parameters being set into the action. This is useful if

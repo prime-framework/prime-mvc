@@ -26,10 +26,10 @@ import org.primeframework.mvc.action.result.annotation.Forward;
 @Action
 @Forward(code = "error", status = 500, page = "/error.ftl")
 public class ThrowsExceptionAction {
+  public boolean errorCalled;
+
   public String message;
 
-  public boolean errorCalled;
-  
   public String execute() {
     errorCalled = true;
     throw new IllegalStateException();

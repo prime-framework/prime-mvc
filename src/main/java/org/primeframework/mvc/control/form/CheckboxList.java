@@ -18,10 +18,9 @@ package org.primeframework.mvc.control.form;
 import java.util.Collection;
 import java.util.Map;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.control.annotation.ControlAttribute;
 import org.primeframework.mvc.control.annotation.ControlAttributes;
-
-import com.google.inject.Inject;
 
 /**
  * This class is the control for a set of checkboxes.

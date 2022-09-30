@@ -18,14 +18,13 @@ package org.primeframework.mvc.parameter.convert.converters;
 import java.lang.reflect.Type;
 import java.util.Map;
 
+import com.google.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.parameter.convert.AbstractGlobalConverter;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.convert.annotation.GlobalConverter;
-
-import com.google.inject.Inject;
 
 /**
  * This converts to and from Enums.
@@ -42,8 +41,13 @@ public class EnumConverter extends AbstractGlobalConverter {
     this.emptyIsNull = configuration.emptyParametersAreNull();
   }
 
+  protected String objectToString(Object value, Type convertFrom, Map<String, String> attributes, String expression)
+      throws ConversionException, ConverterStateException {
+    return value.toString();
+  }
+
   protected Object stringToObject(String value, Type convertTo, Map<String, String> attributes, String expression)
-    throws ConversionException, ConverterStateException {
+      throws ConversionException, ConverterStateException {
     if (emptyIsNull && StringUtils.isBlank(value)) {
       return null;
     }
@@ -56,14 +60,9 @@ public class EnumConverter extends AbstractGlobalConverter {
   }
 
   protected Object stringsToObject(String[] values, Type convertTo, Map<String, String> attributes, String expression)
-    throws ConversionException, ConverterStateException {
+      throws ConversionException, ConverterStateException {
     throw new UnsupportedOperationException("You are attempting to map a form field that contains " +
-      "multiple parameters to a property on the action class that is of type Enum. This isn't " +
-      "allowed.");
-  }
-
-  protected String objectToString(Object value, Type convertFrom, Map<String, String> attributes, String expression)
-    throws ConversionException, ConverterStateException {
-    return value.toString();
+        "multiple parameters to a property on the action class that is of type Enum. This isn't " +
+        "allowed.");
   }
 }

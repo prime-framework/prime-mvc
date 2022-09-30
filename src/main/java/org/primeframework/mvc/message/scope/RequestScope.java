@@ -15,15 +15,14 @@
  */
 package org.primeframework.mvc.message.scope;
 
-import org.primeframework.mvc.http.HTTPRequest;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.primeframework.mvc.message.Message;
-
 import com.google.inject.Inject;
+import io.fusionauth.http.server.HTTPRequest;
+import org.primeframework.mvc.message.Message;
 
 /**
  * This is the message scope which fetches and stores values in the HttpServletRequest.
@@ -33,6 +32,7 @@ import com.google.inject.Inject;
 @SuppressWarnings("unchecked")
 public class RequestScope implements Scope {
   public static final String KEY = "primeMessages";
+
   private final HTTPRequest request;
 
   @Inject
@@ -63,6 +63,11 @@ public class RequestScope implements Scope {
   }
 
   @Override
+  public void clear() {
+    request.removeAttribute(KEY);
+  }
+
+  @Override
   public List<Message> get() {
     List<Message> messages = (List<Message>) request.getAttribute(KEY);
     if (messages != null) {
@@ -70,10 +75,5 @@ public class RequestScope implements Scope {
     }
 
     return Collections.emptyList();
-  }
-
-  @Override
-  public void clear() {
-    request.removeAttribute(KEY);
   }
 }

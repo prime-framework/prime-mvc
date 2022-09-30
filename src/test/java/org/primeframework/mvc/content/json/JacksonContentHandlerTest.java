@@ -15,14 +15,16 @@
  */
 package org.primeframework.mvc.content.json;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
+import io.fusionauth.http.HTTPMethod;
+import io.fusionauth.http.server.HTTPRequest;
 import org.example.action.KitchenSinkAction;
 import org.example.domain.UserField;
 import org.example.domain.UserType;
@@ -32,9 +34,6 @@ import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.ExecuteMethodConfiguration;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration.RequestMember;
-import org.primeframework.mvc.http.DefaultHTTPRequest;
-import org.primeframework.mvc.http.HTTPMethod;
-import org.primeframework.mvc.http.MutableHTTPRequest;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
@@ -109,7 +108,7 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
         "  \"type\":\"COOL\"" +
         "}";
 
-    request.setBody(ByteBuffer.wrap(expected.getBytes()));
+    request.setInputStream(new ByteArrayInputStream(expected.getBytes()));
     request.setContentLength((long) expected.getBytes().length);
     request.setContentType("application/json");
 
@@ -162,8 +161,8 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
         "  }]" +
         "}";
 
-    MutableHTTPRequest request = new DefaultHTTPRequest();
-    request.setBody(ByteBuffer.wrap(expected.getBytes()));
+    HTTPRequest request = new HTTPRequest();
+    request.setInputStream(new ByteArrayInputStream(expected.getBytes()));
     request.setContentLength((long) expected.getBytes().length);
     request.setContentType("application/json");
 
@@ -209,8 +208,8 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
         "  }" +
         "}";
 
-    MutableHTTPRequest request = new DefaultHTTPRequest();
-    request.setBody(ByteBuffer.wrap(expected.getBytes()));
+    HTTPRequest request = new HTTPRequest();
+    request.setInputStream(new ByteArrayInputStream(expected.getBytes()));
     request.setContentLength((long) expected.getBytes().length);
     request.setContentType("application/json");
 
@@ -252,8 +251,8 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
         "  \"bad-active\":true" +
         "}";
 
-    MutableHTTPRequest request = new DefaultHTTPRequest();
-    request.setBody(ByteBuffer.wrap(expected.getBytes()));
+    HTTPRequest request = new HTTPRequest();
+    request.setInputStream(new ByteArrayInputStream(expected.getBytes()));
     request.setContentLength((long) expected.getBytes().length);
     request.setContentType("application/json");
 
@@ -295,8 +294,8 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
         "  \"active\":\"bad\"" +
         "}";
 
-    MutableHTTPRequest request = new DefaultHTTPRequest();
-    request.setBody(ByteBuffer.wrap(expected.getBytes()));
+    HTTPRequest request = new HTTPRequest();
+    request.setInputStream(new ByteArrayInputStream(expected.getBytes()));
     request.setContentLength((long) expected.getBytes().length);
     request.setContentType("application/json");
 
@@ -360,8 +359,8 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
         "  \"type\":\"COOL\"" +
         "}";
 
-    MutableHTTPRequest request = new DefaultHTTPRequest();
-    request.setBody(ByteBuffer.wrap(expected.getBytes()));
+    HTTPRequest request = new HTTPRequest();
+    request.setInputStream(new ByteArrayInputStream(expected.getBytes()));
     request.setContentLength((long) expected.getBytes().length);
     request.setContentType("application/json");
 
@@ -420,8 +419,8 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
         "  \"type\":\"COOL\"" +
         "}";
 
-    MutableHTTPRequest request = new DefaultHTTPRequest();
-    request.setBody(ByteBuffer.wrap(expected.getBytes()));
+    HTTPRequest request = new HTTPRequest();
+    request.setInputStream(new ByteArrayInputStream(expected.getBytes()));
     request.setContentLength((long) expected.getBytes().length);
     request.setContentType("application/json");
 

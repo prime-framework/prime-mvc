@@ -28,12 +28,11 @@ public class ArrayUtils {
     return array.clone();
   }
 
-  public static boolean isNotEmpty(final Object[] array) {
-    return !isEmpty(array);
-  }
-
-  public static boolean isEmpty(final Object[] array) {
-    return getLength(array) == 0;
+  public static byte[] clone(final byte[] array) {
+    if (array == null) {
+      return null;
+    }
+    return array.clone();
   }
 
   public static int getLength(final Object array) {
@@ -43,11 +42,12 @@ public class ArrayUtils {
     return Array.getLength(array);
   }
 
-  public static byte[] clone(final byte[] array) {
-    if (array == null) {
-      return null;
-    }
-    return array.clone();
+  public static boolean isEmpty(final Object[] array) {
+    return getLength(array) == 0;
+  }
+
+  public static boolean isNotEmpty(final Object[] array) {
+    return !isEmpty(array);
   }
 
   public static <T> T[] toArray(final T... items) {

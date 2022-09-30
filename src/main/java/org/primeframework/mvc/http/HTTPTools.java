@@ -17,6 +17,8 @@ package org.primeframework.mvc.http;
 
 import java.util.regex.Pattern;
 
+import io.fusionauth.http.HTTPValues;
+import io.fusionauth.http.server.HTTPRequest;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 /**
@@ -42,7 +44,7 @@ public class HTTPTools {
    * @return null if no value can be found for the Origin or Referer header.
    */
   public static String getOriginHeader(HTTPRequest request) {
-    String value = defaultIfNull(request.getHeader(HTTPStrings.Headers.Origin), request.getHeader(HTTPStrings.Headers.Referer));
+    String value = defaultIfNull(request.getHeader(HTTPValues.Headers.Origin), request.getHeader(HTTPValues.Headers.Referer));
     if (value == null || value.equals("null")) {
       return null;
     }

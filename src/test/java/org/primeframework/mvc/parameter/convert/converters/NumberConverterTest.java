@@ -20,8 +20,9 @@ import org.primeframework.mvc.MockConfiguration;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
 import org.testng.annotations.Test;
-
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.fail;
 
 /**
  * This tests the number converter.
@@ -81,7 +82,7 @@ public class NumberConverterTest {
     assertEquals((int) iw, 1);
 
     lw = (Long) converter.convertFromStrings(Long.class, null, "testExpr", ArrayUtils.toArray("1"));
-    assertEquals((long) lw, 1l);
+    assertEquals((long) lw, 1L);
 
     fw = (Float) converter.convertFromStrings(Float.class, null, "testExpr", ArrayUtils.toArray("1"));
     assertEquals(1f, fw, 0);
@@ -195,10 +196,10 @@ public class NumberConverterTest {
     str = converter.convertToString(Integer.class, null, "testExpr", 42);
     assertEquals(str, "42");
 
-    str = converter.convertToString(Long.class, null, "testExpr", 42l);
+    str = converter.convertToString(Long.class, null, "testExpr", 42L);
     assertEquals(str, "42");
 
-    str = converter.convertToString(Long.TYPE, null, "testExpr", 42l);
+    str = converter.convertToString(Long.TYPE, null, "testExpr", 42L);
     assertEquals(str, "42");
 
     str = converter.convertToString(Float.class, null, "testExpr", 42f);

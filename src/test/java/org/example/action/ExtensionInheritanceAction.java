@@ -29,11 +29,6 @@ import org.primeframework.mvc.parameter.annotation.PostParameterMethod;
 public class ExtensionInheritanceAction extends Extension {
   public boolean invoked = false;
 
-  public String post() {
-    invoked = true;
-    return "child";
-  }
-
   @PostParameterMethod
   public void method2() {
 
@@ -42,5 +37,10 @@ public class ExtensionInheritanceAction extends Extension {
   @PostParameterMethod
   public void method3() {
 
+  }
+
+  public String post() {
+    invoked = true;
+    return "child";
   }
 }

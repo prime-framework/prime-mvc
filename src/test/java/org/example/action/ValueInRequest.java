@@ -16,8 +16,8 @@
 package org.example.action;
 
 import com.google.inject.Inject;
+import io.fusionauth.http.server.HTTPRequest;
 import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.http.HTTPRequest;
 
 /**
  * @author Brian Pontarelli

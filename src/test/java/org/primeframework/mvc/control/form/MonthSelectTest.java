@@ -15,13 +15,12 @@
  */
 package org.primeframework.mvc.control.form;
 
+import com.google.inject.Inject;
 import org.example.action.user.EditAction;
 import org.example.domain.User;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.control.ControlBaseTest;
 import org.testng.annotations.Test;
-
-import com.google.inject.Inject;
 
 /**
  * This tests the months select control.
@@ -32,34 +31,6 @@ public class MonthSelectTest extends ControlBaseTest {
   @Inject public MonthSelect monthSelect;
 
   @Test
-  public void actionLess() {
-    ais.setCurrent(new ActionInvocation(null, null, "/months-select", null, null));
-    new ControlTester(monthSelect).
-      attr("name", "test").
-      attr("class", "css-class").
-      go("<input type=\"hidden\" name=\"test@param\" value=\"param-value\"/>\n" +
-      "<div class=\"css-class-select css-class-input css-class-control select input control\">\n" +
-      "<div class=\"label-container\"><label for=\"test\" class=\"label\">Test</label></div>\n" +
-      "<div class=\"control-container\">\n" +
-      "<select class=\"css-class\" id=\"test\" name=\"test\">\n" +
-      "<option value=\"1\">January</option>\n" +
-      "<option value=\"2\">February</option>\n" +
-      "<option value=\"3\">March</option>\n" +
-      "<option value=\"4\">April</option>\n" +
-      "<option value=\"5\">May</option>\n" +
-      "<option value=\"6\">June</option>\n" +
-      "<option value=\"7\">July</option>\n" +
-      "<option value=\"8\">August</option>\n" +
-      "<option value=\"9\">September</option>\n" +
-      "<option value=\"10\">October</option>\n" +
-      "<option value=\"11\">November</option>\n" +
-      "<option value=\"12\">December</option>\n" +
-      "</select>\n" +
-      "</div>\n" +
-      "</div>\n");
-  }
-
-  @Test
   public void action() {
     EditAction edit = new EditAction();
     edit.user = new User();
@@ -67,26 +38,54 @@ public class MonthSelectTest extends ControlBaseTest {
 
     ais.setCurrent(new ActionInvocation(edit, null, "/months-select", null, null));
     new ControlTester(monthSelect).
-      attr("name", "user.month").
-      go("<input type=\"hidden\" name=\"user.month@param\" value=\"param-value\"/>\n" +
-      "<div class=\"select input control\">\n" +
-      "<div class=\"label-container\"><label for=\"user_month\" class=\"label\">Month</label></div>\n" +
-      "<div class=\"control-container\">\n" +
-      "<select id=\"user_month\" name=\"user.month\">\n" +
-      "<option value=\"1\">January</option>\n" +
-      "<option value=\"2\">February</option>\n" +
-      "<option value=\"3\">March</option>\n" +
-      "<option value=\"4\">April</option>\n" +
-      "<option value=\"5\" selected=\"selected\">May</option>\n" +
-      "<option value=\"6\">June</option>\n" +
-      "<option value=\"7\">July</option>\n" +
-      "<option value=\"8\">August</option>\n" +
-      "<option value=\"9\">September</option>\n" +
-      "<option value=\"10\">October</option>\n" +
-      "<option value=\"11\">November</option>\n" +
-      "<option value=\"12\">December</option>\n" +
-      "</select>\n" +
-      "</div>\n" +
-      "</div>\n");
+        attr("name", "user.month").
+        go("<input type=\"hidden\" name=\"user.month@param\" value=\"param-value\"/>\n" +
+            "<div class=\"select input control\">\n" +
+            "<div class=\"label-container\"><label for=\"user_month\" class=\"label\">Month</label></div>\n" +
+            "<div class=\"control-container\">\n" +
+            "<select id=\"user_month\" name=\"user.month\">\n" +
+            "<option value=\"1\">January</option>\n" +
+            "<option value=\"2\">February</option>\n" +
+            "<option value=\"3\">March</option>\n" +
+            "<option value=\"4\">April</option>\n" +
+            "<option value=\"5\" selected=\"selected\">May</option>\n" +
+            "<option value=\"6\">June</option>\n" +
+            "<option value=\"7\">July</option>\n" +
+            "<option value=\"8\">August</option>\n" +
+            "<option value=\"9\">September</option>\n" +
+            "<option value=\"10\">October</option>\n" +
+            "<option value=\"11\">November</option>\n" +
+            "<option value=\"12\">December</option>\n" +
+            "</select>\n" +
+            "</div>\n" +
+            "</div>\n");
+  }
+
+  @Test
+  public void actionLess() {
+    ais.setCurrent(new ActionInvocation(null, null, "/months-select", null, null));
+    new ControlTester(monthSelect).
+        attr("name", "test").
+        attr("class", "css-class").
+        go("<input type=\"hidden\" name=\"test@param\" value=\"param-value\"/>\n" +
+            "<div class=\"css-class-select css-class-input css-class-control select input control\">\n" +
+            "<div class=\"label-container\"><label for=\"test\" class=\"label\">Test</label></div>\n" +
+            "<div class=\"control-container\">\n" +
+            "<select class=\"css-class\" id=\"test\" name=\"test\">\n" +
+            "<option value=\"1\">January</option>\n" +
+            "<option value=\"2\">February</option>\n" +
+            "<option value=\"3\">March</option>\n" +
+            "<option value=\"4\">April</option>\n" +
+            "<option value=\"5\">May</option>\n" +
+            "<option value=\"6\">June</option>\n" +
+            "<option value=\"7\">July</option>\n" +
+            "<option value=\"8\">August</option>\n" +
+            "<option value=\"9\">September</option>\n" +
+            "<option value=\"10\">October</option>\n" +
+            "<option value=\"11\">November</option>\n" +
+            "<option value=\"12\">December</option>\n" +
+            "</select>\n" +
+            "</div>\n" +
+            "</div>\n");
   }
 }

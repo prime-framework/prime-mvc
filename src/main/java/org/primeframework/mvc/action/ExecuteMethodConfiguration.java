@@ -20,7 +20,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.primeframework.mvc.http.HTTPMethod;
+import io.fusionauth.http.HTTPMethod;
 import org.primeframework.mvc.validation.Validation;
 
 /**

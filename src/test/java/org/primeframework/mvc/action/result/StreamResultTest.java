@@ -18,19 +18,19 @@ package org.primeframework.mvc.action.result;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
+import io.fusionauth.http.HTTPMethod;
+import io.fusionauth.http.server.HTTPResponse;
 import org.easymock.EasyMock;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.ExecuteMethodConfiguration;
 import org.primeframework.mvc.action.result.annotation.Stream;
-import org.primeframework.mvc.http.DefaultHTTPResponse;
-import org.primeframework.mvc.http.HTTPMethod;
-import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -58,7 +58,13 @@ public class StreamResultTest extends PrimeBaseTest {
     EasyMock.expect(ee.getValue("lastModified", action)).andReturn(lastModified);
     EasyMock.replay(ee);
 
-    HTTPResponse response = new DefaultHTTPResponse(new ByteArrayOutputStream());
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    HTTPResponse response = new HTTPResponse(null, null) {
+      @Override
+      public OutputStream getOutputStream() {
+        return baos;
+      }
+    };
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(action, new ExecuteMethodConfiguration(httpMethod, null, null), "/foo", "", null));
     replay(store);
@@ -68,7 +74,7 @@ public class StreamResultTest extends PrimeBaseTest {
     streamResult.execute(stream);
 
     if (httpMethod == HTTPMethod.GET) {
-      assertEquals(response.getOutputStream().toString(), "test");
+      assertEquals(baos.toString(), "test");
       EasyMock.verify(ee);
 
       assertEquals(response.getStatus(), 200);

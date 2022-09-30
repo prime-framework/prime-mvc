@@ -30,12 +30,12 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface ControlAttributes {
   /**
-   * @return This sets the list of required attributes that a control must have in order to function properly.
-   */
-  ControlAttribute[] required() default {};
-
-  /**
    * @return This sets the list of optional attributes that a control can also have.
    */
   ControlAttribute[] optional() default {};
+
+  /**
+   * @return This sets the list of required attributes that a control must have in order to function properly.
+   */
+  ControlAttribute[] required() default {};
 }

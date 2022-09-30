@@ -17,13 +17,12 @@ package org.primeframework.mvc.control.form;
 
 import java.time.ZonedDateTime;
 
+import com.google.inject.Inject;
 import org.example.action.user.EditAction;
 import org.example.domain.User;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.control.ControlBaseTest;
 import org.testng.annotations.Test;
-
-import com.google.inject.Inject;
 
 /**
  * This tests the months select control.
@@ -32,33 +31,6 @@ import com.google.inject.Inject;
  */
 public class YearSelectTest extends ControlBaseTest {
   @Inject public YearSelect yearSelect;
-
-  @Test
-  public void actionLess() {
-    int year = ZonedDateTime.now().getYear();
-    ais.setCurrent(new ActionInvocation(null, null, "/years-select", null, null));
-    new ControlTester(yearSelect)
-        .attr("name", "test")
-        .attr("class", "css-class")
-        .go("<input type=\"hidden\" name=\"test@param\" value=\"param-value\"/>\n" +
-            "<div class=\"css-class-select css-class-input css-class-control select input control\">\n" +
-            "<div class=\"label-container\"><label for=\"test\" class=\"label\">Test</label></div>\n" +
-            "<div class=\"control-container\">\n" +
-            "<select class=\"css-class\" id=\"test\" name=\"test\">\n" +
-            "<option value=\"" + year + "\">" + year++ + "</option>\n" +
-            "<option value=\"" + year + "\">" + year++ + "</option>\n" +
-            "<option value=\"" + year + "\">" + year++ + "</option>\n" +
-            "<option value=\"" + year + "\">" + year++ + "</option>\n" +
-            "<option value=\"" + year + "\">" + year++ + "</option>\n" +
-            "<option value=\"" + year + "\">" + year++ + "</option>\n" +
-            "<option value=\"" + year + "\">" + year++ + "</option>\n" +
-            "<option value=\"" + year + "\">" + year++ + "</option>\n" +
-            "<option value=\"" + year + "\">" + year++ + "</option>\n" +
-            "<option value=\"" + year + "\">" + year + "</option>\n" +
-            "</select>\n" +
-            "</div>\n" +
-            "</div>\n");
-  }
 
   @Test
   public void action() {
@@ -82,6 +54,33 @@ public class YearSelectTest extends ControlBaseTest {
             "<option value=\"2004\">2004</option>\n" +
             "<option value=\"2005\">2005</option>\n" +
             "<option value=\"2006\">2006</option>\n" +
+            "</select>\n" +
+            "</div>\n" +
+            "</div>\n");
+  }
+
+  @Test
+  public void actionLess() {
+    int year = ZonedDateTime.now().getYear();
+    ais.setCurrent(new ActionInvocation(null, null, "/years-select", null, null));
+    new ControlTester(yearSelect)
+        .attr("name", "test")
+        .attr("class", "css-class")
+        .go("<input type=\"hidden\" name=\"test@param\" value=\"param-value\"/>\n" +
+            "<div class=\"css-class-select css-class-input css-class-control select input control\">\n" +
+            "<div class=\"label-container\"><label for=\"test\" class=\"label\">Test</label></div>\n" +
+            "<div class=\"control-container\">\n" +
+            "<select class=\"css-class\" id=\"test\" name=\"test\">\n" +
+            "<option value=\"" + year + "\">" + year++ + "</option>\n" +
+            "<option value=\"" + year + "\">" + year++ + "</option>\n" +
+            "<option value=\"" + year + "\">" + year++ + "</option>\n" +
+            "<option value=\"" + year + "\">" + year++ + "</option>\n" +
+            "<option value=\"" + year + "\">" + year++ + "</option>\n" +
+            "<option value=\"" + year + "\">" + year++ + "</option>\n" +
+            "<option value=\"" + year + "\">" + year++ + "</option>\n" +
+            "<option value=\"" + year + "\">" + year++ + "</option>\n" +
+            "<option value=\"" + year + "\">" + year++ + "</option>\n" +
+            "<option value=\"" + year + "\">" + year + "</option>\n" +
             "</select>\n" +
             "</div>\n" +
             "</div>\n");

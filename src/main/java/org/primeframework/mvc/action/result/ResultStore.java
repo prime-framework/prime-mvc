@@ -22,6 +22,11 @@ package org.primeframework.mvc.action.result;
  */
 public interface ResultStore {
   /**
+   * Clears the result code.
+   */
+  void clear();
+
+  /**
    * @return The current result code.
    */
   String get();
@@ -32,9 +37,4 @@ public interface ResultStore {
    * @param resultCode The new result code.
    */
   void set(String resultCode);
-
-  /**
-   * Clears the result code.
-   */
-  void clear();
 }

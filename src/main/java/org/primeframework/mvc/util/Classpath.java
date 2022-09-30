@@ -29,7 +29,6 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.primeframework.mvc.PrimeException;
-
 import static java.util.Collections.list;
 
 /**
@@ -38,7 +37,7 @@ import static java.util.Collections.list;
  * @author Brian Pontarelli
  */
 public class Classpath {
-  private List<String> names = new ArrayList<String>();
+  private final List<String> names = new ArrayList<String>();
 
   /**
    * Makes a new classpath with the given names.
@@ -71,7 +70,7 @@ public class Classpath {
   /**
    * @return The current classpath.
    * @throws IOException If there was any problems retrieving the classpath from the current thread's context
-   * classloader.
+   *                     classloader.
    */
   public static Classpath getCurrentClassPath() throws IOException {
     ClasspathBuilder builder = new ClasspathBuilder(Thread.currentThread().getContextClassLoader());
@@ -154,16 +153,14 @@ public class Classpath {
   }
 
   /**
-   * Builds a URLClassLoader from the classpath. Each entry is first made into a URL. If this is successful, that URL
-   * is
-   * added to the URLClassLoader's URL list. If not, a File is created and if that File exists, it is converted to a
-   * URL
+   * Builds a URLClassLoader from the classpath. Each entry is first made into a URL. If this is successful, that URL is
+   * added to the URLClassLoader's URL list. If not, a File is created and if that File exists, it is converted to a URL
    * and then added to the URLClassLoader.
    *
    * @param parent The parent classloader of the URLClassLoader being created.
    * @return The URLClassLoader and never null.
    * @throws IllegalStateException If the creation of the URLClassLoader failed because a URL could not be created for
-   * each entry in the classpath.
+   *                               each entry in the classpath.
    */
   public URLClassLoader toURLClassLoader(ClassLoader parent) throws IllegalStateException {
     List<URL> urls = new ArrayList<URL>();

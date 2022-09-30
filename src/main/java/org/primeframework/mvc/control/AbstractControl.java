@@ -22,6 +22,7 @@ import java.util.TreeMap;
 
 import com.google.inject.Inject;
 import freemarker.template.Configuration;
+import io.fusionauth.http.server.HTTPRequest;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
@@ -31,7 +32,6 @@ import org.primeframework.mvc.control.annotation.ControlAttributes;
 import org.primeframework.mvc.control.form.JoinMethod;
 import org.primeframework.mvc.control.message.Message;
 import org.primeframework.mvc.freemarker.FreeMarkerService;
-import org.primeframework.mvc.http.HTTPRequest;
 import org.primeframework.mvc.locale.LocaleProvider;
 import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.security.csrf.CSRFProvider;

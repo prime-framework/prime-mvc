@@ -19,7 +19,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.primeframework.mvc.parameter.fileupload.FileInfo;
+import io.fusionauth.http.FileInfo;
 
 /**
  * This interface defines how parameters are retrieved from the request (usually) and separated into Required, Optional

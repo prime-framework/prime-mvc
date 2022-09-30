@@ -22,12 +22,11 @@ import java.util.List;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
+import io.fusionauth.http.Cookie;
+import io.fusionauth.http.server.HTTPRequest;
+import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.ErrorException;
 import org.primeframework.mvc.config.MVCConfiguration;
-import org.primeframework.mvc.http.Cookie;
-import org.primeframework.mvc.http.HTTPRequest;
-import org.primeframework.mvc.http.HTTPResponse;
-import org.primeframework.mvc.http.MutableHTTPRequest;
 import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.util.CookieTools;
@@ -103,7 +102,7 @@ public class CookieFlashScope implements FlashScope {
     cookie.path = "/";
     response.addCookie(cookie);
 
-    ((MutableHTTPRequest) request).deleteCookie(name);
+    request.deleteCookie(name);
     messages.clear();
   }
 

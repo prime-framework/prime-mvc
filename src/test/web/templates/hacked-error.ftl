@@ -1,3 +1,3 @@
 [#ftl/]
-[#-- @ftlvariable name="response" type="org.primeframework.mvc.http.HTTPResponse" --]
+[#-- @ftlvariable name="response" type="io.fusionauth.http.server.HTTPResponse" --]
 ${response.exception.message}

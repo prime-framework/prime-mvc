@@ -18,7 +18,6 @@ package org.primeframework.mvc.security;
 import java.util.Map;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import io.fusionauth.jwt.InvalidJWTException;
 import io.fusionauth.jwt.InvalidJWTSignatureException;
 import io.fusionauth.jwt.JWTException;
@@ -60,7 +59,8 @@ public class DefaultJWTSecurityContext implements JWTSecurityContext {
       }
 
       return JWT.getDecoder().decode(encodedJWT, verifiers);
-    } catch (InvalidJWTException | InvalidJWTSignatureException | JWTExpiredException | JWTUnavailableForProcessingException e) {
+    } catch (InvalidJWTException | InvalidJWTSignatureException | JWTExpiredException |
+             JWTUnavailableForProcessingException e) {
       requestAdapter.invalidateJWT();
       throw new UnauthenticatedException();
     } catch (JWTException e) {

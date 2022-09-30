@@ -19,9 +19,8 @@ import java.lang.reflect.Array;
 import java.util.Map;
 import java.util.Objects;
 
-import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-
 import com.google.inject.Inject;
+import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 
 /**
  * This class is the abstract control for the inputs that are checkable such as radio buttons and checkboxes.
@@ -53,8 +52,7 @@ public abstract class AbstractCheckedInput extends AbstractInput {
       } else if (value != null) {
         // Collection or array. Iterate and toString each item and compare to value
         String valueAttr = (String) attributes.get("value");
-        if (value instanceof Iterable) {
-          Iterable<?> iterable = (Iterable<?>) value;
+        if (value instanceof Iterable<?> iterable) {
           for (Object o : iterable) {
             if (o.toString().equals(valueAttr)) {
               checked = true;

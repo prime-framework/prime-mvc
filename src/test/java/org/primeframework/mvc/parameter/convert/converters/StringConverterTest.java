@@ -19,8 +19,8 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.primeframework.mvc.MockConfiguration;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
 import org.testng.annotations.Test;
-
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNull;
 
 /**
  * This tests the String converter.

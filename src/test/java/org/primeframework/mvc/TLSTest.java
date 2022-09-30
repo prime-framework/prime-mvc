@@ -15,14 +15,14 @@
  */
 package org.primeframework.mvc;
 
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -31,26 +31,25 @@ import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 import com.google.inject.Module;
 import com.google.inject.util.Modules;
 import com.inversoft.net.ssl.UnsafeTrustManager;
+import io.fusionauth.http.HTTPValues.Headers;
+import io.fusionauth.http.HTTPValues.Methods;
+import io.fusionauth.http.server.HTTPListenerConfiguration;
+import io.fusionauth.http.server.HTTPRequest;
+import io.fusionauth.http.server.HTTPResponse;
+import io.fusionauth.http.server.HTTPServerConfiguration;
 import org.example.action.user.EditAction;
 import org.primeframework.mvc.PrimeBaseTest.TestContentModule;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.cors.CORSConfigurationProvider;
 import org.primeframework.mvc.cors.NoCORSConfigurationProvider;
 import org.primeframework.mvc.guice.MVCModule;
-import org.primeframework.mvc.http.DefaultHTTPRequest;
-import org.primeframework.mvc.http.DefaultHTTPResponse;
 import org.primeframework.mvc.http.HTTPObjectsHolder;
-import org.primeframework.mvc.http.HTTPStrings.Headers;
-import org.primeframework.mvc.http.HTTPStrings.Methods;
 import org.primeframework.mvc.message.TestMessageObserver;
-import org.primeframework.mvc.netty.PrimeHTTPListenerConfiguration;
-import org.primeframework.mvc.netty.PrimeHTTPServerConfiguration;
 import org.primeframework.mvc.security.MockOAuthUserLoginSecurityContext;
 import org.primeframework.mvc.security.UserLoginSecurityContext;
 import org.primeframework.mvc.test.RequestSimulator;
@@ -96,7 +95,7 @@ public class TLSTest {
   }
 
   @BeforeClass
-  public void beforeClass() {
+  public void beforeClass() throws IOException {
     Module mvcModule = new MVCModule() {
       @Override
       protected void configure() {
@@ -107,27 +106,11 @@ public class TLSTest {
       }
     };
 
-    KeyPair keyPair = generateNewRSAKeyPair();
-    X509Certificate x509Certificate = generateX509Certificate(keyPair.getPublic(), keyPair.getPrivate());
-
-    // Verify localhost as ok.
-    final HostnameVerifier defaultHostnameVerifier = javax.net.ssl.HttpsURLConnection.getDefaultHostnameVerifier();
-    final HostnameVerifier localhostAcceptedHostnameVerifier = new javax.net.ssl.HostnameVerifier() {
-      public boolean verify(String hostname, javax.net.ssl.SSLSession sslSession) {
-        if (hostname.equals("localhost")) {
-          return true;
-        }
-        return defaultHostnameVerifier.verify(hostname, sslSession);
-      }
-    };
-    javax.net.ssl.HttpsURLConnection.setDefaultHostnameVerifier(localhostAcceptedHostnameVerifier);
-
+    String userHome = System.getProperty("user.home");
+    String certificate = Files.readString(Paths.get(userHome + "/dev/certificates/fusionauth.pem"));
+    String privateKey = Files.readString(Paths.get(userHome + "/dev/certificates/fusionauth.key"));
     Module module = Modules.override(mvcModule).with(new TestContentModule());
-    TestPrimeMain main = new TestPrimeMain(
-        new PrimeHTTPServerConfiguration(new PrimeHTTPListenerConfiguration().with(c -> c.httpsPort = 9081)
-                                                                             .with(c -> c.privateKey = keyPair.getPrivate())
-                                                                             .with(c -> c.x509Certificates = List.of(x509Certificate))),
-        module);
+    TestPrimeMain main = new TestPrimeMain(new HTTPServerConfiguration().withListener(new HTTPListenerConfiguration(9081, certificate, privateKey)), module);
 
     simulator = new RequestSimulator(main, new TestMessageObserver());
 
@@ -146,8 +129,8 @@ public class TLSTest {
    */
   @BeforeMethod
   public void beforeMethod() {
-    HTTPObjectsHolder.setRequest(new DefaultHTTPRequest());
-    HTTPObjectsHolder.setResponse(new DefaultHTTPResponse(new ByteArrayOutputStream()));
+    HTTPObjectsHolder.setRequest(new HTTPRequest());
+    HTTPObjectsHolder.setResponse(new HTTPResponse(null, null));
   }
 
   @Test

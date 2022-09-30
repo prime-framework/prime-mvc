@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc.parameter.el;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;

@@ -24,17 +24,20 @@ import org.primeframework.mvc.action.result.annotation.Status;
  * @author Daniel DeGroff
  */
 @Action
-@Status
+@Status.List({
+    @Status,
+    @Status(code = "error", status = 500)
+})
 public class CollectionConverterAction {
   public List<String> string;
 
   public List<String> strings;
 
-  public String post() {
-    return "success";
-  }
-
   public String get() {
     return "input";
+  }
+
+  public String post() {
+    return "success";
   }
 }

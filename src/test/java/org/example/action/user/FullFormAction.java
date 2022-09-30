@@ -15,15 +15,14 @@
  */
 package org.example.action.user;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import io.fusionauth.http.FileInfo;
 import org.example.domain.Role;
 import org.example.domain.UserField;
 import org.example.domain.UserType;
 import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.parameter.fileupload.FileInfo;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import static java.util.Arrays.asList;
 
 /**
@@ -33,15 +32,17 @@ import static java.util.Arrays.asList;
  */
 @Action
 public class FullFormAction {
-  public List<Role> roles = asList(new Role(1, "Admin"), new Role(2, "User"));
-  public UserType[] userTypes = UserType.values();
   public List<Integer> ages = new ArrayList<Integer>();
 
-  public UserField user;
+  public FileInfo image;
 
   public List<Integer> roleIds;
 
-  public FileInfo image;
+  public List<Role> roles = asList(new Role(1, "Admin"), new Role(2, "User"));
+
+  public UserField user;
+
+  public UserType[] userTypes = UserType.values();
 
   public FullFormAction() {
     for (int i = 1; i < 100; i++) {

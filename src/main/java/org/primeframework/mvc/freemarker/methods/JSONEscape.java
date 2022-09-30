@@ -17,10 +17,9 @@ package org.primeframework.mvc.freemarker.methods;
 
 import java.util.List;
 
-import org.primeframework.mvc.json.JSONBuilder;
-
 import freemarker.template.TemplateMethodModelEx;
 import freemarker.template.TemplateModelException;
+import org.primeframework.mvc.json.JSONBuilder;
 
 /**
  * This class is a FreeMarker method that escapes JSON.

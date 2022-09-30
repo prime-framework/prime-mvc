@@ -25,10 +25,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.primeframework.mvc.http.HTTPMethod;
-import org.primeframework.mvc.http.HTTPRequest;
-import org.primeframework.mvc.http.HTTPResponse;
-import org.primeframework.mvc.http.HTTPStrings.Headers;
+import io.fusionauth.http.HTTPMethod;
+import io.fusionauth.http.HTTPValues.Headers;
+import io.fusionauth.http.server.HTTPRequest;
+import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -586,7 +586,7 @@ public final class CORSFilter {
             .log("Remote host: %s", request.getHost())
             .log("IP address: %s", request.getIPAddress())
             .log("")
-            .log("Header names: %s", String.join(",", request.getHeadersMap().keySet()));
+            .log("Header names: %s", String.join(",", request.getHeaders().keySet()));
 
     // One edge case we've seen in the field. If using POST w/out a Content-Type header, this will be considered an Invalid CORS request.
     // - This will show up as an UnhandledCORSRequestType. We could optionally re-factor a few things and then pass that all the way here, but

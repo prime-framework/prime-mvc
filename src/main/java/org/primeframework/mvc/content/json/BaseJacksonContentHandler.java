@@ -26,13 +26,13 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.google.inject.Inject;
+import io.fusionauth.http.HTTPMethod;
+import io.fusionauth.http.server.HTTPRequest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.content.ContentHandler;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration.RequestMember;
-import org.primeframework.mvc.http.HTTPMethod;
-import org.primeframework.mvc.http.HTTPRequest;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
@@ -107,7 +107,7 @@ public abstract class BaseJacksonContentHandler implements ContentHandler {
 
       try {
         if (logger.isDebugEnabled()) {
-          String body = new String(request.getBody().array(), 0, contentLength.intValue());
+          String body = new String(request.getBodyBytes(), 0, contentLength.intValue());
           logger.debug("Request: ({} {}) {}", request.getMethod(), request.getPath(), body);
         }
 

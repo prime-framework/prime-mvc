@@ -16,12 +16,12 @@
 package org.primeframework.mvc.action.result;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.fusionauth.http.Cookie;
+import io.fusionauth.http.HTTPMethod;
+import io.fusionauth.http.server.HTTPRequest;
+import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.action.result.annotation.ReexecuteSavedRequest;
 import org.primeframework.mvc.config.MVCConfiguration;
-import org.primeframework.mvc.http.Cookie;
-import org.primeframework.mvc.http.HTTPMethod;
-import org.primeframework.mvc.http.HTTPRequest;
-import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.security.DefaultSavedRequestWorkflow;
 import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.security.SavedRequestException;

@@ -19,16 +19,12 @@ package org.example.domain;
  * @author Brian Pontarelli
  */
 public class Covariant extends CovariantBase<User> {
-  public String value;
   public User user;
+
+  public String value;
 
   @Override
   public String getAbstract() {
-    return value;
-  }
-
-  @Override
-  public String getOverride() {
     return value;
   }
 
@@ -40,5 +36,10 @@ public class Covariant extends CovariantBase<User> {
   @Override
   public void setAbstractNesting(User user) {
     this.user = user;
+  }
+
+  @Override
+  public String getOverride() {
+    return value;
   }
 }

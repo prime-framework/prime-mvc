@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.primeframework.mvc.http.HTTPMethod;
+import io.fusionauth.http.HTTPMethod;
 
 /**
  * Stores the request information when a user accesses a resource that requires authentication and needs to be returned
@@ -57,6 +57,20 @@ public class SavedHttpRequest {
     }
     SavedHttpRequest that = (SavedHttpRequest) o;
     return method == that.method && Objects.equals(parameters, that.parameters) && Objects.equals(uri, that.uri);
+  }
+
+  /**
+   * Helper for Jackson to properly convert a String to an HTTPMethod object.
+   */
+  public String getMethod() {
+    return method != null ? method.name() : null;
+  }
+
+  /**
+   * Helper for Jackson to properly convert a String to an HTTPMethod object.
+   */
+  public void setMethod(String method) {
+    this.method = HTTPMethod.of(method);
   }
 
   @Override

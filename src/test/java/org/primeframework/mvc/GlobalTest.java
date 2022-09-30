@@ -37,6 +37,8 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import freemarker.template.Configuration;
+import io.fusionauth.http.HTTPValues.Headers;
+import io.fusionauth.http.HTTPValues.Methods;
 import org.example.action.JwtAuthorizedAction;
 import org.example.action.LotsOfMessagesAction;
 import org.example.action.OverrideMeAction;
@@ -45,8 +47,6 @@ import org.example.action.user.EditAction;
 import org.example.domain.UserField;
 import org.primeframework.mvc.action.config.ActionConfigurationProvider;
 import org.primeframework.mvc.container.ContainerResolver;
-import org.primeframework.mvc.http.HTTPStrings.Headers;
-import org.primeframework.mvc.http.HTTPStrings.Methods;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
@@ -168,7 +168,7 @@ public class GlobalTest extends PrimeBaseTest {
 
     // Override from the JSON annotation
     simulator.test("/content-type-override")
-             .withParameter("status", 400)
+             .withURLParameter("status", 400)
              .get()
              .assertStatusCode(400)
              .assertContentType("application/json+error");

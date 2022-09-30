@@ -18,6 +18,7 @@ package org.primeframework.mvc.control.form;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import com.google.inject.Inject;
 import org.example.action.user.EditAction;
@@ -54,11 +55,13 @@ public class FormTest extends ControlBaseTest {
 
     form.renderEnd(writer);
     assertSame(IndexAction.class, ais.getCurrent().action.getClass());
-    assertEquals(
-        "<div class=\"form\">\n" +
-            "<form action=\"/user/edit\" method=\"POST\">\n" +
-            "</form>\n" +
-            "</div>\n", writer.toString());
+    assertEquals(writer.toString(),
+        """
+            <div class="form">
+            <form action="/user/edit" method="POST">
+            </form>
+            </div>
+            """);
   }
 
   @Test
@@ -147,7 +150,7 @@ public class FormTest extends ControlBaseTest {
     request.setPath("/user/edit");
     EditAction edit = new EditAction();
     ais.setCurrent(new ActionInvocation(edit, null, "/user/edit", null,
-        new ActionConfiguration(IndexAction.class, null, null, asList(EditAction.class.getMethod("formPrepare")), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null, null)));
+        new ActionConfiguration(IndexAction.class, null, null, List.of(EditAction.class.getMethod("formPrepare")), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null, null)));
 
     new ControlTester(form).
         attr("action", "/user/edit").

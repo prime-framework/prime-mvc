@@ -35,11 +35,11 @@ public class Expression {
 
   private final Map<String, String> attributes;
 
+  private final MVCConfiguration configuration;
+
   private final ConverterProvider converterProvider;
 
   private final String expression;
-
-  private final MVCConfiguration configuration;
 
   private Accessor accessor;
 
@@ -49,17 +49,14 @@ public class Expression {
 
   private Class<?> type;
 
-  public Expression(ConverterProvider converterProvider, String expression, Object current, Map<String, String> attributes, MVCConfiguration configuration) {
+  public Expression(ConverterProvider converterProvider, String expression, Object current,
+                    Map<String, String> attributes, MVCConfiguration configuration) {
     this.expression = expression;
     this.attributes = attributes;
     this.converterProvider = converterProvider;
     this.atoms = parse(expression);
     this.configuration = configuration;
     setCurrentObject(current);
-  }
-
-  public String getExpression() {
-    return expression;
   }
 
   public Map<String, String> getAttributes() {
@@ -89,8 +86,8 @@ public class Expression {
     return converter.convertToString(type, attributes, expression, current);
   }
 
-  public void setCurrentValue(String[] values) {
-    accessor.set(current, values, this);
+  public String getExpression() {
+    return expression;
   }
 
   public Object traverseToEndForGet() {
@@ -125,8 +122,28 @@ public class Expression {
     }
   }
 
-  private String peek() {
-    return atoms.get(index);
+  private Object createValue() {
+    // Peek at the next atom, in case this is an array
+    Object key = hasNext() ? peek() : null;
+    Object value = accessor.createValue(key);
+    accessor.set(current, value, this);
+    return value;
+  }
+
+  private Object getCurrentValue() {
+    return accessor.get(current, this);
+  }
+
+  public void setCurrentValue(String[] values) {
+    accessor.set(current, values, this);
+  }
+
+  public void setCurrentValue(Object value) {
+    accessor.set(current, value, this);
+  }
+
+  private boolean hasNext() {
+    return index < atoms.size();
   }
 
   private void next() {
@@ -157,30 +174,6 @@ public class Expression {
       // Recurse until we hit a non-indexed atom
       next();
     }
-  }
-
-  private boolean hasNext() {
-    return index < atoms.size();
-  }
-
-  private Object createValue() {
-    // Peek at the next atom, in case this is an array
-    Object key = hasNext() ? peek() : null;
-    Object value = accessor.createValue(key);
-    accessor.set(current, value, this);
-    return value;
-  }
-
-  private Object getCurrentValue() {
-    return accessor.get(current, this);
-  }
-
-  public void setCurrentValue(Object value) {
-    accessor.set(current, value, this);
-  }
-
-  private boolean skip() {
-    return accessor != null && accessor.isIndexed();
   }
 
   /**
@@ -267,5 +260,13 @@ public class Expression {
     }
 
     return list;
+  }
+
+  private String peek() {
+    return atoms.get(index);
+  }
+
+  private boolean skip() {
+    return accessor != null && accessor.isIndexed();
   }
 }

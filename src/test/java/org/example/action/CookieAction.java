@@ -18,14 +18,14 @@ package org.example.action;
 import java.util.List;
 
 import com.google.inject.Inject;
+import io.fusionauth.http.Cookie;
+import io.fusionauth.http.server.HTTPRequest;
+import io.fusionauth.http.server.HTTPResponse;
 import org.example.action.BaseCookieAction.Foo;
 import org.primeframework.mvc.ErrorException;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.annotation.Redirect;
 import org.primeframework.mvc.action.result.annotation.Status;
-import org.primeframework.mvc.http.Cookie;
-import org.primeframework.mvc.http.HTTPRequest;
-import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleMessage;

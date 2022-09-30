@@ -15,6 +15,10 @@
  */
 package org.primeframework.mvc.parameter.convert.converters;
 
+import java.lang.reflect.Type;
+import java.util.Map;
+import java.util.UUID;
+
 import com.google.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.primeframework.mvc.config.MVCConfiguration;
@@ -22,10 +26,6 @@ import org.primeframework.mvc.parameter.convert.AbstractGlobalConverter;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.convert.annotation.GlobalConverter;
-
-import java.lang.reflect.Type;
-import java.util.Map;
-import java.util.UUID;
 
 /**
  * This converts to and from UUID.
@@ -39,6 +39,15 @@ public class UUIDConverter extends AbstractGlobalConverter {
   @Inject
   public UUIDConverter(MVCConfiguration configuration) {
     this.emptyIsNull = configuration.emptyParametersAreNull();
+  }
+
+  protected String objectToString(Object value, Type convertFrom, Map<String, String> attributes, String expression)
+      throws ConversionException, ConverterStateException {
+    UUID uuid = (UUID) value;
+    if (uuid.getMostSignificantBits() == 0) {
+      return Long.toString(uuid.getLeastSignificantBits());
+    }
+    return value.toString();
   }
 
   protected Object stringToObject(String value, Type convertTo, Map<String, String> attributes, String expression)
@@ -65,14 +74,5 @@ public class UUIDConverter extends AbstractGlobalConverter {
     throw new UnsupportedOperationException("You are attempting to map a form field that contains " +
         "multiple parameters to a property on the action class that is of type UUID. This isn't " +
         "allowed.");
-  }
-
-  protected String objectToString(Object value, Type convertFrom, Map<String, String> attributes, String expression)
-      throws ConversionException, ConverterStateException {
-    UUID uuid = (UUID) value;
-    if (uuid.getMostSignificantBits() == 0) {
-      return Long.toString(uuid.getLeastSignificantBits());
-    }
-    return value.toString();
   }
 }

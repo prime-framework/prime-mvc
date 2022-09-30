@@ -25,6 +25,7 @@ import java.util.Map;
  */
 public class Bean {
   public Map<Integer, String> coolMap = new HashMap<Integer, String>();
+
   private int age;
 
   public int getAge() {

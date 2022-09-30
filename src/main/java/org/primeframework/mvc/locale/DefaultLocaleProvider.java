@@ -18,11 +18,11 @@ package org.primeframework.mvc.locale;
 import java.util.Locale;
 
 import com.google.inject.Inject;
+import io.fusionauth.http.Cookie;
+import io.fusionauth.http.server.HTTPRequest;
+import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.guice.Nullable;
-import org.primeframework.mvc.http.Cookie;
-import org.primeframework.mvc.http.HTTPRequest;
-import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.util.LocaleTools;
 
 /**

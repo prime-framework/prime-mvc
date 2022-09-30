@@ -96,8 +96,7 @@ public class GuiceBootstrap {
         type = ((ParameterizedType) type).getRawType();
       }
 
-      if (type instanceof Class) {
-        Class<?> bindingType = (Class<?>) type;
+      if (type instanceof Class<?> bindingType) {
         if (Closeable.class.isAssignableFrom(bindingType) && Scopes.isSingleton(bindings.get(key))) {
           Closeable closable = (Closeable) injector.getInstance(key);
           if (closable == null || closed.contains(closable.getClass())) {

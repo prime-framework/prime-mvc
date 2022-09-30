@@ -16,9 +16,9 @@
 package org.primeframework.mvc.workflow;
 
 import com.google.inject.Inject;
+import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.action.result.ResultStore;
 import org.primeframework.mvc.config.MVCConfiguration;
-import org.primeframework.mvc.http.HTTPResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

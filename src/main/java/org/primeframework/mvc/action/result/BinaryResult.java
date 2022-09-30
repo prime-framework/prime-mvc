@@ -21,13 +21,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import com.google.inject.Inject;
+import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.result.annotation.Binary;
 import org.primeframework.mvc.content.binary.BinaryActionConfiguration;
-import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 
 /**

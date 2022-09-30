@@ -16,7 +16,8 @@
 package org.primeframework.mvc;
 
 /**
- * This HTTP Method is not implemented by this MVC. Generally you'll want to return a <code>501</code> for this result code.
+ * This HTTP Method is not implemented by this MVC. Generally you'll want to return a <code>501</code> for this result
+ * code.
  *
  * @author Daniel DeGroff
  */

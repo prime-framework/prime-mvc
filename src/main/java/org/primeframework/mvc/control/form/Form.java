@@ -19,6 +19,8 @@ import java.io.Writer;
 import java.util.Map;
 
 import com.google.inject.Inject;
+import io.fusionauth.http.HTTPMethod;
+import io.fusionauth.http.HTTPValues.Methods;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
@@ -27,8 +29,6 @@ import org.primeframework.mvc.action.config.ActionConfigurationProvider;
 import org.primeframework.mvc.control.AbstractControl;
 import org.primeframework.mvc.control.annotation.ControlAttribute;
 import org.primeframework.mvc.control.annotation.ControlAttributes;
-import org.primeframework.mvc.http.HTTPMethod;
-import org.primeframework.mvc.http.HTTPStrings.Methods;
 import org.primeframework.mvc.parameter.ParameterHandler;
 import org.primeframework.mvc.parameter.ParameterParser;
 import org.primeframework.mvc.parameter.ParameterParser.Parameters;

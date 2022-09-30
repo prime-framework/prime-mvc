@@ -20,13 +20,12 @@ import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.util.MapBuilder;
-
-import com.google.inject.Inject;
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
 
 /**
  * This class is a base test for the controls.
@@ -35,14 +34,17 @@ import static org.testng.Assert.*;
  */
 public class ControlBaseTest extends PrimeBaseTest {
   @Inject protected ActionInvocationStore ais;
+
   @Inject protected MessageStore messageStore;
 
   /**
    * A tester for controls.
    */
   public static class ControlTester {
-    private final Control control;
     private final Map<String, Object> attributes = new HashMap<>();
+
+    private final Control control;
+
     private String body;
 
     public ControlTester(Control control) {
@@ -53,12 +55,12 @@ public class ControlBaseTest extends PrimeBaseTest {
       this.attributes.put(name, value);
       return this;
     }
-    
+
     public ControlTester body(String body) {
       this.body = body;
       return this;
     }
-    
+
     public void go(String result) {
       StringWriter writer = new StringWriter();
       control.renderStart(writer, attributes, MapBuilder.map("param", "param-value").done());

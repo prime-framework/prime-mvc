@@ -17,9 +17,8 @@ package org.primeframework.mvc.control;
 
 import java.io.Writer;
 
-import org.primeframework.mvc.PrimeException;
-
 import freemarker.template.TemplateDirectiveBody;
+import org.primeframework.mvc.PrimeException;
 
 /**
  * This class is a proxy for the FreeMarker directive body.

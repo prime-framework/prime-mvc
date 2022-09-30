@@ -15,11 +15,10 @@
  */
 package org.primeframework.mvc.container.guice;
 
-import org.primeframework.mvc.container.ContainerResolver;
-import org.primeframework.mvc.container.ServletContainerResolver;
-
 import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
+import org.primeframework.mvc.container.ContainerResolver;
+import org.primeframework.mvc.container.ServletContainerResolver;
 
 /**
  * @author Brian Pontarelli

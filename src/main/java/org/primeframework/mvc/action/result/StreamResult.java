@@ -20,12 +20,12 @@ import java.io.InputStream;
 import java.time.ZonedDateTime;
 
 import com.google.inject.Inject;
+import io.fusionauth.http.server.HTTPResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.annotation.Stream;
-import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.util.DateTools;
 import org.primeframework.mvc.util.EncodingUtils;
@@ -61,11 +61,10 @@ public class StreamResult extends AbstractResult<Stream> {
     String type = expand(stream.type(), action, false);
 
     Object object = expressionEvaluator.getValue(property, action);
-    if (!(object instanceof InputStream)) {
+    if (!(object instanceof InputStream is)) {
       throw new PrimeException("Invalid property [" + property + "] for Stream result. This " +
           "property returned null or an Object that is not an InputStream.");
     }
-    InputStream is = (InputStream) object;
 
     ZonedDateTime lastModified = null;
     try {

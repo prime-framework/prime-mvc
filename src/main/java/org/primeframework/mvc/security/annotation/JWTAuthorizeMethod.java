@@ -18,8 +18,8 @@ package org.primeframework.mvc.security.annotation;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import io.fusionauth.http.HTTPValues.Methods;
 import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.http.HTTPStrings.Methods;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 

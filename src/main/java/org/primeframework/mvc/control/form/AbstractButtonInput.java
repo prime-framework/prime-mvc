@@ -15,10 +15,10 @@
  */
 package org.primeframework.mvc.control.form;
 
-import org.primeframework.mvc.http.HTTPRequest;
 import java.util.Map;
 
 import com.google.inject.Inject;
+import io.fusionauth.http.server.HTTPRequest;
 
 /**
  * This class is the abstract control for a button input. Button tags are simple in that the value attribute is dynamic

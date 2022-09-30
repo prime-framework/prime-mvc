@@ -29,17 +29,17 @@ import org.primeframework.mvc.content.json.annotation.JSONResponse;
 @Action
 @JSON
 public class ApiFinalAction {
-  public ActionType action;
-
   @JSONRequest
   @JSONResponse
   public final UserField user = new UserField();
+
+  public ActionType action;
 
   public String post() {
     return "success";
   }
 
-  public static enum ActionType {
+  public enum ActionType {
     ADD,
     EDIT
   }

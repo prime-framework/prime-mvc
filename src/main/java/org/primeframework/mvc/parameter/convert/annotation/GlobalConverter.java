@@ -21,8 +21,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation must be placed on all implementations of the {@link org.primeframework.mvc.parameter.convert.GlobalConverter}
- * interface.
+ * This annotation must be placed on all implementations of the
+ * {@link org.primeframework.mvc.parameter.convert.GlobalConverter} interface.
  *
  * @author Brian Pontarelli
  */

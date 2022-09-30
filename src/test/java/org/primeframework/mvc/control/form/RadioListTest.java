@@ -195,19 +195,19 @@ public class RadioListTest extends ControlBaseTest {
         .attr("name", "user.addresses['work'].country")
         .attr("items", lmap("US", "United States", "DE", "Germany"))
         .attr("uncheckedValue", "US")
-        .
-            go("<input type=\"hidden\" name=\"user.addresses[&#39;work&#39;].country@param\" value=\"param-value\"/>\n" +
-                "<div class=\"radio-list input control\">\n" +
-                "<div class=\"label-container\"><label for=\"user_addresses[&#39;work&#39;]_country\" class=\"label\"><span class=\"error\">Country (fieldError1, fieldError2)</span></label></div>\n" +
-                "<div class=\"control-container\">\n" +
-                "<div class=\"control-item-container\">\n" +
-                "<input type=\"radio\" checked=\"checked\" value=\"US\" name=\"user.addresses[&#39;work&#39;].country\"/><span class=\"radio-text\">United States</span>\n" +
-                "</div>\n" +
-                "<div class=\"control-item-container\">\n" +
-                "<input type=\"radio\" value=\"DE\" name=\"user.addresses[&#39;work&#39;].country\"/><span class=\"radio-text\">Germany</span>\n" +
-                "</div>\n" +
-                "</div>\n" +
-                "</div>\n" +
-                "<input type=\"hidden\" name=\"__rb_user.addresses[&#39;work&#39;].country\" value=\"US\"/>\n");
+            .
+        go("<input type=\"hidden\" name=\"user.addresses[&#39;work&#39;].country@param\" value=\"param-value\"/>\n" +
+            "<div class=\"radio-list input control\">\n" +
+            "<div class=\"label-container\"><label for=\"user_addresses[&#39;work&#39;]_country\" class=\"label\"><span class=\"error\">Country (fieldError1, fieldError2)</span></label></div>\n" +
+            "<div class=\"control-container\">\n" +
+            "<div class=\"control-item-container\">\n" +
+            "<input type=\"radio\" checked=\"checked\" value=\"US\" name=\"user.addresses[&#39;work&#39;].country\"/><span class=\"radio-text\">United States</span>\n" +
+            "</div>\n" +
+            "<div class=\"control-item-container\">\n" +
+            "<input type=\"radio\" value=\"DE\" name=\"user.addresses[&#39;work&#39;].country\"/><span class=\"radio-text\">Germany</span>\n" +
+            "</div>\n" +
+            "</div>\n" +
+            "</div>\n" +
+            "<input type=\"hidden\" name=\"__rb_user.addresses[&#39;work&#39;].country\" value=\"US\"/>\n");
   }
 }

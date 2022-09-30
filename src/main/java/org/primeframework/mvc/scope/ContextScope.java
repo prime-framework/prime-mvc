@@ -15,10 +15,9 @@
  */
 package org.primeframework.mvc.scope;
 
-import org.primeframework.mvc.http.HTTPContext;
-import org.primeframework.mvc.scope.annotation.Context;
-
 import com.google.inject.Inject;
+import io.fusionauth.http.server.HTTPContext;
+import org.primeframework.mvc.scope.annotation.Context;
 
 /**
  * This is the request scope which fetches and stores values in the Context

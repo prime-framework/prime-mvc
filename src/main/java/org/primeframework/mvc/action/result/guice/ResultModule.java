@@ -15,6 +15,7 @@
  */
 package org.primeframework.mvc.action.result.guice;
 
+import com.google.inject.AbstractModule;
 import org.primeframework.mvc.action.result.BinaryResult;
 import org.primeframework.mvc.action.result.ForwardResult;
 import org.primeframework.mvc.action.result.JSONResult;
@@ -36,8 +37,6 @@ import org.primeframework.mvc.action.result.annotation.SaveRequest;
 import org.primeframework.mvc.action.result.annotation.Status;
 import org.primeframework.mvc.action.result.annotation.Stream;
 import org.primeframework.mvc.action.result.annotation.XMLStream;
-
-import com.google.inject.AbstractModule;
 
 /**
  * Binds results.

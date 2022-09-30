@@ -18,13 +18,12 @@ package org.primeframework.mvc.scope;
 import java.io.IOException;
 import java.util.List;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.util.ReflectionUtils;
 import org.primeframework.mvc.workflow.WorkflowChain;
-
-import com.google.inject.Inject;
 
 /**
  * This class implements the scope storage workflow that handles scope storage after the request is finished.

@@ -27,8 +27,9 @@ public interface Workflow {
    * Performs a task.
    *
    * @param workflowChain This chain should be called if the Workflow wants to continue processing the request by the
-   *                      next Workflow in the chain or by the next J2EE filter in the chain after the PrimeMVCRequestHandler.
-   * @throws IOException      If the workflow had any IO problems.
+   *                      next Workflow in the chain or by the next J2EE filter in the chain after the
+   *                      PrimeMVCRequestHandler.
+   * @throws IOException If the workflow had any IO problems.
    */
   void perform(WorkflowChain workflowChain) throws IOException;
 }

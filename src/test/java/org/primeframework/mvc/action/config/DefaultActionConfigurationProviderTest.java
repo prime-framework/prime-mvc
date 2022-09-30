@@ -18,6 +18,7 @@ package org.primeframework.mvc.action.config;
 import java.util.Arrays;
 import java.util.HashSet;
 
+import io.fusionauth.http.HTTPMethod;
 import org.example.action.KitchenSinkAction;
 import org.example.action.SimpleAction;
 import org.example.action.TestAnnotation;
@@ -36,10 +37,8 @@ import org.primeframework.mvc.content.binary.BinaryActionConfiguration;
 import org.primeframework.mvc.content.binary.BinaryActionConfigurator;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration;
 import org.primeframework.mvc.content.json.JacksonActionConfigurator;
-import org.primeframework.mvc.http.HTTPMethod;
 import org.primeframework.mvc.util.DefaultURIBuilder;
 import org.testng.annotations.Test;
-
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -59,7 +58,7 @@ public class DefaultActionConfigurationProviderTest {
     DefaultActionConfigurationProvider provider = new DefaultActionConfigurationProvider
         (new DefaultActionConfigurationBuilder(new DefaultURIBuilder(), new HashSet<>(Arrays.asList(new JacksonActionConfigurator(),
             new BinaryActionConfigurator())))
-    );
+        );
 
     ActionInvocation invocation = provider.lookup("/simple");
     assertSame(invocation.configuration.actionClass, SimpleAction.class);
@@ -161,33 +160,23 @@ public class DefaultActionConfigurationProviderTest {
   }
 
   @Test
-  public void postParametersOnly() {
+  public void index() {
     DefaultActionConfigurationProvider provider = new DefaultActionConfigurationProvider(
         new DefaultActionConfigurationBuilder(new DefaultURIBuilder(), new HashSet<>(Arrays.asList(new JacksonActionConfigurator(),
             new BinaryActionConfigurator())))
     );
 
-    ActionInvocation invocation = provider.lookup("/kitchen-sink/foo/bar/static/baz");
-    assertSame(invocation.configuration.actionClass, KitchenSinkAction.class);
-    assertEquals(invocation.uriParameters.get("name"), singletonList("foo"));
-    assertEquals(invocation.uriParameters.get("value"), singletonList("bar"));
-    assertEquals(invocation.uriParameters.get("foo"), singletonList("baz"));
-  }
+    ActionInvocation invocation = provider.lookup("/nested/one/two/index");
+    assertEquals(invocation.configuration.actionClass, org.example.action.nested.IndexAction.class);
+    assertEquals(invocation.uriParameters.size(), 2);
+    assertEquals(invocation.uriParameters.get("param1"), singletonList("one"));
+    assertEquals(invocation.uriParameters.get("param2"), singletonList("two"));
 
-  @Test
-  public void lookupPrefixParameters() {
-    DefaultActionConfigurationProvider provider = new DefaultActionConfigurationProvider(
-        new DefaultActionConfigurationBuilder(new DefaultURIBuilder(), new HashSet<>(Arrays.asList(new JacksonActionConfigurator(),
-            new BinaryActionConfigurator())))
-    );
-
-    ActionInvocation invocation = provider.lookup("/nested/000/preParam2/parameter/42/postParam2");
-    assertEquals(invocation.configuration.actionClass, ParameterAction.class);
-    assertEquals(invocation.uriParameters.size(), 4);
-    assertEquals(invocation.uriParameters.get("preParam1"), singletonList("000"));
-    assertEquals(invocation.uriParameters.get("preParam2"), singletonList("preParam2"));
-    assertEquals(invocation.uriParameters.get("endParam1"), singletonList("42"));
-    assertEquals(invocation.uriParameters.get("endParam2"), singletonList("postParam2"));
+//    invocation = provider.lookup("/nested/one/two/index");
+//    assertEquals(invocation.configuration.actionClass, org.example.action.nested.IndexAction.class);
+//    assertEquals(invocation.uriParameters.size(), 2);
+//    assertEquals(invocation.uriParameters.get("param1"), singletonList("one"));
+//    assertEquals(invocation.uriParameters.get("param2"), singletonList("two"));
   }
 
   @Test
@@ -207,23 +196,33 @@ public class DefaultActionConfigurationProviderTest {
   }
 
   @Test
-  public void index() {
+  public void lookupPrefixParameters() {
     DefaultActionConfigurationProvider provider = new DefaultActionConfigurationProvider(
         new DefaultActionConfigurationBuilder(new DefaultURIBuilder(), new HashSet<>(Arrays.asList(new JacksonActionConfigurator(),
             new BinaryActionConfigurator())))
     );
 
-    ActionInvocation invocation = provider.lookup("/nested/one/two/index");
-    assertEquals(invocation.configuration.actionClass, org.example.action.nested.IndexAction.class);
-    assertEquals(invocation.uriParameters.size(), 2);
-    assertEquals(invocation.uriParameters.get("param1"), singletonList("one"));
-    assertEquals(invocation.uriParameters.get("param2"), singletonList("two"));
+    ActionInvocation invocation = provider.lookup("/nested/000/preParam2/parameter/42/postParam2");
+    assertEquals(invocation.configuration.actionClass, ParameterAction.class);
+    assertEquals(invocation.uriParameters.size(), 4);
+    assertEquals(invocation.uriParameters.get("preParam1"), singletonList("000"));
+    assertEquals(invocation.uriParameters.get("preParam2"), singletonList("preParam2"));
+    assertEquals(invocation.uriParameters.get("endParam1"), singletonList("42"));
+    assertEquals(invocation.uriParameters.get("endParam2"), singletonList("postParam2"));
+  }
 
-//    invocation = provider.lookup("/nested/one/two/index");
-//    assertEquals(invocation.configuration.actionClass, org.example.action.nested.IndexAction.class);
-//    assertEquals(invocation.uriParameters.size(), 2);
-//    assertEquals(invocation.uriParameters.get("param1"), singletonList("one"));
-//    assertEquals(invocation.uriParameters.get("param2"), singletonList("two"));
+  @Test
+  public void postParametersOnly() {
+    DefaultActionConfigurationProvider provider = new DefaultActionConfigurationProvider(
+        new DefaultActionConfigurationBuilder(new DefaultURIBuilder(), new HashSet<>(Arrays.asList(new JacksonActionConfigurator(),
+            new BinaryActionConfigurator())))
+    );
+
+    ActionInvocation invocation = provider.lookup("/kitchen-sink/foo/bar/static/baz");
+    assertSame(invocation.configuration.actionClass, KitchenSinkAction.class);
+    assertEquals(invocation.uriParameters.get("name"), singletonList("foo"));
+    assertEquals(invocation.uriParameters.get("value"), singletonList("bar"));
+    assertEquals(invocation.uriParameters.get("foo"), singletonList("baz"));
   }
 
 //  @Test

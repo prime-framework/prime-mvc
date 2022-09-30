@@ -16,11 +16,10 @@
 package org.primeframework.mvc.content;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
 import com.google.inject.Inject;
+import io.fusionauth.http.server.HTTPRequest;
 import org.primeframework.mvc.action.ActionInvocationStore;
-import org.primeframework.mvc.http.HTTPRequest;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleMessage;
@@ -58,11 +57,9 @@ public class DefaultContentHandler implements ContentHandler {
   @Override
   public void handle() throws IOException {
     // If you send a request body, you must have a Content-Type header
-    ByteBuffer body = request.getBody();
-    // Limit is the number of bytes left within the current capacity. If > 0, we have at least one byte written.
-    if (body != null && body.limit() > 0) {
+    if (request.hasBody()) {
       String contentType = request.getContentType();
-      if (contentType == null || contentType.equals("")) {
+      if (contentType == null || contentType.isBlank()) {
         messageStore.add(new SimpleMessage(MessageType.ERROR, "[MissingContentType]", messageProvider.getMessage("[MissingContentType]")));
       } else {
         messageStore.add(new SimpleMessage(MessageType.ERROR, "[UnsupportedContentType]", messageProvider.getMessage("[UnsupportedContentType]", contentType)));

@@ -18,12 +18,12 @@ package org.primeframework.mvc.http.guice;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
+import io.fusionauth.http.HTTPMethod;
+import io.fusionauth.http.server.HTTPContext;
+import io.fusionauth.http.server.HTTPRequest;
+import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.config.MVCConfiguration;
-import org.primeframework.mvc.http.HTTPContext;
-import org.primeframework.mvc.http.HTTPMethod;
 import org.primeframework.mvc.http.HTTPObjectsHolder;
-import org.primeframework.mvc.http.HTTPRequest;
-import org.primeframework.mvc.http.HTTPResponse;
 
 /**
  * This class is a Guice module for the Prime MVC HTTP object support.

@@ -25,11 +25,13 @@ import java.lang.annotation.Target;
  * <p>
  * For example, take the following Java package and Action:
  * <code>com.example.action.wellKnown.OpenidConfigurationAction</code>
- * <p>Due to Java package name restriction it is not possible to use this convention based schema and have a URI for this action of
+ * <p>Due to Java package name restriction it is not possible to use this convention based schema and have a URI for
+ * this action of
  * <p>
  * <code>http://www.example.com/.well-known/openid-configuration</code>
  * <p>
- * This modifier could be used to modify the URI during the action configuration from <code>well-known</code> to <code>.well-known</code>.
+ * This modifier could be used to modify the URI during the action configuration from <code>well-known</code> to
+ * <code>.well-known</code>.
  *
  * @author Daniel DeGroff
  */

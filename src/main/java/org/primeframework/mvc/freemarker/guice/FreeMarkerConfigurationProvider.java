@@ -49,7 +49,7 @@ public class FreeMarkerConfigurationProvider implements Provider<Configuration> 
     int checkSeconds = configuration.templateCheckSeconds();
     Configuration config = new Configuration(Configuration.VERSION_2_3_30);
     config.setTagSyntax(Configuration.SQUARE_BRACKET_TAG_SYNTAX);
-    config.setTemplateUpdateDelayMilliseconds(checkSeconds * 1000);
+    config.setTemplateUpdateDelayMilliseconds(checkSeconds * 1000L);
     config.setTemplateLoader(loader);
     config.setDefaultEncoding("UTF-8");
     config.setObjectWrapper(builder.build());

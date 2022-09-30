@@ -18,7 +18,6 @@ package org.primeframework.mvc.content.binary;
 import org.example.action.KitchenSinkAction;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.testng.annotations.Test;
-
 import static org.testng.Assert.assertEquals;
 
 /**

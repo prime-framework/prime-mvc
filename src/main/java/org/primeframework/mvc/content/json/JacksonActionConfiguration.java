@@ -18,9 +18,9 @@ package org.primeframework.mvc.content.json;
 import java.lang.reflect.Method;
 import java.util.Map;
 
+import io.fusionauth.http.HTTPMethod;
 import org.primeframework.mvc.content.json.annotation.JSONPatch;
 import org.primeframework.mvc.content.json.annotation.JSONResponse;
-import org.primeframework.mvc.http.HTTPMethod;
 
 /**
  * Jackson action configuration.

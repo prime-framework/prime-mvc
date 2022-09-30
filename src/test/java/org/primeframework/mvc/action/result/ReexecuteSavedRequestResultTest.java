@@ -15,22 +15,19 @@
  */
 package org.primeframework.mvc.action.result;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.fusionauth.http.Cookie;
+import io.fusionauth.http.HTTPMethod;
+import io.fusionauth.http.server.HTTPRequest;
+import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.ReexecuteSavedRequestResult.ReexecuteSavedRequestImpl;
 import org.primeframework.mvc.action.result.annotation.ReexecuteSavedRequest;
-import org.primeframework.mvc.http.Cookie;
-import org.primeframework.mvc.http.DefaultHTTPRequest;
-import org.primeframework.mvc.http.DefaultHTTPResponse;
-import org.primeframework.mvc.http.HTTPMethod;
-import org.primeframework.mvc.http.HTTPRequest;
-import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.scope.MessageScope;
@@ -59,8 +56,8 @@ public class ReexecuteSavedRequestResultTest extends PrimeBaseTest {
     replay(ee);
 
     List<Message> messages = new ArrayList<>();
-    HTTPRequest request = new DefaultHTTPRequest();
-    HTTPResponse response = new DefaultHTTPResponse(new ByteArrayOutputStream());
+    HTTPRequest request = new HTTPRequest();
+    HTTPResponse response = new HTTPResponse(null, request);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/foo", "", null));
     replay(store);
@@ -94,9 +91,8 @@ public class ReexecuteSavedRequestResultTest extends PrimeBaseTest {
     Encryptor encryptor = new DefaultEncryptor(new DefaultCipherProvider(configuration));
     Cookie cookie = SavedRequestTools.toCookie(savedRequest, configuration, encryptor, objectMapper);
 
-    HTTPRequest request = new DefaultHTTPRequest().with(r -> r.cookies.put(cookie.name, cookie));
-
-    HTTPResponse response = new DefaultHTTPResponse(new ByteArrayOutputStream());
+    HTTPRequest request = new HTTPRequest().with(r -> r.addCookies(cookie));
+    HTTPResponse response = new HTTPResponse(null, request);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     replay(store);
 

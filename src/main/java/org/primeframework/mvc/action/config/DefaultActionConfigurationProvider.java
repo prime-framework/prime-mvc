@@ -262,8 +262,8 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
   }
 
   /**
-   * Return true if the {@code actionClass} is loaded by {@code classLoader} or one of it's descendant {@link
-   * ClassLoader}
+   * Return true if the {@code actionClass} is loaded by {@code classLoader} or one of it's descendant
+   * {@link ClassLoader}
    *
    * @param classLoader the ClassLoader
    * @param actionClass the Class to test

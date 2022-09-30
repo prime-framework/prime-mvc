@@ -16,8 +16,8 @@
 package org.example.action;
 
 import com.google.inject.Inject;
+import io.fusionauth.http.HTTPValues.Methods;
 import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.http.HTTPStrings.Methods;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;

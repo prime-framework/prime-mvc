@@ -15,12 +15,11 @@
  */
 package org.primeframework.mvc.parameter.convert.guice;
 
-import org.primeframework.mvc.parameter.convert.ConverterProvider;
-import org.primeframework.mvc.parameter.convert.GlobalConverter;
-
 import com.google.inject.Binder;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
+import org.primeframework.mvc.parameter.convert.ConverterProvider;
+import org.primeframework.mvc.parameter.convert.GlobalConverter;
 
 /**
  * A binder DSL for adding GlobalConverters to Prime. Generally speaking, using MultiBindings is horrifically slow and
@@ -30,6 +29,12 @@ import com.google.inject.multibindings.MapBinder;
  * @author Brian Pontarelli
  */
 public class GlobalConverterBinder {
+  private final Binder binder;
+
+  public GlobalConverterBinder(Binder binder) {
+    this.binder = binder;
+  }
+
   /**
    * Creates a new GlobalConverterBinder that can be used to register global type converters.
    *
@@ -40,18 +45,13 @@ public class GlobalConverterBinder {
     return new GlobalConverterBinder(binder);
   }
 
-  private final Binder binder;
-
-  public GlobalConverterBinder(Binder binder) {
-    this.binder = binder;
-  }
-
   public GlobalConverterTypeBinder add(Class<? extends GlobalConverter> converterType) {
     return new GlobalConverterTypeBinder(binder, converterType);
   }
 
   public static class GlobalConverterTypeBinder {
     private final Binder binder;
+
     private final Class<? extends GlobalConverter> converterType;
 
     private GlobalConverterTypeBinder(Binder binder, Class<? extends GlobalConverter> converterType) {
@@ -60,7 +60,8 @@ public class GlobalConverterBinder {
     }
 
     public void forTypes(Class<?> firstType, Class<?>... additionalTypes) {
-      MapBinder<Class<?>, GlobalConverter> mapBinder = MapBinder.newMapBinder(binder, new TypeLiteral<>() {}, TypeLiteral.get(GlobalConverter.class));
+      MapBinder<Class<?>, GlobalConverter> mapBinder = MapBinder.newMapBinder(binder, new TypeLiteral<>() {
+      }, TypeLiteral.get(GlobalConverter.class));
       mapBinder.addBinding(firstType).to(converterType);
       for (Class<?> type : additionalTypes) {
         mapBinder.addBinding(type).to(converterType);

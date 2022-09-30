@@ -18,8 +18,6 @@ package org.primeframework.mvc.action.result;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-import org.primeframework.mvc.freemarker.guice.TemplateModelFactory;
-
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.ext.beans.CollectionModel;
 import freemarker.template.ObjectWrapper;
@@ -27,6 +25,7 @@ import freemarker.template.TemplateCollectionModel;
 import freemarker.template.TemplateHashModelEx;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
+import org.primeframework.mvc.freemarker.guice.TemplateModelFactory;
 
 /**
  * This class is a hash that stores TemplateModels in a namespace for use in the FreeMarker templates.

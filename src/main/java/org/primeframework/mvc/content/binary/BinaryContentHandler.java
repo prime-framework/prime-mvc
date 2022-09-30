@@ -18,16 +18,14 @@ package org.primeframework.mvc.content.binary;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 
 import com.google.inject.Inject;
+import io.fusionauth.http.server.HTTPRequest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.content.ContentHandler;
-import org.primeframework.mvc.http.HTTPRequest;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-import org.primeframework.mvc.parameter.fileupload.FileInfo;
 
 /**
  * Set a binary file into the action as a {@link Path} object.
@@ -35,6 +33,8 @@ import org.primeframework.mvc.parameter.fileupload.FileInfo;
  * @author Daniel DeGroff
  */
 public class BinaryContentHandler implements ContentHandler {
+  public static final String RequestAttribute = "prime-mvc-body-file";
+
   private final ExpressionEvaluator expressionEvaluator;
 
   private final HTTPRequest request;
@@ -51,7 +51,14 @@ public class BinaryContentHandler implements ContentHandler {
 
   @Override
   public void cleanup() {
-    handle(false);
+    Path tmpFile = (Path) request.getAttribute(RequestAttribute);
+    if (tmpFile != null) {
+      try {
+        Files.deleteIfExists(tmpFile);
+      } catch (IOException e) {
+        // Ignore
+      }
+    }
   }
 
   @Override
@@ -61,10 +68,6 @@ public class BinaryContentHandler implements ContentHandler {
       return;
     }
 
-    handle(true);
-  }
-
-  private void handle(boolean set) {
     ActionInvocation actionInvocation = store.getCurrent();
     Object action = actionInvocation.action;
     if (action == null) {
@@ -81,30 +84,21 @@ public class BinaryContentHandler implements ContentHandler {
       return;
     }
 
-    List<FileInfo> files = request.getFiles();
-    if (files.isEmpty()) {
-      return;
-    }
-
     BinaryActionConfiguration binaryConfig = (BinaryActionConfiguration) config.additionalConfiguration.get(BinaryActionConfiguration.class);
     if (binaryConfig.requestMember == null) {
       return;
     }
 
-    FileInfo fileInfo = files.get(0);
-
-    if (fileInfo == null) {
-      return;
-    }
-
-    if (set) {
-      expressionEvaluator.setValue(binaryConfig.requestMember, action, fileInfo.file);
-    } else {
-      try {
-        Files.deleteIfExists(fileInfo.file);
-      } catch (IOException e) {
-        // Ignore
+    try {
+      Path tmpFile = Files.createTempFile("prime-mvc", "binary");
+      try (var output = Files.newOutputStream(tmpFile)) {
+        request.getInputStream().transferTo(output);
       }
+
+      request.setAttribute(RequestAttribute, tmpFile);
+      expressionEvaluator.setValue(binaryConfig.requestMember, action, tmpFile);
+    } catch (IOException e) {
+      // Ignore
     }
   }
 }

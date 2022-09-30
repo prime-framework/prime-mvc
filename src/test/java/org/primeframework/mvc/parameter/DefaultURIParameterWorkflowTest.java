@@ -17,13 +17,13 @@ package org.primeframework.mvc.parameter;
 
 import java.util.List;
 
+import io.fusionauth.http.HTTPMethod;
 import org.example.action.ComplexRestAction;
 import org.example.action.user.EditAction;
 import org.example.action.user.RESTEdit;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
-import org.primeframework.mvc.http.HTTPMethod;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
 import static org.easymock.EasyMock.createStrictMock;
@@ -53,13 +53,13 @@ public class DefaultURIParameterWorkflowTest extends PrimeBaseTest {
     DefaultURIParameterWorkflow workflow = new DefaultURIParameterWorkflow(request, store);
     workflow.perform(chain);
 
-    assertEquals(request.getParameterValue("firstName"), "brian");
-    assertEquals(request.getParameterValue("lastName"), "pontarelli");
-    assertEquals(request.getParameterValues("theRest").get(0), "then");
-    assertEquals(request.getParameterValues("theRest").get(1), "a");
-    assertEquals(request.getParameterValues("theRest").get(2), "bunch");
-    assertEquals(request.getParameterValues("theRest").get(3), "of");
-    assertEquals(request.getParameterValues("theRest").get(4), "stuff");
+    assertEquals(request.getParameter("firstName"), "brian");
+    assertEquals(request.getParameter("lastName"), "pontarelli");
+    assertEquals(request.getParameters("theRest").get(0), "then");
+    assertEquals(request.getParameters("theRest").get(1), "a");
+    assertEquals(request.getParameters("theRest").get(2), "bunch");
+    assertEquals(request.getParameters("theRest").get(3), "of");
+    assertEquals(request.getParameters("theRest").get(4), "stuff");
 
     verify(store, chain);
   }
@@ -96,7 +96,7 @@ public class DefaultURIParameterWorkflowTest extends PrimeBaseTest {
     DefaultURIParameterWorkflow workflow = new DefaultURIParameterWorkflow(request, store);
     workflow.perform(chain);
 
-    assertEquals(request.getParameterValue("id"), "12");
+    assertEquals(request.getParameter("id"), "12");
 
     verify(store, chain);
   }

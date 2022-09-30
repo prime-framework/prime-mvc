@@ -21,11 +21,11 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 import com.google.inject.Inject;
+import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.annotation.XMLStream;
-import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 
 /**
@@ -60,7 +60,7 @@ public class XMLStreamResult extends AbstractResult<XMLStream> {
 
     response.setStatus(xmlStream.status());
     response.setContentType("application/xhtml+xml; charset=UTF-8");
-    response.setContentLength((long) xmlBytes.length);
+    response.setContentLength(xmlBytes.length);
 
     // Handle setting cache controls
     addCacheControlHeader(xmlStream, response);

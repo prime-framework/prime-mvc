@@ -15,10 +15,10 @@
  */
 package org.example.action;
 
+import io.fusionauth.http.FileInfo;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.annotation.JSON;
 import org.primeframework.mvc.action.result.annotation.Status;
-import org.primeframework.mvc.parameter.fileupload.FileInfo;
 import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
 
 /**

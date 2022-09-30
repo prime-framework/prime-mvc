@@ -15,15 +15,16 @@
  */
 package org.primeframework.mvc.control.message;
 
+import java.util.List;
+
+import com.google.inject.Inject;
 import org.example.action.user.EditAction;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.control.ControlBaseTest;
 import org.testng.annotations.Test;
-
-import com.google.inject.Inject;
-import static java.util.Arrays.*;
-import static org.testng.Assert.*;
+import static java.util.Arrays.asList;
+import static org.testng.Assert.fail;
 
 /**
  * This class tests the message control.
@@ -34,12 +35,22 @@ public class MessageTest extends ControlBaseTest {
   @Inject Message message;
 
   @Test
+  public void defaultMessage() {
+    EditAction action = new EditAction();
+    ais.setCurrent(new ActionInvocation(action, null, "/user/edit", null, null));
+    new ControlTester(message).
+        attr("key", "bad").
+        attr("default", "Message").
+        go("Message");
+  }
+
+  @Test
   public void messageAction() {
     EditAction action = new EditAction();
     ais.setCurrent(new ActionInvocation(action, null, "/user/edit", null, null));
     new ControlTester(message).
-      attr("key", "key").
-      go("American English Message");
+        attr("key", "key").
+        go("American English Message");
   }
 
   @Test
@@ -47,9 +58,9 @@ public class MessageTest extends ControlBaseTest {
     EditAction action = new EditAction();
     ais.setCurrent(new ActionInvocation(action, null, "/user/edit", null, null));
     new ControlTester(message).
-      attr("key", "params").
-      attr("values", asList("Params")).
-      go("Params Message");
+        attr("key", "params").
+        attr("values", List.of("Params")).
+        go("Params Message");
   }
 
   @Test
@@ -58,21 +69,11 @@ public class MessageTest extends ControlBaseTest {
     ais.setCurrent(new ActionInvocation(action, null, "/user/edit", null, null));
     try {
       new ControlTester(message).
-        attr("key", "bad").
-        go("Bundle message");
+          attr("key", "bad").
+          go("Bundle message");
       fail("Should have failed");
     } catch (PrimeException e) {
       // Expected
     }
-  }
-
-  @Test
-  public void defaultMessage() {
-    EditAction action = new EditAction();
-    ais.setCurrent(new ActionInvocation(action, null, "/user/edit", null, null));
-    new ControlTester(message).
-      attr("key", "bad").
-      attr("default", "Message").
-      go("Message");
   }
 }

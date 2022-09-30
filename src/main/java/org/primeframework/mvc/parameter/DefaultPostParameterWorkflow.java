@@ -17,12 +17,11 @@ package org.primeframework.mvc.parameter;
 
 import java.io.IOException;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.parameter.annotation.PostParameterMethod;
 import org.primeframework.mvc.workflow.WorkflowChain;
-
-import com.google.inject.Inject;
 
 /**
  * This class handles the invocation of all action methods annotated with {@link PostParameterMethod}
@@ -36,7 +35,8 @@ public class DefaultPostParameterWorkflow implements PostParameterWorkflow {
   private final PostParameterHandler postParameterHandler;
 
   @Inject
-  public DefaultPostParameterWorkflow(ActionInvocationStore actionInvocationStore, PostParameterHandler postParameterHandle) {
+  public DefaultPostParameterWorkflow(ActionInvocationStore actionInvocationStore,
+                                      PostParameterHandler postParameterHandle) {
     this.actionInvocationStore = actionInvocationStore;
     this.postParameterHandler = postParameterHandle;
   }

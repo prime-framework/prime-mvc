@@ -45,6 +45,10 @@ public class IndexedCollectionAccessor extends Accessor {
     this.memberAccessor = memberAccessor;
   }
 
+  public Object get(Expression expression) {
+    return getValueFromCollection(index);
+  }
+
   /**
    * @return The memberAccessor member variable.
    */
@@ -58,10 +62,6 @@ public class IndexedCollectionAccessor extends Accessor {
    */
   public boolean isIndexed() {
     return false;
-  }
-
-  public Object get(Expression expression) {
-    return getValueFromCollection(index);
   }
 
   public void set(String[] values, Expression expression) {
@@ -91,15 +91,14 @@ public class IndexedCollectionAccessor extends Accessor {
   /**
    * Adds padding to the array or list so that it can hold the item being inserted.
    *
-   * @param object     The object to pad. If this isn't a List or an array, this method does nothing and just returns the
-   *                   Object.
+   * @param object     The object to pad. If this isn't a List or an array, this method does nothing and just returns
+   *                   the Object.
    * @param expression The current expression.
    * @return The padded list or array.
    */
   @SuppressWarnings("unchecked")
   private Object pad(Object object, Expression expression) {
-    if (object instanceof List) {
-      List list = ((List) object);
+    if (object instanceof List list) {
       int length = list.size();
       if (length <= index) {
         for (int i = length; i <= index; i++) {

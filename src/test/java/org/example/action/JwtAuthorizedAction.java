@@ -15,10 +15,10 @@
  */
 package org.example.action;
 
+import io.fusionauth.http.HTTPValues.Methods;
 import io.fusionauth.jwt.domain.JWT;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.annotation.Status;
-import org.primeframework.mvc.http.HTTPStrings.Methods;
 import org.primeframework.mvc.security.annotation.JWTAuthorizeMethod;
 
 /**

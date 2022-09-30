@@ -18,7 +18,7 @@ package org.primeframework.mvc.message;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.primeframework.mvc.http.HTTPRequest;
+import io.fusionauth.http.server.HTTPRequest;
 import org.primeframework.mvc.message.scope.ApplicationScope;
 import org.primeframework.mvc.message.scope.FlashScope;
 import org.primeframework.mvc.message.scope.MessageScope;

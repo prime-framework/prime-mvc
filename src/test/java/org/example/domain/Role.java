@@ -5,6 +5,7 @@ package org.example.domain;
  */
 public class Role {
   public Integer id;
+
   public String name;
 
   public Role() {

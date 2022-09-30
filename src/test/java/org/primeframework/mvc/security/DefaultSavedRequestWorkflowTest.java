@@ -19,10 +19,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.fusionauth.http.Cookie;
+import io.fusionauth.http.HTTPMethod;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.result.SavedRequestTools;
-import org.primeframework.mvc.http.Cookie;
-import org.primeframework.mvc.http.HTTPMethod;
 import org.primeframework.mvc.security.saved.SavedHttpRequest;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;

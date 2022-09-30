@@ -73,8 +73,8 @@ public abstract class Accessor {
 
   /**
    * @return Returns the member accessor that is closest to the current atom in the expression. If the current atom is a
-   *     member, this should just return <strong>this</strong>. If the current atom is a collection for example,
-   *     this would return the member that the collection was retrieved from.
+   *     member, this should just return <strong>this</strong>. If the current atom is a collection for example, this
+   *     would return the member that the collection was retrieved from.
    */
   public abstract MemberAccessor getMemberAccessor();
 
@@ -126,7 +126,8 @@ public abstract class Accessor {
    * @throws ConversionException If there was a problem converting the parameter.
    */
   @SuppressWarnings("unchecked")
-  protected Object convert(Expression expression, AccessibleObject accessibleObject, final String... values) throws ConversionException {
+  protected Object convert(Expression expression, AccessibleObject accessibleObject, final String... values)
+      throws ConversionException {
     Object newValue = values;
 
     // First look for annotations
@@ -226,8 +227,7 @@ public abstract class Accessor {
       }
 
       return Array.get(this.object, index);
-    } else if (this.object instanceof List) {
-      List<?> l = (List<?>) this.object;
+    } else if (this.object instanceof List<?> l) {
       if (l.size() <= index) {
         return null;
       }

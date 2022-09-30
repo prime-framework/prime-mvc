@@ -21,9 +21,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.google.inject.Inject;
+import io.fusionauth.http.server.HTTPRequest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
-import org.primeframework.mvc.http.HTTPRequest;
 import org.primeframework.mvc.workflow.WorkflowChain;
 
 /**

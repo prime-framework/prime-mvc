@@ -17,10 +17,9 @@ package org.primeframework.mvc.scope;
 
 import java.lang.annotation.Annotation;
 
-import org.primeframework.mvc.scope.annotation.ScopeAnnotation;
-
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import org.primeframework.mvc.scope.annotation.ScopeAnnotation;
 
 /**
  * This class implements the scope provider interface and creates scope instances via Guice.

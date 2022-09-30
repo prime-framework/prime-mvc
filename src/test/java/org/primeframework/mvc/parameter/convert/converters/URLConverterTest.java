@@ -15,13 +15,12 @@
  */
 package org.primeframework.mvc.parameter.convert.converters;
 
-import org.apache.commons.lang3.ArrayUtils;
-import org.primeframework.mvc.parameter.convert.GlobalConverter;
-import org.testng.annotations.Test;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.primeframework.mvc.parameter.convert.GlobalConverter;
+import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.fail;

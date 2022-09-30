@@ -24,10 +24,10 @@ import com.github.fge.jsonpatch.JsonPatchException;
 import com.github.fge.jsonpatch.Patch;
 import com.github.fge.jsonpatch.mergepatch.JsonMergePatch;
 import com.google.inject.Inject;
+import io.fusionauth.http.server.HTTPRequest;
 import org.primeframework.mvc.ErrorException;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration.RequestMember;
-import org.primeframework.mvc.http.HTTPRequest;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleMessage;
@@ -72,7 +72,7 @@ public class JacksonPatchContentHandler extends BaseJacksonContentHandler {
     Patch patch = objectMapper.readerFor(contentType.equals("application/json-patch+json")
                                   ? JsonPatch.class
                                   : JsonMergePatch.class)
-                              .readValue(request.getBody().array(), 0, contentLength.intValue());
+                              .readValue(request.getInputStream());
 
     // Patch the current object
     JsonNode patched = patch.apply(objectMapper.valueToTree(currentValue));

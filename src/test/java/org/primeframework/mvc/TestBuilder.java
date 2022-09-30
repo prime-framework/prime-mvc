@@ -26,9 +26,9 @@ import java.util.UUID;
 import java.util.function.Function;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.fusionauth.http.Cookie;
+import io.fusionauth.http.server.HTTPContext;
 import org.primeframework.mock.MockUserAgent;
-import org.primeframework.mvc.http.Cookie;
-import org.primeframework.mvc.http.HTTPContext;
 import org.primeframework.mvc.test.RequestResult;
 import org.primeframework.mvc.test.RequestResult.ThrowingConsumer;
 import org.primeframework.mvc.test.RequestSimulator;

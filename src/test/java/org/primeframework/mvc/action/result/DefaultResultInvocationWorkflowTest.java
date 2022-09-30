@@ -26,6 +26,7 @@ import java.util.Map;
 
 import com.google.inject.Binder;
 import com.google.inject.Injector;
+import io.fusionauth.http.HTTPMethod;
 import org.example.action.user.EditAction;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.PrimeException;
@@ -37,7 +38,6 @@ import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.result.ForwardResult.ForwardImpl;
 import org.primeframework.mvc.action.result.annotation.Forward;
 import org.primeframework.mvc.action.result.annotation.Redirect;
-import org.primeframework.mvc.http.HTTPMethod;
 import org.primeframework.mvc.validation.Validation;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;

@@ -15,11 +15,11 @@
  */
 package org.primeframework.mvc.message;
 
-import org.primeframework.mvc.message.scope.MessageScope;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
+import org.primeframework.mvc.message.scope.MessageScope;
 
 /**
  * This interface defines the mechanism by which messages are added and fetched.
@@ -51,6 +51,18 @@ public interface MessageStore {
   void addAll(MessageScope scope, Collection<Message> messages);
 
   /**
+   * Clears all messages in all scopes.
+   */
+  void clear();
+
+  /**
+   * Clears the messages in the given scope.
+   *
+   * @param scope The scope.
+   */
+  void clear(MessageScope scope);
+
+  /**
    * @return All of the messages in all the scopes.
    */
   List<Message> get();
@@ -60,11 +72,6 @@ public interface MessageStore {
    * @return All of the messages in the scope.
    */
   List<Message> get(MessageScope scope);
-
-  /**
-   * @return The general messages (non-field messages).
-   */
-  List<Message> getGeneralMessages();
 
   /**
    * @return All of the fields messages in all the scopes. This Map is not live.
@@ -78,14 +85,7 @@ public interface MessageStore {
   Map<String, List<FieldMessage>> getFieldMessages(MessageScope scope);
 
   /**
-   * Clears all messages in all scopes.
+   * @return The general messages (non-field messages).
    */
-  void clear();
-
-  /**
-   * Clears the messages in the given scope.
-   *
-   * @param scope The scope.
-   */
-  void clear(MessageScope scope);
+  List<Message> getGeneralMessages();
 }

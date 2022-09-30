@@ -29,6 +29,7 @@ import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.PropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.google.inject.Inject;
+import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
@@ -36,7 +37,6 @@ import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.result.annotation.JSON;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration.JSONPropertyFilterConfig;
-import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.message.ErrorMessage;
 import org.primeframework.mvc.message.ErrorMessages;
 import org.primeframework.mvc.message.FieldMessage;
@@ -152,8 +152,7 @@ public class JSONResult extends AbstractResult<JSON> {
   private ErrorMessages convertErrors(List<Message> messages) {
     ErrorMessages errorMessages = new ErrorMessages();
     for (Message message : messages) {
-      if (message instanceof FieldMessage) {
-        FieldMessage fieldMessage = (FieldMessage) message;
+      if (message instanceof FieldMessage fieldMessage) {
         errorMessages.addFieldError(fieldMessage.getField(), fieldMessage.getCode(), fieldMessage.toString(), fieldMessage.getData());
       } else {
         errorMessages.generalErrors.add(new ErrorMessage(message.getCode(), message.toString(), message.getData()));

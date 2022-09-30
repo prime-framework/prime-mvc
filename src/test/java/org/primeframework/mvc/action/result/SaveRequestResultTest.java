@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc.action.result;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,16 +23,14 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
+import io.fusionauth.http.HTTPMethod;
+import io.fusionauth.http.server.HTTPRequest;
+import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.SaveRequestResult.SaveRequestImpl;
 import org.primeframework.mvc.action.result.annotation.SaveRequest;
-import org.primeframework.mvc.http.DefaultHTTPRequest;
-import org.primeframework.mvc.http.DefaultHTTPResponse;
-import org.primeframework.mvc.http.HTTPMethod;
-import org.primeframework.mvc.http.HTTPResponse;
-import org.primeframework.mvc.http.MutableHTTPRequest;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.security.DefaultCipherProvider;
@@ -66,12 +63,12 @@ public class SaveRequestResultTest extends PrimeBaseTest {
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/foo", "", null));
     replay(store);
 
-    MutableHTTPRequest request = new DefaultHTTPRequest();
-    HTTPResponse response = new DefaultHTTPResponse(new ByteArrayOutputStream());
+    HTTPRequest request = new HTTPRequest();
+    HTTPResponse response = new HTTPResponse(null, request);
     request.setPath("/test");
     request.setMethod(HTTPMethod.GET);
-    request.addParameter("param1", "value1");
-    request.addParameter("param2", "value2");
+    request.addURLParameter("param1", "value1");
+    request.addURLParameter("param2", "value2");
 
     Encryptor encryptor = new DefaultEncryptor(new DefaultCipherProvider(configuration));
     SaveRequest annotation = new SaveRequestImpl("/login", "unauthenticated", true, false);
@@ -94,12 +91,12 @@ public class SaveRequestResultTest extends PrimeBaseTest {
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/foo", "", null));
     replay(store);
 
-    MutableHTTPRequest request = new DefaultHTTPRequest();
-    HTTPResponse response = new DefaultHTTPResponse(new ByteArrayOutputStream());
+    HTTPRequest request = new HTTPRequest();
+    HTTPResponse response = new HTTPResponse(null, request);
     request.setPath("/test");
     request.setMethod(HTTPMethod.POST);
-    request.addParameter("param1", "value1");
-    request.addParameter("param2", "value2");
+    request.addURLParameter("param1", "value1");
+    request.addURLParameter("param2", "value2");
 
     Encryptor encryptor = new DefaultEncryptor(new DefaultCipherProvider(configuration));
     SaveRequest annotation = new SaveRequestImpl("/login", "unauthenticated", true, false);
@@ -130,14 +127,14 @@ public class SaveRequestResultTest extends PrimeBaseTest {
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/foo", "", parameters, null, true));
     replay(store);
 
-    MutableHTTPRequest request = new DefaultHTTPRequest();
-    HTTPResponse response = new DefaultHTTPResponse(new ByteArrayOutputStream());
+    HTTPRequest request = new HTTPRequest();
+    HTTPResponse response = new HTTPResponse(null, request);
     request.setPath("/test");
     request.setMethod(HTTPMethod.POST);
-    request.addParameter("largeParam1", parameters.get("largeParam1").get(0));
-    request.addParameter("largeParam2", parameters.get("largeParam2").get(0));
-    request.addParameter("largeParam3", parameters.get("largeParam3").get(0));
-    request.addParameter("largeParam4", parameters.get("largeParam4").get(0));
+    request.addURLParameter("largeParam1", parameters.get("largeParam1").get(0));
+    request.addURLParameter("largeParam2", parameters.get("largeParam2").get(0));
+    request.addURLParameter("largeParam3", parameters.get("largeParam3").get(0));
+    request.addURLParameter("largeParam4", parameters.get("largeParam4").get(0));
 
     Encryptor encryptor = new DefaultEncryptor(new DefaultCipherProvider(configuration));
     SaveRequest annotation = new SaveRequestImpl("/login", "unauthenticated", true, false);

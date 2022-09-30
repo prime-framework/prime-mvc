@@ -15,11 +15,10 @@
  */
 package org.primeframework.mvc.util.guice;
 
-import org.primeframework.mvc.util.DefaultURIBuilder;
-import org.primeframework.mvc.util.URIBuilder;
-
 import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
+import org.primeframework.mvc.util.DefaultURIBuilder;
+import org.primeframework.mvc.util.URIBuilder;
 
 /**
  * Binds utility classes.

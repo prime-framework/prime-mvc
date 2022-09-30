@@ -15,11 +15,11 @@
  */
 package org.primeframework.mvc.action;
 
-import org.primeframework.mvc.http.HTTPRequest;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
 import com.google.inject.Inject;
+import io.fusionauth.http.server.HTTPRequest;
 
 /**
  * This class is the default action invocation store.

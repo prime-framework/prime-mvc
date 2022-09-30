@@ -20,7 +20,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.primeframework.mvc.http.Cookie.SameSite;
+import io.fusionauth.http.Cookie.SameSite;
 import org.primeframework.mvc.scope.ManagedCookieScope;
 
 /**

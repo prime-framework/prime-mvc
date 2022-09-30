@@ -42,7 +42,7 @@ public class InternalParametersTest extends PrimeBaseTest {
   @Test
   public void stringBad() {
     try {
-      request.setParameter(InternalParameters.EXECUTE_VALIDATION, "bad");
+      request.addURLParameter(InternalParameters.EXECUTE_VALIDATION, "bad");
       InternalParameters.is(request, InternalParameters.EXECUTE_VALIDATION);
       fail("Should have failed");
     } catch (Exception e) {
@@ -52,14 +52,14 @@ public class InternalParametersTest extends PrimeBaseTest {
 
   @Test
   public void stringFalse() {
-    request.setParameter(InternalParameters.EXECUTE_VALIDATION, "false");
+    request.addURLParameter(InternalParameters.EXECUTE_VALIDATION, "false");
     boolean keyState = InternalParameters.is(request, InternalParameters.EXECUTE_VALIDATION);
     assertFalse(keyState);
   }
 
   @Test
   public void stringTrue() {
-    request.setParameter(InternalParameters.EXECUTE_VALIDATION, "true");
+    request.addURLParameter(InternalParameters.EXECUTE_VALIDATION, "true");
     boolean keyState = InternalParameters.is(request, InternalParameters.EXECUTE_VALIDATION);
     assertTrue(keyState);
   }

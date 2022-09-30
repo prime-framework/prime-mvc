@@ -16,8 +16,8 @@
 package org.primeframework.mvc.security;
 
 /**
- * Manage retrieving the JWT from the HTTP request and ensuring we don't return the JWT (in the form a cookie for example) on a response if
- * it is invalid.
+ * Manage retrieving the JWT from the HTTP request and ensuring we don't return the JWT (in the form a cookie for
+ * example) on a response if it is invalid.
  *
  * @author Daniel DeGroff
  */

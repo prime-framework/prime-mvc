@@ -19,14 +19,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import org.primeframework.mvc.action.result.annotation.Binary;
-
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * This result writes out a member marked with this annotation to the response with the <code>Content-Type</code> set
- * to <code>application/octet-stream</code>. This annotation should be used with {@link Binary} action annotation.
+ * This result writes out a member marked with this annotation to the response with the <code>Content-Type</code> set to
+ * <code>application/octet-stream</code>. This annotation should be used with {@link Binary} action annotation.
  *
  * @author Daniel DeGroff
  */
@@ -35,9 +34,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface BinaryResponse {
 
   /**
-   * Default is true. When true prime will delete the file annotated with {@link BinaryResponse} once it is
-   * successfully written the contents to the output stream. If you do not want the file deleted or wish to handle it
-   * yourself set this parameter to false.
+   * Default is true. When true prime will delete the file annotated with {@link BinaryResponse} once it is successfully
+   * written the contents to the output stream. If you do not want the file deleted or wish to handle it yourself set
+   * this parameter to false.
    *
    * @return true or false
    */

@@ -294,7 +294,7 @@ public class ClassClasspathResolver<U> {
     private static class AnnotatedWithTestable<T extends Annotation, U> implements Testable<Class<U>> {
       private final ClassReader classReader;
 
-      private AnnotatedWithClassVisitor<T> visitor;
+      private final AnnotatedWithClassVisitor<T> visitor;
 
       public AnnotatedWithTestable(Class<T> annotation, ClassReader classReader) {
         this.visitor = new AnnotatedWithClassVisitor<>(annotation);
@@ -369,7 +369,7 @@ public class ClassClasspathResolver<U> {
     private static class IsATestable<U> implements Testable<Class<U>> {
       private final ClassReader classReader;
 
-      private IsAClassVisitor<U> visitor;
+      private final IsAClassVisitor<U> visitor;
 
       public IsATestable(Class<U> parent, ClassReader classReader) {
         this.visitor = new IsAClassVisitor<>(parent);

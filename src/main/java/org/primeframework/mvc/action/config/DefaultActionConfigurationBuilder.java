@@ -32,6 +32,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.google.inject.Inject;
+import io.fusionauth.http.HTTPMethod;
 import io.fusionauth.jwt.domain.JWT;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.AuthorizationMethodConfiguration;
@@ -44,7 +45,6 @@ import org.primeframework.mvc.action.result.annotation.ResultAnnotation;
 import org.primeframework.mvc.action.result.annotation.ResultContainerAnnotation;
 import org.primeframework.mvc.content.ValidContentTypes;
 import org.primeframework.mvc.control.form.annotation.FormPrepareMethod;
-import org.primeframework.mvc.http.HTTPMethod;
 import org.primeframework.mvc.parameter.annotation.PostParameterMethod;
 import org.primeframework.mvc.parameter.annotation.PreParameter;
 import org.primeframework.mvc.parameter.annotation.PreParameterMethod;
@@ -319,7 +319,7 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
     for (HTTPMethod httpMethod : HTTPMethod.StandardMethods.values()) {
       Method method = null;
       try {
-        method = actionClass.getMethod(httpMethod.methodName());
+        method = actionClass.getMethod(httpMethod.name().toLowerCase());
       } catch (NoSuchMethodException e) {
         // Ignore
       }

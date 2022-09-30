@@ -16,9 +16,9 @@
 package org.example.action.user;
 
 import com.google.inject.Inject;
+import io.fusionauth.http.HTTPMethod;
 import org.example.domain.User;
 import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.http.HTTPMethod;
 
 /**
  * @author Brian Pontarelli
@@ -34,13 +34,13 @@ public class ValidatableAction implements org.primeframework.mvc.validation.Vali
     this.method = method;
   }
 
+  public String post() {
+    return "success";
+  }
+
   @Override
   public void validate() {
     if (HTTPMethod.POST.is(method)) {
     }
-  }
-
-  public String post() {
-    return "success";
   }
 }

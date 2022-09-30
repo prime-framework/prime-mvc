@@ -26,7 +26,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 /**
  * Marks a member as the recipient of a {@link Path} object.</p>
  * <p>
- * The object is written to a temporary file from reading bytes from the HTTP request body when the request is made with
+ * The object is written to a temporary file from reading bytes from the HTTP request body when the request is made
+ * with
  * <code>Content-Type: application/octet-stream</code>.
  *
  * @author Daniel DeGroff

@@ -25,7 +25,6 @@ import java.net.URLClassLoader;
 
 import org.primeframework.mvc.util.Classpath.ClasspathBuilder;
 import org.testng.annotations.Test;
-
 import static org.testng.Assert.assertEquals;
 
 /**
@@ -42,7 +41,8 @@ public class ClasspathTest {
     assertCleanedPath("src/test/resources/jars/test-foo-{integration}.jar");
   }
 
-  private void assertCleanedPath(String urlString) throws NoSuchMethodException, IOException, InvocationTargetException, IllegalAccessException, URISyntaxException {
+  private void assertCleanedPath(String urlString)
+      throws NoSuchMethodException, IOException, InvocationTargetException, IllegalAccessException, URISyntaxException {
     URL[] urls = new URL[]{new File(urlString).toURI().toURL()};
     URLClassLoader urlClassLoader = URLClassLoader.newInstance(urls, Thread.currentThread().getContextClassLoader());
     ClasspathBuilder classPathBuilder = new ClasspathBuilder(urlClassLoader);

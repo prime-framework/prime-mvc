@@ -26,6 +26,7 @@ import org.primeframework.mvc.parameter.annotation.PostParameterMethod;
 @Redirect(code = "success", uri = "/")
 public abstract class Extension {
   public String baseField;
+
   public boolean baseInvoked = false;
 
   public String get() {

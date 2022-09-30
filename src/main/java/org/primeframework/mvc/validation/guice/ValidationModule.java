@@ -17,9 +17,9 @@ package org.primeframework.mvc.validation.guice;
 
 import com.google.inject.AbstractModule;
 import org.primeframework.mvc.validation.DefaultValidationProcessor;
+import org.primeframework.mvc.validation.DefaultValidationWorkflow;
 import org.primeframework.mvc.validation.ValidationProcessor;
 import org.primeframework.mvc.validation.ValidationWorkflow;
-import org.primeframework.mvc.validation.DefaultValidationWorkflow;
 
 /**
  * Validation module for Guice.

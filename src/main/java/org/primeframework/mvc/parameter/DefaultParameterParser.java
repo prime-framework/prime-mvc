@@ -23,12 +23,12 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.inject.Inject;
+import io.fusionauth.http.FileInfo;
+import io.fusionauth.http.server.HTTPRequest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.config.MVCConfiguration;
-import org.primeframework.mvc.http.HTTPRequest;
 import org.primeframework.mvc.parameter.ParameterParser.Parameters.Struct;
-import org.primeframework.mvc.parameter.fileupload.FileInfo;
 
 /**
  * This class is the default parameter parser. It pulls all of the parameters from the request and puts them into groups

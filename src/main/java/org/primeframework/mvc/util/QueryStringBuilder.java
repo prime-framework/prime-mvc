@@ -17,6 +17,7 @@ package org.primeframework.mvc.util;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -33,7 +34,7 @@ public class QueryStringBuilder {
 
   private boolean addSeparator;
 
-  private StringBuilder uri = new StringBuilder();
+  private final StringBuilder uri = new StringBuilder();
 
   protected QueryStringBuilder() {
   }
@@ -147,14 +148,9 @@ public class QueryStringBuilder {
       sb.append("&");
     }
 
-    try {
-      sb.append(URLEncoder.encode(name, "UTF-8"))
-        .append("=")
-        .append(URLEncoder.encode(value.toString(), "UTF-8"));
-    } catch (UnsupportedEncodingException e) {
-      // Uh, oh, UTF-8 is no longer supported.
-      throw new RuntimeException(e);
-    }
+    sb.append(URLEncoder.encode(name, StandardCharsets.UTF_8))
+      .append("=")
+      .append(URLEncoder.encode(value.toString(), StandardCharsets.UTF_8));
 
     addSeparator = true;
     return this;

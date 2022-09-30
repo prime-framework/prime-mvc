@@ -13,19 +13,21 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.netty;
+package org.primeframework.mvc.content;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.io.IOException;
 
 /**
- * @author Daniel DeGroff
+ * A no-op handler that indicates the HTTP server handled the content type so that Prime doesn't need to.
+ *
+ * @author Brian Pontarelli
  */
-public class PrimeHTTPServerConfiguration {
-  public List<PrimeHTTPListenerConfiguration> listenerConfigurations = new ArrayList<>();
+public class ServerHandledContentHandler implements ContentHandler {
+  @Override
+  public void cleanup() {
+  }
 
-  public PrimeHTTPServerConfiguration(PrimeHTTPListenerConfiguration... listenerConfigurations) {
-    this.listenerConfigurations.addAll(Arrays.asList(listenerConfigurations));
+  @Override
+  public void handle() throws IOException {
   }
 }

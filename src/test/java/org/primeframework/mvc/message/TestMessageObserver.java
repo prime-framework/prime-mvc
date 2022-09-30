@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.primeframework.mvc.http.HTTPRequest;
+import io.fusionauth.http.server.HTTPRequest;
 import org.primeframework.mvc.message.scope.MessageScope;
 
 /**

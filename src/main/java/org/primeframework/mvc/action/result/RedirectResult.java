@@ -15,12 +15,12 @@
  */
 package org.primeframework.mvc.action.result;
 
-import org.primeframework.mvc.http.HTTPRequest;
-import org.primeframework.mvc.http.HTTPResponse;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 
 import com.google.inject.Inject;
+import io.fusionauth.http.server.HTTPRequest;
+import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.annotation.Redirect;
 import org.primeframework.mvc.message.MessageStore;

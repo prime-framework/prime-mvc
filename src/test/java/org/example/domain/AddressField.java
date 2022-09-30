@@ -21,9 +21,13 @@ package org.example.domain;
  * @author Brian Pontarelli
  */
 public class AddressField {
-  public String street;
-  public String city;
-  public String state;
-  public String zipcode;
   public int age;
+
+  public String city;
+
+  public String state;
+
+  public String street;
+
+  public String zipcode;
 }

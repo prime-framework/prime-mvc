@@ -17,8 +17,8 @@ package org.primeframework.mvc.action;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import io.fusionauth.http.HTTPMethod;
 import org.primeframework.mvc.action.config.ActionConfigurationProvider;
-import org.primeframework.mvc.http.HTTPMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

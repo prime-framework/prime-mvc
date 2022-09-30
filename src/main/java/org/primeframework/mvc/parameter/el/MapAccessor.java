@@ -35,7 +35,8 @@ public class MapAccessor extends Accessor {
 
   final MemberAccessor memberAccessor;
 
-  public MapAccessor(ConverterProvider converterProvider, Accessor accessor, String index, MemberAccessor memberAccessor) {
+  public MapAccessor(ConverterProvider converterProvider, Accessor accessor, String index,
+                     MemberAccessor memberAccessor) {
     super(converterProvider, accessor);
 
     String path = memberAccessor.toString();
@@ -59,11 +60,10 @@ public class MapAccessor extends Accessor {
       keyType = TypeTools.rawType(keyType); // Key type
     }
 
-    if (!(keyType instanceof Class<?>)) {
-      throw new IllegalStateException("Unable to determine concrete type of Map key for [" + toString() + "]");
+    if (!(keyType instanceof Class<?> keyClass)) {
+      throw new IllegalStateException("Unable to determine concrete type of Map key for [" + this + "]");
     }
 
-    Class<?> keyClass = (Class<?>) keyType;
     GlobalConverter converter = converterProvider.lookup(keyClass);
     if (converter == null) {
       throw new ConversionException("No type converter is registered for the type [" + keyClass + "], which is the " +
@@ -78,6 +78,10 @@ public class MapAccessor extends Accessor {
     }
   }
 
+  public Object get(Expression expression) {
+    return ((Map) this.object).get(key);
+  }
+
   /**
    * @return The memberAccessor member variable.
    */
@@ -87,14 +91,10 @@ public class MapAccessor extends Accessor {
 
   /**
    * @return Always false. The reason is that since this retrieves from a Collection, we want it to look like a
-   * non-indexed property so that the context will invoke the method.
+   *     non-indexed property so that the context will invoke the method.
    */
   public boolean isIndexed() {
     return false;
-  }
-
-  public Object get(Expression expression) {
-    return ((Map) this.object).get(key);
   }
 
   public void set(String[] values, Expression expression) {

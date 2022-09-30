@@ -18,8 +18,8 @@ package org.example.domain;
 import org.primeframework.mvc.parameter.annotation.PostParameterMethod;
 import org.primeframework.mvc.parameter.annotation.PreParameter;
 import org.primeframework.mvc.parameter.annotation.PreParameterMethod;
-
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
 
 /**
  * This class hs pre and post handling in it.
@@ -28,15 +28,16 @@ import static org.testng.Assert.*;
  */
 @org.primeframework.mvc.action.annotation.Action("{preField}")
 public class PreAndPostAction {
+  public String notPre;
+
+  public boolean postCalled;
+
+  public boolean preCalled;
+
   @PreParameter
   public Integer preField;
 
   private String preProperty;
-
-  public String notPre;
-
-  public boolean preCalled;
-  public boolean postCalled;
 
   @PreParameter
   public String getPreProperty() {
@@ -47,12 +48,8 @@ public class PreAndPostAction {
     this.preProperty = preProperty;
   }
 
-  @PreParameterMethod
-  public void preParameter() {
-    preCalled = true;
-    assertNotNull(preField);
-    assertNotNull(preProperty);
-    assertNull(notPre);
+  public String post() {
+    return null;
   }
 
   @PostParameterMethod
@@ -63,7 +60,11 @@ public class PreAndPostAction {
     assertNotNull(notPre);
   }
 
-  public String post() {
-    return null;
+  @PreParameterMethod
+  public void preParameter() {
+    preCalled = true;
+    assertNotNull(preField);
+    assertNotNull(preProperty);
+    assertNull(notPre);
   }
 }

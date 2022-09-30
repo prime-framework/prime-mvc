@@ -18,8 +18,8 @@ package org.primeframework.mvc.cors;
 import java.io.IOException;
 
 import com.google.inject.Inject;
-import org.primeframework.mvc.http.HTTPRequest;
-import org.primeframework.mvc.http.HTTPResponse;
+import io.fusionauth.http.server.HTTPRequest;
+import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.workflow.MVCWorkflow;
 import org.primeframework.mvc.workflow.WorkflowChain;
 

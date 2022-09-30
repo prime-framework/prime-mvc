@@ -19,8 +19,8 @@ import java.util.concurrent.TimeUnit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
+import io.fusionauth.http.server.HTTPRequest;
 import org.primeframework.mvc.ErrorException;
-import org.primeframework.mvc.http.HTTPRequest;
 import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.security.UserLoginSecurityContext;
 import org.primeframework.mvc.util.CookieTools;
@@ -71,7 +71,7 @@ public class DefaultEncryptionBasedTokenCSRFProvider implements CSRFProvider {
 
   @Override
   public boolean validateRequest(HTTPRequest request) {
-    CSRFToken token = decrypt(request.getParameterValue(CSRF_PARAMETER_KEY));
+    CSRFToken token = decrypt(request.getParameter(CSRF_PARAMETER_KEY));
     if (token == null) {
       return false;
     }

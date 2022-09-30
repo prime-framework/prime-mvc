@@ -17,16 +17,16 @@ package org.primeframework.mvc.action.result;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 
+import io.fusionauth.http.HTTPMethod;
+import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.ExecuteMethodConfiguration;
 import org.primeframework.mvc.action.result.annotation.XMLStream;
-import org.primeframework.mvc.http.DefaultHTTPResponse;
-import org.primeframework.mvc.http.HTTPMethod;
-import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -55,7 +55,13 @@ public class XMLStreamResultTest extends PrimeBaseTest {
     expect(ee.getValue(property, action)).andReturn(propertyValue);
     replay(ee);
 
-    HTTPResponse response = new DefaultHTTPResponse(new ByteArrayOutputStream());
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    HTTPResponse response = new HTTPResponse(null, null) {
+      @Override
+      public OutputStream getOutputStream() {
+        return baos;
+      }
+    };
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(action, new ExecuteMethodConfiguration(httpMethod, null, null), "/foo", "", null));
     replay(store);
@@ -64,7 +70,7 @@ public class XMLStreamResultTest extends PrimeBaseTest {
     XMLStreamResult streamResult = new XMLStreamResult(ee, response, store);
     streamResult.execute(xmlStream);
 
-    assertEquals(response.getOutputStream().toString(), httpMethod == HTTPMethod.GET ? "<xml/>" : "");
+    assertEquals(baos.toString(), httpMethod == HTTPMethod.GET ? "<xml/>" : "");
 
     verify(ee);
 

@@ -18,13 +18,12 @@ package org.primeframework.mvc.parameter.convert.converters;
 import java.lang.reflect.Type;
 import java.util.Map;
 
+import com.google.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.parameter.convert.AbstractGlobalConverter;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.convert.annotation.GlobalConverter;
-
-import com.google.inject.Inject;
 
 /**
  * This converts to and from Strings.
@@ -40,8 +39,13 @@ public class StringConverter extends AbstractGlobalConverter {
     this.emptyIsNull = configuration.emptyParametersAreNull();
   }
 
+  protected String objectToString(Object value, Type convertFrom, Map<String, String> attributes, String expression)
+      throws org.primeframework.mvc.parameter.convert.ConversionException, ConverterStateException {
+    return value.toString();
+  }
+
   protected Object stringToObject(String value, Type convertTo, Map<String, String> attributes, String expression)
-    throws org.primeframework.mvc.parameter.convert.ConversionException, ConverterStateException {
+      throws org.primeframework.mvc.parameter.convert.ConversionException, ConverterStateException {
     if (emptyIsNull && StringUtils.isBlank(value)) {
       return null;
     }
@@ -50,12 +54,7 @@ public class StringConverter extends AbstractGlobalConverter {
   }
 
   protected Object stringsToObject(String[] values, Type convertTo, Map<String, String> attributes, String expression)
-    throws org.primeframework.mvc.parameter.convert.ConversionException, ConverterStateException {
+      throws org.primeframework.mvc.parameter.convert.ConversionException, ConverterStateException {
     return String.join(",", values);
-  }
-
-  protected String objectToString(Object value, Type convertFrom, Map<String, String> attributes, String expression)
-    throws org.primeframework.mvc.parameter.convert.ConversionException, ConverterStateException {
-    return value.toString();
   }
 }

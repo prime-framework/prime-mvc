@@ -20,12 +20,12 @@ import java.util.Map;
 
 /**
  * Converters are used to convert objects from one type to another, convert strings to objects and to convert from
- * objects and strings to arrays of objects. The way that this is setup is that a Converter implementation is
- * registered with the ConverterRegistry. The registry can then be queried for a particular Conveter (see {@link
- * ConverterProvider} for more information about retrieval). Next, the Converter can be used for conversions using one
- * of the methods described below. Any given Converter may be used to convert to many different types because of the way
- * that the ConverterRegistry searches for Converters. Because of this flexibility when converting the Converter must
- * be told what type to convert to. This is the reason for the second Class parameter on all of the convert methods.
+ * objects and strings to arrays of objects. The way that this is setup is that a Converter implementation is registered
+ * with the ConverterRegistry. The registry can then be queried for a particular Conveter (see {@link ConverterProvider}
+ * for more information about retrieval). Next, the Converter can be used for conversions using one of the methods
+ * described below. Any given Converter may be used to convert to many different types because of the way that the
+ * ConverterRegistry searches for Converters. Because of this flexibility when converting the Converter must be told
+ * what type to convert to. This is the reason for the second Class parameter on all of the convert methods.
  * <p/>
  * The type that appears on all of the methods in this interface can be any type that is support by the Converter, but
  * generally is a type that is the type or a sub-type of the type the converter is registered for. For example, let's
@@ -106,7 +106,7 @@ public interface GlobalConverter {
    *                                 during development but not in production.
    */
   Object convertFromStrings(Type convertTo, Map<String, String> attributes, String expression, String... values)
-    throws ConversionException, ConverterStateException;
+      throws ConversionException, ConverterStateException;
 
   /**
    * Converts the given Object to a String for display purposes.
@@ -122,8 +122,7 @@ public interface GlobalConverter {
    *
    * @param convertFrom The type to convert the value from. This might be a Class or it might be a parameterized type
    *                    such as List&lt;String>.
-   * @param attributes  Any attributes associated with the parameter being converted. Parameter attributes are
-   *                    described
+   * @param attributes  Any attributes associated with the parameter being converted. Parameter attributes are described
    *                    in the {@link org.primeframework.mvc.parameter.ParameterWorkflow} class comment.
    * @param expression  The expression.
    * @param value       The Object value to convert.
@@ -134,5 +133,5 @@ public interface GlobalConverter {
    *                                 during development but not in production.
    */
   String convertToString(Type convertFrom, Map<String, String> attributes, String expression, Object value)
-    throws ConversionException;
+      throws ConversionException;
 }

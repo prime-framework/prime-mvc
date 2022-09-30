@@ -15,12 +15,10 @@
  */
 package org.primeframework.mvc.control.form;
 
-import org.primeframework.mvc.http.HTTPRequest;
-
+import com.google.inject.Inject;
+import io.fusionauth.http.server.HTTPRequest;
 import org.primeframework.mvc.control.annotation.ControlAttribute;
 import org.primeframework.mvc.control.annotation.ControlAttributes;
-
-import com.google.inject.Inject;
 
 /**
  * This class is the control for an image button.
@@ -28,14 +26,14 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 @ControlAttributes(
-  required = {
-    @ControlAttribute(name = "name", types = {String.class})
-  },
-  optional = {
-    @ControlAttribute(name = "disabled", types = {boolean.class, Boolean.class}),
-    @ControlAttribute(name = "ismap", types = {boolean.class, Boolean.class}),
-    @ControlAttribute(name = "tabindex", types = {int.class, Number.class})
-  }
+    required = {
+        @ControlAttribute(name = "name", types = {String.class})
+    },
+    optional = {
+        @ControlAttribute(name = "disabled", types = {boolean.class, Boolean.class}),
+        @ControlAttribute(name = "ismap", types = {boolean.class, Boolean.class}),
+        @ControlAttribute(name = "tabindex", types = {int.class, Number.class})
+    }
 )
 public class Image extends AbstractButtonInput {
   @Inject

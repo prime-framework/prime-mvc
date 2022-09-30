@@ -15,19 +15,17 @@
  */
 package org.primeframework.mvc.action.result;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.annotation.Status;
 import org.primeframework.mvc.action.result.annotation.Status.Header;
-import org.primeframework.mvc.http.DefaultHTTPResponse;
-import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.scope.MessageScope;
@@ -51,12 +49,12 @@ public class StatusResultTest extends PrimeBaseTest {
     expect(ee.expand("someFieldName", action, false)).andReturn("200");
     replay(ee);
 
-    HTTPResponse response = new DefaultHTTPResponse(new ByteArrayOutputStream());
+    HTTPResponse response = new HTTPResponse(null, null);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(action, null, "/foo", "", null));
     replay(store);
 
-    List<Message> messages = new ArrayList<Message>();
+    List<Message> messages = new ArrayList<>();
     MessageStore messageStore = createStrictMock(MessageStore.class);
     expect(messageStore.get(MessageScope.REQUEST)).andReturn(messages);
     messageStore.clear(MessageScope.REQUEST);
@@ -76,7 +74,7 @@ public class StatusResultTest extends PrimeBaseTest {
     ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
     replay(ee);
 
-    HTTPResponse response = new DefaultHTTPResponse(new ByteArrayOutputStream());
+    HTTPResponse response = new HTTPResponse(null, null);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/foo", "", null));
     replay(store);
@@ -103,7 +101,7 @@ public class StatusResultTest extends PrimeBaseTest {
     ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
     replay(ee);
 
-    HTTPResponse response = new DefaultHTTPResponse(new ByteArrayOutputStream());
+    HTTPResponse response = new HTTPResponse(null, null);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/foo", "", null));
     replay(store);

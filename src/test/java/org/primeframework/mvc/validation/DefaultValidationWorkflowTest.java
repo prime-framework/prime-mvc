@@ -18,8 +18,10 @@ package org.primeframework.mvc.validation;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
-
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.createStrictMock;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 import static org.testng.Assert.fail;
 
 /**
@@ -28,22 +30,6 @@ import static org.testng.Assert.fail;
  * @author Brian Pontarelli
  */
 public class DefaultValidationWorkflowTest extends PrimeBaseTest {
-  @Test
-  public void success() throws Exception {
-    ValidationProcessor validationProcessor = createStrictMock(ValidationProcessor.class);
-    validationProcessor.validate();
-    replay(validationProcessor);
-
-    WorkflowChain chain = createStrictMock(WorkflowChain.class);
-    chain.continueWorkflow();
-    replay(chain);
-
-    DefaultValidationWorkflow workflow = new DefaultValidationWorkflow(validationProcessor);
-    workflow.perform(chain);
-    
-    verify(validationProcessor, chain);
-  }
-
   @Test
   public void failureByExcception() throws Exception {
     ValidationProcessor validationProcessor = createStrictMock(ValidationProcessor.class);
@@ -61,6 +47,22 @@ public class DefaultValidationWorkflowTest extends PrimeBaseTest {
     } catch (ValidationException e) {
       // Expected
     }
+
+    verify(validationProcessor, chain);
+  }
+
+  @Test
+  public void success() throws Exception {
+    ValidationProcessor validationProcessor = createStrictMock(ValidationProcessor.class);
+    validationProcessor.validate();
+    replay(validationProcessor);
+
+    WorkflowChain chain = createStrictMock(WorkflowChain.class);
+    chain.continueWorkflow();
+    replay(chain);
+
+    DefaultValidationWorkflow workflow = new DefaultValidationWorkflow(validationProcessor);
+    workflow.perform(chain);
 
     verify(validationProcessor, chain);
   }

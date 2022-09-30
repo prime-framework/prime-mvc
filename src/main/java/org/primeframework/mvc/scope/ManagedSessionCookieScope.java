@@ -17,9 +17,9 @@ package org.primeframework.mvc.scope;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
-import org.primeframework.mvc.http.Cookie;
-import org.primeframework.mvc.http.HTTPRequest;
-import org.primeframework.mvc.http.HTTPResponse;
+import io.fusionauth.http.Cookie;
+import io.fusionauth.http.server.HTTPRequest;
+import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.scope.annotation.ManagedSessionCookie;
 import org.primeframework.mvc.security.Encryptor;
 

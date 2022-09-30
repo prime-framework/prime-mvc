@@ -18,13 +18,12 @@ package org.primeframework.mvc.content.json;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.fusionauth.http.HTTPMethod;
 import org.example.action.KitchenSinkAction;
 import org.example.domain.UserField;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration.RequestMember;
-import org.primeframework.mvc.http.HTTPMethod;
 import org.testng.annotations.Test;
-
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 

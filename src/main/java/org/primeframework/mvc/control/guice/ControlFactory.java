@@ -19,11 +19,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.primeframework.mvc.control.Control;
-
 import com.google.inject.Binder;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import org.primeframework.mvc.control.Control;
 
 /**
  * Builds controls on-demand.

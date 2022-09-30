@@ -25,8 +25,8 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.util.regex.Pattern;
 
+import io.fusionauth.http.HTTPMethod;
 import org.primeframework.mvc.PrimeBaseTest;
-import org.primeframework.mvc.http.HTTPMethod;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
