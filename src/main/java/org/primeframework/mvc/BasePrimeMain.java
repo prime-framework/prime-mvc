@@ -20,6 +20,7 @@ import com.google.inject.Module;
 import io.fusionauth.http.server.HTTPServer;
 import io.fusionauth.http.server.HTTPServerConfiguration;
 import org.primeframework.mvc.guice.GuiceBootstrap;
+import org.primeframework.mvc.log.SLF4JLoggerFactoryAdapter;
 
 /**
  * An abstract class that is used to create the main entry point for Prime (HTTP server and MVC).
@@ -93,7 +94,7 @@ public abstract class BasePrimeMain {
     hup();
 
     // Create the server
-    server = new HTTPServer().withConfiguration(configuration()).withHandler(requestHandler);
+    server = new HTTPServer().withConfiguration(configuration()).withHandler(requestHandler).withLoggerFactory(new SLF4JLoggerFactoryAdapter());
 
     // Start the server
     server.start();
