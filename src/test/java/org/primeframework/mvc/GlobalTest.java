@@ -1201,6 +1201,77 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void parameter_order_of_operation() throws Exception {
+    // Test the order of operation when we have parameters in a body, URI segment, and query string.
+
+    // Provide segment, body and query, body wins
+    test.simulate(() -> simulator.test("/parameter-handler")
+                                 .withURLSegment("segment")
+                                 .withURLParameter("value", "parameter")
+                                 .withContentType("application/x-www-form-urlencoded")
+                                 .withBody("""
+                                     value=body
+                                     """)
+                                 .post()
+                                 .assertStatusCode(200)
+                                 .assertBodyContains("value:body"));
+
+    // Segment and parameter, segment wins
+    test.simulate(() -> simulator.test("/parameter-handler")
+                                 .withURLSegment("segment")
+                                 .withURLParameter("value", "parameter")
+                                 .post()
+                                 .assertStatusCode(200)
+                                 .assertBodyContains("value:segment"));
+
+    // Segment and body, body wins
+    test.simulate(() -> simulator.test("/parameter-handler")
+                                 .withURLSegment("segment")
+                                 .withContentType("application/x-www-form-urlencoded")
+                                 .withBody("""
+                                     value=body
+                                     """)
+                                 .post()
+                                 .assertStatusCode(200)
+                                 .assertBodyContains("value:body"));
+
+    // Parameter and body, body wins
+    test.simulate(() -> simulator.test("/parameter-handler")
+                                 .withURLParameter("value", "parameter")
+                                 .withContentType("application/x-www-form-urlencoded")
+                                 .withBody("""
+                                     value=body
+                                     """)
+                                 .post()
+                                 .assertStatusCode(200)
+                                 .assertBodyContains("value:body"));
+
+    // Body only, body
+    test.simulate(() -> simulator.test("/parameter-handler")
+                                 .withContentType("application/x-www-form-urlencoded")
+                                 .withBody("""
+                                     value=body
+                                     """)
+                                 .post()
+                                 .assertStatusCode(200)
+                                 .assertBodyContains("value:body"));
+
+    // Segment only, segment
+    test.simulate(() -> simulator.test("/parameter-handler")
+                                 .withURLSegment("segment")
+                                 .post()
+                                 .assertStatusCode(200)
+                                 .assertBodyContains("value:segment"));
+
+    // Parameter only, parameter
+    test.simulate(() -> simulator.test("/parameter-handler")
+                                 .withURLParameter("value", "parameter")
+                                 .post()
+                                 .assertStatusCode(200)
+                                 .assertBodyContains("value:parameter"));
+  }
+
+  @Test
   public void post() {
     simulator.test("/post")
              .post()
