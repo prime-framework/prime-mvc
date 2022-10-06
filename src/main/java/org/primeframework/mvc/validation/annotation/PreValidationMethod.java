@@ -21,8 +21,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation defines a method that is invoked prior to validating parameters set into the action. This is useful if
- * you need to setup objects so that validation can run on them.
+ * This annotation defines a method that is invoked prior to validating parameters set into the action. This is useful
+ * if you need to setup objects so that validation can run on them.
  *
  * @author Brian Pontarelli
  */

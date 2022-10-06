@@ -15,11 +15,10 @@
  */
 package org.primeframework.mvc.control.form;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.util.ReflectionUtils;
-
-import com.google.inject.Inject;
 
 /**
  * This is the default implementation of the FormPreparer interface.

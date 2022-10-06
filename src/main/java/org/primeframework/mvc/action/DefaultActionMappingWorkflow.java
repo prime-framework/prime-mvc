@@ -22,10 +22,10 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.inject.Inject;
+import io.fusionauth.http.HTTPMethod;
+import io.fusionauth.http.server.HTTPRequest;
+import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.NotAllowedException;
-import org.primeframework.mvc.http.HTTPMethod;
-import org.primeframework.mvc.http.HTTPRequest;
-import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.http.HTTPTools;
 import org.primeframework.mvc.http.Status;
 import org.primeframework.mvc.parameter.DefaultParameterParser;
@@ -133,8 +133,8 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
     for (String key : keys) {
       if (key.startsWith(DefaultParameterParser.ACTION_PREFIX)) {
         String actionParameterName = key.substring(4);
-        String actionParameterValue = request.getParameterValue(key);
-        if (request.getParameterValue(actionParameterName) != null && actionParameterValue.trim().length() > 0) {
+        String actionParameterValue = request.getParameter(key);
+        if (request.getParameter(actionParameterName) != null && actionParameterValue.trim().length() > 0) {
           uri = actionParameterValue;
 
           // Handle relative URIs

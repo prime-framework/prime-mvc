@@ -18,20 +18,20 @@ package org.primeframework.mvc.security;
 import java.util.Arrays;
 
 import com.google.inject.Inject;
+import io.fusionauth.http.HTTPMethod;
+import io.fusionauth.http.server.HTTPRequest;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.AuthorizationMethodConfiguration;
 import org.primeframework.mvc.action.config.ActionConfiguration;
-import org.primeframework.mvc.http.HTTPMethod;
-import org.primeframework.mvc.http.HTTPRequest;
 import org.primeframework.mvc.parameter.el.ExpressionException;
 import org.primeframework.mvc.security.annotation.AuthorizeMethod;
 import org.primeframework.mvc.util.ReflectionUtils;
 
 /**
- * The scheme itself performs no authentication or authorization, it only calls the method(s) annotated with the {@link
- * AuthorizeMethod}.
+ * The scheme itself performs no authentication or authorization, it only calls the method(s) annotated with the
+ * {@link AuthorizeMethod}.
  *
  * @author Daniel DeGroff
  */

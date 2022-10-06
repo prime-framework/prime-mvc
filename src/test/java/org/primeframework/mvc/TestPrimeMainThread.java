@@ -18,7 +18,7 @@ package org.primeframework.mvc;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
-import org.primeframework.mvc.netty.PrimeHTTPListenerConfiguration;
+import io.fusionauth.http.server.HTTPServerConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,9 +53,9 @@ public class TestPrimeMainThread extends Thread {
       sleep();
 
       // Assume we want the first configured port
-      PrimeHTTPListenerConfiguration listenerConfiguration = main.configuration().listenerConfigurations.get(0);
+      HTTPServerConfiguration configuration = main.configuration();
       try (Socket socket = new Socket()) {
-        socket.connect(new InetSocketAddress("localhost", listenerConfiguration.httpPort), 5);
+        socket.connect(new InetSocketAddress("localhost", configuration.getListeners().get(0).getPort()), 5);
         if (socket.isConnected()) {
           logger.info("Prime HTTP server started");
           break;

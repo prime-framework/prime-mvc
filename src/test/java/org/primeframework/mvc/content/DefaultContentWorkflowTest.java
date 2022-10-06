@@ -15,14 +15,16 @@
  */
 package org.primeframework.mvc.content;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.google.inject.Inject;
+import io.fusionauth.http.HTTPMethod;
+import io.fusionauth.http.server.HTTPRequest;
 import org.example.action.KitchenSinkAction;
 import org.example.domain.UserField;
 import org.example.domain.UserType;
@@ -35,12 +37,8 @@ import org.primeframework.mvc.content.binary.BinaryActionConfiguration;
 import org.primeframework.mvc.content.guice.ContentHandlerFactory;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration.RequestMember;
-import org.primeframework.mvc.http.DefaultHTTPRequest;
-import org.primeframework.mvc.http.HTTPMethod;
-import org.primeframework.mvc.http.MutableHTTPRequest;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.l10n.MessageProvider;
-import org.primeframework.mvc.parameter.fileupload.FileInfo;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
 import static org.easymock.EasyMock.createStrictMock;
@@ -66,26 +64,28 @@ public class DefaultContentWorkflowTest extends PrimeBaseTest {
   @Test
   public void binary() throws Exception {
     test.createFile("Binary File!");
-    request.addFile(new FileInfo(test.tempFile, "temp", "temp", "text/plain"));
-    request.setContentLength(Files.size(test.tempFile));
-    request.setContentType("application/octet-stream");
+    try (var is = Files.newInputStream(test.tempFile)) {
+      request.setContentLength(Files.size(test.tempFile));
+      request.setContentType("application/octet-stream");
+      request.setInputStream(is);
 
-    Map<Class<?>, Object> additionalConfig = new HashMap<>();
-    additionalConfig.put(BinaryActionConfiguration.class, new BinaryActionConfiguration("binaryRequest", null));
+      Map<Class<?>, Object> additionalConfig = new HashMap<>();
+      additionalConfig.put(BinaryActionConfiguration.class, new BinaryActionConfiguration("binaryRequest", null));
 
-    KitchenSinkAction action = new KitchenSinkAction(null);
-    ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, null, null, null, null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, additionalConfig, null, null, null, null);
-    store.setCurrent(new ActionInvocation(action, null, null, null, config));
+      KitchenSinkAction action = new KitchenSinkAction(null);
+      ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, null, null, null, null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, additionalConfig, null, null, null, null);
+      store.setCurrent(new ActionInvocation(action, null, null, null, config));
 
-    WorkflowChain chain = createStrictMock(WorkflowChain.class);
-    chain.continueWorkflow();
-    replay(chain);
+      WorkflowChain chain = createStrictMock(WorkflowChain.class);
+      chain.continueWorkflow();
+      replay(chain);
 
-    new DefaultContentWorkflow(messageStore, new ContentHandlerFactory(injector), messageProvider, request, store).perform(chain);
+      new DefaultContentWorkflow(messageStore, new ContentHandlerFactory(injector), messageProvider, request, store).perform(chain);
 
-    // By the time the action is complete the file should have been deleted
-    assertNotNull(action.binaryRequest);
-    assertFalse(Files.exists(action.binaryRequest));
+      // By the time the action is complete the file should have been deleted
+      assertNotNull(action.binaryRequest);
+      assertFalse(Files.exists(action.binaryRequest));
+    }
   }
 
   @Test
@@ -123,7 +123,7 @@ public class DefaultContentWorkflowTest extends PrimeBaseTest {
         "  \"type\":\"COOL\"" +
         "}";
 
-    request.setBody(ByteBuffer.wrap(expected.getBytes()));
+    request.setInputStream(new ByteArrayInputStream(expected.getBytes()));
     request.setContentLength((long) expected.getBytes().length);
     request.setContentType("application/json");
 
@@ -163,7 +163,7 @@ public class DefaultContentWorkflowTest extends PrimeBaseTest {
 
   @Test
   public void missing() throws IOException {
-    MutableHTTPRequest request = new DefaultHTTPRequest();
+    HTTPRequest request = new HTTPRequest();
     request.setContentType("application/missing");
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);

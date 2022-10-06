@@ -15,7 +15,7 @@
  */
 package org.primeframework.mvc.security.csrf;
 
-import org.primeframework.mvc.http.HTTPRequest;
+import io.fusionauth.http.server.HTTPRequest;
 
 /**
  * @author Daniel DeGroff
@@ -39,7 +39,7 @@ public interface CSRFProvider {
    * @return the CSRF token value if found in the HTTP request.
    */
   default String getTokenFromRequest(HTTPRequest request) {
-    return request.getParameterValue(CSRF_PARAMETER_KEY);
+    return request.getParameter(CSRF_PARAMETER_KEY);
   }
 
   /**

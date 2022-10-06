@@ -21,19 +21,24 @@ package org.example.domain;
  * @author Brian Pontarelli
  */
 public class Address {
-  private String street;
-  private String city;
-  private String state;
-  private String zipcode;
-  private String country;
   private int age;
 
-  public String getStreet() {
-    return street;
+  private String city;
+
+  private String country;
+
+  private String state;
+
+  private String street;
+
+  private String zipcode;
+
+  public int getAge() {
+    return age;
   }
 
-  public void setStreet(String street) {
-    this.street = street;
+  public void setAge(int age) {
+    this.age = age;
   }
 
   public String getCity() {
@@ -44,22 +49,6 @@ public class Address {
     this.city = city;
   }
 
-  public String getState() {
-    return state;
-  }
-
-  public void setState(String state) {
-    this.state = state;
-  }
-
-  public String getZipcode() {
-    return zipcode;
-  }
-
-  public void setZipcode(String zipcode) {
-    this.zipcode = zipcode;
-  }
-
   public String getCountry() {
     return country;
   }
@@ -68,11 +57,27 @@ public class Address {
     this.country = country;
   }
 
-  public int getAge() {
-    return age;
+  public String getState() {
+    return state;
   }
 
-  public void setAge(int age) {
-    this.age = age;
+  public void setState(String state) {
+    this.state = state;
+  }
+
+  public String getStreet() {
+    return street;
+  }
+
+  public void setStreet(String street) {
+    this.street = street;
+  }
+
+  public String getZipcode() {
+    return zipcode;
+  }
+
+  public void setZipcode(String zipcode) {
+    this.zipcode = zipcode;
   }
 }

@@ -1,3 +1,3 @@
 [#ftl/]
-[#-- @ftlvariable name="cookie" type="org.primeframework.mvc.http.Cookie" --]
+[#-- @ftlvariable name="cookie" type="io.fusionauth.http.Cookie" --]
 ${cookie.value}

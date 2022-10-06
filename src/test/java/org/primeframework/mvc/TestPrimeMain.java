@@ -16,7 +16,7 @@
 package org.primeframework.mvc;
 
 import com.google.inject.Module;
-import org.primeframework.mvc.netty.PrimeHTTPServerConfiguration;
+import io.fusionauth.http.server.HTTPServerConfiguration;
 
 /**
  * A test implementation of the BasePrimeMain.
@@ -24,17 +24,17 @@ import org.primeframework.mvc.netty.PrimeHTTPServerConfiguration;
  * @author Brian Pontarelli
  */
 public class TestPrimeMain extends BasePrimeMain {
-  private final PrimeHTTPServerConfiguration configuration;
+  private final HTTPServerConfiguration configuration;
 
   private final Module[] modules;
 
-  public TestPrimeMain(PrimeHTTPServerConfiguration configuration, Module... modules) {
+  public TestPrimeMain(HTTPServerConfiguration configuration, Module... modules) {
     this.configuration = configuration;
     this.modules = modules;
   }
 
   @Override
-  public PrimeHTTPServerConfiguration configuration() {
+  public HTTPServerConfiguration configuration() {
     return configuration;
   }
 

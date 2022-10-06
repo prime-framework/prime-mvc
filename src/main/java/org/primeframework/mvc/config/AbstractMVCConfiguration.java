@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.primeframework.mvc.http.Cookie.SameSite;
+import io.fusionauth.http.Cookie.SameSite;
 import org.primeframework.mvc.parameter.annotation.FieldUnwrapped;
 
 /**

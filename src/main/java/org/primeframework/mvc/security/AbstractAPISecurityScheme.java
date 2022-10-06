@@ -15,9 +15,9 @@
  */
 package org.primeframework.mvc.security;
 
-import org.primeframework.mvc.http.HTTPRequest;
 import java.util.Set;
 
+import io.fusionauth.http.server.HTTPRequest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 
@@ -64,7 +64,7 @@ public abstract class AbstractAPISecurityScheme implements SecurityScheme {
 
   /**
    * @return The authentication key for the current request. The default implementation of this method uses the
-   * Authorization header.
+   *     Authorization header.
    */
   protected String authenticationKey() {
     String header = request.getHeader("Authorization");

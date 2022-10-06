@@ -17,10 +17,10 @@ package org.primeframework.mvc.action.result;
 
 import java.lang.annotation.Annotation;
 
+import io.fusionauth.http.HTTPMethod;
+import io.fusionauth.http.HTTPValues.Headers;
+import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.action.ActionInvocation;
-import org.primeframework.mvc.http.HTTPMethod;
-import org.primeframework.mvc.http.HTTPResponse;
-import org.primeframework.mvc.http.HTTPStrings.Headers;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 
 /**

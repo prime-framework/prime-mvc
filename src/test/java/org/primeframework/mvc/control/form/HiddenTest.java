@@ -15,13 +15,12 @@
  */
 package org.primeframework.mvc.control.form;
 
+import com.google.inject.Inject;
 import org.example.action.user.EditAction;
 import org.example.domain.User;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.control.ControlBaseTest;
 import org.testng.annotations.Test;
-
-import com.google.inject.Inject;
 
 /**
  * @author Daniel DeGroff
@@ -31,13 +30,12 @@ public class HiddenTest extends ControlBaseTest {
   @Inject public Hidden hidden;
 
   @Test
-  public void action_boolean_true() {
+  public void action_boolean_default() {
     EditAction action = new EditAction();
     ais.setCurrent(new ActionInvocation(action, null, "/hidden", null, null));
 
     action.user = new User();
-    action.user.setMale(true);
-    testAction("user.male", true);
+    testAction("user.male", false);
   }
 
   @Test
@@ -51,12 +49,13 @@ public class HiddenTest extends ControlBaseTest {
   }
 
   @Test
-  public void action_boolean_default() {
+  public void action_boolean_true() {
     EditAction action = new EditAction();
     ais.setCurrent(new ActionInvocation(action, null, "/hidden", null, null));
 
     action.user = new User();
-    testAction("user.male", false);
+    action.user.setMale(true);
+    testAction("user.male", true);
   }
 
   protected void testAction(String property, boolean value) {

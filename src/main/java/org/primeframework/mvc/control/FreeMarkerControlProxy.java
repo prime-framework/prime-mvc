@@ -45,8 +45,8 @@ public class FreeMarkerControlProxy implements TemplateDirectiveModel {
   }
 
   /**
-   * Chains to the {@link Control#renderStart(java.io.Writer, java.util.Map, java.util.Map)} method and the {@link
-   * Control#renderEnd(java.io.Writer)}
+   * Chains to the {@link Control#renderStart(java.io.Writer, java.util.Map, java.util.Map)} method and the
+   * {@link Control#renderEnd(java.io.Writer)}
    *
    * @param env      The FreeMarker environment.
    * @param params   The parameters passed to this control in the FTL file.
@@ -71,7 +71,7 @@ public class FreeMarkerControlProxy implements TemplateDirectiveModel {
    * @param env  The environment that can be used to get the writer. This default implementation uses this writer.
    * @param body The body.
    * @throws TemplateException If the body fails to render.
-   * @throws IOException If the render can't write to the writer.
+   * @throws IOException       If the render can't write to the writer.
    */
   protected void executeBody(Environment env, TemplateDirectiveBody body) throws IOException, TemplateException {
     if (body != null) {

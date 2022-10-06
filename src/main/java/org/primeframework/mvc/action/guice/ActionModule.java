@@ -15,6 +15,8 @@
  */
 package org.primeframework.mvc.action.guice;
 
+import com.google.inject.AbstractModule;
+import com.google.inject.Singleton;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.ActionInvocationWorkflow;
 import org.primeframework.mvc.action.ActionMapper;
@@ -35,49 +37,18 @@ import org.primeframework.mvc.action.result.ResultInvocationWorkflow;
 import org.primeframework.mvc.action.result.ResultStore;
 import org.primeframework.mvc.action.result.ThreadLocalResultStore;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Singleton;
-
 /**
  * Binds injections regarding actions such as extensions.
  *
  * @author Brian Pontarelli
  */
 public class ActionModule extends AbstractModule {
-  @Override
-  protected void configure() {
-    bind(String.class).annotatedWith(Extension.class).toProvider(ExtensionProvider.class);
-
-    // Configuration
-    bindConfigurationBuilder();
-    bindConfigurationProvider();
-
-    // Invocation
-    bindStore();
-    bindWorkflow();
-    bindMapper();
-    bindMappingWorkflow();
-
-    // Results
-    bindResourceLocator();
-    bindResultInvocationWorkflow();
-    bindResultStore();
-  }
-
   protected void bindConfigurationBuilder() {
     bind(ActionConfigurationBuilder.class).to(DefaultActionConfigurationBuilder.class);
   }
 
   protected void bindConfigurationProvider() {
     bind(ActionConfigurationProvider.class).to(DefaultActionConfigurationProvider.class).in(Singleton.class);
-  }
-
-  protected void bindStore() {
-    bind(ActionInvocationStore.class).to(DefaultActionInvocationStore.class);
-  }
-
-  protected void bindWorkflow() {
-    bind(ActionInvocationWorkflow.class).to(DefaultActionInvocationWorkflow.class);
   }
 
   protected void bindMapper() {
@@ -98,5 +69,33 @@ public class ActionModule extends AbstractModule {
 
   protected void bindResultStore() {
     bind(ResultStore.class).to(ThreadLocalResultStore.class);
+  }
+
+  protected void bindStore() {
+    bind(ActionInvocationStore.class).to(DefaultActionInvocationStore.class);
+  }
+
+  protected void bindWorkflow() {
+    bind(ActionInvocationWorkflow.class).to(DefaultActionInvocationWorkflow.class);
+  }
+
+  @Override
+  protected void configure() {
+    bind(String.class).annotatedWith(Extension.class).toProvider(ExtensionProvider.class);
+
+    // Configuration
+    bindConfigurationBuilder();
+    bindConfigurationProvider();
+
+    // Invocation
+    bindStore();
+    bindWorkflow();
+    bindMapper();
+    bindMappingWorkflow();
+
+    // Results
+    bindResourceLocator();
+    bindResultInvocationWorkflow();
+    bindResultStore();
   }
 }

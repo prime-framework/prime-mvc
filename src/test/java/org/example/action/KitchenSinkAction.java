@@ -46,12 +46,12 @@ import org.primeframework.mvc.validation.annotation.PreValidationMethod;
  */
 @Action(value = "{name}/{value}/static/{foo}")
 @Forward.List({
-  @Forward(code = "forward1", page = "/WEB-INF/forward1.ftl", contentType = "text"),
-  @Forward(code = "forward2", page = "/WEB-INF/forward2.ftl", contentType = "bin", status = 300, statusStr = "foo")
+    @Forward(code = "forward1", page = "/WEB-INF/forward1.ftl", contentType = "text"),
+    @Forward(code = "forward2", page = "/WEB-INF/forward2.ftl", contentType = "bin", status = 300, statusStr = "foo")
 })
 @Redirect.List({
-  @Redirect(code = "redirect1", uri = "/redirect1", perm = true),
-  @Redirect(code = "redirect2", uri = "/redirect2", perm = false)
+    @Redirect(code = "redirect1", uri = "/redirect1", perm = true),
+    @Redirect(code = "redirect2", uri = "/redirect2", perm = false)
 })
 @Status(code = "status", status = 300, statusStr = "hello world", headers = {@Header(name = "foo", value = "bar"), @Header(name = "baz", value = "fred")})
 @JSON(code = "json", status = 201)
@@ -60,29 +60,23 @@ import org.primeframework.mvc.validation.annotation.PreValidationMethod;
 public class KitchenSinkAction extends KitchenSinkSuperclass implements Validatable {
   private final MessageStore messageStore;
 
-  public Object sessionObject;
-
-  @JSONRequest
-  public UserField jsonRequest;
-
   @BinaryRequest
   public Path binaryRequest;
 
   @BinaryResponse
   public Path binaryResponse;
 
+  @JSONRequest
+  public UserField jsonRequest;
+
   @JSONResponse
   public User jsonResponse;
+
+  public Object sessionObject;
 
   @Inject
   public KitchenSinkAction(MessageStore messageStore) {
     this.messageStore = messageStore;
-  }
-
-  @Override
-  @ValidationMethod
-  public void validate() {
-    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "foo", "code", "ValidationMethod message"));
   }
 
   @TestAnnotation
@@ -94,15 +88,25 @@ public class KitchenSinkAction extends KitchenSinkSuperclass implements Validata
     return "success";
   }
 
-  @PreParameterMethod
-  public void preParameter() {}
-
   @PostParameterMethod
-  public void postParameter() {}
-
-  @PreValidationMethod
-  public void preValidation() {}
+  public void postParameter() {
+  }
 
   @PostValidationMethod
-  public void postValidation() {}
+  public void postValidation() {
+  }
+
+  @PreParameterMethod
+  public void preParameter() {
+  }
+
+  @PreValidationMethod
+  public void preValidation() {
+  }
+
+  @Override
+  @ValidationMethod
+  public void validate() {
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "foo", "code", "ValidationMethod message"));
+  }
 }

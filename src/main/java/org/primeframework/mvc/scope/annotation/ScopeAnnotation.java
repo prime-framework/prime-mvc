@@ -23,8 +23,8 @@ import java.lang.annotation.Target;
 import org.primeframework.mvc.scope.Scope;
 
 /**
- * This annotation should be used to mark scope annotations so that they can be located by the Prime parameter
- * handling mechanism.
+ * This annotation should be used to mark scope annotations so that they can be located by the Prime parameter handling
+ * mechanism.
  *
  * @author Brian Pontarelli
  */

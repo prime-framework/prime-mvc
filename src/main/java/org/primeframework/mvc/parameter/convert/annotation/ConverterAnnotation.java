@@ -33,7 +33,7 @@ import org.primeframework.mvc.parameter.convert.AnnotationConverter;
 public @interface ConverterAnnotation {
   /**
    * @return The Converter class that will perform the conversion for the conversion annotation that this annotation is
-   *         placed on.
+   *     placed on.
    */
   Class<? extends AnnotationConverter> value();
 }

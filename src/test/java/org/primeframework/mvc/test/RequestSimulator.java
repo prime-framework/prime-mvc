@@ -83,7 +83,7 @@ public class RequestSimulator {
    * @return The RequestBuilder.
    */
   public RequestBuilder test(String path) {
-    builder = new RequestBuilder(path, main.getInjector(), userAgent, main.configuration().listenerConfigurations.get(0), messageObserver);
+    builder = new RequestBuilder(path, main.getInjector(), userAgent, main.configuration(), messageObserver);
     builder.useTLS = useTLS;
     return builder;
   }

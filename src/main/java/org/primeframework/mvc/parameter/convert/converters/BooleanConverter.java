@@ -17,12 +17,11 @@ package org.primeframework.mvc.parameter.convert.converters;
 
 import java.util.Map;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.convert.annotation.GlobalConverter;
-
-import com.google.inject.Inject;
 
 /**
  * This class is the type converter for booleans.
@@ -40,28 +39,28 @@ public class BooleanConverter extends AbstractPrimitiveConverter {
    * Returns false.
    */
   protected Object defaultPrimitive(Class convertTo, Map<String, String> attributes)
-    throws ConversionException, ConverterStateException {
+      throws ConversionException, ConverterStateException {
     return Boolean.FALSE;
-  }
-
-  /**
-   * Uses Boolean.valueOf.
-   */
-  protected Object stringToPrimitive(String value, Class convertTo, Map<String, String> attributes)
-    throws ConversionException, ConverterStateException {
-    if (!value.equals("true") && !value.equals("false") && !value.equals("on") && !value.equals("off")
-      && !value.equals("yes") && !value.equals("no")) {
-      throw new ConversionException("Unable to convert invalid boolean String [" + value + "]");
-    }
-
-    return value.equals("true") || value.equals("on") || value.equals("yes");
   }
 
   /**
    * Returns value.toString().
    */
   protected String primitiveToString(Object value, Class convertFrom, Map<String, String> attributes)
-    throws ConversionException, ConverterStateException {
+      throws ConversionException, ConverterStateException {
     return value.toString();
+  }
+
+  /**
+   * Uses Boolean.valueOf.
+   */
+  protected Object stringToPrimitive(String value, Class convertTo, Map<String, String> attributes)
+      throws ConversionException, ConverterStateException {
+    if (!value.equals("true") && !value.equals("false") && !value.equals("on") && !value.equals("off")
+        && !value.equals("yes") && !value.equals("no")) {
+      throw new ConversionException("Unable to convert invalid boolean String [" + value + "]");
+    }
+
+    return value.equals("true") || value.equals("on") || value.equals("yes");
   }
 }

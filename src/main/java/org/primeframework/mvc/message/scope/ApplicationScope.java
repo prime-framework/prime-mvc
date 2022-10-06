@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.google.inject.Inject;
-import org.primeframework.mvc.http.HTTPContext;
+import io.fusionauth.http.server.HTTPContext;
 import org.primeframework.mvc.message.Message;
 
 /**

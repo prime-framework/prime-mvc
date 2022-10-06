@@ -15,12 +15,15 @@
  */
 package org.primeframework.mvc;
 
+import java.io.Closeable;
+
 import com.google.inject.Injector;
+import io.fusionauth.http.HTTPMethod;
+import io.fusionauth.http.server.HTTPHandler;
+import io.fusionauth.http.server.HTTPRequest;
+import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.guice.GuiceBootstrap;
-import org.primeframework.mvc.http.HTTPMethod;
 import org.primeframework.mvc.http.HTTPObjectsHolder;
-import org.primeframework.mvc.http.HTTPResponse;
-import org.primeframework.mvc.http.MutableHTTPRequest;
 import org.primeframework.mvc.workflow.MVCWorkflow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +31,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Brian Pontarelli
  */
-public class PrimeMVCRequestHandler {
+public class PrimeMVCRequestHandler implements HTTPHandler, Closeable {
   private static final Logger logger = LoggerFactory.getLogger(PrimeMVCRequestHandler.class);
 
   protected volatile Injector injector;
@@ -38,13 +41,19 @@ public class PrimeMVCRequestHandler {
     this.injector = injector;
   }
 
+  public void close() {
+    logger.info("Shutting down Prime MVC");
+    GuiceBootstrap.shutdown(injector);
+  }
+
   /**
    * Invokes the Workflow chain.
    *
    * @param request  Passed down chain.
    * @param response Passed down chain.
    */
-  public void handleRequest(MutableHTTPRequest request, HTTPResponse response) {
+  @Override
+  public void handle(HTTPRequest request, HTTPResponse response) {
     // Support for HTTP Method Override
     String methodOverride = request.getHeader("X-HTTP-Method-Override");
     if (methodOverride == null) {
@@ -68,11 +77,6 @@ public class PrimeMVCRequestHandler {
       HTTPObjectsHolder.clearRequest();
       HTTPObjectsHolder.clearResponse();
     }
-  }
-
-  public void shutdown() {
-    logger.info("Shutting down Prime MVC");
-    GuiceBootstrap.shutdown(injector);
   }
 
   public void updateInjector(Injector injector) {

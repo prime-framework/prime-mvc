@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-import org.primeframework.mvc.http.HTTPMethod;
+import io.fusionauth.http.HTTPMethod;
 import org.primeframework.mvc.util.Buildable;
 
 /**

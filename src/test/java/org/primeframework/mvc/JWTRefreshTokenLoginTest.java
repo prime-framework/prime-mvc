@@ -15,20 +15,20 @@
  */
 package org.primeframework.mvc;
 
-import java.io.ByteArrayOutputStream;
-
 import com.codahale.metrics.MetricRegistry;
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.util.Modules;
+import io.fusionauth.http.server.HTTPListenerConfiguration;
+import io.fusionauth.http.server.HTTPRequest;
+import io.fusionauth.http.server.HTTPResponse;
+import io.fusionauth.http.server.HTTPServerConfiguration;
 import org.primeframework.mvc.PrimeBaseTest.TestContentModule;
 import org.primeframework.mvc.PrimeBaseTest.TestMVCConfigurationModule;
 import org.primeframework.mvc.cors.CORSConfigurationProvider;
 import org.primeframework.mvc.cors.NoCORSConfigurationProvider;
 import org.primeframework.mvc.guice.MVCModule;
-import org.primeframework.mvc.http.DefaultHTTPRequest;
-import org.primeframework.mvc.http.DefaultHTTPResponse;
 import org.primeframework.mvc.http.HTTPObjectsHolder;
 import org.primeframework.mvc.jwt.MockVerifierProvider;
 import org.primeframework.mvc.message.MessageObserver;
@@ -37,8 +37,6 @@ import org.primeframework.mvc.message.scope.ApplicationScope;
 import org.primeframework.mvc.message.scope.CookieFlashScope;
 import org.primeframework.mvc.message.scope.FlashScope;
 import org.primeframework.mvc.message.scope.RequestScope;
-import org.primeframework.mvc.netty.PrimeHTTPListenerConfiguration;
-import org.primeframework.mvc.netty.PrimeHTTPServerConfiguration;
 import org.primeframework.mvc.security.MockOAuthUserLoginSecurityContext;
 import org.primeframework.mvc.security.UserLoginSecurityContext;
 import org.primeframework.mvc.security.VerifierProvider;
@@ -56,9 +54,9 @@ public class JWTRefreshTokenLoginTest {
 
   public static Injector injector;
 
-  public DefaultHTTPRequest request;
+  public HTTPRequest request;
 
-  public DefaultHTTPResponse response;
+  public HTTPResponse response;
 
   public RequestSimulator simulator;
 
@@ -88,7 +86,7 @@ public class JWTRefreshTokenLoginTest {
     };
 
     Module module = Modules.override(mvcModule).with(new TestContentModule(), new TestSecurityModule(), new TestScopeModule());
-    TestPrimeMain main = new TestPrimeMain(new PrimeHTTPServerConfiguration(new PrimeHTTPListenerConfiguration(9081)), module);
+    TestPrimeMain main = new TestPrimeMain(new HTTPServerConfiguration().withListener(new HTTPListenerConfiguration(9081)), module);
     simulator = new RequestSimulator(main, messageObserver);
     injector = simulator.getInjector();
   }
@@ -98,8 +96,8 @@ public class JWTRefreshTokenLoginTest {
    */
   @BeforeMethod
   public void beforeMethod() {
-    request = new DefaultHTTPRequest();
-    response = new DefaultHTTPResponse(new ByteArrayOutputStream());
+    request = new HTTPRequest();
+    response = new HTTPResponse(null, null);
     HTTPObjectsHolder.setRequest(request);
     HTTPObjectsHolder.setResponse(response);
 

@@ -19,13 +19,13 @@ import java.io.IOException;
 import java.util.List;
 
 import com.google.inject.Inject;
+import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.ErrorException;
 import org.primeframework.mvc.action.ActionInvocationWorkflow;
 import org.primeframework.mvc.action.ActionMappingWorkflow;
 import org.primeframework.mvc.action.result.ResultInvocationWorkflow;
 import org.primeframework.mvc.content.ContentWorkflow;
 import org.primeframework.mvc.cors.CORSRequestWorkflow;
-import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.message.MessageWorkflow;
 import org.primeframework.mvc.parameter.ParameterWorkflow;
 import org.primeframework.mvc.parameter.PostParameterWorkflow;
@@ -40,7 +40,7 @@ import static java.util.Collections.singletonList;
 
 /**
  * This class is the main entry point for the Prime MVC. It uses the workflows passed into the constructor in the order
- * they are passed in. It also catches {@link ErrorException} and then processes errors using a error workflow set. The
+ * they are passed in. It also catches {@link ErrorException} and then processes errors using an error workflow set. The
  * error set consists of the {@link ScopeStorageWorkflow} followed by the {@link ResultInvocationWorkflow}.
  *
  * @author Brian Pontarelli
@@ -108,7 +108,7 @@ public class DefaultMVCWorkflow implements MVCWorkflow {
       chain.continueWorkflow();
     } catch (RuntimeException | Error e) {
       // If any bytes were written, we are screwed and can't do anything here. Re-throw
-      if (response.wasOneByteWritten()) {
+      if (response.isCommitted()) {
         throw e;
       }
 

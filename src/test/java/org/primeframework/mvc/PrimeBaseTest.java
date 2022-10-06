@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc;
 
-import java.io.ByteArrayOutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -34,6 +33,13 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.Singleton;
 import com.google.inject.util.Modules;
+import io.fusionauth.http.HTTPMethod;
+import io.fusionauth.http.io.NonBlockingByteBufferOutputStream;
+import io.fusionauth.http.server.HTTPContext;
+import io.fusionauth.http.server.HTTPListenerConfiguration;
+import io.fusionauth.http.server.HTTPRequest;
+import io.fusionauth.http.server.HTTPResponse;
+import io.fusionauth.http.server.HTTPServerConfiguration;
 import org.example.action.user.EditAction;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ExecuteMethodConfiguration;
@@ -47,10 +53,6 @@ import org.primeframework.mvc.content.json.JacksonContentHandler;
 import org.primeframework.mvc.cors.CORSConfiguration;
 import org.primeframework.mvc.cors.CORSConfigurationProvider;
 import org.primeframework.mvc.guice.MVCModule;
-import org.primeframework.mvc.http.DefaultHTTPRequest;
-import org.primeframework.mvc.http.DefaultHTTPResponse;
-import org.primeframework.mvc.http.HTTPContext;
-import org.primeframework.mvc.http.HTTPMethod;
 import org.primeframework.mvc.http.HTTPObjectsHolder;
 import org.primeframework.mvc.jwt.MockVerifierProvider;
 import org.primeframework.mvc.message.MessageObserver;
@@ -59,8 +61,6 @@ import org.primeframework.mvc.message.scope.ApplicationScope;
 import org.primeframework.mvc.message.scope.CookieFlashScope;
 import org.primeframework.mvc.message.scope.FlashScope;
 import org.primeframework.mvc.message.scope.RequestScope;
-import org.primeframework.mvc.netty.PrimeHTTPListenerConfiguration;
-import org.primeframework.mvc.netty.PrimeHTTPServerConfiguration;
 import org.primeframework.mvc.security.CipherProvider;
 import org.primeframework.mvc.security.DefaultCipherProvider;
 import org.primeframework.mvc.security.MockUserLoginSecurityContext;
@@ -102,9 +102,9 @@ public abstract class PrimeBaseTest {
 
   @Inject public ObjectMapper objectMapper;
 
-  public DefaultHTTPRequest request;
+  public HTTPRequest request;
 
-  public DefaultHTTPResponse response;
+  public HTTPResponse response;
 
   @Inject public TestBuilder test;
 
@@ -125,8 +125,11 @@ public abstract class PrimeBaseTest {
       }
     };
 
+//    SystemOutLogger.level = Level.Debug;
+
     Module module = Modules.override(mvcModule).with(new TestContentModule(), new TestSecurityModule(), new TestScopeModule());
-    TestPrimeMain main = new TestPrimeMain(new PrimeHTTPServerConfiguration(new PrimeHTTPListenerConfiguration(9080)), module);
+    var configuration = new HTTPServerConfiguration().withListener(new HTTPListenerConfiguration(9080));
+    TestPrimeMain main = new TestPrimeMain(configuration, module);
     simulator = new RequestSimulator(main, messageObserver);
     injector = simulator.getInjector();
     context = injector.getInstance(HTTPContext.class);
@@ -148,8 +151,8 @@ public abstract class PrimeBaseTest {
    */
   @BeforeMethod
   public void beforeMethod() {
-    request = new DefaultHTTPRequest();
-    response = new DefaultHTTPResponse(new ByteArrayOutputStream());
+    request = new HTTPRequest();
+    response = new HTTPResponse(new NonBlockingByteBufferOutputStream(null, 1024), request);
     HTTPObjectsHolder.setRequest(request);
     HTTPObjectsHolder.setResponse(response);
 

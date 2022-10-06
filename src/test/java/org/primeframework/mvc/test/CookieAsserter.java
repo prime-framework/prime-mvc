@@ -17,8 +17,8 @@ package org.primeframework.mvc.test;
 
 import java.util.function.Consumer;
 
-import org.primeframework.mvc.http.Cookie;
-import org.primeframework.mvc.http.Cookie.SameSite;
+import io.fusionauth.http.Cookie;
+import io.fusionauth.http.Cookie.SameSite;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertTrue;

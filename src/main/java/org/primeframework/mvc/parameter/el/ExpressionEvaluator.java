@@ -30,6 +30,26 @@ import org.primeframework.mvc.parameter.convert.ConverterStateException;
  */
 public interface ExpressionEvaluator {
   /**
+   * Expands variables in the given String. The variables must be in the form <code>${foo}</code>.
+   *
+   * @param str    The String to expand.
+   * @param object The Root object where the variables are expanded from.
+   * @param encode Whether or not values are URL encoded.
+   * @return The expanded String and never null.
+   * @throws ExpressionException If the expansion failed.
+   */
+  String expand(String str, Object object, boolean encode) throws ExpressionException;
+
+  /**
+   * Retrieves all of the values of the members from the given Object that can be accessed by the expression evaluator.
+   *
+   * @param obj         The Object to retrieve the values from.
+   * @param memberNames The names of the members to retrieve the value for.
+   * @return The list of member values.
+   */
+  Collection<Object> getAllMemberValues(Object obj, Set<String> memberNames);
+
+  /**
    * Retrieves a value defined by the given expression from the given object. No type conversion is performed and you
    * can get ClassCastExceptions because of the type erasure of the generics.
    *
@@ -68,8 +88,8 @@ public interface ExpressionEvaluator {
   /**
    * Sets the given values into the given object using the given expression. The values given are taken directly from
    * the HttpServletRequest parameters. This performs any necessary conversions from the String[] values to the type
-   * required by the expression and object given. Conversions are done by the appropriate {@link
-   * org.primeframework.mvc.parameter.convert.GlobalConverter}.
+   * required by the expression and object given. Conversions are done by the appropriate
+   * {@link org.primeframework.mvc.parameter.convert.GlobalConverter}.
    *
    * @param expression The expression.
    * @param object     The object.
@@ -84,25 +104,5 @@ public interface ExpressionEvaluator {
    * @throws ExpressionException     If the expression is invalid or there was an error during processing.
    */
   void setValue(String expression, Object object, String[] values, Map<String, String> attributes)
-    throws ConversionException, ConverterStateException, ExpressionException;
-
-  /**
-   * Expands variables in the given String. The variables must be in the form <code>${foo}</code>.
-   *
-   * @param str    The String to expand.
-   * @param object The Root object where the variables are expanded from.
-   * @param encode Whether or not values are URL encoded.
-   * @return The expanded String and never null.
-   * @throws ExpressionException If the expansion failed.
-   */
-  String expand(String str, Object object, boolean encode) throws ExpressionException;
-
-  /**
-   * Retrieves all of the values of the members from the given Object that can be accessed by the expression evaluator.
-   *
-   * @param obj The Object to retrieve the values from.
-   * @param memberNames The names of the members to retrieve the value for.
-   * @return The list of member values.
-   */
-  Collection<Object> getAllMemberValues(Object obj, Set<String> memberNames);
+      throws ConversionException, ConverterStateException, ExpressionException;
 }

@@ -30,12 +30,12 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD, ElementType.METHOD})
 public @interface FileUpload {
   /**
-   * @return The maximum size of the file.
-   */
-  long maxSize() default -1;
-
-  /**
    * @return The allowed content types of the file.
    */
   String[] contentTypes() default {};
+
+  /**
+   * @return The maximum size of the file.
+   */
+  long maxSize() default -1;
 }

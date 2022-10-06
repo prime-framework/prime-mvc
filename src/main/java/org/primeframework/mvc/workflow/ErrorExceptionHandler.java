@@ -36,13 +36,17 @@ import org.primeframework.mvc.message.l10n.MissingMessageException;
  */
 public class ErrorExceptionHandler implements TypedExceptionHandler<ErrorException> {
 
-  private final ResultStore resultStore;
   private final MVCConfiguration configuration;
-  private final MessageStore messageStore;
+
   private final MessageProvider messageProvider;
 
+  private final MessageStore messageStore;
+
+  private final ResultStore resultStore;
+
   @Inject
-  public ErrorExceptionHandler(ResultStore resultStore, MVCConfiguration configuration, MessageStore messageStore, MessageProvider messageProvider) {
+  public ErrorExceptionHandler(ResultStore resultStore, MVCConfiguration configuration, MessageStore messageStore,
+                               MessageProvider messageProvider) {
     this.resultStore = resultStore;
     this.configuration = configuration;
     this.messageStore = messageStore;

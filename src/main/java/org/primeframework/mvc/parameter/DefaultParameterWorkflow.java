@@ -17,12 +17,11 @@ package org.primeframework.mvc.parameter;
 
 import java.io.IOException;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.parameter.ParameterParser.Parameters;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.workflow.WorkflowChain;
-
-import com.google.inject.Inject;
 
 /**
  * This class uses the {@link ExpressionEvaluator} to process the incoming request parameters. It also handles check
@@ -32,11 +31,14 @@ import com.google.inject.Inject;
  */
 public class DefaultParameterWorkflow implements ParameterWorkflow {
   private final ActionInvocationStore actionInvocationStore;
-  private final ParameterParser parser;
+
   private final ParameterHandler handler;
 
+  private final ParameterParser parser;
+
   @Inject
-  public DefaultParameterWorkflow(ActionInvocationStore actionInvocationStore, ParameterParser parser, ParameterHandler handler) {
+  public DefaultParameterWorkflow(ActionInvocationStore actionInvocationStore, ParameterParser parser,
+                                  ParameterHandler handler) {
     this.actionInvocationStore = actionInvocationStore;
     this.parser = parser;
     this.handler = handler;

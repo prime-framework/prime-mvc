@@ -17,12 +17,11 @@ package org.primeframework.mvc.parameter.convert.converters;
 
 import java.util.Map;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.convert.annotation.GlobalConverter;
-
-import com.google.inject.Inject;
 
 /**
  * This class is the type converter for characters.
@@ -40,8 +39,13 @@ public class CharacterConverter extends AbstractPrimitiveConverter {
    * Returns a single character with a unicode value of 0.
    */
   protected Object defaultPrimitive(Class convertTo, Map<String, String> attributes)
-    throws ConversionException, ConverterStateException {
+      throws ConversionException, ConverterStateException {
     return '\u0000';
+  }
+
+  protected String primitiveToString(Object value, Class convertFrom, Map<String, String> attributes)
+      throws ConversionException, ConverterStateException {
+    return value.toString();
   }
 
   /**
@@ -49,17 +53,12 @@ public class CharacterConverter extends AbstractPrimitiveConverter {
    * value is null or empty, this throws an exception.
    */
   protected Object stringToPrimitive(String value, Class convertTo, Map<String, String> attributes)
-    throws ConversionException, ConverterStateException {
+      throws ConversionException, ConverterStateException {
     if (value.length() > 1) {
       throw new ConversionException("Conversion from String to character must be a String" +
-        " of length 1 - [" + value + "] is invalid");
+          " of length 1 - [" + value + "] is invalid");
     }
 
     return value.charAt(0);
-  }
-
-  protected String primitiveToString(Object value, Class convertFrom, Map<String, String> attributes)
-    throws ConversionException, ConverterStateException {
-    return value.toString();
   }
 }

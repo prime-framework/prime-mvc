@@ -23,20 +23,21 @@ package org.primeframework.mvc.message.scope;
  */
 public interface MessageScope {
   /**
-   * The request scope, when messages are stored in the request.
+   * The HTTP context (application) scope, when messages are stored in the HTTPContext. Useful for messages that should
+   * be displayed to all users.
    */
-  MessageScope REQUEST = new PrimeMessageScope(){};
-
+  MessageScope APPLICATION = new PrimeMessageScope() {
+  };
   /**
    * The flash scope, when messages are stored in the session, but are only available on the next request.
    */
-  MessageScope FLASH = new PrimeMessageScope(){};
-
+  MessageScope FLASH = new PrimeMessageScope() {
+  };
   /**
-   * The HTTP context (application) scope, when messages are stored in the HTTPContext. Useful for messages that
-   * should be displayed to all users.
+   * The request scope, when messages are stored in the request.
    */
-  MessageScope APPLICATION = new PrimeMessageScope(){};
+  MessageScope REQUEST = new PrimeMessageScope() {
+  };
 
   /**
    * Internal implementation for the Prime scopes.

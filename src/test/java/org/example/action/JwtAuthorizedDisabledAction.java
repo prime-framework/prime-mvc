@@ -15,11 +15,10 @@
  */
 package org.example.action;
 
+import io.fusionauth.jwt.domain.JWT;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.annotation.Status;
 import org.primeframework.mvc.security.annotation.JWTAuthorizeMethod;
-
-import io.fusionauth.jwt.domain.JWT;
 
 /**
  * @author Daniel DeGroff

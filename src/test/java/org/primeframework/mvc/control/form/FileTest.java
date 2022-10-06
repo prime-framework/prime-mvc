@@ -32,46 +32,31 @@ public class FileTest extends ControlBaseTest {
   @Inject public File file;
 
   @Test
-  public void actionLess() {
-    ais.setCurrent(new ActionInvocation(null, null, "/file", null, null));
-
-    new ControlTester(file).
-      attr("name", "test").
-      attr("class", "css-class").
-      go("<input type=\"hidden\" name=\"test@param\" value=\"param-value\"/>\n" +
-      "<div class=\"css-class-file css-class-input css-class-control file input control\">\n" +
-      "<div class=\"label-container\"><label for=\"test\" class=\"label\">Test</label></div>\n" +
-      "<div class=\"control-container\"><input type=\"file\" class=\"css-class\" id=\"test\" name=\"test\"/></div>\n" +
-      "</div>\n");
-  }
-
-  @Test
   public void action() {
     EditAction action = new EditAction();
     ais.setCurrent(new ActionInvocation(action, null, "/file", null, null));
 
     new ControlTester(file).
-      attr("name", "user.profile").
-      go("<input type=\"hidden\" name=\"user.profile@param\" value=\"param-value\"/>\n" +
-      "<div class=\"file input control\">\n" +
-      "<div class=\"label-container\"><label for=\"user_profile\" class=\"label\">Your profile</label></div>\n" +
-      "<div class=\"control-container\"><input type=\"file\" id=\"user_profile\" name=\"user.profile\"/></div>\n" +
-      "</div>\n");
+        attr("name", "user.profile").
+        go("<input type=\"hidden\" name=\"user.profile@param\" value=\"param-value\"/>\n" +
+            "<div class=\"file input control\">\n" +
+            "<div class=\"label-container\"><label for=\"user_profile\" class=\"label\">Your profile</label></div>\n" +
+            "<div class=\"control-container\"><input type=\"file\" id=\"user_profile\" name=\"user.profile\"/></div>\n" +
+            "</div>\n");
   }
 
   @Test
-  public void htmlLabel() {
-    EditAction action = new EditAction();
-    ais.setCurrent(new ActionInvocation(action, null, "/file", null, null));
+  public void actionLess() {
+    ais.setCurrent(new ActionInvocation(null, null, "/file", null, null));
 
-    // This verifies that HTML is left in for labels. That way people can style their labels in the message properties files
     new ControlTester(file).
-      attr("name", "user.name").
-      go("<input type=\"hidden\" name=\"user.name@param\" value=\"param-value\"/>\n" +
-          "<div class=\"file input control\">\n" +
-          "<div class=\"label-container\"><label for=\"user_name\" class=\"label\">&lt;Name&gt;</label></div>\n" +
-          "<div class=\"control-container\"><input type=\"file\" id=\"user_name\" name=\"user.name\"/></div>\n" +
-          "</div>\n");
+        attr("name", "test").
+        attr("class", "css-class").
+        go("<input type=\"hidden\" name=\"test@param\" value=\"param-value\"/>\n" +
+            "<div class=\"css-class-file css-class-input css-class-control file input control\">\n" +
+            "<div class=\"label-container\"><label for=\"test\" class=\"label\">Test</label></div>\n" +
+            "<div class=\"control-container\"><input type=\"file\" class=\"css-class\" id=\"test\" name=\"test\"/></div>\n" +
+            "</div>\n");
   }
 
   @Test
@@ -83,11 +68,26 @@ public class FileTest extends ControlBaseTest {
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.profile", "code2", "fieldError2"));
 
     new ControlTester(file).
-      attr("name", "user.profile").
-      go("<input type=\"hidden\" name=\"user.profile@param\" value=\"param-value\"/>\n" +
-      "<div class=\"file input control\">\n" +
-      "<div class=\"label-container\"><label for=\"user_profile\" class=\"label\"><span class=\"error\">Your profile (fieldError1, fieldError2)</span></label></div>\n" +
-      "<div class=\"control-container\"><input type=\"file\" id=\"user_profile\" name=\"user.profile\"/></div>\n" +
-      "</div>\n");
+        attr("name", "user.profile").
+        go("<input type=\"hidden\" name=\"user.profile@param\" value=\"param-value\"/>\n" +
+            "<div class=\"file input control\">\n" +
+            "<div class=\"label-container\"><label for=\"user_profile\" class=\"label\"><span class=\"error\">Your profile (fieldError1, fieldError2)</span></label></div>\n" +
+            "<div class=\"control-container\"><input type=\"file\" id=\"user_profile\" name=\"user.profile\"/></div>\n" +
+            "</div>\n");
+  }
+
+  @Test
+  public void htmlLabel() {
+    EditAction action = new EditAction();
+    ais.setCurrent(new ActionInvocation(action, null, "/file", null, null));
+
+    // This verifies that HTML is left in for labels. That way people can style their labels in the message properties files
+    new ControlTester(file).
+        attr("name", "user.name").
+        go("<input type=\"hidden\" name=\"user.name@param\" value=\"param-value\"/>\n" +
+            "<div class=\"file input control\">\n" +
+            "<div class=\"label-container\"><label for=\"user_name\" class=\"label\">&lt;Name&gt;</label></div>\n" +
+            "<div class=\"control-container\"><input type=\"file\" id=\"user_name\" name=\"user.name\"/></div>\n" +
+            "</div>\n");
   }
 }

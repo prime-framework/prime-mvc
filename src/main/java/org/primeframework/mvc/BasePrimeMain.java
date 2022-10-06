@@ -17,14 +17,15 @@ package org.primeframework.mvc;
 
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import io.fusionauth.http.server.HTTPServer;
+import io.fusionauth.http.server.HTTPServerConfiguration;
 import org.primeframework.mvc.guice.GuiceBootstrap;
-import org.primeframework.mvc.netty.PrimeHTTPServer;
-import org.primeframework.mvc.netty.PrimeHTTPServerConfiguration;
+import org.primeframework.mvc.log.SLF4JLoggerFactoryAdapter;
 
 /**
  * An abstract class that is used to create the main entry point for Prime (HTTP server and MVC).
  * <p>
- * To use this class, you need to sub-class it like this:
+ * To use this class, you need to subclass it like this:
  *
  * <pre>
  *   public class MyPrimeMain extends basePrimeMain {
@@ -49,9 +50,9 @@ public abstract class BasePrimeMain {
 
   protected PrimeMVCRequestHandler requestHandler;
 
-  protected PrimeHTTPServer server;
+  protected HTTPServer server;
 
-  public abstract PrimeHTTPServerConfiguration configuration();
+  public abstract HTTPServerConfiguration configuration();
 
   public Injector getInjector() {
     return injector;
@@ -81,8 +82,8 @@ public abstract class BasePrimeMain {
    * shutdown hook if it has been registered.
    */
   public void shutdown() {
-    server.shutdown();
-    requestHandler.shutdown();
+    server.close();
+    requestHandler.close();
   }
 
   public void start() {
@@ -93,7 +94,7 @@ public abstract class BasePrimeMain {
     hup();
 
     // Create the server
-    server = new PrimeHTTPServer(configuration(), requestHandler);
+    server = new HTTPServer().withConfiguration(configuration()).withHandler(requestHandler).withLoggerFactory(new SLF4JLoggerFactoryAdapter());
 
     // Start the server
     server.start();

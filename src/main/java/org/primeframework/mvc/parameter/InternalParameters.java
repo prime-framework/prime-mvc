@@ -15,8 +15,7 @@
  */
 package org.primeframework.mvc.parameter;
 
-import org.primeframework.mvc.http.HTTPRequest;
-
+import io.fusionauth.http.server.HTTPRequest;
 import org.primeframework.mvc.PrimeException;
 import static org.primeframework.mvc.security.csrf.CSRFProvider.CSRF_PARAMETER_KEY;
 
@@ -47,14 +46,14 @@ public final class InternalParameters {
    * @param request The request to look in.
    * @param key     The key to check.
    * @return True of false. If the key doesn't exist in the request, this returns true. If it does exist in the request
-   *         and is equal to {@code true}, this returns true. Otherwise, this returns false.
+   *     and is equal to {@code true}, this returns true. Otherwise, this returns false.
    */
   public static boolean is(HTTPRequest request, String key) {
     if (!isInternalParameter(key)) {
       throw new PrimeException("Invalid key [" + key + "]");
     }
 
-    Object value = request.getParameterValue(key);
+    Object value = request.getParameter(key);
     if (value == null) {
       value = request.getAttribute(key);
     }

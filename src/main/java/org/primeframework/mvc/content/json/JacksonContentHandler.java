@@ -20,9 +20,9 @@ import java.io.IOException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.google.inject.Inject;
+import io.fusionauth.http.server.HTTPRequest;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration.RequestMember;
-import org.primeframework.mvc.http.HTTPRequest;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
@@ -52,7 +52,7 @@ public class JacksonContentHandler extends BaseJacksonContentHandler {
       reader = objectMapper.readerFor(requestMember.type);
     }
 
-    Object jsonObject = reader.readValue(request.getBody().array(), 0, contentLength.intValue());
+    Object jsonObject = reader.readValue(request.getInputStream());
 
     // Set the value into the action if the currentValue from the action was null
     if (currentValue == null) {

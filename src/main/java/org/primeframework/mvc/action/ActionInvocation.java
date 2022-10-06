@@ -29,19 +29,19 @@ import org.primeframework.mvc.action.config.ActionConfiguration;
 public class ActionInvocation {
   public Object action;
 
-  public ExecuteMethodConfiguration method;
-
   public String actionURI;
-
-  public String extension;
-
-  public Map<String, List<String>> uriParameters;
 
   public ActionConfiguration configuration;
 
   public boolean executeResult;
 
+  public String extension;
+
+  public ExecuteMethodConfiguration method;
+
   public boolean redirect;
+
+  public Map<String, List<String>> uriParameters;
 
   public ActionInvocation(Object action, ExecuteMethodConfiguration method, String uri, String extension,
                           ActionConfiguration configuration) {

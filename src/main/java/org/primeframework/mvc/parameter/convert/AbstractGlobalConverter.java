@@ -25,11 +25,10 @@ import org.primeframework.mvc.util.TypeTools;
 
 /**
  * This class is the base type converter for all the type converters that handle Object types. If you are writing a
- * converter for primitive types, use the {@link org.primeframework.mvc.parameter.convert.converters.AbstractPrimitiveConverter}
- * class.
+ * converter for primitive types, use the
+ * {@link org.primeframework.mvc.parameter.convert.converters.AbstractPrimitiveConverter} class.
  * <p/>
- * This class mostly delegates between the various method calls by passing in default values or performing casting.
- * Each
+ * This class mostly delegates between the various method calls by passing in default values or performing casting. Each
  * method describes how it functions.
  *
  * @author Brian Pontarelli
@@ -51,11 +50,12 @@ public abstract class AbstractGlobalConverter implements GlobalConverter {
    * @param expression        The full path to the expression that is causing the conversion.
    * @param values            The values to convert.
    * @return The converted value.
-   * @throws ConversionException If the conversion failed.
+   * @throws ConversionException     If the conversion failed.
    * @throws ConverterStateException if the converter didn't have all of the information it needed to perform the
-   * conversion.
+   *                                 conversion.
    */
-  public Object convertFromStrings(Type convertTo, Map<String, String> dynamicAttributes, String expression, String... values)
+  public Object convertFromStrings(Type convertTo, Map<String, String> dynamicAttributes, String expression,
+                                   String... values)
       throws ConversionException, ConverterStateException {
     // Handle a zero or one String
     Class<?> rawType = TypeTools.rawType(convertTo);
@@ -97,11 +97,12 @@ public abstract class AbstractGlobalConverter implements GlobalConverter {
    * @param expression        The full path to the expression that is causing the conversion.
    * @param value             The value to convert.
    * @return The converted value.
-   * @throws ConversionException If the conversion failed.
+   * @throws ConversionException     If the conversion failed.
    * @throws ConverterStateException if the converter didn't have all of the information it needed to perform the
-   * conversion.
+   *                                 conversion.
    */
-  public String convertToString(Type convertFrom, Map<String, String> dynamicAttributes, String expression, Object value)
+  public String convertToString(Type convertFrom, Map<String, String> dynamicAttributes, String expression,
+                                Object value)
       throws ConversionException {
     // Handle null
     if (value == null) {
@@ -123,89 +124,6 @@ public abstract class AbstractGlobalConverter implements GlobalConverter {
   }
 
   /**
-   * Gets the first parameter type is the given type is a parametrized type. If it isn't, this returns null. If the
-   * type
-   * has multiple parameters, only the first is returned.
-   *
-   * @param type The type.
-   * @return The first parameter type.
-   */
-  protected Class<?> parameterType(Type type) {
-    if (type instanceof ParameterizedType) {
-      return (Class<?>) ((ParameterizedType) type).getActualTypeArguments()[0];
-    }
-
-    return null;
-  }
-
-  /**
-   * This performs the conversion from a single String value to an array of the given type.
-   *
-   * @param value             The value to convert to an array.
-   * @param convertTo         The array type to convert to.
-   * @param dynamicAttributes The dynamic attributes used to assist in conversion.
-   * @param expression        The full path to the expression that is causing the conversion.
-   * @return The converted value.
-   * @throws ConversionException If the conversion failed.
-   * @throws ConverterStateException if the converter didn't have all of the information it needed to perform the
-   * conversion.
-   */
-  protected Object stringToArray(String value, Type convertTo, Map<String, String> dynamicAttributes, String expression)
-      throws ConversionException {
-    if (value == null) {
-      return null;
-    }
-
-    Object finalArray;
-    Class<?> rawType = TypeTools.rawType(convertTo);
-    if (StringUtils.isBlank(value)) {
-      finalArray = Array.newInstance(rawType.getComponentType(), 0);
-    } else {
-      String[] parts = value.split(",");
-      finalArray = Array.newInstance(rawType.getComponentType(), parts.length);
-      for (int i = 0; i < parts.length; i++) {
-        Object singleValue = stringToObject(parts[i], rawType.getComponentType(), dynamicAttributes, expression);
-        Array.set(finalArray, i, singleValue);
-      }
-    }
-
-    return finalArray;
-  }
-
-  /**
-   * This performs the conversion from an array of String values to an array of the given type.
-   *
-   * @param values            The values to convert to an array.
-   * @param convertTo         The array type to convert to.
-   * @param dynamicAttributes The dynamic attributes to assist in the conversion.
-   * @param expression        The full path to the expression that is causing the conversion.
-   * @return The converted value.
-   * @throws ConversionException If the conversion failed.
-   * @throws ConverterStateException if the converter didn't have all of the information it needed to perform the
-   * conversion.
-   */
-  protected Object stringsToArray(String[] values, Type convertTo, Map<String, String> dynamicAttributes, String expression)
-      throws ConversionException {
-    if (values == null) {
-      return null;
-    }
-
-    Object finalArray;
-    Class<?> rawType = TypeTools.rawType(convertTo);
-    if (values.length == 0) {
-      finalArray = Array.newInstance(rawType.getComponentType(), 0);
-    } else {
-      finalArray = Array.newInstance(rawType.getComponentType(), values.length);
-      for (int i = 0; i < values.length; i++) {
-        Object singleValue = stringToObject(values[i], rawType.getComponentType(), dynamicAttributes, expression);
-        Array.set(finalArray, i, singleValue);
-      }
-    }
-
-    return finalArray;
-  }
-
-  /**
    * This performs the conversion from an array to a single String value.
    *
    * @param value             The array value to convert to a String.
@@ -213,11 +131,12 @@ public abstract class AbstractGlobalConverter implements GlobalConverter {
    * @param dynamicAttributes The dynamic attributes to assist in the conversion.
    * @param expression        The full path to the expression that is causing the conversion.
    * @return The converted value.
-   * @throws ConversionException If the conversion failed.
+   * @throws ConversionException     If the conversion failed.
    * @throws ConverterStateException if the converter didn't have all of the information it needed to perform the
-   * conversion.
+   *                                 conversion.
    */
-  protected String arrayToString(Object value, Type convertFrom, Map<String, String> dynamicAttributes, String expression)
+  protected String arrayToString(Object value, Type convertFrom, Map<String, String> dynamicAttributes,
+                                 String expression)
       throws ConversionException {
     Class<?> rawType = TypeTools.rawType(convertFrom);
     if (!rawType.isArray()) {
@@ -251,6 +170,71 @@ public abstract class AbstractGlobalConverter implements GlobalConverter {
   }
 
   /**
+   * Converts the Object value to a String.
+   *
+   * @param value             The Object value to convert.
+   * @param convertFrom       The type to convert from.
+   * @param dynamicAttributes The dynamic attributes to assist in the conversion.
+   * @param expression        The full path to the expression that is causing the conversion.
+   * @return The converted value.
+   * @throws ConversionException     If the conversion failed.
+   * @throws ConverterStateException if the converter didn't have all of the information it needed to perform the
+   *                                 conversion.
+   */
+  protected abstract String objectToString(Object value, Type convertFrom, Map<String, String> dynamicAttributes,
+                                           String expression)
+      throws ConversionException, ConverterStateException;
+
+  /**
+   * Gets the first parameter type is the given type is a parametrized type. If it isn't, this returns null. If the type
+   * has multiple parameters, only the first is returned.
+   *
+   * @param type The type.
+   * @return The first parameter type.
+   */
+  protected Class<?> parameterType(Type type) {
+    if (type instanceof ParameterizedType) {
+      return (Class<?>) ((ParameterizedType) type).getActualTypeArguments()[0];
+    }
+
+    return null;
+  }
+
+  /**
+   * This performs the conversion from a single String value to an array of the given type.
+   *
+   * @param value             The value to convert to an array.
+   * @param convertTo         The array type to convert to.
+   * @param dynamicAttributes The dynamic attributes used to assist in conversion.
+   * @param expression        The full path to the expression that is causing the conversion.
+   * @return The converted value.
+   * @throws ConversionException     If the conversion failed.
+   * @throws ConverterStateException if the converter didn't have all of the information it needed to perform the
+   *                                 conversion.
+   */
+  protected Object stringToArray(String value, Type convertTo, Map<String, String> dynamicAttributes, String expression)
+      throws ConversionException {
+    if (value == null) {
+      return null;
+    }
+
+    Object finalArray;
+    Class<?> rawType = TypeTools.rawType(convertTo);
+    if (StringUtils.isBlank(value)) {
+      finalArray = Array.newInstance(rawType.getComponentType(), 0);
+    } else {
+      String[] parts = value.split(",");
+      finalArray = Array.newInstance(rawType.getComponentType(), parts.length);
+      for (int i = 0; i < parts.length; i++) {
+        Object singleValue = stringToObject(parts[i], rawType.getComponentType(), dynamicAttributes, expression);
+        Array.set(finalArray, i, singleValue);
+      }
+    }
+
+    return finalArray;
+  }
+
+  /**
    * Converts the single String value to an Object.
    *
    * @param value             The String value to convert.
@@ -258,12 +242,47 @@ public abstract class AbstractGlobalConverter implements GlobalConverter {
    * @param dynamicAttributes The dynamic attributes to assist in the conversion.
    * @param expression        The full path to the expression that is causing the conversion.
    * @return The converted value.
-   * @throws ConversionException If the conversion failed.
+   * @throws ConversionException     If the conversion failed.
    * @throws ConverterStateException if the converter didn't have all of the information it needed to perform the
-   * conversion.
+   *                                 conversion.
    */
-  protected abstract Object stringToObject(String value, Type convertTo, Map<String, String> dynamicAttributes, String expression)
+  protected abstract Object stringToObject(String value, Type convertTo, Map<String, String> dynamicAttributes,
+                                           String expression)
       throws ConversionException, ConverterStateException;
+
+  /**
+   * This performs the conversion from an array of String values to an array of the given type.
+   *
+   * @param values            The values to convert to an array.
+   * @param convertTo         The array type to convert to.
+   * @param dynamicAttributes The dynamic attributes to assist in the conversion.
+   * @param expression        The full path to the expression that is causing the conversion.
+   * @return The converted value.
+   * @throws ConversionException     If the conversion failed.
+   * @throws ConverterStateException if the converter didn't have all of the information it needed to perform the
+   *                                 conversion.
+   */
+  protected Object stringsToArray(String[] values, Type convertTo, Map<String, String> dynamicAttributes,
+                                  String expression)
+      throws ConversionException {
+    if (values == null) {
+      return null;
+    }
+
+    Object finalArray;
+    Class<?> rawType = TypeTools.rawType(convertTo);
+    if (values.length == 0) {
+      finalArray = Array.newInstance(rawType.getComponentType(), 0);
+    } else {
+      finalArray = Array.newInstance(rawType.getComponentType(), values.length);
+      for (int i = 0; i < values.length; i++) {
+        Object singleValue = stringToObject(values[i], rawType.getComponentType(), dynamicAttributes, expression);
+        Array.set(finalArray, i, singleValue);
+      }
+    }
+
+    return finalArray;
+  }
 
   /**
    * Converts a String array to a single Object (not an array of Objects). Support for this method is uncommon.
@@ -273,25 +292,11 @@ public abstract class AbstractGlobalConverter implements GlobalConverter {
    * @param dynamicAttributes The dynamic attributes to assist in the conversion.
    * @param expression        The full path to the expression that is causing the conversion.
    * @return The converted value.
-   * @throws ConversionException If the conversion failed.
+   * @throws ConversionException     If the conversion failed.
    * @throws ConverterStateException if the converter didn't have all of the information it needed to perform the
-   * conversion.
+   *                                 conversion.
    */
-  protected abstract Object stringsToObject(String[] values, Type convertTo, Map<String, String> dynamicAttributes, String expression)
-      throws ConversionException, ConverterStateException;
-
-  /**
-   * Converts the Object value to a String.
-   *
-   * @param value             The Object value to convert.
-   * @param convertFrom       The type to convert from.
-   * @param dynamicAttributes The dynamic attributes to assist in the conversion.
-   * @param expression        The full path to the expression that is causing the conversion.
-   * @return The converted value.
-   * @throws ConversionException If the conversion failed.
-   * @throws ConverterStateException if the converter didn't have all of the information it needed to perform the
-   * conversion.
-   */
-  protected abstract String objectToString(Object value, Type convertFrom, Map<String, String> dynamicAttributes, String expression)
+  protected abstract Object stringsToObject(String[] values, Type convertTo, Map<String, String> dynamicAttributes,
+                                            String expression)
       throws ConversionException, ConverterStateException;
 }

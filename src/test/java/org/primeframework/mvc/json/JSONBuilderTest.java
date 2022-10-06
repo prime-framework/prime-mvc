@@ -16,8 +16,7 @@
 package org.primeframework.mvc.json;
 
 import org.testng.annotations.Test;
-
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
 
 /**
  * This class tests the JSONBuilder
@@ -25,170 +24,170 @@ import static org.testng.Assert.*;
  * @author Brian Pontarelli
  */
 public class JSONBuilderTest {
-  public static enum Status {
-    ACTIVE
+  @Test
+  public void punctuation() {
+    StringBuilder build = new StringBuilder();
+    String json = new JSONBuilder(build, false).
+        startObject().
+        startObject("add").
+        startObject("doc").
+        addStringField("id", "id").
+        addStringField("content", "\"hey there\"").
+        addIntField("number", 1).
+        endObject().
+        endObject().
+        endObject().
+        toString();
+
+    assertEquals(json,
+        "{" +
+            "\"add\":{" +
+            "\"doc\":{" +
+            "\"id\":\"id\"," +
+            "\"content\":\"\\\"hey there\\\"\"," +
+            "\"number\":1" +
+            "}" +
+            "}" +
+            "}");
   }
 
   @Test
   public void simplePretty() {
     StringBuilder build = new StringBuilder();
     String json = new JSONBuilder(build, true).
-      startObject().
-      startObject("add").
-      startObject("doc").
-      addStringField("id", "foo").
-      addStringField("content", "bar").
-      addIntField("number", 1).
-      addIntField("numberNull", null).
-      addEnumOrdinalField("enum", Status.ACTIVE).
-      addEnumOrdinalField("enumNull", null).
-      addBooleanField("boolean", true).
-      addBooleanField("booleanNull", null).
-      endObject().
-      startArray("array").
-      startObject().
-      addStringField("id", "foo").
-      addStringField("content", "bar").
-      addIntField("number", 1).
-      endObject().
-      startObject().
-      addStringField("id", "foo").
-      addStringField("content", "bar").
-      addIntField("number", 1).
-      endObject().
-      endArray().
-      endObject().
-      endObject().
-      toString();
+        startObject().
+        startObject("add").
+        startObject("doc").
+        addStringField("id", "foo").
+        addStringField("content", "bar").
+        addIntField("number", 1).
+        addIntField("numberNull", null).
+        addEnumOrdinalField("enum", Status.ACTIVE).
+        addEnumOrdinalField("enumNull", null).
+        addBooleanField("boolean", true).
+        addBooleanField("booleanNull", null).
+        endObject().
+        startArray("array").
+        startObject().
+        addStringField("id", "foo").
+        addStringField("content", "bar").
+        addIntField("number", 1).
+        endObject().
+        startObject().
+        addStringField("id", "foo").
+        addStringField("content", "bar").
+        addIntField("number", 1).
+        endObject().
+        endArray().
+        endObject().
+        endObject().
+        toString();
 
     assertEquals(json,
-      "{\n" +
-        "  \"add\":{\n" +
-        "    \"doc\":{\n" +
-        "      \"id\":\"foo\",\n" +
-        "      \"content\":\"bar\",\n" +
-        "      \"number\":1,\n" +
-        "      \"enum\":0,\n" +
-        "      \"boolean\":true\n" +
-        "    },\n" +
-        "    \"array\":[\n" +
-        "      {\n" +
-        "        \"id\":\"foo\",\n" +
-        "        \"content\":\"bar\",\n" +
-        "        \"number\":1\n" +
-        "      },\n" +
-        "      {\n" +
-        "        \"id\":\"foo\",\n" +
-        "        \"content\":\"bar\",\n" +
-        "        \"number\":1\n" +
-        "      }\n" +
-        "    ]\n" +
-        "  }\n" +
-        "}");
+        "{\n" +
+            "  \"add\":{\n" +
+            "    \"doc\":{\n" +
+            "      \"id\":\"foo\",\n" +
+            "      \"content\":\"bar\",\n" +
+            "      \"number\":1,\n" +
+            "      \"enum\":0,\n" +
+            "      \"boolean\":true\n" +
+            "    },\n" +
+            "    \"array\":[\n" +
+            "      {\n" +
+            "        \"id\":\"foo\",\n" +
+            "        \"content\":\"bar\",\n" +
+            "        \"number\":1\n" +
+            "      },\n" +
+            "      {\n" +
+            "        \"id\":\"foo\",\n" +
+            "        \"content\":\"bar\",\n" +
+            "        \"number\":1\n" +
+            "      }\n" +
+            "    ]\n" +
+            "  }\n" +
+            "}");
   }
 
   @Test
   public void simpleUgly() {
     StringBuilder build = new StringBuilder();
     String json = new JSONBuilder(build, false).
-      startObject().
-      startObject("add").
-      startObject("doc").
-      addStringField("id", "foo").
-      addStringField("content", "bar").
-      addIntField("number", 1).
-      endObject().
-      startArray("array").
-      startObject().
-      addStringField("id", "foo").
-      addStringField("content", "bar").
-      addIntField("number", 1).
-      endObject().
-      startObject().
-      addStringField("id", "foo").
-      addStringField("content", "bar").
-      addIntField("number", 1).
-      endObject().
-      endArray().
-      endObject().
-      endObject().
-      toString();
+        startObject().
+        startObject("add").
+        startObject("doc").
+        addStringField("id", "foo").
+        addStringField("content", "bar").
+        addIntField("number", 1).
+        endObject().
+        startArray("array").
+        startObject().
+        addStringField("id", "foo").
+        addStringField("content", "bar").
+        addIntField("number", 1).
+        endObject().
+        startObject().
+        addStringField("id", "foo").
+        addStringField("content", "bar").
+        addIntField("number", 1).
+        endObject().
+        endArray().
+        endObject().
+        endObject().
+        toString();
 
     assertEquals(json,
-      "{" +
-        "\"add\":{" +
-        "\"doc\":{" +
-        "\"id\":\"foo\"," +
-        "\"content\":\"bar\"," +
-        "\"number\":1" +
-        "}," +
-        "\"array\":[" +
         "{" +
-        "\"id\":\"foo\"," +
-        "\"content\":\"bar\"," +
-        "\"number\":1" +
-        "}," +
-        "{" +
-        "\"id\":\"foo\"," +
-        "\"content\":\"bar\"," +
-        "\"number\":1" +
-        "}" +
-        "]" +
-        "}" +
-        "}");
+            "\"add\":{" +
+            "\"doc\":{" +
+            "\"id\":\"foo\"," +
+            "\"content\":\"bar\"," +
+            "\"number\":1" +
+            "}," +
+            "\"array\":[" +
+            "{" +
+            "\"id\":\"foo\"," +
+            "\"content\":\"bar\"," +
+            "\"number\":1" +
+            "}," +
+            "{" +
+            "\"id\":\"foo\"," +
+            "\"content\":\"bar\"," +
+            "\"number\":1" +
+            "}" +
+            "]" +
+            "}" +
+            "}");
   }
 
   @Test
   public void unicode() {
     StringBuilder build = new StringBuilder();
     String json = new JSONBuilder(build, false).
-      startObject().
-      startObject("add").
-      startObject("doc").
-      addStringField("id", "\u00c3bc").
-      addStringField("content", "bar").
-      addIntField("number", 1).
-      endObject().
-      endObject().
-      endObject().
-      toString();
+        startObject().
+        startObject("add").
+        startObject("doc").
+        addStringField("id", "\u00c3bc").
+        addStringField("content", "bar").
+        addIntField("number", 1).
+        endObject().
+        endObject().
+        endObject().
+        toString();
 
     assertEquals(json,
-      "{" +
-        "\"add\":{" +
-        "\"doc\":{" +
-        "\"id\":\"\u00c3bc\"," +
-        "\"content\":\"bar\"," +
-        "\"number\":1" +
-        "}" +
-        "}" +
-        "}");
+        "{" +
+            "\"add\":{" +
+            "\"doc\":{" +
+            "\"id\":\"\u00c3bc\"," +
+            "\"content\":\"bar\"," +
+            "\"number\":1" +
+            "}" +
+            "}" +
+            "}");
   }
 
-  @Test
-  public void punctuation() {
-    StringBuilder build = new StringBuilder();
-    String json = new JSONBuilder(build, false).
-      startObject().
-      startObject("add").
-      startObject("doc").
-      addStringField("id", "id").
-      addStringField("content", "\"hey there\"").
-      addIntField("number", 1).
-      endObject().
-      endObject().
-      endObject().
-      toString();
-
-    assertEquals(json,
-      "{" +
-        "\"add\":{" +
-        "\"doc\":{" +
-        "\"id\":\"id\"," +
-        "\"content\":\"\\\"hey there\\\"\"," +
-        "\"number\":1" +
-        "}" +
-        "}" +
-        "}");
+  public enum Status {
+    ACTIVE
   }
 }

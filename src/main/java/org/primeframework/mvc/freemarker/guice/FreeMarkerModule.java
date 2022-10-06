@@ -15,16 +15,15 @@
  */
 package org.primeframework.mvc.freemarker.guice;
 
+import com.google.inject.AbstractModule;
+import com.google.inject.Singleton;
+import freemarker.cache.TemplateLoader;
+import freemarker.template.Configuration;
 import org.primeframework.mvc.control.message.Message;
 import org.primeframework.mvc.freemarker.DefaultFreeMarkerService;
 import org.primeframework.mvc.freemarker.FreeMarkerService;
 import org.primeframework.mvc.freemarker.OverridingTemplateLoader;
 import org.primeframework.mvc.freemarker.methods.JSONEscape;
-
-import com.google.inject.AbstractModule;
-import com.google.inject.Singleton;
-import freemarker.cache.TemplateLoader;
-import freemarker.template.Configuration;
 
 /**
  * FreeMarker module that provides the {@link Configuration} instance (as a singleton).

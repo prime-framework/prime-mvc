@@ -15,12 +15,10 @@
  */
 package org.primeframework.mvc.action.guice;
 
-import org.primeframework.mvc.http.HTTPRequest;
-
-import org.primeframework.mvc.util.URITools;
-
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import io.fusionauth.http.server.HTTPRequest;
+import org.primeframework.mvc.util.URITools;
 
 /**
  * Provides a String that is the extension of the request URI.

@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.inject.Inject;
-import org.primeframework.mvc.http.HTTPRequest;
+import io.fusionauth.http.server.HTTPRequest;
 import org.primeframework.mvc.message.scope.ApplicationScope;
 import org.primeframework.mvc.message.scope.FlashScope;
 import org.primeframework.mvc.message.scope.MessageScope;
@@ -118,8 +118,7 @@ public class DefaultMessageStore implements MessageStore {
     List<Message> messages = scope == null ? get() : get(scope);
     Map<String, List<FieldMessage>> map = new HashMap<>();
     for (Message message : messages) {
-      if (message instanceof FieldMessage) {
-        FieldMessage fm = (FieldMessage) message;
+      if (message instanceof FieldMessage fm) {
         List<FieldMessage> list = map.computeIfAbsent(fm.getField(), k -> new ArrayList<>());
         list.add(fm);
       }

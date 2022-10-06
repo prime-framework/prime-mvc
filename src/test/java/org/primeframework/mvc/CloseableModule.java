@@ -15,10 +15,9 @@
  */
 package org.primeframework.mvc;
 
-import org.primeframework.mvc.guice.TestClosable;
-
 import com.google.inject.Binder;
 import com.google.inject.Module;
+import org.primeframework.mvc.guice.TestClosable;
 
 /**
  * Test module outside of a package named Guice to test explicit modules.

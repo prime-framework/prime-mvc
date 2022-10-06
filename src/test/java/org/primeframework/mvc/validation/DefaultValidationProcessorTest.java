@@ -18,10 +18,10 @@ package org.primeframework.mvc.validation;
 import java.util.List;
 
 import com.google.inject.Inject;
+import io.fusionauth.http.HTTPMethod;
 import org.example.action.ValidationMethods;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocationStore;
-import org.primeframework.mvc.http.HTTPMethod;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;

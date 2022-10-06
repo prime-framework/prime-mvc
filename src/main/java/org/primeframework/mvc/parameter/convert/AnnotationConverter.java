@@ -21,9 +21,9 @@ import java.util.Map;
 
 /**
  * Converters are used to convert objects from one type to another, convert strings to objects and to convert from
- * objects and strings to arrays of objects. The way that this is setup is that a Converter implementation is
- * registered with the ConverterRegistry. The registry can then be queried for a particular Converter (see {@link
- * org.primeframework.mvc.parameter.convert.ConverterProvider} for more information about retrieval). Next, the
+ * objects and strings to arrays of objects. The way that this is setup is that a Converter implementation is registered
+ * with the ConverterRegistry. The registry can then be queried for a particular Converter (see
+ * {@link org.primeframework.mvc.parameter.convert.ConverterProvider} for more information about retrieval). Next, the
  * Converter can be used for conversions using one of the methods described below. Any given Converter may be used to
  * convert to many different types because of the way that the ConverterRegistry searches for Converters. Because of
  * this flexibility when converting the Converter must be told what type to convert to. This is the reason for the
@@ -101,14 +101,15 @@ public interface AnnotationConverter<T extends Annotation> {
    *                                 conversion could not occur. This is normally a fatal exception that is fixable
    *                                 during development but not in production.
    */
-  Object convertFromStrings(T annotation, String[] values, Type convertTo, Map<String, String> attributes, String expression)
-    throws ConversionException, ConverterStateException;
+  Object convertFromStrings(T annotation, String[] values, Type convertTo, Map<String, String> attributes,
+                            String expression)
+      throws ConversionException, ConverterStateException;
 
   /**
    * Converts the given Object to a String for display purposes.
    * <p/>
-   * This method should handle all variations of Object to String conversion. The value is always pulled from the
-   * object in the action and is converted to a single String to display.
+   * This method should handle all variations of Object to String conversion. The value is always pulled from the object
+   * in the action and is converted to a single String to display.
    * <p/>
    * <ul>
    * <li>Object to String</li>
@@ -129,5 +130,5 @@ public interface AnnotationConverter<T extends Annotation> {
    *                                 during development but not in production.
    */
   String convertToString(T annotation, Object value, Type convertFrom, Map<String, String> attributes)
-    throws ConversionException;
+      throws ConversionException;
 }

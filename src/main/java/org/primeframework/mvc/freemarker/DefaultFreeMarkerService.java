@@ -30,8 +30,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This is a simple FreeMarkerService implementation. It uses two configuration parameters and the {@link
- * OverridingTemplateLoader} to provide FreeMarker rendering capabilities.
+ * This is a simple FreeMarkerService implementation. It uses two configuration parameters and the
+ * {@link OverridingTemplateLoader} to provide FreeMarker rendering capabilities.
  * <p/>
  * <h3>Caching</h3> By default, FreeMarker provides caching for all templates. This class uses that caching by default
  * as well. However, you can also change this class to not cache at all by setting the check seconds to a negative
@@ -40,8 +40,8 @@ import org.slf4j.LoggerFactory;
  * <strong>NOTE</strong> If you set the check seconds to a negative number, the templates are still cached but just
  * reloaded each time. This will incur memory a penalty.
  * <p/>
- * The configuration interface defines the caching and reloading strategy for this service via the method {@link
- * MVCConfiguration#templateCheckSeconds}.
+ * The configuration interface defines the caching and reloading strategy for this service via the method
+ * {@link MVCConfiguration#templateCheckSeconds}.
  *
  * @author Brian Pontarelli
  */

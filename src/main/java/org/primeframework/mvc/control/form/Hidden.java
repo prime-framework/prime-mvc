@@ -15,11 +15,10 @@
  */
 package org.primeframework.mvc.control.form;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.control.annotation.ControlAttribute;
 import org.primeframework.mvc.control.annotation.ControlAttributes;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-
-import com.google.inject.Inject;
 
 /**
  * This class is the control for a input type=hidden.
@@ -27,9 +26,9 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 @ControlAttributes(
-  required = {
-    @ControlAttribute(name = "name", types = {String.class})
-  }
+    required = {
+        @ControlAttribute(name = "name", types = {String.class})
+    }
 )
 public class Hidden extends AbstractValueInput {
   @Inject

@@ -20,6 +20,7 @@ package org.example.domain;
  */
 public abstract class ParentField {
 
-  public boolean superFoo;
   public boolean superBar;
+
+  public boolean superFoo;
 }

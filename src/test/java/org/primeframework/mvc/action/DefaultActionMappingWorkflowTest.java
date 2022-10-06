@@ -21,13 +21,13 @@ import java.util.HashSet;
 import java.util.Map;
 
 import com.google.inject.Injector;
+import io.fusionauth.http.HTTPMethod;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.example.action.user.EditAction;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.config.ActionConfigurationProvider;
-import org.primeframework.mvc.http.HTTPMethod;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
 import static org.easymock.EasyMock.capture;
@@ -45,9 +45,9 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
   public void differentButtonClick() throws Exception {
     request.setPath("/admin/user/edit");
     request.setMethod(HTTPMethod.POST);
-    request.setParameter("__a_submit", "");
-    request.setParameter("__a_cancel", "/admin/user/cancel");
-    request.setParameter("cancel", "Cancel");
+    request.addURLParameter("__a_submit", "");
+    request.addURLParameter("__a_cancel", "/admin/user/cancel");
+    request.addURLParameter("cancel", "Cancel");
 
     run("/admin/user/cancel", "/admin/user/cancel", null);
   }
@@ -56,9 +56,9 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
   public void differentButtonClickRelativeURI() throws Exception {
     request.setPath("/admin/user/edit");
     request.setMethod(HTTPMethod.POST);
-    request.setParameter("__a_submit", "");
-    request.setParameter("__a_cancel", "cancel");
-    request.setParameter("cancel", "Cancel");
+    request.addURLParameter("__a_submit", "");
+    request.addURLParameter("__a_cancel", "cancel");
+    request.addURLParameter("cancel", "Cancel");
 
     run("/admin/user/cancel", "/admin/user/cancel", null);
   }
@@ -67,9 +67,9 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
   public void extension() throws Exception {
     request.setPath("/admin/user/edit.xml");
     request.setMethod(HTTPMethod.POST);
-    request.setParameter("__a_submit", "");
-    request.setParameter("__a_cancel", "cancel");
-    request.setParameter("submit", "Submit");
+    request.addURLParameter("__a_submit", "");
+    request.addURLParameter("__a_cancel", "cancel");
+    request.addURLParameter("submit", "Submit");
 
     run("/admin/user/edit.xml", "/admin/user/edit", "xml");
   }
@@ -78,9 +78,9 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
   public void requestURI() throws Exception {
     request.setPath("/admin/user/edit");
     request.setMethod(HTTPMethod.POST);
-    request.setParameter("__a_submit", "");
-    request.setParameter("__a_cancel", "cancel");
-    request.setParameter("submit", "Submit");
+    request.addURLParameter("__a_submit", "");
+    request.addURLParameter("__a_cancel", "cancel");
+    request.addURLParameter("submit", "Submit");
 
     run("/admin/user/edit", "/admin/user/edit", null);
   }
@@ -90,9 +90,9 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     request.setPath("/context-path/admin/user/edit");
     request.setContextPath("/context-path");
     request.setMethod(HTTPMethod.POST);
-    request.setParameter("__a_submit", "");
-    request.setParameter("__a_cancel", "cancel");
-    request.setParameter("submit", "Submit");
+    request.addURLParameter("__a_submit", "");
+    request.addURLParameter("__a_cancel", "cancel");
+    request.addURLParameter("submit", "Submit");
 
     run("/admin/user/edit", "/admin/user/edit", null);
   }

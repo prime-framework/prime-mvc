@@ -27,8 +27,7 @@ import org.primeframework.mvc.util.TypeTools;
 /**
  * This class is the base type converter for all the annotaiton type converters that handle Object types.
  * <p/>
- * This class mostly delegates between the various method calls by passing in default values or performing casting.
- * Each
+ * This class mostly delegates between the various method calls by passing in default values or performing casting. Each
  * method describes how it functions.
  *
  * @author Brian Pontarelli
@@ -55,8 +54,9 @@ public abstract class AbstractAnnotationConverter<T extends Annotation> implemen
    * @throws ConverterStateException if the converter didn't have all of the information it needed to perform the
    *                                 conversion.
    */
-  public Object convertFromStrings(T annotation, String[] values, Type convertTo, Map<String, String> dynamicAttributes, String expression)
-    throws ConversionException, ConverterStateException {
+  public Object convertFromStrings(T annotation, String[] values, Type convertTo, Map<String, String> dynamicAttributes,
+                                   String expression)
+      throws ConversionException, ConverterStateException {
     // Handle a zero or one String
     Class<?> rawType = TypeTools.rawType(convertTo);
     if (values == null || values.length <= 1) {
@@ -66,7 +66,7 @@ public abstract class AbstractAnnotationConverter<T extends Annotation> implemen
         // Punt on multi-dimensional arrays
         if (rawType.getComponentType().isArray()) {
           throw new ConverterStateException("Converter [" + getClass() + "] does not support" +
-            " conversion to multi-dimensional arrays of type [" + convertTo + "]");
+              " conversion to multi-dimensional arrays of type [" + convertTo + "]");
         }
 
         return stringToArray(annotation, value, convertTo, dynamicAttributes, expression);
@@ -80,28 +80,13 @@ public abstract class AbstractAnnotationConverter<T extends Annotation> implemen
       // Punt on multi-dimensional arrays
       if (rawType.getComponentType().isArray()) {
         throw new ConverterStateException("Converter [" + getClass() + "] does not support" +
-          " conversion to multi-dimensional arrays of type [" + convertTo + "]");
+            " conversion to multi-dimensional arrays of type [" + convertTo + "]");
       }
 
       return stringsToArray(annotation, values, convertTo, dynamicAttributes, expression);
     }
 
     return stringsToObject(annotation, values, convertTo, dynamicAttributes, expression);
-  }
-
-  /**
-   * Gets the first parameter type is the given type is a parametrized type. If it isn't, this returns null. If the type
-   * has multiple parameters, only the first is returned.
-   *
-   * @param type The type.
-   * @return The first parameter type.
-   */
-  protected Class<?> parameterType(Type type) {
-    if (type instanceof ParameterizedType) {
-      return (Class<?>) ((ParameterizedType) type).getActualTypeArguments()[0];
-    }
-
-    return null;
   }
 
   /**
@@ -119,7 +104,7 @@ public abstract class AbstractAnnotationConverter<T extends Annotation> implemen
    */
   public String convertToString(T annotation, Object value, Type convertFrom, Map<String, String> dynamicAttributes,
                                 String expression)
-    throws ConversionException {
+      throws ConversionException {
     // Handle null
     if (value == null) {
       return null;
@@ -140,79 +125,6 @@ public abstract class AbstractAnnotationConverter<T extends Annotation> implemen
   }
 
   /**
-   * This performs the conversion from a single String value to an array of the given type.
-   *
-   * @param annotation        The annotation from the field.
-   * @param value             The value to convert to an array.
-   * @param convertTo         The array type to convert to.
-   * @param dynamicAttributes The dynamic attributes used to assist in conversion.
-   * @param expression        The full path to the expression that is causing the conversion.
-   * @return The converted value.
-   * @throws ConversionException     If the conversion failed.
-   * @throws ConverterStateException if the converter didn't have all of the information it needed to perform the
-   *                                 conversion.
-   */
-  protected Object stringToArray(T annotation, String value, Type convertTo, Map<String, String> dynamicAttributes,
-                                 String expression)
-    throws ConversionException {
-    if (value == null) {
-      return null;
-    }
-
-    Object finalArray;
-    Class<?> rawType = TypeTools.rawType(convertTo);
-    if (StringUtils.isBlank(value)) {
-      finalArray = Array.newInstance(rawType.getComponentType(), 0);
-    } else {
-      String[] parts = value.split(",");
-      finalArray = Array.newInstance(rawType.getComponentType(), parts.length);
-      for (int i = 0; i < parts.length; i++) {
-        Object singleValue = stringToObject(annotation, parts[i], rawType.getComponentType(),
-          dynamicAttributes, expression);
-        Array.set(finalArray, i, singleValue);
-      }
-    }
-
-    return finalArray;
-  }
-
-  /**
-   * This performs the conversion from an array of String values to an array of the given type.
-   *
-   * @param annotation        The annotation from the field.
-   * @param values            The values to convert to an array.
-   * @param convertTo         The array type to convert to.
-   * @param dynamicAttributes The dynamic attributes to assist in the conversion.
-   * @param expression        The full path to the expression that is causing the conversion.
-   * @return The converted value.
-   * @throws ConversionException     If the conversion failed.
-   * @throws ConverterStateException if the converter didn't have all of the information it needed to perform the
-   *                                 conversion.
-   */
-  protected Object stringsToArray(T annotation, String[] values, Type convertTo, Map<String, String> dynamicAttributes,
-                                  String expression)
-    throws ConversionException {
-    if (values == null) {
-      return null;
-    }
-
-    Object finalArray;
-    Class<?> rawType = TypeTools.rawType(convertTo);
-    if (values.length == 0) {
-      finalArray = Array.newInstance(rawType.getComponentType(), 0);
-    } else {
-      finalArray = Array.newInstance(rawType.getComponentType(), values.length);
-      for (int i = 0; i < values.length; i++) {
-        Object singleValue = stringToObject(annotation, values[i], rawType.getComponentType(),
-          dynamicAttributes, expression);
-        Array.set(finalArray, i, singleValue);
-      }
-    }
-
-    return finalArray;
-  }
-
-  /**
    * This performs the conversion from an array to a single String value.
    *
    * @param annotation        The annotation from the field.
@@ -227,7 +139,7 @@ public abstract class AbstractAnnotationConverter<T extends Annotation> implemen
    */
   protected String arrayToString(T annotation, Object value, Type convertFrom, Map<String, String> dynamicAttributes,
                                  String expression)
-    throws ConversionException {
+      throws ConversionException {
     Class<?> rawType = TypeTools.rawType(convertFrom);
     if (!rawType.isArray()) {
       throw new ConversionException("The convertFrom parameter must be an array type");
@@ -239,7 +151,7 @@ public abstract class AbstractAnnotationConverter<T extends Annotation> implemen
 
     if (value.getClass().getComponentType().isArray()) {
       throw new ConversionException("The value is a multi-dimensional array, which is not" +
-        " supported by the AbstractConverter");
+          " supported by the AbstractConverter");
     }
 
     int length = Array.getLength(value);
@@ -256,40 +168,6 @@ public abstract class AbstractAnnotationConverter<T extends Annotation> implemen
   }
 
   /**
-   * Converts the single String value to an Object.
-   *
-   * @param annotation        The annotation from the field.
-   * @param value             The String value to convert.
-   * @param convertTo         The type to convert to.
-   * @param dynamicAttributes The dynamic attributes to assist in the conversion.
-   * @param expression        The full path to the expression that is causing the conversion.
-   * @return The converted value.
-   * @throws ConversionException     If the conversion failed.
-   * @throws ConverterStateException if the converter didn't have all of the information it needed to perform the
-   *                                 conversion.
-   */
-  protected abstract Object stringToObject(T annotation, String value, Type convertTo, Map<String, String> dynamicAttributes,
-                                           String expression)
-    throws ConversionException, ConverterStateException;
-
-  /**
-   * Converts a String array to a single Object (not an array of Objects). Support for this method is uncommon.
-   *
-   * @param annotation        The annotation from the field.
-   * @param values            The String values to convert.
-   * @param convertTo         The type to convert to.
-   * @param dynamicAttributes The dynamic attributes to assist in the conversion.
-   * @param expression        The full path to the expression that is causing the conversion.
-   * @return The converted value.
-   * @throws ConversionException     If the conversion failed.
-   * @throws ConverterStateException if the converter didn't have all of the information it needed to perform the
-   *                                 conversion.
-   */
-  protected abstract Object stringsToObject(T annotation, String[] values, Type convertTo, Map<String, String> dynamicAttributes,
-                                            String expression)
-    throws ConversionException, ConverterStateException;
-
-  /**
    * Converts the Object value to a String.
    *
    * @param annotation        The annotation from the field.
@@ -304,5 +182,129 @@ public abstract class AbstractAnnotationConverter<T extends Annotation> implemen
    */
   protected abstract String objectToString(T annotation, Object value, Type convertFrom,
                                            Map<String, String> dynamicAttributes, String expression)
-    throws ConversionException, ConverterStateException;
+      throws ConversionException, ConverterStateException;
+
+  /**
+   * Gets the first parameter type is the given type is a parametrized type. If it isn't, this returns null. If the type
+   * has multiple parameters, only the first is returned.
+   *
+   * @param type The type.
+   * @return The first parameter type.
+   */
+  protected Class<?> parameterType(Type type) {
+    if (type instanceof ParameterizedType) {
+      return (Class<?>) ((ParameterizedType) type).getActualTypeArguments()[0];
+    }
+
+    return null;
+  }
+
+  /**
+   * This performs the conversion from a single String value to an array of the given type.
+   *
+   * @param annotation        The annotation from the field.
+   * @param value             The value to convert to an array.
+   * @param convertTo         The array type to convert to.
+   * @param dynamicAttributes The dynamic attributes used to assist in conversion.
+   * @param expression        The full path to the expression that is causing the conversion.
+   * @return The converted value.
+   * @throws ConversionException     If the conversion failed.
+   * @throws ConverterStateException if the converter didn't have all of the information it needed to perform the
+   *                                 conversion.
+   */
+  protected Object stringToArray(T annotation, String value, Type convertTo, Map<String, String> dynamicAttributes,
+                                 String expression)
+      throws ConversionException {
+    if (value == null) {
+      return null;
+    }
+
+    Object finalArray;
+    Class<?> rawType = TypeTools.rawType(convertTo);
+    if (StringUtils.isBlank(value)) {
+      finalArray = Array.newInstance(rawType.getComponentType(), 0);
+    } else {
+      String[] parts = value.split(",");
+      finalArray = Array.newInstance(rawType.getComponentType(), parts.length);
+      for (int i = 0; i < parts.length; i++) {
+        Object singleValue = stringToObject(annotation, parts[i], rawType.getComponentType(),
+            dynamicAttributes, expression);
+        Array.set(finalArray, i, singleValue);
+      }
+    }
+
+    return finalArray;
+  }
+
+  /**
+   * Converts the single String value to an Object.
+   *
+   * @param annotation        The annotation from the field.
+   * @param value             The String value to convert.
+   * @param convertTo         The type to convert to.
+   * @param dynamicAttributes The dynamic attributes to assist in the conversion.
+   * @param expression        The full path to the expression that is causing the conversion.
+   * @return The converted value.
+   * @throws ConversionException     If the conversion failed.
+   * @throws ConverterStateException if the converter didn't have all of the information it needed to perform the
+   *                                 conversion.
+   */
+  protected abstract Object stringToObject(T annotation, String value, Type convertTo,
+                                           Map<String, String> dynamicAttributes,
+                                           String expression)
+      throws ConversionException, ConverterStateException;
+
+  /**
+   * This performs the conversion from an array of String values to an array of the given type.
+   *
+   * @param annotation        The annotation from the field.
+   * @param values            The values to convert to an array.
+   * @param convertTo         The array type to convert to.
+   * @param dynamicAttributes The dynamic attributes to assist in the conversion.
+   * @param expression        The full path to the expression that is causing the conversion.
+   * @return The converted value.
+   * @throws ConversionException     If the conversion failed.
+   * @throws ConverterStateException if the converter didn't have all of the information it needed to perform the
+   *                                 conversion.
+   */
+  protected Object stringsToArray(T annotation, String[] values, Type convertTo, Map<String, String> dynamicAttributes,
+                                  String expression)
+      throws ConversionException {
+    if (values == null) {
+      return null;
+    }
+
+    Object finalArray;
+    Class<?> rawType = TypeTools.rawType(convertTo);
+    if (values.length == 0) {
+      finalArray = Array.newInstance(rawType.getComponentType(), 0);
+    } else {
+      finalArray = Array.newInstance(rawType.getComponentType(), values.length);
+      for (int i = 0; i < values.length; i++) {
+        Object singleValue = stringToObject(annotation, values[i], rawType.getComponentType(),
+            dynamicAttributes, expression);
+        Array.set(finalArray, i, singleValue);
+      }
+    }
+
+    return finalArray;
+  }
+
+  /**
+   * Converts a String array to a single Object (not an array of Objects). Support for this method is uncommon.
+   *
+   * @param annotation        The annotation from the field.
+   * @param values            The String values to convert.
+   * @param convertTo         The type to convert to.
+   * @param dynamicAttributes The dynamic attributes to assist in the conversion.
+   * @param expression        The full path to the expression that is causing the conversion.
+   * @return The converted value.
+   * @throws ConversionException     If the conversion failed.
+   * @throws ConverterStateException if the converter didn't have all of the information it needed to perform the
+   *                                 conversion.
+   */
+  protected abstract Object stringsToObject(T annotation, String[] values, Type convertTo,
+                                            Map<String, String> dynamicAttributes,
+                                            String expression)
+      throws ConversionException, ConverterStateException;
 }

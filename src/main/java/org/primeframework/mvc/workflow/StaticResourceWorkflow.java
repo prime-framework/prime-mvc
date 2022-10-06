@@ -27,11 +27,11 @@ import java.time.ZonedDateTime;
 import java.util.Set;
 
 import com.google.inject.Inject;
+import io.fusionauth.http.HTTPValues.Headers;
+import io.fusionauth.http.server.HTTPContext;
+import io.fusionauth.http.server.HTTPRequest;
+import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.config.MVCConfiguration;
-import org.primeframework.mvc.http.HTTPContext;
-import org.primeframework.mvc.http.HTTPRequest;
-import org.primeframework.mvc.http.HTTPResponse;
-import org.primeframework.mvc.http.HTTPStrings.Headers;
 import org.primeframework.mvc.http.HTTPTools;
 import org.primeframework.mvc.http.Status;
 import org.slf4j.Logger;

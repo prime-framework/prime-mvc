@@ -29,11 +29,11 @@ import java.util.Map;
 public class UserField {
   public boolean active;
 
-  public boolean bar;
-
   public Map<String, AddressField> addresses = new HashMap<>();
 
   public Integer age;
+
+  public boolean bar;
 
   public Integer favoriteMonth;
 

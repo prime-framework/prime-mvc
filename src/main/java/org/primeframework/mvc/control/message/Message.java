@@ -20,16 +20,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.google.inject.Inject;
+import freemarker.template.TemplateMethodModelEx;
+import freemarker.template.TemplateModelException;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.control.AbstractControl;
 import org.primeframework.mvc.control.annotation.ControlAttribute;
 import org.primeframework.mvc.control.annotation.ControlAttributes;
 import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.message.l10n.MissingMessageException;
-
-import com.google.inject.Inject;
-import freemarker.template.TemplateMethodModelEx;
-import freemarker.template.TemplateModelException;
 
 /**
  * This class a FreeMarker method model and a control for retrieving messages.
@@ -98,12 +97,12 @@ public class Message extends AbstractControl implements TemplateMethodModelEx {
   }
 
   @Override
-  protected String startTemplateName() {
-    return null;
+  protected String endTemplateName() {
+    return "message.ftl";
   }
 
   @Override
-  protected String endTemplateName() {
-    return "message.ftl";
+  protected String startTemplateName() {
+    return null;
   }
 }

@@ -27,17 +27,17 @@ import org.primeframework.mvc.action.ActionInvocation;
  */
 public interface ActionConfigurationProvider {
   /**
+   * Return a list of mapped URIs from the action configuration.
+   *
+   * @return the list of mapped action URIs.
+   */
+  List<ActionConfiguration> getActionConfigurations();
+
+  /**
    * Locates the action configuration for the given URI.
    *
    * @param uri The URI.
    * @return The action initial pieces of the ActionInvocation or null if there is no action associated with the URI.
    */
   ActionInvocation lookup(String uri);
-
-  /**
-   * Return a list of mapped URIs from the action configuration.
-   *
-   * @return the list of mapped action URIs.
-   */
-  List<ActionConfiguration> getActionConfigurations();
 }

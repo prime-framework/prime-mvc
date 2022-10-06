@@ -15,8 +15,8 @@
  */
 package org.example.action.scope;
 
+import io.fusionauth.http.FileInfo;
 import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.parameter.fileupload.FileInfo;
 import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
 
 /**
@@ -26,11 +26,11 @@ import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
  */
 @Action(value = "{id}")
 public class PageOneAction {
-  public String id;
-
   // This only exists on PageOneAction, not PageTwoAction
   @FileUpload(contentTypes = {"*"})
   public FileInfo file;
+
+  public String id;
 
   public String get() {
     return "input";

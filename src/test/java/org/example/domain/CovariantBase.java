@@ -19,12 +19,16 @@ package org.example.domain;
  * @author Brian Pontarelli
  */
 public abstract class CovariantBase<T> implements CovariantInterface {
-  public Object override;
-  public Object overrideNesting;
   public User interFace;
 
+  public Object override;
+
+  public Object overrideNesting;
+
   public abstract Object getAbstract();
+
   public abstract T getAbstractNesting();
+
   public abstract void setAbstractNesting(T value);
 
   @Override

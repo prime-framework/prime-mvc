@@ -18,6 +18,7 @@ package org.apache.commons.lang3;
 
 public class StringUtils {
   public static String EMPTY = "";
+
   public static boolean isAllLowerCase(final CharSequence cs) {
     if (cs == null || cs.length() == 0) {
       return false;
@@ -29,10 +30,6 @@ public class StringUtils {
       }
     }
     return true;
-  }
-
-  public static boolean isEmpty(final CharSequence cs) {
-    return cs == null || cs.length() == 0;
   }
 
   public static boolean isAllUpperCase(final CharSequence cs) {
@@ -59,6 +56,10 @@ public class StringUtils {
       }
     }
     return true;
+  }
+
+  public static boolean isEmpty(final CharSequence cs) {
+    return cs == null || cs.length() == 0;
   }
 
   public static boolean isNotBlank(final CharSequence cs) {

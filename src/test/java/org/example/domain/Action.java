@@ -25,19 +25,34 @@ import java.util.Map;
  */
 @org.primeframework.mvc.action.annotation.Action
 public class Action {
-  private int[] roleIds;
-  private List<Integer> selectionIds;
-  private Map<String, List<Integer>> choices;
   private Map<String, Integer[]> associations;
+
+  private Map<String, List<Integer>> choices;
+
+  private int[] roleIds;
+
+  private List<Integer> selectionIds;
 
   private User user;
 
-  public User getUser() {
-    return user;
+  public String execute() {
+    return "success";
   }
 
-  public void setUser(User value) {
-    this.user = value;
+  public Map<String, Integer[]> getAssociations() {
+    return associations;
+  }
+
+  public void setAssociations(Map<String, Integer[]> associations) {
+    this.associations = associations;
+  }
+
+  public Map<String, List<Integer>> getChoices() {
+    return choices;
+  }
+
+  public void setChoices(Map<String, List<Integer>> choices) {
+    this.choices = choices;
   }
 
   public int[] getRoleIds() {
@@ -56,23 +71,11 @@ public class Action {
     this.selectionIds = selectionIds;
   }
 
-  public Map<String, List<Integer>> getChoices() {
-    return choices;
+  public User getUser() {
+    return user;
   }
 
-  public void setChoices(Map<String, List<Integer>> choices) {
-    this.choices = choices;
-  }
-
-  public Map<String, Integer[]> getAssociations() {
-    return associations;
-  }
-
-  public void setAssociations(Map<String, Integer[]> associations) {
-    this.associations = associations;
-  }
-
-  public String execute() {
-    return "success";
+  public void setUser(User value) {
+    this.user = value;
   }
 }

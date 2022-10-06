@@ -91,14 +91,12 @@ public abstract class AbstractListInput extends AbstractInput {
     String l10nExpr = (String) attributes.remove("l10nExpr");
     Object items = attributes.remove("items");
     if (items != null) {
-      if (items instanceof Collection) {
-        Collection<?> c = (Collection<?>) items;
+      if (items instanceof Collection<?> c) {
         for (Object o : c) {
           Object value = makeValue(o, null, valueExpr);
           options.put(value.toString(), makeOption(o, value, beanValue, textExpr, l10nExpr));
         }
-      } else if (items instanceof Map) {
-        Map<?, ?> m = (Map<?, ?>) items;
+      } else if (items instanceof Map<?, ?> m) {
         for (Map.Entry entry : m.entrySet()) {
           Object value = makeValue(entry.getValue(), entry.getKey(), valueExpr);
           Option option = makeOption(entry.getValue(), value, beanValue, textExpr, l10nExpr);
@@ -152,7 +150,7 @@ public abstract class AbstractListInput extends AbstractInput {
     if (text == null && item instanceof Enum) {
       // Try to use a fully qualified enum name first.
       try {
-        text = messageProvider.getMessage(item.getClass().getSimpleName() + "." + item.toString());
+        text = messageProvider.getMessage(item.getClass().getSimpleName() + "." + item);
       } catch (MissingMessageException e) {
         try {
           text = messageProvider.getMessage(item.toString());

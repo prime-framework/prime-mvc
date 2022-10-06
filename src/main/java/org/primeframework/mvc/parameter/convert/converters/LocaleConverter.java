@@ -37,6 +37,16 @@ public class LocaleConverter extends AbstractGlobalConverter {
 
   protected final static String LOCALE_EXT_MARKER = "_#";
 
+  protected int _firstHyphenOrUnderscore(String str) {
+    for (int i = 0, end = str.length(); i < end; ++i) {
+      char c = str.charAt(i);
+      if (c == '_' || c == '-') {
+        return i;
+      }
+    }
+    return -1;
+  }
+
   protected String objectToString(Object value, Type convertFrom, Map<String, String> attributes, String expression)
       throws org.primeframework.mvc.parameter.convert.ConversionException, ConverterStateException {
     return value.toString();
@@ -64,55 +74,8 @@ public class LocaleConverter extends AbstractGlobalConverter {
     return toLocale(values);
   }
 
-  private Locale toLocale(String[] parts) {
-    if (parts.length == 1) {
-      try {
-        return _deserializeLocale(parts[0]);
-      } catch (Exception e) {
-        throw new ConversionException("Invalid locale [" + parts[0] + "]", e);
-      }
-    } else if (parts.length == 2) {
-      return new Locale(parts[0], parts[1]);
-    }
-
-    return new Locale(parts[0], parts[1], parts[2]);
-  }
-
-  protected int _firstHyphenOrUnderscore(String str)
-  {
-    for (int i = 0, end = str.length(); i < end; ++i) {
-      char c = str.charAt(i);
-      if (c == '_' || c == '-') {
-        return i;
-      }
-    }
-    return -1;
-  }
-
-  private Locale _deserializeLocale(String value)
-  {
-    int ix = _firstHyphenOrUnderscore(value);
-    if (ix < 0) { // single argument
-      return new Locale(value);
-    }
-    String first = value.substring(0, ix);
-    value = value.substring(ix+1);
-    ix = _firstHyphenOrUnderscore(value);
-    if (ix < 0) { // two pieces
-      return new Locale(first, value);
-    }
-    String second = value.substring(0, ix);
-    // [databind#3259]: Support for BCP 47 java.util.Locale ser/deser
-    int extMarkerIx = value.indexOf(LOCALE_EXT_MARKER);
-    if (extMarkerIx < 0) {
-      return new Locale(first, second, value.substring(ix+1));
-    }
-    return _deSerializeBCP47Locale(value, ix, first, second, extMarkerIx);
-  }
-
   private Locale _deSerializeBCP47Locale(String value, int ix, String first, String second,
-                                         int extMarkerIx)
-  {
+                                         int extMarkerIx) {
     String third = "";
     try {
       // Below condition checks if variant value is present to handle empty variant values such as
@@ -144,5 +107,39 @@ public class LocaleConverter extends AbstractGlobalConverter {
       // should we really just swallow the exception?
       return new Locale(first, second, third);
     }
+  }
+
+  private Locale _deserializeLocale(String value) {
+    int ix = _firstHyphenOrUnderscore(value);
+    if (ix < 0) { // single argument
+      return new Locale(value);
+    }
+    String first = value.substring(0, ix);
+    value = value.substring(ix + 1);
+    ix = _firstHyphenOrUnderscore(value);
+    if (ix < 0) { // two pieces
+      return new Locale(first, value);
+    }
+    String second = value.substring(0, ix);
+    // [databind#3259]: Support for BCP 47 java.util.Locale ser/deser
+    int extMarkerIx = value.indexOf(LOCALE_EXT_MARKER);
+    if (extMarkerIx < 0) {
+      return new Locale(first, second, value.substring(ix + 1));
+    }
+    return _deSerializeBCP47Locale(value, ix, first, second, extMarkerIx);
+  }
+
+  private Locale toLocale(String[] parts) {
+    if (parts.length == 1) {
+      try {
+        return _deserializeLocale(parts[0]);
+      } catch (Exception e) {
+        throw new ConversionException("Invalid locale [" + parts[0] + "]", e);
+      }
+    } else if (parts.length == 2) {
+      return new Locale(parts[0], parts[1]);
+    }
+
+    return new Locale(parts[0], parts[1], parts[2]);
   }
 }

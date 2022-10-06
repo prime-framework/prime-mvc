@@ -15,9 +15,9 @@
  */
 package org.example.action;
 
+import io.fusionauth.http.Cookie;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.annotation.Status;
-import org.primeframework.mvc.http.Cookie;
 import org.primeframework.mvc.scope.annotation.ManagedCookie;
 
 /**

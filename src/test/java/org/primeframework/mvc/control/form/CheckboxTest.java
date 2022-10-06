@@ -15,6 +15,11 @@
  */
 package org.primeframework.mvc.control.form;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import com.google.inject.Inject;
 import org.example.action.user.EditAction;
 import org.example.domain.User;
@@ -24,11 +29,6 @@ import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.testng.annotations.Test;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 /**
  * This tests the checkbox control.
  *
@@ -36,22 +36,6 @@ import java.util.Set;
  */
 public class CheckboxTest extends ControlBaseTest {
   @Inject public Checkbox checkbox;
-
-  @Test
-  public void actionLess() {
-    ais.setCurrent(new ActionInvocation(null, null, "/checkbox", null, null));
-
-    new ControlTester(checkbox).
-      attr("name", "test").
-      attr("value", "test-value").
-      attr("required", true).
-      attr("class", "css-class").
-      go("<input type=\"hidden\" name=\"test@param\" value=\"param-value\"/>\n" +
-      "<div class=\"css-class-checkbox css-class-input css-class-control checkbox input control\">\n" +
-      "<div class=\"label-container\"><label for=\"test\" class=\"label\">Test<span class=\"required\">*</span></label></div>\n" +
-      "<div class=\"control-container\"><input type=\"checkbox\" class=\"css-class\" id=\"test\" name=\"test\" value=\"test-value\"/><input type=\"hidden\" name=\"__cb_test\" value=\"\"/></div>\n" +
-      "</div>\n");
-  }
 
   @Test
   public void action() {
@@ -106,17 +90,20 @@ public class CheckboxTest extends ControlBaseTest {
     testAction("user.listIDs", false, "4");
   }
 
-  protected void testAction(String property, boolean flag, String value) {
+  @Test
+  public void actionLess() {
+    ais.setCurrent(new ActionInvocation(null, null, "/checkbox", null, null));
+
     new ControlTester(checkbox).
-      attr("name", property).
-      attr("value", value).
-      go("<input type=\"hidden\" name=\"" + property + "@param\" value=\"param-value\"/>\n" +
-      "<div class=\"checkbox input control\">\n" +
-      "<div class=\"label-container\"><label for=\"" + property.replace(".", "_") + "\" class=\"label\">Male?</label></div>\n" +
-      "<div class=\"control-container\"><input type=\"checkbox\" " + (flag ? "checked=\"checked\" " : "") +
-      "id=\"" + property.replace(".", "_") + "\" name=\"" + property + "\" value=\"" + value.replace("<", "&lt;").replace(">", "&gt;") +
-      "\"/><input type=\"hidden\" name=\"__cb_" + property + "\" value=\"\"/></div>\n" +
-      "</div>\n");
+        attr("name", "test").
+        attr("value", "test-value").
+        attr("required", true).
+        attr("class", "css-class").
+        go("<input type=\"hidden\" name=\"test@param\" value=\"param-value\"/>\n" +
+            "<div class=\"css-class-checkbox css-class-input css-class-control checkbox input control\">\n" +
+            "<div class=\"label-container\"><label for=\"test\" class=\"label\">Test<span class=\"required\">*</span></label></div>\n" +
+            "<div class=\"control-container\"><input type=\"checkbox\" class=\"css-class\" id=\"test\" name=\"test\" value=\"test-value\"/><input type=\"hidden\" name=\"__cb_test\" value=\"\"/></div>\n" +
+            "</div>\n");
   }
 
   @Test
@@ -125,30 +112,14 @@ public class CheckboxTest extends ControlBaseTest {
     ais.setCurrent(new ActionInvocation(action, null, "/checkbox", null, null));
 
     new ControlTester(checkbox).
-      attr("name", "user.maleWrapper").
-      attr("defaultChecked", true).
-      attr("value", true).
-      go("<input type=\"hidden\" name=\"user.maleWrapper@param\" value=\"param-value\"/>\n" +
-      "<div class=\"checkbox input control\">\n" +
-      "<div class=\"label-container\"><label for=\"user_maleWrapper\" class=\"label\">Male?</label></div>\n" +
-      "<div class=\"control-container\"><input type=\"checkbox\" checked=\"checked\" id=\"user_maleWrapper\" name=\"user.maleWrapper\" value=\"true\"/><input type=\"hidden\" name=\"__cb_user.maleWrapper\" value=\"\"/></div>\n" +
-      "</div>\n");
-  }
-
-  @Test
-  public void hardCodedChecked() {
-    EditAction action = new EditAction();
-    ais.setCurrent(new ActionInvocation(action, null, "/checkbox", null, null));
-
-    new ControlTester(checkbox).
-      attr("name", "user.male").
-      attr("checked", true).
-      attr("value", "true").
-      go("<input type=\"hidden\" name=\"user.male@param\" value=\"param-value\"/>\n" +
-      "<div class=\"checkbox input control\">\n" +
-      "<div class=\"label-container\"><label for=\"user_male\" class=\"label\">Male?</label></div>\n" +
-      "<div class=\"control-container\"><input type=\"checkbox\" checked=\"checked\" id=\"user_male\" name=\"user.male\" value=\"true\"/><input type=\"hidden\" name=\"__cb_user.male\" value=\"\"/></div>\n" +
-      "</div>\n");
+        attr("name", "user.maleWrapper").
+        attr("defaultChecked", true).
+        attr("value", true).
+        go("<input type=\"hidden\" name=\"user.maleWrapper@param\" value=\"param-value\"/>\n" +
+            "<div class=\"checkbox input control\">\n" +
+            "<div class=\"label-container\"><label for=\"user_maleWrapper\" class=\"label\">Male?</label></div>\n" +
+            "<div class=\"control-container\"><input type=\"checkbox\" checked=\"checked\" id=\"user_maleWrapper\" name=\"user.maleWrapper\" value=\"true\"/><input type=\"hidden\" name=\"__cb_user.maleWrapper\" value=\"\"/></div>\n" +
+            "</div>\n");
   }
 
   @Test
@@ -160,13 +131,29 @@ public class CheckboxTest extends ControlBaseTest {
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.male", "code2", "fieldError2"));
 
     new ControlTester(checkbox).
-      attr("name", "user.male").
-      attr("value", "true").
-      go("<input type=\"hidden\" name=\"user.male@param\" value=\"param-value\"/>\n" +
-      "<div class=\"checkbox input control\">\n" +
-      "<div class=\"label-container\"><label for=\"user_male\" class=\"label\"><span class=\"error\">Male? (fieldError1, fieldError2)</span></label></div>\n" +
-      "<div class=\"control-container\"><input type=\"checkbox\" id=\"user_male\" name=\"user.male\" value=\"true\"/><input type=\"hidden\" name=\"__cb_user.male\" value=\"\"/></div>\n" +
-      "</div>\n");
+        attr("name", "user.male").
+        attr("value", "true").
+        go("<input type=\"hidden\" name=\"user.male@param\" value=\"param-value\"/>\n" +
+            "<div class=\"checkbox input control\">\n" +
+            "<div class=\"label-container\"><label for=\"user_male\" class=\"label\"><span class=\"error\">Male? (fieldError1, fieldError2)</span></label></div>\n" +
+            "<div class=\"control-container\"><input type=\"checkbox\" id=\"user_male\" name=\"user.male\" value=\"true\"/><input type=\"hidden\" name=\"__cb_user.male\" value=\"\"/></div>\n" +
+            "</div>\n");
+  }
+
+  @Test
+  public void hardCodedChecked() {
+    EditAction action = new EditAction();
+    ais.setCurrent(new ActionInvocation(action, null, "/checkbox", null, null));
+
+    new ControlTester(checkbox).
+        attr("name", "user.male").
+        attr("checked", true).
+        attr("value", "true").
+        go("<input type=\"hidden\" name=\"user.male@param\" value=\"param-value\"/>\n" +
+            "<div class=\"checkbox input control\">\n" +
+            "<div class=\"label-container\"><label for=\"user_male\" class=\"label\">Male?</label></div>\n" +
+            "<div class=\"control-container\"><input type=\"checkbox\" checked=\"checked\" id=\"user_male\" name=\"user.male\" value=\"true\"/><input type=\"hidden\" name=\"__cb_user.male\" value=\"\"/></div>\n" +
+            "</div>\n");
   }
 
   @Test
@@ -175,13 +162,26 @@ public class CheckboxTest extends ControlBaseTest {
     ais.setCurrent(new ActionInvocation(action, null, "/checkbox", null, null));
 
     new ControlTester(checkbox).
-      attr("name", "user.maleWrapper").
-      attr("value", "true").
-      attr("uncheckedValue", "false").
-      go("<input type=\"hidden\" name=\"user.maleWrapper@param\" value=\"param-value\"/>\n" +
-      "<div class=\"checkbox input control\">\n" +
-      "<div class=\"label-container\"><label for=\"user_maleWrapper\" class=\"label\">Male?</label></div>\n" +
-      "<div class=\"control-container\"><input type=\"checkbox\" id=\"user_maleWrapper\" name=\"user.maleWrapper\" value=\"true\"/><input type=\"hidden\" name=\"__cb_user.maleWrapper\" value=\"false\"/></div>\n" +
-      "</div>\n");
+        attr("name", "user.maleWrapper").
+        attr("value", "true").
+        attr("uncheckedValue", "false").
+        go("<input type=\"hidden\" name=\"user.maleWrapper@param\" value=\"param-value\"/>\n" +
+            "<div class=\"checkbox input control\">\n" +
+            "<div class=\"label-container\"><label for=\"user_maleWrapper\" class=\"label\">Male?</label></div>\n" +
+            "<div class=\"control-container\"><input type=\"checkbox\" id=\"user_maleWrapper\" name=\"user.maleWrapper\" value=\"true\"/><input type=\"hidden\" name=\"__cb_user.maleWrapper\" value=\"false\"/></div>\n" +
+            "</div>\n");
+  }
+
+  protected void testAction(String property, boolean flag, String value) {
+    new ControlTester(checkbox).
+        attr("name", property).
+        attr("value", value).
+        go("<input type=\"hidden\" name=\"" + property + "@param\" value=\"param-value\"/>\n" +
+            "<div class=\"checkbox input control\">\n" +
+            "<div class=\"label-container\"><label for=\"" + property.replace(".", "_") + "\" class=\"label\">Male?</label></div>\n" +
+            "<div class=\"control-container\"><input type=\"checkbox\" " + (flag ? "checked=\"checked\" " : "") +
+            "id=\"" + property.replace(".", "_") + "\" name=\"" + property + "\" value=\"" + value.replace("<", "&lt;").replace(">", "&gt;") +
+            "\"/><input type=\"hidden\" name=\"__cb_" + property + "\" value=\"\"/></div>\n" +
+            "</div>\n");
   }
 }

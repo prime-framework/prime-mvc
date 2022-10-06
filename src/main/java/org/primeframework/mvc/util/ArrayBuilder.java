@@ -19,7 +19,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.util.Arrays.*;
+import static java.util.Arrays.asList;
 
 /**
  * A simple array builder.
@@ -29,16 +29,17 @@ import static java.util.Arrays.*;
 @SuppressWarnings("unchecked")
 public class ArrayBuilder<T> {
   public final List<T> list = new ArrayList<T>();
-  public final Class<T> type;
 
-  public static <T> T[] asArray(Class<T> type, T... values) {
-    T[] array = (T[]) Array.newInstance(type, values.length);
-    return asList(values).toArray(array);
-  }
+  public final Class<T> type;
 
   public ArrayBuilder(Class<T> type, T... values) {
     this.type = type;
     this.list.addAll(asList(values));
+  }
+
+  public static <T> T[] asArray(Class<T> type, T... values) {
+    T[] array = (T[]) Array.newInstance(type, values.length);
+    return asList(values).toArray(array);
   }
 
   public ArrayBuilder<T> add(T value) {

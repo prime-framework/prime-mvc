@@ -17,8 +17,7 @@ package org.primeframework.mvc.action.config;
 
 import org.primeframework.mvc.util.DefaultURIBuilder;
 import org.testng.annotations.Test;
-
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
 
 /**
  * This class tests the default action URI builder.

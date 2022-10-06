@@ -18,7 +18,7 @@ package org.primeframework.mvc.container;
 import java.net.URL;
 
 import com.google.inject.Inject;
-import org.primeframework.mvc.http.HTTPContext;
+import io.fusionauth.http.server.HTTPContext;
 
 /**
  * This class implements the path resolver using the ServletContext and calling the getRealPath method on that.

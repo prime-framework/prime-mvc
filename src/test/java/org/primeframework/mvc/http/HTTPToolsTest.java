@@ -17,8 +17,8 @@
 package org.primeframework.mvc.http;
 
 import java.net.URI;
-import java.util.List;
 
+import io.fusionauth.http.server.HTTPRequest;
 import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
 
@@ -30,88 +30,88 @@ import static org.testng.Assert.assertEquals;
 public class HTTPToolsTest {
   @Test
   public void buildBaseURI() {
-    HTTPRequest req = new DefaultHTTPRequest().with(r -> r.host = "www.example.com")
-                                              .with(r -> r.path = "/foo/bar")
-                                              .with(r -> r.port = 9011)
-                                              .with(r -> r.scheme = "http");
+    HTTPRequest req = new HTTPRequest().with(r -> r.setHost("www.example.com"))
+                                       .with(r -> r.setPath("/foo/bar"))
+                                       .with(r -> r.setPort(9011))
+                                       .with(r -> r.setScheme("http"));
     URI uri = URI.create(req.getBaseURL());
     assertEquals(uri.toString(), "http://www.example.com:9011");
 
     // http w/ port 80
-    req = new DefaultHTTPRequest().with(r -> r.host = "www.example.com")
-                                  .with(r -> r.path = "/foo/bar")
-                                  .with(r -> r.port = 80)
-                                  .with(r -> r.scheme = "http");
+    req = new HTTPRequest().with(r -> r.setHost("www.example.com"))
+                           .with(r -> r.setPath("/foo/bar"))
+                           .with(r -> r.setPort(80))
+                           .with(r -> r.setScheme("http"));
     uri = URI.create(req.getBaseURL());
     assertEquals(uri.toString(), "http://www.example.com");
 
     // http w/ port 80 behind an https proxy
-    req = new DefaultHTTPRequest().with(r -> r.headers.put("X-Forwarded-Proto", List.of("https")))
-                                  .with(r -> r.host = "www.example.com")
-                                  .with(r -> r.path = "/foo/bar")
-                                  .with(r -> r.port = 443)
-                                  .with(r -> r.scheme = "http");
+    req = new HTTPRequest().with(r -> r.addHeader("X-Forwarded-Proto", "https"))
+                           .with(r -> r.setHost("www.example.com"))
+                           .with(r -> r.setPath("/foo/bar"))
+                           .with(r -> r.setPort(443))
+                           .with(r -> r.setScheme("http"));
     uri = URI.create(req.getBaseURL());
     assertEquals(uri.toString(), "https://www.example.com");
 
     // https w/ port 443 behind an http proxy
-    req = new DefaultHTTPRequest().with(r -> r.headers.put("X-Forwarded-Proto", List.of("http")))
-                                  .with(r -> r.host = "www.example.com")
-                                  .with(r -> r.path = "/foo/bar")
-                                  .with(r -> r.port = 443)
-                                  .with(r -> r.scheme = "https");
+    req = new HTTPRequest().with(r -> r.addHeader("X-Forwarded-Proto", "http"))
+                           .with(r -> r.setHost("www.example.com"))
+                           .with(r -> r.setPath("/foo/bar"))
+                           .with(r -> r.setPort(443))
+                           .with(r -> r.setScheme("https"));
     uri = URI.create(req.getBaseURL());
     assertEquals(uri.toString(), "http://www.example.com:443");
 
     // https w/ port 443 behind an https proxy
-    req = new DefaultHTTPRequest().with(r -> r.headers.put("X-Forwarded-Proto", List.of("https")))
-                                  .with(r -> r.host = "www.example.com")
-                                  .with(r -> r.path = "/foo/bar")
-                                  .with(r -> r.port = 443)
-                                  .with(r -> r.scheme = "https");
+    req = new HTTPRequest().with(r -> r.addHeader("X-Forwarded-Proto", "https"))
+                           .with(r -> r.setHost("www.example.com"))
+                           .with(r -> r.setPath("/foo/bar"))
+                           .with(r -> r.setPort(443))
+                           .with(r -> r.setScheme("https"));
     uri = URI.create(req.getBaseURL());
     assertEquals(uri.toString(), "https://www.example.com");
 
     // https w/ port 80
-    req = new DefaultHTTPRequest().with(r -> r.host = "www.example.com")
-                                  .with(r -> r.path = "/foo/bar")
-                                  .with(r -> r.port = 80)
-                                  .with(r -> r.scheme = "https");
+    req = new HTTPRequest().with(r -> r.setHost("www.example.com"))
+                           .with(r -> r.setPath("/foo/bar"))
+                           .with(r -> r.setPort(80))
+                           .with(r -> r.setScheme("https"));
     uri = URI.create(req.getBaseURL());
     assertEquals(uri.toString(), "https://www.example.com:80");
 
     // https w/ port 443
-    req = new DefaultHTTPRequest().with(r -> r.host = "www.example.com")
-                                  .with(r -> r.path = "/foo/bar")
-                                  .with(r -> r.port = 443)
-                                  .with(r -> r.scheme = "https");
+    req = new HTTPRequest().with(r -> r.setHost("www.example.com"))
+                           .with(r -> r.setPath("/foo/bar"))
+                           .with(r -> r.setPort(443))
+                           .with(r -> r.setScheme("https"));
     uri = URI.create(req.getBaseURL());
     assertEquals(uri.toString(), "https://www.example.com");
 
-    req = new DefaultHTTPRequest().with(r -> r.headers.put("X-Forwarded-Host", List.of("foobar.com")))
-                                  .with(r -> r.host = "www.example.com")
-                                  .with(r -> r.path = "/foo/bar")
-                                  .with(r -> r.port = 443)
-                                  .with(r -> r.scheme = "https");
+    req = new HTTPRequest().with(r -> r.addHeader("X-Forwarded-Host", "foobar.com"))
+                           .with(r -> r.setHost("www.example.com"))
+                           .with(r -> r.setPath("/foo/bar"))
+                           .with(r -> r.setPort(443))
+                           .with(r -> r.setScheme("https"));
     uri = URI.create(req.getBaseURL());
     assertEquals(uri.toString(), "https://foobar.com");
 
-    req = new DefaultHTTPRequest().with(r -> r.headers.put("X-Forwarded-Host", List.of("foobar.com")))
-                                  .with(r -> r.headers.put("X-Forwarded-Proto", List.of("http")))
-                                  .with(r -> r.host = "www.example.com")
-                                  .with(r -> r.path = "/foo/bar")
-                                  .with(r -> r.port = 443)
-                                  .with(r -> r.scheme = "https");
+    req = new HTTPRequest().with(r -> r.addHeader("X-Forwarded-Host", "foobar.com"))
+                           .with(r -> r.addHeader("X-Forwarded-Proto", "http"))
+                           .with(r -> r.setHost("www.example.com"))
+                           .with(r -> r.setPath("/foo/bar"))
+                           .with(r -> r.setPort(443))
+                           .with(r -> r.setScheme("https"));
     uri = URI.create(req.getBaseURL());
     assertEquals(uri.toString(), "http://foobar.com:443");
 
-    req = new DefaultHTTPRequest().with(r -> r.headers.put("X-Forwarded-Host", List.of("foobar.com")))
-                                  .with(r -> r.headers.put("X-Forwarded-Proto", List.of("http")))
-                                  .with(r -> r.headers.put("X-Forwarded-Port", List.of("80")))
-                                  .with(r -> r.host = "www.example.com")
-                                  .with(r -> r.path = "/foo/bar")
-                                  .with(r -> r.port = 443)
-                                  .with(r -> r.scheme = "https");
+    req = new HTTPRequest().with(r -> r.addHeader("X-Forwarded-Host", "foobar.com"))
+                           .with(r -> r.addHeader("X-Forwarded-Proto", "http"))
+                           .with(r -> r.addHeader("X-Forwarded-port", "80"))
+                           .with(r -> r.setHost("www.example.com"))
+                           .with(r -> r.setPath("/foo/bar"))
+                           .with(r -> r.setPort(443))
+                           .with(r -> r.setScheme("https"));
     uri = URI.create(req.getBaseURL());
     assertEquals(uri.toString(), "http://foobar.com");
   }

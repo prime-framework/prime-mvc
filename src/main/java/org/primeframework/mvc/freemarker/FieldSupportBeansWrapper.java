@@ -30,13 +30,6 @@ public class FieldSupportBeansWrapper extends BeansWrapper {
    */
   public static final BeansWrapper INSTANCE;
 
-  static {
-    BeansWrapperBuilder builder = new BeansWrapperBuilder(Configuration.VERSION_2_3_28);
-    builder.setExposeFields(true);
-    builder.setSimpleMapWrapper(true);
-    INSTANCE = builder.build();
-  }
-
   /**
    * Sets the flags on the parent class.
    *
@@ -46,5 +39,12 @@ public class FieldSupportBeansWrapper extends BeansWrapper {
   public FieldSupportBeansWrapper() {
     setExposeFields(true);
     setSimpleMapWrapper(true);
+  }
+
+  static {
+    BeansWrapperBuilder builder = new BeansWrapperBuilder(Configuration.VERSION_2_3_28);
+    builder.setExposeFields(true);
+    builder.setSimpleMapWrapper(true);
+    INSTANCE = builder.build();
   }
 }

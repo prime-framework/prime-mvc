@@ -37,14 +37,6 @@ public class IndexedAccessor extends MemberAccessor {
     this.index = index;
   }
 
-  /**
-   * @return Always false. The reason is that since this invokes the indexed property, we want it to look like a
-   *         non-indexed property so that the context will invoke the method.
-   */
-  public boolean isIndexed() {
-    return false;
-  }
-
   public Object get(Expression expression) {
     Method getter = propertyInfo.getMethods().get("get");
     if (getter.getParameterTypes().length == 0) {
@@ -55,11 +47,19 @@ public class IndexedAccessor extends MemberAccessor {
     GlobalConverter converter = converterProvider.lookup(indexType);
     if (converter == null) {
       throw new ConversionException("Error while getting an indexed property in the expression [" + expression.getExpression() +
-        "]. The indexed property uses a key of type [" + indexType + "] but there isn't a converter registered for that type");
+          "]. The indexed property uses a key of type [" + indexType + "] but there isn't a converter registered for that type");
     }
 
     Object indexObject = converter.convertFromStrings(indexType, null, null, index);
     return ReflectionUtils.invoke(getter, this.object, indexObject);
+  }
+
+  /**
+   * @return Always false. The reason is that since this invokes the indexed property, we want it to look like a
+   *     non-indexed property so that the context will invoke the method.
+   */
+  public boolean isIndexed() {
+    return false;
   }
 
   public void set(String[] values, Expression expression) {
@@ -75,7 +75,7 @@ public class IndexedAccessor extends MemberAccessor {
       GlobalConverter converter = converterProvider.lookup(indexType);
       if (converter == null) {
         throw new ConversionException("Error while setting an indexed property in the expression [" + expression.getExpression() +
-          "]. The indexed property uses a key of type [" + indexType + "] but there isn't a converter registered for that type");
+            "]. The indexed property uses a key of type [" + indexType + "] but there isn't a converter registered for that type");
       }
 
       Object indexObject = converter.convertFromStrings(indexType, null, null, index);

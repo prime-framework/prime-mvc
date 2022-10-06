@@ -20,6 +20,7 @@ dropWizardVersion = "3.2.6"
 easyMockVersion = "4.4.0-20220601"
 freemarkerVersion = "2.3.30"
 fusionAuthJWTVersion = "5.1.0"
+javaHTTPVersion = "0.1.0"
 jsonPatchVersion = "1.13.0"
 guavaVersion = "30.1.0-jre"
 guiceVersion = "5.1.0"
@@ -31,7 +32,7 @@ restifyVersion = "4.1.2"
 slf4jVersion = "2.0.0-alpha7"
 testngVersion = "7.3.0"
 
-project(group: "org.primeframework", name: "prime-mvc", version: "2.4.4", licenses: ["ApacheV2_0"]) {
+project(group: "org.primeframework", name: "prime-mvc", version: "3.0.0", licenses: ["ApacheV2_0"]) {
   workflow {
     fetch {
       cache()
@@ -57,6 +58,7 @@ project(group: "org.primeframework", name: "prime-mvc", version: "2.4.4", licens
       dependency(id: "com.inversoft:restify:${restifyVersion}")
       dependency(id: "io.dropwizard.metrics:metrics-core:${dropWizardVersion}")
       dependency(id: "io.fusionauth:fusionauth-jwt:${fusionAuthJWTVersion}")
+      dependency(id: "io.fusionauth:java-http:${javaHTTPVersion}")
       dependency(id: "io.netty:netty-buffer:${nettyVersion}")
       dependency(id: "io.netty:netty-codec:${nettyVersion}")
       dependency(id: "io.netty:netty-codec-http:${nettyVersion}")
@@ -118,9 +120,7 @@ target(name: "compile", description: "Compiles the project") {
   java.compileMain()
 
   // allow the user of sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl in tests
-  java
-      .settings
-      .compilerArguments += " -XDignore.symbol.file --add-exports java.base/sun.security.x509=ALL-UNNAMED --add-exports java.base/sun.security.util=ALL-UNNAMED"
+  java.settings.compilerArguments += " -XDignore.symbol.file --add-exports java.base/sun.security.x509=ALL-UNNAMED --add-exports java.base/sun.security.util=ALL-UNNAMED"
   java.compileTest()
 
   file.copy(to: "build/classes/main") {
@@ -151,10 +151,8 @@ target(name: "jar", description: "JARs the project", dependsOn: ["compile"]) {
 }
 
 target(name: "test", description: "Runs the project's tests", dependsOn: ["jar"]) {
-//  May be needed for Java 17
-  javaTestNG
-      .settings
-      .jvmArguments = "--add-exports java.base/sun.security.x509=ALL-UNNAMED --add-exports java.base/sun.security.util=ALL-UNNAMED"
+  //  May be needed for Java 17
+  javaTestNG.settings.jvmArguments = "--add-exports java.base/sun.security.x509=ALL-UNNAMED --add-exports java.base/sun.security.util=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED"
   javaTestNG.test()
 }
 

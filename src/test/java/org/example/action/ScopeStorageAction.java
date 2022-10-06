@@ -24,7 +24,7 @@ import org.primeframework.mvc.scope.annotation.Request;
  */
 @Action
 public class ScopeStorageAction {
-  public Object sessionObject;
+  public Object actionSessionObject;
 
   @Context
   public Object contextObject;
@@ -32,7 +32,7 @@ public class ScopeStorageAction {
   @Request
   public Object requestObject;
 
-  public Object actionSessionObject;
+  public Object sessionObject;
 
   public String post() {
     actionSessionObject = new Object();

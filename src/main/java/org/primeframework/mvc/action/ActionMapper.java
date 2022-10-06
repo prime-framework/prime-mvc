@@ -15,7 +15,7 @@
  */
 package org.primeframework.mvc.action;
 
-import org.primeframework.mvc.http.HTTPMethod;
+import io.fusionauth.http.HTTPMethod;
 
 /**
  * This interface defines the method that maps URIs to actions.

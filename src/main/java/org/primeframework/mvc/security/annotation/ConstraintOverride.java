@@ -23,8 +23,8 @@ import java.lang.annotation.Target;
 import org.primeframework.mvc.action.annotation.Action;
 
 /**
- * Allows for a different set of constraint at the method level of an action. If constraints have been defined by the {@link Action}
- * annotation, using this on a method will take precedence.
+ * Allows for a different set of constraint at the method level of an action. If constraints have been defined by the
+ * {@link Action} annotation, using this on a method will take precedence.
  *
  * @author Daniel DeGroff
  */

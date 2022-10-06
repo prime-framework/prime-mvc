@@ -30,6 +30,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.parameter.convert.AbstractGlobalConverter;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
@@ -37,12 +38,10 @@ import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
 import org.primeframework.mvc.util.TypeTools;
 
-import com.google.inject.Inject;
-
 /**
- * This converts to and from Collection types. This handles complex parameterized types by first creating the
- * Collection instance (ArrayList, HashSet, LinkedList, etc) and then by leveraging the other converters for the
- * parametrized type.
+ * This converts to and from Collection types. This handles complex parameterized types by first creating the Collection
+ * instance (ArrayList, HashSet, LinkedList, etc) and then by leveraging the other converters for the parametrized
+ * type.
  *
  * @author Brian Pontarelli
  */
@@ -57,6 +56,54 @@ public class CollectionConverter extends AbstractGlobalConverter {
   }
 
   /**
+   * Creates a new instance of the given collection type. If this type is a collection interface, the most common
+   * implementation is created. Otherwise, the type is instantiated directly. If that fails, this conversion will fail.
+   *
+   * @param type The type of collection.
+   * @return The new collection.
+   */
+  protected Collection makeCollection(Class<?> type) {
+    if (type == List.class) {
+      return new ArrayList();
+    } else if (type == SortedSet.class) {
+      return new TreeSet();
+    } else if (type == Set.class) {
+      return new HashSet();
+    } else if (type == Queue.class) {
+      return new LinkedList();
+    }
+
+    // Try to instantiate it directly
+    try {
+      return (Collection) type.newInstance();
+    } catch (Exception e) {
+      throw new ConverterStateException("The type [" + type + "] is a collection but could not " +
+          "be instantiated by the converter class");
+    }
+  }
+
+  /**
+   * Iterates over the given collection and converts each collection item to a String based on the parameterized type.
+   * If there is no parameterized type, this just joins the collection.
+   *
+   * @param value             The value.
+   * @param convertFrom       The type to convert from.
+   * @param dynamicAttributes The dynamic attributes used to assist in conversion.
+   * @param expression        The full path to the expression that is causing the conversion.
+   * @return The converted value.
+   * @throws ConversionException     If the conversion failed.
+   * @throws ConverterStateException if the converter didn't have all of the information it needed to perform the
+   *                                 conversion.
+   */
+  protected String objectToString(Object value, Type convertFrom, Map<String, String> dynamicAttributes,
+                                  String expression)
+      throws ConversionException, ConverterStateException {
+    Collection<?> collection = value.getClass().isArray() ? Arrays.asList((Object[]) value) : (Collection<?>) value;
+    String values = collection.stream().filter(Objects::nonNull).map(Object::toString).collect(Collectors.joining(","));
+    throw new ConverterStateException("This operation is unsupported. You may not serialize a collection to a string. Expression[" + expression + "], values [" + values + "]");
+  }
+
+  /**
    * Creates the correct collection type and then converts the value String to the parameterized type (if one exists)
    * and then adds it. If there is no parameterized type, this just shoves the String value in the collection.
    *
@@ -65,9 +112,9 @@ public class CollectionConverter extends AbstractGlobalConverter {
    * @param dynamicAttributes The dynamic attributes used to assist in conversion.
    * @param expression        The full path to the expression that is causing the conversion.
    * @return The converted value.
-   * @throws ConversionException If the conversion failed.
+   * @throws ConversionException     If the conversion failed.
    * @throws ConverterStateException if the converter didn't have all of the information it needed to perform the
-   * conversion.
+   *                                 conversion.
    */
   protected Object stringToObject(String value, Type convertTo, Map<String, String> dynamicAttributes,
                                   String expression) throws ConversionException, ConverterStateException {
@@ -83,9 +130,9 @@ public class CollectionConverter extends AbstractGlobalConverter {
    * @param dynamicAttributes The dynamic attributes used to assist in conversion.
    * @param expression        The full path to the expression that is causing the conversion.
    * @return The converted value.
-   * @throws ConversionException If the conversion failed.
+   * @throws ConversionException     If the conversion failed.
    * @throws ConverterStateException if the converter didn't have all of the information it needed to perform the
-   * conversion.
+   *                                 conversion.
    */
   protected Object stringsToObject(String[] values, Type convertTo, Map<String, String> dynamicAttributes,
                                    String expression) throws ConversionException, ConverterStateException {
@@ -117,53 +164,5 @@ public class CollectionConverter extends AbstractGlobalConverter {
     }
 
     return collection;
-  }
-
-  /**
-   * Iterates over the given collection and converts each collection item to a String based on the parameterized type.
-   * If there is no parameterized type, this just joins the collection.
-   *
-   * @param value             The value.
-   * @param convertFrom       The type to convert from.
-   * @param dynamicAttributes The dynamic attributes used to assist in conversion.
-   * @param expression        The full path to the expression that is causing the conversion.
-   * @return The converted value.
-   * @throws ConversionException If the conversion failed.
-   * @throws ConverterStateException if the converter didn't have all of the information it needed to perform the
-   * conversion.
-   */
-  protected String objectToString(Object value, Type convertFrom, Map<String, String> dynamicAttributes,
-                                  String expression)
-      throws ConversionException, ConverterStateException {
-    Collection<?> collection = value.getClass().isArray() ? Arrays.asList((Object[]) value) : (Collection<?>) value;
-    String values = collection.stream().filter(Objects::nonNull).map(Object::toString).collect(Collectors.joining(","));
-    throw new ConverterStateException("This operation is unsupported. You may not serialize a collection to a string. Expression[" + expression + "], values [" + values + "]");
-  }
-
-  /**
-   * Creates a new instance of the given collection type. If this type is a collection interface, the most common
-   * implementation is created. Otherwise, the type is instantiated directly. If that fails, this conversion will fail.
-   *
-   * @param type The type of collection.
-   * @return The new collection.
-   */
-  protected Collection makeCollection(Class<?> type) {
-    if (type == List.class) {
-      return new ArrayList();
-    } else if (type == SortedSet.class) {
-      return new TreeSet();
-    } else if (type == Set.class) {
-      return new HashSet();
-    } else if (type == Queue.class) {
-      return new LinkedList();
-    }
-
-    // Try to instantiate it directly
-    try {
-      return (Collection) type.newInstance();
-    } catch (Exception e) {
-      throw new ConverterStateException("The type [" + type + "] is a collection but could not " +
-          "be instantiated by the converter class");
-    }
   }
 }

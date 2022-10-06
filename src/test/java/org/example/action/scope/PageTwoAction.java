@@ -26,13 +26,22 @@ import org.primeframework.mvc.parameter.annotation.PostParameterMethod;
  */
 @Action
 public class PageTwoAction {
-  public String searchText;
+  public String formPrepareMethodCalled;
 
   public String postParameterMethodCalled;
 
-  public String formPrepareMethodCalled;
+  public String searchText;
 
   public String searchType;
+
+  @FormPrepareMethod
+  public void formPrepareMethod() {
+    if (postParameterMethodCalled == null) {
+      formPrepareMethodCalled = "first";
+    } else {
+      formPrepareMethodCalled = "second";
+    }
+  }
 
   public String get() {
     return "input";
@@ -48,15 +57,6 @@ public class PageTwoAction {
       postParameterMethodCalled = "first";
     } else {
       postParameterMethodCalled = "second";
-    }
-  }
-
-  @FormPrepareMethod
-  public void formPrepareMethod() {
-    if (postParameterMethodCalled == null) {
-      formPrepareMethodCalled = "first";
-    } else {
-      formPrepareMethodCalled = "second";
     }
   }
 }

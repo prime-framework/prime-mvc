@@ -18,9 +18,9 @@ package org.primeframework.mvc.action.result;
 import java.lang.annotation.Annotation;
 import java.util.List;
 
+import io.fusionauth.http.server.HTTPRequest;
+import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.action.ActionInvocationStore;
-import org.primeframework.mvc.http.HTTPRequest;
-import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.http.Status;
 import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;

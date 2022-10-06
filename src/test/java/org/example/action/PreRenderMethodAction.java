@@ -20,12 +20,12 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
 import com.google.inject.Inject;
+import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.annotation.Forward;
 import org.primeframework.mvc.action.result.annotation.JSON;
 import org.primeframework.mvc.action.result.annotation.NoOp;
 import org.primeframework.mvc.content.json.annotation.JSONResponse;
-import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.parameter.annotation.PreRenderMethod;
 
 /**
@@ -78,7 +78,7 @@ public class PreRenderMethodAction {
     response.setContentType("application/potato");
     OutputStream os = response.getOutputStream();
     byte[] bytes = BODY.getBytes(StandardCharsets.UTF_8);
-    response.setContentLength((long) bytes.length);
+    response.setContentLength(bytes.length);
     os.write(bytes);
     os.flush();
   }

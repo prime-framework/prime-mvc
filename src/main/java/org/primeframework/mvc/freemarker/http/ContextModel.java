@@ -19,7 +19,7 @@ import freemarker.template.ObjectWrapper;
 import freemarker.template.TemplateHashModel;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
-import org.primeframework.mvc.http.HTTPContext;
+import io.fusionauth.http.server.HTTPContext;
 
 /**
  * TemplateHashModel wrapper for a Context attributes.

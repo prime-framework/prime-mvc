@@ -17,9 +17,9 @@ package org.primeframework.mvc.scope;
 
 import java.lang.annotation.Annotation;
 
-import org.primeframework.mvc.http.Cookie;
-import org.primeframework.mvc.http.HTTPRequest;
-import org.primeframework.mvc.http.HTTPResponse;
+import io.fusionauth.http.Cookie;
+import io.fusionauth.http.server.HTTPRequest;
+import io.fusionauth.http.server.HTTPResponse;
 
 /**
  * @author Daniel DeGroff

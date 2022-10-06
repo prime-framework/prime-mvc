@@ -18,6 +18,7 @@ package org.primeframework.mvc.action;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
+import io.fusionauth.http.HTTPMethod;
 import org.example.action.ExecuteMethodThrowsCheckedException;
 import org.example.action.ExecuteMethodThrowsExceptionAction;
 import org.example.action.ExtensionInheritanceAction;
@@ -28,7 +29,6 @@ import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.config.DefaultActionConfigurationBuilder;
 import org.primeframework.mvc.action.result.ResultStore;
-import org.primeframework.mvc.http.HTTPMethod;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
 import static org.easymock.EasyMock.createStrictMock;

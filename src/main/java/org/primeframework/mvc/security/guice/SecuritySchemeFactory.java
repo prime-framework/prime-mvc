@@ -18,11 +18,10 @@ package org.primeframework.mvc.security.guice;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.primeframework.mvc.security.SecurityScheme;
-
 import com.google.inject.Binder;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import org.primeframework.mvc.security.SecurityScheme;
 
 /**
  * Factory for building SecurityScheme instances based on the name of the scheme.
@@ -46,7 +45,8 @@ public class SecuritySchemeFactory {
    * @param scheme             The name of the SecurityScheme.
    * @param securitySchemeType The security scheme class.
    */
-  public static void addSecurityScheme(Binder binder, String scheme, Class<? extends SecurityScheme> securitySchemeType) {
+  public static void addSecurityScheme(Binder binder, String scheme,
+                                       Class<? extends SecurityScheme> securitySchemeType) {
     binder.bind(securitySchemeType);
     bindings.put(scheme, securitySchemeType);
   }

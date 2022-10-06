@@ -20,8 +20,10 @@ package org.primeframework.mvc.parameter.el;
  */
 public class MissingPropertyExpressionException extends ExpressionException {
   public String expression;
-  public String property;
+
   public Class klass;
+
+  public String property;
 
   public MissingPropertyExpressionException() {
     super();

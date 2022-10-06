@@ -15,6 +15,7 @@
  */
 package org.primeframework.mvc.control.guice;
 
+import com.google.inject.AbstractModule;
 import org.primeframework.mvc.control.form.Button;
 import org.primeframework.mvc.control.form.Checkbox;
 import org.primeframework.mvc.control.form.CheckboxList;
@@ -39,14 +40,16 @@ import org.primeframework.mvc.control.form.Textarea;
 import org.primeframework.mvc.control.form.YearSelect;
 import org.primeframework.mvc.control.message.Message;
 
-import com.google.inject.AbstractModule;
-
 /**
  * This class is a Guice module that configures the Prime MVC controls.
  *
  * @author Brian Pontarelli
  */
 public class ControlModule extends AbstractModule {
+  protected void bindFormPreparer() {
+    bind(FormPreparer.class).to(DefaultFormPreparer.class);
+  }
+
   @Override
   protected void configure() {
     bind(ControlFactory.class);
@@ -73,9 +76,5 @@ public class ControlModule extends AbstractModule {
     ControlFactory.addControl(binder(), "control", "year_select", YearSelect.class);
 
     bindFormPreparer();
-  }
-
-  protected void bindFormPreparer() {
-    bind(FormPreparer.class).to(DefaultFormPreparer.class);
   }
 }

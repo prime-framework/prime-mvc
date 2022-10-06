@@ -69,7 +69,7 @@ public class JSONBuilderTest {
 
     // Add a boolean
     handler.add("user.active", true);
-    assertEquals(handler.root.at("/user/active").asBoolean(), true);
+    assertTrue(handler.root.at("/user/active").asBoolean());
 
     // Add an array
     handler.add("user.roles", List.of("admin", "user"));
@@ -96,7 +96,7 @@ public class JSONBuilderTest {
 
     handler.add("user.bar.data.foo", true);
     assertTrue(handler.root.at("/user/bar/data/foo").isBoolean(), handler.root.toPrettyString());
-    assertEquals(handler.root.at("/user/bar/data/foo").asBoolean(), true, handler.root.toPrettyString());
+    assertTrue(handler.root.at("/user/bar/data/foo").asBoolean(), handler.root.toPrettyString());
 
     // Remove a value from an array
     handler.remove("user.roles[1]");

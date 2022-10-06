@@ -22,7 +22,12 @@ package org.primeframework.mvc.action.result;
  */
 public class ThreadLocalResultStore implements ResultStore {
   private final static ThreadLocal<String> store = new ThreadLocal<>();
-  
+
+  @Override
+  public void clear() {
+    store.remove();
+  }
+
   @Override
   public String get() {
     return store.get();
@@ -31,10 +36,5 @@ public class ThreadLocalResultStore implements ResultStore {
   @Override
   public void set(String resultCode) {
     store.set(resultCode);
-  }
-
-  @Override
-  public void clear() {
-    store.remove();
   }
 }

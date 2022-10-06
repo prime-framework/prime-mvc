@@ -20,11 +20,10 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 
-import org.primeframework.mvc.parameter.convert.annotation.ConverterAnnotation;
-
 import com.google.inject.Inject;
 import com.google.inject.Injector;
-import static java.util.Arrays.*;
+import org.primeframework.mvc.parameter.convert.annotation.ConverterAnnotation;
+import static java.util.Arrays.asList;
 
 /**
  * This class is the manager for all the Converters. It loads the global type converters from Guice. Therefore, if you
@@ -40,8 +39,9 @@ import static java.util.Arrays.*;
  * @author Brian Pontarelli
  */
 public class DefaultConverterProvider implements ConverterProvider {
-  private final Injector injector;
   private final Map<Class<?>, GlobalConverter> converters;
+
+  private final Injector injector;
 
   @Inject
   public DefaultConverterProvider(Injector injector, Map<Class<?>, GlobalConverter> converters) {

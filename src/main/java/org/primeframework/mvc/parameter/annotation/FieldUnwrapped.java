@@ -21,13 +21,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation used to indicate that a property should be unwrapped, this means the contents will
- * be flattened in the declaring class.
+ * Annotation used to indicate that a property should be unwrapped, this means the contents will be flattened in the
+ * declaring class.
  * <p/>
- * If two fields are annotated with this annotation and the objects both have a field named the
- * same the results are not defined. For example, in the follow example, <code>foo.name</code> is ambiguous
- * when flattened, the field exists in <code>Bar</code> and <code>Baz</code>. During traversal, the first
- * match will be used, doing this is not recommended.
+ * If two fields are annotated with this annotation and the objects both have a field named the same the results are not
+ * defined. For example, in the follow example, <code>foo.name</code> is ambiguous when flattened, the field exists in
+ * <code>Bar</code> and <code>Baz</code>. During traversal, the first match will be used, doing this is not
+ * recommended.
  * <p>
  * <pre>
  *   public class Example {

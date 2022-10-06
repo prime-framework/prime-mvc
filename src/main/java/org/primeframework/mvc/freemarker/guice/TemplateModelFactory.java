@@ -62,7 +62,8 @@ public class TemplateModelFactory {
    * @param name      The name of the TemplateModel.
    * @param modelType The TemplateModle type used to build the TemplateModel on demand.
    */
-  public static void addSingletonModel(Binder binder, String prefix, String name, Class<? extends TemplateModel> modelType) {
+  public static void addSingletonModel(Binder binder, String prefix, String name,
+                                       Class<? extends TemplateModel> modelType) {
     binder.bind(modelType).asEagerSingleton();
     Map<String, Class<? extends TemplateModel>> models = bindings.computeIfAbsent(prefix, k -> new HashMap<>());
 

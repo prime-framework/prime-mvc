@@ -15,6 +15,8 @@
  */
 package org.primeframework.mvc.parameter.guice;
 
+import com.google.inject.AbstractModule;
+import com.google.inject.Singleton;
 import org.primeframework.mvc.parameter.DefaultParameterHandler;
 import org.primeframework.mvc.parameter.DefaultParameterParser;
 import org.primeframework.mvc.parameter.DefaultParameterWorkflow;
@@ -32,27 +34,16 @@ import org.primeframework.mvc.parameter.convert.DefaultConverterProvider;
 import org.primeframework.mvc.parameter.el.DefaultExpressionEvaluator;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Singleton;
-
 /**
  * @author Brian Pontarelli
  */
 public class ParameterModule extends AbstractModule {
-  @Override
-  protected void configure() {
-    bindParameterHandler();
-    bindParameterParser();
-    bindParameterWorkflow();
-    bindPostParameterHandler();
-    bindPostParameterWorkflow();
-    bindURIParameterWorkflow();
-    bindConverterProvider();
-    bindExpressionEvaluator();
+  protected void bindConverterProvider() {
+    bind(ConverterProvider.class).to(DefaultConverterProvider.class).in(Singleton.class);
   }
 
-  protected void bindPostParameterHandler() {
-    bind(PostParameterHandler.class).to(DefaultPostParameterHandler.class);
+  protected void bindExpressionEvaluator() {
+    bind(ExpressionEvaluator.class).to(DefaultExpressionEvaluator.class).in(Singleton.class);
   }
 
   protected void bindParameterHandler() {
@@ -67,6 +58,10 @@ public class ParameterModule extends AbstractModule {
     bind(ParameterWorkflow.class).to(DefaultParameterWorkflow.class);
   }
 
+  protected void bindPostParameterHandler() {
+    bind(PostParameterHandler.class).to(DefaultPostParameterHandler.class);
+  }
+
   protected void bindPostParameterWorkflow() {
     bind(PostParameterWorkflow.class).to(DefaultPostParameterWorkflow.class);
   }
@@ -75,11 +70,15 @@ public class ParameterModule extends AbstractModule {
     bind(URIParameterWorkflow.class).to(DefaultURIParameterWorkflow.class);
   }
 
-  protected void bindConverterProvider() {
-    bind(ConverterProvider.class).to(DefaultConverterProvider.class).in(Singleton.class);
-  }
-
-  protected void bindExpressionEvaluator() {
-    bind(ExpressionEvaluator.class).to(DefaultExpressionEvaluator.class).in(Singleton.class);
+  @Override
+  protected void configure() {
+    bindParameterHandler();
+    bindParameterParser();
+    bindParameterWorkflow();
+    bindPostParameterHandler();
+    bindPostParameterWorkflow();
+    bindURIParameterWorkflow();
+    bindConverterProvider();
+    bindExpressionEvaluator();
   }
 }

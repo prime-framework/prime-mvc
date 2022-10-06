@@ -25,11 +25,11 @@ import java.util.UUID;
  * For testing odd generic cases.
  */
 public class GenericBean {
-  public MapSubclassSubclass mapSubclassSubclass;
+  public MapImplements mapImplements;
 
   public MapSubclass mapSubclass;
 
-  public MapImplements mapImplements;
+  public MapSubclassSubclass mapSubclassSubclass;
 
   public TypedObject<?, ?, ?> typedObject;
 
@@ -38,19 +38,17 @@ public class GenericBean {
   // U = String
   // V = Not used
   public abstract static class BaseTypedObject<S, T, U, V> {
-    public Map<UUID, T> mapOfTypes = new HashMap<>();
-
     public Map<V, T> fullyGenericMapOfTypes = new HashMap<>();
 
     public List<S> listOfStrings = new ArrayList<>();
 
     public List<T> listOfTypes = new ArrayList<>();
 
+    public Map<UUID, T> mapOfTypes = new HashMap<>();
+
     public U singleString;
 
     public T singleType;
-
-    private Map<UUID, T> privateMapOfTypes = new HashMap<>();
 
     private Map<V, T> privateFullyGenericMapOfTypes = new HashMap<>();
 
@@ -58,17 +56,11 @@ public class GenericBean {
 
     private List<T> privateListOfTypes = new ArrayList<>();
 
+    private Map<UUID, T> privateMapOfTypes = new HashMap<>();
+
     private U privateSingleString;
 
     private T privateSingleType;
-
-    public Map<UUID, T> getPrivateMapOfTypes() {
-      return privateMapOfTypes;
-    }
-
-    public void setPrivateMapOfTypes(Map<UUID, T> privateMapOfTypes) {
-      this.privateMapOfTypes = privateMapOfTypes;
-    }
 
     public Map<V, T> getPrivateFullyGenericMapOfTypes() {
       return privateFullyGenericMapOfTypes;
@@ -92,6 +84,14 @@ public class GenericBean {
 
     public void setPrivateListOfTypes(List<T> privateListOfTypes) {
       this.privateListOfTypes = privateListOfTypes;
+    }
+
+    public Map<UUID, T> getPrivateMapOfTypes() {
+      return privateMapOfTypes;
+    }
+
+    public void setPrivateMapOfTypes(Map<UUID, T> privateMapOfTypes) {
+      this.privateMapOfTypes = privateMapOfTypes;
     }
 
     public U getPrivateSingleString() {

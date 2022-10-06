@@ -27,13 +27,8 @@ public class MapImplements implements Map<String, String> {
   public Map<String, String> map = new HashMap<>();
 
   @Override
-  public int size() {
-    return map.size();
-  }
-
-  @Override
-  public boolean isEmpty() {
-    return map.isEmpty();
+  public void clear() {
+    map.clear();
   }
 
   @Override
@@ -47,28 +42,18 @@ public class MapImplements implements Map<String, String> {
   }
 
   @Override
+  public Set<Entry<String, String>> entrySet() {
+    return map.entrySet();
+  }
+
+  @Override
   public String get(Object key) {
     return map.get(key);
   }
 
   @Override
-  public String put(String key, String value) {
-    return map.put(key, value);
-  }
-
-  @Override
-  public String remove(Object key) {
-    return map.remove(key);
-  }
-
-  @Override
-  public void putAll(Map<? extends String, ? extends String> m) {
-    map.putAll(m);
-  }
-
-  @Override
-  public void clear() {
-    map.clear();
+  public boolean isEmpty() {
+    return map.isEmpty();
   }
 
   @Override
@@ -77,12 +62,27 @@ public class MapImplements implements Map<String, String> {
   }
 
   @Override
-  public Collection<String> values() {
-    return map.values();
+  public String put(String key, String value) {
+    return map.put(key, value);
   }
 
   @Override
-  public Set<Entry<String, String>> entrySet() {
-    return map.entrySet();
+  public void putAll(Map<? extends String, ? extends String> m) {
+    map.putAll(m);
+  }
+
+  @Override
+  public String remove(Object key) {
+    return map.remove(key);
+  }
+
+  @Override
+  public int size() {
+    return map.size();
+  }
+
+  @Override
+  public Collection<String> values() {
+    return map.values();
   }
 }

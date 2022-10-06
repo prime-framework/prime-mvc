@@ -15,20 +15,17 @@
  */
 package org.primeframework.mvc.action.result;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.fusionauth.http.server.HTTPRequest;
+import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.annotation.Redirect;
-import org.primeframework.mvc.http.DefaultHTTPRequest;
-import org.primeframework.mvc.http.DefaultHTTPResponse;
-import org.primeframework.mvc.http.HTTPRequest;
-import org.primeframework.mvc.http.HTTPResponse;
 import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.scope.MessageScope;
@@ -53,10 +50,9 @@ public class RedirectResultTest extends PrimeBaseTest {
     replay(ee);
 
     List<Message> messages = new ArrayList<>();
-    HTTPRequest request = new DefaultHTTPRequest().with(r -> r.contextPath = "/")
-                                                  .with(r -> r.path = "/");
+    HTTPRequest request = new HTTPRequest().with(r -> r.setPath("/"));
 
-    HTTPResponse response = new DefaultHTTPResponse(new ByteArrayOutputStream());
+    HTTPResponse response = new HTTPResponse(null, request);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(action, null, "foo", "", null));
     replay(store);
@@ -84,8 +80,8 @@ public class RedirectResultTest extends PrimeBaseTest {
     replay(ee);
 
     List<Message> messages = new ArrayList<>();
-    HTTPRequest request = new DefaultHTTPRequest();
-    HTTPResponse response = new DefaultHTTPResponse(new ByteArrayOutputStream());
+    HTTPRequest request = new HTTPRequest();
+    HTTPResponse response = new HTTPResponse(null, request);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(action, null, "foo", "", null));
     replay(store);
@@ -111,8 +107,8 @@ public class RedirectResultTest extends PrimeBaseTest {
     replay(ee);
 
     List<Message> messages = new ArrayList<>();
-    HTTPRequest request = new DefaultHTTPRequest();
-    HTTPResponse response = new DefaultHTTPResponse(new ByteArrayOutputStream());
+    HTTPRequest request = new HTTPRequest();
+    HTTPResponse response = new HTTPResponse(null, request);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/foo", "", null));
     replay(store);
@@ -138,8 +134,8 @@ public class RedirectResultTest extends PrimeBaseTest {
     replay(ee);
 
     List<Message> messages = new ArrayList<>();
-    HTTPRequest request = new DefaultHTTPRequest();
-    HTTPResponse response = new DefaultHTTPResponse(new ByteArrayOutputStream());
+    HTTPRequest request = new HTTPRequest();
+    HTTPResponse response = new HTTPResponse(null, request);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "foo", "", null));
     replay(store);
@@ -165,8 +161,8 @@ public class RedirectResultTest extends PrimeBaseTest {
     replay(ee);
 
     List<Message> messages = new ArrayList<>();
-    HTTPRequest request = new DefaultHTTPRequest().with(r -> r.contextPath = "/context-path");
-    HTTPResponse response = new DefaultHTTPResponse(new ByteArrayOutputStream());
+    HTTPRequest request = new HTTPRequest().with(r -> r.setContextPath("/context-path"));
+    HTTPResponse response = new HTTPResponse(null, request);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "foo", "", null));
     replay(store);
@@ -192,8 +188,8 @@ public class RedirectResultTest extends PrimeBaseTest {
     replay(ee);
 
     List<Message> messages = new ArrayList<>();
-    HTTPRequest request = new DefaultHTTPRequest().with(r -> r.contextPath = "/context-path");
-    HTTPResponse response = new DefaultHTTPResponse(new ByteArrayOutputStream());
+    HTTPRequest request = new HTTPRequest().with(r -> r.setContextPath("/context-path"));
+    HTTPResponse response = new HTTPResponse(null, request);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "foo", "", null));
     replay(store);

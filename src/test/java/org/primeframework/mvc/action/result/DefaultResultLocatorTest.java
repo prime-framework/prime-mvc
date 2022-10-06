@@ -17,10 +17,10 @@ package org.primeframework.mvc.action.result;
 
 import java.net.URL;
 
+import io.fusionauth.http.server.HTTPContext;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
-import org.primeframework.mvc.http.HTTPContext;
 import org.testng.annotations.Test;
 import static org.easymock.EasyMock.createStrictMock;
 import static org.easymock.EasyMock.expect;

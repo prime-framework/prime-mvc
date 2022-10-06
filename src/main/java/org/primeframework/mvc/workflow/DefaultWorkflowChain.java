@@ -18,7 +18,7 @@ package org.primeframework.mvc.workflow;
 import java.io.IOException;
 import java.util.Iterator;
 
-import static java.util.Arrays.*;
+import static java.util.Arrays.asList;
 
 /**
  * This class is the default chain that iterates over all the Workflow instances passed in.

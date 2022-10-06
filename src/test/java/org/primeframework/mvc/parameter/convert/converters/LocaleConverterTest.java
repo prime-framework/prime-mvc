@@ -21,13 +21,11 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNull;
-import static org.testng.Assert.fail;
 
 /**
  * This tests the locale converter.
@@ -36,19 +34,19 @@ import static org.testng.Assert.fail;
  */
 public class LocaleConverterTest {
 
-  @Test(dataProvider="localeData")
-  public void allLocalesFromStrings(Locale locale) {
+  @Test(dataProvider = "localeData")
+  public void allLocalesFromBCP47Strings(Locale locale) {
     GlobalConverter converter = new LocaleConverter();
-    Locale localeOut = (Locale) converter.convertFromStrings(Locale.class, null, "testExpr", ArrayUtils.toArray(locale.toString()));
+    Locale localeOut = (Locale) converter.convertFromStrings(Locale.class, null, "testExpr", ArrayUtils.toArray(locale.toLanguageTag()));
     assertEquals(locale.getLanguage(), localeOut.getLanguage());
     assertEquals(locale.getCountry(), localeOut.getCountry());
     assertEquals(locale.getVariant(), localeOut.getVariant());
   }
 
-  @Test(dataProvider="localeData")
-  public void allLocalesFromBCP47Strings(Locale locale) {
+  @Test(dataProvider = "localeData")
+  public void allLocalesFromStrings(Locale locale) {
     GlobalConverter converter = new LocaleConverter();
-    Locale localeOut = (Locale) converter.convertFromStrings(Locale.class, null, "testExpr", ArrayUtils.toArray(locale.toLanguageTag()));
+    Locale localeOut = (Locale) converter.convertFromStrings(Locale.class, null, "testExpr", ArrayUtils.toArray(locale.toString()));
     assertEquals(locale.getLanguage(), localeOut.getLanguage());
     assertEquals(locale.getCountry(), localeOut.getCountry());
     assertEquals(locale.getVariant(), localeOut.getVariant());
@@ -95,6 +93,15 @@ public class LocaleConverterTest {
     assertEquals(locale.getVariant(), "UTF8");
   }
 
+  @DataProvider(name = "localeData")
+  public Object[] localeData() {
+    List<Locale> locales = new ArrayList<>();
+    Collections.addAll(locales, Locale.getAvailableLocales());
+    locales.removeIf((locale) -> locale.getLanguage().isEmpty() || locale.hasExtensions() || !locale.getScript().isEmpty() || locale.toString().equals("no_NO_NY"));
+
+    return locales.toArray();
+  }
+
   @Test
   public void toStrings() {
     GlobalConverter converter = new LocaleConverter();
@@ -103,14 +110,5 @@ public class LocaleConverterTest {
 
     str = converter.convertToString(Locale.class, null, "testExpr", Locale.US);
     assertEquals(str, "en_US");
-  }
-
-  @DataProvider(name = "localeData")
-  public Object[] localeData() {
-    List<Locale> locales = new ArrayList<>();
-    Collections.addAll(locales, Locale.getAvailableLocales());
-    locales.removeIf((locale) -> locale.getLanguage().isEmpty() || locale.hasExtensions() || !locale.getScript().isEmpty() || locale.toString().equals("no_NO_NY"));
-
-    return locales.toArray();
   }
 }

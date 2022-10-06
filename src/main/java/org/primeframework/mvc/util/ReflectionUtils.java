@@ -487,9 +487,8 @@ public class ReflectionUtils {
     }
 
     Class type = types[0];
-    if (!type.isInstance(value) && value instanceof Collection) {
+    if (!type.isInstance(value) && value instanceof Collection c) {
       // Handle the Collection special case
-      Collection c = (Collection) value;
       if (c.size() == 1) {
         value = c.iterator().next();
       } else {

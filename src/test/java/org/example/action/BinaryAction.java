@@ -22,7 +22,6 @@ import java.nio.file.Path;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.annotation.Status;
 import org.primeframework.mvc.content.binary.annotation.BinaryRequest;
-
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 

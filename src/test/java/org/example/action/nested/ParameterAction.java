@@ -20,18 +20,15 @@ import org.primeframework.mvc.action.annotation.Action;
 /**
  * /nested/foo/parameter/bar
  * <p>
- * 1. /nested/foo/parameter/bar
- * 2. /nested/foo/parameter/index
- * 3. /nested/foo/parameter {bar}
- * 4. /nested/foo {parameter} {bar}
- * 5. /nested {foo} {parameter} {bar}
- * 6. /index {nested} {foo} {parameter} {bar}
+ * 1. /nested/foo/parameter/bar 2. /nested/foo/parameter/index 3. /nested/foo/parameter {bar} 4. /nested/foo {parameter}
+ * {bar} 5. /nested {foo} {parameter} {bar} 6. /index {nested} {foo} {parameter} {bar}
  * <p>
  * node(package{nested}) -> node(param{preParam1}) -> node(param{preParam2} -> node(action{parameter})
  * <p>
  * /.well-known/well-known/.well-known/openid-configuration
  * <p>
- * node(package{.well-known}) -> node(package{well-known}) -> node(package{.well-known}) -> node(action{openid-configuration})
+ * node(package{.well-known}) -> node(package{well-known}) -> node(package{.well-known}) ->
+ * node(action{openid-configuration})
  *
  * @author Brian Pontarelli
  */

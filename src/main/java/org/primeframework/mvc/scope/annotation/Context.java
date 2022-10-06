@@ -23,8 +23,7 @@ import java.lang.annotation.Target;
 import org.primeframework.mvc.scope.ContextScope;
 
 /**
- * This annotation should be used to mark member fields of actions that should be fetched and stored in the
- * Context
+ * This annotation should be used to mark member fields of actions that should be fetched and stored in the Context
  *
  * @author Brian Pontarelli
  */
@@ -34,7 +33,7 @@ import org.primeframework.mvc.scope.ContextScope;
 public @interface Context {
   /**
    * @return This attribute determines the name under which that the value is stored in the context. The default name is
-   *         the name of the field that the annotation is put on.
+   *     the name of the field that the annotation is put on.
    */
   String value() default "##field-name##";
 }

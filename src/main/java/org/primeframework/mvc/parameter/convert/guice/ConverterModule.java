@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.Locale;
 import java.util.UUID;
 
+import com.google.inject.AbstractModule;
 import org.primeframework.mvc.parameter.convert.converters.BooleanConverter;
 import org.primeframework.mvc.parameter.convert.converters.CharacterConverter;
 import org.primeframework.mvc.parameter.convert.converters.CollectionConverter;
@@ -41,8 +42,6 @@ import org.primeframework.mvc.parameter.convert.converters.URLConverter;
 import org.primeframework.mvc.parameter.convert.converters.UUIDConverter;
 import org.primeframework.mvc.parameter.convert.converters.ZoneIdConverter;
 import org.primeframework.mvc.parameter.convert.converters.ZonedDateTimeConverter;
-
-import com.google.inject.AbstractModule;
 
 /**
  * This class is a guice module for the Prime MVC converters.

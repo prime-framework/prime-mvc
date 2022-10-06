@@ -15,11 +15,10 @@
  */
 package org.primeframework.mvc.control.form;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.control.annotation.ControlAttribute;
 import org.primeframework.mvc.control.annotation.ControlAttributes;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-
-import com.google.inject.Inject;
 
 /**
  * This class is the control for a checkbox.
@@ -27,16 +26,16 @@ import com.google.inject.Inject;
  * @author Brian Pontarelli
  */
 @ControlAttributes(
-  required = {
-    @ControlAttribute(name = "name", types = {String.class})
-  },
-  optional = {
-    @ControlAttribute(name = "checked", types = {boolean.class, Boolean.class}),
-    @ControlAttribute(name = "disabled", types = {boolean.class, Boolean.class}),
-    @ControlAttribute(name = "readonly", types = {boolean.class, Boolean.class}),
-    @ControlAttribute(name = "required", types = {boolean.class, Boolean.class}),
-    @ControlAttribute(name = "tabindex", types = {int.class, Number.class})
-  }
+    required = {
+        @ControlAttribute(name = "name", types = {String.class})
+    },
+    optional = {
+        @ControlAttribute(name = "checked", types = {boolean.class, Boolean.class}),
+        @ControlAttribute(name = "disabled", types = {boolean.class, Boolean.class}),
+        @ControlAttribute(name = "readonly", types = {boolean.class, Boolean.class}),
+        @ControlAttribute(name = "required", types = {boolean.class, Boolean.class}),
+        @ControlAttribute(name = "tabindex", types = {int.class, Number.class})
+    }
 )
 public class Checkbox extends AbstractCheckedInput {
   @Inject

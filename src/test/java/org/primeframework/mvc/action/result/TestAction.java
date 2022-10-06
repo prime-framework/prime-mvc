@@ -25,8 +25,8 @@ import org.primeframework.mvc.action.result.annotation.Redirect;
  */
 @Forward(page = "foo.jsp")
 @Redirect.List({
-  @Redirect(code = "fail", uri = "/fail"),
-  @Redirect(code = "bad", uri = "/bad")
+    @Redirect(code = "fail", uri = "/fail"),
+    @Redirect(code = "bad", uri = "/bad")
 })
 public class TestAction {
 }

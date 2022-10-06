@@ -15,6 +15,7 @@
  */
 package org.primeframework.mvc.control.form;
 
+import com.google.inject.Inject;
 import org.example.action.user.EditAction;
 import org.example.domain.User;
 import org.primeframework.mvc.action.ActionInvocation;
@@ -22,8 +23,6 @@ import org.primeframework.mvc.control.ControlBaseTest;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.testng.annotations.Test;
-
-import com.google.inject.Inject;
 
 /**
  * This tests the password control.
@@ -34,20 +33,6 @@ public class PasswordTest extends ControlBaseTest {
   @Inject public Password password;
 
   @Test
-  public void actionLess() {
-    ais.setCurrent(new ActionInvocation(null, null, "/password", null, null));
-    new ControlTester(password).
-      attr("name", "test").
-      attr("class", "css-class").
-      attr("value", "password").
-      go("<input type=\"hidden\" name=\"test@param\" value=\"param-value\"/>\n" +
-        "<div class=\"css-class-password css-class-input css-class-control password input control\">\n" +
-        "<div class=\"label-container\"><label for=\"test\" class=\"label\">Test</label></div>\n" +
-        "<div class=\"control-container\"><input type=\"password\" class=\"css-class\" id=\"test\" name=\"test\"/></div>\n" +
-        "</div>\n");
-  }
-
-  @Test
   public void action() {
     EditAction edit = new EditAction();
     edit.user = new User();
@@ -55,13 +40,27 @@ public class PasswordTest extends ControlBaseTest {
 
     ais.setCurrent(new ActionInvocation(edit, null, "/password", null, null));
     new ControlTester(password).
-      attr("name", "user.password").
-      attr("value", "password").
-      go("<input type=\"hidden\" name=\"user.password@param\" value=\"param-value\"/>\n" +
-        "<div class=\"password input control\">\n" +
-        "<div class=\"label-container\"><label for=\"user_password\" class=\"label\">Password</label></div>\n" +
-        "<div class=\"control-container\"><input type=\"password\" id=\"user_password\" name=\"user.password\"/></div>\n" +
-        "</div>\n");
+        attr("name", "user.password").
+        attr("value", "password").
+        go("<input type=\"hidden\" name=\"user.password@param\" value=\"param-value\"/>\n" +
+            "<div class=\"password input control\">\n" +
+            "<div class=\"label-container\"><label for=\"user_password\" class=\"label\">Password</label></div>\n" +
+            "<div class=\"control-container\"><input type=\"password\" id=\"user_password\" name=\"user.password\"/></div>\n" +
+            "</div>\n");
+  }
+
+  @Test
+  public void actionLess() {
+    ais.setCurrent(new ActionInvocation(null, null, "/password", null, null));
+    new ControlTester(password).
+        attr("name", "test").
+        attr("class", "css-class").
+        attr("value", "password").
+        go("<input type=\"hidden\" name=\"test@param\" value=\"param-value\"/>\n" +
+            "<div class=\"css-class-password css-class-input css-class-control password input control\">\n" +
+            "<div class=\"label-container\"><label for=\"test\" class=\"label\">Test</label></div>\n" +
+            "<div class=\"control-container\"><input type=\"password\" class=\"css-class\" id=\"test\" name=\"test\"/></div>\n" +
+            "</div>\n");
   }
 
   @Test
@@ -76,12 +75,12 @@ public class PasswordTest extends ControlBaseTest {
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.password", "code2", "fieldError2"));
 
     new ControlTester(password).
-      attr("name", "user.password").
-      attr("value", "password").
-      go("<input type=\"hidden\" name=\"user.password@param\" value=\"param-value\"/>\n" +
-        "<div class=\"password input control\">\n" +
-        "<div class=\"label-container\"><label for=\"user_password\" class=\"label\"><span class=\"error\">Password (fieldError1, fieldError2)</span></label></div>\n" +
-        "<div class=\"control-container\"><input type=\"password\" id=\"user_password\" name=\"user.password\"/></div>\n" +
-        "</div>\n");
+        attr("name", "user.password").
+        attr("value", "password").
+        go("<input type=\"hidden\" name=\"user.password@param\" value=\"param-value\"/>\n" +
+            "<div class=\"password input control\">\n" +
+            "<div class=\"label-container\"><label for=\"user_password\" class=\"label\"><span class=\"error\">Password (fieldError1, fieldError2)</span></label></div>\n" +
+            "<div class=\"control-container\"><input type=\"password\" id=\"user_password\" name=\"user.password\"/></div>\n" +
+            "</div>\n");
   }
 }

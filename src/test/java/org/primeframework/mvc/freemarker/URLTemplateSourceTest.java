@@ -20,8 +20,9 @@ import java.io.File;
 import java.io.IOException;
 
 import org.testng.annotations.Test;
-
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 
 /**
  * This tests the URLTemplateSource class.
@@ -29,15 +30,6 @@ import static org.testng.Assert.*;
  * @author Brian Pontarelli
  */
 public class URLTemplateSourceTest {
-  @Test
-  public void file() throws IOException {
-    File file = new File("build.savant");
-    URLTemplateSource source = new URLTemplateSource(file.toURI().toURL());
-    assertEquals(file.lastModified(), source.lastModified());
-    assertNotNull(source.getInputStream());
-    source.close();
-  }
-
   /**
    * Ensures that the file in the JAR is older that the one on the file system. This also ensures that the JAR file last
    * modified doesn't change.
@@ -50,6 +42,15 @@ public class URLTemplateSourceTest {
     URLTemplateSource source = new URLTemplateSource(Thread.currentThread().getContextClassLoader().getResource("logging.properties"));
     assertTrue(source.lastModified() > file.lastModified());
     assertEquals(source.lastModified(), source.lastModified());
+    assertNotNull(source.getInputStream());
+    source.close();
+  }
+
+  @Test
+  public void file() throws IOException {
+    File file = new File("build.savant");
+    URLTemplateSource source = new URLTemplateSource(file.toURI().toURL());
+    assertEquals(file.lastModified(), source.lastModified());
     assertNotNull(source.getInputStream());
     source.close();
   }

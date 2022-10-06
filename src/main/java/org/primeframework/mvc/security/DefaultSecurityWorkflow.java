@@ -17,6 +17,7 @@ package org.primeframework.mvc.security;
 
 import java.io.IOException;
 
+import com.google.inject.Inject;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
@@ -26,8 +27,6 @@ import org.primeframework.mvc.security.annotation.AnonymousAccess;
 import org.primeframework.mvc.security.annotation.ConstraintOverride;
 import org.primeframework.mvc.security.guice.SecuritySchemeFactory;
 import org.primeframework.mvc.workflow.WorkflowChain;
-
-import com.google.inject.Inject;
 
 /**
  * Default security workflow that uses the {@link MVCConfiguration} and the {@link Action} annotation to manage the

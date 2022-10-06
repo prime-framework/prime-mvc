@@ -19,9 +19,9 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 import com.google.inject.Inject;
+import io.fusionauth.http.server.HTTPContext;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
-import org.primeframework.mvc.http.HTTPContext;
 
 /**
  * Uses a lookup methodology for finding resources based on the action URI, extension, and result code.

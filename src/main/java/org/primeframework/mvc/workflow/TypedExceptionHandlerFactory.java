@@ -29,7 +29,13 @@ import com.google.inject.Injector;
  */
 public class TypedExceptionHandlerFactory {
   private static final Map<Class<? extends Throwable>, Class<? extends TypedExceptionHandler<? extends Throwable>>> handlers = new HashMap<Class<? extends Throwable>, Class<? extends TypedExceptionHandler<? extends Throwable>>>();
+
   private final Injector injector;
+
+  @Inject
+  public TypedExceptionHandlerFactory(Injector injector) {
+    this.injector = injector;
+  }
 
   /**
    * Adds an exception handler mapping.
@@ -40,14 +46,11 @@ public class TypedExceptionHandlerFactory {
    * @param <T>           The exception type.
    * @param <U>           The handler type.
    */
-  public static <T extends Throwable, U extends TypedExceptionHandler<T>> void addExceptionHandler(Binder binder, Class<T> exceptionType, Class<U> handlerType) {
+  public static <T extends Throwable, U extends TypedExceptionHandler<T>> void addExceptionHandler(Binder binder,
+                                                                                                   Class<T> exceptionType,
+                                                                                                   Class<U> handlerType) {
     binder.bind(handlerType);
     handlers.put(exceptionType, handlerType);
-  }
-
-  @Inject
-  public TypedExceptionHandlerFactory(Injector injector) {
-    this.injector = injector;
   }
 
   /**
@@ -56,8 +59,8 @@ public class TypedExceptionHandlerFactory {
    * @param exceptionType The exception type.
    * @param <T>           The exception type.
    * @param <U>           The handler type.
-   * @return An instance of the handler or null if that exception type wasn't registered to a {@link
-   *         TypedExceptionHandler}
+   * @return An instance of the handler or null if that exception type wasn't registered to a
+   *     {@link TypedExceptionHandler}
    */
   @SuppressWarnings("unchecked")
   public <T extends Throwable, U extends TypedExceptionHandler<T>> U build(Class<T> exceptionType) {

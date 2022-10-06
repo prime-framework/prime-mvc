@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc.test;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -49,6 +48,13 @@ import com.google.inject.Injector;
 import com.inversoft.http.HTTPStrings;
 import com.inversoft.http.HTTPStrings.Headers;
 import com.inversoft.rest.ClientResponse;
+import io.fusionauth.http.Cookie;
+import io.fusionauth.http.Cookie.SameSite;
+import io.fusionauth.http.HTTPValues.Methods;
+import io.fusionauth.http.io.NonBlockingByteBufferOutputStream;
+import io.fusionauth.http.server.HTTPRequest;
+import io.fusionauth.http.server.HTTPResponse;
+import io.fusionauth.http.server.HTTPServerConfiguration;
 import io.netty.handler.codec.http.HttpUtil;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -58,12 +64,7 @@ import org.primeframework.mock.MockUserAgent;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.ActionMapper;
-import org.primeframework.mvc.http.Cookie;
-import org.primeframework.mvc.http.Cookie.SameSite;
-import org.primeframework.mvc.http.DefaultHTTPResponse;
 import org.primeframework.mvc.http.HTTPObjectsHolder;
-import org.primeframework.mvc.http.HTTPRequest;
-import org.primeframework.mvc.http.HTTPStrings.Methods;
 import org.primeframework.mvc.message.FieldMessage;
 import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageType;
@@ -71,7 +72,6 @@ import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.primeframework.mvc.message.SimpleMessage;
 import org.primeframework.mvc.message.TestMessageObserver;
 import org.primeframework.mvc.message.l10n.MessageProvider;
-import org.primeframework.mvc.netty.PrimeHTTPListenerConfiguration;
 import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.util.CookieTools;
 import org.primeframework.mvc.util.QueryStringBuilder;
@@ -87,9 +87,9 @@ import static java.util.Arrays.asList;
  */
 @SuppressWarnings({"unused", "UnusedReturnValue"})
 public class RequestResult {
-  public final Injector injector;
+  public final HTTPServerConfiguration configuration;
 
-  public final PrimeHTTPListenerConfiguration listenerConfiguration;
+  public final Injector injector;
 
   public final TestMessageObserver messageObserver;
 
@@ -102,20 +102,20 @@ public class RequestResult {
   private String body;
 
   public RequestResult(Injector injector, HTTPRequest request, ClientResponse<byte[], byte[]> response,
-                       MockUserAgent userAgent, PrimeHTTPListenerConfiguration listenerConfiguration,
+                       MockUserAgent userAgent, HTTPServerConfiguration configuration,
                        TestMessageObserver messageObserver) {
     this.request = request;
     this.injector = injector;
     this.response = response;
     this.userAgent = userAgent;
-    this.listenerConfiguration = listenerConfiguration;
+    this.configuration = configuration;
     this.messageObserver = messageObserver;
 
     // Set the request & response into the thread local so that they can be used when asserting
     HTTPObjectsHolder.clearRequest();
     HTTPObjectsHolder.setRequest(request);
     HTTPObjectsHolder.clearResponse();
-    HTTPObjectsHolder.setResponse(new DefaultHTTPResponse(new ByteArrayOutputStream()));
+    HTTPObjectsHolder.setResponse(new HTTPResponse(new NonBlockingByteBufferOutputStream(null, 1024), request));
   }
 
   /**
@@ -1508,7 +1508,7 @@ public class RequestResult {
   }
 
   private String cookieToString(Cookie cookie) {
-    return "Set-Cookie: " + cookie.toRESTify().toResponseHeader();
+    return "Set-Cookie: " + cookie.toResponseHeader();
   }
 
   private String escape(String s) {
@@ -1547,7 +1547,7 @@ public class RequestResult {
       }
     }
 
-    RequestBuilder rb = new RequestBuilder(uri, injector, userAgent, listenerConfiguration, messageObserver);
+    RequestBuilder rb = new RequestBuilder(uri, injector, userAgent, configuration, messageObserver);
 
     // Handle input, select and textarea
     for (Element element : form.select("input,select,textarea")) {
@@ -1598,7 +1598,7 @@ public class RequestResult {
       newRedirect = redirect.replace(originalURI, baseURI);
     }
 
-    RequestBuilder rb = new RequestBuilder(baseURI, injector, userAgent, listenerConfiguration, messageObserver);
+    RequestBuilder rb = new RequestBuilder(baseURI, injector, userAgent, configuration, messageObserver);
     if (baseURI.length() != newRedirect.length()) {
       String params = newRedirect.substring(newRedirect.indexOf('?') + 1);
       QueryStringTools.parseQueryString(params).forEach(rb::withURLParameters);
@@ -2149,7 +2149,7 @@ public class RequestResult {
     /**
      * Add a parameter to the request that you will expect to match the expected. This may be useful if a timestamp oro
      * other random data is returned that is not important to assert on.
-     *
+     * <p>
      * <strong>This is only intended for use during testing.</strong>
      *
      * @param name the parameter name
@@ -2164,7 +2164,7 @@ public class RequestResult {
     /**
      * Add a parameter as optional which means that it is not required to be on the query string, but if it is, the
      * actual value will be used during the assertion.
-     *
+     * <p>
      * <strong>This is only intended for use during testing.</strong>
      *
      * @param name the parameter name

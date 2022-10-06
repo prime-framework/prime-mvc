@@ -17,8 +17,8 @@ package org.primeframework.mvc.control.form;
 
 /**
  * This interface defines the method that forms can be prepared. Form preparation is generally handled by invoking any
- * no-argument methods in the action class that have been annotated with the {@link
- * org.primeframework.mvc.control.form.annotation.FormPrepareMethod} annotation.
+ * no-argument methods in the action class that have been annotated with the
+ * {@link org.primeframework.mvc.control.form.annotation.FormPrepareMethod} annotation.
  *
  * @author Brian Pontarelli
  */

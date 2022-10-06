@@ -15,11 +15,9 @@
  */
 package org.primeframework.mvc.scope;
 
-import org.primeframework.mvc.http.HTTPRequest;
-
-import org.primeframework.mvc.scope.annotation.Request;
-
 import com.google.inject.Inject;
+import io.fusionauth.http.server.HTTPRequest;
+import org.primeframework.mvc.scope.annotation.Request;
 
 /**
  * This is the request scope which fetches and stores values in the HttpServletRequest.

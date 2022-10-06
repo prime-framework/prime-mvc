@@ -19,13 +19,13 @@ import java.io.IOException;
 import java.util.List;
 
 import com.google.inject.Inject;
+import io.fusionauth.http.HTTPMethod;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.ActionInvocationWorkflow;
 import org.primeframework.mvc.action.ActionMapper;
 import org.primeframework.mvc.action.result.ResultInvocationWorkflow;
 import org.primeframework.mvc.config.MVCConfiguration;
-import org.primeframework.mvc.http.HTTPMethod;
 import org.primeframework.mvc.scope.ScopeStorageWorkflow;
 
 /**

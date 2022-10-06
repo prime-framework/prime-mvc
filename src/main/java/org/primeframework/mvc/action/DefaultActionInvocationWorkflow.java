@@ -52,7 +52,7 @@ public class DefaultActionInvocationWorkflow implements ActionInvocationWorkflow
    * <ul> <li>Invoke the action</li> </ul>
    *
    * @param chain The chain.
-   * @throws IOException      If the chain throws an IOException.
+   * @throws IOException If the chain throws an IOException.
    */
   public void perform(WorkflowChain chain) throws IOException {
     ActionInvocation actionInvocation = actionInvocationStore.getCurrent();

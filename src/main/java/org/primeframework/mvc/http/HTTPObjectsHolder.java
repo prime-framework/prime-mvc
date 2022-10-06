@@ -15,6 +15,8 @@
  */
 package org.primeframework.mvc.http;
 
+import io.fusionauth.http.server.HTTPRequest;
+import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.PrimeException;
 
 /**

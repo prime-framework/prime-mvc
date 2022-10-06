@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.fusionauth.http.HTTPMethod;
 import org.primeframework.mvc.action.config.ActionConfigurator;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration.JSONPropertyFilterConfig;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration.RequestMember;
@@ -29,7 +30,6 @@ import org.primeframework.mvc.content.json.annotation.JSONPatch;
 import org.primeframework.mvc.content.json.annotation.JSONPropertyFilter;
 import org.primeframework.mvc.content.json.annotation.JSONRequest;
 import org.primeframework.mvc.content.json.annotation.JSONResponse;
-import org.primeframework.mvc.http.HTTPMethod;
 import org.primeframework.mvc.util.ReflectionUtils;
 
 /**

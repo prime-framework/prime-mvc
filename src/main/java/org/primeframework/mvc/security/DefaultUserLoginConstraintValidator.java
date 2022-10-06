@@ -21,13 +21,18 @@ import java.util.Set;
 import com.google.inject.Inject;
 
 /**
- * Default User Login constraints validator. If the UserLoginSecurityContext is available ensure the logged in user meets the required
- * constraints.
+ * Default User Login constraints validator. If the UserLoginSecurityContext is available ensure the logged in user
+ * meets the required constraints.
  *
  * @author Daniel DeGroff
  */
 public class DefaultUserLoginConstraintValidator implements UserLoginConstraintsValidator {
   private UserLoginSecurityContext userLoginSecurityContext;
+
+  @Inject(optional = true)
+  public void setUserLoginSecurityContext(UserLoginSecurityContext userLoginSecurityContext) {
+    this.userLoginSecurityContext = userLoginSecurityContext;
+  }
 
   @Override
   public boolean validate(String[] constraints) {
@@ -41,10 +46,5 @@ public class DefaultUserLoginConstraintValidator implements UserLoginConstraints
     }
 
     return true;
-  }
-
-  @Inject(optional = true)
-  public void setUserLoginSecurityContext(UserLoginSecurityContext userLoginSecurityContext) {
-    this.userLoginSecurityContext = userLoginSecurityContext;
   }
 }

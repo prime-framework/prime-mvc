@@ -15,11 +15,11 @@
  */
 package org.primeframework.mvc.security;
 
-import org.primeframework.mvc.http.HTTPRequest;
 import java.util.List;
 
+import io.fusionauth.http.HTTPMethod;
+import io.fusionauth.http.server.HTTPRequest;
 import org.primeframework.mvc.security.annotation.AuthorizeMethod;
-import org.primeframework.mvc.http.HTTPMethod;
 
 /**
  * A container to pass to methods annotated with {@link AuthorizeMethod}.

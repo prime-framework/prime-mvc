@@ -41,12 +41,12 @@ public interface Scope {
   void addAll(Collection<Message> messages);
 
   /**
-   * @return All the messages in the scope.
-   */
-  List<Message> get();
-
-  /**
    * Clears the messages in the scope.
    */
   void clear();
+
+  /**
+   * @return All the messages in the scope.
+   */
+  List<Message> get();
 }

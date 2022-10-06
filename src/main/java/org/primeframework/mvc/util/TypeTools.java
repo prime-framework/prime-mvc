@@ -58,8 +58,7 @@ public class TypeTools {
    * @return The component type.
    */
   public static Type componentType(Type type, String path) {
-    if (type instanceof ParameterizedType) {
-      ParameterizedType parameterizedType = (ParameterizedType) type;
+    if (type instanceof ParameterizedType parameterizedType) {
       Class<?> rawType = (Class<?>) parameterizedType.getRawType();
       if (Map.class.isAssignableFrom(rawType)) {
         return parameterizedType.getActualTypeArguments()[1];
@@ -102,8 +101,7 @@ public class TypeTools {
    * @return The key type.
    */
   public static Type[] mapTypes(Type type, String path) {
-    if (type instanceof Class) {
-      Class<?> c = (Class<?>) type;
+    if (type instanceof Class<?> c) {
 
       while (c != null && !isGenericMap(type)) {
         Type[] types = c.getGenericInterfaces();
@@ -130,8 +128,7 @@ public class TypeTools {
       }
     }
 
-    if (type instanceof ParameterizedType) {
-      ParameterizedType parameterizedType = (ParameterizedType) type;
+    if (type instanceof ParameterizedType parameterizedType) {
       Class<?> rawType = (Class<?>) parameterizedType.getRawType();
       if (Map.class.isAssignableFrom(rawType)) {
         return parameterizedType.getActualTypeArguments();
