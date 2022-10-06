@@ -38,17 +38,6 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/com/inversoft/restify/4.1.2/restify-4.1.2.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/com/inversoft/restify/4.1.2/restify-4.1.2-src.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
           <root url="jar://$USER_HOME$/.savant/cache/io/dropwizard/metrics/metrics-core/3.2.6/metrics-core-3.2.6.jar!/" />
         </CLASSES>
         <JAVADOC />
@@ -65,6 +54,28 @@
         <JAVADOC />
         <SOURCES>
           <root url="jar://$USER_HOME$/.savant/cache/io/fusionauth/fusionauth-jwt/5.1.0/fusionauth-jwt-5.1.0-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.savant/cache/io/fusionauth/java-http/0.1.1/java-http-0.1.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.savant/cache/io/fusionauth/java-http/0.1.1/java-http-0.1.1-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.savant/cache/com/inversoft/restify/4.1.2/restify-4.1.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.savant/cache/com/inversoft/restify/4.1.2/restify-4.1.2-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -98,17 +109,6 @@
         <JAVADOC />
         <SOURCES>
           <root url="jar://$USER_HOME$/.savant/cache/com/fasterxml/jackson/core/jackson-core/2.13.3/jackson-core-2.13.3-src.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/io/fusionauth/java-http/0.1.0-{integration}/java-http-0.1.0-{integration}.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/io/fusionauth/java-http/0.1.0-{integration}/java-http-0.1.0-{integration}-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
