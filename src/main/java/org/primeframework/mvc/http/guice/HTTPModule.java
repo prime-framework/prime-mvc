@@ -49,6 +49,7 @@ public class HTTPModule extends AbstractModule {
   @Provides
   @Singleton
   protected HTTPContext configure(MVCConfiguration configuration) {
+    // java-http has its own HTTPContext, but it's not easily injectable. We are ignoring that one and creating our own here
     return new HTTPContext(configuration.baseDirectory());
   }
 }

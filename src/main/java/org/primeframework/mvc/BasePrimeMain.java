@@ -52,6 +52,8 @@ public abstract class BasePrimeMain {
 
   protected HTTPServer server;
 
+  private PrimeMVCInstrumenter instrumenter;
+
   public abstract HTTPServerConfiguration configuration();
 
   public Injector getInjector() {
@@ -66,6 +68,7 @@ public abstract class BasePrimeMain {
     injector = GuiceBootstrap.initialize(modules());
     injector.injectMembers(this);
     requestHandler.updateInjector(injector);
+    instrumenter.updateInjector(injector);
   }
 
   /**
@@ -90,11 +93,17 @@ public abstract class BasePrimeMain {
     // Make the request handler
     requestHandler = new PrimeMVCRequestHandler(null);
 
+    // Make the instrumenter
+    instrumenter = new PrimeMVCInstrumenter();
+
     // Load the injector
     hup();
 
     // Create the server
-    server = new HTTPServer().withConfiguration(configuration()).withHandler(requestHandler).withLoggerFactory(new SLF4JLoggerFactoryAdapter());
+    server = new HTTPServer().withConfiguration(configuration())
+                             .withHandler(requestHandler)
+                             .withInstrumenter(instrumenter)
+                             .withLoggerFactory(new SLF4JLoggerFactoryAdapter());
 
     // Start the server
     server.start();
