@@ -86,7 +86,8 @@ public class JWTRefreshTokenLoginTest {
     };
 
     Module module = Modules.override(mvcModule).with(new TestContentModule(), new TestSecurityModule(), new TestScopeModule());
-    TestPrimeMain main = new TestPrimeMain(new HTTPServerConfiguration().withListener(new HTTPListenerConfiguration(9081)), module);
+    var config = new HTTPServerConfiguration().withListener(new HTTPListenerConfiguration(9081));
+    TestPrimeMain main = new TestPrimeMain(new HTTPServerConfiguration[]{config}, module);
     simulator = new RequestSimulator(main, messageObserver);
     injector = simulator.getInjector();
   }

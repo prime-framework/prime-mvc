@@ -53,16 +53,18 @@ public class TestPrimeMainThread extends Thread {
       sleep();
 
       // Assume we want the first configured port
-      HTTPServerConfiguration configuration = main.configuration();
-      try (Socket socket = new Socket()) {
-        socket.connect(new InetSocketAddress("localhost", configuration.getListeners().get(0).getPort()), 5);
-        if (socket.isConnected()) {
-          logger.info("Prime HTTP server started");
-          break;
-        }
+      HTTPServerConfiguration[] configuration = main.configuration();
+      for (var config : configuration) {
+        try (Socket socket = new Socket()) {
+          socket.connect(new InetSocketAddress("localhost", config.getListeners().get(0).getPort()), 5);
+          if (socket.isConnected()) {
+            logger.info("Prime HTTP server started");
+            return;
+          }
 
-        sleep();
-      } catch (Exception ignore) {
+          sleep();
+        } catch (Exception ignore) {
+        }
       }
     }
   }

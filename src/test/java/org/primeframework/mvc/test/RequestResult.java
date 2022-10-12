@@ -54,7 +54,6 @@ import io.fusionauth.http.HTTPValues.Methods;
 import io.fusionauth.http.io.NonBlockingByteBufferOutputStream;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
-import io.fusionauth.http.server.HTTPServerConfiguration;
 import io.netty.handler.codec.http.HttpUtil;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -87,11 +86,11 @@ import static java.util.Arrays.asList;
  */
 @SuppressWarnings({"unused", "UnusedReturnValue"})
 public class RequestResult {
-  public final HTTPServerConfiguration configuration;
-
   public final Injector injector;
 
   public final TestMessageObserver messageObserver;
+
+  public final int port;
 
   public final HTTPRequest request;
 
@@ -102,14 +101,13 @@ public class RequestResult {
   private String body;
 
   public RequestResult(Injector injector, HTTPRequest request, ClientResponse<byte[], byte[]> response,
-                       MockUserAgent userAgent, HTTPServerConfiguration configuration,
-                       TestMessageObserver messageObserver) {
+                       MockUserAgent userAgent, TestMessageObserver messageObserver, int port) {
     this.request = request;
     this.injector = injector;
     this.response = response;
     this.userAgent = userAgent;
-    this.configuration = configuration;
     this.messageObserver = messageObserver;
+    this.port = port;
 
     // Set the request & response into the thread local so that they can be used when asserting
     HTTPObjectsHolder.clearRequest();
@@ -691,7 +689,7 @@ public class RequestResult {
   /**
    * Verifies the response Content-Length.
    *
-   * @param expected The expeted Content-Length.
+   * @param expected The expected Content-Length.
    * @return This.
    */
   public RequestResult assertContentLength(long expected) {
@@ -1547,7 +1545,7 @@ public class RequestResult {
       }
     }
 
-    RequestBuilder rb = new RequestBuilder(uri, injector, userAgent, configuration, messageObserver);
+    RequestBuilder rb = new RequestBuilder(uri, injector, userAgent, messageObserver, port);
 
     // Handle input, select and textarea
     for (Element element : form.select("input,select,textarea")) {
@@ -1598,7 +1596,7 @@ public class RequestResult {
       newRedirect = redirect.replace(originalURI, baseURI);
     }
 
-    RequestBuilder rb = new RequestBuilder(baseURI, injector, userAgent, configuration, messageObserver);
+    RequestBuilder rb = new RequestBuilder(baseURI, injector, userAgent, messageObserver, port);
     if (baseURI.length() != newRedirect.length()) {
       String params = newRedirect.substring(newRedirect.indexOf('?') + 1);
       QueryStringTools.parseQueryString(params).forEach(rb::withURLParameters);
