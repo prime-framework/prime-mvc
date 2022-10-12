@@ -47,6 +47,9 @@ public class MultipleServerTest {
     if (simulator != null) {
       simulator.shutdown();
     }
+
+    HTTPObjectsHolder.clearRequest();
+    HTTPObjectsHolder.clearResponse();
   }
 
   @Test
