@@ -96,21 +96,21 @@ public abstract class BasePrimeMain {
     // Make the instrumenter
     instrumenter = new PrimeMVCInstrumenter();
 
+    // Load the injector because the configuration might not be known until the injector is created
+    hup();
+
+    // For each configured server, create the necessary objects
     for (var config : configuration()) {
-      // Make the request handler
-      var requestHandler = new PrimeMVCRequestHandler(null);
+      // Make the request handler for each server and use the current injector
+      var requestHandler = new PrimeMVCRequestHandler(injector);
 
       // Create the server
       var server = new HTTPServer().withConfiguration(config)
                                    .withHandler(requestHandler)
                                    .withInstrumenter(instrumenter)
                                    .withLoggerFactory(new SLF4JLoggerFactoryAdapter());
-
       servers.add(new PrimeHTTPServer(requestHandler, server));
     }
-
-    // Load the injector
-    hup();
 
     // Start the server(s)
     servers.forEach(server -> server.server.start());
