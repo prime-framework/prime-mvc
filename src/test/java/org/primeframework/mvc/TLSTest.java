@@ -19,19 +19,9 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-import java.time.Instant;
-import java.util.Date;
-import java.util.UUID;
 
 import com.google.inject.Module;
 import com.google.inject.util.Modules;
@@ -58,17 +48,6 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-import sun.security.util.KnownOIDs;
-import sun.security.util.ObjectIdentifier;
-import sun.security.x509.AlgorithmId;
-import sun.security.x509.CertificateAlgorithmId;
-import sun.security.x509.CertificateSerialNumber;
-import sun.security.x509.CertificateValidity;
-import sun.security.x509.CertificateVersion;
-import sun.security.x509.CertificateX509Key;
-import sun.security.x509.X500Name;
-import sun.security.x509.X509CertImpl;
-import sun.security.x509.X509CertInfo;
 import static org.testng.Assert.assertTrue;
 
 /**
@@ -110,7 +89,8 @@ public class TLSTest {
     String certificate = Files.readString(Paths.get(userHome + "/dev/certificates/fusionauth.pem"));
     String privateKey = Files.readString(Paths.get(userHome + "/dev/certificates/fusionauth.key"));
     Module module = Modules.override(mvcModule).with(new TestContentModule());
-    TestPrimeMain main = new TestPrimeMain(new HTTPServerConfiguration().withListener(new HTTPListenerConfiguration(9081, certificate, privateKey)), module);
+    var config = new HTTPServerConfiguration().withListener(new HTTPListenerConfiguration(9081, certificate, privateKey));
+    TestPrimeMain main = new TestPrimeMain(new HTTPServerConfiguration[]{config}, module);
 
     simulator = new RequestSimulator(main, new TestMessageObserver());
 
@@ -154,37 +134,5 @@ public class TLSTest {
              .assertStatusCode(200);
 
     assertTrue(EditAction.getCalled);
-  }
-
-  private KeyPair generateNewRSAKeyPair() {
-    try {
-      KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-      keyPairGenerator.initialize(2048);
-      return keyPairGenerator.generateKeyPair();
-    } catch (NoSuchAlgorithmException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  private X509Certificate generateX509Certificate(PublicKey publicKey, PrivateKey privateKey)
-      throws IllegalArgumentException {
-    try {
-      X509CertInfo certInfo = new X509CertInfo();
-      CertificateX509Key certKey = new CertificateX509Key(publicKey);
-      certInfo.set(X509CertInfo.KEY, certKey);
-      // X.509 Certificate version 2 (0 based)
-      certInfo.set(X509CertInfo.VERSION, new CertificateVersion(1));
-      certInfo.set(X509CertInfo.ALGORITHM_ID, new CertificateAlgorithmId(new AlgorithmId(ObjectIdentifier.of(KnownOIDs.SHA256withRSA))));
-      certInfo.set(X509CertInfo.ISSUER, new X500Name("CN=localhost"));
-      certInfo.set(X509CertInfo.SUBJECT, new X500Name("CN=org.primeframework.prime-mvc"));
-      certInfo.set(X509CertInfo.VALIDITY, new CertificateValidity(Date.from(Instant.now().minusSeconds(30)), Date.from(Instant.now().plusSeconds(10_000))));
-      certInfo.set(X509CertInfo.SERIAL_NUMBER, new CertificateSerialNumber(new BigInteger(UUID.randomUUID().toString().replace("-", ""), 16)));
-
-      X509CertImpl impl = new X509CertImpl(certInfo);
-      impl.sign(privateKey, "SHA256withRSA");
-      return impl;
-    } catch (Exception e) {
-      throw new IllegalArgumentException(e);
-    }
   }
 }

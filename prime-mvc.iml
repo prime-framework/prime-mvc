@@ -115,72 +115,6 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-codec-http/4.1.79/netty-codec-http-4.1.79.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-codec-http/4.1.79/netty-codec-http-4.1.79-src.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-handler/4.1.79/netty-handler-4.1.79.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-handler/4.1.79/netty-handler-4.1.79-src.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-codec/4.1.79/netty-codec-4.1.79.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-codec/4.1.79/netty-codec-4.1.79-src.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-transport/4.1.79/netty-transport-4.1.79.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-transport/4.1.79/netty-transport-4.1.79-src.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-buffer/4.1.79/netty-buffer-4.1.79.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-buffer/4.1.79/netty-buffer-4.1.79-src.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-common/4.1.79/netty-common-4.1.79.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-common/4.1.79/netty-common-4.1.79-src.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
           <root url="jar://$USER_HOME$/.savant/cache/org/freemarker/freemarker/2.3.30/freemarker-2.3.30.jar!/" />
         </CLASSES>
         <JAVADOC />
@@ -435,28 +369,6 @@
         <JAVADOC />
         <SOURCES>
           <root url="jar://$USER_HOME$/.savant/cache/com/inversoft/jackson5/3.0.1/jackson5-3.0.1-src.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" scope="RUNTIME">
-      <library>
-        <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-resolver/4.1.79/netty-resolver-4.1.79.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-resolver/4.1.79/netty-resolver-4.1.79-src.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" scope="RUNTIME">
-      <library>
-        <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-transport-native-unix-common/4.1.79/netty-transport-native-unix-common-4.1.79.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/io/netty/netty-transport-native-unix-common/4.1.79/netty-transport-native-unix-common-4.1.79-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>

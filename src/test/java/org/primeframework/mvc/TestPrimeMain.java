@@ -24,17 +24,17 @@ import io.fusionauth.http.server.HTTPServerConfiguration;
  * @author Brian Pontarelli
  */
 public class TestPrimeMain extends BasePrimeMain {
-  private final HTTPServerConfiguration configuration;
+  private final HTTPServerConfiguration[] configuration;
 
   private final Module[] modules;
 
-  public TestPrimeMain(HTTPServerConfiguration configuration, Module... modules) {
+  public TestPrimeMain(HTTPServerConfiguration[] configuration, Module... modules) {
     this.configuration = configuration;
     this.modules = modules;
   }
 
   @Override
-  public HTTPServerConfiguration configuration() {
+  public HTTPServerConfiguration[] configuration() {
     return configuration;
   }
 

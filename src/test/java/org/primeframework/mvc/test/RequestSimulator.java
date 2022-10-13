@@ -28,17 +28,19 @@ import org.primeframework.mvc.message.TestMessageObserver;
  * @author Brian Pontarelli
  */
 public class RequestSimulator {
+  public final BasePrimeMain main;
+
   public final TestMessageObserver messageObserver;
+
+  public final TestPrimeMainThread thread;
 
   public final MockUserAgent userAgent;
 
-  private final BasePrimeMain main;
+  public RequestBuilder builder;
 
-  private final TestPrimeMainThread thread;
+  public int port;
 
-  private RequestBuilder builder;
-
-  private boolean useTLS;
+  public boolean useTLS;
 
   /**
    * Creates a new request simulator that can be used to simulate requests to a Prime application.
@@ -53,6 +55,23 @@ public class RequestSimulator {
     this.thread = new TestPrimeMainThread(main);
     this.messageObserver = messageObserver;
     this.userAgent = new MockUserAgent();
+    this.port = main.configuration()[0].configuration().getListeners().get(0).getPort();
+  }
+
+  /**
+   * Creates a new request simulator that can be used to simulate requests to a Prime application.
+   *
+   * @param main            The main application entry point for the app being tested (or a test entry point). This
+   *                        starts the HTTP server and is blocking, but we'll start a thread for it and manage the
+   *                        lifecycle in this class.
+   * @param messageObserver Used to observe messages from within the HTTP server so that they can be asserted on.
+   */
+  public RequestSimulator(BasePrimeMain main, TestMessageObserver messageObserver, int port) {
+    this.main = main;
+    this.thread = new TestPrimeMainThread(main);
+    this.messageObserver = messageObserver;
+    this.userAgent = new MockUserAgent();
+    this.port = port;
   }
 
   public Injector getInjector() {
@@ -60,18 +79,18 @@ public class RequestSimulator {
   }
 
   public int getPort() {
-    return builder.resolveSimulatorPort();
+    return builder != null ? builder.port : -1;
   }
 
   public void reset() {
     userAgent.clearAllCookies();
-    this.builder = null;
+    builder = null;
     useTLS = false;
   }
 
   public void shutdown() {
-    this.thread.shutdown();
-    this.builder = null;
+    thread.shutdown();
+    builder = null;
     useTLS = false;
   }
 
@@ -83,7 +102,7 @@ public class RequestSimulator {
    * @return The RequestBuilder.
    */
   public RequestBuilder test(String path) {
-    builder = new RequestBuilder(path, main.getInjector(), userAgent, main.configuration(), messageObserver);
+    builder = new RequestBuilder(path, main.getInjector(), userAgent, messageObserver, port);
     builder.useTLS = useTLS;
     return builder;
   }

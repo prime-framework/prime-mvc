@@ -88,15 +88,15 @@ public abstract class PrimeBaseTest {
 
   public static MockConfiguration configuration = new MockConfiguration();
 
+  public static HTTPContext context;
+
   public static CORSConfiguration corsConfiguration;
 
-  protected static HTTPContext context;
+  public static Injector injector;
 
-  protected static Injector injector;
+  public static MetricRegistry metricRegistry = new MetricRegistry();
 
-  protected static MetricRegistry metricRegistry = new MetricRegistry();
-
-  protected static RequestSimulator simulator;
+  public static RequestSimulator simulator;
 
   @Inject public CSRFProvider csrfProvider;
 
@@ -107,38 +107,6 @@ public abstract class PrimeBaseTest {
   public HTTPResponse response;
 
   @Inject public TestBuilder test;
-
-  @BeforeSuite
-  public static void init() {
-    Module mvcModule = new MVCModule() {
-      @Override
-      protected void configure() {
-        super.configure();
-        install(new TestMVCConfigurationModule());
-        bind(CORSConfigurationProvider.class).to(TestCORSConfigurationProvider.class).in(Singleton.class);
-        bind(MessageObserver.class).toInstance(messageObserver);
-        bind(MetricRegistry.class).toInstance(metricRegistry);
-        bind(UserLoginSecurityContext.class).to(MockUserLoginSecurityContext.class);
-
-        // Test Content-Type
-        ContentHandlerFactory.addContentHandler(binder(), "application/test+json", JacksonContentHandler.class);
-      }
-    };
-
-//    SystemOutLogger.level = Level.Debug;
-
-    Module module = Modules.override(mvcModule).with(new TestContentModule(), new TestSecurityModule(), new TestScopeModule());
-    var configuration = new HTTPServerConfiguration().withListener(new HTTPListenerConfiguration(9080));
-    TestPrimeMain main = new TestPrimeMain(configuration, module);
-    simulator = new RequestSimulator(main, messageObserver);
-    injector = simulator.getInjector();
-    context = injector.getInstance(HTTPContext.class);
-  }
-
-  @AfterSuite
-  public static void shutdown() {
-    simulator.shutdown();
-  }
 
   @AfterMethod
   public void afterMethod() {
@@ -181,6 +149,31 @@ public abstract class PrimeBaseTest {
     configuration.csrfEnabled = false;
   }
 
+  @BeforeSuite
+  public void init() {
+    Module mvcModule = new MVCModule() {
+      @Override
+      protected void configure() {
+        super.configure();
+        install(new TestMVCConfigurationModule());
+        bind(CORSConfigurationProvider.class).to(TestCORSConfigurationProvider.class).in(Singleton.class);
+        bind(MessageObserver.class).toInstance(messageObserver);
+        bind(MetricRegistry.class).toInstance(metricRegistry);
+        bind(UserLoginSecurityContext.class).to(MockUserLoginSecurityContext.class);
+
+        // Test Content-Type
+        ContentHandlerFactory.addContentHandler(binder(), "application/test+json", JacksonContentHandler.class);
+      }
+    };
+
+    Module module = Modules.override(mvcModule).with(new TestContentModule(), new TestSecurityModule(), new TestScopeModule());
+    var mainConfig = new HTTPServerConfiguration().withListener(new HTTPListenerConfiguration(9080));
+    TestPrimeMain main = new TestPrimeMain(new HTTPServerConfiguration[]{mainConfig}, module);
+    simulator = new RequestSimulator(main, messageObserver);
+    injector = simulator.getInjector();
+    context = injector.getInstance(HTTPContext.class);
+  }
+
   @DataProvider(name = "methodOverrides")
   public Object[][] methodOverrides() {
     return new Object[][]{
@@ -189,6 +182,11 @@ public abstract class PrimeBaseTest {
         {"X-Method-Override"},
         {"x-method-override"}
     };
+  }
+
+  @AfterSuite
+  public void shutdown() {
+    simulator.shutdown();
   }
 
   @SuppressWarnings("Duplicates")

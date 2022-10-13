@@ -15,6 +15,9 @@
  */
 package org.primeframework.mvc;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import io.fusionauth.http.server.HTTPServer;
@@ -48,13 +51,11 @@ import org.primeframework.mvc.log.SLF4JLoggerFactoryAdapter;
 public abstract class BasePrimeMain {
   protected Injector injector;
 
-  protected PrimeMVCRequestHandler requestHandler;
-
-  protected HTTPServer server;
-
   private PrimeMVCInstrumenter instrumenter;
 
-  public abstract HTTPServerConfiguration configuration();
+  private List<PrimeHTTPServer> servers = new LinkedList<>();
+
+  public abstract HTTPServerConfiguration[] configuration();
 
   public Injector getInjector() {
     return injector;
@@ -67,7 +68,7 @@ public abstract class BasePrimeMain {
   public void hup() {
     injector = GuiceBootstrap.initialize(modules());
     injector.injectMembers(this);
-    requestHandler.updateInjector(injector);
+    servers.forEach(server -> server.handler.updateInjector(injector));
     instrumenter.updateInjector(injector);
   }
 
@@ -81,35 +82,52 @@ public abstract class BasePrimeMain {
   }
 
   /**
-   * Shuts down the entire Prime system (HTTP server and MVC). This can be called from tests. It is also called by the
-   * shutdown hook if it has been registered.
+   * Shuts down the entire Prime system (HTTP server(s) and MVC). This can be called from tests. It is also called by
+   * the shutdown hook if it has been registered.
    */
   public void shutdown() {
-    server.close();
-    requestHandler.close();
+    servers.forEach(server -> {
+      server.server.close();
+      server.handler.close();
+    });
   }
 
   public void start() {
-    // Make the request handler
-    requestHandler = new PrimeMVCRequestHandler(null);
-
     // Make the instrumenter
     instrumenter = new PrimeMVCInstrumenter();
 
-    // Load the injector
+    // Load the injector because the configuration might not be known until the injector is created
     hup();
 
-    // Create the server
-    server = new HTTPServer().withConfiguration(configuration())
-                             .withHandler(requestHandler)
-                             .withInstrumenter(instrumenter)
-                             .withLoggerFactory(new SLF4JLoggerFactoryAdapter());
+    // For each configured server, create the necessary objects
+    for (var config : configuration()) {
+      // Make the request handler for each server and use the current injector
+      var requestHandler = new PrimeMVCRequestHandler(injector);
 
-    // Start the server
-    server.start();
+      // Create the server
+      var server = new HTTPServer().withConfiguration(config)
+                                   .withHandler(requestHandler)
+                                   .withInstrumenter(instrumenter)
+                                   .withLoggerFactory(new SLF4JLoggerFactoryAdapter());
+      servers.add(new PrimeHTTPServer(requestHandler, server));
+    }
+
+    // Start the server(s)
+    servers.forEach(server -> server.server.start());
   }
 
   protected abstract Module[] modules();
+
+  private static class PrimeHTTPServer {
+    public final PrimeMVCRequestHandler handler;
+
+    public final HTTPServer server;
+
+    private PrimeHTTPServer(PrimeMVCRequestHandler handler, HTTPServer server) {
+      this.handler = handler;
+      this.server = server;
+    }
+  }
 
   private class PrimeHTTPServerShutdown extends Thread {
     public void run() {

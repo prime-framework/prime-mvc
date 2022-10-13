@@ -51,7 +51,6 @@ import io.fusionauth.http.HTTPMethod;
 import io.fusionauth.http.io.NonBlockingByteBufferOutputStream;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
-import io.fusionauth.http.server.HTTPServerConfiguration;
 import org.primeframework.mock.MockUserAgent;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.http.HTTPObjectsHolder;
@@ -69,11 +68,11 @@ import org.primeframework.mvc.util.URITools;
  */
 @SuppressWarnings({"unused", "UnusedReturnValue"})
 public class RequestBuilder {
-  public final HTTPServerConfiguration configuration;
-
   public final Injector injector;
 
   public final TestMessageObserver messageObserver;
+
+  public final int port;
 
   public final HTTPRequest request;
 
@@ -85,14 +84,14 @@ public class RequestBuilder {
 
   private byte[] body;
 
-  public RequestBuilder(String path, Injector injector, MockUserAgent userAgent,
-                        HTTPServerConfiguration configuration, TestMessageObserver messageObserver) {
+  public RequestBuilder(String path, Injector injector, MockUserAgent userAgent, TestMessageObserver messageObserver,
+                        int port) {
     this.injector = injector;
-    this.configuration = configuration;
     this.userAgent = userAgent;
     this.messageObserver = messageObserver;
     this.request = new HTTPRequest().with(r -> r.addLocales(Locale.US))
                                     .with(r -> r.setPath(path));
+    this.port = port;
   }
 
   /**
@@ -114,7 +113,7 @@ public class RequestBuilder {
   public RequestResult connect() {
     request.setMethod(HTTPMethod.CONNECT);
     ClientResponse<byte[], byte[]> response = run();
-    return new RequestResult(injector, request, response, userAgent, configuration, messageObserver);
+    return new RequestResult(injector, request, response, userAgent, messageObserver, port);
   }
 
   /**
@@ -125,7 +124,7 @@ public class RequestBuilder {
   public RequestResult delete() {
     request.setMethod(HTTPMethod.DELETE);
     ClientResponse<byte[], byte[]> response = run();
-    return new RequestResult(injector, request, response, userAgent, configuration, messageObserver);
+    return new RequestResult(injector, request, response, userAgent, messageObserver, port);
   }
 
   /**
@@ -136,7 +135,7 @@ public class RequestBuilder {
   public RequestResult get() {
     request.setMethod(HTTPMethod.GET);
     ClientResponse<byte[], byte[]> response = run();
-    return new RequestResult(injector, request, response, userAgent, configuration, messageObserver);
+    return new RequestResult(injector, request, response, userAgent, messageObserver, port);
   }
 
   public HTTPRequest getRequest() {
@@ -151,7 +150,7 @@ public class RequestBuilder {
   public RequestResult head() {
     request.setMethod(HTTPMethod.HEAD);
     ClientResponse<byte[], byte[]> response = run();
-    return new RequestResult(injector, request, response, userAgent, configuration, messageObserver);
+    return new RequestResult(injector, request, response, userAgent, messageObserver, port);
   }
 
   /**
@@ -208,7 +207,7 @@ public class RequestBuilder {
   public RequestResult method(String method) {
     request.setMethod(HTTPMethod.of(method));
     ClientResponse<byte[], byte[]> response = run();
-    return new RequestResult(injector, request, response, userAgent, configuration, messageObserver);
+    return new RequestResult(injector, request, response, userAgent, messageObserver, port);
   }
 
   /**
@@ -219,7 +218,7 @@ public class RequestBuilder {
   public RequestResult options() {
     request.setMethod(HTTPMethod.OPTIONS);
     ClientResponse<byte[], byte[]> response = run();
-    return new RequestResult(injector, request, response, userAgent, configuration, messageObserver);
+    return new RequestResult(injector, request, response, userAgent, messageObserver, port);
   }
 
   /**
@@ -230,7 +229,7 @@ public class RequestBuilder {
   public RequestResult patch() {
     request.setMethod(HTTPMethod.PATCH);
     ClientResponse<byte[], byte[]> response = run();
-    return new RequestResult(injector, request, response, userAgent, configuration, messageObserver);
+    return new RequestResult(injector, request, response, userAgent, messageObserver, port);
   }
 
   /**
@@ -241,7 +240,7 @@ public class RequestBuilder {
   public RequestResult post() {
     request.setMethod(HTTPMethod.POST);
     ClientResponse<byte[], byte[]> response = run();
-    return new RequestResult(injector, request, response, userAgent, configuration, messageObserver);
+    return new RequestResult(injector, request, response, userAgent, messageObserver, port);
   }
 
   /**
@@ -252,11 +251,7 @@ public class RequestBuilder {
   public RequestResult put() {
     request.setMethod(HTTPMethod.PUT);
     ClientResponse<byte[], byte[]> response = run();
-    return new RequestResult(injector, request, response, userAgent, configuration, messageObserver);
-  }
-
-  public int resolveSimulatorPort() {
-    return configuration.getListeners().get(0).getPort();
+    return new RequestResult(injector, request, response, userAgent, messageObserver, port);
   }
 
   /**
@@ -278,7 +273,7 @@ public class RequestBuilder {
   public RequestResult trace() {
     request.setMethod(HTTPMethod.TRACE);
     ClientResponse<byte[], byte[]> response = run();
-    return new RequestResult(injector, request, response, userAgent, configuration, messageObserver);
+    return new RequestResult(injector, request, response, userAgent, messageObserver, port);
   }
 
   /**
@@ -701,7 +696,6 @@ public class RequestBuilder {
                                                                       .with(c1 -> c1.value = c.value))
                              .collect(Collectors.toList());
 
-    int port = resolveSimulatorPort();
     String base = useTLS ? "https://local.fusionauth.io" : "http://localhost";
     URI requestURI = URI.create(base + ":" + port + request.getPath());
 

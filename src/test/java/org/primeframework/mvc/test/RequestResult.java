@@ -50,12 +50,12 @@ import com.inversoft.http.HTTPStrings.Headers;
 import com.inversoft.rest.ClientResponse;
 import io.fusionauth.http.Cookie;
 import io.fusionauth.http.Cookie.SameSite;
+import io.fusionauth.http.HTTPValues.ContentTypes;
 import io.fusionauth.http.HTTPValues.Methods;
 import io.fusionauth.http.io.NonBlockingByteBufferOutputStream;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
-import io.fusionauth.http.server.HTTPServerConfiguration;
-import io.netty.handler.codec.http.HttpUtil;
+import io.fusionauth.http.util.HTTPTools.HeaderValue;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -87,11 +87,11 @@ import static java.util.Arrays.asList;
  */
 @SuppressWarnings({"unused", "UnusedReturnValue"})
 public class RequestResult {
-  public final HTTPServerConfiguration configuration;
-
   public final Injector injector;
 
   public final TestMessageObserver messageObserver;
+
+  public final int port;
 
   public final HTTPRequest request;
 
@@ -102,14 +102,13 @@ public class RequestResult {
   private String body;
 
   public RequestResult(Injector injector, HTTPRequest request, ClientResponse<byte[], byte[]> response,
-                       MockUserAgent userAgent, HTTPServerConfiguration configuration,
-                       TestMessageObserver messageObserver) {
+                       MockUserAgent userAgent, TestMessageObserver messageObserver, int port) {
     this.request = request;
     this.injector = injector;
     this.response = response;
     this.userAgent = userAgent;
-    this.configuration = configuration;
     this.messageObserver = messageObserver;
+    this.port = port;
 
     // Set the request & response into the thread local so that they can be used when asserting
     HTTPObjectsHolder.clearRequest();
@@ -691,7 +690,7 @@ public class RequestResult {
   /**
    * Verifies the response Content-Length.
    *
-   * @param expected The expeted Content-Length.
+   * @param expected The expected Content-Length.
    * @return This.
    */
   public RequestResult assertContentLength(long expected) {
@@ -793,7 +792,7 @@ public class RequestResult {
    * @return This.
    */
   public RequestResult assertEncoding(Charset encoding) {
-    Charset actual = HttpUtil.getCharset(response.getHeader(Headers.ContentType), null);
+    Charset actual = getCharset();
     if (actual != null && !actual.equals(encoding)) {
       throw new AssertionError("Character Encoding [" + actual + "] is not equal to the expected value [" + encoding + "]");
     }
@@ -1296,8 +1295,8 @@ public class RequestResult {
     if (body == null) {
       byte[] bytes = getBody();
       if (bytes != null && bytes.length > 0) {
-        Charset encoding = HttpUtil.getCharset(response.getHeader(Headers.ContentType), StandardCharsets.UTF_8);
-        body = new String(bytes, encoding);
+        Charset encoding = getCharset();
+        body = new String(bytes, encoding != null ? encoding : StandardCharsets.UTF_8);
       } else {
         body = "";
       }
@@ -1547,7 +1546,7 @@ public class RequestResult {
       }
     }
 
-    RequestBuilder rb = new RequestBuilder(uri, injector, userAgent, configuration, messageObserver);
+    RequestBuilder rb = new RequestBuilder(uri, injector, userAgent, messageObserver, port);
 
     // Handle input, select and textarea
     for (Element element : form.select("input,select,textarea")) {
@@ -1598,7 +1597,7 @@ public class RequestResult {
       newRedirect = redirect.replace(originalURI, baseURI);
     }
 
-    RequestBuilder rb = new RequestBuilder(baseURI, injector, userAgent, configuration, messageObserver);
+    RequestBuilder rb = new RequestBuilder(baseURI, injector, userAgent, messageObserver, port);
     if (baseURI.length() != newRedirect.length()) {
       String params = newRedirect.substring(newRedirect.indexOf('?') + 1);
       QueryStringTools.parseQueryString(params).forEach(rb::withURLParameters);
@@ -1607,6 +1606,17 @@ public class RequestResult {
     RequestResult result = rb.get();
     consumer.accept(result);
     return result;
+  }
+
+  private Charset getCharset() {
+    HeaderValue headerValue = io.fusionauth.http.util.HTTPTools.parseHeaderValue(response.getHeader(Headers.ContentType));
+    String charsetParam = headerValue.parameters().get(ContentTypes.CharsetParameter);
+    Charset actual = null;
+    if (charsetParam != null) {
+      actual = Charset.forName(charsetParam);
+    }
+
+    return actual;
   }
 
   private Cookie getCookieOrThrow(String name) {
