@@ -50,11 +50,12 @@ import com.inversoft.http.HTTPStrings.Headers;
 import com.inversoft.rest.ClientResponse;
 import io.fusionauth.http.Cookie;
 import io.fusionauth.http.Cookie.SameSite;
+import io.fusionauth.http.HTTPValues.ContentTypes;
 import io.fusionauth.http.HTTPValues.Methods;
 import io.fusionauth.http.io.NonBlockingByteBufferOutputStream;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
-import io.netty.handler.codec.http.HttpUtil;
+import io.fusionauth.http.util.HTTPTools.HeaderValue;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -791,7 +792,7 @@ public class RequestResult {
    * @return This.
    */
   public RequestResult assertEncoding(Charset encoding) {
-    Charset actual = HttpUtil.getCharset(response.getHeader(Headers.ContentType), null);
+    Charset actual = getCharset();
     if (actual != null && !actual.equals(encoding)) {
       throw new AssertionError("Character Encoding [" + actual + "] is not equal to the expected value [" + encoding + "]");
     }
@@ -1294,8 +1295,8 @@ public class RequestResult {
     if (body == null) {
       byte[] bytes = getBody();
       if (bytes != null && bytes.length > 0) {
-        Charset encoding = HttpUtil.getCharset(response.getHeader(Headers.ContentType), StandardCharsets.UTF_8);
-        body = new String(bytes, encoding);
+        Charset encoding = getCharset();
+        body = new String(bytes, encoding != null ? encoding : StandardCharsets.UTF_8);
       } else {
         body = "";
       }
@@ -1605,6 +1606,17 @@ public class RequestResult {
     RequestResult result = rb.get();
     consumer.accept(result);
     return result;
+  }
+
+  private Charset getCharset() {
+    HeaderValue headerValue = io.fusionauth.http.util.HTTPTools.parseHeaderValue(response.getHeader(Headers.ContentType));
+    String charsetParam = headerValue.parameters().get(ContentTypes.CharsetParameter);
+    Charset actual = null;
+    if (charsetParam != null) {
+      actual = Charset.forName(charsetParam);
+    }
+
+    return actual;
   }
 
   private Cookie getCookieOrThrow(String name) {
