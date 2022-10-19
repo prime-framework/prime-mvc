@@ -745,11 +745,9 @@ public class RequestBuilder {
       if (contentType == null) {
         contentType = "";
       }
-
     } else if (!requestBodyParameters.isEmpty()) {
       bodyHandler = new FormDataBodyHandler(requestBodyParameters);
     }
-
 
     ClientResponse<byte[], byte[]> response = new RESTClient<>(byte[].class, byte[].class)
         .bodyHandler(bodyHandler)

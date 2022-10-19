@@ -1,0 +1,2 @@
+[#ftl/]
+value:${value!'null'}

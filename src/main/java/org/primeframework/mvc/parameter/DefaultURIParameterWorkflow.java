@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,7 +85,7 @@ public class DefaultURIParameterWorkflow implements URIParameterWorkflow {
     if (actionInvocation.uriParameters.size() > 0) {
       Map<String, List<String>> params = actionInvocation.uriParameters;
       for (Entry<String, List<String>> entry : params.entrySet()) {
-        request.getParameters().put(entry.getKey(), entry.getValue());
+        request.getParameters().putIfAbsent(entry.getKey(), entry.getValue());
       }
     }
 
