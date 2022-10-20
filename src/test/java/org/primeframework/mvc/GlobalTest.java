@@ -924,6 +924,19 @@ public class GlobalTest extends PrimeBaseTest {
                                                                          .with("bar", "baz")
                                                                          .with("q", "foo")
                                                                          .with("code", "bar")));
+
+    // When we expect parameters, assert that the URL does not have parameters. This tests for an edge case
+    // that we have fixed in the RequestResult.
+    try {
+      test.simulate(() -> simulator.test("/complex-redirect")
+                                   .withURLParameter("redirectURI", "/foo?bar=baz&q=foo&code=bar")
+                                   .get()
+                                   .assertStatusCode(302)
+                                   .assertRedirect("/foo"));
+      fail("Expected a failure.");
+    } catch (Error e) {
+      assertEquals(e.getClass(), AssertionError.class);
+    }
   }
 
   @Test

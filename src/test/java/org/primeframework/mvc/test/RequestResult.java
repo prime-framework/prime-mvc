@@ -1654,7 +1654,7 @@ public class RequestResult {
     // Bail early they are not even the same size
     if (actual.keySet().size() != expected.keySet().size()) {
       // Check for optional parameters, if we don't have any, we know we are done.
-      if (expected.values().stream().noneMatch(v -> v.get(0).equals("___optional___"))) {
+      if (expected.values().stream().noneMatch(v -> v.size() > 0 && v.get(0).equals("___optional___"))) {
         return false;
       }
     }
