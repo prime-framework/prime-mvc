@@ -264,6 +264,12 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
     }
 
     try {
+      // We can optionally start with only a refresh token, no JWT.
+      // - Treat this the same as an expired JWT - just refresh my JWT man!
+      if (tokens.jwt == null) {
+        return refreshJWT(tokens);
+      }
+
       tokens.decodedJWT = JWT.getDecoder().decode(tokens.jwt, verifiers);
       if (!validateJWTClaims(tokens.decodedJWT)) {
         return refreshJWT(tokens);
