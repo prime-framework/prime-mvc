@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.GeneralSecurityException;
 
 import com.google.inject.Module;
 import com.google.inject.util.Modules;
@@ -74,7 +75,7 @@ public class TLSTest {
   }
 
   @BeforeClass
-  public void beforeClass() throws IOException {
+  public void beforeClass() throws IOException, GeneralSecurityException {
     Module mvcModule = new MVCModule() {
       @Override
       protected void configure() {

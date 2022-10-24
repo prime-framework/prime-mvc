@@ -38,6 +38,8 @@ public class PrimeMVCInstrumenter implements Instrumenter {
 
   private volatile Counter chunkedResponses;
 
+  private volatile Counter connectionsClosed;
+
   @Override
   public void acceptedConnection() {
     inc(acceptedConnections, 1);
@@ -59,6 +61,11 @@ public class PrimeMVCInstrumenter implements Instrumenter {
   }
 
   @Override
+  public void connectionClosed() {
+    inc(connectionsClosed, 1);
+  }
+
+  @Override
   public void readFromClient(long bytes) {
     inc(bytesRead, bytes);
   }
@@ -77,6 +84,7 @@ public class PrimeMVCInstrumenter implements Instrumenter {
     badRequests = metricRegistry.counter("java-http.bad-requests");
     chunkedRequests = metricRegistry.counter("java-http.chunked-requests");
     chunkedResponses = metricRegistry.counter("java-http.chunked-responses");
+    connectionsClosed = metricRegistry.counter("java-http.connections-closed");
     bytesRead = metricRegistry.counter("java-http.bytes-read");
     bytesWritten = metricRegistry.counter("java-http.bytes-written");
   }

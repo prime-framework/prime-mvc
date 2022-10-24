@@ -15,6 +15,7 @@
  */
 package org.primeframework.mvc.log;
 
+import io.fusionauth.http.log.Level;
 import io.fusionauth.http.log.Logger;
 import io.fusionauth.http.log.LoggerFactory;
 
@@ -74,6 +75,11 @@ public class SLF4JLoggerFactoryAdapter implements LoggerFactory {
     @Override
     public boolean isDebuggable() {
       return logger.isDebugEnabled();
+    }
+
+    @Override
+    public void setLevel(Level level) {
+      // No-op, you can implement this yourself if you want
     }
 
     @Override
