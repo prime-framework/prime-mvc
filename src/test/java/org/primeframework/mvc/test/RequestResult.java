@@ -1666,7 +1666,8 @@ public class RequestResult {
     for (i = j = 0; j < expectedKeys.size(); ) {
       if (!Objects.equals(actualKeys.get(i), expectedKeys.get(j))) {
         // We may have optional values, continue;
-        if (expected.get(expectedKeys.get(j)).get(0).equals("___optional___")) {
+        List<String> expectedValues = expected.get(expectedKeys.get(j));
+        if (expectedValues.size() > 0 && expectedValues.get(0).equals("___optional___")) {
           j++;
           continue;
         }
