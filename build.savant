@@ -76,7 +76,7 @@ project(group: "org.primeframework", name: "prime-mvc", version: "4.0.5", licens
       dependency(id: "org.testng:testng:${testngVersion}")
       dependency(id: "org.jsoup:jsoup:${jsoupVersion}")
     }
-    group(name: "test-runtime") {
+    group(name: "test-runtime", export: false) {
       dependency(id: "ch.qos.logback:logback-classic:${logbackVersion}")
       dependency(id: "ch.qos.logback:logback-core:${logbackVersion}")
     }
