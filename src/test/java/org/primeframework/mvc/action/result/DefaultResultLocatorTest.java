@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,8 +34,7 @@ import static org.testng.Assert.assertEquals;
  * @author Brian Pontarelli
  */
 public class DefaultResultLocatorTest extends PrimeBaseTest {
-  // TODO : Re-Enable when we get a released version of EasyMock
-  @Test(enabled = false)
+  @Test
   public void locate() throws Exception {
     ActionInvocation ai = new ActionInvocation(null, null, "/action", "js", null);
 

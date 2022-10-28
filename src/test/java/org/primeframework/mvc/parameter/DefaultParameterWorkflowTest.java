@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2014-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.primeframework.mvc.parameter;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -52,7 +53,6 @@ import org.primeframework.mvc.parameter.el.ExpressionException;
 import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
-import org.testng.reporters.Files;
 import static org.easymock.EasyMock.aryEq;
 import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.createStrictMock;
@@ -93,7 +93,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
         assertEquals(list.get(0).name, "userfile");
 
         try {
-          assertEquals(Files.readFile(list.get(0).file.toFile()), "1234\n");
+          assertEquals(Files.readString(list.get(0).file), "1234\n");
         } catch (IOException e) {
           throw new RuntimeException(e);
         }
@@ -124,8 +124,8 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
         assertEquals(list.get(0).name, "userfiles");
         assertEquals(list.get(1).name, "userfiles");
         try {
-          assertEquals(Files.readFile(list.get(0).file.toFile()), "1234\n");
-          assertEquals(Files.readFile(list.get(1).file.toFile()), "1234\n");
+          assertEquals(Files.readString(list.get(0).file), "1234\n");
+          assertEquals(Files.readString(list.get(1).file), "1234\n");
         } catch (IOException e) {
           throw new RuntimeException(e);
         }

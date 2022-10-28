@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,8 +36,7 @@ import static org.testng.Assert.assertEquals;
  * @author Brian Pontarelli
  */
 public class DefaultMessageStoreTest {
-  // TODO : Re-Enable when we get a released version of EasyMock
-  @Test(enabled = false)
+  @Test
   public void bulk() {
     List<Message> messages = new ArrayList<>();
     messages.add(new SimpleFieldMessage(MessageType.ERROR, "foo.bar", "code", "message"));
@@ -54,8 +53,7 @@ public class DefaultMessageStoreTest {
     verify(scope);
   }
 
-  // TODO : Re-Enable when we get a released version of EasyMock
-  @Test(enabled = false)
+  @Test
   public void get() {
     List<Message> requestMessages = new ArrayList<>();
     requestMessages.add(new SimpleMessage(MessageType.ERROR, "code1", "request1"));
@@ -97,8 +95,7 @@ public class DefaultMessageStoreTest {
     verify(request, flash, application);
   }
 
-  // TODO : Re-Enable when we get a released version of EasyMock
-  @Test(enabled = false)
+  @Test
   public void getScope() {
     List<Message> requestMessages = new ArrayList<>();
     requestMessages.add(new SimpleMessage(MessageType.ERROR, "code1", "request1"));
@@ -120,8 +117,7 @@ public class DefaultMessageStoreTest {
     verify(request);
   }
 
-  // TODO : Re-Enable when we get a released version of EasyMock
-  @Test(enabled = false)
+  @Test
   public void request() {
     Message message = new SimpleFieldMessage(MessageType.ERROR, "foo.bar", "code", "message");
 

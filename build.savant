@@ -16,10 +16,10 @@
 
 asmVersion = "9.2.0"
 dropWizardVersion = "3.2.6"
-easyMockVersion = "4.4.0-20220601"
+easyMockVersion = "5.0.1"
 freemarkerVersion = "2.3.30"
 fusionAuthJWTVersion = "5.1.0"
-javaHTTPVersion = "0.1.5"
+javaHTTPVersion = "0.1.7"
 jsonPatchVersion = "1.13.0"
 guavaVersion = "30.1.0-jre"
 guiceVersion = "5.1.0"
@@ -27,10 +27,10 @@ jacksonVersion = "2.13.4"
 jsoupVersion = "1.12.1"
 logbackVersion = "1.3.0-alpha16"
 restifyVersion = "4.1.2"
-slf4jVersion = "2.0.0-alpha7"
-testngVersion = "7.3.0"
+slf4jVersion = "2.0.3"
+testngVersion = "7.6.1"
 
-project(group: "org.primeframework", name: "prime-mvc", version: "4.0.6", licenses: ["ApacheV2_0"]) {
+project(group: "org.primeframework", name: "prime-mvc", version: "4.0.7", licenses: ["ApacheV2_0"]) {
   workflow {
     fetch {
       cache()
@@ -51,6 +51,7 @@ project(group: "org.primeframework", name: "prime-mvc", version: "4.0.6", licens
       dependency(id: "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}")
       dependency(id: "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}")
       dependency(id: "com.github.java-json-tools:json-patch:${jsonPatchVersion}")
+      // testng:7.6.1 and guava:30.1.0 want 3.0.2, easymock:5.0.1 wants 3.0.1
       dependency(id: "com.google.code.findbugs:jsr305:3.0.2", skipCompatibilityCheck: true)
       dependency(id: "com.google.inject:guice:${guiceVersion}")
       dependency(id: "com.inversoft:restify:${restifyVersion}")
@@ -60,18 +61,13 @@ project(group: "org.primeframework", name: "prime-mvc", version: "4.0.6", licens
       dependency(id: "javax.inject:javax.inject:1.0.0")
       dependency(id: "org.freemarker:freemarker:${freemarkerVersion}")
       dependency(id: "org.ow2.asm:asm:${asmVersion}")
-      dependency(id: "org.slf4j:slf4j-api:${slf4jVersion}")
+      // easymock:5.0.1 wants version 1.7.32
+      dependency(id: "org.slf4j:slf4j-api:${slf4jVersion}", skipCompatibilityCheck: true)
     }
     group(name: "runtime") {
-      dependency(id: "com.google.guava:guava:${guavaVersion}", skipCompatibilityCheck: true)
+      dependency(id: "com.google.guava:guava:${guavaVersion}")
     }
     group(name: "test-compile", export: false) {
-      // Note, I just built master and published the jar into Savant, named it 4.4.0+20220601 since I built it on Jun 1 2022.
-      // Once 4.4 is officially released, we should use it.
-
-      // https://github.com/easymock/easymock/issues/274
-      // https://github.com/easymock/easymock/milestone/25
-      // https://github.com/easymock/easymock/releases
       dependency(id: "org.easymock:easymock:${easyMockVersion}")
       dependency(id: "org.testng:testng:${testngVersion}")
       dependency(id: "org.jsoup:jsoup:${jsoupVersion}")

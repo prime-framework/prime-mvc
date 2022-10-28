@@ -54,8 +54,7 @@ import static org.testng.Assert.fail;
  * @author Brian Pontarelli
  */
 public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
-  // TODO : Re-Enable when we get a released version of EasyMock
-  @Test(enabled = false)
+  @Test
   public void actionLessWithDefaultForward() throws Exception {
     ActionInvocation ai = new ActionInvocation(null, null, "/foo/bar", null, null);
     ActionInvocationStore ais = createStrictMock(ActionInvocationStore.class);
@@ -93,8 +92,8 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
     verify(ais, resultStore, resourceLocator, injector, chain, binder);
   }
 
-  // TODO : Re-Enable when we get a released version of EasyMock
-  @Test(enabled = false)
+
+  @Test
   public void actionLessWithDefaultRedirect() throws Exception {
     ActionInvocation ai = new ActionInvocation(null, null, "/foo/bar", null, null);
     ActionInvocationStore ais = createStrictMock(ActionInvocationStore.class);
@@ -139,8 +138,7 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
     verify(ais, resultStore, resourceLocator, injector, chain, binder);
   }
 
-  // TODO : Re-Enable when we get a released version of EasyMock
-  @Test(enabled = false)
+  @Test
   public void actionLessWithoutDefault() throws Exception {
     ActionInvocation ai = new ActionInvocation(null, null, "/foo/bar", null, null);
     ActionInvocationStore ais = createStrictMock(ActionInvocationStore.class);
@@ -180,8 +178,7 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
     verify(ais, resultStore, resourceLocator, injector, chain, binder);
   }
 
-  // TODO : Re-Enable when we get a released version of EasyMock
-  @Test(enabled = false)
+  @Test
   public void actionMissingResult() throws Exception {
     ForwardImpl annotation = new ForwardImpl("/user/edit", "success");
     ActionInvocation ai = makeActionInvocation(new EditAction(), annotation);
@@ -258,8 +255,7 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
     verify(ais, resultStore, resourceLocator, injector, chain, binder);
   }
 
-  // TODO : Re-Enable when we get a released version of EasyMock
-  @Test(enabled = false)
+  @Test
   public void actionWithResult() throws Exception {
     ForwardImpl annotation = new ForwardImpl("/user/edit", "success");
     ActionInvocation ai = makeActionInvocation(new EditAction(), annotation);

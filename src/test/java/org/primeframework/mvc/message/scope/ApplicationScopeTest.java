@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,8 +35,8 @@ import static org.testng.Assert.assertEquals;
  * @author Brian Pontarelli
  */
 public class ApplicationScopeTest {
-  // TODO : Re-Enable when we get a released version of EasyMock
-  @Test(enabled = false)
+
+  @Test
   public void add() {
     List<Message> messages = new ArrayList<>();
 
@@ -52,8 +52,8 @@ public class ApplicationScopeTest {
     verify(context);
   }
 
-  // TODO : Re-Enable when we get a released version of EasyMock
-  @Test(enabled = false)
+
+  @Test
   public void addAll() {
     List<Message> messages = new ArrayList<>();
 
@@ -70,8 +70,8 @@ public class ApplicationScopeTest {
     verify(context);
   }
 
-  // TODO : Re-Enable when we get a released version of EasyMock
-  @Test(enabled = false)
+
+  @Test
   public void get() {
     HTTPContext context = createStrictMock(HTTPContext.class);
     expect(context.getAttribute(ApplicationScope.KEY)).andReturn(List.of(new SimpleMessage(MessageType.ERROR, "code", "Test message")));
