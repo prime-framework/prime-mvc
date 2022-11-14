@@ -60,6 +60,13 @@ public class HTTPTools {
    */
   public static String getRequestURI(HTTPRequest request) {
     String uri = request.getPath();
+    while (uri.startsWith("/..")) {
+      uri = uri.substring(3);
+    }
+    while (uri.startsWith("../")) {
+      uri = uri.substring(3);
+    }
+
     int semicolon = uri.indexOf(';');
     if (semicolon >= 0) {
       uri = uri.substring(0, semicolon);

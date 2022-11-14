@@ -38,4 +38,11 @@ public class StaticResourceTest extends PrimeBaseTest {
              .assertContentType("text/javascript")
              .assertBodyContains("{};");
   }
+
+  @Test
+  public void get_preventEscape() {
+    simulator.test("/../../resources/logging.properties")
+             .get()
+             .assertStatusCode(404);
+  }
 }

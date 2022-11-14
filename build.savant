@@ -31,7 +31,7 @@ restifyVersion = "4.1.2"
 slf4jVersion = "2.0.3"
 testngVersion = "7.6.1"
 
-project(group: "org.primeframework", name: "prime-mvc", version: "4.0.8", licenses: ["ApacheV2_0"]) {
+project(group: "org.primeframework", name: "prime-mvc", version: "4.0.9", licenses: ["ApacheV2_0"]) {
   workflow {
     fetch {
       cache()
@@ -100,6 +100,7 @@ release = loadPlugin(id: "org.savantbuild.plugin:release-git:2.0.0-RC.2")
 // Plugin settings
 java.settings.javaVersion = "17"
 javaTestNG.settings.javaVersion = "17"
+javaTestNG.settings.jvmArguments = "--add-exports java.base/sun.security.x509=ALL-UNNAMED --add-exports java.base/sun.security.util=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED"
 
 target(name: "clean", description: "Cleans the project") {
   java.clean()
@@ -108,10 +109,8 @@ target(name: "clean", description: "Cleans the project") {
 target(name: "compile", description: "Compiles the project") {
   java.compileMain()
 
-  // allow the user of sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl in tests
-  java
-      .settings
-      .compilerArguments += " -XDignore.symbol.file --add-exports java.base/sun.security.x509=ALL-UNNAMED --add-exports java.base/sun.security.util=ALL-UNNAMED"
+  // Allow the user of sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl in tests (but not in production code)
+  java.settings.compilerArguments = "-XDignore.symbol.file --add-exports java.base/sun.security.x509=ALL-UNNAMED --add-exports java.base/sun.security.util=ALL-UNNAMED"
   java.compileTest()
 
   file.copy(to: "build/classes/main") {
@@ -142,10 +141,6 @@ target(name: "jar", description: "JARs the project", dependsOn: ["compile"]) {
 }
 
 target(name: "test", description: "Runs the project's tests", dependsOn: ["jar"]) {
-  //  May be needed for Java 17
-  javaTestNG
-      .settings
-      .jvmArguments = "--add-exports java.base/sun.security.x509=ALL-UNNAMED --add-exports java.base/sun.security.util=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED"
   javaTestNG.test()
 }
 
@@ -157,8 +152,7 @@ target(name: "int", description: "Releases a local integration build of the proj
   dependency.integrate()
 }
 
-target(name: "list-unused-dependencies", description: "Lists the unused dependencies of the project",
-       dependsOn: ["compile"]) {
+target(name: "list-unused-dependencies", description: "Lists the unused dependencies of the project", dependsOn: ["compile"]) {
   dependency.listUnusedDependencies()
 }
 
