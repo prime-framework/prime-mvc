@@ -31,18 +31,24 @@ public class StaticResourceTest extends PrimeBaseTest {
   }
 
   @Test
+  public void get_preventEscape() {
+    // Literal period
+    simulator.test("/../../resources/logging.properties")
+             .get()
+             .assertStatusCode(404);
+
+    // Unicode period
+    simulator.test("/\u002e\u002e/\u002e\u002e/resources/logging.properties")
+             .get()
+             .assertStatusCode(404);
+  }
+
+  @Test
   public void get_resource() {
     simulator.test("/js/test.js")
              .get()
              .assertStatusCode(200)
              .assertContentType("text/javascript")
              .assertBodyContains("{};");
-  }
-
-  @Test
-  public void get_preventEscape() {
-    simulator.test("/../../resources/logging.properties")
-             .get()
-             .assertStatusCode(404);
   }
 }
