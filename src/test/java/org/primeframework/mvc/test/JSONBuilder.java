@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2021-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package org.primeframework.mvc.test;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -132,6 +133,11 @@ public class JSONBuilder {
 
     // Create the path if it does not yet exist so we can create nexted values.
     createNestedObjectPaths(pointer);
+
+    // Allow the caller to not have initialized the root object
+    if (root == null) {
+      root = (ObjectNode) objectMapper.readTree("{}".getBytes(StandardCharsets.UTF_8));
+    }
 
     JsonNode node = root.at(pointer.parent);
 
