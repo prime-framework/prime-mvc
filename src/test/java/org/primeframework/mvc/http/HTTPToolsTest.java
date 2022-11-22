@@ -115,4 +115,13 @@ public class HTTPToolsTest {
     uri = URI.create(req.getBaseURL());
     assertEquals(uri.toString(), "http://foobar.com");
   }
+
+  @Test
+  public void badURIs() {
+    assertEquals(HTTPTools.getRequestURI(new HTTPRequest().with(r -> r.setPath("../../../foo.png"))), "foo.png");
+    assertEquals(HTTPTools.getRequestURI(new HTTPRequest().with(r -> r.setPath("/../../../foo.png"))), "/foo.png");
+    assertEquals(HTTPTools.getRequestURI(new HTTPRequest().with(r -> r.setPath("/css/../../../foo.png"))), "/css/foo.png");
+    assertEquals(HTTPTools.getRequestURI(new HTTPRequest().with(r -> r.setPath("../css/../../../foo.png"))), "css/foo.png");
+    assertEquals(HTTPTools.getRequestURI(new HTTPRequest().with(r -> r.setPath("/../css/../../../foo.png"))), "/css/foo.png");
+  }
 }
