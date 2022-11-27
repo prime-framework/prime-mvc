@@ -1194,6 +1194,28 @@ public class RequestResult {
   }
 
   /**
+   * Can be called to perform custom assertions or business logic.
+   *
+   * @param consumer The consumer that accepts the RequestResult.
+   * @return This.
+   */
+  public RequestResult custom(ThrowingConsumer<RequestResult> consumer) throws Exception {
+    consumer.accept(this);
+    return this;
+  }
+
+  /**
+   * Can be called to perform custom assertions or business logic.
+   *
+   * @param runnable The runnable to stuff.
+   * @return This.
+   */
+  public RequestResult custom(ThrowingRunnable runnable) throws Exception {
+    runnable.run();
+    return this;
+  }
+
+  /**
    * Attempt to submit the form found in the response body.
    *
    * @param selector The selector used to find the form in the DOM
@@ -1428,7 +1450,7 @@ public class RequestResult {
   }
 
   /**
-   * Can be called to se tup objects for assertions.
+   * Can be called to set up objects for assertions.
    *
    * @param runnable The runnable to stuff.
    * @return This.
