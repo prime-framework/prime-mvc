@@ -112,7 +112,9 @@ public abstract class BaseJacksonContentHandler implements ContentHandler {
           logger.debug("Request: ({} {}) {}", request.getMethod(), request.getPath(), body);
 
           // Replace the input stream, in case anything downstream wants to use it
-          request.setInputStream(new ByteArrayInputStream(body.getBytes(request.getCharacterEncoding())));
+          if(request.getInputStream() != null) {
+            request.setInputStream(new ByteArrayInputStream(body.getBytes(request.getCharacterEncoding())));
+          }
         }
 
         // Retrieve the current value from the action, so we can see if it is non-null
