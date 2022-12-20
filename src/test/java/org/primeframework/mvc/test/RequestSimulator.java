@@ -137,6 +137,7 @@ public class RequestSimulator {
 
   /**
    * Enables HTTPS for the RequestBuilder. Ensure you have set tlsPort as well.
+   *
    * @param useTLS Whether to use TLS.
    * @return The RequestBuilder.
    */
