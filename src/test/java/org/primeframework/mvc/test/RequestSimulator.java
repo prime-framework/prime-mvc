@@ -40,6 +40,8 @@ public class RequestSimulator {
 
   public int port;
 
+  public int tlsPort;
+
   public boolean useTLS;
 
   /**
@@ -47,7 +49,7 @@ public class RequestSimulator {
    *
    * @param main            The main application entry point for the app being tested (or a test entry point). This
    *                        starts the HTTP server and is blocking, but we'll start a thread for it and manage the
-   *                        lifecycle in this class.
+   *                        lifecycle in this class. Uses the first configured listener as the non-HTTPS port.
    * @param messageObserver Used to observe messages from within the HTTP server so that they can be asserted on.
    */
   public RequestSimulator(BasePrimeMain main, TestMessageObserver messageObserver) {
@@ -65,6 +67,7 @@ public class RequestSimulator {
    *                        starts the HTTP server and is blocking, but we'll start a thread for it and manage the
    *                        lifecycle in this class.
    * @param messageObserver Used to observe messages from within the HTTP server so that they can be asserted on.
+   * @param port            The port to use for non-TLS connections.
    */
   public RequestSimulator(BasePrimeMain main, TestMessageObserver messageObserver, int port) {
     this.main = main;
@@ -74,10 +77,34 @@ public class RequestSimulator {
     this.port = port;
   }
 
+  /**
+   * Creates a new request simulator that can be used to simulate requests to a Prime application.
+   *
+   * @param main            The main application entry point for the app being tested (or a test entry point). This
+   *                        starts the HTTP server and is blocking, but we'll start a thread for it and manage the
+   *                        lifecycle in this class.
+   * @param messageObserver Used to observe messages from within the HTTP server so that they can be asserted on.
+   * @param port            The port to use for non-TLS connections.
+   * @param tlsPort         The port to use for TLS connections.
+   */
+  public RequestSimulator(BasePrimeMain main, TestMessageObserver messageObserver, int port, int tlsPort) {
+    this.main = main;
+    this.thread = new TestPrimeMainThread(main);
+    this.messageObserver = messageObserver;
+    this.userAgent = new MockUserAgent();
+    this.port = port;
+    this.tlsPort = tlsPort;
+  }
+
   public Injector getInjector() {
     return main.getInjector();
   }
 
+  /**
+   * The RequestBuilder port. Available only after an invocation of {@link #test(String)}.
+   *
+   * @return The port that the RequestBuilder is using.
+   */
   public int getPort() {
     return builder != null ? builder.port : -1;
   }
@@ -102,11 +129,17 @@ public class RequestSimulator {
    * @return The RequestBuilder.
    */
   public RequestBuilder test(String path) {
-    builder = new RequestBuilder(path, main.getInjector(), userAgent, messageObserver, port);
+    var testPort = useTLS ? tlsPort : port;
+    builder = new RequestBuilder(path, main.getInjector(), userAgent, messageObserver, testPort);
     builder.useTLS = useTLS;
     return builder;
   }
 
+  /**
+   * Enables HTTPS for the RequestBuilder. Ensure you have set tlsPort as well.
+   * @param useTLS Whether to use TLS.
+   * @return The RequestBuilder.
+   */
   public RequestSimulator withTLS(boolean useTLS) {
     this.useTLS = useTLS;
     return this;

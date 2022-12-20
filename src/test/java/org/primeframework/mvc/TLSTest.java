@@ -93,7 +93,7 @@ public class TLSTest {
     var config = new HTTPServerConfiguration().withListener(new HTTPListenerConfiguration(9081, certificate, privateKey));
     TestPrimeMain main = new TestPrimeMain(new HTTPServerConfiguration[]{config}, module);
 
-    simulator = new RequestSimulator(main, new TestMessageObserver());
+    simulator = new RequestSimulator(main, new TestMessageObserver(), 0, 9081);
 
     // Disable SSL validation so we can use a self-signed cert
     try {
