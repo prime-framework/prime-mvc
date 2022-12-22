@@ -86,9 +86,8 @@ public class TLSTest {
       }
     };
 
-    String userHome = System.getProperty("user.home");
-    String certificate = Files.readString(Paths.get(userHome + "/dev/certificates/fusionauth.pem"));
-    String privateKey = Files.readString(Paths.get(userHome + "/dev/certificates/fusionauth.key"));
+    String certificate = Files.readString(Paths.get("src/test/resources/testcert.pem"));
+    String privateKey = Files.readString(Paths.get("src/test/resources/testcert.key"));
     Module module = Modules.override(mvcModule).with(new TestContentModule());
     var config = new HTTPServerConfiguration().withListener(new HTTPListenerConfiguration(9081, certificate, privateKey));
     TestPrimeMain main = new TestPrimeMain(new HTTPServerConfiguration[]{config}, module);

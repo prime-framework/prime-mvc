@@ -696,8 +696,8 @@ public class RequestBuilder {
                                                                       .with(c1 -> c1.value = c.value))
                              .collect(Collectors.toList());
 
-    String base = useTLS ? "https://local.fusionauth.io" : "http://localhost";
-    URI requestURI = URI.create(base + ":" + port + request.getPath());
+    String scheme = useTLS ? "https://" : "http://";
+    URI requestURI = URI.create(scheme + "localhost" + ":" + port + request.getPath());
 
     // Referer for CSRF checks must be provided
     if (request.getHeader("Referer") == null) {
