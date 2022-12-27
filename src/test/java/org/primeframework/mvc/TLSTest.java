@@ -86,6 +86,7 @@ public class TLSTest {
       }
     };
 
+    // TODO: Once the Prime tests work with the latest java-http, these tests should exercise the loading of multiple certs in a chain.
     String certificate = Files.readString(Paths.get("src/test/resources/testcert.pem"));
     String privateKey = Files.readString(Paths.get("src/test/resources/testcert.key"));
     Module module = Modules.override(mvcModule).with(new TestContentModule());
