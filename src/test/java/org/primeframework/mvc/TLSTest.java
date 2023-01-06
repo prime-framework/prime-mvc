@@ -86,14 +86,14 @@ public class TLSTest {
       }
     };
 
-    String userHome = System.getProperty("user.home");
-    String certificate = Files.readString(Paths.get(userHome + "/dev/certificates/fusionauth.pem"));
-    String privateKey = Files.readString(Paths.get(userHome + "/dev/certificates/fusionauth.key"));
+    // TODO: Once the Prime tests work with the latest java-http, these tests should exercise the loading of multiple certs in a chain.
+    String certificate = Files.readString(Paths.get("src/test/resources/testcert.pem"));
+    String privateKey = Files.readString(Paths.get("src/test/resources/testcert.key"));
     Module module = Modules.override(mvcModule).with(new TestContentModule());
     var config = new HTTPServerConfiguration().withListener(new HTTPListenerConfiguration(9081, certificate, privateKey));
     TestPrimeMain main = new TestPrimeMain(new HTTPServerConfiguration[]{config}, module);
 
-    simulator = new RequestSimulator(main, new TestMessageObserver());
+    simulator = new RequestSimulator(main, new TestMessageObserver(), 0, 9081);
 
     // Disable SSL validation so we can use a self-signed cert
     try {
