@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2021-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ public class HTTPTools {
   private static final Pattern DoubleSlash = Pattern.compile("/{2,}");
 
   /**
-   * Return the <code>Origin</code> header or as a fall back, the value of the <code>Referer</code> header will be
+   * Return the <code>Origin</code> header or as a fallback, the value of the <code>Referer</code> header will be
    * returned if the <code>Origin</code> header is not available.
    *
    * <p>
