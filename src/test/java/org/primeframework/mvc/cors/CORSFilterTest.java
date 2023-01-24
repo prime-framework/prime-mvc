@@ -321,9 +321,23 @@ public class CORSFilterTest extends PrimeBaseTest {
     assertNull(response.headers().firstValue("Access-Control-Allow-Methods").orElse(null));
     assertEquals(response.headers().firstValue("Access-Control-Expose-Headers").orElse(null), "Access-Control-Allow-Origin,Access-Control-Allow-Credentials");
     assertNull(response.headers().firstValue("Access-Control-Max-Age").orElse(null));
+  }
 
-    // No Content-Type header currently results in an INVALID_CORS handling
-    // TODO : Is this correct?
+  @Test
+  public void post_validateContentType() throws Exception {
+    HttpClient client = HttpClient.newBuilder().followRedirects(Redirect.NEVER).priority(256).build();
+    // No Content-Type header currently results in an INVALID_CORS handling if there is content
+    HttpResponse<Void> response = client.send(
+        HttpRequest.newBuilder(URI.create("http://localhost:9080/api/status"))
+                   .POST(BodyPublishers.ofString("{}"))
+                   .header("Origin", "https://jackinthebox.com")
+                   .build(),
+        BodyHandlers.discarding()
+    );
+    assertEquals(response.statusCode(), 403);
+    assertNoCORSHeaders(response);
+
+    // Content-Length of 0 and no Content-Type is okay
     response = client.send(
         HttpRequest.newBuilder(URI.create("http://localhost:9080/api/status"))
                    .POST(BodyPublishers.noBody())
@@ -331,8 +345,14 @@ public class CORSFilterTest extends PrimeBaseTest {
                    .build(),
         BodyHandlers.discarding()
     );
-    assertEquals(response.statusCode(), 403);
-    assertNoCORSHeaders(response);
+    assertEquals(response.statusCode(), 200);
+    assertEquals(response.statusCode(), 200);
+    assertEquals(response.headers().firstValue("Access-Control-Allow-Credentials").orElse(null), "true");
+    assertEquals(response.headers().firstValue("Access-Control-Allow-Origin").orElse(null), "https://jackinthebox.com");
+    assertNull(response.headers().firstValue("Access-Control-Allow-Headers").orElse(null));
+    assertNull(response.headers().firstValue("Access-Control-Allow-Methods").orElse(null));
+    assertEquals(response.headers().firstValue("Access-Control-Expose-Headers").orElse(null), "Access-Control-Allow-Origin,Access-Control-Allow-Credentials");
+    assertNull(response.headers().firstValue("Access-Control-Max-Age").orElse(null));
   }
 
   @Test

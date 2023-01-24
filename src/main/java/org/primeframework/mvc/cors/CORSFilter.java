@@ -280,10 +280,10 @@ public final class CORSFilter {
       } else if (HTTPMethod.GET.is(method) || HTTPMethod.HEAD.is(method)) {
         requestType = CORSRequestType.SIMPLE;
       } else if (HTTPMethod.POST.is(method)) {
+        Long contentLength = request.getContentLength();
         String contentType = request.getContentType();
-        if (contentType != null) {
-          contentType = contentType.toLowerCase().trim();
-          if (SimpleHTTPRequestContentTypes.contains(contentType)) {
+        if (contentType != null || 0 == contentLength) {
+          if (contentType != null && SimpleHTTPRequestContentTypes.contains(contentType.toLowerCase().trim())) {
             requestType = CORSRequestType.SIMPLE;
           } else {
             requestType = CORSRequestType.ACTUAL;
