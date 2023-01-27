@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2013-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,8 +41,7 @@ public class JacksonContentHandler extends BaseJacksonContentHandler {
   }
 
   @Override
-  protected void handle(Object action, Object currentValue, Long contentLength, String contentType,
-                        RequestMember requestMember)
+  protected void handle(Object action, Object currentValue, String contentType, RequestMember requestMember)
       throws IOException {
 
     ObjectReader reader;

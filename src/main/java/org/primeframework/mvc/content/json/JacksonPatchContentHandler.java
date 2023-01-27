@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2022-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,8 +53,8 @@ public class JacksonPatchContentHandler extends BaseJacksonContentHandler {
   }
 
   @Override
-  protected void handle(Object action, Object currentValue, Long contentLength, String contentType,
-                        RequestMember requestMember) throws IOException, JsonPatchException {
+  protected void handle(Object action, Object currentValue, String contentType, RequestMember requestMember)
+      throws IOException, JsonPatchException {
 
     if (requestMember.jsonPatch == null) {
       messageStore.add(new SimpleMessage(MessageType.ERROR, "[PatchNotSupported]", messageProvider.getMessage("[PatchNotSupported]", contentType)));

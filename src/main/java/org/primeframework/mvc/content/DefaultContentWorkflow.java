@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2013-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,7 +62,9 @@ public class DefaultContentWorkflow implements ContentWorkflow {
   @Override
   public void perform(WorkflowChain workflowChain) throws IOException {
     String contentType = request.getContentType();
-    validateContentType(contentType);
+    if (request.hasBody()) {
+      validateContentType(contentType);
+    }
 
     ContentHandler handler = factory.build(contentType);
     if (handler != null) {

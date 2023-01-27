@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,26 @@
  */
 package org.primeframework.mvc;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpResponse.BodySubscribers;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
@@ -1350,6 +1360,25 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void post_chunked_json() throws Exception {
+    // Our simulator does not chunk. This test uses the Java HTTP client to test chunking with Content-Type: application/json
+    HttpClient client = HttpClient.newBuilder()
+                                  .connectTimeout(Duration.of(500, ChronoUnit.MILLIS))
+                                  .build();
+
+    var response = client.send(
+        HttpRequest.newBuilder()
+                   .uri(URI.create("http://localhost:9080/api"))
+                   .header(Headers.ContentType, "application/json")
+                   .POST(BodyPublishers.ofInputStream(() -> new ByteArrayInputStream(readBytes("src/test/resources/json/api-jsonWithActual-post.json"))))
+                   .build(),
+        r -> BodySubscribers.ofString(StandardCharsets.UTF_8)
+    );
+
+    assertEquals(response.statusCode(), 200);
+  }
+
+  @Test
   public void post_collectionConverter() throws Exception {
     // Single string containing commas, output contains the same string
     test.simulate(() -> simulator.test("/collection-converter")
@@ -1779,6 +1808,13 @@ public class GlobalTest extends PrimeBaseTest {
                     } ]
                   }
                  """);
+
+    // Supported Content-Type, but invalid for this request, however, because a body is provided, it will be allowed.
+    simulator.test("/json-content-type")
+             .withContentType("application/x-www-form-urlencoded")
+             .post()
+             .assertStatusCode(200)
+             .assertBodyIsEmpty();
 
     // Not supported in general, but this action has restrictions, so we'll get a validation error.
     simulator.test("/json-content-type")
@@ -2260,5 +2296,13 @@ public class GlobalTest extends PrimeBaseTest {
     Map<Class<?>, GlobalConverter> converters = injector.getInstance(Key.get(new TypeLiteral<Map<Class<?>, GlobalConverter>>() {
     }));
     assertSame(converters.get(type), converters.get(type));
+  }
+
+  private byte[] readBytes(String path) {
+    try {
+      return Files.readAllBytes(Path.of(path));
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 }

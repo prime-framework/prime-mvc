@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2013-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@ package org.primeframework.mvc.content.json;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -43,6 +45,7 @@ import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.validation.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import static org.primeframework.mvc.util.ObjectTools.defaultIfNull;
 
 /**
  * Uses the Jackson JSON processor to marshall JSON into Java objects and set them into the action.
@@ -94,11 +97,12 @@ public abstract class BaseJacksonContentHandler implements ContentHandler {
       return;
     }
 
-    String contentType = request.getContentType();
-    Long contentLength = request.getContentLength();
-    if (contentLength == null || contentLength == 0) {
+    // Nothing to do here if we don't have a body
+    if (!request.hasBody()) {
       return;
     }
+
+    String contentType = request.getContentType();
 
     // Process JSON and set into the object
     JacksonActionConfiguration jacksonConfiguration = (JacksonActionConfiguration) config.additionalConfiguration.get(JacksonActionConfiguration.class);
@@ -107,19 +111,21 @@ public abstract class BaseJacksonContentHandler implements ContentHandler {
       RequestMember requestMember = jacksonConfiguration.requestMembers.get(httpMethod);
 
       try {
+        // Note that contentLength may be null when using a chunked transfer encoding.
         if (logger.isDebugEnabled()) {
-          String body = new String(request.getBodyBytes(), 0, contentLength.intValue());
+          String body = new String(request.getBodyBytes());
           logger.debug("Request: ({} {}) {}", request.getMethod(), request.getPath(), body);
 
           // Replace the input stream, in case anything downstream wants to use it
-          if(request.getInputStream() != null) {
-            request.setInputStream(new ByteArrayInputStream(body.getBytes(request.getCharacterEncoding())));
+          if (request.getInputStream() != null) {
+            Charset characterEncoding = defaultIfNull(request.getCharacterEncoding(), StandardCharsets.UTF_8);
+            request.setInputStream(new ByteArrayInputStream(body.getBytes(characterEncoding)));
           }
         }
 
         // Retrieve the current value from the action, so we can see if it is non-null
         Object currentValue = expressionEvaluator.getValue(requestMember.name, action);
-        handle(action, currentValue, contentLength, contentType, requestMember);
+        handle(action, currentValue, contentType, requestMember);
       } catch (InvalidFormatException e) {
         logger.debug("Error parsing JSON request", e);
         addFieldError(e);
@@ -162,14 +168,13 @@ public abstract class BaseJacksonContentHandler implements ContentHandler {
    *
    * @param action        the action from the current action invocation.
    * @param currentValue  the current value found in the action
-   * @param contentLength the value of the Content-Length header for this request
    * @param contentType   the value of the Content-Type header for this request
    * @param requestMember the request member for this action that is bound to the @JSONRequest.
    * @throws IOException        when an IOException occurs. Duh.
    * @throws JsonPatchException when a JsonPatchException occurs. Duh.
    */
-  protected abstract void handle(Object action, Object currentValue, Long contentLength, String contentType,
-                                 RequestMember requestMember) throws IOException, JsonPatchException;
+  protected abstract void handle(Object action, Object currentValue, String contentType, RequestMember requestMember)
+      throws IOException, JsonPatchException;
 
   /**
    * Adds a field error using the information stored in the JsonMappingException.
