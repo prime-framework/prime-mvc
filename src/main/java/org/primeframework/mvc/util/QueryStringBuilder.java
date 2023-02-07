@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2019-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,11 @@
  */
 package org.primeframework.mvc.util;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-
-import org.primeframework.mvc.NotImplementedException;
 
 /**
  * @author Daniel DeGroff
@@ -32,9 +29,9 @@ public class QueryStringBuilder {
 
   private final List<String> segments = new ArrayList<>();
 
-  private boolean addSeparator;
-
   private final StringBuilder uri = new StringBuilder();
+
+  private boolean addSeparator;
 
   protected QueryStringBuilder() {
   }
@@ -157,7 +154,7 @@ public class QueryStringBuilder {
   }
 
   public QueryStringBuilder withActual(String name) {
-    throw new NotImplementedException();
+    throw new UnsupportedOperationException();
   }
 
   public QueryStringBuilder withSegment(Object segment) {
