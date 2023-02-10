@@ -17,12 +17,12 @@ package org.primeframework.mvc;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.primeframework.mvc.action.result.ResultInvocationFinalizer;
+import org.primeframework.mvc.action.result.MVCWorkflowFinalizer;
 
 /**
  * @author Daniel DeGroff
  */
-public class MockResultInvocationFinalizer implements ResultInvocationFinalizer {
+public class MockMVCWorkflowFinalizer implements MVCWorkflowFinalizer {
   public static AtomicInteger Called = new AtomicInteger(0);
 
   @Override

@@ -47,20 +47,17 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
 
   private final ResourceLocator resourceLocator;
 
-  private final ResultInvocationFinalizer resultInvocationFinalizer;
-
   private final ResultStore resultStore;
 
   @Inject
   public DefaultResultInvocationWorkflow(ActionInvocationStore actionInvocationStore, MVCConfiguration configuration,
                                          ResultStore resultStore, ResourceLocator resourceLocator,
-                                         ResultFactory factory, ResultInvocationFinalizer resultInvocationFinalizer) {
+                                         ResultFactory factory) {
     this.actionInvocationStore = actionInvocationStore;
     this.configuration = configuration;
     this.resultStore = resultStore;
     this.resourceLocator = resourceLocator;
     this.factory = factory;
-    this.resultInvocationFinalizer = resultInvocationFinalizer;
   }
 
   /**
@@ -82,43 +79,38 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
    */
   @SuppressWarnings("unchecked")
   public void perform(WorkflowChain chain) throws IOException {
-    try {
-      ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
-      if (actionInvocation.executeResult) {
-        Annotation annotation = null;
-        String resultCode = "success";
-        if (actionInvocation.action != null) {
-          resultCode = resultStore.get();
-          annotation = actionInvocation.configuration.resultConfigurations.get(resultCode);
-        }
+    ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
+    if (actionInvocation.executeResult) {
+      Annotation annotation = null;
+      String resultCode = "success";
+      if (actionInvocation.action != null) {
+        resultCode = resultStore.get();
+        annotation = actionInvocation.configuration.resultConfigurations.get(resultCode);
+      }
 
-        if (annotation == null) {
-          annotation = new ForwardImpl("", resultCode);
-        }
+      if (annotation == null) {
+        annotation = new ForwardImpl("", resultCode);
+      }
 
-        // Call pre-render methods registered for this result
-        if (actionInvocation.action != null && actionInvocation.configuration.preRenderMethods != null) {
-          List<Method> preRenderMethods = actionInvocation.configuration.preRenderMethods.get(annotation.annotationType());
-          if (preRenderMethods != null) {
-            ReflectionUtils.invokeAll(actionInvocation.action, preRenderMethods);
-          }
-        }
-
-        long start = System.currentTimeMillis();
-        Result result = factory.build(annotation.annotationType());
-        boolean handled = result.execute(annotation);
-
-        if (logger.isDebugEnabled()) {
-          logger.debug("Result execute took [{}]", (System.currentTimeMillis() - start));
-        }
-
-        if (!handled) {
-          handleContinueOrRedirect(chain);
+      // Call pre-render methods registered for this result
+      if (actionInvocation.action != null && actionInvocation.configuration.preRenderMethods != null) {
+        List<Method> preRenderMethods = actionInvocation.configuration.preRenderMethods.get(annotation.annotationType());
+        if (preRenderMethods != null) {
+          ReflectionUtils.invokeAll(actionInvocation.action, preRenderMethods);
         }
       }
-    } finally {
-      resultStore.clear();
-      resultInvocationFinalizer.run();
+
+      long start = System.currentTimeMillis();
+      Result result = factory.build(annotation.annotationType());
+      boolean handled = result.execute(annotation);
+
+      if (logger.isDebugEnabled()) {
+        logger.debug("Result execute took [{}]", (System.currentTimeMillis() - start));
+      }
+
+      if (!handled) {
+        handleContinueOrRedirect(chain);
+      }
     }
   }
 

@@ -16,13 +16,13 @@
 package org.primeframework.mvc.action.result;
 
 /**
- * Default no-op implementation.
+ * Always invoked after the Prime request has completed, or failed.
  *
  * @author Daniel DeGroff
  */
-public class DefaultResultInvocationFinalizer implements ResultInvocationFinalizer {
-  @Override
-  public void run() {
-    // no-op
-  }
+public interface MVCWorkflowFinalizer {
+  /**
+   * Run the finalizer.
+   */
+  void run();
 }

@@ -152,7 +152,7 @@ public class GlobalTest extends PrimeBaseTest {
   @Test
   public void get() throws Exception {
     // Not called yet
-    assertEquals(MockResultInvocationFinalizer.Called.get(), 0);
+    assertEquals(MockMVCWorkflowFinalizer.Called.get(), 0);
 
     simulator.test("/user/edit")
              .get()
@@ -164,7 +164,7 @@ public class GlobalTest extends PrimeBaseTest {
              .assertBodyFile(Path.of("src/test/resources/html/edit.html"));
 
     // 1 call! Ah ah ah...
-    assertEquals(MockResultInvocationFinalizer.Called.get(), 1);
+    assertEquals(MockMVCWorkflowFinalizer.Called.get(), 1);
 
     EditAction.getCalled = false;
     simulator.test("/user/edit")
@@ -175,7 +175,7 @@ public class GlobalTest extends PrimeBaseTest {
     assertTrue(EditAction.getCalled);
 
     // 2 calls! Ah ah ah...
-    assertEquals(MockResultInvocationFinalizer.Called.get(), 2);
+    assertEquals(MockMVCWorkflowFinalizer.Called.get(), 2);
   }
 
   @Test

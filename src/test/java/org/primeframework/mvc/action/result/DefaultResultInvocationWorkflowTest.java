@@ -65,7 +65,6 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
     replay(chain);
 
     ResultStore resultStore = createStrictMock(ResultStore.class);
-    resultStore.clear();
     replay(resultStore);
 
     ResourceLocator resourceLocator = createStrictMock(ResourceLocator.class);
@@ -86,14 +85,11 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
     ResultFactory.addResult(binder, Forward.class, ForwardResult.class);
     ResultFactory factory = new ResultFactory(injector);
 
-    ResultInvocationFinalizer resultInvocationFinalizer = createStrictMock(ResultInvocationFinalizer.class);
-
-    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(ais, configuration, resultStore, resourceLocator, factory, resultInvocationFinalizer);
+    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(ais, configuration, resultStore, resourceLocator, factory);
     workflow.perform(chain);
 
     verify(ais, resultStore, resourceLocator, injector, chain, binder);
   }
-
 
   @Test
   public void actionLessWithDefaultRedirect() throws Exception {
@@ -103,7 +99,6 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
     replay(ais);
 
     ResultStore resultStore = createStrictMock(ResultStore.class);
-    resultStore.clear();
     replay(resultStore);
 
     ResourceLocator resourceLocator = createStrictMock(ResourceLocator.class);
@@ -134,9 +129,7 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
     ResultFactory.addResult(binder, Redirect.class, RedirectResult.class);
     ResultFactory factory = new ResultFactory(injector);
 
-    ResultInvocationFinalizer resultInvocationFinalizer = createStrictMock(ResultInvocationFinalizer.class);
-
-    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(ais, configuration, resultStore, resourceLocator, factory, resultInvocationFinalizer);
+    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(ais, configuration, resultStore, resourceLocator, factory);
     workflow.perform(chain);
 
     verify(ais, resultStore, resourceLocator, injector, chain, binder);
@@ -150,7 +143,6 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
     replay(ais);
 
     ResultStore resultStore = createStrictMock(ResultStore.class);
-    resultStore.clear();
     replay(resultStore);
 
     ResourceLocator resourceLocator = createStrictMock(ResourceLocator.class);
@@ -176,9 +168,7 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
     ResultFactory.addResult(binder, Forward.class, ForwardResult.class);
     ResultFactory factory = new ResultFactory(injector);
 
-    ResultInvocationFinalizer resultInvocationFinalizer = createStrictMock(ResultInvocationFinalizer.class);
-
-    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(ais, configuration, resultStore, resourceLocator, factory, resultInvocationFinalizer);
+    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(ais, configuration, resultStore, resourceLocator, factory);
     workflow.perform(chain);
 
     verify(ais, resultStore, resourceLocator, injector, chain, binder);
@@ -197,7 +187,6 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
 
     ResultStore resultStore = createStrictMock(ResultStore.class);
     expect(resultStore.get()).andReturn("failure");
-    resultStore.clear();
     replay(resultStore);
 
     ResourceLocator resourceLocator = createStrictMock(ResourceLocator.class);
@@ -218,9 +207,7 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
     ResultFactory.addResult(binder, Forward.class, ForwardResult.class);
     ResultFactory factory = new ResultFactory(injector);
 
-    ResultInvocationFinalizer resultInvocationFinalizer = createStrictMock(ResultInvocationFinalizer.class);
-
-    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(ais, configuration, resultStore, resourceLocator, factory, resultInvocationFinalizer);
+    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(ais, configuration, resultStore, resourceLocator, factory);
     try {
       workflow.perform(chain);
     } catch (PrimeException e) {
@@ -241,7 +228,6 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
     replay(chain);
 
     ResultStore resultStore = createStrictMock(ResultStore.class);
-    resultStore.clear();
     replay(resultStore);
 
     ResourceLocator resourceLocator = createStrictMock(ResourceLocator.class);
@@ -257,9 +243,7 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
     ResultFactory.addResult(binder, Forward.class, ForwardResult.class);
     ResultFactory factory = new ResultFactory(injector);
 
-    ResultInvocationFinalizer resultInvocationFinalizer = createStrictMock(ResultInvocationFinalizer.class);
-
-    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(ais, configuration, resultStore, resourceLocator, factory, resultInvocationFinalizer);
+    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(ais, configuration, resultStore, resourceLocator, factory);
     workflow.perform(chain);
 
     verify(ais, resultStore, resourceLocator, injector, chain, binder);
@@ -278,7 +262,6 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
 
     ResultStore resultStore = createStrictMock(ResultStore.class);
     expect(resultStore.get()).andReturn("success");
-    resultStore.clear();
     replay(resultStore);
 
     ResourceLocator resourceLocator = createStrictMock(ResourceLocator.class);
@@ -299,9 +282,7 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
     ResultFactory.addResult(binder, Forward.class, ForwardResult.class);
     ResultFactory factory = new ResultFactory(injector);
 
-    ResultInvocationFinalizer resultInvocationFinalizer = createStrictMock(ResultInvocationFinalizer.class);
-
-    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(ais, configuration, resultStore, resourceLocator, factory, resultInvocationFinalizer);
+    DefaultResultInvocationWorkflow workflow = new DefaultResultInvocationWorkflow(ais, configuration, resultStore, resourceLocator, factory);
     workflow.perform(chain);
 
     verify(ais, resultStore, resourceLocator, injector, chain, binder);

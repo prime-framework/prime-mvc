@@ -15,15 +15,21 @@
  */
 package org.primeframework.mvc.action.result;
 
+import com.google.inject.Inject;
+
 /**
- * Always invoked after the invocation result has been processed. This can be used to clean up a ThreadLocal value, or
- * whatever makes you happy.
- *
  * @author Daniel DeGroff
  */
-public interface ResultInvocationFinalizer {
-  /**
-   * Run the finalizer.
-   */
-  void run();
+public class DefaultMVCWorkflowFinalizer implements MVCWorkflowFinalizer {
+  private final ResultStore resultStore;
+
+  @Inject
+  public DefaultMVCWorkflowFinalizer(ResultStore resultStore) {
+    this.resultStore = resultStore;
+  }
+
+  @Override
+  public void run() {
+    resultStore.clear();
+  }
 }
