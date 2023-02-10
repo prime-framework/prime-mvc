@@ -46,6 +46,8 @@ import org.primeframework.mvc.action.ExecuteMethodConfiguration;
 import org.primeframework.mvc.action.ValidationMethodConfiguration;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.config.DefaultActionConfigurationBuilder;
+import org.primeframework.mvc.action.guice.ActionModule;
+import org.primeframework.mvc.action.result.ResultInvocationFinalizer;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.content.guice.ContentHandlerFactory;
 import org.primeframework.mvc.content.guice.ObjectMapperProvider;
@@ -147,6 +149,9 @@ public abstract class PrimeBaseTest {
 
     // Reset CSRF configuration
     configuration.csrfEnabled = false;
+
+    // Reset the call count on the invocation finalizer
+    MockResultInvocationFinalizer.Called.set(0);
   }
 
   @BeforeSuite
@@ -166,7 +171,7 @@ public abstract class PrimeBaseTest {
       }
     };
 
-    Module module = Modules.override(mvcModule).with(new TestContentModule(), new TestSecurityModule(), new TestScopeModule());
+    Module module = Modules.override(mvcModule).with(new TestActionModule(), new TestContentModule(), new TestSecurityModule(), new TestScopeModule());
     var mainConfig = new HTTPServerConfiguration().withListener(new HTTPListenerConfiguration(9080));
     TestPrimeMain main = new TestPrimeMain(new HTTPServerConfiguration[]{mainConfig}, module);
     simulator = new RequestSimulator(main, messageObserver);
@@ -275,6 +280,13 @@ public abstract class PrimeBaseTest {
       map.put(params[i].toString(), (List<String>) params[i + 1]);
     }
     return map;
+  }
+
+  public static class TestActionModule extends ActionModule {
+    @Override
+    protected void bindResultInvocationFinalizer() {
+      bind(ResultInvocationFinalizer.class).to(MockResultInvocationFinalizer.class);
+    }
   }
 
   public static class TestCORSConfigurationProvider implements CORSConfigurationProvider {

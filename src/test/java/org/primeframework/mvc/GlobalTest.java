@@ -151,6 +151,9 @@ public class GlobalTest extends PrimeBaseTest {
 
   @Test
   public void get() throws Exception {
+    // Not called yet
+    assertEquals(MockResultInvocationFinalizer.Called.get(), 0);
+
     simulator.test("/user/edit")
              .get()
              .assertStatusCode(200)
@@ -160,6 +163,9 @@ public class GlobalTest extends PrimeBaseTest {
              .assertHeaderDoesNotContain("Potato")
              .assertBodyFile(Path.of("src/test/resources/html/edit.html"));
 
+    // 1 call! Ah ah ah...
+    assertEquals(MockResultInvocationFinalizer.Called.get(), 1);
+
     EditAction.getCalled = false;
     simulator.test("/user/edit")
              .withHeader(Headers.MethodOverride, Methods.GET)
@@ -167,6 +173,9 @@ public class GlobalTest extends PrimeBaseTest {
              .assertStatusCode(200);
 
     assertTrue(EditAction.getCalled);
+
+    // 2 calls! Ah ah ah...
+    assertEquals(MockResultInvocationFinalizer.Called.get(), 2);
   }
 
   @Test
