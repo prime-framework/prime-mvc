@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,10 @@
 package org.primeframework.mvc.workflow.guice;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Singleton;
 import org.primeframework.mvc.ErrorException;
+import org.primeframework.mvc.action.result.DefaultMVCWorkflowFinalizer;
+import org.primeframework.mvc.action.result.MVCWorkflowFinalizer;
 import org.primeframework.mvc.workflow.DefaultErrorWorkflow;
 import org.primeframework.mvc.workflow.DefaultExceptionHandler;
 import org.primeframework.mvc.workflow.DefaultMVCWorkflow;
@@ -46,6 +49,10 @@ public class WorkflowModule extends AbstractModule {
     bind(MVCWorkflow.class).to(DefaultMVCWorkflow.class);
   }
 
+  protected void bindMVCWorkflowFinalizer() {
+    bind(MVCWorkflowFinalizer.class).to(DefaultMVCWorkflowFinalizer.class).in(Singleton.class);
+  }
+
   protected void bindMissingWorkflow() {
     bind(MissingWorkflow.class).to(DefaultMissingWorkflow.class);
   }
@@ -59,5 +66,6 @@ public class WorkflowModule extends AbstractModule {
     bindExceptionHandler();
     bindMissingWorkflow();
     bindMVCWorkflow();
+    bindMVCWorkflowFinalizer();
   }
 }

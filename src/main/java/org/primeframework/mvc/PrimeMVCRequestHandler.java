@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2021-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import io.fusionauth.http.HTTPMethod;
 import io.fusionauth.http.server.HTTPHandler;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
+import org.primeframework.mvc.action.result.MVCWorkflowFinalizer;
 import org.primeframework.mvc.guice.GuiceBootstrap;
 import org.primeframework.mvc.http.HTTPObjectsHolder;
 import org.primeframework.mvc.workflow.MVCWorkflow;
@@ -76,6 +77,9 @@ public class PrimeMVCRequestHandler implements HTTPHandler, Closeable {
     } finally {
       HTTPObjectsHolder.clearRequest();
       HTTPObjectsHolder.clearResponse();
+
+      // Execute the finalizer
+      injector.getInstance(MVCWorkflowFinalizer.class).run();
     }
   }
 

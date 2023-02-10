@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,7 +65,6 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
     replay(chain);
 
     ResultStore resultStore = createStrictMock(ResultStore.class);
-    resultStore.clear();
     replay(resultStore);
 
     ResourceLocator resourceLocator = createStrictMock(ResourceLocator.class);
@@ -92,7 +91,6 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
     verify(ais, resultStore, resourceLocator, injector, chain, binder);
   }
 
-
   @Test
   public void actionLessWithDefaultRedirect() throws Exception {
     ActionInvocation ai = new ActionInvocation(null, null, "/foo/bar", null, null);
@@ -101,7 +99,6 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
     replay(ais);
 
     ResultStore resultStore = createStrictMock(ResultStore.class);
-    resultStore.clear();
     replay(resultStore);
 
     ResourceLocator resourceLocator = createStrictMock(ResourceLocator.class);
@@ -146,7 +143,6 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
     replay(ais);
 
     ResultStore resultStore = createStrictMock(ResultStore.class);
-    resultStore.clear();
     replay(resultStore);
 
     ResourceLocator resourceLocator = createStrictMock(ResourceLocator.class);
@@ -191,7 +187,6 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
 
     ResultStore resultStore = createStrictMock(ResultStore.class);
     expect(resultStore.get()).andReturn("failure");
-    resultStore.clear();
     replay(resultStore);
 
     ResourceLocator resourceLocator = createStrictMock(ResourceLocator.class);
@@ -233,7 +228,6 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
     replay(chain);
 
     ResultStore resultStore = createStrictMock(ResultStore.class);
-    resultStore.clear();
     replay(resultStore);
 
     ResourceLocator resourceLocator = createStrictMock(ResourceLocator.class);
@@ -268,7 +262,6 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
 
     ResultStore resultStore = createStrictMock(ResultStore.class);
     expect(resultStore.get()).andReturn("success");
-    resultStore.clear();
     replay(resultStore);
 
     ResourceLocator resourceLocator = createStrictMock(ResourceLocator.class);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,42 +79,38 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
    */
   @SuppressWarnings("unchecked")
   public void perform(WorkflowChain chain) throws IOException {
-    try {
-      ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
-      if (actionInvocation.executeResult) {
-        Annotation annotation = null;
-        String resultCode = "success";
-        if (actionInvocation.action != null) {
-          resultCode = resultStore.get();
-          annotation = actionInvocation.configuration.resultConfigurations.get(resultCode);
-        }
+    ActionInvocation actionInvocation = actionInvocationStore.getCurrent();
+    if (actionInvocation.executeResult) {
+      Annotation annotation = null;
+      String resultCode = "success";
+      if (actionInvocation.action != null) {
+        resultCode = resultStore.get();
+        annotation = actionInvocation.configuration.resultConfigurations.get(resultCode);
+      }
 
-        if (annotation == null) {
-          annotation = new ForwardImpl("", resultCode);
-        }
+      if (annotation == null) {
+        annotation = new ForwardImpl("", resultCode);
+      }
 
-        // Call pre-render methods registered for this result
-        if (actionInvocation.action != null && actionInvocation.configuration.preRenderMethods != null) {
-          List<Method> preRenderMethods = actionInvocation.configuration.preRenderMethods.get(annotation.annotationType());
-          if (preRenderMethods != null) {
-            ReflectionUtils.invokeAll(actionInvocation.action, preRenderMethods);
-          }
-        }
-
-        long start = System.currentTimeMillis();
-        Result result = factory.build(annotation.annotationType());
-        boolean handled = result.execute(annotation);
-
-        if (logger.isDebugEnabled()) {
-          logger.debug("Result execute took [{}]", (System.currentTimeMillis() - start));
-        }
-
-        if (!handled) {
-          handleContinueOrRedirect(chain);
+      // Call pre-render methods registered for this result
+      if (actionInvocation.action != null && actionInvocation.configuration.preRenderMethods != null) {
+        List<Method> preRenderMethods = actionInvocation.configuration.preRenderMethods.get(annotation.annotationType());
+        if (preRenderMethods != null) {
+          ReflectionUtils.invokeAll(actionInvocation.action, preRenderMethods);
         }
       }
-    } finally {
-      resultStore.clear();
+
+      long start = System.currentTimeMillis();
+      Result result = factory.build(annotation.annotationType());
+      boolean handled = result.execute(annotation);
+
+      if (logger.isDebugEnabled()) {
+        logger.debug("Result execute took [{}]", (System.currentTimeMillis() - start));
+      }
+
+      if (!handled) {
+        handleContinueOrRedirect(chain);
+      }
     }
   }
 

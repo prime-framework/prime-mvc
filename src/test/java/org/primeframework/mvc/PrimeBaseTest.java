@@ -46,6 +46,7 @@ import org.primeframework.mvc.action.ExecuteMethodConfiguration;
 import org.primeframework.mvc.action.ValidationMethodConfiguration;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.config.DefaultActionConfigurationBuilder;
+import org.primeframework.mvc.action.result.MVCWorkflowFinalizer;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.content.guice.ContentHandlerFactory;
 import org.primeframework.mvc.content.guice.ObjectMapperProvider;
@@ -70,6 +71,7 @@ import org.primeframework.mvc.security.csrf.CSRFProvider;
 import org.primeframework.mvc.test.RequestSimulator;
 import org.primeframework.mvc.util.ThrowingRunnable;
 import org.primeframework.mvc.validation.Validation;
+import org.primeframework.mvc.workflow.guice.WorkflowModule;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;
@@ -147,6 +149,9 @@ public abstract class PrimeBaseTest {
 
     // Reset CSRF configuration
     configuration.csrfEnabled = false;
+
+    // Reset the call count on the invocation finalizer
+    MockMVCWorkflowFinalizer.Called.set(0);
   }
 
   @BeforeSuite
@@ -166,7 +171,7 @@ public abstract class PrimeBaseTest {
       }
     };
 
-    Module module = Modules.override(mvcModule).with(new TestContentModule(), new TestSecurityModule(), new TestScopeModule());
+    Module module = Modules.override(mvcModule).with(new TestContentModule(), new TestSecurityModule(), new TestScopeModule(), new TestWorkflowModule());
     var mainConfig = new HTTPServerConfiguration().withListener(new HTTPListenerConfiguration(9080));
     TestPrimeMain main = new TestPrimeMain(new HTTPServerConfiguration[]{mainConfig}, module);
     simulator = new RequestSimulator(main, messageObserver);
@@ -334,6 +339,13 @@ public abstract class PrimeBaseTest {
       // Don't bind as a singleton in tests so that I can change the key during a test
       bind(CipherProvider.class).to(DefaultCipherProvider.class);
       bind(VerifierProvider.class).to(MockVerifierProvider.class);
+    }
+  }
+
+  public static class TestWorkflowModule extends WorkflowModule {
+    @Override
+    protected void bindMVCWorkflowFinalizer() {
+      bind(MVCWorkflowFinalizer.class).to(MockMVCWorkflowFinalizer.class);
     }
   }
 }
