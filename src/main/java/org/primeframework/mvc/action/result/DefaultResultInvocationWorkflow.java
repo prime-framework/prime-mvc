@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,17 +47,20 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
 
   private final ResourceLocator resourceLocator;
 
+  private final ResultInvocationFinalizer resultInvocationFinalizer;
+
   private final ResultStore resultStore;
 
   @Inject
   public DefaultResultInvocationWorkflow(ActionInvocationStore actionInvocationStore, MVCConfiguration configuration,
                                          ResultStore resultStore, ResourceLocator resourceLocator,
-                                         ResultFactory factory) {
+                                         ResultFactory factory, ResultInvocationFinalizer resultInvocationFinalizer) {
     this.actionInvocationStore = actionInvocationStore;
     this.configuration = configuration;
     this.resultStore = resultStore;
     this.resourceLocator = resourceLocator;
     this.factory = factory;
+    this.resultInvocationFinalizer = resultInvocationFinalizer;
   }
 
   /**
@@ -115,6 +118,7 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
       }
     } finally {
       resultStore.clear();
+      resultInvocationFinalizer.run();
     }
   }
 

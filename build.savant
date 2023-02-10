@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2014-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ restifyVersion = "4.1.2"
 slf4jVersion = "2.0.3"
 testngVersion = "7.6.1"
 
-project(group: "org.primeframework", name: "prime-mvc", version: "4.2.0", licenses: ["ApacheV2_0"]) {
+project(group: "org.primeframework", name: "prime-mvc", version: "4.3.0", licenses: ["ApacheV2_0"]) {
   workflow {
     fetch {
       cache()

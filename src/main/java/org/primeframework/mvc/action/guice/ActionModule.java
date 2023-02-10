@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,8 +31,10 @@ import org.primeframework.mvc.action.config.ActionConfigurationProvider;
 import org.primeframework.mvc.action.config.DefaultActionConfigurationBuilder;
 import org.primeframework.mvc.action.config.DefaultActionConfigurationProvider;
 import org.primeframework.mvc.action.result.DefaultResourceLocator;
+import org.primeframework.mvc.action.result.DefaultResultInvocationFinalizer;
 import org.primeframework.mvc.action.result.DefaultResultInvocationWorkflow;
 import org.primeframework.mvc.action.result.ResourceLocator;
+import org.primeframework.mvc.action.result.ResultInvocationFinalizer;
 import org.primeframework.mvc.action.result.ResultInvocationWorkflow;
 import org.primeframework.mvc.action.result.ResultStore;
 import org.primeframework.mvc.action.result.ThreadLocalResultStore;
@@ -61,6 +63,10 @@ public class ActionModule extends AbstractModule {
 
   protected void bindResourceLocator() {
     bind(ResourceLocator.class).to(DefaultResourceLocator.class);
+  }
+
+  protected void bindResultInvocationFinalizer() {
+    bind(ResultInvocationFinalizer.class).to(DefaultResultInvocationFinalizer.class);
   }
 
   protected void bindResultInvocationWorkflow() {
@@ -96,6 +102,7 @@ public class ActionModule extends AbstractModule {
     // Results
     bindResourceLocator();
     bindResultInvocationWorkflow();
+    bindResultInvocationFinalizer();
     bindResultStore();
   }
 }
