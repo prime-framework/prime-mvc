@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2021-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -104,11 +104,14 @@ public abstract class BasePrimeMain {
       // Make the request handler for each server and use the current injector
       var requestHandler = new PrimeMVCRequestHandler(injector);
 
+      // Set the logger factory for the server.
+      configureLoggerFactory(config);
+
       // Create the server
       var server = new HTTPServer().withConfiguration(config)
                                    .withHandler(requestHandler)
-                                   .withInstrumenter(instrumenter)
-                                   .withLoggerFactory(new SLF4JLoggerFactoryAdapter());
+                                   .withInstrumenter(instrumenter);
+
       servers.add(new PrimeHTTPServer(requestHandler, server));
     }
 
@@ -117,6 +120,13 @@ public abstract class BasePrimeMain {
   }
 
   protected abstract Module[] modules();
+
+  private void configureLoggerFactory(HTTPServerConfiguration config) {
+    // If there is no loggerFactory, or the config is still using the java-http default, let's use SLF4J, cause that is how we roll.
+    if (config.getLoggerFactory() == null || config.getLoggerFactory().getClass().equals(new HTTPServerConfiguration().getLoggerFactory().getClass())) {
+      config.withLoggerFactory(new SLF4JLoggerFactoryAdapter());
+    }
+  }
 
   private static class PrimeHTTPServer {
     public final PrimeMVCRequestHandler handler;
