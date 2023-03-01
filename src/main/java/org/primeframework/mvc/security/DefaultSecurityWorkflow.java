@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2015-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,23 @@
 package org.primeframework.mvc.security;
 
 import java.io.IOException;
+import java.util.Collection;
 
 import com.google.inject.Inject;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
+import org.primeframework.mvc.action.ConstraintOverrideMethodConfiguration;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.security.annotation.AnonymousAccess;
 import org.primeframework.mvc.security.annotation.ConstraintOverride;
 import org.primeframework.mvc.security.guice.SecuritySchemeFactory;
+import org.primeframework.mvc.util.ReflectionUtils;
 import org.primeframework.mvc.workflow.WorkflowChain;
 
 /**
- * Default security workflow that uses the {@link MVCConfiguration} and the {@link Action} annotation to manage the
- * security constraints for actions.
+ * Default security workflow that uses the {@link MVCConfiguration} and the {@link Action} annotation to manage the security constraints for actions.
  *
  * @author Brian Pontarelli
  */
@@ -85,12 +87,42 @@ public class DefaultSecurityWorkflow implements SecurityWorkflow {
   }
 
   protected String[] getConstraints(ActionInvocation actionInvocation) {
+    // Order of operation:
+    // 1. Constraint override on an HTTP method handler.
+    //    - This overrides all other options for a single method on the action such as
+    //      get() or post().
+    //    - These values have the same restrictions as the @Action annotation in that
+    //      they must be constant strings. So this may cramp your style.
+    //
+    // 2. Constraint override method.
+    //    - This overrides the constraints for one or more HTTP methods per the annotation.
+    //    - This could be helpful if you want to dynamically build constraints, or
+    //      if your constraints aren't strings. The method can return a Collection of
+    //      anything, and we'll simply call toString() to get a string value for the
+    //      constraint to pass into the constraint validator.
+    //
+    // 3. Constraints provided in the @Action annotation.
+    //
+    // Note there is no fall through, if you use either override in step 1 or 2, this
+    // will "override" the constraints, and we won't look at any values defined in the
+    // @Action annotation.
+
     // Validate constraints, if provided on the method, this will override the ones on the @Action
     ConstraintOverride constraint = (ConstraintOverride) actionInvocation.method.annotations.get(ConstraintOverride.class);
     if (constraint != null) {
       return constraint.value();
-    } else {
-      return actionInvocation.configuration.annotation.constraints();
     }
+
+    // If we have a constraint override method, this will override the ones on the @Action
+    ConstraintOverrideMethodConfiguration configuration = actionInvocation.configuration.constraintValidationMethods.get(actionInvocation.method.httpMethod);
+    if (configuration != null) {
+      Object constraints = ReflectionUtils.invoke(configuration.method, actionInvocation.action);
+      return constraints != null
+          ? ((Collection<?>) constraints).stream().map(Object::toString).toList().toArray(String[]::new)
+          : new String[]{};
+    }
+
+    // Else, fall back to the busted ol' plain constraints. I guess they could still be cool.
+    return actionInvocation.configuration.annotation.constraints();
   }
 }

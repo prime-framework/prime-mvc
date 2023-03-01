@@ -15,32 +15,26 @@
  */
 package org.primeframework.mvc.security.annotation;
 
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import io.fusionauth.http.HTTPValues.Methods;
 import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.security.AuthorizeSchemeData;
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * HTTP Methods <code>POST</code>, <code>PUT</code>, <code>DELETE</code> and <code>GET</code> all need to be authorized. This means the action needs
- * to ensure coverage for all HTTP Methods. A single method may cover all four methods, or they can be divided to simplify logic.
- * <p>
- * Required when {@link Action#scheme()} contains <code>authorize-method</code>scheme.
- * <p>
- * The method annotated with this annotation may have zero or one parameter, if a parameter is used it must be of type {@link AuthorizeSchemeData}.
- * This is enforced during prime-mvc startup.
+ * Allows for a different set of constraint at the method level of an action. If constraints have been defined by the {@link Action} annotation, using
+ * this on a method will take precedence.
  *
  * @author Daniel DeGroff
  */
-@Retention(RUNTIME)
-@Target(METHOD)
-public @interface AuthorizeMethod {
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface ConstraintOverrideMethod {
 
   /**
-   * @return The HTTP methods to execute the authorization method for. Defaults to POST, PUT, PATCH, DELETE and GET.
+   * @return The HTTP methods to execute the constraint override method for. Defaults to POST, PUT, PATCH, DELETE and GET.
    */
   String[] httpMethods() default {Methods.POST, Methods.PUT, Methods.PATCH, Methods.DELETE, Methods.GET};
 }
