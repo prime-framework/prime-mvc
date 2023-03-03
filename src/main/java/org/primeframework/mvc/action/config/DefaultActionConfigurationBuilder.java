@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +37,7 @@ import io.fusionauth.http.HTTPMethod;
 import io.fusionauth.jwt.domain.JWT;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.AuthorizationMethodConfiguration;
+import org.primeframework.mvc.action.ConstraintOverrideMethodConfiguration;
 import org.primeframework.mvc.action.ExecuteMethodConfiguration;
 import org.primeframework.mvc.action.JWTMethodConfiguration;
 import org.primeframework.mvc.action.PreParameterMethodConfiguration;
@@ -56,6 +58,7 @@ import org.primeframework.mvc.scope.annotation.ScopeAnnotation;
 import org.primeframework.mvc.security.AuthorizeSchemeData;
 import org.primeframework.mvc.security.annotation.AnonymousAccess;
 import org.primeframework.mvc.security.annotation.AuthorizeMethod;
+import org.primeframework.mvc.security.annotation.ConstraintOverrideMethod;
 import org.primeframework.mvc.security.annotation.JWTAuthorizeMethod;
 import org.primeframework.mvc.util.ReflectionUtils;
 import org.primeframework.mvc.util.URIBuilder;
@@ -124,13 +127,13 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
     List<ScopeField> scopeFields = findScopeFields(actionClass);
 
     Map<Class<?>, Object> additionalConfiguration = getAdditionalConfiguration(actionClass);
+    Map<HTTPMethod, ConstraintOverrideMethodConfiguration> constraintValidationMethods = findConstraintValidationMethod(actionClass);
 
     // Unknown parameters field
     Field unknownParametersField = findUnknownParametersField(actionClass);
     Set<String> validContentTypes = findAllowedContentTypes(actionClass);
 
-    return new ActionConfiguration(actionClass, executeMethods, validationMethods, formPrepareMethods, authorizationMethods, jwtAuthorizationMethods, postValidationMethods, preParameterMethods, postParameterMethods, resultAnnotations, preParameterMembers, preRenderMethodsMap, fileUploadMembers, memberNames, securitySchemes, scopeFields, additionalConfiguration, uri, preValidationMethods, unknownParametersField, validContentTypes
-    );
+    return new ActionConfiguration(actionClass, constraintValidationMethods, executeMethods, validationMethods, formPrepareMethods, authorizationMethods, jwtAuthorizationMethods, postValidationMethods, preParameterMethods, postParameterMethods, resultAnnotations, preParameterMembers, preRenderMethodsMap, fileUploadMembers, memberNames, securitySchemes, scopeFields, additionalConfiguration, uri, preValidationMethods, unknownParametersField, validContentTypes);
   }
 
   /**
@@ -214,7 +217,7 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
   }
 
   /**
-   * Locates all of the validation methods and return a map keyed by HTTP Method.
+   * Locates all the validation methods and return a map keyed by HTTP Method.
    *
    * @param actionClass The action class.
    * @return The validation method configurations.
@@ -299,6 +302,38 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
     }
 
     return authorizationMethods;
+  }
+
+  protected Map<HTTPMethod, ConstraintOverrideMethodConfiguration> findConstraintValidationMethod(Class<?> actionClass) {
+    List<Method> methods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, ConstraintOverrideMethod.class);
+    if (methods.isEmpty()) {
+      return Collections.emptyMap();
+    }
+
+    // Return type must be Collection<T>
+    if (methods.stream().anyMatch(m -> !Collection.class.isAssignableFrom(m.getReturnType()))) {
+      throw new PrimeException("The action class [" + actionClass + "] has at least one method annotated with " + ConstraintOverrideMethod.class.getSimpleName() +
+          " that has a declared a return type of something other than Collection<?>. Your method annotated with " + ConstraintOverrideMethod.class.getSimpleName()
+          + " must declare a return type of Collection<T>.");
+    }
+
+    // Map HTTP method to a list of Constraint Override Methods.
+    Map<HTTPMethod, ConstraintOverrideMethodConfiguration> constraintOverrideMethods = new HashMap<>();
+    for (Method method : methods) {
+      ConstraintOverrideMethod annotation = method.getAnnotation(ConstraintOverrideMethod.class);
+      for (String stringMethod : annotation.httpMethods()) {
+        HTTPMethod httpMethod = HTTPMethod.of(stringMethod);
+        if (constraintOverrideMethods.containsKey(httpMethod)) {
+          throw new PrimeException("The action class [" + actionClass + "] has more than one method annotated with " + ConstraintOverrideMethod.class.getSimpleName() +
+              " for the same HTTP method. You may only have one method annotated " + ConstraintOverrideMethod.class.getSimpleName()
+              + " for any one HTTP method.");
+        }
+
+        constraintOverrideMethods.put(httpMethod, new ConstraintOverrideMethodConfiguration(method, annotation));
+      }
+    }
+
+    return constraintOverrideMethods;
   }
 
   /**

@@ -15,8 +15,13 @@
  */
 package org.example.action;
 
+import java.util.List;
+
+import io.fusionauth.http.HTTPValues.Methods;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.annotation.Status;
+import org.primeframework.mvc.security.annotation.ConstraintOverride;
+import org.primeframework.mvc.security.annotation.ConstraintOverrideMethod;
 
 /**
  * Secure action.
@@ -29,11 +34,30 @@ import org.primeframework.mvc.action.result.annotation.Status;
     @Status(code = "unauthorized", status = 403)
 })
 public class SecureAction {
+  @ConstraintOverrideMethod(httpMethods = {Methods.PATCH})
+  public List<String> customConstraintsForPatch() {
+    return List.of("patch-only");
+  }
+
+  @ConstraintOverrideMethod(httpMethods = {Methods.PUT})
+  public List<String> customConstraintsForPut() {
+    return List.of("put-only");
+  }
+
+  @ConstraintOverride("delete-only")
+  public String delete() {
+    return "success";
+  }
+
   public String get() {
     return "success";
   }
 
   public String post() {
+    return "success";
+  }
+
+  public String put() {
     return "success";
   }
 }

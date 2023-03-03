@@ -28,7 +28,6 @@ import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.control.ControlBaseTest;
 import org.primeframework.mvc.util.MapBuilder;
 import org.testng.annotations.Test;
-import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertSame;
 import static org.testng.Assert.assertTrue;
@@ -70,7 +69,7 @@ public class FormTest extends ControlBaseTest {
     request.setContextPath("/context");
     IndexAction index = new IndexAction();
     ais.setCurrent(new ActionInvocation(index, null, "/user/", null,
-        new ActionConfiguration(IndexAction.class, null, null, new ArrayList<>(), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null, null)));
+        new ActionConfiguration(IndexAction.class, null, null, null, new ArrayList<>(), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null, null)));
 
     new ControlTester(form).
         attr("action", "https://www.google.com").
@@ -86,7 +85,7 @@ public class FormTest extends ControlBaseTest {
     request.setPath("/user/");
     IndexAction index = new IndexAction();
     ais.setCurrent(new ActionInvocation(index, null, "/user/", null,
-        new ActionConfiguration(IndexAction.class, null, null, new ArrayList<>(), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null, null)));
+        new ActionConfiguration(IndexAction.class, null, null, null, new ArrayList<>(), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null, null)));
 
     new ControlTester(form).
         attr("action", "/user/").
@@ -103,7 +102,7 @@ public class FormTest extends ControlBaseTest {
     request.setContextPath("/context");
     IndexAction index = new IndexAction();
     ais.setCurrent(new ActionInvocation(index, null, "/user/", null,
-        new ActionConfiguration(IndexAction.class, null, null, new ArrayList<>(), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null, null)));
+        new ActionConfiguration(IndexAction.class, null, null, null, new ArrayList<>(), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null, null)));
 
     new ControlTester(form).
         attr("action", "/user/").
@@ -119,7 +118,7 @@ public class FormTest extends ControlBaseTest {
     request.setPath("/user/");
     IndexAction index = new IndexAction();
     ais.setCurrent(new ActionInvocation(index, null, "/user/", null,
-        new ActionConfiguration(IndexAction.class, null, null, new ArrayList<>(), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null, null)));
+        new ActionConfiguration(IndexAction.class, null, null, null, new ArrayList<>(), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null, null)));
 
     new ControlTester(form).
         attr("action", "https://www.google.com").
@@ -150,7 +149,7 @@ public class FormTest extends ControlBaseTest {
     request.setPath("/user/edit");
     EditAction edit = new EditAction();
     ais.setCurrent(new ActionInvocation(edit, null, "/user/edit", null,
-        new ActionConfiguration(IndexAction.class, null, null, List.of(EditAction.class.getMethod("formPrepare")), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null, null)));
+        new ActionConfiguration(IndexAction.class, null, null, null, List.of(EditAction.class.getMethod("formPrepare")), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null, null)));
 
     new ControlTester(form).
         attr("action", "/user/edit").

@@ -26,9 +26,13 @@ import java.util.UUID;
 import java.util.function.Function;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.Inject;
 import io.fusionauth.http.Cookie;
 import io.fusionauth.http.server.HTTPContext;
+import org.example.domain.User;
 import org.primeframework.mock.MockUserAgent;
+import org.primeframework.mvc.security.MockUserLoginSecurityContext;
+import org.primeframework.mvc.security.UserLoginSecurityContext;
 import org.primeframework.mvc.test.RequestResult;
 import org.primeframework.mvc.test.RequestResult.ThrowingConsumer;
 import org.primeframework.mvc.test.RequestSimulator;
@@ -47,6 +51,8 @@ public class TestBuilder {
   public Function<ObjectMapper, ObjectMapper> objectMapperFunction;
 
   public RequestResult requestResult;
+
+  @Inject public UserLoginSecurityContext securityContext;
 
   public RequestSimulator simulator;
 
@@ -112,6 +118,15 @@ public class TestBuilder {
 
   public <T> TestIterator<T> forEach(T... collection) {
     return new TestIterator<>(this, collection);
+  }
+
+  public TestBuilder loginUserWithRole(String... roles) {
+    securityContext.logout();
+    MockUserLoginSecurityContext.roles.clear();
+    MockUserLoginSecurityContext.roles.addAll(Arrays.asList(roles));
+
+    securityContext.login(new User());
+    return this;
   }
 
   public TestBuilder simulate(ThrowingCallable<RequestResult> callable) throws Exception {

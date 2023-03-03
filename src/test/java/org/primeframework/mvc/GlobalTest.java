@@ -102,6 +102,31 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void custom_constraints() throws Exception {
+    // Using @ConstraintOverride on the delete method.
+    test.loginUserWithRole("delete-only")
+        .simulate(() -> simulator.test("/secure")
+                                 .delete()
+                                 .assertStatusCode(200))
+
+        // But fails for put
+        .simulate(() -> simulator.test("/secure")
+                                 .put()
+                                 .assertStatusCode(403));
+
+    // Using the @ConstraintOverrideMethod
+    test.loginUserWithRole("put-only")
+        .simulate(() -> simulator.test("/secure")
+                                 .put()
+                                 .assertStatusCode(200))
+
+        // But fails for delete
+        .simulate(() -> simulator.test("/secure")
+                                 .delete()
+                                 .assertStatusCode(403));
+  }
+
+  @Test
   public void embeddedFormHandling() throws Exception {
     // Ensure this 'required' parameter for PageOne does not mess up PageTwo which does not have an Id field.
     test.simulate(() -> simulator.test("/scope/page-one")
