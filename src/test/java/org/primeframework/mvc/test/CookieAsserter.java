@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2022-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,11 @@ public class CookieAsserter {
 
   public CookieAsserter(Cookie actual) {
     this.actual = actual;
+  }
+
+  public CookieAsserter assertDomain(String expected) {
+    assertEquals(actual.domain, expected);
+    return this;
   }
 
   public CookieAsserter assertHTTPOnly(boolean expected) {
