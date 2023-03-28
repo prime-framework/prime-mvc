@@ -118,9 +118,8 @@ public class RequestResult {
   }
 
   /**
-   * Compares two JSON objects to ensure they are equal. This is done by converting the JSON objects to Maps, Lists, and
-   * primitives and then comparing them. The error is output so that IntelliJ can diff the two JSON objects in order to
-   * output the results.
+   * Compares two JSON objects to ensure they are equal. This is done by converting the JSON objects to Maps, Lists, and primitives and then comparing
+   * them. The error is output so that IntelliJ can diff the two JSON objects in order to output the results.
    *
    * @param objectMapper The Jackson ObjectMapper used to convert the JSON strings to Maps.
    * @param actual       The actual JSON.
@@ -132,9 +131,8 @@ public class RequestResult {
   }
 
   /**
-   * Compares two JSON objects to ensure they are equal. This is done by converting the JSON objects to Maps, Lists, and
-   * primitives and then comparing them. The error is output so that IntelliJ can diff the two JSON objects in order to
-   * output the results.
+   * Compares two JSON objects to ensure they are equal. This is done by converting the JSON objects to Maps, Lists, and primitives and then comparing
+   * them. The error is output so that IntelliJ can diff the two JSON objects in order to output the results.
    *
    * @param objectMapper The Jackson ObjectMapper used to convert the JSON strings to Maps.
    * @param actual       The actual JSON.
@@ -271,8 +269,8 @@ public class RequestResult {
   }
 
   /**
-   * Verifies that the body contains the messages (escaped) from the given key and optionally provided replacement
-   * values. This uses the MessageProvider for the current test URI and the given keys to look up the messages.
+   * Verifies that the body contains the messages (escaped) from the given key and optionally provided replacement values. This uses the
+   * MessageProvider for the current test URI and the given keys to look up the messages.
    *
    * @param key    The key.
    * @param values The replacement values.
@@ -284,8 +282,8 @@ public class RequestResult {
   }
 
   /**
-   * Verifies that the body contains the messages (escaped) from the given keys. This uses the MessageProvider for the
-   * current test URI and the given keys to look up the messages.
+   * Verifies that the body contains the messages (escaped) from the given keys. This uses the MessageProvider for the current test URI and the given
+   * keys to look up the messages.
    *
    * @param keys The keys.
    * @return This.
@@ -300,8 +298,8 @@ public class RequestResult {
   }
 
   /**
-   * Verifies that the body contains the messages from the given key and optionally provided replacement values. This
-   * uses the MessageProvider for the current test URI and the given keys to look up the messages.
+   * Verifies that the body contains the messages from the given key and optionally provided replacement values. This uses the MessageProvider for the
+   * current test URI and the given keys to look up the messages.
    *
    * @param key    The key.
    * @param values The replacement values.
@@ -313,8 +311,8 @@ public class RequestResult {
   }
 
   /**
-   * Verifies that the body contains the messages from the given keys. This uses the MessageProvider for the current
-   * test URI and the given keys to look up the messages.
+   * Verifies that the body contains the messages from the given keys. This uses the MessageProvider for the current test URI and the given keys to
+   * look up the messages.
    *
    * @param keys The keys.
    * @return This.
@@ -346,8 +344,8 @@ public class RequestResult {
   }
 
   /**
-   * Verifies that the body does not contain the messages from the given key and optionally provided replacement values.
-   * This uses the MessageProvider for the current test URI and the given keys to look up the messages.
+   * Verifies that the body does not contain the messages from the given key and optionally provided replacement values. This uses the MessageProvider
+   * for the current test URI and the given keys to look up the messages.
    *
    * @param key    The key.
    * @param values The replacement values.
@@ -359,8 +357,8 @@ public class RequestResult {
   }
 
   /**
-   * Verifies that the body does contain the messages from the given keys. This uses the MessageProvider for the current
-   * test URI and the given keys to look up the messages.
+   * Verifies that the body does contain the messages from the given keys. This uses the MessageProvider for the current test URI and the given keys
+   * to look up the messages.
    *
    * @param keys The keys.
    * @return This.
@@ -403,8 +401,7 @@ public class RequestResult {
   }
 
   /**
-   * Verifies that the system has errors for the given fields. This doesn't assert the error itself, just that the field
-   * contains an error.
+   * Verifies that the system has errors for the given fields. This doesn't assert the error itself, just that the field contains an error.
    * <p>
    * There may be additional field errors in the messageStore than the ones requested and this will not fail.
    *
@@ -450,8 +447,7 @@ public class RequestResult {
   }
 
   /**
-   * Verifies that the system contains the given error message(s). The message(s) might be in the request, flash,
-   * session or application scopes.
+   * Verifies that the system contains the given error message(s). The message(s) might be in the request, flash, session or application scopes.
    *
    * @param messages The fully rendered error message(s) (not the code).
    * @return This.
@@ -461,11 +457,9 @@ public class RequestResult {
   }
 
   /**
-   * Verifies that the system has errors for the given fields. This doesn't assert the error itself, just that the field
-   * contains an error.
+   * Verifies that the system has errors for the given fields. This doesn't assert the error itself, just that the field contains an error.
    * <p>
-   * If additional field errors exist in the message store not provided here an error will occur to ensure you have
-   * accounted for all errors.
+   * If additional field errors exist in the message store not provided here an error will occur to ensure you have accounted for all errors.
    *
    * @param fields The name of the field code(s). Not the fully rendered message(s)
    * @return This.
@@ -506,8 +500,7 @@ public class RequestResult {
   }
 
   /**
-   * Verifies that the system has general errors. This doesn't assert the error itself, just that the general error
-   * code.
+   * Verifies that the system has general errors. This doesn't assert the error itself, just that the general error code.
    *
    * @param messageCodes The name of the error code(s). Not the fully rendered message(s)
    * @return This.
@@ -517,8 +510,7 @@ public class RequestResult {
   }
 
   /**
-   * Verifies that the system has info errors. This doesn't assert the message itself, just that the general message
-   * code.
+   * Verifies that the system has info errors. This doesn't assert the message itself, just that the general message code.
    *
    * @param messageCodes The name of the message code(s). Not the fully rendered message(s)
    * @return This.
@@ -528,8 +520,7 @@ public class RequestResult {
   }
 
   /**
-   * Verifies that the system has general messages. This doesn't assert the message itself, just that the general
-   * message code.
+   * Verifies that the system has general messages. This doesn't assert the message itself, just that the general message code.
    *
    * @param messageType The message type
    * @param errorCodes  The name of the message code(s). Not the fully rendered message(s)
@@ -567,8 +558,7 @@ public class RequestResult {
   }
 
   /**
-   * Verifies that the system contains the given info message(s). The message(s) might be in the request, flash, session
-   * or application scopes.
+   * Verifies that the system contains the given info message(s). The message(s) might be in the request, flash, session or application scopes.
    *
    * @param messages The fully rendered info message(s) (not the code).
    * @return This.
@@ -578,8 +568,7 @@ public class RequestResult {
   }
 
   /**
-   * Verifies that the system contains the given message(s). The message(s) might be in the request, flash, session or
-   * application scopes.
+   * Verifies that the system contains the given message(s). The message(s) might be in the request, flash, session or application scopes.
    *
    * @param type     The message type (ERROR, INFO, WARNING).
    * @param messages The fully rendered message(s) (not the code).
@@ -677,8 +666,7 @@ public class RequestResult {
   }
 
   /**
-   * Verifies that the system contains the given warning message(s). The message(s) might be in the request, flash,
-   * session or application scopes.
+   * Verifies that the system contains the given warning message(s). The message(s) might be in the request, flash, session or application scopes.
    *
    * @param messages The fully rendered warning message(s) (not the code).
    * @return This.
@@ -717,8 +705,7 @@ public class RequestResult {
   }
 
   /**
-   * Assert the cookie exists by name and then pass it to the provided consumer to allow the caller to assert on
-   * anything they wish.
+   * Assert the cookie exists by name and then pass it to the provided consumer to allow the caller to assert on anything they wish.
    *
    * @param name     The cookie name.
    * @param consumer The consumer used to perform assertions.
@@ -800,8 +787,7 @@ public class RequestResult {
   }
 
   /**
-   * Assert the cookie exists by name and then pass it to the provided consumer to allow the caller to assert on
-   * anything they wish.
+   * Assert the cookie exists by name and then pass it to the provided consumer to allow the caller to assert on anything they wish.
    *
    * @param name     The cookie name.
    * @param consumer The consumer used to perform assertions.
@@ -922,8 +908,7 @@ public class RequestResult {
   }
 
   /**
-   * Verifies that the response body is equal to the JSON created from the given object. The object is marshalled using
-   * Jackson.
+   * Verifies that the response body is equal to the JSON created from the given object. The object is marshalled using Jackson.
    *
    * @param object The object.
    * @return This.
@@ -979,8 +964,7 @@ public class RequestResult {
   }
 
   /**
-   * De-serialize the JSON response using the type provided. To use actual values in the JSON use ${actual.foo} to use
-   * the property named
+   * De-serialize the JSON response using the type provided. To use actual values in the JSON use ${actual.foo} to use the property named
    * <code>foo</code>.
    *
    * @param type     The object type of the JSON.
@@ -1060,8 +1044,7 @@ public class RequestResult {
   }
 
   /**
-   * Verifies that the redirect URI is the given URI. The order of the parameters added using the builder is not
-   * important.
+   * Verifies that the redirect URI is the given URI. The order of the parameters added using the builder is not important.
    *
    * @param uri      The base redirect URI.
    * @param consumer The consumer to accept a URI builder to add parameters
@@ -1098,8 +1081,8 @@ public class RequestResult {
   }
 
   /**
-   * Verifies that the response body is equal to the JSON created from the given object,  preserving the order of JSON
-   * arrays. The object is marshalled using Jackson.
+   * Verifies that the response body is equal to the JSON created from the given object,  preserving the order of JSON arrays. The object is
+   * marshalled using Jackson.
    *
    * @param object The object.
    * @return This.
@@ -1137,8 +1120,8 @@ public class RequestResult {
   }
 
   /**
-   * De-serialize the JSON response using the type provided, preserving the order of JSON arrays. To use actual values
-   * in the JSON use ${actual.foo} to use the property named <code>foo</code>.
+   * De-serialize the JSON response using the type provided, preserving the order of JSON arrays. To use actual values in the JSON use ${actual.foo}
+   * to use the property named <code>foo</code>.
    *
    * @param type     The object type of the JSON.
    * @param jsonFile The JSON file to load and compare to the JSON response.
@@ -1369,6 +1352,24 @@ public class RequestResult {
    * If the test is false, apply the consumer.
    * <p>
    * <pre>
+   *   .ifFalse(foo.isBar(), () -> result.assertBodyDoesNotContain("bar"))
+   * </pre>
+   *
+   * @param test     The boolean test to indicate if the runner should be used.
+   * @param runnable The runnable to 'run'
+   * @return This.
+   */
+  public RequestResult ifFalse(boolean test, ThrowingRunnable runnable) throws Exception {
+    if (!test) {
+      runnable.run();
+    }
+    return this;
+  }
+
+  /**
+   * If the test is false, apply the consumer.
+   * <p>
+   * <pre>
    *   .ifFalse(foo.isBar(), (requestResult) -> requestResult.assertBodyDoesNotContain("bar"))
    * </pre>
    *
@@ -1397,6 +1398,25 @@ public class RequestResult {
       thenConsumer.accept(this);
     } else {
       elseConsumer.accept(this);
+    }
+
+    return this;
+  }
+
+
+  /**
+   * If the test is true, apply the consumer. Example:
+   * <pre>
+   *   .ifTrue(foo.isBar(), () -> result.assertBodyContains("bar"))
+   * </pre>
+   *
+   * @param test     The boolean test to indicate if the runnable should be used.
+   * @param runnable The runnable to 'run'.
+   * @return This.
+   */
+  public RequestResult ifTrue(boolean test, ThrowingRunnable runnable) throws Exception {
+    if (test) {
+      runnable.run();
     }
 
     return this;
@@ -2180,8 +2200,8 @@ public class RequestResult {
     }
 
     /**
-     * Add a parameter to the request that you will expect to match the expected. This may be useful if a timestamp oro
-     * other random data is returned that is not important to assert on.
+     * Add a parameter to the request that you will expect to match the expected. This may be useful if a timestamp oro other random data is returned
+     * that is not important to assert on.
      * <p>
      * <strong>This is only intended for use during testing.</strong>
      *
@@ -2195,8 +2215,8 @@ public class RequestResult {
     }
 
     /**
-     * Add a parameter as optional which means that it is not required to be on the query string, but if it is, the
-     * actual value will be used during the assertion.
+     * Add a parameter as optional which means that it is not required to be on the query string, but if it is, the actual value will be used during
+     * the assertion.
      * <p>
      * <strong>This is only intended for use during testing.</strong>
      *

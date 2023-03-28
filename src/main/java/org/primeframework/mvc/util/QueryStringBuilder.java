@@ -100,9 +100,26 @@ public class QueryStringBuilder {
     return uri.append("?").append(sb).toString();
   }
 
+  public QueryStringBuilder ifFalse(boolean test, Runnable runnable) {
+    if (!test) {
+      runnable.run();
+    }
+
+    return this;
+  }
+
   public QueryStringBuilder ifFalse(boolean test, Consumer<QueryStringBuilder> consumer) {
     if (!test) {
       consumer.accept(this);
+    }
+
+    return this;
+  }
+
+  public QueryStringBuilder ifTrue(boolean test, Runnable runnable) {
+    if (test) {
+      runnable.run();
+
     }
 
     return this;
