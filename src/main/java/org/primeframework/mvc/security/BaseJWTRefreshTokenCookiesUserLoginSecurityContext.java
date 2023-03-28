@@ -63,8 +63,8 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
     this.verifierProvider = verifierProvider;
 
     // The cookies for the tokens has an expiration of 70 years to allow it to work with Firefox
-    this.jwtCookie = new CookieProxy(jwtCookieName(), (long) Integer.MAX_VALUE, SameSite.Strict);
-    this.refreshTokenCookie = new CookieProxy(refreshTokenCookieName(), (long) Integer.MAX_VALUE, SameSite.Strict);
+    this.jwtCookie = new CookieProxy(jwtCookieName(), (long) Integer.MAX_VALUE, cookieSameSite());
+    this.refreshTokenCookie = new CookieProxy(refreshTokenCookieName(), (long) Integer.MAX_VALUE, cookieSameSite());
   }
 
   @Override
@@ -132,6 +132,10 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
     }
   }
 
+  protected SameSite cookieSameSite() {
+    return SameSite.Strict;
+  }
+
   /**
    * Allows subclasses to specify the name of the JWT cookie.
    *
@@ -160,14 +164,13 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
   protected abstract Object retrieveUserForJWT(String jwt);
 
   /**
-   * The JWT that is passed to this method is known to be valid. The signature has been validated, and the JWT is not
-   * expired.
+   * The JWT that is passed to this method is known to be valid. The signature has been validated, and the JWT is not expired.
    * <p>
    * You may wish to perform application specific validation on the JWT claims.
    *
    * @param jwt the decoded JWT
-   * @return true if the validation is ok and the JWT can be used. False if the JWT is not ok- and it should not be
-   *     used. Returning true will still allow a refresh token to be used if available.
+   * @return true if the validation is ok and the JWT can be used. False if the JWT is not ok- and it should not be used. Returning true will still
+   *     allow a refresh token to be used if available.
    */
   protected boolean validateJWTClaims(@SuppressWarnings("unused") JWT jwt) {
     return true;
