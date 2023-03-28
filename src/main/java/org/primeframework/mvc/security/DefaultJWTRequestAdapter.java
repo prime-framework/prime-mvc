@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2016-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,8 +33,7 @@ import io.fusionauth.http.server.HTTPResponse;
  * If an <code>Authorization</code> header is not found in the request next we'll look for a Cookie with a name of
  * <code>access_token</code>.
  * <p/>
- * If you expect the JWT in a different authorization scheme, or a different Cookie name, etc you should bind a
- * different Extractor.
+ * If you expect the JWT in a different authorization scheme, or a different Cookie name, etc you should bind a different Extractor.
  *
  * @author Daniel DeGroff
  */
@@ -61,7 +60,7 @@ public class DefaultJWTRequestAdapter implements JWTRequestAdapter {
       }
     }
 
-    Cookie cookie = request.getCookie("access_token");
+    Cookie cookie = request.getCookie(cookieName());
     return cookie != null ? cookie.value : null;
   }
 
@@ -70,7 +69,7 @@ public class DefaultJWTRequestAdapter implements JWTRequestAdapter {
    */
   @Override
   public String invalidateJWT() {
-    Cookie cookie = request.getCookie("access_token");
+    Cookie cookie = request.getCookie(cookieName());
     if (cookie != null) {
       String token = cookie.value;
       cookie.value = null;
@@ -86,5 +85,12 @@ public class DefaultJWTRequestAdapter implements JWTRequestAdapter {
   @Override
   public boolean requestContainsJWT() {
     return getEncodedJWT() != null;
+  }
+
+  /**
+   * @return the cookie name that is being managed by this adapter.
+   */
+  protected String cookieName() {
+    return "access_token";
   }
 }
