@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2015-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,7 +81,9 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
     }
 
     user = retrieveUserForJWT(tokens.jwt);
-    if (user != null) {
+    if (user == null) {
+      jwtCookie.delete(request, response);
+    } else {
       request.setAttribute(UserKey, user);
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2014-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -747,7 +747,7 @@ public class RequestResult {
    */
   public RequestResult assertCookieWasDeleted(String name) {
     Cookie actual = getCookieOrThrow(name);
-    if (actual.value != null && actual.maxAge != 0) {
+    if (actual.value != null && (actual.maxAge == null || actual.maxAge != 0)) {
       throw new AssertionError("Cookie [" + name + "] was not deleted. The value is [" + actual.value + "] and the maxAge is [" + actual.maxAge + "]"
           + "\nActual cookie:\n"
           + cookieToString(actual));
