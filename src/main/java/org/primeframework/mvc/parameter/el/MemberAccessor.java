@@ -196,7 +196,7 @@ public class MemberAccessor extends Accessor {
   /**
    * Find the fields in the declaring class being aware that if any of those fields are annotated with an annotation
    * indicating it should be unwrapped -  we should ignore that field, and instead add the fields that belong to that
-   * object.
+   * object. Will also checked for named parameter annotations and map those to the defined keys.
    *
    * @return the fields found keyed by the field name.
    */
