@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.primeframework.mvc.config.MVCConfiguration;
+import org.primeframework.mvc.parameter.annotation.NamedParameter;
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
 import org.primeframework.mvc.util.ReflectionUtils;
 import org.primeframework.mvc.util.TypeTools;
@@ -204,6 +205,9 @@ public class MemberAccessor extends Accessor {
     for (Map.Entry<String, Field> entry : ReflectionUtils.findFields(this.currentClass).entrySet()) {
       if (ReflectionUtils.areAnyAnnotationsPresent(entry.getValue(), unWrappedAnnotations)) {
         fields.putAll(ReflectionUtils.findFields(entry.getValue().getType()));
+      } else if (ReflectionUtils.areAnyAnnotationsPresent(entry.getValue(), List.of(NamedParameter.class))) {
+        var parameterName = entry.getValue().getAnnotation(NamedParameter.class);
+        fields.put(parameterName.name(), entry.getValue());
       } else {
         fields.put(entry.getKey(), entry.getValue());
       }
