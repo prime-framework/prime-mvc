@@ -126,11 +126,11 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/freemarker/freemarker/2.3.30/freemarker-2.3.30.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/org/freemarker/freemarker/2.3.32/freemarker-2.3.32.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/freemarker/freemarker/2.3.30/freemarker-2.3.30-src.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/org/freemarker/freemarker/2.3.32/freemarker-2.3.32-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>

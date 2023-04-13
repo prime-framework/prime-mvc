@@ -17,7 +17,7 @@
 asmVersion = "9.2.0"
 dropWizardVersion = "3.2.6"
 easyMockVersion = "5.0.1"
-freemarkerVersion = "2.3.30"
+freemarkerVersion = "2.3.32"
 fusionAuthJWTVersion = "5.1.0"
 javaHTTPVersion = "0.1.8"
 jsonPatchVersion = "1.13.0"
@@ -30,7 +30,7 @@ restifyVersion = "4.1.2"
 slf4jVersion = "2.0.3"
 testngVersion = "7.7.1"
 
-project(group: "org.primeframework", name: "prime-mvc", version: "4.7.1", licenses: ["ApacheV2_0"]) {
+project(group: "org.primeframework", name: "prime-mvc", version: "4.8.0", licenses: ["ApacheV2_0"]) {
   workflow {
     fetch {
       // Dependency resolution order:
@@ -103,6 +103,7 @@ dependency = loadPlugin(id: "org.savantbuild.plugin:dependency:2.0.0-RC.4")
 java = loadPlugin(id: "org.savantbuild.plugin:java:2.0.0-RC.4")
 javaTestNG = loadPlugin(id: "org.savantbuild.plugin:java-testng:2.0.0-RC.4")
 idea = loadPlugin(id: "org.savantbuild.plugin:idea:2.0.0-RC.4")
+pom = loadPlugin(id: "org.savantbuild.plugin:pom:2.0.0-RC.6")
 release = loadPlugin(id: "org.savantbuild.plugin:release-git:2.0.0-RC.4")
 
 // Plugin settings
@@ -148,6 +149,10 @@ target(name: "jar", description: "JARs the project", dependsOn: ["compile"]) {
   }
 }
 
+target(name: "pom", description: "Updates the pom.xml file") {
+  updatePOM()
+}
+
 target(name: "test", description: "Runs the project's tests", dependsOn: ["jar"]) {
   javaTestNG.test()
 }
@@ -170,4 +175,22 @@ target(name: "release", description: "Releases a full version of the project", d
 
 target(name: "idea", description: "Updates the IntelliJ IDEA module file") {
   idea.iml()
+  updatePOM()
+}
+
+void updatePOM() {
+  pom.update()
+
+  // Hack. I think we need to update the pom plugin to optionally have a version mapping back to maven.
+  file.copy(to: ".") {
+    fileSet(dir: ".", includePatterns: [~/pom.xml/])
+    // com.github.java-json-tools:json-patch:1.13.0 -> 1.13
+    filter(token: "<version>1.13.0</version>", value: "<version>1.13</version>")
+    // org.ow2.asm:asm:9.2.0 --> 9.2
+    filter(token: "<version>9.2.0</version>", value: "<version>9.2</version>")
+    // javax.inject:javax.inject:1.0.0 -> 1
+    filter(token: "<version>1.0.0</version>", value: "<version>1</version>")
+    // "com.google.guava:guava:30.1.0-jre -> 30.1-jre
+    filter(token: "<version>30.1.0-jre</version>", value: "<version>30.1-jre</version>")
+  }
 }
