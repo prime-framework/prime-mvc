@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2020, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import freemarker.core.HTMLOutputFormat;
 import freemarker.core.TemplateClassResolver;
 import freemarker.ext.beans.BeansWrapperBuilder;
 import freemarker.template.Configuration;
+import freemarker.template.Version;
 import org.primeframework.mvc.config.MVCConfiguration;
 
 /**
@@ -42,12 +43,13 @@ public class FreeMarkerConfigurationProvider implements Provider<Configuration> 
 
   @Override
   public Configuration get() {
-    BeansWrapperBuilder builder = new BeansWrapperBuilder(Configuration.VERSION_2_3_30);
+    Version incompatibleImprovements = incompatibleImprovementsVersion();
+    BeansWrapperBuilder builder = new BeansWrapperBuilder(incompatibleImprovements);
     builder.setExposeFields(true);
     builder.setSimpleMapWrapper(true);
 
     int checkSeconds = configuration.templateCheckSeconds();
-    Configuration config = new Configuration(Configuration.VERSION_2_3_30);
+    Configuration config = new Configuration(incompatibleImprovements);
     config.setTagSyntax(Configuration.SQUARE_BRACKET_TAG_SYNTAX);
     config.setTemplateUpdateDelayMilliseconds(checkSeconds * 1000L);
     config.setTemplateLoader(loader);
@@ -67,5 +69,10 @@ public class FreeMarkerConfigurationProvider implements Provider<Configuration> 
     config.setAPIBuiltinEnabled(false);
 
     return config;
+  }
+
+  // Allow this to be modified without bumping the version in this library.
+  protected Version incompatibleImprovementsVersion() {
+    return Configuration.VERSION_2_3_32;
   }
 }
