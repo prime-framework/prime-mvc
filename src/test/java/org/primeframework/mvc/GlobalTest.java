@@ -1989,6 +1989,20 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void post_parameterWithDashes() {
+    // Use annotation on a field and method
+    simulator.test("/named-parameter-handler")
+             .withParameter("x-token-field", "token-value-field")
+             .withParameter("x-token-method", "token-value-method")
+             .post()
+             .assertStatusCode(200)
+             .assertBodyContains("""
+                 field:token-value-field
+                 method:token-value-method
+                 """);
+  }
+
+  @Test
   public void post_savedRequest() throws Exception {
     // Post to a page that requires authentication
     BaseStoreAction.loggedIn = false;

@@ -21,13 +21,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation allows you to specify the name of a parameter to be parsed from the request that
- * is different from field name on the target class.
+ * This annotation allows you to specify the name of a parameter to be parsed from the request that is different from field name on the target class.
  *
  * @author Lyle Schemmerling
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD})
+@Target({ElementType.FIELD, ElementType.METHOD})
 public @interface NamedParameter {
   String name();
 }
