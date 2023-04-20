@@ -3,3 +3,10 @@ fieldA:${fieldA!'null'}
 fieldB:${secondField!'null'}
 methodA:${methodA!'null'}
 methodB:${secondMethod!'null'}
+foobar:${foobar!'null'}
+somethingElse1:${somethingElse1!'null'}
+somethingElse2:${somethingElse2!'null'}
+somethingElse3:${somethingElse3!'null'}
+somethingElse4:${somethingElse4!'null'}
+methodE:${methodE!'null'}
+methodF:${methodF!'null'}

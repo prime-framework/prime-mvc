@@ -1932,13 +1932,24 @@ public class GlobalTest extends PrimeBaseTest {
              .withParameter("x-method", "value-method-a")
              .withParameter("secondField", "value-field-b")
              .withParameter("methodB", "value-method-b")
+             .withParameter("setfoo", "value-method-setfoo")
+             .withParameter("setBar", "value-method-setBar")
+             .withParameter("getBaz", "value-method-getBaz")
+             .withParameter("getboom", "value-method-getboom")
              .post()
              .assertStatusCode(200)
-             .assertBodyContains("""
+             .assertBody("""
                  fieldA:value-field-a
                  fieldB:value-field-b
                  methodA:value-method-a
                  methodB:value-method-b
+                 foobar:null
+                 somethingElse1:value-method-setfoo
+                 somethingElse2:value-method-setBar
+                 somethingElse3:value-method-getBaz
+                 somethingElse4:value-method-getboom
+                 methodE:value-method-getBaz
+                 methodF:value-method-getboom
                  """);
   }
 
