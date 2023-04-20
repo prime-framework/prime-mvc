@@ -1925,6 +1925,24 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void post_namedParameters() {
+    // Use annotation on a field and method
+    simulator.test("/named-parameter-handler")
+             .withParameter("x-field", "value-field-a")
+             .withParameter("x-method", "value-method-a")
+             .withParameter("secondField", "value-field-b")
+             .withParameter("methodB", "value-method-b")
+             .post()
+             .assertStatusCode(200)
+             .assertBodyContains("""
+                 fieldA:value-field-a
+                 fieldB:value-field-b
+                 methodA:value-method-a
+                 methodB:value-method-b
+                 """);
+  }
+
+  @Test
   public void post_objectMapValues() throws Exception {
     // Dot notation, set into typed map of Map<String, Object>
     test.simulate(() -> simulator.test("/object-map-values")
@@ -1986,20 +2004,6 @@ public class GlobalTest extends PrimeBaseTest {
                                  .withFile("dataTextHtml", test.tempFile, "text/html")
                                  .post()
                                  .assertStatusCode(200));
-  }
-
-  @Test
-  public void post_parameterWithDashes() {
-    // Use annotation on a field and method
-    simulator.test("/named-parameter-handler")
-             .withParameter("x-token-field", "token-value-field")
-             .withParameter("x-token-method", "token-value-method")
-             .post()
-             .assertStatusCode(200)
-             .assertBodyContains("""
-                 field:token-value-field
-                 method:token-value-method
-                 """);
   }
 
   @Test

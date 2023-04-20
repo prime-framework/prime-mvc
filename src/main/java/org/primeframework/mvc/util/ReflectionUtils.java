@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 
+import org.primeframework.mvc.parameter.annotation.NamedParameter;
 import org.primeframework.mvc.parameter.el.BeanExpressionException;
 import org.primeframework.mvc.parameter.el.CollectionExpressionException;
 import org.primeframework.mvc.parameter.el.ExpressionException;
@@ -251,7 +252,7 @@ public class ReflectionUtils {
 
   /**
    * Loads or fetches from the cache a Map of {@link PropertyInfo} objects keyed into the Map by the property name they
-   * correspond to.
+   * correspond to. If NamedParameters are present it will return as an additional entry in the property map.
    *
    * @param type The class to grab the property map from.
    * @return The Map, which could be empty if the class has no properties.
@@ -312,6 +313,21 @@ public class ReflectionUtils {
 
         if (constructed) {
           propMap.put(name.getName(), info);
+        }
+        if (method.isAnnotationPresent(NamedParameter.class)) {
+          // we'll need to add another entry for the named parameter mapping, but it should only include the methods with the annotation
+          var annotatedName = method.getAnnotation(NamedParameter.class).name();
+          var namedInfo = propMap.get(annotatedName);
+          if (namedInfo == null) {
+            namedInfo = new PropertyInfo();
+            namedInfo.setName(name.getName());
+            namedInfo.setDeclaringClass(method.getDeclaringClass());
+            propMap.put(annotatedName, namedInfo);
+          }
+          namedInfo.getMethods().put(prefix, method);
+          namedInfo.setGenericType(verifier.determineGenericType(method));
+          namedInfo.setType(verifier.determineType(method));
+          namedInfo.setIndexed(verifier.isIndexed(method));
         }
       }
 

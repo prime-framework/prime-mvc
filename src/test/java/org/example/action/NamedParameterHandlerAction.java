@@ -25,14 +25,29 @@ import org.primeframework.mvc.parameter.annotation.NamedParameter;
  */
 @Action
 public class NamedParameterHandlerAction {
-  @NamedParameter(name = "x-token-field")
-  public String field;
+  @NamedParameter(name = "x-field")
+  public String fieldA;
 
-  public String method;
+  @NamedParameter(name = "secondField")
+  public String fieldB;
 
-  @NamedParameter(name = "x-token-method")
-  public void setToken(String token) {
-    method = token;
+  public String methodA;
+
+  private String methodB;
+
+
+  @NamedParameter(name = "x-method")
+  public void setToken(String method) {
+    methodA = method;
+  }
+
+  @NamedParameter(name = "secondMethod")
+  public String getMethodB() {
+    return methodB;
+  }
+
+  public void setMethodB(String method) {
+    this.methodB = method;
   }
 
   public String post() {

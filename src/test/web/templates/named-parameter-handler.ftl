@@ -1,3 +1,5 @@
 [#ftl/]
-field:${field!'null'}
-method:${method!'null'}
+fieldA:${fieldA!'null'}
+fieldB:${secondField!'null'}
+methodA:${methodA!'null'}
+methodB:${secondMethod!'null'}
