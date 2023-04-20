@@ -569,6 +569,7 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
     var allProperties = ReflectionUtils.findPropertyInfo(actionClass);
     var allFields = ReflectionUtils.findFields(actionClass).keySet();
     Map<String, Object> namedParameters = new HashMap<>();
+
     annotatedMethods.forEach(method -> {
       var name = method.getAnnotation(NamedParameter.class).name();
       // find this method in the properties list, it should be there and be a valid property
@@ -596,13 +597,14 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
       // now check that we don't have multiple properties for the same name
       namedParameters.compute(name, (k, existingProp) -> {
         // In a getter/setter situation more than one method may be annotated. They should be the same property here, but multiple properties are an error.
-        if (existingProp != null && !existingProp.equals(foundPropPair.getKey())) {
+        if (existingProp != null && !existingProp.equals(foundProp)) {
           throw new PrimeException("The action class [" + actionClass.getSimpleName() + "] has more than one property annotated with " +
               NamedParameter.class.getSimpleName() + " with name [" + name + "].");
         }
         return foundProp;
       });
     });
+
     // now check all the fields
     annotatedFields.forEach(field -> {
       var name = field.getAnnotation(NamedParameter.class).name();
