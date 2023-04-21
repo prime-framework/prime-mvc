@@ -33,13 +33,17 @@ public class NamedParameterHandlerAction {
 
   public String methodA;
 
+  public String methodE;
+
+  public String methodF;
+
   private String methodB;
 
+  // Should not be visible in the FTL as 'methodC'
+  @NamedParameter(name = "privateField")
+  private String methodC;
 
-  @NamedParameter(name = "x-method")
-  public void setToken(String method) {
-    methodA = method;
-  }
+  private String methodD;
 
   @NamedParameter(name = "secondMethod")
   public String getMethodB() {
@@ -50,7 +54,48 @@ public class NamedParameterHandlerAction {
     this.methodB = method;
   }
 
+  public String getSomethingElse1() {
+    return methodC;
+  }
+
+  public String getSomethingElse2() {
+    return methodD;
+  }
+
+  public String getSomethingElse3() {
+    return methodE;
+  }
+
+  public String getSomethingElse4() {
+    return methodF;
+  }
+
   public String post() {
     return "success";
+  }
+
+  @NamedParameter(name = "setfoo")
+  public void setSomething1(String value) {
+    methodC = value;
+  }
+
+  @NamedParameter(name = "setBar")
+  public void setSomething2(String value) {
+    methodD = value;
+  }
+
+  @NamedParameter(name = "getBaz")
+  public void setSomething3(String value) {
+    methodE = value;
+  }
+
+  @NamedParameter(name = "getboom")
+  public void setSomething4(String value) {
+    methodF = value;
+  }
+
+  @NamedParameter(name = "x-method")
+  public void setToken(String method) {
+    methodA = method;
   }
 }
