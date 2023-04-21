@@ -1,8 +1,11 @@
 [#ftl/]
 fieldA:${fieldA!'null'}
+fieldB:${fieldB!'null'}
 fieldB:${secondField!'null'}
 methodA:${methodA!'null'}
 methodB:${secondMethod!'null'}
+methodC:${methodC!'null'}
+methodC:${privateField!'null'}
 foobar:${foobar!'null'}
 somethingElse1:${somethingElse1!'null'}
 somethingElse2:${somethingElse2!'null'}

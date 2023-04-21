@@ -39,6 +39,8 @@ public class NamedParameterHandlerAction {
 
   private String methodB;
 
+  // Should not be visible in the FTL as 'methodC'
+  @NamedParameter(name = "privateField")
   private String methodC;
 
   private String methodD;
