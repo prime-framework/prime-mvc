@@ -34,18 +34,19 @@ import static org.testng.Assert.fail;
  * @author Lyle Schemmerling
  */
 public class NamedParameterHandlerTest {
+
   @Test
   public void test() {
     var builder = new DefaultActionConfigurationBuilder(new DefaultURIBuilder(), new HashSet<>(Arrays.asList(new JacksonActionConfigurator(), new BinaryActionConfigurator())));
-    buildExpectException(builder, InvalidGetterAction.class, "The action class [InvalidGetterAction] has a NamedParameter annotated method [foo] for name [getme] which is not a valid java bean property method.");
+    buildExpectException(builder, InvalidGetterAction.class, "The action class [%s] has a NamedParameter annotation with name [getAnnotation] on method [foo] which is not a valid java bean property method.");
 
-    buildExpectException(builder, InvalidSetterAction.class, "The action class [InvalidSetterAction] has a NamedParameter annotated method [bar] for name [setme] which is not a valid java bean property method.");
+    buildExpectException(builder, InvalidSetterAction.class, "The action class [%s] has a NamedParameter annotation with name [setAnnotation] on method [bar] which is not a valid java bean property method.");
 
-    buildExpectException(builder, PropClashWithFieldAction.class, "The action class [PropClashWithFieldAction] has a NamedParameter annotated method [setBar] which collides with defined field with name [target].");
+    buildExpectException(builder, PropClashWithFieldAction.class, "The action class [%s] has a method [setBar] annotated with NamedParameter for name [target] collides with defined field named [target].");
 
-    buildExpectException(builder, MultiplePropsAction.class, "The action class [MultiplePropsAction] has more than one property annotated with NamedParameter with name [target].");
+    buildExpectException(builder, MultiplePropsAction.class, "The action class [%s] has more than one property annotated with NamedParameter for name [target]. You may not use this annotation on more than one property in the same class with the same parameter name.");
 
-    buildExpectException(builder, FieldClashWithFieldAction.class, "The action class [FieldClashWithFieldAction] has a NamedParameter annotated field [bar] whose name collides with defined field [foo].");
+    buildExpectException(builder, FieldClashWithFieldAction.class, "The action class [%s] has a NamedParameter annotated field [bar] whose name collides with defined field [foo].");
 
     builder.build(OkayAction.class);
   }
@@ -54,7 +55,7 @@ public class NamedParameterHandlerTest {
     try {
       builder.build(clazz);
     } catch (PrimeException e) {
-      assertEquals(msg, e.getMessage());
+      assertEquals(String.format(msg, clazz), e.getMessage());
       return;
     }
     fail("Builder should have thrown exception");
@@ -62,7 +63,7 @@ public class NamedParameterHandlerTest {
 
   @Action
   private static class FieldClashWithFieldAction {
-    @NamedParameter(name = "foo") public String bar;
+    @NamedParameter("foo") public String bar;
 
     public String foo;
 
@@ -75,7 +76,7 @@ public class NamedParameterHandlerTest {
   private static class InvalidGetterAction {
     private String target;
 
-    @NamedParameter(name = "getme")
+    @NamedParameter("getAnnotation")
     public String foo() {
       return target;
     }
@@ -88,7 +89,7 @@ public class NamedParameterHandlerTest {
   @Action
   private static class InvalidSetterAction {
 
-    @NamedParameter(name = "setme")
+    @NamedParameter("setAnnotation")
     public void bar(String target) {
     }
 
@@ -104,18 +105,18 @@ public class NamedParameterHandlerTest {
       return "success";
     }
 
-    @NamedParameter(name = "target")
+    @NamedParameter("target")
     public void setBar(String target) {
     }
 
-    @NamedParameter(name = "target")
+    @NamedParameter("target")
     public void setFoo(String target) {
     }
   }
 
   @Action
   private static class OkayAction {
-    @NamedParameter(name = "buzz") public String foo;
+    @NamedParameter("buzz") public String foo;
 
     private String bar;
 
@@ -123,12 +124,12 @@ public class NamedParameterHandlerTest {
       return "success";
     }
 
-    @NamedParameter(name = "baz")
+    @NamedParameter("baz")
     public String getBar() {
       return bar;
     }
 
-    @NamedParameter(name = "baz")
+    @NamedParameter("baz")
     public void setBar(String bar) {
       this.bar = bar;
     }
@@ -142,7 +143,7 @@ public class NamedParameterHandlerTest {
       return "success";
     }
 
-    @NamedParameter(name = "target")
+    @NamedParameter("target")
     public void setBar(String target) {
     }
   }

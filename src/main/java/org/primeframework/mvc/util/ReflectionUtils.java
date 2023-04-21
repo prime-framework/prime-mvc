@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2022-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -128,8 +128,8 @@ public class ReflectionUtils {
   }
 
   /**
-   * Locates all of the members (fields and JavaBean properties) that have the given annotation and returns the name of
-   * the member and the annotation itself.
+   * Locates all of the members (fields and JavaBean properties) that have the given annotation and returns the name of the member and the annotation
+   * itself.
    *
    * @param type       The class to find the member annotations from.
    * @param annotation The annotation type.
@@ -175,8 +175,7 @@ public class ReflectionUtils {
   }
 
   /**
-   * Loads or fetches from the cache a Map of {@link Field} objects keyed into the Map by the field name they correspond
-   * to.
+   * Loads or fetches from the cache a Map of {@link Field} objects keyed into the Map by the field name they correspond to.
    *
    * @param type The class to grab the fields from.
    * @return The Map, which could be null if the class has no fields.
@@ -203,9 +202,8 @@ public class ReflectionUtils {
   }
 
   /**
-   * Loads and caches the methods of the given Class in an order array. The order of this array is that methods defined
-   * in superclasses are in the array first, followed by methods in the given type. The deeper the superclass, the
-   * earlier the methods are in the array.
+   * Loads and caches the methods of the given Class in an order array. The order of this array is that methods defined in superclasses are in the
+   * array first, followed by methods in the given type. The deeper the superclass, the earlier the methods are in the array.
    *
    * @param type The class.
    * @return The methods.
@@ -251,8 +249,8 @@ public class ReflectionUtils {
   }
 
   /**
-   * Loads or fetches from the cache a Map of {@link PropertyInfo} objects keyed into the Map by the property name they
-   * correspond to. If NamedParameters are present it will return as an additional entry in the property map.
+   * Loads or fetches from the cache a Map of {@link PropertyInfo} objects keyed into the Map by the property name they correspond to. If
+   * NamedParameters are present it will return as an additional entry in the property map.
    *
    * @param type The class to grab the property map from.
    * @return The Map, which could be empty if the class has no properties.
@@ -314,9 +312,10 @@ public class ReflectionUtils {
         if (constructed) {
           propMap.put(name.getName(), info);
         }
+
         if (method.isAnnotationPresent(NamedParameter.class)) {
           // we'll need to add another entry for the named parameter mapping, but it should only include the methods with the annotation
-          var annotatedName = method.getAnnotation(NamedParameter.class).name();
+          var annotatedName = method.getAnnotation(NamedParameter.class).value();
           var namedInfo = propMap.get(annotatedName);
           if (namedInfo == null) {
             namedInfo = new PropertyInfo();
@@ -383,8 +382,8 @@ public class ReflectionUtils {
    * @param field  The field to get.
    * @param object The object to get he field from.
    * @return The value of the field.
-   * @throws ExpressionException If any mishap occurred whilst Reflecting sire. All the exceptions that could be thrown
-   *                             whilst invoking will be wrapped inside the ReflectionException.
+   * @throws ExpressionException If any mishap occurred whilst Reflecting sire. All the exceptions that could be thrown whilst invoking will be
+   *                             wrapped inside the ReflectionException.
    */
   public static Object getField(Field field, Object object) throws ExpressionException {
     try {
@@ -475,26 +474,22 @@ public class ReflectionUtils {
    * @param method The method to invoke.
    * @param object The object to invoke the method on.
    * @return The return value of the method.
-   * @throws RuntimeException If the target of the InvocationTargetException is a RuntimeException, in which case, it is
-   *                          re-thrown.
-   * @throws Error            If the target of the InvocationTargetException is an Error, in which case, it is
-   *                          re-thrown.
+   * @throws RuntimeException If the target of the InvocationTargetException is a RuntimeException, in which case, it is re-thrown.
+   * @throws Error            If the target of the InvocationTargetException is an Error, in which case, it is re-thrown.
    */
   public static Object invokeGetter(Method method, Object object) throws RuntimeException, Error {
     return invoke(method, object);
   }
 
   /**
-   * This handles invoking the setter method and also will handle a single special case where the setter method takes a
-   * single object and the value is a collection with a single value.
+   * This handles invoking the setter method and also will handle a single special case where the setter method takes a single object and the value is
+   * a collection with a single value.
    *
    * @param method The method to invoke.
    * @param object The object to invoke the method on.
    * @param value  The value to set into the method.
-   * @throws RuntimeException If the target of the InvocationTargetException is a RuntimeException, in which case, it is
-   *                          re-thrown.
-   * @throws Error            If the target of the InvocationTargetException is an Error, in which case, it is
-   *                          re-thrown.
+   * @throws RuntimeException If the target of the InvocationTargetException is a RuntimeException, in which case, it is re-thrown.
+   * @throws Error            If the target of the InvocationTargetException is an Error, in which case, it is re-thrown.
    */
   public static void invokeSetter(Method method, Object object, Object value) throws RuntimeException, Error {
     Class[] types = method.getParameterTypes();
@@ -517,8 +512,8 @@ public class ReflectionUtils {
   }
 
   /**
-   * Check if the method is a proper java bean getter-property method. This means that it starts with get, has the form
-   * getFoo or getFOO, has no parameters and returns a non-void value.
+   * Check if the method is a proper java bean getter-property method. This means that it starts with get, has the form getFoo or getFOO, has no
+   * parameters and returns a non-void value.
    *
    * @param method The method to check.
    * @return True if valid, false otherwise.
@@ -528,8 +523,8 @@ public class ReflectionUtils {
   }
 
   /**
-   * Check if the method is a proper java bean indexed getter method. This means that it starts with get, has the form
-   * getFoo or getFOO, has one parameter, an indices, and returns a non-void value.
+   * Check if the method is a proper java bean indexed getter method. This means that it starts with get, has the form getFoo or getFOO, has one
+   * parameter, an indices, and returns a non-void value.
    *
    * @param method The method to check.
    * @return True if valid, false otherwise.
@@ -539,8 +534,8 @@ public class ReflectionUtils {
   }
 
   /**
-   * Check if the method is a proper java bean indexed setter method. This means that it starts with set, has the form
-   * setFoo or setFOO, takes a two parameters, an indices and a value.
+   * Check if the method is a proper java bean indexed setter method. This means that it starts with set, has the form setFoo or setFOO, takes a two
+   * parameters, an indices and a value.
    *
    * @param method The method to check.
    * @return True if valid, false otherwise.
@@ -550,8 +545,8 @@ public class ReflectionUtils {
   }
 
   /**
-   * Check if the method is a proper java bean setter-property method. This means that it starts with set, has the form
-   * setFoo or setFOO, takes a single parameter.
+   * Check if the method is a proper java bean setter-property method. This means that it starts with set, has the form setFoo or setFOO, takes a
+   * single parameter.
    *
    * @param method The method to check.
    * @return True if valid, false otherwise.
@@ -561,14 +556,14 @@ public class ReflectionUtils {
   }
 
   /**
-   * This handles setting a value on a field and also will handle a single special case where the setter method takes a
-   * single object and the value is a collection with a single value.
+   * This handles setting a value on a field and also will handle a single special case where the setter method takes a single object and the value is
+   * a collection with a single value.
    *
    * @param field  The field to set.
    * @param object The object to set the field on.
    * @param value  The value to set into the field.
-   * @throws ExpressionException If any mishap occurred whilst Reflecting sire. All the exceptions that could be thrown
-   *                             whilst invoking will be wrapped inside the ReflectionException.
+   * @throws ExpressionException If any mishap occurred whilst Reflecting sire. All the exceptions that could be thrown whilst invoking will be
+   *                             wrapped inside the ReflectionException.
    */
   @SuppressWarnings("rawtypes")
   public static void setField(Field field, Object object, Object value) throws ExpressionException {
@@ -756,8 +751,8 @@ public class ReflectionUtils {
   }
 
   /**
-   * This class is a small helper class that is used to store the read and write methods of a bean property as well as a
-   * flag that determines if it is indexed.
+   * This class is a small helper class that is used to store the read and write methods of a bean property as well as a flag that determines if it is
+   * indexed.
    *
    * @author Brian Pontarelli
    */

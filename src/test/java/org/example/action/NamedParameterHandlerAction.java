@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,14 +21,14 @@ import org.primeframework.mvc.parameter.annotation.NamedParameter;
 /**
  * Get named parameters that don't follow bean spec
  *
- * @author Daniel DeGroff
+ * @author Lyle Schemmerling
  */
 @Action
 public class NamedParameterHandlerAction {
-  @NamedParameter(name = "x-field")
+  @NamedParameter("x-field")
   public String fieldA;
 
-  @NamedParameter(name = "secondField")
+  @NamedParameter("secondField")
   public String fieldB;
 
   public String methodA;
@@ -40,12 +40,12 @@ public class NamedParameterHandlerAction {
   private String methodB;
 
   // Should not be visible in the FTL as 'methodC'
-  @NamedParameter(name = "privateField")
+  @NamedParameter("privateField")
   private String methodC;
 
   private String methodD;
 
-  @NamedParameter(name = "secondMethod")
+  @NamedParameter("secondMethod")
   public String getMethodB() {
     return methodB;
   }
@@ -74,27 +74,27 @@ public class NamedParameterHandlerAction {
     return "success";
   }
 
-  @NamedParameter(name = "setfoo")
+  @NamedParameter("setfoo")
   public void setSomething1(String value) {
     methodC = value;
   }
 
-  @NamedParameter(name = "setBar")
+  @NamedParameter("setBar")
   public void setSomething2(String value) {
     methodD = value;
   }
 
-  @NamedParameter(name = "getBaz")
+  @NamedParameter("getBaz")
   public void setSomething3(String value) {
     methodE = value;
   }
 
-  @NamedParameter(name = "getboom")
+  @NamedParameter("getboom")
   public void setSomething4(String value) {
     methodF = value;
   }
 
-  @NamedParameter(name = "x-method")
+  @NamedParameter("x-method")
   public void setToken(String method) {
     methodA = method;
   }

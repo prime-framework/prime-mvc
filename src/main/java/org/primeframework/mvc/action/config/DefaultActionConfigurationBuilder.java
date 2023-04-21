@@ -563,7 +563,6 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
   }
 
   private void validateNamedParameterAnnotations(Class<?> actionClass) {
-
     var annotatedMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, NamedParameter.class);
     var annotatedFields = ReflectionUtils.findAllFieldsWithAnnotation(actionClass, NamedParameter.class);
     var allProperties = ReflectionUtils.findPropertyInfo(actionClass);
@@ -571,11 +570,14 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
     Map<String, Object> namedParameters = new HashMap<>();
 
     annotatedMethods.forEach(method -> {
-      var name = method.getAnnotation(NamedParameter.class).name();
-      // find this method in the properties list, it should be there and be a valid property
+      var name = method.getAnnotation(NamedParameter.class).value();
+      // findPropertyInfo only returns properties that follow java bean convention i.e. "getX", "setX", "isX". We should only accept the annotation on
+      // these methods so that we can properly invoke the get and set operations.
       var foundPropPair = allProperties.values()
                                        .stream()
+                                       // the map will have properties for the annotation and the method, skip the annotated entry to avoid falsely detecting a dupe
                                        .filter(property -> !property.getName().equals(name))
+                                       // find the property that contains this method, returning refs to both the property and method
                                        .map(property -> Map.entry(property, property.getMethods()
                                                                                     .values()
                                                                                     .stream()
@@ -584,40 +586,48 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
                                        .filter(pair -> pair.getValue().isPresent())
                                        .findFirst()
                                        .map(entry -> Map.entry(entry.getKey(), entry.getValue().get()))
-                                       .orElseThrow(() -> new PrimeException("The action class [" + actionClass.getSimpleName() + "] has a " +
-                                           NamedParameter.class.getSimpleName() + " annotated method [" + method.getName() + "] for name [" + name +
-                                           "] which is not a valid java bean property method."));
+                                       // if we failed to find this method in the properties map it means that the annotated method doesn't follow property conventions
+                                       .orElseThrow(() -> new PrimeException("The action class [" + actionClass + "] has a " +
+                                           NamedParameter.class.getSimpleName() + " annotation with name [" + name + "] on method [" +
+                                           method.getName() + "] which is not a valid java bean property method."));
+
       var foundProp = foundPropPair.getKey();
       var foundMethod = foundPropPair.getValue();
+
       // now that we know it is a valid property method check it doesn't clash with an existing field.
       if (allFields.contains(name)) {
-        throw new PrimeException("The action class [" + actionClass.getSimpleName() + "] has a " + NamedParameter.class.getSimpleName() +
-            " annotated method [" + foundMethod.getName() + "] which collides with defined field with name [" + name + "].");
+        throw new PrimeException("The action class [" + actionClass + "] has a method [" + foundMethod.getName() + "] annotated with " +
+            NamedParameter.class.getSimpleName() + " for name [" + name + "] collides with defined field named [" + name + "].");
       }
+
       // now check that we don't have multiple properties for the same name
       namedParameters.compute(name, (k, existingProp) -> {
         // In a getter/setter situation more than one method may be annotated. They should be the same property here, but multiple properties are an error.
         if (existingProp != null && !existingProp.equals(foundProp)) {
-          throw new PrimeException("The action class [" + actionClass.getSimpleName() + "] has more than one property annotated with " +
-              NamedParameter.class.getSimpleName() + " with name [" + name + "].");
+          throw new PrimeException("The action class [" + actionClass + "] has more than one property annotated with " +
+              NamedParameter.class.getSimpleName() + " for name [" + name + "]. You may not use this annotation on more than one property in the " +
+              "same class with the same parameter name.");
         }
         return foundProp;
       });
     });
 
-    // now check all the fields
+    // now check all the fields for collisions
     annotatedFields.forEach(field -> {
-      var name = field.getAnnotation(NamedParameter.class).name();
+      var name = field.getAnnotation(NamedParameter.class).value();
+
       // don't clash with defined fields
       if (allFields.contains(name)) {
-        throw new PrimeException("The action class [" + actionClass.getSimpleName() + "] has a " + NamedParameter.class.getSimpleName() +
+        throw new PrimeException("The action class [" + actionClass + "] has a " + NamedParameter.class.getSimpleName() +
             " annotated field [" + field.getName() + "] whose name collides with defined field [" + name + "].");
       }
+
       // no dupes in field or properties
       if (namedParameters.containsKey(name)) {
-        throw new PrimeException("The action class [" + actionClass.getSimpleName() + "] has multiple fields annotated with " +
+        throw new PrimeException("The action class [" + actionClass + "] has multiple fields annotated with " +
             NamedParameter.class.getSimpleName() + " and name " + name + ".");
       }
+
       namedParameters.put(name, field);
     });
   }

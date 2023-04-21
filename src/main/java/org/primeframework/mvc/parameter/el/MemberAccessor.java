@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2019, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BiFunction;
 
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.parameter.annotation.NamedParameter;
@@ -207,7 +206,7 @@ public class MemberAccessor extends Accessor {
         fields.putAll(ReflectionUtils.findFields(entry.getValue().getType()));
       } else if (entry.getValue().isAnnotationPresent(NamedParameter.class)) {
         var parameterName = entry.getValue().getAnnotation(NamedParameter.class);
-        fields.put(parameterName.name(), entry.getValue());
+        fields.put(parameterName.value(), entry.getValue());
         fields.put(entry.getKey(), entry.getValue());
       } else {
         fields.put(entry.getKey(), entry.getValue());
