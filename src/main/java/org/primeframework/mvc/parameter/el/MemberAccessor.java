@@ -140,7 +140,8 @@ public class MemberAccessor extends Accessor {
   }
 
   /**
-   * This first checks for the annotation on the method and then the field. If this member is a field it doesn't check for any getter or setter.
+   * This first checks for the annotation on the method and then the field. If this member is a field it doesn't check
+   * for any getter or setter.
    *
    * @param type The annotation type.
    * @return The annotation or null.
@@ -192,8 +193,9 @@ public class MemberAccessor extends Accessor {
   }
 
   /**
-   * Find the fields in the declaring class being aware that if any of those fields are annotated with an annotation indicating it should be unwrapped
-   * -  we should ignore that field, and instead add the fields that belong to that object.
+   * Find the fields in the declaring class being aware that if any of those fields are annotated with an annotation
+   * indicating it should be unwrapped -  we should ignore that field, and instead add the fields that belong to that
+   * object.
    *
    * @return the fields found keyed by the field name.
    */
@@ -211,8 +213,8 @@ public class MemberAccessor extends Accessor {
   }
 
   /**
-   * Return the field for the object being aware that the field may be nested inside of another object annotated with an annotation indicating it
-   * should be unwrapped.
+   * Return the field for the object being aware that the field may be nested inside of another object annotated with an
+   * annotation indicating it should be unwrapped.
    *
    * @return the field object.
    */
@@ -234,8 +236,8 @@ public class MemberAccessor extends Accessor {
   }
 
   /**
-   * Set the field in the object being aware that the field may be nested inside of another object annotated with an annotation indicating it should
-   * be unwrapped.
+   * Set the field in the object being aware that the field may be nested inside of another object annotated with an
+   * annotation indicating it should be unwrapped.
    *
    * @param value      The value to set into the field.
    * @param expression the current expression that was used to identify the field, used only for exception cases.
