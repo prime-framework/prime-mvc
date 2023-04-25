@@ -112,7 +112,7 @@ public class ReflectionUtils {
   }
 
   /**
-   * Pulls all of the fields and java bean properties from the given Class and returns the names.
+   * Pulls all the fields and java bean properties from the given Class and returns the names.
    *
    * @param type The Class to pull the names from.
    * @return The names of all the fields and java bean properties.
@@ -128,7 +128,7 @@ public class ReflectionUtils {
   }
 
   /**
-   * Locates all of the members (fields and JavaBean properties) that have the given annotation and returns the name of the member and the annotation
+   * Locates all the members (fields and JavaBean properties) that have the given annotation and returns the name of the member and the annotation
    * itself.
    *
    * @param type       The class to find the member annotations from.
@@ -191,8 +191,27 @@ public class ReflectionUtils {
 
       fieldMap = new HashMap<>();
       Field[] fields = type.getFields();
+      // Just a guess for initial capacity, but I doubt we'll have many NamedParameters.
+      List<Field> namedFields = new ArrayList<>(2);
+
       for (Field field : fields) {
+        // Skip fields annotated with FieldName on th first pass
+        if (field.isAnnotationPresent(FieldName.class)) {
+          namedFields.add(field);
+          continue;
+        }
+
         fieldMap.put(field.getName(), field);
+      }
+
+      // Process named parameters last so that we know the annotation is causing the duplicate name.
+      for (Field field : namedFields) {
+        String name = field.getAnnotation(FieldName.class).value();
+        if (fieldMap.containsKey(name)) {
+          throw new BeanExpressionException("Invalid JavaBean class [" + type + "]. Errors are:\n[A field annotated with " + FieldName.class.getSimpleName() + "] and value of [" + name + "] effectively duplicates the existing field of the same name. Rename or remove the duplicate field.]");
+        }
+
+        fieldMap.put(name, field);
       }
 
       fieldCache.put(type, Collections.unmodifiableMap(fieldMap));
@@ -249,11 +268,19 @@ public class ReflectionUtils {
   }
 
   /**
-   * Loads or fetches from the cache a Map of {@link PropertyInfo} objects keyed into the Map by the property name they correspond to. If
-   * NamedParameters are present it will return as an additional entry in the property map.
-   *
-   * @param type The class to grab the property map from.
-   * @return The Map, which could be empty if the class has no properties.
+   * Loads or fetches from the cache a Map of {@link PropertyInfo} objects keyed into the Map by the property name they correspond to.
+   * <br> <br>
+   * When a method is annotated with {@link FieldName} the configured name will take precedence over the method name.
+   * <br> <br>
+   * Take the following code as an example:
+   * <br> <br>
+   * <pre>
+   *   &#064;NamedParameter("bar")
+   *   public void setFoo(String foo) {
+   *     this.foo = foo;
+   *   }
+   * </pre>
+   * Instead of a property <code>setFoo</code> being resolved, <code>setBar</code> will be found instead.
    */
   public static Map<String, PropertyInfo> findPropertyInfo(Class<?> type) {
     Map<String, PropertyInfo> propMap;
@@ -295,7 +322,7 @@ public class ReflectionUtils {
 
         Method existingMethod = info.getMethods().get(prefix);
         if (existingMethod != null) {
-          errors.add("Two or more [" + prefix + "] methods exist in the class [" + type + "] and Prime can't determine which to call");
+          errors.add("Two or more [" + prefix + "] methods named [" + existingMethod.getName() + "] exist. Rename or remove the duplicate method.");
           continue;
         }
 
@@ -311,22 +338,6 @@ public class ReflectionUtils {
 
         if (constructed) {
           propMap.put(name.getName(), info);
-        }
-
-        if (method.isAnnotationPresent(NamedParameter.class)) {
-          // we'll need to add another entry for the named parameter mapping, but it should only include the methods with the annotation
-          var annotatedName = method.getAnnotation(NamedParameter.class).value();
-          var namedInfo = propMap.get(annotatedName);
-          if (namedInfo == null) {
-            namedInfo = new PropertyInfo();
-            namedInfo.setName(name.getName());
-            namedInfo.setDeclaringClass(method.getDeclaringClass());
-            propMap.put(annotatedName, namedInfo);
-          }
-          namedInfo.getMethods().put(prefix, method);
-          namedInfo.setGenericType(verifier.determineGenericType(method));
-          namedInfo.setType(verifier.determineType(method));
-          namedInfo.setIndexed(verifier.isIndexed(method));
         }
       }
 
@@ -367,7 +378,7 @@ public class ReflectionUtils {
       }
 
       if (errors.size() > 0) {
-        throw new BeanExpressionException("Invalid JavaBean class [" + type + "]. Errors are: \n" + errors);
+        throw new BeanExpressionException("Invalid JavaBean class [" + type + "]. Errors are:\n" + errors);
       }
 
       propertyCache.put(type, Collections.unmodifiableMap(propMap));
@@ -593,7 +604,7 @@ public class ReflectionUtils {
     try {
       if (coercionEligible && fieldAndValueAreCollectionCompatible) {
         Collection collection = (Collection) field.get(object);
-        // Non final fields may be null
+        // Non-final fields may be null
         if (collection == null) {
           collection = (Collection) fieldType.newInstance();
         } else {
@@ -637,7 +648,7 @@ public class ReflectionUtils {
   }
 
   /**
-   * Using the given Method, it returns the name of the java bean property and the prefix of the method.
+   * Using the given Method name, it returns the name of the java bean property and the prefix of the method.
    * <p/>
    * <h3>Examples:</h3>
    * <p/>
@@ -648,11 +659,10 @@ public class ReflectionUtils {
    * handleBar -> handle, bar
    * </pre>
    *
-   * @param method The method to translate.
+   * @param name The method name to translate.
    * @return The property names or null if this was not a valid property Method.
    */
-  private static PropertyName getPropertyNames(Method method) {
-    String name = method.getName();
+  private static PropertyName getPropertyNames(String name) {
     char[] ca = name.toCharArray();
     int startIndex = -1;
     for (int i = 0; i < ca.length; i++) {

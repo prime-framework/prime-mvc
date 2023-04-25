@@ -16,7 +16,7 @@
 package org.example.action;
 
 import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.parameter.annotation.NamedParameter;
+import org.primeframework.mvc.parameter.annotation.FieldName;
 
 /**
  * Get named parameters that don't follow bean spec
@@ -24,11 +24,11 @@ import org.primeframework.mvc.parameter.annotation.NamedParameter;
  * @author Lyle Schemmerling
  */
 @Action
-public class NamedParameterHandlerAction {
-  @NamedParameter("x-field")
+public class FieldNameAction {
+  @FieldName("x-field")
   public String fieldA;
 
-  @NamedParameter("secondField")
+  @FieldName("secondField")
   public String fieldB;
 
   public String methodA;
@@ -37,15 +37,18 @@ public class NamedParameterHandlerAction {
 
   public String methodF;
 
+  public String methodG;
+
+  public String methodH;
+
   private String methodB;
 
   // Should not be visible in the FTL as 'methodC'
-  @NamedParameter("privateField")
+  @FieldName("privateField")
   private String methodC;
 
   private String methodD;
 
-  @NamedParameter("secondMethod")
   public String getMethodB() {
     return methodB;
   }
@@ -74,28 +77,41 @@ public class NamedParameterHandlerAction {
     return "success";
   }
 
-  @NamedParameter("setfoo")
+  @FieldName("setfoo")
   public void setSomething1(String value) {
     methodC = value;
   }
 
-  @NamedParameter("setBar")
+  @FieldName("setBar")
   public void setSomething2(String value) {
     methodD = value;
   }
 
-  @NamedParameter("getBaz")
+  @FieldName("getBaz")
   public void setSomething3(String value) {
     methodE = value;
   }
 
-  @NamedParameter("getboom")
+  @FieldName("getboom")
   public void setSomething4(String value) {
     methodF = value;
   }
 
-  @NamedParameter("x-method")
+  @FieldName("x-method")
   public void setToken(String method) {
     methodA = method;
+  }
+
+  // The method is not using standard bean notation such as setX, getX, or isX.
+  // - Also the parameter name is not using a get or set prefix.
+  @FieldName("value2")
+  public void valueBar(String value) {
+    methodH = value;
+  }
+
+  // The method is not using standard bean notation such as setX, getX, or isX.
+  @FieldName("getValue")
+  public void valueFoo(String value) {
+    methodG = value;
   }
 }

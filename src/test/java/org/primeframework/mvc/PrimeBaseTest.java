@@ -78,10 +78,10 @@ import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.DataProvider;
+import static org.testng.Assert.assertEquals;
 
 /**
- * This class is a base test for testing the Prime framework. It isn't recommended that you use it outside the Prime
- * project.
+ * This class is a base test for testing the Prime framework. It isn't recommended that you use it outside the Prime project.
  *
  * @author Brian Pontarelli and James Humphrey
  */
@@ -109,6 +109,33 @@ public abstract class PrimeBaseTest {
   public HTTPResponse response;
 
   @Inject public TestBuilder test;
+
+  public static void expectException(Class<? extends Throwable> throwable, ThrowingRunnable runnable, String message) {
+    try {
+      runnable.run();
+    } catch (Throwable e) {
+      int count = 0;
+      Throwable t = e;
+      // Attempt to go up to 4 levels deep to find the cause of the exception
+      while (count < 4 && t != null) {
+        if (t.getClass().isAssignableFrom(throwable)) {
+          if (message != null) {
+            assertEquals(t.getMessage(), message);
+          }
+          return;
+        }
+        count++;
+        t = t.getCause();
+      }
+      Assert.fail("Expected [" + throwable.getName() + "], but caught [" + e.getClass().getName() + "] Message [" + (e.getMessage() != null ? e.getMessage() : "-") + "]");
+      return;
+    }
+    Assert.fail("Expected [" + throwable.getName() + "], but no exception was thrown.");
+  }
+
+  public static void expectException(Class<? extends Throwable> throwable, ThrowingRunnable runnable) {
+    expectException(throwable, runnable, null);
+  }
 
   @AfterMethod
   public void afterMethod() {
@@ -192,27 +219,6 @@ public abstract class PrimeBaseTest {
   @AfterSuite
   public void shutdown() {
     simulator.shutdown();
-  }
-
-  @SuppressWarnings("Duplicates")
-  protected void expectException(Class<? extends Throwable> throwable, ThrowingRunnable runnable) {
-    try {
-      runnable.run();
-    } catch (Throwable e) {
-      int count = 0;
-      Throwable t = e;
-      // Attempt to go up to 4 levels deep to find the cause of the exception
-      while (count < 4 && t != null) {
-        if (t.getClass().isAssignableFrom(throwable)) {
-          return;
-        }
-        count++;
-        t = t.getCause();
-      }
-      Assert.fail("Expected [" + throwable.getName() + "], but caught [" + e.getClass().getName() + "]");
-      return;
-    }
-    Assert.fail("Expected [" + throwable.getName() + "], but no exception was thrown.");
   }
 
   /**

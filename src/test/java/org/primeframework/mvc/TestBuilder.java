@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2016-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,8 +37,6 @@ import org.primeframework.mvc.test.RequestResult;
 import org.primeframework.mvc.test.RequestResult.ThrowingConsumer;
 import org.primeframework.mvc.test.RequestSimulator;
 import org.primeframework.mvc.util.ThrowingCallable;
-import org.primeframework.mvc.util.ThrowingRunnable;
-import org.testng.Assert;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
@@ -93,27 +91,6 @@ public class TestBuilder {
 
     Files.write(tempFile, contents.getBytes());
     return this;
-  }
-
-  @SuppressWarnings("Duplicates")
-  public void expectException(Class<? extends Throwable> throwable, ThrowingRunnable runnable) {
-    try {
-      runnable.run();
-    } catch (Throwable e) {
-      int count = 0;
-      Throwable t = e;
-      // Attempt to go up to 4 levels deep to find the cause of the exception
-      while (count < 4 && t != null) {
-        if (t.getClass().isAssignableFrom(throwable)) {
-          return;
-        }
-        count++;
-        t = t.getCause();
-      }
-      Assert.fail("Expected [" + throwable.getName() + "], but caught [" + e.getClass().getName() + "]");
-      return;
-    }
-    Assert.fail("Expected [" + throwable.getName() + "], but no exception was thrown.");
   }
 
   public <T> TestIterator<T> forEach(T... collection) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2023, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2019, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.primeframework.mvc.config.MVCConfiguration;
-import org.primeframework.mvc.parameter.annotation.NamedParameter;
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
 import org.primeframework.mvc.util.ReflectionUtils;
 import org.primeframework.mvc.util.TypeTools;
@@ -194,8 +193,7 @@ public class MemberAccessor extends Accessor {
 
   /**
    * Find the fields in the declaring class being aware that if any of those fields are annotated with an annotation indicating it should be unwrapped
-   * -  we should ignore that field, and instead add the fields that belong to that object. Will also checked for named parameter annotations and map
-   * those to the defined keys.
+   * -  we should ignore that field, and instead add the fields that belong to that object.
    *
    * @return the fields found keyed by the field name.
    */
@@ -204,10 +202,6 @@ public class MemberAccessor extends Accessor {
     for (Map.Entry<String, Field> entry : ReflectionUtils.findFields(this.currentClass).entrySet()) {
       if (ReflectionUtils.areAnyAnnotationsPresent(entry.getValue(), unWrappedAnnotations)) {
         fields.putAll(ReflectionUtils.findFields(entry.getValue().getType()));
-      } else if (entry.getValue().isAnnotationPresent(NamedParameter.class)) {
-        var parameterName = entry.getValue().getAnnotation(NamedParameter.class);
-        fields.put(parameterName.value(), entry.getValue());
-        fields.put(entry.getKey(), entry.getValue());
       } else {
         fields.put(entry.getKey(), entry.getValue());
       }
