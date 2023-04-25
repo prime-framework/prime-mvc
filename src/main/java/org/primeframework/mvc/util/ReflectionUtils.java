@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 
-import org.primeframework.mvc.parameter.annotation.NamedParameter;
+import org.primeframework.mvc.parameter.annotation.FieldName;
 import org.primeframework.mvc.parameter.el.BeanExpressionException;
 import org.primeframework.mvc.parameter.el.CollectionExpressionException;
 import org.primeframework.mvc.parameter.el.ExpressionException;
@@ -158,7 +158,7 @@ public class ReflectionUtils {
   }
 
   /**
-   * Finds all of the methods that have the given annotation on the given Object.
+   * Finds all the methods that have the given annotation on the given Object.
    *
    * @param type       The class to find methods from.
    * @param annotation The annotation.
@@ -300,7 +300,10 @@ public class ReflectionUtils {
           continue;
         }
 
-        PropertyName name = getPropertyNames(method);
+        PropertyName name = method.isAnnotationPresent(FieldName.class)
+            ? new PropertyName("set", method.getAnnotation(FieldName.class).value())
+            : getPropertyNames(method.getName());
+
         if (name == null) {
           continue;
         }
