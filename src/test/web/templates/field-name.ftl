@@ -1,0 +1,17 @@
+[#ftl/]
+fieldA:${fieldA!'null'}
+fieldB:${fieldB!'null'}
+fieldB:${secondField!'null'}
+methodA:${methodA!'null'}
+methodB:${methodB!'null'}
+methodC:${methodC!'null'}
+methodC:${privateField!'null'}
+foobar:${foobar!'null'}
+somethingElse1:${somethingElse1!'null'}
+somethingElse2:${somethingElse2!'null'}
+somethingElse3:${somethingElse3!'null'}
+somethingElse4:${somethingElse4!'null'}
+methodE:${methodE!'null'}
+methodF:${methodF!'null'}
+methodG:${methodG!'null'}
+methodH:${methodH!'null'}

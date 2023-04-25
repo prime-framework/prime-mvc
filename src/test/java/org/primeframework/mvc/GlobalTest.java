@@ -1666,6 +1666,48 @@ public class GlobalTest extends PrimeBaseTest {
                                  .assertStatusCode(200));
   }
 
+  @Test
+  public void post_fieldNames() {
+    // Allow for unknown-parameters so that we can test runtime stuff.
+    configuration.allowUnknownParameters = true;
+
+    // Use annotation on a field and method
+    simulator.test("/field-name")
+             .withParameter("x-field", "value-field-a")
+             .withParameter("x-method", "value-method-a")
+             .withParameter("secondField", "value-field-b")
+             .withParameter("methodB", "value-method-b")
+             .withParameter("setfoo", "value-method-setfoo")
+             .withParameter("setBar", "value-method-setBar")
+             .withParameter("getBaz", "value-method-getBaz")
+             .withParameter("getboom", "value-method-getboom")
+             .withParameter("privateField", "value-private-field")
+             .withParameter("getValue", "value-method-getValue")
+             .withParameter("value2", "value-method-value2")
+             .withParameter("fieldA", "value-field-a-2")
+             .withParameter("fieldB", "value-field-b-2")
+             .post()
+             .assertStatusCode(200)
+             .assertBody("""
+                 fieldA:null
+                 fieldB:null
+                 fieldB:value-field-b
+                 methodA:value-method-a
+                 methodB:value-method-b
+                 methodC:null
+                 methodC:null
+                 foobar:null
+                 somethingElse1:value-method-setfoo
+                 somethingElse2:value-method-setBar
+                 somethingElse3:value-method-getBaz
+                 somethingElse4:value-method-getboom
+                 methodE:value-method-getBaz
+                 methodF:value-method-getboom
+                 methodG:value-method-getValue
+                 methodH:value-method-value2
+                 """);
+  }
+
   // Test that the control behaves as expected
   @Test
   public void post_freemarker_escape() throws Exception {
