@@ -1507,6 +1507,10 @@ public class RequestResult {
       message = messageProvider.getMessage(key, values);
     } catch (MissingMessageException e) {
       // For good measure, let's see if we can find his message from a flash scope cookie.
+      // - At runtime, when we move messages to the flash scope, we have already resolved the message.
+      //   This means that the message that is displayed to the user is not resolved using the current
+      //   action invocation, but the action that requested the redirect. This change allows
+      //   this assertion to behave similar to how it works at runtime.
       CookieFlashScope cookieFlashScope = injector.getInstance(CookieFlashScope.class);
       List<Message> flashMessages = cookieFlashScope.get();
       message = flashMessages.stream()
