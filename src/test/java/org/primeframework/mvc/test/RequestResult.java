@@ -72,6 +72,8 @@ import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.primeframework.mvc.message.SimpleMessage;
 import org.primeframework.mvc.message.TestMessageObserver;
 import org.primeframework.mvc.message.l10n.MessageProvider;
+import org.primeframework.mvc.message.l10n.MissingMessageException;
+import org.primeframework.mvc.message.scope.CookieFlashScope;
 import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.util.CookieTools;
 import org.primeframework.mvc.util.QueryStringBuilder;
@@ -1498,10 +1500,30 @@ public class RequestResult {
     return this;
   }
 
-  private RequestResult _assertBodyContainsMessagesFromKey(MessageProvider messageProvider, boolean contains,
-                                                           String key, boolean escape,
+  private RequestResult _assertBodyContainsMessagesFromKey(MessageProvider messageProvider, boolean contains, String key, boolean escape,
                                                            Object... values) {
-    String message = messageProvider.getMessage(key, values);
+    String message;
+    try {
+      message = messageProvider.getMessage(key, values);
+    } catch (MissingMessageException e) {
+      // For good measure, let's see if we can find his message from a flash scope cookie.
+      // - At runtime, when we move messages to the flash scope, we have already resolved the message.
+      //   This means that the message that is displayed to the user is not resolved using the current
+      //   action invocation, but the action that requested the redirect. This change allows
+      //   this assertion to behave similar to how it works at runtime.
+      CookieFlashScope cookieFlashScope = injector.getInstance(CookieFlashScope.class);
+      List<Message> flashMessages = cookieFlashScope.get();
+      message = flashMessages.stream()
+                             .filter(m -> m.getCode().equals(key))
+                             .findFirst()
+                             .map(Object::toString)
+                             .orElse(null);
+
+      if (message == null) {
+        throw e;
+      }
+    }
+
     if (escape) {
       message = escape(message);
     }
