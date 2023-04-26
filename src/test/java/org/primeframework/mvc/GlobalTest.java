@@ -984,6 +984,26 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void get_redirect_flash_scope_messageLookup() throws Exception {
+    // Use case, see if we can correctly assert on a message key in a body when the message only exists in a bundle for the initial action
+    simulator.test("/flash-scope/redirect")
+             .get()
+             .assertStatusCode(302)
+             .assertContainsGeneralMessageCodes(MessageType.INFO, "[FlashScopeMessageKey]")
+             .assertRedirect("/flash-scope/")
+             .executeRedirectReturnResult(result -> result.assertStatusCode(200)
+                                                          .assertContainsGeneralMessageCodes(MessageType.INFO, "[FlashScopeMessageKey]")
+                                                          .assertBodyContainsMessagesFromKey("[FlashScopeMessageKey]")
+                                                          .assertBody("""
+                                                              This is an index page.
+                                                                                   
+                                                                Info:This is a message!
+                                                                
+                                                              """)
+             );
+  }
+
+  @Test
   public void get_redirect_withActual() throws Exception {
     // Contains no parameters
     test.simulate(() -> simulator.test("/complex-redirect")
