@@ -22,7 +22,6 @@ package org.primeframework.mvc.util;
  */
 public class URITools {
   private static final String URL_PATH_OTHER_SAFE_CHARS =
-      "" +
           // Unreserved characters
           "-._~"
           // The subdelim characters
@@ -88,7 +87,7 @@ public class URITools {
   public static String encodeURIPathSegment(Object value) {
     StringBuilder sb = new StringBuilder();
     for (char ch : value.toString().toCharArray()) {
-      if (URL_PATH_SAFE_CHARS_ARRAY[ch]) {
+      if (ch <= URL_PATH_SAFE_CHARS_ARRAY.length && URL_PATH_SAFE_CHARS_ARRAY[ch]) {
         sb.append(ch);
       } else {
         sb.append('%');

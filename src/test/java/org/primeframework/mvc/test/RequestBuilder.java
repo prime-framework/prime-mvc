@@ -648,7 +648,7 @@ public class RequestBuilder {
     if (value != null) {
       String uri = request.getPath();
       if (uri.charAt(uri.length() - 1) != '/') {
-        uri += ('/');
+        uri += '/';
       }
 
       request.setPath(uri + URITools.encodeURIPathSegment(value));

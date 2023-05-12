@@ -15,15 +15,22 @@
  */
 package org.primeframework.mvc;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,6 +42,9 @@ import com.google.inject.Singleton;
 import com.google.inject.util.Modules;
 import io.fusionauth.http.HTTPMethod;
 import io.fusionauth.http.io.NonBlockingByteBufferOutputStream;
+import io.fusionauth.http.log.AccumulatingLoggerFactory;
+import io.fusionauth.http.log.BaseLogger;
+import io.fusionauth.http.log.Level;
 import io.fusionauth.http.server.HTTPContext;
 import io.fusionauth.http.server.HTTPListenerConfiguration;
 import io.fusionauth.http.server.HTTPRequest;
@@ -73,6 +83,8 @@ import org.primeframework.mvc.util.ThrowingRunnable;
 import org.primeframework.mvc.validation.Validation;
 import org.primeframework.mvc.workflow.guice.WorkflowModule;
 import org.testng.Assert;
+import org.testng.ITestListener;
+import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeMethod;
@@ -179,6 +191,10 @@ public abstract class PrimeBaseTest {
 
     // Reset the call count on the invocation finalizer
     MockMVCWorkflowFinalizer.Called.set(0);
+
+    // Reset accumulating logger, using TRACE for now to debug some tests
+    ((TestAccumulatingLogger) TestAccumulatingLoggerFactory.FACTORY.getLogger(PrimeBaseTest.class)).reset();
+    TestAccumulatingLoggerFactory.FACTORY.getLogger(PrimeBaseTest.class).setLevel(Level.Trace);
   }
 
   @BeforeSuite
@@ -199,7 +215,9 @@ public abstract class PrimeBaseTest {
     };
 
     Module module = Modules.override(mvcModule).with(new TestContentModule(), new TestSecurityModule(), new TestScopeModule(), new TestWorkflowModule());
-    var mainConfig = new HTTPServerConfiguration().withListener(new HTTPListenerConfiguration(9080));
+    var mainConfig = new HTTPServerConfiguration().withClientTimeout(Duration.ofMillis(500))
+                                                  .withListener(new HTTPListenerConfiguration(9080))
+                                                  .withLoggerFactory(TestAccumulatingLoggerFactory.FACTORY);
     TestPrimeMain main = new TestPrimeMain(new HTTPServerConfiguration[]{mainConfig}, module);
     simulator = new RequestSimulator(main, messageObserver);
     injector = simulator.getInjector();
@@ -303,6 +321,79 @@ public abstract class PrimeBaseTest {
     }
   }
 
+  @SuppressWarnings("unused")
+  public static class TestListener implements ITestListener {
+    private final static AtomicInteger TestCounter = new AtomicInteger(0);
+
+    private String lastTestMethod;
+
+    private int lastTestMethodCounter = 0;
+
+    @Override
+    public void onTestFailure(ITestResult result) {
+      Throwable throwable = result.getThrowable();
+      String trace = TestAccumulatingLoggerFactory.FACTORY.getLogger(PrimeBaseTest.class).toString();
+
+      // Intentionally leaving empty lines here
+      System.out.println("""
+                                 
+                
+                                 
+          Test failure
+          -----------------
+          Exception: {{exception}}
+          Message: {{message}}
+                               
+          HTTP Trace:
+          {{trace}}
+          -----------------                       
+           """.replace("{{exception}}", throwable != null ? throwable.getClass().getSimpleName() : "-")
+              .replace("{{message}}", throwable != null ? (throwable.getMessage() != null ? throwable.getMessage() : "-") : "-")
+              .replace("{{trace}}", trace.equals("") ? "[-]" : trace));
+    }
+
+    @Override
+    public void onTestStart(ITestResult result) {
+      Object[] dataProvider = result.getParameters();
+      String iteration = dataProvider != null && dataProvider.length > 0
+          ? " [" + serializeDataProviderArgs(dataProvider) + "]"
+          : "";
+
+      // Still missing the factory data provider, for example when we re-run tests as GraalJS or Nashorn, I don't yet have a way to show that in this output.
+      // - But TestNG can do it - so we can too! Just need to figure it out.
+      String testMethod = result.getTestClass().getName() + "." + result.getName();
+      if (lastTestMethod != null && !lastTestMethod.equals(testMethod)) {
+        lastTestMethodCounter = 0;
+      }
+
+      if (!iteration.equals("")) {
+        iteration += " (" + ++lastTestMethodCounter + ")";
+      }
+
+      lastTestMethod = testMethod;
+
+      // Trying to replicate the name of the test in the IJ TestNG runner.
+      System.out.println("[" + TestCounter.incrementAndGet() + "] " + testMethod + iteration);
+    }
+
+    private String serializeDataProviderArgs(Object[] dataProvider) {
+      String result = Arrays.stream(dataProvider)
+                            .map(o -> (o == null ? "null" : o.toString()).replace("\n", " "))
+                            .collect(Collectors.joining(", "));
+
+      int maxLength = 128;
+      if (result.length() > maxLength) {
+        if (result.charAt(maxLength) == ',') {
+          maxLength -= 1;
+        }
+
+        result = result.substring(0, maxLength) + "\u2026";
+      }
+
+      return result;
+    }
+  }
+
   public static class TestMVCConfigurationModule extends AbstractModule {
     @Override
     protected void configure() {
@@ -346,6 +437,51 @@ public abstract class PrimeBaseTest {
       // Don't bind as a singleton in tests so that I can change the key during a test
       bind(CipherProvider.class).to(DefaultCipherProvider.class);
       bind(VerifierProvider.class).to(MockVerifierProvider.class);
+    }
+  }
+
+  static class TestAccumulatingLogger extends BaseLogger {
+    // Avoid blowing heap, used a fixed length list
+    private final LinkedList<String> messages = new LinkedList<>();
+
+    public void reset() {
+      messages.clear();
+    }
+
+    @Override
+    public String toString() {
+      try {
+        return "\n     | " + String.join("\n     | ", messages);
+      } catch (Exception e) {
+        String message = "\nFailed to call toString()";
+        message += " size [" + messages.size() + "]";
+
+        PrintWriter writer = new PrintWriter(new StringWriter());
+        e.printStackTrace(writer);
+
+        message += "\n" + writer + "\n\n";
+        return message;
+      }
+    }
+
+    @Override
+    protected void handleMessage(String message) {
+      while (messages.size() > 100_000) {
+        messages.removeFirst();
+      }
+
+      messages.add(message);
+    }
+  }
+
+  static class TestAccumulatingLoggerFactory extends AccumulatingLoggerFactory {
+    public static final TestAccumulatingLoggerFactory FACTORY = new TestAccumulatingLoggerFactory();
+
+    private static final io.fusionauth.http.log.Logger logger = new TestAccumulatingLogger();
+
+    @Override
+    public io.fusionauth.http.log.Logger getLogger(Class<?> klass) {
+      return logger;
     }
   }
 
