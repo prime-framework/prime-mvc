@@ -118,7 +118,8 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
     if (result) {
       invocation.actionURI = state.actionConfiguration.uri;
       invocation.configuration = state.actionConfiguration;
-      invocation.uriParameters.putAll(state.uriParameters.entrySet().stream()
+      invocation.uriParameters.putAll(state.uriParameters.entrySet()
+                                                         .stream()
                                                          .filter(e -> e.getValue().size() > 0)
                                                          .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
     }
@@ -220,8 +221,7 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
    * @param addedIndexURIPart True if 'index' was added as an additional segment to the URI parts
    * @return True if we found an action node, false if not.
    */
-  protected boolean traverse(Node node, String[] uriParts, int currentIndex,
-                             TraversalState state, boolean addedIndexURIPart) {
+  protected boolean traverse(Node node, String[] uriParts, int currentIndex, TraversalState state, boolean addedIndexURIPart) {
     // Exit condition
     if (currentIndex == uriParts.length) {
       return false;
@@ -267,7 +267,7 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
    *
    * @param classLoader the ClassLoader
    * @param actionClass the Class to test
-   * @return true if actionClass was loaded by classLoader or one one of its children
+   * @return true if actionClass was loaded by classLoader or one of its children
    */
   private boolean inClassLoaderOrParentClassLoader(ClassLoader classLoader, Class<?> actionClass) {
     ClassLoader actionClassClassLoader = actionClass.getClassLoader();

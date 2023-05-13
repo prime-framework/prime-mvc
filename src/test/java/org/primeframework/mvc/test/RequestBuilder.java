@@ -340,8 +340,7 @@ public class RequestBuilder {
   }
 
   /**
-   * Sets the body content. This processes the file using FreeMarker. Use {@link #withBodyFileRaw(Path)} to skip
-   * FreeMarker processing.
+   * Sets the body content. This processes the file using FreeMarker. Use {@link #withBodyFileRaw(Path)} to skip FreeMarker processing.
    *
    * @param body   The body as a {@link Path} to the file.
    * @param values key value pairs of replacement values for use in the file.
@@ -375,8 +374,8 @@ public class RequestBuilder {
   }
 
   /**
-   * Sets an HTTP request body parameter as a Prime MVC checkbox widget. This can be called multiple times with the same
-   * name, and it will create a list of values for the HTTP parameter.
+   * Sets an HTTP request body parameter as a Prime MVC checkbox widget. This can be called multiple times with the same name, and it will create a
+   * list of values for the HTTP parameter.
    *
    * @param name           The name of the parameter.
    * @param checkedValue   The checked value of the checkbox.
@@ -535,8 +534,8 @@ public class RequestBuilder {
   }
 
   /**
-   * Sets an HTTP request body parameter. This can be called multiple times with the same name it will create a list of
-   * values for the HTTP parameter.
+   * Sets an HTTP request body parameter. This can be called multiple times with the same name it will create a list of values for the HTTP
+   * parameter.
    *
    * @param name  The name of the parameter.
    * @param value The parameter value. This is an object so toString is called on it to convert it to a String.
@@ -548,8 +547,7 @@ public class RequestBuilder {
   }
 
   /**
-   * Sets HTTP request body parameters. This takes the provided collection and adds a request parameter for each item in
-   * the collection.
+   * Sets HTTP request body parameters. This takes the provided collection and adds a request parameter for each item in the collection.
    *
    * @param name   The name of the parameter.
    * @param values The collection of parameter values.
@@ -561,8 +559,8 @@ public class RequestBuilder {
   }
 
   /**
-   * Sets HTTP request parameters from a query String that is already encoded and might contain multiple parameters.
-   * This will split the parameters up and decode them.
+   * Sets HTTP request parameters from a query String that is already encoded and might contain multiple parameters. This will split the parameters up
+   * and decode them.
    *
    * @param query The query string.
    * @return This.
@@ -573,8 +571,8 @@ public class RequestBuilder {
   }
 
   /**
-   * Sets an HTTP request body parameter as a Prime MVC radio button widget. This can be called multiple times with the
-   * same name it will create a list of values for the HTTP parameter.
+   * Sets an HTTP request body parameter as a Prime MVC radio button widget. This can be called multiple times with the same name it will create a
+   * list of values for the HTTP parameter.
    *
    * @param name           The name of the parameter.
    * @param checkedValue   The checked value of the checkbox.
@@ -592,8 +590,8 @@ public class RequestBuilder {
   }
 
   /**
-   * Add a single request header. Calling this sequentially will just overwrite the previous value. If you wish to add a
-   * header multiple times, use {@link #withHeader(String, Object)} instead.
+   * Add a single request header. Calling this sequentially will just overwrite the previous value. If you wish to add a header multiple times, use
+   * {@link #withHeader(String, Object)} instead.
    *
    * @param name  The name of the header.
    * @param value The value of the header.
@@ -653,6 +651,7 @@ public class RequestBuilder {
 
       request.setPath(uri + URITools.encodeURIPathSegment(value));
     }
+
     return this;
   }
 
@@ -697,7 +696,7 @@ public class RequestBuilder {
                              .collect(Collectors.toList());
 
     String scheme = useTLS ? "https://" : "http://";
-    URI requestURI = URI.create(scheme + "localhost" + ":" + port + request.getPath());
+    URI requestURI = URI.create(scheme + "localhost:" + port + request.getPath());
 
     // Referer for CSRF checks must be provided
     if (request.getHeader("Referer") == null) {
