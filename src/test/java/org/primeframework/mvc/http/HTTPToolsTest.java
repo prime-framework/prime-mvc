@@ -138,8 +138,8 @@ public class HTTPToolsTest {
     assertOkRequestURI("/foo/.well-known/.openid-configuration");
   }
 
-  private void assertBadRequestURI(String path, String expected) {
-    assertEquals(HTTPTools.getRequestURI(new HTTPRequest().with(r -> r.setPath(path))), expected);
+  private void assertBadRequestURI(String path, String expectedResult) {
+    assertEquals(HTTPTools.getRequestURI(new HTTPRequest().with(r -> r.setPath(path))), expectedResult);
   }
 
   private void assertOkRequestURI(String path) {

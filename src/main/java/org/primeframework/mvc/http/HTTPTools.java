@@ -29,6 +29,8 @@ import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 public class HTTPTools {
   private static final Pattern DoubleSlash = Pattern.compile("/{2,}");
 
+  private static final Pattern TooManyDots = Pattern.compile("/\\./|\\.{2,}/|/\\.{2,}|\\.{2,}");
+
   /**
    * Return the <code>Origin</code> header or as a fallback, the value of the <code>Referer</code> header will be returned if the <code>Origin</code>
    * header is not available.
@@ -59,7 +61,7 @@ public class HTTPTools {
    */
   public static String getRequestURI(HTTPRequest request) {
     String uri = request.getPath();
-    uri = uri.replaceAll("/\\./|\\.{2,}/|/\\.{2,}|\\.{2,}", "");
+    uri = TooManyDots.matcher(uri).replaceAll("");
 
     int semicolon = uri.indexOf(';');
     if (semicolon >= 0) {
