@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -117,11 +117,32 @@ public class HTTPToolsTest {
   }
 
   @Test
-  public void badURIs() {
-    assertEquals(HTTPTools.getRequestURI(new HTTPRequest().with(r -> r.setPath("../../../foo.png"))), "foo.png");
-    assertEquals(HTTPTools.getRequestURI(new HTTPRequest().with(r -> r.setPath("/../../../foo.png"))), "/foo.png");
-    assertEquals(HTTPTools.getRequestURI(new HTTPRequest().with(r -> r.setPath("/css/../../../foo.png"))), "/css/foo.png");
-    assertEquals(HTTPTools.getRequestURI(new HTTPRequest().with(r -> r.setPath("../css/../../../foo.png"))), "css/foo.png");
-    assertEquals(HTTPTools.getRequestURI(new HTTPRequest().with(r -> r.setPath("/../css/../../../foo.png"))), "/css/foo.png");
+  public void getRequestURI() {
+    // Bad
+    assertBadRequestURI("../../../foo.png", "foo.png");
+    assertBadRequestURI("/../../../foo.png", "/foo.png");
+    assertBadRequestURI("/css/../../../foo.png", "/css/foo.png");
+    assertBadRequestURI("../css/../../../foo.png", "css/foo.png");
+    assertBadRequestURI("/../css/../../../foo.png", "/css/foo.png");
+
+    assertBadRequestURI("/a/./.../....//b/foo.png", "/a/b/foo.png");
+    assertBadRequestURI(".../....///.../....///.../....///.../....///.../....///.../....//foo.png", "/foo.png");
+    assertBadRequestURI("...foo.png", "foo.png");
+    assertBadRequestURI("..../foo.png", "foo.png");
+    assertBadRequestURI("/....foo.png", "foo.png");
+    assertBadRequestURI("/..../foo.png", "/foo.png");
+
+    // Ok
+    assertOkRequestURI("/.well-known/openid-configuration");
+    assertOkRequestURI("/foo/.well-known/openid-configuration");
+    assertOkRequestURI("/foo/.well-known/.openid-configuration");
+  }
+
+  private void assertBadRequestURI(String path, String expected) {
+    assertEquals(HTTPTools.getRequestURI(new HTTPRequest().with(r -> r.setPath(path))), expected);
+  }
+
+  private void assertOkRequestURI(String path) {
+    assertEquals(HTTPTools.getRequestURI(new HTTPRequest().with(r -> r.setPath(path))), path);
   }
 }

@@ -30,15 +30,14 @@ public class HTTPTools {
   private static final Pattern DoubleSlash = Pattern.compile("/{2,}");
 
   /**
-   * Return the <code>Origin</code> header or as a fallback, the value of the <code>Referer</code> header will be
-   * returned if the <code>Origin</code> header is not available.
+   * Return the <code>Origin</code> header or as a fallback, the value of the <code>Referer</code> header will be returned if the <code>Origin</code>
+   * header is not available.
    *
    * <p>
    * This handles a <code>"null"</code> Origin value and returns <code>null</code>.
    * </p>
    * <p>
-   * See <a href="https://stackoverflow.com/a/42242802/3892636">https://stackoverflow.com/a/42242802/3892636</a> for
-   * more information.
+   * See <a href="https://stackoverflow.com/a/42242802/3892636">https://stackoverflow.com/a/42242802/3892636</a> for more information.
    *
    * @param request the request.
    * @return null if no value can be found for the Origin or Referer header.
@@ -60,8 +59,7 @@ public class HTTPTools {
    */
   public static String getRequestURI(HTTPRequest request) {
     String uri = request.getPath();
-    uri = uri.replace("../", "");
-    uri = uri.replace("/..", "");
+    uri = uri.replaceAll("/\\./|\\.{2,}/|/\\.{2,}|\\.{2,}", "");
 
     int semicolon = uri.indexOf(';');
     if (semicolon >= 0) {
