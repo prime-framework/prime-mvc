@@ -21,6 +21,7 @@ import java.net.URI;
 import io.fusionauth.http.server.HTTPRequest;
 import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNull;
 
 /**
  * HTTPTools test.
@@ -118,31 +119,77 @@ public class HTTPToolsTest {
 
   @Test
   public void getRequestURI() {
-    // Bad
-    assertBadRequestURI("../../../foo.png", "foo.png");
-    assertBadRequestURI("/../../../foo.png", "/foo.png");
-    assertBadRequestURI("/css/../../../foo.png", "/css/foo.png");
-    assertBadRequestURI("../css/../../../foo.png", "css/foo.png");
-    assertBadRequestURI("/../css/../../../foo.png", "/css/foo.png");
+    // Not ideal, but not escaping root. These are literal equivalent paths that do not go back further than they go forward.
+    assertBadRequestURI("/foo/../foo.png", "/foo.png");
+    assertBadRequestURI("/./foo/../foo.png", "/foo.png");
+    assertBadRequestURI("/././foo.png", "/foo.png");
 
-    assertBadRequestURI("/a/./.../....//b/foo.png", "/a/b/foo.png");
-    assertBadRequestURI(".../....///.../....///.../....///.../....///.../....///.../....//foo.png", "/foo.png");
-    assertBadRequestURI("...foo.png", "foo.png");
-    assertBadRequestURI("..../foo.png", "foo.png");
-    assertBadRequestURI("/....foo.png", "foo.png");
-    assertBadRequestURI("/..../foo.png", "/foo.png");
+    assertBadRequestURI("/foo/bar/../../foo.png", "/foo.png");
+    assertBadRequestURI("/foo/bar/../.././foo.png", "/foo.png");
+    assertBadRequestURI("/foo/bar/././foo.png", "/foo/bar/foo.png");
 
-    // Ok
+    // Not root escaped, but with encoded dots, should interpret the same as a dot. %2E
+    // - https://www.rfc-editor.org/rfc/rfc3986#section-2.3
+    //
+    // > For consistency, percent-encoded octets in the ranges of ALPHA
+    //   (%41-%5A and %61-%7A), DIGIT (%30-%39), hyphen (%2D), period (%2E),
+    //   underscore (%5F), or tilde (%7E) should not be created by URI
+    //   producers and, when found in a URI, should be decoded to their
+    //   corresponding unreserved characters by URI normalizers.
+    //
+    // This thread https://stackoverflow.com/a/24867425/3892636 quotes the above and interprets this to mean
+    // an encoded dot (.) - %2E should be treated as the literal character.
+
+    assertBadRequestURI("/foo/%2E%2E/foo%2Epng", "/foo.png");
+    assertBadRequestURI("/%2E/foo/%2E%2E/foo%2Epng", "/foo.png");
+
+    // Bad, escaping
+    assertEscapedURI("../../../foo.png");
+    assertEscapedURI("/../../../foo.png");
+    assertEscapedURI("/css/../../../foo.png");
+    assertEscapedURI("../css/../../../foo.png");
+    assertEscapedURI("/../css/../../../foo.png");
+
+    // Bad, too many dots!
+    assertBadURI("/a/./.../....//b/foo.png");
+    assertBadURI(".../....///.../....///.../....///.../....///.../....///.../....//foo.png");
+    assertBadURI("...foo.png");
+    assertBadURI("..../foo.png");
+    assertBadURI("/....foo.png");
+    assertBadURI("/..../foo.png");
+
+    // Ok. These have a dot, but are valid.
     assertOkRequestURI("/.well-known/openid-configuration");
     assertOkRequestURI("/foo/.well-known/openid-configuration");
     assertOkRequestURI("/foo/.well-known/.openid-configuration");
+
+    // Lots of dots in a fileName are ok
+    assertOkRequestURI("/foo/version/1.0/foo.png");
+    assertOkRequestURI("/foo/version/1.0.x/foo.png");
+    assertOkRequestURI("/foo/version/1.2/foo.png");
+    assertOkRequestURI("/foo/version/1.2.0/foo.png");
+    assertOkRequestURI("/foo/version/1.2.0.x/foo.png");
+    assertOkRequestURI("/foo/version/1.2.0.1.9.2.22.1.x/foo.png");
+    assertOkRequestURI("/foo/version/1.2.0.1.9.2.22.1.x./foo.png");
+    assertOkRequestURI("/foo/version/1.2.0.1.9.2.22.1.x./foo..png");
+    assertOkRequestURI("/foo/version/1.2.0.1.9.2.22.1.x./foo....png");
+    assertOkRequestURI("/foo/version/1.2.0.1.9.2.22.1.x./foo.......png");
+    assertOkRequestURI("/f.o.o/b.a.r/1.2.0.1.9.2.22.1.x./f.o.o.png");
   }
 
   private void assertBadRequestURI(String path, String expectedResult) {
-    assertEquals(HTTPTools.getRequestURI(new HTTPRequest().with(r -> r.setPath(path))), expectedResult);
+    assertEquals(HTTPTools.sanitizeURI(HTTPTools.getRequestURI(new HTTPRequest().with(r -> r.setPath(path)))), expectedResult);
+  }
+
+  private void assertBadURI(String path) {
+    assertNull(HTTPTools.sanitizeURI(HTTPTools.getRequestURI(new HTTPRequest().with(r -> r.setPath(path)))));
+  }
+
+  private void assertEscapedURI(String path) {
+    assertNull(HTTPTools.sanitizeURI(HTTPTools.getRequestURI(new HTTPRequest().with(r -> r.setPath(path)))));
   }
 
   private void assertOkRequestURI(String path) {
-    assertEquals(HTTPTools.getRequestURI(new HTTPRequest().with(r -> r.setPath(path))), path);
+    assertEquals(HTTPTools.sanitizeURI(HTTPTools.getRequestURI(new HTTPRequest().with(r -> r.setPath(path)))), path);
   }
 }

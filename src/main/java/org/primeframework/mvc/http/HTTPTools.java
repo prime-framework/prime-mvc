@@ -15,6 +15,7 @@
  */
 package org.primeframework.mvc.http;
 
+import java.util.LinkedList;
 import java.util.regex.Pattern;
 
 import io.fusionauth.http.HTTPValues;
@@ -28,8 +29,6 @@ import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
  */
 public class HTTPTools {
   private static final Pattern DoubleSlash = Pattern.compile("/{2,}");
-
-  private static final Pattern TooManyDots = Pattern.compile("/\\./|\\.{2,}/|/\\.{2,}|\\.{2,}");
 
   /**
    * Return the <code>Origin</code> header or as a fallback, the value of the <code>Referer</code> header will be returned if the <code>Origin</code>
@@ -61,7 +60,6 @@ public class HTTPTools {
    */
   public static String getRequestURI(HTTPRequest request) {
     String uri = request.getPath();
-    uri = TooManyDots.matcher(uri).replaceAll("");
 
     int semicolon = uri.indexOf(';');
     if (semicolon >= 0) {
@@ -74,5 +72,68 @@ public class HTTPTools {
     }
 
     return DoubleSlash.matcher(uri).replaceAll("/");
+  }
+
+  public static String sanitizeURI(String uri) {
+    if (uri == null) {
+      return null;
+    }
+
+    char[] ca = uri.replace("%2E", ".").toCharArray();
+
+    int slash = 0;
+    int dots = 0;
+
+    boolean goodSegment = false;
+    boolean fileName = false;
+
+    LinkedList<String> segments = new LinkedList<>();
+
+    for (int i = 0; i < ca.length; i++) {
+      char c = ca[i];
+
+      if (c == '/') {
+        // If this is a good segment, add it
+        if (goodSegment) {
+          segments.addLast(new String(ca, slash, i - slash));
+        } else if (dots >= 2) {
+          if (segments.isEmpty()) {
+            return null;
+          }
+
+          segments.removeLast();
+        }
+
+        slash = i;
+        dots = 0;
+        fileName = false;
+        goodSegment = false;
+      } else if (c != '.') {
+        goodSegment = true;
+        fileName = true;
+        dots = 0;
+      } else {
+        // It is a dot!
+
+        // We all like dots. but 2 is "too" many!
+        if (dots == 2 && !fileName) {
+          return null;
+        }
+
+        dots++;
+      }
+    }
+
+    if (goodSegment) {
+      segments.addLast(new String(ca, slash, ca.length - slash));
+    } else if (dots == 2) {
+      if (segments.isEmpty()) {
+        return null;
+      }
+
+      segments.pop();
+    }
+
+    return String.join("", segments);
   }
 }

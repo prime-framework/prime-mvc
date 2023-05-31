@@ -40,8 +40,8 @@ public final class BodyTools {
   private static final Configuration config;
 
   /**
-   * Process the FreeMarker template (JSON) and return the rendered string. <p>Example usage when a single replacement
-   * value exists in the json named ${id} :</p>
+   * Process the FreeMarker template (JSON) and return the rendered string. <p>Example usage when a single replacement value exists in the json named
+   * ${id} :</p>
    * <pre>
    *   BodyTools.processTemplate(Path.of("/foo.json"), "id", "ffffffff-1e16-4b1d-88f3-ec68ad1200e2");
    * </pre>
@@ -56,8 +56,8 @@ public final class BodyTools {
   }
 
   /**
-   * Process the FreeMarker template (JSON) and return the rendered string. <p>Example usage when a single replacement
-   * value exists in the json named ${id} :</p>
+   * Process the FreeMarker template (JSON) and return the rendered string. <p>Example usage when a single replacement value exists in the json named
+   * ${id} :</p>
    * <pre>
    *   BodyTools.processTemplate(Path.of("/foo.json"), "id", "ffffffff-1e16-4b1d-88f3-ec68ad1200e2");
    * </pre>
@@ -72,8 +72,8 @@ public final class BodyTools {
   }
 
   /**
-   * Process the FreeMarker template (JSON) and return the rendered string. <p>Example usage when a single replacement
-   * value exists in the json named ${id} :</p>
+   * Process the FreeMarker template (JSON) and return the rendered string. <p>Example usage when a single replacement value exists in the json named
+   * ${id} :</p>
    * <pre>
    *   BodyTools.processTemplateWithMap(Path.of("/foo.json"), MapBuilder.&lt;String, Object&gt;map()
    *     .put("id", "ffffffff-1e16-4b1d-88f3-ec68ad1200e2")
@@ -129,11 +129,11 @@ public final class BodyTools {
   }
 
   static {
-    BeansWrapperBuilder builder = new BeansWrapperBuilder(Configuration.VERSION_2_3_28);
+    BeansWrapperBuilder builder = new BeansWrapperBuilder(Configuration.VERSION_2_3_32);
     builder.setExposeFields(true);
     builder.setSimpleMapWrapper(true);
 
-    config = new Configuration(Configuration.VERSION_2_3_28);
+    config = new Configuration(Configuration.VERSION_2_3_32);
     config.setDefaultEncoding("UTF-8");
     config.setNumberFormat("computer");
     config.setTagSyntax(Configuration.SQUARE_BRACKET_TAG_SYNTAX);
