@@ -80,13 +80,9 @@ public class HTTPTools {
     }
 
     char[] ca = uri.replace("%2E", ".").toCharArray();
-
-    int slash = 0;
     int dots = 0;
-
+    int slash = 0;
     boolean goodSegment = false;
-    boolean fileName = false;
-
     LinkedList<String> segments = new LinkedList<>();
 
     for (int i = 0; i < ca.length; i++) {
@@ -94,9 +90,9 @@ public class HTTPTools {
 
       if (c == '/') {
         // If this is a good segment, add it
-        if (goodSegment) {
+        if (goodSegment || dots > 2) {
           segments.addLast(new String(ca, slash, i - slash));
-        } else if (dots >= 2) {
+        } else if (dots == 2) {
           if (segments.isEmpty()) {
             return null;
           }
@@ -106,32 +102,17 @@ public class HTTPTools {
 
         slash = i;
         dots = 0;
-        fileName = false;
         goodSegment = false;
-      } else if (c != '.') {
-        goodSegment = true;
-        fileName = true;
-        dots = 0;
-      } else {
-        // It is a dot!
-
-        // We all like dots. but 2 is "too" many!
-        if (dots == 2 && !fileName) {
-          return null;
-        }
-
+      } else if (c == '.') {
         dots++;
+      } else {
+        goodSegment = true;
+        dots = 0;
       }
     }
 
     if (goodSegment) {
       segments.addLast(new String(ca, slash, ca.length - slash));
-    } else if (dots == 2) {
-      if (segments.isEmpty()) {
-        return null;
-      }
-
-      segments.pop();
     }
 
     return String.join("", segments);

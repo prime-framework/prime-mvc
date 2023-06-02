@@ -143,27 +143,32 @@ public class HTTPToolsTest {
     assertBadRequestURI("/foo/%2E%2E/foo%2Epng", "/foo.png");
     assertBadRequestURI("/%2E/foo/%2E%2E/foo%2Epng", "/foo.png");
 
-    // Bad, escaping
+    // Bad, escaping, we will return null for these values when sanitized.
+    assertEscapedURI("/../foo.png");
     assertEscapedURI("../../../foo.png");
     assertEscapedURI("/../../../foo.png");
     assertEscapedURI("/css/../../../foo.png");
     assertEscapedURI("../css/../../../foo.png");
     assertEscapedURI("/../css/../../../foo.png");
 
-    // Bad, too many dots!
-    assertBadURI("/a/./.../....//b/foo.png");
-    assertBadURI(".../....///.../....///.../....///.../....///.../....///.../....//foo.png");
-    assertBadURI("...foo.png");
-    assertBadURI("..../foo.png");
-    assertBadURI("/....foo.png");
-    assertBadURI("/..../foo.png");
+    // Lots of dots! But this ok as long as they aren't double dots. You can make a directory named '...'
+    assertBadRequestURI("/a/./.../....//b/foo.png", "/a/.../..../b/foo.png");
+    assertBadRequestURI(".../....///.../....///.../....///.../....///.../....///.../....//foo.png", ".../..../.../..../.../..../.../..../.../..../.../..../foo.png");
+    assertBadRequestURI("...foo.png", "...foo.png");
+
+    // Strange, but ok.
+    assertOkRequestURI("..../foo.png");
+    assertOkRequestURI("/....foo.png");
+    assertOkRequestURI("/..../foo.png");
+    assertOkRequestURI("/..../foo.png..");
+    assertOkRequestURI("/..../foo.png...");
 
     // Ok. These have a dot, but are valid.
     assertOkRequestURI("/.well-known/openid-configuration");
     assertOkRequestURI("/foo/.well-known/openid-configuration");
     assertOkRequestURI("/foo/.well-known/.openid-configuration");
 
-    // Lots of dots in a fileName are ok
+    // Lots of dot separators in a fileName are ok
     assertOkRequestURI("/foo/version/1.0/foo.png");
     assertOkRequestURI("/foo/version/1.0.x/foo.png");
     assertOkRequestURI("/foo/version/1.2/foo.png");
