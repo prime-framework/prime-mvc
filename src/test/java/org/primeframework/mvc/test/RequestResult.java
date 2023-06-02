@@ -1257,6 +1257,16 @@ public class RequestResult {
   }
 
   /**
+   * Attempt to follow a meta-refresh
+   *
+   * @param result A consumer for the request result from following the redirect.
+   * @return This.
+   */
+  public RequestResult executeMetaRefreshReturnResult(ThrowingConsumer<RequestResult> result) throws Exception {
+    return handleFollowMetaRefresh(result);
+  }
+
+  /**
    * Execute the redirect and accept a consumer to assert on the response.
    *
    * @param consumer The request result from following the redirect.
@@ -1637,7 +1647,7 @@ public class RequestResult {
 
     String method = form.attr("method");
     RequestResult requestResult = null;
-    if (method == null || method.equalsIgnoreCase(Methods.GET)) {
+    if (method.equalsIgnoreCase(Methods.GET)) {
       requestResult = rb.get();
     } else if (method.equalsIgnoreCase(Methods.POST)) {
       requestResult = rb.post();
@@ -1706,6 +1716,58 @@ public class RequestResult {
     actionInvocationStore.setCurrent(actionInvocation);
 
     return messageProvider;
+  }
+
+  private RequestResult handleFollowMetaRefresh(ThrowingConsumer<RequestResult> result) throws Exception {
+
+    // Look for and find an element that looks like this:
+    //    <meta http-equiv="refresh" content="0;URL='/foo'">
+    String body = getBodyAsString();
+
+    Document document = Jsoup.parse(body);
+    Elements elements = document.head().getElementsByTag("meta");
+    if (elements.isEmpty()) {
+      throw new AssertionError("The <head> element does not contain any meta elements. Response body\n" + body);
+    }
+
+    Element metaRefresh = null;
+    for (Element element : elements) {
+      if (element.hasAttr("http-equiv")) {
+        String value = element.attr("http-equiv");
+        // Never null
+        if (value.equals("refresh")) {
+          String content = element.attr("content");
+          // Handle this
+          String[] parts = content.split(";");
+          for (String part : parts) {
+            if (part.startsWith("URL=")) {
+              String uri = part.substring(4);
+              if (uri.startsWith("'")) {
+                uri = uri.substring(1, uri.length() - 1);
+              }
+
+              // Try to handle relative URLs, assuming they are relative to the current request. Maybe a naive assumption, but for our use cases it works ok.
+              // - We could also just allow the caller to pass in the URI
+              if (!uri.startsWith("/")) {
+                String baseURI = request.getPath();
+                if (baseURI.contains("/")) {
+                  baseURI = request.getPath().substring(0, baseURI.lastIndexOf('/') + 1);
+                  uri = baseURI + uri;
+                }
+              }
+
+              RequestBuilder rb = new RequestBuilder(uri, injector, userAgent, messageObserver, port);
+
+              RequestResult requestResult = rb.get();
+              result.accept(requestResult);
+              return requestResult;
+            }
+          }
+        }
+      }
+    }
+
+    throw new AssertionError("The <head> element does not contain any meta elements with an attribute of http-equiv=\"refresh\". Response body\n" + body);
   }
 
   private String normalize(String input) {

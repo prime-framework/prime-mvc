@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -198,6 +198,19 @@ public class RequestBuilder {
     return this;
   }
 
+
+  /**
+   * Overrides the HTTP Method from that set by calling {@link #get()} or {@link #post()} for example.
+   *
+   * @param method the  HTTP method
+   * @return This.
+   */
+  public RequestResult method(HTTPMethod method) {
+    request.setMethod(method);
+    ClientResponse<byte[], byte[]> response = run();
+    return new RequestResult(injector, request, response, userAgent, messageObserver, port);
+  }
+
   /**
    * Overrides the HTTP Method from that set by calling {@link #get()} or {@link #post()} for example.
    *
@@ -205,9 +218,7 @@ public class RequestBuilder {
    * @return This.
    */
   public RequestResult method(String method) {
-    request.setMethod(HTTPMethod.of(method));
-    ClientResponse<byte[], byte[]> response = run();
-    return new RequestResult(injector, request, response, userAgent, messageObserver, port);
+    return method(HTTPMethod.of(method));
   }
 
   /**
