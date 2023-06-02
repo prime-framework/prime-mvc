@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2016-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * language governing permissions and limitations under the License.
  */
 package org.primeframework.mvc.action.result;
+
+import java.net.URI;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fusionauth.http.Cookie;
@@ -40,8 +42,7 @@ public class SavedRequestTools {
   private static final Logger logger = LoggerFactory.getLogger(SavedRequestTools.class);
 
   /**
-   * Retrieve the saved request from a cookie for use in the
-   * {@link ReexecuteSavedRequestResult#execute(ReexecuteSavedRequest)} phase.
+   * Retrieve the saved request from a cookie for use in the {@link ReexecuteSavedRequestResult#execute(ReexecuteSavedRequest)} phase.
    *
    * @param configuration The MVC configuration used to determine the name of the cookie.
    * @param encryptor     the encryptor used to decrypt the cookie
@@ -76,8 +77,7 @@ public class SavedRequestTools {
   }
 
   /**
-   * Retrieve the saved request from a cookie for use during the
-   * {@link DefaultSavedRequestWorkflow#perform(WorkflowChain)} step.
+   * Retrieve the saved request from a cookie for use during the {@link DefaultSavedRequestWorkflow#perform(WorkflowChain)} step.
    *
    * @param configuration The MVC configuration used to determine the name of the cookie.
    * @param encryptor     the encryptor used to decrypt the cookie
@@ -120,7 +120,7 @@ public class SavedRequestTools {
       cookie.path = "/"; // Turn the cookie on for everything since we have no clue what URI will Re-execute the Saved Request
       cookie.httpOnly = true; // No JavaScript hacking
       cookie.sameSite = configuration.savedRequestCookieSameSite();
-      cookie.secure = savedRequest.uri.startsWith("/") || savedRequest.uri.startsWith("https"); // Set to secure when schema is 'https'
+      cookie.secure = "https".equalsIgnoreCase(URI.create(savedRequest.uri).getScheme());
       return cookie;
     } catch (Exception e) {
       throw new SavedRequestException(e);

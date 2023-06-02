@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2015-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ import io.fusionauth.http.Cookie;
 import io.fusionauth.http.Cookie.SameSite;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
-import static org.primeframework.mvc.util.ObjectTools.defaultIfNull;
 
 /**
  * Something that can get a cookie...nom nom nom...
@@ -45,7 +44,7 @@ public class CookieProxy {
     cookie.maxAge = maxAge;
     cookie.path = "/";
     cookie.sameSite = sameSite;
-    cookie.secure = "https".equalsIgnoreCase(defaultIfNull(request.getHeader("X-Forwarded-Proto"), request.getScheme()));
+    cookie.secure = "https".equalsIgnoreCase(request.getScheme());
     response.addCookie(cookie);
   }
 
