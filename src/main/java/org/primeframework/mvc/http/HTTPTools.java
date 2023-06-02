@@ -15,6 +15,7 @@
  */
 package org.primeframework.mvc.http;
 
+import java.util.LinkedList;
 import java.util.regex.Pattern;
 
 import io.fusionauth.http.HTTPValues;
@@ -30,15 +31,14 @@ public class HTTPTools {
   private static final Pattern DoubleSlash = Pattern.compile("/{2,}");
 
   /**
-   * Return the <code>Origin</code> header or as a fallback, the value of the <code>Referer</code> header will be
-   * returned if the <code>Origin</code> header is not available.
+   * Return the <code>Origin</code> header or as a fallback, the value of the <code>Referer</code> header will be returned if the <code>Origin</code>
+   * header is not available.
    *
    * <p>
    * This handles a <code>"null"</code> Origin value and returns <code>null</code>.
    * </p>
    * <p>
-   * See <a href="https://stackoverflow.com/a/42242802/3892636">https://stackoverflow.com/a/42242802/3892636</a> for
-   * more information.
+   * See <a href="https://stackoverflow.com/a/42242802/3892636">https://stackoverflow.com/a/42242802/3892636</a> for more information.
    *
    * @param request the request.
    * @return null if no value can be found for the Origin or Referer header.
@@ -60,8 +60,6 @@ public class HTTPTools {
    */
   public static String getRequestURI(HTTPRequest request) {
     String uri = request.getPath();
-    uri = uri.replace("../", "");
-    uri = uri.replace("/..", "");
 
     int semicolon = uri.indexOf(';');
     if (semicolon >= 0) {
@@ -74,5 +72,49 @@ public class HTTPTools {
     }
 
     return DoubleSlash.matcher(uri).replaceAll("/");
+  }
+
+  public static String sanitizeURI(String uri) {
+    if (uri == null) {
+      return null;
+    }
+
+    char[] ca = uri.replace("%2E", ".").toCharArray();
+    int dots = 0;
+    int slash = 0;
+    boolean goodSegment = false;
+    LinkedList<String> segments = new LinkedList<>();
+
+    for (int i = 0; i < ca.length; i++) {
+      char c = ca[i];
+
+      if (c == '/') {
+        // If this is a good segment, add it
+        if (goodSegment || dots > 2) {
+          segments.addLast(new String(ca, slash, i - slash));
+        } else if (dots == 2) {
+          if (segments.isEmpty()) {
+            return null;
+          }
+
+          segments.removeLast();
+        }
+
+        slash = i;
+        dots = 0;
+        goodSegment = false;
+      } else if (c == '.') {
+        dots++;
+      } else {
+        goodSegment = true;
+        dots = 0;
+      }
+    }
+
+    if (goodSegment) {
+      segments.addLast(new String(ca, slash, ca.length - slash));
+    }
+
+    return String.join("", segments);
   }
 }

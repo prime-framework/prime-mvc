@@ -42,7 +42,7 @@ public class FieldSupportBeansWrapper extends BeansWrapper {
   }
 
   static {
-    BeansWrapperBuilder builder = new BeansWrapperBuilder(Configuration.VERSION_2_3_28);
+    BeansWrapperBuilder builder = new BeansWrapperBuilder(Configuration.VERSION_2_3_32);
     builder.setExposeFields(true);
     builder.setSimpleMapWrapper(true);
     INSTANCE = builder.build();

@@ -38,11 +38,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class handles static resources via the Prime workflow chain. Static resources can either be files in the
- * `static` directory of the web application or they can be located inside JAR files in the classpath. This workflow
- * will attempt to load the files from both locations and will properly handle the expiration, last modified instant,
- * and other components of the HTTP request to try and ensure that browsers cache as much as possible to reduce load on
- * the server.
+ * This class handles static resources via the Prime workflow chain. Static resources can either be files in the `static` directory of the web
+ * application or they can be located inside JAR files in the classpath. This workflow will attempt to load the files from both locations and will
+ * properly handle the expiration, last modified instant, and other components of the HTTP request to try and ensure that browsers cache as much as
+ * possible to reduce load on the server.
  *
  * @author Brian Pontarelli
  */
@@ -70,18 +69,24 @@ public class StaticResourceWorkflow implements Workflow {
   }
 
   /**
-   * Checks for static resource request and if it is one, locates and sends back the static resource. If it isn't one,
-   * it passes control down the chain.
+   * Checks for static resource request and if it is one, locates and sends back the static resource. If it isn't one, it passes control down the
+   * chain.
    *
    * @param workflowChain The workflow chain to use if the request is not a static resource.
-   * @throws IOException If the request is a static resource and sending it failed or if the chain throws an
-   *                     IOException.
+   * @throws IOException If the request is a static resource and sending it failed or if the chain throws an IOException.
    */
   public void perform(WorkflowChain workflowChain) throws IOException {
     boolean handled = false;
 
     // Ensure that this is a request for a resource and not a class
     String uri = HTTPTools.getRequestURI(request);
+    String sanitized = HTTPTools.sanitizeURI(uri);
+    if (sanitized == null) {
+      logger.debug("Unable to load static resource at uri [{}]", uri);
+      workflowChain.continueWorkflow();
+      return;
+    }
+
     if (!uri.endsWith(".class")) {
       try {
         handled = findStaticResource(uri, request, response);
@@ -102,8 +107,8 @@ public class StaticResourceWorkflow implements Workflow {
    * @param uri      The resource uri.
    * @param request  The request
    * @param response The response
-   * @return True if the resource was found in the classpath and if it was successfully written back to the output
-   *     stream. Otherwise, this returns false if the resource doesn't exist in the classpath.
+   * @return True if the resource was found in the classpath and if it was successfully written back to the output stream. Otherwise, this returns
+   *     false if the resource doesn't exist in the classpath.
    * @throws IOException If anything goes wrong
    */
   protected boolean findStaticResource(String uri, HTTPRequest request, HTTPResponse response) throws IOException {
