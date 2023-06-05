@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.parameter.convert.AbstractGlobalConverter;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
+import org.primeframework.mvc.parameter.convert.MultipleParametersUnsupportedException;
 import org.primeframework.mvc.parameter.convert.annotation.GlobalConverter;
 
 /**
@@ -71,7 +72,7 @@ public class UUIDConverter extends AbstractGlobalConverter {
 
   protected Object stringsToObject(String[] values, Type convertTo, Map<String, String> attributes, String expression)
       throws ConversionException, ConverterStateException {
-    throw new UnsupportedOperationException("You are attempting to map a form field that contains " +
+    throw new MultipleParametersUnsupportedException("You are attempting to map a form field that contains " +
         "multiple parameters to a property on the action class that is of type UUID. This isn't " +
         "allowed.");
   }

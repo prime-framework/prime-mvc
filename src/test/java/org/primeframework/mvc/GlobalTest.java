@@ -52,6 +52,7 @@ import io.fusionauth.http.HTTPValues.Methods;
 import org.example.action.JwtAuthorizedAction;
 import org.example.action.LotsOfMessagesAction;
 import org.example.action.OverrideMeAction;
+import org.example.action.ParameterHandlerAction;
 import org.example.action.store.BaseStoreAction;
 import org.example.action.user.EditAction;
 import org.example.domain.UserField;
@@ -2138,6 +2139,31 @@ public class GlobalTest extends PrimeBaseTest {
         .simulate(() -> simulator.test("/another-extended-scope-storage")
                                  .get())
         .assertContextAttributeNotNull("contextObject");
+  }
+
+  @Test
+  public void post_unsupported_multipleParameters() throws Exception {
+    // Cannot jam an array into a non-array data type
+    // - We don't currently have an easy way to capture the exception in the execute thread.
+
+    // UUID, two values, no dice.
+    // - We will get a 200, watch the console for the log output.
+    test.simulate(() -> simulator.test("/parameter-handler")
+                                 .withParameter("uuidValue", UUID.randomUUID())
+                                 .withParameter("uuidValue", UUID.randomUUID())
+                                 .post()
+                                 .assertContainsNoGeneralErrors()
+                                 .assertStatusCode(200));
+
+
+    // Enum, two values, no dice
+    // - We will get a 200, watch the console for the log output.
+    test.simulate(() -> simulator.test("/parameter-handler")
+                                 .withParameter("enumValue", ParameterHandlerAction.Fruit.Orange)
+                                 .withParameter("enumValue", ParameterHandlerAction.Fruit.Apple)
+                                 .post()
+                                 .assertContainsNoGeneralErrors()
+                                 .assertStatusCode(200));
   }
 
   @Test
