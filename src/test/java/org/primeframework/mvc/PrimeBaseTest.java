@@ -57,6 +57,7 @@ import org.primeframework.mvc.action.ValidationMethodConfiguration;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.config.DefaultActionConfigurationBuilder;
 import org.primeframework.mvc.action.result.MVCWorkflowFinalizer;
+import org.primeframework.mvc.action.result.ResultStore;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.content.guice.ContentHandlerFactory;
 import org.primeframework.mvc.content.guice.ObjectMapperProvider;
@@ -81,6 +82,8 @@ import org.primeframework.mvc.security.csrf.CSRFProvider;
 import org.primeframework.mvc.test.RequestSimulator;
 import org.primeframework.mvc.util.ThrowingRunnable;
 import org.primeframework.mvc.validation.Validation;
+import org.primeframework.mvc.workflow.TypedExceptionHandler;
+import org.primeframework.mvc.workflow.TypedExceptionHandlerFactory;
 import org.primeframework.mvc.workflow.guice.WorkflowModule;
 import org.testng.Assert;
 import org.testng.ITestListener;
@@ -195,6 +198,8 @@ public abstract class PrimeBaseTest {
     // Reset accumulating logger, using TRACE for now to debug some tests
     ((TestAccumulatingLogger) TestAccumulatingLoggerFactory.FACTORY.getLogger(PrimeBaseTest.class)).reset();
     TestAccumulatingLoggerFactory.FACTORY.getLogger(PrimeBaseTest.class).setLevel(Level.Trace);
+
+    TestUnhandledExceptionHandler.reset();
   }
 
   @BeforeSuite
@@ -440,6 +445,19 @@ public abstract class PrimeBaseTest {
     }
   }
 
+  public static class TestWorkflowModule extends WorkflowModule {
+    @Override
+    protected void bindMVCWorkflowFinalizer() {
+      bind(MVCWorkflowFinalizer.class).to(MockMVCWorkflowFinalizer.class);
+    }
+
+    @Override
+    protected void configure() {
+      super.configure();
+      TypedExceptionHandlerFactory.addExceptionHandler(binder(), Exception.class, TestUnhandledExceptionHandler.class);
+    }
+  }
+
   static class TestAccumulatingLogger extends BaseLogger {
     // Avoid blowing heap, used a fixed length list
     private final LinkedList<String> messages = new LinkedList<>();
@@ -485,10 +503,31 @@ public abstract class PrimeBaseTest {
     }
   }
 
-  public static class TestWorkflowModule extends WorkflowModule {
+  // Bind a handler that just keeps track of the last un-handled exception
+  static class TestUnhandledExceptionHandler implements TypedExceptionHandler<Exception> {
+    public static Exception exception;
+
+    private final ResultStore resultStore;
+
+    @Inject
+    TestUnhandledExceptionHandler(ResultStore resultStore) {
+      this.resultStore = resultStore;
+    }
+
+    public static void assertLastUnhandledException(Exception e) {
+      assertEquals(TestUnhandledExceptionHandler.exception.getClass(), e.getClass());
+      assertEquals(TestUnhandledExceptionHandler.exception.getMessage(), e.getMessage());
+      TestUnhandledExceptionHandler.reset();
+    }
+
+    public static void reset() {
+      exception = null;
+    }
+
     @Override
-    protected void bindMVCWorkflowFinalizer() {
-      bind(MVCWorkflowFinalizer.class).to(MockMVCWorkflowFinalizer.class);
+    public void handle(Exception exception) {
+      resultStore.set("unhandled");
+      TestUnhandledExceptionHandler.exception = exception;
     }
   }
 }

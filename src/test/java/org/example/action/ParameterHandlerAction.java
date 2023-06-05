@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2022-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.example.action;
 import java.util.UUID;
 
 import org.primeframework.mvc.action.annotation.Action;
+import org.primeframework.mvc.action.result.annotation.Status;
 
 /**
  * Test the order of operation on parameter handling.
@@ -25,6 +26,7 @@ import org.primeframework.mvc.action.annotation.Action;
  * @author Daniel DeGroff
  */
 @Action("{value}")
+@Status(code = "unhandled", status = 500)
 public class ParameterHandlerAction {
   public Fruit enumValue;
 

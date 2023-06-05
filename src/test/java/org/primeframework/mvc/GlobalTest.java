@@ -61,6 +61,7 @@ import org.primeframework.mvc.container.ContainerResolver;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
+import org.primeframework.mvc.parameter.convert.MultipleParametersUnsupportedException;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.util.URIBuilder;
 import org.testng.annotations.BeforeClass;
@@ -2144,7 +2145,6 @@ public class GlobalTest extends PrimeBaseTest {
   @Test
   public void post_unsupported_multipleParameters() throws Exception {
     // Cannot jam an array into a non-array data type
-    // - We don't currently have an easy way to capture the exception in the execute thread.
 
     // UUID, two values, no dice.
     // - We will get a 200, watch the console for the log output.
@@ -2152,9 +2152,11 @@ public class GlobalTest extends PrimeBaseTest {
                                  .withParameter("uuidValue", UUID.randomUUID())
                                  .withParameter("uuidValue", UUID.randomUUID())
                                  .post()
-                                 .assertContainsNoGeneralErrors()
-                                 .assertStatusCode(200));
+                                 .assertStatusCode(500)
+                                 .assertBodyIsEmpty());
 
+    TestUnhandledExceptionHandler.assertLastUnhandledException(new MultipleParametersUnsupportedException(
+        "You are attempting to map a form field that contains multiple parameters to a property on the action class that is of type UUID. This isn't allowed. Action class [org.example.action.ParameterHandlerAction] Request URI [/parameter-handler] Parameter name [uuidValue]"));
 
     // Enum, two values, no dice
     // - We will get a 200, watch the console for the log output.
@@ -2162,8 +2164,11 @@ public class GlobalTest extends PrimeBaseTest {
                                  .withParameter("enumValue", ParameterHandlerAction.Fruit.Orange)
                                  .withParameter("enumValue", ParameterHandlerAction.Fruit.Apple)
                                  .post()
-                                 .assertContainsNoGeneralErrors()
-                                 .assertStatusCode(200));
+                                 .assertStatusCode(500)
+                                 .assertBodyIsEmpty());
+
+    TestUnhandledExceptionHandler.assertLastUnhandledException(new MultipleParametersUnsupportedException(
+        "You are attempting to map a form field that contains multiple parameters to a property on the action class that is of type Enum. This isn't allowed. Action class [org.example.action.ParameterHandlerAction] Request URI [/parameter-handler] Parameter name [enumValue]"));
   }
 
   @Test
