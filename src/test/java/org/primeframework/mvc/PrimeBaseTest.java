@@ -526,7 +526,7 @@ public abstract class PrimeBaseTest {
 
     @Override
     public void handle(Exception exception) {
-      resultStore.set("unhandled");
+      resultStore.set("error");
       TestUnhandledExceptionHandler.exception = exception;
     }
   }

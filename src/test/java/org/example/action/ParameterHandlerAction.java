@@ -26,7 +26,7 @@ import org.primeframework.mvc.action.result.annotation.Status;
  * @author Daniel DeGroff
  */
 @Action("{value}")
-@Status(code = "unhandled", status = 500)
+@Status(code = "error", status = 500)
 public class ParameterHandlerAction {
   public Fruit enumValue;
 
