@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,33 +13,18 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.example.action;
-
-import java.util.UUID;
-
-import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.action.result.annotation.Status;
+package org.primeframework.mvc.parameter.convert;
 
 /**
- * Test the order of operation on parameter handling.
+ * This is a runtime exception thrown when a request contains more than one value by name and the object type is not a data type that can accept more
+ * than one value.
+ * <p>
+ * This is either a development time issue, or a bug in a form caused by a duplicate field.
  *
  * @author Daniel DeGroff
  */
-@Action("{value}")
-@Status(code = "error", status = 500)
-public class ParameterHandlerAction {
-  public Fruit enumValue;
-
-  public UUID uuidValue;
-
-  public String value;
-
-  public String post() {
-    return "success";
-  }
-
-  public enum Fruit {
-    Orange,
-    Apple
+public class MultipleParametersUnsupportedException extends UnsupportedOperationException {
+  public MultipleParametersUnsupportedException(String message) {
+    super(message);
   }
 }

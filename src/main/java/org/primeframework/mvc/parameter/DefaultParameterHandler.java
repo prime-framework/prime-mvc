@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2014-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,7 @@ import org.primeframework.mvc.message.l10n.MissingMessageException;
 import org.primeframework.mvc.parameter.ParameterParser.Parameters;
 import org.primeframework.mvc.parameter.ParameterParser.Parameters.Struct;
 import org.primeframework.mvc.parameter.convert.ConversionException;
+import org.primeframework.mvc.parameter.convert.MultipleParametersUnsupportedException;
 import org.primeframework.mvc.parameter.el.BeanExpressionException;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.parameter.el.ExpressionException;
@@ -52,8 +53,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class is the default parameter handler. It sets all of the parameters into the action in the following order
- * (while invoking the correct methods in the order):
+ * This class is the default parameter handler. It sets all the parameters into the action in the following order (while invoking the correct methods
+ * in the order):
  * <p>
  * <ol>
  * <li>Set pre-parameters</li>
@@ -204,8 +205,7 @@ public class DefaultParameterHandler implements ParameterHandler {
    *
    * @param values                 The value mapping.
    * @param actionInvocation       The action invocation.
-   * @param allowUnknownParameters Whether or not invalid parameters should throw an exception or just be ignored and
-   *                               log a fine message.
+   * @param allowUnknownParameters Whether invalid parameters should throw an exception or just be ignored and log a fine message.
    */
   protected void setValues(Map<String, Struct> values, ActionInvocation actionInvocation,
                            boolean allowUnknownParameters) {
@@ -233,6 +233,11 @@ public class DefaultParameterHandler implements ParameterHandler {
         } else {
           throw ee;
         }
+      } catch (MultipleParametersUnsupportedException e) {
+        // Re-throw after adding some meta-data about the current request to make it easier to debug in the log.
+        // - Intentionally not recording the value to avoid logging anything sensitive.
+        throw new MultipleParametersUnsupportedException(e.getMessage() +
+            " Action class [" + action.getClass().getName() + "] Request URI [" + actionInvocation.actionURI + "] Parameter name [" + key + "]");
       }
     }
   }
