@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2019-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,8 @@ public class LocaleActionTest extends PrimeBaseTest {
     simulator.test("/locale")
              .withHeader("Accept-Language", Locale.CHINESE.toString())
              .get()
-             .assertBodyContains("zh");
+             .assertStatusCode(200)
+             .assertBodyContains("Locale:zh");
   }
 
   @Test
@@ -39,7 +40,8 @@ public class LocaleActionTest extends PrimeBaseTest {
              .withHeader("Accept-Language", Locale.CHINESE.toString())
              .withCookie("prime-locale", "fr")
              .get()
-             .assertBodyContains("fr");
+             .assertStatusCode(200)
+             .assertBodyContains("Locale:fr");
   }
 
   @Test
@@ -47,7 +49,8 @@ public class LocaleActionTest extends PrimeBaseTest {
     simulator.test("/locale")
              .withParameter("locale", "zh")
              .post()
-             .assertBodyContains("zh")
+             .assertStatusCode(200)
+             .assertBodyContains("Locale:zh")
              .assertCookie("prime-locale", "zh");
   }
 
@@ -55,7 +58,8 @@ public class LocaleActionTest extends PrimeBaseTest {
   public void setDeleteCookie() {
     simulator.test("/locale")
              .post()
-             .assertBodyContains("empty")
+             .assertStatusCode(200)
+             .assertBodyContains("Locale:empty")
              .assertCookieWasDeleted("prime-locale");
   }
 }

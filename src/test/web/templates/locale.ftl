@@ -1,1 +1,1 @@
-${locale!'empty'}
+Locale:${locale!'empty'}

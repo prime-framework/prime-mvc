@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2019-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,12 +36,12 @@ public class LocaleAction {
   }
 
   public String get() {
-    this.locale = localeProvider.get();
+    locale = localeProvider.get();
     return "input";
   }
 
   public String post() {
-    localeProvider.set(this.locale);
+    localeProvider.set(locale);
     return "input";
   }
 }
