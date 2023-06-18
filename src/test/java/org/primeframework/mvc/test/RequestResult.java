@@ -1209,7 +1209,7 @@ public class RequestResult {
    */
   public RequestResult executeFormPostInResponseBody(String selector, ThrowingConsumer<RequestResult> result)
       throws Exception {
-    executeFormPost(selector, null, result);
+    _submitForm(selector, null, result);
     return this;
   }
 
@@ -1224,40 +1224,44 @@ public class RequestResult {
   public RequestResult executeFormPostInResponseBody(String selector, ThrowingConsumer<DOMHelper> domHelper,
                                                      ThrowingConsumer<RequestResult> result)
       throws Exception {
-    executeFormPost(selector, domHelper, result);
+    _submitForm(selector, domHelper, result);
     return this;
   }
 
   /**
    * Attempt to submit the form found in the response body.
+   * <p>
+   * Prefer {@link #submitForm(String, ThrowingConsumer)}.
    *
    * @param selector The selector used to find the form in the DOM
    * @param result   A consumer for the request result from following the redirect.
    * @return This.
    */
-  public RequestResult executeFormPostInResponseBodyReturnPostResult(String selector,
-                                                                     ThrowingConsumer<RequestResult> result)
+  public RequestResult executeFormPostInResponseBodyReturnPostResult(String selector, ThrowingConsumer<RequestResult> result)
       throws Exception {
-    return executeFormPost(selector, null, result);
+    return _submitForm(selector, null, result);
   }
 
   /**
    * Attempt to submit the form found in the response body.
+   * <p>
+   * Prefer {@link #submitForm(String, ThrowingConsumer, ThrowingConsumer)}.
    *
    * @param selector  The selector used to find the form in the DOM
    * @param domHelper A consumer for the DOM Helper
    * @param result    A consumer for the request result from following the redirect.
    * @return This.
    */
-  public RequestResult executeFormPostInResponseBodyReturnPostResult(String selector,
-                                                                     ThrowingConsumer<DOMHelper> domHelper,
+  public RequestResult executeFormPostInResponseBodyReturnPostResult(String selector, ThrowingConsumer<DOMHelper> domHelper,
                                                                      ThrowingConsumer<RequestResult> result)
       throws Exception {
-    return executeFormPost(selector, domHelper, result);
+    return _submitForm(selector, domHelper, result);
   }
 
   /**
    * Attempt to follow a meta-refresh
+   * <p>
+   * Prefer {@link #followMetaRefresh(ThrowingConsumer)}.
    *
    * @param result A consumer for the request result from following the redirect.
    * @return This.
@@ -1268,23 +1272,47 @@ public class RequestResult {
 
   /**
    * Execute the redirect and accept a consumer to assert on the response.
+   * <p>
+   * Prefer {@link #followRedirect(ThrowingConsumer)}
    *
    * @param consumer The request result from following the redirect.
    * @return This.
    */
   public RequestResult executeRedirect(ThrowingConsumer<RequestResult> consumer) throws Exception {
-    executeRedirectReturningResult(consumer);
+    _followRedirect(consumer);
     return this;
   }
 
   /**
    * Execute the redirect and accept a consumer to assert on the response.
+   * <p>
+   * Prefer {@link #followRedirect(ThrowingConsumer)}
    *
    * @param consumer The request result from following the redirect.
    * @return This.
    */
   public RequestResult executeRedirectReturnResult(ThrowingConsumer<RequestResult> consumer) throws Exception {
-    return executeRedirectReturningResult(consumer);
+    return _followRedirect(consumer);
+  }
+
+  /**
+   * Attempt to follow a meta-refresh
+   *
+   * @param result A consumer for the request result from following the redirect.
+   * @return This.
+   */
+  public RequestResult followMetaRefresh(ThrowingConsumer<RequestResult> result) throws Exception {
+    return handleFollowMetaRefresh(result);
+  }
+
+  /**
+   * Follow the redirect and accept a consumer to assert on the response.
+   *
+   * @param consumer The request result from following the redirect.
+   * @return This.
+   */
+  public RequestResult followRedirect(ThrowingConsumer<RequestResult> consumer) throws Exception {
+    return _followRedirect(consumer);
   }
 
   /**
@@ -1415,7 +1443,6 @@ public class RequestResult {
     return this;
   }
 
-
   /**
    * If the test is true, apply the consumer. Example:
    * <pre>
@@ -1492,6 +1519,30 @@ public class RequestResult {
     return this;
   }
 
+  /**
+   * Attempt to submit the form found in the response body.
+   *
+   * @param selector The selector used to find the form in the DOM
+   * @param result   A consumer for the request result from following the redirect.
+   * @return This.
+   */
+  public RequestResult submitForm(String selector, ThrowingConsumer<RequestResult> result) throws Exception {
+    return _submitForm(selector, null, result);
+  }
+
+  /**
+   * Attempt to submit the form found in the response body.
+   *
+   * @param selector  The selector used to find the form in the DOM
+   * @param domHelper A consumer for the DOM Helper
+   * @param result    A consumer for the request result from following the redirect.
+   * @return This.
+   */
+  public RequestResult submitForm(String selector, ThrowingConsumer<DOMHelper> domHelper, ThrowingConsumer<RequestResult> result)
+      throws Exception {
+    return _submitForm(selector, domHelper, result);
+  }
+
   private RequestResult _assertBodyContains(boolean escape, String... strings) {
     if (escape) {
       for (int i = 0; i < strings.length; i++) {
@@ -1548,55 +1599,32 @@ public class RequestResult {
     return this;
   }
 
-  private Object[] appendArray(Object[] values, Object... objects) {
-    ArrayList<Object> list = new ArrayList<>(Arrays.asList(values));
-    Collections.addAll(list, objects);
-    return list.toArray();
-  }
-
-  private void assertRedirectEquality(String expectedUri) {
+  private RequestResult _followRedirect(ThrowingConsumer<RequestResult> consumer) throws Exception {
     String redirect = response.getHeader(Headers.Location);
-    SortedMap<String, List<String>> actual = uriToMap(redirect);
-    SortedMap<String, List<String>> expected = uriToMap(expectedUri);
+    String baseURI = redirect.contains("?") ? redirect.substring(0, redirect.indexOf('?')) : redirect;
+    String originalURI = baseURI;
+    String newRedirect = redirect;
 
-    if (!actual.equals(expected)) {
-      // Replace any 'actual' values requested and then try again
-      boolean recheck = replaceWithActualValues(actual, expected);
-      if (!recheck || !actual.equals(expected)) {
-        throw new AssertionError("Actual redirect not equal to the expected. Expected [" + expectedUri + "] but found [" + redirect + "]");
-      }
+    // Handle a relative URI
+    if (!baseURI.startsWith("/")) {
+      int index = request.getPath().lastIndexOf('/');
+      String baseURL = request.getPath().substring(0, index);
+      baseURI = baseURL + "/" + baseURI;
+      newRedirect = redirect.replace(originalURI, baseURI);
     }
+
+    RequestBuilder rb = new RequestBuilder(baseURI, injector, userAgent, messageObserver, port);
+    if (baseURI.length() != newRedirect.length()) {
+      String params = newRedirect.substring(newRedirect.indexOf('?') + 1);
+      QueryStringTools.parseQueryString(params).forEach(rb::withURLParameters);
+    }
+
+    RequestResult result = rb.get();
+    consumer.accept(result);
+    return result;
   }
 
-  private Cookie convert(com.inversoft.http.Cookie cookie) {
-    return new Cookie().with(c -> c.domain = cookie.domain)
-                       .with(c -> c.expires = cookie.expires)
-                       .with(c -> c.httpOnly = cookie.httpOnly)
-                       .with(c -> c.maxAge = cookie.maxAge)
-                       .with(c -> c.name = cookie.name)
-                       .with(c -> c.path = cookie.path)
-                       .with(c -> c.sameSite = cookie.sameSite != null ? SameSite.valueOf(cookie.sameSite.name()) : null)
-                       .with(c -> c.secure = cookie.secure)
-                       .with(c -> c.value = cookie.value);
-  }
-
-  private String cookieToString(Cookie cookie) {
-    return "Set-Cookie: " + cookie.toResponseHeader();
-  }
-
-  private String escape(String s) {
-    // TODO
-    // Should we be escaping everything that FreeMarker does? We could also just build a small template
-    // and render it to allow FreeMarker to escape it like we do with BodyTools
-    return s.replaceAll("\"", "&quot;")
-            .replaceAll("'", "&#39;")
-            .replaceAll("<", "&lt;")
-            .replaceAll(">", "&gt;");
-  }
-
-  private RequestResult executeFormPost(String selector, ThrowingConsumer<DOMHelper> domHelper,
-                                        ThrowingConsumer<RequestResult> result)
-      throws Exception {
+  private RequestResult _submitForm(String selector, ThrowingConsumer<DOMHelper> domHelper, ThrowingConsumer<RequestResult> result) throws Exception {
     String body = getBodyAsString();
     Document document = Jsoup.parse(body);
     Element form = document.selectFirst(selector);
@@ -1657,29 +1685,50 @@ public class RequestResult {
     return requestResult;
   }
 
-  private RequestResult executeRedirectReturningResult(ThrowingConsumer<RequestResult> consumer) throws Exception {
+  private Object[] appendArray(Object[] values, Object... objects) {
+    ArrayList<Object> list = new ArrayList<>(Arrays.asList(values));
+    Collections.addAll(list, objects);
+    return list.toArray();
+  }
+
+  private void assertRedirectEquality(String expectedUri) {
     String redirect = response.getHeader(Headers.Location);
-    String baseURI = redirect.contains("?") ? redirect.substring(0, redirect.indexOf('?')) : redirect;
-    String originalURI = baseURI;
-    String newRedirect = redirect;
+    SortedMap<String, List<String>> actual = uriToMap(redirect);
+    SortedMap<String, List<String>> expected = uriToMap(expectedUri);
 
-    // Handle a relative URI
-    if (!baseURI.startsWith("/")) {
-      int index = request.getPath().lastIndexOf('/');
-      String baseURL = request.getPath().substring(0, index);
-      baseURI = baseURL + "/" + baseURI;
-      newRedirect = redirect.replace(originalURI, baseURI);
+    if (!actual.equals(expected)) {
+      // Replace any 'actual' values requested and then try again
+      boolean recheck = replaceWithActualValues(actual, expected);
+      if (!recheck || !actual.equals(expected)) {
+        throw new AssertionError("Actual redirect not equal to the expected. Expected [" + expectedUri + "] but found [" + redirect + "]");
+      }
     }
+  }
 
-    RequestBuilder rb = new RequestBuilder(baseURI, injector, userAgent, messageObserver, port);
-    if (baseURI.length() != newRedirect.length()) {
-      String params = newRedirect.substring(newRedirect.indexOf('?') + 1);
-      QueryStringTools.parseQueryString(params).forEach(rb::withURLParameters);
-    }
+  private Cookie convert(com.inversoft.http.Cookie cookie) {
+    return new Cookie().with(c -> c.domain = cookie.domain)
+                       .with(c -> c.expires = cookie.expires)
+                       .with(c -> c.httpOnly = cookie.httpOnly)
+                       .with(c -> c.maxAge = cookie.maxAge)
+                       .with(c -> c.name = cookie.name)
+                       .with(c -> c.path = cookie.path)
+                       .with(c -> c.sameSite = cookie.sameSite != null ? SameSite.valueOf(cookie.sameSite.name()) : null)
+                       .with(c -> c.secure = cookie.secure)
+                       .with(c -> c.value = cookie.value);
+  }
 
-    RequestResult result = rb.get();
-    consumer.accept(result);
-    return result;
+  private String cookieToString(Cookie cookie) {
+    return "Set-Cookie: " + cookie.toResponseHeader();
+  }
+
+  private String escape(String s) {
+    // TODO
+    // Should we be escaping everything that FreeMarker does? We could also just build a small template
+    // and render it to allow FreeMarker to escape it like we do with BodyTools
+    return s.replaceAll("\"", "&quot;")
+            .replaceAll("'", "&#39;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;");
   }
 
   private Charset getCharset() {
