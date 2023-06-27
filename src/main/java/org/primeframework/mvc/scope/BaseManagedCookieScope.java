@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2021-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -127,9 +127,9 @@ public abstract class BaseManagedCookieScope<T extends Annotation> extends Abstr
     } catch (Exception e) {
       String message = e.getClass().getCanonicalName() + " " + e.getMessage();
       if (encrypt) {
-        logger.warn("Failed to decrypt cookie. This may be expected if the cookie was encrypted using a different key.\n\tCause: " + message);
+        logger.debug("Failed to decrypt cookie. This may be expected if the cookie was encrypted using a different key.\n\tCause: " + message);
       } else {
-        logger.warn("Failed to decode cookie. This is not expected.\n\tCause: " + message);
+        logger.debug("Failed to decode cookie. This is not expected.\n\tCause: " + message);
       }
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,8 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This is the action session scope which fetches and stores values in a cookie, but those values are associated with a
- * specific action.
+ * This is the action session scope which fetches and stores values in a cookie, but those values are associated with a specific action.
  *
  * @author Daniel DeGroff
  */
@@ -94,9 +93,9 @@ public class BrowserActionSessionScope extends BaseBrowserSessionScope<BrowserAc
     } catch (Exception e) {
       String message = e.getClass().getCanonicalName() + " " + e.getMessage();
       if (scope.encrypt()) {
-        logger.warn("Failed to decrypt cookie. This may be expected if the cookie was encrypted using a different key.\n\tCause: {}", message);
+        logger.debug("Failed to decrypt cookie. This may be expected if the cookie was encrypted using a different key.\n\tCause: {}", message);
       } else {
-        logger.warn("Failed to decode cookie. This is not expected.\n\tCause: {}", message);
+        logger.debug("Failed to decode cookie. This is not expected.\n\tCause: {}", message);
       }
     }
 
@@ -114,8 +113,7 @@ public class BrowserActionSessionScope extends BaseBrowserSessionScope<BrowserAc
   }
 
   /**
-   * Using the annotation or the current action invocation, this determines the name of the action used to get the
-   * action session.
+   * Using the annotation or the current action invocation, this determines the name of the action used to get the action session.
    *
    * @param fieldName the field name
    * @param scope     The scope annotation.
