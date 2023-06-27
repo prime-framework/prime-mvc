@@ -32,10 +32,9 @@ import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.util.CookieTools;
 
 /**
- * This is the flash scope which stores messages in a Cookie under the flash key. It fetches values from the
- * HttpServletRequest under the same key as well as the Cookie under that key. This allows for flash messages to be
- * migrated from the cookie to the request during request handling so that they are not persisted in the cookie forever.
- * However, it also allows flash values to be retrieved during the initial request from the cookie.
+ * This is the flash scope which stores messages in a Cookie under the flash key. It fetches values from the HttpServletRequest under the same key as
+ * well as the Cookie under that key. This allows for flash messages to be migrated from the cookie to the request during request handling so that
+ * they are not persisted in the cookie forever. However, it also allows flash values to be retrieved during the initial request from the cookie.
  *
  * @author Daniel DeGroff
  */
@@ -97,12 +96,15 @@ public class CookieFlashScope implements FlashScope {
 
   @Override
   public void clear() {
-    Cookie cookie = new Cookie(name, null);
-    cookie.maxAge = 0L;
-    cookie.path = "/";
-    response.addCookie(cookie);
+    Cookie cookie = request.getCookie(name);
+    if (cookie != null) {
+      cookie.value = null;
+      cookie.maxAge = 0L;
+      cookie.path = "/";
+      response.addCookie(cookie);
+      request.deleteCookie(name);
+    }
 
-    request.deleteCookie(name);
     messages.clear();
   }
 
