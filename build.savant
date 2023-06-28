@@ -35,9 +35,8 @@ project(group: "org.primeframework", name: "prime-mvc", version: "4.9.11", licen
     fetch {
       // Dependency resolution order:
       //
-      // 1. Hit the savant cache, and then maven cache
+      // 1. Hit the savant cache
       cache()
-      mavenCache()
       //
       // 2. Look in public savant repo
       url(url: "https://repository.savantbuild.org")
