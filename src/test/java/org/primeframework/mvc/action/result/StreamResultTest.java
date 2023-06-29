@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2019, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,8 +52,8 @@ public class StreamResultTest {
     EasyMock.expect(ee.expand("10", action, false)).andReturn("10");
     EasyMock.expect(ee.expand(fileName, action, false)).andReturn(fileName);
     EasyMock.expect(ee.expand("application/octet-stream", action, false)).andReturn("application/octet-stream");
-    EasyMock.expect(ee.getValue("stream", action)).andReturn(new ByteArrayInputStream("test".getBytes()));
     EasyMock.expect(ee.getValue("lastModified", action)).andReturn(lastModified);
+    EasyMock.expect(ee.getValue("stream", action)).andReturn(new ByteArrayInputStream("test".getBytes()));
     EasyMock.replay(ee);
 
     MockServletOutputStream sos = new MockServletOutputStream();
@@ -120,7 +120,8 @@ public class StreamResultTest {
 
     private final String type;
 
-    public StreamImpl(String code, String name, String length, String type, String property, String lastModifiedProperty) {
+    public StreamImpl(String code, String name, String length, String type, String property,
+                      String lastModifiedProperty) {
       this.cacheControl = "no-cache";
       this.code = code;
       this.disableCacheControl = false;
