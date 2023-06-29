@@ -90,25 +90,25 @@ public class StreamResult extends AbstractResult<Stream> {
     // Handle setting cache controls
     addCacheControlHeader(stream, response);
 
-    if (isHeadRequest(actionInvocation)) {
-      return true;
-    }
-
-    // This is not a HEAD request, so you must have an InputStream
+    // If not null, this must be an InputStream
     Object object = expressionEvaluator.getValue(property, action);
-    if (!(object instanceof InputStream)) {
-      throw new PrimeException("Invalid property [" + property + "] for Stream result. This " +
-          "property returned null or an Object that is not an InputStream.");
+    if (object != null && !(object instanceof InputStream)) {
+      throw new PrimeException("Invalid property [" + property + "] for Stream result. This property is of type [" + object.getClass().getSimpleName() + "] but it must be an InputStream.");
     }
 
-    InputStream is = (InputStream) object;
-    writeToOutputStream(is, response);
-
-    // We don't know what type of InputStream was provided. We should close it for good measure.
-    try {
-      is.close();
-    } catch (IOException ignore) {
+    if (!isHeadRequest(actionInvocation) && object == null) {
+      throw new PrimeException("Invalid property [" + property + "] for Stream result. This property is must not be null unless the HTTP method is [HEAD].");
     }
+
+    // We don't know what type of InputStream was provided. This will ensure it is closed if non-null.
+    try (InputStream is = (InputStream) object) {
+      if (!isHeadRequest(actionInvocation)) {
+        // We have already validated that this is not null.
+        //noinspection DataFlowIssue
+        is.transferTo(response.getOutputStream());
+      }
+    }
+
     return true;
   }
 
