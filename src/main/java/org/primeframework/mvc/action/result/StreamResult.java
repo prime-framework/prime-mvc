@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2019, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,16 +60,9 @@ public class StreamResult extends AbstractResult<Stream> {
     String name = expand(stream.name(), action, false);
     String type = expand(stream.type(), action, false);
 
-    Object object = expressionEvaluator.getValue(property, action);
-    if (!(object instanceof InputStream)) {
-      throw new PrimeException("Invalid property [" + property + "] for Stream result. This " +
-          "property returned null or an Object that is not an InputStream.");
-    }
-    InputStream is = (InputStream) object;
-
     ZonedDateTime lastModified = null;
     try {
-      object = expressionEvaluator.getValue(lastModifiedProperty, action);
+      Object object = expressionEvaluator.getValue(lastModifiedProperty, action);
       if (!(object instanceof ZonedDateTime)) {
         throw new PrimeException("Invalid property [" + property + "] for Stream result. This " +
             "property returned null or an Object that is not an InputStream.");
@@ -101,7 +94,21 @@ public class StreamResult extends AbstractResult<Stream> {
       return true;
     }
 
+    // This is not a HEAD request, so you must have an InputStream
+    Object object = expressionEvaluator.getValue(property, action);
+    if (!(object instanceof InputStream)) {
+      throw new PrimeException("Invalid property [" + property + "] for Stream result. This " +
+          "property returned null or an Object that is not an InputStream.");
+    }
+
+    InputStream is = (InputStream) object;
     writeToOutputStream(is, response);
+
+    // We don't know what type of InputStream was provided. We should close it for good measure.
+    try {
+      is.close();
+    } catch (IOException ignore) {
+    }
     return true;
   }
 
