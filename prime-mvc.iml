@@ -115,11 +115,11 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/io/fusionauth/java-http/0.1.16/java-http-0.1.16.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/io/fusionauth/java-http/0.1.17-RC.4/java-http-0.1.17-RC.4.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/io/fusionauth/java-http/0.1.16/java-http-0.1.16-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/io/fusionauth/java-http/0.1.17-RC.4/java-http-0.1.17-RC.4-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
