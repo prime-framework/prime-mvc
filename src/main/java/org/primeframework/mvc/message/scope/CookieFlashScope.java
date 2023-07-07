@@ -116,7 +116,7 @@ public class CookieFlashScope implements FlashScope {
   private List<Message> deserialize(String s) {
     try {
       // @formatter:off
-      List<Message> messages = CookieTools.fromJSONCookie(s, new TypeReference<List<Message>>() {}, true, encryptor, objectMapper);
+      List<Message> messages = CookieTools.fromJSONCookie(s, new TypeReference<>() {}, true, encryptor, objectMapper);
       // @formatter:on
 
       if (messages == null) {
