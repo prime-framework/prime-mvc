@@ -731,6 +731,7 @@ public class GlobalTest extends PrimeBaseTest {
 
     Map<String, Timer> timers = metricRegistry.getTimers();
     assertEquals(timers.get("prime-mvc.[/user/full-form].requests").getCount(), 1);
+    assertEquals(timers.get("prime-mvc.all.requests").getCount(), 1);
   }
 
   @Test
@@ -744,6 +745,7 @@ public class GlobalTest extends PrimeBaseTest {
 
     Map<String, Meter> meters = metricRegistry.getMeters();
     assertEquals(meters.get("prime-mvc.[/execute-method-throws-exception].errors").getCount(), 1);
+    assertEquals(meters.get("prime-mvc.all.errors").getCount(), 1);
   }
 
   @Test
