@@ -111,9 +111,9 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
         perPathTimer = metricRegistry.timer("prime-mvc.[" + actionInvocation.uri() + "].requests").time();
 
         //noinspection resource
-        aggregateTimer = metricRegistry.timer("prime-mvc.all.requests").time();
+        aggregateTimer = metricRegistry.timer("prime-mvc.[*].requests").time();
         perPathErrorMeter = metricRegistry.meter("prime-mvc.[" + actionInvocation.uri() + "].errors");
-        aggregateErrorMeter = metricRegistry.meter("prime-mvc.all.errors");
+        aggregateErrorMeter = metricRegistry.meter("prime-mvc.[*].errors");
       }
 
       chain.continueWorkflow();
