@@ -1520,10 +1520,10 @@ public class RequestResult {
   }
 
   /**
-   * Attempt to submit the form found in the response body.
+   * Attempt to submit the form found in the response body and return the result.
    *
    * @param selector The selector used to find the form in the DOM
-   * @param result   A consumer for the request result from following the redirect.
+   * @param result   The request result
    * @return This.
    */
   public RequestResult submitForm(String selector, ThrowingConsumer<RequestResult> result) throws Exception {
@@ -1531,11 +1531,11 @@ public class RequestResult {
   }
 
   /**
-   * Attempt to submit the form found in the response body.
+   * Attempt to submit the form found in the response body and return the result.
    *
    * @param selector  The selector used to find the form in the DOM
    * @param domHelper A consumer for the DOM Helper
-   * @param result    A consumer for the request result from following the redirect.
+   * @param result    The request result
    * @return This.
    */
   public RequestResult submitForm(String selector, ThrowingConsumer<DOMHelper> domHelper, ThrowingConsumer<RequestResult> result)
