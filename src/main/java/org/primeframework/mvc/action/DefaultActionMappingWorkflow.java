@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,8 +35,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class is the default implementation of the ActionMappingWorkflow. During the perform method, this class
- * determines the action that will be invoked based on the URI and put it into the ActionInvocationStore.
+ * This class is the default implementation of the ActionMappingWorkflow. During the perform method, this class determines the action that will be
+ * invoked based on the URI and put it into the ActionInvocationStore.
  *
  * @author Brian Pontarelli
  */
@@ -54,8 +54,8 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
   @Inject(optional = true) private MetricRegistry metricRegistry;
 
   @Inject
-  public DefaultActionMappingWorkflow(HTTPRequest request, HTTPResponse response,
-                                      ActionInvocationStore actionInvocationStore, ActionMapper actionMapper) {
+  public DefaultActionMappingWorkflow(HTTPRequest request, HTTPResponse response, ActionInvocationStore actionInvocationStore,
+                                      ActionMapper actionMapper) {
     this.request = request;
     this.response = response;
     this.actionInvocationStore = actionInvocationStore;
@@ -63,8 +63,7 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
   }
 
   /**
-   * Processes the request URI, loads the action configuration, creates the action and stores the invocation in the
-   * request.
+   * Processes the request URI, loads the action configuration, creates the action and stores the invocation in the request.
    *
    * @param chain The workflow chain.
    * @throws IOException If the chain throws an exception.
@@ -98,16 +97,23 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
       throw new NotAllowedException();
     }
 
-    // Start the timer and grab a meter for errors
-    Timer.Context timer = null;
-    Meter errorMeter = null;
+    // Start the timers and grab some meters for errors
+    Timer.Context perPathTimer = null;
+    Timer.Context aggregateTimer = null;
+    Meter perPathErrorMeter = null;
+    Meter aggregateErrorMeter = null;
 
     try {
       if (metricRegistry != null && actionInvocation.action != null) {
         // Ignore try/resource inspection, we are closing this in the finally block already
+
         //noinspection resource
-        timer = metricRegistry.timer("prime-mvc.[" + actionInvocation.uri() + "].requests").time();
-        errorMeter = metricRegistry.meter("prime-mvc.[" + actionInvocation.uri() + "].errors");
+        perPathTimer = metricRegistry.timer("prime-mvc.[" + actionInvocation.uri() + "].requests").time();
+
+        //noinspection resource
+        aggregateTimer = metricRegistry.timer("prime-mvc.[*].requests").time();
+        perPathErrorMeter = metricRegistry.meter("prime-mvc.[" + actionInvocation.uri() + "].errors");
+        aggregateErrorMeter = metricRegistry.meter("prime-mvc.[*].errors");
       }
 
       chain.continueWorkflow();
@@ -115,14 +121,22 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
       // We need to leave the action in the store because it might be used by the Error Workflow
       actionInvocationStore.removeCurrent();
     } catch (IOException | RuntimeException | Error e) {
-      if (errorMeter != null) {
-        errorMeter.mark();
+      if (perPathErrorMeter != null) {
+        perPathErrorMeter.mark();
+      }
+
+      if (aggregateErrorMeter != null) {
+        aggregateErrorMeter.mark();
       }
 
       throw e;
     } finally {
-      if (timer != null) {
-        timer.stop();
+      if (aggregateTimer != null) {
+        aggregateTimer.stop();
+      }
+
+      if (perPathTimer != null) {
+        perPathTimer.stop();
       }
     }
   }
