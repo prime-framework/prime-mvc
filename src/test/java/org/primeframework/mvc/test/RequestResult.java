@@ -1000,10 +1000,30 @@ public class RequestResult {
 
     for (int i = 0; i < pairs.length; i = i + 2) {
       String pointer = pairs[i].toString();
-      String expectedValue = pairs[i + 1].toString();
-      String actualValue = actual.at(pointer).asText();
-      if (!Objects.equals(actualValue, expectedValue)) {
-        throw new AssertionError("Expected [" + expectedValue + "] but found [" + actualValue + "].\nActual JSON body:\n"
+      JsonNode actualNode = actual.at(pointer);
+
+      String errorMessage = null;
+
+      if (actualNode.isTextual()) {
+        String actualValue = actual.at(pointer).asText();
+        String expectedValue = pairs[i + 1].toString();
+        if (!Objects.equals(actualValue, expectedValue)) {
+          errorMessage = "Expected [" + expectedValue + "] but found [" + actualValue + "]";
+        }
+      } else if (actualNode.isArray()) {
+        // Assuming an array of strings
+        List<String> actualArray = objectMapper.readerForListOf(String.class).readValue(actualNode);
+        @SuppressWarnings("unchecked")
+        List<String> expectedValue = (List<String>) pairs[i + 1];
+        if (!Objects.equals(actualArray, expectedValue)) {
+          errorMessage = "Expected [" + String.join(", ", expectedValue) + "] but found [" + String.join(", ", actualArray) + "]";
+        }
+      } else {
+        throw new RuntimeException("Unsupported type. Currently only a string or an array of strings can be asserted. Type found [" + actualNode.getNodeType() + "]");
+      }
+
+      if (errorMessage != null) {
+        throw new AssertionError(errorMessage + ".\nActual JSON body:\n"
             + objectMapper.writerWithDefaultPrettyPrinter()
                           .withFeatures(SerializationFeature.INDENT_OUTPUT)
                           .with(new DefaultPrettyPrinter().withArrayIndenter(new DefaultIndenter()))
