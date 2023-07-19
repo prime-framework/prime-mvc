@@ -1003,14 +1003,7 @@ public class RequestResult {
       JsonNode actualNode = actual.at(pointer);
 
       String errorMessage = null;
-
-      if (actualNode.isTextual()) {
-        String actualValue = actual.at(pointer).asText();
-        String expectedValue = pairs[i + 1].toString();
-        if (!Objects.equals(actualValue, expectedValue)) {
-          errorMessage = "Expected [" + expectedValue + "] but found [" + actualValue + "]";
-        }
-      } else if (actualNode.isArray()) {
+      if (actualNode.isArray()) {
         // Assuming an array of strings
         List<String> actualArray = objectMapper.readerForListOf(String.class).readValue(actualNode);
         @SuppressWarnings("unchecked")
@@ -1019,7 +1012,12 @@ public class RequestResult {
           errorMessage = "Expected [" + String.join(", ", expectedValue) + "] but found [" + String.join(", ", actualArray) + "]";
         }
       } else {
-        throw new RuntimeException("Unsupported type. Currently only a string or an array of strings can be asserted. Type found [" + actualNode.getNodeType() + "]");
+        // Assume textual
+        String actualValue = actual.at(pointer).asText();
+        String expectedValue = pairs[i + 1].toString();
+        if (!Objects.equals(actualValue, expectedValue)) {
+          errorMessage = "Expected [" + expectedValue + "] but found [" + actualValue + "]";
+        }
       }
 
       if (errorMessage != null) {
