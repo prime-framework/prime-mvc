@@ -20,6 +20,9 @@ import java.util.zip.DataFormatException;
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
+/**
+ * @author Brent Halsey
+ */
 public class CompressorTest {
   @Test
   public void emptyInputDecompress() throws DataFormatException {
