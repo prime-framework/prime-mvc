@@ -15,8 +15,7 @@
  */
 package org.example.action.flashScope;
 
-import javax.inject.Inject;
-
+import com.google.inject.Inject;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.annotation.Redirect;
 import org.primeframework.mvc.message.MessageStore;
