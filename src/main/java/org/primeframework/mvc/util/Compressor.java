@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2022-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,10 @@ import java.util.zip.Inflater;
  */
 public final class Compressor {
   public static byte[] compress(byte[] bytes) {
+    if (bytes.length == 0) {
+      return bytes;
+    }
+
     Deflater deflater = new Deflater(Deflater.BEST_COMPRESSION, false);
     deflater.setInput(bytes);
     deflater.finish();
@@ -42,6 +46,10 @@ public final class Compressor {
   }
 
   public static byte[] decompress(byte[] bytes) throws DataFormatException {
+    if (bytes.length == 0) {
+      return bytes;
+    }
+
     Inflater inflater = new Inflater(false);
     inflater.setInput(bytes);
 
@@ -52,6 +60,7 @@ public final class Compressor {
       if (length == 0) {
         break;
       }
+
       baos.write(buf, 0, length);
     }
 
