@@ -49,6 +49,9 @@ public final class Compressor {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     while (!inflater.finished()) {
       int length = inflater.inflate(buf);
+      if (length == 0) {
+        break;
+      }
       baos.write(buf, 0, length);
     }
 
