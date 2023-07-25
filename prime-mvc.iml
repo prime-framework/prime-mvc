@@ -27,22 +27,22 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/com/google/inject/guice/7.0.0/guice-7.0.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/com/google/inject/guice/5.1.0/guice-5.1.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/com/google/inject/guice/7.0.0/guice-7.0.0-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/com/google/inject/guice/5.1.0/guice-5.1.0-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/javax/inject/javax.inject/1.0.0/javax.inject-1.0.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/javax/inject/javax.inject/1.0.0/javax.inject-1.0.0-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -291,22 +291,53 @@
     <orderEntry type="module-library" scope="RUNTIME">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/aopalliance/aopalliance/1.0.0/aopalliance-1.0.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/aopalliance/aopalliance/1.0.0/aopalliance-1.0.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/aopalliance/aopalliance/1.0.0/aopalliance-1.0.0-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/aopalliance/aopalliance/1.0.0/aopalliance-1.0.0-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library" scope="RUNTIME">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/com/google/guava/guava/31.0.1-jre/guava-31.0.1-jre.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/com/google/guava/guava/30.1.0-jre/guava-30.1.0-jre.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/com/google/guava/guava/31.0.1-jre/guava-31.0.1-jre-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/com/google/guava/guava/30.1.0-jre/guava-30.1.0-jre-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="RUNTIME">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/.savant/cache/com/google/guava/listenablefuture/9999.0.0-empty-to-avoid-conflict-with-guava/listenablefuture-9999.0.0-empty-to-avoid-conflict-with-guava.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="RUNTIME">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/.savant/cache/com/google/j2objc/j2objc-annotations/1.3.0/j2objc-annotations-1.3.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/.savant/cache/com/google/j2objc/j2objc-annotations/1.3.0/j2objc-annotations-1.3.0-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="RUNTIME">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/checkerframework/checker-qual/3.5.0/checker-qual-3.5.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/checkerframework/checker-qual/3.5.0/checker-qual-3.5.0-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -324,42 +355,11 @@
     <orderEntry type="module-library" scope="RUNTIME">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/com/google/guava/listenablefuture/9999.0.0-empty-to-avoid-conflict-with-guava/listenablefuture-9999.0.0-empty-to-avoid-conflict-with-guava.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" scope="RUNTIME">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/org/checkerframework/checker-qual/3.12.0/checker-qual-3.12.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/com/google/errorprone/error_prone_annotations/2.3.4/error_prone_annotations-2.3.4.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/org/checkerframework/checker-qual/3.12.0/checker-qual-3.12.0-src.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" scope="RUNTIME">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/com/google/errorprone/error_prone_annotations/2.7.1/error_prone_annotations-2.7.1.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/com/google/errorprone/error_prone_annotations/2.7.1/error_prone_annotations-2.7.1-src.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" scope="RUNTIME">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/com/google/j2objc/j2objc-annotations/1.3.0/j2objc-annotations-1.3.0.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/com/google/j2objc/j2objc-annotations/1.3.0/j2objc-annotations-1.3.0-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/com/google/errorprone/error_prone_annotations/2.3.4/error_prone_annotations-2.3.4-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>

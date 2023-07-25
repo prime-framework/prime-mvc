@@ -21,7 +21,7 @@ freemarkerVersion = "2.3.32"
 fusionAuthJWTVersion = "5.1.0"
 javaHTTPVersion = "0.2.0"
 jsonPatchVersion = "1.13.0"
-guiceVersion = "7.0.0"
+guiceVersion = "5.1.0"
 jacksonVersion = "2.15.2"
 jsoupVersion = "1.16.1"
 logbackVersion = "1.4.8"
@@ -64,7 +64,7 @@ project(group: "org.primeframework", name: "prime-mvc", version: "4.11.0", licen
       dependency(id: "io.dropwizard.metrics:metrics-core:${dropWizardVersion}")
       dependency(id: "io.fusionauth:fusionauth-jwt:${fusionAuthJWTVersion}")
       dependency(id: "io.fusionauth:java-http:${javaHTTPVersion}")
-      dependency(id: "jakarta.inject:jakarta.inject-api:2.0.1")
+      dependency(id: "javax.inject:javax.inject:1.0.0")
       dependency(id: "org.freemarker:freemarker:${freemarkerVersion}")
       dependency(id: "org.ow2.asm:asm:${asmVersion}")
       dependency(id: "org.slf4j:slf4j-api:${slf4jVersion}", skipCompatibilityCheck: true)
