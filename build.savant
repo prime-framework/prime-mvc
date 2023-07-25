@@ -42,7 +42,6 @@ project(group: "org.primeframework", name: "prime-mvc", version: "4.11.0", licen
       //
       // 3. No dice, see if we can find it in Maven central
       maven()
-      // Test
     }
     publish {
       cache()
