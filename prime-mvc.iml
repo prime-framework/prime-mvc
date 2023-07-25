@@ -71,11 +71,11 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/io/dropwizard/metrics/metrics-core/4.2.19/metrics-core-4.2.19.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/io/dropwizard/metrics/metrics-core/3.2.6/metrics-core-3.2.6.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/io/dropwizard/metrics/metrics-core/4.2.19/metrics-core-4.2.19-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/io/dropwizard/metrics/metrics-core/3.2.6/metrics-core-3.2.6-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -126,11 +126,11 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/io/fusionauth/java-http/0.1.16/java-http-0.1.16.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/io/fusionauth/java-http/0.2.0/java-http-0.2.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/io/fusionauth/java-http/0.1.16/java-http-0.1.16-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/io/fusionauth/java-http/0.2.0/java-http-0.2.0-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -148,11 +148,11 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/org/ow2/asm/asm/9.2.0/asm-9.2.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/ow2/asm/asm/9.5.0/asm-9.5.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/org/ow2/asm/asm/9.2.0/asm-9.2.0-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/ow2/asm/asm/9.5.0/asm-9.5.0-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>

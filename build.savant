@@ -14,23 +14,22 @@
  * language governing permissions and limitations under the License.
  */
 
-asmVersion = "9.2.0"
+asmVersion = "9.5.0"
 dropWizardVersion = "3.2.6"
-easyMockVersion = "5.0.1"
+easyMockVersion = "5.1.0"
 freemarkerVersion = "2.3.32"
 fusionAuthJWTVersion = "5.1.0"
-javaHTTPVersion = "0.1.16"
+javaHTTPVersion = "0.2.0"
 jsonPatchVersion = "1.13.0"
-guavaVersion = "30.1.0-jre"
-guiceVersion = "5.1.0"
-jacksonVersion = "2.14.0"
-jsoupVersion = "1.15.3"
-logbackVersion = "1.4.4"
+guiceVersion = "7.0.0"
+jacksonVersion = "2.15.2"
+jsoupVersion = "1.16.1"
+logbackVersion = "1.4.8"
 restifyVersion = "4.1.2"
-slf4jVersion = "2.0.3"
-testngVersion = "7.7.1"
+slf4jVersion = "2.0.7"
+testngVersion = "7.8.0"
 
-project(group: "org.primeframework", name: "prime-mvc", version: "4.10.4", licenses: ["ApacheV2_0"]) {
+project(group: "org.primeframework", name: "prime-mvc", version: "4.11.0", licenses: ["ApacheV2_0"]) {
   workflow {
     fetch {
       // Dependency resolution order:
@@ -59,21 +58,16 @@ project(group: "org.primeframework", name: "prime-mvc", version: "4.10.4", licen
       dependency(id: "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}")
       dependency(id: "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}")
       dependency(id: "com.github.java-json-tools:json-patch:${jsonPatchVersion}")
-      // testng:7.6.1 and guava:30.1.0 want 3.0.2, easymock:5.0.1 wants 3.0.1
       dependency(id: "com.google.code.findbugs:jsr305:3.0.2", skipCompatibilityCheck: true)
       dependency(id: "com.google.inject:guice:${guiceVersion}")
       dependency(id: "com.inversoft:restify:${restifyVersion}")
       dependency(id: "io.dropwizard.metrics:metrics-core:${dropWizardVersion}")
       dependency(id: "io.fusionauth:fusionauth-jwt:${fusionAuthJWTVersion}")
       dependency(id: "io.fusionauth:java-http:${javaHTTPVersion}")
-      dependency(id: "javax.inject:javax.inject:1.0.0")
+      dependency(id: "jakarta.inject:jakarta.inject-api:2.0.1")
       dependency(id: "org.freemarker:freemarker:${freemarkerVersion}")
       dependency(id: "org.ow2.asm:asm:${asmVersion}")
-      // easymock:5.0.1 wants version 1.7.32
       dependency(id: "org.slf4j:slf4j-api:${slf4jVersion}", skipCompatibilityCheck: true)
-    }
-    group(name: "runtime") {
-      dependency(id: "com.google.guava:guava:${guavaVersion}")
     }
     group(name: "test-compile", export: false) {
       dependency(id: "org.easymock:easymock:${easyMockVersion}")
@@ -189,7 +183,5 @@ void updatePOM() {
     filter(token: "<version>9.2.0</version>", value: "<version>9.2</version>")
     // javax.inject:javax.inject:1.0.0 -> 1
     filter(token: "<version>1.0.0</version>", value: "<version>1</version>")
-    // "com.google.guava:guava:30.1.0-jre -> 30.1-jre
-    filter(token: "<version>30.1.0-jre</version>", value: "<version>30.1-jre</version>")
   }
 }

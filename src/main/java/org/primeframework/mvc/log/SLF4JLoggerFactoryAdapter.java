@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2022-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,8 +73,23 @@ public class SLF4JLoggerFactoryAdapter implements LoggerFactory {
     }
 
     @Override
-    public boolean isDebuggable() {
+    public boolean isDebugEnabled() {
       return logger.isDebugEnabled();
+    }
+
+    @Override
+    public boolean isErrorEnabled() {
+      return logger.isErrorEnabled();
+    }
+
+    @Override
+    public boolean isInfoEnabled() {
+      return logger.isInfoEnabled();
+    }
+
+    @Override
+    public boolean isTraceEnabled() {
+      return logger.isTraceEnabled();
     }
 
     @Override
