@@ -48,6 +48,8 @@ public class ActionConfiguration {
 
   public final Map<Class<?>, Object> additionalConfiguration;
 
+  public final boolean allowUnknownParameters;
+
   public final Action annotation;
 
   public final Map<Class<? extends Annotation>, Annotation> annotations = new HashMap<>();
@@ -99,6 +101,7 @@ public class ActionConfiguration {
   public final Map<HTTPMethod, List<ValidationMethodConfiguration>> validationMethods;
 
   public ActionConfiguration(Class<?> actionClass,
+                             boolean allowUnknownParameters,
                              Map<HTTPMethod, ConstraintOverrideMethodConfiguration> constraintValidationMethods,
                              Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods,
                              Map<HTTPMethod, List<ValidationMethodConfiguration>> validationMethods,
@@ -124,6 +127,7 @@ public class ActionConfiguration {
     Objects.requireNonNull(actionClass);
 
     this.actionClass = actionClass;
+    this.allowUnknownParameters = allowUnknownParameters;
     this.constraintValidationMethods = constraintValidationMethods;
     this.formPrepareMethods = formPrepareMethods;
     this.authorizationMethods = authorizationMethods;

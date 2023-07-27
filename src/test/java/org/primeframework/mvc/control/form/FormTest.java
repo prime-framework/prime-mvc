@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2018, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,8 @@ public class FormTest extends ControlBaseTest {
     ais.setCurrent(new ActionInvocation(index, null, "/user/", null, null));
 
     StringWriter writer = new StringWriter();
-    form.renderStart(writer, MapBuilder.map("action", (Object) "/user/edit").put("method", "POST").done(), MapBuilder.map("param", "param-value").done());
+    form.renderStart(writer, MapBuilder.map("action", (Object) "/user/edit").put("method", "POST").done(),
+                     MapBuilder.map("param", "param-value").done());
 
     EditAction edit = (EditAction) ais.getCurrent().action;
     assertTrue(edit.formPrepared);
@@ -55,12 +56,12 @@ public class FormTest extends ControlBaseTest {
     form.renderEnd(writer);
     assertSame(IndexAction.class, ais.getCurrent().action.getClass());
     assertEquals(writer.toString(),
-        """
-            <div class="form">
-            <form action="/user/edit" method="POST">
-            </form>
-            </div>
-            """);
+                 """
+                     <div class="form">
+                     <form action="/user/edit" method="POST">
+                     </form>
+                     </div>
+                     """);
   }
 
   @Test
@@ -69,15 +70,14 @@ public class FormTest extends ControlBaseTest {
     request.setContextPath("/context");
     IndexAction index = new IndexAction();
     ais.setCurrent(new ActionInvocation(index, null, "/user/", null,
-        new ActionConfiguration(IndexAction.class, null, null, null, new ArrayList<>(), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null, null)));
-
+                                        new ActionConfiguration(IndexAction.class, false, null, null, null, new ArrayList<>(), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null, null)));
     new ControlTester(form).
         attr("action", "https://www.google.com").
         attr("method", "POST").
         go("<div class=\"form\">\n" +
-            "<form action=\"https://www.google.com\" method=\"POST\">\n" +
-            "</form>\n" +
-            "</div>\n");
+           "<form action=\"https://www.google.com\" method=\"POST\">\n" +
+           "</form>\n" +
+           "</div>\n");
   }
 
   @Test
@@ -85,15 +85,15 @@ public class FormTest extends ControlBaseTest {
     request.setPath("/user/");
     IndexAction index = new IndexAction();
     ais.setCurrent(new ActionInvocation(index, null, "/user/", null,
-        new ActionConfiguration(IndexAction.class, null, null, null, new ArrayList<>(), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null, null)));
+                                        new ActionConfiguration(IndexAction.class, false, null, null, null, new ArrayList<>(), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null, null)));
 
     new ControlTester(form).
         attr("action", "/user/").
         attr("method", "POST").
         go("<div class=\"form\">\n" +
-            "<form action=\"/user/\" method=\"POST\">\n" +
-            "</form>\n" +
-            "</div>\n");
+           "<form action=\"/user/\" method=\"POST\">\n" +
+           "</form>\n" +
+           "</div>\n");
   }
 
   @Test
@@ -102,15 +102,15 @@ public class FormTest extends ControlBaseTest {
     request.setContextPath("/context");
     IndexAction index = new IndexAction();
     ais.setCurrent(new ActionInvocation(index, null, "/user/", null,
-        new ActionConfiguration(IndexAction.class, null, null, null, new ArrayList<>(), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null, null)));
+                                        new ActionConfiguration(IndexAction.class, false, null, null, null, new ArrayList<>(), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null, null)));
 
     new ControlTester(form).
         attr("action", "/user/").
         attr("method", "POST").
         go("<div class=\"form\">\n" +
-            "<form action=\"/context/user/\" method=\"POST\">\n" +
-            "</form>\n" +
-            "</div>\n");
+           "<form action=\"/context/user/\" method=\"POST\">\n" +
+           "</form>\n" +
+           "</div>\n");
   }
 
   @Test
@@ -118,15 +118,15 @@ public class FormTest extends ControlBaseTest {
     request.setPath("/user/");
     IndexAction index = new IndexAction();
     ais.setCurrent(new ActionInvocation(index, null, "/user/", null,
-        new ActionConfiguration(IndexAction.class, null, null, null, new ArrayList<>(), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null, null)));
+                                        new ActionConfiguration(IndexAction.class, false, null, null, null, new ArrayList<>(), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null, null)));
 
     new ControlTester(form).
         attr("action", "https://www.google.com").
         attr("method", "POST").
         go("<div class=\"form\">\n" +
-            "<form action=\"https://www.google.com\" method=\"POST\">\n" +
-            "</form>\n" +
-            "</div>\n");
+           "<form action=\"https://www.google.com\" method=\"POST\">\n" +
+           "</form>\n" +
+           "</div>\n");
   }
 
   @Test
@@ -139,9 +139,9 @@ public class FormTest extends ControlBaseTest {
         attr("action", "edit").
         attr("method", "POST").
         go("<div class=\"form\">\n" +
-            "<form action=\"/user/edit\" method=\"POST\">\n" +
-            "</form>\n" +
-            "</div>\n");
+           "<form action=\"/user/edit\" method=\"POST\">\n" +
+           "</form>\n" +
+           "</div>\n");
   }
 
   @Test
@@ -149,15 +149,14 @@ public class FormTest extends ControlBaseTest {
     request.setPath("/user/edit");
     EditAction edit = new EditAction();
     ais.setCurrent(new ActionInvocation(edit, null, "/user/edit", null,
-        new ActionConfiguration(IndexAction.class, null, null, null, List.of(EditAction.class.getMethod("formPrepare")), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null, null)));
-
+                                        new ActionConfiguration(IndexAction.class, false, null, null, null, List.of(EditAction.class.getMethod("formPrepare")), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null, null)));
     new ControlTester(form).
         attr("action", "/user/edit").
         attr("method", "POST").
         go("<div class=\"form\">\n" +
-            "<form action=\"/user/edit\" method=\"POST\">\n" +
-            "</form>\n" +
-            "</div>\n");
+           "<form action=\"/user/edit\" method=\"POST\">\n" +
+           "</form>\n" +
+           "</div>\n");
     assertTrue(edit.formPrepared);
   }
 
@@ -172,8 +171,8 @@ public class FormTest extends ControlBaseTest {
         attr("action", "edit").
         attr("method", "POST").
         go("<div class=\"form\">\n" +
-            "<form action=\"/context/user/edit\" method=\"POST\">\n" +
-            "</form>\n" +
-            "</div>\n");
+           "<form action=\"/context/user/edit\" method=\"POST\">\n" +
+           "</form>\n" +
+           "</div>\n");
   }
 }

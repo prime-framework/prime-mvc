@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,43 +70,43 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
     additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(requestMembers, null, null));
 
     KitchenSinkAction action = new KitchenSinkAction(null);
-    ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null, null, null, null);
+    ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, false, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null, null, null, null);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(action, new ExecuteMethodConfiguration(HTTPMethod.POST, null, null), "/action", null, config));
     replay(store);
 
     String expected = "{" +
-        "  \"active\":true," +
-        "  \"addresses\":{" +
-        "    \"home\":{" +
-        "      \"city\":\"Broomfield\"," +
-        "      \"state\":\"Colorado\"," +
-        "      \"zipcode\":\"80023\"" +
-        "    }," +
-        "    \"work\":{" +
-        "      \"city\":\"Denver\"," +
-        "      \"state\":\"Colorado\"," +
-        "      \"zipcode\":\"80202\"" +
-        "    }" +
-        "  }," +
-        "  \"age\":37," +
-        "  \"favoriteMonth\":5," +
-        "  \"favoriteYear\":1976," +
-        "  \"ids\":{" +
-        "    \"0\":1," +
-        "    \"1\":2" +
-        "  }," +
-        "  \"lifeStory\":\"Hello world\"," +
-        "  \"securityQuestions\":[\"one\",\"two\",\"three\",\"four\"]," +
-        "  \"siblings\":[{" +
-        "    \"active\":false," +
-        "    \"name\":\"Brett\"" +
-        "  },{" +
-        "    \"active\":false," +
-        "    \"name\":\"Beth\"" +
-        "  }]," +
-        "  \"type\":\"COOL\"" +
-        "}";
+                      "  \"active\":true," +
+                      "  \"addresses\":{" +
+                      "    \"home\":{" +
+                      "      \"city\":\"Broomfield\"," +
+                      "      \"state\":\"Colorado\"," +
+                      "      \"zipcode\":\"80023\"" +
+                      "    }," +
+                      "    \"work\":{" +
+                      "      \"city\":\"Denver\"," +
+                      "      \"state\":\"Colorado\"," +
+                      "      \"zipcode\":\"80202\"" +
+                      "    }" +
+                      "  }," +
+                      "  \"age\":37," +
+                      "  \"favoriteMonth\":5," +
+                      "  \"favoriteYear\":1976," +
+                      "  \"ids\":{" +
+                      "    \"0\":1," +
+                      "    \"1\":2" +
+                      "  }," +
+                      "  \"lifeStory\":\"Hello world\"," +
+                      "  \"securityQuestions\":[\"one\",\"two\",\"three\",\"four\"]," +
+                      "  \"siblings\":[{" +
+                      "    \"active\":false," +
+                      "    \"name\":\"Brett\"" +
+                      "  },{" +
+                      "    \"active\":false," +
+                      "    \"name\":\"Beth\"" +
+                      "  }]," +
+                      "  \"type\":\"COOL\"" +
+                      "}";
 
     request.setInputStream(new ByteArrayInputStream(expected.getBytes()));
     request.setContentLength((long) expected.getBytes().length);
@@ -150,16 +150,17 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
     additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(requestMembers, null, null));
 
     KitchenSinkAction action = new KitchenSinkAction(null);
-    ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, null, null, null, null, null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, additionalConfig, null, null, null, null);
+    ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, false, null, null, null, null, null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, additionalConfig, null, null, null, null);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new ActionInvocation(action, new ExecuteMethodConfiguration(HTTPMethod.POST, null, null), "/action", null, config));
+    expect(store.getCurrent()).andReturn(
+        new ActionInvocation(action, new ExecuteMethodConfiguration(HTTPMethod.POST, null, null), "/action", null, config));
     replay(store);
 
     String expected = "{" +
-        "  \"siblings\":[{" +
-        "    \"age\":\"old\"" +
-        "  }]" +
-        "}";
+                      "  \"siblings\":[{" +
+                      "    \"age\":\"old\"" +
+                      "  }]" +
+                      "}";
 
     HTTPRequest request = new HTTPRequest();
     request.setInputStream(new ByteArrayInputStream(expected.getBytes()));
@@ -167,7 +168,8 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
     request.setContentType("application/json");
 
     MessageProvider messageProvider = createStrictMock(MessageProvider.class);
-    expect(messageProvider.getMessage(eq("[invalidJSON]"), eq("siblings.age"), eq("Possible conversion error"), isA(String.class))).andReturn("Bad sibling age");
+    expect(messageProvider.getMessage(eq("[invalidJSON]"), eq("siblings.age"), eq("Possible conversion error"), isA(String.class))).andReturn(
+        "Bad sibling age");
     replay(messageProvider);
 
     MessageStore messageStore = createStrictMock(MessageStore.class);
@@ -195,18 +197,19 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
     additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(requestMembers, null, null));
 
     KitchenSinkAction action = new KitchenSinkAction(null);
-    ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, null, null, null, null, null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, additionalConfig, null, null, null, null);
+    ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, false, null, null, null, null, null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, additionalConfig, null, null, null, null);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new ActionInvocation(action, new ExecuteMethodConfiguration(HTTPMethod.POST, null, null), "/action", null, config));
+    expect(store.getCurrent()).andReturn(
+        new ActionInvocation(action, new ExecuteMethodConfiguration(HTTPMethod.POST, null, null), "/action", null, config));
     replay(store);
 
     String expected = "{" +
-        "  \"addresses\":{" +
-        "    \"home\":{" +
-        "      \"age\":\"old\"" +
-        "    }" +
-        "  }" +
-        "}";
+                      "  \"addresses\":{" +
+                      "    \"home\":{" +
+                      "      \"age\":\"old\"" +
+                      "    }" +
+                      "  }" +
+                      "}";
 
     HTTPRequest request = new HTTPRequest();
     request.setInputStream(new ByteArrayInputStream(expected.getBytes()));
@@ -214,7 +217,8 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
     request.setContentType("application/json");
 
     MessageProvider messageProvider = createNiceMock(MessageProvider.class);
-    expect(messageProvider.getMessage(eq("[invalidJSON]"), eq("addresses.home.age"), eq("Possible conversion error"), isA(String.class))).andReturn("Bad age");
+    expect(messageProvider.getMessage(eq("[invalidJSON]"), eq("addresses.home.age"), eq("Possible conversion error"), isA(String.class))).andReturn(
+        "Bad age");
     replay(messageProvider);
 
     MessageStore messageStore = createNiceMock(MessageStore.class);
@@ -242,14 +246,15 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
     additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(requestMembers, null, null));
 
     KitchenSinkAction action = new KitchenSinkAction(null);
-    ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, null, null, null, null, null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, additionalConfig, null, null, null, null);
+    ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, false, null, null, null, null, null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, additionalConfig, null, null, null, null);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new ActionInvocation(action, new ExecuteMethodConfiguration(HTTPMethod.POST, null, null), "/action", null, config));
+    expect(store.getCurrent()).andReturn(
+        new ActionInvocation(action, new ExecuteMethodConfiguration(HTTPMethod.POST, null, null), "/action", null, config));
     replay(store);
 
     String expected = "{" +
-        "  \"bad-active\":true" +
-        "}";
+                      "  \"bad-active\":true" +
+                      "}";
 
     HTTPRequest request = new HTTPRequest();
     request.setInputStream(new ByteArrayInputStream(expected.getBytes()));
@@ -285,14 +290,15 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
     additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(requestMembers, null, null));
 
     KitchenSinkAction action = new KitchenSinkAction(null);
-    ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, null, null, null, null, null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, additionalConfig, null, null, null, null);
+    ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, false, null, null, null, null, null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, additionalConfig, null, null, null, null);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new ActionInvocation(action, new ExecuteMethodConfiguration(HTTPMethod.POST, null, null), "/action", null, config));
+    expect(store.getCurrent()).andReturn(
+        new ActionInvocation(action, new ExecuteMethodConfiguration(HTTPMethod.POST, null, null), "/action", null, config));
     replay(store);
 
     String expected = "{" +
-        "  \"active\":\"bad\"" +
-        "}";
+                      "  \"active\":\"bad\"" +
+                      "}";
 
     HTTPRequest request = new HTTPRequest();
     request.setInputStream(new ByteArrayInputStream(expected.getBytes()));
@@ -327,37 +333,37 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
     replay(store);
 
     String expected = "{" +
-        "  \"active\":true," +
-        "  \"addresses\":{" +
-        "    \"home\":{" +
-        "      \"city\":\"Broomfield\"," +
-        "      \"state\":\"Colorado\"," +
-        "      \"zipcode\":\"80023\"" +
-        "    }," +
-        "    \"work\":{" +
-        "      \"city\":\"Denver\"," +
-        "      \"state\":\"Colorado\"," +
-        "      \"zipcode\":\"80202\"" +
-        "    }" +
-        "  }," +
-        "  \"age\":37," +
-        "  \"favoriteMonth\":5," +
-        "  \"favoriteYear\":1976," +
-        "  \"ids\":{" +
-        "    \"0\":1," +
-        "    \"1\":2" +
-        "  }," +
-        "  \"lifeStory\":\"Hello world\"," +
-        "  \"securityQuestions\":[\"one\",\"two\",\"three\",\"four\"]," +
-        "  \"siblings\":[{" +
-        "    \"active\":false," +
-        "    \"name\":\"Brett\"" +
-        "  },{" +
-        "    \"active\":false," +
-        "    \"name\":\"Beth\"" +
-        "  }]," +
-        "  \"type\":\"COOL\"" +
-        "}";
+                      "  \"active\":true," +
+                      "  \"addresses\":{" +
+                      "    \"home\":{" +
+                      "      \"city\":\"Broomfield\"," +
+                      "      \"state\":\"Colorado\"," +
+                      "      \"zipcode\":\"80023\"" +
+                      "    }," +
+                      "    \"work\":{" +
+                      "      \"city\":\"Denver\"," +
+                      "      \"state\":\"Colorado\"," +
+                      "      \"zipcode\":\"80202\"" +
+                      "    }" +
+                      "  }," +
+                      "  \"age\":37," +
+                      "  \"favoriteMonth\":5," +
+                      "  \"favoriteYear\":1976," +
+                      "  \"ids\":{" +
+                      "    \"0\":1," +
+                      "    \"1\":2" +
+                      "  }," +
+                      "  \"lifeStory\":\"Hello world\"," +
+                      "  \"securityQuestions\":[\"one\",\"two\",\"three\",\"four\"]," +
+                      "  \"siblings\":[{" +
+                      "    \"active\":false," +
+                      "    \"name\":\"Brett\"" +
+                      "  },{" +
+                      "    \"active\":false," +
+                      "    \"name\":\"Beth\"" +
+                      "  }]," +
+                      "  \"type\":\"COOL\"" +
+                      "}";
 
     HTTPRequest request = new HTTPRequest();
     request.setInputStream(new ByteArrayInputStream(expected.getBytes()));
@@ -381,43 +387,43 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
     Map<Class<?>, Object> additionalConfig = new HashMap<>();
 
     KitchenSinkAction action = new KitchenSinkAction(null);
-    ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, null, null, null, null, null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, additionalConfig, null, null, null, null);
+    ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, false, null, null, null, null, null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, additionalConfig, null, null, null, null);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(action, null, "/action", null, config));
     replay(store);
 
     String expected = "{" +
-        "  \"active\":true," +
-        "  \"addresses\":{" +
-        "    \"home\":{" +
-        "      \"city\":\"Broomfield\"," +
-        "      \"state\":\"Colorado\"," +
-        "      \"zipcode\":\"80023\"" +
-        "    }," +
-        "    \"work\":{" +
-        "      \"city\":\"Denver\"," +
-        "      \"state\":\"Colorado\"," +
-        "      \"zipcode\":\"80202\"" +
-        "    }" +
-        "  }," +
-        "  \"age\":37," +
-        "  \"favoriteMonth\":5," +
-        "  \"favoriteYear\":1976," +
-        "  \"ids\":{" +
-        "    \"0\":1," +
-        "    \"1\":2" +
-        "  }," +
-        "  \"lifeStory\":\"Hello world\"," +
-        "  \"securityQuestions\":[\"one\",\"two\",\"three\",\"four\"]," +
-        "  \"siblings\":[{" +
-        "    \"active\":false," +
-        "    \"name\":\"Brett\"" +
-        "  },{" +
-        "    \"active\":false," +
-        "    \"name\":\"Beth\"" +
-        "  }]," +
-        "  \"type\":\"COOL\"" +
-        "}";
+                      "  \"active\":true," +
+                      "  \"addresses\":{" +
+                      "    \"home\":{" +
+                      "      \"city\":\"Broomfield\"," +
+                      "      \"state\":\"Colorado\"," +
+                      "      \"zipcode\":\"80023\"" +
+                      "    }," +
+                      "    \"work\":{" +
+                      "      \"city\":\"Denver\"," +
+                      "      \"state\":\"Colorado\"," +
+                      "      \"zipcode\":\"80202\"" +
+                      "    }" +
+                      "  }," +
+                      "  \"age\":37," +
+                      "  \"favoriteMonth\":5," +
+                      "  \"favoriteYear\":1976," +
+                      "  \"ids\":{" +
+                      "    \"0\":1," +
+                      "    \"1\":2" +
+                      "  }," +
+                      "  \"lifeStory\":\"Hello world\"," +
+                      "  \"securityQuestions\":[\"one\",\"two\",\"three\",\"four\"]," +
+                      "  \"siblings\":[{" +
+                      "    \"active\":false," +
+                      "    \"name\":\"Brett\"" +
+                      "  },{" +
+                      "    \"active\":false," +
+                      "    \"name\":\"Beth\"" +
+                      "  }]," +
+                      "  \"type\":\"COOL\"" +
+                      "}";
 
     HTTPRequest request = new HTTPRequest();
     request.setInputStream(new ByteArrayInputStream(expected.getBytes()));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -105,10 +105,9 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     EasyMock.expect(provider.lookup(fullURI)).andReturn(
         new ActionInvocation(
             EditAction.class, null, uri, extension,
-            new ActionConfiguration(EditAction.class, null, executeMethods,
-                new HashMap<>(), new ArrayList<>(), new HashMap<>(), new HashMap<>(), new ArrayList<>(), new HashMap<>(),
-                new ArrayList<>(), new HashMap<>(), new HashMap<>(), null, new HashMap<>(), new HashSet<>(), new ArrayList<>(),
-                new ArrayList<>(), new HashMap<>(), uri, new ArrayList<>(), null, null)
+            new ActionConfiguration(EditAction.class, false, null, executeMethods, new HashMap<>(), new ArrayList<>(), new HashMap<>(), new HashMap<>(), new ArrayList<>(), new HashMap<>(),
+                                    new ArrayList<>(), new HashMap<>(), new HashMap<>(), null, new HashMap<>(), new HashSet<>(), new ArrayList<>(),
+                                    new ArrayList<>(), new HashMap<>(), uri, new ArrayList<>(), null, null)
         )
     );
     EasyMock.replay(provider);

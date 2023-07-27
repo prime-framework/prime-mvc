@@ -307,8 +307,9 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
     resultConfigurations.put("success", annotation);
 
     return new ActionInvocation(action, executeMethod, "/user/edit", "",
-        new ActionConfiguration(EditAction.class, null, executeMethods, validationMethods, new ArrayList<>(), null, null,
-            new ArrayList<>(), new HashMap<>(), new ArrayList<>(), resultConfigurations, new HashMap<>(), null, new HashMap<>(),
-            new HashSet<>(), Collections.emptyList(), new ArrayList<>(), new HashMap<>(), "/user/edit", new ArrayList<>(), null, null));
+                                new ActionConfiguration(EditAction.class, false, null, executeMethods, validationMethods, new ArrayList<>(), null,
+                                                        null, new ArrayList<>(), new HashMap<>(), new ArrayList<>(), resultConfigurations,
+                                                        new HashMap<>(), null, new HashMap<>(), new HashSet<>(), Collections.emptyList(),
+                                                        new ArrayList<>(), new HashMap<>(), "/user/edit", new ArrayList<>(), null, null));
   }
 }

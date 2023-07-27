@@ -142,7 +142,8 @@ public abstract class PrimeBaseTest {
         count++;
         t = t.getCause();
       }
-      Assert.fail("Expected [" + throwable.getName() + "], but caught [" + e.getClass().getName() + "] Message [" + (e.getMessage() != null ? e.getMessage() : "-") + "]");
+      Assert.fail(
+          "Expected [" + throwable.getName() + "], but caught [" + e.getClass().getName() + "] Message [" + (e.getMessage() != null ? e.getMessage() : "-") + "]");
       return;
     }
     Assert.fail("Expected [" + throwable.getName() + "], but no exception was thrown.");
@@ -219,7 +220,8 @@ public abstract class PrimeBaseTest {
       }
     };
 
-    Module module = Modules.override(mvcModule).with(new TestContentModule(), new TestSecurityModule(), new TestScopeModule(), new TestWorkflowModule());
+    Module module = Modules.override(mvcModule).with(new TestContentModule(), new TestSecurityModule(), new TestScopeModule(),
+                                                     new TestWorkflowModule());
     var mainConfig = new HTTPServerConfiguration().withClientTimeout(Duration.ofMillis(500))
                                                   .withListener(new HTTPListenerConfiguration(9080))
                                                   .withLoggerFactory(TestAccumulatingLoggerFactory.FACTORY);
@@ -256,7 +258,8 @@ public abstract class PrimeBaseTest {
                                                   Map<String, List<String>> uriParameters) {
     DefaultActionConfigurationBuilder builder = injector.getInstance(DefaultActionConfigurationBuilder.class);
     ActionConfiguration actionConfiguration = builder.build(action.getClass());
-    return new ActionInvocation(action, actionConfiguration.executeMethods.get(httpMethod), actionConfiguration.uri, extension, uriParameters, actionConfiguration, true);
+    return new ActionInvocation(action, actionConfiguration.executeMethods.get(httpMethod), actionConfiguration.uri, extension, uriParameters,
+                                actionConfiguration, true);
   }
 
   /**
@@ -284,10 +287,8 @@ public abstract class PrimeBaseTest {
     resultConfigurations.put(resultCode, annotation);
 
     return new ActionInvocation(action, executeMethod, uri, extension,
-        new ActionConfiguration(EditAction.class, null, executeMethods, validationMethods, new ArrayList<>(), null, null, new ArrayList<>(), new HashMap<>(), new ArrayList<>(), resultConfigurations, new HashMap<>(), null, new HashMap<>(), new HashSet<>(), Collections.emptyList(), new ArrayList<>(), new HashMap<>(), uri, new ArrayList<>(), null, null
-        ));
+                                new ActionConfiguration(EditAction.class, false, null, executeMethods, validationMethods, new ArrayList<>(), null, null, new ArrayList<>(), new HashMap<>(), new ArrayList<>(), resultConfigurations, new HashMap<>(), null, new HashMap<>(), new HashSet<>(), Collections.emptyList(), new ArrayList<>(), new HashMap<>(), uri, new ArrayList<>(), null, null));
   }
-
 
   /**
    * Makes an action invocation and configuration.
@@ -341,20 +342,20 @@ public abstract class PrimeBaseTest {
 
       // Intentionally leaving empty lines here
       System.out.println("""
-                                 
-                
-                                 
-          Test failure
-          -----------------
-          Exception: {{exception}}
-          Message: {{message}}
-                               
-          HTTP Trace:
-          {{trace}}
-          -----------------                       
-           """.replace("{{exception}}", throwable != null ? throwable.getClass().getSimpleName() : "-")
-              .replace("{{message}}", throwable != null ? (throwable.getMessage() != null ? throwable.getMessage() : "-") : "-")
-              .replace("{{trace}}", trace.equals("") ? "[-]" : trace));
+                                                    
+                                   
+                                                    
+                             Test failure
+                             -----------------
+                             Exception: {{exception}}
+                             Message: {{message}}
+                                                  
+                             HTTP Trace:
+                             {{trace}}
+                             -----------------                      
+                              """.replace("{{exception}}", throwable != null ? throwable.getClass().getSimpleName() : "-")
+                                 .replace("{{message}}", throwable != null ? (throwable.getMessage() != null ? throwable.getMessage() : "-") : "-")
+                                 .replace("{{trace}}", trace.equals("") ? "[-]" : trace));
     }
 
     @Override

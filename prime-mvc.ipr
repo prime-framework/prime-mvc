@@ -525,18 +525,7 @@
           <option name="TAB_SIZE" value="2" />
         </value>
       </option>
-      <option name="INSERT_INNER_CLASS_IMPORTS" value="true" />
-      <option name="CLASS_COUNT_TO_USE_IMPORT_ON_DEMAND" value="9999" />
-      <option name="NAMES_COUNT_TO_USE_IMPORT_ON_DEMAND" value="9999" />
-      <option name="IMPORT_LAYOUT_TABLE">
-        <value>
-          <package name="javax" withSubpackages="true" static="false" />
-          <package name="java" withSubpackages="true" static="false" />
-          <emptyLine />
-          <package name="" withSubpackages="true" static="false" />
-          <package name="" withSubpackages="true" static="true" />
-        </value>
-      </option>
+      <option name="RIGHT_MARGIN" value="150" />
       <option name="FORMATTER_TAGS_ENABLED" value="true" />
       <option name="WRAP_COMMENTS" value="true" />
       <option name="DO_NOT_FORMAT">
@@ -546,14 +535,16 @@
         </list>
       </option>
       <DB2CodeStyleSettings version="6">
-        <option name="USE_GENERAL_STYLE" value="false" />
-        <option name="TYPE_CASE" value="3" />
-        <option name="CUSTOM_TYPE_CASE" value="3" />
+        <option name="KEYWORD_CASE" value="2" />
+        <option name="TYPE_CASE" value="2" />
+        <option name="CUSTOM_TYPE_CASE" value="2" />
         <option name="ALIAS_CASE" value="4" />
         <option name="BUILT_IN_CASE" value="0" />
+        <option name="QUERY_SECTION_1ST_WORD_ALIGN" value="2" />
         <option name="QUERY_TRUE_INDENT" value="false" />
         <option name="QUERY_ALIGN_ELEMENTS" value="false" />
         <option name="QUERY_ALIGN_LINE_COMMENTS" value="false" />
+        <option name="INSERT_EL_WRAP" value="0" />
         <option name="INSERT_EL_COMMA" value="2" />
         <option name="SET_EL_WRAP" value="0" />
         <option name="SET_EL_COMMA" value="0" />
@@ -573,6 +564,7 @@
         <option name="TABLE_ALTER_INSTRUCTION_ALIGN" value="false" />
         <option name="POST_OPT_WRAP_1" value="true" />
         <option name="POST_OPT_ALIGN" value="false" />
+        <option name="ROUTINE_ARG_OPENING" value="0" />
         <option name="ROUTINE_ARG_COMMA" value="2" />
         <option name="ROUTINE_ARG_ALIGN_TYPES" value="true" />
         <option name="IMP_DECLARE_EL_WRAP" value="1" />
@@ -583,14 +575,16 @@
         <option name="PRIMARY_KEY_NAME_TEMPLATE" value="{table}_{columns}_pk" />
       </DB2CodeStyleSettings>
       <DerbyCodeStyleSettings version="6">
-        <option name="USE_GENERAL_STYLE" value="false" />
-        <option name="TYPE_CASE" value="3" />
-        <option name="CUSTOM_TYPE_CASE" value="3" />
+        <option name="KEYWORD_CASE" value="2" />
+        <option name="TYPE_CASE" value="2" />
+        <option name="CUSTOM_TYPE_CASE" value="2" />
         <option name="ALIAS_CASE" value="4" />
         <option name="BUILT_IN_CASE" value="0" />
+        <option name="QUERY_SECTION_1ST_WORD_ALIGN" value="2" />
         <option name="QUERY_TRUE_INDENT" value="false" />
         <option name="QUERY_ALIGN_ELEMENTS" value="false" />
         <option name="QUERY_ALIGN_LINE_COMMENTS" value="false" />
+        <option name="INSERT_EL_WRAP" value="0" />
         <option name="INSERT_EL_COMMA" value="2" />
         <option name="SET_EL_WRAP" value="0" />
         <option name="SET_EL_COMMA" value="0" />
@@ -610,6 +604,7 @@
         <option name="TABLE_ALTER_INSTRUCTION_ALIGN" value="false" />
         <option name="POST_OPT_WRAP_1" value="true" />
         <option name="POST_OPT_ALIGN" value="false" />
+        <option name="ROUTINE_ARG_OPENING" value="0" />
         <option name="ROUTINE_ARG_COMMA" value="2" />
         <option name="ROUTINE_ARG_ALIGN_TYPES" value="true" />
         <option name="IMP_DECLARE_EL_WRAP" value="1" />
@@ -624,14 +619,16 @@
         <option name="NAMES_COUNT_TO_USE_IMPORT_ON_DEMAND" value="9999" />
       </GroovyCodeStyleSettings>
       <H2CodeStyleSettings version="6">
-        <option name="USE_GENERAL_STYLE" value="false" />
-        <option name="TYPE_CASE" value="3" />
-        <option name="CUSTOM_TYPE_CASE" value="3" />
+        <option name="KEYWORD_CASE" value="2" />
+        <option name="TYPE_CASE" value="2" />
+        <option name="CUSTOM_TYPE_CASE" value="2" />
         <option name="ALIAS_CASE" value="4" />
         <option name="BUILT_IN_CASE" value="0" />
+        <option name="QUERY_SECTION_1ST_WORD_ALIGN" value="2" />
         <option name="QUERY_TRUE_INDENT" value="false" />
         <option name="QUERY_ALIGN_ELEMENTS" value="false" />
         <option name="QUERY_ALIGN_LINE_COMMENTS" value="false" />
+        <option name="INSERT_EL_WRAP" value="0" />
         <option name="INSERT_EL_COMMA" value="2" />
         <option name="SET_EL_WRAP" value="0" />
         <option name="SET_EL_COMMA" value="0" />
@@ -651,6 +648,7 @@
         <option name="TABLE_ALTER_INSTRUCTION_ALIGN" value="false" />
         <option name="POST_OPT_WRAP_1" value="true" />
         <option name="POST_OPT_ALIGN" value="false" />
+        <option name="ROUTINE_ARG_OPENING" value="0" />
         <option name="ROUTINE_ARG_COMMA" value="2" />
         <option name="ROUTINE_ARG_ALIGN_TYPES" value="true" />
         <option name="IMP_DECLARE_EL_WRAP" value="1" />
@@ -661,14 +659,16 @@
         <option name="PRIMARY_KEY_NAME_TEMPLATE" value="{table}_{columns}_pk" />
       </H2CodeStyleSettings>
       <HSQLCodeStyleSettings version="6">
-        <option name="USE_GENERAL_STYLE" value="false" />
-        <option name="TYPE_CASE" value="3" />
-        <option name="CUSTOM_TYPE_CASE" value="3" />
+        <option name="KEYWORD_CASE" value="2" />
+        <option name="TYPE_CASE" value="2" />
+        <option name="CUSTOM_TYPE_CASE" value="2" />
         <option name="ALIAS_CASE" value="4" />
         <option name="BUILT_IN_CASE" value="0" />
+        <option name="QUERY_SECTION_1ST_WORD_ALIGN" value="2" />
         <option name="QUERY_TRUE_INDENT" value="false" />
         <option name="QUERY_ALIGN_ELEMENTS" value="false" />
         <option name="QUERY_ALIGN_LINE_COMMENTS" value="false" />
+        <option name="INSERT_EL_WRAP" value="0" />
         <option name="INSERT_EL_COMMA" value="2" />
         <option name="SET_EL_WRAP" value="0" />
         <option name="SET_EL_COMMA" value="0" />
@@ -688,6 +688,7 @@
         <option name="TABLE_ALTER_INSTRUCTION_ALIGN" value="false" />
         <option name="POST_OPT_WRAP_1" value="true" />
         <option name="POST_OPT_ALIGN" value="false" />
+        <option name="ROUTINE_ARG_OPENING" value="0" />
         <option name="ROUTINE_ARG_COMMA" value="2" />
         <option name="ROUTINE_ARG_ALIGN_TYPES" value="true" />
         <option name="IMP_DECLARE_EL_WRAP" value="1" />
@@ -697,9 +698,15 @@
         <option name="EXPR_CASE_THEN_WRAP" value="true" />
         <option name="PRIMARY_KEY_NAME_TEMPLATE" value="{table}_{columns}_pk" />
       </HSQLCodeStyleSettings>
+      <JSCodeStyleSettings version="0">
+        <option name="SPACE_BEFORE_FUNCTION_LEFT_PARENTH" value="false" />
+        <option name="USE_DOUBLE_QUOTES" value="false" />
+        <option name="USE_CHAINED_CALLS_GROUP_INDENTS" value="true" />
+      </JSCodeStyleSettings>
       <JavaCodeStyleSettings>
+        <option name="SUBCLASS_NAME_PREFIX" value="Default" />
+        <option name="SUBCLASS_NAME_SUFFIX" value="" />
         <option name="DO_NOT_WRAP_AFTER_SINGLE_ANNOTATION" value="true" />
-        <option name="CLASS_NAMES_IN_JAVADOC" value="3" />
         <option name="INSERT_INNER_CLASS_IMPORTS" value="true" />
         <option name="CLASS_COUNT_TO_USE_IMPORT_ON_DEMAND" value="9999" />
         <option name="NAMES_COUNT_TO_USE_IMPORT_ON_DEMAND" value="9999" />
@@ -712,17 +719,19 @@
             <package name="" withSubpackages="true" static="true" />
           </value>
         </option>
-        <option name="JD_INDENT_ON_CONTINUATION" value="true" />
+        <option name="JD_PRESERVE_LINE_FEEDS" value="true" />
       </JavaCodeStyleSettings>
       <MSSQLCodeStyleSettings version="6">
-        <option name="USE_GENERAL_STYLE" value="false" />
-        <option name="TYPE_CASE" value="3" />
-        <option name="CUSTOM_TYPE_CASE" value="3" />
+        <option name="KEYWORD_CASE" value="2" />
+        <option name="TYPE_CASE" value="2" />
+        <option name="CUSTOM_TYPE_CASE" value="2" />
         <option name="ALIAS_CASE" value="4" />
         <option name="BUILT_IN_CASE" value="0" />
+        <option name="QUERY_SECTION_1ST_WORD_ALIGN" value="2" />
         <option name="QUERY_TRUE_INDENT" value="false" />
         <option name="QUERY_ALIGN_ELEMENTS" value="false" />
         <option name="QUERY_ALIGN_LINE_COMMENTS" value="false" />
+        <option name="INSERT_EL_WRAP" value="0" />
         <option name="INSERT_EL_COMMA" value="2" />
         <option name="SET_EL_WRAP" value="0" />
         <option name="SET_EL_COMMA" value="0" />
@@ -742,6 +751,7 @@
         <option name="TABLE_ALTER_INSTRUCTION_ALIGN" value="false" />
         <option name="POST_OPT_WRAP_1" value="true" />
         <option name="POST_OPT_ALIGN" value="false" />
+        <option name="ROUTINE_ARG_OPENING" value="0" />
         <option name="ROUTINE_ARG_COMMA" value="2" />
         <option name="ROUTINE_ARG_ALIGN_TYPES" value="true" />
         <option name="IMP_DECLARE_EL_WRAP" value="1" />
@@ -752,17 +762,19 @@
         <option name="PRIMARY_KEY_NAME_TEMPLATE" value="{table}_{columns}_pk" />
       </MSSQLCodeStyleSettings>
       <MarkdownNavigatorCodeStyleSettings>
-        <option name="RIGHT_MARGIN" value="72" />
+        <option name="WRAP_ON_TYPING" value="0" />
       </MarkdownNavigatorCodeStyleSettings>
       <MySQLCodeStyleSettings version="6">
-        <option name="USE_GENERAL_STYLE" value="false" />
-        <option name="TYPE_CASE" value="3" />
-        <option name="CUSTOM_TYPE_CASE" value="3" />
+        <option name="KEYWORD_CASE" value="2" />
+        <option name="TYPE_CASE" value="2" />
+        <option name="CUSTOM_TYPE_CASE" value="2" />
         <option name="ALIAS_CASE" value="4" />
         <option name="BUILT_IN_CASE" value="0" />
+        <option name="QUERY_SECTION_1ST_WORD_ALIGN" value="2" />
         <option name="QUERY_TRUE_INDENT" value="false" />
         <option name="QUERY_ALIGN_ELEMENTS" value="false" />
         <option name="QUERY_ALIGN_LINE_COMMENTS" value="false" />
+        <option name="INSERT_EL_WRAP" value="0" />
         <option name="INSERT_EL_COMMA" value="2" />
         <option name="SET_EL_WRAP" value="0" />
         <option name="SET_EL_COMMA" value="0" />
@@ -782,6 +794,7 @@
         <option name="TABLE_ALTER_INSTRUCTION_ALIGN" value="false" />
         <option name="POST_OPT_WRAP_1" value="true" />
         <option name="POST_OPT_ALIGN" value="false" />
+        <option name="ROUTINE_ARG_OPENING" value="0" />
         <option name="ROUTINE_ARG_COMMA" value="2" />
         <option name="ROUTINE_ARG_ALIGN_TYPES" value="true" />
         <option name="IMP_DECLARE_EL_WRAP" value="1" />
@@ -792,14 +805,16 @@
         <option name="PRIMARY_KEY_NAME_TEMPLATE" value="{table}_{columns}_pk" />
       </MySQLCodeStyleSettings>
       <OracleCodeStyleSettings version="6">
-        <option name="USE_GENERAL_STYLE" value="false" />
-        <option name="TYPE_CASE" value="3" />
-        <option name="CUSTOM_TYPE_CASE" value="3" />
+        <option name="KEYWORD_CASE" value="2" />
+        <option name="TYPE_CASE" value="2" />
+        <option name="CUSTOM_TYPE_CASE" value="2" />
         <option name="ALIAS_CASE" value="4" />
         <option name="BUILT_IN_CASE" value="0" />
+        <option name="QUERY_SECTION_1ST_WORD_ALIGN" value="2" />
         <option name="QUERY_TRUE_INDENT" value="false" />
         <option name="QUERY_ALIGN_ELEMENTS" value="false" />
         <option name="QUERY_ALIGN_LINE_COMMENTS" value="false" />
+        <option name="INSERT_EL_WRAP" value="0" />
         <option name="INSERT_EL_COMMA" value="2" />
         <option name="SET_EL_WRAP" value="0" />
         <option name="SET_EL_COMMA" value="0" />
@@ -819,6 +834,7 @@
         <option name="TABLE_ALTER_INSTRUCTION_ALIGN" value="false" />
         <option name="POST_OPT_WRAP_1" value="true" />
         <option name="POST_OPT_ALIGN" value="false" />
+        <option name="ROUTINE_ARG_OPENING" value="0" />
         <option name="ROUTINE_ARG_COMMA" value="2" />
         <option name="ROUTINE_ARG_ALIGN_TYPES" value="true" />
         <option name="IMP_DECLARE_EL_WRAP" value="1" />
@@ -828,15 +844,23 @@
         <option name="EXPR_CASE_THEN_WRAP" value="true" />
         <option name="PRIMARY_KEY_NAME_TEMPLATE" value="{table}_{columns}_pk" />
       </OracleCodeStyleSettings>
+      <PHPCodeStyleSettings>
+        <option name="ALIGN_PHPDOC_PARAM_NAMES" value="true" />
+        <option name="ALIGN_PHPDOC_COMMENTS" value="true" />
+        <option name="PHPDOC_BLANK_LINES_AROUND_PARAMETERS" value="true" />
+        <option name="PHPDOC_WRAP_LONG_LINES" value="true" />
+      </PHPCodeStyleSettings>
       <PostgresCodeStyleSettings version="6">
-        <option name="USE_GENERAL_STYLE" value="false" />
-        <option name="TYPE_CASE" value="3" />
-        <option name="CUSTOM_TYPE_CASE" value="3" />
+        <option name="KEYWORD_CASE" value="2" />
+        <option name="TYPE_CASE" value="2" />
+        <option name="CUSTOM_TYPE_CASE" value="2" />
         <option name="ALIAS_CASE" value="4" />
         <option name="BUILT_IN_CASE" value="0" />
+        <option name="QUERY_SECTION_1ST_WORD_ALIGN" value="2" />
         <option name="QUERY_TRUE_INDENT" value="false" />
         <option name="QUERY_ALIGN_ELEMENTS" value="false" />
         <option name="QUERY_ALIGN_LINE_COMMENTS" value="false" />
+        <option name="INSERT_EL_WRAP" value="0" />
         <option name="INSERT_EL_COMMA" value="2" />
         <option name="SET_EL_WRAP" value="0" />
         <option name="SET_EL_COMMA" value="0" />
@@ -856,6 +880,7 @@
         <option name="TABLE_ALTER_INSTRUCTION_ALIGN" value="false" />
         <option name="POST_OPT_WRAP_1" value="true" />
         <option name="POST_OPT_ALIGN" value="false" />
+        <option name="ROUTINE_ARG_OPENING" value="0" />
         <option name="ROUTINE_ARG_COMMA" value="2" />
         <option name="ROUTINE_ARG_ALIGN_TYPES" value="true" />
         <option name="IMP_DECLARE_EL_WRAP" value="1" />
@@ -869,14 +894,16 @@
         <option name="KEEP_BLANK_LINES" value="true" />
       </Properties>
       <SQLiteCodeStyleSettings version="6">
-        <option name="USE_GENERAL_STYLE" value="false" />
-        <option name="TYPE_CASE" value="3" />
-        <option name="CUSTOM_TYPE_CASE" value="3" />
+        <option name="KEYWORD_CASE" value="2" />
+        <option name="TYPE_CASE" value="2" />
+        <option name="CUSTOM_TYPE_CASE" value="2" />
         <option name="ALIAS_CASE" value="4" />
         <option name="BUILT_IN_CASE" value="0" />
+        <option name="QUERY_SECTION_1ST_WORD_ALIGN" value="2" />
         <option name="QUERY_TRUE_INDENT" value="false" />
         <option name="QUERY_ALIGN_ELEMENTS" value="false" />
         <option name="QUERY_ALIGN_LINE_COMMENTS" value="false" />
+        <option name="INSERT_EL_WRAP" value="0" />
         <option name="INSERT_EL_COMMA" value="2" />
         <option name="SET_EL_WRAP" value="0" />
         <option name="SET_EL_COMMA" value="0" />
@@ -896,6 +923,7 @@
         <option name="TABLE_ALTER_INSTRUCTION_ALIGN" value="false" />
         <option name="POST_OPT_WRAP_1" value="true" />
         <option name="POST_OPT_ALIGN" value="false" />
+        <option name="ROUTINE_ARG_OPENING" value="0" />
         <option name="ROUTINE_ARG_COMMA" value="2" />
         <option name="ROUTINE_ARG_ALIGN_TYPES" value="true" />
         <option name="IMP_DECLARE_EL_WRAP" value="1" />
@@ -909,13 +937,16 @@
         <option name="MULTILINE_STRING_CLOSING_QUOTES_ON_NEW_LINE" value="true" />
       </ScalaCodeStyleSettings>
       <SqlCodeStyleSettings version="6">
-        <option name="TYPE_CASE" value="3" />
-        <option name="CUSTOM_TYPE_CASE" value="3" />
+        <option name="KEYWORD_CASE" value="2" />
+        <option name="TYPE_CASE" value="2" />
+        <option name="CUSTOM_TYPE_CASE" value="2" />
         <option name="ALIAS_CASE" value="4" />
         <option name="BUILT_IN_CASE" value="0" />
+        <option name="QUERY_SECTION_1ST_WORD_ALIGN" value="2" />
         <option name="QUERY_TRUE_INDENT" value="false" />
         <option name="QUERY_ALIGN_ELEMENTS" value="false" />
         <option name="QUERY_ALIGN_LINE_COMMENTS" value="false" />
+        <option name="INSERT_EL_WRAP" value="0" />
         <option name="INSERT_EL_COMMA" value="2" />
         <option name="SET_EL_WRAP" value="0" />
         <option name="SET_EL_COMMA" value="0" />
@@ -923,41 +954,64 @@
         <option name="WITH_EL_COMMA" value="0" />
         <option name="SELECT_EL_WRAP" value="0" />
         <option name="SELECT_EL_COMMA" value="2" />
-        <option name="FROM_EL_WRAP" value="2" />
+        <option name="FROM_EL_WRAP" value="0" />
         <option name="FROM_EL_COMMA" value="2" />
+        <option name="FROM_WRAP_JOIN_1" value="false" />
+        <option name="FROM_WRAP_JOIN_2" value="false" />
         <option name="FROM_PLACE_ON" value="10" />
         <option name="WHERE_EL_WRAP" value="0" />
         <option name="WHERE_EL_BOUND" value="2" />
+        <option name="ORDER_EL_WRAP" value="0" />
         <option name="ORDER_EL_COMMA" value="2" />
         <option name="TABLE_OPENING" value="1" />
         <option name="TABLE_CONTENT" value="2" />
         <option name="TABLE_CLOSING" value="3" />
         <option name="TABLE_ALTER_INSTRUCTION_ALIGN" value="false" />
-        <option name="POST_OPT_WRAP_1" value="true" />
+        <option name="POST_OPT_WRAP_2" value="false" />
         <option name="POST_OPT_ALIGN" value="false" />
+        <option name="ROUTINE_ARG_OPENING" value="0" />
+        <option name="ROUTINE_ARG_WRAP" value="0" />
         <option name="ROUTINE_ARG_COMMA" value="2" />
         <option name="ROUTINE_ARG_ALIGN_TYPES" value="true" />
         <option name="IMP_DECLARE_EL_WRAP" value="1" />
-        <option name="IMP_IF_THEN_WRAP_THEN" value="true" />
+        <option name="IMP_IF_THEN_WRAP_ELSE" value="false" />
+        <option name="IMP_IF_THEN_INDENT_THEN_ELSE" value="true" />
+        <option name="IMP_IF_THEN_INDENT_END" value="true" />
         <option name="CORTEGE_SPACE_BEFORE_L_PAREN" value="false" />
         <option name="EXPR_CASE_WHEN_WRAP" value="false" />
-        <option name="EXPR_CASE_THEN_WRAP" value="true" />
         <option name="PRIMARY_KEY_NAME_TEMPLATE" value="{table}_{columns}_pk" />
-        <option name="NEW_LINE_BEFORE_QUERY_INSIDE_PARENTHESIS" value="true" />
-        <option name="NEW_LINE_BEFORE_QUERY_INSIDE_DML" value="true" />
+        <option name="NEW_LINE_BEFORE_FROM" value="false" />
+        <option name="NEW_LINE_BEFORE_JOIN" value="false" />
+        <option name="NEW_LINE_BEFORE_WHERE" value="false" />
+        <option name="NEW_LINE_BEFORE_GROUP_BY" value="false" />
+        <option name="NEW_LINE_BEFORE_ORDER_BY" value="false" />
+        <option name="NEW_LINE_BEFORE_HAVING" value="false" />
+        <option name="NEW_LINE_BEFORE_THEN" value="false" />
+        <option name="NEW_LINE_BEFORE_ELSE" value="false" />
+        <option name="NEW_LINE_BEFORE_OTHER_CLAUSES" value="false" />
         <option name="WRAP_INSIDE_SELECT" value="5" />
-        <option name="WRAP_INSIDE_WHERE" value="5" />
-        <option name="WRAP_INSIDE_SET" value="5" />
+        <option name="WRAP_INSIDE_JOIN_EXPRESSION" value="0" />
+        <option name="WRAP_INSIDE_GROUP_BY" value="0" />
+        <option name="WRAP_INSIDE_WHERE" value="0" />
+        <option name="WRAP_INSIDE_ORDER_BY" value="0" />
+        <option name="WRAP_INSIDE_SET" value="0" />
+        <option name="WRAP_INSIDE_ARGUMENT_DEFINITION" value="0" />
+        <option name="WRAP_INSIDE_CALL_EXPRESSION" value="0" />
+        <option name="WRAP_INSIDE_VALUES_EXPRESSION" value="0" />
+        <option name="WRAP_PARENTHESIZED_EXPRESSION_INSIDE_VALUES" value="0" />
+        <option name="NEW_LINE_AFTER_SELECT_ITEM" value="false" />
       </SqlCodeStyleSettings>
       <SybaseCodeStyleSettings version="6">
-        <option name="USE_GENERAL_STYLE" value="false" />
-        <option name="TYPE_CASE" value="3" />
-        <option name="CUSTOM_TYPE_CASE" value="3" />
+        <option name="KEYWORD_CASE" value="2" />
+        <option name="TYPE_CASE" value="2" />
+        <option name="CUSTOM_TYPE_CASE" value="2" />
         <option name="ALIAS_CASE" value="4" />
         <option name="BUILT_IN_CASE" value="0" />
+        <option name="QUERY_SECTION_1ST_WORD_ALIGN" value="2" />
         <option name="QUERY_TRUE_INDENT" value="false" />
         <option name="QUERY_ALIGN_ELEMENTS" value="false" />
         <option name="QUERY_ALIGN_LINE_COMMENTS" value="false" />
+        <option name="INSERT_EL_WRAP" value="0" />
         <option name="INSERT_EL_COMMA" value="2" />
         <option name="SET_EL_WRAP" value="0" />
         <option name="SET_EL_COMMA" value="0" />
@@ -977,6 +1031,7 @@
         <option name="TABLE_ALTER_INSTRUCTION_ALIGN" value="false" />
         <option name="POST_OPT_WRAP_1" value="true" />
         <option name="POST_OPT_ALIGN" value="false" />
+        <option name="ROUTINE_ARG_OPENING" value="0" />
         <option name="ROUTINE_ARG_COMMA" value="2" />
         <option name="ROUTINE_ARG_ALIGN_TYPES" value="true" />
         <option name="IMP_DECLARE_EL_WRAP" value="1" />
@@ -986,7 +1041,24 @@
         <option name="EXPR_CASE_THEN_WRAP" value="true" />
         <option name="PRIMARY_KEY_NAME_TEMPLATE" value="{table}_{columns}_pk" />
       </SybaseCodeStyleSettings>
+      <XML>
+        <option name="XML_ATTRIBUTE_WRAP" value="0" />
+      </XML>
       <codeStyleSettings language="CSS">
+        <indentOptions>
+          <option name="INDENT_SIZE" value="2" />
+          <option name="CONTINUATION_INDENT_SIZE" value="4" />
+          <option name="TAB_SIZE" value="2" />
+        </indentOptions>
+      </codeStyleSettings>
+      <codeStyleSettings language="DB2">
+        <indentOptions>
+          <option name="INDENT_SIZE" value="2" />
+          <option name="CONTINUATION_INDENT_SIZE" value="4" />
+          <option name="TAB_SIZE" value="2" />
+        </indentOptions>
+      </codeStyleSettings>
+      <codeStyleSettings language="Derby">
         <indentOptions>
           <option name="INDENT_SIZE" value="2" />
           <option name="CONTINUATION_INDENT_SIZE" value="4" />
@@ -1003,10 +1075,18 @@
       <codeStyleSettings language="Groovy">
         <option name="ALIGN_MULTILINE_CHAINED_METHODS" value="true" />
         <option name="ALIGN_MULTILINE_PARAMETERS_IN_CALLS" value="true" />
-        <option name="METHOD_PARAMETERS_WRAP" value="1" />
+        <option name="CALL_PARAMETERS_WRAP" value="1" />
+        <option name="THROWS_KEYWORD_WRAP" value="1" />
         <option name="IF_BRACE_FORCE" value="3" />
         <option name="WHILE_BRACE_FORCE" value="3" />
         <option name="FOR_BRACE_FORCE" value="3" />
+        <indentOptions>
+          <option name="INDENT_SIZE" value="2" />
+          <option name="CONTINUATION_INDENT_SIZE" value="4" />
+          <option name="TAB_SIZE" value="2" />
+        </indentOptions>
+      </codeStyleSettings>
+      <codeStyleSettings language="H2">
         <indentOptions>
           <option name="INDENT_SIZE" value="2" />
           <option name="CONTINUATION_INDENT_SIZE" value="4" />
@@ -1019,19 +1099,30 @@
           <option name="TAB_SIZE" value="2" />
         </indentOptions>
       </codeStyleSettings>
-      <codeStyleSettings language="HTML">
+      <codeStyleSettings language="HSQLDB">
         <indentOptions>
           <option name="INDENT_SIZE" value="2" />
           <option name="CONTINUATION_INDENT_SIZE" value="4" />
           <option name="TAB_SIZE" value="2" />
         </indentOptions>
       </codeStyleSettings>
+      <codeStyleSettings language="HTML">
+        <indentOptions>
+          <option name="INDENT_SIZE" value="2" />
+          <option name="CONTINUATION_INDENT_SIZE" value="2" />
+          <option name="TAB_SIZE" value="2" />
+        </indentOptions>
+      </codeStyleSettings>
       <codeStyleSettings language="JAVA">
-        <option name="RIGHT_MARGIN" value="150" />
+        <option name="KEEP_BLANK_LINES_IN_DECLARATIONS" value="1" />
         <option name="BLANK_LINES_AROUND_FIELD" value="1" />
+        <option name="BLANK_LINES_AROUND_FIELD_IN_INTERFACE" value="1" />
         <option name="ALIGN_MULTILINE_CHAINED_METHODS" value="true" />
+        <option name="ALIGN_MULTILINE_PARAMETERS_IN_CALLS" value="true" />
+        <option name="ALIGN_MULTILINE_BINARY_OPERATION" value="true" />
         <option name="METHOD_PARAMETERS_WRAP" value="1" />
         <option name="THROWS_KEYWORD_WRAP" value="1" />
+        <option name="KEEP_SIMPLE_LAMBDAS_IN_ONE_LINE" value="true" />
         <option name="WRAP_COMMENTS" value="true" />
         <option name="IF_BRACE_FORCE" value="3" />
         <option name="DOWHILE_BRACE_FORCE" value="3" />
@@ -1655,13 +1746,18 @@
         </indentOptions>
       </codeStyleSettings>
       <codeStyleSettings language="JavaScript">
-        <option name="ALIGN_MULTILINE_PARAMETERS_IN_CALLS" value="true" />
-        <option name="CALL_PARAMETERS_WRAP" value="1" />
+        <option name="RIGHT_MARGIN" value="140" />
+        <option name="LINE_COMMENT_ADD_SPACE" value="false" />
+        <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
+        <option name="KEEP_BLANK_LINES_IN_CODE" value="1" />
+        <option name="ALIGN_MULTILINE_CHAINED_METHODS" value="true" />
         <option name="METHOD_PARAMETERS_WRAP" value="1" />
+        <option name="METHOD_CALL_CHAIN_WRAP" value="5" />
         <option name="IF_BRACE_FORCE" value="3" />
         <option name="DOWHILE_BRACE_FORCE" value="3" />
         <option name="WHILE_BRACE_FORCE" value="3" />
         <option name="FOR_BRACE_FORCE" value="3" />
+        <option name="WRAP_ON_TYPING" value="0" />
         <indentOptions>
           <option name="INDENT_SIZE" value="2" />
           <option name="TAB_SIZE" value="2" />
@@ -1669,6 +1765,33 @@
       </codeStyleSettings>
       <codeStyleSettings language="LESS">
         <indentOptions>
+          <option name="CONTINUATION_INDENT_SIZE" value="4" />
+          <option name="TAB_SIZE" value="2" />
+        </indentOptions>
+      </codeStyleSettings>
+      <codeStyleSettings language="MySQL">
+        <indentOptions>
+          <option name="INDENT_SIZE" value="2" />
+          <option name="CONTINUATION_INDENT_SIZE" value="4" />
+          <option name="TAB_SIZE" value="2" />
+        </indentOptions>
+      </codeStyleSettings>
+      <codeStyleSettings language="Oracle">
+        <indentOptions>
+          <option name="INDENT_SIZE" value="2" />
+          <option name="CONTINUATION_INDENT_SIZE" value="4" />
+          <option name="TAB_SIZE" value="2" />
+        </indentOptions>
+      </codeStyleSettings>
+      <codeStyleSettings language="PHP">
+        <indentOptions>
+          <option name="INDENT_SIZE" value="2" />
+          <option name="TAB_SIZE" value="2" />
+        </indentOptions>
+      </codeStyleSettings>
+      <codeStyleSettings language="PostgreSQL">
+        <indentOptions>
+          <option name="INDENT_SIZE" value="2" />
           <option name="CONTINUATION_INDENT_SIZE" value="4" />
           <option name="TAB_SIZE" value="2" />
         </indentOptions>
@@ -1685,8 +1808,36 @@
           <option name="TAB_SIZE" value="2" />
         </indentOptions>
       </codeStyleSettings>
+      <codeStyleSettings language="SQL">
+        <indentOptions>
+          <option name="INDENT_SIZE" value="2" />
+          <option name="CONTINUATION_INDENT_SIZE" value="4" />
+          <option name="TAB_SIZE" value="2" />
+        </indentOptions>
+      </codeStyleSettings>
+      <codeStyleSettings language="SQLite">
+        <indentOptions>
+          <option name="INDENT_SIZE" value="2" />
+          <option name="CONTINUATION_INDENT_SIZE" value="4" />
+          <option name="TAB_SIZE" value="2" />
+        </indentOptions>
+      </codeStyleSettings>
       <codeStyleSettings language="Stylus">
         <indentOptions>
+          <option name="CONTINUATION_INDENT_SIZE" value="4" />
+          <option name="TAB_SIZE" value="2" />
+        </indentOptions>
+      </codeStyleSettings>
+      <codeStyleSettings language="Sybase">
+        <indentOptions>
+          <option name="INDENT_SIZE" value="2" />
+          <option name="CONTINUATION_INDENT_SIZE" value="4" />
+          <option name="TAB_SIZE" value="2" />
+        </indentOptions>
+      </codeStyleSettings>
+      <codeStyleSettings language="TSQL">
+        <indentOptions>
+          <option name="INDENT_SIZE" value="2" />
           <option name="CONTINUATION_INDENT_SIZE" value="4" />
           <option name="TAB_SIZE" value="2" />
         </indentOptions>

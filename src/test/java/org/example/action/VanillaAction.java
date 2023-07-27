@@ -28,12 +28,11 @@ import org.primeframework.mvc.action.result.annotation.Status;
     @Status,
     @Status(code = "error", status = 500)
 })
-public class Vanilla {
+public class VanillaAction {
 
   public String get() {
     return "success";
   }
-
 
   public String post() {
     return "success";

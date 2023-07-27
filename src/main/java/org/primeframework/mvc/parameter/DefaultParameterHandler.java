@@ -228,7 +228,7 @@ public class DefaultParameterHandler implements ParameterHandler {
         // If unknownParametersField is defined, then the allowUnknownParameters is ignored.
         if (actionInvocation.configuration.unknownParametersField != null) {
           captureUnknownParameter(key, struct, actionInvocation);
-        } else if (allowUnknownParameters) {
+        } else if (allowUnknownParameters || actionInvocation.configuration.allowUnknownParameters) {
           logger.debug("Invalid parameter to action [" + action.getClass().getName() + "]", ee);
         } else {
           throw ee;

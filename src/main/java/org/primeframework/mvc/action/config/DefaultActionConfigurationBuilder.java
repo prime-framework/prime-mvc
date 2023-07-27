@@ -43,6 +43,7 @@ import org.primeframework.mvc.action.JWTMethodConfiguration;
 import org.primeframework.mvc.action.PreParameterMethodConfiguration;
 import org.primeframework.mvc.action.ValidationMethodConfiguration;
 import org.primeframework.mvc.action.annotation.Action;
+import org.primeframework.mvc.action.annotation.AllowUnknownParameters;
 import org.primeframework.mvc.action.result.annotation.ResultAnnotation;
 import org.primeframework.mvc.action.result.annotation.ResultContainerAnnotation;
 import org.primeframework.mvc.content.ValidContentTypes;
@@ -93,11 +94,12 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
   public ActionConfiguration build(Class<?> actionClass) {
     if ((actionClass.getModifiers() & Modifier.ABSTRACT) != 0) {
       throw new PrimeException("The action class [" + actionClass + "] is annotated with the @Action annotation but is " +
-          "abstract. You can only annotate concrete action classes");
+                               "abstract. You can only annotate concrete action classes");
     }
 
     Action action = actionClass.getAnnotation(Action.class);
     String uri = !action.baseURI().equals("") ? action.baseURI() : uriBuilder.build(actionClass);
+    boolean allowKnownParameters = actionClass.getAnnotation(AllowUnknownParameters.class) != null;
     Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods = findExecuteMethods(actionClass);
     List<Method> formPrepareMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, FormPrepareMethod.class);
     List<Method> postParameterMethods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, PostParameterMethod.class);
@@ -121,7 +123,8 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
         config -> Arrays.stream(config.annotation.httpMethods()).map(HTTPMethod::of).collect(Collectors.toList()));
 
     List<String> securitySchemes = findSecuritySchemes(actionClass);
-    Map<HTTPMethod, List<AuthorizationMethodConfiguration>> authorizationMethods = findAuthorizationMethods(actionClass, securitySchemes, executeMethods);
+    Map<HTTPMethod, List<AuthorizationMethodConfiguration>> authorizationMethods = findAuthorizationMethods(actionClass, securitySchemes,
+                                                                                                            executeMethods);
     Map<HTTPMethod, List<JWTMethodConfiguration>> jwtAuthorizationMethods = findJwtAuthorizationMethods(actionClass, securitySchemes, executeMethods);
 
     List<ScopeField> scopeFields = findScopeFields(actionClass);
@@ -133,7 +136,7 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
     Field unknownParametersField = findUnknownParametersField(actionClass);
     Set<String> validContentTypes = findAllowedContentTypes(actionClass);
 
-    return new ActionConfiguration(actionClass, constraintValidationMethods, executeMethods, validationMethods, formPrepareMethods, authorizationMethods, jwtAuthorizationMethods, postValidationMethods, preParameterMethods, postParameterMethods, resultAnnotations, preParameterMembers, preRenderMethodsMap, fileUploadMembers, memberNames, securitySchemes, scopeFields, additionalConfiguration, uri, preValidationMethods, unknownParametersField, validContentTypes);
+    return new ActionConfiguration(actionClass, allowKnownParameters, constraintValidationMethods, executeMethods, validationMethods, formPrepareMethods, authorizationMethods, jwtAuthorizationMethods, postValidationMethods, preParameterMethods, postParameterMethods, resultAnnotations, preParameterMembers, preRenderMethodsMap, fileUploadMembers, memberNames, securitySchemes, scopeFields, additionalConfiguration, uri, preValidationMethods, unknownParametersField, validContentTypes);
   }
 
   /**
@@ -149,19 +152,19 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
       String code = (String) annotation.getClass().getMethod("code").invoke(annotation);
       if (resultConfigurations.containsKey(code)) {
         throw new PrimeException("The action class [" + actionClass + "] contains two or more result annotations for " +
-            "the code [" + code + "]");
+                                 "the code [" + code + "]");
       }
 
       resultConfigurations.put(code, annotation);
     } catch (NoSuchMethodException e) {
       throw new PrimeException("The result annotation [" + annotationType + "] is missing a method named [code] that " +
-          "returns a String. For example:\n\n" +
-          "public @interface MyResult {\n" +
-          "  String code() default \"success\";\n" +
-          "}", e);
+                               "returns a String. For example:\n\n" +
+                               "public @interface MyResult {\n" +
+                               "  String code() default \"success\";\n" +
+                               "}", e);
     } catch (InvocationTargetException | IllegalAccessException e) {
       throw new PrimeException("Unable to invoke the code() method on the result annotation container [" +
-          annotationType + "]", e);
+                               annotationType + "]", e);
     }
   }
 
@@ -188,13 +191,13 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
           }
         } catch (NoSuchMethodException e) {
           throw new PrimeException("The result annotation container [" + annotationType + "] must have a method named " +
-              "[value] that is an array of result annotations. For example:\n\n" +
-              "public @interface MyContainer {\n" +
-              "  MyResult[] value();\n" +
-              "}", e);
+                                   "[value] that is an array of result annotations. For example:\n\n" +
+                                   "public @interface MyContainer {\n" +
+                                   "  MyResult[] value();\n" +
+                                   "}", e);
         } catch (InvocationTargetException | IllegalAccessException e) {
           throw new PrimeException("Unable to invoke the value() method on the result annotation container [" +
-              annotationType + "]", e);
+                                   annotationType + "]", e);
         }
       }
     }
@@ -255,25 +258,27 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
     List<Method> methods = ReflectionUtils.findAllMethodsWithAnnotation(actionClass, AuthorizeMethod.class);
     if (methods.isEmpty()) {
       throw new PrimeException("The action class [" + actionClass + "] is missing at a Authorization method. " +
-          "The class must define a one or more methods annotated " + AuthorizeMethod.class.getSimpleName() + " when the [authorize-method] is specified as a security scheme.");
+                               "The class must define a one or more methods annotated " + AuthorizeMethod.class.getSimpleName() + " when the [authorize-method] is specified as a security scheme.");
     }
 
     // Return type must be Boolean or boolean
     if (methods.stream().anyMatch(m -> m.getReturnType() != Boolean.TYPE && m.getReturnType() != Boolean.class)) {
       throw new PrimeException("The action class [" + actionClass + "] has at least one Authorization method that has declared a return "
-          + "type of something other than boolean. Your method annotated with " + AuthorizeMethod.class.getSimpleName() + " must declare a return type"
-          + "of boolean or Boolean.");
+                               + "type of something other than boolean. Your method annotated with " + AuthorizeMethod.class.getSimpleName() + " must declare a return type"
+                               + "of boolean or Boolean.");
     }
 
     // Optionally take a single parameter
     if (methods.stream().anyMatch(m -> m.getParameterCount() > 1)) {
-      throw new PrimeException("The action class [" + actionClass + "] has at least one Authorization method that has not declared the correct method "
+      throw new PrimeException(
+          "The action class [" + actionClass + "] has at least one Authorization method that has not declared the correct method "
           + "signature. Your method annotated with " + AuthorizeMethod.class.getSimpleName() + " may be declared without parameters, or a single parameter of type " + AuthorizeSchemeData.class.getSimpleName() + ".");
     }
 
     // If a parameter is in the signature, it must be of type AuthorizeSchemeData
     if (methods.stream().filter(m -> m.getParameterCount() == 1).anyMatch(m -> m.getParameterTypes()[0] != AuthorizeSchemeData.class)) {
-      throw new PrimeException("The action class [" + actionClass + "] has at least one Authorization method that has not declared the correct method "
+      throw new PrimeException(
+          "The action class [" + actionClass + "] has at least one Authorization method that has not declared the correct method "
           + "signature. Your method annotated with " + AuthorizeMethod.class.getSimpleName() + " must declare a single method parameter of type " + AuthorizeSchemeData.class.getSimpleName() + ".");
     }
 
@@ -297,8 +302,8 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
 
     if (!authorizationMethods.keySet().containsAll(authenticatedMethods)) {
       throw new PrimeException("The action class [" + actionClass + "] is missing at an Authorization method. " +
-          "The class must define one or more methods annotated " + AuthorizeMethod.class.getSimpleName() + " when the [authorize-method] is specified as a security scheme. "
-          + "Ensure that for each execute method in your action such as post, put, get and delete that a method is configured to authorize the request.");
+                               "The class must define one or more methods annotated " + AuthorizeMethod.class.getSimpleName() + " when the [authorize-method] is specified as a security scheme. "
+                               + "Ensure that for each execute method in your action such as post, put, get and delete that a method is configured to authorize the request.");
     }
 
     return authorizationMethods;
@@ -312,7 +317,8 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
 
     // Return type must be Collection<T>
     if (methods.stream().anyMatch(m -> !Collection.class.isAssignableFrom(m.getReturnType()))) {
-      throw new PrimeException("The action class [" + actionClass + "] has at least one method annotated with " + ConstraintOverrideMethod.class.getSimpleName() +
+      throw new PrimeException(
+          "The action class [" + actionClass + "] has at least one method annotated with " + ConstraintOverrideMethod.class.getSimpleName() +
           " that has a declared a return type of something other than Collection<?>. Your method annotated with " + ConstraintOverrideMethod.class.getSimpleName()
           + " must declare a return type of Collection<T>.");
     }
@@ -324,7 +330,8 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
       for (String stringMethod : annotation.httpMethods()) {
         HTTPMethod httpMethod = HTTPMethod.of(stringMethod);
         if (constraintOverrideMethods.containsKey(httpMethod)) {
-          throw new PrimeException("The action class [" + actionClass + "] has more than one method annotated with " + ConstraintOverrideMethod.class.getSimpleName() +
+          throw new PrimeException(
+              "The action class [" + actionClass + "] has more than one method annotated with " + ConstraintOverrideMethod.class.getSimpleName() +
               " for the same HTTP method. You may only have one method annotated " + ConstraintOverrideMethod.class.getSimpleName()
               + " for any one HTTP method.");
         }
@@ -380,15 +387,15 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
 
     if (executeMethods.isEmpty()) {
       throw new PrimeException("The action class [" + actionClass + "] is missing at least one valid execute method. " +
-          "The class can define execute methods with the same names as the HTTP methods (lowercased) or a default execute " +
-          "method named [execute]. For example:\n\n" +
-          "public String execute() {\n" +
-          "  return \"success\"\n" +
-          "}\n\n" +
-          "or\n\n" +
-          "public String post() {\n" +
-          "  return \"success\"\n" +
-          "}");
+                               "The class can define execute methods with the same names as the HTTP methods (lowercased) or a default execute " +
+                               "method named [execute]. For example:\n\n" +
+                               "public String execute() {\n" +
+                               "  return \"success\"\n" +
+                               "}\n\n" +
+                               "or\n\n" +
+                               "public String post() {\n" +
+                               "  return \"success\"\n" +
+                               "}");
     }
 
     return executeMethods;
@@ -408,13 +415,14 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
     // Return type must be Boolean or boolean
     if (methods.stream().anyMatch(m -> m.getReturnType() != Boolean.TYPE && m.getReturnType() != Boolean.class)) {
       throw new PrimeException("The action class [" + actionClass + "] has at least one JWT Authorization method that has declared a return "
-          + "type of something other than boolean. Your method annotated with " + JWTAuthorizeMethod.class.getSimpleName() + " must declare a return type"
-          + "of boolean or Boolean.");
+                               + "type of something other than boolean. Your method annotated with " + JWTAuthorizeMethod.class.getSimpleName() + " must declare a return type"
+                               + "of boolean or Boolean.");
     }
 
     // Must take a single parameter for a JWT
     if (methods.stream().anyMatch(m -> m.getParameterCount() != 1 || m.getParameterTypes()[0] != JWT.class)) {
-      throw new PrimeException("The action class [" + actionClass + "] has at least one JWT Authorization method that has not declared the correct method "
+      throw new PrimeException(
+          "The action class [" + actionClass + "] has at least one JWT Authorization method that has not declared the correct method "
           + "signature. Your method annotated with " + JWTAuthorizeMethod.class.getSimpleName() + " must declare a single method parameter of type JWT.");
     }
 
@@ -438,8 +446,8 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
 
     if (!jwtMethods.keySet().containsAll(authenticatedMethods)) {
       throw new PrimeException("The action class [" + actionClass + "] is missing at a JWT Authorization method. " +
-          "The class must define one or more methods annotated " + JWTAuthorizeMethod.class.getSimpleName() + " when [jwtEnabled] is set to [true]. "
-          + "Ensure that for each execute method in your action such as post, put, get and delete that a method is configured to authorize the JWT.");
+                               "The class must define one or more methods annotated " + JWTAuthorizeMethod.class.getSimpleName() + " when [jwtEnabled] is set to [true]. "
+                               + "Ensure that for each execute method in your action such as post, put, get and delete that a method is configured to authorize the JWT.");
     }
 
     return jwtMethods;
@@ -491,7 +499,8 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
   protected Field findUnknownParametersField(Class<?> actionClass) {
     List<Field> unknownParameters = ReflectionUtils.findAllFieldsWithAnnotation(actionClass, UnknownParameters.class);
     if (unknownParameters.size() > 1) {
-      throw new PrimeException("The action class [" + actionClass + "] has more than one field annotated with " + UnknownParameters.class.getSimpleName() + ". This annotation may only be used once in the action class.");
+      throw new PrimeException(
+          "The action class [" + actionClass + "] has more than one field annotated with " + UnknownParameters.class.getSimpleName() + ". This annotation may only be used once in the action class.");
     }
 
     if (unknownParameters.size() == 1) {
@@ -510,11 +519,11 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
   protected void verify(Method method) {
     if (method.getReturnType() != String.class || method.getParameterTypes().length != 0) {
       throw new PrimeException("The action class [" + method.getDeclaringClass() + "] has defined an " +
-          "execute method named [" + method.getName() + "] that is invalid. Execute methods must have zero parameters " +
-          "and return a String like this:\n\n" +
-          "public String execute() {\n" +
-          "  return \"success\"\n" +
-          "}");
+                               "execute method named [" + method.getName() + "] that is invalid. Execute methods must have zero parameters " +
+                               "and return a String like this:\n\n" +
+                               "public String execute() {\n" +
+                               "  return \"success\"\n" +
+                               "}");
     }
   }
 
@@ -526,7 +535,7 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
         if (clazz.getAnnotation(ResultAnnotation.class) == null) {
           throw new PrimeException(
               "The request annotation [" + clazz.getSimpleName() + "] must also have " +
-                  "the @ResultAnnotation annotation to be properly considered as a result class type.");
+              "the @ResultAnnotation annotation to be properly considered as a result class type.");
         }
 
         result.computeIfAbsent(clazz, key -> new ArrayList<>()).add(method);

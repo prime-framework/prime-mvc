@@ -396,7 +396,7 @@ public class GlobalTest extends PrimeBaseTest {
 
     // Bad parameter (i.e. /invalid-api?bad-param=42
     simulator.test("/invalid-api")
-             .withParameter("bad-param", "42")
+             .withURLParameter("bad-param", "42")
              .get()
              .assertStatusCode(500);
   }
@@ -522,36 +522,36 @@ public class GlobalTest extends PrimeBaseTest {
     if (shouldBeEscaped) {
       // Test from user data
       simulator.test("/freemarker/escape")
-               .withParameter("mode", mode)
+               .withURLParameter("mode", mode)
                .get()
                .assertStatusCode(200)
                .assertBodyContains("Output format: HTML",
-                   "Auto-escaping: true",
-                   "Select\u2026",
-                   ",\u0020",
-                   "&lt;p&gt;Are you sure?&lt;/p&gt;",
-                   "Hello, to access your account go to &lt;a href=&quot;https://foo.com&quot;&gt;foo.com&lt;/a&gt;.",
-                   "Dismiss",
-                   "Ignore")
+                                   "Auto-escaping: true",
+                                   "Select\u2026",
+                                   ",\u0020",
+                                   "&lt;p&gt;Are you sure?&lt;/p&gt;",
+                                   "Hello, to access your account go to &lt;a href=&quot;https://foo.com&quot;&gt;foo.com&lt;/a&gt;.",
+                                   "Dismiss",
+                                   "Ignore")
                .assertBodyDoesNotContain("<p>Are you sure?</p>",
-                   "Hello, to access your account go to <a href=\"https://foo.com\">foo.com</a>.",
-                   "freemarker.core.TemplateHTMLOutputModel"); // Check to make sure that we don't toString an output model
+                                         "Hello, to access your account go to <a href=\"https://foo.com\">foo.com</a>.",
+                                         "freemarker.core.TemplateHTMLOutputModel"); // Check to make sure that we don't toString an output model
     } else {
       simulator.test("/freemarker/escape")
-               .withParameter("mode", mode)
+               .withURLParameter("mode", mode)
                .get()
                .assertStatusCode(200)
                .assertBodyContains("Output format: HTML",
-                   "Auto-escaping: true",
-                   "Select\u2026",
-                   ",\u0020",
-                   "<p>Are you sure?</p>",
-                   "Hello, to access your account go to <a href=\"https://foo.com\">foo.com</a>.",
-                   "Dismiss",
-                   "Ignore")
+                                   "Auto-escaping: true",
+                                   "Select\u2026",
+                                   ",\u0020",
+                                   "<p>Are you sure?</p>",
+                                   "Hello, to access your account go to <a href=\"https://foo.com\">foo.com</a>.",
+                                   "Dismiss",
+                                   "Ignore")
                .assertBodyDoesNotContain("&lt;p&gt;Are you sure?&lt;/p&gt;",
-                   "Hello, to access your account go to &lt;a href=&quot;https://foo.com&quot;&gt;foo.com&lt;/a&gt;.",
-                   "freemarker.core.TemplateHTMLOutputModel"); // Check to make sure that we don't toString an output model
+                                         "Hello, to access your account go to &lt;a href=&quot;https://foo.com&quot;&gt;foo.com&lt;/a&gt;.",
+                                         "freemarker.core.TemplateHTMLOutputModel"); // Check to make sure that we don't toString an output model
     }
   }
 
@@ -574,12 +574,24 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void get_action_unknownParameters() throws Exception {
+    // simulate a development runtime
+    configuration.allowUnknownParameters = false;
+
+    // Even though the global config does not allow unknown parameters, this action does.
+    test.simulate(() -> simulator.test("/allow-unknown-parameters")
+                                 .withURLParameter("foo", "bar")
+                                 .get()
+                                 .assertStatusCode(200));
+  }
+
+  @Test
   public void get_fuzzing_invalid_expression() throws Exception {
     // simulate a production runtime
     configuration.allowUnknownParameters = true;
     test.simulate(() -> simulator.test("/vanilla")
                                  // This is an invalid expression, but unknown parameters are ignored.
-                                 .withParameter("class.method", "foo")
+                                 .withURLParameter("class.method", "foo")
                                  .get()
                                  .assertStatusCode(200));
 
@@ -587,7 +599,7 @@ public class GlobalTest extends PrimeBaseTest {
     configuration.allowUnknownParameters = false;
     test.simulate(() -> simulator.test("/vanilla")
                                  // This is an invalid expression, an exception will be thrown and return a 500.
-                                 .withParameter("class.method", "foo")
+                                 .withURLParameter("class.method", "foo")
                                  .get()
                                  .assertStatusCode(500));
   }
@@ -879,7 +891,7 @@ public class GlobalTest extends PrimeBaseTest {
   @Test
   public void get_preRender() {
     simulator.test("/pre-render-method")
-             .withParameter("result", "forward")
+             .withURLParameter("result", "forward")
              .get()
              .assertStatusCode(200)
              .assertContentType("text/html; charset=UTF-8")
@@ -1018,11 +1030,11 @@ public class GlobalTest extends PrimeBaseTest {
                                                           .assertContainsGeneralMessageCodes(MessageType.INFO, "[FlashScopeMessageKey]")
                                                           .assertBodyContainsMessagesFromKey("[FlashScopeMessageKey]")
                                                           .assertBody("""
-                                                              This is an index page.
-                                                                                   
-                                                                Info:This is a message!
-                                                                
-                                                              """)
+                                                                          This is an index page.
+                                                                                               
+                                                                            Info:This is a message!
+                                                                            
+                                                                          """)
              );
   }
 
@@ -1207,12 +1219,12 @@ public class GlobalTest extends PrimeBaseTest {
         OutputStream os = socket.getOutputStream();
         // Build an HTTP request body
         os.write((
-            "POST /inform HTTP/1.1\r\n" +
-                "Host: 192.168.1.44:8080\r\n" +
-                "Accept: */*\r\n" +
-                "Content-Length: 8588\r\n" +
-                "\r\n"
-        ).getBytes(StandardCharsets.UTF_8));
+                     "POST /inform HTTP/1.1\r\n" +
+                     "Host: 192.168.1.44:8080\r\n" +
+                     "Accept: */*\r\n" +
+                     "Content-Length: 8588\r\n" +
+                     "\r\n"
+                 ).getBytes(StandardCharsets.UTF_8));
 
         os.flush();
         if (i % 100 == 0) {
@@ -1310,8 +1322,8 @@ public class GlobalTest extends PrimeBaseTest {
                                  .withURLParameter("value", "parameter")
                                  .withContentType("application/x-www-form-urlencoded")
                                  .withBody("""
-                                     value=body
-                                     """)
+                                               value=body
+                                               """)
                                  .post()
                                  .assertStatusCode(200)
                                  .assertBodyContains("value:parameter,body"));
@@ -1329,8 +1341,8 @@ public class GlobalTest extends PrimeBaseTest {
                                  .withURLSegment("segment")
                                  .withContentType("application/x-www-form-urlencoded")
                                  .withBody("""
-                                     value=body
-                                     """)
+                                               value=body
+                                               """)
                                  .post()
                                  .assertStatusCode(200)
                                  .assertBodyContains("value:body"));
@@ -1340,8 +1352,8 @@ public class GlobalTest extends PrimeBaseTest {
                                  .withURLParameter("value", "parameter")
                                  .withContentType("application/x-www-form-urlencoded")
                                  .withBody("""
-                                     value=body
-                                     """)
+                                               value=body
+                                               """)
                                  .post()
                                  .assertStatusCode(200)
                                  .assertBodyContains("value:parameter,body"));
@@ -1350,8 +1362,8 @@ public class GlobalTest extends PrimeBaseTest {
     test.simulate(() -> simulator.test("/parameter-handler")
                                  .withContentType("application/x-www-form-urlencoded")
                                  .withBody("""
-                                     value=body
-                                     """)
+                                               value=body
+                                               """)
                                  .post()
                                  .assertStatusCode(200)
                                  .assertBodyContains("value:body"));
@@ -1732,23 +1744,23 @@ public class GlobalTest extends PrimeBaseTest {
              .post()
              .assertStatusCode(200)
              .assertBody("""
-                 fieldA:null
-                 fieldB:null
-                 fieldB:value-field-b
-                 methodA:value-method-a
-                 methodB:value-method-b
-                 methodC:null
-                 methodC:null
-                 foobar:null
-                 somethingElse1:value-method-setfoo
-                 somethingElse2:value-method-setBar
-                 somethingElse3:value-method-getBaz
-                 somethingElse4:value-method-getboom
-                 methodE:value-method-getBaz
-                 methodF:value-method-getboom
-                 methodG:value-method-getValue
-                 methodH:value-method-value2
-                 """);
+                             fieldA:null
+                             fieldB:null
+                             fieldB:value-field-b
+                             methodA:value-method-a
+                             methodB:value-method-b
+                             methodC:null
+                             methodC:null
+                             foobar:null
+                             somethingElse1:value-method-setfoo
+                             somethingElse2:value-method-setBar
+                             somethingElse3:value-method-getBaz
+                             somethingElse4:value-method-getboom
+                             methodE:value-method-getBaz
+                             methodF:value-method-getboom
+                             methodG:value-method-getValue
+                             methodH:value-method-value2
+                             """);
   }
 
   // Test that the control behaves as expected
@@ -1891,61 +1903,61 @@ public class GlobalTest extends PrimeBaseTest {
     simulator.test("/json-content-type")
              .withContentType("application/test+json")
              .withBody("""
-                 {
-                   "foo": "bar"
-                 }
-                 """)
+                           {
+                             "foo": "bar"
+                           }
+                           """)
              .post()
              .assertStatusCode(400)
              .assertJSON("""
-                 {
-                   "fieldErrors" : { },
-                   "generalErrors" : [ {
-                     "code" : "[InvalidContentType]",
-                     "message" : "Invalid [Content-Type] HTTP request header value of [application/test+json]. Supported values for this request include [application/json]."
-                   } ]
-                 }
-                  """);
+                             {
+                               "fieldErrors" : { },
+                               "generalErrors" : [ {
+                                 "code" : "[InvalidContentType]",
+                                 "message" : "Invalid [Content-Type] HTTP request header value of [application/test+json]. Supported values for this request include [application/json]."
+                               } ]
+                             }
+                              """);
 
     // Patch not supported on this endpoint
     simulator.test("/json-content-type-no-restriction")
              .withContentType("application/json-patch+json")
              .withBody("""
-                 {
-                   "foo": "bar"
-                 }
-                 """)
+                           {
+                             "foo": "bar"
+                           }
+                           """)
              .post()
              .assertStatusCode(400)
              .assertJSON("""
-                 {
-                   "fieldErrors" : { },
-                   "generalErrors" : [ {
-                     "code" : "[PatchNotSupported]",
-                     "message" : "The [Content-Type] HTTP request header value of [application/json-patch+json] is not supported for this request."
-                   } ]
-                 }
-                  """);
+                             {
+                               "fieldErrors" : { },
+                               "generalErrors" : [ {
+                                 "code" : "[PatchNotSupported]",
+                                 "message" : "The [Content-Type] HTTP request header value of [application/json-patch+json] is not supported for this request."
+                               } ]
+                             }
+                              """);
 
     // Missing Content-Type Header
     simulator.test("/json-content-type")
              .withContentType("")
              .withBody("""
-                 {
-                   "foo": "bar"
-                 }
-                 """)
+                           {
+                             "foo": "bar"
+                           }
+                           """)
              .post()
              .assertStatusCode(400)
              .assertJSON("""
-                  {
-                    "fieldErrors" : { },
-                    "generalErrors" : [ {
-                      "code" : "[MissingContentType]",
-                      "message" : "Missing required [Content-Type] HTTP request header."
-                    } ]
-                  }
-                 """);
+                              {
+                                "fieldErrors" : { },
+                                "generalErrors" : [ {
+                                  "code" : "[MissingContentType]",
+                                  "message" : "Missing required [Content-Type] HTTP request header."
+                                } ]
+                              }
+                             """);
 
     // Supported Content-Type, but invalid for this request, however, because a body is provided, it will be allowed.
     simulator.test("/json-content-type")
@@ -1958,50 +1970,50 @@ public class GlobalTest extends PrimeBaseTest {
     simulator.test("/json-content-type")
              .withContentType("application/klingon")
              .withBody("""
-                 {
-                   "foo": "bar"
-                 }
-                 """)
+                           {
+                             "foo": "bar"
+                           }
+                           """)
              .post()
              .assertStatusCode(400)
              .assertJSON("""
-                 {
-                   "fieldErrors" : { },
-                   "generalErrors" : [ {
-                     "code" : "[InvalidContentType]",
-                     "message" : "Invalid [Content-Type] HTTP request header value of [application/klingon]. Supported values for this request include [application/json]."
-                   } ]
-                 }
-                  """);
+                             {
+                               "fieldErrors" : { },
+                               "generalErrors" : [ {
+                                 "code" : "[InvalidContentType]",
+                                 "message" : "Invalid [Content-Type] HTTP request header value of [application/klingon]. Supported values for this request include [application/json]."
+                               } ]
+                             }
+                              """);
 
     // Not supported in general
     simulator.test("/json-content-type-no-restriction")
              .withContentType("application/klingon")
              .withBody("""
-                 {
-                   "foo": "bar"
-                 }
-                 """)
+                           {
+                             "foo": "bar"
+                           }
+                           """)
              .post()
              .assertStatusCode(400)
              .assertJSON("""
-                  {
-                    "fieldErrors" : { },
-                    "generalErrors" : [ {
-                      "code" : "[UnsupportedContentType]",
-                          "message" : "Unsupported [Content-Type] HTTP request header value of [application/klingon]."
-                    } ]
-                  }
-                 """);
+                              {
+                                "fieldErrors" : { },
+                                "generalErrors" : [ {
+                                  "code" : "[UnsupportedContentType]",
+                                      "message" : "Unsupported [Content-Type] HTTP request header value of [application/klingon]."
+                                } ]
+                              }
+                             """);
 
     // Not supported in general, URL does not exist, a fuzzer. Expect a 404
     simulator.test("/hack-the-planet")
              .withContentType("application/klingon")
              .withBody("""
-                 {
-                   "foo": "bar"
-                 }
-                 """)
+                           {
+                             "foo": "bar"
+                           }
+                           """)
              .post()
              .assertStatusCode(404)
              .assertBodyContains("The page is missing!");
@@ -2111,12 +2123,12 @@ public class GlobalTest extends PrimeBaseTest {
 
                                                // Post on Login, get a session, and redirect back to the cart which completes the beer purchase
                                                .executeFormPostInResponseBody("form",
-                                                   postReq -> postReq.assertStatusCode(302)
-                                                                     .assertHeaderContains("Cache-Control", "no-cache")
-                                                                     .assertRedirect("/store/purchase")
+                                                                              postReq -> postReq.assertStatusCode(302)
+                                                                                                .assertHeaderContains("Cache-Control", "no-cache")
+                                                                                                .assertRedirect("/store/purchase")
 
-                                                                     .executeRedirect(
-                                                                         redirReq -> redirReq.assertStatusCode(200).assertBodyContains("Buy:beer")))));
+                                                                                                .executeRedirect(
+                                                                                                    redirReq -> redirReq.assertStatusCode(200).assertBodyContains("Buy:beer")))));
   }
 
   @Test
@@ -2141,18 +2153,18 @@ public class GlobalTest extends PrimeBaseTest {
 
                                                // Post on Login, get a session, and redirect back to the cart which completes the beer purchase
                                                .executeFormPostInResponseBody("form",
-                                                   postReq -> postReq.assertStatusCode(302)
-                                                                     .assertHeaderContains("Cache-Control", "no-cache")
-                                                                     .assertRedirect("/store/")
+                                                                              postReq -> postReq.assertStatusCode(302)
+                                                                                                .assertHeaderContains("Cache-Control", "no-cache")
+                                                                                                .assertRedirect("/store/")
 
-                                                                     .executeRedirect(
-                                                                         redirReq -> redirReq.assertStatusCode(200)
-                                                                                             // We'll end up on the /store/index instead of completing the save request,
-                                                                                             // we're logged in, but the beer purchase failed. Sad.
-                                                                                             .assertBodyContains(
-                                                                                                 "/store/index",
-                                                                                                 "IsLoggedIn:true")
-                                                                                             .assertBodyDoesNotContain("Buy:beer")))));
+                                                                                                .executeRedirect(
+                                                                                                    redirReq -> redirReq.assertStatusCode(200)
+                                                                                                                        // We'll end up on the /store/index instead of completing the save request,
+                                                                                                                        // we're logged in, but the beer purchase failed. Sad.
+                                                                                                                        .assertBodyContains(
+                                                                                                                            "/store/index",
+                                                                                                                            "IsLoggedIn:true")
+                                                                                                                        .assertBodyDoesNotContain("Buy:beer")))));
   }
 
   @Test

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2013-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,7 +73,7 @@ public class DefaultContentWorkflowTest extends PrimeBaseTest {
       additionalConfig.put(BinaryActionConfiguration.class, new BinaryActionConfiguration("binaryRequest", null));
 
       KitchenSinkAction action = new KitchenSinkAction(null);
-      ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, null, null, null, null, null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, additionalConfig, null, null, null, null);
+      ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, false, null, null, null, null, null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, additionalConfig, null, null, null, null);
       store.setCurrent(new ActionInvocation(action, null, null, null, config));
 
       WorkflowChain chain = createStrictMock(WorkflowChain.class);
@@ -91,37 +91,37 @@ public class DefaultContentWorkflowTest extends PrimeBaseTest {
   @Test
   public void callJSON() throws IOException {
     String expected = "{" +
-        "  \"active\":true," +
-        "  \"addresses\":{" +
-        "    \"home\":{" +
-        "      \"city\":\"Broomfield\"," +
-        "      \"state\":\"Colorado\"," +
-        "      \"zipcode\":\"80023\"" +
-        "    }," +
-        "    \"work\":{" +
-        "      \"city\":\"Denver\"," +
-        "      \"state\":\"Colorado\"," +
-        "      \"zipcode\":\"80202\"" +
-        "    }" +
-        "  }," +
-        "  \"age\":37," +
-        "  \"favoriteMonth\":5," +
-        "  \"favoriteYear\":1976," +
-        "  \"ids\":{" +
-        "    \"0\":1," +
-        "    \"1\":2" +
-        "  }," +
-        "  \"lifeStory\":\"Hello world\"," +
-        "  \"securityQuestions\":[\"one\",\"two\",\"three\",\"four\"]," +
-        "  \"siblings\":[{" +
-        "    \"active\":false," +
-        "    \"name\":\"Brett\"" +
-        "  },{" +
-        "    \"active\":false," +
-        "    \"name\":\"Beth\"" +
-        "  }]," +
-        "  \"type\":\"COOL\"" +
-        "}";
+                      "  \"active\":true," +
+                      "  \"addresses\":{" +
+                      "    \"home\":{" +
+                      "      \"city\":\"Broomfield\"," +
+                      "      \"state\":\"Colorado\"," +
+                      "      \"zipcode\":\"80023\"" +
+                      "    }," +
+                      "    \"work\":{" +
+                      "      \"city\":\"Denver\"," +
+                      "      \"state\":\"Colorado\"," +
+                      "      \"zipcode\":\"80202\"" +
+                      "    }" +
+                      "  }," +
+                      "  \"age\":37," +
+                      "  \"favoriteMonth\":5," +
+                      "  \"favoriteYear\":1976," +
+                      "  \"ids\":{" +
+                      "    \"0\":1," +
+                      "    \"1\":2" +
+                      "  }," +
+                      "  \"lifeStory\":\"Hello world\"," +
+                      "  \"securityQuestions\":[\"one\",\"two\",\"three\",\"four\"]," +
+                      "  \"siblings\":[{" +
+                      "    \"active\":false," +
+                      "    \"name\":\"Brett\"" +
+                      "  },{" +
+                      "    \"active\":false," +
+                      "    \"name\":\"Beth\"" +
+                      "  }]," +
+                      "  \"type\":\"COOL\"" +
+                      "}";
 
     request.setInputStream(new ByteArrayInputStream(expected.getBytes()));
     request.setContentLength((long) expected.getBytes().length);
@@ -133,7 +133,7 @@ public class DefaultContentWorkflowTest extends PrimeBaseTest {
     additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(requestMembers, null, null));
 
     KitchenSinkAction action = new KitchenSinkAction(null);
-    ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, null, null, null, null, null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, additionalConfig, null, null, null, null);
+    ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, false, null, null, null, null, null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, additionalConfig, null, null, null, null);
     store.setCurrent(new ActionInvocation(action, new ExecuteMethodConfiguration(HTTPMethod.POST, null, null), null, null, config));
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);
