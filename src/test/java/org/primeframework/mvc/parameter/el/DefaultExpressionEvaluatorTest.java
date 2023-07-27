@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2019, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,6 @@ import org.primeframework.mvc.PrimeBaseTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
-import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNull;
@@ -276,6 +275,28 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     evaluator.setValue("user.name", action, List.of("Brian"));
     evaluator.setValue("user.active", action, ArrayUtils.toArray("true"), null);
     assertEquals(action.user.name, "Brian");
+  }
+
+  @Test
+  public void fuzzing() {
+    // Trying to recreate an exception found in a customer log that looks to be fuzzing.
+    GenericBean bean = new GenericBean();
+
+    // Cannot use class in a setValue expression
+    try {
+      evaluator.setValue("class.method", bean, "foo");
+      fail("Expected an [InvalidExpressionException] exception.");
+    } catch (InvalidExpressionException e) {
+      assertEquals(e.getMessage(), "The expression string [class.method] is invalid.");
+    }
+
+    // Cannot use class in a getValue expression
+    try {
+      evaluator.getValue("class.name", bean);
+      fail("Expected an [InvalidExpressionException] exception.");
+    } catch (InvalidExpressionException e) {
+      assertEquals(e.getMessage(), "The expression string [class.name] is invalid.");
+    }
   }
 
   @Test

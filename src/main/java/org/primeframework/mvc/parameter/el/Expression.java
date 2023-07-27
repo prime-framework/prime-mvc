@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -177,9 +177,8 @@ public class Expression {
   }
 
   /**
-   * This breaks the expression name down into manageable pieces. These are the individual instances of the Atom inner
-   * class which store the name and the indices (which could be null or any object). This is broken on the '.'
-   * character.
+   * This breaks the expression name down into manageable pieces. These are the individual instances of the Atom inner class which store the name and
+   * the indices (which could be null or any object). This is broken on the '.' character.
    *
    * @param expression The expression string to break down.
    * @return A new ArrayList of PropertyInfo objects.
@@ -257,6 +256,16 @@ public class Expression {
 
     if (position > 0) {
       list.add(new String(buf, 0, position));
+    }
+
+    // atom may be null
+    // - The 'class' name is reserved. This will fail anyway, but failing earlier with a better message. This also
+    //   allows us to ignore this expression when allowUnknownParameters is true which will avoid un-necessary
+    //   logging.
+    for (String atom : list) {
+      if ("class".equals(atom)) {
+        throw new InvalidExpressionException("The expression string [" + expression + "] is invalid.");
+      }
     }
 
     return list;

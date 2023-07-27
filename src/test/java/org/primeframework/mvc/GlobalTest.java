@@ -574,6 +574,25 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void get_fuzzing_invalid_expression() throws Exception {
+    // simulate a production runtime
+    configuration.allowUnknownParameters = true;
+    test.simulate(() -> simulator.test("/vanilla")
+                                 // This is an invalid expression, but unknown parameters are ignored.
+                                 .withParameter("class.method", "foo")
+                                 .get()
+                                 .assertStatusCode(200));
+
+    // simulate dev runtime
+    configuration.allowUnknownParameters = false;
+    test.simulate(() -> simulator.test("/vanilla")
+                                 // This is an invalid expression, an exception will be thrown and return a 500.
+                                 .withParameter("class.method", "foo")
+                                 .get()
+                                 .assertStatusCode(500));
+  }
+
+  @Test
   public void get_index() throws Exception {
     test.simulate(() -> simulator.test("/user/")
                                  .get()
@@ -1742,6 +1761,25 @@ public class GlobalTest extends PrimeBaseTest {
              .assertStatusCode(200)
              .assertHTML(html -> html.assertElementExists("input[name=listTest][value=none][checked]")
                                      .assertElementExists("input[name=listTest2][value=none][checked]"));
+  }
+
+  @Test
+  public void post_fuzzing_invalid_expression() throws Exception {
+    // simulate a production runtime
+    configuration.allowUnknownParameters = true;
+    test.simulate(() -> simulator.test("/vanilla")
+                                 // This is an invalid expression, but unknown parameters are ignored.
+                                 .withParameter("class.method", "foo")
+                                 .post()
+                                 .assertStatusCode(200));
+
+    // simulate dev runtime
+    configuration.allowUnknownParameters = false;
+    test.simulate(() -> simulator.test("/vanilla")
+                                 // This is an invalid expression, an exception will be thrown and return a 500.
+                                 .withParameter("class.method", "foo")
+                                 .post()
+                                 .assertStatusCode(500));
   }
 
   @Test
