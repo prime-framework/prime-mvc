@@ -21,6 +21,7 @@ freemarkerVersion = "2.3.32"
 fusionAuthJWTVersion = "5.1.0"
 javaHTTPVersion = "0.2.0"
 jsonPatchVersion = "1.13.0"
+guavaVersion = "32.1.2-jre"
 guiceVersion = "6.0.0"
 jacksonVersion = "2.15.2"
 jsoupVersion = "1.16.1"
@@ -69,6 +70,9 @@ project(group: "org.primeframework", name: "prime-mvc", version: "4.13.0", licen
       dependency(id: "org.freemarker:freemarker:${freemarkerVersion}")
       dependency(id: "org.ow2.asm:asm:${asmVersion}")
       dependency(id: "org.slf4j:slf4j-api:${slf4jVersion}", skipCompatibilityCheck: true)
+    }
+    group(name: "runtime") {
+      dependency(id: "com.google.guava:guava:${guavaVersion}", skipCompatibilityCheck: true)
     }
     group(name: "test-compile", export: false) {
       dependency(id: "org.easymock:easymock:${easyMockVersion}")
