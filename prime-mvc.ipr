@@ -2151,6 +2151,7 @@
     <dictionary name="degroff">
       <words>
         <w>asserter</w>
+        <w>charsetc</w>
         <w>decryptor</w>
         <w>inversoft</w>
         <w>marshalled</w>

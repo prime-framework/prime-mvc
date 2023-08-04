@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2019-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,14 @@ import java.util.Arrays;
  * @author Daniel DeGroff
  */
 public class EncodingUtils {
+  // attr-char per RFC 5987
+  private static final byte[] attr_char = {'!', '#', '$', '&', '+', '-', '.', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '^', '_', '`', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '|', '~'};
+
+  // hex digits for percent encoding (pct-encoded) per RFC 5987
+  private static final char[] hex_digits = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
   /**
-   * Basic escape of double quotes and back slash.
+   * Basic escape of double quotes and back-slash.
    *
    * @param s the string to escape
    * @return an escaped string.
@@ -46,21 +51,17 @@ public class EncodingUtils {
     final byte[] s_bytes = s.getBytes(StandardCharsets.UTF_8);
     final int len = s_bytes.length;
     final StringBuilder sb = new StringBuilder(len << 1);
-    final char[] digits = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
-    final byte[] attr_char = {'!', '#', '$', '&', '+', '-', '.', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '^', '_', '`', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '|', '~'};
-    for (int i = 0; i < len; ++i) {
-      final byte b = s_bytes[i];
+
+    for (final byte b : s_bytes) {
       if (Arrays.binarySearch(attr_char, b) >= 0) {
         sb.append((char) b);
       } else {
         sb.append('%');
-        sb.append(digits[0x0f & (b >>> 4)]);
-        sb.append(digits[b & 0x0f]);
+        sb.append(hex_digits[0x0f & (b >>> 4)]);
+        sb.append(hex_digits[b & 0x0f]);
       }
     }
 
     return sb.toString();
   }
-
-
 }
