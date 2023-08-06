@@ -60,10 +60,10 @@ public class PrimeHTTPServerTest extends PrimeBaseTest {
     PostAction.invoked = false;
     HttpResponse<String> response = HttpClient.newHttpClient()
                                               .send(HttpRequest.newBuilder()
-                                                               .uri(URI.create("http://localhost:" + simulator.getPort() + "/post"))
+                                                               .uri(URI.create("http://localhost:" + simulator.port + "/post"))
                                                                .POST(BodyPublishers.noBody())
                                                                .build(),
-                                                  info -> BodySubscribers.ofString(StandardCharsets.UTF_8)
+                                                    info -> BodySubscribers.ofString(StandardCharsets.UTF_8)
                                               );
     assertEquals(response.statusCode(), 200);
     assertTrue(response.body().contains("Brian Pontarelli"));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ public class RequestSimulator {
 
   public final MockUserAgent userAgent;
 
-  public RequestBuilder builder;
+  public int actualPort = -1;
 
   public int port;
 
@@ -106,18 +106,18 @@ public class RequestSimulator {
    * @return The port that the RequestBuilder is using.
    */
   public int getPort() {
-    return builder != null ? builder.port : -1;
+    return actualPort;
   }
 
   public void reset() {
+    actualPort = -1;
     userAgent.clearAllCookies();
-    builder = null;
     useTLS = false;
   }
 
   public void shutdown() {
+    actualPort = -1;
     thread.shutdown();
-    builder = null;
     useTLS = false;
   }
 
@@ -129,8 +129,8 @@ public class RequestSimulator {
    * @return The RequestBuilder.
    */
   public RequestBuilder test(String path) {
-    var testPort = useTLS ? tlsPort : port;
-    builder = new RequestBuilder(path, main.getInjector(), userAgent, messageObserver, testPort);
+    actualPort = useTLS ? tlsPort : port;
+    RequestBuilder builder = new RequestBuilder(path, main.getInjector(), userAgent, messageObserver, actualPort);
     builder.useTLS = useTLS;
     return builder;
   }
