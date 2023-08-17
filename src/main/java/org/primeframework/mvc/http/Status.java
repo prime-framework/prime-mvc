@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2021-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@ public final class Status {
   public static final int MOVED_PERMANENTLY = 301;
 
   public static final int MOVED_TEMPORARILY = 302;
+
+  public static final int OK = 200;
 
   public static final int SC_NOT_MODIFIED = 304;
 }

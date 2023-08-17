@@ -267,7 +267,7 @@ public class CORSFilterTest extends PrimeBaseTest {
 
   @Test
   public void options_validateExcludedURIs() throws Exception {
-    // Options request of blocked URI pattern bypasses CORS filter and is blocked by Prime MVC with 405
+    // Options request of blocked URI pattern bypasses CORS filter and is handled by prime-mvc by returning an Allow header.
     HttpClient client = HttpClient.newBuilder().followRedirects(Redirect.NEVER).priority(256).build();
     HttpResponse<Void> response = client.send(
         HttpRequest.newBuilder(URI.create("http://localhost:9080/admin/foo"))
@@ -276,8 +276,12 @@ public class CORSFilterTest extends PrimeBaseTest {
                    .build(),
         BodyHandlers.discarding()
     );
-    assertEquals(response.statusCode(), 405);
+    assertEquals(response.statusCode(), 200);
     assertNoCORSHeaders(response);
+
+    // Ensure we have the correct Allow response header
+    //noinspection OptionalGetWithoutIsPresent
+    assertEquals(response.headers().firstValue("Allow").get(), "GET, HEAD, OPTIONS");
   }
 
   @Test

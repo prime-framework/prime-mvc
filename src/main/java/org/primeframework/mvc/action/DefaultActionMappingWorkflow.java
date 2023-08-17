@@ -16,7 +16,10 @@
 package org.primeframework.mvc.action;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
@@ -92,6 +95,18 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
 
     // Anyone downstream should understand it is possible for the method to be null in the ActionInvocation
     if (actionInvocation.action != null && actionInvocation.method == null) {
+      // Handle OPTIONS if not defined by the action
+      if (method == HTTPMethod.OPTIONS) {
+        response.setStatus(Status.OK);
+        List<HTTPMethod> methods = new ArrayList<>(actionInvocation.configuration.executeMethods.keySet());
+        methods.add(HTTPMethod.OPTIONS);
+        response.addHeader("Allow", methods.stream()
+                                           .map(HTTPMethod::toString)
+                                           .sorted()
+                                           .collect(Collectors.joining(", ")));
+        return;
+      }
+
       Class<?> actionClass = actionInvocation.configuration.actionClass;
       logger.debug("The action class [{}] does not have a valid execute method for the HTTP method [{}]", actionClass.getCanonicalName(), method);
       throw new NotAllowedException();

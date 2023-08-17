@@ -348,6 +348,18 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void get_action_unknownParameters() throws Exception {
+    // simulate a development runtime
+    configuration.allowUnknownParameters = false;
+
+    // Even though the global config does not allow unknown parameters, this action does.
+    test.simulate(() -> simulator.test("/allow-unknown-parameters")
+                                 .withURLParameter("foo", "bar")
+                                 .get()
+                                 .assertStatusCode(200));
+  }
+
+  @Test
   public void get_collectionConverter() throws Exception {
     // Both of these will fail because the action has a List<String> as the backing values for this form, and the input field is a text field.
     test.simulate(() -> simulator.test("/collection-converter")
@@ -571,18 +583,6 @@ public class GlobalTest extends PrimeBaseTest {
     simulator.test("/user/full-form")
              .get()
              .assertBodyFile(Path.of("src/test/resources/html/full-form.html"));
-  }
-
-  @Test
-  public void get_action_unknownParameters() throws Exception {
-    // simulate a development runtime
-    configuration.allowUnknownParameters = false;
-
-    // Even though the global config does not allow unknown parameters, this action does.
-    test.simulate(() -> simulator.test("/allow-unknown-parameters")
-                                 .withURLParameter("foo", "bar")
-                                 .get()
-                                 .assertStatusCode(200));
   }
 
   @Test
@@ -1310,6 +1310,16 @@ public class GlobalTest extends PrimeBaseTest {
              .method("POTATO")
              .assertStatusCode(405) // Not allowed since we can handle any name but the action doesn't have that method
              .assertHeaderContains("Cache-Control", "no-cache");
+  }
+
+  @Test
+  public void options() throws Exception {
+    test.simulate(() -> simulator.test("/vanilla")
+                                 .options()
+                                 .assertStatusCode(200)
+                                 .assertHeaderContains("Allow", "GET, HEAD, OPTIONS, POST")
+                                 .assertHeaderContains("Content-Length", "0")
+                                 .assertBodyIsEmpty());
   }
 
   @Test
