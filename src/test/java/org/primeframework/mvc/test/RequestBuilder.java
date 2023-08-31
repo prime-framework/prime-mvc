@@ -48,7 +48,7 @@ import com.inversoft.rest.RESTClient.BodyHandler;
 import io.fusionauth.http.Cookie;
 import io.fusionauth.http.FileInfo;
 import io.fusionauth.http.HTTPMethod;
-import io.fusionauth.http.io.NonBlockingByteBufferOutputStream;
+import io.fusionauth.http.io.BlockingByteBufferOutputStream;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mock.MockUserAgent;
@@ -197,7 +197,6 @@ public class RequestBuilder {
 
     return this;
   }
-
 
   /**
    * Overrides the HTTP Method from that set by calling {@link #get()} or {@link #post()} for example.
@@ -681,7 +680,7 @@ public class RequestBuilder {
     HTTPObjectsHolder.clearRequest();
     HTTPObjectsHolder.setRequest(request);
     HTTPObjectsHolder.clearResponse();
-    HTTPObjectsHolder.setResponse(new HTTPResponse(new NonBlockingByteBufferOutputStream(null, 1024), request));
+    HTTPObjectsHolder.setResponse(new HTTPResponse(new BlockingByteBufferOutputStream(null, 1024, 32), request));
 
     // Add a unique Id so that we can identify messages for this request in the observer.
     String messageStoreId = UUID.randomUUID().toString();

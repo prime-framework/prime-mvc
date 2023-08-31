@@ -52,7 +52,7 @@ import io.fusionauth.http.Cookie;
 import io.fusionauth.http.Cookie.SameSite;
 import io.fusionauth.http.HTTPValues.ContentTypes;
 import io.fusionauth.http.HTTPValues.Methods;
-import io.fusionauth.http.io.NonBlockingByteBufferOutputStream;
+import io.fusionauth.http.io.BlockingByteBufferOutputStream;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
 import io.fusionauth.http.util.HTTPTools.HeaderValue;
@@ -116,7 +116,7 @@ public class RequestResult {
     HTTPObjectsHolder.clearRequest();
     HTTPObjectsHolder.setRequest(request);
     HTTPObjectsHolder.clearResponse();
-    HTTPObjectsHolder.setResponse(new HTTPResponse(new NonBlockingByteBufferOutputStream(null, 1024), request));
+    HTTPObjectsHolder.setResponse(new HTTPResponse(new BlockingByteBufferOutputStream(null, 1024, 32), request));
   }
 
   /**
@@ -151,7 +151,7 @@ public class RequestResult {
       throws IOException {
     if (actual == null || actual.equals("")) {
       throw new AssertionError("The actual response body is empty or is equal to an empty string without any JSON. This was "
-          + "unexpected since you are trying to assert on JSON.");
+                               + "unexpected since you are trying to assert on JSON.");
     }
 
     Map<String, Object> response = objectMapper.readerFor(Map.class).readValue(actual);
@@ -734,8 +734,8 @@ public class RequestResult {
     Cookie actual = getCookieOrThrow(name);
     if (!value.equals(actual.value)) {
       throw new AssertionError("Cookie [" + name + "] with value [" + actual.value + "] was not equal to the expected value [" + value + "]"
-          + "\nActual cookie:\n"
-          + cookieToString(actual));
+                               + "\nActual cookie:\n"
+                               + cookieToString(actual));
     }
 
     return this;
@@ -751,8 +751,8 @@ public class RequestResult {
     Cookie actual = getCookieOrThrow(name);
     if (actual.value != null && (actual.maxAge == null || actual.maxAge != 0)) {
       throw new AssertionError("Cookie [" + name + "] was not deleted. The value is [" + actual.value + "] and the maxAge is [" + actual.maxAge + "]"
-          + "\nActual cookie:\n"
-          + cookieToString(actual));
+                               + "\nActual cookie:\n"
+                               + cookieToString(actual));
     }
 
     return this;
@@ -768,8 +768,8 @@ public class RequestResult {
     Cookie actual = getCookie(name);
     if (actual != null) {
       throw new AssertionError("Cookie [" + name + "] was not expected to be found in the response.\n"
-          + "Cookies found:\n"
-          + response.getCookies().stream().map(this::convert).map(this::cookieToString).collect(Collectors.joining("\n")));
+                               + "Cookies found:\n"
+                               + response.getCookies().stream().map(this::convert).map(this::cookieToString).collect(Collectors.joining("\n")));
     }
     return this;
   }
@@ -827,8 +827,8 @@ public class RequestResult {
     String actualDecrypted = CookieTools.fromCookie(actual.value, true, encryptor, oldFunction, newFunction);
     if (!Objects.equals(value, actualDecrypted)) {
       throw new AssertionError("Cookie [" + name + "] with decrypted value [" + actualDecrypted + "] was not equal to the expected value [" + value + "]"
-          + "\nActual cookie:\n"
-          + cookieToString(actual));
+                               + "\nActual cookie:\n"
+                               + cookieToString(actual));
     }
 
     return this;
@@ -1022,10 +1022,10 @@ public class RequestResult {
 
       if (errorMessage != null) {
         throw new AssertionError(errorMessage + ".\nActual JSON body:\n"
-            + objectMapper.writerWithDefaultPrettyPrinter()
-                          .withFeatures(SerializationFeature.INDENT_OUTPUT)
-                          .with(new DefaultPrettyPrinter().withArrayIndenter(new DefaultIndenter()))
-                          .writeValueAsString(actual));
+                                 + objectMapper.writerWithDefaultPrettyPrinter()
+                                               .withFeatures(SerializationFeature.INDENT_OUTPUT)
+                                               .with(new DefaultPrettyPrinter().withArrayIndenter(new DefaultIndenter()))
+                                               .writeValueAsString(actual));
       }
     }
 
@@ -1385,8 +1385,8 @@ public class RequestResult {
       return null;
     } else if (cookies.size() > 1) {
       throw new AssertionError("Expected a single cookie with name [" + name + "] but found [" + cookies.size() + "]."
-          + "\nCookies found:\n"
-          + cookies.stream().map(this::cookieToString).collect(Collectors.joining("\n")));
+                               + "\nCookies found:\n"
+                               + cookies.stream().map(this::cookieToString).collect(Collectors.joining("\n")));
     }
 
     return cookies.get(0);
@@ -1764,8 +1764,8 @@ public class RequestResult {
     Cookie actual = getCookie(name);
     if (actual == null) {
       throw new AssertionError("Cookie [" + name + "] was not found in the response.\n"
-          + "Cookies found:\n"
-          + response.getCookies().stream().map(this::convert).map(this::cookieToString).collect(Collectors.joining("\n")));
+                               + "Cookies found:\n"
+                               + response.getCookies().stream().map(this::convert).map(this::cookieToString).collect(Collectors.joining("\n")));
     }
     return actual;
   }

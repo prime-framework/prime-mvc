@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ import com.google.inject.Module;
 import com.google.inject.Singleton;
 import com.google.inject.util.Modules;
 import io.fusionauth.http.HTTPMethod;
-import io.fusionauth.http.io.NonBlockingByteBufferOutputStream;
+import io.fusionauth.http.io.BlockingByteBufferOutputStream;
 import io.fusionauth.http.log.AccumulatingLoggerFactory;
 import io.fusionauth.http.log.BaseLogger;
 import io.fusionauth.http.log.Level;
@@ -165,7 +165,7 @@ public abstract class PrimeBaseTest {
   @BeforeMethod
   public void beforeMethod() {
     request = new HTTPRequest();
-    response = new HTTPResponse(new NonBlockingByteBufferOutputStream(null, 1024), request);
+    response = new HTTPResponse(new BlockingByteBufferOutputStream(null, 1024, 32), request);
     HTTPObjectsHolder.setRequest(request);
     HTTPObjectsHolder.setResponse(response);
 
