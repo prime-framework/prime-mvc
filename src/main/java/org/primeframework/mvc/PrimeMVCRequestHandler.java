@@ -73,7 +73,12 @@ public class PrimeMVCRequestHandler implements HTTPHandler, Closeable {
     } catch (Throwable t) {
       response.setStatus(500);
 
-      logger.error("Error encountered", t);
+      // Do not error log an InterruptedException
+      if (t.getCause() != null && t.getCause() instanceof InterruptedException) {
+        logger.debug("Request interrupted.", t);
+      } else {
+        logger.error("Error encountered", t);
+      }
     } finally {
       HTTPObjectsHolder.clearRequest();
       HTTPObjectsHolder.clearResponse();
