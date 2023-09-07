@@ -71,12 +71,19 @@ public class PrimeMVCRequestHandler implements HTTPHandler, Closeable {
     try {
       injector.getInstance(MVCWorkflow.class).perform(null);
     } catch (Throwable t) {
-      response.setStatus(500);
-
       // Do not error log an InterruptedException
       if (t.getCause() != null && t.getCause() instanceof InterruptedException) {
+        // Making the assumption that the java-http server threw this Exception because the connection was interrupted
+        // because the client stopped responding, or was reading or writing too slow.
+        // - Not using a 500 because that implies a server side failure, and the convention is that a stack trace will
+        //   be found in the logs for each 500 status code.
+        // - It would be great if java-http would include some meta-data in the Exception that we could log. java-http
+        //   will produce logs with DEBUG enabled to indicate why the connection is closed. I don't know if this is possible yet.
+        // - 408 seems the most appropriate status code here. https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/408
+        response.setStatus(408);
         logger.debug("Request interrupted.", t);
       } else {
+        response.setStatus(500);
         logger.error("Error encountered", t);
       }
     } finally {
