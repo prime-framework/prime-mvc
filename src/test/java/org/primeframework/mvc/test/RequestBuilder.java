@@ -489,38 +489,78 @@ public class RequestBuilder {
   }
 
   /**
-   * Uses the given object as the JSON body for the request. This object is converted into JSON using Jackson.
+   * Uses the given object as the JSON body for the request with the {@code application/json} content type. This object is converted into JSON using Jackson.
    *
    * @param object The object to send in the request.
    * @return This.
    * @throws JsonProcessingException If the Jackson marshalling failed.
    */
   public RequestBuilder withJSON(Object object) throws JsonProcessingException {
-    ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
-    byte[] json = objectMapper.writeValueAsBytes(object);
-    return withContentType("application/json").withBody(json);
+    return withJSON("application/json", object);
   }
 
   /**
-   * Uses the given string as the JSON body for the request.
+   * Uses the given object as the JSON body for the request with the given content type. This object is converted into JSON using Jackson.
+   *
+   * @param contentType The Content-Type header value
+   * @param object The object to send in the request.
+   * @return This.
+   * @throws JsonProcessingException If the Jackson marshalling failed.
+   */
+  public RequestBuilder withJSON(String contentType, Object object) throws JsonProcessingException {
+    ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
+    byte[] json = objectMapper.writeValueAsBytes(object);
+    return withContentType(contentType).withBody(json);
+  }
+
+  /**
+   * Uses the given string as the JSON body for the request with the {@code application/json} content type.
    *
    * @param json The string representation of the JSON to send in the request.
    * @return This.
    */
   public RequestBuilder withJSON(String json) {
-    return withContentType("application/json").withBody(json);
+    return withJSON("application/json", json);
   }
 
+  /**
+   * Uses the given string as the JSON body for the request with the given content type.
+   *
+   * @param contentType The Content-Type header value
+   * @param json The string representation of the JSON to send in the request.
+   * @return This.
+   */
+  public RequestBuilder withJSON(String contentType, String json) {
+    return withContentType(contentType).withBody(json);
+  }
+
+  /**
+   * Applies the given consumer to build a JSON body for the request with the {@code application/json} content type.
+   * @param consumer The {@link JSONBuilder} consumer to build request
+   * @return This.
+   * @throws Exception If the Jackson marshalling failed or consumer threw an exception.
+   */
   public RequestBuilder withJSONBuilder(ThrowingConsumer<JSONBuilder> consumer) throws Exception {
+    return withJSONBuilder("application/json", consumer);
+  }
+
+  /**
+   * Applies the given consumer to build a JSON body for the request with the given content type.
+   * @param contentType The Content-Type header value
+   * @param consumer The {@link JSONBuilder} consumer to build request
+   * @return This.
+   * @throws Exception If the Jackson marshalling failed or consumer threw an exception.
+   */
+  public RequestBuilder withJSONBuilder(String contentType, ThrowingConsumer<JSONBuilder> consumer) throws Exception {
     ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
     JSONBuilder builder = new JSONBuilder(objectMapper);
     consumer.accept(builder);
-    withJSON(builder.build());
+    withJSON(contentType, builder.build());
     return this;
   }
 
   /**
-   * Uses the given {@link Path} object to a JSON file as the JSON body for the request.
+   * Uses the given {@link Path} object to a JSON file as the JSON body for the request with the {@code application/json} content type.
    *
    * @param jsonFile The string representation of the JSON to send in the request.
    * @param values   key value pairs of replacement values for use in the JSON file.
@@ -529,7 +569,21 @@ public class RequestBuilder {
    */
   public RequestBuilder withJSONFile(Path jsonFile, Object... values)
       throws IOException {
-    return withContentType("application/json").withBodyFile(jsonFile, values);
+    return withJSONFile("application/json", jsonFile, values);
+  }
+
+  /**
+   * Uses the given {@link Path} object to a JSON file as the JSON body for the request with the given content type.
+   *
+   * @param contentType The Content-Type header value
+   * @param jsonFile The string representation of the JSON to send in the request.
+   * @param values   key value pairs of replacement values for use in the JSON file.
+   * @return This.
+   * @throws IOException If the file could not be loaded.
+   */
+  public RequestBuilder withJSONFile(String contentType, Path jsonFile, Object... values)
+      throws IOException {
+    return withContentType(contentType).withBodyFile(jsonFile, values);
   }
 
   /**
