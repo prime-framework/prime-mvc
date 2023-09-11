@@ -555,7 +555,7 @@ public class RequestBuilder {
     ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
     JSONBuilder builder = new JSONBuilder(objectMapper);
     consumer.accept(builder);
-    withJSON(builder.build(), contentType);
+    withJSON(contentType, builder.build());
     return this;
   }
 
