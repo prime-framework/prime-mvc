@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2020, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,19 +25,19 @@ import io.fusionauth.http.Cookie.SameSite;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 
 /**
- * The main configuration interface for Prime that outlines all of the configurable values for the framework. This
+ * The main configuration interface for Prime that outlines all the configurable values for the framework. This
  * interface can easily be implemented to suit any needs in your application.
  *
  * @author Brian Pontarelli
  */
 public interface MVCConfiguration {
   /**
-   * @return Whether or not unknown parameters should be allowed or if they should throw an exception.
+   * @return True if unknown parameters should be allowed or if they should throw an exception.
    */
   boolean allowUnknownParameters();
 
   /**
-   * @return Whether or not auto HTML escaping will be enabled for all templates.
+   * @return True if auto HTML escaping will be enabled for all templates.
    */
   boolean autoHTMLEscapingEnabled();
 
@@ -57,7 +57,7 @@ public interface MVCConfiguration {
   Key cookieEncryptionKey();
 
   /**
-   * @return Whether or not the CSRF handling is enabled or not.
+   * @return True if CSRF handling is enabled or not.
    */
   boolean csrfEnabled();
 
@@ -135,7 +135,7 @@ public interface MVCConfiguration {
 
   /**
    * @return The number of seconds to check for Freemarker template updates (max integer means never and 0 means
-   *     always).
+   * always).
    */
   int templateCheckSeconds();
 
@@ -146,7 +146,7 @@ public interface MVCConfiguration {
 
   /**
    * @return The annotations that identify a field to be un-wrapped - or be considered transparent by the
-   *     {@link ExpressionEvaluator}.
+   * {@link ExpressionEvaluator}.
    */
   List<Class<? extends Annotation>> unwrapAnnotations();
 }

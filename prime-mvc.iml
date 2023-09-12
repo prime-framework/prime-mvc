@@ -137,11 +137,11 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/io/fusionauth/java-http/0.2.7/java-http-0.2.7.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/io/fusionauth/java-http/0.2.8/java-http-0.2.8.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/io/fusionauth/java-http/0.2.7/java-http-0.2.7-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/io/fusionauth/java-http/0.2.8/java-http-0.2.8-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>

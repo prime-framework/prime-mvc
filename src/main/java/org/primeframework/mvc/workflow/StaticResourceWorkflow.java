@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,8 @@ import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.http.HTTPTools;
 import org.primeframework.mvc.http.Status;
+import org.primeframework.mvc.security.StaticClasspathResourceFilter;
+import org.primeframework.mvc.security.StaticResourceFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,22 +52,29 @@ public class StaticResourceWorkflow implements Workflow {
 
   private final Set<ClassLoader> additionalClassLoaders;
 
+  private final StaticClasspathResourceFilter classpathResourceFilter;
+
   private final MVCConfiguration configuration;
 
   private final HTTPContext context;
 
   private final HTTPRequest request;
 
+  private final StaticResourceFilter resourceFilter;
+
   private final HTTPResponse response;
 
   @Inject
   public StaticResourceWorkflow(HTTPContext context, HTTPRequest request, HTTPResponse response,
-                                Set<ClassLoader> additionalClassLoaders, MVCConfiguration configuration) {
+                                Set<ClassLoader> additionalClassLoaders, StaticClasspathResourceFilter classpathResourceFilter,
+                                MVCConfiguration configuration, StaticResourceFilter resourceFilter) {
     this.context = context;
     this.request = request;
     this.response = response;
     this.additionalClassLoaders = additionalClassLoaders;
+    this.classpathResourceFilter = classpathResourceFilter;
     this.configuration = configuration;
+    this.resourceFilter = resourceFilter;
   }
 
   /**
@@ -87,13 +96,11 @@ public class StaticResourceWorkflow implements Workflow {
       return;
     }
 
-    if (!uri.endsWith(".class")) {
-      try {
-        handled = findStaticResource(uri, request, response);
-      } catch (RuntimeException | IOException e) {
-        logger.error("Unable to load static resource at uri [{}]", uri);
-        throw e;
-      }
+    try {
+      handled = findStaticResource(uri, request, response);
+    } catch (RuntimeException | IOException e) {
+      logger.error("Unable to load static resource at uri [{}]", uri);
+      throw e;
     }
 
     if (!handled) {
@@ -108,7 +115,7 @@ public class StaticResourceWorkflow implements Workflow {
    * @param request  The request
    * @param response The response
    * @return True if the resource was found in the classpath and if it was successfully written back to the output stream. Otherwise, this returns
-   *     false if the resource doesn't exist in the classpath.
+   * false if the resource doesn't exist in the classpath.
    * @throws IOException If anything goes wrong
    */
   protected boolean findStaticResource(String uri, HTTPRequest request, HTTPResponse response) throws IOException {
@@ -121,65 +128,69 @@ public class StaticResourceWorkflow implements Workflow {
     }
 
     // See if a file exists in the static directory
-    String staticDirectory = configuration.staticDirectory();
-    Path file = context.resolve(staticDirectory + uri);
-    if (Files.isRegularFile(file) && Files.isReadable(file)) {
-      // Guess the content type
-      String contentType = Files.probeContentType(file);
-      response.setContentType(contentType);
+    if (resourceFilter.allow(uri)) {
+      String staticDirectory = configuration.staticDirectory();
+      Path file = context.resolve(staticDirectory + uri);
+      if (Files.isRegularFile(file) && Files.isReadable(file)) {
+        // Guess the content type
+        String contentType = Files.probeContentType(file);
+        response.setContentType(contentType);
 
-      // Write if modified
-      Instant modified = Files.getLastModifiedTime(file).toInstant();
-      if (ifModifiedSince == null || modified.isAfter(ifModifiedSince)) {
-        // Set the content-length since we know it. This will keep-alive the connection for faster processing
-        response.setContentLength(Files.size(file));
+        // Write if modified
+        Instant modified = Files.getLastModifiedTime(file).toInstant();
+        if (ifModifiedSince == null || modified.isAfter(ifModifiedSince)) {
+          // Set the content-length since we know it. This will keep-alive the connection for faster processing
+          response.setContentLength(Files.size(file));
 
-        try (InputStream is = Files.newInputStream(file)) {
-          writeResponse(response, is, modified);
+          try (InputStream is = Files.newInputStream(file)) {
+            writeResponse(response, is, modified);
+          }
+        } else {
+          addHeaders(response, modified);
+          response.setStatus(Status.SC_NOT_MODIFIED);
         }
-      } else {
-        addHeaders(response, modified);
-        response.setStatus(Status.SC_NOT_MODIFIED);
-      }
 
-      return true;
+        return true;
+      }
     }
 
     // See if there is a classpath entry
-    URL url = HTTPContext.class.getResource(uri);
-    if (url == null) {
-      for (ClassLoader classLoader : additionalClassLoaders) {
-        url = classLoader.getResource(uri);
-        if (url != null) {
-          break;
+    if (classpathResourceFilter.allow(uri)) {
+      URL url = HTTPContext.class.getResource(uri);
+      if (url == null) {
+        for (ClassLoader classLoader : additionalClassLoaders) {
+          url = classLoader.getResource(uri);
+          if (url != null) {
+            break;
+          }
         }
       }
-    }
 
-    if (url != null) {
-      URLConnection connection = url.openConnection();
+      if (url != null) {
+        URLConnection connection = url.openConnection();
 
-      // Guess the content type
-      response.setContentType(connection.getContentType());
+        // Guess the content type
+        response.setContentType(connection.getContentType());
 
-      // Write if modified
-      Instant modified = Instant.ofEpochMilli(connection.getLastModified());
-      if (ifModifiedSince == null || modified.isAfter(ifModifiedSince)) {
-        // Set the content-length if we know it. This will keep-alive the connection for faster processing
-        long length = connection.getContentLengthLong();
-        if (length > 0) {
-          response.setContentLength(length);
+        // Write if modified
+        Instant modified = Instant.ofEpochMilli(connection.getLastModified());
+        if (ifModifiedSince == null || modified.isAfter(ifModifiedSince)) {
+          // Set the content-length if we know it. This will keep-alive the connection for faster processing
+          long length = connection.getContentLengthLong();
+          if (length > 0) {
+            response.setContentLength(length);
+          }
+
+          try (InputStream is = connection.getInputStream()) {
+            writeResponse(response, is, modified);
+          }
+        } else {
+          addHeaders(response, modified);
+          response.setStatus(Status.SC_NOT_MODIFIED);
         }
 
-        try (InputStream is = connection.getInputStream()) {
-          writeResponse(response, is, modified);
-        }
-      } else {
-        addHeaders(response, modified);
-        response.setStatus(Status.SC_NOT_MODIFIED);
+        return true;
       }
-
-      return true;
     }
 
     return false;

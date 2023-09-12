@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,12 +30,13 @@ import org.primeframework.mvc.message.scope.guice.ScopeModule;
 import org.primeframework.mvc.parameter.convert.guice.ConverterModule;
 import org.primeframework.mvc.parameter.guice.ParameterModule;
 import org.primeframework.mvc.security.guice.SecurityModule;
+import org.primeframework.mvc.security.guice.StaticResourceModule;
 import org.primeframework.mvc.util.guice.UtilModule;
 import org.primeframework.mvc.validation.guice.ValidationModule;
 import org.primeframework.mvc.workflow.guice.WorkflowModule;
 
 /**
- * A virtual module that installs all of the Prime MVC modules.
+ * A virtual module that installs all the Prime MVC modules.
  *
  * @author Brian Pontarelli
  */
@@ -56,6 +57,7 @@ public class MVCModule extends AbstractModule {
     install(new SecurityModule());
     install(new ScopeModule());
     install(new org.primeframework.mvc.scope.guice.ScopeModule());
+    install(new StaticResourceModule());
     install(new UtilModule());
     install(new ValidationModule());
     install(new WorkflowModule());

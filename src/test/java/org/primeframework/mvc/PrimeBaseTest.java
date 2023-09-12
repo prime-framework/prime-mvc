@@ -75,7 +75,11 @@ import org.primeframework.mvc.message.scope.FlashScope;
 import org.primeframework.mvc.message.scope.RequestScope;
 import org.primeframework.mvc.security.CipherProvider;
 import org.primeframework.mvc.security.DefaultCipherProvider;
+import org.primeframework.mvc.security.MockStaticClasspathResourceFilter;
+import org.primeframework.mvc.security.MockStaticResourceFilter;
 import org.primeframework.mvc.security.MockUserLoginSecurityContext;
+import org.primeframework.mvc.security.StaticClasspathResourceFilter;
+import org.primeframework.mvc.security.StaticResourceFilter;
 import org.primeframework.mvc.security.UserLoginSecurityContext;
 import org.primeframework.mvc.security.VerifierProvider;
 import org.primeframework.mvc.security.csrf.CSRFProvider;
@@ -221,7 +225,7 @@ public abstract class PrimeBaseTest {
     };
 
     Module module = Modules.override(mvcModule).with(new TestContentModule(), new TestSecurityModule(), new TestScopeModule(),
-                                                     new TestWorkflowModule());
+                                                     new TestWorkflowModule(), new TestStaticResourceModule());
     var mainConfig = new HTTPServerConfiguration().withClientTimeout(Duration.ofMillis(500))
                                                   .withListener(new HTTPListenerConfiguration(9080))
                                                   .withLoggerFactory(TestAccumulatingLoggerFactory.FACTORY);
@@ -443,6 +447,14 @@ public abstract class PrimeBaseTest {
       // Don't bind as a singleton in tests so that I can change the key during a test
       bind(CipherProvider.class).to(DefaultCipherProvider.class);
       bind(VerifierProvider.class).to(MockVerifierProvider.class);
+    }
+  }
+
+  public static class TestStaticResourceModule extends AbstractModule {
+    @Override
+    protected void configure() {
+      bind(StaticResourceFilter.class).to(MockStaticResourceFilter.class);
+      bind(StaticClasspathResourceFilter.class).to(MockStaticClasspathResourceFilter.class);
     }
   }
 
