@@ -15,6 +15,8 @@
  */
 package org.primeframework.mvc.security;
 
+import io.fusionauth.http.server.HTTPRequest;
+
 /**
  * A filter for static resource requests.
  *
@@ -22,8 +24,9 @@ package org.primeframework.mvc.security;
  */
 public interface StaticResourceFilter {
   /**
-   * @param uri the request URI
+   * @param uri     the request URI
+   * @param request the request
    * @return true if resolution should be attempted using the configured static resource directory.
    */
-  boolean allow(String uri);
+  boolean allow(String uri, HTTPRequest request);
 }

@@ -17,6 +17,8 @@ package org.primeframework.mvc.security;
 
 import java.util.function.Function;
 
+import io.fusionauth.http.server.HTTPRequest;
+
 /**
  * @author Daniel DeGroff
  */
@@ -24,11 +26,11 @@ public class MockStaticResourceFilter extends DefaultStaticResourceFilter {
   public static Function<String, Boolean> TestFunction;
 
   @Override
-  public boolean allow(String uri) {
+  public boolean allow(String uri, HTTPRequest request) {
     if (TestFunction != null) {
       return TestFunction.apply(uri);
     }
 
-    return super.allow(uri);
+    return super.allow(uri, request);
   }
 }

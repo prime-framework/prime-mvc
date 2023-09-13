@@ -15,6 +15,8 @@
  */
 package org.primeframework.mvc.security;
 
+import io.fusionauth.http.server.HTTPRequest;
+
 /**
  * The default filter behavior will block all requests. You will need to bind your own filter and explicitly allow some
  * or all requests based upon the URI.
@@ -23,7 +25,7 @@ package org.primeframework.mvc.security;
  */
 public class DefaultStaticClasspathResourceFilter implements StaticClasspathResourceFilter {
   @Override
-  public boolean allow(String uri) {
+  public boolean allow(String uri, HTTPRequest request) {
     // Loading resources from the class path is disabled by default.
     return false;
   }

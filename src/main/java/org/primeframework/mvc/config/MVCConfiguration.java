@@ -32,12 +32,12 @@ import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
  */
 public interface MVCConfiguration {
   /**
-   * @return True if unknown parameters should be allowed or if they should throw an exception.
+   * @return true if unknown parameters should be allowed, false if they are not allowed.
    */
   boolean allowUnknownParameters();
 
   /**
-   * @return True if auto HTML escaping will be enabled for all templates.
+   * @return true if auto HTML escaping will be enabled for all templates.
    */
   boolean autoHTMLEscapingEnabled();
 
@@ -57,12 +57,12 @@ public interface MVCConfiguration {
   Key cookieEncryptionKey();
 
   /**
-   * @return True if CSRF handling is enabled or not.
+   * @return true if CSRF handling is enabled.
    */
   boolean csrfEnabled();
 
   /**
-   * @return True if empty HTTP request parameters should be considered null values by the conversion system.
+   * @return true if empty HTTP request parameters should be considered null values by the conversion system.
    */
   boolean emptyParametersAreNull();
 

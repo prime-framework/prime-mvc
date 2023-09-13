@@ -110,12 +110,17 @@ public class StaticResourceWorkflow implements Workflow {
 
   /**
    * Locate a static resource and copy directly to the response, setting the appropriate caching headers.
+   * <p>
+   * The {@link StaticResourceFilter} will be used to filter requests prior to resolving them in the configured static directory as configured by
+   * {@link MVCConfiguration#staticDirectory()}.
+   * <p>
+   * If a resources is not found in the configured static directory, an attempt will be made to resolve it in the class path if the
+   * {@link StaticClasspathResourceFilter} indicates the URI is allowed.
    *
    * @param uri      The resource uri.
    * @param request  The request
    * @param response The response
-   * @return True if the resource was found in the classpath and if it was successfully written back to the output stream. Otherwise, this returns
-   * false if the resource doesn't exist in the classpath.
+   * @return true if the resource was found, false if the resources was not found, or not allowed to be resolved based upon the configured resource filters.
    * @throws IOException If anything goes wrong
    */
   protected boolean findStaticResource(String uri, HTTPRequest request, HTTPResponse response) throws IOException {
@@ -128,7 +133,7 @@ public class StaticResourceWorkflow implements Workflow {
     }
 
     // See if a file exists in the static directory
-    if (resourceFilter.allow(uri)) {
+    if (resourceFilter.allow(uri, request)) {
       String staticDirectory = configuration.staticDirectory();
       Path file = context.resolve(staticDirectory + uri);
       if (Files.isRegularFile(file) && Files.isReadable(file)) {
@@ -155,7 +160,7 @@ public class StaticResourceWorkflow implements Workflow {
     }
 
     // See if there is a classpath entry
-    if (classpathResourceFilter.allow(uri)) {
+    if (classpathResourceFilter.allow(uri, request)) {
       URL url = HTTPContext.class.getResource(uri);
       if (url == null) {
         for (ClassLoader classLoader : additionalClassLoaders) {

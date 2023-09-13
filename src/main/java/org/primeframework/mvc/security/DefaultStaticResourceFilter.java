@@ -15,6 +15,7 @@
  */
 package org.primeframework.mvc.security;
 
+import io.fusionauth.http.server.HTTPRequest;
 import org.primeframework.mvc.config.MVCConfiguration;
 
 /**
@@ -25,7 +26,7 @@ import org.primeframework.mvc.config.MVCConfiguration;
  */
 public class DefaultStaticResourceFilter implements StaticResourceFilter {
   @Override
-  public boolean allow(String uri) {
+  public boolean allow(String uri, HTTPRequest request) {
     // Allow all resources to be loaded.
     return true;
   }

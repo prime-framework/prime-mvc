@@ -22,6 +22,8 @@ import org.primeframework.mvc.security.StaticClasspathResourceFilter;
 import org.primeframework.mvc.security.StaticResourceFilter;
 
 /**
+ * A guice module for static resource configuration.
+ *
  * @author Daniel DeGroff
  */
 public class StaticResourceModule extends AbstractModule {
