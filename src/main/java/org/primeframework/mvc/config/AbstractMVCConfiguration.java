@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import org.primeframework.mvc.parameter.annotation.FieldUnwrapped;
 /**
  * This class is an abstract implementation of the {@link MVCConfiguration} interface. It provides good default values
  * for most of the methods on that interface but leaves a few methods to be implemented by your application. To
- * accomplish this, sub-class this class and implement the missing methods. Then bind your implementation into the Guice
+ * accomplish this, subclass this class and implement the missing methods. Then bind your implementation into the Guice
  * injector using a Module.
  *
  * @author Brian Pontarelli
@@ -44,7 +44,7 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
 
   public String controlTemplateDirectory = "control-templates";
 
-  public boolean csrfEnabled = false;
+  public boolean csrfEnabled;
 
   public boolean emptyParametersAreNull = true;
 
@@ -54,7 +54,7 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
 
   public long fileUploadMaxSize = MAX_SIZE;
 
-  public boolean ignoreEmptyParameters = false;
+  public boolean ignoreEmptyParameters;
 
   public String localeCookieName = "prime-locale";
 
