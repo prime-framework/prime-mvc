@@ -44,6 +44,7 @@ import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.google.inject.Injector;
 import com.inversoft.http.HTTPStrings;
 import com.inversoft.http.HTTPStrings.Headers;
@@ -1012,20 +1013,28 @@ public class RequestResult {
           errorMessage = "Expected [" + String.join(", ", expectedValue) + "] but found [" + String.join(", ", actualArray) + "]";
         }
       } else {
-        // Assume textual
-        String actualValue = actual.at(pointer).asText();
-        String expectedValue = pairs[i + 1].toString();
-        if (!Objects.equals(actualValue, expectedValue)) {
-          errorMessage = "Expected [" + expectedValue + "] but found [" + actualValue + "]";
+        JsonNode actualValue = actual.at(pointer);
+        Object expectedValue = pairs[i + 1];
+        if (expectedValue == null) {
+          if (!actualValue.isMissingNode()) {
+            errorMessage = "Expected a missing node but found [" + actualValue.asText() + "]";
+          }
+        } else {
+          // Assume textual
+          if (!Objects.equals(actualValue.asText(), expectedValue.toString())) {
+            errorMessage = "Expected [" + expectedValue + "] but found [" + actualValue.asText() + "]";
+          }
         }
       }
 
       if (errorMessage != null) {
-        throw new AssertionError(errorMessage + ".\nActual JSON body:\n"
+        throw new AssertionError("Actual JSON body:\n"
                                  + objectMapper.writerWithDefaultPrettyPrinter()
                                                .withFeatures(SerializationFeature.INDENT_OUTPUT)
                                                .with(new DefaultPrettyPrinter().withArrayIndenter(new DefaultIndenter()))
-                                               .writeValueAsString(actual));
+                                               .writeValueAsString(actual)
+
+                                 + "\n" + errorMessage);
       }
     }
 
@@ -1061,6 +1070,35 @@ public class RequestResult {
       return assertNormalizedBody(normalize(Files.readString(path)));
     }
     return assertNormalizedBody(normalize(BodyTools.processTemplateForAssertion(path, values)));
+  }
+
+  /**
+   * Assert on a specific value in a JSON response.
+   *
+   * @param pointer  the JSON pointer
+   * @param consumer the consumer of the JSON found returned by the pointer
+   * @return This.
+   * @throws IOException If the JSON marshalling failed.
+   */
+  public RequestResult assertOnJSONValueAt(String pointer, Consumer<JSONAsserter> consumer) throws IOException {
+    ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
+    JsonNode actual = objectMapper.readTree(getBodyAsString());
+
+    JsonNode actualNode = actual.at(pointer);
+    JSONAsserter asserter = new JSONAsserter(actualNode);
+    consumer.accept(asserter);
+
+    if (asserter.errorMessage != null) {
+      throw new AssertionError("Actual JSON body:\n"
+                               + objectMapper.writerWithDefaultPrettyPrinter()
+                                             .withFeatures(SerializationFeature.INDENT_OUTPUT)
+                                             .with(new DefaultPrettyPrinter().withArrayIndenter(new DefaultIndenter()))
+                                             .writeValueAsString(actual)
+
+                               + "\n" + asserter.errorMessage);
+    }
+
+    return this;
   }
 
   /**
@@ -2316,6 +2354,34 @@ public class RequestResult {
       }
 
       return elements.get(0);
+    }
+  }
+
+  public static class JSONAsserter {
+    public String errorMessage;
+
+    public JsonNode node;
+
+    public Integer size;
+
+    public JSONAsserter(JsonNode node) {
+      this.node = node;
+    }
+
+    public JSONAsserter assertLength(int expected) {
+      if (node.size() != expected) {
+        errorMessage = "Expected an array of size [" + expected + "] but found [" + node.size() + "]";
+      }
+
+      return this;
+    }
+
+    public JSONAsserter assertType(JsonNodeType expected) {
+      if (node.getNodeType() != expected) {
+        errorMessage = "Expected node to be of type [" + expected + "] but found [" + node.getNodeType() + "]";
+      }
+
+      return this;
     }
   }
 
