@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2016-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.security.oauth.OAuthConfiguration;
 import org.primeframework.mvc.security.oauth.TokenAuthenticationMethod;
+import org.primeframework.mvc.security.oauth.Tokens;
 
 /**
  * @author Brian Pontarelli
@@ -34,6 +35,8 @@ public class MockOAuthUserLoginSecurityContext extends BaseJWTRefreshTokenCookie
 
   public static String TokenEndpoint = "http://localhost:8000/oauth/token";
 
+  public static boolean ValidateJWTOnLogin = true;
+
   public static String clientId;
 
   public static String clientSecret;
@@ -44,6 +47,11 @@ public class MockOAuthUserLoginSecurityContext extends BaseJWTRefreshTokenCookie
     super(request, response, verifierProvider);
   }
 
+  public static void reset() {
+    TokenEndpoint = "http://localhost:8000/oauth/token";
+    ValidateJWTOnLogin = true;
+  }
+
   @Override
   public Set<String> getCurrentUsersRoles() {
     return Roles;
@@ -52,6 +60,26 @@ public class MockOAuthUserLoginSecurityContext extends BaseJWTRefreshTokenCookie
   @Override
   public String getSessionId() {
     return CurrentUser != null ? Integer.toString(CurrentUser.hashCode()) : null;
+  }
+
+  @Override
+  public void login(Object context) {
+    if (ValidateJWTOnLogin) {
+      super.login(context);
+    }
+
+    // This is a Mock version, it does not validate the JWT on login.
+    if (!(context instanceof Tokens tokens)) {
+      throw new IllegalArgumentException("The login context for [BaseJWTRefreshTokenCookiesUserLoginSecurityContext] is expected to be of type [" + Tokens.class.getCanonicalName() + "] but an object of type [" + context.getClass().getCanonicalName() + "] was provided. This is a development time error.");
+    }
+
+    if (tokens.jwt != null) {
+      jwtCookie.add(request, response, tokens.jwt);
+    }
+
+    if (tokens.refreshToken != null) {
+      refreshTokenCookie.add(request, response, tokens.refreshToken);
+    }
   }
 
   @Override

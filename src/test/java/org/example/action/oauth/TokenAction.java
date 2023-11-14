@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2021-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,8 @@ public class TokenAction {
 
     JWT jwt = new JWT();
     jwt.audience = "prime-tests";
-    jwt.expiration = ZonedDateTime.now(ZoneOffset.UTC).plusMinutes(1);
+    jwt.issuedAt = ZonedDateTime.now(ZoneOffset.UTC);
+    jwt.expiration = jwt.issuedAt.plusMinutes(1);
     jwt.issuer = "Prime";
     jwt.subject = Subject;
 

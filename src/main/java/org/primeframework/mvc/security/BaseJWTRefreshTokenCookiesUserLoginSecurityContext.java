@@ -111,12 +111,30 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
       throw new IllegalArgumentException("The login context for [BaseJWTRefreshTokenCookiesUserLoginSecurityContext] is expected to be of type [" + Tokens.class.getCanonicalName() + "] but an object of type [" + context.getClass().getCanonicalName() + "] was provided. This is a development time error.");
     }
 
-    if (tokens.jwt != null) {
-      jwtCookie.add(request, response, tokens.jwt);
-    }
+    // Do not trust the input to this method.
+    // - We expect the caller to provide a valid JWT, but let's ensure it is not expired and check for application specific claims.
+    try {
+      Map<String, Verifier> verifiers = getVerifiersOrNull();
+      if (verifiers == null) {
+        return;
+      }
 
-    if (tokens.refreshToken != null) {
-      refreshTokenCookie.add(request, response, tokens.refreshToken);
+      tokens.decodedJWT = JWT.getDecoder().decode(tokens.jwt, verifiers);
+      if (!validateJWTClaims(tokens.decodedJWT)) {
+        clearTokens(tokens);
+        throw new InvalidLoginContext();
+      }
+
+      if (tokens.jwt != null) {
+        jwtCookie.add(request, response, tokens.jwt);
+      }
+
+      if (tokens.refreshToken != null) {
+        refreshTokenCookie.add(request, response, tokens.refreshToken);
+      }
+    } catch (Exception e) {
+      clearTokens(tokens);
+      throw new InvalidLoginContext();
     }
   }
 
@@ -136,6 +154,18 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
 
   protected SameSite cookieSameSite() {
     return SameSite.Strict;
+  }
+
+  /**
+   * The JWT that is passed to this method is known to be valid. The signature has been validated, and the JWT is not expired.
+   * <p>
+   * You may wish to perform an additional check to identify if this JWT has been revoked and no longer valid based upon external criteria.
+   *
+   * @param jwt the decoded JWT
+   * @return true if this JWT has been revoked. False if the JWT has not been revoked and is ok to be used.
+   */
+  protected boolean isRevoked(@SuppressWarnings("unused") JWT jwt) {
+    return false;
   }
 
   /**
@@ -172,10 +202,18 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
    *
    * @param jwt the decoded JWT
    * @return true if the validation is ok and the JWT can be used. False if the JWT is not ok- and it should not be used. Returning true will still
-   *     allow a refresh token to be used if available.
+   * allow a refresh token to be used if available.
    */
   protected boolean validateJWTClaims(@SuppressWarnings("unused") JWT jwt) {
     return true;
+  }
+
+  private void clearTokens(Tokens tokens) {
+    tokens.decodedJWT = null;
+    tokens.jwt = null;
+    tokens.refreshToken = null;
+    jwtCookie.delete(request, response);
+    refreshTokenCookie.delete(request, response);
   }
 
   private Map<String, Verifier> getVerifiersOrNull() {
@@ -234,6 +272,11 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
     Map<String, Verifier> verifiers = getVerifiersOrNull();
     if (verifiers != null) {
       tokens.decodedJWT = JWT.getDecoder().decode(tokens.jwt, verifiers);
+      // The JWT was refreshed successfully, and signature verified. However, we still want to verify claims on each refresh.
+      if (!validateJWTClaims(tokens.decodedJWT)) {
+        clearTokens(tokens);
+        return tokens;
+      }
     }
 
     if (tokens.jwt != null) {
@@ -276,18 +319,16 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
       }
 
       tokens.decodedJWT = JWT.getDecoder().decode(tokens.jwt, verifiers);
-      if (!validateJWTClaims(tokens.decodedJWT)) {
-        return refreshJWT(tokens);
+      if (!validateJWTClaims(tokens.decodedJWT) || isRevoked(tokens.decodedJWT)) {
+        clearTokens(tokens);
+        return tokens;
       }
 
       return tokens;
     } catch (JWTExpiredException e) {
       return refreshJWT(tokens);
     } catch (Exception e) {
-      tokens.jwt = null;
-      tokens.refreshToken = null;
-      jwtCookie.delete(request, response);
-      refreshTokenCookie.delete(request, response);
+      clearTokens(tokens);
       return tokens;
     }
   }

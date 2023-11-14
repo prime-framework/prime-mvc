@@ -101,12 +101,13 @@ public class RequestSimulator {
   }
 
   /**
-   * The RequestBuilder port. Available only after an invocation of {@link #test(String)}.
+   * The RequestBuilder port.
    *
    * @return The port that the RequestBuilder is using.
    */
   public int getPort() {
-    return actualPort;
+    // Default to the configured port if we have not yet actualPort.
+    return actualPort != -1 ? actualPort : port;
   }
 
   public void reset() {
