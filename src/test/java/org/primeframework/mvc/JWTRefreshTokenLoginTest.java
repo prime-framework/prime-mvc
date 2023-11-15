@@ -150,7 +150,7 @@ public class JWTRefreshTokenLoginTest {
 
   @Test
   public void refreshTokenEndpointDown() {
-    // By default, the Token endpoint int he MockUserLoginSecurityContext is configured to a port that is not listening. So it is 'down'.
+    // By default, the Token endpoint in the MockUserLoginSecurityContext is configured to a port that is not listening. So it is 'down'.
     MockOAuthUserLoginSecurityContext.ValidateJWTOnLogin = false;
 
     // Setting 'expired: true' on the request just tells the Login action to create an expired JWT and store it in the LoginContext.
