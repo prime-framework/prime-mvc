@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2021-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,10 @@ import org.primeframework.mvc.security.UserLoginSecurityContext;
 import org.primeframework.mvc.security.oauth.Tokens;
 
 @Action
-@Status
+@Status.List({
+    @Status,
+    @Status(code = "unauthenticated", status = 401)
+})
 public class LoginAction {
   public static final String Subject = UUID.randomUUID().toString();
 
@@ -47,7 +50,8 @@ public class LoginAction {
   public String post() {
     JWT jwt = new JWT();
     jwt.audience = "prime-tests";
-    jwt.expiration = expired ? ZonedDateTime.now(ZoneOffset.UTC).minusMinutes(1) : ZonedDateTime.now(ZoneOffset.UTC).plusMinutes(1);
+    jwt.issuedAt = ZonedDateTime.now(ZoneOffset.UTC);
+    jwt.expiration = expired ? jwt.issuedAt.minusMinutes(1) : jwt.issuedAt.plusMinutes(1);
     jwt.issuer = "Prime";
     jwt.subject = Subject;
 
