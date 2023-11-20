@@ -111,21 +111,22 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
       throw new IllegalArgumentException("The login context for [BaseJWTRefreshTokenCookiesUserLoginSecurityContext] is expected to be of type [" + Tokens.class.getCanonicalName() + "] but an object of type [" + context.getClass().getCanonicalName() + "] was provided. This is a development time error.");
     }
 
-    // Do not trust the input to this method.
-    // - We expect the caller to provide a valid JWT, but let's ensure it is not expired and check for application specific claims.
     try {
-      Map<String, Verifier> verifiers = getVerifiersOrNull();
-      if (verifiers == null) {
-        return;
-      }
-
-      tokens.decodedJWT = JWT.getDecoder().decode(tokens.jwt, verifiers);
-      if (!validateJWTClaims(tokens.decodedJWT)) {
-        clearTokens(tokens);
-        throw new InvalidLoginContext();
-      }
-
+      // Do not trust the input to this method.
+      // - We expect the caller to provide a valid JWT, but let's ensure it is not expired and check for application specific claims.
+      // - Note that it is allowed to omit the JWT on login which simply causes an immediate refresh.
       if (tokens.jwt != null) {
+        Map<String, Verifier> verifiers = getVerifiersOrNull();
+        if (verifiers == null) {
+          return;
+        }
+
+        tokens.decodedJWT = JWT.getDecoder().decode(tokens.jwt, verifiers);
+        if (!validateJWTClaims(tokens.decodedJWT)) {
+          clearTokens(tokens);
+          throw new InvalidLoginContext();
+        }
+
         jwtCookie.add(request, response, tokens.jwt);
       }
 
