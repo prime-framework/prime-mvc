@@ -33,11 +33,13 @@ import org.example.domain.ActionField;
 import org.example.domain.Address;
 import org.example.domain.AddressField;
 import org.example.domain.Covariant;
+import org.example.domain.CustomObject;
 import org.example.domain.GenericBean;
 import org.example.domain.NestedDataUnwrappedAction;
 import org.example.domain.User;
 import org.example.domain.UserField;
 import org.primeframework.mvc.PrimeBaseTest;
+import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
@@ -323,6 +325,19 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     ActionField action = new ActionField();
     evaluator.setValue("reallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyLongFieldName", action, ArrayUtils.toArray("value"), null);
     assertEquals(action.reallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyLongFieldName, "value");
+  }
+
+  @Test
+  public void missingConverter() {
+    CustomObject custom = new CustomObject();
+
+    // Missing converter, assert better exception message.
+    try {
+      evaluator.setValue("custom.value", custom, new String[]{"foo"}, Collections.emptyMap());
+      fail("Expected an [ConverterStateException] exception.");
+    } catch (ConverterStateException e) {
+      assertEquals(e.getMessage(), "While evaluating the expression [custom.value] in class [org.example.domain.CustomObject.Custom]. No type converter found for the type [java.lang.Class].");
+    }
   }
 
   @Test
