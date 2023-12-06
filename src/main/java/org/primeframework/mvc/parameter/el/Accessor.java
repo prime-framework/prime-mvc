@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -147,7 +147,9 @@ public abstract class Accessor {
     if (!typeClass.isInstance(values)) {
       GlobalConverter converter = converterProvider.lookup(typeClass);
       if (converter == null) {
-        throw new ConverterStateException("No type converter found for the type [" + typeClass.getName() + "]");
+        String className = currentClass != null ? currentClass.getCanonicalName() : "unknown";
+        throw new ConverterStateException("While evaluating the expression [" + expression.getExpression() + "] in class [" +
+                                          className + "]. No type converter found for the type [" + typeClass.getName() + "].");
       }
 
       newValue = converter.convertFromStrings(type, expression.getAttributes(), expression.getExpression(), values);
@@ -180,7 +182,7 @@ public abstract class Accessor {
     } else if (typeClass.isArray()) {
       if (key == null) {
         throw new UpdateExpressionException("Attempting to create an array, but there isn't an index " +
-            "available to determine the size of the array");
+                                            "available to determine the size of the array");
       }
 
       value = Array.newInstance(typeClass.getComponentType(), Integer.parseInt(key.toString()) + 1);
@@ -271,7 +273,7 @@ public abstract class Accessor {
       l.set(index, value);
     } else {
       throw new UpdateExpressionException("You can only set values into arrays and Lists. You are setting a parameter into [" +
-          getMemberAccessor() + "] which is of type [" + this.object.getClass() + "]");
+                                          getMemberAccessor() + "] which is of type [" + this.object.getClass() + "]");
     }
   }
 }
