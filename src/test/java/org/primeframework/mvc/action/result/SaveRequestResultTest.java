@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2018, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2015-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -103,10 +103,9 @@ public class SaveRequestResultTest extends PrimeBaseTest {
     SaveRequestResult result = new SaveRequestResult(messageStore, expressionEvaluator, response, request, store, configuration, encryptor, objectMapper);
     result.execute(annotation);
 
-    // The cookie value will be different each time because the initialization vector is unique per request. Decrypt the actual value to compare it to the expected.
-    SavedHttpRequest actual = CookieTools.fromJSONCookie(response.getCookies().get(0).value, SavedHttpRequest.class, true, encryptor, objectMapper);
-    SavedHttpRequest expected = new SavedHttpRequest(HTTPMethod.POST, "/test", request.getParameters());
-    assertEquals(actual, expected);
+    // Note that POST does not work with saved request, so expect it to not work at all yo.
+    assertEquals(simulator.userAgent.getCookies(request), List.of());
+    assertEquals(response.getRedirect(), "/login");
 
     assertEquals(response.getRedirect(), "/login");
 

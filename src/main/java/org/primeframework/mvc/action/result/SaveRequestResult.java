@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2015-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,30 +63,30 @@ public class SaveRequestResult extends AbstractRedirectResult<SaveRequest> {
   public boolean execute(SaveRequest saveRequest) throws IOException {
     moveMessagesToFlash();
 
-    Map<String, List<String>> requestParameters = null;
-    String redirectURI;
+    // We are only going to capture the saved request for replay on a GET request.
+    // - It is too dangerous to try and replay a POST request w/out trusting the origin, etc.
+    // - We could optionally only the POST request on a same origin, however, it still leaves us open to various attack vectors.
     HTTPMethod method = request.getMethod();
-    if (HTTPMethod.GET.is(request.getMethod())) {
+    if (HTTPMethod.GET.is(method)) {
+      Map<String, List<String>> requestParameters = null;
+      String redirectURI;
       Map<String, List<String>> params = request.getParameters();
       redirectURI = request.getPath() + makeQueryString(params);
-    } else {
-      requestParameters = request.getParameters();
-      redirectURI = request.getPath();
-    }
 
-    // Build a saved request cookie
-    Cookie saveRequestCookie = SavedRequestTools.toCookie(new SavedHttpRequest(method, redirectURI, requestParameters), configuration, encryptor, objectMapper);
+      // Build a saved request cookie
+      Cookie saveRequestCookie = SavedRequestTools.toCookie(new SavedHttpRequest(method, redirectURI, requestParameters), configuration, encryptor, objectMapper);
 
-    // If the resulting cookie exceeds the maximum configured size in bytes, it would be bad.
-    //
-    // Peter: I'm fuzzy on the whole good/bad thing. What do you mean, "bad"?
-    // Egon: Try to imagine all life as you know it stopping instantaneously, and every molecule in your body exploding at the speed of light.
-    // Ray: [shocked gasp] Total protonic reversal.
-    // Peter:  Right. That's bad. Okay. All right. Important safety tip. Thanks, Egon.
-    //
-    // Ok, not that bad, but Tomcat will exception and the user will receive a 500. See MVCConfiguration.savedRequestCookieMaximumSize for more information.
-    if (saveRequestCookie.value.getBytes(StandardCharsets.UTF_8).length <= configuration.savedRequestCookieMaximumSize()) {
-      response.addCookie(saveRequestCookie);
+      // If the resulting cookie exceeds the maximum configured size in bytes, it would be bad.
+      //
+      // Peter: I'm fuzzy on the whole good/bad thing. What do you mean, "bad"?
+      // Egon: Try to imagine all life as you know it stopping instantaneously, and every molecule in your body exploding at the speed of light.
+      // Ray: [shocked gasp] Total protonic reversal.
+      // Peter:  Right. That's bad. Okay. All right. Important safety tip. Thanks, Egon.
+      //
+      // Ok, not that bad, but Tomcat will exception and the user will receive a 500. See MVCConfiguration.savedRequestCookieMaximumSize for more information.
+      if (saveRequestCookie.value.getBytes(StandardCharsets.UTF_8).length <= configuration.savedRequestCookieMaximumSize()) {
+        response.addCookie(saveRequestCookie);
+      }
     }
 
     // Handle setting cache controls

@@ -2108,6 +2108,8 @@ public class GlobalTest extends PrimeBaseTest {
   public void post_savedRequest() throws Exception {
     // Post to a page that requires authentication
     BaseStoreAction.loggedIn = false;
+
+    // Post will not work with saved request, so expect to just end up at the normal location after login
     test.simulate(() -> simulator.test("/store/purchase")
                                  .withParameter("item", "beer")
                                  .post()
@@ -2116,19 +2118,24 @@ public class GlobalTest extends PrimeBaseTest {
                                  .assertRedirect("/store/login")
 
                                  // Redirected to login
-                                 .executeRedirect(
-                                     req -> req.assertStatusCode(200)
-                                               .assertHeaderContains("Cache-Control", "no-cache")
-                                               .assertBodyContains("Login")
+                                 .followRedirect(result -> result
+                                     .assertStatusCode(200)
+                                     .assertHeaderContains("Cache-Control", "no-cache")
+                                     .assertBodyContains("Login"))
 
-                                               // Post on Login, get a session, and redirect back to the cart which completes the beer purchase
-                                               .executeFormPostInResponseBody("form",
-                                                                              postReq -> postReq.assertStatusCode(302)
-                                                                                                .assertHeaderContains("Cache-Control", "no-cache")
-                                                                                                .assertRedirect("/store/purchase")
+                                 // Post on Login, get a session, and redirect back to store index, because we threw out the saved request to the cart.
+                                 .submitForm("form", result -> result
+                                     .assertStatusCode(302)
+                                     .assertHeaderContains("Cache-Control", "no-cache")
+                                     .assertRedirect("/store/"))
 
-                                                                                                .executeRedirect(
-                                                                                                    redirReq -> redirReq.assertStatusCode(200).assertBodyContains("Buy:beer")))));
+                                 .followRedirect(result -> result
+                                     .assertStatusCode(200)
+                                     .assertBody("""
+                                                     /store/index
+                                                     IsLoggedIn:true""")
+                                     .assertBodyDoesNotContain("Buy:beer"))
+    );
   }
 
   @Test

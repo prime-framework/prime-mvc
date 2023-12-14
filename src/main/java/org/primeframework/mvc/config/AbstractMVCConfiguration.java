@@ -64,7 +64,7 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
 
   public String missingPath = "/missing";
 
-  public int savedRequestCookieMaximumSize = 16 * 1024; // 6 KB
+  public int savedRequestCookieMaximumSize = 16 * 1024; // 16 KB
 
   public String savedRequestCookieName = "prime-mvc-saved-request";
 
