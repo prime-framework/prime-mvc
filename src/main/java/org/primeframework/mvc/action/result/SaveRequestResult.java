@@ -17,6 +17,7 @@ package org.primeframework.mvc.action.result;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -33,6 +34,7 @@ import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.annotation.ReexecuteSavedRequest;
 import org.primeframework.mvc.action.result.annotation.SaveRequest;
 import org.primeframework.mvc.config.MVCConfiguration;
+import org.primeframework.mvc.http.HTTPTools;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.security.Encryptor;
@@ -63,15 +65,33 @@ public class SaveRequestResult extends AbstractRedirectResult<SaveRequest> {
   public boolean execute(SaveRequest saveRequest) throws IOException {
     moveMessagesToFlash();
 
-    // We are only going to capture the saved request for replay on a GET request.
-    // - It is too dangerous to try and replay a POST request w/out trusting the origin, etc.
-    // - We could optionally only the POST request on a same origin, however, it still leaves us open to various attack vectors.
     HTTPMethod method = request.getMethod();
-    if (HTTPMethod.GET.is(method)) {
+
+    // GET requests are always ok.
+    boolean saveRequestAllowed = HTTPMethod.GET.is(method);
+
+    // When performing a saved request on a POST, ensure it is same origin
+    if (HTTPMethod.POST.is(method)) {
+      String source = HTTPTools.getOriginHeader(request);
+      if (source != null) {
+        URI uri = URI.create(request.getBaseURL());
+        URI sourceURI = URI.create(source);
+        if (uri.getPort() == sourceURI.getPort() && uri.getScheme().equalsIgnoreCase(sourceURI.getScheme()) && uri.getHost().equalsIgnoreCase(sourceURI.getHost())) {
+          saveRequestAllowed = true;
+        }
+      }
+    }
+
+    if (saveRequestAllowed) {
       Map<String, List<String>> requestParameters = null;
       String redirectURI;
-      Map<String, List<String>> params = request.getParameters();
-      redirectURI = request.getPath() + makeQueryString(params);
+      if (HTTPMethod.GET.is(request.getMethod())) {
+        Map<String, List<String>> params = request.getParameters();
+        redirectURI = request.getPath() + makeQueryString(params);
+      } else {
+        requestParameters = request.getParameters();
+        redirectURI = request.getPath();
+      }
 
       // Build a saved request cookie
       Cookie saveRequestCookie = SavedRequestTools.toCookie(new SavedHttpRequest(method, redirectURI, requestParameters), configuration, encryptor, objectMapper);

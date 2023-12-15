@@ -2105,40 +2105,6 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
-  public void post_savedRequest() throws Exception {
-    // Post to a page that requires authentication
-    BaseStoreAction.loggedIn = false;
-
-    // Post will not work with saved request, so expect to just end up at the normal location after login
-    test.simulate(() -> simulator.test("/store/purchase")
-                                 .withParameter("item", "beer")
-                                 .post()
-                                 .assertStatusCode(302)
-                                 .assertHeaderContains("Cache-Control", "no-cache")
-                                 .assertRedirect("/store/login")
-
-                                 // Redirected to login
-                                 .followRedirect(result -> result
-                                     .assertStatusCode(200)
-                                     .assertHeaderContains("Cache-Control", "no-cache")
-                                     .assertBodyContains("Login"))
-
-                                 // Post on Login, get a session, and redirect back to store index, because we threw out the saved request to the cart.
-                                 .submitForm("form", result -> result
-                                     .assertStatusCode(302)
-                                     .assertHeaderContains("Cache-Control", "no-cache")
-                                     .assertRedirect("/store/"))
-
-                                 .followRedirect(result -> result
-                                     .assertStatusCode(200)
-                                     .assertBody("""
-                                                     /store/index
-                                                     IsLoggedIn:true""")
-                                     .assertBodyDoesNotContain("Buy:beer"))
-    );
-  }
-
-  @Test
   public void post_savedRequest_cookieExpired_orCannotBeDeserialized() throws Exception {
     // Post to a page that requires authentication
     BaseStoreAction.loggedIn = false;
@@ -2172,6 +2138,74 @@ public class GlobalTest extends PrimeBaseTest {
                                                                                                                             "/store/index",
                                                                                                                             "IsLoggedIn:true")
                                                                                                                         .assertBodyDoesNotContain("Buy:beer")))));
+  }
+
+  @Test
+  public void post_savedRequest_crossOrigin() throws Exception {
+    // Post to a page that requires authentication
+    BaseStoreAction.loggedIn = false;
+
+    // A cross-origin POST request not work with saved request, so expect to just end up at the normal location after login
+    test.simulate(() -> simulator.test("/store/purchase")
+                                 .withParameter("item", "beer")
+                                 .withSingleHeader("Origin", "https://hacked.com")
+                                 .post()
+                                 .assertStatusCode(302)
+                                 .assertHeaderContains("Cache-Control", "no-cache")
+                                 .assertRedirect("/store/login")
+
+                                 // Redirected to login
+                                 .followRedirect(result -> result
+                                     .assertStatusCode(200)
+                                     .assertHeaderContains("Cache-Control", "no-cache")
+                                     .assertBodyContains("Login"))
+
+                                 // Post on Login, get a session, and redirect back to store index, because we threw out the saved request to the cart.
+                                 .submitForm("form", result -> result
+                                     .assertStatusCode(302)
+                                     .assertHeaderContains("Cache-Control", "no-cache")
+                                     .assertRedirect("/store/"))
+
+                                 .followRedirect(result -> result
+                                     .assertStatusCode(200)
+                                     .assertBody("""
+                                                     /store/index
+                                                     IsLoggedIn:true""")
+                                     .assertBodyDoesNotContain("Buy:beer"))
+    );
+  }
+
+  @Test
+  public void post_savedRequest_sameOrigin() throws Exception {
+    // Post to a page that requires authentication
+    BaseStoreAction.loggedIn = false;
+
+    // Same origin POST request will work with saved request
+    test.simulate(() -> simulator.test("/store/purchase")
+                                 .withParameter("item", "beer")
+                                 .post()
+                                 .assertStatusCode(302)
+                                 .assertHeaderContains("Cache-Control", "no-cache")
+                                 .assertRedirect("/store/login")
+
+                                 // Redirected to login
+                                 .followRedirect(result -> result
+                                     .assertStatusCode(200)
+                                     .assertHeaderContains("Cache-Control", "no-cache")
+                                     .assertBodyContains("Login"))
+
+                                 // Post on Login, get a session, and redirect back to the cart which completes the beer purchase
+                                 .submitForm("form", result -> result
+                                     .assertStatusCode(302)
+                                     .assertHeaderContains("Cache-Control", "no-cache")
+                                     .assertRedirect("/store/purchase"))
+
+                                 .followRedirect(result -> result
+                                     .assertStatusCode(200)
+                                     .assertBody("""
+                                                     /store/purchase
+                                                     Buy:beer"""))
+    );
   }
 
   @Test
