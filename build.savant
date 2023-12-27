@@ -25,11 +25,19 @@ logbackVersion = "1.3.0-alpha10"
 primeMockVersion = "0.9.0"
 slf4jVersion = "2.0.0-alpha5"
 
-project(group: "org.primeframework", name: "prime-mvc", version: "1.32.2", licenses: ["ApacheV2_0"]) {
+project(group: "org.primeframework", name: "prime-mvc", version: "1.32.3", licenses: ["ApacheV2_0"]) {
   workflow {
     fetch {
+      // Dependency resolution order:
+      //
+      // 1. Hit the savant cache
       cache()
-      url(url: "https://external.savant.fusionauth.io")
+      //
+      // 2. Look in public savant repo
+      url(url: "https://repository.savantbuild.org")
+      //
+      // 3. No dice, see if we can find it in Maven central
+      maven()
     }
     publish {
       cache()
@@ -37,7 +45,7 @@ project(group: "org.primeframework", name: "prime-mvc", version: "1.32.2", licen
   }
 
   publishWorkflow {
-    subversion(repository: "https://external.svn.fusionauth.io")
+    subversion(repository: "https://svn.savantbuild.org")
   }
 
   dependencies {
@@ -53,7 +61,7 @@ project(group: "org.primeframework", name: "prime-mvc", version: "1.32.2", licen
       dependency(id: "io.fusionauth:fusionauth-jwt:${fusionAuthJWTVersion}")
       dependency(id: "javax.inject:javax.inject:1.0.0")
       // fileupload depends upon commons-io, so until we can ditch fileupload, may as well keep both.
-      dependency(id: "org.apache.commons:commons-fileupload:1.4.0")
+      dependency(id: "org.apache.commons:commons-fileupload:1.5.0")
       dependency(id: "org.apache.commons:commons-io:2.7.0")
       dependency(id: "org.apache.commons:commons-lang3:3.11.0")
       dependency(id: "org.freemarker:freemarker:2.3.30")
@@ -86,12 +94,13 @@ project(group: "org.primeframework", name: "prime-mvc", version: "1.32.2", licen
 }
 
 // Plugins
-file = loadPlugin(id: "org.savantbuild.plugin:file:1.0.2")
-dependency = loadPlugin(id: "org.savantbuild.plugin:dependency:1.0.2")
-java = loadPlugin(id: "org.savantbuild.plugin:java:1.0.2")
-javaTestNG = loadPlugin(id: "org.savantbuild.plugin:java-testng:1.0.9")
-idea = loadPlugin(id: "org.savantbuild.plugin:idea:1.0.1")
-release = loadPlugin(id: "org.savantbuild.plugin:release-git:${savantVersion}")
+file = loadPlugin(id: "org.savantbuild.plugin:file:2.0.0-RC.6")
+dependency = loadPlugin(id: "org.savantbuild.plugin:dependency:2.0.0-RC.6")
+java = loadPlugin(id: "org.savantbuild.plugin:java:2.0.0-RC.6")
+javaTestNG = loadPlugin(id: "org.savantbuild.plugin:java-testng:2.0.0-RC.6")
+idea = loadPlugin(id: "org.savantbuild.plugin:idea:2.0.0-RC.7")
+pom = loadPlugin(id: "org.savantbuild.plugin:pom:2.0.0-RC.6")
+release = loadPlugin(id: "org.savantbuild.plugin:release-git:2.0.0-RC.6")
 
 // Plugin settings
 // Note: Pending support from EasyMock to move to 17. The following issue should be fixed in 4.4, waiting for that release.
