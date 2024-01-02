@@ -15,16 +15,32 @@
  */
 package org.example.action.store;
 
+import javax.inject.Inject;
+
+import org.primeframework.mvc.action.annotation.Action;
+import org.primeframework.mvc.action.result.annotation.Forward;
 import org.primeframework.mvc.action.result.annotation.SaveRequest;
+import org.primeframework.mvc.message.MessageStore;
 
 /**
- * @author Daniel DeGroff
+ * @author Lyle Schemmerling
  */
-@SaveRequest(uri = "/store/login")
-public abstract class BaseStoreAction {
-  public static boolean loggedIn;
+@Action
+@SaveRequest(uri = "/store/login", allowPost = true)
+@Forward(page = "/store/purchase.ftl")
+public class AllowPostPurchaseAction extends PurchaseAction {
 
-  protected boolean isLoggedIn() {
-    return loggedIn;
+  @Inject
+  public AllowPostPurchaseAction(MessageStore messageStore) {
+    super(messageStore);
   }
+
+  public String get() {
+    return super.get();
+  }
+
+  public String post() {
+    return super.post();
+  }
+
 }

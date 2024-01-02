@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2023, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2015-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,8 +70,8 @@ public class SaveRequestResult extends AbstractRedirectResult<SaveRequest> {
     // GET requests are always ok.
     boolean saveRequestAllowed = HTTPMethod.GET.is(method);
 
-    // When performing a saved request on a POST, ensure it is same origin
-    if (HTTPMethod.POST.is(method)) {
+    // When performing a saved request on a POST, ensure it is same origin if explicitly allowed by the annotation.
+    if (HTTPMethod.POST.is(method) && saveRequest.allowPost()) {
       String source = HTTPTools.getOriginHeader(request);
       if (source != null) {
         URI uri = URI.create(request.getBaseURL());
@@ -146,6 +146,7 @@ public class SaveRequestResult extends AbstractRedirectResult<SaveRequest> {
   }
 
   public static class SaveRequestImpl implements SaveRequest {
+
     private final String cacheControl;
 
     private final String code;
@@ -158,6 +159,8 @@ public class SaveRequestResult extends AbstractRedirectResult<SaveRequest> {
 
     private final String uri;
 
+    private boolean allowPost;
+
     public SaveRequestImpl(String uri, String code, boolean perm, boolean encode) {
       this.cacheControl = "no-cache";
       this.code = code;
@@ -165,6 +168,11 @@ public class SaveRequestResult extends AbstractRedirectResult<SaveRequest> {
       this.encode = encode;
       this.uri = uri;
       this.perm = perm;
+    }
+
+    @Override
+    public boolean allowPost() {
+      return allowPost;
     }
 
     public Class<? extends Annotation> annotationType() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,14 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Target(TYPE)
 public @interface SaveRequest {
+  /**
+   * If true then SavedRequest will be performed on a POST request as long as it is a same-origin request. Otherwise, only GET calls are allowed.
+   * Defaults to false.
+   *
+   * @return set to true to allow POST.
+   */
+  boolean allowPost() default false;
+
   /**
    * @return the value to use for the <code>Cache-Control</code> header.
    */

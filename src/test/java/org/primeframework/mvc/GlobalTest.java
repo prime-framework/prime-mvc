@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2023, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -2140,13 +2141,14 @@ public class GlobalTest extends PrimeBaseTest {
                                                                                                                         .assertBodyDoesNotContain("Buy:beer")))));
   }
 
-  @Test
-  public void post_savedRequest_crossOrigin() throws Exception {
+  @Test(dataProvider = "purchaseRoutes")
+  public void post_savedRequest_crossOrigin(String route) throws Exception {
     // Post to a page that requires authentication
     BaseStoreAction.loggedIn = false;
 
     // A cross-origin POST request not work with saved request, so expect to just end up at the normal location after login
-    test.simulate(() -> simulator.test("/store/purchase")
+    // allow-post-purchase has allowPost = true on the SaveRequest annotation but cross-origin should behave the same
+    test.simulate(() -> simulator.test(route)
                                  .withParameter("item", "beer")
                                  .withSingleHeader("Origin", "https://hacked.com")
                                  .post()
@@ -2171,16 +2173,48 @@ public class GlobalTest extends PrimeBaseTest {
                                      .assertBody("""
                                                      /store/index
                                                      IsLoggedIn:true""")
-                                     .assertBodyDoesNotContain("Buy:beer"))
-    );
+                                     .assertBodyDoesNotContain("Buy:beer")));
   }
 
   @Test
-  public void post_savedRequest_sameOrigin() throws Exception {
+  public void post_savedRequest_sameOriginAllowed() throws Exception {
     // Post to a page that requires authentication
     BaseStoreAction.loggedIn = false;
 
-    // Same origin POST request will work with saved request
+    // Same origin POST request will work with saved request and allowPost =true
+    test.simulate(() -> simulator
+        .test("/store/allow-post-purchase")
+        .withParameter("item", "beer")
+        .post()
+        .assertStatusCode(302)
+        .assertHeaderContains("Cache-Control", "no-cache")
+        .assertRedirect("/store/login")
+
+        // Redirected to login
+        .followRedirect(result -> result
+            .assertStatusCode(200)
+            .assertHeaderContains("Cache-Control", "no-cache")
+            .assertBodyContains("Login"))
+
+        // Post on Login, get a session, and redirect back to the cart which completes the beer purchase
+        .submitForm("form", result -> result
+            .assertStatusCode(302)
+            .assertHeaderContains("Cache-Control", "no-cache")
+            .assertRedirect("/store/allow-post-purchase"))
+
+        .followRedirect(result -> result
+            .assertStatusCode(200)
+            .assertBody("""
+                            /store/purchase
+                            Buy:beer""")));
+  }
+
+  @Test
+  public void post_savedRequest_sameOriginDenied() throws Exception {
+    // Post to a page that requires authentication
+    BaseStoreAction.loggedIn = false;
+
+    // same origin post saved request will fail if allowPost = false
     test.simulate(() -> simulator.test("/store/purchase")
                                  .withParameter("item", "beer")
                                  .post()
@@ -2194,18 +2228,19 @@ public class GlobalTest extends PrimeBaseTest {
                                      .assertHeaderContains("Cache-Control", "no-cache")
                                      .assertBodyContains("Login"))
 
-                                 // Post on Login, get a session, and redirect back to the cart which completes the beer purchase
+                                 // Post on Login, get a session, and redirect back to store index, because we threw out the saved request to the cart.
                                  .submitForm("form", result -> result
                                      .assertStatusCode(302)
                                      .assertHeaderContains("Cache-Control", "no-cache")
-                                     .assertRedirect("/store/purchase"))
+                                     .assertRedirect("/store/"))
 
+                                 // land on the regular index page
                                  .followRedirect(result -> result
                                      .assertStatusCode(200)
                                      .assertBody("""
-                                                     /store/purchase
-                                                     Buy:beer"""))
-    );
+                                                     /store/index
+                                                     IsLoggedIn:true""")
+                                     .assertBodyDoesNotContain("Buy:beer")));
   }
 
   @Test
@@ -2465,6 +2500,14 @@ public class GlobalTest extends PrimeBaseTest {
              .assertStatusCode(200)
              .assertContainsNoFieldMessages()
              .assertBodyContains("/api/no-action-value/index", "potato:null", "userId:null");
+  }
+
+  @DataProvider
+  public Object[][] purchaseRoutes() {
+    return new Object[][]{
+        {"/store/purchase"},
+        {"/store/allow-post-purchase"}
+    };
   }
 
   @Test
