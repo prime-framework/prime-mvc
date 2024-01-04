@@ -147,6 +147,8 @@ public class SaveRequestResult extends AbstractRedirectResult<SaveRequest> {
 
   public static class SaveRequestImpl implements SaveRequest {
 
+    private final boolean allowPost;
+
     private final String cacheControl;
 
     private final String code;
@@ -159,15 +161,14 @@ public class SaveRequestResult extends AbstractRedirectResult<SaveRequest> {
 
     private final String uri;
 
-    private boolean allowPost;
-
-    public SaveRequestImpl(String uri, String code, boolean perm, boolean encode) {
+    public SaveRequestImpl(String uri, String code, boolean perm, boolean encode, boolean allowPost) {
       this.cacheControl = "no-cache";
       this.code = code;
       this.disableCacheControl = false;
       this.encode = encode;
       this.uri = uri;
       this.perm = perm;
+      this.allowPost = allowPost;
     }
 
     @Override

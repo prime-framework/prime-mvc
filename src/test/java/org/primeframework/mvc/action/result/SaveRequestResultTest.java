@@ -38,6 +38,7 @@ import org.primeframework.mvc.security.DefaultEncryptor;
 import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.security.saved.SavedHttpRequest;
 import org.primeframework.mvc.util.CookieTools;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import static org.easymock.EasyMock.createStrictMock;
 import static org.easymock.EasyMock.expect;
@@ -57,6 +58,16 @@ public class SaveRequestResultTest extends PrimeBaseTest {
 
   @Inject public ObjectMapper objectMapper;
 
+  @DataProvider
+  public Object[][] postScenarios() {
+    return new Object[][]{
+        {true, "http://localhost"},
+        {true, "http://myhouse"},
+        {false, "http://localhost"},
+        {false, "http://myhouse"}
+    };
+  }
+
   @Test
   public void saveRequestGET() throws Exception {
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
@@ -71,7 +82,7 @@ public class SaveRequestResultTest extends PrimeBaseTest {
     request.addURLParameter("param2", "value2");
 
     Encryptor encryptor = new DefaultEncryptor(new DefaultCipherProvider(configuration));
-    SaveRequest annotation = new SaveRequestImpl("/login", "unauthenticated", true, false);
+    SaveRequest annotation = new SaveRequestImpl("/login", "unauthenticated", true, false, false);
     SaveRequestResult result = new SaveRequestResult(messageStore, expressionEvaluator, response, request, store, configuration, encryptor, objectMapper);
     result.execute(annotation);
 
@@ -85,27 +96,36 @@ public class SaveRequestResultTest extends PrimeBaseTest {
     verify(store);
   }
 
-  @Test
-  public void saveRequestPOST() throws Exception {
+  @Test(dataProvider = "postScenarios")
+  public void saveRequestPOST(boolean allowPost, String origin) throws Exception {
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/foo", "", null));
     replay(store);
 
     HTTPRequest request = new HTTPRequest();
     HTTPResponse response = new HTTPResponse(null, request);
+    request.setScheme("http");
+    request.setHost("localhost");
     request.setPath("/test");
     request.setMethod(HTTPMethod.POST);
     request.addURLParameter("param1", "value1");
     request.addURLParameter("param2", "value2");
+    request.addHeader("Origin", origin);
 
     Encryptor encryptor = new DefaultEncryptor(new DefaultCipherProvider(configuration));
-    SaveRequest annotation = new SaveRequestImpl("/login", "unauthenticated", true, false);
+    SaveRequest annotation = new SaveRequestImpl("/login", "unauthenticated", true, false, allowPost);
     SaveRequestResult result = new SaveRequestResult(messageStore, expressionEvaluator, response, request, store, configuration, encryptor, objectMapper);
     result.execute(annotation);
 
-    // Note that POST does not work with saved request, so expect it to not work at all yo.
-    assertEquals(simulator.userAgent.getCookies(request), List.of());
-    assertEquals(response.getRedirect(), "/login");
+    if (allowPost && origin.equals(request.getBaseURL())) {
+      // The cookie value will be different each time because the initialization vector is unique per request. Decrypt the actual value to compare it to the expected.
+      SavedHttpRequest actual = CookieTools.fromJSONCookie(response.getCookies().get(0).value, SavedHttpRequest.class, true, encryptor, objectMapper);
+      SavedHttpRequest expected = new SavedHttpRequest(HTTPMethod.POST, "/test", request.getParameters());
+      assertEquals(actual, expected);
+    } else {
+      // Note that POST by default does not work with saved request, so expect it to not work at all yo.
+      assertEquals(response.getCookies(), List.of());
+    }
 
     assertEquals(response.getRedirect(), "/login");
 
@@ -136,7 +156,7 @@ public class SaveRequestResultTest extends PrimeBaseTest {
     request.addURLParameter("largeParam4", parameters.get("largeParam4").get(0));
 
     Encryptor encryptor = new DefaultEncryptor(new DefaultCipherProvider(configuration));
-    SaveRequest annotation = new SaveRequestImpl("/login", "unauthenticated", true, false);
+    SaveRequest annotation = new SaveRequestImpl("/login", "unauthenticated", true, false, false);
     SaveRequestResult result = new SaveRequestResult(messageStore, expressionEvaluator, response, request, store, configuration, encryptor, objectMapper);
     result.execute(annotation);
 
