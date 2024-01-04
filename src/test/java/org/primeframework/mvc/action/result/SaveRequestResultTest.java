@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2023, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2015-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -114,7 +114,7 @@ public class SaveRequestResultTest extends PrimeBaseTest {
 
   @Test
   public void saveRequestPOST_tooBig() throws IOException {
-    // By default Tomcat limits the HTTP Header to 8 KB (see Tomcat maxHttpHeaderSize)
+    // By default, Tomcat limits the HTTP Header to 8 KB (see Tomcat maxHttpHeaderSize)
     // If we think we might be surpassing that size, we should skip the save request otherwise we'll return a 500 to the client
 
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
