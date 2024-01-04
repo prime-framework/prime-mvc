@@ -85,7 +85,7 @@ public class SaveRequestResult extends AbstractRedirectResult<SaveRequest> {
     if (saveRequestAllowed) {
       Map<String, List<String>> requestParameters = null;
       String redirectURI;
-      if (HTTPMethod.GET.is(request.getMethod())) {
+      if (HTTPMethod.GET.is(method)) {
         Map<String, List<String>> params = request.getParameters();
         redirectURI = request.getPath() + makeQueryString(params);
       } else {
