@@ -1,11 +1,12 @@
 <!--
   ~ Copyright (c) 2023, FusionAuth, All Rights Reserved
-  --><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.primeframework</groupId>
   <artifactId>prime-mvc</artifactId>
-  <version>4.18.2</version>
+  <version>4.19.0</version>
   <packaging>jar</packaging>
 
   <name>FusionAuth App</name>

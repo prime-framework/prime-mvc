@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2015-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package org.primeframework.mvc.action.result;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -33,6 +34,7 @@ import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.annotation.ReexecuteSavedRequest;
 import org.primeframework.mvc.action.result.annotation.SaveRequest;
 import org.primeframework.mvc.config.MVCConfiguration;
+import org.primeframework.mvc.http.HTTPTools;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.security.Encryptor;
@@ -63,30 +65,48 @@ public class SaveRequestResult extends AbstractRedirectResult<SaveRequest> {
   public boolean execute(SaveRequest saveRequest) throws IOException {
     moveMessagesToFlash();
 
-    Map<String, List<String>> requestParameters = null;
-    String redirectURI;
     HTTPMethod method = request.getMethod();
-    if (HTTPMethod.GET.is(request.getMethod())) {
-      Map<String, List<String>> params = request.getParameters();
-      redirectURI = request.getPath() + makeQueryString(params);
-    } else {
-      requestParameters = request.getParameters();
-      redirectURI = request.getPath();
+
+    // GET requests are always ok.
+    boolean saveRequestAllowed = HTTPMethod.GET.is(method);
+
+    // When performing a saved request on a POST, ensure it is same origin if explicitly allowed by the annotation.
+    if (HTTPMethod.POST.is(method) && saveRequest.allowPost()) {
+      String source = HTTPTools.getOriginHeader(request);
+      if (source != null) {
+        URI uri = URI.create(request.getBaseURL());
+        URI sourceURI = URI.create(source);
+        if (uri.getPort() == sourceURI.getPort() && uri.getScheme().equalsIgnoreCase(sourceURI.getScheme()) && uri.getHost().equalsIgnoreCase(sourceURI.getHost())) {
+          saveRequestAllowed = true;
+        }
+      }
     }
 
-    // Build a saved request cookie
-    Cookie saveRequestCookie = SavedRequestTools.toCookie(new SavedHttpRequest(method, redirectURI, requestParameters), configuration, encryptor, objectMapper);
+    if (saveRequestAllowed) {
+      Map<String, List<String>> requestParameters = null;
+      String redirectURI;
+      if (HTTPMethod.GET.is(method)) {
+        Map<String, List<String>> params = request.getParameters();
+        redirectURI = request.getPath() + makeQueryString(params);
+      } else {
+        requestParameters = request.getParameters();
+        redirectURI = request.getPath();
+      }
 
-    // If the resulting cookie exceeds the maximum configured size in bytes, it would be bad.
-    //
-    // Peter: I'm fuzzy on the whole good/bad thing. What do you mean, "bad"?
-    // Egon: Try to imagine all life as you know it stopping instantaneously, and every molecule in your body exploding at the speed of light.
-    // Ray: [shocked gasp] Total protonic reversal.
-    // Peter:  Right. That's bad. Okay. All right. Important safety tip. Thanks, Egon.
-    //
-    // Ok, not that bad, but Tomcat will exception and the user will receive a 500. See MVCConfiguration.savedRequestCookieMaximumSize for more information.
-    if (saveRequestCookie.value.getBytes(StandardCharsets.UTF_8).length <= configuration.savedRequestCookieMaximumSize()) {
-      response.addCookie(saveRequestCookie);
+      // Build a saved request cookie
+      Cookie saveRequestCookie = SavedRequestTools.toCookie(new SavedHttpRequest(method, redirectURI, requestParameters), configuration, encryptor, objectMapper);
+
+      // If the resulting cookie exceeds the maximum configured size in bytes, it would be bad.
+      //
+      // Peter: I'm fuzzy on the whole good/bad thing. What do you mean, "bad"?
+      // Egon: Try to imagine all life as you know it stopping instantaneously, and every molecule in your body exploding at the speed of light.
+      // Ray: [shocked gasp] Total protonic reversal.
+      // Peter:  Right. That's bad. Okay. All right. Important safety tip. Thanks, Egon.
+      //
+      // Ok, not that bad, but Tomcat will exception and the user will receive a 500. See MVCConfiguration.savedRequestCookieMaximumSize for more information.
+      if (saveRequestCookie.value.getBytes(StandardCharsets.UTF_8).length <= configuration.savedRequestCookieMaximumSize()) {
+        response.addCookie(saveRequestCookie);
+      }
     }
 
     // Handle setting cache controls
@@ -126,6 +146,9 @@ public class SaveRequestResult extends AbstractRedirectResult<SaveRequest> {
   }
 
   public static class SaveRequestImpl implements SaveRequest {
+
+    private final boolean allowPost;
+
     private final String cacheControl;
 
     private final String code;
@@ -138,13 +161,19 @@ public class SaveRequestResult extends AbstractRedirectResult<SaveRequest> {
 
     private final String uri;
 
-    public SaveRequestImpl(String uri, String code, boolean perm, boolean encode) {
+    public SaveRequestImpl(String uri, String code, boolean perm, boolean encode, boolean allowPost) {
       this.cacheControl = "no-cache";
       this.code = code;
       this.disableCacheControl = false;
       this.encode = encode;
       this.uri = uri;
       this.perm = perm;
+      this.allowPost = allowPost;
+    }
+
+    @Override
+    public boolean allowPost() {
+      return allowPost;
     }
 
     public Class<? extends Annotation> annotationType() {
