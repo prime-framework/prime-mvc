@@ -862,10 +862,6 @@ public class RequestBuilder {
     }
   }
 
-  private void assertRequestDoesNotContainBodyParameters() {
-
-  }
-
   private void setRequestBodyParameter(String name, Object value) {
     List<String> values = new ArrayList<>();
     values.add(value.toString());
