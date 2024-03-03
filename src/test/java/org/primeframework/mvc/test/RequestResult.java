@@ -1705,6 +1705,7 @@ public class RequestResult {
     }
 
     RequestBuilder rb = new RequestBuilder(uri, injector, userAgent, messageObserver, port);
+    String method = form.attr("method");
 
     // Handle input, select and textarea
     for (Element element : form.select("input,select,textarea")) {
@@ -1712,24 +1713,23 @@ public class RequestResult {
         if (element.is("select")) {
           for (Element option : element.select("option")) {
             if (option.hasAttr("selected")) {
-              rb.withParameter(element.attr("name"), option.val());
+              withParameter(rb, method, element.attr("name"), option.val());
             }
           }
         } else if (element.is("[type=radio],[type=checkbox]")) {
           if (element.hasAttr("checked")) {
             if (element.hasAttr("value")) {
-              rb.withParameter(element.attr("name"), element.val());
+              withParameter(rb, method, element.attr("name"), element.val());
             } else {
-              rb.withParameter(element.attr("name"), "on");
+              withParameter(rb, method, element.attr("name"), "on");
             }
           }
         } else {
-          rb.withParameter(element.attr("name"), element.val());
+          withParameter(rb, method, element.attr("name"), element.val());
         }
       }
     }
 
-    String method = form.attr("method");
     RequestResult requestResult = null;
     if (method.equalsIgnoreCase(Methods.GET)) {
       requestResult = rb.get();
@@ -1971,6 +1971,22 @@ public class RequestResult {
     // Sort the lists so we can check for equality
     map.values().forEach(l -> l.sort(Comparator.naturalOrder()));
     return map;
+  }
+
+  /**
+   * Handle adding the parameter to the request builder accounting for the HTTP method in use by the form.
+   *
+   * @param rb     the request builder
+   * @param method the HTTP method
+   * @param name   the parameter name
+   * @param value  the parameter value
+   */
+  private void withParameter(RequestBuilder rb, String method, String name, String value) {
+    if (method.equalsIgnoreCase(Methods.GET)) {
+      rb.withURLParameter(name, value);
+    } else {
+      rb.withParameter(name, value);
+    }
   }
 
   @FunctionalInterface
