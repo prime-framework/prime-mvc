@@ -1257,6 +1257,46 @@ public class RequestResult {
   }
 
   /**
+   * Can be used to build custom assertions or workflows that return a new result to re-use common chains workflows chains.
+   *
+   * @param function the function that takes the current result and returns a new one
+   * @return the final result from the delegate handler
+   */
+  public RequestResult delegate(ThrowingFunction<RequestResult, RequestResult> function) throws Exception {
+    return function.apply(this);
+  }
+
+  /**
+   * Can be used to build custom assertions or workflows that return a new result to re-use common chains workflows chains.
+   *
+   * @param test     false the function should be invoked
+   * @param function the function that takes the current result and returns a new one
+   * @return the final result from the delegate handler
+   */
+  public RequestResult delegateIfFalse(boolean test, ThrowingFunction<RequestResult, RequestResult> function) throws Exception {
+    if (!test) {
+      return function.apply(this);
+    }
+
+    return this;
+  }
+
+  /**
+   * Can be used to build custom assertions or workflows that return a new result to re-use common chains workflows chains.
+   *
+   * @param test     true if the function should be invoked
+   * @param function the function that takes the current result and returns a new one
+   * @return the final result from the delegate handler
+   */
+  public RequestResult delegateIfTrue(boolean test, ThrowingFunction<RequestResult, RequestResult> function) throws Exception {
+    if (test) {
+      return function.apply(this);
+    }
+
+    return this;
+  }
+
+  /**
    * Attempt to submit the form found in the response body.
    *
    * @param selector The selector used to find the form in the DOM
@@ -2423,13 +2463,13 @@ public class RequestResult {
     }
 
     @Override
-    public TestURIBuilder with(String name, Consumer<QueryStringBuilder> consumer) {
-      return (TestURIBuilder) super.with(name, consumer);
+    public TestURIBuilder with(String name, Object value) {
+      return (TestURIBuilder) super.with(name, value);
     }
 
     @Override
-    public TestURIBuilder with(String name, Object value) {
-      return (TestURIBuilder) super.with(name, value);
+    public TestURIBuilder with(String name, Consumer<QueryStringBuilder> consumer) {
+      return (TestURIBuilder) super.with(name, consumer);
     }
 
     /**
@@ -2447,6 +2487,14 @@ public class RequestResult {
       return this;
     }
 
+    public TestURIBuilder withConsumer(Consumer<TestURIBuilder> consumer) {
+      if (consumer != null) {
+        consumer.accept(this);
+      }
+
+      return this;
+    }
+
     /**
      * Add a parameter as optional which means that it is not required to be on the query string, but if it is, the actual value will be used during
      * the assertion.
@@ -2458,6 +2506,13 @@ public class RequestResult {
      */
     public TestURIBuilder withOptional(String name) {
       with(name, "___optional___");
+      return this;
+    }
+
+    public TestURIBuilder withQueryString(String queryString) {
+      Map<String, List<String>> parsed = QueryStringTools.parseQueryString(queryString);
+      parsed.forEach((name, values) -> values
+          .forEach(value -> super.with(name, value)));
       return this;
     }
 
