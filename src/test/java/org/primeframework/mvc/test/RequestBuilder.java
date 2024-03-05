@@ -859,7 +859,7 @@ public class RequestBuilder {
     // and this can be difficult to debug to understand why setting the method to GET results in a POST.
     // Let's fail the request to encourage the correct usage of the request builder.
     if (!requestBodyParameters.isEmpty()) {
-      throw new AssertionError("Invalid builder usage. When making a GET request, please use withURLParameter instead of " +
+      throw new AssertionError("Invalid builder usage. When making a GET or HEAD request, please use withURLParameter instead of " +
                                "withParameter. The underlying HttpURLConnection will change a GET to a POST when the body contains " +
                                "application/x-www-form-urlencoded data. The purpose of this exception is to enforce the correct usage to " +
                                "avoid confusion when your GET request is converted to a POST.");
