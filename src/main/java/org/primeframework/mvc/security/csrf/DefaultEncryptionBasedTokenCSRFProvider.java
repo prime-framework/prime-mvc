@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2020-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ public class DefaultEncryptionBasedTokenCSRFProvider implements CSRFProvider {
   @Override
   public String getToken(HTTPRequest request) {
     // Check to see if we have already generated the token, we store it in the request attribute.
-    String csrfToken = (String) request.getAttribute(CSRF_PARAMETER_KEY);
+    String csrfToken = (String) request.getAttribute(getParameterName());
     if (csrfToken == null) {
       String sessionId = securityContext.getSessionId();
       if (sessionId == null) {
@@ -63,7 +63,7 @@ public class DefaultEncryptionBasedTokenCSRFProvider implements CSRFProvider {
       }
 
       csrfToken = generateToken(sessionId);
-      request.setAttribute(CSRF_PARAMETER_KEY, csrfToken);
+      request.setAttribute(getParameterName(), csrfToken);
     }
 
     return csrfToken;
@@ -71,7 +71,7 @@ public class DefaultEncryptionBasedTokenCSRFProvider implements CSRFProvider {
 
   @Override
   public boolean validateRequest(HTTPRequest request) {
-    CSRFToken token = decrypt(request.getParameter(CSRF_PARAMETER_KEY));
+    CSRFToken token = decrypt(request.getParameter(getParameterName()));
     if (token == null) {
       return false;
     }
