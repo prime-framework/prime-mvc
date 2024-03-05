@@ -28,7 +28,6 @@ import org.example.action.user.EditAction;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.config.ActionConfigurationProvider;
-import org.primeframework.mvc.parameter.InternalParameters;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
 import static org.easymock.EasyMock.capture;
@@ -127,7 +126,7 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     chain.continueWorkflow();
     EasyMock.replay(chain);
 
-    DefaultActionMappingWorkflow workflow = new DefaultActionMappingWorkflow(request, response, store, new DefaultActionMapper(provider, injector), new InternalParameters(csrfProvider));
+    DefaultActionMappingWorkflow workflow = new DefaultActionMappingWorkflow(request, response, store, new DefaultActionMapper(provider, injector));
     workflow.perform(chain);
 
     ActionInvocation ai = capture.getValue();

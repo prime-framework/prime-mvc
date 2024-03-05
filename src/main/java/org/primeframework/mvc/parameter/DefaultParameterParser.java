@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2018, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.parameter.ParameterParser.Parameters.Struct;
+import org.primeframework.mvc.security.csrf.CSRFProvider;
 
 /**
  * This class is the default parameter parser. It pulls all the parameters from the request and puts them into groups
@@ -55,16 +56,16 @@ public class DefaultParameterParser implements ParameterParser {
 
   private final MVCConfiguration configuration;
 
-  private final InternalParameters internalParameters;
+  private final CSRFProvider csrfProvider;
 
   private final HTTPRequest request;
 
   @Inject
-  public DefaultParameterParser(MVCConfiguration configuration, ActionInvocationStore actionInvocationStore, InternalParameters internalParameters,
+  public DefaultParameterParser(MVCConfiguration configuration, ActionInvocationStore actionInvocationStore, CSRFProvider csrfProvider,
                                 HTTPRequest request) {
     this.configuration = configuration;
     this.actionInvocationStore = actionInvocationStore;
-    this.internalParameters = internalParameters;
+    this.csrfProvider = csrfProvider;
     this.request = request;
   }
 
@@ -154,11 +155,11 @@ public class DefaultParameterParser implements ParameterParser {
                                   Map<String, List<String>> checkBoxes,
                                   Map<String, List<String>> radioButtons, Set<String> actions) {
     for (String key : parameters.keySet()) {
-      if (internalParameters.isInternalParameter(key)) {
+      if (InternalParameters.isInternalParameter(key)) {
         continue;
       }
 
-      boolean optional = (key.endsWith(".x") || key.endsWith(".y"));
+      boolean optional = key.endsWith(".x") || key.endsWith(".y") || key.equals(csrfProvider.getParameterName());
 
       if (key.startsWith(CHECKBOX_PREFIX)) {
         checkBoxes.put(key.substring(CHECKBOX_PREFIX.length()), parameters.get(key));

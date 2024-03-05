@@ -15,10 +15,8 @@
  */
 package org.primeframework.mvc.parameter;
 
-import com.google.inject.Inject;
 import io.fusionauth.http.server.HTTPRequest;
 import org.primeframework.mvc.PrimeException;
-import org.primeframework.mvc.security.csrf.CSRFProvider;
 
 /**
  * This class handles all the parameters that control the Prime MVC internal behavior like validation, result
@@ -39,17 +37,6 @@ public final class InternalParameters {
    */
   public static final String EXECUTE_VALIDATION = "primeExecuteValidation";
 
-  private final CSRFProvider csrfProvider;
-
-  @Inject
-  public InternalParameters(CSRFProvider csrfProvider) {
-    this.csrfProvider = csrfProvider;
-  }
-
-  private static boolean isValidBoolean(String str) {
-    return str != null && (str.equals("true") || str.equals("false"));
-  }
-
   /**
    * Determines if the key given is true or false. The key must be one of the statics defined on this class and the
    * request parameters and request scope are checked, in that order.
@@ -59,7 +46,7 @@ public final class InternalParameters {
    * @return True of false. If the key doesn't exist in the request, this returns true. If it does exist in the request
    *     and is equal to {@code true}, this returns true. Otherwise, this returns false.
    */
-  public boolean is(HTTPRequest request, String key) {
+  public static boolean is(HTTPRequest request, String key) {
     if (!isInternalParameter(key)) {
       throw new PrimeException("Invalid key [" + key + "]");
     }
@@ -83,7 +70,11 @@ public final class InternalParameters {
    * @param key The key.
    * @return True if it is, false otherwise.
    */
-  public boolean isInternalParameter(String key) {
-    return key.equals(EXECUTE_RESULT) || key.equals(EXECUTE_VALIDATION) || key.equals(csrfProvider.getParameterName());
+  public static boolean isInternalParameter(String key) {
+    return key.equals(EXECUTE_RESULT) || key.equals(EXECUTE_VALIDATION);
+  }
+
+  private static boolean isValidBoolean(String str) {
+    return str != null && (str.equals("true") || str.equals("false"));
   }
 }
