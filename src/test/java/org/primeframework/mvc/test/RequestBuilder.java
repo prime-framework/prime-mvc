@@ -489,7 +489,8 @@ public class RequestBuilder {
   }
 
   /**
-   * Uses the given object as the JSON body for the request with the {@code application/json} content type. This object is converted into JSON using Jackson.
+   * Uses the given object as the JSON body for the request with the {@code application/json} content type. This object is converted into JSON using
+   * Jackson.
    *
    * @param object The object to send in the request.
    * @return This.
@@ -503,7 +504,7 @@ public class RequestBuilder {
    * Uses the given object as the JSON body for the request with the given content type. This object is converted into JSON using Jackson.
    *
    * @param contentType The Content-Type header value
-   * @param object The object to send in the request.
+   * @param object      The object to send in the request.
    * @return This.
    * @throws JsonProcessingException If the Jackson marshalling failed.
    */
@@ -527,7 +528,7 @@ public class RequestBuilder {
    * Uses the given string as the JSON body for the request with the given content type.
    *
    * @param contentType The Content-Type header value
-   * @param json The string representation of the JSON to send in the request.
+   * @param json        The string representation of the JSON to send in the request.
    * @return This.
    */
   public RequestBuilder withJSON(String contentType, String json) {
@@ -536,6 +537,7 @@ public class RequestBuilder {
 
   /**
    * Applies the given consumer to build a JSON body for the request with the {@code application/json} content type.
+   *
    * @param consumer The {@link JSONBuilder} consumer to build request
    * @return This.
    * @throws Exception If the Jackson marshalling failed or consumer threw an exception.
@@ -546,8 +548,9 @@ public class RequestBuilder {
 
   /**
    * Applies the given consumer to build a JSON body for the request with the given content type.
+   *
    * @param contentType The Content-Type header value
-   * @param consumer The {@link JSONBuilder} consumer to build request
+   * @param consumer    The {@link JSONBuilder} consumer to build request
    * @return This.
    * @throws Exception If the Jackson marshalling failed or consumer threw an exception.
    */
@@ -576,8 +579,8 @@ public class RequestBuilder {
    * Uses the given {@link Path} object to a JSON file as the JSON body for the request with the given content type.
    *
    * @param contentType The Content-Type header value
-   * @param jsonFile The string representation of the JSON to send in the request.
-   * @param values   key value pairs of replacement values for use in the JSON file.
+   * @param jsonFile    The string representation of the JSON to send in the request.
+   * @param values      key value pairs of replacement values for use in the JSON file.
    * @return This.
    * @throws IOException If the file could not be loaded.
    */
@@ -730,6 +733,12 @@ public class RequestBuilder {
   }
 
   ClientResponse<byte[], byte[]> run() {
+    // Perform some initial validation for the caller.
+    // - Doing this here instead of in the get() or head() method because you can also call method(HTTPMethod.*).
+    if (request.getMethod().is(HTTPMethod.GET) || request.getMethod().is(HTTPMethod.HEAD)) {
+      assertRequestDoesNotContainBodyParameters(request);
+    }
+
     // Set the new request & response so that we can inject things below
     HTTPObjectsHolder.clearRequest();
     HTTPObjectsHolder.setRequest(request);
@@ -843,6 +852,18 @@ public class RequestBuilder {
                                  .collect(Collectors.toList()));
 
     return response;
+  }
+
+  private void assertRequestDoesNotContainBodyParameters(HTTPRequest request) {
+    // If the user has added parameters to the request body, HttpURLConnection will convert a GET to a POST
+    // and this can be difficult to debug to understand why setting the method to GET results in a POST.
+    // Let's fail the request to encourage the correct usage of the request builder.
+    if (!requestBodyParameters.isEmpty()) {
+      throw new AssertionError("Invalid builder usage. When making a GET or HEAD request, please use withURLParameter instead of " +
+                               "withParameter. The underlying HttpURLConnection will change a GET to a POST when the body contains " +
+                               "application/x-www-form-urlencoded data. The purpose of this exception is to enforce the correct usage to " +
+                               "avoid confusion when your GET request is converted to a POST.");
+    }
   }
 
   private void setRequestBodyParameter(String name, Object value) {
