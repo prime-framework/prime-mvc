@@ -134,7 +134,6 @@ public class RequestBuilder {
    */
   public RequestResult get() {
     request.setMethod(HTTPMethod.GET);
-    assertRequestDoesNotContainBodyParameters(request);
     ClientResponse<byte[], byte[]> response = run();
     return new RequestResult(injector, request, response, userAgent, messageObserver, port);
   }
@@ -150,7 +149,6 @@ public class RequestBuilder {
    */
   public RequestResult head() {
     request.setMethod(HTTPMethod.HEAD);
-    assertRequestDoesNotContainBodyParameters(request);
     ClientResponse<byte[], byte[]> response = run();
     return new RequestResult(injector, request, response, userAgent, messageObserver, port);
   }
@@ -735,6 +733,12 @@ public class RequestBuilder {
   }
 
   ClientResponse<byte[], byte[]> run() {
+    // Perform some initial validation for the caller.
+    // - Doing this here instead of in the get() or head() method because you can also call method(HTTPMethod.*).
+    if (request.getMethod().is(HTTPMethod.GET) || request.getMethod().is(HTTPMethod.HEAD)) {
+      assertRequestDoesNotContainBodyParameters(request);
+    }
+
     // Set the new request & response so that we can inject things below
     HTTPObjectsHolder.clearRequest();
     HTTPObjectsHolder.setRequest(request);
