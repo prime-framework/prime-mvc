@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2024, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,23 +47,19 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
 
   private final ActionMapper actionMapper;
 
-  private final InternalParameters internalParameters;
-
   private final HTTPRequest request;
 
   private final HTTPResponse response;
 
-  @Inject(optional = true)
-  private MetricRegistry metricRegistry;
+  @Inject(optional = true) private MetricRegistry metricRegistry;
 
   @Inject
   public DefaultActionMappingWorkflow(HTTPRequest request, HTTPResponse response, ActionInvocationStore actionInvocationStore,
-                                      ActionMapper actionMapper, InternalParameters internalParameters) {
+                                      ActionMapper actionMapper) {
     this.request = request;
     this.response = response;
     this.actionInvocationStore = actionInvocationStore;
     this.actionMapper = actionMapper;
-    this.internalParameters = internalParameters;
   }
 
   /**
@@ -80,7 +76,7 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
     }
 
     HTTPMethod method = request.getMethod();
-    boolean executeResult = internalParameters.is(request, InternalParameters.EXECUTE_RESULT);
+    boolean executeResult = InternalParameters.is(request, InternalParameters.EXECUTE_RESULT);
     ActionInvocation actionInvocation = actionMapper.map(method, uri, executeResult);
 
     // This case is a redirect because the URI maps to something new and there isn't an action associated with it. For
