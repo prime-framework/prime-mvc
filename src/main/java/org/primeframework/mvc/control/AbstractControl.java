@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -186,6 +186,7 @@ public abstract class AbstractControl implements Control {
     Map<String, Object> parameters = new HashMap<>();
     if (configuration.csrfEnabled()) {
       parameters.put("csrfToken", csrfProvider.getToken(request));
+      parameters.put("csrfTokenName", csrfProvider.getParameterName());
     }
     parameters.put("attributes", attributes);
     parameters.put("dynamicAttributes", dynamicAttributes);
@@ -232,7 +233,7 @@ public abstract class AbstractControl implements Control {
         Object name = attributes.get("name");
         String nameAttribute = name != null ? " with name [" + name + "]" : "";
         errors.addError("The [" + controlName() + "] control" + nameAttribute + " is missing the required attribute [" +
-            controlAttribute.name() + "]");
+                        controlAttribute.name() + "]");
       } else if (value != null) {
         Class<?>[] attributeTypes = controlAttribute.types();
         boolean found = false;
@@ -247,7 +248,7 @@ public abstract class AbstractControl implements Control {
           Object name = attributes.get("name");
           String nameAttribute = name != null ? " with name [" + name + "]" : "";
           errors.addError("The [" + controlName() + "] control" + nameAttribute + " has an invalid attribute [" + controlAttribute.name() +
-              "] of type [" + value.getClass() + "]. It must be an instance of [" + toTypeListString(attributeTypes) + "]");
+                          "] of type [" + value.getClass() + "]. It must be an instance of [" + toTypeListString(attributeTypes) + "]");
         }
       }
     }

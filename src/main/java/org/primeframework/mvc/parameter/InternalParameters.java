@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,13 @@
  */
 package org.primeframework.mvc.parameter;
 
+import com.google.inject.Inject;
 import io.fusionauth.http.server.HTTPRequest;
 import org.primeframework.mvc.PrimeException;
-import static org.primeframework.mvc.security.csrf.CSRFProvider.CSRF_PARAMETER_KEY;
+import org.primeframework.mvc.security.csrf.CSRFProvider;
 
 /**
- * This class handles all of the parameters that control the Prime MVC internal behavior like validation, result
+ * This class handles all the parameters that control the Prime MVC internal behavior like validation, result
  * execution, action execution, etc.
  *
  * @author Brian Pontarelli
@@ -34,10 +35,20 @@ public final class InternalParameters {
 
   /**
    * HTTP request parameter or scoped attribute from the request that indicates if validation should be executed or not.
-   * By default the validation is always executed, but this can be used to suppress that behavior.
+   * By default, the validation is always executed, but this can be used to suppress that behavior.
    */
   public static final String EXECUTE_VALIDATION = "primeExecuteValidation";
 
+  private final CSRFProvider csrfProvider;
+
+  @Inject
+  public InternalParameters(CSRFProvider csrfProvider) {
+    this.csrfProvider = csrfProvider;
+  }
+
+  private static boolean isValidBoolean(String str) {
+    return str != null && (str.equals("true") || str.equals("false"));
+  }
 
   /**
    * Determines if the key given is true or false. The key must be one of the statics defined on this class and the
@@ -48,7 +59,7 @@ public final class InternalParameters {
    * @return True of false. If the key doesn't exist in the request, this returns true. If it does exist in the request
    *     and is equal to {@code true}, this returns true. Otherwise, this returns false.
    */
-  public static boolean is(HTTPRequest request, String key) {
+  public boolean is(HTTPRequest request, String key) {
     if (!isInternalParameter(key)) {
       throw new PrimeException("Invalid key [" + key + "]");
     }
@@ -72,11 +83,7 @@ public final class InternalParameters {
    * @param key The key.
    * @return True if it is, false otherwise.
    */
-  public static boolean isInternalParameter(String key) {
-    return key.equals(EXECUTE_RESULT) || key.equals(EXECUTE_VALIDATION) || key.equals(CSRF_PARAMETER_KEY);
-  }
-
-  private static boolean isValidBoolean(String str) {
-    return str != null && (str.equals("true") || str.equals("false"));
+  public boolean isInternalParameter(String key) {
+    return key.equals(EXECUTE_RESULT) || key.equals(EXECUTE_VALIDATION) || key.equals(csrfProvider.getParameterName());
   }
 }

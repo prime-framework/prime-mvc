@@ -192,7 +192,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(messageStore);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
-        actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
+        actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, new InternalParameters(csrfProvider), request),
         new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore, request));
     workflow.perform(chain);
 
@@ -254,7 +254,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(messageStore);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
-        actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
+        actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, new InternalParameters(csrfProvider), request),
         new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore, request));
     workflow.perform(chain);
 
@@ -301,7 +301,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(provider);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
-        actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
+        actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, new InternalParameters(csrfProvider), request),
         new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore, request));
     workflow.perform(chain);
 
@@ -351,7 +351,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(messageStore);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
-        actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
+        actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, new InternalParameters(csrfProvider), request),
         new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore, request));
     workflow.perform(chain);
 
@@ -400,7 +400,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(messageStore);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
-        actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
+        actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, new InternalParameters(csrfProvider), request),
         new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore, request));
     workflow.perform(chain);
 
@@ -448,7 +448,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(provider);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
-        actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
+        actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, new InternalParameters(csrfProvider), request),
         new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore, request));
     workflow.perform(chain);
 
@@ -492,7 +492,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(provider);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
-        actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
+        actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, new InternalParameters(csrfProvider), request),
         new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore, request));
     try {
       workflow.perform(chain);
@@ -542,7 +542,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(provider);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
-        actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
+        actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, new InternalParameters(csrfProvider), request),
         new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore, request));
     workflow.perform(chain);
 
@@ -591,7 +591,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(provider);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
-        actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
+        actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, new InternalParameters(csrfProvider), request),
         new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore, request));
     workflow.perform(chain);
 
@@ -638,7 +638,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(provider);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
-        actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
+        actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, new InternalParameters(csrfProvider), request),
         new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore, request));
     workflow.perform(chain);
 
@@ -694,7 +694,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(provider);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
-        actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
+        actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, new InternalParameters(csrfProvider), request),
         new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore, request));
     workflow.perform(chain);
 
@@ -735,7 +735,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(messageStore);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
-        actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
+        actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, new InternalParameters(csrfProvider), request),
         new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore, request));
     workflow.perform(chain);
 
@@ -776,7 +776,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(messageStore);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
-        actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
+        actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, new InternalParameters(csrfProvider), request),
         new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore, request));
     workflow.perform(chain);
 
@@ -819,7 +819,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(messageStore);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
-        actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
+        actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, new InternalParameters(csrfProvider), request),
         new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore, request));
     workflow.perform(chain);
 
@@ -863,7 +863,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(messageStore);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
-        actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
+        actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, new InternalParameters(csrfProvider), request),
         new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore, request));
     workflow.perform(chain);
 
@@ -920,7 +920,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
     replay(messageStore);
 
     DefaultParameterWorkflow workflow = new DefaultParameterWorkflow(
-        actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, request),
+        actionInvocationStore, new DefaultParameterParser(config, actionInvocationStore, new InternalParameters(csrfProvider), request),
         new DefaultParameterHandler(config, actionInvocationStore, expressionEvaluator, provider, messageStore, request));
     workflow.perform(chain);
 

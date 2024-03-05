@@ -31,7 +31,7 @@ import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.parameter.ParameterParser.Parameters.Struct;
 
 /**
- * This class is the default parameter parser. It pulls all of the parameters from the request and puts them into groups
+ * This class is the default parameter parser. It pulls all the parameters from the request and puts them into groups
  * that are as follows:
  *
  * <table>
@@ -55,13 +55,16 @@ public class DefaultParameterParser implements ParameterParser {
 
   private final MVCConfiguration configuration;
 
+  private final InternalParameters internalParameters;
+
   private final HTTPRequest request;
 
   @Inject
-  public DefaultParameterParser(MVCConfiguration configuration, ActionInvocationStore actionInvocationStore,
+  public DefaultParameterParser(MVCConfiguration configuration, ActionInvocationStore actionInvocationStore, InternalParameters internalParameters,
                                 HTTPRequest request) {
     this.configuration = configuration;
     this.actionInvocationStore = actionInvocationStore;
+    this.internalParameters = internalParameters;
     this.request = request;
   }
 
@@ -151,7 +154,7 @@ public class DefaultParameterParser implements ParameterParser {
                                   Map<String, List<String>> checkBoxes,
                                   Map<String, List<String>> radioButtons, Set<String> actions) {
     for (String key : parameters.keySet()) {
-      if (InternalParameters.isInternalParameter(key)) {
+      if (internalParameters.isInternalParameter(key)) {
         continue;
       }
 

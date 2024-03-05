@@ -379,7 +379,8 @@ public class RequestBuilder {
    * @return This.
    */
   public RequestBuilder withCSRFToken(String token) {
-    request.addURLParameter(CSRFProvider.CSRF_PARAMETER_KEY, token);
+    String parameterName = injector.getInstance(CSRFProvider.class).getParameterName();
+    request.addURLParameter(parameterName, token);
     return this;
   }
 
@@ -788,7 +789,8 @@ public class RequestBuilder {
       if (csrfProvider.getTokenFromRequest(request) == null) {
         String token = csrfProvider.getToken(request);
         if (token != null) {
-          request.addURLParameter(CSRFProvider.CSRF_PARAMETER_KEY, token);
+          String parameterName = csrfProvider.getParameterName();
+          request.addURLParameter(parameterName, token);
         }
       }
     }

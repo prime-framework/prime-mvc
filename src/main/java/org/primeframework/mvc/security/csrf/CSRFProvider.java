@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2020-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,12 @@ import io.fusionauth.http.server.HTTPRequest;
  * @author Daniel DeGroff
  */
 public interface CSRFProvider {
-  String CSRF_PARAMETER_KEY = "primeCSRFToken";
+  /**
+   * @return the CSRF parameter name
+   */
+  default String getParameterName() {
+    return "primeCSRFToken";
+  }
 
   /**
    * Return a CSRF token, it is up to the implementation to decide if the same value is returned during an entire
@@ -39,7 +44,7 @@ public interface CSRFProvider {
    * @return the CSRF token value if found in the HTTP request.
    */
   default String getTokenFromRequest(HTTPRequest request) {
-    return request.getParameter(CSRF_PARAMETER_KEY);
+    return request.getParameter(getParameterName());
   }
 
   /**

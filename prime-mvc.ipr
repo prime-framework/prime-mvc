@@ -89,6 +89,9 @@
       <item index="2" class="java.lang.String" itemvalue="org.primeframework.mvc.parameter.annotation.PreRenderMethod" />
       <item index="3" class="java.lang.String" itemvalue="org.primeframework.mvc.parameter.annotation.UnknownParameters" />
     </list>
+    <writeAnnotations>
+      <writeAnnotation name="com.google.inject.Inject" />
+    </writeAnnotations>
   </component>
   <component name="IdProvider" IDEtalkID="FAFCC8F55516B0FC710A9E287F066E00" />
   <component name="InspectionProjectProfileManager">
