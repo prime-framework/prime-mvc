@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2023, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2015-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -203,7 +203,7 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
    *
    * @param jwt the decoded JWT
    * @return true if the validation is ok and the JWT can be used. False if the JWT is not ok- and it should not be used. Returning true will still
-   * allow a refresh token to be used if available.
+   *     allow a refresh token to be used if available.
    */
   protected boolean validateJWTClaims(@SuppressWarnings("unused") JWT jwt) {
     return true;
@@ -242,6 +242,10 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
     body.put("refresh_token", List.of(tokens.refreshToken));
 
     OAuthConfiguration oauthConfiguration = oauthConfiguration();
+    if (oauthConfiguration == null) {
+      return tokens;
+    }
+
     RESTClient<RefreshResponse, JsonNode> client = new RESTClient<>(RefreshResponse.class, JsonNode.class)
         .url(oauthConfiguration.tokenEndpoint)
         .successResponseHandler(new JSONResponseHandler<>(RefreshResponse.class))
