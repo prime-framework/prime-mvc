@@ -33,7 +33,7 @@ import static org.testng.AssertJUnit.assertNull;
 @Status
 public class BinaryAction {
   public String expected;
-  public boolean expectedNullFile = false;
+  public boolean expectedNullFile;
 
   @BinaryRequest
   public Path file;
