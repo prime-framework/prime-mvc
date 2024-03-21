@@ -734,12 +734,6 @@ public class RequestBuilder {
   }
 
   ClientResponse<byte[], byte[]> run() {
-    // Perform some initial validation for the caller.
-    // - Doing this here instead of in the get() or head() method because you can also call method(HTTPMethod.*).
-    if (request.getMethod().is(HTTPMethod.GET) || request.getMethod().is(HTTPMethod.HEAD)) {
-      assertRequestDoesNotContainBodyParameters(request);
-    }
-
     // Set the new request & response so that we can inject things below
     HTTPObjectsHolder.clearRequest();
     HTTPObjectsHolder.setRequest(request);
@@ -823,6 +817,25 @@ public class RequestBuilder {
       bodyHandler = new FormDataBodyHandler(requestBodyParameters);
     }
 
+    // HttpURLConnection will convert a GET to a POST if there is a body.
+    if ((request.getMethod().is(HTTPMethod.GET) || request.getMethod().is(HTTPMethod.HEAD)) && bodyHandler != null) {
+      // This can be difficult to debug to understand why setting the method to GET results in a POST if we allow this to occur.
+      //
+      // See sun.net.www.protocol.http.HttpURLConnection#getOutputStream0()
+      //
+      //      if (method.equals("GET")) {
+      //        method = "POST"; // Backward compatibility
+      //      }
+      //
+      // Fail the request to encourage the correct usage of the request builder. If we move away from HttpURLConnection in the future,
+      // we may want to remove this code so that we can optionally make GET requests with a body or at least have it fail server side
+      // if it is not supported.
+      throw new AssertionError("Invalid builder usage. When making a GET or HEAD request, please use withURLParameter instead " +
+                               "of withParameter, and to not add a body. The underlying HttpURLConnection will change a GET to a POST if " +
+                               "there are bytes to write to the OutputStream regardless of the Content-Type. The purpose of this exception " +
+                               "is to enforce the correct usage to avoid confusion when your GET request is converted to a POST.");
+    }
+
     ClientResponse<byte[], byte[]> response = new RESTClient<>(byte[].class, byte[].class)
         .bodyHandler(bodyHandler)
         .connectTimeout(0)
@@ -854,18 +867,6 @@ public class RequestBuilder {
                                  .collect(Collectors.toList()));
 
     return response;
-  }
-
-  private void assertRequestDoesNotContainBodyParameters(HTTPRequest request) {
-    // If the user has added parameters to the request body, HttpURLConnection will convert a GET to a POST
-    // and this can be difficult to debug to understand why setting the method to GET results in a POST.
-    // Let's fail the request to encourage the correct usage of the request builder.
-    if (!requestBodyParameters.isEmpty()) {
-      throw new AssertionError("Invalid builder usage. When making a GET or HEAD request, please use withURLParameter instead of " +
-                               "withParameter. The underlying HttpURLConnection will change a GET to a POST when the body contains " +
-                               "application/x-www-form-urlencoded data. The purpose of this exception is to enforce the correct usage to " +
-                               "avoid confusion when your GET request is converted to a POST.");
-    }
   }
 
   private void setRequestBodyParameter(String name, Object value) {
