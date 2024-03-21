@@ -24,6 +24,7 @@ import org.primeframework.mvc.action.result.annotation.Status;
 import org.primeframework.mvc.content.binary.annotation.BinaryRequest;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
+import static org.testng.AssertJUnit.assertNull;
 
 /**
  * @author Daniel DeGroff
@@ -32,11 +33,16 @@ import static org.testng.Assert.assertNotNull;
 @Status
 public class BinaryAction {
   public String expected;
+  public boolean expectedNullFile;
 
   @BinaryRequest
   public Path file;
 
   public String post() {
+    if (expectedNullFile) {
+      assertNull(file);
+      return "success";
+    }
     assertNotNull(expected, "You need to pass in the expected value on the request.");
     assertNotNull(file);
     try {

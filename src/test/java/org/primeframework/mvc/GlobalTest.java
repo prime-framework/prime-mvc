@@ -1449,6 +1449,16 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void post_binary_no_body() throws Exception {
+    test.simulate(() -> simulator.test("/binary")
+                                 .withURLParameter("expectedNullFile", "true")
+                                 .withContentType("application/octet-stream")
+                                 .post()
+                                 .assertStatusCode(200)
+                                 .assertHeaderContains("Cache-Control", "no-cache"));
+  }
+
+  @Test
   public void post_chunked_json() throws Exception {
     // Our simulator does not chunk. This test uses the Java HTTP client to test chunking with Content-Type: application/json
     HttpClient client = HttpClient.newBuilder()

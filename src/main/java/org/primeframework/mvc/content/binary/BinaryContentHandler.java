@@ -79,8 +79,8 @@ public class BinaryContentHandler implements ContentHandler {
       return;
     }
 
-    long contentLength = request.getContentLength();
-    if (contentLength == 0) {
+    Long contentLength = request.getContentLength();
+    if (contentLength == null || contentLength == 0) {
       return;
     }
 
