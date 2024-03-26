@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2014-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,6 +82,7 @@ import org.primeframework.mvc.util.QueryStringTools;
 import org.primeframework.mvc.util.ThrowingFunction;
 import org.primeframework.mvc.util.ThrowingRunnable;
 import static java.util.Arrays.asList;
+import static org.primeframework.mvc.message.TestMessageObserver.ObserverMessageStoreId;
 
 /**
  * Result of a request to the {@link org.primeframework.mvc.test.RequestSimulator}.
@@ -101,6 +102,8 @@ public class RequestResult {
   public final ClientResponse<byte[], byte[]> response;
 
   public final MockUserAgent userAgent;
+
+  private Set<String> IgnoredHeadersOnRedirect = Set.of("authorization", "referer", ObserverMessageStoreId.toLowerCase());
 
   private String body;
 
@@ -1701,6 +1704,15 @@ public class RequestResult {
     String originalURI = baseURI;
     String newRedirect = redirect;
 
+    // This is pretty naive, and we could improve it if we thought it was necessary. curl will copy along headers when following redirects. We
+    // are aiming to do the same. If we need to make this smarter we can, but for now leaving it fairly dumb.
+    Map<String, List<String>> headersCopy = new HashMap<>();
+    request.getHeaders()
+           .keySet()
+           .stream()
+           .filter(name -> !IgnoredHeadersOnRedirect.contains(name.toLowerCase()))
+           .forEach(name -> headersCopy.put(name, new ArrayList<>(request.getHeaders(name))));
+
     // Handle a relative URI
     if (!baseURI.startsWith("/")) {
       int index = request.getPath().lastIndexOf('/');
@@ -1714,6 +1726,11 @@ public class RequestResult {
       String params = newRedirect.substring(newRedirect.indexOf('?') + 1);
       QueryStringTools.parseQueryString(params).forEach(rb::withURLParameters);
     }
+
+    // Copy them to the new request. This is essentially what curl does when you follow redirects I think.
+    // - Add in a Referer header for the current URL
+    rb.withHeader("Referer", request.getBaseURL());
+    headersCopy.forEach((name, value) -> value.forEach(v -> rb.withHeader(name, v)));
 
     RequestResult result = rb.get();
     consumer.accept(result);
