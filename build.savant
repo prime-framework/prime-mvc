@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2014-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ dropWizardVersion = "3.2.6"
 easyMockVersion = "5.1.0"
 freemarkerVersion = "2.3.32"
 fusionAuthJWTVersion = "5.1.0"
-javaHTTPVersion = "0.3.1-{integration}"
+javaHTTPVersion = "0.3.1"
 jsonPatchVersion = "1.13.0"
 guavaVersion = "32.1.2-jre"
 guiceVersion = "6.0.0"
