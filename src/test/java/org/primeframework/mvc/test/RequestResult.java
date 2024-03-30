@@ -46,9 +46,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.google.inject.Injector;
-import com.inversoft.http.HTTPStrings;
 import com.inversoft.http.HTTPStrings.Headers;
-import com.inversoft.rest.ClientResponse;
 import io.fusionauth.http.Cookie;
 import io.fusionauth.http.Cookie.SameSite;
 import io.fusionauth.http.HTTPValues.ContentTypes;
@@ -99,15 +97,15 @@ public class RequestResult {
 
   public final HTTPRequest request;
 
-  public final ClientResponse<byte[], byte[]> response;
+  public final HTTPResponseWrapper response;
 
   public final MockUserAgent userAgent;
 
-  private Set<String> IgnoredHeadersOnRedirect = Set.of("authorization", "referer", ObserverMessageStoreId.toLowerCase());
+  private final Set<String> IgnoredHeadersOnRedirect = Set.of("authorization", "referer", ObserverMessageStoreId.toLowerCase());
 
   private String body;
 
-  public RequestResult(Injector injector, HTTPRequest request, ClientResponse<byte[], byte[]> response,
+  public RequestResult(Injector injector, HTTPRequest request, HTTPResponseWrapper response,
                        MockUserAgent userAgent, TestMessageObserver messageObserver, int port) {
     this.request = request;
     this.injector = injector;
@@ -342,7 +340,7 @@ public class RequestResult {
     String body = getBodyAsString();
     for (String string : strings) {
       if (body.contains(string)) {
-        throw new AssertionError("Body shouldn't contain [" + string + "]\nRedirect: [" + response.getHeader(HTTPStrings.Headers.Location) + "]\nBody:\n" + body);
+        throw new AssertionError("Body shouldn't contain [" + string + "]\nRedirect: [" + response.getHeader(Headers.Location) + "]\nBody:\n" + body);
       }
     }
 
@@ -773,7 +771,7 @@ public class RequestResult {
     if (actual != null) {
       throw new AssertionError("Cookie [" + name + "] was not expected to be found in the response.\n"
                                + "Cookies found:\n"
-                               + response.getCookies().stream().map(this::convert).map(this::cookieToString).collect(Collectors.joining("\n")));
+                               + response.getCookies().stream().map(this::cookieToString).collect(Collectors.joining("\n")));
     }
     return this;
   }
@@ -1429,7 +1427,7 @@ public class RequestResult {
    * @return the body as a byte array.
    */
   public byte[] getBody() {
-    return response.wasSuccessful() ? response.successResponse : response.errorResponse;
+    return response.getBody();
   }
 
   /**
@@ -1456,12 +1454,7 @@ public class RequestResult {
    * @return The Cookie or null.
    */
   public Cookie getCookie(String name) {
-    List<Cookie> cookies = response.getCookies()
-                                   .stream()
-                                   .filter(c -> c.name.equals(name))
-                                   .map(this::convert)
-                                   .toList();
-
+    List<Cookie> cookies = response.getCookies(name);
     if (cookies.size() == 0) {
       return null;
     } else if (cookies.size() > 1) {
@@ -1480,11 +1473,7 @@ public class RequestResult {
    * @return The list of cookies with this name, or an empty list.
    */
   public List<Cookie> getCookies(String name) {
-    return response.getCookies()
-                   .stream()
-                   .filter(c -> c.name.equals(name))
-                   .map(this::convert)
-                   .collect(Collectors.toList());
+    return response.getCookies(name);
   }
 
   /**
@@ -1860,7 +1849,7 @@ public class RequestResult {
     if (actual == null) {
       throw new AssertionError("Cookie [" + name + "] was not found in the response.\n"
                                + "Cookies found:\n"
-                               + response.getCookies().stream().map(this::convert).map(this::cookieToString).collect(Collectors.joining("\n")));
+                               + response.getCookies().stream().map(this::cookieToString).collect(Collectors.joining("\n")));
     }
     return actual;
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2021-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc;
 
-import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import java.io.IOException;
@@ -62,7 +61,9 @@ public class TLSTest {
     simulator.shutdown();
 
     try {
-      SSLContext.getInstance("SSL").init(null, null, null);
+      SSLContext sslContext = SSLContext.getInstance("SSL");
+      sslContext.init(null, null, null);
+      SSLContext.setDefault(sslContext);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -99,7 +100,7 @@ public class TLSTest {
     try {
       SSLContext context = SSLContext.getInstance("SSL");
       context.init(null, new TrustManager[]{new UnsafeTrustManager()}, null);
-      HttpsURLConnection.setDefaultSSLSocketFactory(context.getSocketFactory());
+      SSLContext.setDefault(context);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

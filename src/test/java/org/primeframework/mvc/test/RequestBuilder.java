@@ -17,10 +17,18 @@ package org.primeframework.mvc.test;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpClient.Redirect;
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublisher;
+import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
@@ -28,6 +36,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -37,14 +46,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Injector;
 import com.inversoft.http.Cookie.SameSite;
 import com.inversoft.http.FileUpload;
-import com.inversoft.rest.ByteArrayBodyHandler;
-import com.inversoft.rest.ByteArrayResponseHandler;
-import com.inversoft.rest.ClientResponse;
+import com.inversoft.http.HTTPStrings;
+import com.inversoft.http.HTTPStrings.Headers;
 import com.inversoft.rest.FormDataBodyHandler;
 import com.inversoft.rest.MultipartBodyHandler;
 import com.inversoft.rest.MultipartBodyHandler.Multiparts;
-import com.inversoft.rest.RESTClient;
-import com.inversoft.rest.RESTClient.BodyHandler;
 import io.fusionauth.http.Cookie;
 import io.fusionauth.http.FileInfo;
 import io.fusionauth.http.HTTPMethod;
@@ -58,6 +64,7 @@ import org.primeframework.mvc.message.TestMessageObserver;
 import org.primeframework.mvc.parameter.DefaultParameterParser;
 import org.primeframework.mvc.security.csrf.CSRFProvider;
 import org.primeframework.mvc.test.RequestResult.ThrowingConsumer;
+import org.primeframework.mvc.util.QueryStringBuilder;
 import org.primeframework.mvc.util.QueryStringTools;
 import org.primeframework.mvc.util.URITools;
 
@@ -79,6 +86,8 @@ public class RequestBuilder {
   public final Map<String, List<String>> requestBodyParameters = new LinkedHashMap<>();
 
   public final MockUserAgent userAgent;
+
+  public HttpClient client;
 
   public boolean useTLS;
 
@@ -112,7 +121,7 @@ public class RequestBuilder {
    */
   public RequestResult connect() {
     request.setMethod(HTTPMethod.CONNECT);
-    ClientResponse<byte[], byte[]> response = run();
+    HTTPResponseWrapper response = run();
     return new RequestResult(injector, request, response, userAgent, messageObserver, port);
   }
 
@@ -123,7 +132,7 @@ public class RequestBuilder {
    */
   public RequestResult delete() {
     request.setMethod(HTTPMethod.DELETE);
-    ClientResponse<byte[], byte[]> response = run();
+    HTTPResponseWrapper response = run();
     return new RequestResult(injector, request, response, userAgent, messageObserver, port);
   }
 
@@ -134,7 +143,7 @@ public class RequestBuilder {
    */
   public RequestResult get() {
     request.setMethod(HTTPMethod.GET);
-    ClientResponse<byte[], byte[]> response = run();
+    HTTPResponseWrapper response = run();
     return new RequestResult(injector, request, response, userAgent, messageObserver, port);
   }
 
@@ -149,7 +158,7 @@ public class RequestBuilder {
    */
   public RequestResult head() {
     request.setMethod(HTTPMethod.HEAD);
-    ClientResponse<byte[], byte[]> response = run();
+    HTTPResponseWrapper response = run();
     return new RequestResult(injector, request, response, userAgent, messageObserver, port);
   }
 
@@ -206,7 +215,7 @@ public class RequestBuilder {
    */
   public RequestResult method(HTTPMethod method) {
     request.setMethod(method);
-    ClientResponse<byte[], byte[]> response = run();
+    HTTPResponseWrapper response = run();
     return new RequestResult(injector, request, response, userAgent, messageObserver, port);
   }
 
@@ -227,7 +236,7 @@ public class RequestBuilder {
    */
   public RequestResult options() {
     request.setMethod(HTTPMethod.OPTIONS);
-    ClientResponse<byte[], byte[]> response = run();
+    HTTPResponseWrapper response = run();
     return new RequestResult(injector, request, response, userAgent, messageObserver, port);
   }
 
@@ -238,7 +247,7 @@ public class RequestBuilder {
    */
   public RequestResult patch() {
     request.setMethod(HTTPMethod.PATCH);
-    ClientResponse<byte[], byte[]> response = run();
+    HTTPResponseWrapper response = run();
     return new RequestResult(injector, request, response, userAgent, messageObserver, port);
   }
 
@@ -249,7 +258,7 @@ public class RequestBuilder {
    */
   public RequestResult post() {
     request.setMethod(HTTPMethod.POST);
-    ClientResponse<byte[], byte[]> response = run();
+    HTTPResponseWrapper response = run();
     return new RequestResult(injector, request, response, userAgent, messageObserver, port);
   }
 
@@ -260,7 +269,7 @@ public class RequestBuilder {
    */
   public RequestResult put() {
     request.setMethod(HTTPMethod.PUT);
-    ClientResponse<byte[], byte[]> response = run();
+    HTTPResponseWrapper response = run();
     return new RequestResult(injector, request, response, userAgent, messageObserver, port);
   }
 
@@ -282,7 +291,7 @@ public class RequestBuilder {
    */
   public RequestResult trace() {
     request.setMethod(HTTPMethod.TRACE);
-    ClientResponse<byte[], byte[]> response = run();
+    HTTPResponseWrapper response = run();
     return new RequestResult(injector, request, response, userAgent, messageObserver, port);
   }
 
@@ -733,7 +742,7 @@ public class RequestBuilder {
     return withURLSegment(value);
   }
 
-  ClientResponse<byte[], byte[]> run() {
+  HTTPResponseWrapper run() {
     // Set the new request & response so that we can inject things below
     HTTPObjectsHolder.clearRequest();
     HTTPObjectsHolder.setRequest(request);
@@ -761,7 +770,7 @@ public class RequestBuilder {
                                                                       .with(c1 -> c1.sameSite = c.sameSite != null ? SameSite.valueOf(c.sameSite.name()) : null)
                                                                       .with(c1 -> c1.secure = c.secure)
                                                                       .with(c1 -> c1.value = c.value))
-                             .collect(Collectors.toList());
+                             .toList();
 
     String scheme = useTLS ? "https://" : "http://";
     URI requestURI = URI.create(scheme + "localhost:" + port + request.getPath());
@@ -796,88 +805,113 @@ public class RequestBuilder {
 
     Map<String, List<String>> urlParameters = request.getParameters();
     List<FileInfo> files = request.getFiles();
-    BodyHandler bodyHandler = null;
+    BodyPublisher bodyPublisher = BodyPublishers.noBody();
+
     if (files != null && files.size() > 0) {
       List<FileUpload> fileUploads = files.stream()
                                           .map(fi -> new FileUpload(fi.contentType, fi.file, fi.fileName, fi.name))
                                           .collect(Collectors.toList());
-      bodyHandler = new MultipartBodyHandler(new Multiparts(fileUploads, urlParameters));
-    } else if (body != null) {
-      bodyHandler = new ByteArrayBodyHandler(body);
-
-      // The HttpURLConnection will set the Content-Type to application/w-www-url-encoded if you
-      // provide a body w/out a Content-Type set. Set to empty string to keep this from happening.
-      // - Remove if we ever get rid of the HttpURLConnection in Restify.
-      // - Only doing this here because the other two body handlers will set a Content-Type later
-      //   when invoked by Restify.
+      MultipartBodyHandler multipartBodyHandler = new MultipartBodyHandler(new Multiparts(fileUploads, urlParameters));
+      bodyPublisher = BodyPublishers.ofByteArray(multipartBodyHandler.getBody());
       if (contentType == null) {
-        contentType = "";
+        contentType = "multipart/form-data; boundary=" + multipartBodyHandler.boundary;
       }
+    } else if (body != null) {
+      bodyPublisher = BodyPublishers.ofByteArray(body);
     } else if (!requestBodyParameters.isEmpty()) {
-      bodyHandler = new FormDataBodyHandler(requestBodyParameters);
+      bodyPublisher = BodyPublishers.ofByteArray(new FormDataBodyHandler(requestBodyParameters).getBody());
+      if (contentType == null) {
+        contentType = "application/x-www-form-urlencoded";
+      }
     }
 
-    // HttpURLConnection will convert a GET to a POST if there is a body.
-    if ((request.getMethod().is(HTTPMethod.GET) || request.getMethod().is(HTTPMethod.HEAD)) && bodyHandler != null) {
-      // This can be difficult to debug to understand why setting the method to GET results in a POST if we allow this to occur.
-      //
-      // See sun.net.www.protocol.http.HttpURLConnection#getOutputStream0()
-      //
-      //      if (method.equals("GET")) {
-      //        method = "POST"; // Backward compatibility
-      //      }
-      //
-      // Fail the request to encourage the correct usage of the request builder. If we move away from HttpURLConnection in the future,
-      // we may want to remove this code so that we can optionally make GET requests with a body or at least have it fail server side
-      // if it is not supported.
-      throw new AssertionError("Invalid builder usage. When making a GET or HEAD request, please use withURLParameter instead " +
-                               "of withParameter, and to not add a body. The underlying HttpURLConnection will change a GET to a POST if " +
-                               "there are bytes to write to the OutputStream regardless of the Content-Type. The purpose of this exception " +
-                               "is to enforce the correct usage to avoid confusion when your GET request is converted to a POST.");
+    // Re-use the HTTP client
+    if (client == null) {
+      client = HttpClient.newBuilder()
+                         // Setting this too low will cause TLS connections to timeout
+                         // - We used to set it to 0 in our own REST client, but 0 is not supported.
+                         // - 50 works fine for non TLS tests.
+                         .connectTimeout(Duration.ofMillis(250))
+                         .followRedirects(Redirect.NEVER)
+                         .build();
     }
 
-    ClientResponse<byte[], byte[]> response = new RESTClient<>(byte[].class, byte[].class)
-        .bodyHandler(bodyHandler)
-        .connectTimeout(0)
-        .cookies(restCookies)
-        .errorResponseHandler(new ByteArrayResponseHandler())
-        .followRedirects(false)
-        .setHeader("Accept-Language", locales.size() > 0 ? locales.stream().map(Locale::toLanguageTag).collect(Collectors.joining(", ")) : null)
-        .setHeader("Content-Type", contentType != null ? (contentType + (characterEncoding != null ? "; charset=" + characterEncoding : "")) : null)
-        .setHeaders(request.getHeaders())
-        .method(request.getMethod().name())
-        .readTimeout(0)
-        .successResponseHandler(new ByteArrayResponseHandler())
-        .url(requestURI.toString())
-        .addURLParameters(urlParameters)
-        .go();
+    var requestBuilder = HttpRequest.newBuilder()
+                                    .method(request.getMethod().name(), bodyPublisher);
+
+    if (locales.size() > 0) {
+      requestBuilder.setHeader("Accept-Language", locales.stream().map(Locale::toLanguageTag).collect(Collectors.joining(", ")));
+    }
+
+    if (contentType != null) {
+      requestBuilder.setHeader(Headers.ContentType, contentType + (characterEncoding != null ? "; charset=" + characterEncoding : ""));
+    }
+
+    // Copy over headers
+    request.getHeaders().forEach((name, values) -> values
+        .forEach(value -> requestBuilder.setHeader(name, value)));
+
+    // Set cookies
+    if (request.getHeaders().keySet().stream().noneMatch(name -> name.equalsIgnoreCase(HTTPStrings.Headers.Cookie)) && request.getCookies().size() > 0) {
+      String header = request.getCookies()
+                             .stream()
+                             .map(io.fusionauth.http.Cookie::toRequestHeader)
+                             .collect(Collectors.joining("; "));
+      requestBuilder.setHeader(HTTPStrings.Headers.Cookie, header);
+    }
+
+    QueryStringBuilder queryStringBuilder = QueryStringBuilder.builder();
+    urlParameters.forEach((name, values) -> values.forEach(value -> queryStringBuilder.with(name, value)));
+
+    URI fullURI = urlParameters.isEmpty()
+        ? requestURI
+        : URI.create(requestURI + "?" + queryStringBuilder.build());
+
+    requestBuilder.uri(fullURI);
+
+    HTTPResponseWrapper result = new HTTPResponseWrapper();
+    try {
+      result.response = client.send(requestBuilder.build(),
+                                    BodyHandlers.ofByteArray());
+    } catch (Exception e) {
+      result.exception = e;
+      result.init();
+      return result;
+    }
 
     // Extract the cookies and put them in the UserAgent
-    userAgent.addCookies(response.getCookies()
-                                 .stream()
-                                 .map(c -> new Cookie().with(c1 -> c1.domain = c.domain)
-                                                       .with(c1 -> c1.expires = c.expires)
-                                                       .with(c1 -> c1.httpOnly = c.httpOnly)
-                                                       .with(c1 -> c1.maxAge = c.maxAge)
-                                                       .with(c1 -> c1.name = c.name)
-                                                       .with(c1 -> c1.path = c.path)
-                                                       .with(c1 -> c1.sameSite = c.sameSite != null ? Cookie.SameSite.valueOf(c.sameSite.name()) : null)
-                                                       .with(c1 -> c1.secure = c.secure)
-                                                       .with(c1 -> c1.value = c.value))
-                                 .collect(Collectors.toList()));
+    userAgent.addCookies(getCookies(result.response)
+                             .stream()
+                             .map(c -> new Cookie().with(c1 -> c1.domain = c.domain)
+                                                   .with(c1 -> c1.expires = c.expires)
+                                                   .with(c1 -> c1.httpOnly = c.httpOnly)
+                                                   .with(c1 -> c1.maxAge = c.maxAge)
+                                                   .with(c1 -> c1.name = c.name)
+                                                   .with(c1 -> c1.path = c.path)
+                                                   .with(c1 -> c1.sameSite = c.sameSite != null ? Cookie.SameSite.valueOf(c.sameSite.name()) : null)
+                                                   .with(c1 -> c1.secure = c.secure)
+                                                   .with(c1 -> c1.value = c.value))
+                             .collect(Collectors.toList()));
 
-    return response;
+    result.init();
+    return result;
+  }
+
+  private List<io.fusionauth.http.Cookie> getCookies(HttpResponse<byte[]> response) {
+    List<String> cookies = response.headers().allValues(HTTPStrings.Headers.SetCookie.toLowerCase());
+    if (cookies != null && cookies.size() > 0) {
+      return cookies.stream()
+                    .map(io.fusionauth.http.Cookie::fromResponseHeader)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+    }
+
+    return List.of();
   }
 
   private void setRequestBodyParameter(String name, Object value) {
     List<String> values = new ArrayList<>();
     values.add(value.toString());
     requestBodyParameters.put(name, values);
-  }
-
-  static {
-    // Do not restrict the HTTP request headers that can be set by the REST client.
-    // - Used by HttpURLConnection
-    System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
   }
 }
