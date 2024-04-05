@@ -860,6 +860,12 @@ public class RequestBuilder {
       requestBuilder.setHeader(HTTPStrings.Headers.Cookie, header);
     }
 
+    // Set the UserAgent header if not already set
+    // - Do this because the default UserAgent string will include the Java version string which is annoying to update in tests.
+    if (request.getHeaders().keySet().stream().noneMatch(name -> name.equalsIgnoreCase(Headers.UserAgent))) {
+      requestBuilder.setHeader(HTTPStrings.Headers.UserAgent, "Java HttpClient");
+    }
+
     QueryStringBuilder queryStringBuilder = QueryStringBuilder.builder();
     urlParameters.forEach((name, values) -> values.forEach(value -> queryStringBuilder.with(name, value)));
 
