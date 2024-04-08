@@ -75,6 +75,8 @@ import org.primeframework.mvc.util.URITools;
  */
 @SuppressWarnings({"unused", "UnusedReturnValue"})
 public class RequestBuilder {
+  public static HttpClient HttpClientInstance = newHttpClient();
+
   public final Injector injector;
 
   public final TestMessageObserver messageObserver;
@@ -86,8 +88,6 @@ public class RequestBuilder {
   public final Map<String, List<String>> requestBodyParameters = new LinkedHashMap<>();
 
   public final MockUserAgent userAgent;
-
-  public HttpClient client;
 
   public boolean useTLS;
 
@@ -101,6 +101,20 @@ public class RequestBuilder {
     this.request = new HTTPRequest().with(r -> r.addLocales(Locale.US))
                                     .with(r -> r.setPath(path));
     this.port = port;
+  }
+
+  public static HttpClient newHttpClient() {
+    return HttpClient.newBuilder()
+                     // Setting this too low will cause TLS connections to timeout
+                     // - We used to set it to 0 in our own REST client, but 0 is not supported.
+                     // - 50 works fine for non TLS tests.
+                     .connectTimeout(Duration.ofMillis(250))
+                     .followRedirects(Redirect.NEVER)
+                     .build();
+  }
+
+  public static void resetHttpClientInstance() {
+    HttpClientInstance = newHttpClient();
   }
 
   /**
@@ -825,17 +839,6 @@ public class RequestBuilder {
       }
     }
 
-    // Re-use the HTTP client
-    if (client == null) {
-      client = HttpClient.newBuilder()
-                         // Setting this too low will cause TLS connections to timeout
-                         // - We used to set it to 0 in our own REST client, but 0 is not supported.
-                         // - 50 works fine for non TLS tests.
-                         .connectTimeout(Duration.ofMillis(250))
-                         .followRedirects(Redirect.NEVER)
-                         .build();
-    }
-
     var requestBuilder = HttpRequest.newBuilder()
                                     .method(request.getMethod().name(), bodyPublisher);
 
@@ -877,8 +880,8 @@ public class RequestBuilder {
 
     HTTPResponseWrapper result = new HTTPResponseWrapper();
     try {
-      result.response = client.send(requestBuilder.build(),
-                                    BodyHandlers.ofByteArray());
+      result.response = HttpClientInstance.send(requestBuilder.build(),
+                                                BodyHandlers.ofByteArray());
     } catch (Exception e) {
       result.exception = e;
       result.init();
