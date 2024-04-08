@@ -65,6 +65,9 @@ public class TLSTest {
       SSLContext sslContext = SSLContext.getInstance("SSL");
       sslContext.init(null, null, null);
       SSLContext.setDefault(sslContext);
+
+      // Reset the HttpClient after changing the SSLContext
+      RequestBuilder.resetHttpClientInstance();
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
