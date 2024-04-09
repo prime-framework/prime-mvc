@@ -15,7 +15,9 @@
  */
 package org.primeframework.mvc.test;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpClient.Redirect;
@@ -820,8 +822,10 @@ public class RequestBuilder {
     Map<String, List<String>> urlParameters = request.getParameters();
     List<FileInfo> files = request.getFiles();
     BodyPublisher bodyPublisher = BodyPublishers.noBody();
+    // We'll use this to keep the java-http HTTP Request in sync
+    InputStream inputStream = null;
 
-    if (files != null && files.size() > 0) {
+    if (files != null && !files.isEmpty()) {
       List<FileUpload> fileUploads = files.stream()
                                           .map(fi -> new FileUpload(fi.contentType, fi.file, fi.fileName, fi.name))
                                           .collect(Collectors.toList());
@@ -830,24 +834,36 @@ public class RequestBuilder {
       if (contentType == null) {
         contentType = "multipart/form-data; boundary=" + multipartBodyHandler.boundary;
       }
+      inputStream = new ByteArrayInputStream(multipartBodyHandler.getBody());
     } else if (body != null) {
       bodyPublisher = BodyPublishers.ofByteArray(body);
+      inputStream = new ByteArrayInputStream(body);
     } else if (!requestBodyParameters.isEmpty()) {
-      bodyPublisher = BodyPublishers.ofByteArray(new FormDataBodyHandler(requestBodyParameters).getBody());
+      byte[] formBody = new FormDataBodyHandler(requestBodyParameters).getBody();
+      bodyPublisher = BodyPublishers.ofByteArray(formBody);
       if (contentType == null) {
         contentType = "application/x-www-form-urlencoded";
       }
+      inputStream = (new ByteArrayInputStream(formBody));
+    }
+
+    // Keep this HTTP request in sync so that we can optionally use it in various test use cases.
+    if (inputStream != null) {
+      request.setInputStream(inputStream);
     }
 
     var requestBuilder = HttpRequest.newBuilder()
                                     .method(request.getMethod().name(), bodyPublisher);
 
-    if (locales.size() > 0) {
+    if (!locales.isEmpty()) {
       requestBuilder.setHeader("Accept-Language", locales.stream().map(Locale::toLanguageTag).collect(Collectors.joining(", ")));
     }
 
     if (contentType != null) {
       requestBuilder.setHeader(Headers.ContentType, contentType + (characterEncoding != null ? "; charset=" + characterEncoding : ""));
+
+      // Keep this HTTP request in sync so that we can optionally use it in various test use cases.
+      request.setContentType(contentType);
     }
 
     // Copy over headers
@@ -855,7 +871,7 @@ public class RequestBuilder {
         .forEach(value -> requestBuilder.setHeader(name, value)));
 
     // Set cookies
-    if (request.getHeaders().keySet().stream().noneMatch(name -> name.equalsIgnoreCase(HTTPStrings.Headers.Cookie)) && request.getCookies().size() > 0) {
+    if (request.getHeaders().keySet().stream().noneMatch(name -> name.equalsIgnoreCase(HTTPStrings.Headers.Cookie)) && !request.getCookies().isEmpty()) {
       String header = request.getCookies()
                              .stream()
                              .map(io.fusionauth.http.Cookie::toRequestHeader)
@@ -908,7 +924,7 @@ public class RequestBuilder {
 
   private List<io.fusionauth.http.Cookie> getCookies(HttpResponse<byte[]> response) {
     List<String> cookies = response.headers().allValues(HTTPStrings.Headers.SetCookie.toLowerCase());
-    if (cookies != null && cookies.size() > 0) {
+    if (cookies != null && !cookies.isEmpty()) {
       return cookies.stream()
                     .map(io.fusionauth.http.Cookie::fromResponseHeader)
                     .filter(Objects::nonNull)
