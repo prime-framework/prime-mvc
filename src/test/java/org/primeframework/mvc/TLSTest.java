@@ -42,6 +42,7 @@ import org.primeframework.mvc.http.HTTPObjectsHolder;
 import org.primeframework.mvc.message.TestMessageObserver;
 import org.primeframework.mvc.security.MockOAuthUserLoginSecurityContext;
 import org.primeframework.mvc.security.UserLoginSecurityContext;
+import org.primeframework.mvc.test.RequestBuilder;
 import org.primeframework.mvc.test.RequestSimulator;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
@@ -64,6 +65,9 @@ public class TLSTest {
       SSLContext sslContext = SSLContext.getInstance("SSL");
       sslContext.init(null, null, null);
       SSLContext.setDefault(sslContext);
+
+      // Reset the HttpClient after changing the SSLContext
+      RequestBuilder.resetHttpClientInstance();
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -104,6 +108,9 @@ public class TLSTest {
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
+
+    // Reset the HttpClient after changing the SSLContext
+    RequestBuilder.resetHttpClientInstance();
   }
 
   /**
