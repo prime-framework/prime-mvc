@@ -17,6 +17,7 @@ package org.primeframework.mvc.test;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpClient.Redirect;
@@ -821,6 +822,8 @@ public class RequestBuilder {
     Map<String, List<String>> urlParameters = request.getParameters();
     List<FileInfo> files = request.getFiles();
     BodyPublisher bodyPublisher = BodyPublishers.noBody();
+    // We'll use this to keep the java-http HTTP Request in sync
+    InputStream inputStream = null;
 
     if (files != null && !files.isEmpty()) {
       List<FileUpload> fileUploads = files.stream()
@@ -831,23 +834,22 @@ public class RequestBuilder {
       if (contentType == null) {
         contentType = "multipart/form-data; boundary=" + multipartBodyHandler.boundary;
       }
-      request.setInputStream(new ByteArrayInputStream(multipartBodyHandler.getBody()));
-      request.setContentLength(bodyPublisher.contentLength());
-      request.setContentType(contentType);
+      inputStream = new ByteArrayInputStream(multipartBodyHandler.getBody());
     } else if (body != null) {
       bodyPublisher = BodyPublishers.ofByteArray(body);
-      request.setInputStream(new ByteArrayInputStream(body));
-      request.setContentLength((long) body.length);
-      request.setContentType(contentType);
+      inputStream = new ByteArrayInputStream(body);
     } else if (!requestBodyParameters.isEmpty()) {
       byte[] formBody = new FormDataBodyHandler(requestBodyParameters).getBody();
       bodyPublisher = BodyPublishers.ofByteArray(formBody);
       if (contentType == null) {
         contentType = "application/x-www-form-urlencoded";
       }
-      request.setInputStream(new ByteArrayInputStream(formBody));
-      request.setContentLength((long) formBody.length);
-      request.setContentType(contentType);
+      inputStream = (new ByteArrayInputStream(formBody));
+    }
+
+    // Keep this HTTP request in sync so that we can optionally use it in various test use cases.
+    if (inputStream != null) {
+      request.setInputStream(inputStream);
     }
 
     var requestBuilder = HttpRequest.newBuilder()
@@ -859,6 +861,9 @@ public class RequestBuilder {
 
     if (contentType != null) {
       requestBuilder.setHeader(Headers.ContentType, contentType + (characterEncoding != null ? "; charset=" + characterEncoding : ""));
+
+      // Keep this HTTP request in sync so that we can optionally use it in various test use cases.
+      request.setContentType(contentType);
     }
 
     // Copy over headers
