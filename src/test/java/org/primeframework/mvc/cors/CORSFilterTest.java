@@ -230,6 +230,16 @@ public class CORSFilterTest extends PrimeBaseTest {
     // assert
     var expectedStatus = expectCorsAllow ? 204 : 403;
     assertEquals(response.statusCode(), expectedStatus);
+    if (!expectCorsAllow) {
+      return;
+    }
+    assertEquals(response.headers().firstValue("Access-Control-Allow-Credentials").orElse(null), "true");
+    assertEquals(response.headers().firstValue("Access-Control-Allow-Headers").orElse(null), "Accept,Access-Control-Request-Headers,Access-Control-Request-Method,Authorization,Content-Type,Last-Modified,Origin,X-FusionAuth-TenantId,X-Requested-With");
+    assertEquals(response.headers().firstValue("Access-Control-Allow-Methods").orElse(null), "GET");
+    assertEquals(response.headers().firstValue("Access-Control-Max-Age").orElse(null), "1800");
+    assertEquals(response.headers().firstValue("Access-Control-Allow-Origin").orElse(null), "https://jackinthebox.com");
+    assertNull(response.headers().firstValue("Access-Control-Expose-Headers").orElse(null));
+    assertEquals(response.headers().firstValue("Vary").orElse(null), "Origin");
   }
 
   @Test(dataProvider = "get_included_path_pattern")
@@ -257,6 +267,16 @@ public class CORSFilterTest extends PrimeBaseTest {
     // assert
     var expectedStatus = expectCorsAllow ? 204 : 403;
     assertEquals(response.statusCode(), expectedStatus);
+    if (!expectCorsAllow) {
+      return;
+    }
+    assertEquals(response.headers().firstValue("Access-Control-Allow-Credentials").orElse(null), "true");
+    assertEquals(response.headers().firstValue("Access-Control-Allow-Headers").orElse(null), "Accept,Access-Control-Request-Headers,Access-Control-Request-Method,Authorization,Content-Type,Last-Modified,Origin,X-FusionAuth-TenantId,X-Requested-With");
+    assertEquals(response.headers().firstValue("Access-Control-Allow-Methods").orElse(null), "GET");
+    assertEquals(response.headers().firstValue("Access-Control-Max-Age").orElse(null), "1800");
+    assertEquals(response.headers().firstValue("Access-Control-Allow-Origin").orElse(null), "https://jackinthebox.com");
+    assertNull(response.headers().firstValue("Access-Control-Expose-Headers").orElse(null));
+    assertEquals(response.headers().firstValue("Vary").orElse(null), "Origin");
   }
 
   @Test(dataProvider = "get_included_path_pattern")
