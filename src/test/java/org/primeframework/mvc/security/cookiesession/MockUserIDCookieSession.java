@@ -26,7 +26,7 @@ import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.security.Encryptor;
 
-public class MockUserIDCookieSession extends UserIDCookieSession {
+public class MockUserIDCookieSession extends UserIDCookieSessionSecurityContext {
   @Inject
   protected MockUserIDCookieSession(HTTPRequest request, HTTPResponse response,
                                     Encryptor encryptor, ObjectMapper objectMapper,

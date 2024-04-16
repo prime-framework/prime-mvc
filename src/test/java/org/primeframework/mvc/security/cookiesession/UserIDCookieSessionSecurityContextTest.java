@@ -15,7 +15,7 @@ import io.fusionauth.http.server.HTTPServerConfiguration;
 import org.primeframework.mvc.TestPrimeMain;
 import org.primeframework.mvc.guice.MVCModule;
 import org.primeframework.mvc.message.TestMessageObserver;
-import org.primeframework.mvc.security.cookiesession.UserIDCookieSession.CookieExtendResult;
+import org.primeframework.mvc.security.cookiesession.UserIDCookieSessionSecurityContext.CookieExtendResult;
 import org.primeframework.mvc.test.RequestResult;
 import org.primeframework.mvc.test.RequestSimulator;
 import org.slf4j.Logger;
@@ -29,8 +29,9 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
 @Test
-public class UserIDCookieSessionTest {
-  private static final Logger logger = LoggerFactory.getLogger(UserIDCookieSessionTest.class);
+public class UserIDCookieSessionSecurityContextTest {
+  private static final Logger logger = LoggerFactory.getLogger(UserIDCookieSessionSecurityContext.class);
+  private static final String UserKey = UserIDCookieSessionSecurityContext.UserKey;
 
   private static ZonedDateTime mockClockNow;
 
@@ -121,7 +122,7 @@ public class UserIDCookieSessionTest {
 
     // assert
     // normally the cookie will not be set again with a different max age
-    result.assertContainsCookie(UserIDCookieSession.UserKey);
+    result.assertContainsCookie(UserKey);
   }
 
   @Test
@@ -137,7 +138,7 @@ public class UserIDCookieSessionTest {
     // assert
     // normally the cookie will not be set again with a different max age
     result.assertBodyContains("the current user is (no user)");
-    assertEquals(result.getCookie(UserIDCookieSession.UserKey).value, "null");
+    assertEquals(result.getCookie(UserKey).value, "null");
   }
 
   @Test
@@ -185,7 +186,7 @@ public class UserIDCookieSessionTest {
     result
         .assertStatusCode(200)
         .assertContainsNoGeneralErrors()
-        .assertContainsCookie(UserIDCookieSession.UserKey);
+        .assertContainsCookie(UserKey);
   }
 
   @Test
@@ -242,7 +243,7 @@ public class UserIDCookieSessionTest {
     // and if not handled properly, will stack trace and the user cannot get back in
 
     // act
-    var existingCookie = simulator.userAgent.getCookie(UserIDCookieSession.UserKey);
+    var existingCookie = simulator.userAgent.getCookie(UserKey);
     cookieKeyChanger.changeIt(existingCookie);
 
     // assert
@@ -273,7 +274,7 @@ public class UserIDCookieSessionTest {
     // arrange
 
     // act
-    var actualResult = UserIDCookieSession.shouldExtendCookie(mockClockNow, signInTime, maxSessionAge, sessionTimeout);
+    var actualResult = UserIDCookieSessionSecurityContext.shouldExtendCookie(mockClockNow, signInTime, maxSessionAge, sessionTimeout);
 
     // assert
     assertEquals(actualResult, expectedResult);

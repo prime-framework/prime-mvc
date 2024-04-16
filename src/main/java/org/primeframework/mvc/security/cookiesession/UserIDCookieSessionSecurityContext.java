@@ -38,7 +38,7 @@ import org.primeframework.mvc.util.CookieTools;
  * timeout with a maximum age
  *
  */
-public abstract class UserIDCookieSession implements UserLoginSecurityContext {
+public abstract class UserIDCookieSessionSecurityContext implements UserLoginSecurityContext {
   public static final String UserKey = "primeCurrentUser";
 
   private final HTTPRequest request;
@@ -57,13 +57,13 @@ public abstract class UserIDCookieSession implements UserLoginSecurityContext {
 
   private final Duration sessionTimeout;
 
-  protected UserIDCookieSession(HTTPRequest request,
-                                HTTPResponse response,
-                                Encryptor encryptor,
-                                ObjectMapper objectMapper,
-                                Clock clock,
-                                Duration sessionTimeout,
-                                Duration sessionMaxAge) {
+  protected UserIDCookieSessionSecurityContext(HTTPRequest request,
+                                               HTTPResponse response,
+                                               Encryptor encryptor,
+                                               ObjectMapper objectMapper,
+                                               Clock clock,
+                                               Duration sessionTimeout,
+                                               Duration sessionMaxAge) {
     this.request = request;
     this.response = response;
     this.encryptor = encryptor;
