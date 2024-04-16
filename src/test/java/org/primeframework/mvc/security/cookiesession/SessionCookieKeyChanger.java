@@ -6,6 +6,7 @@ package org.primeframework.mvc.security.cookiesession;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import io.fusionauth.http.Cookie;
+import org.primeframework.mvc.MockConfiguration;
 import org.primeframework.mvc.security.DefaultCipherProvider;
 import org.primeframework.mvc.security.DefaultEncryptor;
 import org.primeframework.mvc.security.Encryptor;
@@ -34,8 +35,8 @@ public class SessionCookieKeyChanger {
     try {
       SerializedSessionContainer existingContainer = CookieTools.fromJSONCookie(cookie.value, SerializedSessionContainer.class, true, encryptor, objectMapper);
       byte[] result = objectMapper.writeValueAsBytes(existingContainer);
-      var config = new SessionTestPrimeConfig();
-      config.changeCookieEncryptionKey();
+      var config = new MockConfiguration();
+      config.regenerateCookieEncryptionKey();
       // guarantee we use a different key than this.encryptor
       var differentKeyCipherProvider = new DefaultCipherProvider(config);
       var differentKeyEncryptor = new DefaultEncryptor(differentKeyCipherProvider);

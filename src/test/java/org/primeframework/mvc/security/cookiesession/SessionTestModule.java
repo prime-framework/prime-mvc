@@ -8,6 +8,7 @@ import java.time.Clock;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
 import com.google.inject.TypeLiteral;
+import org.primeframework.mvc.MockConfiguration;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.cors.CORSConfigurationProvider;
 import org.primeframework.mvc.cors.NoCORSConfigurationProvider;
@@ -23,7 +24,7 @@ public class SessionTestModule extends AbstractModule {
 
   @Override
   protected void configure() {
-    bind(MVCConfiguration.class).to(SessionTestPrimeConfig.class).asEagerSingleton();
+    bind(MVCConfiguration.class).to(MockConfiguration.class).asEagerSingleton();
     bind(UserLoginSecurityContext.class).to(MockUserIDCookieSession.class);
     bind(CORSConfigurationProvider.class).to(NoCORSConfigurationProvider.class).asEagerSingleton();
     bind(Clock.class).toProvider(clockProvider);
