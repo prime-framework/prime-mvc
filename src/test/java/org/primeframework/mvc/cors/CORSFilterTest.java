@@ -197,8 +197,16 @@ public class CORSFilterTest extends PrimeBaseTest {
     assertNoCORSHeaders(response);
   }
 
-  @Test
-  public void get_included_path_pattern() {
+  @DataProvider(name="get_included_path_pattern")
+  private static Object[][] getIncludeExcludes() {
+    return new Object[][]{
+        {"/foo", false},
+        {"/admin/foo", true}
+    };
+  }
+
+  @Test(dataProvider = "get_included_path_pattern")
+  public void options_included_path_pattern(String path, boolean expectCorsAllow) throws Exception {
     // arrange
     corsConfiguration = new CORSConfiguration().withAllowCredentials(true)
                                                .withAllowedMethods(HTTPMethod.GET, HTTPMethod.POST, HTTPMethod.HEAD, HTTPMethod.OPTIONS, HTTPMethod.PUT, HTTPMethod.DELETE)
@@ -209,9 +217,19 @@ public class CORSFilterTest extends PrimeBaseTest {
                                                .withPreflightMaxAgeInSeconds(1800);
 
     // act
+    HttpClient client = HttpClient.newBuilder().followRedirects(Redirect.NEVER).priority(256).build();
+    HttpResponse<Void> response = client.send(
+        HttpRequest.newBuilder(URI.create("http://localhost:9080"+path))
+                   .method("OPTIONS", BodyPublishers.noBody())
+                   .header("Access-Control-Request-Method", "GET")
+                   .header("Origin", "https://jackinthebox.com")
+                   .build(),
+        BodyHandlers.discarding()
+    );
 
     // assert
-    Assert.fail("Write the test");
+    var expectedStatus = expectCorsAllow ? 204 : 403;
+    assertEquals(response.statusCode(), expectedStatus);
   }
 
   @Test

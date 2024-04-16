@@ -117,6 +117,12 @@ public final class CORSFilter {
   private Pattern excludedPathPattern;
 
   /**
+   * Regex for including URI patterns from CORS filter processing
+   */
+
+  private Pattern includedPathPattern;
+
+  /**
    * Indicates (in seconds) how long the results of a pre-flight request can be cached in a pre-flight result cache.
    */
   private long preflightMaxAge;
@@ -233,6 +239,11 @@ public final class CORSFilter {
     return this;
   }
 
+  public CORSFilter withIncludedPathPattern(Pattern pattern) {
+    this.includedPathPattern = pattern;
+    return this;
+  }
+
   public CORSFilter withExposedHeaders(List<String> headers) {
     if (headers != null) {
       this.exposedHeaders.clear();
@@ -304,7 +315,14 @@ public final class CORSFilter {
    * @return true if this request should be excluded from CORS
    */
   private boolean excludedRequestURI(final String requestURI) {
-    return excludedPathPattern != null && excludedPathPattern.matcher(requestURI).find();
+    if (excludedPathPattern != null) {
+      return excludedPathPattern.matcher(requestURI).find();
+    }
+    else if (includedPathPattern != null) {
+      return !includedPathPattern.matcher(requestURI).find();
+    }
+    // we're not using any of the functionality
+    return false;
   }
 
   /**

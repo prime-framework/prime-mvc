@@ -55,10 +55,15 @@ public class CORSRequestWorkflow implements MVCWorkflow {
           .withAllowedHTTPMethods(corsConfiguration.allowedMethods)
           .withAllowedOrigins(corsConfiguration.allowedOrigins)
           .withDebugEnabled(corsConfiguration.debug)
-          .withDebugger(debugger)
-          .withExcludedPathPattern(corsConfiguration.excludedPathPattern)
-          .withExposedHeaders(corsConfiguration.exposedHeaders)
-          .withPreflightMaxAge(corsConfiguration.preflightMaxAgeInSeconds);
+          .withDebugger(debugger);
+      if (corsConfiguration.excludedPathPattern != null) {
+        corsFilter.withExcludedPathPattern(corsConfiguration.excludedPathPattern);
+      }
+      else if (corsConfiguration.includedPathPattern != null) {
+        corsFilter.withIncludedPathPattern(corsConfiguration.includedPathPattern);
+      }
+      corsFilter.withExposedHeaders(corsConfiguration.exposedHeaders)
+                .withPreflightMaxAge(corsConfiguration.preflightMaxAgeInSeconds);
 
       corsFilter.doFilter(request, response, workflowChain);
     } else {
