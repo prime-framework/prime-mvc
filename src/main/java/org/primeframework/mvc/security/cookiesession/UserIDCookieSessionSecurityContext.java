@@ -138,7 +138,7 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
                                             sessionTimeout);
       switch (shouldExtend) {
         case Extend:
-          // same cookie value, but with longer time
+          // same cookie value, but with longer time (set on cookie proxy in constructor)
           this.sessionCookie.add(request, response, cookie);
           break;
         case Invalid:
@@ -147,7 +147,7 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
           return null;
       }
       var user = retrieveUserById(deserializedContainer.userId);
-      // in our same request cycle, we avoid a DB call
+      // in our same request cycle, we avoid a DB call by holding on to this
       container = new InMemorySessionContainer(deserializedContainer, user);
       this.request.setAttribute(UserKey, container);
       return container;
