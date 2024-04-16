@@ -190,7 +190,7 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
         var container = new SerializedSessionContainer(id, newSessionId.toString(), now);
         writeContainerToCookie(container);
       } else {
-        throw new IllegalArgumentException("Expected a user object here of type UUIdentifiable!");
+        throw new IllegalArgumentException("Expected a user object here of type IdentifiableUser!");
       }
     } catch (Exception e) {
       // no partial state
