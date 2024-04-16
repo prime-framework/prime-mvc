@@ -233,7 +233,7 @@ public class CORSFilterTest extends PrimeBaseTest {
   }
 
   @Test
-  public void get_included_uri_checker() {
+  public void options_included_uri_checker() {
     // arrange
 
     // act
@@ -243,7 +243,7 @@ public class CORSFilterTest extends PrimeBaseTest {
   }
 
   @Test
-  public void get_excluded_uri_checker() {
+  public void options_excluded_uri_checker() {
     // arrange
 
     // act
@@ -253,7 +253,7 @@ public class CORSFilterTest extends PrimeBaseTest {
   }
 
   @Test
-  public void get_included_path_and_excluded_path_supplied() {
+  public void included_path_and_excluded_path_supplied() {
     // arrange + act + assert
     var exception = expectThrows(Exception.class, () -> new CORSConfiguration().withAllowCredentials(true)
                                                                                .withAllowedMethods(HTTPMethod.GET, HTTPMethod.POST, HTTPMethod.HEAD, HTTPMethod.OPTIONS, HTTPMethod.PUT, HTTPMethod.DELETE)
@@ -268,7 +268,7 @@ public class CORSFilterTest extends PrimeBaseTest {
   }
 
   @Test
-  public void get_included_and_excluded_uri_checker_supplied() {
+  public void included_and_excluded_uri_checker_supplied() {
     var exception = expectThrows(Exception.class, () -> new CORSConfiguration().withAllowCredentials(true)
                                                                                .withAllowedMethods(HTTPMethod.GET, HTTPMethod.POST, HTTPMethod.HEAD, HTTPMethod.OPTIONS, HTTPMethod.PUT, HTTPMethod.DELETE)
                                                                                .withAllowedHeaders("Accept", "Access-Control-Request-Headers", "Access-Control-Request-Method", "Authorization", "Content-Type", "Last-Modified", "Origin", "X-FusionAuth-TenantId", "X-Requested-With")
@@ -282,7 +282,7 @@ public class CORSFilterTest extends PrimeBaseTest {
   }
 
   @Test
-  public void get_path_and_checker_supplied() {
+  public void path_and_checker_supplied() {
     var exception = expectThrows(Exception.class, () -> new CORSConfiguration().withAllowCredentials(true)
                                                                                .withAllowedMethods(HTTPMethod.GET, HTTPMethod.POST, HTTPMethod.HEAD, HTTPMethod.OPTIONS, HTTPMethod.PUT, HTTPMethod.DELETE)
                                                                                .withAllowedHeaders("Accept", "Access-Control-Request-Headers", "Access-Control-Request-Method", "Authorization", "Content-Type", "Last-Modified", "Origin", "X-FusionAuth-TenantId", "X-Requested-With")
