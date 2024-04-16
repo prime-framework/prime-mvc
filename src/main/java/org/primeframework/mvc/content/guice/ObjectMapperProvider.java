@@ -55,6 +55,8 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
     // Bind the Prime-MVC Jackson Module
     objectMapper.registerModule(new JacksonModule());
 
+    objectMapper.registerModule(new com.inversoft.json.JacksonModule());
+
     return configure(objectMapper);
   }
 
