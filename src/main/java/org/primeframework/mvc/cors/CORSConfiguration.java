@@ -19,6 +19,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import io.fusionauth.http.HTTPMethod;
@@ -101,6 +102,18 @@ public class CORSConfiguration implements Buildable<CORSConfiguration> {
   public CORSConfiguration withExcludedPathPattern(Pattern pattern) {
     this.excludedPathPattern = pattern;
     return this;
+  }
+
+  public CORSConfiguration withIncludedPathPattern(Pattern pattern) {
+    return null;
+  }
+
+  public CORSConfiguration withExcludedUriChecker(Predicate<String> excludeFunction) {
+    return null;
+  }
+
+  public CORSConfiguration withIncludedUriChecker(Predicate<String> includeFunction) {
+    return null;
   }
 
   public CORSConfiguration withExposedHeaders(String... headers) {

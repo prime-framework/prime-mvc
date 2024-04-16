@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 
 import io.fusionauth.http.HTTPMethod;
 import org.primeframework.mvc.PrimeBaseTest;
+import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -192,6 +193,86 @@ public class CORSFilterTest extends PrimeBaseTest {
     );
     assertEquals(response.statusCode(), 200);
     assertNoCORSHeaders(response);
+  }
+
+  @Test
+  public void get_included_path_pattern() {
+    // arrange
+
+    // act
+
+    // assert
+    Assert.fail("Write the test");
+  }
+
+  @Test
+  public void get_included_path_and_excluded_path_supplied() {
+    // arrange
+
+    // act
+
+    // assert
+    Assert.fail("Write the test");
+  }
+
+  @Test
+  public void get_included_uri_checker() {
+    // arrange
+
+    // act
+
+    // assert
+    Assert.fail("Write the test");
+  }
+
+  @Test
+  public void get_excluded_uri_checker() {
+    // arrange
+
+    // act
+
+    // assert
+    Assert.fail("Write the test");
+  }
+
+  @Test
+  public void get_included_and_excluded_uri_checker_supplied() {
+    // arrange
+
+    // act
+
+    // assert
+    Assert.fail("Write the test");
+  }
+
+  @Test
+  public void get_excluded_path_excluded_checker_supplied() {
+    // arrange
+
+    // act
+
+    // assert
+    Assert.fail("Write the test");
+  }
+
+  @Test
+  public void get_included_path_included_checker_supplied() {
+    // arrange
+
+    // act
+
+    // assert
+    Assert.fail("Write the test");
+  }
+
+  @Test
+  public void get_included_path_excluded_checker_supplied() {
+    // arrange
+
+    // act
+
+    // assert
+    Assert.fail("Write the test");
   }
 
   @Test
