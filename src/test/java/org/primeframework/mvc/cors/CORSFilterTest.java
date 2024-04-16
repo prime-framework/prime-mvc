@@ -34,6 +34,8 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertThrows;
+import static org.testng.Assert.expectThrows;
 
 /**
  * @author Brian Pontarelli
@@ -198,6 +200,13 @@ public class CORSFilterTest extends PrimeBaseTest {
   @Test
   public void get_included_path_pattern() {
     // arrange
+    corsConfiguration = new CORSConfiguration().withAllowCredentials(true)
+                                               .withAllowedMethods(HTTPMethod.GET, HTTPMethod.POST, HTTPMethod.HEAD, HTTPMethod.OPTIONS, HTTPMethod.PUT, HTTPMethod.DELETE)
+                                               .withAllowedHeaders("Accept", "Access-Control-Request-Headers", "Access-Control-Request-Method", "Authorization", "Content-Type", "Last-Modified", "Origin", "X-FusionAuth-TenantId", "X-Requested-With")
+                                               .withAllowedOrigins(URI.create("*"))
+                                               .withIncludedPathPattern(Pattern.compile("^/admin/foo"))
+                                               .withExposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")
+                                               .withPreflightMaxAgeInSeconds(1800);
 
     // act
 
@@ -209,10 +218,17 @@ public class CORSFilterTest extends PrimeBaseTest {
   public void get_included_path_and_excluded_path_supplied() {
     // arrange
 
-    // act
-
-    // assert
-    Assert.fail("Write the test");
+    // act + assert
+    var exception = expectThrows(Exception.class, () -> new CORSConfiguration().withAllowCredentials(true)
+                                                                             .withAllowedMethods(HTTPMethod.GET, HTTPMethod.POST, HTTPMethod.HEAD, HTTPMethod.OPTIONS, HTTPMethod.PUT, HTTPMethod.DELETE)
+                                                                             .withAllowedHeaders("Accept", "Access-Control-Request-Headers", "Access-Control-Request-Method", "Authorization", "Content-Type", "Last-Modified", "Origin", "X-FusionAuth-TenantId", "X-Requested-With")
+                                                                             .withAllowedOrigins(URI.create("*"))
+                                                                             .withExcludedPathPattern(Pattern.compile("does not matter"))
+                                                                             .withIncludedPathPattern(Pattern.compile("does not matter"))
+                                                                             .withExposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")
+                                                                             .withPreflightMaxAgeInSeconds(1800));
+    assertEquals(exception.getMessage(),
+                 "You cannot use both withExcludedPathPattern and withIncludedPathPattern. Must be one or the other.");
   }
 
   @Test

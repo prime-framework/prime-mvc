@@ -41,6 +41,8 @@ public class CORSConfiguration implements Buildable<CORSConfiguration> {
 
   public Pattern excludedPathPattern;
 
+  public Pattern includedPathPattern;
+
   public List<String> exposedHeaders = new ArrayList<>();
 
   public int preflightMaxAgeInSeconds;
@@ -99,21 +101,30 @@ public class CORSConfiguration implements Buildable<CORSConfiguration> {
     return this;
   }
 
+  private void checkExclusiveMatching() {
+    if (excludedPathPattern != null && includedPathPattern != null) {
+      throw new RuntimeException("You cannot use both withExcludedPathPattern and withIncludedPathPattern. Must be one or the other.");
+    }
+  }
+
   public CORSConfiguration withExcludedPathPattern(Pattern pattern) {
     this.excludedPathPattern = pattern;
+    checkExclusiveMatching();
     return this;
   }
 
   public CORSConfiguration withIncludedPathPattern(Pattern pattern) {
-    return null;
+    this.includedPathPattern = pattern;
+    checkExclusiveMatching();
+    return this;
   }
 
   public CORSConfiguration withExcludedUriChecker(Predicate<String> excludeFunction) {
-    return null;
+    return this;
   }
 
   public CORSConfiguration withIncludedUriChecker(Predicate<String> includeFunction) {
-    return null;
+    return this;
   }
 
   public CORSConfiguration withExposedHeaders(String... headers) {
