@@ -23,6 +23,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import io.fusionauth.http.HTTPMethod;
@@ -121,6 +122,11 @@ public final class CORSFilter {
    */
 
   private Pattern includedPathPattern;
+
+  /**
+   * Allow a predicate to decide whether to include in CORS
+   */
+  private Predicate<String> includeUriChecker;
 
   /**
    * Indicates (in seconds) how long the results of a pre-flight request can be cached in a pre-flight result cache.
@@ -244,6 +250,11 @@ public final class CORSFilter {
     return this;
   }
 
+  public CORSFilter withIncludedUriChecker(Predicate<String> includeFunction) {
+    this.includeUriChecker = includeFunction;
+    return this;
+  }
+
   public CORSFilter withExposedHeaders(List<String> headers) {
     if (headers != null) {
       this.exposedHeaders.clear();
@@ -320,6 +331,9 @@ public final class CORSFilter {
     }
     else if (includedPathPattern != null) {
       return !includedPathPattern.matcher(requestURI).find();
+    }
+    else if (includeUriChecker != null) {
+      return !includeUriChecker.test(requestURI);
     }
     // we're not using any of the functionality
     return false;
