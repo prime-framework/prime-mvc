@@ -43,6 +43,10 @@ public class CORSConfiguration implements Buildable<CORSConfiguration> {
 
   public Pattern includedPathPattern;
 
+  public Predicate<String> excludeUriChecker;
+
+  public Predicate<String> includeUriChecker;
+
   public List<String> exposedHeaders = new ArrayList<>();
 
   public int preflightMaxAgeInSeconds;
@@ -105,6 +109,13 @@ public class CORSConfiguration implements Buildable<CORSConfiguration> {
     if (excludedPathPattern != null && includedPathPattern != null) {
       throw new RuntimeException("You cannot use both withExcludedPathPattern and withIncludedPathPattern. Must be one or the other.");
     }
+    if (includeUriChecker != null && excludeUriChecker != null) {
+      throw new RuntimeException("You cannot use both withIncludedUriChecker and withExcludedUriChecker. Must be one or the other.");
+    }
+    if ((includeUriChecker != null ^ excludeUriChecker != null) &&
+        (excludedPathPattern != null ^ includedPathPattern != null)) {
+      throw new RuntimeException("You cannot use both a path (withIncludedPathPattern/withExcludedPathPattern) and predicate based (withIncludedUriChecker/withExcludedUriChecker). Must be one or the other.");
+    }
   }
 
   public CORSConfiguration withExcludedPathPattern(Pattern pattern) {
@@ -120,10 +131,14 @@ public class CORSConfiguration implements Buildable<CORSConfiguration> {
   }
 
   public CORSConfiguration withExcludedUriChecker(Predicate<String> excludeFunction) {
+    this.excludeUriChecker = excludeFunction;
+    checkExclusiveMatching();
     return this;
   }
 
   public CORSConfiguration withIncludedUriChecker(Predicate<String> includeFunction) {
+    this.includeUriChecker = includeFunction;
+    checkExclusiveMatching();
     return this;
   }
 

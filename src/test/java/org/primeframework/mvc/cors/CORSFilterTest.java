@@ -215,23 +215,6 @@ public class CORSFilterTest extends PrimeBaseTest {
   }
 
   @Test
-  public void get_included_path_and_excluded_path_supplied() {
-    // arrange
-
-    // act + assert
-    var exception = expectThrows(Exception.class, () -> new CORSConfiguration().withAllowCredentials(true)
-                                                                             .withAllowedMethods(HTTPMethod.GET, HTTPMethod.POST, HTTPMethod.HEAD, HTTPMethod.OPTIONS, HTTPMethod.PUT, HTTPMethod.DELETE)
-                                                                             .withAllowedHeaders("Accept", "Access-Control-Request-Headers", "Access-Control-Request-Method", "Authorization", "Content-Type", "Last-Modified", "Origin", "X-FusionAuth-TenantId", "X-Requested-With")
-                                                                             .withAllowedOrigins(URI.create("*"))
-                                                                             .withExcludedPathPattern(Pattern.compile("does not matter"))
-                                                                             .withIncludedPathPattern(Pattern.compile("does not matter"))
-                                                                             .withExposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")
-                                                                             .withPreflightMaxAgeInSeconds(1800));
-    assertEquals(exception.getMessage(),
-                 "You cannot use both withExcludedPathPattern and withIncludedPathPattern. Must be one or the other.");
-  }
-
-  @Test
   public void get_included_uri_checker() {
     // arrange
 
@@ -252,43 +235,46 @@ public class CORSFilterTest extends PrimeBaseTest {
   }
 
   @Test
+  public void get_included_path_and_excluded_path_supplied() {
+    // arrange + act + assert
+    var exception = expectThrows(Exception.class, () -> new CORSConfiguration().withAllowCredentials(true)
+                                                                               .withAllowedMethods(HTTPMethod.GET, HTTPMethod.POST, HTTPMethod.HEAD, HTTPMethod.OPTIONS, HTTPMethod.PUT, HTTPMethod.DELETE)
+                                                                               .withAllowedHeaders("Accept", "Access-Control-Request-Headers", "Access-Control-Request-Method", "Authorization", "Content-Type", "Last-Modified", "Origin", "X-FusionAuth-TenantId", "X-Requested-With")
+                                                                               .withAllowedOrigins(URI.create("*"))
+                                                                               .withExcludedPathPattern(Pattern.compile("does not matter"))
+                                                                               .withIncludedPathPattern(Pattern.compile("does not matter"))
+                                                                               .withExposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")
+                                                                               .withPreflightMaxAgeInSeconds(1800));
+    assertEquals(exception.getMessage(),
+                 "You cannot use both withExcludedPathPattern and withIncludedPathPattern. Must be one or the other.");
+  }
+
+  @Test
   public void get_included_and_excluded_uri_checker_supplied() {
-    // arrange
-
-    // act
-
-    // assert
-    Assert.fail("Write the test");
+    var exception = expectThrows(Exception.class, () -> new CORSConfiguration().withAllowCredentials(true)
+                                                                               .withAllowedMethods(HTTPMethod.GET, HTTPMethod.POST, HTTPMethod.HEAD, HTTPMethod.OPTIONS, HTTPMethod.PUT, HTTPMethod.DELETE)
+                                                                               .withAllowedHeaders("Accept", "Access-Control-Request-Headers", "Access-Control-Request-Method", "Authorization", "Content-Type", "Last-Modified", "Origin", "X-FusionAuth-TenantId", "X-Requested-With")
+                                                                               .withAllowedOrigins(URI.create("*"))
+                                                                               .withIncludedUriChecker(s -> true)
+                                                                               .withExcludedUriChecker(s -> true)
+                                                                               .withExposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")
+                                                                               .withPreflightMaxAgeInSeconds(1800));
+    assertEquals(exception.getMessage(),
+                 "You cannot use both withIncludedUriChecker and withExcludedUriChecker. Must be one or the other.");
   }
 
   @Test
-  public void get_excluded_path_excluded_checker_supplied() {
-    // arrange
-
-    // act
-
-    // assert
-    Assert.fail("Write the test");
-  }
-
-  @Test
-  public void get_included_path_included_checker_supplied() {
-    // arrange
-
-    // act
-
-    // assert
-    Assert.fail("Write the test");
-  }
-
-  @Test
-  public void get_included_path_excluded_checker_supplied() {
-    // arrange
-
-    // act
-
-    // assert
-    Assert.fail("Write the test");
+  public void get_path_and_checker_supplied() {
+    var exception = expectThrows(Exception.class, () -> new CORSConfiguration().withAllowCredentials(true)
+                                                                               .withAllowedMethods(HTTPMethod.GET, HTTPMethod.POST, HTTPMethod.HEAD, HTTPMethod.OPTIONS, HTTPMethod.PUT, HTTPMethod.DELETE)
+                                                                               .withAllowedHeaders("Accept", "Access-Control-Request-Headers", "Access-Control-Request-Method", "Authorization", "Content-Type", "Last-Modified", "Origin", "X-FusionAuth-TenantId", "X-Requested-With")
+                                                                               .withAllowedOrigins(URI.create("*"))
+                                                                               .withExcludedPathPattern(Pattern.compile("does not matter"))
+                                                                               .withExcludedUriChecker(s -> true)
+                                                                               .withExposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")
+                                                                               .withPreflightMaxAgeInSeconds(1800));
+    assertEquals(exception.getMessage(),
+                 "You cannot use both a path (withIncludedPathPattern/withExcludedPathPattern) and predicate based (withIncludedUriChecker/withExcludedUriChecker). Must be one or the other.");
   }
 
   @Test
