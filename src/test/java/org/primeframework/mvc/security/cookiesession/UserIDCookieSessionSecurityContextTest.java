@@ -14,13 +14,13 @@ import io.fusionauth.http.server.HTTPListenerConfiguration;
 import io.fusionauth.http.server.HTTPServerConfiguration;
 import org.primeframework.mvc.TestPrimeMain;
 import org.primeframework.mvc.guice.MVCModule;
+import org.primeframework.mvc.http.HTTPObjectsHolder;
 import org.primeframework.mvc.message.TestMessageObserver;
 import org.primeframework.mvc.security.cookiesession.UserIDCookieSessionSecurityContext.CookieExtendResult;
 import org.primeframework.mvc.test.RequestResult;
 import org.primeframework.mvc.test.RequestSimulator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -30,7 +30,6 @@ import static org.testng.Assert.assertTrue;
 
 @Test
 public class UserIDCookieSessionSecurityContextTest {
-  private static final Logger logger = LoggerFactory.getLogger(UserIDCookieSessionSecurityContext.class);
   private static final String UserKey = UserIDCookieSessionSecurityContext.UserKey;
 
   private static ZonedDateTime mockClockNow;
@@ -48,15 +47,20 @@ public class UserIDCookieSessionSecurityContextTest {
 
   // makes it easier to see why we "start" an HTTP server twice in test runs
   @AfterClass
-  public void logDone() {
-    logger.info("----------------- DONE Running SessionLoginContextTest.startItUp -------------------");
+  public void shutdown() {
+    simulator.shutdown();
+  }
+
+  @AfterMethod
+  public void afterMethod() {
+    HTTPObjectsHolder.clearRequest();
+    HTTPObjectsHolder.clearResponse();
   }
 
   @BeforeClass
-  static void startItUp() {
-    logger.info("----------------- Running SessionLoginContextTest.startItUp -------------------");
+  public void startItUp() {
     resetMockClock();
-    // BaseAcceptanceTest uses 9080
+    // PrimeBaseTest uses 9080
     var httpConfig = new HTTPServerConfiguration().withListener(new HTTPListenerConfiguration(9081));
     var main = new TestPrimeMain(new HTTPServerConfiguration[]{httpConfig},
                                  new SessionTestModule(() -> mockClock),
