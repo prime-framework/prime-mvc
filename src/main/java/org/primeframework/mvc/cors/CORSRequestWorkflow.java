@@ -65,6 +65,9 @@ public class CORSRequestWorkflow implements MVCWorkflow {
       else if (corsConfiguration.includeUriChecker != null) {
         corsFilter.withIncludedUriChecker(corsConfiguration.includeUriChecker);
       }
+      else if (corsConfiguration.excludeUriChecker != null) {
+        corsFilter.withExcludedUriChecker(corsConfiguration.excludeUriChecker);
+      }
       corsFilter.withExposedHeaders(corsConfiguration.exposedHeaders)
                 .withPreflightMaxAge(corsConfiguration.preflightMaxAgeInSeconds);
 

@@ -259,14 +259,31 @@ public class CORSFilterTest extends PrimeBaseTest {
     assertEquals(response.statusCode(), expectedStatus);
   }
 
-  @Test
-  public void options_excluded_uri_checker() {
+  @Test(dataProvider = "get_included_path_pattern")
+  public void options_excluded_uri_checker(String path, boolean expectCorsAllow) throws Exception {
     // arrange
+    corsConfiguration = new CORSConfiguration().withAllowCredentials(true)
+                                               .withAllowedMethods(HTTPMethod.GET, HTTPMethod.POST, HTTPMethod.HEAD, HTTPMethod.OPTIONS, HTTPMethod.PUT, HTTPMethod.DELETE)
+                                               .withAllowedHeaders("Accept", "Access-Control-Request-Headers", "Access-Control-Request-Method", "Authorization", "Content-Type", "Last-Modified", "Origin", "X-FusionAuth-TenantId", "X-Requested-With")
+                                               .withAllowedOrigins(URI.create("*"))
+                                               .withExcludedUriChecker(u -> u.startsWith("/foo"))
+                                               .withExposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")
+                                               .withPreflightMaxAgeInSeconds(1800);
 
     // act
+    HttpClient client = HttpClient.newBuilder().followRedirects(Redirect.NEVER).priority(256).build();
+    HttpResponse<Void> response = client.send(
+        HttpRequest.newBuilder(URI.create("http://localhost:9080" + path))
+                   .method("OPTIONS", BodyPublishers.noBody())
+                   .header("Access-Control-Request-Method", "GET")
+                   .header("Origin", "https://jackinthebox.com")
+                   .build(),
+        BodyHandlers.discarding()
+    );
 
     // assert
-    Assert.fail("Write the test");
+    var expectedStatus = expectCorsAllow ? 204 : 403;
+    assertEquals(response.statusCode(), expectedStatus);
   }
 
   @Test
