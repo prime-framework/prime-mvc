@@ -9,7 +9,6 @@ import com.google.inject.Inject;
 import io.fusionauth.http.server.HTTPRequest;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.security.UserLoginSecurityContext;
-import org.primeframework.mvc.security.cookiesession.HydratedUserSessionContainer;
 import org.primeframework.mvc.security.cookiesession.MockUser;
 
 @Action
@@ -32,7 +31,7 @@ public class GetSessionInfoAction {
 
   public String updateNewUserEmail;
 
-  public String get() {
+  public String get() throws Exception {
     if (update != null && update.equals("yes")) {
       context.getCurrentUser();
       context.updateUser(new MockUser(updateNewUserEmail));
@@ -51,9 +50,15 @@ public class GetSessionInfoAction {
     this.sessionId = Optional.ofNullable(context.getSessionId())
                              .orElse("(no session)");
     this.loggedIn = context.isLoggedIn() ? "yes" : "no";
-    var sessionContainer = Optional.ofNullable((HydratedUserSessionContainer) httpRequest.getAttribute("primeCurrentUser"));
-    var user = sessionContainer.map(c -> c.user);
-    this.userInRequest = user.map(u -> ((MockUser) u).email).orElse("(nothing)");
+    var sessionContainer = httpRequest.getAttribute("primeCurrentUser");
+    if (sessionContainer == null) {
+      this.userInRequest = "(nothing)";
+    } else {
+      var userField = sessionContainer.getClass().getDeclaredField("user");
+      userField.setAccessible(true);
+      var user = (MockUser) userField.get(sessionContainer);
+      this.userInRequest = user.email;
+    }
     return "success";
   }
 }

@@ -8,17 +8,22 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
-public class SerializedSessionContainer {
+/**
+ * Session container serialized as JSON into the cookie
+ *
+ * @author Brady Wied
+ */
+class SerializedSessionContainer {
   public UUID userId;
 
   public String sessionId;
 
-  public ZonedDateTime signInInstant;
+  public ZonedDateTime loginInstant;
 
-  SerializedSessionContainer(UUID userId, String sessionId, ZonedDateTime signInInstant) {
+  SerializedSessionContainer(UUID userId, String sessionId, ZonedDateTime loginInstant) {
     this.userId = userId;
     this.sessionId = sessionId;
-    this.signInInstant = signInInstant;
+    this.loginInstant = loginInstant;
   }
 
   @JsonCreator

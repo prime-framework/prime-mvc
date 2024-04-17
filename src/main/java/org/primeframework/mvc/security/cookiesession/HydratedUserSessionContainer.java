@@ -5,17 +5,22 @@ package org.primeframework.mvc.security.cookiesession;
 
 import java.time.ZonedDateTime;
 
-public class HydratedUserSessionContainer extends SerializedSessionContainer {
+/**
+ * Session container class that includes a hydrated user object
+ *
+ * @author Brady Wied
+ */
+class HydratedUserSessionContainer extends SerializedSessionContainer {
   public final IdentifiableUser user;
 
   public HydratedUserSessionContainer(SerializedSessionContainer serializedSessionContainer, IdentifiableUser user) {
     this(serializedSessionContainer.sessionId,
-         serializedSessionContainer.signInInstant,
+         serializedSessionContainer.loginInstant,
          user);
   }
 
-  public HydratedUserSessionContainer(String sessionId, ZonedDateTime signInInstant, IdentifiableUser user) {
-    super(user.getId(), sessionId, signInInstant);
+  public HydratedUserSessionContainer(String sessionId, ZonedDateTime loginInstant, IdentifiableUser user) {
+    super(user.getId(), sessionId, loginInstant);
     this.user = user;
   }
 }

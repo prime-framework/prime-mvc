@@ -17,6 +17,12 @@ package org.primeframework.mvc.security.cookiesession;
 
 import java.util.UUID;
 
+/**
+ * Denotes a hydrated user object. Depending on your application, could be a User
+ * domain object
+ *
+ * @author Brady Wied
+ */
 public interface IdentifiableUser {
   UUID getId();
 }

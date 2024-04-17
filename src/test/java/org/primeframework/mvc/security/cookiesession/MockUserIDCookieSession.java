@@ -28,10 +28,13 @@ import org.primeframework.mvc.security.Encryptor;
 
 public class MockUserIDCookieSession extends UserIDCookieSessionSecurityContext {
   @Inject
-  protected MockUserIDCookieSession(HTTPRequest request, HTTPResponse response,
-                                    Encryptor encryptor, ObjectMapper objectMapper,
-                                    Clock clock) {
+  protected MockUserIDCookieSession(HTTPRequest request, HTTPResponse response, Encryptor encryptor, ObjectMapper objectMapper, Clock clock) {
     super(request, response, encryptor, objectMapper, clock, Duration.ofMinutes(5), Duration.ofMinutes(30));
+  }
+
+  public MockUserIDCookieSession(HTTPRequest request, HTTPResponse response, Encryptor encryptor, ObjectMapper objectMapper, Clock clock,
+                                 Duration sessionTimeout, Duration sessionMaxAge) {
+    super(request, response, encryptor, objectMapper, clock, sessionTimeout, sessionMaxAge);
   }
 
   @Override

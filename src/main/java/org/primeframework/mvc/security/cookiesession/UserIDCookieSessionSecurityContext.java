@@ -37,6 +37,8 @@ import org.primeframework.mvc.util.CookieTools;
 /**
  * Logs in and out users based on storing their User ID in a cookie and also adds a sliding session
  * timeout with a maximum age
+ *
+ * @author Brady Wied
  */
 public abstract class UserIDCookieSessionSecurityContext implements UserLoginSecurityContext {
   public static final String UserKey = "primeCurrentUser";
@@ -77,7 +79,7 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
   enum CookieExtendResult {
     // no extension needed
     Keep,
-    // extend the cookie with the same value
+    // extend the cookie with the same value, but longer expiration time
     Extend,
     // the cookie is now invalid
     Invalid
@@ -86,14 +88,12 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
   /**
    * Figure out whether to extend cookie
    *
-   * @param now            the time now
-   * @param signInTime     when user signed in originally
-   * @param maxSessionAge  max absolute session length
-   * @param sessionTimeout max session timeout
+   * @param signInTime when user signed in originally
    * @return correct cookie behavior
    */
-  static CookieExtendResult shouldExtendCookie(ZonedDateTime now, ZonedDateTime signInTime, Duration maxSessionAge, Duration sessionTimeout) {
-    var maxSessionAgeTime = signInTime.plus(maxSessionAge);
+  CookieExtendResult shouldExtendCookie(ZonedDateTime signInTime) {
+    var now = ZonedDateTime.now(clock);
+    var maxSessionAgeTime = signInTime.plus(sessionMaxAge);
     if (now.isAfter(maxSessionAgeTime)) {
       return CookieExtendResult.Invalid;
     }
@@ -106,9 +106,7 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
   }
 
   /**
-   * Get the currently logged in user.
-   *
-   * Only calls retrieveUserById once per request cycle.
+   * Get the currently logged in user. Only calls retrieveUserById once per request cycle.
    *
    * @return null if no user is logged in. Otherwise the user object as retrieved by retrieveUserById using the ID from the session
    */
@@ -127,6 +125,11 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
     return newContainer.user;
   }
 
+  /**
+   * Get existing deserialized session container from cookie
+   *
+   * @return value from cookie, null if no existing session
+   */
   private SerializedSessionContainer getSessionContainer() {
     var container = (SerializedSessionContainer) this.request.getAttribute(UserKey);
     if (container != null) {
@@ -138,7 +141,7 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
     }
     try {
       container = CookieTools.fromJSONCookie(cookie, SerializedSessionContainer.class, true, encryptor, objectMapper);
-      var shouldExtend = shouldExtendCookie(ZonedDateTime.now(this.clock), container.signInInstant, sessionMaxAge, sessionTimeout);
+      var shouldExtend = shouldExtendCookie(container.loginInstant);
       switch (shouldExtend) {
         case Extend:
           // same cookie value, but with longer time (set on cookie proxy in constructor)
@@ -172,6 +175,11 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
    */
   protected abstract IdentifiableUser retrieveUserById(UUID id);
 
+  /**
+   * The current session ID
+   *
+   * @return the session ID, if a session exists, otherwise null
+   */
   @Override
   public String getSessionId() {
     return Optional.ofNullable(getSessionContainer()).map(c -> c.sessionId).orElse(null);
@@ -183,6 +191,11 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
     return getSessionId() != null;
   }
 
+  /**
+   * Sets a cookie to log the user in
+   *
+   * @param context The user
+   */
   @Override
   public void login(Object context) {
     if (!(context instanceof IdentifiableUser user)) {
@@ -241,7 +254,7 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
     if (currentContainer == null) {
       throw new UnauthenticatedException();
     }
-    var newContainer = new HydratedUserSessionContainer(currentContainer.sessionId, currentContainer.signInInstant, user);
+    var newContainer = new HydratedUserSessionContainer(currentContainer.sessionId, currentContainer.loginInstant, user);
     request.setAttribute(UserKey, newContainer);
   }
 }

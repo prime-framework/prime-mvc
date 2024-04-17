@@ -44,8 +44,7 @@ public class UserIDCookieSessionSecurityContextTest {
     mockClockNow = mockClock.instant().atZone(ZoneId.of("UTC"));
   }
 
-  @Inject
-  private SessionCookieKeyChanger cookieKeyChanger;
+  @Inject private SessionCookieKeyChanger cookieKeyChanger;
 
   // makes it easier to see why we "start" an HTTP server twice in test runs
   @AfterClass
@@ -69,9 +68,7 @@ public class UserIDCookieSessionSecurityContextTest {
   private static RequestSimulator buildSimulator(SessionTestModule module) {
     // PrimeBaseTest uses 9080
     var httpConfig = new HTTPServerConfiguration().withListener(new HTTPListenerConfiguration(9081));
-    var main = new TestPrimeMain(new HTTPServerConfiguration[]{httpConfig},
-                                 module,
-                                 new MVCModule());
+    var main = new TestPrimeMain(new HTTPServerConfiguration[]{httpConfig}, module, new MVCModule());
     return new RequestSimulator(main, new TestMessageObserver());
   }
 
@@ -87,16 +84,13 @@ public class UserIDCookieSessionSecurityContextTest {
   }
 
   private RequestResult doLogin(int expectedStatusCode) {
-    return simulator.test("/security/cookiesession/do-login")
-                    .get()
-                    .assertStatusCode(expectedStatusCode);
+    return simulator.test("/security/cookiesession/do-login").get().assertStatusCode(expectedStatusCode);
   }
 
   @Test
   public void getCurrentUser_no_session() {
     // act + assert
-    getSessionInfo()
-        .assertBodyContains("the current user is (no user)");
+    getSessionInfo().assertBodyContains("the current user is (no user)");
   }
 
   @Test
@@ -105,8 +99,7 @@ public class UserIDCookieSessionSecurityContextTest {
     doLogin(200);
 
     // act + assert
-    getSessionInfo()
-        .assertBodyContains("the current user is bob");
+    getSessionInfo().assertBodyContains("the current user is bob");
   }
 
   @Test
@@ -115,8 +108,7 @@ public class UserIDCookieSessionSecurityContextTest {
     doLogin(200);
 
     // act + assert
-    getSessionInfo()
-        .assertBodyContains("the user in the request is bob");
+    getSessionInfo().assertBodyContains("the user in the request is bob");
 
   }
 
@@ -154,8 +146,7 @@ public class UserIDCookieSessionSecurityContextTest {
   @Test
   public void getSessionId_no_session() {
     // act + assert
-    getSessionInfo()
-        .assertBodyContains("the session ID is (no session)");
+    getSessionInfo().assertBodyContains("the session ID is (no session)");
   }
 
   @Test
@@ -164,15 +155,13 @@ public class UserIDCookieSessionSecurityContextTest {
     doLogin(200);
 
     // act + assert
-    getSessionInfo()
-        .assertBodyDoesNotContain("the session ID is (no session)");
+    getSessionInfo().assertBodyDoesNotContain("the session ID is (no session)");
   }
 
   @Test
   public void isLoggedIn_no_session() {
     // act + assert
-    getSessionInfo()
-        .assertBodyContains("logged in no");
+    getSessionInfo().assertBodyContains("logged in no");
   }
 
   @Test
@@ -181,8 +170,7 @@ public class UserIDCookieSessionSecurityContextTest {
     doLogin(200);
 
     // act + assert
-    getSessionInfo()
-        .assertBodyContains("logged in yes");
+    getSessionInfo().assertBodyContains("logged in yes");
   }
 
   @Test
@@ -193,10 +181,7 @@ public class UserIDCookieSessionSecurityContextTest {
     var result = doLogin(200);
 
     // assert
-    result
-        .assertStatusCode(200)
-        .assertContainsNoGeneralErrors()
-        .assertContainsCookie(UserKey);
+    result.assertStatusCode(200).assertContainsNoGeneralErrors().assertContainsCookie(UserKey);
   }
 
   @Test
@@ -227,10 +212,7 @@ public class UserIDCookieSessionSecurityContextTest {
     simulator.test("/security/cookiesession/do-logout").get();
 
     // assert
-    getSessionInfo()
-        .assertBodyContains("the session ID is (no session)")
-        .assertBodyContains("logged in no")
-        .assertBodyContains("the current user is (no user)");
+    getSessionInfo().assertBodyContains("the session ID is (no session)").assertBodyContains("logged in no").assertBodyContains("the current user is (no user)");
   }
 
   private static String getSessionID(RequestResult response) {
@@ -248,10 +230,7 @@ public class UserIDCookieSessionSecurityContextTest {
     var previousSessionId = getSessionID(baselineGet);
 
     // act
-    var updateResponse = simulator.test("/security/cookiesession/get-session-info")
-                                  .withURLParameter("update", "yes")
-                                  .withURLParameter("updateNewUserEmail", "alice")
-                                  .get();
+    var updateResponse = simulator.test("/security/cookiesession/get-session-info").withURLParameter("update", "yes").withURLParameter("updateNewUserEmail", "alice").get();
 
     // assert
     updateResponse.assertBodyContains("the current user is alice")
@@ -259,9 +238,7 @@ public class UserIDCookieSessionSecurityContextTest {
                   .assertBodyContains("the session ID is " + previousSessionId);
     // ensure with a fresh GET, our session is consistent, but given we hydrate the user from the DB
     // we would expect the current user to go back to Bob
-    getSessionInfo()
-        .assertBodyContains("the session ID is " + previousSessionId)
-        .assertBodyContains("the current user is bob");
+    getSessionInfo().assertBodyContains("the session ID is " + previousSessionId).assertBodyContains("the current user is bob");
   }
 
   @Test
@@ -276,34 +253,23 @@ public class UserIDCookieSessionSecurityContextTest {
     cookieKeyChanger.changeIt(existingCookie);
 
     // assert
-    getSessionInfo()
-        .assertBodyContains("the session ID is (no session)")
-        .assertBodyContains("logged in no")
-        .assertBodyContains("the current user is (no user)");
+    getSessionInfo().assertBodyContains("the session ID is (no session)").assertBodyContains("logged in no").assertBodyContains("the current user is (no user)");
   }
 
   @DataProvider(name = "cookieActionData")
   public Object[][] extendCookieData() {
-    return new Object[][]{
-        {"less_than_halfway_through_timeout", mockClockNow, Duration.ofDays(1), Duration.ofMinutes(30), CookieExtendResult.Keep},
-        {"halfway_through_timeout", mockClockNow.minusMinutes(15), Duration.ofDays(1), Duration.ofMinutes(30), CookieExtendResult.Keep},
-        {"more_than_halfway_through_timeout", mockClockNow.minusMinutes(16), Duration.ofDays(1), Duration.ofMinutes(30), CookieExtendResult.Extend},
-        {"almost_max_age", mockClockNow.minusMinutes(10), Duration.ofMinutes(30), Duration.ofMinutes(30), CookieExtendResult.Keep},
-        {"equals_max_age", mockClockNow.minusMinutes(30), Duration.ofMinutes(30), Duration.ofMinutes(30), CookieExtendResult.Keep},
-        {"past_max_age", mockClockNow.minusMinutes(60), Duration.ofMinutes(30), Duration.ofMinutes(30), CookieExtendResult.Invalid}
-    };
+    return new Object[][]{{"less_than_halfway_through_timeout", mockClockNow, Duration.ofDays(1), Duration.ofMinutes(30), CookieExtendResult.Keep}, {"halfway_through_timeout", mockClockNow.minusMinutes(15), Duration.ofDays(1), Duration.ofMinutes(30), CookieExtendResult.Keep}, {"more_than_halfway_through_timeout", mockClockNow.minusMinutes(16), Duration.ofDays(1), Duration.ofMinutes(30), CookieExtendResult.Extend}, {"almost_max_age", mockClockNow.minusMinutes(10), Duration.ofMinutes(30), Duration.ofMinutes(30), CookieExtendResult.Keep}, {"equals_max_age", mockClockNow.minusMinutes(30), Duration.ofMinutes(30), Duration.ofMinutes(30), CookieExtendResult.Keep}, {"past_max_age", mockClockNow.minusMinutes(60), Duration.ofMinutes(30), Duration.ofMinutes(30), CookieExtendResult.Invalid}};
   }
 
   @Test(dataProvider = "cookieActionData")
-  public void shouldExtendCookie(String label,
-                                 ZonedDateTime signInTime,
-                                 Duration maxSessionAge,
-                                 Duration sessionTimeout,
+  public void shouldExtendCookie(String label, ZonedDateTime signInTime, Duration maxSessionAge, Duration sessionTimeout,
                                  CookieExtendResult expectedResult) {
     // arrange
+    // we don't need most of these dependencies to test this
+    var securityContext = new MockUserIDCookieSession(null, null, null, null, mockClock, sessionTimeout, maxSessionAge);
 
     // act
-    var actualResult = UserIDCookieSessionSecurityContext.shouldExtendCookie(mockClockNow, signInTime, maxSessionAge, sessionTimeout);
+    var actualResult = securityContext.shouldExtendCookie(signInTime);
 
     // assert
     assertEquals(actualResult, expectedResult);
