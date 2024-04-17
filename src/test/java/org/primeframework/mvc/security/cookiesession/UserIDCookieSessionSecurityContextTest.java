@@ -10,6 +10,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.regex.Pattern;
 
+import com.google.inject.Inject;
 import io.fusionauth.http.server.HTTPListenerConfiguration;
 import io.fusionauth.http.server.HTTPServerConfiguration;
 import org.primeframework.mvc.TestPrimeMain;
@@ -19,6 +20,7 @@ import org.primeframework.mvc.message.TestMessageObserver;
 import org.primeframework.mvc.security.cookiesession.UserIDCookieSessionSecurityContext.CookieExtendResult;
 import org.primeframework.mvc.test.RequestResult;
 import org.primeframework.mvc.test.RequestSimulator;
+import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
@@ -36,14 +38,15 @@ public class UserIDCookieSessionSecurityContextTest {
 
   private static RequestSimulator simulator;
 
-  private static SessionCookieKeyChanger cookieKeyChanger;
-
   private static Clock mockClock;
 
   private static void resetMockClock() {
     mockClock = Clock.fixed(Instant.ofEpochSecond(42), ZoneId.of("UTC"));
     mockClockNow = mockClock.instant().atZone(ZoneId.of("UTC"));
   }
+
+  @Inject
+  private SessionCookieKeyChanger cookieKeyChanger;
 
   // makes it easier to see why we "start" an HTTP server twice in test runs
   @AfterClass
@@ -60,13 +63,17 @@ public class UserIDCookieSessionSecurityContextTest {
   @BeforeClass
   public void startItUp() {
     resetMockClock();
+    simulator = buildSimulator(new SessionTestModule(() -> mockClock, true));
+    simulator.getInjector().injectMembers(this);
+  }
+
+  private static RequestSimulator buildSimulator(SessionTestModule module) {
     // PrimeBaseTest uses 9080
     var httpConfig = new HTTPServerConfiguration().withListener(new HTTPListenerConfiguration(9081));
     var main = new TestPrimeMain(new HTTPServerConfiguration[]{httpConfig},
-                                 new SessionTestModule(() -> mockClock),
+                                 module,
                                  new MVCModule());
-    simulator = new RequestSimulator(main, new TestMessageObserver());
-    cookieKeyChanger = main.getInjector().getInstance(SessionCookieKeyChanger.class);
+    return new RequestSimulator(main, new TestMessageObserver());
   }
 
   @BeforeMethod
@@ -80,10 +87,10 @@ public class UserIDCookieSessionSecurityContextTest {
     return requestBuilder.get();
   }
 
-  private RequestResult doLogin() {
+  private RequestResult doLogin(int expectedStatusCode) {
     return simulator.test("/security/cookiesession/do-login")
                     .get()
-                    .assertStatusCode(200);
+                    .assertStatusCode(expectedStatusCode);
   }
 
   @Test
@@ -96,7 +103,7 @@ public class UserIDCookieSessionSecurityContextTest {
   @Test
   public void getCurrentUser_has_session() {
     // arrange
-    doLogin();
+    doLogin(200);
 
     // act + assert
     getSessionInfo()
@@ -106,7 +113,7 @@ public class UserIDCookieSessionSecurityContextTest {
   @Test
   public void getCurrentUser_has_session_caches_in_request() {
     // arrange
-    doLogin();
+    doLogin(200);
 
     // act + assert
     getSessionInfo()
@@ -117,7 +124,7 @@ public class UserIDCookieSessionSecurityContextTest {
   @Test
   public void getCurrentUser_extend() {
     // arrange
-    doLogin();
+    doLogin(200);
     var moreThanHalf = mockClockNow.plusMinutes(4);
     mockClock = Clock.fixed(moreThanHalf.toInstant(), ZoneId.of("UTC"));
 
@@ -132,7 +139,7 @@ public class UserIDCookieSessionSecurityContextTest {
   @Test
   public void getCurrentUser_no_extend() {
     // arrange
-    doLogin();
+    doLogin(200);
     var pastAge = mockClockNow.plusMinutes(31);
     mockClock = Clock.fixed(pastAge.toInstant(), ZoneId.of("UTC"));
 
@@ -155,7 +162,7 @@ public class UserIDCookieSessionSecurityContextTest {
   @Test
   public void getSessionId_has_session() {
     // arrange
-    doLogin();
+    doLogin(200);
 
     // act + assert
     getSessionInfo()
@@ -172,7 +179,7 @@ public class UserIDCookieSessionSecurityContextTest {
   @Test
   public void isLoggedIn_has_session() {
     // arrange
-    doLogin();
+    doLogin(200);
 
     // act + assert
     getSessionInfo()
@@ -184,7 +191,7 @@ public class UserIDCookieSessionSecurityContextTest {
     // arrange
 
     // act
-    var result = doLogin();
+    var result = doLogin(200);
 
     // assert
     result
@@ -194,9 +201,28 @@ public class UserIDCookieSessionSecurityContextTest {
   }
 
   @Test
+  public void login_without_jackson_modules() {
+    // arrange
+    simulator.shutdown();
+    try {
+      simulator = buildSimulator(new SessionTestModule(() -> mockClock, false));
+      // act
+      var result = doLogin(500);
+
+      // assert
+      result.assertBodyContains("java.lang.IllegalStateException: You are missing a Jackson module that serializes ZonedDateTime");
+    } finally {
+      // repair our @BeforeClass state
+      simulator.shutdown();
+      simulator = buildSimulator(new SessionTestModule(() -> mockClock, true));
+      simulator.getInjector().injectMembers(this);
+    }
+  }
+
+  @Test
   public void logout() {
     // arrange
-    doLogin();
+    doLogin(200);
 
     // act
     simulator.test("/security/cookiesession/do-logout").get();
@@ -218,7 +244,7 @@ public class UserIDCookieSessionSecurityContextTest {
   @Test
   public void updateUser() {
     // arrange
-    doLogin();
+    doLogin(200);
     var baselineGet = getSessionInfo();
     var previousSessionId = getSessionID(baselineGet);
 
@@ -242,7 +268,7 @@ public class UserIDCookieSessionSecurityContextTest {
   @Test
   public void cookie_encryption_key_changed() {
     // arrange
-    doLogin();
+    doLogin(200);
     // if this key changes, the user's browser will still supply a cookie, but it will fail to be decrypted
     // and if not handled properly, will stack trace and the user cannot get back in
 

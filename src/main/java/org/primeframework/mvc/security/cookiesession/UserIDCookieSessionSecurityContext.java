@@ -23,6 +23,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.InvalidDefinitionException;
 import io.fusionauth.http.Cookie;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
@@ -36,7 +37,6 @@ import org.primeframework.mvc.util.CookieTools;
 /**
  * Logs in and out users based on storing their User ID in a cookie and also adds a sliding session
  * timeout with a maximum age
- *
  */
 public abstract class UserIDCookieSessionSecurityContext implements UserLoginSecurityContext {
   public static final String UserKey = "primeCurrentUser";
@@ -156,6 +156,9 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
       // decrypt and a user will be stuck trying to get back in
       this.deleteCookies();
       return null;
+    } catch (InvalidDefinitionException e) {
+      checkForMissingLibrary(e);
+      return null;
     } catch (Exception e) {
       throw new ErrorException(e);
     }
@@ -199,13 +202,26 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
     }
   }
 
+  private void checkForMissingLibrary(InvalidDefinitionException e) throws ErrorException {
+    Exception cause = e;
+    if (e.getMessage().contains("Java 8 date/time type `java.time.ZonedDateTime` not supported by default: add Module")) {
+      cause = new IllegalStateException("You are missing a Jackson module that serializes ZonedDateTime. Adding com.inversoft:jackson5 to your dependencies and adding JacksonModule from that dependency to your MultiBinder is recommended.",
+                                        e);
+    }
+    throw new ErrorException(cause);
+  }
+
   private void writeContainerToCookie(SerializedSessionContainer container) throws Exception {
-    var cookieValue = CookieTools.toJSONCookie(container,
-                                               true,
-                                               true,
-                                               this.encryptor,
-                                               this.objectMapper);
-    this.sessionCookie.add(request, response, cookieValue);
+    try {
+      var cookieValue = CookieTools.toJSONCookie(container,
+                                                 true,
+                                                 true,
+                                                 this.encryptor,
+                                                 this.objectMapper);
+      this.sessionCookie.add(request, response, cookieValue);
+    } catch (InvalidDefinitionException e) {
+      checkForMissingLibrary(e);
+    }
   }
 
   private void deleteCookies() {

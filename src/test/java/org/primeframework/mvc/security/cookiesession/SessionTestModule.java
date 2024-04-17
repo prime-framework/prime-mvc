@@ -5,9 +5,11 @@ package org.primeframework.mvc.security.cookiesession;
 
 import java.time.Clock;
 
+import com.fasterxml.jackson.databind.Module;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
-import com.google.inject.TypeLiteral;
+import com.google.inject.multibindings.Multibinder;
+import com.inversoft.json.JacksonModule;
 import org.primeframework.mvc.MockConfiguration;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.cors.CORSConfigurationProvider;
@@ -18,8 +20,12 @@ public class SessionTestModule extends AbstractModule {
 
   private final Provider<Clock> clockProvider;
 
-  public SessionTestModule(Provider<Clock> clockProvider) {
+  private final boolean includeJacksonModule;
+
+  public SessionTestModule(Provider<Clock> clockProvider,
+                           boolean includeJacksonModule) {
     this.clockProvider = clockProvider;
+    this.includeJacksonModule = includeJacksonModule;
   }
 
   @Override
@@ -28,5 +34,9 @@ public class SessionTestModule extends AbstractModule {
     bind(UserLoginSecurityContext.class).to(MockUserIDCookieSession.class);
     bind(CORSConfigurationProvider.class).to(NoCORSConfigurationProvider.class).asEagerSingleton();
     bind(Clock.class).toProvider(clockProvider);
+    if (includeJacksonModule) {
+      var jacksonMultiBinder = Multibinder.newSetBinder(binder(), Module.class);
+      jacksonMultiBinder.addBinding().toInstance(new JacksonModule());
+    }
   }
 }
