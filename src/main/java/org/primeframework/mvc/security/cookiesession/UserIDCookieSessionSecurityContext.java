@@ -118,11 +118,11 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
     if (sessionContainer == null) {
       return null;
     }
-    if (sessionContainer instanceof InMemorySessionContainer inMemory) {
+    if (sessionContainer instanceof HydratedUserSessionContainer inMemory) {
       return inMemory.user;
     }
     var user = retrieveUserById(sessionContainer.userId);
-    var newContainer = new InMemorySessionContainer(sessionContainer, user);
+    var newContainer = new HydratedUserSessionContainer(sessionContainer, user);
     this.request.setAttribute(UserKey, newContainer);
     return newContainer.user;
   }
@@ -241,7 +241,7 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
     if (currentContainer == null) {
       throw new UnauthenticatedException();
     }
-    var newContainer = new InMemorySessionContainer(currentContainer.sessionId, currentContainer.signInInstant, user);
+    var newContainer = new HydratedUserSessionContainer(currentContainer.sessionId, currentContainer.signInInstant, user);
     request.setAttribute(UserKey, newContainer);
   }
 }

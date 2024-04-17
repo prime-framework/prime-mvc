@@ -9,7 +9,7 @@ import com.google.inject.Inject;
 import io.fusionauth.http.server.HTTPRequest;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.security.UserLoginSecurityContext;
-import org.primeframework.mvc.security.cookiesession.InMemorySessionContainer;
+import org.primeframework.mvc.security.cookiesession.HydratedUserSessionContainer;
 import org.primeframework.mvc.security.cookiesession.MockUser;
 
 @Action
@@ -51,7 +51,7 @@ public class GetSessionInfoAction {
     this.sessionId = Optional.ofNullable(context.getSessionId())
                              .orElse("(no session)");
     this.loggedIn = context.isLoggedIn() ? "yes" : "no";
-    var sessionContainer = Optional.ofNullable((InMemorySessionContainer) httpRequest.getAttribute("primeCurrentUser"));
+    var sessionContainer = Optional.ofNullable((HydratedUserSessionContainer) httpRequest.getAttribute("primeCurrentUser"));
     var user = sessionContainer.map(c -> c.user);
     this.userInRequest = user.map(u -> ((MockUser) u).email).orElse("(nothing)");
     return "success";
