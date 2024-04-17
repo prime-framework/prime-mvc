@@ -57,13 +57,8 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
 
   private final Duration sessionTimeout;
 
-  protected UserIDCookieSessionSecurityContext(HTTPRequest request,
-                                               HTTPResponse response,
-                                               Encryptor encryptor,
-                                               ObjectMapper objectMapper,
-                                               Clock clock,
-                                               Duration sessionTimeout,
-                                               Duration sessionMaxAge) {
+  protected UserIDCookieSessionSecurityContext(HTTPRequest request, HTTPResponse response, Encryptor encryptor, ObjectMapper objectMapper,
+                                               Clock clock, Duration sessionTimeout, Duration sessionMaxAge) {
     this.request = request;
     this.response = response;
     this.encryptor = encryptor;
@@ -112,9 +107,7 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
 
   @Override
   public Object getCurrentUser() {
-    return Optional.ofNullable(getSessionContainer())
-                   .map(c -> c.user)
-                   .orElse(null);
+    return Optional.ofNullable(getSessionContainer()).map(c -> c.user).orElse(null);
   }
 
   private InMemorySessionContainer getSessionContainer() {
@@ -127,15 +120,8 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
       return null;
     }
     try {
-      var deserializedContainer = CookieTools.fromJSONCookie(cookie,
-                                                             SerializedSessionContainer.class,
-                                                             true,
-                                                             encryptor,
-                                                             objectMapper);
-      var shouldExtend = shouldExtendCookie(ZonedDateTime.now(this.clock),
-                                            deserializedContainer.signInInstant,
-                                            sessionMaxAge,
-                                            sessionTimeout);
+      var deserializedContainer = CookieTools.fromJSONCookie(cookie, SerializedSessionContainer.class, true, encryptor, objectMapper);
+      var shouldExtend = shouldExtendCookie(ZonedDateTime.now(this.clock), deserializedContainer.signInInstant, sessionMaxAge, sessionTimeout);
       switch (shouldExtend) {
         case Extend:
           // same cookie value, but with longer time (set on cookie proxy in constructor)
@@ -185,16 +171,15 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
 
   @Override
   public void login(Object context) {
+    if (!(context instanceof IdentifiableUser user)) {
+      throw new IllegalArgumentException("Expected a user object here of type IdentifiableUser!");
+    }
     try {
-      if (context instanceof IdentifiableUser user) {
-        var id = user.getId();
-        var newSessionId = UUID.randomUUID();
-        ZonedDateTime now = ZonedDateTime.now(clock);
-        var container = new SerializedSessionContainer(id, newSessionId.toString(), now);
-        writeContainerToCookie(container);
-      } else {
-        throw new IllegalArgumentException("Expected a user object here of type IdentifiableUser!");
-      }
+      var id = user.getId();
+      var newSessionId = UUID.randomUUID();
+      ZonedDateTime now = ZonedDateTime.now(clock);
+      var container = new SerializedSessionContainer(id, newSessionId.toString(), now);
+      writeContainerToCookie(container);
     } catch (Exception e) {
       // no partial state
       deleteCookies();
@@ -205,19 +190,14 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
   private void checkForMissingLibrary(InvalidDefinitionException e) throws ErrorException {
     Exception cause = e;
     if (e.getMessage().contains("Java 8 date/time type `java.time.ZonedDateTime` not supported by default: add Module")) {
-      cause = new IllegalStateException("You are missing a Jackson module that serializes ZonedDateTime. Adding com.inversoft:jackson5 to your dependencies and adding JacksonModule from that dependency to your MultiBinder is recommended.",
-                                        e);
+      cause = new IllegalStateException("You are missing a Jackson module that serializes ZonedDateTime. Adding com.inversoft:jackson5 to your dependencies and adding JacksonModule from that dependency to your MultiBinder is recommended.", e);
     }
     throw new ErrorException(cause);
   }
 
   private void writeContainerToCookie(SerializedSessionContainer container) throws Exception {
     try {
-      var cookieValue = CookieTools.toJSONCookie(container,
-                                                 true,
-                                                 true,
-                                                 this.encryptor,
-                                                 this.objectMapper);
+      var cookieValue = CookieTools.toJSONCookie(container, true, true, this.encryptor, this.objectMapper);
       this.sessionCookie.add(request, response, cookieValue);
     } catch (InvalidDefinitionException e) {
       checkForMissingLibrary(e);
@@ -244,9 +224,7 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
     if (currentContainer == null) {
       throw new UnauthenticatedException();
     }
-    var newContainer = new InMemorySessionContainer(currentContainer.sessionId,
-                                                    currentContainer.signInInstant,
-                                                    user);
+    var newContainer = new InMemorySessionContainer(currentContainer.sessionId, currentContainer.signInInstant, user);
     request.setAttribute(UserKey, newContainer);
   }
 }
