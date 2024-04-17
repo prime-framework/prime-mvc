@@ -105,13 +105,30 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
     return now.isAfter(halfWayPoint) ? CookieExtendResult.Extend : CookieExtendResult.Keep;
   }
 
+  /**
+   * Get the currently logged in user.
+   *
+   * Only calls retrieveUserById once per request cycle.
+   *
+   * @return null if no user is logged in. Otherwise the user object as retrieved by retrieveUserById using the ID from the session
+   */
   @Override
   public Object getCurrentUser() {
-    return Optional.ofNullable(getSessionContainer()).map(c -> c.user).orElse(null);
+    SerializedSessionContainer sessionContainer = getSessionContainer();
+    if (sessionContainer == null) {
+      return null;
+    }
+    if (sessionContainer instanceof InMemorySessionContainer inMemory) {
+      return inMemory.user;
+    }
+    var user = retrieveUserById(sessionContainer.userId);
+    var newContainer = new InMemorySessionContainer(sessionContainer, user);
+    this.request.setAttribute(UserKey, newContainer);
+    return newContainer.user;
   }
 
-  private InMemorySessionContainer getSessionContainer() {
-    var container = (InMemorySessionContainer) this.request.getAttribute(UserKey);
+  private SerializedSessionContainer getSessionContainer() {
+    var container = (SerializedSessionContainer) this.request.getAttribute(UserKey);
     if (container != null) {
       return container;
     }
@@ -120,8 +137,8 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
       return null;
     }
     try {
-      var deserializedContainer = CookieTools.fromJSONCookie(cookie, SerializedSessionContainer.class, true, encryptor, objectMapper);
-      var shouldExtend = shouldExtendCookie(ZonedDateTime.now(this.clock), deserializedContainer.signInInstant, sessionMaxAge, sessionTimeout);
+      container = CookieTools.fromJSONCookie(cookie, SerializedSessionContainer.class, true, encryptor, objectMapper);
+      var shouldExtend = shouldExtendCookie(ZonedDateTime.now(this.clock), container.signInInstant, sessionMaxAge, sessionTimeout);
       switch (shouldExtend) {
         case Extend:
           // same cookie value, but with longer time (set on cookie proxy in constructor)
@@ -132,9 +149,6 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
           deleteCookies();
           return null;
       }
-      var user = retrieveUserById(deserializedContainer.userId);
-      // in our same request cycle, we avoid a DB call by holding on to this
-      container = new InMemorySessionContainer(deserializedContainer, user);
       this.request.setAttribute(UserKey, container);
       return container;
     } catch (BadPaddingException e) {
@@ -156,7 +170,7 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
    * @param id unique ID for the user
    * @return the object representing the user
    */
-  protected abstract Object retrieveUserById(UUID id);
+  protected abstract IdentifiableUser retrieveUserById(UUID id);
 
   @Override
   public String getSessionId() {
@@ -165,7 +179,7 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
 
   @Override
   public boolean isLoggedIn() {
-    // user causes a DB query
+    // user MIGHT a DB query to hydrate the user so we can do a lighter weight check by just looking for the session ID
     return getSessionId() != null;
   }
 
@@ -216,10 +230,13 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
   /**
    * Ensures any other usages of getCurrentUser in the current request cycle are updated
    *
-   * @param user The user to update
+   * @param context The user to update
    */
   @Override
-  public void updateUser(Object user) {
+  public void updateUser(Object context) {
+    if (!(context instanceof IdentifiableUser user)) {
+      throw new IllegalArgumentException("Expected a user object here of type IdentifiableUser!");
+    }
     var currentContainer = getSessionContainer();
     if (currentContainer == null) {
       throw new UnauthenticatedException();
