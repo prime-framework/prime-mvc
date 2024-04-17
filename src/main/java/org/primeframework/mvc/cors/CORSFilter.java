@@ -131,7 +131,7 @@ public final class CORSFilter {
   /**
    * Allow a predicate to decide whether to exclude in CORS
    */
-  private Predicate<String> excludeUriChecker;
+  private Predicate<String> excludePredicate;
 
   /**
    * Indicates (in seconds) how long the results of a pre-flight request can be cached in a pre-flight result cache.
@@ -255,13 +255,13 @@ public final class CORSFilter {
     return this;
   }
 
-  public CORSFilter withIncludedUriChecker(Predicate<String> includeFunction) {
-    this.includeUriChecker = includeFunction;
+  public CORSFilter withIncludePredicate(Predicate<String> includePredicate) {
+    this.includeUriChecker = includePredicate;
     return this;
   }
 
-  public CORSFilter withExcludedUriChecker(Predicate<String> excludeFunction) {
-    this.excludeUriChecker = excludeFunction;
+  public CORSFilter withExcludePredicate(Predicate<String> excludePredicate) {
+    this.excludePredicate = excludePredicate;
     return this;
   }
 
@@ -345,8 +345,8 @@ public final class CORSFilter {
     else if (includeUriChecker != null) {
       return !includeUriChecker.test(requestURI);
     }
-    else if (excludeUriChecker != null) {
-      return excludeUriChecker.test(requestURI);
+    else if (excludePredicate != null) {
+      return excludePredicate.test(requestURI);
     }
     // we're not using any of the functionality
     return false;

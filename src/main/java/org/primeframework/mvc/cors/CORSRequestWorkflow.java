@@ -62,11 +62,11 @@ public class CORSRequestWorkflow implements MVCWorkflow {
       else if (corsConfiguration.includedPathPattern != null) {
         corsFilter.withIncludedPathPattern(corsConfiguration.includedPathPattern);
       }
-      else if (corsConfiguration.includeUriChecker != null) {
-        corsFilter.withIncludedUriChecker(corsConfiguration.includeUriChecker);
+      else if (corsConfiguration.includeUriPredicate != null) {
+        corsFilter.withIncludePredicate(corsConfiguration.includeUriPredicate);
       }
-      else if (corsConfiguration.excludeUriChecker != null) {
-        corsFilter.withExcludedUriChecker(corsConfiguration.excludeUriChecker);
+      else if (corsConfiguration.excludeUriPredicate != null) {
+        corsFilter.withExcludePredicate(corsConfiguration.excludeUriPredicate);
       }
       corsFilter.withExposedHeaders(corsConfiguration.exposedHeaders)
                 .withPreflightMaxAge(corsConfiguration.preflightMaxAgeInSeconds);

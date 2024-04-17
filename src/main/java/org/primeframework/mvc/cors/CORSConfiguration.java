@@ -43,9 +43,9 @@ public class CORSConfiguration implements Buildable<CORSConfiguration> {
 
   public Pattern includedPathPattern;
 
-  public Predicate<String> excludeUriChecker;
+  public Predicate<String> excludeUriPredicate;
 
-  public Predicate<String> includeUriChecker;
+  public Predicate<String> includeUriPredicate;
 
   public List<String> exposedHeaders = new ArrayList<>();
 
@@ -107,14 +107,14 @@ public class CORSConfiguration implements Buildable<CORSConfiguration> {
 
   private void checkExclusiveMatching() {
     if (excludedPathPattern != null && includedPathPattern != null) {
-      throw new RuntimeException("You cannot use both withExcludedPathPattern and withIncludedPathPattern. Must be one or the other.");
+      throw new IllegalStateException("You cannot use both withExcludedPathPattern and withIncludedPathPattern. You must use one or the other.");
     }
-    if (includeUriChecker != null && excludeUriChecker != null) {
-      throw new RuntimeException("You cannot use both withIncludedUriChecker and withExcludedUriChecker. Must be one or the other.");
+    if (includeUriPredicate != null && excludeUriPredicate != null) {
+      throw new IllegalStateException("You cannot use both withIncludeUriPredicate and withExcludeUriPredicate. You must use one or the other.");
     }
-    if ((includeUriChecker != null ^ excludeUriChecker != null) &&
+    if ((includeUriPredicate != null ^ excludeUriPredicate != null) &&
         (excludedPathPattern != null ^ includedPathPattern != null)) {
-      throw new RuntimeException("You cannot use both a path (withIncludedPathPattern/withExcludedPathPattern) and predicate based (withIncludedUriChecker/withExcludedUriChecker). Must be one or the other.");
+      throw new IllegalStateException("You cannot use both a path (withIncludedPathPattern/withExcludedPathPattern) and predicate based (withIncludeUriPredicate/withExcludeUriPredicate). You must use one or the other.");
     }
   }
 
@@ -130,14 +130,14 @@ public class CORSConfiguration implements Buildable<CORSConfiguration> {
     return this;
   }
 
-  public CORSConfiguration withExcludedUriChecker(Predicate<String> excludeFunction) {
-    this.excludeUriChecker = excludeFunction;
+  public CORSConfiguration withExcludeUriPredicate(Predicate<String> excludeUriPredicate) {
+    this.excludeUriPredicate = excludeUriPredicate;
     checkExclusiveMatching();
     return this;
   }
 
-  public CORSConfiguration withIncludedUriChecker(Predicate<String> includeFunction) {
-    this.includeUriChecker = includeFunction;
+  public CORSConfiguration withIncludeUriPredicate(Predicate<String> includeUriPredicate) {
+    this.includeUriPredicate = includeUriPredicate;
     checkExclusiveMatching();
     return this;
   }
