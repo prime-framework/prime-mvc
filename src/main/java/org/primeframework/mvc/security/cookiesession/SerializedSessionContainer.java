@@ -10,7 +10,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 
 public class SerializedSessionContainer {
   public UUID userId;
+
   public String sessionId;
+
   public ZonedDateTime signInInstant;
 
   SerializedSessionContainer(UUID userId, String sessionId, ZonedDateTime signInInstant) {
@@ -20,5 +22,6 @@ public class SerializedSessionContainer {
   }
 
   @JsonCreator
-  private SerializedSessionContainer() {}
+  private SerializedSessionContainer() {
+  }
 }

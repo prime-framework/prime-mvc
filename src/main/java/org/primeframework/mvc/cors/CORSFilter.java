@@ -338,16 +338,14 @@ public final class CORSFilter {
   private boolean excludedRequestURI(final String requestURI) {
     if (excludedPathPattern != null) {
       return excludedPathPattern.matcher(requestURI).find();
-    }
-    else if (includedPathPattern != null) {
+    } else if (includedPathPattern != null) {
       return !includedPathPattern.matcher(requestURI).find();
-    }
-    else if (includeUriChecker != null) {
+    } else if (includeUriChecker != null) {
       return !includeUriChecker.test(requestURI);
-    }
-    else if (excludePredicate != null) {
+    } else if (excludePredicate != null) {
       return excludePredicate.test(requestURI);
     }
+
     // we're not using any of the functionality
     return false;
   }

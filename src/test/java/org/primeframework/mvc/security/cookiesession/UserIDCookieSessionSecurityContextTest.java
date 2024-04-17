@@ -20,7 +20,6 @@ import org.primeframework.mvc.message.TestMessageObserver;
 import org.primeframework.mvc.security.cookiesession.UserIDCookieSessionSecurityContext.CookieExtendResult;
 import org.primeframework.mvc.test.RequestResult;
 import org.primeframework.mvc.test.RequestSimulator;
-import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;

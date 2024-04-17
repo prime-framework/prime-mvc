@@ -19,6 +19,7 @@ import java.util.UUID;
 
 public class MockUser implements IdentifiableUser {
   public UUID id;
+
   public String email;
 
   public MockUser(String email) {
