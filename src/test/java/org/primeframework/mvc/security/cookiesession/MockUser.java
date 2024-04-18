@@ -17,17 +17,12 @@ package org.primeframework.mvc.security.cookiesession;
 
 import java.util.UUID;
 
-public class MockUser implements IdentifiableUser {
+public class MockUser {
   public UUID id;
 
   public String email;
 
   public MockUser(String email) {
     this.email = email;
-  }
-
-  @Override
-  public UUID getId() {
-    return id;
   }
 }

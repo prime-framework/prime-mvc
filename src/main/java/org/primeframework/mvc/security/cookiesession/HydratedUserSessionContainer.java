@@ -4,6 +4,7 @@
 package org.primeframework.mvc.security.cookiesession;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 /**
  * Session container class that includes a hydrated user object
@@ -11,16 +12,17 @@ import java.time.ZonedDateTime;
  * @author Brady Wied
  */
 class HydratedUserSessionContainer extends SerializedSessionContainer {
-  public final IdentifiableUser user;
+  public final Object user;
 
-  public HydratedUserSessionContainer(SerializedSessionContainer serializedSessionContainer, IdentifiableUser user) {
+  public HydratedUserSessionContainer(SerializedSessionContainer serializedSessionContainer, Object user) {
     this(serializedSessionContainer.sessionId,
          serializedSessionContainer.loginInstant,
-         user);
+         user,
+         serializedSessionContainer.userId);
   }
 
-  public HydratedUserSessionContainer(String sessionId, ZonedDateTime loginInstant, IdentifiableUser user) {
-    super(user.getId(), sessionId, loginInstant);
+  public HydratedUserSessionContainer(String sessionId, ZonedDateTime loginInstant, Object user, UUID userId) {
+    super(userId, sessionId, loginInstant);
     this.user = user;
   }
 }

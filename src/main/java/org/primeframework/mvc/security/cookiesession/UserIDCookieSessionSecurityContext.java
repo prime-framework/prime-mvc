@@ -168,12 +168,20 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
   }
 
   /**
-   * Hydrates/retrieves the user based
+   * Hydrates/retrieves the user based on ID
    *
    * @param id unique ID for the user
    * @return the object representing the user
    */
-  protected abstract IdentifiableUser retrieveUserById(UUID id);
+  protected abstract Object retrieveUserById(UUID id);
+
+  /**
+   * Get the ID based on the user
+   *
+   * @param user user to retrieve the ID for
+   * @return ID of the user
+   */
+  protected abstract UUID retrieveIdByUser(Object user);
 
   /**
    * The current session ID
@@ -194,15 +202,12 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
   /**
    * Sets a cookie to log the user in
    *
-   * @param context The user
+   * @param user The user
    */
   @Override
-  public void login(Object context) {
-    if (!(context instanceof IdentifiableUser user)) {
-      throw new IllegalArgumentException("Expected a user object here of type IdentifiableUser!");
-    }
+  public void login(Object user) {
     try {
-      var id = user.getId();
+      var id = retrieveIdByUser(user);
       var newSessionId = UUID.randomUUID();
       ZonedDateTime now = ZonedDateTime.now(clock);
       var container = new SerializedSessionContainer(id, newSessionId.toString(), now);
@@ -243,18 +248,16 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
   /**
    * Ensures any other usages of getCurrentUser in the current request cycle are updated
    *
-   * @param context The user to update
+   * @param user The user to update
    */
   @Override
-  public void updateUser(Object context) {
-    if (!(context instanceof IdentifiableUser user)) {
-      throw new IllegalArgumentException("Expected a user object here of type IdentifiableUser!");
-    }
+  public void updateUser(Object user) {
     var currentContainer = getSessionContainer();
     if (currentContainer == null) {
       throw new UnauthenticatedException();
     }
-    var newContainer = new HydratedUserSessionContainer(currentContainer.sessionId, currentContainer.loginInstant, user);
+    var userId = retrieveIdByUser(user);
+    var newContainer = new HydratedUserSessionContainer(currentContainer.sessionId, currentContainer.loginInstant, user, userId);
     request.setAttribute(UserKey, newContainer);
   }
 }
