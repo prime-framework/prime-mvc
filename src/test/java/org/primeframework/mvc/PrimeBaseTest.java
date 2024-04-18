@@ -218,6 +218,7 @@ public abstract class PrimeBaseTest {
         bind(MessageObserver.class).toInstance(messageObserver);
         bind(MetricRegistry.class).toInstance(metricRegistry);
         bind(UserLoginSecurityContext.class).to(MockUserLoginSecurityContext.class);
+        bind(URLPrinter.class);
 
         // Test Content-Type
         ContentHandlerFactory.addContentHandler(binder(), "application/test+json", JacksonContentHandler.class);
