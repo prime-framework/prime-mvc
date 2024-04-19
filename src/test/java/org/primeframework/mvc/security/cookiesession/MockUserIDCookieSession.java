@@ -48,9 +48,9 @@ public class MockUserIDCookieSession extends UserIDCookieSessionSecurityContext 
   }
 
   @Override
-  protected UUID retrieveIdByUser(Object user) {
+  protected UUID getIdFromUser(Object user) {
     if (!(user instanceof MockUser mockUser)) {
-      throw new RuntimeException("Expected MockUser and got "+user.getClass());
+      throw new RuntimeException("Expected MockUser and got " + user.getClass());
     }
     return mockUser.id;
   }

@@ -207,7 +207,7 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
   @Override
   public void login(Object user) {
     try {
-      var id = retrieveIdByUser(user);
+      var id = getIdFromUser(user);
       var newSessionId = UUID.randomUUID();
       ZonedDateTime now = ZonedDateTime.now(clock);
       var container = new SerializedSessionContainer(id, newSessionId.toString(), now);
@@ -256,7 +256,7 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
     if (currentContainer == null) {
       throw new UnauthenticatedException();
     }
-    var userId = retrieveIdByUser(user);
+    var userId = getIdFromUser(user);
     var newContainer = new HydratedUserSessionContainer(currentContainer.sessionId, currentContainer.loginInstant, user, userId);
     request.setAttribute(UserKey, newContainer);
   }
