@@ -247,7 +247,7 @@ public class UserIDCookieSessionSecurityContextTest {
                                  CookieExtendResult expectedResult) {
     // arrange
     // we don't need most of these dependencies to test this
-    var securityContext = new MockUserIDCookieSession(null, null, null, null, mockClock, sessionTimeout, maxSessionAge, null);
+    var securityContext = new MockUserIDCookieSessionSecurityContext(null, null, null, null, mockClock, sessionTimeout, maxSessionAge, null);
 
     // act
     var actualResult = securityContext.shouldExtendCookie(signInTime);

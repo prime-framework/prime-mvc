@@ -26,14 +26,14 @@ import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.security.Encryptor;
 
-public class MockUserIDCookieSession extends UserIDCookieSessionSecurityContext {
+public class MockUserIDCookieSessionSecurityContext extends UserIDCookieSessionSecurityContext {
   @Inject
-  protected MockUserIDCookieSession(HTTPRequest request, HTTPResponse response, Encryptor encryptor, ObjectMapper objectMapper, Clock clock, SessionContainerFactory sessionContainerFactory) {
+  protected MockUserIDCookieSessionSecurityContext(HTTPRequest request, HTTPResponse response, Encryptor encryptor, ObjectMapper objectMapper, Clock clock, SessionContainerFactory sessionContainerFactory) {
     super(request, response, encryptor, objectMapper, clock, Duration.ofMinutes(5), Duration.ofMinutes(30), sessionContainerFactory, MockSerializedSessionContainer.class);
   }
 
-  public MockUserIDCookieSession(HTTPRequest request, HTTPResponse response, Encryptor encryptor, ObjectMapper objectMapper, Clock clock,
-                                 Duration sessionTimeout, Duration sessionMaxAge, SessionContainerFactory sessionContainerFactory) {
+  public MockUserIDCookieSessionSecurityContext(HTTPRequest request, HTTPResponse response, Encryptor encryptor, ObjectMapper objectMapper, Clock clock,
+                                                Duration sessionTimeout, Duration sessionMaxAge, SessionContainerFactory sessionContainerFactory) {
     super(request, response, encryptor, objectMapper, clock, sessionTimeout, sessionMaxAge, sessionContainerFactory, MockSerializedSessionContainer.class);
   }
 
