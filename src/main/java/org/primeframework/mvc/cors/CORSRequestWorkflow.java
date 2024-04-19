@@ -55,21 +55,13 @@ public class CORSRequestWorkflow implements MVCWorkflow {
           .withAllowedHTTPMethods(corsConfiguration.allowedMethods)
           .withAllowedOrigins(corsConfiguration.allowedOrigins)
           .withDebugEnabled(corsConfiguration.debug)
-          .withDebugger(debugger);
-      if (corsConfiguration.excludedPathPattern != null) {
-        corsFilter.withExcludedPathPattern(corsConfiguration.excludedPathPattern);
-      }
-      else if (corsConfiguration.includedPathPattern != null) {
-        corsFilter.withIncludedPathPattern(corsConfiguration.includedPathPattern);
-      }
-      else if (corsConfiguration.includeUriPredicate != null) {
-        corsFilter.withIncludePredicate(corsConfiguration.includeUriPredicate);
-      }
-      else if (corsConfiguration.excludeUriPredicate != null) {
-        corsFilter.withExcludePredicate(corsConfiguration.excludeUriPredicate);
-      }
-      corsFilter.withExposedHeaders(corsConfiguration.exposedHeaders)
-                .withPreflightMaxAge(corsConfiguration.preflightMaxAgeInSeconds);
+          .withDebugger(debugger)
+          .withExcludedPathPattern(corsConfiguration.excludedPathPattern)
+          .withIncludedPathPattern(corsConfiguration.includedPathPattern)
+          .withIncludePredicate(corsConfiguration.includeUriPredicate)
+          .withExcludePredicate(corsConfiguration.excludeUriPredicate)
+          .withExposedHeaders(corsConfiguration.exposedHeaders)
+          .withPreflightMaxAge(corsConfiguration.preflightMaxAgeInSeconds);
 
       corsFilter.doFilter(request, response, workflowChain);
     } else {
