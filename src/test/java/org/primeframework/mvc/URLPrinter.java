@@ -16,7 +16,7 @@
 package org.primeframework.mvc;
 
 import java.net.URISyntaxException;
-import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
@@ -40,19 +40,14 @@ public class URLPrinter {
   /**
    * Dumps a list of URLs in the application based on discovered actions.
    *
-   * @param dumpMethods should HTTP methods declared on the action be printed
-   * @param includeTestClasses should action classes in the test path (build/classes/test) be included
+   * @param dumpMethods   should HTTP methods declared on the action be printed
+   * @param pathsToIgnore paths to ignore when searching for actions
    */
-  public void dump(boolean dumpMethods, boolean includeTestClasses) {
+  public void dump(boolean dumpMethods,
+                   String... pathsToIgnore) {
     provider.getActionConfigurations()
             .stream()
-            .filter(ac -> {
-              try {
-                return includeTestClasses || !isTestClass(ac);
-              } catch (URISyntaxException e) {
-                throw new RuntimeException(e);
-              }
-            })
+            .filter(ac -> !ignoreActionClass(ac, pathsToIgnore))
             .sorted(Comparator.comparing(ac -> ac.uri))
             .forEach(actionConfig -> {
               var methods = actionConfig.executeMethods.entrySet().stream()
@@ -72,8 +67,11 @@ public class URLPrinter {
             });
   }
 
-  private boolean isTestClass(ActionConfiguration actionConfiguration) throws URISyntaxException {
-    return Paths.get(actionConfiguration.actionClass.getProtectionDomain().getCodeSource().getLocation().toURI()).endsWith(Paths.get("build/classes/test"));
+  private boolean ignoreActionClass(ActionConfiguration actionConfiguration,
+                                    String... pathsToIgnore) {
+    var actionClassPath = actionConfiguration.actionClass.getProtectionDomain().getCodeSource().getLocation().getPath();
+    return Arrays.stream(pathsToIgnore)
+                 .anyMatch(actionClassPath::contains);
   }
 
   private String formatMethod(Entry<HTTPMethod, ExecuteMethodConfiguration> entry) {

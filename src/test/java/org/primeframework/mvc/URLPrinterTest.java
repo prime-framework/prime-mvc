@@ -31,7 +31,8 @@ public class URLPrinterTest extends PrimeBaseTest {
     // arrange
 
     // act
-    // since the URLs in this project all come from test classes, the 2nd param is true, but you usually would want to use false
-    urlPrinter.dump(true, true);
+    // since the URLs in this project all come from test classes, the 2nd param is not provided, but you usually would want to use
+    // something like "build/classes/test", depending on your build tool
+    urlPrinter.dump(true);
   }
 }
