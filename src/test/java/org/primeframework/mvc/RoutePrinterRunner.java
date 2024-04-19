@@ -19,14 +19,14 @@ import com.google.inject.Inject;
 import org.testng.annotations.Test;
 
 /**
- * Example of using the {@link RoutePrinter utility}
+ * Example of using the {@link RoutePrinter utility}. You can use this in your project
+ * as you see fit (remove enabled = false) from the annotation
  */
-@Test
-public class RoutePrinterTest extends PrimeBaseTest {
+public class RoutePrinterRunner extends PrimeBaseTest {
   @Inject
   private RoutePrinter routePrinter;
 
-  @Test
+  @Test(enabled = false)
   public void dump_show_everything() {
     // arrange
 
@@ -36,7 +36,7 @@ public class RoutePrinterTest extends PrimeBaseTest {
     routePrinter.dump(true, true);
   }
 
-  @Test
+  @Test(enabled = false)
   public void dump_no_actions() {
     // arrange
 
@@ -46,7 +46,7 @@ public class RoutePrinterTest extends PrimeBaseTest {
     routePrinter.dump(true, false);
   }
 
-  @Test
+  @Test(enabled = false)
   public void dump_no_methods_no_actions() {
     // arrange
 
@@ -54,7 +54,7 @@ public class RoutePrinterTest extends PrimeBaseTest {
     routePrinter.dump(false, false);
   }
 
-  @Test
+  @Test(enabled = false)
   public void dump_exclude() {
     // arrange
 
