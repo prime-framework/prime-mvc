@@ -39,31 +39,42 @@ public class RoutePrinter {
   /**
    * Dumps a list of URLs in the application based on discovered actions.
    *
-   * @param dumpMethods   should HTTP methods declared on the action be printed
-   * @param pathsToIgnore paths to ignore when searching for actions
+   * @param showMethods       should HTTP methods declared on the action be printed
+   * @param showActionClasses whether the classes that go with the URL should be printed
+   * @param ignorePaths       paths to ignore when searching for actions
    */
-  public void dump(boolean dumpMethods,
-                   String... pathsToIgnore) {
-    provider.getActionConfigurations()
-            .stream()
-            .filter(ac -> !ignoreActionClass(ac, pathsToIgnore))
-            .sorted(Comparator.comparing(ac -> ac.uri))
-            .forEach(actionConfig -> {
-              var methods = actionConfig.executeMethods.entrySet().stream()
-                                                       .map(this::formatMethod)
-                                                       .collect(Collectors.joining(", "));
-              String uri = actionConfig.uri;
-              if (!actionConfig.pattern.isEmpty()) {
-                uri = uri + "/" + actionConfig.pattern;
-              }
-              if (dumpMethods) {
-                System.out.printf("%-60s%s\n",
-                                  uri,
-                                  methods);
-              } else {
-                System.out.println(uri);
-              }
-            });
+  public void dump(boolean showMethods,
+                   boolean showActionClasses,
+                   String... ignorePaths) {
+    var sortedList = provider.getActionConfigurations()
+                             .stream()
+                             .filter(ac -> !ignoreActionClass(ac, ignorePaths))
+                             .sorted(Comparator.comparing(ac -> ac.uri))
+                             .toList();
+    // pad our output
+    final int[] lengthMaximums = {0, 0};
+    sortedList.forEach(actionConfig -> {
+      lengthMaximums[0] = Math.max(lengthMaximums[0], actionConfig.uri.length() + 2);
+      var actionClassName = actionConfig.actionClass.getName();
+      lengthMaximums[1] = Math.max(lengthMaximums[1], actionClassName.length() + 2);
+    });
+    sortedList.forEach(actionConfig -> {
+      var methods = actionConfig.executeMethods.entrySet().stream()
+                                               .map(this::formatMethod)
+                                               .collect(Collectors.joining(", "));
+      String uri = actionConfig.uri;
+      if (!actionConfig.pattern.isEmpty()) {
+        uri = uri + "/" + actionConfig.pattern;
+      }
+      System.out.printf("%-" + lengthMaximums[0] + "s", uri);
+      if (showActionClasses) {
+        System.out.printf("%-" + lengthMaximums[1] + "s", actionConfig.actionClass.getName());
+      }
+      if (showMethods) {
+        System.out.print(methods);
+      }
+      System.out.println();
+    });
   }
 
   private boolean ignoreActionClass(ActionConfiguration actionConfiguration,

@@ -27,12 +27,40 @@ public class RoutePrinterTest extends PrimeBaseTest {
   private RoutePrinter routePrinter;
 
   @Test
-  public void dump_routes() {
+  public void dump_show_everything() {
     // arrange
 
     // act
     // since the URLs in this project all come from test classes, the 2nd param is not provided, but you usually would want to use
     // something like "build/classes/test", depending on your build tool
-    routePrinter.dump(true);
+    routePrinter.dump(true, true);
+  }
+
+  @Test
+  public void dump_no_actions() {
+    // arrange
+
+    // act
+
+    // assert
+    routePrinter.dump(true, false);
+  }
+
+  @Test
+  public void dump_no_methods_no_actions() {
+    // arrange
+
+    // act
+    routePrinter.dump(false, false);
+  }
+
+  @Test
+  public void dump_exclude() {
+    // arrange
+
+    // act
+
+    // assert
+    routePrinter.dump(true, true, "build/classes/test");
   }
 }
