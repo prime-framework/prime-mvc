@@ -28,8 +28,7 @@ import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.config.ActionConfigurationProvider;
 
 /**
- * Prints out URLs/routes in the app based on Prime MVC actions. To use, do an untargeted binding in your test Guice module
- * like this - bind(URLPrinter.class);
+ * Prints out URLs/routes in the app based on Prime MVC actions. To use:
  * Then inject URLPrinter into your tests and call the dump method (see below)
  *
  * @author Brady Wied
