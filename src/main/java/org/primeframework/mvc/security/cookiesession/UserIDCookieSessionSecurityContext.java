@@ -59,8 +59,12 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
 
   private final Duration sessionTimeout;
 
+  private final SessionContainerFactory sessionContainerFactory;
+
+  private final Class<? extends SerializedSessionContainer> sessionClass;
+
   protected UserIDCookieSessionSecurityContext(HTTPRequest request, HTTPResponse response, Encryptor encryptor, ObjectMapper objectMapper,
-                                               Clock clock, Duration sessionTimeout, Duration sessionMaxAge) {
+                                               Clock clock, Duration sessionTimeout, Duration sessionMaxAge, SessionContainerFactory sessionContainerFactory, Class<? extends SerializedSessionContainer> sessionClass) {
     this.request = request;
     this.response = response;
     this.encryptor = encryptor;
@@ -68,6 +72,8 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
     this.clock = clock;
     this.sessionMaxAge = sessionMaxAge;
     this.sessionTimeout = sessionTimeout;
+    this.sessionContainerFactory = sessionContainerFactory;
+    this.sessionClass = sessionClass;
     long timeoutInSeconds = sessionTimeout.toSeconds();
     this.sessionCookie = new CookieProxy(getCookieName(), timeoutInSeconds, Cookie.SameSite.Strict);
   }
@@ -116,13 +122,13 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
     if (sessionContainer == null) {
       return null;
     }
-    if (sessionContainer instanceof HydratedUserSessionContainer inMemory) {
-      return inMemory.user;
+    if (sessionContainer instanceof HydratedSessionContainer inMemory) {
+      return inMemory.user();
     }
-    var user = retrieveUserById(sessionContainer.userId);
-    var newContainer = new HydratedUserSessionContainer(sessionContainer, user);
+    var user = retrieveUserById(sessionContainer.userId());
+    var newContainer = sessionContainerFactory.createHydrated(sessionContainer, user);
     this.request.setAttribute(UserKey, newContainer);
-    return newContainer.user;
+    return newContainer.user();
   }
 
   /**
@@ -140,8 +146,8 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
       return null;
     }
     try {
-      container = CookieTools.fromJSONCookie(cookie, SerializedSessionContainer.class, true, encryptor, objectMapper);
-      var shouldExtend = shouldExtendCookie(container.loginInstant);
+      container = CookieTools.fromJSONCookie(cookie, sessionClass, true, encryptor, objectMapper);
+      var shouldExtend = shouldExtendCookie(container.loginInstant());
       switch (shouldExtend) {
         case Extend:
           // same cookie value, but with longer time (set on cookie proxy in constructor)
@@ -190,7 +196,7 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
    */
   @Override
   public String getSessionId() {
-    return Optional.ofNullable(getSessionContainer()).map(c -> c.sessionId).orElse(null);
+    return Optional.ofNullable(getSessionContainer()).map(SerializedSessionContainer::sessionId).orElse(null);
   }
 
   @Override
@@ -210,7 +216,7 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
       var id = getIdFromUser(user);
       var newSessionId = UUID.randomUUID();
       ZonedDateTime now = ZonedDateTime.now(clock);
-      var container = new SerializedSessionContainer(id, newSessionId.toString(), now);
+      var container = sessionContainerFactory.create(id, newSessionId.toString(), now);
       writeContainerToCookie(container);
     } catch (Exception e) {
       // no partial state
@@ -256,8 +262,7 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
     if (currentContainer == null) {
       throw new UnauthenticatedException();
     }
-    var userId = getIdFromUser(user);
-    var newContainer = new HydratedUserSessionContainer(currentContainer.sessionId, currentContainer.loginInstant, user, userId);
+    var newContainer = sessionContainerFactory.createHydrated(currentContainer, user);
     request.setAttribute(UserKey, newContainer);
   }
 }

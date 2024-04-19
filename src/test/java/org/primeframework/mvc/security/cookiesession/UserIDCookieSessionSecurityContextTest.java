@@ -61,7 +61,7 @@ public class UserIDCookieSessionSecurityContextTest {
   @BeforeClass
   public void startItUp() {
     resetMockClock();
-    simulator = buildSimulator(new SessionTestModule(() -> mockClock, true));
+    simulator = buildSimulator(new SessionTestModule(() -> mockClock));
     simulator.getInjector().injectMembers(this);
   }
 
@@ -185,25 +185,6 @@ public class UserIDCookieSessionSecurityContextTest {
   }
 
   @Test
-  public void login_without_jackson_modules() {
-    // arrange
-    simulator.shutdown();
-    try {
-      simulator = buildSimulator(new SessionTestModule(() -> mockClock, false));
-      // act
-      var result = doLogin(500);
-
-      // assert
-      result.assertBodyContains("java.lang.IllegalStateException: You are missing a Jackson module that serializes ZonedDateTime");
-    } finally {
-      // repair our @BeforeClass state
-      simulator.shutdown();
-      simulator = buildSimulator(new SessionTestModule(() -> mockClock, true));
-      simulator.getInjector().injectMembers(this);
-    }
-  }
-
-  @Test
   public void logout() {
     // arrange
     doLogin(200);
@@ -266,7 +247,7 @@ public class UserIDCookieSessionSecurityContextTest {
                                  CookieExtendResult expectedResult) {
     // arrange
     // we don't need most of these dependencies to test this
-    var securityContext = new MockUserIDCookieSession(null, null, null, null, mockClock, sessionTimeout, maxSessionAge);
+    var securityContext = new MockUserIDCookieSession(null, null, null, null, mockClock, sessionTimeout, maxSessionAge, null);
 
     // act
     var actualResult = securityContext.shouldExtendCookie(signInTime);

@@ -17,26 +17,20 @@ import org.primeframework.mvc.cors.NoCORSConfigurationProvider;
 import org.primeframework.mvc.security.UserLoginSecurityContext;
 
 public class SessionTestModule extends AbstractModule {
-
   private final Provider<Clock> clockProvider;
 
-  private final boolean includeJacksonModule;
-
-  public SessionTestModule(Provider<Clock> clockProvider,
-                           boolean includeJacksonModule) {
+  public SessionTestModule(Provider<Clock> clockProvider) {
     this.clockProvider = clockProvider;
-    this.includeJacksonModule = includeJacksonModule;
   }
 
   @Override
   protected void configure() {
+    bind(SessionContainerFactory.class).to(MockSessionContainerFactory.class);
     bind(MVCConfiguration.class).to(MockConfiguration.class).asEagerSingleton();
     bind(UserLoginSecurityContext.class).to(MockUserIDCookieSession.class);
     bind(CORSConfigurationProvider.class).to(NoCORSConfigurationProvider.class).asEagerSingleton();
     bind(Clock.class).toProvider(clockProvider);
-    if (includeJacksonModule) {
-      var jacksonMultiBinder = Multibinder.newSetBinder(binder(), Module.class);
-      jacksonMultiBinder.addBinding().toInstance(new JacksonModule());
-    }
+    var jacksonMultiBinder = Multibinder.newSetBinder(binder(), Module.class);
+    jacksonMultiBinder.addBinding().toInstance(new JacksonModule());
   }
 }

@@ -6,27 +6,30 @@ package org.primeframework.mvc.security.cookiesession;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-
 /**
  * Session container serialized as JSON into the cookie
  *
  * @author Brady Wied
  */
-class SerializedSessionContainer {
-  public UUID userId;
+public interface SerializedSessionContainer {
+  /**
+   * The User ID for the logged in user
+   *
+   * @return the user ID
+   */
+  UUID userId();
 
-  public String sessionId;
+  /**
+   * The session ID for the logged in user
+   *
+   * @return the session ID
+   */
+  String sessionId();
 
-  public ZonedDateTime loginInstant;
-
-  SerializedSessionContainer(UUID userId, String sessionId, ZonedDateTime loginInstant) {
-    this.userId = userId;
-    this.sessionId = sessionId;
-    this.loginInstant = loginInstant;
-  }
-
-  @JsonCreator
-  private SerializedSessionContainer() {
-  }
+  /**
+   * The instant the user logged in
+   *
+   * @return instant user logged in
+   */
+  ZonedDateTime loginInstant();
 }
