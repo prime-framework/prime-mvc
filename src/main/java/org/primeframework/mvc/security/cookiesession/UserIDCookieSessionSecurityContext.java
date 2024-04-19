@@ -176,12 +176,12 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
   protected abstract Object retrieveUserById(UUID id);
 
   /**
-   * Get the ID based on the user
+   * Get the ID from the supplied user object
    *
    * @param user user to retrieve the ID for
    * @return ID of the user
    */
-  protected abstract UUID retrieveIdByUser(Object user);
+  protected abstract UUID getIdFromUser(Object user);
 
   /**
    * The current session ID
