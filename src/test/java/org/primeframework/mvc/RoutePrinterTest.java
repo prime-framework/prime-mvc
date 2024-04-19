@@ -19,20 +19,20 @@ import com.google.inject.Inject;
 import org.testng.annotations.Test;
 
 /**
- * Example of using the {@link URLPrinter utility}
+ * Example of using the {@link RoutePrinter utility}
  */
 @Test
-public class URLPrinterTest extends PrimeBaseTest {
+public class RoutePrinterTest extends PrimeBaseTest {
   @Inject
-  private URLPrinter urlPrinter;
+  private RoutePrinter routePrinter;
 
   @Test
-  public void dump_urls() {
+  public void dump_routes() {
     // arrange
 
     // act
     // since the URLs in this project all come from test classes, the 2nd param is not provided, but you usually would want to use
     // something like "build/classes/test", depending on your build tool
-    urlPrinter.dump(true);
+    routePrinter.dump(true);
   }
 }

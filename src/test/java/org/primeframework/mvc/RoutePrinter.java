@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc;
 
-import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Map.Entry;
@@ -33,7 +32,7 @@ import org.primeframework.mvc.action.config.ActionConfigurationProvider;
  *
  * @author Brady Wied
  */
-public class URLPrinter {
+public class RoutePrinter {
   @Inject
   private ActionConfigurationProvider provider;
 
