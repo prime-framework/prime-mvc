@@ -2323,11 +2323,11 @@ public class GlobalTest extends PrimeBaseTest {
                                  // assert
                                  .assertStatusCode(200));
 
-    assertEquals(FullFormAction.roleIdsFromLastInvocation.size(), 2);
-    assertEquals(FullFormAction.agesFromLastInvocation.size(), 1);
-    var fileContents = Files.readString((FullFormAction.imageFromLastInvocation.getFile()));
+    assertEquals(FullFormAction.roleIdsFromLastPost.size(), 2);
+    assertEquals(FullFormAction.agesFromLastPost.size(), 1);
+    var fileContents = Files.readString((FullFormAction.imageFromLastPost.getFile()));
     assertEquals(fileContents, "Hello World");
-    assertEquals(FullFormAction.stringFieldFromLastInvocation, "hello with space");
+    assertEquals(FullFormAction.stringFieldFromLastPost, "hello with space");
   }
 
   @Test

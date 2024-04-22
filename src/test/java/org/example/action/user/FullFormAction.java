@@ -34,15 +34,15 @@ import static java.util.Arrays.asList;
 public class FullFormAction {
   public List<Integer> ages = new ArrayList<Integer>();
 
-  public static List<Integer> agesFromLastInvocation;
+  public static List<Integer> agesFromLastPost;
 
   public FileInfo image;
 
-  public static FileInfo imageFromLastInvocation;
+  public static FileInfo imageFromLastPost;
 
   public List<Integer> roleIds;
 
-  public static List<Integer> roleIdsFromLastInvocation;
+  public static List<Integer> roleIdsFromLastPost;
 
   public List<Role> roles = asList(new Role(1, "Admin"), new Role(2, "User"));
 
@@ -52,7 +52,7 @@ public class FullFormAction {
 
   public String stringField;
 
-  public static String stringFieldFromLastInvocation;
+  public static String stringFieldFromLastPost;
 
   public FullFormAction() {
     for (int i = 1; i < 100; i++) {
@@ -66,17 +66,17 @@ public class FullFormAction {
   }
 
   public String post() {
-    roleIdsFromLastInvocation = roleIds;
-    imageFromLastInvocation = image;
-    agesFromLastInvocation = ages;
-    stringFieldFromLastInvocation = stringField;
+    roleIdsFromLastPost = roleIds;
+    imageFromLastPost = image;
+    agesFromLastPost = ages;
+    stringFieldFromLastPost = stringField;
     return "success";
   }
 
   public static void reset() {
-    roleIdsFromLastInvocation = null;
-    imageFromLastInvocation = null;
-    agesFromLastInvocation = null;
-    stringFieldFromLastInvocation = null;
+    roleIdsFromLastPost = null;
+    imageFromLastPost = null;
+    agesFromLastPost = null;
+    stringFieldFromLastPost = null;
   }
 }
