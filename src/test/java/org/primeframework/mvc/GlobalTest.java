@@ -55,6 +55,7 @@ import org.example.action.OverrideMeAction;
 import org.example.action.ParameterHandlerAction;
 import org.example.action.store.BaseStoreAction;
 import org.example.action.user.EditAction;
+import org.example.action.user.FullFormAction;
 import org.example.domain.UserField;
 import org.primeframework.mvc.action.config.ActionConfigurationProvider;
 import org.primeframework.mvc.container.ContainerResolver;
@@ -64,7 +65,9 @@ import org.primeframework.mvc.parameter.convert.GlobalConverter;
 import org.primeframework.mvc.parameter.convert.MultipleParametersUnsupportedException;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.util.URIBuilder;
+import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
@@ -83,6 +86,12 @@ public class GlobalTest extends PrimeBaseTest {
   @BeforeClass
   public void beforeClass() {
     jsonDir = Path.of("src/test/resources/json");
+  }
+
+  @BeforeMethod
+  public void beforeMethod() {
+    super.beforeMethod();
+    FullFormAction.reset();
   }
 
   @Test
@@ -2306,6 +2315,25 @@ public class GlobalTest extends PrimeBaseTest {
 
     TestUnhandledExceptionHandler.assertLastUnhandledException(new MultipleParametersUnsupportedException(
         "You are attempting to map a form field that contains multiple parameters to a property on the action class that is of type Enum. This isn't allowed. Action class [org.example.action.ParameterHandlerAction] Request URI [/parameter-handler] Parameter name [enumValue]"));
+  }
+
+  @Test
+  public void post_multipart() throws IOException {
+    // arrange
+    test.createFile("Hello World");
+
+    // act
+    var result = simulator.test("/user/full-form")
+                          .withParameter("roleIds", 21)
+                          .withParameter("roleIds", 22)
+                          .withFile("image", test.tempFile, "text/plain")
+                          .post();
+
+    // assert
+    result.assertStatusCode(200);
+    assertEquals(FullFormAction.getRoleIdsFromLastInvocation().size(), 2);
+    assertEquals(FullFormAction.getImageFromLastInvocation().file.toString(), "foo");
+    Assert.fail("Write the test");
   }
 
   @Test

@@ -35,8 +35,10 @@ public class FullFormAction {
   public List<Integer> ages = new ArrayList<Integer>();
 
   public FileInfo image;
+  private static FileInfo imageFromLastInvocation;
 
   public List<Integer> roleIds;
+  private static List<Integer> roleIdsFromLastInvocation;
 
   public List<Role> roles = asList(new Role(1, "Admin"), new Role(2, "User"));
 
@@ -55,6 +57,21 @@ public class FullFormAction {
   }
 
   public String post() {
+    roleIdsFromLastInvocation = roleIds;
+    imageFromLastInvocation = image;
     return "success";
+  }
+
+  public static List<Integer> getRoleIdsFromLastInvocation() {
+    return roleIdsFromLastInvocation;
+  }
+
+  public static FileInfo getImageFromLastInvocation() {
+    return imageFromLastInvocation;
+  }
+
+  public static void reset() {
+    roleIdsFromLastInvocation = null;
+    imageFromLastInvocation = null;
   }
 }
