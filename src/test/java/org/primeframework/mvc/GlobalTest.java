@@ -86,13 +86,7 @@ public class GlobalTest extends PrimeBaseTest {
   public void beforeClass() {
     jsonDir = Path.of("src/test/resources/json");
   }
-
-  @BeforeMethod
-  public void beforeMethod() {
-    super.beforeMethod();
-    FullFormAction.reset();
-  }
-
+  
   @Test
   public void cache_control_disabled() throws Exception {
     // Disable cache control managed by the result handler.

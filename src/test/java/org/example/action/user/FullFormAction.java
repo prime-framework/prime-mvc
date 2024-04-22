@@ -33,12 +33,15 @@ import static java.util.Arrays.asList;
 @Action
 public class FullFormAction {
   public List<Integer> ages = new ArrayList<Integer>();
+
   private static List<Integer> agesFromLastInvocation;
 
   public FileInfo image;
+
   private static FileInfo imageFromLastInvocation;
 
   public List<Integer> roleIds;
+
   private static List<Integer> roleIdsFromLastInvocation;
 
   public List<Role> roles = asList(new Role(1, "Admin"), new Role(2, "User"));
@@ -47,10 +50,13 @@ public class FullFormAction {
 
   public UserType[] userTypes = UserType.values();
 
+  public String stringField;
+
   public FullFormAction() {
     for (int i = 1; i < 100; i++) {
       ages.add(i);
     }
+    reset();
   }
 
   public String get() {
