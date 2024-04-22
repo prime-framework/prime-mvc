@@ -829,7 +829,7 @@ public class RequestBuilder {
       List<FileUpload> fileUploads = files.stream()
                                           .map(fi -> new FileUpload(fi.contentType, fi.file, fi.fileName, fi.name))
                                           .collect(Collectors.toList());
-      MultipartBodyHandler multipartBodyHandler = new MultipartBodyHandler(new Multiparts(fileUploads, urlParameters));
+      MultipartBodyHandler multipartBodyHandler = new MultipartBodyHandler(new Multiparts(fileUploads, requestBodyParameters));
       bodyPublisher = BodyPublishers.ofByteArray(multipartBodyHandler.getBody());
       if (contentType == null) {
         contentType = "multipart/form-data; boundary=" + multipartBodyHandler.boundary;
