@@ -66,7 +66,6 @@ import org.primeframework.mvc.parameter.convert.MultipleParametersUnsupportedExc
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.util.URIBuilder;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
@@ -86,7 +85,7 @@ public class GlobalTest extends PrimeBaseTest {
   public void beforeClass() {
     jsonDir = Path.of("src/test/resources/json");
   }
-  
+
   @Test
   public void cache_control_disabled() throws Exception {
     // Disable cache control managed by the result handler.
@@ -2318,15 +2317,17 @@ public class GlobalTest extends PrimeBaseTest {
                                  .withParameter("roleIds", 21)
                                  .withParameter("roleIds", 22)
                                  .withURLParameter("ages", 42)
+                                 .withParameter("stringField", "hello with space")
                                  .withFile("image", test.tempFile, "text/plain")
                                  .post()
                                  // assert
                                  .assertStatusCode(200));
 
-    assertEquals(FullFormAction.getRoleIdsFromLastInvocation().size(), 2);
-    assertEquals(FullFormAction.getAgesFromLastInvocation().size(), 1);
-    var fileContents = Files.readString((FullFormAction.getImageFromLastInvocation().getFile()));
+    assertEquals(FullFormAction.roleIdsFromLastInvocation.size(), 2);
+    assertEquals(FullFormAction.agesFromLastInvocation.size(), 1);
+    var fileContents = Files.readString((FullFormAction.imageFromLastInvocation.getFile()));
     assertEquals(fileContents, "Hello World");
+    assertEquals(FullFormAction.stringFieldFromLastInvocation, "hello with space");
   }
 
   @Test
