@@ -2317,20 +2317,18 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
-  public void post_multipart_parameter_mix() throws IOException {
+  public void post_multipart_parameter_mix() throws Exception {
     // arrange
-    test.createFile("Hello World");
+    test.createFile("Hello World")
+        .simulate(() -> simulator.test("/user/full-form")
+                                 .withParameter("roleIds", 21)
+                                 .withParameter("roleIds", 22)
+                                 .withURLParameter("ages", 42)
+                                 .withFile("image", test.tempFile, "text/plain")
+                                 .post()
+                                 // assert
+                                 .assertStatusCode(200));
 
-    // act
-    var result = simulator.test("/user/full-form")
-                          .withParameter("roleIds", 21)
-                          .withParameter("roleIds", 22)
-                          .withURLParameter("ages", 42)
-                          .withFile("image", test.tempFile, "text/plain")
-                          .post();
-
-    // assert
-    result.assertStatusCode(200);
     assertEquals(FullFormAction.getRoleIdsFromLastInvocation().size(), 2);
     assertEquals(FullFormAction.getAgesFromLastInvocation().size(), 1);
     var fileContents = Files.readString((FullFormAction.getImageFromLastInvocation().getFile()));
