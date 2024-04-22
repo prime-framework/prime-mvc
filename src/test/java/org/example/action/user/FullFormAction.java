@@ -33,6 +33,7 @@ import static java.util.Arrays.asList;
 @Action
 public class FullFormAction {
   public List<Integer> ages = new ArrayList<Integer>();
+  private static List<Integer> agesFromLastInvocation;
 
   public FileInfo image;
   private static FileInfo imageFromLastInvocation;
@@ -59,6 +60,7 @@ public class FullFormAction {
   public String post() {
     roleIdsFromLastInvocation = roleIds;
     imageFromLastInvocation = image;
+    agesFromLastInvocation = ages;
     return "success";
   }
 
@@ -70,8 +72,13 @@ public class FullFormAction {
     return imageFromLastInvocation;
   }
 
+  public static List<Integer> getAgesFromLastInvocation() {
+    return agesFromLastInvocation;
+  }
+
   public static void reset() {
     roleIdsFromLastInvocation = null;
     imageFromLastInvocation = null;
+    agesFromLastInvocation = null;
   }
 }

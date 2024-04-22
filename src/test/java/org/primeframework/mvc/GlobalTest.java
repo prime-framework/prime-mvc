@@ -17,7 +17,6 @@ package org.primeframework.mvc;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
@@ -66,7 +65,6 @@ import org.primeframework.mvc.parameter.convert.GlobalConverter;
 import org.primeframework.mvc.parameter.convert.MultipleParametersUnsupportedException;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.util.URIBuilder;
-import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -2319,7 +2317,7 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
-  public void post_multipart() throws IOException {
+  public void post_multipart_parameter_mix() throws IOException {
     // arrange
     test.createFile("Hello World");
 
@@ -2327,12 +2325,14 @@ public class GlobalTest extends PrimeBaseTest {
     var result = simulator.test("/user/full-form")
                           .withParameter("roleIds", 21)
                           .withParameter("roleIds", 22)
+                          .withURLParameter("ages", 42)
                           .withFile("image", test.tempFile, "text/plain")
                           .post();
 
     // assert
     result.assertStatusCode(200);
     assertEquals(FullFormAction.getRoleIdsFromLastInvocation().size(), 2);
+    assertEquals(FullFormAction.getAgesFromLastInvocation().size(), 1);
     var fileContents = Files.readString((FullFormAction.getImageFromLastInvocation().getFile()));
     assertEquals(fileContents, "Hello World");
   }
