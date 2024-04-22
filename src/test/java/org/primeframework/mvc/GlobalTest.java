@@ -17,6 +17,7 @@ package org.primeframework.mvc;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
@@ -2332,8 +2333,8 @@ public class GlobalTest extends PrimeBaseTest {
     // assert
     result.assertStatusCode(200);
     assertEquals(FullFormAction.getRoleIdsFromLastInvocation().size(), 2);
-    assertEquals(FullFormAction.getImageFromLastInvocation().file.toString(), "foo");
-    Assert.fail("Write the test");
+    var fileContents = Files.readString((FullFormAction.getImageFromLastInvocation().getFile()));
+    assertEquals(fileContents, "Hello World");
   }
 
   @Test
