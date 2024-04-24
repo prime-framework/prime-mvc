@@ -73,7 +73,7 @@ public class MultipartBodyHandler {
           for (Map.Entry<String, List<String>> entry : request.parameters.entrySet()) {
             for (String value : entry.getValue()) {
               writer.append("--").append(boundary).append("\r\n");
-              writer.append("Content-Disposition: form-data; name=\"").append(URLEncoder.encode(entry.getKey(), "UTF-8")).append("\"\r\n\r\n").append(URLEncoder.encode(value, "UTF-8")).append("\r\n");
+              writer.append("Content-Disposition: form-data; name=\"").append(URLEncoder.encode(entry.getKey(), "UTF-8")).append("\"\r\n\r\n").append(value).append("\r\n");
             }
           }
         }

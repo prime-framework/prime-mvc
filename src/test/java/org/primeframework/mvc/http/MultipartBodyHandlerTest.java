@@ -31,7 +31,7 @@ public class MultipartBodyHandlerTest {
   public void post_formData_multiPart() throws Exception {
     Map<String, List<String>> parameters = new LinkedHashMap<>();
     parameters.put("test1", singletonList("value1"));
-    parameters.put("test2", singletonList("value2"));
+    parameters.put("test2", singletonList("value2 with space"));
 
     List<MultipartFileUpload> files = new ArrayList<>();
     files.add(new MultipartFileUpload("text/plain", Paths.get("src/test/java/org/primeframework/mvc/http/test-file.txt"), "foo.bar.txt", "formField"));
@@ -49,7 +49,7 @@ public class MultipartBodyHandlerTest {
                           "value1\r\n" +
                           "--" + bodyHandler.boundary + "\r\n" +
                           "Content-Disposition: form-data; name=\"test2\"\r\n\r\n" +
-                          "value2\r\n" +
+                          "value2 with space\r\n" +
                           "--" + bodyHandler.boundary + "--";
 
     byte[] actualBody = bodyHandler.getBody();
