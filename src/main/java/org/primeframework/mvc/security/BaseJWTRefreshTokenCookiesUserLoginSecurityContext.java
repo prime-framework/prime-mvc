@@ -258,6 +258,7 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
     HttpClient client = HttpClient.newHttpClient();
     Builder requestBuilder = HttpRequest.newBuilder(URI.create(oauthConfiguration.tokenEndpoint));
     if (oauthConfiguration.authenticationMethod == TokenAuthenticationMethod.client_secret_basic) {
+      // see https://www.rfc-editor.org/rfc/rfc2617#section-2
       if (oauthConfiguration.clientId.contains(":")) {
         tokens.refreshToken = null;
         jwtCookie.delete(request, response);
