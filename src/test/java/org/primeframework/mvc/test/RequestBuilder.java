@@ -94,11 +94,13 @@ public class RequestBuilder {
 
   private byte[] body;
 
-  public RequestBuilder(String path, Injector injector, MockUserAgent userAgent, TestMessageObserver messageObserver, int port) {
+  public RequestBuilder(String path, Injector injector, MockUserAgent userAgent, TestMessageObserver messageObserver,
+                        int port) {
     this.injector = injector;
     this.userAgent = userAgent;
     this.messageObserver = messageObserver;
-    this.request = new HTTPRequest().with(r -> r.addLocales(Locale.US)).with(r -> r.setPath(path));
+    this.request = new HTTPRequest().with(r -> r.addLocales(Locale.US))
+                                    .with(r -> r.setPath(path));
     this.port = port;
   }
 
@@ -107,7 +109,9 @@ public class RequestBuilder {
                      // Setting this too low will cause TLS connections to timeout
                      // - We used to set it to 0 in our own REST client, but 0 is not supported.
                      // - 50 works fine for non TLS tests.
-                     .connectTimeout(Duration.ofMillis(250)).followRedirects(Redirect.NEVER).build();
+                     .connectTimeout(Duration.ofMillis(250))
+                     .followRedirects(Redirect.NEVER)
+                     .build();
   }
 
   public static void resetHttpClientInstance() {
@@ -181,8 +185,8 @@ public class RequestBuilder {
    * @param elseConsumer the consumer used if the test is false
    * @return This.
    */
-  public RequestBuilder ifElse(boolean test, ThrowingConsumer<RequestBuilder> ifConsumer, ThrowingConsumer<RequestBuilder> elseConsumer)
-      throws Exception {
+  public RequestBuilder ifElse(boolean test, ThrowingConsumer<RequestBuilder> ifConsumer,
+                               ThrowingConsumer<RequestBuilder> elseConsumer) throws Exception {
     if (test) {
       ifConsumer.accept(this);
     } else {
@@ -591,7 +595,8 @@ public class RequestBuilder {
    * @return This.
    * @throws IOException If the file could not be loaded.
    */
-  public RequestBuilder withJSONFile(Path jsonFile, Object... values) throws IOException {
+  public RequestBuilder withJSONFile(Path jsonFile, Object... values)
+      throws IOException {
     return withJSONFile("application/json", jsonFile, values);
   }
 
@@ -604,7 +609,8 @@ public class RequestBuilder {
    * @return This.
    * @throws IOException If the file could not be loaded.
    */
-  public RequestBuilder withJSONFile(String contentType, Path jsonFile, Object... values) throws IOException {
+  public RequestBuilder withJSONFile(String contentType, Path jsonFile, Object... values)
+      throws IOException {
     return withContentType(contentType).withBodyFile(jsonFile, values);
   }
 
@@ -768,7 +774,18 @@ public class RequestBuilder {
     userAgent.addCookies(request.getCookies());
     request.getCookies().clear();
     request.addCookies(userAgent.getCookies(request));
-    var restCookies = request.getCookies().stream().map(c -> new Cookie().with(c1 -> c1.domain = c.domain).with(c1 -> c1.expires = c.expires).with(c1 -> c1.httpOnly = c.httpOnly).with(c1 -> c1.maxAge = c.maxAge).with(c1 -> c1.name = c.name).with(c1 -> c1.path = c.path).with(c1 -> c1.sameSite = c.sameSite != null ? SameSite.valueOf(c.sameSite.name()) : null).with(c1 -> c1.secure = c.secure).with(c1 -> c1.value = c.value)).toList();
+    var restCookies = request.getCookies()
+                             .stream()
+                             .map(c -> new Cookie().with(c1 -> c1.domain = c.domain)
+                                                   .with(c1 -> c1.expires = c.expires)
+                                                   .with(c1 -> c1.httpOnly = c.httpOnly)
+                                                   .with(c1 -> c1.maxAge = c.maxAge)
+                                                   .with(c1 -> c1.name = c.name)
+                                                   .with(c1 -> c1.path = c.path)
+                                                   .with(c1 -> c1.sameSite = c.sameSite != null ? SameSite.valueOf(c.sameSite.name()) : null)
+                                                   .with(c1 -> c1.secure = c.secure)
+                                                   .with(c1 -> c1.value = c.value))
+                             .toList();
 
     String scheme = useTLS ? "https://" : "http://";
     URI requestURI = URI.create(scheme + "localhost:" + port + request.getPath());
@@ -808,7 +825,9 @@ public class RequestBuilder {
     InputStream inputStream = null;
 
     if (files != null && !files.isEmpty()) {
-      List<MultipartFileUpload> fileUploads = files.stream().map(fi -> new MultipartFileUpload(fi.contentType, fi.file, fi.fileName, fi.name)).collect(Collectors.toList());
+      List<MultipartFileUpload> fileUploads = files.stream()
+                                                   .map(fi -> new MultipartFileUpload(fi.contentType, fi.file, fi.fileName, fi.name))
+                                                   .collect(Collectors.toList());
       MultipartBodyHandler multipartBodyHandler = new MultipartBodyHandler(new Multiparts(fileUploads, requestBodyParameters));
       bodyPublisher = BodyPublishers.ofByteArray(multipartBodyHandler.getBody());
       if (contentType == null) {
@@ -832,7 +851,8 @@ public class RequestBuilder {
       request.setInputStream(inputStream);
     }
 
-    var requestBuilder = HttpRequest.newBuilder().method(request.getMethod().name(), bodyPublisher);
+    var requestBuilder = HttpRequest.newBuilder()
+                                    .method(request.getMethod().name(), bodyPublisher);
 
     if (!locales.isEmpty()) {
       requestBuilder.setHeader("Accept-Language", locales.stream().map(Locale::toLanguageTag).collect(Collectors.joining(", ")));
@@ -846,11 +866,15 @@ public class RequestBuilder {
     }
 
     // Copy over headers
-    request.getHeaders().forEach((name, values) -> values.forEach(value -> requestBuilder.setHeader(name, value)));
+    request.getHeaders().forEach((name, values) ->
+                                     values.forEach(value -> requestBuilder.setHeader(name, value)));
 
     // Set cookies
     if (request.getHeaders().keySet().stream().noneMatch(name -> name.equalsIgnoreCase(HTTPValues.Headers.Cookie)) && !request.getCookies().isEmpty()) {
-      String header = request.getCookies().stream().map(io.fusionauth.http.Cookie::toRequestHeader).collect(Collectors.joining("; "));
+      String header = request.getCookies()
+                             .stream()
+                             .map(io.fusionauth.http.Cookie::toRequestHeader)
+                             .collect(Collectors.joining("; "));
       requestBuilder.setHeader(HTTPValues.Headers.Cookie, header);
     }
 
@@ -863,13 +887,16 @@ public class RequestBuilder {
     QueryStringBuilder queryStringBuilder = QueryStringBuilder.builder();
     urlParameters.forEach((name, values) -> values.forEach(value -> queryStringBuilder.with(name, value)));
 
-    URI fullURI = urlParameters.isEmpty() ? requestURI : URI.create(requestURI + "?" + queryStringBuilder.build());
+    URI fullURI = urlParameters.isEmpty()
+        ? requestURI
+        : URI.create(requestURI + "?" + queryStringBuilder.build());
 
     requestBuilder.uri(fullURI);
 
     HTTPResponseWrapper result = new HTTPResponseWrapper();
     try {
-      result.response = HttpClientInstance.send(requestBuilder.build(), BodyHandlers.ofByteArray());
+      result.response = HttpClientInstance.send(requestBuilder.build(),
+                                                BodyHandlers.ofByteArray());
     } catch (Exception e) {
       result.exception = e;
       result.init();
@@ -877,7 +904,17 @@ public class RequestBuilder {
     }
 
     // Extract the cookies and put them in the UserAgent
-    userAgent.addCookies(getCookies(result.response).stream().map(c -> new Cookie().with(c1 -> c1.domain = c.domain).with(c1 -> c1.expires = c.expires).with(c1 -> c1.httpOnly = c.httpOnly).with(c1 -> c1.maxAge = c.maxAge).with(c1 -> c1.name = c.name).with(c1 -> c1.path = c.path).with(c1 -> c1.sameSite = c.sameSite != null ? Cookie.SameSite.valueOf(c.sameSite.name()) : null).with(c1 -> c1.secure = c.secure).with(c1 -> c1.value = c.value)).collect(Collectors.toList()));
+    userAgent.addCookies(getCookies(result.response)
+                             .stream()
+                             .map(c -> new Cookie().with(c1 -> c1.domain = c.domain)
+                                                   .with(c1 -> c1.expires = c.expires)
+                                                   .with(c1 -> c1.httpOnly = c.httpOnly)
+                                                   .with(c1 -> c1.maxAge = c.maxAge)
+                                                   .with(c1 -> c1.name = c.name)
+                                                   .with(c1 -> c1.path = c.path)
+                                                   .with(c1 -> c1.sameSite = c.sameSite != null ? Cookie.SameSite.valueOf(c.sameSite.name()) : null)
+                                                   .with(c1 -> c1.secure = c.secure).with(c1 -> c1.value = c.value))
+                             .collect(Collectors.toList()));
 
     result.init();
     return result;

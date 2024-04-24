@@ -267,15 +267,19 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
       }
       // not using the HttpClient authenticator/PasswordAuthentication support because
       // we want pre-emptive auth here
-      var encoded = Base64.getEncoder().encodeToString((oauthConfiguration.clientId + ":" + oauthConfiguration.clientSecret).getBytes(StandardCharsets.UTF_8));
+      String encoded = Base64.getEncoder()
+                             .encodeToString((oauthConfiguration.clientId + ":" + oauthConfiguration.clientSecret)
+                                                 .getBytes(StandardCharsets.UTF_8));
       requestBuilder.header("Authorization", "Basic " + encoded);
     } else if (oauthConfiguration.authenticationMethod == TokenAuthenticationMethod.client_secret_post) {
       body.put("client_id", List.of(oauthConfiguration.clientId));
       body.put("client_secret", List.of(oauthConfiguration.clientSecret));
     }
 
-    var handler = new FormDataBodyHandler(body);
-    HttpRequest refreshRequest = requestBuilder.header(Headers.ContentType, ContentTypes.Form).POST(BodyPublishers.ofByteArray(handler.getBody())).build();
+    FormDataBodyHandler handler = new FormDataBodyHandler(body);
+    HttpRequest refreshRequest = requestBuilder.header(Headers.ContentType, ContentTypes.Form)
+                                               .POST(BodyPublishers.ofByteArray(handler.getBody()))
+                                               .build();
 
     HttpResponse<InputStream> resp = null;
     Exception endpointException = null;
@@ -291,7 +295,7 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
       return tokens;
     }
 
-    var responseHandler = new JSONResponseHandler<>(RefreshResponse.class);
+    JSONResponseHandler<RefreshResponse> responseHandler = new JSONResponseHandler<>(RefreshResponse.class);
     RefreshResponse rr;
     try {
       rr = responseHandler.apply(resp.body());
