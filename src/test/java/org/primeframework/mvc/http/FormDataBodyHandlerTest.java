@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc.http;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -25,7 +24,6 @@ import java.util.Map;
 import org.testng.annotations.Test;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertSame;
 
 public class FormDataBodyHandlerTest {
   @Test

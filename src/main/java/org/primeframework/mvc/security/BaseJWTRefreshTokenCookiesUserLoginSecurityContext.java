@@ -20,7 +20,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
-import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpRequest.Builder;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
@@ -276,9 +275,8 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
       body.put("client_secret", List.of(oauthConfiguration.clientSecret));
     }
 
-    FormDataBodyHandler handler = new FormDataBodyHandler(body);
     HttpRequest refreshRequest = requestBuilder.header(Headers.ContentType, ContentTypes.Form)
-                                               .POST(BodyPublishers.ofByteArray(handler.getBody()))
+                                               .POST(new FormDataBodyHandler(body))
                                                .build();
 
     HttpResponse<InputStream> resp = null;

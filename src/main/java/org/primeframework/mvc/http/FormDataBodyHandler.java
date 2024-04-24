@@ -15,50 +15,54 @@
  */
 package org.primeframework.mvc.http;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.net.http.HttpRequest.BodyPublisher;
+import java.net.http.HttpRequest.BodyPublishers;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Flow.Subscriber;
 
 /**
  * @author Brian Pontarelli
  */
-public class FormDataBodyHandler {
-  private final Map<String, List<String>> request;
+public class FormDataBodyHandler implements BodyPublisher {
 
   private byte[] body;
 
-  private boolean excludeNullValues;
+  private BodyPublisher publisher;
 
   public FormDataBodyHandler(Map<String, List<String>> request, boolean excludeNullValues) {
-    this.request = request;
-    this.excludeNullValues = excludeNullValues;
+    body = getBody(request, excludeNullValues);
+    // avoids duplicating all of the logic in ByteArrayPublisher
+    publisher = BodyPublishers.ofByteArray(body);
   }
 
   public FormDataBodyHandler(Map<String, List<String>> request) {
-    this.request = request;
-  }
-
-  public FormDataBodyHandler() {
-    request = new HashMap<>();
-  }
-
-  public void accept(OutputStream os) throws IOException {
-    if (body != null && os != null) {
-      os.write(body);
-    }
+    this(request, false);
   }
 
   public byte[] getBody() {
-    if (request != null) {
-      serializeRequest();
-    }
     return body;
+  }
+
+  private byte[] getBody(Map<String, List<String>> request, boolean excludeNullValues) {
+    if (request != null) {
+      return serializeRequest(request, excludeNullValues);
+    }
+    return null;
+  }
+
+  @Override
+  public long contentLength() {
+    return publisher.contentLength();
+  }
+
+  @Override
+  public void subscribe(Subscriber<? super ByteBuffer> subscriber) {
+    publisher.subscribe(subscriber);
   }
 
   private void append(StringBuilder build, String key, String value) {
@@ -80,25 +84,23 @@ public class FormDataBodyHandler {
     }
   }
 
-  private void serializeRequest() {
-    if (body == null) {
-      StringBuilder build = new StringBuilder();
-      request.forEach((key, values) -> {
-        if (values == null) {
-          if (!excludeNullValues) {
-            append(build, key, null);
-          }
-
-          return;
+  private byte[] serializeRequest(Map<String, List<String>> request, boolean excludeNullValues) {
+    StringBuilder build = new StringBuilder();
+    request.forEach((key, values) -> {
+      if (values == null) {
+        if (!excludeNullValues) {
+          append(build, key, null);
         }
 
-        // Values is non-null
-        values.stream()
-              .filter(v -> v != null || !excludeNullValues)
-              .forEach(v -> append(build, key, v));
-      });
+        return;
+      }
 
-      body = build.toString().getBytes(StandardCharsets.UTF_8);
-    }
+      // Values is non-null
+      values.stream()
+            .filter(v -> v != null || !excludeNullValues)
+            .forEach(v -> append(build, key, v));
+    });
+
+    return build.toString().getBytes(StandardCharsets.UTF_8);
   }
 }
