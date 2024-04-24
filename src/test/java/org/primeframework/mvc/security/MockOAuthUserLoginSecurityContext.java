@@ -41,6 +41,8 @@ public class MockOAuthUserLoginSecurityContext extends BaseJWTRefreshTokenCookie
 
   public static String clientSecret;
 
+  public static TokenAuthenticationMethod tokenAuthenticationMethod;
+
   @Inject
   public MockOAuthUserLoginSecurityContext(HTTPRequest request, HTTPResponse response,
                                            VerifierProvider verifierProvider) {
@@ -50,6 +52,7 @@ public class MockOAuthUserLoginSecurityContext extends BaseJWTRefreshTokenCookie
   public static void reset() {
     TokenEndpoint = "http://localhost:8000/oauth/token";
     ValidateJWTOnLogin = true;
+    tokenAuthenticationMethod = TokenAuthenticationMethod.none;
   }
 
   @Override
@@ -89,9 +92,9 @@ public class MockOAuthUserLoginSecurityContext extends BaseJWTRefreshTokenCookie
 
   @Override
   protected OAuthConfiguration oauthConfiguration() {
-    return new OAuthConfiguration().with(c -> c.authenticationMethod = TokenAuthenticationMethod.none)
+    return new OAuthConfiguration().with(c -> c.authenticationMethod = tokenAuthenticationMethod)
                                    .with(c -> c.clientId = clientId)
-                                   .with(c -> c.clientId = clientSecret)
+                                   .with(c -> c.clientSecret = clientSecret)
                                    .with(c -> c.tokenEndpoint = TokenEndpoint);
   }
 

@@ -19,11 +19,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
-import java.net.http.HttpClient.Builder;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpRequest.Builder;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,8 +66,7 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
 
   protected final VerifierProvider verifierProvider;
 
-  protected BaseJWTRefreshTokenCookiesUserLoginSecurityContext(HTTPRequest request, HTTPResponse response,
-                                                               VerifierProvider verifierProvider) {
+  protected BaseJWTRefreshTokenCookiesUserLoginSecurityContext(HTTPRequest request, HTTPResponse response, VerifierProvider verifierProvider) {
     this.request = request;
     this.response = response;
     this.verifierProvider = verifierProvider;
@@ -254,25 +255,25 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
       return tokens;
     }
 
-    Builder clientBuilder = HttpClient.newBuilder();
-
+    HttpClient client = HttpClient.newHttpClient();
+    Builder requestBuilder = HttpRequest.newBuilder(URI.create(oauthConfiguration.tokenEndpoint));
     if (oauthConfiguration.authenticationMethod == TokenAuthenticationMethod.client_secret_basic) {
-      clientBuilder.authenticator(new BasicAuthenticator(oauthConfiguration.clientId, oauthConfiguration.clientSecret));
+      // not using the HttpClient authenticator/PasswordAuthentication support because
+      // we want pre-emptive auth here
+      var encoded = Base64.getEncoder().encodeToString((oauthConfiguration.clientId + ":" + oauthConfiguration.clientSecret).getBytes(StandardCharsets.UTF_8));
+      requestBuilder.header("Authorization", "Basic " + encoded);
     } else if (oauthConfiguration.authenticationMethod == TokenAuthenticationMethod.client_secret_post) {
       body.put("client_id", List.of(oauthConfiguration.clientId));
       body.put("client_secret", List.of(oauthConfiguration.clientSecret));
     }
 
     var handler = new FormDataBodyHandler(body);
-    HttpRequest refreshRequest = HttpRequest.newBuilder(URI.create(oauthConfiguration.tokenEndpoint))
-                                            .header(Headers.ContentType, ContentTypes.Form)
-                                            .POST(BodyPublishers.ofByteArray(handler.getBody()))
-                                            .build();
+    HttpRequest refreshRequest = requestBuilder.header(Headers.ContentType, ContentTypes.Form).POST(BodyPublishers.ofByteArray(handler.getBody())).build();
 
     HttpResponse<InputStream> resp = null;
     Exception endpointException = null;
     try {
-      resp = clientBuilder.build().send(refreshRequest, BodyHandlers.ofInputStream());
+      resp = client.send(refreshRequest, BodyHandlers.ofInputStream());
     } catch (Exception e) {
       endpointException = e;
     }
