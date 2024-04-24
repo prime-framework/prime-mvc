@@ -25,6 +25,7 @@ import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import io.fusionauth.http.Cookie.SameSite;
@@ -244,9 +245,9 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
       return tokens;
     }
 
-    Map<String, String> body = new HashMap<>(2);
-    body.put("grant_type", "refresh_token");
-    body.put("refresh_token", tokens.refreshToken);
+    Map<String, List<String>> body = new HashMap<>(2);
+    body.put("grant_type", List.of("refresh_token"));
+    body.put("refresh_token", List.of(tokens.refreshToken));
 
     OAuthConfiguration oauthConfiguration = oauthConfiguration();
     if (oauthConfiguration == null) {
@@ -258,12 +259,11 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
     if (oauthConfiguration.authenticationMethod == TokenAuthenticationMethod.client_secret_basic) {
       clientBuilder.authenticator(new BasicAuthenticator(oauthConfiguration.clientId, oauthConfiguration.clientSecret));
     } else if (oauthConfiguration.authenticationMethod == TokenAuthenticationMethod.client_secret_post) {
-      body.put("client_id", oauthConfiguration.clientId);
-      body.put("client_secret", oauthConfiguration.clientSecret);
+      body.put("client_id", List.of(oauthConfiguration.clientId));
+      body.put("client_secret", List.of(oauthConfiguration.clientSecret));
     }
 
-    var handler = new FormDataBodyHandler();
-    handler.withParameters(body);
+    var handler = new FormDataBodyHandler(body);
     HttpRequest refreshRequest = HttpRequest.newBuilder(URI.create(oauthConfiguration.tokenEndpoint))
                                             .header(Headers.ContentType, ContentTypes.Form)
                                             .POST(BodyPublishers.ofByteArray(handler.getBody()))

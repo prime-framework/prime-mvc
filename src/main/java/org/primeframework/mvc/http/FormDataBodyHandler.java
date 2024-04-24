@@ -61,12 +61,6 @@ public class FormDataBodyHandler {
     return body;
   }
 
-  public FormDataBodyHandler withParameters(Map<String, String> parameters) {
-    //noinspection ArraysAsListWithZeroOrOneArgument
-    parameters.keySet().forEach(k -> request.put(k, Arrays.asList(parameters.get(k))));
-    return this;
-  }
-
   private void append(StringBuilder build, String key, String value) {
     if (build.length() > 0) {
       build.append("&");
