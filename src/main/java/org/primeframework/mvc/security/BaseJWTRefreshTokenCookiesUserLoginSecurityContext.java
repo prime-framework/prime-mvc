@@ -258,6 +258,12 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
     HttpClient client = HttpClient.newHttpClient();
     Builder requestBuilder = HttpRequest.newBuilder(URI.create(oauthConfiguration.tokenEndpoint));
     if (oauthConfiguration.authenticationMethod == TokenAuthenticationMethod.client_secret_basic) {
+      if (oauthConfiguration.clientId.contains(":")) {
+        tokens.refreshToken = null;
+        jwtCookie.delete(request, response);
+        refreshTokenCookie.delete(request, response);
+        return tokens;
+      }
       // not using the HttpClient authenticator/PasswordAuthentication support because
       // we want pre-emptive auth here
       var encoded = Base64.getEncoder().encodeToString((oauthConfiguration.clientId + ":" + oauthConfiguration.clientSecret).getBytes(StandardCharsets.UTF_8));

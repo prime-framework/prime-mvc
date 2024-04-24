@@ -234,6 +234,29 @@ public class JWTRefreshTokenLoginTest {
              .assertBodyContains("Logged in");
   }
 
+  @Test
+  public void refreshTokenEndpointUp_auth_client_secret_basic_colon_in_client_id() {
+    MockOAuthUserLoginSecurityContext.tokenAuthenticationMethod = TokenAuthenticationMethod.client_secret_basic;
+    MockOAuthUserLoginSecurityContext.clientId = "the:client ID";
+    MockOAuthUserLoginSecurityContext.clientSecret = "the client secret";
+    MockOAuthUserLoginSecurityContext.ValidateJWTOnLogin = false;
+    MockOAuthUserLoginSecurityContext.TokenEndpoint = "http://localhost:" + simulator.getPort() + "/oauth/token";
+
+    // Setting 'expired: true' on the request just tells the Login action to create an expired JWT and store it in the LoginContext.
+    // - So we expect this to succeed, but the login context wil now contain an expired JWT. This means it will be refreshed on first use.
+    simulator.test("/oauth/login")
+             .withParameter("expired", "true")
+             .post()
+             .assertStatusCode(200);
+
+    // The JWT in the security context was found to be expired on first use even though login succeeded.
+    // - This will have caused us to refresh the token, so this action should succeed.
+    simulator.test("/oauth/protected-resource")
+             .get()
+             .assertStatusCode(302)
+             .assertRedirect("/oauth/login");
+  }
+
   public static class TestScopeModule extends AbstractModule {
     @Override
     protected void configure() {
