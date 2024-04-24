@@ -5,7 +5,7 @@
 
   <groupId>org.primeframework</groupId>
   <artifactId>prime-mvc</artifactId>
-  <version>4.22.7</version>
+  <version>4.22.8</version>
   <packaging>jar</packaging>
 
   <name>FusionAuth App</name>
@@ -86,14 +86,6 @@
       <groupId>com.google.inject</groupId>
       <artifactId>guice</artifactId>
       <version>6.0.0</version>
-      <type>jar</type>
-      <scope>compile</scope>
-      <optional>false</optional>
-    </dependency>
-    <dependency>
-      <groupId>com.inversoft</groupId>
-      <artifactId>restify</artifactId>
-      <version>4.1.2</version>
       <type>jar</type>
       <scope>compile</scope>
       <optional>false</optional>

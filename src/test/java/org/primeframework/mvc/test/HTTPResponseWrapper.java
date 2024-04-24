@@ -21,8 +21,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import com.inversoft.http.HTTPStrings;
 import io.fusionauth.http.Cookie;
+import io.fusionauth.http.HTTPValues;
 
 /**
  * Test container for the HTTP Response and exception.
@@ -56,7 +56,7 @@ public class HTTPResponseWrapper {
       return List.of();
     }
 
-    List<String> cookies = response.headers().allValues(HTTPStrings.Headers.SetCookie.toLowerCase());
+    List<String> cookies = response.headers().allValues(HTTPValues.Headers.SetCookie.toLowerCase());
     if (cookies != null && cookies.size() > 0) {
       return cookies.stream()
                     .map(Cookie::fromResponseHeader)

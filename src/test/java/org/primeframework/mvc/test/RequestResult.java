@@ -46,10 +46,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.google.inject.Injector;
-import com.inversoft.http.HTTPStrings.Headers;
 import io.fusionauth.http.Cookie;
 import io.fusionauth.http.Cookie.SameSite;
 import io.fusionauth.http.HTTPValues.ContentTypes;
+import io.fusionauth.http.HTTPValues.Headers;
 import io.fusionauth.http.HTTPValues.Methods;
 import io.fusionauth.http.io.BlockingByteBufferOutputStream;
 import io.fusionauth.http.server.HTTPRequest;
@@ -1807,7 +1807,7 @@ public class RequestResult {
     }
   }
 
-  private Cookie convert(com.inversoft.http.Cookie cookie) {
+  private Cookie convert(Cookie cookie) {
     return new Cookie().with(c -> c.domain = cookie.domain)
                        .with(c -> c.expires = cookie.expires)
                        .with(c -> c.httpOnly = cookie.httpOnly)

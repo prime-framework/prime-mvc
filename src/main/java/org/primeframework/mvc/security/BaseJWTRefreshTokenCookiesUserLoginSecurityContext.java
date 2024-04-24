@@ -15,21 +15,28 @@
  */
 package org.primeframework.mvc.security;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpClient.Builder;
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.inversoft.rest.ClientResponse;
-import com.inversoft.rest.FormDataBodyHandler;
-import com.inversoft.rest.JSONResponseHandler;
-import com.inversoft.rest.RESTClient;
 import io.fusionauth.http.Cookie.SameSite;
+import io.fusionauth.http.HTTPValues.ContentTypes;
+import io.fusionauth.http.HTTPValues.Headers;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
 import io.fusionauth.jwt.JWTExpiredException;
 import io.fusionauth.jwt.Verifier;
 import io.fusionauth.jwt.domain.JWT;
+import org.primeframework.mvc.http.FormDataBodyHandler;
+import org.primeframework.mvc.http.JSONResponseHandler;
 import org.primeframework.mvc.security.oauth.OAuthConfiguration;
 import org.primeframework.mvc.security.oauth.RefreshResponse;
 import org.primeframework.mvc.security.oauth.TokenAuthenticationMethod;
@@ -237,40 +244,52 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
       return tokens;
     }
 
-    Map<String, List<String>> body = new HashMap<>(2);
-    body.put("grant_type", List.of("refresh_token"));
-    body.put("refresh_token", List.of(tokens.refreshToken));
+    Map<String, String> body = new HashMap<>(2);
+    body.put("grant_type", "refresh_token");
+    body.put("refresh_token", tokens.refreshToken);
 
     OAuthConfiguration oauthConfiguration = oauthConfiguration();
     if (oauthConfiguration == null) {
       return tokens;
     }
 
-    RESTClient<RefreshResponse, JsonNode> client = new RESTClient<>(RefreshResponse.class, JsonNode.class)
-        .url(oauthConfiguration.tokenEndpoint)
-        .successResponseHandler(new JSONResponseHandler<>(RefreshResponse.class))
-        .errorResponseHandler(new JSONResponseHandler<>(JsonNode.class));
+    Builder clientBuilder = HttpClient.newBuilder();
 
     if (oauthConfiguration.authenticationMethod == TokenAuthenticationMethod.client_secret_basic) {
-      client.basicAuthorization(oauthConfiguration.clientId, oauthConfiguration.clientSecret);
+      clientBuilder.authenticator(new BasicAuthenticator(oauthConfiguration.clientId, oauthConfiguration.clientSecret));
     } else if (oauthConfiguration.authenticationMethod == TokenAuthenticationMethod.client_secret_post) {
-      body.put("client_id", List.of(oauthConfiguration.clientId));
-      body.put("client_secret", List.of(oauthConfiguration.clientSecret));
+      body.put("client_id", oauthConfiguration.clientId);
+      body.put("client_secret", oauthConfiguration.clientSecret);
     }
 
-    ClientResponse<RefreshResponse, JsonNode> resp = client
-        .bodyHandler(new FormDataBodyHandler(body))
-        .post()
-        .go();
+    var handler = new FormDataBodyHandler();
+    handler.withParameters(body);
+    HttpRequest refreshRequest = HttpRequest.newBuilder(URI.create(oauthConfiguration.tokenEndpoint))
+                                            .header(Headers.ContentType, ContentTypes.Form)
+                                            .POST(BodyPublishers.ofByteArray(handler.getBody()))
+                                            .build();
 
-    if (!resp.wasSuccessful()) {
+    HttpResponse<InputStream> resp = null;
+    Exception endpointException = null;
+    try {
+      resp = clientBuilder.build().send(refreshRequest, BodyHandlers.ofInputStream());
+    } catch (Exception e) {
+      endpointException = e;
+    }
+    if (endpointException != null || resp.statusCode() < 200 || resp.statusCode() > 299) {
       tokens.refreshToken = null;
       jwtCookie.delete(request, response);
       refreshTokenCookie.delete(request, response);
       return tokens;
     }
 
-    RefreshResponse rr = resp.getSuccessResponse();
+    var responseHandler = new JSONResponseHandler<>(RefreshResponse.class);
+    RefreshResponse rr;
+    try {
+      rr = responseHandler.apply(resp.body());
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
     tokens.jwt = rr.access_token;
     tokens.refreshToken = defaultIfNull(rr.refresh_token, tokens.refreshToken);
 

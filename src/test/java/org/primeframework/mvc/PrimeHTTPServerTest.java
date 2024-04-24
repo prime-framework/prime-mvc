@@ -15,18 +15,19 @@
  */
 package org.primeframework.mvc;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
+import java.net.http.HttpClient.Redirect;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
 import java.net.http.HttpResponse.BodySubscribers;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.inversoft.rest.RESTClient;
-import com.inversoft.rest.TextResponseHandler;
 import org.example.action.PostAction;
 import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
@@ -36,19 +37,19 @@ public class PrimeHTTPServerTest extends PrimeBaseTest {
   @Test(enabled = false)
   public void load() {
     long start = System.currentTimeMillis();
-//    HttpClient client = HttpClient.newBuilder().followRedirects(Redirect.NEVER).priority(256).build();
+    HttpClient client = HttpClient.newBuilder().followRedirects(Redirect.NEVER).priority(256).build();
     for (int i = 0; i < 100_000; i++) {
-//      HttpResponse<String> response = client.send(HttpRequest.newBuilder(URI.create("http://localhost:8080/post")).POST(BodyPublishers.noBody()).build(), BodyHandlers.ofString(StandardCharsets.UTF_8));
-//      assertEquals(response.statusCode(), 200);
-//      assertTrue(response.body().contains("Brian Pontarelli"));
-      var response = new RESTClient<>(String.class, String.class)
-          .url("http://localhost:" + simulator.getPort() + "/post")
-          .successResponseHandler(new TextResponseHandler())
-          .errorResponseHandler(new TextResponseHandler())
-          .post()
-          .go();
-      assertEquals(response.status, 200);
-      assertTrue(response.successResponse.contains("Brian Pontarelli"));
+      var request = HttpRequest.newBuilder(URI.create("http://localhost:" + simulator.getPort() + "/post"))
+                               .POST(BodyPublishers.noBody())
+                               .build();
+      HttpResponse<String> response = null;
+      try {
+        response = client.send(request, BodyHandlers.ofString());
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+      assertEquals(response.statusCode(), 200);
+      assertTrue(response.body().contains("Brian Pontarelli"));
     }
 
     long end = System.currentTimeMillis();
@@ -74,20 +75,23 @@ public class PrimeHTTPServerTest extends PrimeBaseTest {
   public void threads() throws Exception {
     long start = System.currentTimeMillis();
 
+    HttpClient client = HttpClient.newBuilder().followRedirects(Redirect.NEVER).priority(256).build();
     List<Thread> threads = new ArrayList<>();
     for (int i = 0; i < 10; i++) {
       final String name = "Thread " + i;
       Thread thread = new Thread(() -> {
         for (int j = 0; j < 10_000; j++) {
-          var response = new RESTClient<>(String.class, String.class)
-              .url("http://localhost:" + simulator.getPort() + "/echo")
-              .addURLParameter("message", name)
-              .successResponseHandler(new TextResponseHandler())
-              .errorResponseHandler(new TextResponseHandler())
-              .get()
-              .go();
-          assertEquals(response.status, 200);
-          assertTrue(response.successResponse.contains(name));
+          var request = HttpRequest.newBuilder(URI.create("http://localhost:" + simulator.getPort() + "/echo?message=" + name))
+                                   .GET()
+                                   .build();
+          HttpResponse<String> response = null;
+          try {
+            response = client.send(request, BodyHandlers.ofString());
+          } catch (Exception e) {
+            throw new RuntimeException(e);
+          }
+          assertEquals(response.statusCode(), 200);
+          assertTrue(response.body().contains(name));
         }
       }, name);
       threads.add(thread);

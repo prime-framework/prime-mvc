@@ -15,12 +15,14 @@
  */
 package org.example.action;
 
+import java.io.IOException;
 import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse.BodyHandlers;
+import java.time.Duration;
 
 import com.google.inject.Inject;
-import com.inversoft.rest.ClientResponse;
-import com.inversoft.rest.RESTClient;
-import com.inversoft.rest.RESTClient.HTTPMethod;
 import io.fusionauth.http.server.HTTPRequest;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.annotation.Status;
@@ -54,13 +56,18 @@ public class CallbackAction {
     messageStore.add(new SimpleMessage(MessageType.WARNING, "[WARNING]", messageProvider.getMessage("[WARNING]")));
 
     // Call another endpoint that adds messages to the message store
-    URI url = URI.create(request.getBaseURL());
-    ClientResponse<Void, Void> response = new RESTClient<>(Void.TYPE, Void.TYPE)
-        .connectTimeout(0)
-        .url(url + "/message-store")
-        .method(HTTPMethod.GET)
-        .go();
-
+    URI url = URI.create(request.getBaseURL() + "/message-store");
+    var request = HttpRequest.newBuilder(url)
+                             .GET()
+                             .build();
+    var client = HttpClient.newBuilder()
+                           // omitting connect timeout appears to use the default (no timeout)
+                           .build();
+    try {
+      client.send(request, BodyHandlers.discarding());
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
     return "success";
   }
 }

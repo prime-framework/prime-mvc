@@ -71,17 +71,6 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/com/inversoft/restify/4.1.2/restify-4.1.2.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/com/inversoft/restify/4.1.2/restify-4.1.2-src.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
           <root url="jar://$MODULE_DIR$/.savant/cache/io/dropwizard/metrics/metrics-core/3.2.6/metrics-core-3.2.6.jar!/" />
         </CLASSES>
         <JAVADOC />
@@ -371,17 +360,6 @@
         <JAVADOC />
         <SOURCES>
           <root url="jar://$MODULE_DIR$/.savant/cache/com/google/j2objc/j2objc-annotations/2.8.0/j2objc-annotations-2.8.0-src.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" scope="RUNTIME">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/com/inversoft/jackson5/3.0.1/jackson5-3.0.1.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/com/inversoft/jackson5/3.0.1/jackson5-3.0.1-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
