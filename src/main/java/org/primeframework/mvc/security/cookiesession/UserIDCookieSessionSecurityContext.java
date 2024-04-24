@@ -30,7 +30,6 @@ import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.ErrorException;
 import org.primeframework.mvc.security.CookieProxy;
 import org.primeframework.mvc.security.Encryptor;
-import org.primeframework.mvc.security.UnauthenticatedException;
 import org.primeframework.mvc.security.UserLoginSecurityContext;
 import org.primeframework.mvc.util.CookieTools;
 
@@ -41,6 +40,8 @@ import org.primeframework.mvc.util.CookieTools;
  * @author Brady Wied
  */
 public abstract class UserIDCookieSessionSecurityContext implements UserLoginSecurityContext {
+  private static final String ContextKey = "primeLoginContext";
+
   public static final String UserKey = "primeCurrentUser";
 
   private final HTTPRequest request;
@@ -64,7 +65,9 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
   private final Class<? extends SerializedSessionContainer> sessionClass;
 
   protected UserIDCookieSessionSecurityContext(HTTPRequest request, HTTPResponse response, Encryptor encryptor, ObjectMapper objectMapper,
-                                               Clock clock, Duration sessionTimeout, Duration sessionMaxAge, SessionContainerFactory sessionContainerFactory, Class<? extends SerializedSessionContainer> sessionClass) {
+                                               Clock clock, Duration sessionTimeout, Duration sessionMaxAge,
+                                               SessionContainerFactory sessionContainerFactory,
+                                               Class<? extends SerializedSessionContainer> sessionClass) {
     this.request = request;
     this.response = response;
     this.encryptor = encryptor;
@@ -118,17 +121,17 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
    */
   @Override
   public Object getCurrentUser() {
+    var user = request.getAttribute(UserKey);
+    if (user != null) {
+      return user;
+    }
     SerializedSessionContainer sessionContainer = getSessionContainer();
     if (sessionContainer == null) {
       return null;
     }
-    if (sessionContainer instanceof HydratedSessionContainer inMemory) {
-      return inMemory.user();
-    }
-    var user = retrieveUserById(sessionContainer.userId());
-    var newContainer = sessionContainerFactory.createHydrated(sessionContainer, user);
-    this.request.setAttribute(UserKey, newContainer);
-    return newContainer.user();
+    user = retrieveUserById(sessionContainer.userId());
+    this.request.setAttribute(UserKey, user);
+    return user;
   }
 
   /**
@@ -137,7 +140,7 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
    * @return value from cookie, null if no existing session
    */
   private SerializedSessionContainer getSessionContainer() {
-    var container = (SerializedSessionContainer) this.request.getAttribute(UserKey);
+    var container = (SerializedSessionContainer) this.request.getAttribute(ContextKey);
     if (container != null) {
       return container;
     }
@@ -158,7 +161,7 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
           deleteCookies();
           return null;
       }
-      this.request.setAttribute(UserKey, container);
+      this.request.setAttribute(ContextKey, container);
       return container;
     } catch (BadPaddingException e) {
       // if the cookie encryption key changes (DB change, etc.) then we need new cookies, otherwise we cannot
@@ -258,11 +261,9 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
    */
   @Override
   public void updateUser(Object user) {
-    var currentContainer = getSessionContainer();
-    if (currentContainer == null) {
-      throw new UnauthenticatedException();
+    Object currentUser = request.getAttribute(UserKey);
+    if (currentUser != null) {
+      request.setAttribute(UserKey, user);
     }
-    var newContainer = sessionContainerFactory.createHydrated(currentContainer, user);
-    request.setAttribute(UserKey, newContainer);
   }
 }

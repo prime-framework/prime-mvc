@@ -20,11 +20,6 @@ import java.util.UUID;
 
 public class MockSessionContainerFactory implements SessionContainerFactory {
   @Override
-  public HydratedSessionContainer createHydrated(SerializedSessionContainer serializedSessionContainer, Object user) {
-    return new MockHydratedSessionContainer(serializedSessionContainer.userId(), serializedSessionContainer.sessionId(), serializedSessionContainer.loginInstant(), user);
-  }
-
-  @Override
   public SerializedSessionContainer create(UUID userId, String sessionId, ZonedDateTime loginInstant) {
     return new MockSerializedSessionContainer(userId, sessionId, loginInstant);
   }

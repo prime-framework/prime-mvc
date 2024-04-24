@@ -26,22 +26,11 @@ import java.util.UUID;
  */
 public interface SessionContainerFactory {
   /**
-   * Create a new session container, hydrated with a full user object
-   *
-   * @param serializedSessionContainer existing serialized session container
-   * @param user full user object
-   *
-   * @return a hydrated session container that can be used for the remainder of the request cycle
-   */
-  HydratedSessionContainer createHydrated(SerializedSessionContainer serializedSessionContainer, Object user);
-
-  /**
    * Create a new Jackson serializable session container
    *
-   * @param userId user ID the session is for
-   * @param sessionId the unique ID of the user's session
+   * @param userId       user ID the session is for
+   * @param sessionId    the unique ID of the user's session
    * @param loginInstant the instant the user logged in
-   *
    * @return a Jackson serializable container
    */
   SerializedSessionContainer create(UUID userId, String sessionId, ZonedDateTime loginInstant);
