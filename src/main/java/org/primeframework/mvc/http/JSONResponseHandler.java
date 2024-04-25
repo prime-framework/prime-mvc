@@ -15,9 +15,15 @@
  */
 package org.primeframework.mvc.http;
 
+import javax.annotation.Nonnull;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandler;
+import java.net.http.HttpResponse.BodySubscriber;
+import java.net.http.HttpResponse.BodySubscribers;
+import java.net.http.HttpResponse.ResponseInfo;
 import java.nio.charset.StandardCharsets;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,7 +36,7 @@ import io.fusionauth.jwt.json.JacksonModule;
  *
  * @author Brian Pontarelli
  */
-public class JSONResponseHandler<T> {
+public class JSONResponseHandler<T> implements BodyHandler<T> {
   private final static ObjectMapper objectMapper = new ObjectMapper().registerModule(new JacksonModule());
 
   private final Class<T> type;
@@ -39,20 +45,25 @@ public class JSONResponseHandler<T> {
     this.type = type;
   }
 
-  public T apply(InputStream is) throws IOException {
+  T apply(InputStream is) {
     if (is == null) {
       return null;
     }
+    BetterBufferedInputStream bis;
 
-    // Read a single byte of data to see if the stream is empty but then reset the stream back 0
-    BetterBufferedInputStream bis = new BetterBufferedInputStream(is, 1024, 1024);
-    bis.mark(1024);
-    int c = bis.read();
-    if (c == -1) {
-      return null;
+    try {
+      // Read a single byte of data to see if the stream is empty but then reset the stream back 0
+      bis = new BetterBufferedInputStream(is, 1024, 1024);
+      bis.mark(1024);
+      int c = bis.read();
+      if (c == -1) {
+        return null;
+      }
+
+      bis.reset();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
-
-    bis.reset();
 
     try {
       return objectMapper.readValue(bis, type);
@@ -62,6 +73,13 @@ public class JSONResponseHandler<T> {
                                              ? ("Note: Output has been truncated to the first " + bis.getObservableLength() + " of " + bis.actualLength + " bytes.\n\n") : "") +
                                          bis.getObservableAsString(), e);
     }
+  }
+
+  @Override
+  public BodySubscriber<T> apply(ResponseInfo responseInfo) {
+    // Use the InputStream subscriber first, then map using our Jackson function
+    return HttpResponse.BodySubscribers.mapping(BodySubscribers.ofInputStream(),
+                                                this::apply);
   }
 
   public static class BetterBufferedInputStream extends BufferedInputStream {
@@ -77,16 +95,6 @@ public class JSONResponseHandler<T> {
       super(in, size);
       this.maximumBytesToObserve = maximumBytesToObserve;
       observableBuffer = new byte[maximumBytesToObserve];
-    }
-
-    public BetterBufferedInputStream(InputStream in) {
-      super(in);
-      this.maximumBytesToObserve = 1024;
-      observableBuffer = new byte[maximumBytesToObserve];
-    }
-
-    public int getActualLength() {
-      return actualLength;
     }
 
     public String getObservableAsString() {
@@ -113,7 +121,7 @@ public class JSONResponseHandler<T> {
     }
 
     @Override
-    public synchronized int read(byte[] b, int off, int len) throws IOException {
+    public synchronized int read(@Nonnull byte[] b, int off, int len) throws IOException {
       int read = super.read(b, off, len);
       if (read == -1) {
         return read;

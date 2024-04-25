@@ -15,42 +15,71 @@
  */
 package org.primeframework.mvc.http;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.http.HttpClient.Version;
+import java.net.http.HttpHeaders;
+import java.net.http.HttpResponse.BodySubscriber;
+import java.net.http.HttpResponse.ResponseInfo;
+import java.nio.ByteBuffer;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.SubmissionPublisher;
 
 import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNull;
 
 public class JSONResponseHandlerTest {
+
   @Test
-  public void json() throws IOException {
+  public void apply_subscriber() throws Exception {
     // arrange
     var handler = new JSONResponseHandler<>(Map.class);
+    BodySubscriber<Map> subscriber = handler.apply(new ResponseInfo() {
+      @Override
+      public int statusCode() {
+        return 200;
+      }
+
+      @Override
+      public HttpHeaders headers() {
+        return null;
+      }
+
+      @Override
+      public Version version() {
+        return Version.HTTP_1_1;
+      }
+    });
+    try (var jsonPublisher = new SubmissionPublisher<List<ByteBuffer>>()) {
+      jsonPublisher.subscribe(subscriber);
+      jsonPublisher.submit(List.of(ByteBuffer.wrap("{\"test1\":\"value1\",\"test2\":\"value2\"}".getBytes())));
+    }
 
     // act
-    var result = handler.apply(new ByteArrayInputStream("{\"test1\":\"value1\",\"test2\":\"value2\"}".getBytes()));
+    var result = subscriber.getBody()
+                           .toCompletableFuture()
+                           .get();
 
     // assert
     assertEquals(result.get("test1"), "value1");
   }
 
   @Test
-  public void json_null() throws IOException {
+  public void apply_inputstream_null() throws Exception {
     // arrange
     var handler = new JSONResponseHandler<>(Map.class);
 
     // act
-    var result = handler.apply(null);
+    var result = handler.apply((InputStream) null);
 
     // assert
     assertNull(result);
   }
 
   @Test
-  public void json_empty() throws IOException {
+  public void apply_inputstream_empty() throws IOException {
     // arrange
     var handler = new JSONResponseHandler<>(Map.class);
 

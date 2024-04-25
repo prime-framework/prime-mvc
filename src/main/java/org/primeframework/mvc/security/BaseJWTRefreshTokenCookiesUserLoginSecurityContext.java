@@ -15,14 +15,11 @@
  */
 package org.primeframework.mvc.security;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.Builder;
 import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashMap;
@@ -279,10 +276,10 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
                                                .POST(new FormDataBodyHandler(body))
                                                .build();
 
-    HttpResponse<InputStream> resp = null;
+    HttpResponse<RefreshResponse> resp = null;
     Exception endpointException = null;
     try {
-      resp = client.send(refreshRequest, BodyHandlers.ofInputStream());
+      resp = client.send(refreshRequest, new JSONResponseHandler<>(RefreshResponse.class));
     } catch (Exception e) {
       endpointException = e;
     }
@@ -293,13 +290,7 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
       return tokens;
     }
 
-    JSONResponseHandler<RefreshResponse> responseHandler = new JSONResponseHandler<>(RefreshResponse.class);
-    RefreshResponse rr;
-    try {
-      rr = responseHandler.apply(resp.body());
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    RefreshResponse rr = resp.body();
     tokens.jwt = rr.access_token;
     tokens.refreshToken = defaultIfNull(rr.refresh_token, tokens.refreshToken);
 
