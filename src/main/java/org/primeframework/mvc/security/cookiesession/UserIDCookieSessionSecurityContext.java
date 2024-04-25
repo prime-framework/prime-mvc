@@ -168,9 +168,6 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
       // decrypt and a user will be stuck trying to get back in
       this.deleteCookies();
       return null;
-    } catch (InvalidDefinitionException e) {
-      checkForMissingLibrary(e);
-      return null;
     } catch (Exception e) {
       throw new ErrorException(e);
     }
@@ -228,21 +225,9 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
     }
   }
 
-  private void checkForMissingLibrary(InvalidDefinitionException e) throws ErrorException {
-    Exception cause = e;
-    if (e.getMessage().contains("Java 8 date/time type `java.time.ZonedDateTime` not supported by default: add Module")) {
-      cause = new IllegalStateException("You are missing a Jackson module that serializes ZonedDateTime. Adding com.inversoft:jackson5 to your dependencies and adding JacksonModule from that dependency to your MultiBinder is recommended.", e);
-    }
-    throw new ErrorException(cause);
-  }
-
   private void writeContainerToCookie(SerializedSessionContainer container) throws Exception {
-    try {
-      var cookieValue = CookieTools.toJSONCookie(container, true, true, this.encryptor, this.objectMapper);
-      this.sessionCookie.add(request, response, cookieValue);
-    } catch (InvalidDefinitionException e) {
-      checkForMissingLibrary(e);
-    }
+    var cookieValue = CookieTools.toJSONCookie(container, true, true, this.encryptor, this.objectMapper);
+    this.sessionCookie.add(request, response, cookieValue);
   }
 
   private void deleteCookies() {
