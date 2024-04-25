@@ -33,12 +33,12 @@ import java.util.concurrent.Flow.Subscriber;
  */
 public class FormDataBodyHandler implements BodyPublisher {
 
-  private byte[] body;
+  private final byte[] body;
 
-  private BodyPublisher publisher;
+  private final BodyPublisher publisher;
 
   public FormDataBodyHandler(Map<String, List<String>> request, boolean excludeNullValues) {
-    body = getBody(request, excludeNullValues);
+    body = createBody(request, excludeNullValues);
     // avoids duplicating all of the logic in ByteArrayPublisher
     publisher = BodyPublishers.ofByteArray(body);
   }
@@ -51,7 +51,7 @@ public class FormDataBodyHandler implements BodyPublisher {
     return body;
   }
 
-  private byte[] getBody(Map<String, List<String>> request, boolean excludeNullValues) {
+  private byte[] createBody(Map<String, List<String>> request, boolean excludeNullValues) {
     if (request != null) {
       return serializeRequest(request, excludeNullValues);
     }
@@ -68,7 +68,7 @@ public class FormDataBodyHandler implements BodyPublisher {
     publisher.subscribe(subscriber);
   }
 
-  private void append(StringBuilder build, String key, String value) {
+  private static void append(StringBuilder build, String key, String value) {
     if (build.length() > 0) {
       build.append("&");
     }
@@ -79,7 +79,7 @@ public class FormDataBodyHandler implements BodyPublisher {
     }
   }
 
-  private String encode(String s) {
+  private static String encode(String s) {
     try {
       return URLEncoder.encode(s, "UTF-8");
     } catch (UnsupportedEncodingException e) {
@@ -87,7 +87,7 @@ public class FormDataBodyHandler implements BodyPublisher {
     }
   }
 
-  private byte[] serializeRequest(Map<String, List<String>> request, boolean excludeNullValues) {
+  private static byte[] serializeRequest(Map<String, List<String>> request, boolean excludeNullValues) {
     StringBuilder build = new StringBuilder();
     request.forEach((key, values) -> {
       if (values == null) {
