@@ -56,7 +56,6 @@ import com.inversoft.rest.MultipartBodyHandler.Multiparts;
 import io.fusionauth.http.Cookie;
 import io.fusionauth.http.FileInfo;
 import io.fusionauth.http.HTTPMethod;
-import io.fusionauth.http.io.BlockingByteBufferOutputStream;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mock.MockUserAgent;
@@ -763,7 +762,7 @@ public class RequestBuilder {
     HTTPObjectsHolder.clearRequest();
     HTTPObjectsHolder.setRequest(request);
     HTTPObjectsHolder.clearResponse();
-    HTTPObjectsHolder.setResponse(new HTTPResponse(new BlockingByteBufferOutputStream(null, 1024, 32), request));
+    HTTPObjectsHolder.setResponse(new HTTPResponse());
 
     // Add a unique Id so that we can identify messages for this request in the observer.
     String messageStoreId = UUID.randomUUID().toString();

@@ -56,7 +56,7 @@ public class XMLStreamResultTest extends PrimeBaseTest {
     replay(ee);
 
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    HTTPResponse response = new HTTPResponse(null, null) {
+    HTTPResponse response = new HTTPResponse() {
       @Override
       public OutputStream getOutputStream() {
         return baos;
@@ -66,7 +66,7 @@ public class XMLStreamResultTest extends PrimeBaseTest {
     expect(store.getCurrent()).andReturn(new ActionInvocation(action, new ExecuteMethodConfiguration(httpMethod, null, null), "/foo", "", null));
     replay(store);
 
-    XMLStream xmlStream = new XMLStreamResultTest.XMLStreamImpl("success", "xml", 200);
+    XMLStream xmlStream = new XMLStreamImpl("success", "xml", 200);
     XMLStreamResult streamResult = new XMLStreamResult(ee, response, store);
     streamResult.execute(xmlStream);
 
@@ -85,7 +85,8 @@ public class XMLStreamResultTest extends PrimeBaseTest {
     return new Object[][]{{HTTPMethod.GET}, {HTTPMethod.HEAD}};
   }
 
-  public class XMLStreamImpl implements XMLStream {
+  @SuppressWarnings("ClassExplicitlyAnnotation")
+  public static class XMLStreamImpl implements XMLStream {
     private final String cacheControl;
 
     private final String code;

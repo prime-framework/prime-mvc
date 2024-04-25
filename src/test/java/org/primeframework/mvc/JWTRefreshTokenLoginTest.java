@@ -101,7 +101,7 @@ public class JWTRefreshTokenLoginTest {
   @BeforeMethod
   public void beforeMethod() {
     request = new HTTPRequest();
-    response = new HTTPResponse(null, null);
+    response = new HTTPResponse();
     HTTPObjectsHolder.setRequest(request);
     HTTPObjectsHolder.setResponse(response);
 
@@ -111,7 +111,7 @@ public class JWTRefreshTokenLoginTest {
     // Clear the message observer
     messageObserver.reset();
 
-    // Clear the roles and logged in user
+    // Clear the roles and logged-in user
     MockOAuthUserLoginSecurityContext.Roles.clear();
     MockOAuthUserLoginSecurityContext.CurrentUser = null;
 

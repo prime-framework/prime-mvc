@@ -48,7 +48,7 @@ public class LocaleTools {
     return new Locale(first, second, value.substring(ix + 1));
   }
 
-  private static int firstHyphenOrUnderscore(String str) {
+  public static int firstHyphenOrUnderscore(String str) {
     for (int i = 0, end = str.length(); i < end; ++i) {
       char c = str.charAt(i);
       if (c == '_' || c == '-') {
