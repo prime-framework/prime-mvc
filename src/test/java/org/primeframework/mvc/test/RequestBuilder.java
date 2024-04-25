@@ -50,7 +50,7 @@ import io.fusionauth.http.Cookie;
 import io.fusionauth.http.Cookie.SameSite;
 import io.fusionauth.http.FileInfo;
 import io.fusionauth.http.HTTPMethod;
-import io.fusionauth.http.HTTPValues;
+import io.fusionauth.http.HTTPValues.Headers;
 import io.fusionauth.http.io.BlockingByteBufferOutputStream;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
@@ -859,7 +859,7 @@ public class RequestBuilder {
     }
 
     if (contentType != null) {
-      requestBuilder.setHeader(HTTPValues.Headers.ContentType, contentType + (characterEncoding != null ? "; charset=" + characterEncoding : ""));
+      requestBuilder.setHeader(Headers.ContentType, contentType + (characterEncoding != null ? "; charset=" + characterEncoding : ""));
 
       // Keep this HTTP request in sync so that we can optionally use it in various test use cases.
       request.setContentType(contentType);
@@ -870,18 +870,18 @@ public class RequestBuilder {
                                      values.forEach(value -> requestBuilder.setHeader(name, value)));
 
     // Set cookies
-    if (request.getHeaders().keySet().stream().noneMatch(name -> name.equalsIgnoreCase(HTTPValues.Headers.Cookie)) && !request.getCookies().isEmpty()) {
+    if (request.getHeaders().keySet().stream().noneMatch(name -> name.equalsIgnoreCase(Headers.Cookie)) && !request.getCookies().isEmpty()) {
       String header = request.getCookies()
                              .stream()
                              .map(io.fusionauth.http.Cookie::toRequestHeader)
                              .collect(Collectors.joining("; "));
-      requestBuilder.setHeader(HTTPValues.Headers.Cookie, header);
+      requestBuilder.setHeader(Headers.Cookie, header);
     }
 
     // Set the UserAgent header if not already set
     // - Do this because the default UserAgent string will include the Java version string which is annoying to update in tests.
-    if (request.getHeaders().keySet().stream().noneMatch(name -> name.equalsIgnoreCase(HTTPValues.Headers.UserAgent))) {
-      requestBuilder.setHeader(HTTPValues.Headers.UserAgent, "Java HttpClient");
+    if (request.getHeaders().keySet().stream().noneMatch(name -> name.equalsIgnoreCase(Headers.UserAgent))) {
+      requestBuilder.setHeader(Headers.UserAgent, "Java HttpClient");
     }
 
     QueryStringBuilder queryStringBuilder = QueryStringBuilder.builder();
@@ -921,7 +921,7 @@ public class RequestBuilder {
   }
 
   private List<io.fusionauth.http.Cookie> getCookies(HttpResponse<byte[]> response) {
-    List<String> cookies = response.headers().allValues(HTTPValues.Headers.SetCookie.toLowerCase());
+    List<String> cookies = response.headers().allValues(Headers.SetCookie.toLowerCase());
     if (cookies != null && !cookies.isEmpty()) {
       return cookies.stream().map(io.fusionauth.http.Cookie::fromResponseHeader).filter(Objects::nonNull).collect(Collectors.toList());
     }
