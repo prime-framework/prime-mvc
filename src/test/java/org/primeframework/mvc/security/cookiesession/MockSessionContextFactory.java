@@ -18,9 +18,9 @@ package org.primeframework.mvc.security.cookiesession;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
-public class MockSessionContainerFactory implements SessionContainerFactory {
+public class MockSessionContextFactory implements SessionContextFactory {
   @Override
-  public SerializedSessionContainer create(UUID userId, String sessionId, ZonedDateTime loginInstant) {
-    return new MockSerializedSessionContainer(userId, sessionId, loginInstant);
+  public SerializedSessionContext create(UUID userId, String sessionId, ZonedDateTime loginInstant) {
+    return new MockSerializedSessionContext(userId, sessionId, loginInstant);
   }
 }

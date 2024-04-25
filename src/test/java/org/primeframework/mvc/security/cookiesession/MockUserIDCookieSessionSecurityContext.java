@@ -28,13 +28,15 @@ import org.primeframework.mvc.security.Encryptor;
 
 public class MockUserIDCookieSessionSecurityContext extends UserIDCookieSessionSecurityContext {
   @Inject
-  protected MockUserIDCookieSessionSecurityContext(HTTPRequest request, HTTPResponse response, Encryptor encryptor, ObjectMapper objectMapper, Clock clock, SessionContainerFactory sessionContainerFactory) {
-    super(request, response, encryptor, objectMapper, clock, Duration.ofMinutes(5), Duration.ofMinutes(30), sessionContainerFactory, MockSerializedSessionContainer.class);
+  protected MockUserIDCookieSessionSecurityContext(HTTPRequest request, HTTPResponse response, Encryptor encryptor, ObjectMapper objectMapper,
+                                                   Clock clock, SessionContextFactory sessionContextFactory) {
+    super(request, response, encryptor, objectMapper, clock, Duration.ofMinutes(5), Duration.ofMinutes(30), sessionContextFactory, MockSerializedSessionContext.class);
   }
 
-  public MockUserIDCookieSessionSecurityContext(HTTPRequest request, HTTPResponse response, Encryptor encryptor, ObjectMapper objectMapper, Clock clock,
-                                                Duration sessionTimeout, Duration sessionMaxAge, SessionContainerFactory sessionContainerFactory) {
-    super(request, response, encryptor, objectMapper, clock, sessionTimeout, sessionMaxAge, sessionContainerFactory, MockSerializedSessionContainer.class);
+  public MockUserIDCookieSessionSecurityContext(HTTPRequest request, HTTPResponse response, Encryptor encryptor, ObjectMapper objectMapper,
+                                                Clock clock,
+                                                Duration sessionTimeout, Duration sessionMaxAge, SessionContextFactory sessionContextFactory) {
+    super(request, response, encryptor, objectMapper, clock, sessionTimeout, sessionMaxAge, sessionContextFactory, MockSerializedSessionContext.class);
   }
 
   @Override

@@ -23,7 +23,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.exc.InvalidDefinitionException;
 import io.fusionauth.http.Cookie;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
@@ -60,14 +59,14 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
 
   private final Duration sessionTimeout;
 
-  private final SessionContainerFactory sessionContainerFactory;
+  private final SessionContextFactory sessionContextFactory;
 
-  private final Class<? extends SerializedSessionContainer> sessionClass;
+  private final Class<? extends SerializedSessionContext> sessionClass;
 
   protected UserIDCookieSessionSecurityContext(HTTPRequest request, HTTPResponse response, Encryptor encryptor, ObjectMapper objectMapper,
                                                Clock clock, Duration sessionTimeout, Duration sessionMaxAge,
-                                               SessionContainerFactory sessionContainerFactory,
-                                               Class<? extends SerializedSessionContainer> sessionClass) {
+                                               SessionContextFactory sessionContextFactory,
+                                               Class<? extends SerializedSessionContext> sessionClass) {
     this.request = request;
     this.response = response;
     this.encryptor = encryptor;
@@ -75,7 +74,7 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
     this.clock = clock;
     this.sessionMaxAge = sessionMaxAge;
     this.sessionTimeout = sessionTimeout;
-    this.sessionContainerFactory = sessionContainerFactory;
+    this.sessionContextFactory = sessionContextFactory;
     this.sessionClass = sessionClass;
     long timeoutInSeconds = sessionTimeout.toSeconds();
     this.sessionCookie = new CookieProxy(getCookieName(), timeoutInSeconds, Cookie.SameSite.Strict);
@@ -125,32 +124,32 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
     if (user != null) {
       return user;
     }
-    SerializedSessionContainer sessionContainer = getSessionContainer();
-    if (sessionContainer == null) {
+    SerializedSessionContext sessionContext = resolveContext();
+    if (sessionContext == null) {
       return null;
     }
-    user = retrieveUserById(sessionContainer.userId());
+    user = retrieveUserById(sessionContext.userId());
     this.request.setAttribute(UserKey, user);
     return user;
   }
 
   /**
-   * Get existing deserialized session container from cookie
+   * Get existing deserialized session context from cookie
    *
    * @return value from cookie, null if no existing session
    */
-  private SerializedSessionContainer getSessionContainer() {
-    var container = (SerializedSessionContainer) this.request.getAttribute(ContextKey);
-    if (container != null) {
-      return container;
+  private SerializedSessionContext resolveContext() {
+    var context = (SerializedSessionContext) this.request.getAttribute(ContextKey);
+    if (context != null) {
+      return context;
     }
     var cookie = this.sessionCookie.get(this.request);
     if (cookie == null) {
       return null;
     }
     try {
-      container = CookieTools.fromJSONCookie(cookie, sessionClass, true, encryptor, objectMapper);
-      var shouldExtend = shouldExtendCookie(container.loginInstant());
+      context = CookieTools.fromJSONCookie(cookie, sessionClass, true, encryptor, objectMapper);
+      var shouldExtend = shouldExtendCookie(context.loginInstant());
       switch (shouldExtend) {
         case Extend:
           // same cookie value, but with longer time (set on cookie proxy in constructor)
@@ -161,8 +160,8 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
           deleteCookies();
           return null;
       }
-      this.request.setAttribute(ContextKey, container);
-      return container;
+      this.request.setAttribute(ContextKey, context);
+      return context;
     } catch (BadPaddingException e) {
       // if the cookie encryption key changes (DB change, etc.) then we need new cookies, otherwise we cannot
       // decrypt and a user will be stuck trying to get back in
@@ -196,13 +195,15 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
    */
   @Override
   public String getSessionId() {
-    return Optional.ofNullable(getSessionContainer()).map(SerializedSessionContainer::sessionId).orElse(null);
+    return Optional.ofNullable(resolveContext())
+                   .map(SerializedSessionContext::sessionId)
+                   .orElse(null);
   }
 
   @Override
   public boolean isLoggedIn() {
-    // user MIGHT a DB query to hydrate the user so we can do a lighter weight check by just looking for the session ID
-    return getSessionId() != null;
+    // user MIGHT a DB query to hydrate the user so we can do a lighter weight check
+    return resolveContext() != null;
   }
 
   /**
@@ -216,18 +217,14 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
       var id = getIdFromUser(user);
       var newSessionId = UUID.randomUUID();
       ZonedDateTime now = ZonedDateTime.now(clock);
-      var container = sessionContainerFactory.create(id, newSessionId.toString(), now);
-      writeContainerToCookie(container);
+      var sessionContext = sessionContextFactory.create(id, newSessionId.toString(), now);
+      var cookieValue = CookieTools.toJSONCookie(sessionContext, true, true, this.encryptor, this.objectMapper);
+      this.sessionCookie.add(request, response, cookieValue);
     } catch (Exception e) {
       // no partial state
       deleteCookies();
       throw new ErrorException(e);
     }
-  }
-
-  private void writeContainerToCookie(SerializedSessionContainer container) throws Exception {
-    var cookieValue = CookieTools.toJSONCookie(container, true, true, this.encryptor, this.objectMapper);
-    this.sessionCookie.add(request, response, cookieValue);
   }
 
   private void deleteCookies() {

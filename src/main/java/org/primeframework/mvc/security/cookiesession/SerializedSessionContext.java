@@ -11,7 +11,7 @@ import java.util.UUID;
  *
  * @author Brady Wied
  */
-public interface SerializedSessionContainer {
+public interface SerializedSessionContext {
   /**
    * The User ID for the logged in user
    *
