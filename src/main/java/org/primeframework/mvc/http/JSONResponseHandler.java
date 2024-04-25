@@ -33,6 +33,9 @@ import io.fusionauth.jwt.json.JacksonModule;
  * Response handler that reads the body as JSON using Jackson. The default ObjectMapper uses Jackson's standard
  * ObjectMapper configuration for deserializing. It also uses the JacksonModule from the
  * <code>io.fusionauth.jwt</code> library for handling various type conversions.
+ * <p>
+ * The primary way to use this class is via the {@link java.net.http.HttpClient}
+ * {@link BodyHandler} interface.
  *
  * @author Brian Pontarelli
  */
@@ -41,10 +44,21 @@ public class JSONResponseHandler<T> implements BodyHandler<T> {
 
   private final Class<T> type;
 
+  /**
+   * Constructs handler for the given type
+   *
+   * @param type responses will be deserialized using this type
+   */
   public JSONResponseHandler(Class<T> type) {
     this.type = type;
   }
 
+  /**
+   * Testing method to directly deserialize using the stream.
+   *
+   * @param is stream of JSON
+   * @return deserialized object
+   */
   T apply(InputStream is) {
     if (is == null) {
       return null;
@@ -75,6 +89,13 @@ public class JSONResponseHandler<T> implements BodyHandler<T> {
     }
   }
 
+  /**
+   * Creates a subscriber to deserialize content
+   *
+   * @param responseInfo the response info
+   * @return a subscriber that goes from {@link InputStream} to the desired
+   *     class.
+   */
   @Override
   public BodySubscriber<T> apply(ResponseInfo responseInfo) {
     // Use the InputStream subscriber first, then map using our Jackson function

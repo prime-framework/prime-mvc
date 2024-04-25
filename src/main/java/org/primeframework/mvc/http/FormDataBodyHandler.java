@@ -36,16 +36,36 @@ public class FormDataBodyHandler implements BodyPublisher {
 
   private final BodyPublisher publisher;
 
+  /**
+   * Constructs a handler and completes multipart encoding in a way that can be fetched
+   * by {@link #getBody} or through the {@link java.net.http.HttpClient} related
+   * {@link BodyPublisher} interface.
+   *
+   * @param request           map of values to include
+   * @param excludeNullValues whether null values should be excluded
+   */
   public FormDataBodyHandler(Map<String, List<String>> request, boolean excludeNullValues) {
     body = createBody(request, excludeNullValues);
     // avoids duplicating all of the logic in ByteArrayPublisher
     publisher = BodyPublishers.ofByteArray(body);
   }
 
+  /**
+   * Constructs a handler and completes multipart encoding in a way that can be fetched
+   * by {@link #getBody} or through the {@link java.net.http.HttpClient} related
+   * {@link BodyPublisher} interface.
+   *
+   * @param request map of values to include. Null values will be included
+   */
   public FormDataBodyHandler(Map<String, List<String>> request) {
     this(request, false);
   }
 
+  /**
+   * Returns the encoded represent the form content
+   *
+   * @return bytes of content in UTF-8 encoding
+   */
   public byte[] getBody() {
     return body;
   }
