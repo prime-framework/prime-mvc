@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc.http;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpRequest.BodyPublishers;
@@ -69,7 +68,7 @@ public class FormDataBodyHandler implements BodyPublisher {
   }
 
   private static void append(StringBuilder build, String key, String value) {
-    if (build.length() > 0) {
+    if (!build.isEmpty()) {
       build.append("&");
     }
 
@@ -80,11 +79,7 @@ public class FormDataBodyHandler implements BodyPublisher {
   }
 
   private static String encode(String s) {
-    try {
-      return URLEncoder.encode(s, "UTF-8");
-    } catch (UnsupportedEncodingException e) {
-      throw new IllegalStateException(e);
-    }
+    return URLEncoder.encode(s, StandardCharsets.UTF_8);
   }
 
   private static byte[] serializeRequest(Map<String, List<String>> request, boolean excludeNullValues) {
