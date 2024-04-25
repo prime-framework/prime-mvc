@@ -24,28 +24,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fusionauth.jwt.json.JacksonModule;
 
 /**
- * Response handler that reads the body as JSON using Jackson. By default, this uses the <code>defaultObjectMapper</code> variable for
- * JSON parsing. You can optionally specify a different ObjectMapper to the constructor. The default ObjectMapper uses Jackson's standard
- * ObjectMapper configuration for deserializing. It also uses the JacksonModule from the <code>jackson5</code> library for handling various
- * type conversions.
+ * Response handler that reads the body as JSON using Jackson. The default ObjectMapper uses Jackson's standard
+ * ObjectMapper configuration for deserializing. It also uses the JacksonModule from the
+ * <code>io.fusionauth.jwt</code> library for handling various type conversions.
  *
  * @author Brian Pontarelli
  */
 public class JSONResponseHandler<T> {
-  private final ObjectMapper instanceObjectMapper;
-
-  public final static ObjectMapper defaultObjectMapper = new ObjectMapper().registerModule(new JacksonModule());
+  private final static ObjectMapper objectMapper = new ObjectMapper().registerModule(new JacksonModule());
 
   private final Class<T> type;
 
   public JSONResponseHandler(Class<T> type) {
     this.type = type;
-    this.instanceObjectMapper = defaultObjectMapper;
-  }
-
-  public JSONResponseHandler(Class<T> type, ObjectMapper objectMapper) {
-    this.type = type;
-    this.instanceObjectMapper = objectMapper;
   }
 
   public T apply(InputStream is) throws IOException {
@@ -64,7 +55,7 @@ public class JSONResponseHandler<T> {
     bis.reset();
 
     try {
-      return instanceObjectMapper.readValue(bis, type);
+      return objectMapper.readValue(bis, type);
     } catch (IOException e) {
       throw new IllegalArgumentException("Failed to parse the HTTP response as JSON. Actual HTTP response body:\n" +
                                          (bis.isObservableTruncated()

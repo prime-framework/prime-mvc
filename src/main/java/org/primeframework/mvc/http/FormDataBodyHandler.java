@@ -26,6 +26,9 @@ import java.util.Map;
 import java.util.concurrent.Flow.Subscriber;
 
 /**
+ * Converts a map of data to form URL encoded data (application/x-www-form-urlencoded)
+ * in a way that works with {@link java.net.http.HttpClient} BodyPublishers
+ *
  * @author Brian Pontarelli
  */
 public class FormDataBodyHandler implements BodyPublisher {

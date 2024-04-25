@@ -27,6 +27,12 @@ import java.util.UUID;
 
 import org.primeframework.mvc.util.EncodingUtils;
 
+/**
+ * Converts {@link Multiparts} of data to an encoded byte array, properly formatted for the
+ * multipart/form-data content type
+ *
+ * @author Brian Pontarelli
+ */
 public class MultipartBodyHandler {
   public final String boundary = UUID.randomUUID().toString().replace("-", "");
 

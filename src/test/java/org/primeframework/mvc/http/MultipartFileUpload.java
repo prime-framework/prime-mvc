@@ -17,6 +17,11 @@ package org.primeframework.mvc.http;
 
 import java.nio.file.Path;
 
+/**
+ * Holds each file used with {@link MultipartBodyHandler} via the {@link org.primeframework.mvc.http.MultipartBodyHandler.Multiparts class}
+ *
+ * @author Brian Pontarelli
+ */
 public class MultipartFileUpload {
   public final String contentType;
 
