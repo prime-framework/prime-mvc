@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2021-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
 import com.google.inject.Inject;
-import io.fusionauth.http.HTTPValues;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.jwt.JWTEncoder;
 import io.fusionauth.jwt.domain.JWT;
@@ -30,8 +29,6 @@ import org.primeframework.mvc.content.json.annotation.JSONResponse;
 import org.primeframework.mvc.parameter.annotation.FieldName;
 import org.primeframework.mvc.security.MockOAuthUserLoginSecurityContext;
 import org.primeframework.mvc.security.oauth.RefreshResponse;
-import org.primeframework.mvc.security.oauth.TokenAuthenticationMethod;
-import org.testng.Assert;
 import static org.example.action.oauth.LoginAction.Subject;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;

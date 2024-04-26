@@ -2052,6 +2052,27 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void post_multipart_parameter_mix() throws Exception {
+    // arrange
+    test.createFile("Hello World")
+        .simulate(() -> simulator.test("/user/full-form")
+                                 .withParameter("roleIds", 21)
+                                 .withParameter("roleIds", 22)
+                                 .withURLParameter("ages", 42)
+                                 .withParameter("stringField", "hello with space")
+                                 .withFile("image", test.tempFile, "text/plain")
+                                 .post()
+                                 // assert
+                                 .assertStatusCode(200));
+
+    assertEquals(FullFormAction.roleIdsFromLastPost.size(), 2);
+    assertEquals(FullFormAction.agesFromLastPost.size(), 1);
+    var fileContents = Files.readString((FullFormAction.imageFromLastPost.getFile()));
+    assertEquals(fileContents, "Hello World");
+    assertEquals(FullFormAction.stringFieldFromLastPost, "hello with space");
+  }
+
+  @Test
   public void post_objectMapValues() throws Exception {
     // Dot notation, set into typed map of Map<String, Object>
     test.simulate(() -> simulator.test("/object-map-values")
@@ -2307,27 +2328,6 @@ public class GlobalTest extends PrimeBaseTest {
 
     TestUnhandledExceptionHandler.assertLastUnhandledException(new MultipleParametersUnsupportedException(
         "You are attempting to map a form field that contains multiple parameters to a property on the action class that is of type Enum. This isn't allowed. Action class [org.example.action.ParameterHandlerAction] Request URI [/parameter-handler] Parameter name [enumValue]"));
-  }
-
-  @Test
-  public void post_multipart_parameter_mix() throws Exception {
-    // arrange
-    test.createFile("Hello World")
-        .simulate(() -> simulator.test("/user/full-form")
-                                 .withParameter("roleIds", 21)
-                                 .withParameter("roleIds", 22)
-                                 .withURLParameter("ages", 42)
-                                 .withParameter("stringField", "hello with space")
-                                 .withFile("image", test.tempFile, "text/plain")
-                                 .post()
-                                 // assert
-                                 .assertStatusCode(200));
-
-    assertEquals(FullFormAction.roleIdsFromLastPost.size(), 2);
-    assertEquals(FullFormAction.agesFromLastPost.size(), 1);
-    var fileContents = Files.readString((FullFormAction.imageFromLastPost.getFile()));
-    assertEquals(fileContents, "Hello World");
-    assertEquals(FullFormAction.stringFieldFromLastPost, "hello with space");
   }
 
   @Test

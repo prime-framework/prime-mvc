@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +61,7 @@ public class MultipartBodyHandler {
         if (request.files != null) {
           for (MultipartFileUpload file : request.files) {
             writer.append("--").append(boundary).append("\r\n");
-            writer.append("Content-Disposition: form-data; name=\"").append(URLEncoder.encode(file.name, "UTF-8")).append("\"")
+            writer.append("Content-Disposition: form-data; name=\"").append(URLEncoder.encode(file.name, StandardCharsets.UTF_8)).append("\"")
                   .append("; filename=\"").append(EncodingUtils.escapedQuotedString(file.fileName))
                   .append("\"; filename*=UTF-8''").append(EncodingUtils.rfc5987_encode(file.fileName));
             if (file.contentType != null) {
@@ -79,7 +80,7 @@ public class MultipartBodyHandler {
           for (Map.Entry<String, List<String>> entry : request.parameters.entrySet()) {
             for (String value : entry.getValue()) {
               writer.append("--").append(boundary).append("\r\n");
-              writer.append("Content-Disposition: form-data; name=\"").append(URLEncoder.encode(entry.getKey(), "UTF-8")).append("\"\r\n\r\n").append(value).append("\r\n");
+              writer.append("Content-Disposition: form-data; name=\"").append(URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8)).append("\"\r\n\r\n").append(value).append("\r\n");
             }
           }
         }

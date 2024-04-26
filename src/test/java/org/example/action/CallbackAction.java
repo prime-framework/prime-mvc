@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2022-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,10 @@
  */
 package org.example.action;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse.BodyHandlers;
-import java.time.Duration;
 
 import com.google.inject.Inject;
 import io.fusionauth.http.server.HTTPRequest;
