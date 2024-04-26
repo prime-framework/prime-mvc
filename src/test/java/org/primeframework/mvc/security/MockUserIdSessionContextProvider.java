@@ -13,17 +13,14 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.security.cookiesession;
+package org.primeframework.mvc.security;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
-import org.primeframework.mvc.security.UserIdSessionContext;
-import org.primeframework.mvc.security.UserIdSessionContextProvider;
-
 public class MockUserIdSessionContextProvider implements UserIdSessionContextProvider {
   @Override
-  public UserIdSessionContext get(UUID userId, String sessionId, ZonedDateTime loginInstant) {
-    return new MockUserIdSessionContext(userId, sessionId, loginInstant);
+  public UserIdSessionContext get(Object userId, ZonedDateTime loginInstant) {
+    return new MockUserIdSessionContext((UUID) userId, loginInstant);
   }
 }

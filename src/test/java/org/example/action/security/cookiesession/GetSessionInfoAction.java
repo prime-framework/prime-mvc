@@ -9,7 +9,7 @@ import com.google.inject.Inject;
 import io.fusionauth.http.server.HTTPRequest;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.security.UserLoginSecurityContext;
-import org.primeframework.mvc.security.cookiesession.MockUser;
+import org.primeframework.mvc.security.MockUser;
 import org.primeframework.mvc.security.BaseUserIdCookieSecurityContext;
 
 @Action

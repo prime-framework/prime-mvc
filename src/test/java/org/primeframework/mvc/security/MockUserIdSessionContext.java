@@ -13,14 +13,13 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.security.cookiesession;
+package org.primeframework.mvc.security;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.primeframework.mvc.security.UserIdSessionContext;
 
 public class MockUserIdSessionContext implements UserIdSessionContext {
   @JsonProperty
@@ -32,9 +31,9 @@ public class MockUserIdSessionContext implements UserIdSessionContext {
   @JsonProperty
   private ZonedDateTime loginInstant;
 
-  public MockUserIdSessionContext(UUID userId, String sessionId, ZonedDateTime loginInstant) {
+  public MockUserIdSessionContext(UUID userId, ZonedDateTime loginInstant) {
     this.userId = userId;
-    this.sessionId = sessionId;
+    this.sessionId = UUID.randomUUID().toString();
     this.loginInstant = loginInstant;
   }
 
@@ -43,7 +42,7 @@ public class MockUserIdSessionContext implements UserIdSessionContext {
   }
 
   @Override
-  public UUID userId() {
+  public Object userId() {
     return userId;
   }
 

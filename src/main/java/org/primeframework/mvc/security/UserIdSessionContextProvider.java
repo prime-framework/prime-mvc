@@ -29,9 +29,8 @@ public interface UserIdSessionContextProvider {
    * Create a new Jackson serializable session container
    *
    * @param userId       user ID the session is for
-   * @param sessionId    the unique ID of the user's session
    * @param loginInstant the instant the user logged in
    * @return a Jackson serializable container
    */
-  UserIdSessionContext get(UUID userId, String sessionId, ZonedDateTime loginInstant);
+  UserIdSessionContext get(Object userId, ZonedDateTime loginInstant);
 }

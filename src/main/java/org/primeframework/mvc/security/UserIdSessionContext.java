@@ -16,7 +16,6 @@
 package org.primeframework.mvc.security;
 
 import java.time.ZonedDateTime;
-import java.util.UUID;
 
 /**
  * Session container serialized as JSON into the cookie
@@ -29,10 +28,10 @@ public interface UserIdSessionContext {
    *
    * @return the user ID
    */
-  UUID userId();
+  Object userId();
 
   /**
-   * The session ID for the logged in user
+   * The session ID for the logged in user. This should be unique.
    *
    * @return the session ID
    */

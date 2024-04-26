@@ -13,33 +13,34 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.security.cookiesession;
+package org.primeframework.mvc.security;
 
 import java.time.Clock;
 import java.time.Duration;
 import java.util.Set;
-import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
-import org.primeframework.mvc.security.BaseUserIdCookieSecurityContext;
-import org.primeframework.mvc.security.Encryptor;
-import org.primeframework.mvc.security.UserIdSessionContextProvider;
 
 public class MockBaseUserIdCookieSecurityContext extends BaseUserIdCookieSecurityContext {
   @Inject
   protected MockBaseUserIdCookieSecurityContext(HTTPRequest request, HTTPResponse response, Encryptor encryptor, ObjectMapper objectMapper,
                                                 Clock clock, UserIdSessionContextProvider userIdSessionContextProvider) {
-    super(request, response, encryptor, objectMapper, clock, Duration.ofMinutes(5), Duration.ofMinutes(30), userIdSessionContextProvider, MockUserIdSessionContext.class);
+    super(request, response, encryptor, objectMapper, clock, Duration.ofMinutes(5), Duration.ofMinutes(30), userIdSessionContextProvider);
   }
 
   public MockBaseUserIdCookieSecurityContext(HTTPRequest request, HTTPResponse response, Encryptor encryptor, ObjectMapper objectMapper,
                                              Clock clock,
                                              Duration sessionTimeout, Duration sessionMaxAge,
                                              UserIdSessionContextProvider userIdSessionContextProvider) {
-    super(request, response, encryptor, objectMapper, clock, sessionTimeout, sessionMaxAge, userIdSessionContextProvider, MockUserIdSessionContext.class);
+    super(request, response, encryptor, objectMapper, clock, sessionTimeout, sessionMaxAge, userIdSessionContextProvider);
+  }
+
+  @Override
+  protected Class<? extends UserIdSessionContext> getUserIdSessionContextClass() {
+    return MockUserIdSessionContext.class;
   }
 
   @Override
@@ -48,12 +49,12 @@ public class MockBaseUserIdCookieSecurityContext extends BaseUserIdCookieSecurit
   }
 
   @Override
-  protected MockUser retrieveUserById(UUID id) {
+  protected MockUser retrieveUserById(Object id) {
     return new MockUser("bob");
   }
 
   @Override
-  protected UUID getIdFromUser(Object user) {
+  protected Object getIdFromUser(Object user) {
     if (!(user instanceof MockUser mockUser)) {
       throw new RuntimeException("Expected MockUser and got " + user.getClass());
     }
