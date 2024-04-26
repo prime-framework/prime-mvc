@@ -38,7 +38,9 @@ public class SessionTestModule extends AbstractModule {
 
   @Override
   protected void configure() {
-    bind(UserIdSessionContextProvider.class).to(MockUserIdSessionContextProvider.class);
+    bind(new TypeLiteral<UserIdSessionContext<UUID>>() {
+    })
+        .to(MockUserIdSessionContext.class);
     bind(MVCConfiguration.class).to(MockConfiguration.class).asEagerSingleton();
     bind(UserLoginSecurityContext.class).to(MockBaseUserIdCookieSecurityContext.class);
     bind(CORSConfigurationProvider.class).to(NoCORSConfigurationProvider.class).asEagerSingleton();

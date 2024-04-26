@@ -22,25 +22,39 @@ import java.time.ZonedDateTime;
  *
  * @author Brady Wied
  */
-public interface UserIdSessionContext {
+public interface UserIdSessionContext<TUserId> {
   /**
-   * The User ID for the logged in user
+   * The instant the user logged in
    *
-   * @return the user ID
+   * @return instant user logged in
    */
-  Object userId();
+  ZonedDateTime getLoginInstant();
+
+  /**
+   * When a login occurs, the BaseUserIdCookieSecurityContext will set the moment of login on the object
+   *
+   * @param time login time
+   */
+  void setLoginInstant(ZonedDateTime loginInstant);
 
   /**
    * The session ID for the logged in user. This should be unique.
    *
    * @return the session ID
    */
-  String sessionId();
+  String getSessionId();
 
   /**
-   * The instant the user logged in
+   * The User ID for the logged in user
    *
-   * @return instant user logged in
+   * @return the user ID
    */
-  ZonedDateTime loginInstant();
+  TUserId getUserId();
+
+  /**
+   * When a login occurs, the BaseUserIdCookieSecurityContext will set the user ID on the object
+   *
+   * @param userId user ID
+   */
+  void setUserId(TUserId userId);
 }

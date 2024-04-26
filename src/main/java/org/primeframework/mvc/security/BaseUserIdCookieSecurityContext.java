@@ -22,6 +22,7 @@ import java.time.ZonedDateTime;
 import java.util.Optional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.Provider;
 import io.fusionauth.http.Cookie;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
@@ -34,7 +35,7 @@ import org.primeframework.mvc.util.CookieTools;
  *
  * @author Brady Wied
  */
-public abstract class BaseUserIdCookieSecurityContext implements UserLoginSecurityContext {
+public abstract class BaseUserIdCookieSecurityContext<TUserId> implements UserLoginSecurityContext {
   public static final String UserKey = "primeCurrentUser";
 
   private static final String ContextKey = "primeLoginContext";
@@ -55,11 +56,11 @@ public abstract class BaseUserIdCookieSecurityContext implements UserLoginSecuri
 
   private final Duration sessionTimeout;
 
-  private final UserIdSessionContextProvider userIdSessionContextProvider;
+  private final Provider<UserIdSessionContext<TUserId>> userIdSessionContextProvider;
 
   protected BaseUserIdCookieSecurityContext(HTTPRequest request, HTTPResponse response, Encryptor encryptor, ObjectMapper objectMapper,
                                             Clock clock, Duration sessionTimeout, Duration sessionMaxAge,
-                                            UserIdSessionContextProvider userIdSessionContextProvider) {
+                                            Provider<UserIdSessionContext<TUserId>> userIdSessionContextProvider) {
     this.request = request;
     this.response = response;
     this.encryptor = encryptor;
@@ -83,11 +84,11 @@ public abstract class BaseUserIdCookieSecurityContext implements UserLoginSecuri
     if (user != null) {
       return user;
     }
-    UserIdSessionContext sessionContext = resolveContext();
+    UserIdSessionContext<TUserId> sessionContext = resolveContext();
     if (sessionContext == null) {
       return null;
     }
-    user = retrieveUserById(sessionContext.userId());
+    user = retrieveUserById(sessionContext.getUserId());
     this.request.setAttribute(UserKey, user);
     return user;
   }
@@ -100,7 +101,7 @@ public abstract class BaseUserIdCookieSecurityContext implements UserLoginSecuri
   @Override
   public String getSessionId() {
     return Optional.ofNullable(resolveContext())
-                   .map(UserIdSessionContext::sessionId)
+                   .map(UserIdSessionContext::getSessionId)
                    .orElse(null);
   }
 
@@ -120,7 +121,12 @@ public abstract class BaseUserIdCookieSecurityContext implements UserLoginSecuri
     try {
       var id = getIdFromUser(user);
       ZonedDateTime now = ZonedDateTime.now(clock);
-      var sessionContext = userIdSessionContextProvider.get(id, now);
+      var sessionContext = userIdSessionContextProvider.get();
+      sessionContext.setUserId(id);
+      sessionContext.setLoginInstant(now);
+      if (sessionContext.getSessionId() == null) {
+        throw new IllegalArgumentException("Received a null getSessionId from " + sessionContext.getClass());
+      }
       var cookieValue = CookieTools.toJSONCookie(sessionContext, true, true, this.encryptor, this.objectMapper);
       this.sessionCookie.add(request, response, cookieValue);
     } catch (Exception e) {
@@ -158,14 +164,14 @@ public abstract class BaseUserIdCookieSecurityContext implements UserLoginSecuri
    * @param user user to retrieve the ID for
    * @return ID of the user
    */
-  protected abstract Object getIdFromUser(Object user);
+  protected abstract TUserId getIdFromUser(Object user);
 
   /**
    * What is the session context class
    *
    * @return the class
    */
-  protected abstract Class<? extends UserIdSessionContext> getUserIdSessionContextClass();
+  protected abstract Class<? extends UserIdSessionContext<TUserId>> getUserIdSessionContextClass();
 
   /**
    * Hydrates/retrieves the user based on ID
@@ -173,7 +179,7 @@ public abstract class BaseUserIdCookieSecurityContext implements UserLoginSecuri
    * @param id unique ID for the user
    * @return the object representing the user
    */
-  protected abstract Object retrieveUserById(Object id);
+  protected abstract Object retrieveUserById(TUserId id);
 
   /**
    * Figure out whether to extend cookie
@@ -204,8 +210,8 @@ public abstract class BaseUserIdCookieSecurityContext implements UserLoginSecuri
    *
    * @return value from cookie, null if no existing session
    */
-  private UserIdSessionContext resolveContext() {
-    var context = (UserIdSessionContext) this.request.getAttribute(ContextKey);
+  private UserIdSessionContext<TUserId> resolveContext() {
+    var context = (UserIdSessionContext<TUserId>) this.request.getAttribute(ContextKey);
     if (context != null) {
       return context;
     }
@@ -215,7 +221,7 @@ public abstract class BaseUserIdCookieSecurityContext implements UserLoginSecuri
     }
     try {
       context = CookieTools.fromJSONCookie(cookie, getUserIdSessionContextClass(), true, encryptor, objectMapper);
-      var shouldExtend = shouldExtendCookie(context.loginInstant());
+      var shouldExtend = shouldExtendCookie(context.getLoginInstant());
       switch (shouldExtend) {
         case Extend:
           // same cookie value, but with longer time (set on cookie proxy in constructor)
