@@ -10,7 +10,7 @@ import io.fusionauth.http.server.HTTPRequest;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.security.UserLoginSecurityContext;
 import org.primeframework.mvc.security.cookiesession.MockUser;
-import org.primeframework.mvc.security.cookiesession.UserIDCookieSessionSecurityContext;
+import org.primeframework.mvc.security.cookiesession.BaseUserIdCookieSecurityContext;
 
 @Action
 public class GetSessionInfoAction {
@@ -51,7 +51,7 @@ public class GetSessionInfoAction {
     this.sessionId = Optional.ofNullable(context.getSessionId())
                              .orElse("(no session)");
     this.loggedIn = context.isLoggedIn() ? "yes" : "no";
-    var userObjectInRequest = httpRequest.getAttribute(UserIDCookieSessionSecurityContext.UserKey);
+    var userObjectInRequest = httpRequest.getAttribute(BaseUserIdCookieSecurityContext.UserKey);
     if (userObjectInRequest == null) {
       this.userInRequest = "(nothing)";
     } else {

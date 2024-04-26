@@ -24,7 +24,7 @@ import java.util.UUID;
  *
  * @author Brady Wied
  */
-public interface SessionContextFactory {
+public interface UserIdSessionContextProvider {
   /**
    * Create a new Jackson serializable session container
    *
@@ -33,5 +33,5 @@ public interface SessionContextFactory {
    * @param loginInstant the instant the user logged in
    * @return a Jackson serializable container
    */
-  SerializedSessionContext create(UUID userId, String sessionId, ZonedDateTime loginInstant);
+  UserIdSessionContext get(UUID userId, String sessionId, ZonedDateTime loginInstant);
 }

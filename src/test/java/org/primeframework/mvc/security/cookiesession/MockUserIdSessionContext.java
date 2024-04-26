@@ -21,7 +21,7 @@ import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class MockSerializedSessionContext implements SerializedSessionContext {
+public class MockUserIdSessionContext implements UserIdSessionContext {
   @JsonProperty
   private UUID userId;
 
@@ -31,14 +31,14 @@ public class MockSerializedSessionContext implements SerializedSessionContext {
   @JsonProperty
   private ZonedDateTime loginInstant;
 
-  public MockSerializedSessionContext(UUID userId, String sessionId, ZonedDateTime loginInstant) {
+  public MockUserIdSessionContext(UUID userId, String sessionId, ZonedDateTime loginInstant) {
     this.userId = userId;
     this.sessionId = sessionId;
     this.loginInstant = loginInstant;
   }
 
   @JsonCreator
-  private MockSerializedSessionContext() {
+  private MockUserIdSessionContext() {
   }
 
   @Override

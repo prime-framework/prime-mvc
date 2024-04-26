@@ -17,7 +17,7 @@ import org.primeframework.mvc.TestPrimeMain;
 import org.primeframework.mvc.guice.MVCModule;
 import org.primeframework.mvc.http.HTTPObjectsHolder;
 import org.primeframework.mvc.message.TestMessageObserver;
-import org.primeframework.mvc.security.cookiesession.UserIDCookieSessionSecurityContext.CookieExtendResult;
+import org.primeframework.mvc.security.cookiesession.BaseUserIdCookieSecurityContext.CookieExtendResult;
 import org.primeframework.mvc.test.RequestResult;
 import org.primeframework.mvc.test.RequestSimulator;
 import org.testng.annotations.AfterClass;
@@ -30,8 +30,8 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
 @Test
-public class UserIDCookieSessionSecurityContextTest {
-  private static final String UserKey = UserIDCookieSessionSecurityContext.UserKey;
+public class BaseUserIdCookieSecurityContextTest {
+  private static final String UserKey = BaseUserIdCookieSecurityContext.UserKey;
 
   private static ZonedDateTime mockClockNow;
 
@@ -247,7 +247,7 @@ public class UserIDCookieSessionSecurityContextTest {
                                  CookieExtendResult expectedResult) {
     // arrange
     // we don't need most of these dependencies to test this
-    var securityContext = new MockUserIDCookieSessionSecurityContext(null, null, null, null, mockClock, sessionTimeout, maxSessionAge, null);
+    var securityContext = new MockBaseUserIdCookieSecurityContext(null, null, null, null, mockClock, sessionTimeout, maxSessionAge, null);
 
     // act
     var actualResult = securityContext.shouldExtendCookie(signInTime);

@@ -26,17 +26,18 @@ import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.security.Encryptor;
 
-public class MockUserIDCookieSessionSecurityContext extends UserIDCookieSessionSecurityContext {
+public class MockBaseUserIdCookieSecurityContext extends BaseUserIdCookieSecurityContext {
   @Inject
-  protected MockUserIDCookieSessionSecurityContext(HTTPRequest request, HTTPResponse response, Encryptor encryptor, ObjectMapper objectMapper,
-                                                   Clock clock, SessionContextFactory sessionContextFactory) {
-    super(request, response, encryptor, objectMapper, clock, Duration.ofMinutes(5), Duration.ofMinutes(30), sessionContextFactory, MockSerializedSessionContext.class);
+  protected MockBaseUserIdCookieSecurityContext(HTTPRequest request, HTTPResponse response, Encryptor encryptor, ObjectMapper objectMapper,
+                                                Clock clock, UserIdSessionContextProvider userIdSessionContextProvider) {
+    super(request, response, encryptor, objectMapper, clock, Duration.ofMinutes(5), Duration.ofMinutes(30), userIdSessionContextProvider, MockUserIdSessionContext.class);
   }
 
-  public MockUserIDCookieSessionSecurityContext(HTTPRequest request, HTTPResponse response, Encryptor encryptor, ObjectMapper objectMapper,
-                                                Clock clock,
-                                                Duration sessionTimeout, Duration sessionMaxAge, SessionContextFactory sessionContextFactory) {
-    super(request, response, encryptor, objectMapper, clock, sessionTimeout, sessionMaxAge, sessionContextFactory, MockSerializedSessionContext.class);
+  public MockBaseUserIdCookieSecurityContext(HTTPRequest request, HTTPResponse response, Encryptor encryptor, ObjectMapper objectMapper,
+                                             Clock clock,
+                                             Duration sessionTimeout, Duration sessionMaxAge,
+                                             UserIdSessionContextProvider userIdSessionContextProvider) {
+    super(request, response, encryptor, objectMapper, clock, sessionTimeout, sessionMaxAge, userIdSessionContextProvider, MockUserIdSessionContext.class);
   }
 
   @Override

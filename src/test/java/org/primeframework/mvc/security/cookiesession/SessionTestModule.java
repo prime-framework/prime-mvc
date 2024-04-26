@@ -25,9 +25,9 @@ public class SessionTestModule extends AbstractModule {
 
   @Override
   protected void configure() {
-    bind(SessionContextFactory.class).to(MockSessionContextFactory.class);
+    bind(UserIdSessionContextProvider.class).to(MockUserIdSessionContextProvider.class);
     bind(MVCConfiguration.class).to(MockConfiguration.class).asEagerSingleton();
-    bind(UserLoginSecurityContext.class).to(MockUserIDCookieSessionSecurityContext.class);
+    bind(UserLoginSecurityContext.class).to(MockBaseUserIdCookieSecurityContext.class);
     bind(CORSConfigurationProvider.class).to(NoCORSConfigurationProvider.class).asEagerSingleton();
     bind(Clock.class).toProvider(clockProvider);
     var jacksonMultiBinder = Multibinder.newSetBinder(binder(), Module.class);

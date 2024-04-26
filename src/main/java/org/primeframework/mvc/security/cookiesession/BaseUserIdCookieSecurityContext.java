@@ -38,7 +38,7 @@ import org.primeframework.mvc.util.CookieTools;
  *
  * @author Brady Wied
  */
-public abstract class UserIDCookieSessionSecurityContext implements UserLoginSecurityContext {
+public abstract class BaseUserIdCookieSecurityContext implements UserLoginSecurityContext {
   private static final String ContextKey = "primeLoginContext";
 
   public static final String UserKey = "primeCurrentUser";
@@ -59,14 +59,14 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
 
   private final Duration sessionTimeout;
 
-  private final SessionContextFactory sessionContextFactory;
+  private final UserIdSessionContextProvider userIdSessionContextProvider;
 
-  private final Class<? extends SerializedSessionContext> sessionClass;
+  private final Class<? extends UserIdSessionContext> sessionClass;
 
-  protected UserIDCookieSessionSecurityContext(HTTPRequest request, HTTPResponse response, Encryptor encryptor, ObjectMapper objectMapper,
-                                               Clock clock, Duration sessionTimeout, Duration sessionMaxAge,
-                                               SessionContextFactory sessionContextFactory,
-                                               Class<? extends SerializedSessionContext> sessionClass) {
+  protected BaseUserIdCookieSecurityContext(HTTPRequest request, HTTPResponse response, Encryptor encryptor, ObjectMapper objectMapper,
+                                            Clock clock, Duration sessionTimeout, Duration sessionMaxAge,
+                                            UserIdSessionContextProvider userIdSessionContextProvider,
+                                            Class<? extends UserIdSessionContext> sessionClass) {
     this.request = request;
     this.response = response;
     this.encryptor = encryptor;
@@ -74,7 +74,7 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
     this.clock = clock;
     this.sessionMaxAge = sessionMaxAge;
     this.sessionTimeout = sessionTimeout;
-    this.sessionContextFactory = sessionContextFactory;
+    this.userIdSessionContextProvider = userIdSessionContextProvider;
     this.sessionClass = sessionClass;
     long timeoutInSeconds = sessionTimeout.toSeconds();
     this.sessionCookie = new CookieProxy(getCookieName(), timeoutInSeconds, Cookie.SameSite.Strict);
@@ -124,7 +124,7 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
     if (user != null) {
       return user;
     }
-    SerializedSessionContext sessionContext = resolveContext();
+    UserIdSessionContext sessionContext = resolveContext();
     if (sessionContext == null) {
       return null;
     }
@@ -138,8 +138,8 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
    *
    * @return value from cookie, null if no existing session
    */
-  private SerializedSessionContext resolveContext() {
-    var context = (SerializedSessionContext) this.request.getAttribute(ContextKey);
+  private UserIdSessionContext resolveContext() {
+    var context = (UserIdSessionContext) this.request.getAttribute(ContextKey);
     if (context != null) {
       return context;
     }
@@ -196,7 +196,7 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
   @Override
   public String getSessionId() {
     return Optional.ofNullable(resolveContext())
-                   .map(SerializedSessionContext::sessionId)
+                   .map(UserIdSessionContext::sessionId)
                    .orElse(null);
   }
 
@@ -217,7 +217,7 @@ public abstract class UserIDCookieSessionSecurityContext implements UserLoginSec
       var id = getIdFromUser(user);
       var newSessionId = UUID.randomUUID();
       ZonedDateTime now = ZonedDateTime.now(clock);
-      var sessionContext = sessionContextFactory.create(id, newSessionId.toString(), now);
+      var sessionContext = userIdSessionContextProvider.get(id, newSessionId.toString(), now);
       var cookieValue = CookieTools.toJSONCookie(sessionContext, true, true, this.encryptor, this.objectMapper);
       this.sessionCookie.add(request, response, cookieValue);
     } catch (Exception e) {
