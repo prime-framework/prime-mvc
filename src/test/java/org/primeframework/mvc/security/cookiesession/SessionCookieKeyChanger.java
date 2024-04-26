@@ -10,6 +10,7 @@ import org.primeframework.mvc.MockConfiguration;
 import org.primeframework.mvc.security.DefaultCipherProvider;
 import org.primeframework.mvc.security.DefaultEncryptor;
 import org.primeframework.mvc.security.Encryptor;
+import org.primeframework.mvc.security.UserIdSessionContext;
 import org.primeframework.mvc.util.CookieTools;
 
 /**

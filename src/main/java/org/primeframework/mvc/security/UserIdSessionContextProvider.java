@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.security.cookiesession;
+package org.primeframework.mvc.security;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;

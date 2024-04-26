@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2024-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +13,35 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.security.cookiesession;
+package org.primeframework.mvc.security;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
-import org.primeframework.mvc.security.UserIdSessionContext;
-import org.primeframework.mvc.security.UserIdSessionContextProvider;
+/**
+ * Session container serialized as JSON into the cookie
+ *
+ * @author Brady Wied
+ */
+public interface UserIdSessionContext {
+  /**
+   * The User ID for the logged in user
+   *
+   * @return the user ID
+   */
+  UUID userId();
 
-public class MockUserIdSessionContextProvider implements UserIdSessionContextProvider {
-  @Override
-  public UserIdSessionContext get(UUID userId, String sessionId, ZonedDateTime loginInstant) {
-    return new MockUserIdSessionContext(userId, sessionId, loginInstant);
-  }
+  /**
+   * The session ID for the logged in user
+   *
+   * @return the session ID
+   */
+  String sessionId();
+
+  /**
+   * The instant the user logged in
+   *
+   * @return instant user logged in
+   */
+  ZonedDateTime loginInstant();
 }

@@ -14,6 +14,7 @@ import org.primeframework.mvc.MockConfiguration;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.cors.CORSConfigurationProvider;
 import org.primeframework.mvc.cors.NoCORSConfigurationProvider;
+import org.primeframework.mvc.security.UserIdSessionContextProvider;
 import org.primeframework.mvc.security.UserLoginSecurityContext;
 
 public class SessionTestModule extends AbstractModule {

@@ -10,7 +10,7 @@ import io.fusionauth.http.server.HTTPRequest;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.security.UserLoginSecurityContext;
 import org.primeframework.mvc.security.cookiesession.MockUser;
-import org.primeframework.mvc.security.cookiesession.BaseUserIdCookieSecurityContext;
+import org.primeframework.mvc.security.BaseUserIdCookieSecurityContext;
 
 @Action
 public class GetSessionInfoAction {

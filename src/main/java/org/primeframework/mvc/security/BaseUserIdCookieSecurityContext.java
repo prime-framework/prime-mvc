@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.security.cookiesession;
+package org.primeframework.mvc.security;
 
 import javax.crypto.BadPaddingException;
 import java.time.Clock;
@@ -27,9 +27,6 @@ import io.fusionauth.http.Cookie;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.ErrorException;
-import org.primeframework.mvc.security.CookieProxy;
-import org.primeframework.mvc.security.Encryptor;
-import org.primeframework.mvc.security.UserLoginSecurityContext;
 import org.primeframework.mvc.util.CookieTools;
 
 /**

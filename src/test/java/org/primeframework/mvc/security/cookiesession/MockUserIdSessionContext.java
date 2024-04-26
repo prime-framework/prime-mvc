@@ -20,6 +20,7 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.primeframework.mvc.security.UserIdSessionContext;
 
 public class MockUserIdSessionContext implements UserIdSessionContext {
   @JsonProperty

@@ -24,7 +24,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
+import org.primeframework.mvc.security.BaseUserIdCookieSecurityContext;
 import org.primeframework.mvc.security.Encryptor;
+import org.primeframework.mvc.security.UserIdSessionContextProvider;
 
 public class MockBaseUserIdCookieSecurityContext extends BaseUserIdCookieSecurityContext {
   @Inject
