@@ -35,21 +35,21 @@ import org.primeframework.mvc.util.CookieTools;
  * @author Brady Wied
  */
 public abstract class BaseUserIdCookieSecurityContext implements UserLoginSecurityContext {
-  private static final String ContextKey = "primeLoginContext";
-
   public static final String UserKey = "primeCurrentUser";
 
-  private final HTTPRequest request;
+  private static final String ContextKey = "primeLoginContext";
 
-  private final HTTPResponse response;
+  protected final CookieProxy sessionCookie;
+
+  private final Clock clock;
 
   private final Encryptor encryptor;
 
   private final ObjectMapper objectMapper;
 
-  protected final CookieProxy sessionCookie;
+  private final HTTPRequest request;
 
-  private final Clock clock;
+  private final HTTPResponse response;
 
   private final Duration sessionMaxAge;
 
@@ -70,39 +70,6 @@ public abstract class BaseUserIdCookieSecurityContext implements UserLoginSecuri
     this.userIdSessionContextProvider = userIdSessionContextProvider;
     long timeoutInSeconds = sessionTimeout.toSeconds();
     this.sessionCookie = new CookieProxy(getCookieName(), timeoutInSeconds, Cookie.SameSite.Strict);
-  }
-
-  protected String getCookieName() {
-    return UserKey;
-  }
-
-  enum CookieExtendResult {
-    // no extension needed
-    Keep,
-    // extend the cookie with the same value, but longer expiration time
-    Extend,
-    // the cookie is now invalid
-    Invalid
-  }
-
-  /**
-   * Figure out whether to extend cookie
-   *
-   * @param signInTime when user signed in originally
-   * @return correct cookie behavior
-   */
-  CookieExtendResult shouldExtendCookie(ZonedDateTime signInTime) {
-    var now = ZonedDateTime.now(clock);
-    var maxSessionAgeTime = signInTime.plus(sessionMaxAge);
-    if (now.isAfter(maxSessionAgeTime)) {
-      return CookieExtendResult.Invalid;
-    }
-    var extensionTime = now.plus(sessionTimeout);
-    if (extensionTime.isAfter(maxSessionAgeTime)) {
-      return CookieExtendResult.Keep;
-    }
-    var halfWayPoint = signInTime.plusMinutes(sessionTimeout.toMinutes() / 2);
-    return now.isAfter(halfWayPoint) ? CookieExtendResult.Extend : CookieExtendResult.Keep;
   }
 
   /**
@@ -126,11 +93,111 @@ public abstract class BaseUserIdCookieSecurityContext implements UserLoginSecuri
   }
 
   /**
+   * The current session ID
+   *
+   * @return the session ID, if a session exists, otherwise null
+   */
+  @Override
+  public String getSessionId() {
+    return Optional.ofNullable(resolveContext())
+                   .map(UserIdSessionContext::sessionId)
+                   .orElse(null);
+  }
+
+  @Override
+  public boolean isLoggedIn() {
+    // user MIGHT a DB query to hydrate the user so we can do a lighter weight check
+    return resolveContext() != null;
+  }
+
+  /**
+   * Sets a cookie to log the user in
+   *
+   * @param user The user
+   */
+  @Override
+  public void login(Object user) {
+    try {
+      var id = getIdFromUser(user);
+      ZonedDateTime now = ZonedDateTime.now(clock);
+      var sessionContext = userIdSessionContextProvider.get(id, now);
+      var cookieValue = CookieTools.toJSONCookie(sessionContext, true, true, this.encryptor, this.objectMapper);
+      this.sessionCookie.add(request, response, cookieValue);
+    } catch (Exception e) {
+      // no partial state
+      deleteCookies();
+      throw new ErrorException(e);
+    }
+  }
+
+  @Override
+  public void logout() {
+    deleteCookies();
+  }
+
+  /**
+   * Ensures any other usages of getCurrentUser in the current request cycle are updated
+   *
+   * @param user The user to update
+   */
+  @Override
+  public void updateUser(Object user) {
+    Object currentUser = request.getAttribute(UserKey);
+    if (currentUser != null) {
+      request.setAttribute(UserKey, user);
+    }
+  }
+
+  protected String getCookieName() {
+    return UserKey;
+  }
+
+  /**
+   * Get the ID from the supplied user object
+   *
+   * @param user user to retrieve the ID for
+   * @return ID of the user
+   */
+  protected abstract Object getIdFromUser(Object user);
+
+  /**
    * What is the session context class
    *
    * @return the class
    */
   protected abstract Class<? extends UserIdSessionContext> getUserIdSessionContextClass();
+
+  /**
+   * Hydrates/retrieves the user based on ID
+   *
+   * @param id unique ID for the user
+   * @return the object representing the user
+   */
+  protected abstract Object retrieveUserById(Object id);
+
+  /**
+   * Figure out whether to extend cookie
+   *
+   * @param signInTime when user signed in originally
+   * @return correct cookie behavior
+   */
+  CookieExtendResult shouldExtendCookie(ZonedDateTime signInTime) {
+    var now = ZonedDateTime.now(clock);
+    var maxSessionAgeTime = signInTime.plus(sessionMaxAge);
+    if (now.isAfter(maxSessionAgeTime)) {
+      return CookieExtendResult.Invalid;
+    }
+    var extensionTime = now.plus(sessionTimeout);
+    if (extensionTime.isAfter(maxSessionAgeTime)) {
+      return CookieExtendResult.Keep;
+    }
+    var halfWayPoint = signInTime.plusMinutes(sessionTimeout.toMinutes() / 2);
+    return now.isAfter(halfWayPoint) ? CookieExtendResult.Extend : CookieExtendResult.Keep;
+  }
+
+  private void deleteCookies() {
+    this.sessionCookie.delete(request, response);
+  }
 
   /**
    * Get existing deserialized session context from cookie
@@ -171,79 +238,12 @@ public abstract class BaseUserIdCookieSecurityContext implements UserLoginSecuri
     }
   }
 
-  /**
-   * Hydrates/retrieves the user based on ID
-   *
-   * @param id unique ID for the user
-   * @return the object representing the user
-   */
-  protected abstract Object retrieveUserById(Object id);
-
-  /**
-   * Get the ID from the supplied user object
-   *
-   * @param user user to retrieve the ID for
-   * @return ID of the user
-   */
-  protected abstract Object getIdFromUser(Object user);
-
-  /**
-   * The current session ID
-   *
-   * @return the session ID, if a session exists, otherwise null
-   */
-  @Override
-  public String getSessionId() {
-    return Optional.ofNullable(resolveContext())
-                   .map(UserIdSessionContext::sessionId)
-                   .orElse(null);
-  }
-
-  @Override
-  public boolean isLoggedIn() {
-    // user MIGHT a DB query to hydrate the user so we can do a lighter weight check
-    return resolveContext() != null;
-  }
-
-  /**
-   * Sets a cookie to log the user in
-   *
-   * @param user The user
-   */
-  @Override
-  public void login(Object user) {
-    try {
-      var id = getIdFromUser(user);
-      ZonedDateTime now = ZonedDateTime.now(clock);
-      var sessionContext = userIdSessionContextProvider.get(id, now);
-      var cookieValue = CookieTools.toJSONCookie(sessionContext, true, true, this.encryptor, this.objectMapper);
-      this.sessionCookie.add(request, response, cookieValue);
-    } catch (Exception e) {
-      // no partial state
-      deleteCookies();
-      throw new ErrorException(e);
-    }
-  }
-
-  private void deleteCookies() {
-    this.sessionCookie.delete(request, response);
-  }
-
-  @Override
-  public void logout() {
-    deleteCookies();
-  }
-
-  /**
-   * Ensures any other usages of getCurrentUser in the current request cycle are updated
-   *
-   * @param user The user to update
-   */
-  @Override
-  public void updateUser(Object user) {
-    Object currentUser = request.getAttribute(UserKey);
-    if (currentUser != null) {
-      request.setAttribute(UserKey, user);
-    }
+  enum CookieExtendResult {
+    // no extension needed
+    Keep,
+    // extend the cookie with the same value, but longer expiration time
+    Extend,
+    // the cookie is now invalid
+    Invalid
   }
 }
