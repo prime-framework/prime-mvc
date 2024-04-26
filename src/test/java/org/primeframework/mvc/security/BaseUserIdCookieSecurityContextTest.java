@@ -45,37 +45,13 @@ import static org.testng.Assert.assertTrue;
 public class BaseUserIdCookieSecurityContextTest {
   private static final String UserKey = BaseUserIdCookieSecurityContext.UserKey;
 
+  private static Clock mockClock;
+
   private static ZonedDateTime mockClockNow;
 
   private static RequestSimulator simulator;
 
-  private static Clock mockClock;
-
-  private static void resetMockClock() {
-    mockClock = Clock.fixed(Instant.ofEpochSecond(42), ZoneId.of("UTC"));
-    mockClockNow = mockClock.instant().atZone(ZoneId.of("UTC"));
-  }
-
   @Inject private SessionCookieKeyChanger cookieKeyChanger;
-
-  // makes it easier to see why we "start" an HTTP server twice in test runs
-  @AfterClass
-  public void shutdown() {
-    simulator.shutdown();
-  }
-
-  @AfterMethod
-  public void afterMethod() {
-    HTTPObjectsHolder.clearRequest();
-    HTTPObjectsHolder.clearResponse();
-  }
-
-  @BeforeClass
-  public void startItUp() {
-    resetMockClock();
-    simulator = buildSimulator(new SessionTestModule(() -> mockClock));
-    simulator.getInjector().injectMembers(this);
-  }
 
   private static RequestSimulator buildSimulator(SessionTestModule module) {
     // PrimeBaseTest uses 9080
@@ -84,25 +60,100 @@ public class BaseUserIdCookieSecurityContextTest {
     return new RequestSimulator(main, new TestMessageObserver());
   }
 
-  @BeforeMethod
-  void cleanup() {
-    simulator.reset();
-    resetMockClock();
+  private static String getSessionID(RequestResult response) {
+    var pattern = Pattern.compile(".*the session ID is (\\S+).*", Pattern.MULTILINE | Pattern.DOTALL);
+    var matcher = pattern.matcher(response.getBodyAsString());
+    assertTrue(matcher.matches());
+    return matcher.group(1);
   }
 
-  private RequestResult getSessionInfo() {
-    var requestBuilder = simulator.test("/security/cookiesession/get-session-info");
-    return requestBuilder.get();
+  private static void resetMockClock() {
+    mockClock = Clock.fixed(Instant.ofEpochSecond(42), ZoneId.of("UTC"));
+    mockClockNow = mockClock.instant().atZone(ZoneId.of("UTC"));
   }
 
-  private RequestResult doLogin(int expectedStatusCode) {
-    return simulator.test("/security/cookiesession/do-login").get().assertStatusCode(expectedStatusCode);
+  @AfterMethod
+  public void afterMethod() {
+    HTTPObjectsHolder.clearRequest();
+    HTTPObjectsHolder.clearResponse();
   }
 
   @Test
-  public void getCurrentUser_no_session() {
-    // act + assert
-    getSessionInfo().assertBodyContains("the current user is (no user)");
+  public void cookie_encryption_key_changed() {
+    // arrange
+    doLogin(200);
+    // if this key changes, the user's browser will still supply a cookie, but it will fail to be decrypted
+    // and if not handled properly, will stack trace and the user cannot get back in
+
+    // act
+    var existingCookie = simulator.userAgent.getCookie(UserKey);
+    cookieKeyChanger.changeIt(existingCookie);
+
+    // assert
+    getSessionInfo().assertBodyContains("the session ID is (no session)").assertBodyContains("logged in no").assertBodyContains("the current user is (no user)");
+  }
+
+  @DataProvider(name = "cookieActionData")
+  public Object[][] extendCookieData() {
+    return new Object[][]{
+        {
+            "less_than_halfway_through_timeout",
+            mockClockNow,
+            Duration.ofDays(1),
+            Duration.ofMinutes(30),
+            CookieExtendResult.Keep
+        },
+        {
+            "halfway_through_timeout",
+            mockClockNow.minusMinutes(15),
+            Duration.ofDays(1),
+            Duration.ofMinutes(30),
+            CookieExtendResult.Keep
+        },
+        {
+            "more_than_halfway_through_timeout",
+            mockClockNow.minusMinutes(16),
+            Duration.ofDays(1),
+            Duration.ofMinutes(30),
+            CookieExtendResult.Extend
+        },
+        {
+            "almost_max_age",
+            mockClockNow.minusMinutes(10),
+            Duration.ofMinutes(30),
+            Duration.ofMinutes(30),
+            CookieExtendResult.Keep
+        },
+        {
+            "equals_max_age",
+            mockClockNow.minusMinutes(30),
+            Duration.ofMinutes(30),
+            Duration.ofMinutes(30),
+            CookieExtendResult.Keep
+        },
+        {
+            "past_max_age",
+            mockClockNow.minusMinutes(60),
+            Duration.ofMinutes(30),
+            Duration.ofMinutes(30),
+            CookieExtendResult.Invalid
+        }
+    };
+  }
+
+  @Test
+  public void getCurrentUser_extend() {
+    // arrange
+    doLogin(200);
+    var moreThanHalf = mockClockNow.plusMinutes(4);
+    mockClock = Clock.fixed(moreThanHalf.toInstant(), ZoneId.of("UTC"));
+
+    // act
+    var result = getSessionInfo();
+
+    // assert
+    // normally the cookie will not be set again with a different max age
+    result.assertContainsCookie(UserKey);
   }
 
   @Test
@@ -125,21 +176,6 @@ public class BaseUserIdCookieSecurityContextTest {
   }
 
   @Test
-  public void getCurrentUser_extend() {
-    // arrange
-    doLogin(200);
-    var moreThanHalf = mockClockNow.plusMinutes(4);
-    mockClock = Clock.fixed(moreThanHalf.toInstant(), ZoneId.of("UTC"));
-
-    // act
-    var result = getSessionInfo();
-
-    // assert
-    // normally the cookie will not be set again with a different max age
-    result.assertContainsCookie(UserKey);
-  }
-
-  @Test
   public void getCurrentUser_no_extend() {
     // arrange
     doLogin(200);
@@ -156,9 +192,9 @@ public class BaseUserIdCookieSecurityContextTest {
   }
 
   @Test
-  public void getSessionId_no_session() {
+  public void getCurrentUser_no_session() {
     // act + assert
-    getSessionInfo().assertBodyContains("the session ID is (no session)");
+    getSessionInfo().assertBodyContains("the current user is (no user)");
   }
 
   @Test
@@ -171,9 +207,9 @@ public class BaseUserIdCookieSecurityContextTest {
   }
 
   @Test
-  public void isLoggedIn_no_session() {
+  public void getSessionId_no_session() {
     // act + assert
-    getSessionInfo().assertBodyContains("logged in no");
+    getSessionInfo().assertBodyContains("the session ID is (no session)");
   }
 
   @Test
@@ -183,6 +219,12 @@ public class BaseUserIdCookieSecurityContextTest {
 
     // act + assert
     getSessionInfo().assertBodyContains("logged in yes");
+  }
+
+  @Test
+  public void isLoggedIn_no_session() {
+    // act + assert
+    getSessionInfo().assertBodyContains("logged in no");
   }
 
   @Test
@@ -208,11 +250,31 @@ public class BaseUserIdCookieSecurityContextTest {
     getSessionInfo().assertBodyContains("the session ID is (no session)").assertBodyContains("logged in no").assertBodyContains("the current user is (no user)");
   }
 
-  private static String getSessionID(RequestResult response) {
-    var pattern = Pattern.compile(".*the session ID is (\\S+).*", Pattern.MULTILINE | Pattern.DOTALL);
-    var matcher = pattern.matcher(response.getBodyAsString());
-    assertTrue(matcher.matches());
-    return matcher.group(1);
+  @Test(dataProvider = "cookieActionData")
+  public void shouldExtendCookie(String label, ZonedDateTime signInTime, Duration maxSessionAge, Duration sessionTimeout,
+                                 CookieExtendResult expectedResult) {
+    // arrange
+    // we don't need most of these dependencies to test this
+    var securityContext = new MockBaseUserIdCookieSecurityContext(null, null, null, null, mockClock, sessionTimeout, maxSessionAge, null);
+
+    // act
+    var actualResult = securityContext.shouldExtendCookie(signInTime);
+
+    // assert
+    assertEquals(actualResult, expectedResult);
+  }
+
+  // makes it easier to see why we "start" an HTTP server twice in test runs
+  @AfterClass
+  public void shutdown() {
+    simulator.shutdown();
+  }
+
+  @BeforeClass
+  public void startItUp() {
+    resetMockClock();
+    simulator = buildSimulator(new SessionTestModule(() -> mockClock));
+    simulator.getInjector().injectMembers(this);
   }
 
   @Test
@@ -234,37 +296,18 @@ public class BaseUserIdCookieSecurityContextTest {
     getSessionInfo().assertBodyContains("the session ID is " + previousSessionId).assertBodyContains("the current user is bob");
   }
 
-  @Test
-  public void cookie_encryption_key_changed() {
-    // arrange
-    doLogin(200);
-    // if this key changes, the user's browser will still supply a cookie, but it will fail to be decrypted
-    // and if not handled properly, will stack trace and the user cannot get back in
-
-    // act
-    var existingCookie = simulator.userAgent.getCookie(UserKey);
-    cookieKeyChanger.changeIt(existingCookie);
-
-    // assert
-    getSessionInfo().assertBodyContains("the session ID is (no session)").assertBodyContains("logged in no").assertBodyContains("the current user is (no user)");
+  @BeforeMethod
+  void cleanup() {
+    simulator.reset();
+    resetMockClock();
   }
 
-  @DataProvider(name = "cookieActionData")
-  public Object[][] extendCookieData() {
-    return new Object[][]{{"less_than_halfway_through_timeout", mockClockNow, Duration.ofDays(1), Duration.ofMinutes(30), CookieExtendResult.Keep}, {"halfway_through_timeout", mockClockNow.minusMinutes(15), Duration.ofDays(1), Duration.ofMinutes(30), CookieExtendResult.Keep}, {"more_than_halfway_through_timeout", mockClockNow.minusMinutes(16), Duration.ofDays(1), Duration.ofMinutes(30), CookieExtendResult.Extend}, {"almost_max_age", mockClockNow.minusMinutes(10), Duration.ofMinutes(30), Duration.ofMinutes(30), CookieExtendResult.Keep}, {"equals_max_age", mockClockNow.minusMinutes(30), Duration.ofMinutes(30), Duration.ofMinutes(30), CookieExtendResult.Keep}, {"past_max_age", mockClockNow.minusMinutes(60), Duration.ofMinutes(30), Duration.ofMinutes(30), CookieExtendResult.Invalid}};
+  private RequestResult doLogin(int expectedStatusCode) {
+    return simulator.test("/security/cookiesession/do-login").get().assertStatusCode(expectedStatusCode);
   }
 
-  @Test(dataProvider = "cookieActionData")
-  public void shouldExtendCookie(String label, ZonedDateTime signInTime, Duration maxSessionAge, Duration sessionTimeout,
-                                 CookieExtendResult expectedResult) {
-    // arrange
-    // we don't need most of these dependencies to test this
-    var securityContext = new MockBaseUserIdCookieSecurityContext(null, null, null, null, mockClock, sessionTimeout, maxSessionAge, null);
-
-    // act
-    var actualResult = securityContext.shouldExtendCookie(signInTime);
-
-    // assert
-    assertEquals(actualResult, expectedResult);
+  private RequestResult getSessionInfo() {
+    var requestBuilder = simulator.test("/security/cookiesession/get-session-info");
+    return requestBuilder.get();
   }
 }

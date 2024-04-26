@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2022-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,15 +39,15 @@ public class CORSConfiguration implements Buildable<CORSConfiguration> {
 
   public boolean debug;
 
+  public Predicate<String> excludeUriPredicate;
+
   public Pattern excludedPathPattern;
 
-  public Pattern includedPathPattern;
-
-  public Predicate<String> excludeUriPredicate;
+  public List<String> exposedHeaders = new ArrayList<>();
 
   public Predicate<String> includeUriPredicate;
 
-  public List<String> exposedHeaders = new ArrayList<>();
+  public Pattern includedPathPattern;
 
   public int preflightMaxAgeInSeconds;
 
@@ -64,12 +64,12 @@ public class CORSConfiguration implements Buildable<CORSConfiguration> {
     }
     CORSConfiguration that = (CORSConfiguration) o;
     return allowCredentials == that.allowCredentials &&
-        debug == that.debug &&
-        preflightMaxAgeInSeconds == that.preflightMaxAgeInSeconds &&
-        Objects.equals(allowedHeaders, that.allowedHeaders) &&
-        Objects.equals(allowedMethods, that.allowedMethods) &&
-        Objects.equals(allowedOrigins, that.allowedOrigins) &&
-        Objects.equals(exposedHeaders, that.exposedHeaders);
+           debug == that.debug &&
+           preflightMaxAgeInSeconds == that.preflightMaxAgeInSeconds &&
+           Objects.equals(allowedHeaders, that.allowedHeaders) &&
+           Objects.equals(allowedMethods, that.allowedMethods) &&
+           Objects.equals(allowedOrigins, that.allowedOrigins) &&
+           Objects.equals(exposedHeaders, that.exposedHeaders);
   }
 
   @Override
@@ -105,6 +105,41 @@ public class CORSConfiguration implements Buildable<CORSConfiguration> {
     return this;
   }
 
+  public CORSConfiguration withExcludeUriPredicate(Predicate<String> excludeUriPredicate) {
+    this.excludeUriPredicate = excludeUriPredicate;
+    checkExclusiveMatching();
+    return this;
+  }
+
+  public CORSConfiguration withExcludedPathPattern(Pattern pattern) {
+    this.excludedPathPattern = pattern;
+    checkExclusiveMatching();
+    return this;
+  }
+
+  public CORSConfiguration withExposedHeaders(String... headers) {
+    this.exposedHeaders.clear();
+    this.exposedHeaders.addAll(List.of(headers));
+    return this;
+  }
+
+  public CORSConfiguration withIncludeUriPredicate(Predicate<String> includeUriPredicate) {
+    this.includeUriPredicate = includeUriPredicate;
+    checkExclusiveMatching();
+    return this;
+  }
+
+  public CORSConfiguration withIncludedPathPattern(Pattern pattern) {
+    this.includedPathPattern = pattern;
+    checkExclusiveMatching();
+    return this;
+  }
+
+  public CORSConfiguration withPreflightMaxAgeInSeconds(int maxAge) {
+    this.preflightMaxAgeInSeconds = maxAge;
+    return this;
+  }
+
   private void checkExclusiveMatching() {
     if (excludedPathPattern != null && includedPathPattern != null) {
       throw new IllegalStateException("You cannot use both withExcludedPathPattern and withIncludedPathPattern. You must use one or the other.");
@@ -116,40 +151,5 @@ public class CORSConfiguration implements Buildable<CORSConfiguration> {
         (excludedPathPattern != null ^ includedPathPattern != null)) {
       throw new IllegalStateException("You cannot use both a path (withIncludedPathPattern/withExcludedPathPattern) and predicate based (withIncludeUriPredicate/withExcludeUriPredicate). You must use one or the other.");
     }
-  }
-
-  public CORSConfiguration withExcludedPathPattern(Pattern pattern) {
-    this.excludedPathPattern = pattern;
-    checkExclusiveMatching();
-    return this;
-  }
-
-  public CORSConfiguration withIncludedPathPattern(Pattern pattern) {
-    this.includedPathPattern = pattern;
-    checkExclusiveMatching();
-    return this;
-  }
-
-  public CORSConfiguration withExcludeUriPredicate(Predicate<String> excludeUriPredicate) {
-    this.excludeUriPredicate = excludeUriPredicate;
-    checkExclusiveMatching();
-    return this;
-  }
-
-  public CORSConfiguration withIncludeUriPredicate(Predicate<String> includeUriPredicate) {
-    this.includeUriPredicate = includeUriPredicate;
-    checkExclusiveMatching();
-    return this;
-  }
-
-  public CORSConfiguration withExposedHeaders(String... headers) {
-    this.exposedHeaders.clear();
-    this.exposedHeaders.addAll(List.of(headers));
-    return this;
-  }
-
-  public CORSConfiguration withPreflightMaxAgeInSeconds(int maxAge) {
-    this.preflightMaxAgeInSeconds = maxAge;
-    return this;
   }
 }

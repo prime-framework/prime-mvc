@@ -33,7 +33,7 @@ public interface UserIdSessionContext<TUserId> {
   /**
    * When a login occurs, the BaseUserIdCookieSecurityContext will set the moment of login on the object
    *
-   * @param time login time
+   * @param loginInstant login time
    */
   void setLoginInstant(ZonedDateTime loginInstant);
 

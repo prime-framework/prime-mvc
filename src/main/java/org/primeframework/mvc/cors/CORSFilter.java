@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2022-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -113,15 +113,14 @@ public final class CORSFilter {
   private CORSDebugger debugger;
 
   /**
+   * Allow a predicate to decide whether to exclude in CORS
+   */
+  private Predicate<String> excludePredicate;
+
+  /**
    * Regex for excluding URI patterns from CORS filter processing
    */
   private Pattern excludedPathPattern;
-
-  /**
-   * Regex for including URI patterns from CORS filter processing
-   */
-
-  private Pattern includedPathPattern;
 
   /**
    * Allow a predicate to decide whether to include in CORS
@@ -129,9 +128,10 @@ public final class CORSFilter {
   private Predicate<String> includeUriChecker;
 
   /**
-   * Allow a predicate to decide whether to exclude in CORS
+   * Regex for including URI patterns from CORS filter processing
    */
-  private Predicate<String> excludePredicate;
+
+  private Pattern includedPathPattern;
 
   /**
    * Indicates (in seconds) how long the results of a pre-flight request can be cached in a pre-flight result cache.
@@ -238,6 +238,11 @@ public final class CORSFilter {
     return this;
   }
 
+  public CORSFilter withExcludePredicate(Predicate<String> excludePredicate) {
+    this.excludePredicate = excludePredicate;
+    return this;
+  }
+
   /**
    * Specifies a regex that matches paths that should be ignored for CORS (meaning they will always fail CORS and the
    * browser will not load them). This effectively protects these resources.
@@ -250,8 +255,11 @@ public final class CORSFilter {
     return this;
   }
 
-  public CORSFilter withIncludedPathPattern(Pattern pattern) {
-    this.includedPathPattern = pattern;
+  public CORSFilter withExposedHeaders(List<String> headers) {
+    if (headers != null) {
+      this.exposedHeaders.clear();
+      this.exposedHeaders.addAll(headers);
+    }
     return this;
   }
 
@@ -260,16 +268,8 @@ public final class CORSFilter {
     return this;
   }
 
-  public CORSFilter withExcludePredicate(Predicate<String> excludePredicate) {
-    this.excludePredicate = excludePredicate;
-    return this;
-  }
-
-  public CORSFilter withExposedHeaders(List<String> headers) {
-    if (headers != null) {
-      this.exposedHeaders.clear();
-      this.exposedHeaders.addAll(headers);
-    }
+  public CORSFilter withIncludedPathPattern(Pattern pattern) {
+    this.includedPathPattern = pattern;
     return this;
   }
 
@@ -603,12 +603,9 @@ public final class CORSFilter {
       case PreFlightUnexpected -> "Invalid request. Not expecting a preflight request from URI [" + reasonValue + "].";
       case SimpleMethodNotAllowed -> "Invalid Simple CORS request. HTTP method not allowed. [" + reasonValue + "]";
       case SimpleOriginNotAllowed -> "Invalid Simple CORS request. Origin not allowed. [" + reasonValue + "]";
-      case PreFlightHeaderNotAllowed ->
-          "Invalid CORS pre-flight request. HTTP header not allowed. [" + reasonValue + "]";
-      case PreFlightMethodNotAllowed ->
-          "Invalid CORS pre-flight request. HTTP method not allowed. [" + reasonValue + "]";
-      case PreFlightMethodNotRecognized ->
-          "Invalid CORS pre-flight request. HTTP method not recognized. [" + reasonValue + "]";
+      case PreFlightHeaderNotAllowed -> "Invalid CORS pre-flight request. HTTP header not allowed. [" + reasonValue + "]";
+      case PreFlightMethodNotAllowed -> "Invalid CORS pre-flight request. HTTP method not allowed. [" + reasonValue + "]";
+      case PreFlightMethodNotRecognized -> "Invalid CORS pre-flight request. HTTP method not recognized. [" + reasonValue + "]";
       case PreFlightOriginNotAllowed -> "Invalid CORS pre-flight request. Origin not allowed. [" + reasonValue + "]";
       case UnhandledCORSRequestType -> "Invalid request. Unhandled CORS request type [" + reasonValue + "].";
     };

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2022-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,14 @@ import static org.testng.Assert.expectThrows;
  * @author Brian Pontarelli
  */
 public class CORSFilterTest extends PrimeBaseTest {
+  @DataProvider(name = "get_included_path_pattern")
+  private static Object[][] getIncludeExcludes() {
+    return new Object[][]{
+        {"/foo", false},
+        {"/admin/foo", true}
+    };
+  }
+
   @AfterMethod
   public void afterMethod() {
     super.afterMethod();
@@ -195,12 +203,83 @@ public class CORSFilterTest extends PrimeBaseTest {
     assertNoCORSHeaders(response);
   }
 
-  @DataProvider(name = "get_included_path_pattern")
-  private static Object[][] getIncludeExcludes() {
-    return new Object[][]{
-        {"/foo", false},
-        {"/admin/foo", true}
-    };
+  @Test
+  public void included_and_excluded_uri_checker_supplied() {
+    var exception = expectThrows(IllegalStateException.class, () -> new CORSConfiguration().withAllowCredentials(true)
+                                                                                           .withAllowedMethods(HTTPMethod.GET, HTTPMethod.POST, HTTPMethod.HEAD, HTTPMethod.OPTIONS, HTTPMethod.PUT, HTTPMethod.DELETE)
+                                                                                           .withAllowedHeaders("Accept", "Access-Control-Request-Headers", "Access-Control-Request-Method", "Authorization", "Content-Type", "Last-Modified", "Origin", "X-FusionAuth-TenantId", "X-Requested-With")
+                                                                                           .withAllowedOrigins(URI.create("*"))
+                                                                                           .withIncludeUriPredicate(s -> true)
+                                                                                           .withExcludeUriPredicate(s -> true)
+                                                                                           .withExposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")
+                                                                                           .withPreflightMaxAgeInSeconds(1800));
+    assertEquals(exception.getMessage(),
+                 "You cannot use both withIncludeUriPredicate and withExcludeUriPredicate. You must use one or the other.");
+  }
+
+  @Test
+  public void included_path_and_excluded_path_supplied() {
+    // arrange + act + assert
+    var exception = expectThrows(IllegalStateException.class, () -> new CORSConfiguration().withAllowCredentials(true)
+                                                                                           .withAllowedMethods(HTTPMethod.GET, HTTPMethod.POST, HTTPMethod.HEAD, HTTPMethod.OPTIONS, HTTPMethod.PUT, HTTPMethod.DELETE)
+                                                                                           .withAllowedHeaders("Accept", "Access-Control-Request-Headers", "Access-Control-Request-Method", "Authorization", "Content-Type", "Last-Modified", "Origin", "X-FusionAuth-TenantId", "X-Requested-With")
+                                                                                           .withAllowedOrigins(URI.create("*"))
+                                                                                           .withExcludedPathPattern(Pattern.compile("does not matter"))
+                                                                                           .withIncludedPathPattern(Pattern.compile("does not matter"))
+                                                                                           .withExposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")
+                                                                                           .withPreflightMaxAgeInSeconds(1800));
+    assertEquals(exception.getMessage(),
+                 "You cannot use both withExcludedPathPattern and withIncludedPathPattern. You must use one or the other.");
+  }
+
+  @Test
+  public void options() throws Exception {
+    // Pass through with default configuration
+    HttpClient client = HttpClient.newBuilder().followRedirects(Redirect.NEVER).priority(256).build();
+    HttpResponse<Void> response = client.send(
+        HttpRequest.newBuilder(URI.create("http://localhost:9080/api/status"))
+                   .method("OPTIONS", BodyPublishers.noBody())
+                   .header("Access-Control-Request-Method", "POST")
+                   .header("Access-Control-Request-Headers", "X-FusionAuth-TenantId")
+                   .header("Origin", "https://jackinthebox.com")
+                   .build(),
+        BodyHandlers.discarding()
+    );
+    assertEquals(response.statusCode(), 204);
+    assertEquals(response.headers().firstValue("Access-Control-Allow-Credentials").orElse(null), "true");
+    assertEquals(response.headers().firstValue("Access-Control-Allow-Headers").orElse(null), "Accept,Access-Control-Request-Headers,Access-Control-Request-Method,Authorization,Content-Type,Last-Modified,Origin,X-FusionAuth-TenantId,X-Requested-With");
+    assertEquals(response.headers().firstValue("Access-Control-Allow-Methods").orElse(null), "POST");
+    assertEquals(response.headers().firstValue("Access-Control-Max-Age").orElse(null), "1800");
+    assertEquals(response.headers().firstValue("Access-Control-Allow-Origin").orElse(null), "https://jackinthebox.com");
+    assertNull(response.headers().firstValue("Access-Control-Expose-Headers").orElse(null));
+    assertEquals(response.headers().firstValue("Vary").orElse(null), "Origin");
+  }
+
+  @Test(dataProvider = "get_included_path_pattern")
+  public void options_excluded_uri_checker(String path, boolean expectCorsAllow) throws Exception {
+    // arrange
+    corsConfiguration = new CORSConfiguration().withAllowCredentials(true)
+                                               .withAllowedMethods(HTTPMethod.GET, HTTPMethod.POST, HTTPMethod.HEAD, HTTPMethod.OPTIONS, HTTPMethod.PUT, HTTPMethod.DELETE)
+                                               .withAllowedHeaders("Accept", "Access-Control-Request-Headers", "Access-Control-Request-Method", "Authorization", "Content-Type", "Last-Modified", "Origin", "X-FusionAuth-TenantId", "X-Requested-With")
+                                               .withAllowedOrigins(URI.create("*"))
+                                               .withExcludeUriPredicate(u -> u.startsWith("/foo"))
+                                               .withExposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")
+                                               .withPreflightMaxAgeInSeconds(1800);
+
+    // act
+    HttpClient client = HttpClient.newBuilder().followRedirects(Redirect.NEVER).priority(256).build();
+    HttpResponse<Void> response = client.send(
+        HttpRequest.newBuilder(URI.create("http://localhost:9080" + path))
+                   .method("OPTIONS", BodyPublishers.noBody())
+                   .header("Access-Control-Request-Method", "GET")
+                   .header("Origin", "https://jackinthebox.com")
+                   .build(),
+        BodyHandlers.discarding()
+    );
+
+    // assert
+    var expectedStatus = expectCorsAllow ? 204 : 403;
+    assertEquals(response.statusCode(), expectedStatus);
   }
 
   @Test(dataProvider = "get_included_path_pattern")
@@ -271,99 +350,6 @@ public class CORSFilterTest extends PrimeBaseTest {
     assertEquals(response.headers().firstValue("Access-Control-Allow-Credentials").orElse(null), "true");
     assertEquals(response.headers().firstValue("Access-Control-Allow-Headers").orElse(null), "Accept,Access-Control-Request-Headers,Access-Control-Request-Method,Authorization,Content-Type,Last-Modified,Origin,X-FusionAuth-TenantId,X-Requested-With");
     assertEquals(response.headers().firstValue("Access-Control-Allow-Methods").orElse(null), "GET");
-    assertEquals(response.headers().firstValue("Access-Control-Max-Age").orElse(null), "1800");
-    assertEquals(response.headers().firstValue("Access-Control-Allow-Origin").orElse(null), "https://jackinthebox.com");
-    assertNull(response.headers().firstValue("Access-Control-Expose-Headers").orElse(null));
-    assertEquals(response.headers().firstValue("Vary").orElse(null), "Origin");
-  }
-
-  @Test(dataProvider = "get_included_path_pattern")
-  public void options_excluded_uri_checker(String path, boolean expectCorsAllow) throws Exception {
-    // arrange
-    corsConfiguration = new CORSConfiguration().withAllowCredentials(true)
-                                               .withAllowedMethods(HTTPMethod.GET, HTTPMethod.POST, HTTPMethod.HEAD, HTTPMethod.OPTIONS, HTTPMethod.PUT, HTTPMethod.DELETE)
-                                               .withAllowedHeaders("Accept", "Access-Control-Request-Headers", "Access-Control-Request-Method", "Authorization", "Content-Type", "Last-Modified", "Origin", "X-FusionAuth-TenantId", "X-Requested-With")
-                                               .withAllowedOrigins(URI.create("*"))
-                                               .withExcludeUriPredicate(u -> u.startsWith("/foo"))
-                                               .withExposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")
-                                               .withPreflightMaxAgeInSeconds(1800);
-
-    // act
-    HttpClient client = HttpClient.newBuilder().followRedirects(Redirect.NEVER).priority(256).build();
-    HttpResponse<Void> response = client.send(
-        HttpRequest.newBuilder(URI.create("http://localhost:9080" + path))
-                   .method("OPTIONS", BodyPublishers.noBody())
-                   .header("Access-Control-Request-Method", "GET")
-                   .header("Origin", "https://jackinthebox.com")
-                   .build(),
-        BodyHandlers.discarding()
-    );
-
-    // assert
-    var expectedStatus = expectCorsAllow ? 204 : 403;
-    assertEquals(response.statusCode(), expectedStatus);
-  }
-
-  @Test
-  public void included_path_and_excluded_path_supplied() {
-    // arrange + act + assert
-    var exception = expectThrows(IllegalStateException.class, () -> new CORSConfiguration().withAllowCredentials(true)
-                                                                                           .withAllowedMethods(HTTPMethod.GET, HTTPMethod.POST, HTTPMethod.HEAD, HTTPMethod.OPTIONS, HTTPMethod.PUT, HTTPMethod.DELETE)
-                                                                                           .withAllowedHeaders("Accept", "Access-Control-Request-Headers", "Access-Control-Request-Method", "Authorization", "Content-Type", "Last-Modified", "Origin", "X-FusionAuth-TenantId", "X-Requested-With")
-                                                                                           .withAllowedOrigins(URI.create("*"))
-                                                                                           .withExcludedPathPattern(Pattern.compile("does not matter"))
-                                                                                           .withIncludedPathPattern(Pattern.compile("does not matter"))
-                                                                                           .withExposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")
-                                                                                           .withPreflightMaxAgeInSeconds(1800));
-    assertEquals(exception.getMessage(),
-                 "You cannot use both withExcludedPathPattern and withIncludedPathPattern. You must use one or the other.");
-  }
-
-  @Test
-  public void included_and_excluded_uri_checker_supplied() {
-    var exception = expectThrows(IllegalStateException.class, () -> new CORSConfiguration().withAllowCredentials(true)
-                                                                                           .withAllowedMethods(HTTPMethod.GET, HTTPMethod.POST, HTTPMethod.HEAD, HTTPMethod.OPTIONS, HTTPMethod.PUT, HTTPMethod.DELETE)
-                                                                                           .withAllowedHeaders("Accept", "Access-Control-Request-Headers", "Access-Control-Request-Method", "Authorization", "Content-Type", "Last-Modified", "Origin", "X-FusionAuth-TenantId", "X-Requested-With")
-                                                                                           .withAllowedOrigins(URI.create("*"))
-                                                                                           .withIncludeUriPredicate(s -> true)
-                                                                                           .withExcludeUriPredicate(s -> true)
-                                                                                           .withExposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")
-                                                                                           .withPreflightMaxAgeInSeconds(1800));
-    assertEquals(exception.getMessage(),
-                 "You cannot use both withIncludeUriPredicate and withExcludeUriPredicate. You must use one or the other.");
-  }
-
-  @Test
-  public void path_and_checker_supplied() {
-    var exception = expectThrows(IllegalStateException.class, () -> new CORSConfiguration().withAllowCredentials(true)
-                                                                                           .withAllowedMethods(HTTPMethod.GET, HTTPMethod.POST, HTTPMethod.HEAD, HTTPMethod.OPTIONS, HTTPMethod.PUT, HTTPMethod.DELETE)
-                                                                                           .withAllowedHeaders("Accept", "Access-Control-Request-Headers", "Access-Control-Request-Method", "Authorization", "Content-Type", "Last-Modified", "Origin", "X-FusionAuth-TenantId", "X-Requested-With")
-                                                                                           .withAllowedOrigins(URI.create("*"))
-                                                                                           .withExcludedPathPattern(Pattern.compile("does not matter"))
-                                                                                           .withExcludeUriPredicate(s -> true)
-                                                                                           .withExposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")
-                                                                                           .withPreflightMaxAgeInSeconds(1800));
-    assertEquals(exception.getMessage(),
-                 "You cannot use both a path (withIncludedPathPattern/withExcludedPathPattern) and predicate based (withIncludeUriPredicate/withExcludeUriPredicate). You must use one or the other.");
-  }
-
-  @Test
-  public void options() throws Exception {
-    // Pass through with default configuration
-    HttpClient client = HttpClient.newBuilder().followRedirects(Redirect.NEVER).priority(256).build();
-    HttpResponse<Void> response = client.send(
-        HttpRequest.newBuilder(URI.create("http://localhost:9080/api/status"))
-                   .method("OPTIONS", BodyPublishers.noBody())
-                   .header("Access-Control-Request-Method", "POST")
-                   .header("Access-Control-Request-Headers", "X-FusionAuth-TenantId")
-                   .header("Origin", "https://jackinthebox.com")
-                   .build(),
-        BodyHandlers.discarding()
-    );
-    assertEquals(response.statusCode(), 204);
-    assertEquals(response.headers().firstValue("Access-Control-Allow-Credentials").orElse(null), "true");
-    assertEquals(response.headers().firstValue("Access-Control-Allow-Headers").orElse(null), "Accept,Access-Control-Request-Headers,Access-Control-Request-Method,Authorization,Content-Type,Last-Modified,Origin,X-FusionAuth-TenantId,X-Requested-With");
-    assertEquals(response.headers().firstValue("Access-Control-Allow-Methods").orElse(null), "POST");
     assertEquals(response.headers().firstValue("Access-Control-Max-Age").orElse(null), "1800");
     assertEquals(response.headers().firstValue("Access-Control-Allow-Origin").orElse(null), "https://jackinthebox.com");
     assertNull(response.headers().firstValue("Access-Control-Expose-Headers").orElse(null));
@@ -454,6 +440,20 @@ public class CORSFilterTest extends PrimeBaseTest {
     assertEquals(response.headers().firstValue("Access-Control-Allow-Methods").orElse(null), "GET");
     assertNull(response.headers().firstValue("Access-Control-Expose-Headers").orElse(null));
     assertEquals(response.headers().firstValue("Access-Control-Max-Age").orElse(null), "1800");
+  }
+
+  @Test
+  public void path_and_checker_supplied() {
+    var exception = expectThrows(IllegalStateException.class, () -> new CORSConfiguration().withAllowCredentials(true)
+                                                                                           .withAllowedMethods(HTTPMethod.GET, HTTPMethod.POST, HTTPMethod.HEAD, HTTPMethod.OPTIONS, HTTPMethod.PUT, HTTPMethod.DELETE)
+                                                                                           .withAllowedHeaders("Accept", "Access-Control-Request-Headers", "Access-Control-Request-Method", "Authorization", "Content-Type", "Last-Modified", "Origin", "X-FusionAuth-TenantId", "X-Requested-With")
+                                                                                           .withAllowedOrigins(URI.create("*"))
+                                                                                           .withExcludedPathPattern(Pattern.compile("does not matter"))
+                                                                                           .withExcludeUriPredicate(s -> true)
+                                                                                           .withExposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")
+                                                                                           .withPreflightMaxAgeInSeconds(1800));
+    assertEquals(exception.getMessage(),
+                 "You cannot use both a path (withIncludedPathPattern/withExcludedPathPattern) and predicate based (withIncludeUriPredicate/withExcludeUriPredicate). You must use one or the other.");
   }
 
   @Test

@@ -18,9 +18,9 @@ package org.primeframework.mvc.security;
 import java.util.UUID;
 
 public class MockUser {
-  public UUID id;
-
   public String email;
+
+  public UUID id;
 
   public MockUser(String email) {
     this.email = email;
