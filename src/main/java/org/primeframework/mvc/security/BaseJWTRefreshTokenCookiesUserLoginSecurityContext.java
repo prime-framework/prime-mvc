@@ -52,6 +52,9 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
 
   private static final String UserKey = "primeCurrentUser";
 
+  // can run out of open files if we create too many of these
+  private static final HttpClient httpClient = HttpClient.newHttpClient();
+
   protected final CookieProxy jwtCookie;
 
   protected final CookieProxy refreshTokenCookie;
@@ -251,7 +254,6 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
       return tokens;
     }
 
-    HttpClient client = HttpClient.newHttpClient();
     Builder requestBuilder = HttpRequest.newBuilder(URI.create(oauthConfiguration.tokenEndpoint));
     if (oauthConfiguration.authenticationMethod == TokenAuthenticationMethod.client_secret_basic) {
       // see https://www.rfc-editor.org/rfc/rfc2617#section-2
@@ -279,7 +281,7 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
     HttpResponse<RefreshResponse> resp = null;
     Exception endpointException = null;
     try {
-      resp = client.send(refreshRequest, new JSONResponseBodyHandler<>(RefreshResponse.class));
+      resp = httpClient.send(refreshRequest, new JSONResponseBodyHandler<>(RefreshResponse.class));
     } catch (Exception e) {
       endpointException = e;
     }
