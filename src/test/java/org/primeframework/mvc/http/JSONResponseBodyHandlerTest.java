@@ -30,21 +30,54 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNull;
 
-public class JSONResponseHandlerTest {
+public class JSONResponseBodyHandlerTest {
+
+  @Test
+  public void apply_inputstream_empty() throws IOException {
+    // arrange
+    var handler = new JSONResponseBodyHandler<>(Map.class);
+
+    // act
+    var result = handler.apply(new InputStream() {
+      @Override
+      public int available() {
+        return 0;
+      }
+
+      public int read() {
+        return -1;
+      }
+    });
+
+    // assert
+    assertNull(result);
+  }
+
+  @Test
+  public void apply_inputstream_null() throws Exception {
+    // arrange
+    var handler = new JSONResponseBodyHandler<>(Map.class);
+
+    // act
+    var result = handler.apply((InputStream) null);
+
+    // assert
+    assertNull(result);
+  }
 
   @Test
   public void apply_subscriber() throws Exception {
     // arrange
-    var handler = new JSONResponseHandler<>(Map.class);
+    var handler = new JSONResponseBodyHandler<>(Map.class);
     BodySubscriber<Map> subscriber = handler.apply(new ResponseInfo() {
-      @Override
-      public int statusCode() {
-        return 200;
-      }
-
       @Override
       public HttpHeaders headers() {
         return null;
+      }
+
+      @Override
+      public int statusCode() {
+        return 200;
       }
 
       @Override
@@ -64,38 +97,5 @@ public class JSONResponseHandlerTest {
 
     // assert
     assertEquals(result.get("test1"), "value1");
-  }
-
-  @Test
-  public void apply_inputstream_null() throws Exception {
-    // arrange
-    var handler = new JSONResponseHandler<>(Map.class);
-
-    // act
-    var result = handler.apply((InputStream) null);
-
-    // assert
-    assertNull(result);
-  }
-
-  @Test
-  public void apply_inputstream_empty() throws IOException {
-    // arrange
-    var handler = new JSONResponseHandler<>(Map.class);
-
-    // act
-    var result = handler.apply(new InputStream() {
-      @Override
-      public int available() {
-        return 0;
-      }
-
-      public int read() {
-        return -1;
-      }
-    });
-
-    // assert
-    assertNull(result);
   }
 }

@@ -56,7 +56,7 @@ import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mock.MockUserAgent;
 import org.primeframework.mvc.config.MVCConfiguration;
-import org.primeframework.mvc.http.FormDataBodyHandler;
+import org.primeframework.mvc.http.FormBodyPublisher;
 import org.primeframework.mvc.http.HTTPObjectsHolder;
 import org.primeframework.mvc.http.MultipartBodyHandler;
 import org.primeframework.mvc.http.MultipartBodyHandler.Multiparts;
@@ -838,7 +838,7 @@ public class RequestBuilder {
       bodyPublisher = BodyPublishers.ofByteArray(body);
       inputStream = new ByteArrayInputStream(body);
     } else if (!requestBodyParameters.isEmpty()) {
-      byte[] formBody = new FormDataBodyHandler(requestBodyParameters).getBody();
+      byte[] formBody = new FormBodyPublisher(requestBodyParameters).getBody();
       bodyPublisher = BodyPublishers.ofByteArray(formBody);
       if (contentType == null) {
         contentType = "application/x-www-form-urlencoded";

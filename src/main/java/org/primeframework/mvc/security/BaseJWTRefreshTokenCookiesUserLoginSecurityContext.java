@@ -34,8 +34,8 @@ import io.fusionauth.http.server.HTTPResponse;
 import io.fusionauth.jwt.JWTExpiredException;
 import io.fusionauth.jwt.Verifier;
 import io.fusionauth.jwt.domain.JWT;
-import org.primeframework.mvc.http.FormDataBodyHandler;
-import org.primeframework.mvc.http.JSONResponseHandler;
+import org.primeframework.mvc.http.FormBodyPublisher;
+import org.primeframework.mvc.http.JSONResponseBodyHandler;
 import org.primeframework.mvc.security.oauth.OAuthConfiguration;
 import org.primeframework.mvc.security.oauth.RefreshResponse;
 import org.primeframework.mvc.security.oauth.TokenAuthenticationMethod;
@@ -273,13 +273,13 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
     }
 
     HttpRequest refreshRequest = requestBuilder.header(Headers.ContentType, ContentTypes.Form)
-                                               .POST(new FormDataBodyHandler(body))
+                                               .POST(new FormBodyPublisher(body))
                                                .build();
 
     HttpResponse<RefreshResponse> resp = null;
     Exception endpointException = null;
     try {
-      resp = client.send(refreshRequest, new JSONResponseHandler<>(RefreshResponse.class));
+      resp = client.send(refreshRequest, new JSONResponseBodyHandler<>(RefreshResponse.class));
     } catch (Exception e) {
       endpointException = e;
     }

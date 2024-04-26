@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2021, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2016-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ import io.fusionauth.jwt.json.JacksonModule;
  *
  * @author Brian Pontarelli
  */
-public class JSONResponseHandler<T> implements BodyHandler<T> {
+public class JSONResponseBodyHandler<T> implements BodyHandler<T> {
   private final static ObjectMapper objectMapper = new ObjectMapper().registerModule(new JacksonModule());
 
   private final Class<T> type;
@@ -49,8 +49,22 @@ public class JSONResponseHandler<T> implements BodyHandler<T> {
    *
    * @param type responses will be deserialized using this type
    */
-  public JSONResponseHandler(Class<T> type) {
+  public JSONResponseBodyHandler(Class<T> type) {
     this.type = type;
+  }
+
+  /**
+   * Creates a subscriber to deserialize content
+   *
+   * @param responseInfo the response info
+   * @return a subscriber that goes from {@link InputStream} to the desired
+   *     class.
+   */
+  @Override
+  public BodySubscriber<T> apply(ResponseInfo responseInfo) {
+    // Use the InputStream subscriber first, then map using our Jackson function
+    return HttpResponse.BodySubscribers.mapping(BodySubscribers.ofInputStream(),
+                                                this::apply);
   }
 
   /**
@@ -87,20 +101,6 @@ public class JSONResponseHandler<T> implements BodyHandler<T> {
                                              ? ("Note: Output has been truncated to the first " + bis.getObservableLength() + " of " + bis.actualLength + " bytes.\n\n") : "") +
                                          bis.getObservableAsString(), e);
     }
-  }
-
-  /**
-   * Creates a subscriber to deserialize content
-   *
-   * @param responseInfo the response info
-   * @return a subscriber that goes from {@link InputStream} to the desired
-   *     class.
-   */
-  @Override
-  public BodySubscriber<T> apply(ResponseInfo responseInfo) {
-    // Use the InputStream subscriber first, then map using our Jackson function
-    return HttpResponse.BodySubscribers.mapping(BodySubscribers.ofInputStream(),
-                                                this::apply);
   }
 
   public static class BetterBufferedInputStream extends BufferedInputStream {

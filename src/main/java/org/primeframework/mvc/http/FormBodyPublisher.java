@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2016-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import java.util.concurrent.Flow.Subscriber;
  *
  * @author Brian Pontarelli
  */
-public class FormDataBodyHandler implements BodyPublisher {
+public class FormBodyPublisher implements BodyPublisher {
 
   private final byte[] body;
 
@@ -44,7 +44,7 @@ public class FormDataBodyHandler implements BodyPublisher {
    * @param request           map of values to include
    * @param excludeNullValues whether null values should be excluded
    */
-  public FormDataBodyHandler(Map<String, List<String>> request, boolean excludeNullValues) {
+  public FormBodyPublisher(Map<String, List<String>> request, boolean excludeNullValues) {
     body = createBody(request, excludeNullValues);
     // avoids duplicating all of the logic in ByteArrayPublisher
     publisher = BodyPublishers.ofByteArray(body);
@@ -57,34 +57,8 @@ public class FormDataBodyHandler implements BodyPublisher {
    *
    * @param request map of values to include. Null values will be included
    */
-  public FormDataBodyHandler(Map<String, List<String>> request) {
+  public FormBodyPublisher(Map<String, List<String>> request) {
     this(request, false);
-  }
-
-  /**
-   * Returns the encoded represent the form content
-   *
-   * @return bytes of content in UTF-8 encoding
-   */
-  public byte[] getBody() {
-    return body;
-  }
-
-  private byte[] createBody(Map<String, List<String>> request, boolean excludeNullValues) {
-    if (request != null) {
-      return serializeRequest(request, excludeNullValues);
-    }
-    return null;
-  }
-
-  @Override
-  public long contentLength() {
-    return publisher.contentLength();
-  }
-
-  @Override
-  public void subscribe(Subscriber<? super ByteBuffer> subscriber) {
-    publisher.subscribe(subscriber);
   }
 
   private static void append(StringBuilder build, String key, String value) {
@@ -120,5 +94,31 @@ public class FormDataBodyHandler implements BodyPublisher {
     });
 
     return build.toString().getBytes(StandardCharsets.UTF_8);
+  }
+
+  @Override
+  public long contentLength() {
+    return publisher.contentLength();
+  }
+
+  /**
+   * Returns the encoded represent the form content
+   *
+   * @return bytes of content in UTF-8 encoding
+   */
+  public byte[] getBody() {
+    return body;
+  }
+
+  @Override
+  public void subscribe(Subscriber<? super ByteBuffer> subscriber) {
+    publisher.subscribe(subscriber);
+  }
+
+  private byte[] createBody(Map<String, List<String>> request, boolean excludeNullValues) {
+    if (request != null) {
+      return serializeRequest(request, excludeNullValues);
+    }
+    return null;
   }
 }

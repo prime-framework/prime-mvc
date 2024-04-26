@@ -25,7 +25,7 @@ import org.testng.annotations.Test;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 
-public class FormDataBodyHandlerTest {
+public class FormBodyPublisherTest {
   @Test
   public void post_formData_string() {
     Map<String, List<String>> parameters = new LinkedHashMap<>();
@@ -35,7 +35,7 @@ public class FormDataBodyHandlerTest {
     parameters.put("test3", new ArrayList<>(Arrays.asList("value3", null)));
     parameters.put("test4", null);
 
-    var handler = new FormDataBodyHandler(parameters);
+    var handler = new FormBodyPublisher(parameters);
     String actualBody = new String(handler.getBody());
 
     assertEquals(actualBody, "test1=value1&test2=value2&test3=value3&test3=&test4=");
@@ -50,7 +50,7 @@ public class FormDataBodyHandlerTest {
     parameters.put("test3", new ArrayList<>(Arrays.asList("value3", null)));
     parameters.put("test4", null);
 
-    var handler = new FormDataBodyHandler(parameters, true);
+    var handler = new FormBodyPublisher(parameters, true);
     String actualBody = new String(handler.getBody());
 
     assertEquals(actualBody, "test1=value1&test2=value2&test3=value3");
