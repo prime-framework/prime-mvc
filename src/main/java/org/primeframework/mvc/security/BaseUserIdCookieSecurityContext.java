@@ -22,7 +22,6 @@ import java.time.ZonedDateTime;
 import java.util.Optional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.inject.Provider;
 import io.fusionauth.http.Cookie;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
@@ -56,11 +55,8 @@ public abstract class BaseUserIdCookieSecurityContext<TUserId> implements UserLo
 
   private final Duration sessionTimeout;
 
-  private final Provider<UserIdSessionContext<TUserId>> userIdSessionContextProvider;
-
   protected BaseUserIdCookieSecurityContext(HTTPRequest request, HTTPResponse response, Encryptor encryptor, ObjectMapper objectMapper,
-                                            Clock clock, Duration sessionTimeout, Duration sessionMaxAge,
-                                            Provider<UserIdSessionContext<TUserId>> userIdSessionContextProvider) {
+                                            Clock clock, Duration sessionTimeout, Duration sessionMaxAge) {
     this.request = request;
     this.response = response;
     this.encryptor = encryptor;
@@ -68,7 +64,6 @@ public abstract class BaseUserIdCookieSecurityContext<TUserId> implements UserLo
     this.clock = clock;
     this.sessionMaxAge = sessionMaxAge;
     this.sessionTimeout = sessionTimeout;
-    this.userIdSessionContextProvider = userIdSessionContextProvider;
     long timeoutInSeconds = sessionTimeout.toSeconds();
     this.sessionCookie = new CookieProxy(getCookieName(), timeoutInSeconds, Cookie.SameSite.Strict);
   }
@@ -121,9 +116,7 @@ public abstract class BaseUserIdCookieSecurityContext<TUserId> implements UserLo
     try {
       var id = getIdFromUser(user);
       ZonedDateTime now = ZonedDateTime.now(clock);
-      var sessionContext = userIdSessionContextProvider.get();
-      sessionContext.setUserId(id);
-      sessionContext.setLoginInstant(now);
+      var sessionContext = createUserIdSessionContext(id, now);
       if (sessionContext.getSessionId() == null) {
         throw new IllegalArgumentException("Received a null getSessionId from " + sessionContext.getClass());
       }
@@ -153,6 +146,15 @@ public abstract class BaseUserIdCookieSecurityContext<TUserId> implements UserLo
       request.setAttribute(UserKey, user);
     }
   }
+
+  /**
+   * Creates a new context that can be persisted in the session
+   *
+   * @param userId       user ID the context is for
+   * @param loginInstant the instant the user logged in
+   * @return context, readily serializable/deserializable by Jackson
+   */
+  protected abstract UserIdSessionContext<TUserId> createUserIdSessionContext(TUserId userId, ZonedDateTime loginInstant);
 
   protected String getCookieName() {
     return UserKey;

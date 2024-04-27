@@ -16,12 +16,10 @@
 package org.primeframework.mvc.security;
 
 import java.time.Clock;
-import java.util.UUID;
 
 import com.fasterxml.jackson.databind.Module;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
-import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.Multibinder;
 import com.inversoft.json.JacksonModule;
 import org.primeframework.mvc.MockConfiguration;
@@ -38,9 +36,6 @@ public class SessionTestModule extends AbstractModule {
 
   @Override
   protected void configure() {
-    bind(new TypeLiteral<UserIdSessionContext<UUID>>() {
-    })
-        .to(MockUserIdSessionContext.class);
     bind(MVCConfiguration.class).to(MockConfiguration.class).asEagerSingleton();
     bind(UserLoginSecurityContext.class).to(MockBaseUserIdCookieSecurityContext.class);
     bind(CORSConfigurationProvider.class).to(NoCORSConfigurationProvider.class).asEagerSingleton();

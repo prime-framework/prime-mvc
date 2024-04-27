@@ -31,13 +31,6 @@ public interface UserIdSessionContext<TUserId> {
   ZonedDateTime getLoginInstant();
 
   /**
-   * When a login occurs, the BaseUserIdCookieSecurityContext will set the moment of login on the object
-   *
-   * @param loginInstant login time
-   */
-  void setLoginInstant(ZonedDateTime loginInstant);
-
-  /**
    * The session ID for the logged in user. This should be unique.
    *
    * @return the session ID
@@ -50,11 +43,4 @@ public interface UserIdSessionContext<TUserId> {
    * @return the user ID
    */
   TUserId getUserId();
-
-  /**
-   * When a login occurs, the BaseUserIdCookieSecurityContext will set the user ID on the object
-   *
-   * @param userId user ID
-   */
-  void setUserId(TUserId userId);
 }

@@ -18,6 +18,7 @@ package org.primeframework.mvc.security;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class MockUserIdSessionContext implements UserIdSessionContext<UUID> {
@@ -30,18 +31,19 @@ public class MockUserIdSessionContext implements UserIdSessionContext<UUID> {
   @JsonProperty
   private UUID userId;
 
-  public MockUserIdSessionContext() {
+  public MockUserIdSessionContext(UUID userId, ZonedDateTime loginInstant) {
     sessionId = UUID.randomUUID().toString();
+    this.userId = userId;
+    this.loginInstant = loginInstant;
+  }
+
+  @JsonCreator
+  private MockUserIdSessionContext() {
   }
 
   @Override
   public ZonedDateTime getLoginInstant() {
     return loginInstant;
-  }
-
-  @Override
-  public void setLoginInstant(ZonedDateTime loginInstant) {
-    this.loginInstant = loginInstant;
   }
 
   @Override
@@ -54,8 +56,4 @@ public class MockUserIdSessionContext implements UserIdSessionContext<UUID> {
     return userId;
   }
 
-  @Override
-  public void setUserId(UUID userId) {
-    this.userId = userId;
-  }
 }

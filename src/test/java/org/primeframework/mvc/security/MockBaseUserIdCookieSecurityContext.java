@@ -17,32 +17,36 @@ package org.primeframework.mvc.security;
 
 import java.time.Clock;
 import java.time.Duration;
+import java.time.ZonedDateTime;
 import java.util.Set;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
 
 public class MockBaseUserIdCookieSecurityContext extends BaseUserIdCookieSecurityContext<UUID> {
   public MockBaseUserIdCookieSecurityContext(HTTPRequest request, HTTPResponse response, Encryptor encryptor, ObjectMapper objectMapper,
                                              Clock clock,
-                                             Duration sessionTimeout, Duration sessionMaxAge,
-                                             Provider<UserIdSessionContext<UUID>> userIdSessionContextProvider) {
-    super(request, response, encryptor, objectMapper, clock, sessionTimeout, sessionMaxAge, userIdSessionContextProvider);
+                                             Duration sessionTimeout, Duration sessionMaxAge) {
+    super(request, response, encryptor, objectMapper, clock, sessionTimeout, sessionMaxAge);
   }
 
   @Inject
   protected MockBaseUserIdCookieSecurityContext(HTTPRequest request, HTTPResponse response, Encryptor encryptor, ObjectMapper objectMapper,
-                                                Clock clock, Provider<UserIdSessionContext<UUID>> userIdSessionContextProvider) {
-    super(request, response, encryptor, objectMapper, clock, Duration.ofMinutes(5), Duration.ofMinutes(30), userIdSessionContextProvider);
+                                                Clock clock) {
+    super(request, response, encryptor, objectMapper, clock, Duration.ofMinutes(5), Duration.ofMinutes(30));
   }
 
   @Override
   public Set<String> getCurrentUsersRoles() {
     return Set.of();
+  }
+
+  @Override
+  protected UserIdSessionContext<UUID> createUserIdSessionContext(UUID userId, ZonedDateTime loginInstant) {
+    return new MockUserIdSessionContext(userId, loginInstant);
   }
 
   @Override
