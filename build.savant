@@ -130,14 +130,21 @@ target(name: "compile", description: "Compiles the project") {
 target(name: "jar", description: "JARs the project", dependsOn: ["compile"]) {
   java.jar()
 
+  def simulatorPatterns = [
+      ~/org\/primeframework\/mvc\/test.+/,
+      ~/org\/primeframework\/mvc\/message\/TestMessageObserver/,
+      ~/org\/primeframework\/mvc\/TestPrimeMain/,
+      ~/org\/primeframework\/mvc\/util\/Throwing.*/,
+      ~/org\/primeframework\/mock/
+  ]
   // Create a separate test jar that only includes org/primeframework
   file.copy(to: "build/classes/simulator") {
-    fileSet(dir: "build/classes/test", includePatterns: [~/org\/primeframework.+/])
+    fileSet(dir: "build/classes/test", includePatterns: simulatorPatterns)
   }
 
   // Create a separate test jar that only includes org/primeframework
   file.copy(to: "build/src/simulator") {
-    fileSet(dir: "src/test/java", includePatterns: [~/org\/primeframework.+/])
+    fileSet(dir: "src/test/java", includePatterns: simulatorPatterns)
   }
 
   file.jar(file: "build/jars/${project.name}-simulator-${project.version}.jar") {
