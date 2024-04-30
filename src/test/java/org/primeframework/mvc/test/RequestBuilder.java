@@ -46,7 +46,6 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Injector;
-import com.inversoft.http.Cookie.SameSite;
 import com.inversoft.http.FileUpload;
 import com.inversoft.http.HTTPStrings;
 import com.inversoft.http.HTTPStrings.Headers;
@@ -774,18 +773,6 @@ public class RequestBuilder {
     userAgent.addCookies(request.getCookies());
     request.getCookies().clear();
     request.addCookies(userAgent.getCookies(request));
-    var restCookies = request.getCookies()
-                             .stream()
-                             .map(c -> new com.inversoft.http.Cookie().with(c1 -> c1.domain = c.domain)
-                                                                      .with(c1 -> c1.expires = c.expires)
-                                                                      .with(c1 -> c1.httpOnly = c.httpOnly)
-                                                                      .with(c1 -> c1.maxAge = c.maxAge)
-                                                                      .with(c1 -> c1.name = c.name)
-                                                                      .with(c1 -> c1.path = c.path)
-                                                                      .with(c1 -> c1.sameSite = c.sameSite != null ? SameSite.valueOf(c.sameSite.name()) : null)
-                                                                      .with(c1 -> c1.secure = c.secure)
-                                                                      .with(c1 -> c1.value = c.value))
-                             .toList();
 
     String scheme = useTLS ? "https://" : "http://";
     URI requestURI = URI.create(scheme + "localhost:" + port + request.getPath());

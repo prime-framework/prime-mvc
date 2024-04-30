@@ -225,7 +225,10 @@ public abstract class PrimeBaseTest {
 
     Module module = Modules.override(mvcModule).with(new TestContentModule(), new TestSecurityModule(), new TestScopeModule(),
                                                      new TestWorkflowModule(), new TestStaticResourceModule());
-    var mainConfig = new HTTPServerConfiguration().withInitialReadTimeout(Duration.ofMillis(500))
+    var mainConfig = new HTTPServerConfiguration().withInitialReadTimeout(Duration.ofMinutes(10)) // for debugging
+                                                  .withMinimumReadThroughput(-1) // for debugging
+                                                  .withMinimumWriteThroughput(-1) // for debugging
+                                                  .withProcessingTimeoutDuration(Duration.ofMinutes(10)) // for debugging
                                                   .withListener(new HTTPListenerConfiguration(9080))
                                                   .withLoggerFactory(TestAccumulatingLoggerFactory.FACTORY);
     TestPrimeMain main = new TestPrimeMain(new HTTPServerConfiguration[]{mainConfig}, module);

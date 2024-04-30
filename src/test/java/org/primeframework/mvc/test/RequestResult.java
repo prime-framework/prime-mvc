@@ -1819,7 +1819,7 @@ public class RequestResult {
   }
 
   private String cookieToString(Cookie cookie) {
-    return "Set-Cookie: " + cookie.toResponseHeader(StandardCharsets.UTF_8);
+    return "Set-Cookie: " + cookie.toResponseHeader();
   }
 
   private String escape(String s) {
