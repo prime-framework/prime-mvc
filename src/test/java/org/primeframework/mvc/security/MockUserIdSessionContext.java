@@ -19,11 +19,12 @@ import java.time.ZonedDateTime;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class MockUserIdSessionContext implements UserIdSessionContext<UUID> {
   @JsonProperty
-  private ZonedDateTime loginInstant;
+  private String loginInstant;
 
   @JsonProperty
   private String sessionId;
@@ -34,16 +35,17 @@ public class MockUserIdSessionContext implements UserIdSessionContext<UUID> {
   public MockUserIdSessionContext(UUID userId, ZonedDateTime loginInstant) {
     sessionId = UUID.randomUUID().toString();
     this.userId = userId;
-    this.loginInstant = loginInstant;
+    this.loginInstant = loginInstant.toString();
   }
 
   @JsonCreator
   private MockUserIdSessionContext() {
   }
 
+  @JsonIgnore
   @Override
   public ZonedDateTime getLoginInstant() {
-    return loginInstant;
+    return ZonedDateTime.parse(loginInstant);
   }
 
   @Override
