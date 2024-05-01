@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2022-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import io.fusionauth.http.HTTPMethod;
@@ -112,9 +113,25 @@ public final class CORSFilter {
   private CORSDebugger debugger;
 
   /**
+   * Allow a predicate to decide whether to exclude in CORS
+   */
+  private Predicate<String> excludeURIPredicate;
+
+  /**
    * Regex for excluding URI patterns from CORS filter processing
    */
   private Pattern excludedPathPattern;
+
+  /**
+   * Allow a predicate to decide whether to include in CORS
+   */
+  private Predicate<String> includeURIPredicate;
+
+  /**
+   * Regex for including URI patterns from CORS filter processing
+   */
+
+  private Pattern includedPathPattern;
 
   /**
    * Indicates (in seconds) how long the results of a pre-flight request can be cached in a pre-flight result cache.
@@ -221,6 +238,11 @@ public final class CORSFilter {
     return this;
   }
 
+  public CORSFilter withExcludeURIPredicate(Predicate<String> excludeURIPredicate) {
+    this.excludeURIPredicate = excludeURIPredicate;
+    return this;
+  }
+
   /**
    * Specifies a regex that matches paths that should be ignored for CORS (meaning they will always fail CORS and the
    * browser will not load them). This effectively protects these resources.
@@ -238,6 +260,16 @@ public final class CORSFilter {
       this.exposedHeaders.clear();
       this.exposedHeaders.addAll(headers);
     }
+    return this;
+  }
+
+  public CORSFilter withIncludeURIPredicate(Predicate<String> includeURIPredicate) {
+    this.includeURIPredicate = includeURIPredicate;
+    return this;
+  }
+
+  public CORSFilter withIncludedPathPattern(Pattern pattern) {
+    this.includedPathPattern = pattern;
     return this;
   }
 
@@ -304,7 +336,18 @@ public final class CORSFilter {
    * @return true if this request should be excluded from CORS
    */
   private boolean excludedRequestURI(final String requestURI) {
-    return excludedPathPattern != null && excludedPathPattern.matcher(requestURI).find();
+    if (excludedPathPattern != null) {
+      return excludedPathPattern.matcher(requestURI).find();
+    } else if (includedPathPattern != null) {
+      return !includedPathPattern.matcher(requestURI).find();
+    } else if (includeURIPredicate != null) {
+      return !includeURIPredicate.test(requestURI);
+    } else if (excludeURIPredicate != null) {
+      return excludeURIPredicate.test(requestURI);
+    }
+
+    // we're not using any of the functionality
+    return false;
   }
 
   /**
@@ -560,12 +603,9 @@ public final class CORSFilter {
       case PreFlightUnexpected -> "Invalid request. Not expecting a preflight request from URI [" + reasonValue + "].";
       case SimpleMethodNotAllowed -> "Invalid Simple CORS request. HTTP method not allowed. [" + reasonValue + "]";
       case SimpleOriginNotAllowed -> "Invalid Simple CORS request. Origin not allowed. [" + reasonValue + "]";
-      case PreFlightHeaderNotAllowed ->
-          "Invalid CORS pre-flight request. HTTP header not allowed. [" + reasonValue + "]";
-      case PreFlightMethodNotAllowed ->
-          "Invalid CORS pre-flight request. HTTP method not allowed. [" + reasonValue + "]";
-      case PreFlightMethodNotRecognized ->
-          "Invalid CORS pre-flight request. HTTP method not recognized. [" + reasonValue + "]";
+      case PreFlightHeaderNotAllowed -> "Invalid CORS pre-flight request. HTTP header not allowed. [" + reasonValue + "]";
+      case PreFlightMethodNotAllowed -> "Invalid CORS pre-flight request. HTTP method not allowed. [" + reasonValue + "]";
+      case PreFlightMethodNotRecognized -> "Invalid CORS pre-flight request. HTTP method not recognized. [" + reasonValue + "]";
       case PreFlightOriginNotAllowed -> "Invalid CORS pre-flight request. Origin not allowed. [" + reasonValue + "]";
       case UnhandledCORSRequestType -> "Invalid request. Unhandled CORS request type [" + reasonValue + "].";
     };

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2022-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,27 +17,30 @@ package org.primeframework.mvc.cors;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpClient.Redirect;
-import java.net.http.HttpRequest;
-import java.net.http.HttpRequest.BodyPublishers;
-import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodyHandlers;
 import java.util.regex.Pattern;
 
 import io.fusionauth.http.HTTPMethod;
 import org.primeframework.mvc.PrimeBaseTest;
+import org.primeframework.mvc.test.RequestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNull;
+import static org.testng.Assert.expectThrows;
 
 /**
  * @author Brian Pontarelli
  */
 public class CORSFilterTest extends PrimeBaseTest {
+  @DataProvider(name = "get_included_path_pattern")
+  private static Object[][] getIncludeExcludes() {
+    return new Object[][]{
+        {"/foo", false},
+        {"/admin/foo", true}
+    };
+  }
+
   @AfterMethod
   public void afterMethod() {
     super.afterMethod();
@@ -68,59 +71,46 @@ public class CORSFilterTest extends PrimeBaseTest {
 
   @Test
   public void get() throws Exception {
-    HttpClient client = HttpClient.newBuilder().followRedirects(Redirect.NEVER).priority(256).build();
-    HttpResponse<Void> response = client.send(
-        HttpRequest.newBuilder(URI.create("http://localhost:9080/api/status"))
-                   .GET()
-                   .header("Origin", "https://jackinthebox.com")
-                   .build(),
-        BodyHandlers.discarding()
-    );
-    assertEquals(response.statusCode(), 200);
-    assertEquals(response.headers().firstValue("Access-Control-Allow-Credentials").orElse(null), "true");
-    assertEquals(response.headers().firstValue("Access-Control-Expose-Headers").orElse(null), "Access-Control-Allow-Origin,Access-Control-Allow-Credentials");
-    assertEquals(response.headers().firstValue("Access-Control-Allow-Origin").orElse(null), "https://jackinthebox.com");
-    assertEquals(response.headers().firstValue("Vary").orElse(null), "Origin");
-    assertNull(response.headers().firstValue("Access-Control-Allow-Methods").orElse(null));
-    assertNull(response.headers().firstValue("Access-Control-Allow-Headers").orElse(null));
-    assertNull(response.headers().firstValue("Access-Control-Max-Age").orElse(null));
+    simulator.test("/api/status")
+             .withHeader("Origin", "https://jackinthebox.com")
+             .get()
+             .assertStatusCode(200)
+             .assertHeaderContains("Access-Control-Allow-Credentials", "true")
+             .assertHeaderContains("Access-Control-Expose-Headers", "Access-Control-Allow-Origin,Access-Control-Allow-Credentials")
+             .assertHeaderContains("Access-Control-Allow-Origin", "https://jackinthebox.com")
+             .assertHeaderContains("Vary", "Origin")
+             .assertHeaderDoesNotContain("Access-Control-Allow-Methods")
+             .assertHeaderDoesNotContain("Access-Control-Allow-Headers")
+             .assertHeaderDoesNotContain("Access-Control-Max-Age");
   }
 
   @Test
   public void get_reactNativeOrigin() throws Exception {
-    HttpClient client = HttpClient.newBuilder().followRedirects(Redirect.NEVER).priority(256).build();
-    HttpResponse<Void> response = client.send(
-        HttpRequest.newBuilder(URI.create("http://localhost:9080/api/status"))
-                   .GET()
-                   .header("Origin", "file://foo/index.html")
-                   .build(),
-        BodyHandlers.discarding()
-    );
-    assertEquals(response.statusCode(), 200);
-    assertEquals(response.headers().firstValue("Access-Control-Allow-Credentials").orElse(null), "true");
-    assertEquals(response.headers().firstValue("Access-Control-Expose-Headers").orElse(null), "Access-Control-Allow-Origin,Access-Control-Allow-Credentials");
-    assertEquals(response.headers().firstValue("Access-Control-Allow-Origin").orElse(null), "file://foo/index.html");
-    assertEquals(response.headers().firstValue("Vary").orElse(null), "Origin");
-    assertNull(response.headers().firstValue("Access-Control-Allow-Methods").orElse(null));
-    assertNull(response.headers().firstValue("Access-Control-Allow-Headers").orElse(null));
-    assertNull(response.headers().firstValue("Access-Control-Max-Age").orElse(null));
+    simulator.test("/api/status")
+             .withHeader("Origin", "file://foo/index.html")
+             .get()
+             .assertStatusCode(200)
+             .assertHeaderContains("Access-Control-Allow-Credentials", "true")
+             .assertHeaderContains("Access-Control-Expose-Headers", "Access-Control-Allow-Origin,Access-Control-Allow-Credentials")
+             .assertHeaderContains("Access-Control-Allow-Origin", "file://foo/index.html")
+             .assertHeaderContains("Vary", "Origin")
+             .assertHeaderDoesNotContain("Access-Control-Allow-Methods")
+             .assertHeaderDoesNotContain("Access-Control-Allow-Headers")
+             .assertHeaderDoesNotContain("Access-Control-Max-Age");
+
 
     // Handle file://, see https://github.com/FusionAuth/fusionauth-issues/issues/414 & https://bz.apache.org/bugzilla/show_bug.cgi?id=60008
-    response = client.send(
-        HttpRequest.newBuilder(URI.create("http://localhost:9080/api/status"))
-                   .GET()
-                   .header("Origin", "file://")
-                   .build(),
-        BodyHandlers.discarding()
-    );
-    assertEquals(response.statusCode(), 200);
-    assertEquals(response.headers().firstValue("Access-Control-Allow-Credentials").orElse(null), "true");
-    assertEquals(response.headers().firstValue("Access-Control-Expose-Headers").orElse(null), "Access-Control-Allow-Origin,Access-Control-Allow-Credentials");
-    assertEquals(response.headers().firstValue("Access-Control-Allow-Origin").orElse(null), "file://");
-    assertEquals(response.headers().firstValue("Vary").orElse(null), "Origin");
-    assertNull(response.headers().firstValue("Access-Control-Allow-Methods").orElse(null));
-    assertNull(response.headers().firstValue("Access-Control-Allow-Headers").orElse(null));
-    assertNull(response.headers().firstValue("Access-Control-Max-Age").orElse(null));
+    simulator.test("/api/status")
+             .withHeader("Origin", "file://")
+             .get()
+             .assertStatusCode(200)
+             .assertHeaderContains("Access-Control-Allow-Credentials", "true")
+             .assertHeaderContains("Access-Control-Expose-Headers", "Access-Control-Allow-Origin,Access-Control-Allow-Credentials")
+             .assertHeaderContains("Access-Control-Allow-Origin", "file://")
+             .assertHeaderContains("Vary", "Origin")
+             .assertHeaderDoesNotContain("Access-Control-Allow-Methods")
+             .assertHeaderDoesNotContain("Access-Control-Allow-Headers")
+             .assertHeaderDoesNotContain("Access-Control-Max-Age");
   }
 
   @Test
@@ -128,29 +118,21 @@ public class CORSFilterTest extends PrimeBaseTest {
     // Remove all HTTP methods from the CORS configuration, this would otherwise brick the action, but it is same-site
     corsConfiguration.allowedOrigins.clear();
 
-    HttpClient client = HttpClient.newBuilder().followRedirects(Redirect.NEVER).priority(256).build();
-    HttpResponse<Void> response = client.send(
-        HttpRequest.newBuilder(URI.create("http://localhost:9080/api/status"))
-                   .GET()
-                   .header("Origin", "http://localhost:9080")
-                   .build(),
-        BodyHandlers.discarding()
-    );
-    assertEquals(response.statusCode(), 200);
+    var response = simulator.test("/api/status")
+                            .withHeader("Origin", "http://localhost:9080")
+                            .get()
+                            .assertStatusCode(200);
+
     assertNoCORSHeaders(response);
 
     // Same request, different origin - allowed origin, but still missing HTTP POST method from the config, expecting 403
     corsConfiguration.withAllowedOrigins(URI.create("http://jackinthebox.com"))
                      .withAllowedMethods(HTTPMethod.GET);
-    response = client.send(
-        HttpRequest.newBuilder(URI.create("http://localhost:9080/api/status"))
-                   .POST(BodyPublishers.noBody())
-                   .header("Content-Type", "application/json")
-                   .header("Origin", "http://jackinthebox.com")
-                   .build(),
-        BodyHandlers.discarding()
-    );
-    assertEquals(response.statusCode(), 403);
+    response = simulator.test("/api/status")
+                        .withHeader("Content-Type", "application/json")
+                        .withHeader("Origin", "http://jackinthebox.com")
+                        .post()
+                        .assertStatusCode(403);
     assertNoCORSHeaders(response);
   }
 
@@ -172,111 +154,188 @@ public class CORSFilterTest extends PrimeBaseTest {
   public void get_validateExcludedURIs(String uri) throws Exception {
     // Ensure we receive a 200 without the 'Access-Control-Allow-Origin' header in the response
     // - No origin header means this is not a CORS request
-    HttpClient client = HttpClient.newBuilder().followRedirects(Redirect.NEVER).priority(256).build();
-    HttpResponse<Void> response = client.send(
-        HttpRequest.newBuilder(URI.create("http://localhost:9080" + uri))
-                   .GET()
-                   .build(),
-        BodyHandlers.discarding()
-    );
-    assertEquals(response.statusCode(), 200);
+    var response = simulator.test(uri)
+                            .get()
+                            .assertStatusCode(200);
+
     assertNoCORSHeaders(response);
 
     // Origin header, this is a Simple CORS request, ensure we get a 200 with the correct CORS headers
-    response = client.send(
-        HttpRequest.newBuilder(URI.create("http://localhost:9080" + uri))
-                   .GET()
-                   .header("Origin", "http://foo.com")
-                   .build(),
-        BodyHandlers.discarding()
-    );
-    assertEquals(response.statusCode(), 200);
+    response = simulator.test(uri)
+                        .withHeader("Origin", "http://foo.com")
+                        .get()
+                        .assertStatusCode(200);
     assertNoCORSHeaders(response);
+  }
+
+  @Test
+  public void included_and_excluded_uri_checker_supplied() {
+    var exception = expectThrows(IllegalStateException.class, () -> new CORSConfiguration().withAllowCredentials(true)
+                                                                                           .withAllowedMethods(HTTPMethod.GET, HTTPMethod.POST, HTTPMethod.HEAD, HTTPMethod.OPTIONS, HTTPMethod.PUT, HTTPMethod.DELETE)
+                                                                                           .withAllowedHeaders("Accept", "Access-Control-Request-Headers", "Access-Control-Request-Method", "Authorization", "Content-Type", "Last-Modified", "Origin", "X-FusionAuth-TenantId", "X-Requested-With")
+                                                                                           .withAllowedOrigins(URI.create("*"))
+                                                                                           .withIncludeURIPredicate(s -> true)
+                                                                                           .withExcludeURIPredicate(s -> true)
+                                                                                           .withExposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")
+                                                                                           .withPreflightMaxAgeInSeconds(1800));
+    assertEquals(exception.getMessage(),
+                 "You cannot use both withIncludeURIPredicate and withExcludeURIPredicate. You must use one or the other.");
+  }
+
+  @Test
+  public void included_path_and_excluded_path_supplied() {
+    // arrange + act + assert
+    var exception = expectThrows(IllegalStateException.class, () -> new CORSConfiguration().withAllowCredentials(true)
+                                                                                           .withAllowedMethods(HTTPMethod.GET, HTTPMethod.POST, HTTPMethod.HEAD, HTTPMethod.OPTIONS, HTTPMethod.PUT, HTTPMethod.DELETE)
+                                                                                           .withAllowedHeaders("Accept", "Access-Control-Request-Headers", "Access-Control-Request-Method", "Authorization", "Content-Type", "Last-Modified", "Origin", "X-FusionAuth-TenantId", "X-Requested-With")
+                                                                                           .withAllowedOrigins(URI.create("*"))
+                                                                                           .withExcludedPathPattern(Pattern.compile("does not matter"))
+                                                                                           .withIncludedPathPattern(Pattern.compile("does not matter"))
+                                                                                           .withExposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")
+                                                                                           .withPreflightMaxAgeInSeconds(1800));
+    assertEquals(exception.getMessage(),
+                 "You cannot use both withExcludedPathPattern and withIncludedPathPattern. You must use one or the other.");
   }
 
   @Test
   public void options() throws Exception {
     // Pass through with default configuration
-    HttpClient client = HttpClient.newBuilder().followRedirects(Redirect.NEVER).priority(256).build();
-    HttpResponse<Void> response = client.send(
-        HttpRequest.newBuilder(URI.create("http://localhost:9080/api/status"))
-                   .method("OPTIONS", BodyPublishers.noBody())
-                   .header("Access-Control-Request-Method", "POST")
-                   .header("Access-Control-Request-Headers", "X-FusionAuth-TenantId")
-                   .header("Origin", "https://jackinthebox.com")
-                   .build(),
-        BodyHandlers.discarding()
-    );
-    assertEquals(response.statusCode(), 204);
-    assertEquals(response.headers().firstValue("Access-Control-Allow-Credentials").orElse(null), "true");
-    assertEquals(response.headers().firstValue("Access-Control-Allow-Headers").orElse(null), "Accept,Access-Control-Request-Headers,Access-Control-Request-Method,Authorization,Content-Type,Last-Modified,Origin,X-FusionAuth-TenantId,X-Requested-With");
-    assertEquals(response.headers().firstValue("Access-Control-Allow-Methods").orElse(null), "POST");
-    assertEquals(response.headers().firstValue("Access-Control-Max-Age").orElse(null), "1800");
-    assertEquals(response.headers().firstValue("Access-Control-Allow-Origin").orElse(null), "https://jackinthebox.com");
-    assertNull(response.headers().firstValue("Access-Control-Expose-Headers").orElse(null));
-    assertEquals(response.headers().firstValue("Vary").orElse(null), "Origin");
+    simulator.test("/api/status")
+             .withHeader("Access-Control-Request-Method", "POST")
+             .withHeader("Access-Control-Request-Headers", "X-FusionAuth-TenantId")
+             .withHeader("Origin", "https://jackinthebox.com")
+             .options()
+             .assertStatusCode(204)
+             .assertHeaderContains("Access-Control-Allow-Credentials", "true")
+             .assertHeaderContains("Access-Control-Allow-Headers", "Accept,Access-Control-Request-Headers,Access-Control-Request-Method,Authorization,Content-Type,Last-Modified,Origin,X-FusionAuth-TenantId,X-Requested-With")
+             .assertHeaderContains("Access-Control-Allow-Methods", "POST")
+             .assertHeaderContains("Access-Control-Max-Age", "1800")
+             .assertHeaderContains("Access-Control-Allow-Origin", "https://jackinthebox.com")
+             .assertHeaderDoesNotContain("Access-Control-Expose-Headers")
+             .assertHeaderContains("Vary", "Origin");
+  }
+
+  @Test(dataProvider = "get_included_path_pattern")
+  public void options_excluded_uri_checker(String path, boolean expectCorsAllow) throws Exception {
+    // arrange
+    corsConfiguration = new CORSConfiguration().withAllowCredentials(true)
+                                               .withAllowedMethods(HTTPMethod.GET, HTTPMethod.POST, HTTPMethod.HEAD, HTTPMethod.OPTIONS, HTTPMethod.PUT, HTTPMethod.DELETE)
+                                               .withAllowedHeaders("Accept", "Access-Control-Request-Headers", "Access-Control-Request-Method", "Authorization", "Content-Type", "Last-Modified", "Origin", "X-FusionAuth-TenantId", "X-Requested-With")
+                                               .withAllowedOrigins(URI.create("*"))
+                                               .withExcludeURIPredicate(u -> u.startsWith("/foo"))
+                                               .withExposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")
+                                               .withPreflightMaxAgeInSeconds(1800);
+
+    // act + assert
+    simulator.test(path)
+             .withHeader("Access-Control-Request-Method", "GET")
+             .withHeader("Origin", "https://jackinthebox.com")
+             .options()
+             .assertStatusCode(expectCorsAllow ? 204 : 403);
+  }
+
+  @Test(dataProvider = "get_included_path_pattern")
+  public void options_included_path_pattern(String path, boolean expectCorsAllow) throws Exception {
+    // arrange
+    corsConfiguration = new CORSConfiguration().withAllowCredentials(true)
+                                               .withAllowedMethods(HTTPMethod.GET, HTTPMethod.POST, HTTPMethod.HEAD, HTTPMethod.OPTIONS, HTTPMethod.PUT, HTTPMethod.DELETE)
+                                               .withAllowedHeaders("Accept", "Access-Control-Request-Headers", "Access-Control-Request-Method", "Authorization", "Content-Type", "Last-Modified", "Origin", "X-FusionAuth-TenantId", "X-Requested-With")
+                                               .withAllowedOrigins(URI.create("*"))
+                                               .withIncludedPathPattern(Pattern.compile("^/admin/foo"))
+                                               .withExposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")
+                                               .withPreflightMaxAgeInSeconds(1800);
+
+    // act + assert
+    var result = simulator.test(path)
+                          .withHeader("Access-Control-Request-Method", "GET")
+                          .withHeader("Origin", "https://jackinthebox.com")
+                          .options()
+                          .assertStatusCode(expectCorsAllow ? 204 : 403);
+    if (!expectCorsAllow) {
+      return;
+    }
+    result.assertHeaderContains("Access-Control-Allow-Credentials", "true")
+          .assertHeaderContains("Access-Control-Allow-Headers", "Accept,Access-Control-Request-Headers,Access-Control-Request-Method,Authorization,Content-Type,Last-Modified,Origin,X-FusionAuth-TenantId,X-Requested-With")
+          .assertHeaderContains("Access-Control-Allow-Methods", "GET")
+          .assertHeaderContains("Access-Control-Max-Age", "1800")
+          .assertHeaderContains("Access-Control-Allow-Origin", "https://jackinthebox.com")
+          .assertHeaderDoesNotContain("Access-Control-Expose-Headers")
+          .assertHeaderContains("Vary", "Origin");
+  }
+
+  @Test(dataProvider = "get_included_path_pattern")
+  public void options_included_uri_checker(String path, boolean expectCorsAllow) throws Exception {
+    // arrange
+    corsConfiguration = new CORSConfiguration().withAllowCredentials(true)
+                                               .withAllowedMethods(HTTPMethod.GET, HTTPMethod.POST, HTTPMethod.HEAD, HTTPMethod.OPTIONS, HTTPMethod.PUT, HTTPMethod.DELETE)
+                                               .withAllowedHeaders("Accept", "Access-Control-Request-Headers", "Access-Control-Request-Method", "Authorization", "Content-Type", "Last-Modified", "Origin", "X-FusionAuth-TenantId", "X-Requested-With")
+                                               .withAllowedOrigins(URI.create("*"))
+                                               .withIncludeURIPredicate(u -> u.startsWith("/admin/foo"))
+                                               .withExposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")
+                                               .withPreflightMaxAgeInSeconds(1800);
+
+    // act + assert
+    var result = simulator.test(path)
+                          .withHeader("Access-Control-Request-Method", "GET")
+                          .withHeader("Origin", "https://jackinthebox.com")
+                          .options()
+                          .assertStatusCode(expectCorsAllow ? 204 : 403);
+    if (!expectCorsAllow) {
+      return;
+    }
+    result.assertHeaderContains("Access-Control-Allow-Credentials", "true")
+          .assertHeaderContains("Access-Control-Allow-Headers", "Accept,Access-Control-Request-Headers,Access-Control-Request-Method,Authorization,Content-Type,Last-Modified,Origin,X-FusionAuth-TenantId,X-Requested-With")
+          .assertHeaderContains("Access-Control-Allow-Methods", "GET")
+          .assertHeaderContains("Access-Control-Max-Age", "1800")
+          .assertHeaderContains("Access-Control-Allow-Origin", "https://jackinthebox.com")
+          .assertHeaderDoesNotContain("Access-Control-Expose-Headers")
+          .assertHeaderContains("Vary", "Origin");
   }
 
   @Test
   public void options_validateDisallowedHeader() throws Exception {
-    HttpClient client = HttpClient.newBuilder().followRedirects(Redirect.NEVER).priority(256).build();
-    HttpResponse<Void> response = client.send(
-        HttpRequest.newBuilder(URI.create("http://localhost:9080/api/status"))
-                   .method("OPTIONS", BodyPublishers.noBody())
-                   .header("Access-Control-Request-Method", "GET")
-                   .header("Access-Control-Request-Headers", "X-Foo")
-                   .header("Origin", "https://jackinthebox.com")
-                   .build(),
-        BodyHandlers.discarding()
-    );
-    assertEquals(response.statusCode(), 403);
+    var response = simulator.test("/api/status")
+                            .withHeader("Access-Control-Request-Method", "GET")
+                            .withHeader("Access-Control-Request-Headers", "X-Foo")
+                            .withHeader("Origin", "https://jackinthebox.com")
+                            .options()
+                            .assertStatusCode(403);
+
     assertNoCORSHeaders(response);
   }
 
   @Test
   public void options_validateDisallowedMethod() throws Exception {
     corsConfiguration.withAllowedMethods(HTTPMethod.POST);
-    HttpClient client = HttpClient.newBuilder().followRedirects(Redirect.NEVER).priority(256).build();
-    HttpResponse<Void> response = client.send(
-        HttpRequest.newBuilder(URI.create("http://localhost:9080/api/status"))
-                   .method("OPTIONS", BodyPublishers.noBody())
-                   .header("Access-Control-Request-Method", "GET")
-                   .header("Origin", "https://jackinthebox.com")
-                   .build(),
-        BodyHandlers.discarding()
-    );
-    assertEquals(response.statusCode(), 403);
+    var response = simulator.test("/api/status")
+                            .withHeader("Access-Control-Request-Method", "GET")
+                            .withHeader("Origin", "https://jackinthebox.com")
+                            .options()
+                            .assertStatusCode(403);
+
     assertNoCORSHeaders(response);
   }
 
   @Test
   public void options_validateDisallowedOrigin() throws Exception {
     corsConfiguration.withAllowedOrigins(URI.create("http://foo.com"));
-    HttpClient client = HttpClient.newBuilder().followRedirects(Redirect.NEVER).priority(256).build();
-    HttpResponse<Void> response = client.send(
-        HttpRequest.newBuilder(URI.create("http://localhost:9080/api/status"))
-                   .method("OPTIONS", BodyPublishers.noBody())
-                   .header("Access-Control-Request-Method", "GET")
-                   .header("Origin", "https://jackinthebox.com")
-                   .build(),
-        BodyHandlers.discarding()
-    );
-    assertEquals(response.statusCode(), 403);
+    var response = simulator.test("/api/status")
+                            .withHeader("Access-Control-Request-Method", "GET")
+                            .withHeader("Origin", "https://jackinthebox.com")
+                            .options()
+                            .assertStatusCode(403);
+
     assertNoCORSHeaders(response);
   }
 
   @Test
   public void options_validateExcludedURIs() throws Exception {
     // Options request of blocked URI pattern bypasses CORS filter and is blocked by Prime MVC with 405
-    HttpClient client = HttpClient.newBuilder().followRedirects(Redirect.NEVER).priority(256).build();
-    HttpResponse<Void> response = client.send(
-        HttpRequest.newBuilder(URI.create("http://localhost:9080/admin/foo"))
-                   .method("OPTIONS", BodyPublishers.noBody())
-                   .header("Origin", "http://foo.com")
-                   .build(),
-        BodyHandlers.discarding()
-    );
-    assertEquals(response.statusCode(), 405);
+    var response = simulator.test("/admin/foo")
+                            .withHeader("Origin", "http://foo.com")
+                            .options()
+                            .assertStatusCode(405);
+
     assertNoCORSHeaders(response);
   }
 
@@ -285,53 +344,55 @@ public class CORSFilterTest extends PrimeBaseTest {
     corsConfiguration.withAllowedMethods(HTTPMethod.GET)
                      .withAllowedOrigins(URI.create("*"))
                      .withAllowCredentials(false);
-    HttpClient client = HttpClient.newBuilder().followRedirects(Redirect.NEVER).priority(256).build();
-    HttpResponse<Void> response = client.send(
-        HttpRequest.newBuilder(URI.create("http://localhost:9080/api/status"))
-                   .method("OPTIONS", BodyPublishers.noBody())
-                   .header("Access-Control-Request-Method", "GET")
-                   .header("Origin", "https://jackinthebox.com")
-                   .build(),
-        BodyHandlers.discarding()
-    );
-    assertEquals(response.statusCode(), 204);
-    assertNull(response.headers().firstValue("Access-Control-Allow-Credentials").orElse(null));
-    assertEquals(response.headers().firstValue("Access-Control-Allow-Origin").orElse(null), "*");
-    assertEquals(response.headers().firstValue("Access-Control-Allow-Headers").orElse(null), "Accept,Access-Control-Request-Headers,Access-Control-Request-Method,Authorization,Content-Type,Last-Modified,Origin,X-FusionAuth-TenantId,X-Requested-With");
-    assertEquals(response.headers().firstValue("Access-Control-Allow-Methods").orElse(null), "GET");
-    assertNull(response.headers().firstValue("Access-Control-Expose-Headers").orElse(null));
-    assertEquals(response.headers().firstValue("Access-Control-Max-Age").orElse(null), "1800");
+
+    simulator.test("/api/status")
+             .withHeader("Access-Control-Request-Method", "GET")
+             .withHeader("Origin", "https://jackinthebox.com")
+             .options()
+             .assertStatusCode(204)
+             .assertHeaderDoesNotContain("Access-Control-Allow-Credentials")
+             .assertHeaderContains("Access-Control-Allow-Origin", "*")
+             .assertHeaderContains("Access-Control-Allow-Headers", "Accept,Access-Control-Request-Headers,Access-Control-Request-Method,Authorization,Content-Type,Last-Modified,Origin,X-FusionAuth-TenantId,X-Requested-With")
+             .assertHeaderContains("Access-Control-Allow-Methods", "GET")
+             .assertHeaderDoesNotContain("Access-Control-Expose-Headers")
+             .assertHeaderContains("Access-Control-Max-Age", "1800");
+  }
+
+  @Test
+  public void path_and_checker_supplied() {
+    var exception = expectThrows(IllegalStateException.class, () -> new CORSConfiguration().withAllowCredentials(true)
+                                                                                           .withAllowedMethods(HTTPMethod.GET, HTTPMethod.POST, HTTPMethod.HEAD, HTTPMethod.OPTIONS, HTTPMethod.PUT, HTTPMethod.DELETE)
+                                                                                           .withAllowedHeaders("Accept", "Access-Control-Request-Headers", "Access-Control-Request-Method", "Authorization", "Content-Type", "Last-Modified", "Origin", "X-FusionAuth-TenantId", "X-Requested-With")
+                                                                                           .withAllowedOrigins(URI.create("*"))
+                                                                                           .withExcludedPathPattern(Pattern.compile("does not matter"))
+                                                                                           .withExcludeURIPredicate(s -> true)
+                                                                                           .withExposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")
+                                                                                           .withPreflightMaxAgeInSeconds(1800));
+    assertEquals(exception.getMessage(),
+                 "You cannot use both a path (withIncludedPathPattern/withExcludedPathPattern) and predicate based (withIncludeURIPredicate/withExcludeURIPredicate). You must use one or the other.");
   }
 
   @Test
   public void post() throws Exception {
-    HttpClient client = HttpClient.newBuilder().followRedirects(Redirect.NEVER).priority(256).build();
-    HttpResponse<Void> response = client.send(
-        HttpRequest.newBuilder(URI.create("http://localhost:9080/api/status"))
-                   .POST(BodyPublishers.noBody())
-                   .header("Content-Type", "application/json")
-                   .header("Origin", "https://jackinthebox.com")
-                   .build(),
-        BodyHandlers.discarding()
-    );
-    assertEquals(response.statusCode(), 200);
-    assertEquals(response.headers().firstValue("Access-Control-Allow-Credentials").orElse(null), "true");
-    assertEquals(response.headers().firstValue("Access-Control-Allow-Origin").orElse(null), "https://jackinthebox.com");
-    assertNull(response.headers().firstValue("Access-Control-Allow-Headers").orElse(null));
-    assertNull(response.headers().firstValue("Access-Control-Allow-Methods").orElse(null));
-    assertEquals(response.headers().firstValue("Access-Control-Expose-Headers").orElse(null), "Access-Control-Allow-Origin,Access-Control-Allow-Credentials");
-    assertNull(response.headers().firstValue("Access-Control-Max-Age").orElse(null));
+    simulator.test("/api/status")
+             .withHeader("Content-Type", "application/json")
+             .withHeader("Origin", "https://jackinthebox.com")
+             .post()
+             .assertStatusCode(200)
+             .assertHeaderContains("Access-Control-Allow-Credentials", "true")
+             .assertHeaderContains("Access-Control-Allow-Origin", "https://jackinthebox.com")
+             .assertHeaderDoesNotContain("Access-Control-Allow-Headers")
+             .assertHeaderDoesNotContain("Access-Control-Allow-Methods")
+             .assertHeaderContains("Access-Control-Expose-Headers", "Access-Control-Allow-Origin,Access-Control-Allow-Credentials")
+             .assertBodyDoesNotContain("Access-Control-Max-Age");
 
     // No Content-Type header currently results in an INVALID_CORS handling
     // TODO : Is this correct?
-    response = client.send(
-        HttpRequest.newBuilder(URI.create("http://localhost:9080/api/status"))
-                   .POST(BodyPublishers.noBody())
-                   .header("Origin", "https://jackinthebox.com")
-                   .build(),
-        BodyHandlers.discarding()
-    );
-    assertEquals(response.statusCode(), 403);
+    var response = simulator.test("/api/status")
+                            .withHeader("Origin", "https://jackinthebox.com")
+                            .post()
+                            .assertStatusCode(403);
+
     assertNoCORSHeaders(response);
   }
 
@@ -339,15 +400,11 @@ public class CORSFilterTest extends PrimeBaseTest {
   public void post_validateDisallowedMethod() throws Exception {
     corsConfiguration.withAllowedMethods(HTTPMethod.GET);
 
-    HttpClient client = HttpClient.newBuilder().followRedirects(Redirect.NEVER).priority(256).build();
-    HttpResponse<Void> response = client.send(
-        HttpRequest.newBuilder(URI.create("http://localhost:9080/api/status"))
-                   .POST(BodyPublishers.noBody())
-                   .header("Origin", "https://jackinthebox.com")
-                   .build(),
-        BodyHandlers.discarding()
-    );
-    assertEquals(response.statusCode(), 403);
+    var response = simulator.test("/api/status")
+                            .withHeader("Origin", "https://jackinthebox.com")
+                            .post()
+                            .assertStatusCode(403);
+
     assertNoCORSHeaders(response);
   }
 
@@ -355,15 +412,11 @@ public class CORSFilterTest extends PrimeBaseTest {
   public void post_validateDisallowedOrigin() throws Exception {
     corsConfiguration.withAllowedOrigins(URI.create("http://foo.com"));
 
-    HttpClient client = HttpClient.newBuilder().followRedirects(Redirect.NEVER).priority(256).build();
-    HttpResponse<Void> response = client.send(
-        HttpRequest.newBuilder(URI.create("http://localhost:9080/api/status"))
-                   .POST(BodyPublishers.noBody())
-                   .header("Origin", "https://jackinthebox.com")
-                   .build(),
-        BodyHandlers.discarding()
-    );
-    assertEquals(response.statusCode(), 403);
+    var response = simulator.test("/api/status")
+                            .withHeader("Origin", "https://jackinthebox.com")
+                            .post()
+                            .assertStatusCode(403);
+
     assertNoCORSHeaders(response);
   }
 
@@ -371,48 +424,36 @@ public class CORSFilterTest extends PrimeBaseTest {
   public void post_validateExcludedURIs_withSimpleContentType() throws Exception {
     // Skip CORS Filter on same origin request of blocked URI patterns
     // No origin header, this is not a CORS request, response should not have a CORS header
-    HttpClient client = HttpClient.newBuilder().followRedirects(Redirect.NEVER).priority(256).build();
-    HttpResponse<Void> response = client.send(
-        HttpRequest.newBuilder(URI.create("http://localhost:9080/admin/nested/foo"))
-                   .POST(BodyPublishers.noBody())
-                   .build(),
-        BodyHandlers.discarding()
-    );
-    assertEquals(response.statusCode(), 200);
+    var response = simulator.test("/admin/nested/foo")
+                            .post()
+                            .assertStatusCode(200);
     assertNoCORSHeaders(response);
 
     // With origin header, it's still excluded to the action is run
-    response = client.send(
-        HttpRequest.newBuilder(URI.create("http://localhost:9080/admin/nested/foo"))
-                   .POST(BodyPublishers.noBody())
-                   .header("Origin", "https://jackinthebox.com")
-                   .build(),
-        BodyHandlers.discarding()
-    );
-    assertEquals(response.statusCode(), 200);
+    response = simulator.test("/admin/nested/foo")
+                        .withHeader("Origin", "https://jackinthebox.com")
+                        .post()
+                        .assertStatusCode(200);
+
     assertNoCORSHeaders(response);
   }
 
-  private void assertNoCORSHeaders(HttpResponse<Void> response) {
-    assertNull(response.headers().firstValue("Access-Control-Allow-Credentials").orElse(null));
-    assertNull(response.headers().firstValue("Access-Control-Allow-Headers").orElse(null));
-    assertNull(response.headers().firstValue("Access-Control-Allow-Methods").orElse(null));
-    assertNull(response.headers().firstValue("Access-Control-Allow-Origin").orElse(null));
-    assertNull(response.headers().firstValue("Access-Control-Expose-Headers").orElse(null));
-    assertNull(response.headers().firstValue("Access-Control-Max-Age").orElse(null));
-    assertNull(response.headers().firstValue("Vary").orElse(null));
+  private void assertNoCORSHeaders(RequestResult response) {
+    response.assertHeaderDoesNotContain("Access-Control-Allow-Credentials")
+            .assertHeaderDoesNotContain("Access-Control-Allow-Headers")
+            .assertHeaderDoesNotContain("Access-Control-Allow-Methods")
+            .assertHeaderDoesNotContain("Access-Control-Allow-Origin")
+            .assertHeaderDoesNotContain("Access-Control-Expose-Headers")
+            .assertHeaderDoesNotContain("Access-Control-Max-Age")
+            .assertHeaderDoesNotContain("Vary");
   }
 
   private void assertUnauthorized() throws IOException, InterruptedException {
-    HttpClient client = HttpClient.newBuilder().followRedirects(Redirect.NEVER).priority(256).build();
-    HttpResponse<Void> response = client.send(
-        HttpRequest.newBuilder(URI.create("http://localhost:9080/api/status"))
-                   .GET()
-                   .header("Origin", "https://jackinthebox.com")
-                   .build(),
-        BodyHandlers.discarding()
-    );
-    assertEquals(response.statusCode(), 403);
+    var response = simulator.test("/api/status")
+                            .withHeader("Origin", "https://jackinthebox.com")
+                            .get()
+                            .assertStatusCode(403);
+
     assertNoCORSHeaders(response);
   }
 }

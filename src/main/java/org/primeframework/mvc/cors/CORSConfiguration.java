@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2022-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import io.fusionauth.http.HTTPMethod;
@@ -38,9 +39,15 @@ public class CORSConfiguration implements Buildable<CORSConfiguration> {
 
   public boolean debug;
 
+  public Predicate<String> excludeURIPredicate;
+
   public Pattern excludedPathPattern;
 
   public List<String> exposedHeaders = new ArrayList<>();
+
+  public Predicate<String> includeURIPredicate;
+
+  public Pattern includedPathPattern;
 
   public int preflightMaxAgeInSeconds;
 
@@ -57,12 +64,12 @@ public class CORSConfiguration implements Buildable<CORSConfiguration> {
     }
     CORSConfiguration that = (CORSConfiguration) o;
     return allowCredentials == that.allowCredentials &&
-        debug == that.debug &&
-        preflightMaxAgeInSeconds == that.preflightMaxAgeInSeconds &&
-        Objects.equals(allowedHeaders, that.allowedHeaders) &&
-        Objects.equals(allowedMethods, that.allowedMethods) &&
-        Objects.equals(allowedOrigins, that.allowedOrigins) &&
-        Objects.equals(exposedHeaders, that.exposedHeaders);
+           debug == that.debug &&
+           preflightMaxAgeInSeconds == that.preflightMaxAgeInSeconds &&
+           Objects.equals(allowedHeaders, that.allowedHeaders) &&
+           Objects.equals(allowedMethods, that.allowedMethods) &&
+           Objects.equals(allowedOrigins, that.allowedOrigins) &&
+           Objects.equals(exposedHeaders, that.exposedHeaders);
   }
 
   @Override
@@ -98,8 +105,15 @@ public class CORSConfiguration implements Buildable<CORSConfiguration> {
     return this;
   }
 
+  public CORSConfiguration withExcludeURIPredicate(Predicate<String> excludeURIPredicate) {
+    this.excludeURIPredicate = excludeURIPredicate;
+    checkExclusiveMatching();
+    return this;
+  }
+
   public CORSConfiguration withExcludedPathPattern(Pattern pattern) {
     this.excludedPathPattern = pattern;
+    checkExclusiveMatching();
     return this;
   }
 
@@ -109,8 +123,33 @@ public class CORSConfiguration implements Buildable<CORSConfiguration> {
     return this;
   }
 
+  public CORSConfiguration withIncludeURIPredicate(Predicate<String> includeURIPredicate) {
+    this.includeURIPredicate = includeURIPredicate;
+    checkExclusiveMatching();
+    return this;
+  }
+
+  public CORSConfiguration withIncludedPathPattern(Pattern pattern) {
+    this.includedPathPattern = pattern;
+    checkExclusiveMatching();
+    return this;
+  }
+
   public CORSConfiguration withPreflightMaxAgeInSeconds(int maxAge) {
     this.preflightMaxAgeInSeconds = maxAge;
     return this;
+  }
+
+  private void checkExclusiveMatching() {
+    if (excludedPathPattern != null && includedPathPattern != null) {
+      throw new IllegalStateException("You cannot use both withExcludedPathPattern and withIncludedPathPattern. You must use one or the other.");
+    }
+    if (includeURIPredicate != null && excludeURIPredicate != null) {
+      throw new IllegalStateException("You cannot use both withIncludeURIPredicate and withExcludeURIPredicate. You must use one or the other.");
+    }
+    if ((includeURIPredicate != null ^ excludeURIPredicate != null) &&
+        (excludedPathPattern != null ^ includedPathPattern != null)) {
+      throw new IllegalStateException("You cannot use both a path (withIncludedPathPattern/withExcludedPathPattern) and predicate based (withIncludeURIPredicate/withExcludeURIPredicate). You must use one or the other.");
+    }
   }
 }

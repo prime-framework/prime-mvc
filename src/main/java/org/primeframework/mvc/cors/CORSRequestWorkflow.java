@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2022-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,6 +57,9 @@ public class CORSRequestWorkflow implements MVCWorkflow {
           .withDebugEnabled(corsConfiguration.debug)
           .withDebugger(debugger)
           .withExcludedPathPattern(corsConfiguration.excludedPathPattern)
+          .withIncludedPathPattern(corsConfiguration.includedPathPattern)
+          .withIncludeURIPredicate(corsConfiguration.includeURIPredicate)
+          .withExcludeURIPredicate(corsConfiguration.excludeURIPredicate)
           .withExposedHeaders(corsConfiguration.exposedHeaders)
           .withPreflightMaxAge(corsConfiguration.preflightMaxAgeInSeconds);
 
