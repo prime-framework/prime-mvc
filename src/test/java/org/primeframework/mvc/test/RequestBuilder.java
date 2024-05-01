@@ -46,22 +46,21 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Injector;
-import com.inversoft.http.Cookie.SameSite;
-import com.inversoft.http.FileUpload;
-import com.inversoft.http.HTTPStrings;
-import com.inversoft.http.HTTPStrings.Headers;
-import com.inversoft.rest.FormDataBodyHandler;
-import com.inversoft.rest.MultipartBodyHandler;
-import com.inversoft.rest.MultipartBodyHandler.Multiparts;
 import io.fusionauth.http.Cookie;
+import io.fusionauth.http.Cookie.SameSite;
 import io.fusionauth.http.FileInfo;
 import io.fusionauth.http.HTTPMethod;
+import io.fusionauth.http.HTTPValues.Headers;
 import io.fusionauth.http.io.BlockingByteBufferOutputStream;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mock.MockUserAgent;
 import org.primeframework.mvc.config.MVCConfiguration;
+import org.primeframework.mvc.http.FormBodyPublisher;
 import org.primeframework.mvc.http.HTTPObjectsHolder;
+import org.primeframework.mvc.http.MultipartBodyHandler;
+import org.primeframework.mvc.http.MultipartBodyHandler.Multiparts;
+import org.primeframework.mvc.http.MultipartFileUpload;
 import org.primeframework.mvc.message.TestMessageObserver;
 import org.primeframework.mvc.parameter.DefaultParameterParser;
 import org.primeframework.mvc.security.csrf.CSRFProvider;
@@ -777,15 +776,15 @@ public class RequestBuilder {
     request.addCookies(userAgent.getCookies(request));
     var restCookies = request.getCookies()
                              .stream()
-                             .map(c -> new com.inversoft.http.Cookie().with(c1 -> c1.domain = c.domain)
-                                                                      .with(c1 -> c1.expires = c.expires)
-                                                                      .with(c1 -> c1.httpOnly = c.httpOnly)
-                                                                      .with(c1 -> c1.maxAge = c.maxAge)
-                                                                      .with(c1 -> c1.name = c.name)
-                                                                      .with(c1 -> c1.path = c.path)
-                                                                      .with(c1 -> c1.sameSite = c.sameSite != null ? SameSite.valueOf(c.sameSite.name()) : null)
-                                                                      .with(c1 -> c1.secure = c.secure)
-                                                                      .with(c1 -> c1.value = c.value))
+                             .map(c -> new Cookie().with(c1 -> c1.domain = c.domain)
+                                                   .with(c1 -> c1.expires = c.expires)
+                                                   .with(c1 -> c1.httpOnly = c.httpOnly)
+                                                   .with(c1 -> c1.maxAge = c.maxAge)
+                                                   .with(c1 -> c1.name = c.name)
+                                                   .with(c1 -> c1.path = c.path)
+                                                   .with(c1 -> c1.sameSite = c.sameSite != null ? SameSite.valueOf(c.sameSite.name()) : null)
+                                                   .with(c1 -> c1.secure = c.secure)
+                                                   .with(c1 -> c1.value = c.value))
                              .toList();
 
     String scheme = useTLS ? "https://" : "http://";
@@ -826,10 +825,10 @@ public class RequestBuilder {
     InputStream inputStream = null;
 
     if (files != null && !files.isEmpty()) {
-      List<FileUpload> fileUploads = files.stream()
-                                          .map(fi -> new FileUpload(fi.contentType, fi.file, fi.fileName, fi.name))
-                                          .collect(Collectors.toList());
-      MultipartBodyHandler multipartBodyHandler = new MultipartBodyHandler(new Multiparts(fileUploads, urlParameters));
+      List<MultipartFileUpload> fileUploads = files.stream()
+                                                   .map(fi -> new MultipartFileUpload(fi.contentType, fi.file, fi.fileName, fi.name))
+                                                   .collect(Collectors.toList());
+      MultipartBodyHandler multipartBodyHandler = new MultipartBodyHandler(new Multiparts(fileUploads, requestBodyParameters));
       bodyPublisher = BodyPublishers.ofByteArray(multipartBodyHandler.getBody());
       if (contentType == null) {
         contentType = "multipart/form-data; boundary=" + multipartBodyHandler.boundary;
@@ -839,7 +838,7 @@ public class RequestBuilder {
       bodyPublisher = BodyPublishers.ofByteArray(body);
       inputStream = new ByteArrayInputStream(body);
     } else if (!requestBodyParameters.isEmpty()) {
-      byte[] formBody = new FormDataBodyHandler(requestBodyParameters).getBody();
+      byte[] formBody = new FormBodyPublisher(requestBodyParameters).getBody();
       bodyPublisher = BodyPublishers.ofByteArray(formBody);
       if (contentType == null) {
         contentType = "application/x-www-form-urlencoded";
@@ -867,22 +866,22 @@ public class RequestBuilder {
     }
 
     // Copy over headers
-    request.getHeaders().forEach((name, values) -> values
-        .forEach(value -> requestBuilder.setHeader(name, value)));
+    request.getHeaders().forEach((name, values) ->
+                                     values.forEach(value -> requestBuilder.setHeader(name, value)));
 
     // Set cookies
-    if (request.getHeaders().keySet().stream().noneMatch(name -> name.equalsIgnoreCase(HTTPStrings.Headers.Cookie)) && !request.getCookies().isEmpty()) {
+    if (request.getHeaders().keySet().stream().noneMatch(name -> name.equalsIgnoreCase(Headers.Cookie)) && !request.getCookies().isEmpty()) {
       String header = request.getCookies()
                              .stream()
                              .map(io.fusionauth.http.Cookie::toRequestHeader)
                              .collect(Collectors.joining("; "));
-      requestBuilder.setHeader(HTTPStrings.Headers.Cookie, header);
+      requestBuilder.setHeader(Headers.Cookie, header);
     }
 
     // Set the UserAgent header if not already set
     // - Do this because the default UserAgent string will include the Java version string which is annoying to update in tests.
     if (request.getHeaders().keySet().stream().noneMatch(name -> name.equalsIgnoreCase(Headers.UserAgent))) {
-      requestBuilder.setHeader(HTTPStrings.Headers.UserAgent, "Java HttpClient");
+      requestBuilder.setHeader(Headers.UserAgent, "Java HttpClient");
     }
 
     QueryStringBuilder queryStringBuilder = QueryStringBuilder.builder();
@@ -914,8 +913,7 @@ public class RequestBuilder {
                                                    .with(c1 -> c1.name = c.name)
                                                    .with(c1 -> c1.path = c.path)
                                                    .with(c1 -> c1.sameSite = c.sameSite != null ? Cookie.SameSite.valueOf(c.sameSite.name()) : null)
-                                                   .with(c1 -> c1.secure = c.secure)
-                                                   .with(c1 -> c1.value = c.value))
+                                                   .with(c1 -> c1.secure = c.secure).with(c1 -> c1.value = c.value))
                              .collect(Collectors.toList()));
 
     result.init();
@@ -923,12 +921,9 @@ public class RequestBuilder {
   }
 
   private List<io.fusionauth.http.Cookie> getCookies(HttpResponse<byte[]> response) {
-    List<String> cookies = response.headers().allValues(HTTPStrings.Headers.SetCookie.toLowerCase());
+    List<String> cookies = response.headers().allValues(Headers.SetCookie.toLowerCase());
     if (cookies != null && !cookies.isEmpty()) {
-      return cookies.stream()
-                    .map(io.fusionauth.http.Cookie::fromResponseHeader)
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
+      return cookies.stream().map(io.fusionauth.http.Cookie::fromResponseHeader).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     return List.of();

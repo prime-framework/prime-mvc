@@ -55,6 +55,7 @@ import org.example.action.OverrideMeAction;
 import org.example.action.ParameterHandlerAction;
 import org.example.action.store.BaseStoreAction;
 import org.example.action.user.EditAction;
+import org.example.action.user.FullFormAction;
 import org.example.domain.UserField;
 import org.primeframework.mvc.action.config.ActionConfigurationProvider;
 import org.primeframework.mvc.container.ContainerResolver;
@@ -2048,6 +2049,27 @@ public class GlobalTest extends PrimeBaseTest {
 
     // Once for the API call and another for the message lookup
     assertEquals(LotsOfMessagesAction.invocationCount.get(), 2);
+  }
+
+  @Test
+  public void post_multipart_parameter_mix() throws Exception {
+    // arrange
+    test.createFile("Hello World")
+        .simulate(() -> simulator.test("/user/full-form")
+                                 .withParameter("roleIds", 21)
+                                 .withParameter("roleIds", 22)
+                                 .withURLParameter("ages", 42)
+                                 .withParameter("stringField", "hello with space")
+                                 .withFile("image", test.tempFile, "text/plain")
+                                 .post()
+                                 // assert
+                                 .assertStatusCode(200));
+
+    assertEquals(FullFormAction.roleIdsFromLastPost.size(), 2);
+    assertEquals(FullFormAction.agesFromLastPost.size(), 1);
+    var fileContents = Files.readString((FullFormAction.imageFromLastPost.getFile()));
+    assertEquals(fileContents, "Hello World");
+    assertEquals(FullFormAction.stringFieldFromLastPost, "hello with space");
   }
 
   @Test

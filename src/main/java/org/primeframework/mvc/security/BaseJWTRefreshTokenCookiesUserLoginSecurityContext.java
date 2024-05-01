@@ -15,21 +15,27 @@
  */
 package org.primeframework.mvc.security;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.Builder;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.inversoft.rest.ClientResponse;
-import com.inversoft.rest.FormDataBodyHandler;
-import com.inversoft.rest.JSONResponseHandler;
-import com.inversoft.rest.RESTClient;
 import io.fusionauth.http.Cookie.SameSite;
+import io.fusionauth.http.HTTPValues.ContentTypes;
+import io.fusionauth.http.HTTPValues.Headers;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
 import io.fusionauth.jwt.JWTExpiredException;
 import io.fusionauth.jwt.Verifier;
 import io.fusionauth.jwt.domain.JWT;
+import org.primeframework.mvc.http.FormBodyPublisher;
+import org.primeframework.mvc.http.JSONResponseBodyHandler;
 import org.primeframework.mvc.security.oauth.OAuthConfiguration;
 import org.primeframework.mvc.security.oauth.RefreshResponse;
 import org.primeframework.mvc.security.oauth.TokenAuthenticationMethod;
@@ -46,6 +52,9 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
 
   private static final String UserKey = "primeCurrentUser";
 
+  // can run out of open files if we create too many of these
+  private static final HttpClient httpClient = HttpClient.newHttpClient();
+
   protected final CookieProxy jwtCookie;
 
   protected final CookieProxy refreshTokenCookie;
@@ -56,8 +65,7 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
 
   protected final VerifierProvider verifierProvider;
 
-  protected BaseJWTRefreshTokenCookiesUserLoginSecurityContext(HTTPRequest request, HTTPResponse response,
-                                                               VerifierProvider verifierProvider) {
+  protected BaseJWTRefreshTokenCookiesUserLoginSecurityContext(HTTPRequest request, HTTPResponse response, VerifierProvider verifierProvider) {
     this.request = request;
     this.response = response;
     this.verifierProvider = verifierProvider;
@@ -246,31 +254,45 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
       return tokens;
     }
 
-    RESTClient<RefreshResponse, JsonNode> client = new RESTClient<>(RefreshResponse.class, JsonNode.class)
-        .url(oauthConfiguration.tokenEndpoint)
-        .successResponseHandler(new JSONResponseHandler<>(RefreshResponse.class))
-        .errorResponseHandler(new JSONResponseHandler<>(JsonNode.class));
-
+    Builder requestBuilder = HttpRequest.newBuilder(URI.create(oauthConfiguration.tokenEndpoint));
     if (oauthConfiguration.authenticationMethod == TokenAuthenticationMethod.client_secret_basic) {
-      client.basicAuthorization(oauthConfiguration.clientId, oauthConfiguration.clientSecret);
+      // see https://www.rfc-editor.org/rfc/rfc2617#section-2
+      if (oauthConfiguration.clientId.contains(":")) {
+        tokens.refreshToken = null;
+        jwtCookie.delete(request, response);
+        refreshTokenCookie.delete(request, response);
+        return tokens;
+      }
+      // not using the HttpClient authenticator/PasswordAuthentication support because
+      // we want pre-emptive auth here
+      String encoded = Base64.getEncoder()
+                             .encodeToString((oauthConfiguration.clientId + ":" + oauthConfiguration.clientSecret)
+                                                 .getBytes(StandardCharsets.UTF_8));
+      requestBuilder.header("Authorization", "Basic " + encoded);
     } else if (oauthConfiguration.authenticationMethod == TokenAuthenticationMethod.client_secret_post) {
       body.put("client_id", List.of(oauthConfiguration.clientId));
       body.put("client_secret", List.of(oauthConfiguration.clientSecret));
     }
 
-    ClientResponse<RefreshResponse, JsonNode> resp = client
-        .bodyHandler(new FormDataBodyHandler(body))
-        .post()
-        .go();
+    HttpRequest refreshRequest = requestBuilder.header(Headers.ContentType, ContentTypes.Form)
+                                               .POST(new FormBodyPublisher(body))
+                                               .build();
 
-    if (!resp.wasSuccessful()) {
+    HttpResponse<RefreshResponse> resp = null;
+    Exception endpointException = null;
+    try {
+      resp = httpClient.send(refreshRequest, new JSONResponseBodyHandler<>(RefreshResponse.class));
+    } catch (Exception e) {
+      endpointException = e;
+    }
+    if (endpointException != null || resp.statusCode() < 200 || resp.statusCode() > 299) {
       tokens.refreshToken = null;
       jwtCookie.delete(request, response);
       refreshTokenCookie.delete(request, response);
       return tokens;
     }
 
-    RefreshResponse rr = resp.getSuccessResponse();
+    RefreshResponse rr = resp.body();
     tokens.jwt = rr.access_token;
     tokens.refreshToken = defaultIfNull(rr.refresh_token, tokens.refreshToken);
 

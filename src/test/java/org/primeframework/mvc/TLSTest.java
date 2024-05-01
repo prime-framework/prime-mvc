@@ -25,7 +25,6 @@ import java.security.GeneralSecurityException;
 
 import com.google.inject.Module;
 import com.google.inject.util.Modules;
-import com.inversoft.net.ssl.UnsafeTrustManager;
 import io.fusionauth.http.HTTPValues.Headers;
 import io.fusionauth.http.HTTPValues.Methods;
 import io.fusionauth.http.server.HTTPListenerConfiguration;
@@ -44,6 +43,7 @@ import org.primeframework.mvc.security.MockOAuthUserLoginSecurityContext;
 import org.primeframework.mvc.security.UserLoginSecurityContext;
 import org.primeframework.mvc.test.RequestBuilder;
 import org.primeframework.mvc.test.RequestSimulator;
+import org.primeframework.mvc.util.UnsafeTrustManager;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;

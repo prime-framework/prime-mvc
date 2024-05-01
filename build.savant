@@ -26,11 +26,10 @@ guiceVersion = "6.0.0"
 jacksonVersion = "2.15.2"
 jsoupVersion = "1.16.1"
 logbackVersion = "1.4.8"
-restifyVersion = "4.1.2"
 slf4jVersion = "2.0.7"
 testngVersion = "7.8.0"
 
-project(group: "org.primeframework", name: "prime-mvc", version: "4.22.7", licenses: ["ApacheV2_0"]) {
+project(group: "org.primeframework", name: "prime-mvc", version: "4.22.8", licenses: ["ApacheV2_0"]) {
   workflow {
     fetch {
       // Dependency resolution order:
@@ -61,7 +60,6 @@ project(group: "org.primeframework", name: "prime-mvc", version: "4.22.7", licen
       dependency(id: "com.github.java-json-tools:json-patch:${jsonPatchVersion}")
       dependency(id: "com.google.code.findbugs:jsr305:3.0.2", skipCompatibilityCheck: true)
       dependency(id: "com.google.inject:guice:${guiceVersion}")
-      dependency(id: "com.inversoft:restify:${restifyVersion}")
       dependency(id: "io.dropwizard.metrics:metrics-core:${dropWizardVersion}")
       dependency(id: "io.fusionauth:fusionauth-jwt:${fusionAuthJWTVersion}")
       dependency(id: "io.fusionauth:java-http:${javaHTTPVersion}")
