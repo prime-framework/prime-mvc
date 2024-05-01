@@ -102,7 +102,8 @@ public abstract class BaseUserIdCookieSecurityContext<TUserId> implements UserLo
 
   @Override
   public boolean isLoggedIn() {
-    // user MIGHT a DB query to hydrate the user so we can do a lighter weight check
+    // We only need to check the context, not the current user, to avoid calling the
+    // retrieveUserById method, which is often less performant (DB call)
     return resolveContext() != null;
   }
 
