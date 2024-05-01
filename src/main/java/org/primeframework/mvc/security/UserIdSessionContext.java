@@ -31,16 +31,16 @@ public interface UserIdSessionContext<TUserId> {
   ZonedDateTime getLoginInstant();
 
   /**
-   * The session ID for the logged in user. This should be unique.
+   * The session Id for the logged in user. This should be unique.
    *
-   * @return the session ID
+   * @return the session Id
    */
   String getSessionId();
 
   /**
-   * The User ID for the logged in user
+   * The User Id for the logged in user
    *
-   * @return the user ID
+   * @return the user Id
    */
   TUserId getUserId();
 }
