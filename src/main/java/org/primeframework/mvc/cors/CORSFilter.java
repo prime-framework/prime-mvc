@@ -115,7 +115,7 @@ public final class CORSFilter {
   /**
    * Allow a predicate to decide whether to exclude in CORS
    */
-  private Predicate<String> excludePredicate;
+  private Predicate<String> excludeURIPredicate;
 
   /**
    * Regex for excluding URI patterns from CORS filter processing
@@ -125,7 +125,7 @@ public final class CORSFilter {
   /**
    * Allow a predicate to decide whether to include in CORS
    */
-  private Predicate<String> includeUriChecker;
+  private Predicate<String> includeURIPredicate;
 
   /**
    * Regex for including URI patterns from CORS filter processing
@@ -238,8 +238,8 @@ public final class CORSFilter {
     return this;
   }
 
-  public CORSFilter withExcludePredicate(Predicate<String> excludePredicate) {
-    this.excludePredicate = excludePredicate;
+  public CORSFilter withExcludeURIPredicate(Predicate<String> excludeURIPredicate) {
+    this.excludeURIPredicate = excludeURIPredicate;
     return this;
   }
 
@@ -263,8 +263,8 @@ public final class CORSFilter {
     return this;
   }
 
-  public CORSFilter withIncludePredicate(Predicate<String> includePredicate) {
-    this.includeUriChecker = includePredicate;
+  public CORSFilter withIncludeURIPredicate(Predicate<String> includeURIPredicate) {
+    this.includeURIPredicate = includeURIPredicate;
     return this;
   }
 
@@ -340,10 +340,10 @@ public final class CORSFilter {
       return excludedPathPattern.matcher(requestURI).find();
     } else if (includedPathPattern != null) {
       return !includedPathPattern.matcher(requestURI).find();
-    } else if (includeUriChecker != null) {
-      return !includeUriChecker.test(requestURI);
-    } else if (excludePredicate != null) {
-      return excludePredicate.test(requestURI);
+    } else if (includeURIPredicate != null) {
+      return !includeURIPredicate.test(requestURI);
+    } else if (excludeURIPredicate != null) {
+      return excludeURIPredicate.test(requestURI);
     }
 
     // we're not using any of the functionality

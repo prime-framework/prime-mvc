@@ -209,12 +209,12 @@ public class CORSFilterTest extends PrimeBaseTest {
                                                                                            .withAllowedMethods(HTTPMethod.GET, HTTPMethod.POST, HTTPMethod.HEAD, HTTPMethod.OPTIONS, HTTPMethod.PUT, HTTPMethod.DELETE)
                                                                                            .withAllowedHeaders("Accept", "Access-Control-Request-Headers", "Access-Control-Request-Method", "Authorization", "Content-Type", "Last-Modified", "Origin", "X-FusionAuth-TenantId", "X-Requested-With")
                                                                                            .withAllowedOrigins(URI.create("*"))
-                                                                                           .withIncludeUriPredicate(s -> true)
-                                                                                           .withExcludeUriPredicate(s -> true)
+                                                                                           .withIncludeURIPredicate(s -> true)
+                                                                                           .withExcludeURIPredicate(s -> true)
                                                                                            .withExposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")
                                                                                            .withPreflightMaxAgeInSeconds(1800));
     assertEquals(exception.getMessage(),
-                 "You cannot use both withIncludeUriPredicate and withExcludeUriPredicate. You must use one or the other.");
+                 "You cannot use both withIncludeURIPredicate and withExcludeURIPredicate. You must use one or the other.");
   }
 
   @Test
@@ -262,7 +262,7 @@ public class CORSFilterTest extends PrimeBaseTest {
                                                .withAllowedMethods(HTTPMethod.GET, HTTPMethod.POST, HTTPMethod.HEAD, HTTPMethod.OPTIONS, HTTPMethod.PUT, HTTPMethod.DELETE)
                                                .withAllowedHeaders("Accept", "Access-Control-Request-Headers", "Access-Control-Request-Method", "Authorization", "Content-Type", "Last-Modified", "Origin", "X-FusionAuth-TenantId", "X-Requested-With")
                                                .withAllowedOrigins(URI.create("*"))
-                                               .withExcludeUriPredicate(u -> u.startsWith("/foo"))
+                                               .withExcludeURIPredicate(u -> u.startsWith("/foo"))
                                                .withExposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")
                                                .withPreflightMaxAgeInSeconds(1800);
 
@@ -326,7 +326,7 @@ public class CORSFilterTest extends PrimeBaseTest {
                                                .withAllowedMethods(HTTPMethod.GET, HTTPMethod.POST, HTTPMethod.HEAD, HTTPMethod.OPTIONS, HTTPMethod.PUT, HTTPMethod.DELETE)
                                                .withAllowedHeaders("Accept", "Access-Control-Request-Headers", "Access-Control-Request-Method", "Authorization", "Content-Type", "Last-Modified", "Origin", "X-FusionAuth-TenantId", "X-Requested-With")
                                                .withAllowedOrigins(URI.create("*"))
-                                               .withIncludeUriPredicate(u -> u.startsWith("/admin/foo"))
+                                               .withIncludeURIPredicate(u -> u.startsWith("/admin/foo"))
                                                .withExposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")
                                                .withPreflightMaxAgeInSeconds(1800);
 
@@ -449,11 +449,11 @@ public class CORSFilterTest extends PrimeBaseTest {
                                                                                            .withAllowedHeaders("Accept", "Access-Control-Request-Headers", "Access-Control-Request-Method", "Authorization", "Content-Type", "Last-Modified", "Origin", "X-FusionAuth-TenantId", "X-Requested-With")
                                                                                            .withAllowedOrigins(URI.create("*"))
                                                                                            .withExcludedPathPattern(Pattern.compile("does not matter"))
-                                                                                           .withExcludeUriPredicate(s -> true)
+                                                                                           .withExcludeURIPredicate(s -> true)
                                                                                            .withExposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")
                                                                                            .withPreflightMaxAgeInSeconds(1800));
     assertEquals(exception.getMessage(),
-                 "You cannot use both a path (withIncludedPathPattern/withExcludedPathPattern) and predicate based (withIncludeUriPredicate/withExcludeUriPredicate). You must use one or the other.");
+                 "You cannot use both a path (withIncludedPathPattern/withExcludedPathPattern) and predicate based (withIncludeURIPredicate/withExcludeURIPredicate). You must use one or the other.");
   }
 
   @Test

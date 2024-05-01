@@ -39,13 +39,13 @@ public class CORSConfiguration implements Buildable<CORSConfiguration> {
 
   public boolean debug;
 
-  public Predicate<String> excludeUriPredicate;
+  public Predicate<String> excludeURIPredicate;
 
   public Pattern excludedPathPattern;
 
   public List<String> exposedHeaders = new ArrayList<>();
 
-  public Predicate<String> includeUriPredicate;
+  public Predicate<String> includeURIPredicate;
 
   public Pattern includedPathPattern;
 
@@ -105,8 +105,8 @@ public class CORSConfiguration implements Buildable<CORSConfiguration> {
     return this;
   }
 
-  public CORSConfiguration withExcludeUriPredicate(Predicate<String> excludeUriPredicate) {
-    this.excludeUriPredicate = excludeUriPredicate;
+  public CORSConfiguration withExcludeURIPredicate(Predicate<String> excludeURIPredicate) {
+    this.excludeURIPredicate = excludeURIPredicate;
     checkExclusiveMatching();
     return this;
   }
@@ -123,8 +123,8 @@ public class CORSConfiguration implements Buildable<CORSConfiguration> {
     return this;
   }
 
-  public CORSConfiguration withIncludeUriPredicate(Predicate<String> includeUriPredicate) {
-    this.includeUriPredicate = includeUriPredicate;
+  public CORSConfiguration withIncludeURIPredicate(Predicate<String> includeURIPredicate) {
+    this.includeURIPredicate = includeURIPredicate;
     checkExclusiveMatching();
     return this;
   }
@@ -144,12 +144,12 @@ public class CORSConfiguration implements Buildable<CORSConfiguration> {
     if (excludedPathPattern != null && includedPathPattern != null) {
       throw new IllegalStateException("You cannot use both withExcludedPathPattern and withIncludedPathPattern. You must use one or the other.");
     }
-    if (includeUriPredicate != null && excludeUriPredicate != null) {
-      throw new IllegalStateException("You cannot use both withIncludeUriPredicate and withExcludeUriPredicate. You must use one or the other.");
+    if (includeURIPredicate != null && excludeURIPredicate != null) {
+      throw new IllegalStateException("You cannot use both withIncludeURIPredicate and withExcludeURIPredicate. You must use one or the other.");
     }
-    if ((includeUriPredicate != null ^ excludeUriPredicate != null) &&
+    if ((includeURIPredicate != null ^ excludeURIPredicate != null) &&
         (excludedPathPattern != null ^ includedPathPattern != null)) {
-      throw new IllegalStateException("You cannot use both a path (withIncludedPathPattern/withExcludedPathPattern) and predicate based (withIncludeUriPredicate/withExcludeUriPredicate). You must use one or the other.");
+      throw new IllegalStateException("You cannot use both a path (withIncludedPathPattern/withExcludedPathPattern) and predicate based (withIncludeURIPredicate/withExcludeURIPredicate). You must use one or the other.");
     }
   }
 }
