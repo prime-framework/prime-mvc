@@ -137,12 +137,14 @@ target(name: "jar", description: "JARs the project", dependsOn: ["compile"]) {
       ~/org\/primeframework\/mvc\/util\/Throwing.*/,
       ~/org\/primeframework\/mock/
   ]
-  // Create a separate test jar that only includes org/primeframework
+  // Create a separate test jar that only includes org.primeframework.mvc.test.RequestSimulator
+  // and its dependencies
   file.copy(to: "build/classes/simulator") {
     fileSet(dir: "build/classes/test", includePatterns: simulatorPatterns)
   }
 
-  // Create a separate test jar that only includes org/primeframework
+  // Create a separate test jar that only includes org.primeframework.mvc.test.RequestSimulator
+  // and its dependencies
   file.copy(to: "build/src/simulator") {
     fileSet(dir: "src/test/java", includePatterns: simulatorPatterns)
   }
