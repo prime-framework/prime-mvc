@@ -78,18 +78,23 @@ public class LocaleConverter extends AbstractGlobalConverter {
 
       if (value.indexOf('_') < 0 && value.indexOf('-') < 0) {
         return new Locale.Builder().setLanguage(first)
-                                   .setRegion(second).setVariant(third).setScript(value).build();
+                                   .setRegion(second)
+                                   .setVariant(third)
+                                   .setScript(value)
+                                   .build();
       }
       if (value.indexOf('_') < 0) {
         ix = value.indexOf('-');
         return new Locale.Builder().setLanguage(first)
-                                   .setRegion(second).setVariant(third)
+                                   .setRegion(second)
+                                   .setVariant(third)
                                    .setExtension(value.charAt(0), value.substring(ix + 1))
                                    .build();
       }
       ix = value.indexOf('_');
       return new Locale.Builder().setLanguage(first)
-                                 .setRegion(second).setVariant(third)
+                                 .setRegion(second)
+                                 .setVariant(third)
                                  .setScript(value.substring(0, ix))
                                  .setExtension(value.charAt(ix + 1), value.substring(ix + 3))
                                  .build();
@@ -109,7 +114,13 @@ public class LocaleConverter extends AbstractGlobalConverter {
     value = value.substring(ix + 1);
     ix = LocaleTools.firstHyphenOrUnderscore(value);
     if (ix < 0) { // two pieces
-      return Locale.of(first, value);
+      int length = value.length();
+      if (length == 2 || length == 3) {
+        return Locale.of(first, value);
+      }
+
+      // This is a special case for BCP where the variant is only separated by a single dash
+      return Locale.of(first, "", value);
     }
 
     String second = value.substring(0, ix);

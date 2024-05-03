@@ -34,18 +34,18 @@ public class LocaleTools {
 
     int ix = firstHyphenOrUnderscore(value);
     if (ix < 0) { // single argument
-      return new Locale(value);
+      return Locale.of(value);
     }
 
     String first = value.substring(0, ix);
     value = value.substring(ix + 1);
     ix = firstHyphenOrUnderscore(value);
     if (ix < 0) { // two pieces
-      return new Locale(first, value);
+      return Locale.of(first, value);
     }
 
     String second = value.substring(0, ix);
-    return new Locale(first, second, value.substring(ix + 1));
+    return Locale.of(first, second, value.substring(ix + 1));
   }
 
   public static int firstHyphenOrUnderscore(String str) {
