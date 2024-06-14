@@ -18,7 +18,7 @@ asmVersion = "9.5.0"
 dropWizardVersion = "3.2.6"
 easyMockVersion = "5.1.0"
 freemarkerVersion = "2.3.32"
-fusionAuthJWTVersion = "5.1.0"
+fusionAuthJWTVersion = "5.3.2"
 javaHTTPVersion = "0.3.5"
 jsonPatchVersion = "1.13.0"
 guavaVersion = "32.1.2-jre"
@@ -29,7 +29,7 @@ logbackVersion = "1.4.8"
 slf4jVersion = "2.0.7"
 testngVersion = "7.8.0"
 
-project(group: "org.primeframework", name: "prime-mvc", version: "4.22.9", licenses: ["ApacheV2_0"]) {
+project(group: "org.primeframework", name: "prime-mvc", version: "4.22.10", licenses: ["ApacheV2_0"]) {
   workflow {
     fetch {
       // Dependency resolution order:
@@ -45,6 +45,10 @@ project(group: "org.primeframework", name: "prime-mvc", version: "4.22.9", licen
     }
     publish {
       cache()
+    }
+    semanticVersions {
+      mapping(id: "com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava", version: "9999.0.0")
+      mapping(id: "com.google.guava:guava-parent:26.0-android", version: "26.0.0")
     }
   }
 
@@ -94,8 +98,8 @@ project(group: "org.primeframework", name: "prime-mvc", version: "4.22.9", licen
 }
 
 // Plugins
-file = loadPlugin(id: "org.savantbuild.plugin:file:2.0.0-RC.6")
-dependency = loadPlugin(id: "org.savantbuild.plugin:dependency:2.0.0-RC.6")
+file = loadPlugin(id: "org.savantbuild.plugin:file:2.0.0-RC.7")
+dependency = loadPlugin(id: "org.savantbuild.plugin:dependency:2.0.0-RC.7")
 java = loadPlugin(id: "org.savantbuild.plugin:java:2.0.0-RC.6")
 javaTestNG = loadPlugin(id: "org.savantbuild.plugin:java-testng:2.0.0-RC.6")
 idea = loadPlugin(id: "org.savantbuild.plugin:idea:2.0.0-RC.7")
