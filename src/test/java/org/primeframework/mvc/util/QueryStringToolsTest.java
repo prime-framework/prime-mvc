@@ -41,5 +41,11 @@ public class QueryStringToolsTest {
     assertEquals(QueryStringTools.parseQueryString("foo=bar="), Map.of("foo", List.of("bar=")));
     assertEquals(QueryStringTools.parseQueryString("foo=bar=baz=&bar=foo=baz="), Map.of("foo", List.of("bar=baz="),
                                                                                         "bar", List.of("foo=baz=")));
+
+    // Name w/out value
+    assertEquals(QueryStringTools.parseQueryString("foo="), Map.of("foo", List.of("")));
+
+    // Multiple values
+    assertEquals(QueryStringTools.parseQueryString("foo=bar&foo=bar"), Map.of("foo", List.of("bar", "bar")));
   }
 }
