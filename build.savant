@@ -137,16 +137,23 @@ target(name: "jar", description: "JARs the project", dependsOn: ["compile"]) {
       ~/org\/primeframework\/mvc\/util\/Throwing.*/,
       ~/org\/primeframework\/mock/
   ]
+  def simulatorExcludePatterns = [
+      ~/.*Test/
+  ]
   // Create a separate test jar that only includes org.primeframework.mvc.test.RequestSimulator
   // and its dependencies
   file.copy(to: "build/classes/simulator") {
-    fileSet(dir: "build/classes/test", includePatterns: simulatorPatterns)
+    fileSet(dir: "build/classes/test",
+            includePatterns: simulatorPatterns,
+            excludePatterns: simulatorExcludePatterns)
   }
 
-  // Create a separate test jar that only includes org.primeframework.mvc.test.RequestSimulator
+  // Create a separate test src jar that only includes org.primeframework.mvc.test.RequestSimulator
   // and its dependencies
   file.copy(to: "build/src/simulator") {
-    fileSet(dir: "src/test/java", includePatterns: simulatorPatterns)
+    fileSet(dir: "src/test/java",
+            includePatterns: simulatorPatterns,
+            excludePatterns: simulatorExcludePatterns)
   }
 
   file.jar(file: "build/jars/${project.name}-simulator-${project.version}.jar") {
