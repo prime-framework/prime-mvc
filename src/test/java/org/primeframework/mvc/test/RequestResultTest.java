@@ -45,10 +45,10 @@ public class RequestResultTest extends PrimeBaseTest {
   @Test(expectedExceptions = AssertionError.class,
       expectedExceptionsMessageRegExp = "Content-Type \\[null] does not start with the expected value.*")
   public void assertContentTypeIsJSON_incorrect() throws IOException {
-    simulator.test("/api/status")
+    simulator.test("/api/no-content-type-json")
              .get()
              .assertStatusCode(200)
-             .assertJSON("foo");
+             .assertJSONValuesAt("/hello", 123);
   }
 
   @Test(enabled = false)
