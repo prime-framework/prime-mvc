@@ -43,7 +43,7 @@ public class RequestResultTest extends PrimeBaseTest {
   }
 
   @Test(expectedExceptions = AssertionError.class,
-      expectedExceptionsMessageRegExp = "Content-Type \\[null] does not start with the expected value.*")
+      expectedExceptionsMessageRegExp = "Content-Type \\[text/plain] does not start with the expected value \\[application/json]")
   public void assertContentTypeIsJSON_incorrect() throws IOException {
     simulator.test("/api/no-content-type-json")
              .get()

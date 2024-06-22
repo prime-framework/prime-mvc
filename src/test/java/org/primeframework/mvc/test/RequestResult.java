@@ -934,6 +934,7 @@ public class RequestResult {
    */
   public <T> RequestResult assertJSON(Class<T> type, Consumer<T> consumer) throws IOException {
     ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
+    assertContentTypeIsJSON();
     T response = objectMapper.readValue(getBodyAsString(), type);
     consumer.accept(response);
     return this;
@@ -948,6 +949,7 @@ public class RequestResult {
    */
   public RequestResult assertJSON(String json) throws IOException {
     ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
+    assertContentTypeIsJSON();
     assertJSONEquals(objectMapper, getBodyAsString(), json);
     return this;
   }
@@ -963,6 +965,7 @@ public class RequestResult {
   public RequestResult assertJSONFile(Path jsonFile, Object... values) throws IOException {
     ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
     String expected = BodyTools.processTemplateForAssertion(jsonFile, appendArray(values, "_to_milli", new ZonedDateTimeToMilliSeconds()));
+    assertContentTypeIsJSON();
     _assertJSONEquals(objectMapper, getBodyAsString(), expected, true, jsonFile);
     return this;
   }
@@ -979,6 +982,7 @@ public class RequestResult {
    */
   public <T> RequestResult assertJSONFileWithActual(Class<T> type, Path jsonFile, Object... values) throws IOException {
     ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
+    assertContentTypeIsJSON();
     T actual = objectMapper.readValue(getBodyAsString(), type);
 
     return assertJSONFile(jsonFile, appendArray(values, "actual", actual, "_to_milli", new ZonedDateTimeToMilliSeconds()));
@@ -998,6 +1002,7 @@ public class RequestResult {
     }
 
     ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
+    assertContentTypeIsJSON();
     JsonNode actual = objectMapper.readTree(getBodyAsString());
 
     for (int i = 0; i < pairs.length; i = i + 2) {
@@ -1791,6 +1796,15 @@ public class RequestResult {
     ArrayList<Object> list = new ArrayList<>(Arrays.asList(values));
     Collections.addAll(list, objects);
     return list.toArray();
+  }
+
+  private void assertContentTypeIsJSON() {
+    // did not use assertContentType because did not want to bake in a particular encoding here
+    String actual = response.getHeader(Headers.ContentType);
+    String expectedContentType = "application/json";
+    if (actual == null || !actual.startsWith(expectedContentType)) {
+      throw new AssertionError("Content-Type [" + actual + "] does not start with the expected value [" + expectedContentType + "]");
+    }
   }
 
   private void assertRedirectEquality(String expectedUri) {
