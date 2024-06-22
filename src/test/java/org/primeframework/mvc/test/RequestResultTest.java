@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2018-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,17 +20,35 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.primeframework.mvc.PrimeBaseTest;
 import org.testng.annotations.Test;
 
 /**
  * @author Daniel DeGroff
  */
-public class RequestResultTest {
+public class RequestResultTest extends PrimeBaseTest {
   @Test
   public void arrays() throws IOException {
     Path jsonFile1 = Path.of("src/test/resources/json/SortedJSONArrays1.json");
     Path jsonFile2 = Path.of("src/test/resources/json/SortedJSONArrays2.json");
     RequestResult.assertJSONEquals(new ObjectMapper(), Files.readString(jsonFile1), Files.readString(jsonFile2));
+  }
+
+  @Test
+  public void assertContentTypeIsJSON_correct() throws IOException {
+    simulator.test("/api-final")
+             .post()
+             .assertStatusCode(200)
+             .assertJSONValuesAt("/bar", false);
+  }
+
+  @Test(expectedExceptions = AssertionError.class,
+      expectedExceptionsMessageRegExp = "Content-Type \\[null] does not start with the expected value.*")
+  public void assertContentTypeIsJSON_incorrect() throws IOException {
+    simulator.test("/api/status")
+             .get()
+             .assertStatusCode(200)
+             .assertJSON("foo");
   }
 
   @Test(enabled = false)
