@@ -135,10 +135,14 @@ target(name: "jar", description: "JARs the project", dependsOn: ["compile"]) {
       ~/org\/primeframework\/mvc\/message\/TestMessageObserver/,
       ~/org\/primeframework\/mvc\/TestPrimeMain/,
       ~/org\/primeframework\/mvc\/util\/Throwing.*/,
-      ~/org\/primeframework\/mock/
+      ~/org\/primeframework\/mock/,
+      // dependencies of RequestBuilder
+      ~/org\/primeframework\/mvc\/http\/MultipartBodyHandler.*/,
+      ~/org\/primeframework\/mvc\/http\/MultipartFileUpload.*/
   ]
   def simulatorExcludePatterns = [
-      ~/.*Test/
+      // don't want to exclude things that start with Test, like TestPrimeMain or TestMessageObserver
+      ~/.*Test$/
   ]
   // Create a separate test jar that only includes org.primeframework.mvc.test.RequestSimulator
   // and its dependencies
