@@ -29,7 +29,7 @@ logbackVersion = "1.4.8"
 slf4jVersion = "2.0.7"
 testngVersion = "7.8.0"
 
-project(group: "org.primeframework", name: "prime-mvc", version: "4.22.10", licenses: ["ApacheV2_0"]) {
+project(group: "org.primeframework", name: "prime-mvc", version: "4.22.11", licenses: ["ApacheV2_0"]) {
   workflow {
     fetch {
       // Dependency resolution order:
@@ -130,14 +130,34 @@ target(name: "compile", description: "Compiles the project") {
 target(name: "jar", description: "JARs the project", dependsOn: ["compile"]) {
   java.jar()
 
-  // Create a separate test jar that only includes org/primeframework
+  def simulatorPatterns = [
+      ~/org\/primeframework\/mvc\/test.+/,
+      ~/org\/primeframework\/mvc\/message\/TestMessageObserver/,
+      ~/org\/primeframework\/mvc\/TestPrimeMain/,
+      ~/org\/primeframework\/mvc\/util\/Throwing.*/,
+      ~/org\/primeframework\/mock/,
+      // dependencies of RequestBuilder
+      ~/org\/primeframework\/mvc\/http\/MultipartBodyHandler.*/,
+      ~/org\/primeframework\/mvc\/http\/MultipartFileUpload.*/
+  ]
+  def simulatorExcludePatterns = [
+      // don't want to exclude things that start with Test, like TestPrimeMain or TestMessageObserver
+      ~/.*Test$/
+  ]
+  // Create a separate test jar that only includes org.primeframework.mvc.test.RequestSimulator
+  // and its dependencies
   file.copy(to: "build/classes/simulator") {
-    fileSet(dir: "build/classes/test", includePatterns: [~/org\/primeframework.+/])
+    fileSet(dir: "build/classes/test",
+            includePatterns: simulatorPatterns,
+            excludePatterns: simulatorExcludePatterns)
   }
 
-  // Create a separate test jar that only includes org/primeframework
+  // Create a separate test src jar that only includes org.primeframework.mvc.test.RequestSimulator
+  // and its dependencies
   file.copy(to: "build/src/simulator") {
-    fileSet(dir: "src/test/java", includePatterns: [~/org\/primeframework.+/])
+    fileSet(dir: "src/test/java",
+            includePatterns: simulatorPatterns,
+            excludePatterns: simulatorExcludePatterns)
   }
 
   file.jar(file: "build/jars/${project.name}-simulator-${project.version}.jar") {
