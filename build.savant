@@ -92,7 +92,8 @@ project(group: "org.primeframework", name: "prime-mvc", version: "4.22.10", lice
     main {
       publication(name: "${project.name}-simulator", type: "jar",
                   file: "build/jars/${project.name}-simulator-${project.version}.jar",
-                  source: "build/jars/${project.name}-simulator-${project.version}-src.jar")
+                  source: "build/jars/${project.name}-simulator-${project.version}-src.jar"
+      )
     }
   }
 }
