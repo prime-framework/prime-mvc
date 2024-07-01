@@ -5,7 +5,7 @@
 
   <groupId>org.primeframework</groupId>
   <artifactId>prime-mvc</artifactId>
-  <version>4.22.11</version>
+  <version>4.22.12</version>
   <packaging>jar</packaging>
 
   <name>FusionAuth App</name>
@@ -149,7 +149,7 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>2.0.7</version>
+      <version>2.0.13</version>
       <type>jar</type>
       <scope>compile</scope>
       <optional>false</optional>

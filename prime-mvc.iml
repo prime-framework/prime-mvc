@@ -159,11 +159,11 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/org/slf4j/slf4j-api/2.0.7/slf4j-api-2.0.7.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/slf4j/slf4j-api/2.0.13/slf4j-api-2.0.13.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/org/slf4j/slf4j-api/2.0.7/slf4j-api-2.0.7-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/slf4j/slf4j-api/2.0.13/slf4j-api-2.0.13-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -240,7 +240,7 @@
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/ch/qos/logback/logback-classic/1.4.14/logback-classic-1.4.14-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/ch/qos/logback/logback-classic/1.4.14/logback-classic-1.4.14-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -251,7 +251,7 @@
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/ch/qos/logback/logback-core/1.4.14/logback-core-1.4.14-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/ch/qos/logback/logback-core/1.4.14/logback-core-1.4.14-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>

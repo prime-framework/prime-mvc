@@ -26,10 +26,10 @@ guiceVersion = "6.0.0"
 jacksonVersion = "2.15.2"
 jsoupVersion = "1.16.1"
 logbackVersion = "1.4.14"
-slf4jVersion = "2.0.7"
+slf4jVersion = "2.0.13"
 testngVersion = "7.8.0"
 
-project(group: "org.primeframework", name: "prime-mvc", version: "4.22.11", licenses: ["ApacheV2_0"]) {
+project(group: "org.primeframework", name: "prime-mvc", version: "4.22.12", licenses: ["ApacheV2_0"]) {
   workflow {
     fetch {
       // Dependency resolution order:
