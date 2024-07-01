@@ -25,7 +25,7 @@ guavaVersion = "32.1.2-jre"
 guiceVersion = "6.0.0"
 jacksonVersion = "2.15.2"
 jsoupVersion = "1.16.1"
-logbackVersion = "1.4.8"
+logbackVersion = "1.4.14"
 slf4jVersion = "2.0.7"
 testngVersion = "7.8.0"
 
