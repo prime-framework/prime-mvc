@@ -236,22 +236,22 @@
     <orderEntry type="module-library" scope="TEST">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/ch/qos/logback/logback-classic/1.4.8/logback-classic-1.4.8.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/ch/qos/logback/logback-classic/1.4.14/logback-classic-1.4.14.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/ch/qos/logback/logback-classic/1.4.8/logback-classic-1.4.8-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/ch/qos/logback/logback-classic/1.4.14/logback-classic-1.4.14-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library" scope="TEST">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/ch/qos/logback/logback-core/1.4.8/logback-core-1.4.8.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/ch/qos/logback/logback-core/1.4.14/logback-core-1.4.14.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/ch/qos/logback/logback-core/1.4.8/logback-core-1.4.8-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/ch/qos/logback/logback-core/1.4.14/logback-core-1.4.14-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
