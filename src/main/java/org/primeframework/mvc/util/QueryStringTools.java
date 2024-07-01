@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2019-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ public class QueryStringTools {
     try {
       String[] parts = query.split("&");
       for (String part : parts) {
-        String[] pieces = part.split("=");
+        String[] pieces = part.split("=", 2);
         String name = URLDecoder.decode(pieces[0], StandardCharsets.UTF_8);
         String value = pieces.length > 1 ? URLDecoder.decode(pieces[1], StandardCharsets.UTF_8) : "";
         parameters.computeIfAbsent(name, k -> new ArrayList<>()).add(value);
