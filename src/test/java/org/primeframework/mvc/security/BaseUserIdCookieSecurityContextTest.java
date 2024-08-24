@@ -22,6 +22,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.regex.Pattern;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import io.fusionauth.http.server.HTTPListenerConfiguration;
 import io.fusionauth.http.server.HTTPServerConfiguration;
@@ -32,6 +33,7 @@ import org.primeframework.mvc.message.TestMessageObserver;
 import org.primeframework.mvc.security.BaseUserIdCookieSecurityContext.CookieExtendResult;
 import org.primeframework.mvc.test.RequestResult;
 import org.primeframework.mvc.test.RequestSimulator;
+import org.primeframework.mvc.util.CookieTools;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
@@ -52,6 +54,12 @@ public class BaseUserIdCookieSecurityContextTest {
   private static RequestSimulator simulator;
 
   @Inject private SessionCookieKeyChanger cookieKeyChanger;
+
+  @Inject
+  private Encryptor encryptor;
+
+  @Inject
+  private ObjectMapper objectMapper;
 
   private static RequestSimulator buildSimulator(SessionTestModule module) {
     // PrimeBaseTest uses 9080
@@ -275,6 +283,18 @@ public class BaseUserIdCookieSecurityContextTest {
     resetMockClock();
     simulator = buildSimulator(new SessionTestModule(() -> mockClock));
     simulator.getInjector().injectMembers(this);
+  }
+
+  @Test
+  public void unencrypted_cookie_presented() throws Exception {
+    // arrange
+    doLogin(200);
+    var existingCookie = simulator.userAgent.getCookie("primeCurrentUser");
+    var context = CookieTools.fromJSONCookie(existingCookie.value, MockUserIdSessionContext.class, true, true, encryptor, objectMapper);
+    existingCookie.value = CookieTools.toJSONCookie(context, true, false, encryptor, objectMapper);
+
+    // act + assert
+    getSessionInfo().assertBodyContains("the session ID is (no session)");
   }
 
   @Test
