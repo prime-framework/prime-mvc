@@ -163,7 +163,7 @@
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/org/slf4j/slf4j-api/2.0.13/slf4j-api-2.0.13-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/slf4j/slf4j-api/2.0.13/slf4j-api-2.0.13-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
