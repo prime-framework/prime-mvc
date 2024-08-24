@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2021-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,14 @@ public @interface ManagedCookie {
    * @return true if the cookie value should be encrypted.
    */
   boolean encrypt() default true;
+
+  /**
+   * By default, if an unencrypted cookie is presented by the browser, that cookie will not be used.
+   * Setting this to false is dangerous.
+   *
+   * @return true if encryption is required, false if not
+   */
+  boolean encryptionRequired() default true;
 
   /**
    * Optionally specify a value to set on the cookie for Max-Age. Defaults to 70 years because Firefox has issues with

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2021-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,11 @@ import org.primeframework.mvc.scope.annotation.ManagedCookie;
  */
 @Action
 public class LegacyManagedCookieAction {
-  @ManagedCookie
+  // since CompressedManagedCookieAction sets encrypt to false, the 2nd HTTP request of
+  // ManagedCookieTest.compressed_only_cookie, which is a POST, sets an unencrypted
+  // cookie value. the get to this action which follows should be able to read it if
+  // and ONLY if encryptionRequired is set to false here
+  @ManagedCookie(encryptionRequired = false)
   public Cookie cookie;
 
   public String value;

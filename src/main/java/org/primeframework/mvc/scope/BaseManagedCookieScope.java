@@ -90,6 +90,8 @@ public abstract class BaseManagedCookieScope<T extends Annotation> extends Abstr
    */
   protected abstract boolean encrypt(T scope);
 
+  protected abstract boolean encryptionRequired(T scope);
+
   /**
    * Using the annotation, determines if the cookie is allowed to be null.
    *
@@ -102,6 +104,7 @@ public abstract class BaseManagedCookieScope<T extends Annotation> extends Abstr
   protected Cookie processCookie(Cookie cookie, String fieldName, Class<?> type, T scope) {
     boolean compress = compress(scope);
     boolean encrypt = encrypt(scope);
+    boolean encryptionRequired = encryptionRequired(scope);
     boolean neverNull = neverNull(scope);
 
     String cookieName = getCookieName(fieldName, scope);
@@ -114,10 +117,10 @@ public abstract class BaseManagedCookieScope<T extends Annotation> extends Abstr
       ThrowingFunction<byte[], String> oldFunction = r -> objectMapper.readerFor(String.class).readValue(r);
       ThrowingFunction<byte[], String> newFunction = r -> new String(r, StandardCharsets.UTF_8);
       if (compress || encrypt) {
-        cookie.value = CookieTools.fromCookie(cookieValue, encrypt, true, encryptor, oldFunction, newFunction);
+        cookie.value = CookieTools.fromCookie(cookieValue, encryptionRequired, true, encryptor, oldFunction, newFunction);
       } else {
         try {
-          cookie.value = CookieTools.fromCookie(cookieValue, encrypt, false, encryptor, oldFunction, newFunction);
+          cookie.value = CookieTools.fromCookie(cookieValue, encryptionRequired, false, encryptor, oldFunction, newFunction);
         } catch (Throwable t) {
           // Smother because the cookie already has the value in it
         }
