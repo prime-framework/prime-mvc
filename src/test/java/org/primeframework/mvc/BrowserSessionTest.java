@@ -38,7 +38,7 @@ public class BrowserSessionTest extends PrimeBaseTest {
                                  // requires an encrypted cookie by virtue of
                                  // relying on the defaults for @BrowserSession
                                  .assertBodyContains("The user is missing")
-                                 .assertDoesNotContainsCookie("user"));
+                                 .assertCookieWasDeleted("user"));
   }
 
   @Test

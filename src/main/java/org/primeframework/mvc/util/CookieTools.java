@@ -71,7 +71,9 @@ public final class CookieTools {
     boolean compress = (result[3] & 0x02) == 0x02; // Second bit is compressed
     result = Arrays.copyOfRange(result, 4, result.length);
 
-    if (encrypt) {
+    if (encryptionRequired && !encrypt) {
+      throw new EncryptionException("Encryption is required to decrypt cookie but a non-encrypted cookie was presented");
+    } else if (encrypt) {
       result = encryptor.decrypt(result);
     }
 
@@ -85,13 +87,14 @@ public final class CookieTools {
   /**
    * Processes a cookie value and converts it to an object.
    *
-   * @param value          The cookie value.
-   * @param type           The type of object to convert to.
-   * @param encryptedIfOld If the cookie header indicates it is an older cookie, then we only decrypt it if this is
-   *                       true.
-   * @param encryptor      The encryptor to use for decrypting the cookie.
-   * @param objectMapper   The ObjectMapper used to convert from JSON to an object.
-   * @param <T>            The type to convert to.
+   * @param value              The cookie value.
+   * @param type               The type of object to convert to.
+   * @param encryptionRequired Whether encryption is required or not
+   * @param encryptedIfOld     If the cookie header indicates it is an older cookie, then we only decrypt it if this is
+   *                           true.
+   * @param encryptor          The encryptor to use for decrypting the cookie.
+   * @param objectMapper       The ObjectMapper used to convert from JSON to an object.
+   * @param <T>                The type to convert to.
    * @return The object or null if the cookie couldn't be converted.
    * @throws Exception If the operation fails.
    */
@@ -105,13 +108,14 @@ public final class CookieTools {
   /**
    * Processes a cookie value and converts it to an object.
    *
-   * @param value          The cookie value.
-   * @param type           The type of object to convert to.
-   * @param encryptedIfOld If the cookie header indicates it is an older cookie, then we only decrypt it if this is
-   *                       true.
-   * @param encryptor      The encryptor to use for decrypting the cookie.
-   * @param objectMapper   The ObjectMapper used to convert from JSON to an object.
-   * @param <T>            The type to convert to.
+   * @param value              The cookie value.
+   * @param type               The type of object to convert to.
+   * @param encryptionRequired Whether encryption is required or not
+   * @param encryptedIfOld     If the cookie header indicates it is an older cookie, then we only decrypt it if this is
+   *                           true.
+   * @param encryptor          The encryptor to use for decrypting the cookie.
+   * @param objectMapper       The ObjectMapper used to convert from JSON to an object.
+   * @param <T>                The type to convert to.
    * @return The object or null if the cookie couldn't be converted.
    * @throws Exception If the operation fails.
    */
