@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2023, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2016-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -146,7 +146,13 @@ public class SavedRequestTools {
         value = value.substring("ready_".length());
       }
 
-      SavedHttpRequest savedRequest = CookieTools.fromJSONCookie(value, SavedHttpRequest.class, true, encryptor, objectMapper);
+      SavedHttpRequest savedRequest = CookieTools.fromJSONCookie(value,
+                                                                 SavedHttpRequest.class,
+                                                                 // we always encrypt in toCookie call
+                                                                 true,
+                                                                 true,
+                                                                 encryptor,
+                                                                 objectMapper);
       return new SaveHttpRequestResult(cookie, ready, savedRequest);
     } catch (Exception e) {
       logger.warn("Bad SavedRequest cookie [{}]. Error is [{}]", cookie.value, e.getMessage());

@@ -87,7 +87,12 @@ public class SaveRequestResultTest extends PrimeBaseTest {
     result.execute(annotation);
 
     // The cookie value will be different each time because the initialization vector is unique per request. Decrypt the actual value to compare it to the expected.
-    SavedHttpRequest actual = CookieTools.fromJSONCookie(response.getCookies().get(0).value, SavedHttpRequest.class, true, encryptor, objectMapper);
+    SavedHttpRequest actual = CookieTools.fromJSONCookie(response.getCookies().get(0).value,
+                                                         SavedHttpRequest.class,
+                                                         true,
+                                                         true,
+                                                         encryptor,
+                                                         objectMapper);
     SavedHttpRequest expected = new SavedHttpRequest(HTTPMethod.GET, "/test?param1=value1&param2=value2", null);
     assertEquals(actual, expected);
 
@@ -119,7 +124,12 @@ public class SaveRequestResultTest extends PrimeBaseTest {
 
     if (allowPost && origin.equals(request.getBaseURL())) {
       // The cookie value will be different each time because the initialization vector is unique per request. Decrypt the actual value to compare it to the expected.
-      SavedHttpRequest actual = CookieTools.fromJSONCookie(response.getCookies().get(0).value, SavedHttpRequest.class, true, encryptor, objectMapper);
+      SavedHttpRequest actual = CookieTools.fromJSONCookie(response.getCookies().get(0).value,
+                                                           SavedHttpRequest.class,
+                                                           true,
+                                                           true,
+                                                           encryptor,
+                                                           objectMapper);
       SavedHttpRequest expected = new SavedHttpRequest(HTTPMethod.POST, "/test", request.getParameters());
       assertEquals(actual, expected);
     } else {

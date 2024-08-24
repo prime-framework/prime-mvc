@@ -102,7 +102,8 @@ public class DefaultEncryptionBasedTokenCSRFProvider implements CSRFProvider {
 
   private CSRFToken decrypt(String s) {
     try {
-      return CookieTools.fromJSONCookie(s, CSRFToken.class, true, encryptor, objectMapper);
+      // we encrypt going to cookie, so requiring going from
+      return CookieTools.fromJSONCookie(s, CSRFToken.class, true, true, encryptor, objectMapper);
     } catch (Exception e) {
       return null;
     }
