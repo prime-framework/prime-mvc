@@ -90,7 +90,9 @@ public final class CookieTools {
     boolean compress = (result[3] & 0x02) == 0x02; // Second bit is compressed
     result = Arrays.copyOfRange(result, 4, result.length);
 
-    if (encrypt) {
+    if (encryptionRequired && !encrypt) {
+      throw new EncryptionException("Encryption is required to decrypt cookie but a non-encrypted cookie was presented");
+    } else if (encrypt) {
       result = encryptor.decrypt(result);
     }
 
