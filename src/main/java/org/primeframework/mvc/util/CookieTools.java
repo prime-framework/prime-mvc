@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2022-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,16 +31,17 @@ public final class CookieTools {
   /**
    * Processes a cookie value and calls a Function to convert it to a meaningful value for the application (or Prime).
    *
-   * @param value          The cookie value.
-   * @param encryptedIfOld Whether a legacy cookie was likely encrypted or not.
-   * @param encryptor      The encryptor to use if needed.
-   * @param oldFunction    The function to call if the cookie looks legacy.
-   * @param newFunction    The function to call if the cookie looks new (contains our magic header).
-   * @param <T>            The type that the function returns.
+   * @param value              The cookie value.
+   * @param encryptionRequired Whether encryption is required or not
+   * @param encryptedIfOld     Whether a legacy cookie was likely encrypted or not.
+   * @param encryptor          The encryptor to use if needed.
+   * @param oldFunction        The function to call if the cookie looks legacy.
+   * @param newFunction        The function to call if the cookie looks new (contains our magic header).
+   * @param <T>                The type that the function returns.
    * @return The value or null if the cookie is empty.
    * @throws Exception If the operation fails.
    */
-  public static <T> T fromCookie(String value, boolean encryptedIfOld, Encryptor encryptor,
+  public static <T> T fromCookie(String value, boolean encryptionRequired, boolean encryptedIfOld, Encryptor encryptor,
                                  ThrowingFunction<byte[], T> oldFunction, ThrowingFunction<byte[], T> newFunction)
       throws Exception {
     if (value == null || value.isBlank()) {
@@ -94,10 +95,11 @@ public final class CookieTools {
    * @return The object or null if the cookie couldn't be converted.
    * @throws Exception If the operation fails.
    */
-  public static <T> T fromJSONCookie(String value, TypeReference<T> type, boolean encryptedIfOld, Encryptor encryptor,
+  public static <T> T fromJSONCookie(String value, TypeReference<T> type, boolean encryptionRequired,
+                                     boolean encryptedIfOld, Encryptor encryptor,
                                      ObjectMapper objectMapper) throws Exception {
     ThrowingFunction<byte[], T> read = r -> objectMapper.readerFor(type).readValue(r);
-    return fromCookie(value, encryptedIfOld, encryptor, read, read);
+    return fromCookie(value, encryptionRequired, encryptedIfOld, encryptor, read, read);
   }
 
   /**
@@ -113,10 +115,10 @@ public final class CookieTools {
    * @return The object or null if the cookie couldn't be converted.
    * @throws Exception If the operation fails.
    */
-  public static <T> T fromJSONCookie(String value, Class<T> type, boolean encryptedIfOld, Encryptor encryptor,
+  public static <T> T fromJSONCookie(String value, Class<T> type, boolean encryptionRequired, boolean encryptedIfOld, Encryptor encryptor,
                                      ObjectMapper objectMapper) throws Exception {
     ThrowingFunction<byte[], T> read = r -> objectMapper.readerFor(type).readValue(r);
-    return fromCookie(value, encryptedIfOld, encryptor, read, read);
+    return fromCookie(value, encryptionRequired, encryptedIfOld, encryptor, read, read);
   }
 
   /**
