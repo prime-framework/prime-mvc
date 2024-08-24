@@ -227,7 +227,12 @@ public abstract class BaseUserIdCookieSecurityContext<TUserId> implements UserLo
       return null;
     }
     try {
-      context = CookieTools.fromJSONCookie(cookie, getUserIdSessionContextClass(), true, encryptor, objectMapper);
+      context = CookieTools.fromJSONCookie(cookie,
+                                           getUserIdSessionContextClass(),
+                                           true,
+                                           true,
+                                           encryptor,
+                                           objectMapper);
       var shouldExtend = shouldExtendCookie(context.getLoginInstant());
       switch (shouldExtend) {
         case Extend:
