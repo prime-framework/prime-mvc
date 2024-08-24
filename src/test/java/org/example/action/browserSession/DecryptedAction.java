@@ -24,7 +24,8 @@ import org.primeframework.mvc.scope.annotation.BrowserSession;
 @Redirect(code = "next", uri = "/browser-session/second")
 public class DecryptedAction {
   // idea is to have this action serialize user to a decrypted cookie
-  // and then attempt to decrypt using SecondAction
+  // and then attempt to decrypt using SecondAction, which
+  // requires an encrypted cookie
   @BrowserSession(encrypt = false)
   public User user;
 
