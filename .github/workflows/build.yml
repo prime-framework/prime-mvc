@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-24.04
     defaults:
       run:
-        shell: /usr/bin/bash -l -e -o pipefail -x {0}
+        shell: /usr/bin/bash -l -e -o pipefail {0}
     steps:
       - name: checkout
         uses: actions/checkout@v4
@@ -31,6 +31,10 @@ jobs:
           $JAVA_HOME/bin/java -version
           sb --version
           sb clean compile
+      - name: set locale
+        run: |
+          # MessageTest.java expects a US/english locale
+          echo "LANG=en_US.utf8" >> $GITHUB_ENV
       - name: run tests/integrate
         run: |
           sb clean int
