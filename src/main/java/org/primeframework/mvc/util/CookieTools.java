@@ -41,7 +41,7 @@ public final class CookieTools {
    * @return The value or null if the cookie is empty.
    * @throws Exception If the operation fails.
    */
-
+  @Deprecated(forRemoval = true, since = "4.22.13")
   public static <T> T fromCookie(String value, boolean encryptedIfOld, Encryptor encryptor,
                                  ThrowingFunction<byte[], T> oldFunction, ThrowingFunction<byte[], T> newFunction) throws Exception {
     return fromCookie(value, false, encryptedIfOld, encryptor, oldFunction, newFunction);
@@ -106,17 +106,17 @@ public final class CookieTools {
   /**
    * Processes a cookie value (WITHOUT REQUIRING ENCRYPTED COOKIES) and converts it to an object
    *
-   * @param value              The cookie value.
-   * @param type               The type of object to convert to.
-   * @param encryptionRequired Whether encryption is required or not
-   * @param encryptedIfOld     If the cookie header indicates it is an older cookie, then we only decrypt it if this is
-   *                           true.
-   * @param encryptor          The encryptor to use for decrypting the cookie.
-   * @param objectMapper       The ObjectMapper used to convert from JSON to an object.
-   * @param <T>                The type to convert to.
+   * @param value          The cookie value.
+   * @param type           The type of object to convert to.
+   * @param encryptedIfOld If the cookie header indicates it is an older cookie, then we only decrypt it if this is
+   *                       true.
+   * @param encryptor      The encryptor to use for decrypting the cookie.
+   * @param objectMapper   The ObjectMapper used to convert from JSON to an object.
+   * @param <T>            The type to convert to.
    * @return The object or null if the cookie couldn't be converted.
    * @throws Exception If the operation fails.
    */
+  @Deprecated(forRemoval = true, since = "4.22.13")
   public static <T> T fromJSONCookie(String value, TypeReference<T> type,
                                      boolean encryptedIfOld, Encryptor encryptor,
                                      ObjectMapper objectMapper) throws Exception {
@@ -148,17 +148,17 @@ public final class CookieTools {
   /**
    * Processes a cookie value (WITHOUT REQUIRING ENCRYPTED COOKIES) and converts it to an object.
    *
-   * @param value              The cookie value.
-   * @param type               The type of object to convert to.
-   * @param encryptionRequired Whether encryption is required or not
-   * @param encryptedIfOld     If the cookie header indicates it is an older cookie, then we only decrypt it if this is
-   *                           true.
-   * @param encryptor          The encryptor to use for decrypting the cookie.
-   * @param objectMapper       The ObjectMapper used to convert from JSON to an object.
-   * @param <T>                The type to convert to.
+   * @param value          The cookie value.
+   * @param type           The type of object to convert to.
+   * @param encryptedIfOld If the cookie header indicates it is an older cookie, then we only decrypt it if this is
+   *                       true.
+   * @param encryptor      The encryptor to use for decrypting the cookie.
+   * @param objectMapper   The ObjectMapper used to convert from JSON to an object.
+   * @param <T>            The type to convert to.
    * @return The object or null if the cookie couldn't be converted.
    * @throws Exception If the operation fails.
    */
+  @Deprecated(forRemoval = true, since = "4.22.13")
   public static <T> T fromJSONCookie(String value, Class<T> type, boolean encryptedIfOld, Encryptor encryptor,
                                      ObjectMapper objectMapper) throws Exception {
     ThrowingFunction<byte[], T> read = r -> objectMapper.readerFor(type).readValue(r);

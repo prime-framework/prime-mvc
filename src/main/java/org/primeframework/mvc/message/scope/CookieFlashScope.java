@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2019, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -116,7 +116,13 @@ public class CookieFlashScope implements FlashScope {
   private List<Message> deserialize(String s) {
     try {
       // @formatter:off
-      List<Message> messages = CookieTools.fromJSONCookie(s, new TypeReference<List<Message>>() {}, true, encryptor, objectMapper);
+      // requiring encryption on the 'from' side since we encrypt going to cookie
+      List<Message> messages = CookieTools.fromJSONCookie(s,
+                                                          new TypeReference<List<Message>>() {},
+                                                          true,
+                                                          true,
+                                                          encryptor,
+                                                          objectMapper);
       // @formatter:on
 
       if (messages == null) {
