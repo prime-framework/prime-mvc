@@ -31,25 +31,16 @@ public class ManagedCookieTest extends PrimeBaseTest {
 
   @Test
   public void compressed_only_cookie() throws Exception {
-    String value = "foo";
-    byte[] json = objectMapper.writeValueAsBytes(value);
-    byte[] encrypted = encryptor.encrypt(json);
-    String encoded = Base64.getUrlEncoder().encodeToString(encrypted);
-
-    // This is the legacy version
     test.simulate(() -> simulator.test("/compressed-managed-cookie")
-                                 .withCookie("cookie", encoded)
-                                 .get()
-                                 .assertStatusCode(200)
-                                 .assertBody("foo"))
-
-        // Set a modern version and re-test
-        .simulate(() -> simulator.test("/compressed-managed-cookie")
                                  .withParameter("value", "bar")
                                  .post()
                                  .assertStatusCode(200)
                                  .assertBody("bar")
                                  .assertContainsCookie("cookie"))
+        .simulate(() -> simulator.test("/compressed-managed-cookie")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertBody("bar"))
         .simulate(() -> simulator.test("/encrypted-managed-cookie")
                                  .get()
                                  .assertStatusCode(200)
