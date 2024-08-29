@@ -131,6 +131,8 @@ public abstract class BaseManagedCookieScope<T extends Annotation> extends Abstr
       } else {
         logger.debug("Failed to decode cookie. This is not expected.\n\tCause: " + message);
       }
+      // if we had an encryption or decoding problem, we should not keep a cookie value around at all
+      cookie.value = null;
     }
 
     return neverNull ? cookie : null;

@@ -47,7 +47,7 @@ public class ManagedCookieTest extends PrimeBaseTest {
                                  // this would be expected to "fail" gracefully (neverNull is true)
                                  // because we're taking an unencrypted managed cookie from CompressedManagedCookieAction
                                  // and feeding it to EncryptedManagedCookieAction which requires encryption
-                                 .assertBody("(null)"));
+                                 .assertNormalizedBody("(null)"));
   }
 
   @Test
@@ -62,19 +62,19 @@ public class ManagedCookieTest extends PrimeBaseTest {
                                  .withCookie("cookie", legacyEncoded)
                                  .get()
                                  .assertStatusCode(200)
-                                 .assertBody("foo"))
+                                 .assertNormalizedBody("foo"))
 
         // Set a modern version and re-test
         .simulate(() -> simulator.test("/encrypted-managed-cookie")
                                  .withParameter("value", "bar")
                                  .post()
                                  .assertStatusCode(200)
-                                 .assertBody("bar")
+                                 .assertNormalizedBody("bar")
                                  .assertEncryptedCookie("cookie", "bar"))
         .simulate(() -> simulator.test("/encrypted-managed-cookie")
                                  .get()
                                  .assertStatusCode(200)
-                                 .assertBody("bar"));
+                                 .assertNormalizedBody("bar"));
   }
 
   @Test
