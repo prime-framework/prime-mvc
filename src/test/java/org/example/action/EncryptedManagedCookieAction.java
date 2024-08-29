@@ -23,7 +23,7 @@ import org.primeframework.mvc.scope.annotation.ManagedCookie;
  * @author Brian Pontarelli
  */
 @Action
-public class LegacyManagedCookieAction {
+public class EncryptedManagedCookieAction {
   @ManagedCookie
   public Cookie cookie;
 

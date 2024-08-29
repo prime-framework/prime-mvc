@@ -89,7 +89,7 @@ public class BrowserActionSessionScope extends BaseBrowserSessionScope<BrowserAc
     try {
       Encryptor encryptor = injector.getInstance(Encryptor.class);
       ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
-      return CookieTools.fromJSONCookie(value, type, encrypted, true, encryptor, objectMapper);
+      return CookieTools.fromJSONCookie(value, type, encrypted, encrypted, encryptor, objectMapper);
     } catch (Exception e) {
       String message = e.getClass().getCanonicalName() + " " + e.getMessage();
       if (scope.encrypt()) {

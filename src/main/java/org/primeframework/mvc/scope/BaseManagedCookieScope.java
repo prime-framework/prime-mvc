@@ -114,10 +114,10 @@ public abstract class BaseManagedCookieScope<T extends Annotation> extends Abstr
       ThrowingFunction<byte[], String> oldFunction = r -> objectMapper.readerFor(String.class).readValue(r);
       ThrowingFunction<byte[], String> newFunction = r -> new String(r, StandardCharsets.UTF_8);
       if (compress || encrypt) {
-        cookie.value = CookieTools.fromCookie(cookieValue, true, encryptor, oldFunction, newFunction);
+        cookie.value = CookieTools.fromCookie(cookieValue, true, true, encryptor, oldFunction, newFunction);
       } else {
         try {
-          cookie.value = CookieTools.fromCookie(cookieValue, false, encryptor, oldFunction, newFunction);
+          cookie.value = CookieTools.fromCookie(cookieValue, true, false, encryptor, oldFunction, newFunction);
         } catch (Throwable t) {
           // Smother because the cookie already has the value in it
         }

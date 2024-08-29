@@ -90,7 +90,7 @@ public abstract class BaseBrowserSessionScope<T extends Annotation> extends Abst
 
     boolean encrypt = encrypt(scope);
     try {
-      return CookieTools.fromJSONCookie(value, type, encrypt, true, encryptor, objectMapper);
+      return CookieTools.fromJSONCookie(value, type, encrypt, encrypt, encryptor, objectMapper);
     } catch (Exception e) {
       String message = e.getClass().getCanonicalName() + " " + e.getMessage();
       if (encrypt) {

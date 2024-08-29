@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,34 +50,37 @@ public class ManagedCookieTest extends PrimeBaseTest {
                                  .assertStatusCode(200)
                                  .assertBody("bar")
                                  .assertContainsCookie("cookie"))
-        .simulate(() -> simulator.test("/legacy-managed-cookie")
+        .simulate(() -> simulator.test("/encrypted-managed-cookie")
                                  .get()
                                  .assertStatusCode(200)
-                                 .assertBody("bar"));
+                                 // this would be expected to "fail" gracefully (neverNull is true)
+                                 // because we're taking an unencrypted managed cookie from CompressedManagedCookieAction
+                                 // and feeding it to EncryptedManagedCookieAction which requires encryption
+                                 .assertBody("(null)"));
   }
 
   @Test
   public void legacy_cookie() throws Exception {
     String value = "foo";
     byte[] json = objectMapper.writeValueAsBytes(value);
-    byte[] encrypted = encryptor.encrypt(json);
-    String encoded = Base64.getUrlEncoder().encodeToString(encrypted);
+    byte[] legacyEncrypted = encryptor.encrypt(json);
+    String legacyEncoded = Base64.getUrlEncoder().encodeToString(legacyEncrypted);
 
     // This is the legacy version but it should work even though it is set to compress the cookie
-    test.simulate(() -> simulator.test("/legacy-managed-cookie")
-                                 .withCookie("cookie", encoded)
+    test.simulate(() -> simulator.test("/encrypted-managed-cookie")
+                                 .withCookie("cookie", legacyEncoded)
                                  .get()
                                  .assertStatusCode(200)
                                  .assertBody("foo"))
 
         // Set a modern version and re-test
-        .simulate(() -> simulator.test("/legacy-managed-cookie")
+        .simulate(() -> simulator.test("/encrypted-managed-cookie")
                                  .withParameter("value", "bar")
                                  .post()
                                  .assertStatusCode(200)
                                  .assertBody("bar")
                                  .assertEncryptedCookie("cookie", "bar"))
-        .simulate(() -> simulator.test("/legacy-managed-cookie")
+        .simulate(() -> simulator.test("/encrypted-managed-cookie")
                                  .get()
                                  .assertStatusCode(200)
                                  .assertBody("bar"));
