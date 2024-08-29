@@ -29,7 +29,7 @@ public final class CookieTools {
   public static final int HIGHEST_BIT_MASK = 0x03;
 
   /**
-   * Processes a cookie value (WITHOUT REQUIRING ENCRYPTED COOKIES) and calls a Function to convert it to a meaningful value
+   * Processes a cookie value and calls a Function to convert it to a meaningful value
    * for the application (or Prime).
    *
    * @param value          The cookie value.
@@ -104,7 +104,7 @@ public final class CookieTools {
   }
 
   /**
-   * Processes a cookie value (WITHOUT REQUIRING ENCRYPTED COOKIES) and converts it to an object
+   * Processes a cookie value and converts it to an object
    *
    * @param value          The cookie value.
    * @param type           The type of object to convert to.
@@ -146,7 +146,7 @@ public final class CookieTools {
   }
 
   /**
-   * Processes a cookie value (WITHOUT REQUIRING ENCRYPTED COOKIES) and converts it to an object.
+   * Processes a cookie value and converts it to an object.
    *
    * @param value          The cookie value.
    * @param type           The type of object to convert to.
