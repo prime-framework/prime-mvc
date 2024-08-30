@@ -100,7 +100,6 @@ public abstract class BaseManagedCookieScope<T extends Annotation> extends Abstr
 
   @Override
   protected Cookie processCookie(Cookie cookie, String fieldName, Class<?> type, T scope) {
-    boolean compress = compress(scope);
     boolean encrypt = encrypt(scope);
     boolean neverNull = neverNull(scope);
 
@@ -111,9 +110,8 @@ public abstract class BaseManagedCookieScope<T extends Annotation> extends Abstr
     }
 
     try {
-      ThrowingFunction<byte[], String> oldFunction = r -> objectMapper.readerFor(String.class).readValue(r);
       ThrowingFunction<byte[], String> newFunction = r -> new String(r, StandardCharsets.UTF_8);
-      cookie.value = CookieTools.fromCookie(cookieValue, encrypt, encryptor, oldFunction, newFunction);
+      cookie.value = CookieTools.fromCookie(cookieValue, encrypt, encryptor, newFunction);
 
       return cookie;
     } catch (Exception e) {

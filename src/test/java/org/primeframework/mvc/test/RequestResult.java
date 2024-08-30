@@ -802,9 +802,8 @@ public class RequestResult {
 
     Encryptor encryptor = injector.getInstance(Encryptor.class);
     ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
-    ThrowingFunction<byte[], String> oldFunction = r -> objectMapper.readerFor(String.class).readValue(r);
     ThrowingFunction<byte[], String> newFunction = r -> new String(r, StandardCharsets.UTF_8);
-    actual.value = CookieTools.fromCookie(actual.value, true, encryptor, oldFunction, newFunction);
+    actual.value = CookieTools.fromCookie(actual.value, true, encryptor, newFunction);
     if (consumer != null) {
       consumer.accept(actual);
     }
@@ -824,9 +823,8 @@ public class RequestResult {
 
     Encryptor encryptor = injector.getInstance(Encryptor.class);
     ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
-    ThrowingFunction<byte[], String> oldFunction = r -> objectMapper.readerFor(String.class).readValue(r);
     ThrowingFunction<byte[], String> newFunction = r -> new String(r, StandardCharsets.UTF_8);
-    String actualDecrypted = CookieTools.fromCookie(actual.value, true, encryptor, oldFunction, newFunction);
+    String actualDecrypted = CookieTools.fromCookie(actual.value, true, encryptor, newFunction);
     if (!Objects.equals(value, actualDecrypted)) {
       throw new AssertionError("Cookie [" + name + "] with decrypted value [" + actualDecrypted + "] was not equal to the expected value [" + value + "]"
                                + "\nActual cookie:\n"

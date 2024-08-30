@@ -79,33 +79,6 @@ public class ManagedCookieTest extends PrimeBaseTest {
   }
 
   @Test
-  public void legacy_cookie() throws Exception {
-    String value = "foo";
-    byte[] json = objectMapper.writeValueAsBytes(value);
-    byte[] legacyEncrypted = encryptor.encrypt(json);
-    String legacyEncoded = Base64.getUrlEncoder().encodeToString(legacyEncrypted);
-
-    // This is the legacy version but it should work even though it is set to compress the cookie
-    test.simulate(() -> simulator.test("/encrypted-managed-cookie")
-                                 .withCookie("cookie", legacyEncoded)
-                                 .get()
-                                 .assertStatusCode(200)
-                                 .assertNormalizedBody("foo"))
-
-        // Set a modern version and re-test
-        .simulate(() -> simulator.test("/encrypted-managed-cookie")
-                                 .withParameter("value", "bar")
-                                 .post()
-                                 .assertStatusCode(200)
-                                 .assertNormalizedBody("bar")
-                                 .assertEncryptedCookie("cookie", "bar"))
-        .simulate(() -> simulator.test("/encrypted-managed-cookie")
-                                 .get()
-                                 .assertStatusCode(200)
-                                 .assertNormalizedBody("bar"));
-  }
-
-  @Test
   public void managed_cookie_scope() throws Exception {
     // Values are not set, no cookies
     test.simulate(() -> simulator.test("/managed-cookie")

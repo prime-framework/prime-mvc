@@ -34,20 +34,23 @@ public final class CookieTools {
    * @param value              The cookie value.
    * @param encryptionRequired Whether encryption is required or not
    * @param encryptor          The encryptor to use if needed.
-   * @param oldFunction        The function to call if the cookie looks legacy.
-   * @param newFunction        The function to call if the cookie looks new (contains our magic header).
+   * @param function           The function to call to deserialize the cookie
    * @param <T>                The type that the function returns.
    * @return The value or null if the cookie is empty.
    * @throws Exception If the operation fails.
    */
   public static <T> T fromCookie(String value, boolean encryptionRequired, Encryptor encryptor,
-                                 ThrowingFunction<byte[], T> oldFunction, ThrowingFunction<byte[], T> newFunction)
+                                 ThrowingFunction<byte[], T> function)
       throws Exception {
     if (value == null || value.isBlank()) {
       return null;
     }
 
     byte[] result = Base64.getUrlDecoder().decode(value);
+    if (!encryptionRequired && (result.length < 5 || result[0] != 0x42 || result[1] != 0x42 || result[2] != 0x42 || result[3] > HIGHEST_BIT_MASK)) {
+      // no encryption required and it's not our format with a header, just spit it back out
+      return function.apply(value.getBytes());
+    }
 
     boolean encrypt = (result[3] & 0x01) == 0x01; // First bit is encrypted
     boolean compress = (result[3] & 0x02) == 0x02; // Second bit is compressed
@@ -63,7 +66,7 @@ public final class CookieTools {
       result = Compressor.decompress(result);
     }
 
-    return newFunction.apply(result);
+    return function.apply(result);
   }
 
   /**
@@ -82,7 +85,7 @@ public final class CookieTools {
                                      Encryptor encryptor,
                                      ObjectMapper objectMapper) throws Exception {
     ThrowingFunction<byte[], T> read = r -> objectMapper.readerFor(type).readValue(r);
-    return fromCookie(value, encryptionRequired, encryptor, read, read);
+    return fromCookie(value, encryptionRequired, encryptor, read);
   }
 
   /**
@@ -100,7 +103,7 @@ public final class CookieTools {
   public static <T> T fromJSONCookie(String value, Class<T> type, boolean encryptionRequired, Encryptor encryptor,
                                      ObjectMapper objectMapper) throws Exception {
     ThrowingFunction<byte[], T> read = r -> objectMapper.readerFor(type).readValue(r);
-    return fromCookie(value, encryptionRequired, encryptor, read, read);
+    return fromCookie(value, encryptionRequired, encryptor, read);
   }
 
   /**
