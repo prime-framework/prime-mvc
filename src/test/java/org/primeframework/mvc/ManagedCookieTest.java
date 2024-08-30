@@ -20,6 +20,7 @@ import java.util.Base64;
 import com.google.inject.Inject;
 import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.util.CookieTools;
+import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
 /**
@@ -49,6 +50,20 @@ public class ManagedCookieTest extends PrimeBaseTest {
                                  // because we're taking an unencrypted managed cookie from CompressedManagedCookieAction
                                  // and feeding it to EncryptedManagedCookieAction which requires encryption
                                  .assertNormalizedBody("(null)"));
+  }
+
+  @Test
+  // test fails in current code as well
+  @Ignore
+  public void cookie_accidentally_starts_with_header() throws Exception {
+    // BBB<null>BB
+    var cookie = "QkJCAEJC";
+
+    test.simulate(() -> simulator.test("/managed-cookie")
+                                 .withCookie("cookie1", cookie)
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertCookie("cookie1", "QkJCAEJC"));
   }
 
   @Test
