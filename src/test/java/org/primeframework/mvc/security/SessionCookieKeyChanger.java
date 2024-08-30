@@ -42,7 +42,7 @@ public class SessionCookieKeyChanger {
    */
   public void changeIt(Cookie cookie) {
     try {
-      UserIdSessionContext existingContainer = CookieTools.fromJSONCookie(cookie.value, MockUserIdSessionContext.class, true, true, encryptor, objectMapper);
+      UserIdSessionContext existingContainer = CookieTools.fromJSONCookie(cookie.value, MockUserIdSessionContext.class, true, encryptor, objectMapper);
       byte[] result = objectMapper.writeValueAsBytes(existingContainer);
       var config = new MockConfiguration();
       config.regenerateCookieEncryptionKey();

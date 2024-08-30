@@ -290,7 +290,7 @@ public class BaseUserIdCookieSecurityContextTest {
     // arrange
     doLogin(200);
     var existingCookie = simulator.userAgent.getCookie("primeCurrentUser");
-    var context = CookieTools.fromJSONCookie(existingCookie.value, MockUserIdSessionContext.class, true, true, encryptor, objectMapper);
+    var context = CookieTools.fromJSONCookie(existingCookie.value, MockUserIdSessionContext.class, true, encryptor, objectMapper);
     existingCookie.value = CookieTools.toJSONCookie(context, true, false, encryptor, objectMapper);
 
     // act + assert

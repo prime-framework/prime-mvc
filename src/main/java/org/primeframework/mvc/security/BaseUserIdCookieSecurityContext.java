@@ -230,7 +230,6 @@ public abstract class BaseUserIdCookieSecurityContext<TUserId> implements UserLo
       context = CookieTools.fromJSONCookie(cookie,
                                            getUserIdSessionContextClass(),
                                            true,
-                                           true,
                                            encryptor,
                                            objectMapper);
       var shouldExtend = shouldExtendCookie(context.getLoginInstant());

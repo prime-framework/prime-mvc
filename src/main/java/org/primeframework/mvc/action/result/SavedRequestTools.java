@@ -150,7 +150,6 @@ public class SavedRequestTools {
       SavedHttpRequest savedRequest = CookieTools.fromJSONCookie(value,
                                                                  SavedHttpRequest.class,
                                                                  true,
-                                                                 true,
                                                                  encryptor,
                                                                  objectMapper);
       return new SaveHttpRequestResult(cookie, ready, savedRequest);

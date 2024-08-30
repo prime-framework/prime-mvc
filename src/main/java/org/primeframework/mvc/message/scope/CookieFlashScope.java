@@ -120,7 +120,6 @@ public class CookieFlashScope implements FlashScope {
       List<Message> messages = CookieTools.fromJSONCookie(s,
                                                           new TypeReference<List<Message>>() {},
                                                           true,
-                                                          true,
                                                           encryptor,
                                                           objectMapper);
       // @formatter:on
