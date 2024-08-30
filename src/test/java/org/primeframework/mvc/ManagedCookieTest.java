@@ -173,10 +173,10 @@ public class ManagedCookieTest extends PrimeBaseTest {
     // ManagedCookieAction's cookie1 field does not)
     String value = "foo";
     byte[] json = objectMapper.writeValueAsBytes(value);
-    String cookie = CookieTools.toCookie(json, false, false, encryptor);
+    String base64EncodedCookieWithHeader = CookieTools.toCookie(json, false, false, encryptor);
 
     test.simulate(() -> simulator.test("/managed-cookie")
-                                 .withCookie("cookie1", cookie)
+                                 .withCookie("cookie1", base64EncodedCookieWithHeader)
                                  .get()
                                  .assertStatusCode(200)
                                  .assertCookie("cookie1", "foo"));
