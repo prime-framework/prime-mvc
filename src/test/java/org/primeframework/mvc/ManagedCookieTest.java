@@ -32,6 +32,34 @@ public class ManagedCookieTest extends PrimeBaseTest {
   @Inject public Encryptor encryptor;
 
   @Test
+  public void compressed_annotation_legacy_uncompressed_cookie_longer_than_5() throws Exception {
+    var value = "foobar";
+    byte[] json = objectMapper.writeValueAsBytes(value);
+    var legacyCookieWithNoCompression = Base64.getEncoder().encodeToString(json);
+    test.simulate(() -> simulator.test("/compressed-managed-cookie")
+                                 .withCookie("cookie", legacyCookieWithNoCompression)
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertBody("foobar")
+                                 // modern format with 0x42 3 times...
+                                 .assertCookie("cookie", "QkJCAnjaS8vPT0osAgAIqwJ6"));
+  }
+
+  @Test
+  public void compressed_annotation_legacy_uncompressed_cookie_shorter_than_5() throws Exception {
+    var value = "f";
+    byte[] json = objectMapper.writeValueAsBytes(value);
+    var legacyCookieWithNoCompression = Base64.getEncoder().encodeToString(json);
+    test.simulate(() -> simulator.test("/compressed-managed-cookie")
+                                 .withCookie("cookie", legacyCookieWithNoCompression)
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertBody("f")
+                                 // modern format with 0x42 3 times...
+                                 .assertCookie("cookie", "QkJCAnjaSwMAAGcAZw=="));
+  }
+
+  @Test
   public void compressed_only_cookie() throws Exception {
     test.simulate(() -> simulator.test("/compressed-managed-cookie")
                                  .withParameter("value", "bar")
@@ -50,34 +78,6 @@ public class ManagedCookieTest extends PrimeBaseTest {
                                  // because we're taking an unencrypted managed cookie from CompressedManagedCookieAction
                                  // and feeding it to EncryptedManagedCookieAction which requires encryption
                                  .assertNormalizedBody("(null)"));
-  }
-
-  @Test
-  public void compressed_only_legacy_cookie_longer_than_5() throws Exception {
-    var value = "foobar";
-    byte[] json = objectMapper.writeValueAsBytes(value);
-    var legacyCookie = Base64.getEncoder().encodeToString(json);
-    test.simulate(() -> simulator.test("/compressed-managed-cookie")
-                                 .withCookie("cookie", legacyCookie)
-                                 .get()
-                                 .assertStatusCode(200)
-                                 .assertBody("foobar")
-                                 // modern format with 0x42 3 times...
-                                 .assertCookie("cookie", "QkJCAnjaS8vPT0osAgAIqwJ6"));
-  }
-
-  @Test
-  public void compressed_only_legacy_cookie_shorter_than_5() throws Exception {
-    var value = "f";
-    byte[] json = objectMapper.writeValueAsBytes(value);
-    var legacyCookie = Base64.getEncoder().encodeToString(json);
-    test.simulate(() -> simulator.test("/compressed-managed-cookie")
-                                 .withCookie("cookie", legacyCookie)
-                                 .get()
-                                 .assertStatusCode(200)
-                                 .assertBody("f")
-                                 // modern format with 0x42 3 times...
-                                 .assertCookie("cookie", "QkJCAnjaSwMAAGcAZw=="));
   }
 
   @Test
