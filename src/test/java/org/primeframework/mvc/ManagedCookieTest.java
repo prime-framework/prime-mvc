@@ -19,6 +19,7 @@ import java.util.Base64;
 
 import com.google.inject.Inject;
 import org.primeframework.mvc.security.Encryptor;
+import org.primeframework.mvc.util.CookieTools;
 import org.testng.annotations.Test;
 
 /**
@@ -150,5 +151,22 @@ public class ManagedCookieTest extends PrimeBaseTest {
                                  .assertDoesNotContainsCookie("cookie1")
                                  .assertDoesNotContainsCookie("cookie2")
                                  .assertDoesNotContainsCookie("fusionauth.sso"));
+  }
+
+  @Test
+  public void uncompressed_unencrypted_starts_with_header_byte_sequence() throws Exception {
+    // if compress and encrypt are off, BaseManagedCookieScope#buildCookie will not put a header on the cookie
+    // but there might be some edge cases where we have a header indicating an uncompressed, unencrypted cookie
+    // and we should allow that if the annotation does not use/require encryption (and
+    // ManagedCookieAction's cookie1 field does not)
+    String value = "foo";
+    byte[] json = objectMapper.writeValueAsBytes(value);
+    String cookie = CookieTools.toCookie(json, false, false, encryptor);
+
+    test.simulate(() -> simulator.test("/managed-cookie")
+                                 .withCookie("cookie1", cookie)
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertCookie("cookie1", "foo"));
   }
 }
