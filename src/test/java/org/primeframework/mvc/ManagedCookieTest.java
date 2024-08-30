@@ -53,6 +53,34 @@ public class ManagedCookieTest extends PrimeBaseTest {
   }
 
   @Test
+  public void compressed_only_legacy_cookie_longer_than_5() throws Exception {
+    var value = "foobar";
+    byte[] json = objectMapper.writeValueAsBytes(value);
+    var legacyCookie = Base64.getEncoder().encodeToString(json);
+    test.simulate(() -> simulator.test("/compressed-managed-cookie")
+                                 .withCookie("cookie", legacyCookie)
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertBody("foobar")
+                                 // modern format with 0x42 3 times...
+                                 .assertCookie("cookie", "QkJCAnjaS8vPT0osAgAIqwJ6"));
+  }
+
+  @Test
+  public void compressed_only_legacy_cookie_shorter_than_5() throws Exception {
+    var value = "f";
+    byte[] json = objectMapper.writeValueAsBytes(value);
+    var legacyCookie = Base64.getEncoder().encodeToString(json);
+    test.simulate(() -> simulator.test("/compressed-managed-cookie")
+                                 .withCookie("cookie", legacyCookie)
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertBody("f")
+                                 // modern format with 0x42 3 times...
+                                 .assertCookie("cookie", "QkJCAnjaSwMAAGcAZw=="));
+  }
+
+  @Test
   // test fails in current code as well
   @Ignore
   public void cookie_accidentally_starts_with_header() throws Exception {
