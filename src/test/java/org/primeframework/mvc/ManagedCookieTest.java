@@ -52,6 +52,18 @@ public class ManagedCookieTest extends PrimeBaseTest {
   }
 
   @Test
+  public void cookie_is_base64_encoded_without_header() throws Exception {
+    String cookie = Base64.getEncoder().encodeToString("foobar".getBytes());
+
+    test.simulate(() -> simulator.test("/managed-cookie")
+                                 .withCookie("cookie1", cookie)
+                                 .get()
+                                 .assertStatusCode(200)
+                                 // Zm9vYmFy is base64 encoded foobar
+                                 .assertCookie("cookie1", "Zm9vYmFy"));
+  }
+
+  @Test
   public void legacy_cookie() throws Exception {
     String value = "foo";
     byte[] json = objectMapper.writeValueAsBytes(value);
