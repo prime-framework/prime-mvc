@@ -41,7 +41,7 @@ public final class CookieTools {
    * @return The value or null if the cookie is empty.
    * @throws Exception If the operation fails.
    */
-  @Deprecated(forRemoval = true, since = "4.22.13")
+  @Deprecated(forRemoval = true, since = "4.23.0")
   public static <T> T fromCookie(String value, boolean encryptedIfOld, Encryptor encryptor,
                                  ThrowingFunction<byte[], T> oldFunction, ThrowingFunction<byte[], T> newFunction) throws Exception {
     return fromCookie(value, false, encryptedIfOld, encryptor, oldFunction, newFunction);
@@ -91,7 +91,7 @@ public final class CookieTools {
     result = Arrays.copyOfRange(result, 4, result.length);
 
     if (encryptionRequired && !encrypt) {
-      throw new EncryptionException("Encryption is required to decrypt cookie but a non-encrypted cookie was presented");
+      throw new IllegalStateException("Encryption is required to decrypt cookie but a non-encrypted cookie was presented");
     } else if (encrypt) {
       result = encryptor.decrypt(result);
     }
@@ -116,7 +116,7 @@ public final class CookieTools {
    * @return The object or null if the cookie couldn't be converted.
    * @throws Exception If the operation fails.
    */
-  @Deprecated(forRemoval = true, since = "4.22.13")
+  @Deprecated(forRemoval = true, since = "4.23.0")
   public static <T> T fromJSONCookie(String value, TypeReference<T> type,
                                      boolean encryptedIfOld, Encryptor encryptor,
                                      ObjectMapper objectMapper) throws Exception {
@@ -158,7 +158,7 @@ public final class CookieTools {
    * @return The object or null if the cookie couldn't be converted.
    * @throws Exception If the operation fails.
    */
-  @Deprecated(forRemoval = true, since = "4.22.13")
+  @Deprecated(forRemoval = true, since = "4.23.0")
   public static <T> T fromJSONCookie(String value, Class<T> type, boolean encryptedIfOld, Encryptor encryptor,
                                      ObjectMapper objectMapper) throws Exception {
     ThrowingFunction<byte[], T> read = r -> objectMapper.readerFor(type).readValue(r);

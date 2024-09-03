@@ -89,7 +89,7 @@ public class BaseUserIdCookieSecurityContextTest {
   @Test
   public void cookie_encryption_key_changed() {
     // arrange
-    doLogin(200);
+    doLogin();
     // if this key changes, the user's browser will still supply a cookie, but it will fail to be decrypted
     // and if not handled properly, will stack trace and the user cannot get back in
 
@@ -152,7 +152,7 @@ public class BaseUserIdCookieSecurityContextTest {
   @Test
   public void getCurrentUser_extend() {
     // arrange
-    doLogin(200);
+    doLogin();
     var moreThanHalf = mockClockNow.plusMinutes(4);
     mockClock = Clock.fixed(moreThanHalf.toInstant(), ZoneId.of("UTC"));
 
@@ -167,7 +167,7 @@ public class BaseUserIdCookieSecurityContextTest {
   @Test
   public void getCurrentUser_has_session() {
     // arrange
-    doLogin(200);
+    doLogin();
 
     // act + assert
     getSessionInfo().assertBodyContains("the current user is bob");
@@ -176,7 +176,7 @@ public class BaseUserIdCookieSecurityContextTest {
   @Test
   public void getCurrentUser_has_session_caches_in_request() {
     // arrange
-    doLogin(200);
+    doLogin();
 
     // act + assert
     getSessionInfo().assertBodyContains("the user in the request is bob");
@@ -186,7 +186,7 @@ public class BaseUserIdCookieSecurityContextTest {
   @Test
   public void getCurrentUser_no_extend() {
     // arrange
-    doLogin(200);
+    doLogin();
     var pastAge = mockClockNow.plusMinutes(31);
     mockClock = Clock.fixed(pastAge.toInstant(), ZoneId.of("UTC"));
 
@@ -208,7 +208,7 @@ public class BaseUserIdCookieSecurityContextTest {
   @Test
   public void getSessionId_has_session() {
     // arrange
-    doLogin(200);
+    doLogin();
 
     // act + assert
     getSessionInfo().assertBodyDoesNotContain("the session ID is (no session)");
@@ -223,7 +223,7 @@ public class BaseUserIdCookieSecurityContextTest {
   @Test
   public void isLoggedIn_has_session() {
     // arrange
-    doLogin(200);
+    doLogin();
 
     // act + assert
     getSessionInfo().assertBodyContains("logged in yes");
@@ -240,7 +240,7 @@ public class BaseUserIdCookieSecurityContextTest {
     // arrange
 
     // act
-    var result = doLogin(200);
+    var result = doLogin();
 
     // assert
     result.assertStatusCode(200).assertContainsNoGeneralErrors().assertContainsCookie(UserKey);
@@ -249,7 +249,7 @@ public class BaseUserIdCookieSecurityContextTest {
   @Test
   public void logout() {
     // arrange
-    doLogin(200);
+    doLogin();
 
     // act
     simulator.test("/security/cookiesession/do-logout").get();
@@ -259,7 +259,7 @@ public class BaseUserIdCookieSecurityContextTest {
   }
 
   @Test(dataProvider = "cookieActionData")
-  public void shouldExtendCookie(String label, ZonedDateTime signInTime, Duration maxSessionAge, Duration sessionTimeout,
+  public void shouldExtendCookie(String ignoredLabel, ZonedDateTime signInTime, Duration maxSessionAge, Duration sessionTimeout,
                                  CookieExtendResult expectedResult) {
     // arrange
     // we don't need most of these dependencies to test this
@@ -288,7 +288,7 @@ public class BaseUserIdCookieSecurityContextTest {
   @Test
   public void unencrypted_cookie_presented() throws Exception {
     // arrange
-    doLogin(200);
+    doLogin();
     var existingCookie = simulator.userAgent.getCookie("primeCurrentUser");
     var context = CookieTools.fromJSONCookie(existingCookie.value, MockUserIdSessionContext.class, true, true, encryptor, objectMapper);
     existingCookie.value = CookieTools.toJSONCookie(context, true, false, encryptor, objectMapper);
@@ -300,7 +300,7 @@ public class BaseUserIdCookieSecurityContextTest {
   @Test
   public void updateUser() {
     // arrange
-    doLogin(200);
+    doLogin();
     var baselineGet = getSessionInfo();
     var previousSessionId = getSessionID(baselineGet);
 
@@ -322,8 +322,8 @@ public class BaseUserIdCookieSecurityContextTest {
     resetMockClock();
   }
 
-  private RequestResult doLogin(int expectedStatusCode) {
-    return simulator.test("/security/cookiesession/do-login").get().assertStatusCode(expectedStatusCode);
+  private RequestResult doLogin() {
+    return simulator.test("/security/cookiesession/do-login").get().assertStatusCode(200);
   }
 
   private RequestResult getSessionInfo() {

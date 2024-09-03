@@ -247,14 +247,14 @@ public abstract class BaseUserIdCookieSecurityContext<TUserId> implements UserLo
       this.request.setAttribute(ContextKey, context);
       return context;
     } catch (BadPaddingException e) {
-      logger.debug("User cookie parsing failed. It is likely the cookie encryption key has changed, deleting session",
+      logger.debug("User cookie parsing failed. It is likely the cookie encryption key has changed, therefore deleting session.",
                    e);
       // if the cookie encryption key changes (DB change, etc.) then we need new cookies, otherwise we cannot
       // decrypt and a user will be stuck trying to get back in
       this.deleteCookies();
       return null;
     } catch (Exception e) {
-      logger.debug("User cookie parsing failed because decoding or decryption failed, deleting session", e);
+      logger.debug("User cookie parsing failed because decoding or decryption failed, therefore deleting session.", e);
       this.deleteCookies();
       return null;
     }

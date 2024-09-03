@@ -23,6 +23,12 @@ import org.testng.annotations.Test;
  * @author Brian Pontarelli
  */
 public class BrowserSessionTest extends PrimeBaseTest {
+  // Scenario:
+  // 1) Browser visits the /browser-session/decrypted page
+  // 2) DecryptedAction sets the cookie value to a non-encrypted value
+  // 3) SecondAction, which expects an encrypted cookie, will not be able to decrypt an un-encrypted cookie since
+  //    encryption is required.
+
   @Test
   public void not_encrypted_cookie() throws Exception {
     test.simulate(() -> simulator.test("/browser-session/decrypted")
