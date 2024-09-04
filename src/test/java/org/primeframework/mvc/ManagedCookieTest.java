@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@ import java.util.Base64;
 
 import com.google.inject.Inject;
 import org.primeframework.mvc.security.Encryptor;
+import org.primeframework.mvc.util.CookieTools;
+import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
 /**
@@ -30,57 +32,126 @@ public class ManagedCookieTest extends PrimeBaseTest {
   @Inject public Encryptor encryptor;
 
   @Test
-  public void compressed_only_cookie() throws Exception {
-    String value = "foo";
-    byte[] json = objectMapper.writeValueAsBytes(value);
-    byte[] encrypted = encryptor.encrypt(json);
-    String encoded = Base64.getUrlEncoder().encodeToString(encrypted);
+  public void compressed_annotation_legacy_uncompressed_cookie_longer_than_5() throws Exception {
+    // Scenario:
+    // 1) Browser has uncompressed, non-encrypted cookie with value 'foobar' from a long time ago
+    // 2) Application decides to start compressing (but not encrypting) cookie. Adds @ManagedCookie(compress = true, encrypt = false)
+    // to app
+    // 3) Browser submits cookie
 
-    // This is the legacy version
+    var value = "foobar";
+    byte[] json = objectMapper.writeValueAsBytes(value);
+    var legacyCookieWithNoCompression = Base64.getEncoder().encodeToString(json);
     test.simulate(() -> simulator.test("/compressed-managed-cookie")
-                                 .withCookie("cookie", encoded)
+                                 .withCookie("cookie", legacyCookieWithNoCompression)
                                  .get()
                                  .assertStatusCode(200)
-                                 .assertBody("foo"))
+                                 .assertBody("foobar")
+                                 // Expected result is modern format with 0x42 3 times...
+                                 .assertCookie("cookie", "QkJCAnjaS8vPT0osAgAIqwJ6"));
+  }
 
-        // Set a modern version and re-test
-        .simulate(() -> simulator.test("/compressed-managed-cookie")
+  @Test
+  public void compressed_annotation_legacy_uncompressed_cookie_shorter_than_5() throws Exception {
+    // Scenario:
+    // 1) Browser has uncompressed, non-encrypted cookie with value 'f' from a long time ago
+    // 2) Application decides to start compressing (but not encrypting) cookie. Adds @ManagedCookie(compress = true, encrypt = false)
+    // to app
+    // 3) Browser submits cookie
+
+    var value = "f";
+    byte[] json = objectMapper.writeValueAsBytes(value);
+    var legacyCookieWithNoCompression = Base64.getEncoder().encodeToString(json);
+    test.simulate(() -> simulator.test("/compressed-managed-cookie")
+                                 .withCookie("cookie", legacyCookieWithNoCompression)
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertBody("f")
+                                 // Expected result is modern format with 0x42 3 times...
+                                 .assertCookie("cookie", "QkJCAnjaSwMAAGcAZw=="));
+  }
+
+  @Test
+  public void compressed_only_cookie() throws Exception {
+    // Browser sets cookie for the first time
+    test.simulate(() -> simulator.test("/compressed-managed-cookie")
                                  .withParameter("value", "bar")
                                  .post()
                                  .assertStatusCode(200)
                                  .assertBody("bar")
                                  .assertContainsCookie("cookie"))
-        .simulate(() -> simulator.test("/legacy-managed-cookie")
+        // modern (compressed, not encrypted) cookie is now set in our simulator user agent
+        .simulate(() -> simulator.test("/compressed-managed-cookie")
                                  .get()
                                  .assertStatusCode(200)
-                                 .assertBody("bar"));
+                                 .assertBody("bar"))
+        .simulate(() -> simulator.test("/encrypted-managed-cookie")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 // this would be expected to "fail" gracefully (neverNull is true)
+                                 // because we're taking an unencrypted managed cookie from CompressedManagedCookieAction
+                                 // and feeding it to EncryptedManagedCookieAction which requires encryption
+                                 .assertNormalizedBody("(null)"));
+  }
+
+  @Test
+  // test fails in current code as well
+  @Ignore
+  public void cookie_accidentally_starts_with_header() throws Exception {
+    // BBB<null>BB
+    var cookie = "QkJCAEJC";
+
+    test.simulate(() -> simulator.test("/managed-cookie")
+                                 .withCookie("cookie1", cookie)
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertCookie("cookie1", "QkJCAEJC"));
+  }
+
+  @Test
+  public void cookie_is_base64_encoded_without_header() throws Exception {
+    String cookie = Base64.getEncoder().encodeToString("foobar".getBytes());
+
+    test.simulate(() -> simulator.test("/managed-cookie")
+                                 .withCookie("cookie1", cookie)
+                                 .get()
+                                 .assertStatusCode(200)
+                                 // Zm9vYmFy is base64 encoded foobar
+                                 .assertCookie("cookie1", "Zm9vYmFy"));
   }
 
   @Test
   public void legacy_cookie() throws Exception {
+    // Scenario:
+    // 1) Browser has uncompressed, encrypted cookie with value '"foo"' from a long time ago
+    // 2) Application upgrades to the modern cookie format with header, etc.
+    // 3) Browser submits cookie
     String value = "foo";
     byte[] json = objectMapper.writeValueAsBytes(value);
-    byte[] encrypted = encryptor.encrypt(json);
-    String encoded = Base64.getUrlEncoder().encodeToString(encrypted);
+    byte[] legacyEncrypted = encryptor.encrypt(json);
+    String legacyEncoded = Base64.getUrlEncoder().encodeToString(legacyEncrypted);
 
-    // This is the legacy version but it should work even though it is set to compress the cookie
-    test.simulate(() -> simulator.test("/legacy-managed-cookie")
-                                 .withCookie("cookie", encoded)
+    // This is the legacy version but it should work even though the EncryptedManagedCookieAction
+    // has compression enabled
+    test.simulate(() -> simulator.test("/encrypted-managed-cookie")
+                                 .withCookie("cookie", legacyEncoded)
                                  .get()
                                  .assertStatusCode(200)
-                                 .assertBody("foo"))
+                                 .assertNormalizedBody("foo")
+                                 // during the get, our cookie is modernized
+                                 .assertEncryptedCookie("cookie", "foo"))
 
         // Set a modern version and re-test
-        .simulate(() -> simulator.test("/legacy-managed-cookie")
+        .simulate(() -> simulator.test("/encrypted-managed-cookie")
                                  .withParameter("value", "bar")
                                  .post()
                                  .assertStatusCode(200)
-                                 .assertBody("bar")
+                                 .assertNormalizedBody("bar")
                                  .assertEncryptedCookie("cookie", "bar"))
-        .simulate(() -> simulator.test("/legacy-managed-cookie")
+        .simulate(() -> simulator.test("/encrypted-managed-cookie")
                                  .get()
                                  .assertStatusCode(200)
-                                 .assertBody("bar"));
+                                 .assertNormalizedBody("bar"));
   }
 
   @Test
@@ -156,5 +227,22 @@ public class ManagedCookieTest extends PrimeBaseTest {
                                  .assertDoesNotContainsCookie("cookie1")
                                  .assertDoesNotContainsCookie("cookie2")
                                  .assertDoesNotContainsCookie("fusionauth.sso"));
+  }
+
+  @Test
+  public void uncompressed_unencrypted_starts_with_header_byte_sequence() throws Exception {
+    // if compress and encrypt are off, BaseManagedCookieScope#buildCookie will not put a header on the cookie
+    // but there might be some edge cases where we have a header indicating an uncompressed, unencrypted cookie
+    // and we should allow that if the annotation does not use/require encryption (and
+    // ManagedCookieAction's cookie1 field does not)
+    String value = "foo";
+    byte[] json = objectMapper.writeValueAsBytes(value);
+    String base64EncodedCookieWithHeader = CookieTools.toCookie(json, false, false, encryptor);
+
+    test.simulate(() -> simulator.test("/managed-cookie")
+                                 .withCookie("cookie1", base64EncodedCookieWithHeader)
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertCookie("cookie1", "foo"));
   }
 }

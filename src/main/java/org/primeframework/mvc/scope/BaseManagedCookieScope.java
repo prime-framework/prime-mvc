@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2021-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -114,10 +114,10 @@ public abstract class BaseManagedCookieScope<T extends Annotation> extends Abstr
       ThrowingFunction<byte[], String> oldFunction = r -> objectMapper.readerFor(String.class).readValue(r);
       ThrowingFunction<byte[], String> newFunction = r -> new String(r, StandardCharsets.UTF_8);
       if (compress || encrypt) {
-        cookie.value = CookieTools.fromCookie(cookieValue, true, encryptor, oldFunction, newFunction);
+        cookie.value = CookieTools.fromCookie(cookieValue, encrypt, encrypt, encryptor, oldFunction, newFunction);
       } else {
         try {
-          cookie.value = CookieTools.fromCookie(cookieValue, false, encryptor, oldFunction, newFunction);
+          cookie.value = CookieTools.fromCookie(cookieValue, false, false, encryptor, oldFunction, newFunction);
         } catch (Throwable t) {
           // Smother because the cookie already has the value in it
         }
@@ -131,6 +131,8 @@ public abstract class BaseManagedCookieScope<T extends Annotation> extends Abstr
       } else {
         logger.debug("Failed to decode cookie. This is not expected.\n\tCause: " + message);
       }
+      // if we had an encryption or decoding problem, we should not keep a cookie value around at all
+      cookie.value = null;
     }
 
     return neverNull ? cookie : null;

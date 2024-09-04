@@ -27,6 +27,8 @@ import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.ErrorException;
 import org.primeframework.mvc.util.CookieTools;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Logs in and out users based on storing their User ID in a cookie and also adds a sliding session
@@ -38,6 +40,8 @@ public abstract class BaseUserIdCookieSecurityContext<TUserId> implements UserLo
   public static final String UserKey = "primeCurrentUser";
 
   private static final String ContextKey = "primeLoginContext";
+
+  private static final Logger logger = LoggerFactory.getLogger(BaseUserIdCookieSecurityContext.class);
 
   protected final CookieProxy sessionCookie;
 
@@ -223,7 +227,12 @@ public abstract class BaseUserIdCookieSecurityContext<TUserId> implements UserLo
       return null;
     }
     try {
-      context = CookieTools.fromJSONCookie(cookie, getUserIdSessionContextClass(), true, encryptor, objectMapper);
+      context = CookieTools.fromJSONCookie(cookie,
+                                           getUserIdSessionContextClass(),
+                                           true,
+                                           true,
+                                           encryptor,
+                                           objectMapper);
       var shouldExtend = shouldExtendCookie(context.getLoginInstant());
       switch (shouldExtend) {
         case Extend:
@@ -238,12 +247,16 @@ public abstract class BaseUserIdCookieSecurityContext<TUserId> implements UserLo
       this.request.setAttribute(ContextKey, context);
       return context;
     } catch (BadPaddingException e) {
+      logger.debug("User cookie parsing failed. It is likely the cookie encryption key has changed, therefore deleting session.",
+                   e);
       // if the cookie encryption key changes (DB change, etc.) then we need new cookies, otherwise we cannot
       // decrypt and a user will be stuck trying to get back in
       this.deleteCookies();
       return null;
     } catch (Exception e) {
-      throw new ErrorException(e);
+      logger.debug("User cookie parsing failed because decoding or decryption failed, therefore deleting session.", e);
+      this.deleteCookies();
+      return null;
     }
   }
 

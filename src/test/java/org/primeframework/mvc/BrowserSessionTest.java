@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2020, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,30 @@ import org.testng.annotations.Test;
  * @author Brian Pontarelli
  */
 public class BrowserSessionTest extends PrimeBaseTest {
+  @Test
+  public void not_encrypted_cookie() throws Exception {
+    // Scenario:
+    // 1) Browser visits the /browser-session/decrypted page
+    // 2) DecryptedAction sets the cookie value to a non-encrypted value
+    // 3) SecondAction, which expects an encrypted cookie, will not be able to decrypt an un-encrypted cookie since
+    //    encryption is required.
+
+    test.simulate(() -> simulator.test("/browser-session/decrypted")
+                                 .get()
+                                 .assertStatusCode(302)
+                                 .assertRedirect("/browser-session/second")
+                                 .assertContainsCookie("user"))
+        .simulate(() -> simulator.test("/browser-session/second")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 // decrypted tries to use a non-encrypted cookie
+                                 // to supply a user to SecondAction, which
+                                 // requires an encrypted cookie by virtue of
+                                 // relying on the defaults for @BrowserSession
+                                 .assertBodyContains("The user is missing")
+                                 .assertCookieWasDeleted("user"));
+  }
+
   @Test
   public void sessionCookie() throws Exception {
     test.simulate(() -> simulator.test("/browser-session/first")

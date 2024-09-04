@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2023, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,7 +89,7 @@ public class BrowserActionSessionScope extends BaseBrowserSessionScope<BrowserAc
     try {
       Encryptor encryptor = injector.getInstance(Encryptor.class);
       ObjectMapper objectMapper = injector.getInstance(ObjectMapper.class);
-      return CookieTools.fromJSONCookie(value, type, encrypted, encryptor, objectMapper);
+      return CookieTools.fromJSONCookie(value, type, encrypted, encrypted, encryptor, objectMapper);
     } catch (Exception e) {
       String message = e.getClass().getCanonicalName() + " " + e.getMessage();
       if (scope.encrypt()) {
@@ -128,7 +128,7 @@ public class BrowserActionSessionScope extends BaseBrowserSessionScope<BrowserAc
       ActionInvocation ai = actionInvocationStore.getCurrent();
       if (ai.action == null) {
         throw new PrimeException("Attempting to store a value in the action session but the current request URL isn'" +
-            "t associated with an action class");
+                                 "t associated with an action class");
       }
       className = ai.action.getClass().getName();
     }
