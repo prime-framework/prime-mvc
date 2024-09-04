@@ -28,7 +28,7 @@ import java.security.NoSuchAlgorithmException;
  */
 public interface CipherProvider {
   /**
-   * Return a cipher used for decrypting.
+   * Return a cipher used for decrypting AES/CBC.
    *
    * @param iv the initialization vector
    * @return the Cipher object.
@@ -41,7 +41,20 @@ public interface CipherProvider {
       throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException;
 
   /**
-   * Return a cipher used for encrypting.
+   * Return a cipher used for decrypting AES/GCM.
+   *
+   * @param iv the initialization vector
+   * @return the Cipher object.
+   * @throws NoSuchPaddingException             when this happens.
+   * @throws NoSuchAlgorithmException           when this happens.
+   * @throws InvalidAlgorithmParameterException when this happens.
+   * @throws InvalidKeyException                when this happens.
+   */
+  Cipher getDecryptorGCM(byte[] iv)
+      throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException;
+
+  /**
+   * Return a cipher used for encrypting AES/CBC.
    *
    * @param iv the initialization vector
    * @return the Cipher object.
@@ -51,5 +64,18 @@ public interface CipherProvider {
    * @throws InvalidKeyException                when this happens.
    */
   Cipher getEncryptor(byte[] iv)
+      throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException;
+
+  /**
+   * Return a cipher used for encrypting AES/CBC.
+   *
+   * @param iv the initialization vector
+   * @return the Cipher object.
+   * @throws NoSuchPaddingException             when this happens.
+   * @throws NoSuchAlgorithmException           when this happens.
+   * @throws InvalidAlgorithmParameterException when this happens.
+   * @throws InvalidKeyException                when this happens.
+   */
+  Cipher getEncryptorGCM(byte[] iv)
       throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException;
 }

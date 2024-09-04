@@ -17,6 +17,7 @@ package org.primeframework.mvc.security;
 
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -44,6 +45,22 @@ public class DefaultCipherProvider implements CipherProvider {
       throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
     Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
     cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(iv));
+    return cipher;
+  }
+
+  @Override
+  public Cipher getDecryptorGCM(byte[] iv)
+      throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
+    Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+    cipher.init(Cipher.DECRYPT_MODE, key, new GCMParameterSpec(128, iv));
+    return cipher;
+  }
+
+  @Override
+  public Cipher getEncryptorGCM(byte[] iv)
+      throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
+    Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+    cipher.init(Cipher.ENCRYPT_MODE, key, new GCMParameterSpec(128, iv));
     return cipher;
   }
 
