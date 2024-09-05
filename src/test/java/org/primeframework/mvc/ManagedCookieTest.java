@@ -123,12 +123,14 @@ public class ManagedCookieTest extends PrimeBaseTest {
   @Test
   public void legacy_cookie() throws Exception {
     // Scenario:
-    // 1) Browser has uncompressed, encrypted cookie with value '"foo"' from a long time ago
+    // 1) Browser has uncompressed, AES/CBC-encrypted cookie with value '"foo"' from a long time ago
     // 2) Application upgrades to the modern cookie format with header, etc.
     // 3) Browser submits cookie
     String value = "foo";
     byte[] json = objectMapper.writeValueAsBytes(value);
-    byte[] legacyEncrypted = encryptor.encryptGCM(json);
+    // We want to use the deprecated encrypt method to test forward compatibility with the new decryption method
+    @SuppressWarnings("deprecation")
+    byte[] legacyEncrypted = encryptor.encrypt(json);
     String legacyEncoded = Base64.getUrlEncoder().encodeToString(legacyEncrypted);
 
     // This is the legacy version but it should work even though the EncryptedManagedCookieAction
