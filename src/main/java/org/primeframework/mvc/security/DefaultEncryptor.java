@@ -79,7 +79,7 @@ public class DefaultEncryptor implements Encryptor {
    */
   private byte[] doDecrypt(byte[] bytes, Cipher cipher) throws GeneralSecurityException {
     byte[] result = new byte[cipher.getOutputSize(bytes.length)];
-    int resultLength = cipher.update(bytes, 0, result.length, result, 0);
+    int resultLength = cipher.update(bytes, 0, bytes.length, result, 0);
     resultLength += cipher.doFinal(result, resultLength);
     return Arrays.copyOfRange(result, 0, resultLength);
   }
