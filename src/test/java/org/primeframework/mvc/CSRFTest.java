@@ -15,8 +15,11 @@
  */
 package org.primeframework.mvc;
 
+import java.util.Base64;
+
 import com.google.inject.Inject;
 import org.example.domain.User;
+import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.security.MockUserLoginSecurityContext;
 import org.primeframework.mvc.security.UserLoginSecurityContext;
 import org.testng.annotations.Test;
@@ -25,6 +28,8 @@ import org.testng.annotations.Test;
  * @author Daniel DeGroff
  */
 public class CSRFTest extends PrimeBaseTest {
+  @Inject public Encryptor encryptor;
+
   @Inject public UserLoginSecurityContext securityContext;
 
   @Test(enabled = false)
@@ -94,5 +99,31 @@ public class CSRFTest extends PrimeBaseTest {
              .post()
              .assertStatusCode(200)
              .assertBody("Secure!");
+  }
+
+  @Test
+  public void post_CSRFTokenCompatibility() throws Exception {
+    // Use case: a CSRF token encrypted with CBC can be decrypted using the updated method
+    MockUserLoginSecurityContext.roles.add("admin");
+    securityContext.login(new User());
+    configuration.csrfEnabled = true;
+
+    // Craft a CSRF token, serialize to JSON, encrypt with CBC, base64url-encode
+    CSRFToken token = new CSRFToken(securityContext.getSessionId(), System.currentTimeMillis());
+    byte[] serialized = objectMapper.writeValueAsBytes(token);
+    @SuppressWarnings("deprecation")
+    byte[] encrypted = encryptor.encrypt(serialized);
+    String encoded = Base64.getUrlEncoder().encodeToString(encrypted);
+
+    simulator.test("/secure")
+             .withSingleHeader("Referer", "http://localhost:" + simulator.getPort() + "/secure")
+             .withCSRFToken(encoded)
+             .post()
+             .assertStatusCode(200)
+             .assertBody("Secure!");
+  }
+
+  // Add for testing legacy-encrypted CSRF token which is defined as a private class in DefaultEncryptionBasedTokenCSRFProvider
+  private record CSRFToken(String sid, long instant) {
   }
 }
