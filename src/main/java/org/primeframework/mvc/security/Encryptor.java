@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2016-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,8 @@ package org.primeframework.mvc.security;
 public interface Encryptor {
   /**
    * Decrypt a set of bytes.
+   * <p>
+   * This will attempt to decrypt with GCM and then CBC if that fails.
    *
    * @param bytes The bytes to decrypt.
    * @return The decrypted bytes.
@@ -30,10 +32,21 @@ public interface Encryptor {
   byte[] decrypt(byte[] bytes) throws Exception;
 
   /**
-   * Encrypt a set of bytes.
+   * Encrypt a set of bytes using AES/CBC.
+   * <p>
+   * This method is provided for backward compatibility. Prefer using the more secure {@link #encryptGCM(byte[])} unless CBC mode is required.
    *
    * @param bytes The bytes to encrypt.
    * @return The encrypted bytes.
    */
+  @Deprecated(since = "4.24.0")
   byte[] encrypt(byte[] bytes) throws Exception;
+
+  /**
+   * Encrypt a set of bytes using AES/GCM.
+   *
+   * @param bytes The bytes to encrypt.
+   * @return The encrypted bytes.
+   */
+  byte[] encryptGCM(byte[] bytes) throws Exception;
 }

@@ -128,7 +128,7 @@ public class ManagedCookieTest extends PrimeBaseTest {
     // 3) Browser submits cookie
     String value = "foo";
     byte[] json = objectMapper.writeValueAsBytes(value);
-    byte[] legacyEncrypted = encryptor.encrypt(json);
+    byte[] legacyEncrypted = encryptor.encryptGCM(json);
     String legacyEncoded = Base64.getUrlEncoder().encodeToString(legacyEncrypted);
 
     // This is the legacy version but it should work even though the EncryptedManagedCookieAction

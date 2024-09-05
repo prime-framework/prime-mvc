@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2020-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package org.primeframework.mvc.security;
 
 import javax.crypto.Cipher;
+import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
@@ -34,35 +35,85 @@ public class DefaultEncryptor implements Encryptor {
 
   @Override
   public byte[] decrypt(byte[] bytes) throws Exception {
-    // The first 16 bytes are the IV
-    byte[] iv = new byte[16];
-    System.arraycopy(bytes, 0, iv, 0, 16);
+    // The first 16 bytes contain the initialization vector (IV)
+    byte[] iv = Arrays.copyOfRange(bytes, 0, 16);
+    // The remainder contains the encrypted bytes
+    byte[] encryptedBytes = Arrays.copyOfRange(bytes, 16, bytes.length);
 
-    Cipher cipher = cipherProvider.getDecryptor(iv);
-
-    byte[] json = Arrays.copyOfRange(bytes, 16, bytes.length);
-    byte[] result = new byte[cipher.getOutputSize(json.length)];
-    int resultLength = cipher.update(json, 0, result.length, result, 0);
-    resultLength += cipher.doFinal(result, resultLength);
-    return Arrays.copyOfRange(result, 0, resultLength);
+    try {
+      // Attempt to decrypt using AES/GCM
+      Cipher cipher = cipherProvider.getDecryptorGCM(iv);
+      return doDecrypt(encryptedBytes, cipher);
+    } catch (GeneralSecurityException gcmException) {
+      // If GCM failed, try decrypting in CBC mode
+      try {
+        Cipher cipher = cipherProvider.getDecryptor(iv);
+        return doDecrypt(encryptedBytes, cipher);
+      } catch (GeneralSecurityException cbcException) {
+        // If CBC also failed, re-throw the original GCM exception
+        throw gcmException;
+      }
+    }
   }
 
   @Override
   public byte[] encrypt(byte[] bytes) throws Exception {
-    // The first 16 bytes are the IV
-    byte[] iv = new byte[16];
-    new SecureRandom().nextBytes(iv);
-
+    byte[] iv = generateIV();
     Cipher cipher = cipherProvider.getEncryptor(iv);
+    return doEncrypt(bytes, cipher);
+  }
+
+  @Override
+  public byte[] encryptGCM(byte[] bytes) throws Exception {
+    byte[] iv = generateIV();
+    Cipher cipher = cipherProvider.getEncryptorGCM(iv);
+    return doEncrypt(bytes, cipher);
+  }
+
+  /**
+   * Decrypt a set of bytes using the provided cipher
+   *
+   * @param bytes  The bytes to decrypt
+   * @param cipher The cipher for decryption
+   * @return the decrypted bytes
+   */
+  private byte[] doDecrypt(byte[] bytes, Cipher cipher) throws GeneralSecurityException {
+    byte[] result = new byte[cipher.getOutputSize(bytes.length)];
+    int resultLength = cipher.update(bytes, 0, result.length, result, 0);
+    resultLength += cipher.doFinal(result, resultLength);
+    return Arrays.copyOfRange(result, 0, resultLength);
+  }
+
+  /**
+   * Encrypt a set of bytes using the provided cipher
+   *
+   * @param bytes The bytes to encrypt
+   * @param cipher The cipher for encryption
+   * @return the encrypted bytes
+   */
+  private byte[] doEncrypt(byte[] bytes, Cipher cipher) throws GeneralSecurityException {
+    // Allocate array for encryption result
     byte[] result = new byte[cipher.getOutputSize(bytes.length)];
     int resultLength = cipher.update(bytes, 0, bytes.length, result, 0);
     resultLength += cipher.doFinal(result, resultLength);
 
-    // Combine the IV + encrypted result
-    byte[] combined = new byte[resultLength + iv.length];
+    // Extract IV from cipher and combine with encrypted result
+    byte[] iv = cipher.getIV();
+    byte[] combined = new byte[iv.length + resultLength];
     System.arraycopy(iv, 0, combined, 0, iv.length);
     System.arraycopy(result, 0, combined, iv.length, resultLength);
 
     return combined;
+  }
+
+  /**
+   * Generates a 16 byte initialization vector for AES encryption.
+   *
+   * @return a byte array containing the IV
+   */
+  private byte[] generateIV() {
+    byte[] iv = new byte[16];
+    new SecureRandom().nextBytes(iv);
+    return iv;
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2020, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2016-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,18 +57,18 @@ public class DefaultCipherProvider implements CipherProvider {
   }
 
   @Override
-  public Cipher getEncryptorGCM(byte[] iv)
-      throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
-    Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
-    cipher.init(Cipher.ENCRYPT_MODE, key, new GCMParameterSpec(128, iv));
-    return cipher;
-  }
-
-  @Override
   public Cipher getEncryptor(byte[] iv)
       throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
     Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
     cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(iv));
+    return cipher;
+  }
+
+  @Override
+  public Cipher getEncryptorGCM(byte[] iv)
+      throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
+    Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+    cipher.init(Cipher.ENCRYPT_MODE, key, new GCMParameterSpec(128, iv));
     return cipher;
   }
 }
