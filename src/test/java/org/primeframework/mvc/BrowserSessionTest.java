@@ -15,6 +15,11 @@
  */
 package org.primeframework.mvc;
 
+import java.util.Base64;
+
+import com.google.inject.Inject;
+import org.example.domain.User;
+import org.primeframework.mvc.security.Encryptor;
 import org.testng.annotations.Test;
 
 /**
@@ -23,6 +28,8 @@ import org.testng.annotations.Test;
  * @author Brian Pontarelli
  */
 public class BrowserSessionTest extends PrimeBaseTest {
+  @Inject public Encryptor encryptor;
+
   @Test
   public void not_encrypted_cookie() throws Exception {
     // Scenario:
@@ -48,6 +55,28 @@ public class BrowserSessionTest extends PrimeBaseTest {
   }
 
   @Test
+  public void compatibility() throws Exception {
+    // Scenario:
+    // 1) A cookie using AES/CBC is sent to the page
+    // 2) The cookie decryption will try AES/GCM first and fall back to AES/CBC
+
+    // Create a User object, serialize to JSON, encrypt with CBC, base64url-encode
+    var user = new User();
+    user.setName("Brian Pontarelli");
+    byte[] serialized = objectMapper.writeValueAsBytes(user);
+    @SuppressWarnings("deprecation")
+    byte[] encrypted = encryptor.encrypt(serialized);
+    String encoded = Base64.getUrlEncoder().encodeToString(encrypted);
+
+    test.simulate(() -> simulator.test("/browser-session/second")
+                                 .withCookie("user", encoded)
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertBodyContains("The user is Brian Pontarelli")
+                                 .assertContainsCookie("user"));
+  }
+
+  @Test
   public void sessionCookie() throws Exception {
     test.simulate(() -> simulator.test("/browser-session/first")
                                  .get()
@@ -63,7 +92,7 @@ public class BrowserSessionTest extends PrimeBaseTest {
                                  .post()
                                  .assertStatusCode(302)
                                  .assertRedirect("/browser-session/second")
-                                 .assertContainsCookie("user")) // Delete the cookie
+                                 .assertCookieWasDeleted("user")) // Delete the cookie
         .simulate(() -> simulator.test("/browser-session/second")
                                  .get()
                                  .assertStatusCode(200)
