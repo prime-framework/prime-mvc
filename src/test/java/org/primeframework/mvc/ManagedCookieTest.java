@@ -29,6 +29,8 @@ import org.testng.annotations.Test;
  * @author Brian Pontarelli
  */
 public class ManagedCookieTest extends PrimeBaseTest {
+  @Inject private Encryptor encryptor;
+  
   @Test
   public void compressed_annotation_legacy_uncompressed_cookie_longer_than_5() throws Exception {
     // Scenario:

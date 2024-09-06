@@ -46,6 +46,7 @@ import java.util.UUID;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.databind.MapperFeature;
+import com.google.inject.Inject;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import freemarker.template.Configuration;
@@ -67,6 +68,7 @@ import org.primeframework.mvc.parameter.convert.ConverterProvider;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
 import org.primeframework.mvc.parameter.convert.MultipleParametersUnsupportedException;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
+import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.util.URIBuilder;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
@@ -82,6 +84,8 @@ import static org.testng.FileAssert.fail;
  * @author Brian Pontarelli
  */
 public class GlobalTest extends PrimeBaseTest {
+  @Inject private Encryptor encryptor;
+
   private Path jsonDir;
 
   @BeforeClass

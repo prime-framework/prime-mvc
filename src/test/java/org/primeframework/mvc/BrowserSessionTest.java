@@ -28,6 +28,8 @@ import org.testng.annotations.Test;
  * @author Brian Pontarelli
  */
 public class BrowserSessionTest extends PrimeBaseTest {
+  @Inject private Encryptor encryptor;
+  
   @Test
   public void not_encrypted_cookie() throws Exception {
     // Scenario:

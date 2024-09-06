@@ -75,7 +75,6 @@ import org.primeframework.mvc.message.scope.FlashScope;
 import org.primeframework.mvc.message.scope.RequestScope;
 import org.primeframework.mvc.security.CipherProvider;
 import org.primeframework.mvc.security.DefaultCipherProvider;
-import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.security.MockStaticClasspathResourceFilter;
 import org.primeframework.mvc.security.MockStaticResourceFilter;
 import org.primeframework.mvc.security.MockUserLoginSecurityContext;
@@ -123,8 +122,6 @@ public abstract class PrimeBaseTest {
   @Inject public CSRFProvider csrfProvider;
 
   @Inject public ObjectMapper objectMapper;
-
-  @Inject public Encryptor encryptor;
 
   public HTTPRequest request;
 

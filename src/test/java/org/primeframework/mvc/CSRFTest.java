@@ -28,6 +28,8 @@ import org.testng.annotations.Test;
  * @author Daniel DeGroff
  */
 public class CSRFTest extends PrimeBaseTest {
+  @Inject private Encryptor encryptor;
+  
   @Inject public UserLoginSecurityContext securityContext;
 
   @Test(enabled = false)
