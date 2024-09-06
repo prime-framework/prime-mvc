@@ -87,7 +87,7 @@ public class DefaultEncryptor implements Encryptor {
   /**
    * Encrypt a set of bytes using the provided cipher
    *
-   * @param bytes The bytes to encrypt
+   * @param bytes  The bytes to encrypt
    * @param cipher The cipher for encryption
    * @return the encrypted bytes
    */
