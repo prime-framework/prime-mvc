@@ -49,7 +49,7 @@ public class StatusResultTest extends PrimeBaseTest {
     expect(ee.expand("someFieldName", action, false)).andReturn("200");
     replay(ee);
 
-    HTTPResponse response = new HTTPResponse(null, null);
+    HTTPResponse response = new HTTPResponse();
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(action, null, "/foo", "", null));
     replay(store);
@@ -74,12 +74,12 @@ public class StatusResultTest extends PrimeBaseTest {
     ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
     replay(ee);
 
-    HTTPResponse response = new HTTPResponse(null, null);
+    HTTPResponse response = new HTTPResponse();
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/foo", "", null));
     replay(store);
 
-    List<Message> messages = new ArrayList<Message>();
+    List<Message> messages = new ArrayList<>();
     MessageStore messageStore = createStrictMock(MessageStore.class);
     expect(messageStore.get(MessageScope.REQUEST)).andReturn(messages);
     messageStore.clear(MessageScope.REQUEST);
@@ -101,12 +101,12 @@ public class StatusResultTest extends PrimeBaseTest {
     ExpressionEvaluator ee = createStrictMock(ExpressionEvaluator.class);
     replay(ee);
 
-    HTTPResponse response = new HTTPResponse(null, null);
+    HTTPResponse response = new HTTPResponse();
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/foo", "", null));
     replay(store);
 
-    List<Message> messages = new ArrayList<Message>();
+    List<Message> messages = new ArrayList<>();
     MessageStore messageStore = createStrictMock(MessageStore.class);
     expect(messageStore.get(MessageScope.REQUEST)).andReturn(messages);
     messageStore.clear(MessageScope.REQUEST);
@@ -121,7 +121,8 @@ public class StatusResultTest extends PrimeBaseTest {
     assertEquals(response.getHeader("Cache-Control"), "no-cache");
   }
 
-  public class HeaderImpl implements Header {
+  @SuppressWarnings("ClassExplicitlyAnnotation")
+  public static class HeaderImpl implements Header {
     private final String name;
 
     private final String value;
@@ -147,7 +148,8 @@ public class StatusResultTest extends PrimeBaseTest {
     }
   }
 
-  public class StatusImpl implements Status {
+  @SuppressWarnings("ClassExplicitlyAnnotation")
+  public static class StatusImpl implements Status {
     private final String cacheControl;
 
     private final String code;

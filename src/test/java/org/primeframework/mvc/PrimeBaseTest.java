@@ -41,7 +41,6 @@ import com.google.inject.Module;
 import com.google.inject.Singleton;
 import com.google.inject.util.Modules;
 import io.fusionauth.http.HTTPMethod;
-import io.fusionauth.http.io.BlockingByteBufferOutputStream;
 import io.fusionauth.http.log.AccumulatingLoggerFactory;
 import io.fusionauth.http.log.BaseLogger;
 import io.fusionauth.http.log.Level;
@@ -169,7 +168,7 @@ public abstract class PrimeBaseTest {
   @BeforeMethod
   public void beforeMethod() {
     request = new HTTPRequest();
-    response = new HTTPResponse(new BlockingByteBufferOutputStream(null, 1024, 32), request);
+    response = new HTTPResponse();
     HTTPObjectsHolder.setRequest(request);
     HTTPObjectsHolder.setResponse(response);
 
@@ -226,7 +225,10 @@ public abstract class PrimeBaseTest {
 
     Module module = Modules.override(mvcModule).with(new TestContentModule(), new TestSecurityModule(), new TestScopeModule(),
                                                      new TestWorkflowModule(), new TestStaticResourceModule());
-    var mainConfig = new HTTPServerConfiguration().withClientTimeout(Duration.ofMillis(500))
+    var mainConfig = new HTTPServerConfiguration().withInitialReadTimeout(Duration.ofMinutes(10)) // for debugging
+                                                  .withMinimumReadThroughput(-1) // for debugging
+                                                  .withMinimumWriteThroughput(-1) // for debugging
+                                                  .withProcessingTimeoutDuration(Duration.ofMinutes(10)) // for debugging
                                                   .withListener(new HTTPListenerConfiguration(9080))
                                                   .withLoggerFactory(TestAccumulatingLoggerFactory.FACTORY);
     TestPrimeMain main = new TestPrimeMain(new HTTPServerConfiguration[]{mainConfig}, module);
@@ -538,9 +540,11 @@ public abstract class PrimeBaseTest {
     }
 
     @Override
+    @SuppressWarnings("CallToPrintStackTrace")
     public void handle(Exception exception) {
       resultStore.set("error");
       TestUnhandledExceptionHandler.exception = exception;
+      exception.printStackTrace();
     }
   }
 }

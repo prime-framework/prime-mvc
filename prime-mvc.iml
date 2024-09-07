@@ -31,7 +31,7 @@
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/com/google/inject/guice/6.0.0/guice-6.0.0-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/com/google/inject/guice/6.0.0/guice-6.0.0-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -53,7 +53,7 @@
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -97,7 +97,7 @@
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/com/fasterxml/jackson/core/jackson-databind/2.15.2/jackson-databind-2.15.2-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/com/fasterxml/jackson/core/jackson-databind/2.15.2/jackson-databind-2.15.2-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -108,7 +108,7 @@
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/com/fasterxml/jackson/core/jackson-annotations/2.15.2/jackson-annotations-2.15.2-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/com/fasterxml/jackson/core/jackson-annotations/2.15.2/jackson-annotations-2.15.2-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -119,18 +119,18 @@
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/com/fasterxml/jackson/core/jackson-core/2.15.2/jackson-core-2.15.2-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/com/fasterxml/jackson/core/jackson-core/2.15.2/jackson-core-2.15.2-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/io/fusionauth/java-http/0.3.5/java-http-0.3.5.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/io/fusionauth/java-http/0.4.0-RC.1.{integration}/java-http-0.4.0-RC.1.{integration}.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/io/fusionauth/java-http/0.3.5/java-http-0.3.5-src.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/io/fusionauth/java-http/0.4.0-RC.1.{integration}/java-http-0.4.0-RC.1.{integration}-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -141,7 +141,7 @@
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/org/freemarker/freemarker/2.3.32/freemarker-2.3.32-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/freemarker/freemarker/2.3.32/freemarker-2.3.32-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -170,11 +170,11 @@
     <orderEntry type="module-library" scope="TEST">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/org/easymock/easymock/5.1.0/easymock-5.1.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/easymock/easymock/5.2.0/easymock-5.2.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/org/easymock/easymock/5.1.0/easymock-5.1.0-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/easymock/easymock/5.2.0/easymock-5.2.0-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -196,7 +196,7 @@
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/org/testng/testng/7.8.0/testng-7.8.0-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/testng/testng/7.8.0/testng-7.8.0-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -218,7 +218,7 @@
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/org/webjars/jquery/3.6.1/jquery-3.6.1-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/webjars/jquery/3.6.1/jquery-3.6.1-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -229,7 +229,7 @@
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/org/jsoup/jsoup/1.16.1/jsoup-1.16.1-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/jsoup/jsoup/1.16.1/jsoup-1.16.1-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -240,7 +240,7 @@
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/ch/qos/logback/logback-classic/1.4.14/logback-classic-1.4.14-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/ch/qos/logback/logback-classic/1.4.14/logback-classic-1.4.14-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -251,7 +251,7 @@
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/ch/qos/logback/logback-core/1.4.14/logback-core-1.4.14-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/ch/qos/logback/logback-core/1.4.14/logback-core-1.4.14-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>

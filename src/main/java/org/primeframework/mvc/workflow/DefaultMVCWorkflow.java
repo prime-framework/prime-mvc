@@ -112,7 +112,8 @@ public class DefaultMVCWorkflow implements MVCWorkflow {
         throw e;
       }
 
-      // Otherwise, we can handle the exception and then invoke the error workflow
+      // Otherwise, we can handle the exception and then invoke the error workflow, but we have to reset the response first
+      response.reset();
       exceptionHandler.handle(e);
 
       WorkflowChain errorChain = new SubWorkflowChain(singletonList(errorWorkflow), workflowChain);

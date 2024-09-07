@@ -55,7 +55,7 @@ public class PrimeMVCRequestHandler implements HTTPHandler, Closeable {
    * @param response Passed down chain.
    */
   @Override
-  public void handle(HTTPRequest request, HTTPResponse response) {
+  public void handle(HTTPRequest request, HTTPResponse response) throws Exception {
     // Support for HTTP Method Override
     String methodOverride = request.getHeader("X-HTTP-Method-Override");
     if (methodOverride == null) {
@@ -75,8 +75,8 @@ public class PrimeMVCRequestHandler implements HTTPHandler, Closeable {
       response.setStatus(408);
       logger.debug("Connection closed. This is generally caused due to a timeout, or a slow connection.", e);
     } catch (Throwable t) {
-      response.setStatus(500);
       logger.error("Error encountered", t);
+      throw t; // java-http will cause this error to write back a 500 if possible and close the socket
     } finally {
       HTTPObjectsHolder.clearRequest();
       HTTPObjectsHolder.clearResponse();

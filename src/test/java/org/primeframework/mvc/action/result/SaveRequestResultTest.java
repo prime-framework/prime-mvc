@@ -75,7 +75,7 @@ public class SaveRequestResultTest extends PrimeBaseTest {
     replay(store);
 
     HTTPRequest request = new HTTPRequest();
-    HTTPResponse response = new HTTPResponse(null, request);
+    HTTPResponse response = new HTTPResponse();
     request.setPath("/test");
     request.setMethod(HTTPMethod.GET);
     request.addURLParameter("param1", "value1");
@@ -87,7 +87,7 @@ public class SaveRequestResultTest extends PrimeBaseTest {
     result.execute(annotation);
 
     // The cookie value will be different each time because the initialization vector is unique per request. Decrypt the actual value to compare it to the expected.
-    SavedHttpRequest actual = CookieTools.fromJSONCookie(response.getCookies().get(0).value, SavedHttpRequest.class, true, true, encryptor, objectMapper);
+    SavedHttpRequest actual = CookieTools.fromJSONCookie(response.getCookies().getFirst().value, SavedHttpRequest.class, true, true, encryptor, objectMapper);
     SavedHttpRequest expected = new SavedHttpRequest(HTTPMethod.GET, "/test?param1=value1&param2=value2", null);
     assertEquals(actual, expected);
 
@@ -103,7 +103,7 @@ public class SaveRequestResultTest extends PrimeBaseTest {
     replay(store);
 
     HTTPRequest request = new HTTPRequest();
-    HTTPResponse response = new HTTPResponse(null, request);
+    HTTPResponse response = new HTTPResponse();
     request.setScheme("http");
     request.setHost("localhost");
     request.setPath("/test");
@@ -119,7 +119,7 @@ public class SaveRequestResultTest extends PrimeBaseTest {
 
     if (allowPost && origin.equals(request.getBaseURL())) {
       // The cookie value will be different each time because the initialization vector is unique per request. Decrypt the actual value to compare it to the expected.
-      SavedHttpRequest actual = CookieTools.fromJSONCookie(response.getCookies().get(0).value, SavedHttpRequest.class, true, true, encryptor, objectMapper);
+      SavedHttpRequest actual = CookieTools.fromJSONCookie(response.getCookies().getFirst().value, SavedHttpRequest.class, true, true, encryptor, objectMapper);
       SavedHttpRequest expected = new SavedHttpRequest(HTTPMethod.POST, "/test", request.getParameters());
       assertEquals(actual, expected);
     } else {
@@ -147,20 +147,20 @@ public class SaveRequestResultTest extends PrimeBaseTest {
     replay(store);
 
     HTTPRequest request = new HTTPRequest();
-    HTTPResponse response = new HTTPResponse(null, request);
+    HTTPResponse response = new HTTPResponse();
     request.setPath("/test");
     request.setMethod(HTTPMethod.POST);
-    request.addURLParameter("largeParam1", parameters.get("largeParam1").get(0));
-    request.addURLParameter("largeParam2", parameters.get("largeParam2").get(0));
-    request.addURLParameter("largeParam3", parameters.get("largeParam3").get(0));
-    request.addURLParameter("largeParam4", parameters.get("largeParam4").get(0));
+    request.addURLParameter("largeParam1", parameters.get("largeParam1").getFirst());
+    request.addURLParameter("largeParam2", parameters.get("largeParam2").getFirst());
+    request.addURLParameter("largeParam3", parameters.get("largeParam3").getFirst());
+    request.addURLParameter("largeParam4", parameters.get("largeParam4").getFirst());
 
     Encryptor encryptor = new DefaultEncryptor(new DefaultCipherProvider(configuration));
     SaveRequest annotation = new SaveRequestImpl("/login", "unauthenticated", true, false, false);
     SaveRequestResult result = new SaveRequestResult(messageStore, expressionEvaluator, response, request, store, configuration, encryptor, objectMapper);
     result.execute(annotation);
 
-    // Expect no cookies in the response, sadly, the cookie was just too big and we omitted it from the HTTP response.
+    // Expect no cookies in the response, sadly, the cookie was just too big, and we omitted it from the HTTP response.
     assertEquals(simulator.userAgent.getCookies(request), List.of());
     assertEquals(response.getRedirect(), "/login");
 
