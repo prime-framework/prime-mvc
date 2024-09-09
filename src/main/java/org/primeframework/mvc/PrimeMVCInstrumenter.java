@@ -40,6 +40,8 @@ public class PrimeMVCInstrumenter implements Instrumenter {
 
   private volatile Counter connectionsClosed;
 
+  private volatile Counter threads;
+
   @Override
   public void acceptedConnection() {
     inc(acceptedConnections, 1);
@@ -75,6 +77,16 @@ public class PrimeMVCInstrumenter implements Instrumenter {
     // Ignored
   }
 
+  @Override
+  public void threadExited() {
+    inc(threads, 1);
+  }
+
+  @Override
+  public void threadStarted() {
+    dec(threads, 1);
+  }
+
   public void updateInjector(Injector injector) {
     // If MetricRegistry is not bound to a singleton, this will return a new instance. But that's fine because we will
     // just store Counters from it and use those. Meaning, this won't thrash or eat performance because the Counters
@@ -87,6 +99,7 @@ public class PrimeMVCInstrumenter implements Instrumenter {
     connectionsClosed = metricRegistry.counter("java-http.connections-closed");
     bytesRead = metricRegistry.counter("java-http.bytes-read");
     bytesWritten = metricRegistry.counter("java-http.bytes-written");
+    threads = metricRegistry.counter("java-http.running-threads");
   }
 
   @Override
@@ -97,6 +110,12 @@ public class PrimeMVCInstrumenter implements Instrumenter {
   private void inc(Counter counter, long number) {
     if (counter != null) {
       counter.inc(number);
+    }
+  }
+
+  private void dec(Counter counter, long number) {
+    if (counter != null) {
+      counter.dec(number);
     }
   }
 }
