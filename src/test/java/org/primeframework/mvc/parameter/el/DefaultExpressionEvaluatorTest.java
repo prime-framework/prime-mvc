@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2023, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import com.google.inject.Inject;
 import org.apache.commons.lang3.ArrayUtils;
@@ -318,6 +320,94 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
 
     evaluator.setValue("mapImplements['foo']", bean, new String[]{"value"}, Collections.emptyMap());
     assertEquals(bean.mapImplements.get("foo"), "value");
+  }
+
+  @Test
+  public void immutableList() {
+    // Expect this to fail nicely w/out a 500 based upon the MVC configuration
+    ActionField action = new ActionField();
+    //noinspection Java9CollectionFactory
+    action.list = Collections.unmodifiableList(new ArrayList<>(Arrays.asList("value1", "value2")));
+
+    try {
+      evaluator.setValue("list", action, new String[]{"value3"});
+      fail("Expected this to fail!");
+    } catch (UnsupportedOperationException expected) {
+    }
+    assertEquals(action.list, List.of("value1", "value2"));
+
+    // Try again with Java List.of()
+    action.list = List.of("value1", "value2");
+    try {
+      evaluator.setValue("list", action, new String[]{"value3"});
+      fail("Expected this to fail!");
+    } catch (UnsupportedOperationException expected) {
+    }
+    assertEquals(action.list, List.of("value1", "value2"));
+
+    // Using this configuration to understand if we can ignore exceptions on read only collections
+    configuration.allowUnknownParameters = true;
+
+    try {
+      evaluator.setValue("list", action, new String[]{"value3"});
+    } catch (UnsupportedOperationException expected) {
+      fail("Unexpected exception", expected);
+    }
+    assertEquals(action.list, List.of("value1", "value2"));
+
+    // Try again with Java List.of()
+    action.list = List.of("value1", "value2");
+    try {
+      evaluator.setValue("list", action, new String[]{"value3"});
+    } catch (UnsupportedOperationException expected) {
+      fail("Unexpected exception", expected);
+    }
+    assertEquals(action.list, List.of("value1", "value2"));
+  }
+
+  @Test
+  public void immutableMap() {
+    // Expect this to fail nicely w/out a 500 based upon the MVC configuration
+    ActionField action = new ActionField();
+    var map = new LinkedHashMap<String, String>();
+    map.put("key1", "value1");
+    map.put("key2", "value2");
+    action.map = Collections.unmodifiableMap(map);
+
+    try {
+      evaluator.setValue("map.key1", action, "newValue");
+      fail("Expected this to fail!");
+    } catch (UnsupportedOperationException expected) {
+    }
+    assertEquals(action.map.get("key1"), "value1");
+
+    // Try again with Java Map.of()
+    action.map = Map.of("key1", "value1", "key2", "value2");
+    try {
+      evaluator.setValue("map.key1", action, "newValue");
+      fail("Expected this to fail!");
+    } catch (UnsupportedOperationException expected) {
+    }
+    assertEquals(action.map.get("key1"), "value1");
+
+    // Using this configuration to understand if we can ignore exceptions on read only collections
+    configuration.allowUnknownParameters = true;
+
+    try {
+      evaluator.setValue("map.key1", action, "newValue");
+    } catch (UnsupportedOperationException expected) {
+      fail("Unexpected exception", expected);
+    }
+    assertEquals(action.map.get("key1"), "value1");
+
+    // Try again with Java Map.of()
+    action.map = Map.of("key1", "value1", "key2", "value2");
+    try {
+      evaluator.setValue("map.key1", action, "newValue");
+    } catch (UnsupportedOperationException expected) {
+      fail("Unexpected exception", expected);
+    }
+    assertEquals(action.map.get("key1"), "value1");
   }
 
   @Test
