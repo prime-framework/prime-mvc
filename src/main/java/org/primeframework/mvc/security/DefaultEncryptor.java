@@ -62,7 +62,8 @@ public class DefaultEncryptor implements Encryptor {
 
   @Override
   public byte[] encrypt(byte[] bytes) throws Exception {
-    byte[] iv = generateIV();
+    byte[] iv = new byte[16];
+    new SecureRandom().nextBytes(iv);
     Cipher cipher = gcmCipherProvider.getEncryptor(iv);
     return doEncrypt(bytes, cipher);
   }
@@ -101,16 +102,5 @@ public class DefaultEncryptor implements Encryptor {
     System.arraycopy(result, 0, combined, iv.length, resultLength);
 
     return combined;
-  }
-
-  /**
-   * Generates a 16 byte initialization vector for AES encryption.
-   *
-   * @return a byte array containing the IV
-   */
-  private byte[] generateIV() {
-    byte[] iv = new byte[16];
-    new SecureRandom().nextBytes(iv);
-    return iv;
   }
 }

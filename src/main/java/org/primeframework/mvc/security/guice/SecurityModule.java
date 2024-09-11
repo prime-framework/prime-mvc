@@ -68,6 +68,8 @@ public class SecurityModule extends AbstractModule {
     // Bind the Cipher/Encryption interfaces
     bind(CipherProvider.class).annotatedWith(Names.named("CBC")).to(CBCCipherProvider.class).asEagerSingleton();
     bind(CipherProvider.class).annotatedWith(Names.named("GCM")).to(GCMCipherProvider.class).asEagerSingleton();
+    // An injected CipherProvider without a Named annotation should resolve to CBC for backward compatibility
+    bind(CipherProvider.class).to(CBCCipherProvider.class).asEagerSingleton();
     bind(Encryptor.class).to(DefaultEncryptor.class);
   }
 }

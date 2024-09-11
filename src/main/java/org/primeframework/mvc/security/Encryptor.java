@@ -23,8 +23,6 @@ package org.primeframework.mvc.security;
 public interface Encryptor {
   /**
    * Decrypt a set of bytes.
-   * <p>
-   * This will attempt to decrypt with GCM and then CBC if that fails.
    *
    * @param bytes The bytes to decrypt.
    * @return The decrypted bytes.
@@ -32,7 +30,7 @@ public interface Encryptor {
   byte[] decrypt(byte[] bytes) throws Exception;
 
   /**
-   * Encrypt a set of bytes using AES.
+   * Encrypt a set of bytes.
    *
    * @param bytes The bytes to encrypt.
    * @return The encrypted bytes.

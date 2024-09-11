@@ -22,13 +22,13 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * Provider for getting a Cipher instance that can be used for AES encryption and any other security as necessary.
+ * Provider for getting a Cipher instance that can be used for encryption and any other security as necessary.
  *
  * @author Brian Pontarelli
  */
 public interface CipherProvider {
   /**
-   * Return a cipher used for decrypting AES.
+   * Return a cipher used for decrypting.
    *
    * @param iv the initialization vector
    * @return the Cipher object.
@@ -41,7 +41,7 @@ public interface CipherProvider {
       throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException;
 
   /**
-   * Return a cipher used for encrypting AES.
+   * Return a cipher used for encrypting.
    *
    * @param iv the initialization vector
    * @return the Cipher object.
