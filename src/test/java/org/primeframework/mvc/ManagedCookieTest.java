@@ -18,6 +18,8 @@ package org.primeframework.mvc;
 import java.util.Base64;
 
 import com.google.inject.Inject;
+import org.primeframework.mvc.security.CBCCipherProvider;
+import org.primeframework.mvc.security.DefaultEncryptor;
 import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.util.CookieTools;
 import org.testng.annotations.Ignore;
@@ -30,7 +32,7 @@ import org.testng.annotations.Test;
  */
 public class ManagedCookieTest extends PrimeBaseTest {
   @Inject private Encryptor encryptor;
-  
+
   @Test
   public void compressed_annotation_legacy_uncompressed_cookie_longer_than_5() throws Exception {
     // Scenario:
@@ -129,11 +131,12 @@ public class ManagedCookieTest extends PrimeBaseTest {
     String value = "foo";
     byte[] json = objectMapper.writeValueAsBytes(value);
     // We want to use the deprecated encrypt method to test forward compatibility with the new decryption method
-    @SuppressWarnings("deprecation")
-    byte[] legacyEncrypted = encryptor.encrypt(json);
+    // Instantiate DefaultEncryptor with two copies of CBCCipherProvider to encrypt with CBC
+    Encryptor cbcEncryptor = new DefaultEncryptor(new CBCCipherProvider(configuration), new CBCCipherProvider(configuration));
+    byte[] legacyEncrypted = cbcEncryptor.encrypt(json);
     String legacyEncoded = Base64.getUrlEncoder().encodeToString(legacyEncrypted);
 
-    // This is the legacy version but it should work even though the EncryptedManagedCookieAction
+    // This is the legacy version, but it should work even though the EncryptedManagedCookieAction
     // has compression enabled
     test.simulate(() -> simulator.test("/encrypted-managed-cookie")
                                  .withCookie("cookie", legacyEncoded)

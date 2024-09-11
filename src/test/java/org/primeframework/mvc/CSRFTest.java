@@ -19,6 +19,8 @@ import java.util.Base64;
 
 import com.google.inject.Inject;
 import org.example.domain.User;
+import org.primeframework.mvc.security.CBCCipherProvider;
+import org.primeframework.mvc.security.DefaultEncryptor;
 import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.security.MockUserLoginSecurityContext;
 import org.primeframework.mvc.security.UserLoginSecurityContext;
@@ -28,8 +30,6 @@ import org.testng.annotations.Test;
  * @author Daniel DeGroff
  */
 public class CSRFTest extends PrimeBaseTest {
-  @Inject private Encryptor encryptor;
-  
   @Inject public UserLoginSecurityContext securityContext;
 
   @Test(enabled = false)
@@ -111,8 +111,9 @@ public class CSRFTest extends PrimeBaseTest {
     // Craft a CSRF token, serialize to JSON, encrypt with CBC, base64url-encode
     CSRFToken token = new CSRFToken(securityContext.getSessionId(), System.currentTimeMillis());
     byte[] serialized = objectMapper.writeValueAsBytes(token);
-    @SuppressWarnings("deprecation")
-    byte[] encrypted = encryptor.encrypt(serialized);
+    // Instantiate DefaultEncryptor with two copies of CBCCipherProvider to encrypt with CBC
+    Encryptor cbcEncryptor = new DefaultEncryptor(new CBCCipherProvider(configuration), new CBCCipherProvider(configuration));
+    byte[] encrypted = cbcEncryptor.encrypt(serialized);
     String encoded = Base64.getUrlEncoder().encodeToString(encrypted);
 
     simulator.test("/secure")

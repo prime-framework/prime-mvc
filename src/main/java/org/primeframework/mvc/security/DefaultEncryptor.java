@@ -21,16 +21,20 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 /**
  * @author Daniel DeGroff
  */
 public class DefaultEncryptor implements Encryptor {
-  private final CipherProvider cipherProvider;
+  private final CipherProvider cbcCipherProvider;
+
+  private final CipherProvider gcmCipherProvider;
 
   @Inject
-  public DefaultEncryptor(CipherProvider cipherProvider) {
-    this.cipherProvider = cipherProvider;
+  public DefaultEncryptor(@Named("CBC") CipherProvider cbcCipherProvider, @Named("GCM") CipherProvider gcmCipherProvider) {
+    this.cbcCipherProvider = cbcCipherProvider;
+    this.gcmCipherProvider = gcmCipherProvider;
   }
 
   @Override
@@ -42,12 +46,12 @@ public class DefaultEncryptor implements Encryptor {
 
     try {
       // Attempt to decrypt using AES/GCM
-      Cipher cipher = cipherProvider.getDecryptorGCM(iv);
+      Cipher cipher = gcmCipherProvider.getDecryptor(iv);
       return doDecrypt(encryptedBytes, cipher);
     } catch (GeneralSecurityException gcmException) {
       // If GCM failed, try decrypting in CBC mode
       try {
-        Cipher cipher = cipherProvider.getDecryptor(iv);
+        Cipher cipher = cbcCipherProvider.getDecryptor(iv);
         return doDecrypt(encryptedBytes, cipher);
       } catch (GeneralSecurityException cbcException) {
         // If CBC also failed, re-throw the original GCM exception
@@ -59,14 +63,7 @@ public class DefaultEncryptor implements Encryptor {
   @Override
   public byte[] encrypt(byte[] bytes) throws Exception {
     byte[] iv = generateIV();
-    Cipher cipher = cipherProvider.getEncryptor(iv);
-    return doEncrypt(bytes, cipher);
-  }
-
-  @Override
-  public byte[] encryptGCM(byte[] bytes) throws Exception {
-    byte[] iv = generateIV();
-    Cipher cipher = cipherProvider.getEncryptorGCM(iv);
+    Cipher cipher = gcmCipherProvider.getEncryptor(iv);
     return doEncrypt(bytes, cipher);
   }
 

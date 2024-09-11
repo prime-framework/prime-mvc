@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2023, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.Singleton;
+import com.google.inject.name.Names;
 import com.google.inject.util.Modules;
 import io.fusionauth.http.HTTPMethod;
 import io.fusionauth.http.io.BlockingByteBufferOutputStream;
@@ -74,7 +75,8 @@ import org.primeframework.mvc.message.scope.CookieFlashScope;
 import org.primeframework.mvc.message.scope.FlashScope;
 import org.primeframework.mvc.message.scope.RequestScope;
 import org.primeframework.mvc.security.CipherProvider;
-import org.primeframework.mvc.security.DefaultCipherProvider;
+import org.primeframework.mvc.security.CBCCipherProvider;
+import org.primeframework.mvc.security.GCMCipherProvider;
 import org.primeframework.mvc.security.MockStaticClasspathResourceFilter;
 import org.primeframework.mvc.security.MockStaticResourceFilter;
 import org.primeframework.mvc.security.MockUserLoginSecurityContext;
@@ -445,7 +447,8 @@ public abstract class PrimeBaseTest {
     @Override
     protected void configure() {
       // Don't bind as a singleton in tests so that I can change the key during a test
-      bind(CipherProvider.class).to(DefaultCipherProvider.class);
+      bind(CipherProvider.class).annotatedWith(Names.named("CBC")).to(CBCCipherProvider.class);
+      bind(CipherProvider.class).annotatedWith(Names.named("GCM")).to(GCMCipherProvider.class);
       bind(VerifierProvider.class).to(MockVerifierProvider.class);
     }
   }

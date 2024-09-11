@@ -17,8 +17,9 @@ package org.primeframework.mvc;
 
 import java.util.Base64;
 
-import com.google.inject.Inject;
 import org.example.domain.User;
+import org.primeframework.mvc.security.CBCCipherProvider;
+import org.primeframework.mvc.security.DefaultEncryptor;
 import org.primeframework.mvc.security.Encryptor;
 import org.testng.annotations.Test;
 
@@ -28,8 +29,6 @@ import org.testng.annotations.Test;
  * @author Brian Pontarelli
  */
 public class BrowserSessionTest extends PrimeBaseTest {
-  @Inject private Encryptor encryptor;
-  
   @Test
   public void not_encrypted_cookie() throws Exception {
     // Scenario:
@@ -64,8 +63,9 @@ public class BrowserSessionTest extends PrimeBaseTest {
     var user = new User();
     user.setName("Brian Pontarelli");
     byte[] serialized = objectMapper.writeValueAsBytes(user);
-    @SuppressWarnings("deprecation")
-    byte[] encrypted = encryptor.encrypt(serialized);
+    // Instantiate DefaultEncryptor with two copies of CBCCipherProvider to encrypt with CBC
+    Encryptor cbcEncryptor = new DefaultEncryptor(new CBCCipherProvider(configuration), new CBCCipherProvider(configuration));
+    byte[] encrypted = cbcEncryptor.encrypt(serialized);
     String encoded = Base64.getUrlEncoder().encodeToString(encrypted);
 
     test.simulate(() -> simulator.test("/browser-session/second")

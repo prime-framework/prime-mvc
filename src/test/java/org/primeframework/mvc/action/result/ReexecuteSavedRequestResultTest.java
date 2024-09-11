@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2019, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2015-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,9 +32,10 @@ import org.primeframework.mvc.message.Message;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.scope.MessageScope;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-import org.primeframework.mvc.security.DefaultCipherProvider;
+import org.primeframework.mvc.security.CBCCipherProvider;
 import org.primeframework.mvc.security.DefaultEncryptor;
 import org.primeframework.mvc.security.Encryptor;
+import org.primeframework.mvc.security.GCMCipherProvider;
 import org.primeframework.mvc.security.saved.SavedHttpRequest;
 import org.testng.annotations.Test;
 import static org.easymock.EasyMock.createStrictMock;
@@ -69,7 +70,7 @@ public class ReexecuteSavedRequestResultTest extends PrimeBaseTest {
     replay(messageStore);
 
     ReexecuteSavedRequest redirect = new ReexecuteSavedRequestImpl("/", "success", true, false);
-    ReexecuteSavedRequestResult result = new ReexecuteSavedRequestResult(messageStore, ee, response, request, store, configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration)), objectMapper);
+    ReexecuteSavedRequestResult result = new ReexecuteSavedRequestResult(messageStore, ee, response, request, store, configuration, new DefaultEncryptor(new CBCCipherProvider(configuration), new GCMCipherProvider(configuration)), objectMapper);
     result.execute(redirect);
 
     verify(ee, store, messageStore);
@@ -85,10 +86,10 @@ public class ReexecuteSavedRequestResultTest extends PrimeBaseTest {
     replay(ee);
 
     SavedHttpRequest savedRequest = new SavedHttpRequest(HTTPMethod.GET, "/secure?test=value1&test2=value2", null);
-    simulator.userAgent.addCookie(SavedRequestTools.toCookie(savedRequest, configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration)), objectMapper));
+    simulator.userAgent.addCookie(SavedRequestTools.toCookie(savedRequest, configuration, new DefaultEncryptor(new CBCCipherProvider(configuration), new GCMCipherProvider(configuration)), objectMapper));
 
     List<Message> messages = new ArrayList<>();
-    Encryptor encryptor = new DefaultEncryptor(new DefaultCipherProvider(configuration));
+    Encryptor encryptor = new DefaultEncryptor(new CBCCipherProvider(configuration), new GCMCipherProvider(configuration));
     Cookie cookie = SavedRequestTools.toCookie(savedRequest, configuration, encryptor, objectMapper);
 
     HTTPRequest request = new HTTPRequest().with(r -> r.addCookies(cookie));
@@ -103,7 +104,7 @@ public class ReexecuteSavedRequestResultTest extends PrimeBaseTest {
     replay(messageStore);
 
     ReexecuteSavedRequest redirect = new ReexecuteSavedRequestImpl("/", "success", true, false);
-    ReexecuteSavedRequestResult result = new ReexecuteSavedRequestResult(messageStore, ee, response, request, store, configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration)), objectMapper);
+    ReexecuteSavedRequestResult result = new ReexecuteSavedRequestResult(messageStore, ee, response, request, store, configuration, new DefaultEncryptor(new CBCCipherProvider(configuration), new GCMCipherProvider(configuration)), objectMapper);
     result.execute(redirect);
 
     verify(ee, store, messageStore);

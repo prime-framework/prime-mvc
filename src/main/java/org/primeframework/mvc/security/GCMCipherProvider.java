@@ -28,28 +28,20 @@ import com.google.inject.Inject;
 import org.primeframework.mvc.config.MVCConfiguration;
 
 /**
- * Default implementation that generates a new key on startup. This will render all existing Saved Requests useless.
+ * AES/GCM cipher provider implementation
  *
- * @author Brian Pontarelli
+ * @author Spencer Witt
  */
-public class DefaultCipherProvider implements CipherProvider {
+public class GCMCipherProvider implements CipherProvider {
   private final Key key;
 
   @Inject
-  public DefaultCipherProvider(MVCConfiguration configuration) {
+  public GCMCipherProvider(MVCConfiguration configuration) {
     this.key = configuration.cookieEncryptionKey();
   }
 
   @Override
   public Cipher getDecryptor(byte[] iv)
-      throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
-    Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-    cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(iv));
-    return cipher;
-  }
-
-  @Override
-  public Cipher getDecryptorGCM(byte[] iv)
       throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
     Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
     cipher.init(Cipher.DECRYPT_MODE, key, new GCMParameterSpec(128, iv));
@@ -58,14 +50,6 @@ public class DefaultCipherProvider implements CipherProvider {
 
   @Override
   public Cipher getEncryptor(byte[] iv)
-      throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
-    Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-    cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(iv));
-    return cipher;
-  }
-
-  @Override
-  public Cipher getEncryptorGCM(byte[] iv)
       throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
     Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
     cipher.init(Cipher.ENCRYPT_MODE, key, new GCMParameterSpec(128, iv));

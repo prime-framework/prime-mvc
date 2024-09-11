@@ -203,7 +203,7 @@ public final class CookieTools {
     }
 
     if (encrypt) {
-      value = encryptor.encryptGCM(value);
+      value = encryptor.encrypt(value);
     }
 
     byte[] header = new byte[4];

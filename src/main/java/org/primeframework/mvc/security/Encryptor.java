@@ -32,21 +32,10 @@ public interface Encryptor {
   byte[] decrypt(byte[] bytes) throws Exception;
 
   /**
-   * Encrypt a set of bytes using AES/CBC.
-   * <p>
-   * This method is provided for backward compatibility. Prefer using the more secure {@link #encryptGCM(byte[])} unless CBC mode is required.
+   * Encrypt a set of bytes using AES.
    *
    * @param bytes The bytes to encrypt.
    * @return The encrypted bytes.
    */
-  @Deprecated(since = "4.24.0")
   byte[] encrypt(byte[] bytes) throws Exception;
-
-  /**
-   * Encrypt a set of bytes using AES/GCM.
-   *
-   * @param bytes The bytes to encrypt.
-   * @return The encrypted bytes.
-   */
-  byte[] encryptGCM(byte[] bytes) throws Exception;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2015-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ import static org.testng.Assert.assertEquals;
 public class DefaultSavedRequestWorkflowTest extends PrimeBaseTest {
   @Test
   public void performNoSavedRequest() throws Exception {
-    DefaultSavedRequestWorkflow workflow = new DefaultSavedRequestWorkflow(configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration)), objectMapper, request, response);
+    DefaultSavedRequestWorkflow workflow = new DefaultSavedRequestWorkflow(configuration, new DefaultEncryptor(new CBCCipherProvider(configuration), new GCMCipherProvider(configuration)), objectMapper, request, response);
 
     WorkflowChain workflowChain = createStrictMock(WorkflowChain.class);
     workflowChain.continueWorkflow();
@@ -54,12 +54,12 @@ public class DefaultSavedRequestWorkflowTest extends PrimeBaseTest {
     parameters.put("test", List.of("value"));
     parameters.put("test2", List.of("value2"));
 
-    Cookie cookie = SavedRequestTools.toCookie(new SavedHttpRequest(HTTPMethod.POST, "/secure", parameters), configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration)), objectMapper);
+    Cookie cookie = SavedRequestTools.toCookie(new SavedHttpRequest(HTTPMethod.POST, "/secure", parameters), configuration, new DefaultEncryptor(new CBCCipherProvider(configuration), new GCMCipherProvider(configuration)), objectMapper);
     cookie.setValue("ready_" + cookie.getValue());
     request.addCookies(cookie);
     request.setPath("/secure");
 
-    DefaultSavedRequestWorkflow workflow = new DefaultSavedRequestWorkflow(configuration, new DefaultEncryptor(new DefaultCipherProvider(configuration)), objectMapper, request, response);
+    DefaultSavedRequestWorkflow workflow = new DefaultSavedRequestWorkflow(configuration, new DefaultEncryptor(new CBCCipherProvider(configuration), new GCMCipherProvider(configuration)), objectMapper, request, response);
 
     WorkflowChain workflowChain = createStrictMock(WorkflowChain.class);
     workflowChain.continueWorkflow();

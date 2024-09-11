@@ -22,13 +22,13 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * Provider for getting a Cipher instance that can be used for encryption and any other security as necessary.
+ * Provider for getting a Cipher instance that can be used for AES encryption and any other security as necessary.
  *
  * @author Brian Pontarelli
  */
 public interface CipherProvider {
   /**
-   * Return a cipher used for decrypting AES/CBC.
+   * Return a cipher used for decrypting AES.
    *
    * @param iv the initialization vector
    * @return the Cipher object.
@@ -41,20 +41,7 @@ public interface CipherProvider {
       throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException;
 
   /**
-   * Return a cipher used for decrypting AES/GCM.
-   *
-   * @param iv the initialization vector
-   * @return the Cipher object.
-   * @throws NoSuchPaddingException             when this happens.
-   * @throws NoSuchAlgorithmException           when this happens.
-   * @throws InvalidAlgorithmParameterException when this happens.
-   * @throws InvalidKeyException                when this happens.
-   */
-  Cipher getDecryptorGCM(byte[] iv)
-      throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException;
-
-  /**
-   * Return a cipher used for encrypting AES/CBC.
+   * Return a cipher used for encrypting AES.
    *
    * @param iv the initialization vector
    * @return the Cipher object.
@@ -64,18 +51,5 @@ public interface CipherProvider {
    * @throws InvalidKeyException                when this happens.
    */
   Cipher getEncryptor(byte[] iv)
-      throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException;
-
-  /**
-   * Return a cipher used for encrypting AES/CBC.
-   *
-   * @param iv the initialization vector
-   * @return the Cipher object.
-   * @throws NoSuchPaddingException             when this happens.
-   * @throws NoSuchAlgorithmException           when this happens.
-   * @throws InvalidAlgorithmParameterException when this happens.
-   * @throws InvalidKeyException                when this happens.
-   */
-  Cipher getEncryptorGCM(byte[] iv)
       throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException;
 }

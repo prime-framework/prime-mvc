@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2018, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2015-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,10 @@
 package org.primeframework.mvc.security.guice;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.name.Names;
 import org.primeframework.mvc.security.AuthorizeMethodScheme;
 import org.primeframework.mvc.security.CipherProvider;
-import org.primeframework.mvc.security.DefaultCipherProvider;
+import org.primeframework.mvc.security.CBCCipherProvider;
 import org.primeframework.mvc.security.DefaultEncryptor;
 import org.primeframework.mvc.security.DefaultJWTConstraintsValidator;
 import org.primeframework.mvc.security.DefaultJWTRequestAdapter;
@@ -28,6 +29,7 @@ import org.primeframework.mvc.security.DefaultSecurityWorkflow;
 import org.primeframework.mvc.security.DefaultUserLoginConstraintValidator;
 import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.security.ExplosiveVerifierProvider;
+import org.primeframework.mvc.security.GCMCipherProvider;
 import org.primeframework.mvc.security.JWTConstraintsValidator;
 import org.primeframework.mvc.security.JWTRequestAdapter;
 import org.primeframework.mvc.security.JWTSecurityContext;
@@ -64,7 +66,8 @@ public class SecurityModule extends AbstractModule {
     SecuritySchemeFactory.addSecurityScheme(binder(), "authorize-method", AuthorizeMethodScheme.class);
 
     // Bind the Cipher/Encryption interfaces
-    bind(CipherProvider.class).to(DefaultCipherProvider.class).asEagerSingleton();
+    bind(CipherProvider.class).annotatedWith(Names.named("CBC")).to(CBCCipherProvider.class).asEagerSingleton();
+    bind(CipherProvider.class).annotatedWith(Names.named("GCM")).to(GCMCipherProvider.class).asEagerSingleton();
     bind(Encryptor.class).to(DefaultEncryptor.class);
   }
 }
