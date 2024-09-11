@@ -197,6 +197,9 @@ public abstract class PrimeBaseTest {
     // Reset CSRF configuration
     configuration.csrfEnabled = false;
 
+    // Reset allowUnknownParameters
+    configuration.allowUnknownParameters = false;
+
     // Reset the call count on the invocation finalizer
     MockMVCWorkflowFinalizer.Called.set(0);
 
