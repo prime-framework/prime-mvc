@@ -285,7 +285,7 @@ public class Expression {
     //   allows us to ignore this expression when allowUnknownParameters is true which will avoid un-necessary
     //   logging.
     for (String atom : list) {
-      if ("class" .equals(atom)) {
+      if ("class".equals(atom)) {
         throw new InvalidExpressionException("The expression string [" + expression + "] is invalid.");
       }
     }
