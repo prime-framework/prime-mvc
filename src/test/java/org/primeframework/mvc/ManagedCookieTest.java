@@ -18,6 +18,8 @@ package org.primeframework.mvc;
 import java.util.Base64;
 
 import com.google.inject.Inject;
+import org.primeframework.mvc.security.CBCCipherProvider;
+import org.primeframework.mvc.security.DefaultEncryptor;
 import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.util.CookieTools;
 import org.testng.annotations.Ignore;
@@ -29,7 +31,7 @@ import org.testng.annotations.Test;
  * @author Brian Pontarelli
  */
 public class ManagedCookieTest extends PrimeBaseTest {
-  @Inject public Encryptor encryptor;
+  @Inject private Encryptor encryptor;
 
   @Test
   public void compressed_annotation_legacy_uncompressed_cookie_longer_than_5() throws Exception {
@@ -123,15 +125,18 @@ public class ManagedCookieTest extends PrimeBaseTest {
   @Test
   public void legacy_cookie() throws Exception {
     // Scenario:
-    // 1) Browser has uncompressed, encrypted cookie with value '"foo"' from a long time ago
+    // 1) Browser has uncompressed, AES/CBC-encrypted cookie with value '"foo"' from a long time ago
     // 2) Application upgrades to the modern cookie format with header, etc.
     // 3) Browser submits cookie
     String value = "foo";
     byte[] json = objectMapper.writeValueAsBytes(value);
-    byte[] legacyEncrypted = encryptor.encrypt(json);
+    // We want to use the deprecated encrypt method to test forward compatibility with the new decryption method
+    // Instantiate DefaultEncryptor with two copies of CBCCipherProvider to encrypt with CBC
+    Encryptor cbcEncryptor = new DefaultEncryptor(new CBCCipherProvider(configuration), new CBCCipherProvider(configuration));
+    byte[] legacyEncrypted = cbcEncryptor.encrypt(json);
     String legacyEncoded = Base64.getUrlEncoder().encodeToString(legacyEncrypted);
 
-    // This is the legacy version but it should work even though the EncryptedManagedCookieAction
+    // This is the legacy version, but it should work even though the EncryptedManagedCookieAction
     // has compression enabled
     test.simulate(() -> simulator.test("/encrypted-managed-cookie")
                                  .withCookie("cookie", legacyEncoded)

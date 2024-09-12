@@ -47,8 +47,9 @@ public class SessionCookieKeyChanger {
       var config = new MockConfiguration();
       config.regenerateCookieEncryptionKey();
       // guarantee we use a different key than this.encryptor
-      var differentKeyCipherProvider = new DefaultCipherProvider(config);
-      var differentKeyEncryptor = new DefaultEncryptor(differentKeyCipherProvider);
+      var differentKeyCBCCipherProvider = new CBCCipherProvider(config);
+      var differentKeyGCMCipherProvider = new GCMCipherProvider(config);
+      var differentKeyEncryptor = new DefaultEncryptor(differentKeyCBCCipherProvider, differentKeyGCMCipherProvider);
       cookie.value = CookieTools.toCookie(result, true, true, differentKeyEncryptor);
     } catch (Exception e) {
       throw new RuntimeException(e);

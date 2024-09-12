@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2019-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,13 @@
  */
 package org.primeframework.mvc;
 
+import java.util.Base64;
+
 import com.google.inject.Inject;
 import org.example.domain.User;
+import org.primeframework.mvc.security.CBCCipherProvider;
+import org.primeframework.mvc.security.DefaultEncryptor;
+import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.security.MockUserLoginSecurityContext;
 import org.primeframework.mvc.security.UserLoginSecurityContext;
 import org.testng.annotations.Test;
@@ -94,5 +99,32 @@ public class CSRFTest extends PrimeBaseTest {
              .post()
              .assertStatusCode(200)
              .assertBody("Secure!");
+  }
+
+  @Test
+  public void post_CSRFTokenCompatibility() throws Exception {
+    // Use case: a CSRF token encrypted with CBC can be decrypted using the updated method
+    MockUserLoginSecurityContext.roles.add("admin");
+    securityContext.login(new User());
+    configuration.csrfEnabled = true;
+
+    // Craft a CSRF token, serialize to JSON, encrypt with CBC, base64url-encode
+    CSRFToken token = new CSRFToken(securityContext.getSessionId(), System.currentTimeMillis());
+    byte[] serialized = objectMapper.writeValueAsBytes(token);
+    // Instantiate DefaultEncryptor with two copies of CBCCipherProvider to encrypt with CBC
+    Encryptor cbcEncryptor = new DefaultEncryptor(new CBCCipherProvider(configuration), new CBCCipherProvider(configuration));
+    byte[] encrypted = cbcEncryptor.encrypt(serialized);
+    String encoded = Base64.getUrlEncoder().encodeToString(encrypted);
+
+    simulator.test("/secure")
+             .withSingleHeader("Referer", "http://localhost:" + simulator.getPort() + "/secure")
+             .withCSRFToken(encoded)
+             .post()
+             .assertStatusCode(200)
+             .assertBody("Secure!");
+  }
+
+  // Add for testing legacy-encrypted CSRF token which is defined as a private class in DefaultEncryptionBasedTokenCSRFProvider
+  private record CSRFToken(String sid, long instant) {
   }
 }
