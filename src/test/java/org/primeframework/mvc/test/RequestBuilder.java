@@ -63,8 +63,10 @@ import org.primeframework.mvc.http.MultipartBodyHandler.Multiparts;
 import org.primeframework.mvc.http.MultipartFileUpload;
 import org.primeframework.mvc.message.TestMessageObserver;
 import org.primeframework.mvc.parameter.DefaultParameterParser;
+import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.security.csrf.CSRFProvider;
 import org.primeframework.mvc.test.RequestResult.ThrowingConsumer;
+import org.primeframework.mvc.util.CookieTools;
 import org.primeframework.mvc.util.QueryStringBuilder;
 import org.primeframework.mvc.util.QueryStringTools;
 import org.primeframework.mvc.util.URITools;
@@ -462,6 +464,17 @@ public class RequestBuilder {
       request.addCookies(cookie);
     }
     return this;
+  }
+
+  /**
+   * Encrypt the provided value and add a cookie with the encrypted value to the request
+   *
+   * @param name  The name of the cookie.
+   * @param value The unencrypted value of the cookie.
+   * @return This.
+   */
+  public RequestBuilder withEncryptedCookie(String name, String value) throws Exception {
+    return withCookie(name, CookieTools.toCookie(value.getBytes(StandardCharsets.UTF_8), false, true, injector.getInstance(Encryptor.class)));
   }
 
   /**
