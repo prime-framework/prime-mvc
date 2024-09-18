@@ -63,8 +63,10 @@ import org.primeframework.mvc.http.MultipartBodyHandler.Multiparts;
 import org.primeframework.mvc.http.MultipartFileUpload;
 import org.primeframework.mvc.message.TestMessageObserver;
 import org.primeframework.mvc.parameter.DefaultParameterParser;
+import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.security.csrf.CSRFProvider;
 import org.primeframework.mvc.test.RequestResult.ThrowingConsumer;
+import org.primeframework.mvc.util.CookieTools;
 import org.primeframework.mvc.util.QueryStringBuilder;
 import org.primeframework.mvc.util.QueryStringTools;
 import org.primeframework.mvc.util.URITools;
@@ -450,18 +452,47 @@ public class RequestBuilder {
   }
 
   /**
-   * Add a cookie to the request.
+   * Add a cookie to the request that is optionally compressed and/or encrypted.
+   *
+   * @param name     The name of the cookie.
+   * @param value    The plaintext value of the cookie.
+   * @param compress Whether to compress the cookie.
+   * @param encrypt  Whether to encrypt the cookie.
+   * @return This.
+   */
+  public RequestBuilder withCookie(String name, String value, boolean compress, boolean encrypt) throws Exception {
+    if (name != null) {
+      Cookie cookie;
+      if ((compress || encrypt) && value != null) {
+        cookie = new Cookie(name, CookieTools.toCookie(value.getBytes(StandardCharsets.UTF_8), compress, encrypt, injector.getInstance(Encryptor.class)));
+      } else {
+        cookie = new Cookie(name, value);
+      }
+      request.addCookies(cookie);
+    }
+    return this;
+  }
+
+  /**
+   * Add a plaintext cookie to the request.
    *
    * @param name  The name of the cookie.
    * @param value The value of the cookie.
    * @return This.
    */
-  public RequestBuilder withCookie(String name, String value) {
-    if (name != null) {
-      Cookie cookie = new Cookie(name, value);
-      request.addCookies(cookie);
-    }
-    return this;
+  public RequestBuilder withCookie(String name, String value) throws Exception {
+    return withCookie(name, value, false, false);
+  }
+
+  /**
+   * Encrypt the provided value and add a cookie with the encrypted value to the request
+   *
+   * @param name  The name of the cookie.
+   * @param value The unencrypted value of the cookie.
+   * @return This.
+   */
+  public RequestBuilder withEncryptedCookie(String name, String value) throws Exception {
+    return withCookie(name, value, false, true);
   }
 
   /**
