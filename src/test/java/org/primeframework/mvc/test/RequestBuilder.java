@@ -452,18 +452,36 @@ public class RequestBuilder {
   }
 
   /**
-   * Add a cookie to the request.
+   * Add a cookie to the request that is optionally compressed and/or encrypted.
+   *
+   * @param name     The name of the cookie.
+   * @param value    The plaintext value of the cookie.
+   * @param compress Whether to compress the cookie.
+   * @param encrypt  Whether to encrypt the cookie.
+   * @return This.
+   */
+  public RequestBuilder withCookie(String name, String value, boolean compress, boolean encrypt) throws Exception {
+    if (name != null) {
+      Cookie cookie;
+      if ((compress || encrypt) && value != null) {
+        cookie = new Cookie(name, CookieTools.toCookie(value.getBytes(StandardCharsets.UTF_8), compress, encrypt, injector.getInstance(Encryptor.class)));
+      } else {
+        cookie = new Cookie(name, value);
+      }
+      request.addCookies(cookie);
+    }
+    return this;
+  }
+
+  /**
+   * Add a plaintext cookie to the request.
    *
    * @param name  The name of the cookie.
    * @param value The value of the cookie.
    * @return This.
    */
-  public RequestBuilder withCookie(String name, String value) {
-    if (name != null) {
-      Cookie cookie = new Cookie(name, value);
-      request.addCookies(cookie);
-    }
-    return this;
+  public RequestBuilder withCookie(String name, String value) throws Exception {
+    return withCookie(name, value, false, false);
   }
 
   /**
@@ -474,7 +492,7 @@ public class RequestBuilder {
    * @return This.
    */
   public RequestBuilder withEncryptedCookie(String name, String value) throws Exception {
-    return withCookie(name, CookieTools.toCookie(value.getBytes(StandardCharsets.UTF_8), false, true, injector.getInstance(Encryptor.class)));
+    return withCookie(name, value, false, true);
   }
 
   /**

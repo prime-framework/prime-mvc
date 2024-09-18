@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2023, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2019-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ public class LocaleActionTest extends PrimeBaseTest {
   }
 
   @Test
-  public void getFromCookie() {
+  public void getFromCookie() throws Exception {
     // The cookie overrides the header
     simulator.test("/locale")
              .withHeader("Accept-Language", Locale.CHINESE.toString())
