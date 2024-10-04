@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,9 +72,11 @@ public class GuiceBootstrapTest extends PrimeBaseTest {
     });
     assertNotNull(injector.getInstance(TestClosable.class));
     assertTrue(injector.getInstance(TestClosable.class).open);
+    assertTrue(injector.getInstance(TestCloseableInterface.class).isOpen());
 
     GuiceBootstrap.shutdown(injector);
     assertFalse(injector.getInstance(TestClosable.class).open);
+    assertFalse(injector.getInstance(TestCloseableInterface.class).isOpen());
   }
 
   public static class TestMVCWorkflow implements MVCWorkflow {

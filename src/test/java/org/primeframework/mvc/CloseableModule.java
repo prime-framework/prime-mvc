@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2010, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ package org.primeframework.mvc;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import org.primeframework.mvc.guice.TestClosable;
+import org.primeframework.mvc.guice.TestCloseableImplementation;
+import org.primeframework.mvc.guice.TestCloseableInterface;
 
 /**
  * Test module outside of a package named Guice to test explicit modules.
@@ -28,5 +30,6 @@ public class CloseableModule implements Module {
   public void configure(Binder binder) {
     binder.bind(TestClosable.class);
     binder.requestStaticInjection(TestClosable.class);
+    binder.bind(TestCloseableInterface.class).to(TestCloseableImplementation.class);
   }
 }
