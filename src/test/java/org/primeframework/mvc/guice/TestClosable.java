@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2010, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ public class TestClosable implements Closeable {
   public boolean open = false;
 
   @Inject
-  public static void intialize(TestClosable instance) {
+  public static void initialize(TestClosable instance) {
     instance.open = true;
   }
 
