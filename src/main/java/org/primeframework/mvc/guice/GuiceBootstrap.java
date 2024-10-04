@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,8 +72,8 @@ public class GuiceBootstrap {
       });
       logger.error(
           "\n\n===================================================================================================\n\n" +
-              "  Unable to start the server. Here's why: \n\n\n{}" +
-              "\n\n===================================================================================================\n\n",
+          "  Unable to start the server. Here's why: \n\n\n{}" +
+          "\n\n===================================================================================================\n\n",
           String.join("\n", errorMessages)
       );
       logger.error("Unable to start the server. Exception: \n", e);
@@ -96,10 +96,9 @@ public class GuiceBootstrap {
         type = ((ParameterizedType) type).getRawType();
       }
 
-      if (type instanceof Class<?> bindingType) {
-        if (Closeable.class.isAssignableFrom(bindingType) && Scopes.isSingleton(bindings.get(key))) {
-          Closeable closable = (Closeable) injector.getInstance(key);
-          if (closable == null || closed.contains(closable.getClass())) {
+      if (type instanceof Class<?>) {
+        if (Scopes.isSingleton(bindings.get(key)) && injector.getInstance(key) instanceof Closeable closable) {
+          if (closed.contains(closable.getClass())) {
             continue;
           }
 
