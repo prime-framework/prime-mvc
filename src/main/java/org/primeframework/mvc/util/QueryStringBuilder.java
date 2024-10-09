@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2023, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2019-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,51 +49,54 @@ public class QueryStringBuilder {
   }
 
   public QueryStringBuilder beginFragment() {
-    sb.append("#");
-    addSeparator = false;
+    // If query string contains no terms, remove the question mark
+    if (sb.toString().endsWith("?")) {
+      sb.setLength(sb.length() - 1);
+    }
+
+    if (sb.indexOf("#") == -1) {
+      sb.append("#");
+      addSeparator = false;
+    } else {
+      char lastChar = sb.charAt(sb.length() - 1);
+      addSeparator = lastChar != '#' && lastChar != '&';
+    }
     return this;
   }
 
   public QueryStringBuilder beginQuery() {
-    sb.append("?");
-    addSeparator = false;
+    if (sb.indexOf("#") != -1) {
+      throw new IllegalStateException("You cannot add a query after a fragment");
+    }
+
+    if (sb.indexOf("?") == -1) {
+      sb.append("?");
+      addSeparator = false;
+    } else {
+      char lastChar = sb.charAt(sb.length() - 1);
+      addSeparator = lastChar != '?' && lastChar != '&';
+    }
     return this;
   }
 
   public String build() {
-    if (uri.length() == 0) {
+    if (uri.isEmpty()) {
       return sb.toString();
     }
 
-    // URL provided contains a ?, perhaps other parameters as well
-    if (uri.indexOf("?") != -1) {
-      if (sb.indexOf("?") == 0) {
-        return uri + sb.substring(1);
+    if (segments.size() > 0) {
+      if (uri.lastIndexOf("/") != uri.length() - 1) {
+        uri.append("/");
       }
-      return uri.append(sb).toString();
-    } else {
-      if (segments.size() > 0) {
-        if (uri.lastIndexOf("/") != uri.length() - 1) {
-          uri.append("/");
-        }
 
-        uri.append(String.join("/", segments));
-      }
+      uri.append(String.join("/", segments));
     }
 
-    if (sb.indexOf("?") == 0) {
+    if ((sb.indexOf("?") == 0 || sb.indexOf("#") == 0) && sb.length() > 1) {
       return uri.append(sb).toString();
     }
 
-    if (sb.indexOf("#") == 0) {
-      return uri.append(sb).toString();
-    }
-
-    if (uri.indexOf("#") != -1 && sb.length() > 0) {
-      return uri.append("&").append(sb).toString();
-    }
-
-    if (sb.length() == 0) {
+    if (sb.isEmpty() || sb.toString().equals("?") || sb.toString().equals("#")) {
       return uri.toString();
     }
 
@@ -134,13 +137,26 @@ public class QueryStringBuilder {
   }
 
   public QueryStringBuilder uri(String uri) {
-    if (this.uri.length() > 0) {
+    if (!this.uri.isEmpty()) {
       throw new IllegalStateException("Object has already been initialized with a URL");
     }
 
     if (uri != null) {
-      this.uri.append(uri);
-      if (uri.contains("?") && !uri.endsWith("&")) {
+      String del = null;
+      if (uri.contains("?")) {
+        del = "?";
+      } else if (uri.contains("#")) {
+        del = "#";
+      }
+
+      if (del != null) {
+        this.uri.append(uri, 0, uri.indexOf(del));
+        this.sb.append(uri, uri.indexOf(del), uri.length());
+      } else {
+        this.uri.append(uri);
+      }
+
+      if ((uri.contains("?") || uri.contains("#")) && !List.of('#', '?', '&').contains(uri.charAt(uri.length() - 1))) {
         addSeparator = true;
       }
     }
@@ -162,9 +178,7 @@ public class QueryStringBuilder {
       sb.append("&");
     }
 
-    sb.append(URLEncoder.encode(name, StandardCharsets.UTF_8))
-      .append("=")
-      .append(URLEncoder.encode(value.toString(), StandardCharsets.UTF_8));
+    sb.append(URLEncoder.encode(name, StandardCharsets.UTF_8)).append("=").append(URLEncoder.encode(value.toString(), StandardCharsets.UTF_8));
 
     addSeparator = true;
     return this;
@@ -175,8 +189,13 @@ public class QueryStringBuilder {
   }
 
   public QueryStringBuilder withSegment(Object segment) {
-    if (uri.length() > 0 && (uri.indexOf("?") == uri.length() - 1)) {
-      throw new IllegalStateException("You cannot add a URL segment after you have appended a ? to the end of the URL");
+    String message = "You cannot add a URL segment after you have appended a %s to the end of the URL";
+
+    if (!sb.isEmpty() && (sb.indexOf("?") != -1)) {
+      throw new IllegalStateException(String.format(message, "?"));
+    }
+    if (!sb.isEmpty() && (sb.indexOf("#") != -1)) {
+      throw new IllegalStateException(String.format(message, "#"));
     }
 
     if (segment != null) {
