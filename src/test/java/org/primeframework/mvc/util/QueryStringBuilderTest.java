@@ -43,6 +43,7 @@ public class QueryStringBuilderTest {
 
     // With a URL
     test("http://acme.com", b -> b.with("foo", "bar"), "http://acme.com?foo=bar");
+    test("http://acme.com", b -> b.beginQuery().with("foo", "bar"), "http://acme.com?foo=bar");
     test("http://acme.com?foo=bar", b -> b.with("bing", "baz"), "http://acme.com?foo=bar&bing=baz");
     test("http://acme.com?foo=bar&bing=baz", b -> b.with("boom", "dynamite"), "http://acme.com?foo=bar&bing=baz&boom=dynamite");
 
@@ -76,51 +77,48 @@ public class QueryStringBuilderTest {
     // URL with query term, adding another term
     test("http://acme.com?test=data", b -> b.with("foo", "bar"), "http://acme.com?test=data&foo=bar");
     test("http://acme.com?test=data", b -> b.beginQuery().with("foo", "bar"), "http://acme.com?test=data&foo=bar");
+    test("http://acme.com?test=data", b -> b.beginQuery().with("foo", "bar").beginQuery().with("bing", "baz"), "http://acme.com?test=data&foo=bar&bing=baz");
+    test("http://acme.com?test=data", b -> b.beginQuery().with("foo", "bar").beginFragment().with("bing", "baz"), "http://acme.com?test=data&foo=bar#bing=baz");
 
     // URL with fragment, adding more fragment terms
     test("http://acme.com#frag", b -> b.with("foo", "bar"), "http://acme.com#frag&foo=bar");
     test("http://acme.com#frag", b -> b.with("foo", "bar").with("bing", "baz"), "http://acme.com#frag&foo=bar&bing=baz");
     test("http://acme.com#frag", b -> b.beginFragment().with("foo", "bar").with("bing", "baz"), "http://acme.com#frag&foo=bar&bing=baz");
+    test("http://acme.com#frag", b -> b.beginFragment().with("foo", "bar").beginFragment().with("bing", "baz"), "http://acme.com#frag&foo=bar&bing=baz");
 
-    // Should not include query since no terms were added before beginFragment
-    test("http://acme.com", b -> b.beginQuery().beginFragment().with("foo", "bar"), "http://acme.com#foo=bar");
+    // Include empty query
+    test("http://acme.com", b -> b.beginQuery().beginFragment().with("foo", "bar"), "http://acme.com?#foo=bar");
 
     // URLs contain trailing control characters
     test("http://acme.com?", b -> b.with("foo", "bar"), "http://acme.com?foo=bar");
     test("http://acme.com#test&", b -> b.beginFragment().with("foo", "bar"), "http://acme.com#test&foo=bar");
     test("http://acme.com?test=data&", b -> b.beginQuery().with("foo", "bar"), "http://acme.com?test=data&foo=bar");
+    test("http://acme.com#test&", b -> b.with("foo", "bar"), "http://acme.com#test&foo=bar");
+    test("http://acme.com?test=data&", b -> b.with("foo", "bar"), "http://acme.com?test=data&foo=bar");
 
-    // Begin query and fragement but add no terms
-    test("http://acme.com", QueryStringBuilder::beginQuery, "http://acme.com");
-    test("http://acme.com", QueryStringBuilder::beginFragment, "http://acme.com");
+    // Begin query and fragment but add no terms
+    test("http://acme.com", QueryStringBuilder::beginQuery, "http://acme.com?");
+    test("http://acme.com", QueryStringBuilder::beginFragment, "http://acme.com#");
 
-    try {
-      test("http://acme.com?test=data", b -> b.withSegment("bar").with("foo", "bar"), "http://acme.com/bar?test=data&foo=bar");
-      fail("Expected this to fail");
-    } catch (Exception e) {
-      assertEquals(e.getMessage(), "You cannot add a URL segment after you have appended a ? to the end of the URL");
-    }
+    // Can't add segment after a # (empty fragment)
+    testInvalid("http://acme.com#", b -> b.withSegment("bar").with("foo", "bar"),
+                "You cannot add a URL segment after you have appended a # to the end of the URL");
 
-    try {
-      test("http://acme.com#frag", b -> b.withSegment("bar").with("foo", "bar"), "http://acme.com/bar#frag");
-      fail("Expected this to fail");
-    } catch (Exception e) {
-      assertEquals(e.getMessage(), "You cannot add a URL segment after you have appended a # to the end of the URL");
-    }
+    // Can't add segment after a fragment
+    testInvalid("http://acme.com#frag", b -> b.withSegment("bar").with("foo", "bar"),
+                "You cannot add a URL segment after you have appended a # to the end of the URL");
 
-    try {
-      test("http://acme.com#frag", b -> b.beginQuery().with("foo", "bar"), "http://acme.com/bar");
-      fail("Expected this to fail");
-    } catch (Exception e) {
-      assertEquals(e.getMessage(), "You cannot add a query after a fragment");
-    }
+    // Can't add query after a fragment
+    testInvalid("http://acme.com#frag", b -> b.beginQuery().with("foo", "bar"),
+                "You cannot add a query after a fragment");
 
-    // Expect to explode, if you leave a ? at the end of the initial URL you can't have any segments
-    try {
-      test("http://acme.com?", b -> b.withSegment("bar").with("foo", "bar"), "http://acme.com?foo=bar");
-      fail("Expected this to fail");
-    } catch (IllegalStateException ignore) {
-    }
+    // Can't add segment after ? (empty query)
+    testInvalid("http://acme.com?", b -> b.withSegment("bar").with("foo", "bar"),
+                "You cannot add a URL segment after you have appended a ? to the end of the URL");
+
+    // Can't add segment after a query
+    testInvalid("http://acme.com?test=data", b -> b.withSegment("bar").with("foo", "bar"),
+                "You cannot add a URL segment after you have appended a ? to the end of the URL");
   }
 
   private void test(String uri, String expected) {
@@ -138,5 +136,15 @@ public class QueryStringBuilderTest {
     QueryStringBuilder builder = QueryStringBuilder.builder();
     consumer.accept(builder);
     assertEquals(builder.build(), expected);
+  }
+
+  private void testInvalid(String uri, Consumer<QueryStringBuilder> consumer, String expectedMessage) {
+    try {
+      QueryStringBuilder builder = QueryStringBuilder.builder(uri);
+      consumer.accept(builder);
+      fail("Expected this to fail.");
+    } catch (Exception e) {
+      assertEquals(e.getMessage(), expectedMessage);
+    }
   }
 }

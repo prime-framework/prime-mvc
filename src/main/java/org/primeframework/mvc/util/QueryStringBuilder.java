@@ -49,11 +49,6 @@ public class QueryStringBuilder {
   }
 
   public QueryStringBuilder beginFragment() {
-    // If query string contains no terms, remove the question mark
-    if (sb.toString().endsWith("?")) {
-      sb.setLength(sb.length() - 1);
-    }
-
     if (sb.indexOf("#") == -1) {
       sb.append("#");
       addSeparator = false;
@@ -92,11 +87,11 @@ public class QueryStringBuilder {
       uri.append(String.join("/", segments));
     }
 
-    if ((sb.indexOf("?") == 0 || sb.indexOf("#") == 0) && sb.length() > 1) {
+    if (sb.indexOf("?") == 0 || sb.indexOf("#") == 0) {
       return uri.append(sb).toString();
     }
 
-    if (sb.isEmpty() || sb.toString().equals("?") || sb.toString().equals("#")) {
+    if (sb.isEmpty()) {
       return uri.toString();
     }
 
@@ -191,11 +186,13 @@ public class QueryStringBuilder {
   public QueryStringBuilder withSegment(Object segment) {
     String message = "You cannot add a URL segment after you have appended a %s to the end of the URL";
 
-    if (!sb.isEmpty() && (sb.indexOf("?") != -1)) {
-      throw new IllegalStateException(String.format(message, "?"));
-    }
-    if (!sb.isEmpty() && (sb.indexOf("#") != -1)) {
-      throw new IllegalStateException(String.format(message, "#"));
+    if (!sb.isEmpty()) {
+      if (sb.indexOf("?") != -1) {
+        throw new IllegalStateException(String.format(message, "?"));
+      }
+      if (sb.indexOf("#") != -1) {
+        throw new IllegalStateException(String.format(message, "#"));
+      }
     }
 
     if (segment != null) {
