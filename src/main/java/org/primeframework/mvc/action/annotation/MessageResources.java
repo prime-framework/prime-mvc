@@ -30,8 +30,9 @@ import java.lang.annotation.Target;
 public @interface MessageResources {
   /**
    * @return Prime MVC, by default, will look for messages, via the {@link org.primeframework.mvc.message.l10n.MessageProvider}
-   *     interface, in a certain search order (see {@link org.primeframework.mvc.message.l10n.ResourceBundleMessageProvider} for an example).
-   *     If you want to add an additional action's messages to the search path, use this attribute.
+   *     interface, in an implementation specific search path (see {@link org.primeframework.mvc.message.l10n.ResourceBundleMessageProvider} for an
+   *     example).
+   *     If you want an additional action's messages in the search path, use this attribute.
    */
   Class<?> fallback();
 }

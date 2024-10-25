@@ -24,7 +24,6 @@ public class MessageResourcesTest extends PrimeBaseTest {
     simulator.test("/message-resources-annotated")
              .get()
              .assertStatusCode(200)
-             .assertContainsGeneralMessageCodes(MessageType.INFO, "normal_message")
-             .assertContainsGeneralMessageCodes(MessageType.INFO, "nested_message");
+             .assertContainsGeneralMessageCodes(MessageType.INFO, "normal_message", "nested_message");
   }
 }

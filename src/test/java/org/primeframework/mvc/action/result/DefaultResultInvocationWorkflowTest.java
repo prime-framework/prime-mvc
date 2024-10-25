@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2023, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -310,6 +310,6 @@ public class DefaultResultInvocationWorkflowTest extends PrimeBaseTest {
                                 new ActionConfiguration(EditAction.class, false, null, executeMethods, validationMethods, new ArrayList<>(), null,
                                                         null, new ArrayList<>(), new HashMap<>(), new ArrayList<>(), resultConfigurations,
                                                         new HashMap<>(), null, new HashMap<>(), new HashSet<>(), Collections.emptyList(),
-                                                        new ArrayList<>(), new HashMap<>(), "/user/edit", new ArrayList<>(), null, null));
+                                                        new ArrayList<>(), new HashMap<>(), "/user/edit", new ArrayList<>(), null, null, null));
   }
 }
