@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2022-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,9 +40,9 @@ public class MessageStoreAction {
   }
 
   public String get() {
-    messageStore.add(new SimpleMessage(MessageType.ERROR, "[ERROR]", messageProvider.getMessage("[ERROR]")));
-    messageStore.add(new SimpleMessage(MessageType.INFO, "[INFO]", messageProvider.getMessage("[INFO]")));
-    messageStore.add(new SimpleMessage(MessageType.WARNING, "[WARNING]", messageProvider.getMessage("[WARNING]")));
+    messageStore.add(new SimpleMessage(MessageType.ERROR, "[STORE_ERROR]", messageProvider.getMessage("[STORE_ERROR]")));
+    messageStore.add(new SimpleMessage(MessageType.INFO, "[STORE_INFO]", messageProvider.getMessage("[STORE_INFO]")));
+    messageStore.add(new SimpleMessage(MessageType.WARNING, "[STORE_WARNING]", messageProvider.getMessage("[STORE_WARNING]")));
     return "success";
   }
 }
