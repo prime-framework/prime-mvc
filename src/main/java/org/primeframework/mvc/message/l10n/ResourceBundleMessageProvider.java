@@ -135,7 +135,7 @@ public class ResourceBundleMessageProvider implements MessageProvider {
     }
 
     ActionConfiguration config = actionInvocation.configuration;
-    if (config.fallbackMessageResourcesPath != null) {
+    if (config != null && config.fallbackMessageResourcesPath != null) {
       return findMessage(config.fallbackMessageResourcesPath, key);
     }
 
