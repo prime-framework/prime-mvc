@@ -18,6 +18,7 @@ package org.primeframework.mvc.message.l10n;
 import java.util.Formatter;
 import java.util.LinkedList;
 import java.util.MissingResourceException;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.ResourceBundle;
 import java.util.ResourceBundle.Control;
@@ -25,6 +26,7 @@ import java.util.ResourceBundle.Control;
 import com.google.inject.Inject;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
+import org.primeframework.mvc.action.annotation.AlternateMessageResources;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.locale.LocaleProvider;
 import org.slf4j.Logger;
@@ -121,7 +123,7 @@ public class ResourceBundleMessageProvider implements MessageProvider {
 
   /**
    * Finds the message in a resource bundle using the search method described in the class comment.
-   * If the action was annotated with a {@link org.primeframework.mvc.action.annotation.MessageResources} annotation
+   * If the action was annotated with a {@link AlternateMessageResources} annotation
    * and the message was not found with the request's action, that action will be searched as well.
    *
    * @param actionInvocation The action invocation.
@@ -135,8 +137,12 @@ public class ResourceBundleMessageProvider implements MessageProvider {
     }
 
     ActionConfiguration config = actionInvocation.configuration;
-    if (config != null && config.fallbackMessageResourcesPath != null) {
-      return findMessage(config.fallbackMessageResourcesPath, key);
+    if (config != null) {
+      return config.fallbackActionMessageURIs.stream()
+                                             .map(uri -> findMessage(uri, key))
+                                             .filter(Objects::nonNull)
+                                             .findFirst()
+                                             .orElse(null);
     }
 
     return null;

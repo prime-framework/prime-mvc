@@ -60,7 +60,7 @@ public class ActionConfiguration {
 
   public final Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods;
 
-  public final String fallbackMessageResourcesPath;
+  public final List<String> fallbackActionMessageURIs;
 
   public final Map<String, FileUpload> fileUploadMembers;
 
@@ -125,7 +125,7 @@ public class ActionConfiguration {
                              List<Method> preValidationMethods,
                              Field unknownParametersField,
                              Set<String> validContentTypes,
-                             String fallbackMessageResourcesPath) {
+                             List<String> fallbackActionMessageURIs) {
     Objects.requireNonNull(actionClass);
 
     this.actionClass = actionClass;
@@ -133,7 +133,7 @@ public class ActionConfiguration {
     this.constraintValidationMethods = constraintValidationMethods;
     this.formPrepareMethods = formPrepareMethods;
     this.authorizationMethods = authorizationMethods;
-    this.fallbackMessageResourcesPath = fallbackMessageResourcesPath;
+    this.fallbackActionMessageURIs = fallbackActionMessageURIs;
     this.jwtAuthorizationMethods = jwtAuthorizationMethods;
     this.preValidationMethods = preValidationMethods;
     this.postValidationMethods = postValidationMethods;

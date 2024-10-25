@@ -18,37 +18,34 @@ package org.example.action;
 import com.google.inject.Inject;
 import org.example.action.nested.NestedMessageAction;
 import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.action.annotation.MessageResources;
+import org.primeframework.mvc.action.annotation.AlternateMessageResources;
 import org.primeframework.mvc.action.result.annotation.Status;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleMessage;
 import org.primeframework.mvc.message.l10n.MessageProvider;
-import org.primeframework.mvc.message.l10n.MissingMessageException;
 
 @Action
 @Status
-@MessageResources(fallback = NestedMessageAction.class)
-public class MessageResourcesAnnotatedAction {
+@AlternateMessageResources(actions = NestedMessageAction.class)
+public class AlternateMessageResourcesAnnotatedAction {
   private final MessageProvider messageProvider;
 
   private final MessageStore messageStore;
 
+  public String messageKey;
+
   @Inject
-  public MessageResourcesAnnotatedAction(MessageProvider messageProvider, MessageStore messageStore) {
+  public AlternateMessageResourcesAnnotatedAction(MessageProvider messageProvider, MessageStore messageStore) {
     this.messageProvider = messageProvider;
     this.messageStore = messageStore;
   }
 
   public String get() {
     try {
-      // this message exists in a standard path by convention - src/test/web/messages/message-resources-annotated.properties
-      messageStore.add(new SimpleMessage(MessageType.INFO, "normal_message", messageProvider.getMessage("normal_message")));
-      // this message only exists in NestedMessageAction's path - in src/test/web/messages/nested/nested-message.properties
-      messageStore.add(new SimpleMessage(MessageType.INFO, "nested_message", messageProvider.getMessage("nested_message")));
-    } catch (MissingMessageException e) {
-      e.printStackTrace();
-      throw new RuntimeException(e);
+      messageStore.add(new SimpleMessage(MessageType.INFO, messageKey, messageProvider.getMessage(messageKey)));
+    } catch (Exception e) {
+      messageStore.add(new SimpleMessage(MessageType.ERROR, messageKey, "not found"));
     }
     return "success";
   }

@@ -21,18 +21,18 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Tells Prime MVC to customize message resource behavior for an action class
+ * Customize message resource behavior for an action class
  *
  * @author Brady Wied
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface MessageResources {
+public @interface AlternateMessageResources {
   /**
-   * @return Prime MVC, by default, will look for messages, via the {@link org.primeframework.mvc.message.l10n.MessageProvider}
+   * @return By default, will look for messages, via the {@link org.primeframework.mvc.message.l10n.MessageProvider}
    *     interface, in an implementation specific search path (see {@link org.primeframework.mvc.message.l10n.ResourceBundleMessageProvider} for an
    *     example).
    *     If you want an additional action's messages in the search path, use this attribute.
    */
-  Class<?> fallback();
+  Class<?>[] actions();
 }

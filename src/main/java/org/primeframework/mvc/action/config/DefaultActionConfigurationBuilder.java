@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -44,7 +45,7 @@ import org.primeframework.mvc.action.PreParameterMethodConfiguration;
 import org.primeframework.mvc.action.ValidationMethodConfiguration;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.annotation.AllowUnknownParameters;
-import org.primeframework.mvc.action.annotation.MessageResources;
+import org.primeframework.mvc.action.annotation.AlternateMessageResources;
 import org.primeframework.mvc.action.result.annotation.ResultAnnotation;
 import org.primeframework.mvc.action.result.annotation.ResultContainerAnnotation;
 import org.primeframework.mvc.content.ValidContentTypes;
@@ -137,13 +138,13 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
     Field unknownParametersField = findUnknownParametersField(actionClass);
     Set<String> validContentTypes = findAllowedContentTypes(actionClass);
 
-    MessageResources messageResources = actionClass.getAnnotation(MessageResources.class);
-    String fallbackMessageResourcesPath = null;
-    if (messageResources != null) {
-      fallbackMessageResourcesPath = uriBuilder.build(messageResources.fallback());
-    }
+    List<String> fallbackActionMessageURIs = Optional.ofNullable(actionClass.getAnnotation(AlternateMessageResources.class))
+                                                     .map(alternates -> Arrays.stream(alternates.actions())
+                                                                              .map(uriBuilder::build)
+                                                                              .toList())
+                                                     .orElse(List.of());
 
-    return new ActionConfiguration(actionClass, allowKnownParameters, constraintValidationMethods, executeMethods, validationMethods, formPrepareMethods, authorizationMethods, jwtAuthorizationMethods, postValidationMethods, preParameterMethods, postParameterMethods, resultAnnotations, preParameterMembers, preRenderMethodsMap, fileUploadMembers, memberNames, securitySchemes, scopeFields, additionalConfiguration, uri, preValidationMethods, unknownParametersField, validContentTypes, fallbackMessageResourcesPath);
+    return new ActionConfiguration(actionClass, allowKnownParameters, constraintValidationMethods, executeMethods, validationMethods, formPrepareMethods, authorizationMethods, jwtAuthorizationMethods, postValidationMethods, preParameterMethods, postParameterMethods, resultAnnotations, preParameterMembers, preRenderMethodsMap, fileUploadMembers, memberNames, securitySchemes, scopeFields, additionalConfiguration, uri, preValidationMethods, unknownParametersField, validContentTypes, fallbackActionMessageURIs);
   }
 
   /**
