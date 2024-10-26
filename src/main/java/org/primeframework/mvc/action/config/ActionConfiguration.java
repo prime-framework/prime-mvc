@@ -50,6 +50,8 @@ public class ActionConfiguration {
 
   public final boolean allowUnknownParameters;
 
+  public final List<String> alternateMessageURIs;
+
   public final Action annotation;
 
   public final Map<Class<? extends Annotation>, Annotation> annotations = new HashMap<>();
@@ -59,8 +61,6 @@ public class ActionConfiguration {
   public final Map<HTTPMethod, ConstraintOverrideMethodConfiguration> constraintValidationMethods;
 
   public final Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods;
-
-  public final List<String> fallbackActionMessageURIs;
 
   public final Map<String, FileUpload> fileUploadMembers;
 
@@ -125,7 +125,7 @@ public class ActionConfiguration {
                              List<Method> preValidationMethods,
                              Field unknownParametersField,
                              Set<String> validContentTypes,
-                             List<String> fallbackActionMessageURIs) {
+                             List<String> alternateMessageURIs) {
     Objects.requireNonNull(actionClass);
 
     this.actionClass = actionClass;
@@ -133,7 +133,7 @@ public class ActionConfiguration {
     this.constraintValidationMethods = constraintValidationMethods;
     this.formPrepareMethods = formPrepareMethods;
     this.authorizationMethods = authorizationMethods;
-    this.fallbackActionMessageURIs = fallbackActionMessageURIs;
+    this.alternateMessageURIs = alternateMessageURIs;
     this.jwtAuthorizationMethods = jwtAuthorizationMethods;
     this.preValidationMethods = preValidationMethods;
     this.postValidationMethods = postValidationMethods;
