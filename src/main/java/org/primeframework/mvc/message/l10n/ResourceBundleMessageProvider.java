@@ -137,15 +137,11 @@ public class ResourceBundleMessageProvider implements MessageProvider {
     }
 
     ActionConfiguration config = actionInvocation.configuration;
-    if (config != null) {
-      return config.alternateMessageURIs.stream()
-                                        .map(uri -> findMessage(uri, key))
-                                        .filter(Objects::nonNull)
-                                        .findFirst()
-                                        .orElse(null);
-    }
-
-    return null;
+    return config.alternateMessageURIs.stream()
+                                      .map(uri -> findMessage(uri, key))
+                                      .filter(Objects::nonNull)
+                                      .findFirst()
+                                      .orElse(null);
   }
 
   /**

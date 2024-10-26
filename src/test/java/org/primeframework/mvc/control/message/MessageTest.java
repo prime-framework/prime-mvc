@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,17 @@
 package org.primeframework.mvc.control.message;
 
 import java.util.List;
+import java.util.Set;
 
 import com.google.inject.Inject;
 import org.example.action.user.EditAction;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
+import org.primeframework.mvc.action.config.ActionConfiguration;
+import org.primeframework.mvc.action.config.DefaultActionConfigurationBuilder;
 import org.primeframework.mvc.control.ControlBaseTest;
+import org.primeframework.mvc.util.DefaultURIBuilder;
 import org.testng.annotations.Test;
-import static java.util.Arrays.asList;
 import static org.testng.Assert.fail;
 
 /**
@@ -32,12 +35,14 @@ import static org.testng.Assert.fail;
  * @author Brian Pontarelli
  */
 public class MessageTest extends ControlBaseTest {
+  private static final ActionConfiguration userEditActionConfiguration;
+
   @Inject Message message;
 
   @Test
   public void defaultMessage() {
     EditAction action = new EditAction();
-    ais.setCurrent(new ActionInvocation(action, null, "/user/edit", null, null));
+    ais.setCurrent(new ActionInvocation(action, null, "/user/edit", null, userEditActionConfiguration));
     new ControlTester(message).
         attr("key", "bad").
         attr("default", "Message").
@@ -47,7 +52,7 @@ public class MessageTest extends ControlBaseTest {
   @Test
   public void messageAction() {
     EditAction action = new EditAction();
-    ais.setCurrent(new ActionInvocation(action, null, "/user/edit", null, null));
+    ais.setCurrent(new ActionInvocation(action, null, "/user/edit", null, userEditActionConfiguration));
     new ControlTester(message).
         attr("key", "key").
         go("American English Message");
@@ -56,7 +61,7 @@ public class MessageTest extends ControlBaseTest {
   @Test
   public void messageBundleWithParams() {
     EditAction action = new EditAction();
-    ais.setCurrent(new ActionInvocation(action, null, "/user/edit", null, null));
+    ais.setCurrent(new ActionInvocation(action, null, "/user/edit", null, userEditActionConfiguration));
     new ControlTester(message).
         attr("key", "params").
         attr("values", List.of("Params")).
@@ -66,7 +71,7 @@ public class MessageTest extends ControlBaseTest {
   @Test
   public void messageFailure() {
     EditAction action = new EditAction();
-    ais.setCurrent(new ActionInvocation(action, null, "/user/edit", null, null));
+    ais.setCurrent(new ActionInvocation(action, null, "/user/edit", null, userEditActionConfiguration));
     try {
       new ControlTester(message).
           attr("key", "bad").
@@ -75,5 +80,10 @@ public class MessageTest extends ControlBaseTest {
     } catch (PrimeException e) {
       // Expected
     }
+  }
+
+  static {
+    userEditActionConfiguration = new DefaultActionConfigurationBuilder(new DefaultURIBuilder(), Set.of())
+        .build(EditAction.class);
   }
 }

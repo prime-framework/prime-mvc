@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2020, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  */
 package org.primeframework.mvc.control.form;
 
+import java.util.Set;
+
 import com.google.inject.Inject;
 import org.apache.commons.lang3.ArrayUtils;
 import org.example.action.user.EditAction;
@@ -23,9 +25,12 @@ import org.example.domain.Address;
 import org.example.domain.User;
 import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
+import org.primeframework.mvc.action.config.ActionConfiguration;
+import org.primeframework.mvc.action.config.DefaultActionConfigurationBuilder;
 import org.primeframework.mvc.control.ControlBaseTest;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
+import org.primeframework.mvc.util.DefaultURIBuilder;
 import org.testng.annotations.Test;
 import static java.util.Arrays.asList;
 import static org.primeframework.mvc.util.MapBuilder.lmap;
@@ -38,6 +43,8 @@ import static org.testng.Assert.fail;
  * @author Brian Pontarelli
  */
 public class SelectTest extends ControlBaseTest {
+  private static final ActionConfiguration userEditActionConfiguration;
+
   @Inject public Select select;
 
   @Test
@@ -48,7 +55,7 @@ public class SelectTest extends ControlBaseTest {
     action.user = new User();
     action.user.setAddress("work", address);
 
-    ais.setCurrent(new ActionInvocation(action, null, "/select", null, null));
+    ais.setCurrent(new ActionInvocation(action, null, "/select", null, userEditActionConfiguration));
 
     new ControlTester(select)
         .attr("name", "user.addresses['work'].country")
@@ -67,7 +74,7 @@ public class SelectTest extends ControlBaseTest {
 
   @Test
   public void actionLess() {
-    ais.setCurrent(new ActionInvocation(null, null, "/select", null, null));
+    ais.setCurrent(new ActionInvocation(null, null, "/select", null, userEditActionConfiguration));
     new ControlTester(select)
         .attr("name", "test")
         .attr("class", "css-class")
@@ -89,7 +96,7 @@ public class SelectTest extends ControlBaseTest {
   public void enums() {
     EditAction action = new EditAction();
 
-    ais.setCurrent(new ActionInvocation(action, null, "/select", null, null));
+    ais.setCurrent(new ActionInvocation(action, null, "/select", null, userEditActionConfiguration));
 
     new ControlTester(select)
         .attr("name", "enumValue")
@@ -116,7 +123,7 @@ public class SelectTest extends ControlBaseTest {
     action.user = new User();
     action.user.setAddress("work", address);
 
-    ais.setCurrent(new ActionInvocation(action, null, "/select", null, null));
+    ais.setCurrent(new ActionInvocation(action, null, "/select", null, userEditActionConfiguration));
 
     Pair us = new Pair("US", "United States");
     Pair de = new Pair("DE", "Germany");
@@ -146,7 +153,7 @@ public class SelectTest extends ControlBaseTest {
     action.user = new User();
     action.user.setAddress("work", address);
 
-    ais.setCurrent(new ActionInvocation(action, null, "/select", null, null));
+    ais.setCurrent(new ActionInvocation(action, null, "/select", null, userEditActionConfiguration));
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "code1", "fieldError1"));
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "code2", "fieldError2"));
 
@@ -167,7 +174,7 @@ public class SelectTest extends ControlBaseTest {
 
   @Test
   public void headerOption() {
-    ais.setCurrent(new ActionInvocation(null, null, "/select", null, null));
+    ais.setCurrent(new ActionInvocation(null, null, "/select", null, userEditActionConfiguration));
     new ControlTester(select)
         .attr("name", "test")
         .attr("headerValue", "zero")
@@ -194,7 +201,7 @@ public class SelectTest extends ControlBaseTest {
     action.user = new User();
     action.user.setAddress("work", address);
 
-    ais.setCurrent(new ActionInvocation(action, null, "/select", null, null));
+    ais.setCurrent(new ActionInvocation(action, null, "/select", null, userEditActionConfiguration));
 
     new ControlTester(select)
         .attr("name", "user.addresses['work'].country")
@@ -219,7 +226,7 @@ public class SelectTest extends ControlBaseTest {
     action.user = new User();
     action.user.setAddress("work", address);
 
-    ais.setCurrent(new ActionInvocation(action, null, "/select", null, null));
+    ais.setCurrent(new ActionInvocation(action, null, "/select", null, userEditActionConfiguration));
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "code1", "fieldError1"));
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR, "user.addresses['work'].country", "code2", "fieldError2"));
 
@@ -235,5 +242,10 @@ public class SelectTest extends ControlBaseTest {
       // Expected
       assertTrue(e.getMessage().contains("multiple"));
     }
+  }
+
+  static {
+    userEditActionConfiguration = new DefaultActionConfigurationBuilder(new DefaultURIBuilder(), Set.of())
+        .build(EditAction.class);
   }
 }
