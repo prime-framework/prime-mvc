@@ -15,10 +15,10 @@ jobs:
         uses: actions/checkout@v4
       - name: savant setup
         run: |
-          curl -O https://repository.savantbuild.org/org/savantbuild/savant-core/2.0.0-RC.7/savant-2.0.0-RC.7.tar.gz
-          tar xzvf savant-2.0.0-RC.7.tar.gz
-          savant-2.0.0-RC.7/bin/sb --version
-          SAVANT_PATH=$(realpath -s "./savant-2.0.0-RC.7/bin")
+          curl -O https://repository.savantbuild.org/org/savantbuild/savant-core/2.0.0/savant-2.0.0.tar.gz
+          tar xzvf savant-2.0.0.tar.gz
+          savant-2.0.0/bin/sb --version
+          SAVANT_PATH=$(realpath -s "./savant-2.0.0/bin")
           echo "${SAVANT_PATH}" >> $GITHUB_PATH
           mkdir -p ~/.savant/plugins
           # For now, using the JDK that comes on the GHA runner
