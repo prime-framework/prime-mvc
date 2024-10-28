@@ -184,6 +184,33 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void flash_scope_compatibility() throws Exception {
+    // Use case: MVC is able to decrypt a flash message cookie that was encrypted with legacy methods
+    // Create a SimpleMessage, serialize, encrypt, and encode. The message text is hard-coded here because there is no context to look up the message.
+    var message = new SimpleMessage(MessageType.INFO, "[FlashScopeMessageKey]", "This is a message!");
+    // Serialize List<Message>
+    var serialized = objectMapper.writeValueAsBytes(List.of(message));
+    // Instantiate DefaultEncryptor with two copies of CBCCipherProvider to encrypt with CBC
+    Encryptor cbcEncryptor = new DefaultEncryptor(new CBCCipherProvider(configuration), new CBCCipherProvider(configuration));
+    var encrypted = cbcEncryptor.encrypt(serialized);
+    var encoded = Base64.getUrlEncoder().encodeToString(encrypted);
+
+    simulator.test("/flash-scope/")
+             .withCookie(configuration.messageFlashScopeCookieName(), encoded)
+             .get()
+             .assertStatusCode(200)
+             .assertContainsGeneralMessageCodes(MessageType.INFO, "[FlashScopeMessageKey]")
+             .assertBodyContainsMessagesFromKey("[FlashScopeMessageKey]")
+             .assertBody("""
+                             This is an index page.
+                             
+                               Info:This is a message!
+                             
+                             """)
+    ;
+  }
+
+  @Test
   public void get() throws Exception {
     // Not called yet
     assertEquals(MockMVCWorkflowFinalizer.Called.get(), 0);
@@ -1038,38 +1065,11 @@ public class GlobalTest extends PrimeBaseTest {
                                                           .assertBodyContainsMessagesFromKey("[FlashScopeMessageKey]")
                                                           .assertBody("""
                                                                           This is an index page.
-                                                                                               
+                                                                          
                                                                             Info:This is a message!
-                                                                            
+                                                                          
                                                                           """)
              );
-  }
-
-  @Test
-  public void flash_scope_compatibility() throws Exception {
-    // Use case: MVC is able to decrypt a flash message cookie that was encrypted with legacy methods
-    // Create a SimpleMessage, serialize, encrypt, and encode. The message text is hard-coded here because there is no context to look up the message.
-    var message = new SimpleMessage(MessageType.INFO, "[FlashScopeMessageKey]", "This is a message!");
-    // Serialize List<Message>
-    var serialized = objectMapper.writeValueAsBytes(List.of(message));
-    // Instantiate DefaultEncryptor with two copies of CBCCipherProvider to encrypt with CBC
-    Encryptor cbcEncryptor = new DefaultEncryptor(new CBCCipherProvider(configuration), new CBCCipherProvider(configuration));
-    var encrypted = cbcEncryptor.encrypt(serialized);
-    var encoded = Base64.getUrlEncoder().encodeToString(encrypted);
-
-    simulator.test("/flash-scope/")
-             .withCookie(configuration.messageFlashScopeCookieName(), encoded)
-             .get()
-             .assertStatusCode(200)
-             .assertContainsGeneralMessageCodes(MessageType.INFO, "[FlashScopeMessageKey]")
-             .assertBodyContainsMessagesFromKey("[FlashScopeMessageKey]")
-             .assertBody("""
-                             This is an index page.
-                                                  
-                               Info:This is a message!
-                               
-                             """)
-    ;
   }
 
   @Test
@@ -1099,6 +1099,12 @@ public class GlobalTest extends PrimeBaseTest {
              .get()
              .assertStatusCode(200)
              .assertBodyContains("Yo, nice template.");
+
+    // uses a message key that's not found
+    simulator.test("/freemarker/missing-message-template")
+             .get()
+             .assertStatusCode(200)
+             .assertBodyContains("Yo, nice template.", "the default message");
 
     // Double slash, redirect to the correct location
     simulator.test("/freemarker//stand-alone-template")
@@ -1961,7 +1967,7 @@ public class GlobalTest extends PrimeBaseTest {
                                  "message" : "Invalid [Content-Type] HTTP request header value of [application/test+json]. Supported values for this request include [application/json]."
                                } ]
                              }
-                              """);
+                             """);
 
     // Patch not supported on this endpoint
     simulator.test("/json-content-type-no-restriction")
@@ -1981,7 +1987,7 @@ public class GlobalTest extends PrimeBaseTest {
                                  "message" : "The [Content-Type] HTTP request header value of [application/json-patch+json] is not supported for this request."
                                } ]
                              }
-                              """);
+                             """);
 
     // Missing Content-Type Header
     simulator.test("/json-content-type")
@@ -2028,7 +2034,7 @@ public class GlobalTest extends PrimeBaseTest {
                                  "message" : "Invalid [Content-Type] HTTP request header value of [application/klingon]. Supported values for this request include [application/json]."
                                } ]
                              }
-                              """);
+                             """);
 
     // Not supported in general
     simulator.test("/json-content-type-no-restriction")
