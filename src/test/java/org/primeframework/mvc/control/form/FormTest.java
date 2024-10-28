@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2023, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,7 +70,7 @@ public class FormTest extends ControlBaseTest {
     request.setContextPath("/context");
     IndexAction index = new IndexAction();
     ais.setCurrent(new ActionInvocation(index, null, "/user/", null,
-                                        new ActionConfiguration(IndexAction.class, false, null, null, null, new ArrayList<>(), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null, null)));
+                                        new ActionConfiguration(IndexAction.class, false, null, null, null, new ArrayList<>(), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null, null, null)));
     new ControlTester(form).
         attr("action", "https://www.google.com").
         attr("method", "POST").
@@ -85,7 +85,7 @@ public class FormTest extends ControlBaseTest {
     request.setPath("/user/");
     IndexAction index = new IndexAction();
     ais.setCurrent(new ActionInvocation(index, null, "/user/", null,
-                                        new ActionConfiguration(IndexAction.class, false, null, null, null, new ArrayList<>(), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null, null)));
+                                        new ActionConfiguration(IndexAction.class, false, null, null, null, new ArrayList<>(), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null, null, null)));
 
     new ControlTester(form).
         attr("action", "/user/").
@@ -102,7 +102,7 @@ public class FormTest extends ControlBaseTest {
     request.setContextPath("/context");
     IndexAction index = new IndexAction();
     ais.setCurrent(new ActionInvocation(index, null, "/user/", null,
-                                        new ActionConfiguration(IndexAction.class, false, null, null, null, new ArrayList<>(), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null, null)));
+                                        new ActionConfiguration(IndexAction.class, false, null, null, null, new ArrayList<>(), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null, null, null)));
 
     new ControlTester(form).
         attr("action", "/user/").
@@ -118,7 +118,7 @@ public class FormTest extends ControlBaseTest {
     request.setPath("/user/");
     IndexAction index = new IndexAction();
     ais.setCurrent(new ActionInvocation(index, null, "/user/", null,
-                                        new ActionConfiguration(IndexAction.class, false, null, null, null, new ArrayList<>(), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null, null)));
+                                        new ActionConfiguration(IndexAction.class, false, null, null, null, new ArrayList<>(), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null, null, null)));
 
     new ControlTester(form).
         attr("action", "https://www.google.com").
@@ -149,7 +149,7 @@ public class FormTest extends ControlBaseTest {
     request.setPath("/user/edit");
     EditAction edit = new EditAction();
     ais.setCurrent(new ActionInvocation(edit, null, "/user/edit", null,
-                                        new ActionConfiguration(IndexAction.class, false, null, null, null, List.of(EditAction.class.getMethod("formPrepare")), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null, null)));
+                                        new ActionConfiguration(IndexAction.class, false, null, null, null, List.of(EditAction.class.getMethod("formPrepare")), null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, null, "/user/", null, null, null, null)));
     new ControlTester(form).
         attr("action", "/user/edit").
         attr("method", "POST").

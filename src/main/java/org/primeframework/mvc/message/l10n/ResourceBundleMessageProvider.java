@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2019, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.primeframework.mvc.message.l10n;
 import java.util.Formatter;
 import java.util.LinkedList;
 import java.util.MissingResourceException;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.ResourceBundle;
 import java.util.ResourceBundle.Control;
@@ -25,6 +26,8 @@ import java.util.ResourceBundle.Control;
 import com.google.inject.Inject;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
+import org.primeframework.mvc.action.annotation.AlternateMessageResources;
+import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.locale.LocaleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -120,24 +123,25 @@ public class ResourceBundleMessageProvider implements MessageProvider {
 
   /**
    * Finds the message in a resource bundle using the search method described in the class comment.
+   * If the action was annotated with a {@link AlternateMessageResources} annotation
+   * and the message was not found with the request's action, that action will be searched as well.
    *
    * @param actionInvocation The action invocation.
    * @param key              The key of the message.
    * @return The message or null if it doesn't exist.
    */
   protected String findMessage(ActionInvocation actionInvocation, String key) {
-    String uri = actionInvocation.actionURI;
-    Queue<String> names = determineBundles(uri);
-    for (String name : names) {
-      try {
-        ResourceBundle rb = ResourceBundle.getBundle(name, localeProvider.get(), control);
-        return rb.getString(key);
-      } catch (MissingResourceException ignore) {
-        // Ignore and check the next bundle
-      }
+    String message = findMessage(actionInvocation.actionURI, key);
+    if (message != null) {
+      return message;
     }
 
-    return null;
+    ActionConfiguration config = actionInvocation.configuration;
+    return config.alternateMessageURIs.stream()
+                                      .map(uri -> findMessage(uri, key))
+                                      .filter(Objects::nonNull)
+                                      .findFirst()
+                                      .orElse(null);
   }
 
   /**
@@ -152,6 +156,27 @@ public class ResourceBundleMessageProvider implements MessageProvider {
       int index = key.indexOf(']', 1);
       if (index != -1) {
         return findMessage(actionInvocation, key.substring(0, index + 1));
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Finds the message in a resource bundle using the search method described in the class comment.
+   *
+   * @param uri The action URI to use for searching.
+   * @param key The key of the message.
+   * @return The message or null if it doesn't exist.
+   */
+  private String findMessage(String uri, String key) {
+    Queue<String> names = determineBundles(uri);
+    for (String name : names) {
+      try {
+        ResourceBundle rb = ResourceBundle.getBundle(name, localeProvider.get(), control);
+        return rb.getString(key);
+      } catch (MissingResourceException ignore) {
+        // Ignore and check the next bundle
       }
     }
 

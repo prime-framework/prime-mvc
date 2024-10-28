@@ -74,8 +74,8 @@ import org.primeframework.mvc.message.scope.ApplicationScope;
 import org.primeframework.mvc.message.scope.CookieFlashScope;
 import org.primeframework.mvc.message.scope.FlashScope;
 import org.primeframework.mvc.message.scope.RequestScope;
-import org.primeframework.mvc.security.CipherProvider;
 import org.primeframework.mvc.security.CBCCipherProvider;
+import org.primeframework.mvc.security.CipherProvider;
 import org.primeframework.mvc.security.GCMCipherProvider;
 import org.primeframework.mvc.security.MockStaticClasspathResourceFilter;
 import org.primeframework.mvc.security.MockStaticResourceFilter;
@@ -296,7 +296,7 @@ public abstract class PrimeBaseTest {
     resultConfigurations.put(resultCode, annotation);
 
     return new ActionInvocation(action, executeMethod, uri, extension,
-                                new ActionConfiguration(EditAction.class, false, null, executeMethods, validationMethods, new ArrayList<>(), null, null, new ArrayList<>(), new HashMap<>(), new ArrayList<>(), resultConfigurations, new HashMap<>(), null, new HashMap<>(), new HashSet<>(), Collections.emptyList(), new ArrayList<>(), new HashMap<>(), uri, new ArrayList<>(), null, null));
+                                new ActionConfiguration(EditAction.class, false, null, executeMethods, validationMethods, new ArrayList<>(), null, null, new ArrayList<>(), new HashMap<>(), new ArrayList<>(), resultConfigurations, new HashMap<>(), null, new HashMap<>(), new HashSet<>(), Collections.emptyList(), new ArrayList<>(), new HashMap<>(), uri, new ArrayList<>(), null, null, null));
   }
 
   /**
@@ -351,20 +351,20 @@ public abstract class PrimeBaseTest {
 
       // Intentionally leaving empty lines here
       System.out.println("""
-                                                    
-                                   
-                                                    
+                             
+                             
+                             
                              Test failure
                              -----------------
                              Exception: {{exception}}
                              Message: {{message}}
-                                                  
+                             
                              HTTP Trace:
                              {{trace}}
                              -----------------                      
-                              """.replace("{{exception}}", throwable != null ? throwable.getClass().getSimpleName() : "-")
-                                 .replace("{{message}}", throwable != null ? (throwable.getMessage() != null ? throwable.getMessage() : "-") : "-")
-                                 .replace("{{trace}}", trace.equals("") ? "[-]" : trace));
+                             """.replace("{{exception}}", throwable != null ? throwable.getClass().getSimpleName() : "-")
+                                .replace("{{message}}", throwable != null ? (throwable.getMessage() != null ? throwable.getMessage() : "-") : "-")
+                                .replace("{{trace}}", trace.equals("") ? "[-]" : trace));
     }
 
     @Override
