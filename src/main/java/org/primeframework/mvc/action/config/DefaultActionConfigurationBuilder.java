@@ -138,13 +138,13 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
     Field unknownParametersField = findUnknownParametersField(actionClass);
     Set<String> validContentTypes = findAllowedContentTypes(actionClass);
 
-    List<String> fallbackActionMessageURIs = Optional.ofNullable(actionClass.getAnnotation(AlternateMessageResources.class))
-                                                     .map(alternates -> Arrays.stream(alternates.actions())
-                                                                              .map(uriBuilder::build)
-                                                                              .toList())
-                                                     .orElse(List.of());
+    List<String> alternateMessageURIs = Optional.ofNullable(actionClass.getAnnotation(AlternateMessageResources.class))
+                                                .map(alternate -> Arrays.stream(alternate.actions())
+                                                                        .map(uriBuilder::build)
+                                                                        .toList())
+                                                .orElse(List.of());
 
-    return new ActionConfiguration(actionClass, allowKnownParameters, constraintValidationMethods, executeMethods, validationMethods, formPrepareMethods, authorizationMethods, jwtAuthorizationMethods, postValidationMethods, preParameterMethods, postParameterMethods, resultAnnotations, preParameterMembers, preRenderMethodsMap, fileUploadMembers, memberNames, securitySchemes, scopeFields, additionalConfiguration, uri, preValidationMethods, unknownParametersField, validContentTypes, fallbackActionMessageURIs);
+    return new ActionConfiguration(actionClass, allowKnownParameters, constraintValidationMethods, executeMethods, validationMethods, formPrepareMethods, authorizationMethods, jwtAuthorizationMethods, postValidationMethods, preParameterMethods, postParameterMethods, resultAnnotations, preParameterMembers, preRenderMethodsMap, fileUploadMembers, memberNames, securitySchemes, scopeFields, additionalConfiguration, uri, preValidationMethods, unknownParametersField, validContentTypes, alternateMessageURIs);
   }
 
   /**
