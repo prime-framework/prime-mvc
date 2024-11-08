@@ -616,7 +616,7 @@ public class GlobalTest extends PrimeBaseTest {
   public void get_fullFormWithAllAttributes() throws Exception {
     simulator.test("/user/full-form")
              .get()
-             .assertBodyFile(Path.of("src/test/resources/html/full-form.html"));
+             .assertBody(Files.readString(Path.of("src/test/resources/html/full-form.html")).trim());
   }
 
   @Test
@@ -792,7 +792,7 @@ public class GlobalTest extends PrimeBaseTest {
   public void get_metrics() throws Exception {
     simulator.test("/user/full-form")
              .get()
-             .assertBodyFile(Path.of("src/test/resources/html/full-form.html"));
+             .assertBody(Files.readString(Path.of("src/test/resources/html/full-form.html")).trim());
 
     Map<String, Timer> timers = metricRegistry.getTimers();
     assertEquals(timers.get("prime-mvc.[/user/full-form].requests").getCount(), 1);
