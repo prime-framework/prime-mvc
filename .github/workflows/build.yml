@@ -33,6 +33,8 @@ jobs:
           17=${JAVA_HOME_17}
           21=${JAVA_HOME_21}
           EOF
+          echo "~/.savant/plugins/org.savantbuild.plugin.java.properties"
+          cat ~/.savant/plugins/org.savantbuild.plugin.java.properties
       # Takes some time, better to tell difference between this step and actual test run time
       - name: compile/pull Savant dependencies
         run: |
