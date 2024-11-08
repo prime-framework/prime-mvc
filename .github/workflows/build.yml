@@ -30,15 +30,15 @@ jobs:
           mkdir -p ~/.savant/plugins
           # For now, using the JDK that comes on the GHA runner
           cat << EOF > ~/.savant/plugins/org.savantbuild.plugin.java.properties
-          17=${JAVA_HOME_17}
-          21=${JAVA_HOME_21}
+          17=${JAVA_HOME_17_ARM64}
+          21=${JAVA_HOME_21_ARM64}
           EOF
           echo "~/.savant/plugins/org.savantbuild.plugin.java.properties"
           cat ~/.savant/plugins/org.savantbuild.plugin.java.properties
       # Takes some time, better to tell difference between this step and actual test run time
       - name: compile/pull Savant dependencies
         run: |
-          $JAVA_HOME_17/bin/java -version
+          $JAVA_HOME_17_ARM64/bin/java -version
           sb --version
           sb clean compile
       - name: set locale
