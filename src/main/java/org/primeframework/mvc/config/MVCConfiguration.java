@@ -135,7 +135,7 @@ public interface MVCConfiguration {
 
   /**
    * @return The number of seconds to check for Freemarker template updates (max integer means never and 0 means
-   * always).
+   *     always).
    */
   int templateCheckSeconds();
 
@@ -146,7 +146,7 @@ public interface MVCConfiguration {
 
   /**
    * @return The annotations that identify a field to be un-wrapped - or be considered transparent by the
-   * {@link ExpressionEvaluator}.
+   *     {@link ExpressionEvaluator}.
    */
   List<Class<? extends Annotation>> unwrapAnnotations();
 }

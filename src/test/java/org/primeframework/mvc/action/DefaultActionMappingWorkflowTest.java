@@ -42,33 +42,9 @@ import static org.testng.Assert.assertTrue;
  */
 public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
   @Test
-  public void differentButtonClick() throws Exception {
-    request.setPath("/admin/user/edit");
-    request.setMethod(HTTPMethod.POST);
-    request.addURLParameter("__a_submit", "");
-    request.addURLParameter("__a_cancel", "/admin/user/cancel");
-    request.addURLParameter("cancel", "Cancel");
-
-    run("/admin/user/cancel", "/admin/user/cancel", null);
-  }
-
-  @Test
-  public void differentButtonClickRelativeURI() throws Exception {
-    request.setPath("/admin/user/edit");
-    request.setMethod(HTTPMethod.POST);
-    request.addURLParameter("__a_submit", "");
-    request.addURLParameter("__a_cancel", "cancel");
-    request.addURLParameter("cancel", "Cancel");
-
-    run("/admin/user/cancel", "/admin/user/cancel", null);
-  }
-
-  @Test
   public void extension() throws Exception {
     request.setPath("/admin/user/edit.xml");
     request.setMethod(HTTPMethod.POST);
-    request.addURLParameter("__a_submit", "");
-    request.addURLParameter("__a_cancel", "cancel");
     request.addURLParameter("submit", "Submit");
 
     run("/admin/user/edit.xml", "/admin/user/edit", "xml");
@@ -78,8 +54,6 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
   public void requestURI() throws Exception {
     request.setPath("/admin/user/edit");
     request.setMethod(HTTPMethod.POST);
-    request.addURLParameter("__a_submit", "");
-    request.addURLParameter("__a_cancel", "cancel");
     request.addURLParameter("submit", "Submit");
 
     run("/admin/user/edit", "/admin/user/edit", null);
@@ -90,8 +64,6 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     request.setPath("/context-path/admin/user/edit");
     request.setContextPath("/context-path");
     request.setMethod(HTTPMethod.POST);
-    request.addURLParameter("__a_submit", "");
-    request.addURLParameter("__a_cancel", "cancel");
     request.addURLParameter("submit", "Submit");
 
     run("/admin/user/edit", "/admin/user/edit", null);

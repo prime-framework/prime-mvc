@@ -209,6 +209,9 @@ public abstract class PrimeBaseTest {
     ((TestAccumulatingLogger) TestAccumulatingLoggerFactory.FACTORY.getLogger(PrimeBaseTest.class)).reset();
     TestAccumulatingLoggerFactory.FACTORY.getLogger(PrimeBaseTest.class).setLevel(Level.Trace);
 
+    // Reset
+    EditAction.getCalled = false;
+
     TestUnhandledExceptionHandler.reset();
   }
 

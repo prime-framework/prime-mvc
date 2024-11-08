@@ -105,6 +105,7 @@
       <inspection_tool class="SizeReplaceableByIsEmpty" enabled="true" level="WARNING" enabled_by_default="true">
         <option name="ignoredTypes">
           <set>
+            <option value="java.lang.String" />
             <option value="java.util.List" />
           </set>
         </option>
@@ -544,7 +545,7 @@
           <fileSet type="namedScope" name="control-templates" pattern="file[prime-mvc]:src/main/ftl/WEB-INF/control-templates/*" />
         </list>
       </option>
-      <DB2CodeStyleSettings version="6">
+      <DB2CodeStyleSettings version="7">
         <option name="KEYWORD_CASE" value="2" />
         <option name="TYPE_CASE" value="2" />
         <option name="CUSTOM_TYPE_CASE" value="2" />
@@ -584,7 +585,7 @@
         <option name="EXPR_CASE_THEN_WRAP" value="true" />
         <option name="PRIMARY_KEY_NAME_TEMPLATE" value="{table}_{columns}_pk" />
       </DB2CodeStyleSettings>
-      <DerbyCodeStyleSettings version="6">
+      <DerbyCodeStyleSettings version="7">
         <option name="KEYWORD_CASE" value="2" />
         <option name="TYPE_CASE" value="2" />
         <option name="CUSTOM_TYPE_CASE" value="2" />
@@ -628,7 +629,7 @@
         <option name="CLASS_COUNT_TO_USE_IMPORT_ON_DEMAND" value="9999" />
         <option name="NAMES_COUNT_TO_USE_IMPORT_ON_DEMAND" value="9999" />
       </GroovyCodeStyleSettings>
-      <H2CodeStyleSettings version="6">
+      <H2CodeStyleSettings version="7">
         <option name="KEYWORD_CASE" value="2" />
         <option name="TYPE_CASE" value="2" />
         <option name="CUSTOM_TYPE_CASE" value="2" />
@@ -668,7 +669,7 @@
         <option name="EXPR_CASE_THEN_WRAP" value="true" />
         <option name="PRIMARY_KEY_NAME_TEMPLATE" value="{table}_{columns}_pk" />
       </H2CodeStyleSettings>
-      <HSQLCodeStyleSettings version="6">
+      <HSQLCodeStyleSettings version="7">
         <option name="KEYWORD_CASE" value="2" />
         <option name="TYPE_CASE" value="2" />
         <option name="CUSTOM_TYPE_CASE" value="2" />
@@ -732,7 +733,7 @@
         <option name="JD_PRESERVE_LINE_FEEDS" value="true" />
         <option name="JD_INDENT_ON_CONTINUATION" value="true" />
       </JavaCodeStyleSettings>
-      <MSSQLCodeStyleSettings version="6">
+      <MSSQLCodeStyleSettings version="7">
         <option name="KEYWORD_CASE" value="2" />
         <option name="TYPE_CASE" value="2" />
         <option name="CUSTOM_TYPE_CASE" value="2" />
@@ -775,7 +776,7 @@
       <MarkdownNavigatorCodeStyleSettings>
         <option name="WRAP_ON_TYPING" value="0" />
       </MarkdownNavigatorCodeStyleSettings>
-      <MySQLCodeStyleSettings version="6">
+      <MySQLCodeStyleSettings version="7">
         <option name="KEYWORD_CASE" value="2" />
         <option name="TYPE_CASE" value="2" />
         <option name="CUSTOM_TYPE_CASE" value="2" />
@@ -815,7 +816,7 @@
         <option name="EXPR_CASE_THEN_WRAP" value="true" />
         <option name="PRIMARY_KEY_NAME_TEMPLATE" value="{table}_{columns}_pk" />
       </MySQLCodeStyleSettings>
-      <OracleCodeStyleSettings version="6">
+      <OracleCodeStyleSettings version="7">
         <option name="KEYWORD_CASE" value="2" />
         <option name="TYPE_CASE" value="2" />
         <option name="CUSTOM_TYPE_CASE" value="2" />
@@ -861,7 +862,7 @@
         <option name="PHPDOC_BLANK_LINES_AROUND_PARAMETERS" value="true" />
         <option name="PHPDOC_WRAP_LONG_LINES" value="true" />
       </PHPCodeStyleSettings>
-      <PostgresCodeStyleSettings version="6">
+      <PostgresCodeStyleSettings version="7">
         <option name="KEYWORD_CASE" value="2" />
         <option name="TYPE_CASE" value="2" />
         <option name="CUSTOM_TYPE_CASE" value="2" />
@@ -904,7 +905,7 @@
       <Properties>
         <option name="KEEP_BLANK_LINES" value="true" />
       </Properties>
-      <SQLiteCodeStyleSettings version="6">
+      <SQLiteCodeStyleSettings version="7">
         <option name="KEYWORD_CASE" value="2" />
         <option name="TYPE_CASE" value="2" />
         <option name="CUSTOM_TYPE_CASE" value="2" />
@@ -947,7 +948,7 @@
       <ScalaCodeStyleSettings>
         <option name="MULTILINE_STRING_CLOSING_QUOTES_ON_NEW_LINE" value="true" />
       </ScalaCodeStyleSettings>
-      <SqlCodeStyleSettings version="6">
+      <SqlCodeStyleSettings version="7">
         <option name="KEYWORD_CASE" value="2" />
         <option name="TYPE_CASE" value="2" />
         <option name="CUSTOM_TYPE_CASE" value="2" />
@@ -1012,7 +1013,7 @@
         <option name="WRAP_PARENTHESIZED_EXPRESSION_INSIDE_VALUES" value="0" />
         <option name="NEW_LINE_AFTER_SELECT_ITEM" value="false" />
       </SqlCodeStyleSettings>
-      <SybaseCodeStyleSettings version="6">
+      <SybaseCodeStyleSettings version="7">
         <option name="KEYWORD_CASE" value="2" />
         <option name="TYPE_CASE" value="2" />
         <option name="CUSTOM_TYPE_CASE" value="2" />

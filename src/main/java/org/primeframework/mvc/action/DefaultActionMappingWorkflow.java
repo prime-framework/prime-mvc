@@ -16,7 +16,6 @@
 package org.primeframework.mvc.action;
 
 import java.io.IOException;
-import java.util.Set;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
@@ -28,7 +27,6 @@ import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.NotAllowedException;
 import org.primeframework.mvc.http.HTTPTools;
 import org.primeframework.mvc.http.Status;
-import org.primeframework.mvc.parameter.DefaultParameterParser;
 import org.primeframework.mvc.parameter.InternalParameters;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.slf4j.Logger;
@@ -142,33 +140,11 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
   }
 
   private String determineURI() {
-    String uri = null;
-    Set<String> keys = request.getParameters().keySet();
-    for (String key : keys) {
-      if (key.startsWith(DefaultParameterParser.ACTION_PREFIX)) {
-        String actionParameterName = key.substring(4);
-        String actionParameterValue = request.getParameter(key);
-        if (request.getParameter(actionParameterName) != null && actionParameterValue.trim().length() > 0) {
-          uri = actionParameterValue;
-
-          // Handle relative URIs
-          if (!uri.startsWith("/")) {
-            String requestURI = HTTPTools.getRequestURI(request);
-            int index = requestURI.lastIndexOf('/');
-            if (index >= 0) {
-              uri = requestURI.substring(0, index) + "/" + uri;
-            }
-          }
-        }
-      }
+    String uri = HTTPTools.getRequestURI(request);
+    if (!uri.startsWith("/")) {
+      uri = "/" + uri;
     }
 
-    if (uri == null) {
-      uri = HTTPTools.getRequestURI(request);
-      if (!uri.startsWith("/")) {
-        uri = "/" + uri;
-      }
-    }
     return uri;
   }
 }
