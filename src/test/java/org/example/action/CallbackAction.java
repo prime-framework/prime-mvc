@@ -53,7 +53,8 @@ public class CallbackAction {
     messageStore.add(new SimpleMessage(MessageType.INFO, "[INFO]", messageProvider.getMessage("[INFO]")));
     messageStore.add(new SimpleMessage(MessageType.WARNING, "[WARNING]", messageProvider.getMessage("[WARNING]")));
 
-    // Call another endpoint that adds messages to the message store
+    // Call another endpoint that adds messages to the message store - we want to ensure those messages are scoped
+    // with the request we make here using HttpClient, NOT with the request we are handling
     URI url = URI.create(request.getBaseURL() + "/message-store");
     var request = HttpRequest.newBuilder(url)
                              .GET()

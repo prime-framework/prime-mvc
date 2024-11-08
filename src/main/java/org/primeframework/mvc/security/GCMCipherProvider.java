@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2020, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2016-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package org.primeframework.mvc.security;
 
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -27,31 +28,31 @@ import com.google.inject.Inject;
 import org.primeframework.mvc.config.MVCConfiguration;
 
 /**
- * Default implementation that generates a new key on startup. This will render all existing Saved Requests useless.
+ * AES/GCM cipher provider implementation
  *
- * @author Brian Pontarelli
+ * @author Spencer Witt
  */
-public class DefaultCipherProvider implements CipherProvider {
+public class GCMCipherProvider implements CipherProvider {
   private final Key key;
 
   @Inject
-  public DefaultCipherProvider(MVCConfiguration configuration) {
+  public GCMCipherProvider(MVCConfiguration configuration) {
     this.key = configuration.cookieEncryptionKey();
   }
 
   @Override
   public Cipher getDecryptor(byte[] iv)
       throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
-    Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-    cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(iv));
+    Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+    cipher.init(Cipher.DECRYPT_MODE, key, new GCMParameterSpec(128, iv));
     return cipher;
   }
 
   @Override
   public Cipher getEncryptor(byte[] iv)
       throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
-    Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-    cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(iv));
+    Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+    cipher.init(Cipher.ENCRYPT_MODE, key, new GCMParameterSpec(128, iv));
     return cipher;
   }
 }

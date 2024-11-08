@@ -33,9 +33,10 @@ import org.primeframework.mvc.action.result.SaveRequestResult.SaveRequestImpl;
 import org.primeframework.mvc.action.result.annotation.SaveRequest;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
-import org.primeframework.mvc.security.DefaultCipherProvider;
+import org.primeframework.mvc.security.CBCCipherProvider;
 import org.primeframework.mvc.security.DefaultEncryptor;
 import org.primeframework.mvc.security.Encryptor;
+import org.primeframework.mvc.security.GCMCipherProvider;
 import org.primeframework.mvc.security.saved.SavedHttpRequest;
 import org.primeframework.mvc.util.CookieTools;
 import org.testng.annotations.DataProvider;
@@ -81,7 +82,7 @@ public class SaveRequestResultTest extends PrimeBaseTest {
     request.addURLParameter("param1", "value1");
     request.addURLParameter("param2", "value2");
 
-    Encryptor encryptor = new DefaultEncryptor(new DefaultCipherProvider(configuration));
+    Encryptor encryptor = new DefaultEncryptor(new CBCCipherProvider(configuration), new GCMCipherProvider(configuration));
     SaveRequest annotation = new SaveRequestImpl("/login", "unauthenticated", true, false, false);
     SaveRequestResult result = new SaveRequestResult(messageStore, expressionEvaluator, response, request, store, configuration, encryptor, objectMapper);
     result.execute(annotation);
@@ -112,7 +113,7 @@ public class SaveRequestResultTest extends PrimeBaseTest {
     request.addURLParameter("param2", "value2");
     request.addHeader("Origin", origin);
 
-    Encryptor encryptor = new DefaultEncryptor(new DefaultCipherProvider(configuration));
+    Encryptor encryptor = new DefaultEncryptor(new CBCCipherProvider(configuration), new GCMCipherProvider(configuration));
     SaveRequest annotation = new SaveRequestImpl("/login", "unauthenticated", true, false, allowPost);
     SaveRequestResult result = new SaveRequestResult(messageStore, expressionEvaluator, response, request, store, configuration, encryptor, objectMapper);
     result.execute(annotation);
@@ -155,7 +156,7 @@ public class SaveRequestResultTest extends PrimeBaseTest {
     request.addURLParameter("largeParam3", parameters.get("largeParam3").getFirst());
     request.addURLParameter("largeParam4", parameters.get("largeParam4").getFirst());
 
-    Encryptor encryptor = new DefaultEncryptor(new DefaultCipherProvider(configuration));
+    Encryptor encryptor = new DefaultEncryptor(new CBCCipherProvider(configuration), new GCMCipherProvider(configuration));
     SaveRequest annotation = new SaveRequestImpl("/login", "unauthenticated", true, false, false);
     SaveRequestResult result = new SaveRequestResult(messageStore, expressionEvaluator, response, request, store, configuration, encryptor, objectMapper);
     result.execute(annotation);

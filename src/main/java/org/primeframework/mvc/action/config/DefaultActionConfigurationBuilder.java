@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2023, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -44,6 +45,7 @@ import org.primeframework.mvc.action.PreParameterMethodConfiguration;
 import org.primeframework.mvc.action.ValidationMethodConfiguration;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.annotation.AllowUnknownParameters;
+import org.primeframework.mvc.action.annotation.AlternateMessageResources;
 import org.primeframework.mvc.action.result.annotation.ResultAnnotation;
 import org.primeframework.mvc.action.result.annotation.ResultContainerAnnotation;
 import org.primeframework.mvc.content.ValidContentTypes;
@@ -136,7 +138,13 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
     Field unknownParametersField = findUnknownParametersField(actionClass);
     Set<String> validContentTypes = findAllowedContentTypes(actionClass);
 
-    return new ActionConfiguration(actionClass, allowKnownParameters, constraintValidationMethods, executeMethods, validationMethods, formPrepareMethods, authorizationMethods, jwtAuthorizationMethods, postValidationMethods, preParameterMethods, postParameterMethods, resultAnnotations, preParameterMembers, preRenderMethodsMap, fileUploadMembers, memberNames, securitySchemes, scopeFields, additionalConfiguration, uri, preValidationMethods, unknownParametersField, validContentTypes);
+    List<String> alternateMessageURIs = Optional.ofNullable(actionClass.getAnnotation(AlternateMessageResources.class))
+                                                .map(alternate -> Arrays.stream(alternate.actions())
+                                                                        .map(uriBuilder::build)
+                                                                        .toList())
+                                                .orElse(List.of());
+
+    return new ActionConfiguration(actionClass, allowKnownParameters, constraintValidationMethods, executeMethods, validationMethods, formPrepareMethods, authorizationMethods, jwtAuthorizationMethods, postValidationMethods, preParameterMethods, postParameterMethods, resultAnnotations, preParameterMembers, preRenderMethodsMap, fileUploadMembers, memberNames, securitySchemes, scopeFields, additionalConfiguration, uri, preValidationMethods, unknownParametersField, validContentTypes, alternateMessageURIs);
   }
 
   /**

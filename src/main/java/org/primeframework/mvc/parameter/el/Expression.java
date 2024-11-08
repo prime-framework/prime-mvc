@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2023, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -126,7 +126,7 @@ public class Expression {
     // Peek at the next atom, in case this is an array
     Object key = hasNext() ? peek() : null;
     Object value = accessor.createValue(key);
-    accessor.set(current, value, this);
+    setCurrentValue(value);
     return value;
   }
 
@@ -135,11 +135,33 @@ public class Expression {
   }
 
   public void setCurrentValue(String[] values) {
-    accessor.set(current, values, this);
+    try {
+      accessor.set(current, values, this);
+    } catch (UnsupportedOperationException e) {
+      // Re-using allowUnknownParameters. At runtime, if this exception is thrown
+      // it means someone is trying to set something we did not intend. We can safely
+      // treat this as an unknown parameter and ignore this exception.
+      if (configuration.allowUnknownParameters()) {
+        return;
+      }
+
+      throw e;
+    }
   }
 
   public void setCurrentValue(Object value) {
-    accessor.set(current, value, this);
+    try {
+      accessor.set(current, value, this);
+    } catch (UnsupportedOperationException e) {
+      // Re-using allowUnknownParameters. At runtime, if this exception is thrown
+      // it means someone is trying to set something we did not intend. We can safely
+      // treat this as an unknown parameter and ignore this exception.
+      if (configuration.allowUnknownParameters()) {
+        return;
+      }
+
+      throw e;
+    }
   }
 
   private boolean hasNext() {

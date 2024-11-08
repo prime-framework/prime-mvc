@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +17,22 @@ package org.primeframework.mvc.message.l10n;
 
 import java.nio.file.Path;
 import java.util.Locale;
+import java.util.Set;
 
 import io.fusionauth.http.server.HTTPContext;
+import org.example.action.AlternateMessageResourcesAnnotatedAction;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
+import org.primeframework.mvc.action.config.ActionConfiguration;
+import org.primeframework.mvc.action.config.DefaultActionConfigurationBuilder;
 import org.primeframework.mvc.container.ServletContainerResolver;
 import org.primeframework.mvc.locale.LocaleProvider;
+import org.primeframework.mvc.util.DefaultURIBuilder;
 import org.testng.annotations.Test;
 import static org.easymock.EasyMock.createStrictMock;
 import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.mock;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.testng.Assert.assertEquals;
@@ -38,15 +44,19 @@ import static org.testng.Assert.fail;
  * @author Brian Pontarelli
  */
 public class ResourceBundleMessageProviderTest extends PrimeBaseTest {
+  // most of these tests do not care what the action config is but in the real world, ResourceBundleMessageProvider
+  // objects always have an action config
+  private static final ActionConfiguration actionConfiguration;
+
   @Test
   public void defaultMessages() {
     HTTPContext context = new HTTPContext(Path.of("src/test/java"));
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/l10n/", null, null)).times(4);
+    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/l10n/", null, actionConfiguration)).times(4);
     replay(store);
 
     LocaleProvider localeProvider = createStrictMock(LocaleProvider.class);
-    expect(localeProvider.get()).andReturn(Locale.US).times(15);
+    expect(localeProvider.get()).andReturn(Locale.US).anyTimes();
     replay(localeProvider);
 
     ResourceBundleMessageProvider provider = new ResourceBundleMessageProvider(localeProvider, new WebControl(new ServletContainerResolver(context), configuration), store);
@@ -65,13 +75,33 @@ public class ResourceBundleMessageProviderTest extends PrimeBaseTest {
   }
 
   @Test
+  public void findMessage_Multiple() {
+    // arrange
+    HTTPContext context = new HTTPContext(Path.of("src/test/web"));
+    LocaleProvider localeProvider = mock(LocaleProvider.class);
+    expect(localeProvider.get()).andReturn(Locale.US).anyTimes();
+    ActionInvocationStore store = mock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/alternate-message-resources-annotated", null, actionConfiguration)).anyTimes();
+    replay(store);
+    replay(localeProvider);
+
+    // act
+    ResourceBundleMessageProvider provider = new ResourceBundleMessageProvider(localeProvider, new WebControl(new ServletContainerResolver(context), configuration), store);
+
+    // assert
+    assertEquals(provider.getMessage("format_key", "b", "a", "c"), "Super Package Message b a c");
+    assertEquals(provider.getMessage("normal_message"), "Normal message");
+    assertEquals(provider.getMessage("nested_message"), "Nested message");
+  }
+
+  @Test
   public void format() {
     HTTPContext context = new HTTPContext(Path.of("src/test/java"));
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/l10n/Test", null, null));
-    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/l10n/NonExistent", null, null));
-    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/badPackage/Test", null, null));
-    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/l10n/Test", null, null));
+    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/l10n/Test", null, actionConfiguration));
+    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/l10n/NonExistent", null, actionConfiguration));
+    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/badPackage/Test", null, actionConfiguration));
+    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/l10n/Test", null, actionConfiguration));
     replay(store);
 
     LocaleProvider localeProvider = createStrictMock(LocaleProvider.class);
@@ -94,11 +124,11 @@ public class ResourceBundleMessageProviderTest extends PrimeBaseTest {
   public void missing() {
     HTTPContext context = new HTTPContext(Path.of("src/test/java"));
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/l10n/Test", null, null)).times(2);
+    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/l10n/Test", null, actionConfiguration)).times(2);
     replay(store);
 
     LocaleProvider localeProvider = createStrictMock(LocaleProvider.class);
-    expect(localeProvider.get()).andReturn(Locale.US).times(3);
+    expect(localeProvider.get()).andReturn(Locale.US).anyTimes();
     replay(localeProvider);
 
     ResourceBundleMessageProvider provider = new ResourceBundleMessageProvider(localeProvider, new WebControl(new ServletContainerResolver(context), configuration), store);
@@ -116,10 +146,10 @@ public class ResourceBundleMessageProviderTest extends PrimeBaseTest {
   public void search() {
     HTTPContext context = new HTTPContext(Path.of("src/test/java"));
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
-    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/l10n/Test", null, null));
-    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/l10n/NonExistent", null, null));
-    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/badPackage/Test", null, null));
-    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/l10n/Test", null, null));
+    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/l10n/Test", null, actionConfiguration));
+    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/l10n/NonExistent", null, actionConfiguration));
+    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/badPackage/Test", null, actionConfiguration));
+    expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/l10n/Test", null, actionConfiguration));
     replay(store);
 
     LocaleProvider localeProvider = createStrictMock(LocaleProvider.class);
@@ -136,5 +166,10 @@ public class ResourceBundleMessageProviderTest extends PrimeBaseTest {
     assertEquals(provider.getMessage("key"), "Default Message");
 
     verify(store);
+  }
+
+  static {
+    actionConfiguration = new DefaultActionConfigurationBuilder(new DefaultURIBuilder(), Set.of())
+        .build(AlternateMessageResourcesAnnotatedAction.class);
   }
 }

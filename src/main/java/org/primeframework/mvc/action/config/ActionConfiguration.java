@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2023, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,6 +49,8 @@ public class ActionConfiguration {
   public final Map<Class<?>, Object> additionalConfiguration;
 
   public final boolean allowUnknownParameters;
+
+  public final List<String> alternateMessageURIs;
 
   public final Action annotation;
 
@@ -122,8 +124,8 @@ public class ActionConfiguration {
                              String uri,
                              List<Method> preValidationMethods,
                              Field unknownParametersField,
-                             Set<String> validContentTypes) {
-
+                             Set<String> validContentTypes,
+                             List<String> alternateMessageURIs) {
     Objects.requireNonNull(actionClass);
 
     this.actionClass = actionClass;
@@ -131,6 +133,7 @@ public class ActionConfiguration {
     this.constraintValidationMethods = constraintValidationMethods;
     this.formPrepareMethods = formPrepareMethods;
     this.authorizationMethods = authorizationMethods;
+    this.alternateMessageURIs = alternateMessageURIs;
     this.jwtAuthorizationMethods = jwtAuthorizationMethods;
     this.preValidationMethods = preValidationMethods;
     this.postValidationMethods = postValidationMethods;

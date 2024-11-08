@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,33 +16,37 @@
 package org.example.action;
 
 import com.google.inject.Inject;
+import org.example.action.nested.NestedMessageAction;
 import org.primeframework.mvc.action.annotation.Action;
+import org.primeframework.mvc.action.annotation.AlternateMessageResources;
 import org.primeframework.mvc.action.result.annotation.Status;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleMessage;
 import org.primeframework.mvc.message.l10n.MessageProvider;
 
-/**
- * @author Daniel DeGroff
- */
 @Action
 @Status
-public class MessageStoreAction {
+@AlternateMessageResources(actions = NestedMessageAction.class)
+public class AlternateMessageResourcesAnnotatedAction {
   private final MessageProvider messageProvider;
 
   private final MessageStore messageStore;
 
+  public String messageKey;
+
   @Inject
-  public MessageStoreAction(MessageProvider messageProvider, MessageStore messageStore) {
+  public AlternateMessageResourcesAnnotatedAction(MessageProvider messageProvider, MessageStore messageStore) {
     this.messageProvider = messageProvider;
     this.messageStore = messageStore;
   }
 
   public String get() {
-    messageStore.add(new SimpleMessage(MessageType.ERROR, "[STORE_ERROR]", messageProvider.getMessage("[STORE_ERROR]")));
-    messageStore.add(new SimpleMessage(MessageType.INFO, "[STORE_INFO]", messageProvider.getMessage("[STORE_INFO]")));
-    messageStore.add(new SimpleMessage(MessageType.WARNING, "[STORE_WARNING]", messageProvider.getMessage("[STORE_WARNING]")));
+    try {
+      messageStore.add(new SimpleMessage(MessageType.INFO, messageKey, messageProvider.getMessage(messageKey)));
+    } catch (Exception e) {
+      messageStore.add(new SimpleMessage(MessageType.ERROR, messageKey, "not found"));
+    }
     return "success";
   }
 }
