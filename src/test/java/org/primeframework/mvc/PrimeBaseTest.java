@@ -202,12 +202,18 @@ public abstract class PrimeBaseTest {
     // Reset allowUnknownParameters
     configuration.allowUnknownParameters = false;
 
+    // Reset to default
+    configuration.allowActionParameterDuringActionMappingWorkflow = true;
+
     // Reset the call count on the invocation finalizer
     MockMVCWorkflowFinalizer.Called.set(0);
 
     // Reset accumulating logger, using TRACE for now to debug some tests
     ((TestAccumulatingLogger) TestAccumulatingLoggerFactory.FACTORY.getLogger(PrimeBaseTest.class)).reset();
     TestAccumulatingLoggerFactory.FACTORY.getLogger(PrimeBaseTest.class).setLevel(Level.Trace);
+
+    // Reset
+    EditAction.getCalled = false;
 
     TestUnhandledExceptionHandler.reset();
   }

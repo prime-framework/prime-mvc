@@ -53,7 +53,24 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
   }
 
   @Test
+  public void differentButtonClick_notAllowed() throws Exception {
+    // Disable action mapping using action parameter __a_
+    configuration.allowActionParameterDuringActionMappingWorkflow = false;
+
+    request.setPath("/admin/user/edit");
+    request.setMethod(HTTPMethod.POST);
+    request.addURLParameter("__a_submit", "");
+    request.addURLParameter("__a_cancel", "/admin/user/cancel");
+    request.addURLParameter("cancel", "Cancel");
+
+    run("/admin/user/edit", "/admin/user/edit", null);
+  }
+
+  @Test
   public void differentButtonClickRelativeURI() throws Exception {
+    // enable alternate form actions
+    configuration.allowActionParameterDuringActionMappingWorkflow = true;
+
     request.setPath("/admin/user/edit");
     request.setMethod(HTTPMethod.POST);
     request.addURLParameter("__a_submit", "");
@@ -126,7 +143,7 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     chain.continueWorkflow();
     EasyMock.replay(chain);
 
-    DefaultActionMappingWorkflow workflow = new DefaultActionMappingWorkflow(request, response, store, new DefaultActionMapper(provider, injector));
+    DefaultActionMappingWorkflow workflow = new DefaultActionMappingWorkflow(request, response, store, new DefaultActionMapper(provider, injector), configuration);
     workflow.perform(chain);
 
     ActionInvocation ai = capture.getValue();
