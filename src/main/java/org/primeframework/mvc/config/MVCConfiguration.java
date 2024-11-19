@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2023, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 
 import io.fusionauth.http.Cookie.SameSite;
+import org.primeframework.mvc.parameter.DefaultParameterParser;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 
 /**
@@ -31,6 +32,13 @@ import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
  * @author Brian Pontarelli
  */
 public interface MVCConfiguration {
+  /**
+   * In most cases you should disable this feature. While it may be useful, modifying the URI may have un-intended consequences.
+   *
+   * @return true if alternate actions can be specified by using the {@link DefaultParameterParser#ACTION_PREFIX} prefix.
+   */
+  boolean allowActionParameterDuringActionMappingWorkflow();
+
   /**
    * @return true if unknown parameters should be allowed, false if they are not allowed.
    */
@@ -135,7 +143,7 @@ public interface MVCConfiguration {
 
   /**
    * @return The number of seconds to check for Freemarker template updates (max integer means never and 0 means
-   * always).
+   *     always).
    */
   int templateCheckSeconds();
 
@@ -146,7 +154,7 @@ public interface MVCConfiguration {
 
   /**
    * @return The annotations that identify a field to be un-wrapped - or be considered transparent by the
-   * {@link ExpressionEvaluator}.
+   *     {@link ExpressionEvaluator}.
    */
   List<Class<? extends Annotation>> unwrapAnnotations();
 }

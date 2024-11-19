@@ -77,6 +77,7 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertSame;
 import static org.testng.Assert.assertTrue;
+import static org.testng.AssertJUnit.assertFalse;
 import static org.testng.FileAssert.fail;
 
 /**
@@ -1174,6 +1175,31 @@ public class GlobalTest extends PrimeBaseTest {
                                      "foo.bar => [baz]",
                                      "foo/0/bar/bam => [purple]"
                                  ));
+  }
+
+  @Test
+  public void get_url_rewrite() {
+    simulator.test("/doesNotExist?__a_foo=/user/edit&foo=true")
+             .get()
+             .assertStatusCode(200)
+             .assertContainsNoFieldMessages()
+             .assertBodyContains("""
+                                     <head><title>Edit a user</title></head>
+                                     """);
+    assertTrue(EditAction.getCalled);
+
+    // Disabled
+    configuration.allowActionParameterDuringActionMappingWorkflow = false;
+
+    // Reset
+    EditAction.getCalled = false;
+
+    simulator.test("/doesNotExist?__a_foo=/user/edit&foo=true")
+             .get()
+             .assertStatusCode(404)
+             .assertContainsNoFieldMessages()
+             .assertBodyContains("The page is missing!");
+    assertFalse(EditAction.getCalled);
   }
 
   @Test

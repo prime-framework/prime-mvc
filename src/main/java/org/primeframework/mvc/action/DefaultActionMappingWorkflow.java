@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2023, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import io.fusionauth.http.HTTPMethod;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.NotAllowedException;
+import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.http.HTTPTools;
 import org.primeframework.mvc.http.Status;
 import org.primeframework.mvc.parameter.DefaultParameterParser;
@@ -47,6 +48,8 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
 
   private final ActionMapper actionMapper;
 
+  private final MVCConfiguration configuration;
+
   private final HTTPRequest request;
 
   private final HTTPResponse response;
@@ -55,11 +58,12 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
 
   @Inject
   public DefaultActionMappingWorkflow(HTTPRequest request, HTTPResponse response, ActionInvocationStore actionInvocationStore,
-                                      ActionMapper actionMapper) {
+                                      ActionMapper actionMapper, MVCConfiguration configuration) {
     this.request = request;
     this.response = response;
     this.actionInvocationStore = actionInvocationStore;
     this.actionMapper = actionMapper;
+    this.configuration = configuration;
   }
 
   /**
@@ -143,20 +147,24 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
 
   private String determineURI() {
     String uri = null;
-    Set<String> keys = request.getParameters().keySet();
-    for (String key : keys) {
-      if (key.startsWith(DefaultParameterParser.ACTION_PREFIX)) {
-        String actionParameterName = key.substring(4);
-        String actionParameterValue = request.getParameter(key);
-        if (request.getParameter(actionParameterName) != null && actionParameterValue.trim().length() > 0) {
-          uri = actionParameterValue;
 
-          // Handle relative URIs
-          if (!uri.startsWith("/")) {
-            String requestURI = HTTPTools.getRequestURI(request);
-            int index = requestURI.lastIndexOf('/');
-            if (index >= 0) {
-              uri = requestURI.substring(0, index) + "/" + uri;
+    if (configuration.allowActionParameterDuringActionMappingWorkflow()) {
+      Set<String> keys = request.getParameters().keySet();
+      for (String key : keys) {
+        if (key.startsWith(DefaultParameterParser.ACTION_PREFIX)) {
+
+          String actionParameterName = key.substring(4);
+          String actionParameterValue = request.getParameter(key);
+          if (request.getParameter(actionParameterName) != null && actionParameterValue.trim().length() > 0) {
+            uri = actionParameterValue;
+
+            // Handle relative URIs
+            if (!uri.startsWith("/")) {
+              String requestURI = HTTPTools.getRequestURI(request);
+              int index = requestURI.lastIndexOf('/');
+              if (index >= 0) {
+                uri = requestURI.substring(0, index) + "/" + uri;
+              }
             }
           }
         }

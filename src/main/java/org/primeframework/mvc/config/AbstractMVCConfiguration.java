@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2023, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,8 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
 
   public static final long MAX_SIZE = 1024000;
 
+  public boolean allowActionParameterDuringActionMappingWorkflow = true;
+
   public boolean autoHTMLEscapingEnabled = true;
 
   public String controlTemplateDirectory = "control-templates";
@@ -75,6 +77,11 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
   public String templateDirectory = "templates";
 
   public List<Class<? extends Annotation>> unwrapAnnotations = Collections.singletonList(FieldUnwrapped.class);
+
+  @Override
+  public boolean allowActionParameterDuringActionMappingWorkflow() {
+    return allowActionParameterDuringActionMappingWorkflow;
+  }
 
   @Override
   public boolean autoHTMLEscapingEnabled() {
