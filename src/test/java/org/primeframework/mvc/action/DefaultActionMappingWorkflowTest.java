@@ -54,7 +54,7 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
 
   @Test
   public void differentButtonClick_notAllowed() throws Exception {
-    // Default behavior will be to limit using alternate form actions
+    // Disable action mapping using action parameter __a_
     configuration.allowActionParameterDuringActionMappingWorkflow = false;
 
     request.setPath("/admin/user/edit");
