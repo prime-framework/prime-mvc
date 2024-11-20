@@ -1718,7 +1718,14 @@ public class RequestResult {
 
     // Copy them to the new request. This is essentially what curl does when you follow redirects I think.
     // - Add in a Referer header for the current URL
-    rb.withHeader("Referer", request.getBaseURL());
+    // - Note that this is a full Referer that includes path and query string. We could make this configurable or allow a
+    //   Referer function to be specified given the current request object.
+    // - In practice we are not making requests cross-origin, or mixing http and https here, so functionally this is
+    //   equivalent to Referrer-Policy of same-origin
+    //   https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy
+    rb.withHeader("Referer", request.getBaseURL() +
+                             (request.getPath() == null || request.getPath().equals("/") ? "" : request.getPath()) +
+                             (request.getQueryString() == null || request.getQueryString().isEmpty() ? "" : "?" + request.getQueryString()));
     headersCopy.forEach((name, value) -> value.forEach(v -> rb.withHeader(name, v)));
 
     RequestResult result = rb.get();
