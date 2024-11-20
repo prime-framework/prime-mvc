@@ -40,8 +40,6 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
 
   public static final long MAX_SIZE = 1024000;
 
-  public boolean allowActionParameterDuringActionMappingWorkflow = true;
-
   public boolean autoHTMLEscapingEnabled = true;
 
   public String controlTemplateDirectory = "control-templates";
@@ -77,11 +75,6 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
   public String templateDirectory = "templates";
 
   public List<Class<? extends Annotation>> unwrapAnnotations = Collections.singletonList(FieldUnwrapped.class);
-
-  @Override
-  public boolean allowActionParameterDuringActionMappingWorkflow() {
-    return allowActionParameterDuringActionMappingWorkflow;
-  }
 
   @Override
   public boolean autoHTMLEscapingEnabled() {

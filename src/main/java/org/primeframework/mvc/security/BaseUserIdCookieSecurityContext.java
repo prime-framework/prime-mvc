@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Brady Wied
  */
-public abstract class BaseUserIdCookieSecurityContext<TUserId> implements UserLoginSecurityContext {
+public abstract class BaseUserIdCookieSecurityContext<T> implements UserLoginSecurityContext {
   public static final String UserKey = "primeCurrentUser";
 
   private static final String ContextKey = "primeLoginContext";
@@ -68,6 +68,7 @@ public abstract class BaseUserIdCookieSecurityContext<TUserId> implements UserLo
     this.clock = clock;
     this.sessionMaxAge = sessionMaxAge;
     this.sessionTimeout = sessionTimeout;
+
     long timeoutInSeconds = sessionTimeout.toSeconds();
     this.sessionCookie = new CookieProxy(getCookieName(), timeoutInSeconds, Cookie.SameSite.Strict);
   }
@@ -83,12 +84,14 @@ public abstract class BaseUserIdCookieSecurityContext<TUserId> implements UserLo
     if (user != null) {
       return user;
     }
-    UserIdSessionContext<TUserId> sessionContext = resolveContext();
+
+    UserIdSessionContext<T> sessionContext = resolveContext();
     if (sessionContext == null) {
       return null;
     }
+
     user = retrieveUserById(sessionContext.getUserId());
-    this.request.setAttribute(UserKey, user);
+    request.setAttribute(UserKey, user);
     return user;
   }
 
@@ -159,7 +162,7 @@ public abstract class BaseUserIdCookieSecurityContext<TUserId> implements UserLo
    * @param loginInstant the instant the user logged in
    * @return context, readily serializable/deserializable by Jackson
    */
-  protected abstract UserIdSessionContext<TUserId> createUserIdSessionContext(TUserId userId, ZonedDateTime loginInstant);
+  protected abstract UserIdSessionContext<T> createUserIdSessionContext(T userId, ZonedDateTime loginInstant);
 
   protected String getCookieName() {
     return UserKey;
@@ -171,14 +174,14 @@ public abstract class BaseUserIdCookieSecurityContext<TUserId> implements UserLo
    * @param user user to retrieve the ID for
    * @return ID of the user
    */
-  protected abstract TUserId getIdFromUser(Object user);
+  protected abstract T getIdFromUser(Object user);
 
   /**
    * What is the session context class
    *
    * @return the class
    */
-  protected abstract Class<? extends UserIdSessionContext<TUserId>> getUserIdSessionContextClass();
+  protected abstract Class<? extends UserIdSessionContext<T>> getUserIdSessionContextClass();
 
   /**
    * Hydrates/retrieves the user based on ID
@@ -186,7 +189,7 @@ public abstract class BaseUserIdCookieSecurityContext<TUserId> implements UserLo
    * @param id unique ID for the user
    * @return the object representing the user
    */
-  protected abstract Object retrieveUserById(TUserId id);
+  protected abstract Object retrieveUserById(T id);
 
   /**
    * Figure out whether to extend cookie
@@ -217,15 +220,18 @@ public abstract class BaseUserIdCookieSecurityContext<TUserId> implements UserLo
    *
    * @return value from cookie, null if no existing session
    */
-  private UserIdSessionContext<TUserId> resolveContext() {
-    var context = (UserIdSessionContext<TUserId>) this.request.getAttribute(ContextKey);
+  @SuppressWarnings("unchecked")
+  private UserIdSessionContext<T> resolveContext() {
+    var context = (UserIdSessionContext<T>) this.request.getAttribute(ContextKey);
     if (context != null) {
       return context;
     }
+
     var cookie = this.sessionCookie.get(this.request);
     if (cookie == null) {
       return null;
     }
+
     try {
       context = CookieTools.fromJSONCookie(cookie,
                                            getUserIdSessionContextClass(),
@@ -244,6 +250,7 @@ public abstract class BaseUserIdCookieSecurityContext<TUserId> implements UserLo
           deleteCookies();
           return null;
       }
+
       this.request.setAttribute(ContextKey, context);
       return context;
     } catch (BadPaddingException e) {

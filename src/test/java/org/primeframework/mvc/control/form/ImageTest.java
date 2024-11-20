@@ -50,7 +50,6 @@ public class ImageTest extends ControlBaseTest {
                             .attr("value", "test-value")
                             .attr("src", "foo.gif")
                             .go("<input type=\"hidden\" name=\"image@param\" value=\"param-value\"/>\n" +
-                                "<input type=\"hidden\" name=\"__a_image\" value=\"/foo\"/>\n" +
                                 "<div class=\"image-button button control\">\n" +
                                 "<div class=\"label-container\"> </div>\n" +
                                 "<div class=\"control-container\"><input type=\"image\" id=\"image\" name=\"image\" src=\"foo.gif\" value=\"Image\"/></div>\n" +
@@ -66,7 +65,6 @@ public class ImageTest extends ControlBaseTest {
                             .attr("action", "/foo")
                             .attr("src", "foo.gif")
                             .go("<input type=\"hidden\" name=\"image@param\" value=\"param-value\"/>\n" +
-                                "<input type=\"hidden\" name=\"__a_image\" value=\"/context/foo\"/>\n" +
                                 "<div class=\"image-button button control\">\n" +
                                 "<div class=\"label-container\"> </div>\n" +
                                 "<div class=\"control-container\"><input type=\"image\" id=\"image\" name=\"image\" src=\"foo.gif\" value=\"Image\"/></div>\n" +
@@ -82,7 +80,6 @@ public class ImageTest extends ControlBaseTest {
                             .attr("action", "foo")
                             .attr("src", "foo.gif")
                             .go("<input type=\"hidden\" name=\"image@param\" value=\"param-value\"/>\n" +
-                                "<input type=\"hidden\" name=\"__a_image\" value=\"foo\"/>\n" +
                                 "<div class=\"image-button button control\">\n" +
                                 "<div class=\"label-container\"> </div>\n" +
                                 "<div class=\"control-container\"><input type=\"image\" id=\"image\" name=\"image\" src=\"foo.gif\" value=\"Image\"/></div>\n" +
