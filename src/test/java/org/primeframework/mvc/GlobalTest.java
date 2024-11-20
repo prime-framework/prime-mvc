@@ -2288,6 +2288,11 @@ public class GlobalTest extends PrimeBaseTest {
 
         // Redirected to login
         .followRedirect(result -> result
+            // assert the request that was made included the correct Referer header
+            // - We could make this configurable, but for now, it is sending the full header, simulating a Refer policy of same-origin.
+            //   See RequestResult._followRedirect notes.
+            .custom(() -> assertEquals(result.request.getHeader("Referer"),
+                                       "http://localhost:9080/store/allow-post-purchase"))
             .assertStatusCode(200)
             .assertHeaderContains("Cache-Control", "no-cache")
             .assertBodyContains("Login"))
