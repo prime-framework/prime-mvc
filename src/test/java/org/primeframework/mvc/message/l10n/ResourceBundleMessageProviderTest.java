@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2024, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -134,6 +134,31 @@ public class ResourceBundleMessageProviderTest extends PrimeBaseTest {
     ResourceBundleMessageProvider provider = new ResourceBundleMessageProvider(localeProvider, new WebControl(new ServletContainerResolver(context), configuration), store);
     try {
       provider.getMessage("bad_key");
+      fail("Should have failed");
+    } catch (MissingMessageException e) {
+      // Expected
+    }
+
+    verify(store);
+  }
+
+  @Test
+  public void noActionInvocation() {
+    HTTPContext context = new HTTPContext(Path.of("src/test/java"));
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(null).times(3);
+    replay(store);
+
+    LocaleProvider localeProvider = createStrictMock(LocaleProvider.class);
+    expect(localeProvider.get()).andReturn(Locale.US).anyTimes();
+    replay(localeProvider);
+
+    ResourceBundleMessageProvider provider = new ResourceBundleMessageProvider(localeProvider, new WebControl(new ServletContainerResolver(context), configuration), store);
+    assertEquals(provider.getMessage("[blank]foo.bar"), "Required");
+
+    // Really missing
+    try {
+      provider.getMessage("[not_found]bar");
       fail("Should have failed");
     } catch (MissingMessageException e) {
       // Expected
