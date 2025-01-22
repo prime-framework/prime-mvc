@@ -45,6 +45,7 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.ConfigurationException;
 import com.google.inject.Injector;
 import io.fusionauth.http.Cookie;
 import io.fusionauth.http.Cookie.SameSite;
@@ -832,16 +833,27 @@ public class RequestBuilder {
 
     // Now that the cookies are ready, if the CSRF token is enabled and the parameter isn't set, we set it to be consistent
     // since the [@control.form] would normally set that into the form and into the request.
-    MVCConfiguration configuration = injector.getInstance(MVCConfiguration.class);
-    if (configuration.csrfEnabled()) {
-      CSRFProvider csrfProvider = injector.getInstance(CSRFProvider.class);
-      if (csrfProvider.getTokenFromRequest(request) == null) {
-        String token = csrfProvider.getToken(request);
-        if (token != null) {
-          String parameterName = csrfProvider.getParameterName();
-          request.addURLParameter(parameterName, token);
+    if (request.getMethod() == HTTPMethod.POST) {
+      MVCConfiguration configuration = injector.getInstance(MVCConfiguration.class);
+      if (configuration.csrfEnabled()) {
+        CSRFProvider csrfProvider = injector.getInstance(CSRFProvider.class);
+        if (csrfProvider.getTokenFromRequest(request) == null) {
+          String token = csrfProvider.getToken(request);
+          if (token != null) {
+            String parameterName = csrfProvider.getParameterName();
+            requestBodyParameters.put(parameterName, List.of(token));
+          }
         }
       }
+    }
+
+    // Optionally allow the caller to consume the HTTP request in order to mutate it and what not.
+    try {
+      RequestBuilderHTTPRequestConsumer httpRequestConsumer = injector.getInstance(RequestBuilderHTTPRequestConsumer.class);
+      if (httpRequestConsumer != null) {
+        httpRequestConsumer.accept(request);
+      }
+    } catch (ConfigurationException ignore) {
     }
 
     List<Locale> locales = request.getLocales();
