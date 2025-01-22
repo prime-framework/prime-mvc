@@ -849,7 +849,8 @@ public class RequestBuilder {
 
     // Optionally allow the caller to consume the HTTP request in order to mutate it and what not.
     try {
-      RequestBuilderHTTPRequestConsumer httpRequestConsumer = injector.getInstance(RequestBuilderHTTPRequestConsumer.class);
+      injector.getBinding(HTTPRequestConsumer.class);
+      HTTPRequestConsumer httpRequestConsumer = injector.getInstance(HTTPRequestConsumer.class);
       if (httpRequestConsumer != null) {
         httpRequestConsumer.accept(request);
       }
@@ -976,5 +977,12 @@ public class RequestBuilder {
     List<String> values = new ArrayList<>();
     values.add(value.toString());
     requestBodyParameters.put(name, values);
+  }
+
+  public interface HTTPRequestConsumer {
+    /**
+     * @param httpRequest the http request
+     */
+    void accept(HTTPRequest httpRequest);
   }
 }
