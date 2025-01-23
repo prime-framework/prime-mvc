@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2024, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,6 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.inject.ConfigurationException;
 import com.google.inject.Injector;
 import io.fusionauth.http.Cookie;
 import io.fusionauth.http.Cookie.SameSite;
@@ -847,15 +846,8 @@ public class RequestBuilder {
       }
     }
 
-    // Optionally allow the caller to consume the HTTP request in order to mutate it and what not.
-    try {
-      injector.getBinding(HTTPRequestConsumer.class);
-      HTTPRequestConsumer httpRequestConsumer = injector.getInstance(HTTPRequestConsumer.class);
-      if (httpRequestConsumer != null) {
-        httpRequestConsumer.accept(request);
-      }
-    } catch (ConfigurationException ignore) {
-    }
+    // Allow the caller to consume the HTTP request in order to mutate it and what not.
+    injector.getInstance(HTTPRequestConsumer.class).accept(request);
 
     List<Locale> locales = request.getLocales();
     String contentType = request.getContentType();
@@ -979,10 +971,11 @@ public class RequestBuilder {
     requestBodyParameters.put(name, values);
   }
 
-  public interface HTTPRequestConsumer {
+  public static class HTTPRequestConsumer {
     /**
      * @param httpRequest the http request
      */
-    void accept(HTTPRequest httpRequest);
+    void accept(HTTPRequest httpRequest) {
+    }
   }
 }
