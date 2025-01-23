@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2024, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -812,6 +812,15 @@ public class GlobalTest extends PrimeBaseTest {
     Map<String, Meter> meters = metricRegistry.getMeters();
     assertEquals(meters.get("prime-mvc.[/execute-method-throws-exception].errors").getCount(), 1);
     assertEquals(meters.get("prime-mvc.[*].errors").getCount(), 1);
+  }
+
+  @Test
+  public void get_modifyRequest() throws Exception {
+    // The Test HTTP request consumer will have added an HTTP request header.
+    simulator.test("/foo")
+             .get()
+             .assertStatusCode(200)
+             .custom(result -> assertEquals(result.request.getHeader("X-Test-HTTP-Request-Consumer"), "true"));
   }
 
   @Test

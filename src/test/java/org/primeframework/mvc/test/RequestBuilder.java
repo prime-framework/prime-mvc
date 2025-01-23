@@ -45,6 +45,7 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.Inject;
 import com.google.inject.Injector;
 import io.fusionauth.http.Cookie;
 import io.fusionauth.http.Cookie.SameSite;
@@ -96,6 +97,9 @@ public class RequestBuilder {
 
   private byte[] body;
 
+  @Inject(optional = true)
+  private HTTPRequestConsumer httpRequestConsumer;
+
   public RequestBuilder(String path, Injector injector, MockUserAgent userAgent, TestMessageObserver messageObserver,
                         int port) {
     this.injector = injector;
@@ -104,6 +108,8 @@ public class RequestBuilder {
     this.request = new HTTPRequest().with(r -> r.addLocales(Locale.US))
                                     .with(r -> r.setPath(path));
     this.port = port;
+    //Injections optionally HTTPRequestConsumer
+    injector.injectMembers(this);
   }
 
   public static HttpClient newHttpClient() {
@@ -847,7 +853,9 @@ public class RequestBuilder {
     }
 
     // Allow the caller to consume the HTTP request in order to mutate it and what not.
-    injector.getInstance(HTTPRequestConsumer.class).accept(request);
+    if (httpRequestConsumer != null) {
+      httpRequestConsumer.accept(request);
+    }
 
     List<Locale> locales = request.getLocales();
     String contentType = request.getContentType();
@@ -971,11 +979,10 @@ public class RequestBuilder {
     requestBodyParameters.put(name, values);
   }
 
-  public static class HTTPRequestConsumer {
+  public interface HTTPRequestConsumer {
     /**
      * @param httpRequest the http request
      */
-    void accept(HTTPRequest httpRequest) {
-    }
+    void accept(HTTPRequest httpRequest);
   }
 }
