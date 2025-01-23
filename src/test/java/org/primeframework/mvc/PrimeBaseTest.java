@@ -51,6 +51,7 @@ import io.fusionauth.http.server.HTTPListenerConfiguration;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
 import io.fusionauth.http.server.HTTPServerConfiguration;
+import org.example.action.SecureAction;
 import org.example.action.user.EditAction;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ExecuteMethodConfiguration;
@@ -214,6 +215,7 @@ public abstract class PrimeBaseTest {
 
     // Reset
     EditAction.getCalled = false;
+    SecureAction.UnknownParameters.clear();
 
     TestUnhandledExceptionHandler.reset();
   }
