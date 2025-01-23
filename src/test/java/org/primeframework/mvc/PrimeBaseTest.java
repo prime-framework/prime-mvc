@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2024, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,7 @@ import io.fusionauth.http.server.HTTPListenerConfiguration;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
 import io.fusionauth.http.server.HTTPServerConfiguration;
+import org.example.action.SecureAction;
 import org.example.action.user.EditAction;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ExecuteMethodConfiguration;
@@ -85,6 +86,7 @@ import org.primeframework.mvc.security.StaticResourceFilter;
 import org.primeframework.mvc.security.UserLoginSecurityContext;
 import org.primeframework.mvc.security.VerifierProvider;
 import org.primeframework.mvc.security.csrf.CSRFProvider;
+import org.primeframework.mvc.test.RequestBuilder.HTTPRequestConsumer;
 import org.primeframework.mvc.test.RequestSimulator;
 import org.primeframework.mvc.util.ThrowingRunnable;
 import org.primeframework.mvc.validation.Validation;
@@ -214,6 +216,7 @@ public abstract class PrimeBaseTest {
 
     // Reset
     EditAction.getCalled = false;
+    SecureAction.UnknownParameters.clear();
 
     TestUnhandledExceptionHandler.reset();
   }
@@ -226,6 +229,7 @@ public abstract class PrimeBaseTest {
         super.configure();
         install(new TestMVCConfigurationModule());
         bind(CORSConfigurationProvider.class).to(TestCORSConfigurationProvider.class).in(Singleton.class);
+        bind(HTTPRequestConsumer.class).to(TestHTTPRequestConsumer.class);
         bind(MessageObserver.class).toInstance(messageObserver);
         bind(MetricRegistry.class).toInstance(metricRegistry);
         bind(UserLoginSecurityContext.class).to(MockUserLoginSecurityContext.class);
@@ -339,6 +343,15 @@ public abstract class PrimeBaseTest {
     @Override
     protected void configure() {
       bind(ObjectMapper.class).toProvider(TestObjectMapperProvider.class);
+    }
+  }
+
+  public static class TestHTTPRequestConsumer implements HTTPRequestConsumer {
+    /**
+     * @param httpRequest the http request
+     */
+    public void accept(HTTPRequest httpRequest) {
+      httpRequest.setHeader("X-Test-HTTP-Request-Consumer", "true");
     }
   }
 
