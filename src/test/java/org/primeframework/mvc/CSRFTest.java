@@ -82,33 +82,6 @@ public class CSRFTest extends PrimeBaseTest {
   }
 
   @Test
-  public void post_CSRFTokenCompatibility() throws Exception {
-    // Use case: a CSRF token encrypted with CBC can be decrypted using the updated method
-    MockUserLoginSecurityContext.roles.add("admin");
-    securityContext.login(new User());
-    configuration.csrfEnabled = true;
-
-    // Craft a CSRF token, serialize to JSON, encrypt with CBC, base64url-encode
-    CSRFToken token = new CSRFToken(securityContext.getSessionId(), System.currentTimeMillis());
-    byte[] serialized = objectMapper.writeValueAsBytes(token);
-    // Instantiate DefaultEncryptor with two copies of CBCCipherProvider to encrypt with CBC
-    Encryptor cbcEncryptor = new DefaultEncryptor(new CBCCipherProvider(configuration), new CBCCipherProvider(configuration));
-    byte[] encrypted = cbcEncryptor.encrypt(serialized);
-    String encoded = Base64.getUrlEncoder().encodeToString(encrypted);
-
-    simulator.test("/secure")
-             .withSingleHeader("Referer", "http://localhost:" + simulator.getPort() + "/secure")
-             .withCSRFToken(encoded)
-             .post()
-             .assertStatusCode(200)
-             .assertBody("Secure!");
-
-    // A POST request will contain the CSRF token
-    // - This is just testing the RequestBuilder that will try and automatically add the CSRF token
-    assertTrue(SecureAction.UnknownParameters.containsKey(csrfProvider.getParameterName()));
-  }
-
-  @Test
   public void post_CSRFTokenFailure() {
     MockUserLoginSecurityContext.roles.add("admin");
     securityContext.login(new User());
@@ -145,6 +118,33 @@ public class CSRFTest extends PrimeBaseTest {
              .post()
              .assertStatusCode(200)
              .assertBody("Secure!");
+  }
+
+  @Test
+  public void post_CSRFTokenCompatibility() throws Exception {
+    // Use case: a CSRF token encrypted with CBC can be decrypted using the updated method
+    MockUserLoginSecurityContext.roles.add("admin");
+    securityContext.login(new User());
+    configuration.csrfEnabled = true;
+
+    // Craft a CSRF token, serialize to JSON, encrypt with CBC, base64url-encode
+    CSRFToken token = new CSRFToken(securityContext.getSessionId(), System.currentTimeMillis());
+    byte[] serialized = objectMapper.writeValueAsBytes(token);
+    // Instantiate DefaultEncryptor with two copies of CBCCipherProvider to encrypt with CBC
+    Encryptor cbcEncryptor = new DefaultEncryptor(new CBCCipherProvider(configuration), new CBCCipherProvider(configuration));
+    byte[] encrypted = cbcEncryptor.encrypt(serialized);
+    String encoded = Base64.getUrlEncoder().encodeToString(encrypted);
+
+    simulator.test("/secure")
+             .withSingleHeader("Referer", "http://localhost:" + simulator.getPort() + "/secure")
+             .withCSRFToken(encoded)
+             .post()
+             .assertStatusCode(200)
+             .assertBody("Secure!");
+
+    // A POST request will contain the CSRF token
+    // - This is just testing the RequestBuilder that will try and automatically add the CSRF token
+    assertTrue(SecureAction.UnknownParameters.containsKey(csrfProvider.getParameterName()));
   }
 
   // Add for testing legacy-encrypted CSRF token which is defined as a private class in DefaultEncryptionBasedTokenCSRFProvider
