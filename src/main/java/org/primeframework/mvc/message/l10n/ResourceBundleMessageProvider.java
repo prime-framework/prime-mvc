@@ -79,7 +79,8 @@ public class ResourceBundleMessageProvider implements MessageProvider {
     String message = getOptionalMessage(key, values);
     if (message == null) {
       ActionInvocation actionInvocation = invocationStore.getCurrent();
-      throw new MissingMessageException("Message could not be found for the URI [" + actionInvocation.actionURI + "] and key [" + key + "]");
+      String uri = actionInvocation != null ? actionInvocation.actionURI : null;
+      throw new MissingMessageException("Message could not be found for the URI [" + uri + "] and key [" + key + "]");
     }
 
     return message;
@@ -96,7 +97,8 @@ public class ResourceBundleMessageProvider implements MessageProvider {
 
     if (template == null) {
       if (!"[ValidationException]".equals(key)) {
-        logger.debug("Message could not be found for the URI [{}] and key [{}]", actionInvocation.actionURI, key);
+        String uri = actionInvocation != null ? actionInvocation.actionURI : null;
+        logger.debug("Message could not be found for the URI [{}] and key [{}]", uri, key);
       }
 
       return null;
@@ -131,12 +133,13 @@ public class ResourceBundleMessageProvider implements MessageProvider {
    * @return The message or null if it doesn't exist.
    */
   protected String findMessage(ActionInvocation actionInvocation, String key) {
-    String message = findMessage(actionInvocation.actionURI, key);
+    String actionURI = actionInvocation != null ? actionInvocation.actionURI : "/";
+    String message = findMessage(actionURI, key);
     if (message != null) {
       return message;
     }
 
-    ActionConfiguration config = actionInvocation.configuration;
+    ActionConfiguration config = actionInvocation != null ? actionInvocation.configuration : null;
     if (config == null) {
       return null;
     }
