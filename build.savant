@@ -19,7 +19,7 @@ dropWizardVersion = "3.2.6"
 easyMockVersion = "5.1.0"
 freemarkerVersion = "2.3.32"
 fusionAuthJWTVersion = "5.3.2"
-javaHTTPVersion = "0.3.5"
+javaHTTPVersion = "0.3.6"
 jsonPatchVersion = "1.13.0"
 guavaVersion = "32.1.2-jre"
 guiceVersion = "6.0.0"
@@ -29,7 +29,7 @@ logbackVersion = "1.4.14"
 slf4jVersion = "2.0.13"
 testngVersion = "7.8.0"
 
-project(group: "org.primeframework", name: "prime-mvc", version: "4.29.0", licenses: ["ApacheV2_0"]) {
+project(group: "org.primeframework", name: "prime-mvc", version: "4.29.1", licenses: ["ApacheV2_0"]) {
   workflow {
     fetch {
       // Dependency resolution order:
