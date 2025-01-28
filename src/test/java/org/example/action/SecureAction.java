@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2015-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,14 @@
  */
 package org.example.action;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.fusionauth.http.HTTPValues.Methods;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.annotation.Status;
+import org.primeframework.mvc.parameter.annotation.UnknownParameters;
 import org.primeframework.mvc.security.annotation.ConstraintOverride;
 import org.primeframework.mvc.security.annotation.ConstraintOverrideMethod;
 
@@ -34,6 +37,9 @@ import org.primeframework.mvc.security.annotation.ConstraintOverrideMethod;
     @Status(code = "unauthorized", status = 403)
 })
 public class SecureAction {
+  @UnknownParameters
+  public static Map<String, String[]> UnknownParameters = new HashMap<>();
+
   @ConstraintOverrideMethod(httpMethods = {Methods.PATCH})
   public List<String> customConstraintsForPatch() {
     return List.of("patch-only");
