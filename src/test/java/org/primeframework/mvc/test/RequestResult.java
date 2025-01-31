@@ -51,7 +51,6 @@ import io.fusionauth.http.Cookie.SameSite;
 import io.fusionauth.http.HTTPValues.ContentTypes;
 import io.fusionauth.http.HTTPValues.Headers;
 import io.fusionauth.http.HTTPValues.Methods;
-import io.fusionauth.http.io.BlockingByteBufferOutputStream;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
 import io.fusionauth.http.util.HTTPTools.HeaderValue;
@@ -118,7 +117,7 @@ public class RequestResult {
     HTTPObjectsHolder.clearRequest();
     HTTPObjectsHolder.setRequest(request);
     HTTPObjectsHolder.clearResponse();
-    HTTPObjectsHolder.setResponse(new HTTPResponse(new BlockingByteBufferOutputStream(null, 1024, 32), request));
+    HTTPObjectsHolder.setResponse(new HTTPResponse());
   }
 
   /**
@@ -151,7 +150,7 @@ public class RequestResult {
   private static void _assertJSONEquals(ObjectMapper objectMapper, String actual, String expected, boolean sortArrays,
                                         Path jsonFile)
       throws IOException {
-    if (actual == null || actual.equals("")) {
+    if (actual == null || actual.isEmpty()) {
       throw new AssertionError("The actual response body is empty or is equal to an empty string without any JSON. This was "
                                + "unexpected since you are trying to assert on JSON.");
     }
@@ -1463,7 +1462,7 @@ public class RequestResult {
                                + cookies.stream().map(this::cookieToString).collect(Collectors.joining("\n")));
     }
 
-    return cookies.get(0);
+    return cookies.getFirst();
   }
 
   /**
@@ -1938,7 +1937,7 @@ public class RequestResult {
     // Bail early they are not even the same size
     if (actual.keySet().size() != expected.keySet().size()) {
       // Check for optional parameters, if we don't have any, we know we are done.
-      if (expected.values().stream().noneMatch(v -> v.size() > 0 && v.get(0).equals("___optional___"))) {
+      if (expected.values().stream().noneMatch(v -> v.size() > 0 && v.getFirst().equals("___optional___"))) {
         return false;
       }
     }
@@ -1951,7 +1950,7 @@ public class RequestResult {
       if (!Objects.equals(actualKeys.get(i), expectedKeys.get(j))) {
         // We may have optional values, continue;
         List<String> expectedValues = expected.get(expectedKeys.get(j));
-        if (expectedValues.size() > 0 && expectedValues.get(0).equals("___optional___")) {
+        if (expectedValues.size() > 0 && expectedValues.getFirst().equals("___optional___")) {
           j++;
           continue;
         }
@@ -1962,7 +1961,7 @@ public class RequestResult {
       // Replace any ___actual___ or ___optional___ if they exist.
       List<String> expectedValues = expected.get(expectedKeys.get(j));
       if (expectedValues != null && expectedValues.size() > 0) {
-        if (expectedValues.get(0).equals("___actual___") || expectedValues.get(0).equals("___optional___")) {
+        if (expectedValues.getFirst().equals("___actual___") || expectedValues.getFirst().equals("___optional___")) {
           expectedValues.clear();
           expectedValues.addAll(actual.get(actualKeys.get(i)));
           recheck = true;
@@ -1974,7 +1973,7 @@ public class RequestResult {
     }
 
     // Remove any optional keys if they aren't in the actual key set
-    if (expected.keySet().removeIf(k -> !actualKeys.contains(k) && expected.get(k).get(0).equals("___optional___"))) {
+    if (expected.keySet().removeIf(k -> !actualKeys.contains(k) && expected.get(k).getFirst().equals("___optional___"))) {
       recheck = true;
     }
 
@@ -2285,7 +2284,7 @@ public class RequestResult {
         throw new AssertionError("Expected a single element to match the selector " + selector + ". Found [" + elements.size() + "] elements instead." + ((elements.size() == 0) ? "" : "\n\n" + elements) + "\n\nActual body:\n" + requestResult.getBodyAsString());
       }
 
-      Element element = elements.get(0);
+      Element element = elements.getFirst();
       if (!expectedInnerHTML.equals(element.html())) {
         throw new AssertionError("Expected a value of [" + expectedInnerHTML + "] to match the selector " + selector + ". Found [" + element.html() + "] instead." + "\n\nActual body:\n" + requestResult.getBodyAsString());
       }
@@ -2305,7 +2304,7 @@ public class RequestResult {
         throw new AssertionError("Expected a single element to match the selector " + selector + ". Found [" + elements.size() + "] elements instead." + ((elements.size() == 0) ? "" : "\n\n" + elements) + "\n\nActual body:\n" + requestResult.getBodyAsString());
       }
 
-      if (!elements.get(0).hasAttr("checked")) {
+      if (!elements.getFirst().hasAttr("checked")) {
         throw new AssertionError("Expected the element to be checked." + "\n\nActual body:\n" + requestResult.getBodyAsString());
       }
 
@@ -2324,7 +2323,7 @@ public class RequestResult {
         throw new AssertionError("Expected a single element to match the selector " + selector + ". Found [" + elements.size() + "] elements instead." + ((elements.size() == 0) ? "" : "\n\n" + elements) + "\n\nActual body:\n" + requestResult.getBodyAsString());
       }
 
-      if (elements.get(0).hasAttr("checked")) {
+      if (elements.getFirst().hasAttr("checked")) {
         throw new AssertionError("Expected the element NOT to be checked." + "\n\nActual body:\n" + requestResult.getBodyAsString());
       }
 
@@ -2344,7 +2343,7 @@ public class RequestResult {
         throw new AssertionError("Expected a single element to match the selector " + selector + ". Found [" + elements.size() + "] instead." + ((elements.size() == 0) ? "" : "\n\n" + elements) + "\n\nActual body:\n" + requestResult.getBodyAsString());
       }
 
-      Element element = elements.get(0);
+      Element element = elements.getFirst();
       if (!element.val().equals(value.toString())) {
         throw new AssertionError("Using the selector [" + selector + "] expected [" + value + "] but found [" + element.val() + "]. Actual matched element: \n\n" + element + "\n\nActual body:\n" + requestResult.getBodyAsString());
       }
@@ -2422,7 +2421,7 @@ public class RequestResult {
         throw new AssertionError("Expected a single element to match the selector " + selector + ". Found [" + elements.size() + "] elements instead." + ((elements.size() == 0) ? "" : "\n\n" + elements) + "\n\nActual body:\n" + requestResult.getBodyAsString());
       }
 
-      return elements.get(0);
+      return elements.getFirst();
     }
   }
 

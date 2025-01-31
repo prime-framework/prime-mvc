@@ -37,7 +37,6 @@ public class ButtonTest extends ControlBaseTest {
         .attr("action", "/foo")
         .attr("value", "test-value")
         .go("<input type=\"hidden\" name=\"button@param\" value=\"param-value\"/>\n" +
-            "<input type=\"hidden\" name=\"__a_button\" value=\"/foo\"/>\n" +
             "<div class=\"button-button button control\">\n" +
             "<div class=\"label-container\"> </div>\n" +
             "<div class=\"control-container\"><input type=\"button\" id=\"button\" name=\"button\" value=\"Button\"/></div>\n" +
@@ -53,7 +52,6 @@ public class ButtonTest extends ControlBaseTest {
         .attr("action", "/foo")
         .attr("value", "test-value")
         .go("<input type=\"hidden\" name=\"button@param\" value=\"param-value\"/>\n" +
-            "<input type=\"hidden\" name=\"__a_button\" value=\"/context/foo\"/>\n" +
             "<div class=\"button-button button control\">\n" +
             "<div class=\"label-container\"> </div>\n" +
             "<div class=\"control-container\"><input type=\"button\" id=\"button\" name=\"button\" value=\"Button\"/></div>\n" +
@@ -69,7 +67,6 @@ public class ButtonTest extends ControlBaseTest {
         .attr("action", "foo")
         .attr("value", "test-value")
         .go("<input type=\"hidden\" name=\"button@param\" value=\"param-value\"/>\n" +
-            "<input type=\"hidden\" name=\"__a_button\" value=\"foo\"/>\n" +
             "<div class=\"button-button button control\">\n" +
             "<div class=\"label-container\"> </div>\n" +
             "<div class=\"control-container\"><input type=\"button\" id=\"button\" name=\"button\" value=\"Button\"/></div>\n" +
@@ -111,7 +108,6 @@ public class ButtonTest extends ControlBaseTest {
         .attr("action", "/foo")
         .attr("value", "test-value")
         .go("<input type=\"hidden\" name=\"html@param\" value=\"param-value\"/>\n" +
-            "<input type=\"hidden\" name=\"__a_html\" value=\"/foo\"/>\n" +
             "<div class=\"button-button button control\">\n" +
             "<div class=\"label-container\"> </div>\n" +
             "<div class=\"control-container\"><input type=\"button\" id=\"html\" name=\"html\" value=\"&lt;Button&gt;\"/></div>\n" +

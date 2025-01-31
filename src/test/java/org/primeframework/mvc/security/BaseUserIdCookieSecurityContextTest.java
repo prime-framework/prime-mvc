@@ -196,7 +196,7 @@ public class BaseUserIdCookieSecurityContextTest {
     // assert
     // normally the cookie will not be set again with a different max age
     result.assertBodyContains("the current user is (no user)");
-    assertEquals(result.getCookie(UserKey).value, "null");
+    assertEquals(result.getCookie(UserKey).value, "");
   }
 
   @Test
@@ -327,7 +327,7 @@ public class BaseUserIdCookieSecurityContextTest {
   }
 
   private RequestResult getSessionInfo() {
-    var requestBuilder = simulator.test("/security/cookiesession/get-session-info");
-    return requestBuilder.get();
+    return simulator.test("/security/cookiesession/get-session-info")
+                    .get();
   }
 }

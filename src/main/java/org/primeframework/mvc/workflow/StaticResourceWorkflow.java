@@ -85,7 +85,7 @@ public class StaticResourceWorkflow implements Workflow {
    * @throws IOException If the request is a static resource and sending it failed or if the chain throws an IOException.
    */
   public void perform(WorkflowChain workflowChain) throws IOException {
-    boolean handled = false;
+    boolean handled;
 
     // Ensure that this is a request for a resource and not a class
     String uri = HTTPTools.getRequestURI(request);
