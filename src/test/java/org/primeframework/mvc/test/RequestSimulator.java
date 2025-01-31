@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2023, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,8 +34,6 @@ public class RequestSimulator {
 
   public final TestPrimeMainThread thread;
 
-  public final MockUserAgent userAgent;
-
   public int actualPort = -1;
 
   public int port;
@@ -43,6 +41,8 @@ public class RequestSimulator {
   public int tlsPort;
 
   public boolean useTLS;
+
+  public MockUserAgent userAgent;
 
   /**
    * Creates a new request simulator that can be used to simulate requests to a Prime application.
@@ -112,7 +112,7 @@ public class RequestSimulator {
 
   public void reset() {
     actualPort = -1;
-    userAgent.clearAllCookies();
+    userAgent = new MockUserAgent();
     useTLS = false;
   }
 
