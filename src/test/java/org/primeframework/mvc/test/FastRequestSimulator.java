@@ -30,6 +30,7 @@ import java.util.Optional;
 
 import com.google.inject.Injector;
 import io.fusionauth.http.Cookie;
+import io.fusionauth.http.HTTPMethod;
 import io.fusionauth.http.HTTPValues.Headers;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
@@ -69,7 +70,7 @@ public class FastRequestSimulator extends RequestSimulator {
     @Override
     protected HttpResponse<byte[]> executeHttpRequest(HttpRequest javaNetHttpRequest, InputStream inputStream)
         throws IOException, InterruptedException {
-      var fusionAuthJavaHttpRequest = getFusionAuthJavaHttpRequest(javaNetHttpRequest);
+      var fusionAuthJavaHttpRequest = getFusionAuthJavaHttpRequest(javaNetHttpRequest, inputStream);
 
       HTTPObjectsHolder.clearResponse();
       // we want to use a simpler stream
@@ -85,26 +86,25 @@ public class FastRequestSimulator extends RequestSimulator {
       return new JavaNetHttpResponseWrapper(fusionAuthJavaHttpResponse, javaNetHttpRequest, responseStream);
     }
 
-    private HTTPRequest getFusionAuthJavaHttpRequest(HttpRequest javaNetHttpRequest) {
+    private HTTPRequest getFusionAuthJavaHttpRequest(HttpRequest javaNetHttpRequest, InputStream inputStream) {
+      var uri = javaNetHttpRequest.uri();
+      // setPath will handle all of this, we just need to get rid of the host
+      var pathWithQuery = uri.toString()
+                             .replace(uri.getScheme() + "://" + uri.getHost() + ":" + uri.getPort(), "");
       // build a fresh request, distinct from the one that requestBuilder used.
-      HTTPRequest newFusionAuthJavaHttpRequest = new HTTPRequest();
-      HTTPRequest existingRequest = HTTPObjectsHolder.getRequest();
-      // using the "odd" existing request here that we build but don't send directly
+      var foo = new HTTPRequest()
+          .with(r -> r.setPath(pathWithQuery))
+          .with(r -> r.setMethod(HTTPMethod.of(javaNetHttpRequest.method())))
+          .with(r -> r.setPort(uri.getPort()))
+          .with(r -> r.setScheme(uri.getScheme()))
+          .with(r -> r.setHost(uri.getHost()))
 
-      newFusionAuthJavaHttpRequest.with(r -> r.setPath(existingRequest.getPath()))
-                                  .with(r -> r.setMethod(existingRequest.getMethod()))
-                                  .with(r -> r.setPort(existingRequest.getPort()))
-                                  .with(r -> r.setScheme(existingRequest.getScheme()))
-                                  .with(r -> r.setURLParameters(existingRequest.getURLParameters()))
+          .with(r -> r.setHeaders(javaNetHttpRequest.headers().map()))
 
-                                  .with(r -> r.setHeaders(existingRequest.getHeaders()))
-                                  .with(r -> r.addCookies(existingRequest.getCookies()))
+          .with(r -> r.setContentLength(javaNetHttpRequest.bodyPublisher().get().contentLength()))
+          .with(r -> r.setInputStream(inputStream));
 
-                                  .with(r -> r.setContentLength(javaNetHttpRequest.bodyPublisher().get().contentLength()))
-                                  .with(r -> r.setContentType(existingRequest.getContentType()))
-                                  .with(r -> r.setInputStream(existingRequest.getInputStream()));
-
-      return newFusionAuthJavaHttpRequest;
+      return foo;
     }
   }
 
