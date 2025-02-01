@@ -110,6 +110,8 @@ public class FastRequestSimulator extends RequestSimulator {
       List<Cookie> parsedCookies = getParsedCookies(javaNetHttpHeaders);
       fusionAuthJavaHttpRequest.addCookies(parsedCookies);
 
+      fusionAuthJavaHttpRequest.setContentLength(javaNetHttpRequest.bodyPublisher().get().contentLength());
+
       return fusionAuthJavaHttpRequest;
     }
   }
