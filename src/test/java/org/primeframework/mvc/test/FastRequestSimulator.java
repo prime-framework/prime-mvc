@@ -31,7 +31,6 @@ import java.util.stream.Collectors;
 
 import com.google.inject.Injector;
 import io.fusionauth.http.Cookie;
-import io.fusionauth.http.HTTPMethod;
 import io.fusionauth.http.HTTPValues.Headers;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
@@ -110,12 +109,6 @@ public class FastRequestSimulator extends RequestSimulator {
 
       List<Cookie> parsedCookies = getParsedCookies(javaHttpHeaders);
       fusionAuthJavaHttpRequest.addCookies(parsedCookies);
-
-      fusionAuthJavaHttpRequest.setMethod(HTTPMethod.of(javaNetHttpRequest.method()));
-
-      URI uri = javaNetHttpRequest.uri();
-      fusionAuthJavaHttpRequest.setHost(uri.getHost());
-      fusionAuthJavaHttpRequest.setPath(uri.getPath());
 
       return fusionAuthJavaHttpRequest;
     }
