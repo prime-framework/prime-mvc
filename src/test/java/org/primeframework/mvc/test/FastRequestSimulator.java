@@ -85,45 +85,50 @@ public class FastRequestSimulator extends RequestSimulator {
     }
 
     @Override
-    protected HttpResponse<byte[]> executeHttpRequest(HttpRequest javaHttpRequest) throws IOException, InterruptedException {
-      var primeHttpRequest = HTTPObjectsHolder.getRequest();
-      populatePrimeHttpRequest(javaHttpRequest, primeHttpRequest);
+    protected HttpResponse<byte[]> executeHttpRequest(HttpRequest javaNetHttpRequest) throws IOException, InterruptedException {
+      var fusionAuthJavaHttpRequest = getFusionAuthJavaHttpRequest(javaNetHttpRequest);
 
       HTTPObjectsHolder.clearResponse();
       // we want to use a simpler stream
       ByteArrayOutputStream responseStream = new ByteArrayOutputStream();
-      HTTPResponse primeHttpResponse = new HTTPResponse(responseStream, primeHttpRequest);
-      HTTPObjectsHolder.setResponse(primeHttpResponse);
+      HTTPResponse fusionAuthJavaHttpResponse = new HTTPResponse(responseStream, fusionAuthJavaHttpRequest);
+      HTTPObjectsHolder.setResponse(fusionAuthJavaHttpResponse);
 
       // may not need this, working around ThreadLocal
-      Thread requestThread = new Thread(() -> handler.handle(primeHttpRequest, primeHttpResponse));
+      Thread requestThread = new Thread(() -> handler.handle(fusionAuthJavaHttpRequest, fusionAuthJavaHttpResponse));
       requestThread.start();
       requestThread.join();
 
-      return new ResponseWrapper(primeHttpResponse, javaHttpRequest, responseStream);
+      return new JavaNetHttpResponseWrapper(fusionAuthJavaHttpResponse, javaNetHttpRequest, responseStream);
     }
 
-    private void populatePrimeHttpRequest(HttpRequest javaHttpRequest, HTTPRequest primeHttpRequest) {
-      Map<String, List<String>> javaHttpHeaders = javaHttpRequest.headers().map();
+    private HTTPRequest getFusionAuthJavaHttpRequest(HttpRequest javaNetHttpRequest) {
+      HTTPRequest fusionAuthJavaHttpRequest = HTTPObjectsHolder.getRequest();
+      Map<String, List<String>> javaHttpHeaders = javaNetHttpRequest.headers().map();
       Map<String, List<String>> headersWithoutCookie = getHeadersWithoutCookie(javaHttpHeaders);
-      primeHttpRequest.setHeaders(headersWithoutCookie);
+      fusionAuthJavaHttpRequest.setHeaders(headersWithoutCookie);
+
       List<Cookie> parsedCookies = getParsedCookies(javaHttpHeaders);
-      primeHttpRequest.addCookies(parsedCookies);
-      primeHttpRequest.setMethod(HTTPMethod.of(javaHttpRequest.method()));
-      URI uri = javaHttpRequest.uri();
-      primeHttpRequest.setHost(uri.getHost());
-      primeHttpRequest.setPath(uri.getPath());
+      fusionAuthJavaHttpRequest.addCookies(parsedCookies);
+
+      fusionAuthJavaHttpRequest.setMethod(HTTPMethod.of(javaNetHttpRequest.method()));
+
+      URI uri = javaNetHttpRequest.uri();
+      fusionAuthJavaHttpRequest.setHost(uri.getHost());
+      fusionAuthJavaHttpRequest.setPath(uri.getPath());
+
+      return fusionAuthJavaHttpRequest;
     }
   }
 
-  private static class ResponseWrapper implements HttpResponse<byte[]> {
+  private static class JavaNetHttpResponseWrapper implements HttpResponse<byte[]> {
     private final HTTPResponse primeMvcResponse;
 
     private final HttpRequest request;
 
     private final ByteArrayOutputStream responseStream;
 
-    private ResponseWrapper(HTTPResponse primeMvcResponse, HttpRequest request, ByteArrayOutputStream responseStream) {
+    private JavaNetHttpResponseWrapper(HTTPResponse primeMvcResponse, HttpRequest request, ByteArrayOutputStream responseStream) {
       this.primeMvcResponse = primeMvcResponse;
       this.request = request;
       this.responseStream = responseStream;
