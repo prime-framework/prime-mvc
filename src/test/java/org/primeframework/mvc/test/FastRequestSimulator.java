@@ -18,6 +18,7 @@ package org.primeframework.mvc.test;
 import javax.net.ssl.SSLSession;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpClient.Version;
 import java.net.http.HttpHeaders;
@@ -84,7 +85,8 @@ public class FastRequestSimulator extends RequestSimulator {
     }
 
     @Override
-    protected HttpResponse<byte[]> executeHttpRequest(HttpRequest javaNetHttpRequest) throws IOException, InterruptedException {
+    protected HttpResponse<byte[]> executeHttpRequest(HttpRequest javaNetHttpRequest, InputStream inputStream)
+        throws IOException, InterruptedException {
       var fusionAuthJavaHttpRequest = getFusionAuthJavaHttpRequest(javaNetHttpRequest);
 
       HTTPObjectsHolder.clearResponse();
@@ -102,17 +104,37 @@ public class FastRequestSimulator extends RequestSimulator {
     }
 
     private HTTPRequest getFusionAuthJavaHttpRequest(HttpRequest javaNetHttpRequest) {
-      HTTPRequest fusionAuthJavaHttpRequest = HTTPObjectsHolder.getRequest();
-      Map<String, List<String>> javaNetHttpHeaders = javaNetHttpRequest.headers().map();
-      Map<String, List<String>> headersWithoutCookie = getHeadersWithoutCookie(javaNetHttpHeaders);
-      fusionAuthJavaHttpRequest.setHeaders(headersWithoutCookie);
+      // build a fresh request, distinct from the one that requestBuilder used.
+      HTTPRequest newFusionAuthJavaHttpRequest = new HTTPRequest();
+      HTTPRequest existingRequest = HTTPObjectsHolder.getRequest();
+      // using the "odd" existing request here that we build but don't send directly
 
-      List<Cookie> parsedCookies = getParsedCookies(javaNetHttpHeaders);
-      fusionAuthJavaHttpRequest.addCookies(parsedCookies);
+      newFusionAuthJavaHttpRequest.with(r -> r.setPath(existingRequest.getPath()))
+                                  .with(r -> r.setMethod(existingRequest.getMethod()))
+                                  .with(r -> r.setPort(existingRequest.getPort()))
+                                  .with(r -> r.setScheme(existingRequest.getScheme()))
+                                  .with(r -> r.setURLParameters(existingRequest.getURLParameters()))
 
-      fusionAuthJavaHttpRequest.setContentLength(javaNetHttpRequest.bodyPublisher().get().contentLength());
+                                  .with(r -> r.setHeaders(existingRequest.getHeaders()))
+                                  .with(r -> r.addCookies(existingRequest.getCookies()))
 
-      return fusionAuthJavaHttpRequest;
+                                  .with(r -> r.setContentLength(javaNetHttpRequest.bodyPublisher().get().contentLength()))
+                                  .with(r -> r.setContentType(existingRequest.getContentType()))
+                                  .with(r -> r.setInputStream(existingRequest.getInputStream()))
+      ;
+
+//      Map<String, List<String>> javaNetHttpHeaders = javaNetHttpRequest.headers().map();
+//      Map<String, List<String>> headersWithoutCookie = getHeadersWithoutCookie(javaNetHttpHeaders);
+//      fusionAuthJavaHttpRequest.setHeaders(headersWithoutCookie);
+//
+//      List<Cookie> parsedCookies = getParsedCookies(javaNetHttpHeaders);
+//      fusionAuthJavaHttpRequest.addCookies(parsedCookies);
+//
+//      BodyPublisher bodyPublisher = javaNetHttpRequest.bodyPublisher().get();
+//      fusionAuthJavaHttpRequest.setContentLength(bodyPublisher.contentLength());
+//      fusionAuthJavaHttpRequest.setInputStream(inputStream);
+
+      return newFusionAuthJavaHttpRequest;
     }
   }
 

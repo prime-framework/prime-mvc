@@ -794,7 +794,8 @@ public class RequestBuilder {
     return withURLSegment(value);
   }
 
-  protected HttpResponse<byte[]> executeHttpRequest(HttpRequest request) throws IOException, InterruptedException {
+  protected HttpResponse<byte[]> executeHttpRequest(HttpRequest request,
+                                                    InputStream inputStream) throws IOException, InterruptedException {
     return HttpClientInstance.send(request,
                                    BodyHandlers.ofByteArray());
   }
@@ -944,7 +945,7 @@ public class RequestBuilder {
 
     HTTPResponseWrapper result = new HTTPResponseWrapper();
     try {
-      result.response = executeHttpRequest(requestBuilder.build());
+      result.response = executeHttpRequest(requestBuilder.build(), inputStream);
     } catch (Exception e) {
       result.exception = e;
       result.init();
