@@ -103,11 +103,11 @@ public class FastRequestSimulator extends RequestSimulator {
 
     private HTTPRequest getFusionAuthJavaHttpRequest(HttpRequest javaNetHttpRequest) {
       HTTPRequest fusionAuthJavaHttpRequest = HTTPObjectsHolder.getRequest();
-      Map<String, List<String>> javaHttpHeaders = javaNetHttpRequest.headers().map();
-      Map<String, List<String>> headersWithoutCookie = getHeadersWithoutCookie(javaHttpHeaders);
+      Map<String, List<String>> javaNetHttpHeaders = javaNetHttpRequest.headers().map();
+      Map<String, List<String>> headersWithoutCookie = getHeadersWithoutCookie(javaNetHttpHeaders);
       fusionAuthJavaHttpRequest.setHeaders(headersWithoutCookie);
 
-      List<Cookie> parsedCookies = getParsedCookies(javaHttpHeaders);
+      List<Cookie> parsedCookies = getParsedCookies(javaNetHttpHeaders);
       fusionAuthJavaHttpRequest.addCookies(parsedCookies);
 
       return fusionAuthJavaHttpRequest;
