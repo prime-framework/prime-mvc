@@ -78,7 +78,6 @@ public class FastRequestSimulator extends RequestSimulator {
       Thread requestThread = new Thread(() -> handler.handle(realRequest, realResponse));
       requestThread.start();
       requestThread.join();
-      realResponse.close();
       return new ResponseWrapper(realResponse, request, responseStream);
     }
   }
