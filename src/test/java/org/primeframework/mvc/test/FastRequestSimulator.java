@@ -98,6 +98,7 @@ public class FastRequestSimulator extends RequestSimulator {
           .with(r -> r.setPort(uri.getPort()))
           .with(r -> r.setScheme(uri.getScheme()))
           .with(r -> r.setHost(uri.getHost()))
+          .with(r -> r.setIPAddress("127.0.0.1"))
 
           .with(r -> r.setHeaders(javaNetHttpRequest.headers().map()))
 
