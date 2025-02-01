@@ -491,17 +491,6 @@ public class RequestBuilder {
   }
 
   /**
-   * Encrypt the provided value and add a cookie with the encrypted value to the request
-   *
-   * @param name  The name of the cookie.
-   * @param value The unencrypted value of the cookie.
-   * @return This.
-   */
-  public RequestBuilder withEncryptedCookie(String name, String value) throws Exception {
-    return withCookie(name, value, false, true);
-  }
-
-  /**
    * Add a cookie to the request.
    *
    * @param cookie The cookie.
@@ -523,6 +512,17 @@ public class RequestBuilder {
   public RequestBuilder withEncoding(Charset encoding) {
     request.setCharacterEncoding(encoding);
     return this;
+  }
+
+  /**
+   * Encrypt the provided value and add a cookie with the encrypted value to the request
+   *
+   * @param name  The name of the cookie.
+   * @param value The unencrypted value of the cookie.
+   * @return This.
+   */
+  public RequestBuilder withEncryptedCookie(String name, String value) throws Exception {
+    return withCookie(name, value, false, true);
   }
 
   /**
@@ -794,6 +794,11 @@ public class RequestBuilder {
     return withURLSegment(value);
   }
 
+  protected HttpResponse<byte[]> executeHttpRequest(HttpRequest request) throws IOException, InterruptedException {
+    return HttpClientInstance.send(request,
+                                   BodyHandlers.ofByteArray());
+  }
+
   HTTPResponseWrapper run() {
     // Set the new request & response so that we can inject things below
     HTTPObjectsHolder.clearRequest();
@@ -939,8 +944,7 @@ public class RequestBuilder {
 
     HTTPResponseWrapper result = new HTTPResponseWrapper();
     try {
-      result.response = HttpClientInstance.send(requestBuilder.build(),
-                                                BodyHandlers.ofByteArray());
+      result.response = executeHttpRequest(requestBuilder.build());
     } catch (Exception e) {
       result.exception = e;
       result.init();

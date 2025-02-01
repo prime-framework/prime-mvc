@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2014-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1936,7 +1936,7 @@ public class RequestResult {
     boolean recheck = false;
 
     // Bail early they are not even the same size
-    if (actual.keySet().size() != expected.keySet().size()) {
+    if (actual.size() != expected.size()) {
       // Check for optional parameters, if we don't have any, we know we are done.
       if (expected.values().stream().noneMatch(v -> v.size() > 0 && v.get(0).equals("___optional___"))) {
         return false;

@@ -86,6 +86,7 @@ import org.primeframework.mvc.security.StaticResourceFilter;
 import org.primeframework.mvc.security.UserLoginSecurityContext;
 import org.primeframework.mvc.security.VerifierProvider;
 import org.primeframework.mvc.security.csrf.CSRFProvider;
+import org.primeframework.mvc.test.FastRequestSimulator;
 import org.primeframework.mvc.test.RequestBuilder.HTTPRequestConsumer;
 import org.primeframework.mvc.test.RequestSimulator;
 import org.primeframework.mvc.util.ThrowingRunnable;
@@ -245,7 +246,8 @@ public abstract class PrimeBaseTest {
                                                   .withListener(new HTTPListenerConfiguration(9080))
                                                   .withLoggerFactory(TestAccumulatingLoggerFactory.FACTORY);
     TestPrimeMain main = new TestPrimeMain(new HTTPServerConfiguration[]{mainConfig}, module);
-    simulator = new RequestSimulator(main, messageObserver);
+    //simulator = new RequestSimulator(main, messageObserver);
+    simulator = new FastRequestSimulator(main, messageObserver);
     injector = simulator.getInjector();
     context = injector.getInstance(HTTPContext.class);
   }
