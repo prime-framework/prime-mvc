@@ -33,6 +33,7 @@ import com.google.inject.Injector;
 import io.fusionauth.http.Cookie;
 import io.fusionauth.http.HTTPMethod;
 import io.fusionauth.http.HTTPValues.Headers;
+import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mock.MockUserAgent;
 import org.primeframework.mvc.BasePrimeMain;
@@ -67,37 +68,51 @@ public class FastRequestSimulator extends RequestSimulator {
       this.handler = handler;
     }
 
+    private static Map<String, List<String>> getHeadersWithoutCookie(Map<String, List<String>> javaHttpHeaders) {
+      return javaHttpHeaders.entrySet()
+                            .stream()
+                            .filter(kv -> !kv.getKey().equalsIgnoreCase("cookie"))
+                            .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+    }
+
+    private static List<Cookie> getParsedCookies(Map<String, List<String>> javaHttpHeaders) {
+      List<String> rawCookies = javaHttpHeaders.get("Cookie");
+      return Optional.ofNullable(rawCookies)
+                     .orElse(List.of())
+                     .stream()
+                     .flatMap(c -> Cookie.fromRequestHeader(c).stream())
+                     .toList();
+    }
+
     @Override
     protected HttpResponse<byte[]> executeHttpRequest(HttpRequest javaHttpRequest) throws IOException, InterruptedException {
       var primeHttpRequest = HTTPObjectsHolder.getRequest();
+      populatePrimeHttpRequest(javaHttpRequest, primeHttpRequest);
+
       HTTPObjectsHolder.clearResponse();
       // we want to use a simpler stream
       ByteArrayOutputStream responseStream = new ByteArrayOutputStream();
-      HTTPObjectsHolder.setResponse(new HTTPResponse(responseStream, primeHttpRequest));
+      HTTPResponse primeHttpResponse = new HTTPResponse(responseStream, primeHttpRequest);
+      HTTPObjectsHolder.setResponse(primeHttpResponse);
+
+      // may not need this, working around ThreadLocal
+      Thread requestThread = new Thread(() -> handler.handle(primeHttpRequest, primeHttpResponse));
+      requestThread.start();
+      requestThread.join();
+
+      return new ResponseWrapper(primeHttpResponse, javaHttpRequest, responseStream);
+    }
+
+    private void populatePrimeHttpRequest(HttpRequest javaHttpRequest, HTTPRequest primeHttpRequest) {
       Map<String, List<String>> javaHttpHeaders = javaHttpRequest.headers().map();
-      List<String> rawCookies = javaHttpHeaders.get("Cookie");
-      Map<String, List<String>> headersWithoutCookie = javaHttpHeaders.entrySet()
-                                                                      .stream()
-                                                                      .filter(kv -> !kv.getKey().equalsIgnoreCase("cookie"))
-                                                                      .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+      Map<String, List<String>> headersWithoutCookie = getHeadersWithoutCookie(javaHttpHeaders);
       primeHttpRequest.setHeaders(headersWithoutCookie);
-      List<Cookie> parsedCookies = Optional.ofNullable(rawCookies)
-                                           .orElse(List.of())
-                                           .stream()
-                                           .flatMap(c -> Cookie.fromRequestHeader(c).stream())
-                                           .toList();
+      List<Cookie> parsedCookies = getParsedCookies(javaHttpHeaders);
       primeHttpRequest.addCookies(parsedCookies);
       primeHttpRequest.setMethod(HTTPMethod.of(javaHttpRequest.method()));
       URI uri = javaHttpRequest.uri();
       primeHttpRequest.setHost(uri.getHost());
       primeHttpRequest.setPath(uri.getPath());
-      // inputStream is already set
-      HTTPResponse realResponse = HTTPObjectsHolder.getResponse();
-      // may not need this, working around ThreadLocal
-      Thread requestThread = new Thread(() -> handler.handle(primeHttpRequest, realResponse));
-      requestThread.start();
-      requestThread.join();
-      return new ResponseWrapper(realResponse, javaHttpRequest, responseStream);
     }
   }
 
