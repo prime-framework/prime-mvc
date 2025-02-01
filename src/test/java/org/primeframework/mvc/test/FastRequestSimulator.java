@@ -72,16 +72,13 @@ public class FastRequestSimulator extends RequestSimulator {
         throws IOException, InterruptedException {
       var fusionAuthJavaHttpRequest = getFusionAuthJavaHttpRequest(javaNetHttpRequest, inputStream);
 
+      HTTPObjectsHolder.clearRequest();
       HTTPObjectsHolder.clearResponse();
       // we want to use a simpler stream
       ByteArrayOutputStream responseStream = new ByteArrayOutputStream();
       HTTPResponse fusionAuthJavaHttpResponse = new HTTPResponse(responseStream, fusionAuthJavaHttpRequest);
-      HTTPObjectsHolder.setResponse(fusionAuthJavaHttpResponse);
 
-      // may not need this, working around ThreadLocal
-      Thread requestThread = new Thread(() -> handler.handle(fusionAuthJavaHttpRequest, fusionAuthJavaHttpResponse));
-      requestThread.start();
-      requestThread.join();
+      handler.handle(fusionAuthJavaHttpRequest, fusionAuthJavaHttpResponse);
 
       return new JavaNetHttpResponseWrapper(fusionAuthJavaHttpResponse, javaNetHttpRequest, responseStream);
     }
