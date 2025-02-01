@@ -26,9 +26,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import com.google.inject.Injector;
 import io.fusionauth.http.Cookie;
@@ -68,22 +66,6 @@ public class FastRequestSimulator extends RequestSimulator {
       this.handler = handler;
     }
 
-    private static Map<String, List<String>> getHeadersWithoutCookie(Map<String, List<String>> javaHttpHeaders) {
-      return javaHttpHeaders.entrySet()
-                            .stream()
-                            .filter(kv -> !kv.getKey().equalsIgnoreCase("cookie"))
-                            .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
-    }
-
-    private static List<Cookie> getParsedCookies(Map<String, List<String>> javaHttpHeaders) {
-      List<String> rawCookies = javaHttpHeaders.get("Cookie");
-      return Optional.ofNullable(rawCookies)
-                     .orElse(List.of())
-                     .stream()
-                     .flatMap(c -> Cookie.fromRequestHeader(c).stream())
-                     .toList();
-    }
-
     @Override
     protected HttpResponse<byte[]> executeHttpRequest(HttpRequest javaNetHttpRequest, InputStream inputStream)
         throws IOException, InterruptedException {
@@ -120,19 +102,7 @@ public class FastRequestSimulator extends RequestSimulator {
 
                                   .with(r -> r.setContentLength(javaNetHttpRequest.bodyPublisher().get().contentLength()))
                                   .with(r -> r.setContentType(existingRequest.getContentType()))
-                                  .with(r -> r.setInputStream(existingRequest.getInputStream()))
-      ;
-
-//      Map<String, List<String>> javaNetHttpHeaders = javaNetHttpRequest.headers().map();
-//      Map<String, List<String>> headersWithoutCookie = getHeadersWithoutCookie(javaNetHttpHeaders);
-//      fusionAuthJavaHttpRequest.setHeaders(headersWithoutCookie);
-//
-//      List<Cookie> parsedCookies = getParsedCookies(javaNetHttpHeaders);
-//      fusionAuthJavaHttpRequest.addCookies(parsedCookies);
-//
-//      BodyPublisher bodyPublisher = javaNetHttpRequest.bodyPublisher().get();
-//      fusionAuthJavaHttpRequest.setContentLength(bodyPublisher.contentLength());
-//      fusionAuthJavaHttpRequest.setInputStream(inputStream);
+                                  .with(r -> r.setInputStream(existingRequest.getInputStream()));
 
       return newFusionAuthJavaHttpRequest;
     }
