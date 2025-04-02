@@ -39,7 +39,8 @@ jobs:
         run: |
           sb clean int
       - name: publish test report
-        uses: mikepenz/action-junit-report@v4
+        # v4
+        uses: mikepenz/action-junit-report@db71d41eb79864e25ab0337e395c352e84523afe
         if: success() || failure() # always run even if the previous step fails
         with:
           report_paths: 'build/test-reports/junitreports/**/*.xml'
