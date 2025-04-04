@@ -291,26 +291,31 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
       System.out.println("---refreshJWT - got back exception " + e.getMessage());
       e.printStackTrace();
       try {
-        List<String> args = List.of("curl",
-                                    "-v",
-                                    "-H",
-                                    "Content-Type: application/x-www-form-urlencoded",
-                                    "-d",
-                                    new String(new FormBodyPublisher(body).getBody()),
-                                    oauthConfiguration.tokenEndpoint);
-        System.out.println("---refreshJWT - sending another request with curl, command line " + args);
-        Process process = new ProcessBuilder(args)
-            .inheritIO()
-            .start();
-        process.waitFor();
-        System.out.println("---refreshJWT - curl request complete, trying again with java net http");
-        try {
-          resp = httpClient.send(refreshRequest, new JSONResponseBodyHandler<>(RefreshResponse.class));
-          System.out.println("---refreshJWT java net http attempt 2 - got back status code " + resp.statusCode());
-        } catch (Exception attempt2) {
-          System.out.println("---refreshJWT java net http attempt 2 - got back exception " + attempt2.getMessage());
-          attempt2.printStackTrace();
-          endpointException = attempt2;
+        if (System.getenv("curl_refresh_retry") != null) {
+          List<String> args = List.of("curl",
+                                      "-v",
+                                      "-H",
+                                      "Content-Type: application/x-www-form-urlencoded",
+                                      "-d",
+                                      new String(new FormBodyPublisher(body).getBody()),
+                                      oauthConfiguration.tokenEndpoint);
+          System.out.println("---refreshJWT - sending another request with curl, command line " + args);
+          Process process = new ProcessBuilder(args)
+              .inheritIO()
+              .start();
+          process.waitFor();
+          System.out.println("---refreshJWT - curl request complete");
+        }
+        if (System.getenv("java_net_http_refresh_retry") != null) {
+          System.out.println("---refreshJWT trying again with java net http");
+          try {
+            resp = httpClient.send(refreshRequest, new JSONResponseBodyHandler<>(RefreshResponse.class));
+            System.out.println("---refreshJWT java net http attempt 2 - got back status code " + resp.statusCode());
+          } catch (Exception attempt2) {
+            System.out.println("---refreshJWT java net http attempt 2 - got back exception " + attempt2.getMessage());
+            attempt2.printStackTrace();
+            endpointException = attempt2;
+          }
         }
       } catch (Exception curlE) {
         throw new RuntimeException(curlE);
