@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2024, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2015-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,18 +80,22 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
     // Cache in the request
     Object user = request.getAttribute(UserKey);
     if (user != null) {
+      //System.out.println("---returning attribute user " + user);
       return user;
     }
 
     Tokens tokens = resolveContext();
     if (tokens.jwt == null) {
+      // System.out.println("---returning null because tokens.jwt is null");
       return null;
     }
 
     user = retrieveUserForJWT(tokens.jwt);
     if (user == null) {
+      // System.out.println("---returning null because retrieveUserForJWT is null");
       jwtCookie.delete(request, response);
     } else {
+      // System.out.println("---yay got user " + user);
       request.setAttribute(UserKey, user);
     }
 
@@ -282,9 +286,37 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
     Exception endpointException = null;
     try {
       resp = httpClient.send(refreshRequest, new JSONResponseBodyHandler<>(RefreshResponse.class));
+      System.out.println("---refreshJWT - got back status code " + resp.statusCode());
     } catch (Exception e) {
-      endpointException = e;
+      System.out.println("---refreshJWT - got back exception " + e.getMessage());
+      e.printStackTrace();
+      try {
+        List<String> args = List.of("curl",
+                                    "-v",
+                                    "-H",
+                                    "Content-Type: application/x-www-form-urlencoded",
+                                    "-d",
+                                    new String(new FormBodyPublisher(body).getBody()),
+                                    oauthConfiguration.tokenEndpoint);
+        System.out.println("---refreshJWT - sending another request with curl, command line " + args);
+        Process process = new ProcessBuilder(args)
+            .inheritIO()
+            .start();
+        process.waitFor();
+        System.out.println("---refreshJWT - curl request complete, trying again with java net http");
+        try {
+          resp = httpClient.send(refreshRequest, new JSONResponseBodyHandler<>(RefreshResponse.class));
+          System.out.println("---refreshJWT java net http attempt 2 - got back status code " + resp.statusCode());
+        } catch (Exception attempt2) {
+          System.out.println("---refreshJWT java net http attempt 2 - got back exception " + attempt2.getMessage());
+          attempt2.printStackTrace();
+          endpointException = attempt2;
+        }
+      } catch (Exception curlE) {
+        throw new RuntimeException(curlE);
+      }
     }
+
     if (endpointException != null || resp.statusCode() < 200 || resp.statusCode() > 299) {
       tokens.refreshToken = null;
       jwtCookie.delete(request, response);
@@ -320,6 +352,7 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
   private Tokens resolveContext() {
     Tokens tokens = (Tokens) request.getAttribute(ContextKey);
     if (tokens != null) {
+      //System.out.println("---resolveContext returning tokens from attributes");
       return tokens;
     }
 
@@ -329,12 +362,14 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
 
     Map<String, Verifier> verifiers = getVerifiersOrNull();
     if (verifiers == null) {
+      //System.out.println("---resolveContext returning empty tokens because verifiers is null");
       return tokens;
     }
 
     tokens.jwt = jwtCookie.get(request);
     tokens.refreshToken = refreshTokenCookie.get(request);
     if (tokens.jwt == null && tokens.refreshToken == null) {
+      //System.out.println("---resolveContext returning empty tokens because refresh and jwt are null");
       return tokens;
     }
 
@@ -342,19 +377,23 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
       // We can optionally start with only a refresh token, no JWT.
       // - Treat this the same as an expired JWT - just refresh my JWT man!
       if (tokens.jwt == null) {
+        System.out.println("---resolveContext refreshing and returning");
         return refreshJWT(tokens);
       }
 
       tokens.decodedJWT = JWT.getDecoder().decode(tokens.jwt, verifiers);
       if (!validateJWTClaims(tokens.decodedJWT) || isRevoked(tokens.decodedJWT)) {
+        System.out.println("---resolveContext returning empty tokens because jWT claims invalid or revoked");
         clearTokens(tokens);
         return tokens;
       }
 
       return tokens;
     } catch (JWTExpiredException e) {
+      System.out.println("---resolveContext refreshing due to JWTExpiredException and returning");
       return refreshJWT(tokens);
     } catch (Exception e) {
+      System.out.println("---resolveContext returning empty tokens due to " + e.getMessage());
       clearTokens(tokens);
       return tokens;
     }
