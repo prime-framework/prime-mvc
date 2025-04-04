@@ -15,6 +15,8 @@
  */
 package org.primeframework.mvc.security;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -26,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fusionauth.http.Cookie.SameSite;
 import io.fusionauth.http.HTTPValues.ContentTypes;
 import io.fusionauth.http.HTTPValues.Headers;
@@ -278,60 +281,93 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
       body.put("client_secret", List.of(oauthConfiguration.clientSecret));
     }
 
-    HttpRequest refreshRequest = requestBuilder.header(Headers.ContentType, ContentTypes.Form)
-                                               .POST(new FormBodyPublisher(body))
-                                               .build();
+    if (System.getenv("curl_refresh_only") == null) {
+      HttpRequest refreshRequest = requestBuilder.header(Headers.ContentType, ContentTypes.Form)
+                                                 .POST(new FormBodyPublisher(body))
+                                                 .build();
 
-    HttpResponse<RefreshResponse> resp = null;
-    Exception endpointException = null;
-    try {
-      resp = httpClient.send(refreshRequest, new JSONResponseBodyHandler<>(RefreshResponse.class));
-      System.out.println("---refreshJWT - got back status code " + resp.statusCode());
-    } catch (Exception e) {
-      System.out.println("---refreshJWT - got back exception " + e.getMessage());
-      e.printStackTrace();
+      HttpResponse<RefreshResponse> resp = null;
+      Exception endpointException = null;
       try {
-        if (System.getenv("curl_refresh_retry") != null) {
-          List<String> args = List.of("curl",
-                                      "-v",
-                                      "-H",
-                                      "Content-Type: application/x-www-form-urlencoded",
-                                      "-d",
-                                      new String(new FormBodyPublisher(body).getBody()),
-                                      oauthConfiguration.tokenEndpoint);
-          System.out.println("---refreshJWT - sending another request with curl, command line " + args);
-          Process process = new ProcessBuilder(args)
-              .inheritIO()
-              .start();
-          process.waitFor();
-          System.out.println("---refreshJWT - curl request complete");
-        }
-        if (System.getenv("java_net_http_refresh_retry") != null) {
-          System.out.println("---refreshJWT trying again with java net http");
-          try {
-            resp = httpClient.send(refreshRequest, new JSONResponseBodyHandler<>(RefreshResponse.class));
-            System.out.println("---refreshJWT java net http attempt 2 - got back status code " + resp.statusCode());
-          } catch (Exception attempt2) {
-            System.out.println("---refreshJWT java net http attempt 2 - got back exception " + attempt2.getMessage());
-            attempt2.printStackTrace();
-            endpointException = attempt2;
+        resp = httpClient.send(refreshRequest, new JSONResponseBodyHandler<>(RefreshResponse.class));
+        System.out.println("---refreshJWT - got back status code " + resp.statusCode());
+      } catch (Exception e) {
+        System.out.println("---refreshJWT - got back exception " + e.getMessage());
+        e.printStackTrace();
+        try {
+          if (System.getenv("curl_refresh_retry") != null) {
+            List<String> args = List.of("curl",
+                                        "-v",
+                                        "-H",
+                                        "Content-Type: application/x-www-form-urlencoded",
+                                        "-d",
+                                        new String(new FormBodyPublisher(body).getBody()),
+                                        oauthConfiguration.tokenEndpoint);
+            System.out.println("---refreshJWT - sending another request with curl, command line " + args);
+            Process process = new ProcessBuilder(args)
+                .inheritIO()
+                .start();
+            process.waitFor();
+            System.out.println("---refreshJWT - curl request complete");
           }
+          if (System.getenv("java_net_http_refresh_retry") != null) {
+            System.out.println("---refreshJWT trying again with java net http");
+            try {
+              resp = httpClient.send(refreshRequest, new JSONResponseBodyHandler<>(RefreshResponse.class));
+              System.out.println("---refreshJWT java net http attempt 2 - got back status code " + resp.statusCode());
+            } catch (Exception attempt2) {
+              System.out.println("---refreshJWT java net http attempt 2 - got back exception " + attempt2.getMessage());
+              attempt2.printStackTrace();
+              endpointException = attempt2;
+            }
+          }
+        } catch (Exception curlE) {
+          throw new RuntimeException(curlE);
         }
-      } catch (Exception curlE) {
-        throw new RuntimeException(curlE);
       }
-    }
 
-    if (endpointException != null || resp.statusCode() < 200 || resp.statusCode() > 299) {
-      tokens.refreshToken = null;
-      jwtCookie.delete(request, response);
-      refreshTokenCookie.delete(request, response);
-      return tokens;
-    }
+      if (endpointException != null || resp.statusCode() < 200 || resp.statusCode() > 299) {
+        tokens.refreshToken = null;
+        jwtCookie.delete(request, response);
+        refreshTokenCookie.delete(request, response);
+        return tokens;
+      }
 
-    RefreshResponse rr = resp.body();
-    tokens.jwt = rr.access_token;
-    tokens.refreshToken = defaultIfNull(rr.refresh_token, tokens.refreshToken);
+      RefreshResponse rr = resp.body();
+      tokens.jwt = rr.access_token;
+      tokens.refreshToken = defaultIfNull(rr.refresh_token, tokens.refreshToken);
+    } else {
+      List<String> args = List.of("curl",
+                                  "-s",
+                                  "-H",
+                                  "Content-Type: application/x-www-form-urlencoded",
+                                  "-d",
+                                  new String(new FormBodyPublisher(body).getBody()),
+                                  oauthConfiguration.tokenEndpoint);
+      System.out.println("---refreshJWT - sending ONLY request with curl, command line " + args);
+      try {
+        Process process = new ProcessBuilder(args)
+            .start();
+        process.waitFor();
+        BufferedReader reader =
+            new BufferedReader(new InputStreamReader(process.getInputStream()));
+        StringBuilder builder = new StringBuilder();
+        String line = null;
+        while ((line = reader.readLine()) != null) {
+          builder.append(line);
+          builder.append(System.getProperty("line.separator"));
+        }
+        String result = builder.toString();
+        System.out.println("---refreshJWT - sending ONLY request with curl, got result " + result);
+        RefreshResponse rr = new ObjectMapper().readValue(result, RefreshResponse.class);
+        tokens.jwt = rr.access_token;
+        tokens.refreshToken = defaultIfNull(rr.refresh_token, tokens.refreshToken);
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+
+      System.out.println("---refreshJWT - curl request complete");
+    }
 
     Map<String, Verifier> verifiers = getVerifiersOrNull();
     if (verifiers != null) {
