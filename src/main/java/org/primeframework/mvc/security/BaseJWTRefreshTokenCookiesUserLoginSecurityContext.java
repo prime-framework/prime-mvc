@@ -22,6 +22,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.Builder;
 import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashMap;
@@ -37,6 +38,7 @@ import io.fusionauth.http.server.HTTPResponse;
 import io.fusionauth.jwt.JWTExpiredException;
 import io.fusionauth.jwt.Verifier;
 import io.fusionauth.jwt.domain.JWT;
+import io.fusionauth.jwt.json.JacksonModule;
 import org.primeframework.mvc.http.FormBodyPublisher;
 import org.primeframework.mvc.http.JSONResponseBodyHandler;
 import org.primeframework.mvc.security.oauth.OAuthConfiguration;
@@ -59,6 +61,8 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
   private static final HttpClient httpClient = HttpClient.newHttpClient();
 
   protected final CookieProxy jwtCookie;
+
+  private final static ObjectMapper objectMapper = new ObjectMapper().registerModule(new JacksonModule());
 
   protected final CookieProxy refreshTokenCookie;
 
@@ -286,10 +290,15 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
                                                  .POST(new FormBodyPublisher(body))
                                                  .build();
 
-      HttpResponse<RefreshResponse> resp = null;
+//      HttpResponse<RefreshResponse> resp = null;
+      HttpResponse<String> resp = null;
       Exception endpointException = null;
+      RefreshResponse rr = null;
+
       try {
-        resp = httpClient.send(refreshRequest, new JSONResponseBodyHandler<>(RefreshResponse.class));
+//        resp = httpClient.send(refreshRequest, new JSONResponseBodyHandler<>(RefreshResponse.class));
+        resp = httpClient.send(refreshRequest, BodyHandlers.ofString());
+        rr = objectMapper.readValue(resp.body(), RefreshResponse.class);
         System.out.println("---refreshJWT - got back status code " + resp.statusCode());
       } catch (Exception e) {
         System.out.println("---refreshJWT - got back exception " + e.getMessage());
@@ -313,7 +322,9 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
           if (System.getenv("java_net_http_refresh_retry") != null) {
             System.out.println("---refreshJWT trying again with java net http");
             try {
-              resp = httpClient.send(refreshRequest, new JSONResponseBodyHandler<>(RefreshResponse.class));
+//              resp = httpClient.send(refreshRequest, new JSONResponseBodyHandler<>(RefreshResponse.class));
+              resp = httpClient.send(refreshRequest, BodyHandlers.ofString());
+              rr = objectMapper.readValue(resp.body(), RefreshResponse.class);
               System.out.println("---refreshJWT java net http attempt 2 - got back status code " + resp.statusCode());
             } catch (Exception attempt2) {
               System.out.println("---refreshJWT java net http attempt 2 - got back exception " + attempt2.getMessage());
@@ -333,7 +344,7 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
         return tokens;
       }
 
-      RefreshResponse rr = resp.body();
+//      RefreshResponse rr = resp.body();
       tokens.jwt = rr.access_token;
       tokens.refreshToken = defaultIfNull(rr.refresh_token, tokens.refreshToken);
     } else {
