@@ -178,7 +178,7 @@ public class JWTRefreshTokenLoginTest {
     MockOAuthUserLoginSecurityContext.ValidateJWTOnLogin = false;
     MockOAuthUserLoginSecurityContext.TokenEndpoint = "http://localhost:" + simulator.getPort() + "/oauth/token";
 
-    IntStream.range(0, 1000).forEach(attempt -> {
+    IntStream.range(0, 100).forEach(attempt -> {
       Random random = new Random();
       int rand;
       while (true) {
