@@ -15,17 +15,21 @@
  */
 package org.primeframework.mvc.security;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.Builder;
 import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fusionauth.http.Cookie.SameSite;
 import io.fusionauth.http.HTTPValues.ContentTypes;
 import io.fusionauth.http.HTTPValues.Headers;
@@ -34,8 +38,8 @@ import io.fusionauth.http.server.HTTPResponse;
 import io.fusionauth.jwt.JWTExpiredException;
 import io.fusionauth.jwt.Verifier;
 import io.fusionauth.jwt.domain.JWT;
+import io.fusionauth.jwt.json.JacksonModule;
 import org.primeframework.mvc.http.FormBodyPublisher;
-import org.primeframework.mvc.http.JSONResponseBodyHandler;
 import org.primeframework.mvc.security.oauth.OAuthConfiguration;
 import org.primeframework.mvc.security.oauth.RefreshResponse;
 import org.primeframework.mvc.security.oauth.TokenAuthenticationMethod;
@@ -58,6 +62,8 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
   private static final HttpClient httpClient = HttpClient.newHttpClient();
 
   private static final Logger log = LoggerFactory.getLogger(BaseJWTRefreshTokenCookiesUserLoginSecurityContext.class);
+
+  private final static ObjectMapper objectMapper = new ObjectMapper().registerModule(new JacksonModule());
 
   protected final CookieProxy jwtCookie;
 
@@ -258,13 +264,17 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
       return tokens;
     }
 
+    Runnable clearIt = () -> {
+      tokens.refreshToken = null;
+      jwtCookie.delete(request, response);
+      refreshTokenCookie.delete(request, response);
+    };
+
     Builder requestBuilder = HttpRequest.newBuilder(URI.create(oauthConfiguration.tokenEndpoint));
     if (oauthConfiguration.authenticationMethod == TokenAuthenticationMethod.client_secret_basic) {
       // see https://www.rfc-editor.org/rfc/rfc2617#section-2
       if (oauthConfiguration.clientId.contains(":")) {
-        tokens.refreshToken = null;
-        jwtCookie.delete(request, response);
-        refreshTokenCookie.delete(request, response);
+        clearIt.run();
         return tokens;
       }
       // not using the HttpClient authenticator/PasswordAuthentication support because
@@ -282,24 +292,31 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
                                                .POST(new FormBodyPublisher(body))
                                                .build();
 
-    HttpResponse<RefreshResponse> resp = null;
-    Exception endpointException = null;
+    HttpResponse<InputStream> httpResponse;
     try {
-      resp = httpClient.send(refreshRequest, new JSONResponseBodyHandler<>(RefreshResponse.class));
+      httpResponse = httpClient.send(refreshRequest, BodyHandlers.ofInputStream());
     } catch (Exception e) {
       log.error("Unable to refresh refresh token", e);
-      endpointException = e;
-    }
-    if (endpointException != null || resp.statusCode() < 200 || resp.statusCode() > 299) {
-      tokens.refreshToken = null;
-      jwtCookie.delete(request, response);
-      refreshTokenCookie.delete(request, response);
+      clearIt.run();
       return tokens;
     }
 
-    RefreshResponse rr = resp.body();
-    tokens.jwt = rr.access_token;
-    tokens.refreshToken = defaultIfNull(rr.refresh_token, tokens.refreshToken);
+    // Jackson will not close the stream unless StreamReadFeature.AUTO_CLOSE_SOURCE is enabled
+    // and we did not enable it above, so ensure it gets closed
+    try (InputStream responseBody = httpResponse.body()) {
+      if (httpResponse.statusCode() < 200 || httpResponse.statusCode() > 299) {
+        clearIt.run();
+        return tokens;
+      }
+
+      RefreshResponse rr = objectMapper.readValue(responseBody, RefreshResponse.class);
+      tokens.jwt = rr.access_token;
+      tokens.refreshToken = defaultIfNull(rr.refresh_token, tokens.refreshToken);
+    } catch (IOException e) {
+      log.error("Unable to parse refresh token response", e);
+      clearIt.run();
+      return tokens;
+    }
 
     Map<String, Verifier> verifiers = getVerifiersOrNull();
     if (verifiers != null) {
