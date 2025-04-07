@@ -227,12 +227,13 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
     return true;
   }
 
-  private void clearTokens(Tokens tokens) {
+  private Tokens clearTokens(Tokens tokens) {
     tokens.decodedJWT = null;
     tokens.jwt = null;
     tokens.refreshToken = null;
     jwtCookie.delete(request, response);
     refreshTokenCookie.delete(request, response);
+    return tokens;
   }
 
   private Map<String, Verifier> getVerifiersOrNull() {
@@ -264,18 +265,11 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
       return tokens;
     }
 
-    Runnable clearIt = () -> {
-      tokens.refreshToken = null;
-      jwtCookie.delete(request, response);
-      refreshTokenCookie.delete(request, response);
-    };
-
     Builder requestBuilder = HttpRequest.newBuilder(URI.create(oauthConfiguration.tokenEndpoint));
     if (oauthConfiguration.authenticationMethod == TokenAuthenticationMethod.client_secret_basic) {
       // see https://www.rfc-editor.org/rfc/rfc2617#section-2
       if (oauthConfiguration.clientId.contains(":")) {
-        clearIt.run();
-        return tokens;
+        return clearTokens(tokens);
       }
       // not using the HttpClient authenticator/PasswordAuthentication support because
       // we want pre-emptive auth here
@@ -297,16 +291,14 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
       httpResponse = httpClient.send(refreshRequest, BodyHandlers.ofInputStream());
     } catch (Exception e) {
       log.error("Unable to refresh refresh token", e);
-      clearIt.run();
-      return tokens;
+      return clearTokens(tokens);
     }
 
     // Jackson will not close the stream unless StreamReadFeature.AUTO_CLOSE_SOURCE is enabled
     // and we did not enable it above, so ensure it gets closed
     try (InputStream responseBody = httpResponse.body()) {
       if (httpResponse.statusCode() < 200 || httpResponse.statusCode() > 299) {
-        clearIt.run();
-        return tokens;
+        return clearTokens(tokens);
       }
 
       RefreshResponse rr = objectMapper.readValue(responseBody, RefreshResponse.class);
@@ -314,8 +306,7 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
       tokens.refreshToken = defaultIfNull(rr.refresh_token, tokens.refreshToken);
     } catch (IOException e) {
       log.error("Unable to parse refresh token response", e);
-      clearIt.run();
-      return tokens;
+      return clearTokens(tokens);
     }
 
     Map<String, Verifier> verifiers = getVerifiersOrNull();
