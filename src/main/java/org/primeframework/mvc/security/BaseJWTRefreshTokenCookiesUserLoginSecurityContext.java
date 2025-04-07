@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2024, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2015-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,8 @@ import org.primeframework.mvc.security.oauth.OAuthConfiguration;
 import org.primeframework.mvc.security.oauth.RefreshResponse;
 import org.primeframework.mvc.security.oauth.TokenAuthenticationMethod;
 import org.primeframework.mvc.security.oauth.Tokens;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import static org.primeframework.mvc.util.ObjectTools.defaultIfNull;
 
 /**
@@ -54,6 +56,8 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
 
   // can run out of open files if we create too many of these
   private static final HttpClient httpClient = HttpClient.newHttpClient();
+
+  private static final Logger log = LoggerFactory.getLogger(BaseJWTRefreshTokenCookiesUserLoginSecurityContext.class);
 
   protected final CookieProxy jwtCookie;
 
@@ -283,6 +287,7 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
     try {
       resp = httpClient.send(refreshRequest, new JSONResponseBodyHandler<>(RefreshResponse.class));
     } catch (Exception e) {
+      log.error("Unable to refresh refresh token", e);
       endpointException = e;
     }
     if (endpointException != null || resp.statusCode() < 200 || resp.statusCode() > 299) {
