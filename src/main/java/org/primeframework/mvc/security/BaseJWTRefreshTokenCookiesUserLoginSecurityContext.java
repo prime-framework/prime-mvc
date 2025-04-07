@@ -141,7 +141,7 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
 
         tokens.decodedJWT = JWT.getDecoder().decode(tokens.jwt, verifiers);
         if (!validateJWTClaims(tokens.decodedJWT)) {
-          clearTokens(tokens);
+          invalidateSession(tokens);
           throw new InvalidLoginContext();
         }
 
@@ -152,7 +152,7 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
         refreshTokenCookie.add(request, response, tokens.refreshToken);
       }
     } catch (Exception e) {
-      clearTokens(tokens);
+      invalidateSession(tokens);
       throw new InvalidLoginContext();
     }
   }
@@ -227,15 +227,6 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
     return true;
   }
 
-  private Tokens clearTokens(Tokens tokens) {
-    tokens.decodedJWT = null;
-    tokens.jwt = null;
-    tokens.refreshToken = null;
-    jwtCookie.delete(request, response);
-    refreshTokenCookie.delete(request, response);
-    return tokens;
-  }
-
   private Map<String, Verifier> getVerifiersOrNull() {
     // If we do not have any verifiers, do not attempt to decode the JWT.
     // - This is a fail-safe against validating a JWT with an alg of 'none'.
@@ -245,6 +236,21 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
     // - By returning null, we ensure that the JWT decoder will explode because the 'verifiers' is a non-null parameter.
     Map<String, Verifier> verifiers = verifierProvider.get();
     return verifiers.isEmpty() ? null : verifiers;
+  }
+
+  /**
+   * Invalidates the session by deleting the access token (jwtCookie) and refresh token (refreshTokenCookie)
+   *
+   * @param tokens token holder
+   * @return same object as tokens parameter, but with nulled out decodedJWT, jwt, and refreshToken fields
+   */
+  private Tokens invalidateSession(Tokens tokens) {
+    tokens.decodedJWT = null;
+    tokens.jwt = null;
+    tokens.refreshToken = null;
+    jwtCookie.delete(request, response);
+    refreshTokenCookie.delete(request, response);
+    return tokens;
   }
 
   private Tokens refreshJWT(Tokens tokens) {
@@ -269,7 +275,7 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
     if (oauthConfiguration.authenticationMethod == TokenAuthenticationMethod.client_secret_basic) {
       // see https://www.rfc-editor.org/rfc/rfc2617#section-2
       if (oauthConfiguration.clientId.contains(":")) {
-        return clearTokens(tokens);
+        return invalidateSession(tokens);
       }
       // not using the HttpClient authenticator/PasswordAuthentication support because
       // we want pre-emptive auth here
@@ -291,14 +297,14 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
       httpResponse = httpClient.send(refreshRequest, BodyHandlers.ofInputStream());
     } catch (Exception e) {
       log.error("Unable to refresh refresh token", e);
-      return clearTokens(tokens);
+      return invalidateSession(tokens);
     }
 
     // Jackson will not close the stream unless StreamReadFeature.AUTO_CLOSE_SOURCE is enabled
     // and we did not enable it above, so ensure it gets closed
     try (InputStream responseBody = httpResponse.body()) {
       if (httpResponse.statusCode() < 200 || httpResponse.statusCode() > 299) {
-        return clearTokens(tokens);
+        return invalidateSession(tokens);
       }
 
       RefreshResponse rr = objectMapper.readValue(responseBody, RefreshResponse.class);
@@ -306,7 +312,7 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
       tokens.refreshToken = defaultIfNull(rr.refresh_token, tokens.refreshToken);
     } catch (IOException e) {
       log.error("Unable to parse refresh token response", e);
-      return clearTokens(tokens);
+      return invalidateSession(tokens);
     }
 
     Map<String, Verifier> verifiers = getVerifiersOrNull();
@@ -314,7 +320,7 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
       tokens.decodedJWT = JWT.getDecoder().decode(tokens.jwt, verifiers);
       // The JWT was refreshed successfully, and signature verified. However, we still want to verify claims on each refresh.
       if (!validateJWTClaims(tokens.decodedJWT)) {
-        clearTokens(tokens);
+        invalidateSession(tokens);
         return tokens;
       }
     }
@@ -360,7 +366,7 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
 
       tokens.decodedJWT = JWT.getDecoder().decode(tokens.jwt, verifiers);
       if (!validateJWTClaims(tokens.decodedJWT) || isRevoked(tokens.decodedJWT)) {
-        clearTokens(tokens);
+        invalidateSession(tokens);
         return tokens;
       }
 
@@ -368,7 +374,7 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
     } catch (JWTExpiredException e) {
       return refreshJWT(tokens);
     } catch (Exception e) {
-      clearTokens(tokens);
+      invalidateSession(tokens);
       return tokens;
     }
   }
