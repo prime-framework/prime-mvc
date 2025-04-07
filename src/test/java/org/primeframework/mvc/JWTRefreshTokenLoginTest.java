@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2021-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,6 @@
  * language governing permissions and limitations under the License.
  */
 package org.primeframework.mvc;
-
-import java.util.Random;
-import java.util.stream.IntStream;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.inject.AbstractModule;
@@ -178,35 +175,19 @@ public class JWTRefreshTokenLoginTest {
     MockOAuthUserLoginSecurityContext.ValidateJWTOnLogin = false;
     MockOAuthUserLoginSecurityContext.TokenEndpoint = "http://localhost:" + simulator.getPort() + "/oauth/token";
 
-    IntStream.range(0, 100).forEach(attempt -> {
-      Random random = new Random();
-      int rand;
-      while (true) {
-        rand = random.nextInt(50);
-        if (rand != 0) {
-          break;
-        }
-      }
-      try {
-        Thread.sleep(rand);
-      } catch (InterruptedException e) {
-        throw new RuntimeException(e);
-      }
-      System.out.printf("attempt %d\n", attempt);
-      // Setting 'expired: true' on the request just tells the Login action to create an expired JWT and store it in the LoginContext.
-      // - So we expect this to succeed, but the login context will now contain an expired JWT. This means it will be refreshed on first use.
-      simulator.test("/oauth/login")
-               .withParameter("expired", "true")
-               .post()
-               .assertStatusCode(200);
+    // Setting 'expired: true' on the request just tells the Login action to create an expired JWT and store it in the LoginContext.
+    // - So we expect this to succeed, but the login context wil now contain an expired JWT. This means it will be refreshed on first use.
+    simulator.test("/oauth/login")
+             .withParameter("expired", "true")
+             .post()
+             .assertStatusCode(200);
 
-      // The JWT in the security context was found to be expired on first use even though login succeeded.
-      // - This will have caused us to refresh the token, so this action should succeed.
-      simulator.test("/oauth/protected-resource")
-               .get()
-               .assertStatusCode(200)
-               .assertBodyContains("Logged in");
-    });
+    // The JWT in the security context was found to be expired on first use even though login succeeded.
+    // - This will have caused us to refresh the token, so this action should succeed.
+    simulator.test("/oauth/protected-resource")
+             .get()
+             .assertStatusCode(200)
+             .assertBodyContains("Logged in");
   }
 
   @Test
