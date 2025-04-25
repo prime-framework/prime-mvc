@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2021-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -111,6 +111,7 @@ public abstract class BaseManagedCookieScope<T extends Annotation> extends Abstr
     }
 
     try {
+      // The mangling happens when Jackson is called here
       ThrowingFunction<byte[], String> oldFunction = r -> objectMapper.readerFor(String.class).readValue(r);
       ThrowingFunction<byte[], String> newFunction = r -> new String(r, StandardCharsets.UTF_8);
       if (compress || encrypt) {
