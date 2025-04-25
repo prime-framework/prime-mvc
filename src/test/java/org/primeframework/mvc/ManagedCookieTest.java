@@ -15,6 +15,7 @@
  */
 package org.primeframework.mvc;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 import com.google.inject.Inject;
@@ -32,6 +33,19 @@ import org.testng.annotations.Test;
  */
 public class ManagedCookieTest extends PrimeBaseTest {
   @Inject private Encryptor encryptor;
+
+  @Test
+  public void broken_csrf_case() {
+    // write this value into a cookie. This value was generated from the same code that random_csrf_case uses but fails
+    simulator.test("/managed-cookie")
+             .withURLParameter("writeCookie3", "NQryyR_pFrynPybHfMk_4Hka_J0HZ1WV6iVVWVki0mVg-WpdVkk2HO8_XQ46yhw8_w==")
+             .get();
+
+    // we should be able to read back the same value
+    simulator.test("/managed-cookie")
+             .get()
+             .assertCookie("fusionauth.sso", "NQryyR_pFrynPybHfMk_4Hka_J0HZ1WV6iVVWVki0mVg-WpdVkk2HO8_XQ46yhw8_w==");
+  }
 
   @Test
   public void compressed_annotation_legacy_uncompressed_cookie_longer_than_5() throws Exception {
@@ -235,16 +249,19 @@ public class ManagedCookieTest extends PrimeBaseTest {
   }
 
   @Test
-  public void stuff() {
+  public void random_csrf_case() throws Exception {
+    String s = "passwordlessLogin";
+    String value = Base64.getUrlEncoder().encodeToString(encryptor.encrypt(s.getBytes(StandardCharsets.UTF_8)));
+
     // write this value into a cookie
     simulator.test("/managed-cookie")
-             .withURLParameter("writeCookie3", "NQryyR_pFrynPybHfMk_4Hka_J0HZ1WV6iVVWVki0mVg-WpdVkk2HO8_XQ46yhw8_w==")
+             .withURLParameter("writeCookie3", value)
              .get();
 
     // we should be able to read back the same value
     simulator.test("/managed-cookie")
              .get()
-             .assertCookie("fusionauth.sso", "NQryyR_pFrynPybHfMk_4Hka_J0HZ1WV6iVVWVki0mVg-WpdVkk2HO8_XQ46yhw8_w==");
+             .assertCookie("fusionauth.sso", value);
   }
 
   @Test
