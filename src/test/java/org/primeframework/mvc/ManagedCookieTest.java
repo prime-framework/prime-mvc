@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2024, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -232,6 +232,19 @@ public class ManagedCookieTest extends PrimeBaseTest {
                                  .assertDoesNotContainsCookie("cookie1")
                                  .assertDoesNotContainsCookie("cookie2")
                                  .assertDoesNotContainsCookie("fusionauth.sso"));
+  }
+
+  @Test
+  public void stuff() {
+    // write this value into a cookie
+    simulator.test("/managed-cookie")
+             .withURLParameter("writeCookie3", "NQryyR_pFrynPybHfMk_4Hka_J0HZ1WV6iVVWVki0mVg-WpdVkk2HO8_XQ46yhw8_w==")
+             .get();
+
+    // we should be able to read back the same value
+    simulator.test("/managed-cookie")
+             .get()
+             .assertCookie("fusionauth.sso", "NQryyR_pFrynPybHfMk_4Hka_J0HZ1WV6iVVWVki0mVg-WpdVkk2HO8_XQ46yhw8_w==");
   }
 
   @Test
