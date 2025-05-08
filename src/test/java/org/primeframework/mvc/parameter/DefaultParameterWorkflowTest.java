@@ -90,13 +90,13 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
         List<FileInfo> list = (List<FileInfo>) argument;
         assertNotNull(list);
         assertEquals(list.size(), 1);
-        assertNotNull(list.get(0));
-        assertEquals(list.get(0).contentType, "text/plain");
-        assertEquals(list.get(0).fileName, "test-file-upload.txt");
-        assertEquals(list.get(0).name, "userfile");
+        assertNotNull(list.getFirst());
+        assertEquals(list.getFirst().contentType, "text/plain");
+        assertEquals(list.getFirst().fileName, "test-file-upload.txt");
+        assertEquals(list.getFirst().name, "userfile");
 
         try {
-          assertEquals(Files.readString(list.get(0).file), "1234\n");
+          assertEquals(Files.readString(list.getFirst().file), "1234\n");
         } catch (IOException e) {
           throw new RuntimeException(e);
         }
@@ -602,7 +602,7 @@ public class DefaultParameterWorkflowTest extends PrimeBaseTest {
   }
 
   /*
-   * Tests that all of the pre and post handling works correctly.
+   * Tests that all the pre- and post-handling works correctly.
    */
   @Test
   public void preAndPost() throws Exception {

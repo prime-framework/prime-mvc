@@ -52,7 +52,7 @@ public class RedirectResultTest extends PrimeBaseTest {
     List<Message> messages = new ArrayList<>();
     HTTPRequest request = new HTTPRequest().with(r -> r.setPath("/"));
 
-    HTTPResponse response = new HTTPResponse(null, request);
+    HTTPResponse response = new HTTPResponse();
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(action, null, "foo", "", null));
     replay(store);
@@ -81,7 +81,7 @@ public class RedirectResultTest extends PrimeBaseTest {
 
     List<Message> messages = new ArrayList<>();
     HTTPRequest request = new HTTPRequest();
-    HTTPResponse response = new HTTPResponse(null, request);
+    HTTPResponse response = new HTTPResponse();
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(action, null, "foo", "", null));
     replay(store);
@@ -108,7 +108,7 @@ public class RedirectResultTest extends PrimeBaseTest {
 
     List<Message> messages = new ArrayList<>();
     HTTPRequest request = new HTTPRequest();
-    HTTPResponse response = new HTTPResponse(null, request);
+    HTTPResponse response = new HTTPResponse();
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/foo", "", null));
     replay(store);
@@ -135,7 +135,7 @@ public class RedirectResultTest extends PrimeBaseTest {
 
     List<Message> messages = new ArrayList<>();
     HTTPRequest request = new HTTPRequest();
-    HTTPResponse response = new HTTPResponse(null, request);
+    HTTPResponse response = new HTTPResponse();
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "foo", "", null));
     replay(store);
@@ -162,7 +162,7 @@ public class RedirectResultTest extends PrimeBaseTest {
 
     List<Message> messages = new ArrayList<>();
     HTTPRequest request = new HTTPRequest().with(r -> r.setContextPath("/context-path"));
-    HTTPResponse response = new HTTPResponse(null, request);
+    HTTPResponse response = new HTTPResponse();
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "foo", "", null));
     replay(store);
@@ -189,7 +189,7 @@ public class RedirectResultTest extends PrimeBaseTest {
 
     List<Message> messages = new ArrayList<>();
     HTTPRequest request = new HTTPRequest().with(r -> r.setContextPath("/context-path"));
-    HTTPResponse response = new HTTPResponse(null, request);
+    HTTPResponse response = new HTTPResponse();
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "foo", "", null));
     replay(store);
@@ -209,7 +209,8 @@ public class RedirectResultTest extends PrimeBaseTest {
     assertEquals(response.getHeader("Cache-Control"), "no-cache");
   }
 
-  public class RedirectImpl implements Redirect {
+  @SuppressWarnings("ClassExplicitlyAnnotation")
+  public static class RedirectImpl implements Redirect {
     private final String cacheControl;
 
     private final String code;

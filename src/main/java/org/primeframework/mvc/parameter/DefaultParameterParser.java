@@ -46,8 +46,6 @@ import org.primeframework.mvc.security.csrf.CSRFProvider;
  * @author Brian Pontarelli
  */
 public class DefaultParameterParser implements ParameterParser {
-  public static final String ACTION_PREFIX = "__a_";
-
   public static final String CHECKBOX_PREFIX = "__cb_";
 
   public static final String RADIOBUTTON_PREFIX = "__rb_";
@@ -165,8 +163,6 @@ public class DefaultParameterParser implements ParameterParser {
         checkBoxes.put(key.substring(CHECKBOX_PREFIX.length()), parameters.get(key));
       } else if (key.startsWith(RADIOBUTTON_PREFIX)) {
         radioButtons.put(key.substring(RADIOBUTTON_PREFIX.length()), parameters.get(key));
-      } else if (key.startsWith(ACTION_PREFIX)) {
-        actions.add(key.substring(ACTION_PREFIX.length()));
       } else {
         int index = key.indexOf('@');
         String parameter = (index > 0) ? key.substring(0, index) : key;

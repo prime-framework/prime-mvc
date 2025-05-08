@@ -13,6 +13,13 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v4
+      - name: setup java  
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: |
+           21
+           17
       - name: savant setup
         run: |
           curl -O https://repository.savantbuild.org/org/savantbuild/savant-core/2.0.0/savant-2.0.0.tar.gz
@@ -23,8 +30,11 @@ jobs:
           mkdir -p ~/.savant/plugins
           # For now, using the JDK that comes on the GHA runner
           cat << EOF > ~/.savant/plugins/org.savantbuild.plugin.java.properties
-          17=${JAVA_HOME}
+          17=${JAVA_HOME_17_X64}
+          21=${JAVA_HOME_21_X64}
           EOF
+          echo "~/.savant/plugins/org.savantbuild.plugin.java.properties"
+          cat ~/.savant/plugins/org.savantbuild.plugin.java.properties
       # Takes some time, better to tell difference between this step and actual test run time
       - name: compile/pull Savant dependencies
         run: |
