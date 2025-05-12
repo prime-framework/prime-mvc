@@ -25,7 +25,7 @@ import org.primeframework.mvc.scope.annotation.ManagedCookie;
  */
 @Action
 @Status
-public class ManagedCookieScope {
+public class ManagedCookieScopesAction {
   @ManagedCookie(encrypt = false)
   public Cookie cookie1;
 

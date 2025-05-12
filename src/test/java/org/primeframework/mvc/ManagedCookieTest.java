@@ -202,7 +202,7 @@ public class ManagedCookieTest extends PrimeBaseTest {
   @Test
   public void managed_cookie_scope() throws Exception {
     // Values are not set, no cookies
-    test.simulate(() -> simulator.test("/managed-cookie-scope")
+    test.simulate(() -> simulator.test("/managed-cookie-scopes")
                                  .get()
                                  .assertStatusCode(200)
                                  .assertDoesNotContainsCookie("cookie1")
@@ -212,7 +212,7 @@ public class ManagedCookieTest extends PrimeBaseTest {
                                  .assertDoesNotContainsCookie("fusionauth.sso"))
 
         // Write all three cookies
-        .simulate(() -> simulator.test("/managed-cookie-scope")
+        .simulate(() -> simulator.test("/managed-cookie-scopes")
                                  .withURLParameter("writeCookie1", "foo")
                                  .withURLParameter("writeCookie2", "bar")
                                  .withURLParameter("writeCookie3", "baz")
@@ -223,7 +223,7 @@ public class ManagedCookieTest extends PrimeBaseTest {
         .assertCookie("fusionauth.sso", "baz")
 
         // Cookies are persisted, hit the GET, and they will still be there.
-        .simulate(() -> simulator.test("/managed-cookie-scope")
+        .simulate(() -> simulator.test("/managed-cookie-scopes")
                                  .get()
                                  .assertStatusCode(200)
                                  .assertCookie("cookie1", "foo"))
@@ -231,7 +231,7 @@ public class ManagedCookieTest extends PrimeBaseTest {
         .assertCookie("fusionauth.sso", "baz")
 
         // Delete stringCookie2
-        .simulate(() -> simulator.test("/managed-cookie-scope")
+        .simulate(() -> simulator.test("/managed-cookie-scopes")
                                  .withURLParameter("deleteCookie2", true)
                                  .get()
                                  .assertStatusCode(200)
@@ -240,7 +240,7 @@ public class ManagedCookieTest extends PrimeBaseTest {
                                  .assertCookie("fusionauth.sso", "baz"))
 
         // Next request stringCookie2 will be all the way gone
-        .simulate(() -> simulator.test("/managed-cookie-scope")
+        .simulate(() -> simulator.test("/managed-cookie-scopes")
                                  .get()
                                  .assertStatusCode(200)
                                  .assertCookie("cookie1", "foo")
@@ -248,7 +248,7 @@ public class ManagedCookieTest extends PrimeBaseTest {
                                  .assertCookie("fusionauth.sso", "baz"))
 
         // stringCookie1 and stringCookie3 holding strong after another request
-        .simulate(() -> simulator.test("/managed-cookie-scope")
+        .simulate(() -> simulator.test("/managed-cookie-scopes")
                                  .get()
                                  .assertStatusCode(200)
                                  .assertCookie("cookie1", "foo")
@@ -256,7 +256,7 @@ public class ManagedCookieTest extends PrimeBaseTest {
                                  .assertCookie("fusionauth.sso", "baz"))
 
         // Delete all of them!!! - 1 and 3
-        .simulate(() -> simulator.test("/managed-cookie-scope")
+        .simulate(() -> simulator.test("/managed-cookie-scopes")
                                  .withURLParameter("deleteCookie1", true)
                                  .withURLParameter("deleteCookie3", true)
                                  .get()
@@ -266,7 +266,7 @@ public class ManagedCookieTest extends PrimeBaseTest {
                                  .assertCookieWasDeleted("fusionauth.sso"))
 
         // They are now all gone.
-        .simulate(() -> simulator.test("/managed-cookie-scope")
+        .simulate(() -> simulator.test("/managed-cookie-scopes")
                                  .get()
                                  .assertStatusCode(200)
                                  .assertDoesNotContainsCookie("cookie1")
