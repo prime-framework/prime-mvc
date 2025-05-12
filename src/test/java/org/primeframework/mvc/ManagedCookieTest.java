@@ -35,21 +35,38 @@ public class ManagedCookieTest extends PrimeBaseTest {
   @Inject private Encryptor encryptor;
 
   @Test
-  public void broken_csrf_case() {
-    // write this value into a cookie. This value was generated from the same code that random_csrf_case uses but fails
-    simulator.test("/managed-cookie")
-             .withParameter("value", "NQryyR_pFrynPybHfMk_4Hka_J0HZ1WV6iVVWVki0mVg-WpdVkk2HO8_XQ46yhw8_w==")
-             .post()
-             .assertBody("NQryyR_pFrynPybHfMk_4Hka_J0HZ1WV6iVVWVki0mVg-WpdVkk2HO8_XQ46yhw8_w==")
-             .assertCookie("cookie", "NQryyR_pFrynPybHfMk_4Hka_J0HZ1WV6iVVWVki0mVg-WpdVkk2HO8_XQ46yhw8_w==")
-    ;
+  public void broken_csrf_case() throws Exception {
+    // When base64-decoded, the beginning of this cookie value is "5\n". When a cookie does not contain the header bytes, we attempt to
+    //  parse the value as a JSON string. Jackson interprets the \n as the end of the JSON string, and the number 5 is valid JSON.
+    var badCookieValue = "NQryyR_pFrynPybHfMk_4Hka_J0HZ1WV6iVVWVki0mVg-WpdVkk2HO8_XQ46yhw8_w==";
 
+    // Send the bad cookie value directly on a GET request.
+    simulator.test("/managed-cookie")
+             .withCookie("cookie", badCookieValue)
+             .get()
+             // The cookie is base64-decoded and parsed as JSON
+             .assertBody("5")
+             // The new cookie value is written with the header and base64-encoded
+             .assertCookie("cookie", CookieTools.toCookie("5".getBytes(), false, false, encryptor));
+
+    // Make a second GET request with the cookie. No change in rendered value or cookie value
     simulator.test("/managed-cookie")
              .get()
-             .assertBody("NQryyR_pFrynPybHfMk_4Hka_J0HZ1WV6iVVWVki0mVg-WpdVkk2HO8_XQ46yhw8_w==")
-             // we should be able to read back the same value
-             .assertCookie("cookie", "NQryyR_pFrynPybHfMk_4Hka_J0HZ1WV6iVVWVki0mVg-WpdVkk2HO8_XQ46yhw8_w==")
-    ;
+             .assertBody("5")
+             .assertCookie("cookie", CookieTools.toCookie("5".getBytes(), false, false, encryptor));
+
+    // Make a request to set the cookie value via the annotation
+    simulator.test("/managed-cookie")
+             .withParameter("value", badCookieValue)
+             .post()
+             .assertBody(badCookieValue)
+             .assertCookie("cookie", CookieTools.toCookie(badCookieValue.getBytes(), false, false, encryptor));
+
+    // Make a GET request with the existing cookie value. No change.
+    simulator.test("/managed-cookie")
+             .get()
+             .assertBody(badCookieValue)
+             .assertCookie("cookie", CookieTools.toCookie(badCookieValue.getBytes(), false, false, encryptor));
   }
 
   @Test
