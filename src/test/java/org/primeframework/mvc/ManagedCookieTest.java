@@ -175,8 +175,15 @@ public class ManagedCookieTest extends PrimeBaseTest {
                                  .assertStatusCode(200)
                                  // The rendered value is not decoded
                                  .assertBody(cookie)
-                                 // Zm9vYmFy is base64 encoded foobar
-                                 .assertCookie("cookie", cookie));
+                                 // The cookie will be updated with a header
+                                 .assertCookie("cookie", CookieTools.toCookie(cookie.getBytes(), false, false, encryptor)));
+
+    // Make a second GET request with the updated cookie. No change to body or cookie value
+    test.simulate(() -> simulator.test("/managed-cookie")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertBody(cookie)
+                                 .assertCookie("cookie", CookieTools.toCookie(cookie.getBytes(), false, false, encryptor)));
   }
 
   @Test
