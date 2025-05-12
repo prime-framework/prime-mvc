@@ -156,7 +156,8 @@ public class ManagedCookieTest extends PrimeBaseTest {
                                  .withCookie("cookie", cookie)
                                  .get()
                                  .assertStatusCode(200)
-                                 .assertBodyContains(cookie)
+                                 // The rendered value is not decoded
+                                 .assertBody(cookie)
                                  // Zm9vYmFy is base64 encoded foobar
                                  .assertCookie("cookie", cookie));
   }
@@ -296,6 +297,7 @@ public class ManagedCookieTest extends PrimeBaseTest {
 
   @Test
   public void uncompressed_unencrypted_starts_with_header_byte_sequence() throws Exception {
+    // TODO : ENG-2638 : All cookies will include the header going forward. This test may not be relevant.
     // if compress and encrypt are off, BaseManagedCookieScope#buildCookie will not put a header on the cookie
     // but there might be some edge cases where we have a header indicating an uncompressed, unencrypted cookie
     // and we should allow that if the annotation does not use/require encryption (and
@@ -304,11 +306,23 @@ public class ManagedCookieTest extends PrimeBaseTest {
     byte[] json = objectMapper.writeValueAsBytes(value);
     String base64EncodedCookieWithHeader = CookieTools.toCookie(json, false, false, encryptor);
 
+    // The first request is a modern, base64-encoded cookie with headers. The value is the JSON String `"foo"`
     test.simulate(() -> simulator.test("/managed-cookie")
                                  .withCookie("cookie", base64EncodedCookieWithHeader)
                                  .get()
                                  .assertStatusCode(200)
-                                 .assertBodyContains("foo")
+                                 // `"foo"` is rendered
+                                 .assertBody("\"foo\"")
+                                 // The newly written cookie is not written as a JSON value and does not include the header
+                                 .assertCookie("cookie", "foo"));
+
+    // The request works a second time with the updated cookie
+    test.simulate(() -> simulator.test("/managed-cookie")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 // The cookie is no longer a JSON string. The body does not include quotes
+                                 .assertBody("foo")
+                                 // No change in the cookie value
                                  .assertCookie("cookie", "foo"));
   }
 }
