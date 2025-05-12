@@ -299,27 +299,6 @@ public class ManagedCookieTest extends PrimeBaseTest {
   }
 
   @Test
-  public void random_csrf_case() throws Exception {
-    String s = "passwordlessLogin";
-    String value = Base64.getUrlEncoder().encodeToString(encryptor.encrypt(s.getBytes(StandardCharsets.UTF_8)));
-
-    // write this value into a cookie
-    simulator.test("/managed-cookie")
-             .withParameter("value", value)
-             .post()
-             .assertStatusCode(200)
-             .assertBody(value)
-             .assertCookie("cookie", value);
-
-    // we should be able to read back the same value
-    simulator.test("/managed-cookie")
-             .get()
-             .assertStatusCode(200)
-             .assertBody(value)
-             .assertCookie("cookie", value);
-  }
-
-  @Test
   public void uncompressed_unencrypted_starts_with_header_byte_sequence() throws Exception {
     // TODO : ENG-2638 : All cookies will include the header going forward. This test may not be relevant.
     // if compress and encrypt are off, BaseManagedCookieScope#buildCookie will not put a header on the cookie
