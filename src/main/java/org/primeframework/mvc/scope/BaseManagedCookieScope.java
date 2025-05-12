@@ -61,13 +61,11 @@ public abstract class BaseManagedCookieScope<T extends Annotation> extends Abstr
       return null;
     }
 
-    if (compress || encrypt) {
-      byte[] result = cookieValue.getBytes(StandardCharsets.UTF_8);
-      try {
-        cookie.value = CookieTools.toCookie(result, compress, encrypt, encryptor);
-      } catch (Exception e) {
-        throw new ErrorException("error", e);
-      }
+    byte[] result = cookieValue.getBytes(StandardCharsets.UTF_8);
+    try {
+      cookie.value = CookieTools.toCookie(result, compress, encrypt, encryptor);
+    } catch (Exception e) {
+      throw new ErrorException("error", e);
     }
 
     setCookieValues(cookie, scope);
