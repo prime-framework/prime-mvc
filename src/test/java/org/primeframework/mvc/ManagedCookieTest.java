@@ -167,17 +167,26 @@ public class ManagedCookieTest extends PrimeBaseTest {
   }
 
   @Test
-  // test fails in current code as well
-  @Ignore
   public void cookie_accidentally_starts_with_header() throws Exception {
+    // A cookie that happens to start with the header will be interpreted accordingly
     // BBB<null>BB
     var cookie = "QkJCAEJC";
 
+    // Make a request with the raw cookie value included in the header
     test.simulate(() -> simulator.test("/managed-cookie")
                                  .withCookie("cookie", cookie)
                                  .get()
                                  .assertStatusCode(200)
-                                 .assertCookie("cookie", "QkJCAEJC"));
+                                 // The body contains string after removing header bytes
+                                 .assertBody("BB")
+                                 // The new cookie value has header bytes and is encoded
+                                 .assertCookie("cookie", cookie))
+        // A second request using the cookie value set in user agent behaves the same
+        .simulate(() -> simulator.test("/managed-cookie")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertBody("BB")
+                                 .assertCookie("cookie", cookie));
   }
 
   @Test
