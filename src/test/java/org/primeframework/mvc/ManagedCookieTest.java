@@ -59,7 +59,9 @@ public class ManagedCookieTest extends PrimeBaseTest {
     simulator.test("/managed-cookie")
              .withParameter("value", badCookieValue)
              .post()
+             // The original value is available to the action
              .assertBody(badCookieValue)
+             // The cookie value is prefaced with a header
              .assertCookie("cookie", CookieTools.toCookie(badCookieValue.getBytes(), false, false, encryptor));
 
     // Make a GET request with the existing cookie value. No change.
@@ -136,19 +138,32 @@ public class ManagedCookieTest extends PrimeBaseTest {
                                  .post()
                                  .assertStatusCode(200)
                                  .assertBody("bar")
-                                 .assertContainsCookie("cookie"))
+                                 .assertCookie("cookie", CookieTools.toCookie("bar".getBytes(), true, false, encryptor))
+        )
         // modern (compressed, not encrypted) cookie is now set in our simulator user agent
         .simulate(() -> simulator.test("/compressed-managed-cookie")
                                  .get()
                                  .assertStatusCode(200)
-                                 .assertBody("bar"))
+                                 .assertBody("bar")
+                                 .assertCookie("cookie", CookieTools.toCookie("bar".getBytes(), true, false, encryptor))
+        )
+        // Test the compressed-only cookie on a page that requires the cookie to be encrypted.
         .simulate(() -> simulator.test("/encrypted-managed-cookie")
                                  .get()
                                  .assertStatusCode(200)
-                                 // this would be expected to "fail" gracefully (neverNull is true)
-                                 // because we're taking an unencrypted managed cookie from CompressedManagedCookieAction
-                                 // and feeding it to EncryptedManagedCookieAction which requires encryption
-                                 .assertNormalizedBody("(null)"));
+                                 // Failed to decrypt the cookie, but it failed gracefully (neverNull is true).
+                                 // The body does not contain the cookie value.
+                                 .assertNormalizedBody("(null)")
+                                 // The cookie was deleted because it failed parsing.
+                                 .assertCookieWasDeleted("cookie")
+        )
+        // Making the request back to the compressed page will not find the cookie
+        .simulate(() -> simulator.test("/compressed-managed-cookie")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertBody("(null)")
+                                 .assertDoesNotContainsCookie("cookie")
+        );
   }
 
   @Test
