@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2014-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,7 @@ import org.primeframework.mvc.message.l10n.MissingMessageException;
 import org.primeframework.mvc.parameter.ParameterParser.Parameters;
 import org.primeframework.mvc.parameter.ParameterParser.Parameters.Struct;
 import org.primeframework.mvc.parameter.convert.ConversionException;
+import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.convert.MultipleParametersUnsupportedException;
 import org.primeframework.mvc.parameter.el.BeanExpressionException;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
@@ -222,6 +223,17 @@ public class DefaultParameterHandler implements ParameterHandler {
         expressionEvaluator.setValue(key, action, struct.values.toArray(new String[0]), struct.attributes);
       } catch (ConversionException ce) {
         addCouldNotConvertMessage(key, struct, ce);
+      } catch (ConverterStateException cse) {
+        // This type of exception is most likely the cause of a dev time issue, or a fuzzing attack.
+        // - The assumption is that in a production runtime you want to allow unknown parameters. This isn't exactly an unknown parameter,
+        //   but this is used fairly generically in parameter handling to be more or less verbose. We could consider adding another
+        //   configuration parameters such as "ignoreConversionErrors" as these are almost always a dev time issue or a fuzzing result.
+        //   In those cases, you want to fail fast in dev with exceptions, and at runtime ignore the fuzzing attacks.
+        if (allowUnknownParameters) {
+          logger.debug("Invalid parameter to action [{}]", action.getClass().getName(), cse);
+        } else {
+          throw cse;
+        }
       } catch (BeanExpressionException ee) {
         throw ee;
       } catch (ExpressionException ee) {
@@ -237,7 +249,7 @@ public class DefaultParameterHandler implements ParameterHandler {
         // Re-throw after adding some meta-data about the current request to make it easier to debug in the log.
         // - Intentionally not recording the value to avoid logging anything sensitive.
         throw new MultipleParametersUnsupportedException(e.getMessage() +
-            " Action class [" + action.getClass().getName() + "] Request URI [" + actionInvocation.actionURI + "] Parameter name [" + key + "]");
+                                                         " Action class [" + action.getClass().getName() + "] Request URI [" + actionInvocation.actionURI + "] Parameter name [" + key + "]");
       }
     }
   }

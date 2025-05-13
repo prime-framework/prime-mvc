@@ -102,6 +102,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.DataProvider;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNull;
 
 /**
  * This class is a base test for testing the Prime framework. It isn't recommended that you use it outside the Prime project.
@@ -556,6 +557,10 @@ public abstract class PrimeBaseTest {
       assertEquals(TestUnhandledExceptionHandler.exception.getClass(), e.getClass());
       assertEquals(TestUnhandledExceptionHandler.exception.getMessage(), e.getMessage());
       TestUnhandledExceptionHandler.reset();
+    }
+
+    public static void assertNoUnhandledException() {
+      assertNull(TestUnhandledExceptionHandler.exception);
     }
 
     public static void reset() {

@@ -64,9 +64,11 @@ import org.primeframework.mvc.container.ContainerResolver;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleMessage;
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
+import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
 import org.primeframework.mvc.parameter.convert.MultipleParametersUnsupportedException;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
+import org.primeframework.mvc.parameter.el.InvalidExpressionException;
 import org.primeframework.mvc.security.CBCCipherProvider;
 import org.primeframework.mvc.security.DefaultEncryptor;
 import org.primeframework.mvc.security.Encryptor;
@@ -630,6 +632,9 @@ public class GlobalTest extends PrimeBaseTest {
                                  .get()
                                  .assertStatusCode(200));
 
+    // No un-handled exception
+    TestUnhandledExceptionHandler.assertNoUnhandledException();
+
     // simulate dev runtime
     configuration.allowUnknownParameters = false;
     test.simulate(() -> simulator.test("/vanilla")
@@ -637,6 +642,32 @@ public class GlobalTest extends PrimeBaseTest {
                                  .withURLParameter("class.method", "foo")
                                  .get()
                                  .assertStatusCode(500));
+
+    // Expect to have thrown InvalidExpressionException
+    TestUnhandledExceptionHandler.assertLastUnhandledException(new InvalidExpressionException("The expression string [class.method] is invalid."));
+  }
+
+  @Test
+  public void get_fuzzing_invalid_expression_2() throws Exception {
+    // Allow unknown parameters
+    configuration.allowUnknownParameters = true;
+    test.simulate(() -> simulator.test("/user/edit")
+                                 .withURLParameter("user", "org.example.domain.User")
+                                 .get()
+                                 .assertStatusCode(200));
+
+    // No un-handled exception
+    TestUnhandledExceptionHandler.assertNoUnhandledException();
+
+    // Back to dev runtime - do not allow unknown parameters. The action behavior will not change, but there will be an unhandled exception logged.
+    configuration.allowUnknownParameters = false;
+    test.simulate(() -> simulator.test("/user/edit")
+                                 .withURLParameter("user", "org.example.domain.User")
+                                 .get()
+                                 .assertStatusCode(200));
+
+    // Expect to have thrown ConverterStateException
+    TestUnhandledExceptionHandler.assertLastUnhandledException(new ConverterStateException("While evaluating the expression [user] in class [org.example.action.user.EditAction]. No type converter found for the type [org.example.domain.User]."));
   }
 
   @Test
