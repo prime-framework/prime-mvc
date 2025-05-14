@@ -36,11 +36,23 @@ public class ManagedCookieTest extends PrimeBaseTest {
 
   @Test
   public void broken_csrf_case() throws Exception {
+    // Use case: this covers a situation that was thought to only come up in CSRF testing, but it turns out that it was possible with any cookie
+    //  that is not compressed or encrypted.
+    // 1) An action uses a @ManagedCookie or @ManagedSessionCookie with compress=false / encrypt=false
+    // 2) When the action is requested, BaseManagedCookieScope.processCookie() attempts to parse the base64-encoded cookie value as a legacy cookie (no header bytes)
+    // 3) The function applied for parsing in this case attempts to parse the value as a JSON string using Jackson
+    // 4) If base64-decoded cookie value starts with valid JSON followed by a newline (\n, 0x0a, 10) character, Jackson stops its parsing at that point at returns the
+    //    JSON value before the newline.
+    //
+    // The fix is to add the header byte prefix before base64-encoding the value for all cookies going forward. Cookie parsing has not been updated in
+    //  order to maintain backward compatibility. This test demonstrates the bug that exists in cookie parsing and shows that the new MVC cookie-writing
+    //  logic that includes the header bytes means that the same payload can be written and read back properly.
+
     // When base64-decoded, the beginning of this cookie value is "5\n". When a cookie does not contain the header bytes, we attempt to
     //  parse the value as a JSON string. Jackson interprets the \n as the end of the JSON string, and the number 5 is valid JSON.
     var badCookieValue = "NQryyR_pFrynPybHfMk_4Hka_J0HZ1WV6iVVWVki0mVg-WpdVkk2HO8_XQ46yhw8_w==";
 
-    // Send the bad cookie value directly on a GET request.
+    // Send the bad cookie value directly on a GET request to avoid it being written by PMVC
     simulator.test("/managed-cookie")
              .withCookie("cookie", badCookieValue)
              .get()
@@ -55,11 +67,11 @@ public class ManagedCookieTest extends PrimeBaseTest {
              .assertBody("5")
              .assertCookie("cookie", CookieTools.toCookie("5".getBytes(), false, false, encryptor));
 
-    // Make a request to set the cookie value via the annotation
+    // Make a request to set the cookie value via the PMVC annotation
     simulator.test("/managed-cookie")
              .withParameter("value", badCookieValue)
              .post()
-             // The original value is available to the action
+             // The original value is available to the action (technically comes from the "value" parameter directly in this case)
              .assertBody(badCookieValue)
              // The cookie value is prefaced with a header
              .assertCookie("cookie", CookieTools.toCookie(badCookieValue.getBytes(), false, false, encryptor));
@@ -191,8 +203,10 @@ public class ManagedCookieTest extends PrimeBaseTest {
 
   @Test
   public void cookie_is_base64_encoded_without_header() throws Exception {
+    // Use case: a cookie that is base64-encoded before being written by PMVC will still be base64-encoded when reading back.
     String cookie = Base64.getEncoder().encodeToString("foobar".getBytes());
 
+    // Provide the base64-encoded value as a legacy cookie without headers by including directly on request.
     test.simulate(() -> simulator.test("/managed-cookie")
                                  .withCookie("cookie", cookie)
                                  .get()
@@ -333,6 +347,9 @@ public class ManagedCookieTest extends PrimeBaseTest {
   @Test
   public void uncompressed_unencrypted_contains_json() throws Exception {
     // 1) The legacy cookie contains a value that can be parsed as JSON
+    // 2) The cookie is parsed, and the value is displayed as a JSON string
+    // 3) The cookie is rewritten in the modern format with a header
+    // 4) The follow-up request with the modern cookie still renders the JSON string
     String value = "foo"; // `foo`
     byte[] json = objectMapper.writeValueAsBytes(value); // `"foo"`
     String jsonStr = new String(json, StandardCharsets.UTF_8);
