@@ -23,7 +23,6 @@ import org.primeframework.mvc.security.CBCCipherProvider;
 import org.primeframework.mvc.security.DefaultEncryptor;
 import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.util.CookieTools;
-import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
 /**
