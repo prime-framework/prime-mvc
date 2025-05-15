@@ -1467,29 +1467,6 @@ public class RequestResult {
   }
 
   /**
-   * Retrieve a cookie by name. If the cookie does not exist in the response, this returns null.
-   *
-   * @param name The name of the cookie.
-   * @return The Cookie or null.
-   * @throws Exception Decoding the cookie failed, or the cookie was in a format that did not require decoding.
-   *                   <p>
-   *                   If you need the raw cookie value or are requesting a cookie not managed by Prime MVC, use {@link #getCookie(String)}.
-   *                   <p>
-   *                   If this parsing fails unexpectedly, there may be an issue with decryption, or the cookie may being written incorrectly.
-   */
-  public Cookie getDecodedCookie(String name) throws Exception {
-    Cookie cookie = getCookie(name);
-    if (cookie != null) {
-      cookie.value = CookieTools.fromCookie(
-          cookie.value, false, false, injector.getInstance(Encryptor.class),
-          b -> injector.getInstance(ObjectMapper.class).readerFor(String.class).readValue(b),
-          b -> new String(b, StandardCharsets.UTF_8)
-      );
-    }
-    return cookie;
-  }
-
-  /**
    * Retrieve cookies by name. If the cookie does not exist in the response, this returns null.
    *
    * @param name The name of the cookie.
