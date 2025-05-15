@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2024, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.primeframework.mvc;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 import com.google.inject.Inject;
@@ -22,7 +23,6 @@ import org.primeframework.mvc.security.CBCCipherProvider;
 import org.primeframework.mvc.security.DefaultEncryptor;
 import org.primeframework.mvc.security.Encryptor;
 import org.primeframework.mvc.util.CookieTools;
-import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
 /**
@@ -32,6 +32,55 @@ import org.testng.annotations.Test;
  */
 public class ManagedCookieTest extends PrimeBaseTest {
   @Inject private Encryptor encryptor;
+
+  @Test
+  public void broken_csrf_case() throws Exception {
+    // Use case: this covers a situation that was thought to only come up in CSRF testing, but it turns out that it was possible with any cookie
+    //  that is not compressed or encrypted.
+    // 1) An action uses a @ManagedCookie or @ManagedSessionCookie with compress=false / encrypt=false
+    // 2) When the action is requested, BaseManagedCookieScope.processCookie() attempts to parse the base64-encoded cookie value as a legacy cookie (no header bytes)
+    // 3) The function applied for parsing in this case attempts to parse the value as a JSON string using Jackson
+    // 4) If base64-decoded cookie value starts with valid JSON followed by a newline (\n, 0x0a, 10) character, Jackson stops its parsing at that point at returns the
+    //    JSON value before the newline.
+    //
+    // The fix is to add the header byte prefix before base64-encoding the value for all cookies going forward. Cookie parsing has not been updated in
+    //  order to maintain backward compatibility. This test demonstrates the bug that exists in cookie parsing and shows that the new MVC cookie-writing
+    //  logic that includes the header bytes means that the same payload can be written and read back properly.
+
+    // When base64-decoded, the beginning of this cookie value is "5\n". When a cookie does not contain the header bytes, we attempt to
+    //  parse the value as a JSON string. Jackson interprets the \n as the end of the JSON string, and the number 5 is valid JSON.
+    var badCookieValue = "NQryyR_pFrynPybHfMk_4Hka_J0HZ1WV6iVVWVki0mVg-WpdVkk2HO8_XQ46yhw8_w==";
+
+    // Send the bad cookie value directly on a GET request to avoid it being written by PMVC
+    simulator.test("/managed-cookie")
+             .withCookie("cookie", badCookieValue)
+             .get()
+             // The cookie is base64-decoded and parsed as JSON
+             .assertBody("5")
+             // The new cookie value is written with the header and base64-encoded
+             .assertCookie("cookie", CookieTools.toCookie("5".getBytes(), false, false, encryptor));
+
+    // Make a second GET request with the cookie. No change in rendered value or cookie value
+    simulator.test("/managed-cookie")
+             .get()
+             .assertBody("5")
+             .assertCookie("cookie", CookieTools.toCookie("5".getBytes(), false, false, encryptor));
+
+    // Make a request to set the cookie value via the PMVC annotation
+    simulator.test("/managed-cookie")
+             .withParameter("value", badCookieValue)
+             .post()
+             // The original value is available to the action (technically comes from the "value" parameter directly in this case)
+             .assertBody(badCookieValue)
+             // The cookie value is prefaced with a header
+             .assertCookie("cookie", CookieTools.toCookie(badCookieValue.getBytes(), false, false, encryptor));
+
+    // Make a GET request with the existing cookie value. No change.
+    simulator.test("/managed-cookie")
+             .get()
+             .assertBody(badCookieValue)
+             .assertCookie("cookie", CookieTools.toCookie(badCookieValue.getBytes(), false, false, encryptor));
+  }
 
   @Test
   public void compressed_annotation_legacy_uncompressed_cookie_longer_than_5() throws Exception {
@@ -44,13 +93,22 @@ public class ManagedCookieTest extends PrimeBaseTest {
     var value = "foobar";
     byte[] json = objectMapper.writeValueAsBytes(value);
     var legacyCookieWithNoCompression = Base64.getEncoder().encodeToString(json);
+    var modernCookie = CookieTools.toCookie(value.getBytes(), true, false, encryptor);
     test.simulate(() -> simulator.test("/compressed-managed-cookie")
                                  .withCookie("cookie", legacyCookieWithNoCompression)
                                  .get()
                                  .assertStatusCode(200)
-                                 .assertBody("foobar")
+                                 .assertBody(value)
                                  // Expected result is modern format with 0x42 3 times...
-                                 .assertCookie("cookie", "QkJCAnjaS8vPT0osAgAIqwJ6"));
+                                 .assertCookie("cookie", modernCookie))
+
+        // The request works a second time with the updated cookie
+        .simulate(() -> simulator.test("/compressed-managed-cookie")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertBody(value)
+                                 .assertCookie("cookie", modernCookie))
+    ;
   }
 
   @Test
@@ -64,13 +122,23 @@ public class ManagedCookieTest extends PrimeBaseTest {
     var value = "f";
     byte[] json = objectMapper.writeValueAsBytes(value);
     var legacyCookieWithNoCompression = Base64.getEncoder().encodeToString(json);
+    var modernCookie = CookieTools.toCookie(value.getBytes(), true, false, encryptor);
     test.simulate(() -> simulator.test("/compressed-managed-cookie")
                                  .withCookie("cookie", legacyCookieWithNoCompression)
                                  .get()
                                  .assertStatusCode(200)
-                                 .assertBody("f")
+                                 .assertBody(value)
                                  // Expected result is modern format with 0x42 3 times...
-                                 .assertCookie("cookie", "QkJCAnjaSwMAAGcAZw=="));
+                                 .assertCookie("cookie", modernCookie)
+        )
+
+        // The request works a second time with the updated cookie
+        .simulate(() -> simulator.test("/compressed-managed-cookie")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertBody(value)
+                                 .assertCookie("cookie", modernCookie))
+    ;
   }
 
   @Test
@@ -81,45 +149,78 @@ public class ManagedCookieTest extends PrimeBaseTest {
                                  .post()
                                  .assertStatusCode(200)
                                  .assertBody("bar")
-                                 .assertContainsCookie("cookie"))
+                                 .assertCookie("cookie", CookieTools.toCookie("bar".getBytes(), true, false, encryptor))
+        )
         // modern (compressed, not encrypted) cookie is now set in our simulator user agent
         .simulate(() -> simulator.test("/compressed-managed-cookie")
                                  .get()
                                  .assertStatusCode(200)
-                                 .assertBody("bar"))
+                                 .assertBody("bar")
+                                 .assertCookie("cookie", CookieTools.toCookie("bar".getBytes(), true, false, encryptor))
+        )
+        // Test the compressed-only cookie on a page that requires the cookie to be encrypted.
         .simulate(() -> simulator.test("/encrypted-managed-cookie")
                                  .get()
                                  .assertStatusCode(200)
-                                 // this would be expected to "fail" gracefully (neverNull is true)
-                                 // because we're taking an unencrypted managed cookie from CompressedManagedCookieAction
-                                 // and feeding it to EncryptedManagedCookieAction which requires encryption
-                                 .assertNormalizedBody("(null)"));
+                                 // Failed to decrypt the cookie, but it failed gracefully (neverNull is true).
+                                 // The body does not contain the cookie value.
+                                 .assertNormalizedBody("(null)")
+                                 // The cookie was deleted because it failed parsing.
+                                 .assertCookieWasDeleted("cookie")
+        )
+        // Making the request back to the compressed page will not find the cookie
+        .simulate(() -> simulator.test("/compressed-managed-cookie")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertBody("(null)")
+                                 .assertDoesNotContainsCookie("cookie")
+        );
   }
 
   @Test
-  // test fails in current code as well
-  @Ignore
   public void cookie_accidentally_starts_with_header() throws Exception {
+    // A cookie that happens to start with the header will be interpreted accordingly
     // BBB<null>BB
     var cookie = "QkJCAEJC";
 
+    // Make a request with the raw cookie value included in the header
     test.simulate(() -> simulator.test("/managed-cookie")
-                                 .withCookie("cookie1", cookie)
+                                 .withCookie("cookie", cookie)
                                  .get()
                                  .assertStatusCode(200)
-                                 .assertCookie("cookie1", "QkJCAEJC"));
+                                 // The body contains string after removing header bytes
+                                 .assertBody("BB")
+                                 // The new cookie value has header bytes and is encoded
+                                 .assertCookie("cookie", cookie))
+        // A second request using the cookie value set in user agent behaves the same
+        .simulate(() -> simulator.test("/managed-cookie")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertBody("BB")
+                                 .assertCookie("cookie", cookie));
   }
 
   @Test
   public void cookie_is_base64_encoded_without_header() throws Exception {
+    // Use case: a cookie that is base64-encoded before being written by PMVC will still be base64-encoded when reading back.
     String cookie = Base64.getEncoder().encodeToString("foobar".getBytes());
 
+    // Provide the base64-encoded value as a legacy cookie without headers by including directly on request.
     test.simulate(() -> simulator.test("/managed-cookie")
-                                 .withCookie("cookie1", cookie)
+                                 .withCookie("cookie", cookie)
                                  .get()
                                  .assertStatusCode(200)
-                                 // Zm9vYmFy is base64 encoded foobar
-                                 .assertCookie("cookie1", "Zm9vYmFy"));
+                                 // The rendered value is not decoded
+                                 .assertBody(cookie)
+                                 // The cookie will be updated with a header
+                                 .assertCookie("cookie", CookieTools.toCookie(cookie.getBytes(), false, false, encryptor)));
+
+    // Make a second GET request with the updated cookie. No change to body or cookie value
+    test.simulate(() -> simulator.test("/managed-cookie")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertBody(cookie)
+                                 .assertCookie("cookie", CookieTools.toCookie(cookie.getBytes(), false, false, encryptor)));
   }
 
   @Test
@@ -161,8 +262,13 @@ public class ManagedCookieTest extends PrimeBaseTest {
 
   @Test
   public void managed_cookie_scope() throws Exception {
+    // Test use of multiple cookies on a single action
+    var fooCookie = CookieTools.toCookie("foo".getBytes(), false, false, encryptor);
+    var barCookie = CookieTools.toCookie("bar".getBytes(), false, false, encryptor);
+    var bazCookie = CookieTools.toCookie("baz".getBytes(), false, false, encryptor);
+
     // Values are not set, no cookies
-    test.simulate(() -> simulator.test("/managed-cookie")
+    test.simulate(() -> simulator.test("/managed-cookie-scopes")
                                  .get()
                                  .assertStatusCode(200)
                                  .assertDoesNotContainsCookie("cookie1")
@@ -172,51 +278,54 @@ public class ManagedCookieTest extends PrimeBaseTest {
                                  .assertDoesNotContainsCookie("fusionauth.sso"))
 
         // Write all three cookies
-        .simulate(() -> simulator.test("/managed-cookie")
+        .simulate(() -> simulator.test("/managed-cookie-scopes")
                                  .withURLParameter("writeCookie1", "foo")
                                  .withURLParameter("writeCookie2", "bar")
                                  .withURLParameter("writeCookie3", "baz")
                                  .get()
                                  .assertStatusCode(200)
-                                 .assertCookie("cookie1", "foo"))
-        .assertCookie("cookie2", "bar")
-        .assertCookie("fusionauth.sso", "baz")
+                                 // The cookies are written in new format
+                                 .assertCookie("cookie1", fooCookie)
+                                 .assertCookie("cookie2", barCookie)
+                                 .assertCookie("fusionauth.sso", bazCookie)
+        )
 
         // Cookies are persisted, hit the GET, and they will still be there.
-        .simulate(() -> simulator.test("/managed-cookie")
+        .simulate(() -> simulator.test("/managed-cookie-scopes")
                                  .get()
                                  .assertStatusCode(200)
-                                 .assertCookie("cookie1", "foo"))
-        .assertCookie("cookie2", "bar")
-        .assertCookie("fusionauth.sso", "baz")
+                                 .assertCookie("cookie1", fooCookie)
+                                 .assertCookie("cookie2", barCookie)
+                                 .assertCookie("fusionauth.sso", bazCookie)
+        )
 
         // Delete stringCookie2
-        .simulate(() -> simulator.test("/managed-cookie")
+        .simulate(() -> simulator.test("/managed-cookie-scopes")
                                  .withURLParameter("deleteCookie2", true)
                                  .get()
                                  .assertStatusCode(200)
-                                 .assertCookie("cookie1", "foo")
+                                 .assertCookie("cookie1", fooCookie)
                                  .assertCookieWasDeleted("cookie2")
-                                 .assertCookie("fusionauth.sso", "baz"))
+                                 .assertCookie("fusionauth.sso", bazCookie))
 
         // Next request stringCookie2 will be all the way gone
-        .simulate(() -> simulator.test("/managed-cookie")
+        .simulate(() -> simulator.test("/managed-cookie-scopes")
                                  .get()
                                  .assertStatusCode(200)
-                                 .assertCookie("cookie1", "foo")
+                                 .assertCookie("cookie1", fooCookie)
                                  .assertDoesNotContainsCookie("cookie2")
-                                 .assertCookie("fusionauth.sso", "baz"))
+                                 .assertCookie("fusionauth.sso", bazCookie))
 
         // stringCookie1 and stringCookie3 holding strong after another request
-        .simulate(() -> simulator.test("/managed-cookie")
+        .simulate(() -> simulator.test("/managed-cookie-scopes")
                                  .get()
                                  .assertStatusCode(200)
-                                 .assertCookie("cookie1", "foo")
+                                 .assertCookie("cookie1", fooCookie)
                                  .assertDoesNotContainsCookie("cookie2")
-                                 .assertCookie("fusionauth.sso", "baz"))
+                                 .assertCookie("fusionauth.sso", bazCookie))
 
         // Delete all of them!!! - 1 and 3
-        .simulate(() -> simulator.test("/managed-cookie")
+        .simulate(() -> simulator.test("/managed-cookie-scopes")
                                  .withURLParameter("deleteCookie1", true)
                                  .withURLParameter("deleteCookie3", true)
                                  .get()
@@ -226,7 +335,7 @@ public class ManagedCookieTest extends PrimeBaseTest {
                                  .assertCookieWasDeleted("fusionauth.sso"))
 
         // They are now all gone.
-        .simulate(() -> simulator.test("/managed-cookie")
+        .simulate(() -> simulator.test("/managed-cookie-scopes")
                                  .get()
                                  .assertStatusCode(200)
                                  .assertDoesNotContainsCookie("cookie1")
@@ -235,19 +344,32 @@ public class ManagedCookieTest extends PrimeBaseTest {
   }
 
   @Test
-  public void uncompressed_unencrypted_starts_with_header_byte_sequence() throws Exception {
-    // if compress and encrypt are off, BaseManagedCookieScope#buildCookie will not put a header on the cookie
-    // but there might be some edge cases where we have a header indicating an uncompressed, unencrypted cookie
-    // and we should allow that if the annotation does not use/require encryption (and
-    // ManagedCookieAction's cookie1 field does not)
-    String value = "foo";
-    byte[] json = objectMapper.writeValueAsBytes(value);
-    String base64EncodedCookieWithHeader = CookieTools.toCookie(json, false, false, encryptor);
+  public void uncompressed_unencrypted_contains_json() throws Exception {
+    // 1) The legacy cookie contains a value that can be parsed as JSON
+    // 2) The cookie is parsed, and the value is displayed as a JSON string
+    // 3) The cookie is rewritten in the modern format with a header
+    // 4) The follow-up request with the modern cookie still renders the JSON string
+    String value = "foo"; // `foo`
+    byte[] json = objectMapper.writeValueAsBytes(value); // `"foo"`
+    String jsonStr = new String(json, StandardCharsets.UTF_8);
 
+    // The first request is a modern, base64-encoded cookie with headers. The value is the JSON String `"foo"`
     test.simulate(() -> simulator.test("/managed-cookie")
-                                 .withCookie("cookie1", base64EncodedCookieWithHeader)
+                                 .withCookie("cookie", jsonStr)
                                  .get()
                                  .assertStatusCode(200)
-                                 .assertCookie("cookie1", "foo"));
+                                 // `"foo"` is rendered
+                                 .assertBody(jsonStr)
+                                 // The new cookie is written in the modern format
+                                 .assertCookie("cookie", CookieTools.toCookie(json, false, false, encryptor)));
+
+    // The request works a second time with the updated cookie
+    test.simulate(() -> simulator.test("/managed-cookie")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 // The cookie still contains `"foo"` after decoding
+                                 .assertBody(jsonStr)
+                                 // No change in the cookie value
+                                 .assertCookie("cookie", CookieTools.toCookie(json, false, false, encryptor)));
   }
 }

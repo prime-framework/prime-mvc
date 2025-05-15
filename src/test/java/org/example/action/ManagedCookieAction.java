@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2021-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,62 +17,24 @@ package org.example.action;
 
 import io.fusionauth.http.Cookie;
 import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.action.result.annotation.Status;
 import org.primeframework.mvc.scope.annotation.ManagedCookie;
 
 /**
- * @author Daniel DeGroff
+ * @author Spencer Witt
  */
 @Action
-@Status
 public class ManagedCookieAction {
   @ManagedCookie(encrypt = false)
-  public Cookie cookie1;
+  public Cookie cookie;
 
-  @ManagedCookie(encrypt = false)
-  public Cookie cookie2;
-
-  @ManagedCookie(name = "fusionauth.sso", encrypt = false)
-  public Cookie cookie3;
-
-  public boolean deleteCookie1;
-
-  public boolean deleteCookie2;
-
-  public boolean deleteCookie3;
-
-  public String writeCookie1;
-
-  public String writeCookie2;
-
-  public String writeCookie3;
+  public String value;
 
   public String get() {
-    if (writeCookie1 != null) {
-      cookie1.value = writeCookie1;
-    }
+    return "input";
+  }
 
-    if (writeCookie2 != null) {
-      cookie2.value = writeCookie2;
-    }
-
-
-    if (writeCookie3 != null) {
-      cookie3.value = writeCookie3;
-    }
-
-    if (deleteCookie1) {
-      cookie1 = null;
-    }
-
-    if (deleteCookie2) {
-      cookie2 = null;
-    }
-
-    if (deleteCookie3) {
-      cookie3 = null;
-    }
-
-    return "success";
+  public String post() {
+    cookie.value = value;
+    return "input";
   }
 }
