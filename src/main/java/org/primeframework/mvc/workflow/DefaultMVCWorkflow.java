@@ -1,5 +1,5 @@
 /*
-` * Copyright (c) 2001-2016, Inversoft Inc., All Rights Reserved
+` * Copyright (c) 2001-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -113,7 +113,12 @@ public class DefaultMVCWorkflow implements MVCWorkflow {
       }
 
       // Otherwise, we can handle the exception and then invoke the error workflow, but we have to reset the response first
+      // TODO : Daniel : Hacking... It doesn't seem like we want to always clear the response headers.
+      //                 We could remove the header clear from the reset() or build a new method?
+      //                 Why do we have to reset the response?
+      var headers = response.getHeadersMap();
       response.reset();
+      headers.keySet().forEach(k -> headers.get(k).forEach(v -> response.addHeader(k, v)));
       exceptionHandler.handle(e);
 
       WorkflowChain errorChain = new SubWorkflowChain(singletonList(errorWorkflow), workflowChain);

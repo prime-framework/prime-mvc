@@ -1225,7 +1225,7 @@ public class GlobalTest extends PrimeBaseTest {
 
   @Test
   public void hacked() {
-    // Make sure we don't invoke 'freemarker.template.utility.Execute"
+    // Make sure we don't invoke freemarker.template.utility.Execute
     simulator.test("/hacked")
              .get()
              .assertStatusCode(500)
