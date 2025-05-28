@@ -20,6 +20,7 @@ import java.util.List;
 
 import com.google.inject.Inject;
 import io.fusionauth.http.server.HTTPResponse;
+import io.fusionauth.http.server.io.HTTPOutputStream;
 import org.primeframework.mvc.ErrorException;
 import org.primeframework.mvc.action.ActionInvocationWorkflow;
 import org.primeframework.mvc.action.ActionMappingWorkflow;
@@ -113,12 +114,9 @@ public class DefaultMVCWorkflow implements MVCWorkflow {
       }
 
       // Otherwise, we can handle the exception and then invoke the error workflow, but we have to reset the response first
-      // TODO : Daniel : Hacking... It doesn't seem like we want to always clear the response headers.
-      //                 We could remove the header clear from the reset() or build a new method?
-      //                 Why do we have to reset the response?
-      var headers = response.getHeadersMap();
-      response.reset();
-      headers.keySet().forEach(k -> headers.get(k).forEach(v -> response.addHeader(k, v)));
+      // TODO : Daniel : What is the minimum I need to do here? .reset() is too much, I want to preserve headers and cookies.
+      //        - Need to figure out what is failing when I don't do this, and then ensure I only fix that.
+      ((HTTPOutputStream) response.getOutputStream()).reset();
       exceptionHandler.handle(e);
 
       WorkflowChain errorChain = new SubWorkflowChain(singletonList(errorWorkflow), workflowChain);
