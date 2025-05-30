@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2021-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,13 +61,11 @@ public abstract class BaseManagedCookieScope<T extends Annotation> extends Abstr
       return null;
     }
 
-    if (compress || encrypt) {
-      byte[] result = cookieValue.getBytes(StandardCharsets.UTF_8);
-      try {
-        cookie.value = CookieTools.toCookie(result, compress, encrypt, encryptor);
-      } catch (Exception e) {
-        throw new ErrorException("error", e);
-      }
+    byte[] result = cookieValue.getBytes(StandardCharsets.UTF_8);
+    try {
+      cookie.value = CookieTools.toCookie(result, compress, encrypt, encryptor);
+    } catch (Exception e) {
+      throw new ErrorException("error", e);
     }
 
     setCookieValues(cookie, scope);
@@ -111,12 +109,16 @@ public abstract class BaseManagedCookieScope<T extends Annotation> extends Abstr
     }
 
     try {
+      // Note: If the cookie value begins with valid JSON followed by a newline character (\n, 0x0a, 10), oldFunction will return the
+      //  JSON string and truncate the newline onward. Starting in 4.30.0 all cookies are written with header bytes to avoid this issue.
       ThrowingFunction<byte[], String> oldFunction = r -> objectMapper.readerFor(String.class).readValue(r);
       ThrowingFunction<byte[], String> newFunction = r -> new String(r, StandardCharsets.UTF_8);
       if (compress || encrypt) {
+        // If a cookie meant to be compressed or encrypted according to the annotation, the processing must succeed.
         cookie.value = CookieTools.fromCookie(cookieValue, encrypt, encrypt, encryptor, oldFunction, newFunction);
       } else {
         try {
+          // If a managed cookie is not compressed or encrypted, attempt to parse. If parsing fails (Exception), assume a legacy cookie that had the proper value in it.
           cookie.value = CookieTools.fromCookie(cookieValue, false, false, encryptor, oldFunction, newFunction);
         } catch (Throwable t) {
           // Smother because the cookie already has the value in it
