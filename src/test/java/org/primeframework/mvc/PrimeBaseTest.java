@@ -43,6 +43,7 @@ import com.google.inject.name.Names;
 import com.google.inject.util.Modules;
 import io.fusionauth.http.HTTPMethod;
 import io.fusionauth.http.io.BlockingByteBufferOutputStream;
+import io.fusionauth.http.io.MultipartProcessorConfiguration;
 import io.fusionauth.http.log.AccumulatingLoggerFactory;
 import io.fusionauth.http.log.BaseLogger;
 import io.fusionauth.http.log.Level;
@@ -243,7 +244,8 @@ public abstract class PrimeBaseTest {
                                                      new TestWorkflowModule(), new TestStaticResourceModule());
     var mainConfig = new HTTPServerConfiguration().withClientTimeout(Duration.ofMillis(500))
                                                   .withListener(new HTTPListenerConfiguration(9080))
-                                                  .withLoggerFactory(TestAccumulatingLoggerFactory.FACTORY);
+                                                  .withLoggerFactory(TestAccumulatingLoggerFactory.FACTORY)
+                                                  .withMultipartConfiguration(injector.getInstance(MultipartProcessorConfiguration.class));
     TestPrimeMain main = new TestPrimeMain(new HTTPServerConfiguration[]{mainConfig}, module);
     simulator = new RequestSimulator(main, messageObserver);
     injector = simulator.getInjector();

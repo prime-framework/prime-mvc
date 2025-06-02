@@ -22,6 +22,7 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import io.fusionauth.http.server.HTTPServer;
 import io.fusionauth.http.server.HTTPServerConfiguration;
+import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.guice.GuiceBootstrap;
 import org.primeframework.mvc.log.SLF4JLoggerFactoryAdapter;
 
@@ -106,6 +107,17 @@ public abstract class BasePrimeMain {
 
       // Set the logger factory for the server.
       configureLoggerFactory(config);
+
+      // prime and the HTTP server both have a configuration for max file size on an upload request.
+      // - Ensure they are compatible.
+      // -
+      // Note that the prime-mvc check must wait for the file to be written to disk, so it does not keep the file from being written.
+      //   It waits until the file is written by the HTTP server and then fails nicely to let the end user know it is too big.
+      // Note that the java-http check will be performed during upload, so if it fails, the prime-mvc request handler will not be invoked.
+      MVCConfiguration mvcConfiguration = injector.getInstance(MVCConfiguration.class);
+      if (mvcConfiguration.fileUploadMaxSize() < config.getMultipartProcessorConfiguration().getMaxFileSize()) {
+        throw new IllegalStateException("MVCConfiguration.fileUploadMaxSize must be less than or equal to the HTTP server configuration. Prime MVC configuration [" + mvcConfiguration.fileUploadMaxSize() + "] HTTP server configuration [" + config.getMultipartProcessorConfiguration().getMaxFileSize() + "]");
+      }
 
       // Create the server
       var server = new HTTPServer().withConfiguration(config)

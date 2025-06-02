@@ -1,5 +1,5 @@
 /*
-` * Copyright (c) 2012-2022, Inversoft Inc., All Rights Reserved
+` * Copyright (c) 2012-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
+import io.fusionauth.http.io.MultipartProcessorConfiguration;
 import org.primeframework.mvc.action.config.ActionConfigurator;
 import org.primeframework.mvc.content.ContentWorkflow;
 import org.primeframework.mvc.content.DefaultContentHandler;
@@ -29,6 +30,7 @@ import org.primeframework.mvc.content.binary.BinaryContentHandler;
 import org.primeframework.mvc.content.json.JacksonActionConfigurator;
 import org.primeframework.mvc.content.json.JacksonContentHandler;
 import org.primeframework.mvc.content.json.JacksonPatchContentHandler;
+import org.primeframework.mvc.http.guice.PrimeMultipartProcessConfigurationProvider;
 
 /**
  * This class is a Guice module that configures the ContentHandlerFactory and the default ContentHandlers.
@@ -42,10 +44,14 @@ public class ContentModule extends AbstractModule {
     ContentHandlerFactory.addContentHandler(binder(), "application/json-patch+json", JacksonPatchContentHandler.class);
     ContentHandlerFactory.addContentHandler(binder(), "application/merge-patch+json", JacksonPatchContentHandler.class);
     ContentHandlerFactory.addContentHandler(binder(), "application/octet-stream", BinaryContentHandler.class);
+    // Note that multipart and form data are handled by the server.
     ContentHandlerFactory.addContentHandler(binder(), "multipart/form-data", ServerHandledContentHandler.class);
     ContentHandlerFactory.addContentHandler(binder(), "application/x-www-form-urlencoded", ServerHandledContentHandler.class);
+
     // Default exploding handler to handle missing Content-Type header, or un-supported values.
     ContentHandlerFactory.addContentHandler(binder(), "", DefaultContentHandler.class);
+
+    bindMultipartProcessingConfiguration();
 
     Multibinder<ActionConfigurator> multiBinder = Multibinder.newSetBinder(binder(), ActionConfigurator.class);
     multiBinder.addBinding().to(JacksonActionConfigurator.class);
@@ -54,6 +60,10 @@ public class ContentModule extends AbstractModule {
     // Set up the Jackson Module bindings and the provider for the ObjectMapper
     Multibinder.newSetBinder(binder(), Module.class);
     bindObjectMapper();
+  }
+
+  protected void bindMultipartProcessingConfiguration() {
+    bind(MultipartProcessorConfiguration.class).toProvider(PrimeMultipartProcessConfigurationProvider.class);
   }
 
   protected void bindObjectMapper() {
