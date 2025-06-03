@@ -50,7 +50,7 @@ public class PrimeMVCInstrumenter implements Instrumenter {
   }
 
   @Override
-  public void acceptedRequests() {
+  public void acceptedRequest() {
     inc(acceptedRequests, 1);
   }
 
@@ -84,16 +84,6 @@ public class PrimeMVCInstrumenter implements Instrumenter {
     // Ignored
   }
 
-  @Override
-  public void threadExited() {
-    inc(threads, 1);
-  }
-
-  @Override
-  public void threadStarted() {
-    dec(threads, 1);
-  }
-
   public void updateInjector(Injector injector) {
     // If MetricRegistry is not bound to a singleton, this will return a new instance. But that's fine because we will
     // just store Counters from it and use those. Meaning, this won't thrash or eat performance because the Counters
@@ -108,6 +98,16 @@ public class PrimeMVCInstrumenter implements Instrumenter {
     bytesRead = metricRegistry.counter("java-http.bytes-read");
     bytesWritten = metricRegistry.counter("java-http.bytes-written");
     threads = metricRegistry.counter("java-http.running-threads");
+  }
+
+  @Override
+  public void workerStarted() {
+    dec(threads, 1);
+  }
+
+  @Override
+  public void workerStopped() {
+    inc(threads, 1);
   }
 
   @Override
