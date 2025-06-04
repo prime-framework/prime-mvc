@@ -40,6 +40,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -116,6 +117,9 @@ public class RequestBuilder {
                      // - We used to set it to 0 in our own REST client, but 0 is not supported.
                      // - 50 works fine for non TLS tests.
                      .connectTimeout(Duration.ofMillis(250))
+                     // In theory this is faster. When switching to virtual threads in the load test framework I nearly doubled the RPS.
+                     // - However it is still way slower than RESTify which uses HTTPURLConnection. But that does have its own issues.
+                     .executor(Executors.newVirtualThreadPerTaskExecutor())
                      .followRedirects(Redirect.NEVER)
                      .build();
   }
