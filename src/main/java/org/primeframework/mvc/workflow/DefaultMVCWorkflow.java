@@ -17,6 +17,7 @@ package org.primeframework.mvc.workflow;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import com.google.inject.Inject;
 import io.fusionauth.http.server.HTTPResponse;
@@ -112,12 +113,17 @@ public class DefaultMVCWorkflow implements MVCWorkflow {
         throw e;
       }
 
-      // Otherwise, we can handle the exception and then invoke the error workflow, but we have to reset the response first
-      // TODO : Daniel : What is the minimum I need to do here? .reset() is too much, I want to preserve headers and cookies.
-      //        - Need to figure out what is failing when I don't do this, and then ensure I only fix that.
-      response.resetOutputStream();
+      // Reset the response, but preserve cookies and headers.
+      var cookies = List.copyOf(response.getCookies());
+      var headers = Map.copyOf(response.getHeadersMap());
+      response.reset();
+      headers.keySet().forEach(k -> headers.get(k).forEach(v -> response.addHeader(k, v)));
+      cookies.forEach(response::addCookie);
+
+      // Call the exception handler
       exceptionHandler.handle(e);
 
+      // Continue the error workflow
       WorkflowChain errorChain = new SubWorkflowChain(singletonList(errorWorkflow), workflowChain);
       errorChain.continueWorkflow();
     }

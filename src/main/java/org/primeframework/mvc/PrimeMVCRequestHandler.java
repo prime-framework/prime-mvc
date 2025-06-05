@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2021-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,11 @@ package org.primeframework.mvc;
 import java.io.Closeable;
 
 import com.google.inject.Injector;
-import io.fusionauth.http.ConnectionClosedException;
 import io.fusionauth.http.HTTPMethod;
 import io.fusionauth.http.server.HTTPHandler;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
+import io.fusionauth.http.server.io.ConnectionClosedException;
 import org.primeframework.mvc.action.result.MVCWorkflowFinalizer;
 import org.primeframework.mvc.guice.GuiceBootstrap;
 import org.primeframework.mvc.http.HTTPObjectsHolder;
