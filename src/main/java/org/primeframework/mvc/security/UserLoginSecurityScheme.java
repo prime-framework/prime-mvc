@@ -16,6 +16,7 @@
 package org.primeframework.mvc.security;
 
 import java.net.URI;
+import java.util.Set;
 
 import com.google.inject.Inject;
 import io.fusionauth.http.HTTPMethod;
@@ -30,6 +31,9 @@ import org.primeframework.mvc.security.csrf.CSRFProvider;
  * @author Brian Pontarelli
  */
 public class UserLoginSecurityScheme implements SecurityScheme {
+
+  private static final Set<HTTPMethod> CSRF_METHODS = Set.of(HTTPMethod.POST, HTTPMethod.PUT, HTTPMethod.PATCH, HTTPMethod.DELETE);
+
   private final MVCConfiguration configuration;
 
   private final UserLoginConstraintsValidator constraintsValidator;
@@ -73,7 +77,7 @@ public class UserLoginSecurityScheme implements SecurityScheme {
     }
 
     // CSRF on POST only
-    if (HTTPMethod.POST.is(method)) {
+    if (CSRF_METHODS.contains(method)) {
       // Check for CSRF request origins
       String source = HTTPTools.getOriginHeader(request);
       if (source == null) {
