@@ -115,8 +115,12 @@ public abstract class BasePrimeMain {
       //   It waits until the file is written by the HTTP server and then fails nicely to let the end user know it is too big.
       // Note that the java-http check will be performed during upload, so if it fails, the prime-mvc request handler will not be invoked.
       MVCConfiguration mvcConfiguration = injector.getInstance(MVCConfiguration.class);
-      if (mvcConfiguration.fileUploadMaxSize() < config.getMultipartProcessorConfiguration().getMaxFileSize()) {
-        throw new IllegalStateException("MVCConfiguration.fileUploadMaxSize must be less than or equal to the HTTP server configuration. Prime MVC configuration [" + mvcConfiguration.fileUploadMaxSize() + "] HTTP server configuration [" + config.getMultipartProcessorConfiguration().getMaxFileSize() + "]");
+      long mvcMaxFileSize = mvcConfiguration.fileUploadMaxSize();
+      long httpMaxFileSize = config.getMultipartConfiguration().getMaxFileSize();
+      // TODO : Daniel : Review : We could use fileUploadMaxSize() to set the java-http configuration file instead of just ensuring it is larger.
+      //        The only benefit if using the MVC config would be to provide a better error message I suppose?
+      if (mvcMaxFileSize < httpMaxFileSize) {
+        throw new IllegalStateException("MVCConfiguration.fileUploadMaxSize must be greater than or equal to the HTTP server configuration. Prime MVC configuration [" + mvcMaxFileSize + "] HTTP server configuration [" + httpMaxFileSize + "]");
       }
 
       // Create the server

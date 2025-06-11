@@ -101,6 +101,16 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
       throw new NotAllowedException();
     }
 
+    // Note that multipart file handling is disabled by default. Enable it if the action has indicated it is expecting a file upload.
+    boolean expectingFileUploads = !actionInvocation.configuration.fileUploadMembers.isEmpty();
+    if (expectingFileUploads) {
+      // Note we could optionally inspect all the FileUpload annotations, and take the MAX of maxSize if set, and set the max file size for this
+      // specific request. In most cases - assuming we have just a single FileUpload annotation per action, this would effectively allow java-http
+      // to enforce this value.
+      // Note that this method may return null. We do not expect this in production and we should throw an NPE if this occurs.
+      request.getMultipartConfiguration().withFileUploadEnabled(true);
+    }
+
     // Start the timers and grab some meters for errors
     Timer.Context perPathTimer = null;
     Timer.Context aggregateTimer = null;

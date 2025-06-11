@@ -19,7 +19,6 @@ import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
-import io.fusionauth.http.io.MultipartProcessorConfiguration;
 import org.primeframework.mvc.action.config.ActionConfigurator;
 import org.primeframework.mvc.content.ContentWorkflow;
 import org.primeframework.mvc.content.DefaultContentHandler;
@@ -30,7 +29,6 @@ import org.primeframework.mvc.content.binary.BinaryContentHandler;
 import org.primeframework.mvc.content.json.JacksonActionConfigurator;
 import org.primeframework.mvc.content.json.JacksonContentHandler;
 import org.primeframework.mvc.content.json.JacksonPatchContentHandler;
-import org.primeframework.mvc.http.guice.PrimeMultipartProcessConfigurationProvider;
 
 /**
  * This class is a Guice module that configures the ContentHandlerFactory and the default ContentHandlers.
@@ -51,8 +49,6 @@ public class ContentModule extends AbstractModule {
     // Default exploding handler to handle missing Content-Type header, or un-supported values.
     ContentHandlerFactory.addContentHandler(binder(), "", DefaultContentHandler.class);
 
-    bindMultipartProcessingConfiguration();
-
     Multibinder<ActionConfigurator> multiBinder = Multibinder.newSetBinder(binder(), ActionConfigurator.class);
     multiBinder.addBinding().to(JacksonActionConfigurator.class);
     multiBinder.addBinding().to(BinaryActionConfigurator.class);
@@ -60,10 +56,6 @@ public class ContentModule extends AbstractModule {
     // Set up the Jackson Module bindings and the provider for the ObjectMapper
     Multibinder.newSetBinder(binder(), Module.class);
     bindObjectMapper();
-  }
-
-  protected void bindMultipartProcessingConfiguration() {
-    bind(MultipartProcessorConfiguration.class).toProvider(PrimeMultipartProcessConfigurationProvider.class);
   }
 
   protected void bindObjectMapper() {
