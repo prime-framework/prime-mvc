@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2024, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -108,7 +108,8 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
       // specific request. In most cases - assuming we have just a single FileUpload annotation per action, this would effectively allow java-http
       // to enforce this value.
       // Note that this method may return null. We do not expect this in production and we should throw an NPE if this occurs.
-      request.getMultipartConfiguration().withFileUploadEnabled(true);
+      // TODO : Daniel : This isn't going to work, need to review this workflow to see how early we can modify the config.
+//      request.getMultipartConfiguration().withFileUploadEnabled(true);
     }
 
     // Start the timers and grab some meters for errors

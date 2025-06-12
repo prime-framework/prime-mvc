@@ -385,7 +385,8 @@ public class RequestResult {
    */
   public RequestResult assertBodyFile(Path path, Object... values) throws IOException {
     if (values.length == 0) {
-      return assertBody(Files.readString(path));
+      var body = Files.readString(path).trim();
+      return assertBody(body);
     }
     return assertBody(BodyTools.processTemplateForAssertion(path, values));
   }
