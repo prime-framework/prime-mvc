@@ -76,7 +76,7 @@ public class UserLoginSecurityScheme implements SecurityScheme {
       return;
     }
 
-    // CSRF on POST only
+    // CSRF on modifying requests
     if (CSRF_METHODS.contains(method)) {
       // Check for CSRF request origins
       String source = HTTPTools.getOriginHeader(request);
