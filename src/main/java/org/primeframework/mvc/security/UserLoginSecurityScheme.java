@@ -90,7 +90,7 @@ public class UserLoginSecurityScheme implements SecurityScheme {
         throw new UnauthorizedException();
       }
 
-      // Handle CSRF tokens (for POST only)
+      // Handle CSRF tokens (for modifying requests)
       if (!csrfProvider.validateRequest(request)) {
         // TODO : Should we do something less brute force here?
         throw new UnauthorizedException();
