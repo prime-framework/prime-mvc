@@ -36,6 +36,33 @@ public class CSRFTest extends PrimeBaseTest {
   @Inject public UserLoginSecurityContext securityContext;
 
   @Test
+  public void delete_CSRFTokenSuccess() {
+    MockUserLoginSecurityContext.roles.add("delete-only");
+    securityContext.login(new User());
+
+    configuration.csrfEnabled = true;
+    simulator.test("/secure")
+             .withSingleHeader("Referer", "http://localhost:" + simulator.getPort() + "/secure")
+             .withSingleHeader(csrfProvider.getHeaderName(), csrfProvider.getToken(request))
+             .delete()
+             .assertStatusCode(200)
+             .assertBody("Secure!");
+
+    // No referer to ensure that RequestBuilder adds it
+    simulator.test("/secure")
+             .withSingleHeader(csrfProvider.getHeaderName(), csrfProvider.getToken(request))
+             .delete()
+             .assertStatusCode(200)
+             .assertBody("Secure!");
+
+    // No referer or token to ensure that RequestBuilder adds it
+    simulator.test("/secure")
+             .delete()
+             .assertStatusCode(200)
+             .assertBody("Secure!");
+  }
+
+  @Test
   public void get_CSRFToken() {
     MockUserLoginSecurityContext.roles.add("admin");
     securityContext.login(new User());
@@ -49,6 +76,33 @@ public class CSRFTest extends PrimeBaseTest {
     // A GET request won't contain the parameter
     // - This is just testing the RequestBuilder that will try and automatically add the CSRF token
     assertFalse(SecureAction.UnknownParameters.containsKey(csrfProvider.getParameterName()));
+  }
+
+  @Test
+  public void patch_CSRFTokenSuccess() {
+    MockUserLoginSecurityContext.roles.add("patch-only");
+    securityContext.login(new User());
+
+    configuration.csrfEnabled = true;
+    simulator.test("/secure")
+             .withSingleHeader("Referer", "http://localhost:" + simulator.getPort() + "/secure")
+             .withSingleHeader(csrfProvider.getHeaderName(), csrfProvider.getToken(request))
+             .patch()
+             .assertStatusCode(200)
+             .assertBody("Secure!");
+
+    // No referer to ensure that RequestBuilder adds it
+    simulator.test("/secure")
+             .withSingleHeader(csrfProvider.getHeaderName(), csrfProvider.getToken(request))
+             .patch()
+             .assertStatusCode(200)
+             .assertBody("Secure!");
+
+    // No referer or token to ensure that RequestBuilder adds it
+    simulator.test("/secure")
+             .patch()
+             .assertStatusCode(200)
+             .assertBody("Secure!");
   }
 
   @Test
@@ -145,6 +199,33 @@ public class CSRFTest extends PrimeBaseTest {
     // A POST request will contain the CSRF token
     // - This is just testing the RequestBuilder that will try and automatically add the CSRF token
     assertTrue(SecureAction.UnknownParameters.containsKey(csrfProvider.getParameterName()));
+  }
+
+  @Test
+  public void put_CSRFTokenSuccess() {
+    MockUserLoginSecurityContext.roles.add("put-only");
+    securityContext.login(new User());
+
+    configuration.csrfEnabled = true;
+    simulator.test("/secure")
+             .withSingleHeader("Referer", "http://localhost:" + simulator.getPort() + "/secure")
+             .withSingleHeader(csrfProvider.getHeaderName(), csrfProvider.getToken(request))
+             .put()
+             .assertStatusCode(200)
+             .assertBody("Secure!");
+
+    // No referer to ensure that RequestBuilder adds it
+    simulator.test("/secure")
+             .withSingleHeader(csrfProvider.getHeaderName(), csrfProvider.getToken(request))
+             .put()
+             .assertStatusCode(200)
+             .assertBody("Secure!");
+
+    // No referer or token to ensure that RequestBuilder adds it
+    simulator.test("/secure")
+             .put()
+             .assertStatusCode(200)
+             .assertBody("Secure!");
   }
 
   // Add for testing legacy-encrypted CSRF token which is defined as a private class in DefaultEncryptionBasedTokenCSRFProvider

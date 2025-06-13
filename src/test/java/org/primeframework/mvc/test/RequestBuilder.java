@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -847,6 +848,18 @@ public class RequestBuilder {
           if (token != null) {
             String parameterName = csrfProvider.getParameterName();
             requestBodyParameters.put(parameterName, List.of(token));
+          }
+        }
+      }
+    } else if (Set.of(HTTPMethod.DELETE, HTTPMethod.PATCH, HTTPMethod.PUT).contains(request.getMethod())) {
+      MVCConfiguration configuration = injector.getInstance(MVCConfiguration.class);
+      if (configuration.csrfEnabled()) {
+        CSRFProvider csrfProvider = injector.getInstance(CSRFProvider.class);
+        if (csrfProvider.getTokenFromRequest(request) == null) {
+          String token = csrfProvider.getToken(request);
+          if (token != null) {
+            String parameterName = csrfProvider.getParameterName();
+            request.setHeader(csrfProvider.getHeaderName(), token);
           }
         }
       }

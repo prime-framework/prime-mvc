@@ -32,7 +32,9 @@ import org.primeframework.mvc.security.csrf.CSRFProvider;
  */
 public class UserLoginSecurityScheme implements SecurityScheme {
 
-  private static final Set<HTTPMethod> CSRF_METHODS = Set.of(HTTPMethod.POST, HTTPMethod.PUT, HTTPMethod.PATCH, HTTPMethod.DELETE);
+  // Set of HTTP methods that are considered unsafe and require CSRF protection. Can be overridden by subclasses if CSRF
+  // protection is not required for certain methods.
+  protected Set<HTTPMethod> unsafeHttpMethods = Set.of(HTTPMethod.POST, HTTPMethod.PUT, HTTPMethod.PATCH, HTTPMethod.DELETE);
 
   private final MVCConfiguration configuration;
 
@@ -77,7 +79,7 @@ public class UserLoginSecurityScheme implements SecurityScheme {
     }
 
     // CSRF on modifying requests
-    if (CSRF_METHODS.contains(method)) {
+    if (unsafeHttpMethods.contains(method)) {
       // Check for CSRF request origins
       String source = HTTPTools.getOriginHeader(request);
       if (source == null) {
