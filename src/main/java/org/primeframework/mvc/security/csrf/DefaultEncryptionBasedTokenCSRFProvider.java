@@ -71,7 +71,7 @@ public class DefaultEncryptionBasedTokenCSRFProvider implements CSRFProvider {
 
   @Override
   public boolean validateRequest(HTTPRequest request) {
-    CSRFToken token = decrypt(request.getParameter(getParameterName()));
+    CSRFToken token = decrypt(getTokenFromRequest(request));
     if (token == null) {
       return false;
     }
