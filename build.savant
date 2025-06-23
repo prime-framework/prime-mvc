@@ -190,6 +190,7 @@ void updatePOM() {
     // org.ow2.asm:asm:9.5.0 --> 9.5
     filter(token: "<version>9.5.0</version>", value: "<version>9.5</version>")
     // javax.inject:javax.inject:1.0.0 -> 1
-    filter(token: "<version>1.0.0</version>", value: "<version>1</version>")
+    filter(token: "<artifactId>javax.inject</artifactId>\n      <version>1.0.0</version>",
+           value: "<artifactId>javax.inject</artifactId>\n      <version>1</version>")
   }
 }
