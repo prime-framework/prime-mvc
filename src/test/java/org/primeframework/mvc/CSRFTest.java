@@ -54,12 +54,6 @@ public class CSRFTest extends PrimeBaseTest {
              .delete()
              .assertStatusCode(200)
              .assertBody("Secure!");
-
-    // No referer or token to ensure that RequestBuilder adds it
-    simulator.test("/secure")
-             .delete()
-             .assertStatusCode(200)
-             .assertBody("Secure!");
   }
 
   @Test
@@ -94,12 +88,6 @@ public class CSRFTest extends PrimeBaseTest {
     // No referer to ensure that RequestBuilder adds it
     simulator.test("/secure")
              .withSingleHeader(csrfProvider.getHeaderName(), csrfProvider.getToken(request))
-             .patch()
-             .assertStatusCode(200)
-             .assertBody("Secure!");
-
-    // No referer or token to ensure that RequestBuilder adds it
-    simulator.test("/secure")
              .patch()
              .assertStatusCode(200)
              .assertBody("Secure!");
@@ -217,12 +205,6 @@ public class CSRFTest extends PrimeBaseTest {
     // No referer to ensure that RequestBuilder adds it
     simulator.test("/secure")
              .withSingleHeader(csrfProvider.getHeaderName(), csrfProvider.getToken(request))
-             .put()
-             .assertStatusCode(200)
-             .assertBody("Secure!");
-
-    // No referer or token to ensure that RequestBuilder adds it
-    simulator.test("/secure")
              .put()
              .assertStatusCode(200)
              .assertBody("Secure!");

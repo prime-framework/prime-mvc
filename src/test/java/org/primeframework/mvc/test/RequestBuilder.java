@@ -851,18 +851,6 @@ public class RequestBuilder {
           }
         }
       }
-    } else if (Set.of(HTTPMethod.DELETE, HTTPMethod.PATCH, HTTPMethod.PUT).contains(request.getMethod())) {
-      MVCConfiguration configuration = injector.getInstance(MVCConfiguration.class);
-      if (configuration.csrfEnabled()) {
-        CSRFProvider csrfProvider = injector.getInstance(CSRFProvider.class);
-        if (csrfProvider.getTokenFromRequest(request) == null) {
-          String token = csrfProvider.getToken(request);
-          if (token != null) {
-            String parameterName = csrfProvider.getParameterName();
-            request.setHeader(csrfProvider.getHeaderName(), token);
-          }
-        }
-      }
     }
 
     // Allow the caller to consume the HTTP request in order to mutate it and what not.
