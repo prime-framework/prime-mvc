@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2022-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,8 @@ import io.fusionauth.http.server.Instrumenter;
 public class PrimeMVCInstrumenter implements Instrumenter {
   private volatile Counter acceptedConnections;
 
+  private volatile Counter acceptedRequests;
+
   private volatile Counter badRequests;
 
   private volatile Counter bytesRead;
@@ -40,9 +42,16 @@ public class PrimeMVCInstrumenter implements Instrumenter {
 
   private volatile Counter connectionsClosed;
 
+  private volatile Counter threads;
+
   @Override
   public void acceptedConnection() {
     inc(acceptedConnections, 1);
+  }
+
+  @Override
+  public void acceptedRequest() {
+    inc(acceptedRequests, 1);
   }
 
   @Override
@@ -81,17 +90,36 @@ public class PrimeMVCInstrumenter implements Instrumenter {
     // will always point to the same objects until the server is `hup-ed`
     var metricRegistry = injector.getInstance(MetricRegistry.class);
     acceptedConnections = metricRegistry.counter("java-http.accepted-connections");
+    acceptedRequests = metricRegistry.counter("java-http.accepted-requests");
     badRequests = metricRegistry.counter("java-http.bad-requests");
     chunkedRequests = metricRegistry.counter("java-http.chunked-requests");
     chunkedResponses = metricRegistry.counter("java-http.chunked-responses");
     connectionsClosed = metricRegistry.counter("java-http.connections-closed");
     bytesRead = metricRegistry.counter("java-http.bytes-read");
     bytesWritten = metricRegistry.counter("java-http.bytes-written");
+    threads = metricRegistry.counter("java-http.running-threads");
+  }
+
+  @Override
+  public void workerStarted() {
+    dec(threads, 1);
+  }
+
+  @Override
+  public void workerStopped() {
+    inc(threads, 1);
   }
 
   @Override
   public void wroteToClient(long bytes) {
     inc(bytesWritten, bytes);
+  }
+
+  @SuppressWarnings("SameParameterValue")
+  private void dec(Counter counter, long number) {
+    if (counter != null) {
+      counter.dec(number);
+    }
   }
 
   private void inc(Counter counter, long number) {

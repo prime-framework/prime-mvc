@@ -11,7 +11,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/test/resources" type="java-test-resource" />
       <excludeFolder url="file://$MODULE_DIR$/build" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="Java 21" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library">
       <library>
@@ -126,11 +126,11 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/io/fusionauth/java-http/0.3.6/java-http-0.3.6.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/io/fusionauth/java-http/1.0.0/java-http-1.0.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/io/fusionauth/java-http/0.3.6/java-http-0.3.6-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/io/fusionauth/java-http/1.0.0/java-http-1.0.0-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -170,11 +170,11 @@
     <orderEntry type="module-library" scope="TEST">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/org/easymock/easymock/5.1.0/easymock-5.1.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/easymock/easymock/5.2.0/easymock-5.2.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/org/easymock/easymock/5.1.0/easymock-5.1.0-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/easymock/easymock/5.2.0/easymock-5.2.0-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -225,11 +225,11 @@
     <orderEntry type="module-library" scope="TEST">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/org/jsoup/jsoup/1.16.1/jsoup-1.16.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/jsoup/jsoup/1.16.2/jsoup-1.16.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/org/jsoup/jsoup/1.16.1/jsoup-1.16.1-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/jsoup/jsoup/1.16.2/jsoup-1.16.2-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>

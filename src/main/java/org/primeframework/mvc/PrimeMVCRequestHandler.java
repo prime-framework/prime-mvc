@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2021-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,11 @@ package org.primeframework.mvc;
 import java.io.Closeable;
 
 import com.google.inject.Injector;
-import io.fusionauth.http.ConnectionClosedException;
 import io.fusionauth.http.HTTPMethod;
 import io.fusionauth.http.server.HTTPHandler;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
+import io.fusionauth.http.server.io.ConnectionClosedException;
 import org.primeframework.mvc.action.result.MVCWorkflowFinalizer;
 import org.primeframework.mvc.guice.GuiceBootstrap;
 import org.primeframework.mvc.http.HTTPObjectsHolder;
@@ -55,7 +55,7 @@ public class PrimeMVCRequestHandler implements HTTPHandler, Closeable {
    * @param response Passed down chain.
    */
   @Override
-  public void handle(HTTPRequest request, HTTPResponse response) {
+  public void handle(HTTPRequest request, HTTPResponse response) throws Exception {
     // Support for HTTP Method Override
     String methodOverride = request.getHeader("X-HTTP-Method-Override");
     if (methodOverride == null) {
@@ -75,8 +75,8 @@ public class PrimeMVCRequestHandler implements HTTPHandler, Closeable {
       response.setStatus(408);
       logger.debug("Connection closed. This is generally caused due to a timeout, or a slow connection.", e);
     } catch (Throwable t) {
-      response.setStatus(500);
       logger.error("Error encountered", t);
+      throw t; // java-http will cause this error to write back a 500 if possible and close the socket
     } finally {
       HTTPObjectsHolder.clearRequest();
       HTTPObjectsHolder.clearResponse();

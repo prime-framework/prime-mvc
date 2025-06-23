@@ -39,7 +39,7 @@ public class StaticResourceTest extends PrimeBaseTest {
              .assertStatusCode(200)
              .assertContentType("content/unknown")
              .assertBodyContains("[#ftl/]")
-             .assertContentLength(470);
+             .assertContentLength(368);
 
     // We used to ignore .class URIs by default. We still do, but no longer explicitly. The class path resolution rejects everything by default.
     // - Ensure we can't look this up w/out modifying the filter.
@@ -54,7 +54,7 @@ public class StaticResourceTest extends PrimeBaseTest {
     simulator.test("/org/primeframework/mvc/PrimeMVCRequestHandler.class")
              .get()
              .assertStatusCode(200)
-             .assertContentLength(3176);
+             .assertContentLength(3188);
   }
 
   @Test

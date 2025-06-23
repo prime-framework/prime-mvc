@@ -55,7 +55,7 @@ public class MultipleServerTest {
   @Test
   public void multipleServers() {
     HTTPObjectsHolder.setRequest(new HTTPRequest());
-    HTTPObjectsHolder.setResponse(new HTTPResponse(null, null));
+    HTTPObjectsHolder.setResponse(new HTTPResponse());
 
     Module mvcModule = new MVCModule() {
       @Override

@@ -46,7 +46,7 @@ import org.primeframework.mvc.util.TypeTools;
  * @author Brian Pontarelli
  */
 @org.primeframework.mvc.parameter.convert.annotation.GlobalConverter
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class CollectionConverter extends AbstractGlobalConverter {
   private final ConverterProvider provider;
 
@@ -75,7 +75,7 @@ public class CollectionConverter extends AbstractGlobalConverter {
 
     // Try to instantiate it directly
     try {
-      return (Collection) type.newInstance();
+      return (Collection) type.getDeclaredConstructor().newInstance();
     } catch (Exception e) {
       throw new ConverterStateException("The type [" + type + "] is a collection but could not " +
           "be instantiated by the converter class");

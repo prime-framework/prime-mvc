@@ -5,7 +5,7 @@
 
   <groupId>org.primeframework</groupId>
   <artifactId>prime-mvc</artifactId>
-  <version>4.31.0</version>
+  <version>5.0.0</version>
   <packaging>jar</packaging>
 
   <name>FusionAuth App</name>
@@ -36,8 +36,8 @@
   </scm>
 
   <properties>
-    <maven.compiler.source>17</maven.compiler.source>
-    <maven.compiler.target>17</maven.compiler.target>
+    <maven.compiler.source>21</maven.compiler.source>
+    <maven.compiler.target>21</maven.compiler.target>
     <project.build.sourceEncoding>UTF8</project.build.sourceEncoding>
   </properties>
 
@@ -109,7 +109,7 @@
     <dependency>
       <groupId>io.fusionauth</groupId>
       <artifactId>java-http</artifactId>
-      <version>0.3.6</version>
+      <version>1.0.0</version>
       <type>jar</type>
       <scope>compile</scope>
       <optional>false</optional>
@@ -165,7 +165,7 @@
     <dependency>
       <groupId>org.easymock</groupId>
       <artifactId>easymock</artifactId>
-      <version>5.1.0</version>
+      <version>5.2.0</version>
       <type>jar</type>
       <scope>test</scope>
       <optional>false</optional>
@@ -181,7 +181,7 @@
     <dependency>
       <groupId>org.jsoup</groupId>
       <artifactId>jsoup</artifactId>
-      <version>1.16.1</version>
+      <version>1.16.2</version>
       <type>jar</type>
       <scope>test</scope>
       <optional>false</optional>
@@ -203,13 +203,4 @@
       <optional>false</optional>
     </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.0.0-M5</version>
-      </plugin>
-    </plugins>
-  </build>
 </project>

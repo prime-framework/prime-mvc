@@ -33,7 +33,6 @@ import static org.testng.Assert.assertNull;
  * @author Brian Pontarelli
  */
 public class LocaleConverterTest {
-
   @Test(dataProvider = "localeData")
   public void allLocalesFromBCP47Strings(Locale locale) {
     GlobalConverter converter = new LocaleConverter();

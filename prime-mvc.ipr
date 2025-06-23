@@ -718,11 +718,13 @@
         <option name="SUBCLASS_NAME_PREFIX" value="Default" />
         <option name="SUBCLASS_NAME_SUFFIX" value="" />
         <option name="DO_NOT_WRAP_AFTER_SINGLE_ANNOTATION" value="true" />
+        <option name="BLANK_LINES_AROUND_FIELD_WITH_ANNOTATIONS" value="1" />
         <option name="INSERT_INNER_CLASS_IMPORTS" value="true" />
         <option name="CLASS_COUNT_TO_USE_IMPORT_ON_DEMAND" value="9999" />
         <option name="NAMES_COUNT_TO_USE_IMPORT_ON_DEMAND" value="9999" />
         <option name="IMPORT_LAYOUT_TABLE">
           <value>
+            <package name="" withSubpackages="true" static="false" module="true" />
             <package name="javax" withSubpackages="true" static="false" />
             <package name="java" withSubpackages="true" static="false" />
             <emptyLine />
@@ -2178,7 +2180,7 @@
   <component name="ProjectResources">
     <default-html-doctype>http://www.w3.org/1999/xhtml</default-html-doctype>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_17" project-jdk-name="Java 17" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_21" project-jdk-name="Java 21" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
   <component name="TemplateDataLanguageMappings">

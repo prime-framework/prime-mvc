@@ -1,5 +1,5 @@
 /*
-` * Copyright (c) 2001-2016, Inversoft Inc., All Rights Reserved
+` * Copyright (c) 2001-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package org.primeframework.mvc.workflow;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import com.google.inject.Inject;
 import io.fusionauth.http.server.HTTPResponse;
@@ -112,9 +113,17 @@ public class DefaultMVCWorkflow implements MVCWorkflow {
         throw e;
       }
 
-      // Otherwise, we can handle the exception and then invoke the error workflow
+      // Reset the response, but preserve cookies and headers.
+      var cookies = List.copyOf(response.getCookies());
+      var headers = Map.copyOf(response.getHeadersMap());
+      response.reset();
+      headers.keySet().forEach(k -> headers.get(k).forEach(v -> response.addHeader(k, v)));
+      cookies.forEach(response::addCookie);
+
+      // Call the exception handler
       exceptionHandler.handle(e);
 
+      // Continue the error workflow
       WorkflowChain errorChain = new SubWorkflowChain(singletonList(errorWorkflow), workflowChain);
       errorChain.continueWorkflow();
     }

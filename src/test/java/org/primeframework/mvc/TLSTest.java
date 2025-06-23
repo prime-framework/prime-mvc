@@ -119,7 +119,7 @@ public class TLSTest {
   @BeforeMethod
   public void beforeMethod() {
     HTTPObjectsHolder.setRequest(new HTTPRequest());
-    HTTPObjectsHolder.setResponse(new HTTPResponse(null, null));
+    HTTPObjectsHolder.setResponse(new HTTPResponse());
   }
 
   @Test

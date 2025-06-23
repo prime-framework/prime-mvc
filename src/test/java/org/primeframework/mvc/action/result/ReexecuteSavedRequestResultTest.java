@@ -58,7 +58,7 @@ public class ReexecuteSavedRequestResultTest extends PrimeBaseTest {
 
     List<Message> messages = new ArrayList<>();
     HTTPRequest request = new HTTPRequest();
-    HTTPResponse response = new HTTPResponse(null, request);
+    HTTPResponse response = new HTTPResponse();
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(null, null, "/foo", "", null));
     replay(store);
@@ -93,7 +93,7 @@ public class ReexecuteSavedRequestResultTest extends PrimeBaseTest {
     Cookie cookie = SavedRequestTools.toCookie(savedRequest, configuration, encryptor, objectMapper);
 
     HTTPRequest request = new HTTPRequest().with(r -> r.addCookies(cookie));
-    HTTPResponse response = new HTTPResponse(null, request);
+    HTTPResponse response = new HTTPResponse();
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     replay(store);
 
@@ -110,9 +110,9 @@ public class ReexecuteSavedRequestResultTest extends PrimeBaseTest {
     verify(ee, store, messageStore);
 
     assertEquals(response.getCookies().size(), 1);
-    assertEquals(response.getCookies().get(0).name, configuration.savedRequestCookieName);
-    assertEquals(response.getCookies().get(0).maxAge.longValue(), 0);
-    assertFalse(response.getCookies().get(0).value.startsWith("ready_"));
+    assertEquals(response.getCookies().getFirst().name, configuration.savedRequestCookieName);
+    assertEquals(response.getCookies().getFirst().maxAge.longValue(), 0);
+    assertFalse(response.getCookies().getFirst().value.startsWith("ready_"));
     assertEquals(response.getStatus(), 301);
     assertEquals(response.getRedirect(), "/secure?test=value1&test2=value2");
     assertEquals(response.getHeader("Cache-Control"), "no-cache");

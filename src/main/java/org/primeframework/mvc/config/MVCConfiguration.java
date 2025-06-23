@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Set;
 
 import io.fusionauth.http.Cookie.SameSite;
-import org.primeframework.mvc.parameter.DefaultParameterParser;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 
 /**
@@ -32,13 +31,6 @@ import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
  * @author Brian Pontarelli
  */
 public interface MVCConfiguration {
-  /**
-   * In most cases you should disable this feature. While it may be useful, modifying the URI may have un-intended consequences.
-   *
-   * @return true if alternate actions can be specified by using the {@link DefaultParameterParser#ACTION_PREFIX} prefix.
-   */
-  boolean allowActionParameterDuringActionMappingWorkflow();
-
   /**
    * @return true if unknown parameters should be allowed, false if they are not allowed.
    */

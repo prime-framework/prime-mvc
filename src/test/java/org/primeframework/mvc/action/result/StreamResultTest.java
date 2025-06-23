@@ -60,7 +60,7 @@ public class StreamResultTest extends PrimeBaseTest {
     EasyMock.replay(ee);
 
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    HTTPResponse response = new HTTPResponse(null, null) {
+    HTTPResponse response = new HTTPResponse() {
       @Override
       public OutputStream getOutputStream() {
         return baos;
@@ -107,6 +107,7 @@ public class StreamResultTest extends PrimeBaseTest {
     };
   }
 
+  @SuppressWarnings("ClassExplicitlyAnnotation")
   public static class StreamImpl implements Stream {
     private final String cacheControl;
 
