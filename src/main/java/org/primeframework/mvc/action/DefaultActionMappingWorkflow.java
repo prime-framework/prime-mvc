@@ -31,7 +31,6 @@ import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.http.HTTPTools;
 import org.primeframework.mvc.http.Status;
 import org.primeframework.mvc.parameter.DefaultParameterParser;
-import org.primeframework.mvc.parameter.InternalParameters;
 import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.slf4j.Logger;
@@ -82,7 +81,6 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
     }
 
     HTTPMethod method = request.getMethod();
-    boolean executeResult = InternalParameters.is(request, InternalParameters.EXECUTE_RESULT);
     ActionInvocation actionInvocation = actionMapper.map(method, uri);
 
     // This case is a redirect because the URI maps to something new and there isn't an action associated with it. For

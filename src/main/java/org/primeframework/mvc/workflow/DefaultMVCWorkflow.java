@@ -1,5 +1,5 @@
 /*
-` * Copyright (c) 2001-2016, Inversoft Inc., All Rights Reserved
+` * Copyright (c) 2001-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.List;
 
 import com.google.inject.Inject;
+import io.fusionauth.http.HTTPProcessingException;
 import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.ErrorException;
 import org.primeframework.mvc.action.ActionInvocationWorkflow;
@@ -112,8 +113,14 @@ public class DefaultMVCWorkflow implements MVCWorkflow {
         throw e;
       }
 
+      // TODO : Daniel : I think I should just bind a discrete exception handler for this type
+      Throwable throwable = e;
+      if (throwable instanceof HTTPProcessingException) {
+        throwable = new ErrorException(e);
+      }
+
       // Otherwise, we can handle the exception and then invoke the error workflow
-      exceptionHandler.handle(e);
+      exceptionHandler.handle(throwable);
 
       WorkflowChain errorChain = new SubWorkflowChain(singletonList(errorWorkflow), workflowChain);
       errorChain.continueWorkflow();

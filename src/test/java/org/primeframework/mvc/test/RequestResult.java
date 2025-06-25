@@ -1871,7 +1871,7 @@ public class RequestResult {
     ActionMapper actionMapper = get(ActionMapper.class);
 
     // Using the ActionMapper so that URL segments are properly handled and the correct URL is used for message lookups.
-    ActionInvocation actionInvocation = actionMapper.map(null, request.getPath(), true);
+    ActionInvocation actionInvocation = actionMapper.map(null, request.getPath());
     actionInvocationStore.setCurrent(actionInvocation);
 
     return messageProvider;
