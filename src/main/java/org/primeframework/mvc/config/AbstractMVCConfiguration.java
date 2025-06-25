@@ -38,7 +38,7 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
       "video/dv", "video/h261", "video/h262", "video/h263", "video/h264", "video/jpeg", "video/mp4", "video/mpeg", "video/mpv", "video/ogg", "video/quicktime", "video/x-flv",
       "application/octet-stream", "application/pdf", "application/msword", "application/msexcel", "application/mspowerpoint");
 
-  public static final long MAX_SIZE = 1024000;
+  public static final long MAX_SIZE = 1024 * 1024; // 1 MB
 
   public boolean allowActionParameterDuringActionMappingWorkflow = true;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2024, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,19 @@
 package org.primeframework.mvc.action;
 
 import java.io.IOException;
-import java.util.Set;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.inject.Inject;
 import io.fusionauth.http.HTTPMethod;
+import io.fusionauth.http.io.MultipartConfiguration;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.NotAllowedException;
-import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.http.HTTPTools;
 import org.primeframework.mvc.http.Status;
-import org.primeframework.mvc.parameter.DefaultParameterParser;
-import org.primeframework.mvc.parameter.InternalParameters;
+import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,8 +46,6 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
 
   private final ActionMapper actionMapper;
 
-  private final MVCConfiguration configuration;
-
   private final HTTPRequest request;
 
   private final HTTPResponse response;
@@ -58,12 +54,11 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
 
   @Inject
   public DefaultActionMappingWorkflow(HTTPRequest request, HTTPResponse response, ActionInvocationStore actionInvocationStore,
-                                      ActionMapper actionMapper, MVCConfiguration configuration) {
+                                      ActionMapper actionMapper) {
     this.request = request;
     this.response = response;
     this.actionInvocationStore = actionInvocationStore;
     this.actionMapper = actionMapper;
-    this.configuration = configuration;
   }
 
   /**
@@ -80,8 +75,7 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
     }
 
     HTTPMethod method = request.getMethod();
-    boolean executeResult = InternalParameters.is(request, InternalParameters.EXECUTE_RESULT);
-    ActionInvocation actionInvocation = actionMapper.map(method, uri, executeResult);
+    ActionInvocation actionInvocation = actionMapper.map(method, uri);
 
     // This case is a redirect because the URI maps to something new and there isn't an action associated with it. For
     // example, this is how the index handling works.
@@ -100,6 +94,9 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
       logger.debug("The action class [{}] does not have a valid execute method for the HTTP method [{}]", actionClass.getCanonicalName(), method);
       throw new NotAllowedException();
     }
+
+    // Handle multipart file configuration
+    handleMultiPartConfiguration(actionInvocation);
 
     // Start the timers and grab some meters for errors
     Timer.Context perPathTimer = null;
@@ -146,37 +143,48 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
   }
 
   private String determineURI() {
-    String uri = null;
-
-    if (configuration.allowActionParameterDuringActionMappingWorkflow()) {
-      Set<String> keys = request.getParameters().keySet();
-      for (String key : keys) {
-        if (key.startsWith(DefaultParameterParser.ACTION_PREFIX)) {
-
-          String actionParameterName = key.substring(4);
-          String actionParameterValue = request.getParameter(key);
-          if (request.getParameter(actionParameterName) != null && actionParameterValue.trim().length() > 0) {
-            uri = actionParameterValue;
-
-            // Handle relative URIs
-            if (!uri.startsWith("/")) {
-              String requestURI = HTTPTools.getRequestURI(request);
-              int index = requestURI.lastIndexOf('/');
-              if (index >= 0) {
-                uri = requestURI.substring(0, index) + "/" + uri;
-              }
-            }
-          }
-        }
-      }
+    String uri = HTTPTools.getRequestURI(request);
+    if (!uri.startsWith("/")) {
+      uri = "/" + uri;
     }
 
-    if (uri == null) {
-      uri = HTTPTools.getRequestURI(request);
-      if (!uri.startsWith("/")) {
-        uri = "/" + uri;
-      }
-    }
     return uri;
+  }
+
+  private void handleMultiPartConfiguration(ActionInvocation actionInvocation) {
+    // Note that multipart file handling is disabled by default. Enable it if the action has indicated it is expecting a file upload.
+    boolean expectingFileUploads = !actionInvocation.configuration.fileUploadMembers.isEmpty();
+    if (!expectingFileUploads) {
+      return;
+    }
+
+    // Note we could optionally inspect all the FileUpload annotations, and take the MAX of maxSize if set, and set the max file size for this
+    // specific request. In most cases - assuming we have just a single FileUpload annotation per action, this would effectively allow java-http
+    // to enforce this value.
+    MultipartConfiguration multipartConfiguration = request.getMultiPartStreamProcessor().getMultiPartConfiguration();
+    multipartConfiguration.withFileUploadEnabled(true);
+
+    // Take the largest configured file size, or if non have specified a max file size, use the configured default.
+    long configuredMaxFileSize = multipartConfiguration.getMaxFileSize();
+    var fileUploadMembers = actionInvocation.configuration.fileUploadMembers;
+    long maxFileSize = fileUploadMembers.values().stream()
+                                        .map(FileUpload::maxSize)
+                                        .filter(m -> m != -1)
+                                        .max(Long::compareTo)
+                                        .orElse(configuredMaxFileSize);
+    multipartConfiguration.withMaxFileSize(maxFileSize);
+
+    // If each file specifies a max size, then this will be the sum. It may also be 0 if no FileUpload members specified a max size.
+    long expectedFileSizes = fileUploadMembers.values().stream()
+                                              .map(FileUpload::maxSize)
+                                              .filter(m -> m != -1)
+                                              .count();
+    long calculatedExpectedFileSize = maxFileSize * fileUploadMembers.size();
+
+    // Take the larger of the two and add 1MB
+    long adjustedMaxRequestSize = Math.max(expectedFileSizes, calculatedExpectedFileSize) + (1024 * 1024);
+    if (Math.max(expectedFileSizes, calculatedExpectedFileSize) > multipartConfiguration.getMaxRequestSize()) {
+      multipartConfiguration.withMaxRequestSize(adjustedMaxRequestSize);
+    }
   }
 }

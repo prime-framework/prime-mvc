@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2024, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import org.example.domain.Role;
 import org.example.domain.UserField;
 import org.example.domain.UserType;
 import org.primeframework.mvc.action.annotation.Action;
+import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
 import static java.util.Arrays.asList;
 
 /**
@@ -42,6 +43,7 @@ public class FullFormAction {
 
   public List<Integer> ages = new ArrayList<Integer>();
 
+  @FileUpload(contentTypes = {"*"})
   public FileInfo image;
 
   public List<Integer> roleIds;

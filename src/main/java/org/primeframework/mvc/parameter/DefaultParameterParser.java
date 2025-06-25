@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2024, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -155,10 +155,6 @@ public class DefaultParameterParser implements ParameterParser {
                                   Map<String, List<String>> checkBoxes,
                                   Map<String, List<String>> radioButtons, Set<String> actions) {
     for (String key : parameters.keySet()) {
-      if (InternalParameters.isInternalParameter(key)) {
-        continue;
-      }
-
       boolean optional = key.endsWith(".x") || key.endsWith(".y") || key.equals(csrfProvider.getParameterName());
 
       if (key.startsWith(CHECKBOX_PREFIX)) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,11 +26,9 @@ public interface ActionMapper {
   /**
    * Maps the given URI to an action invocation.
    *
-   * @param httpMethod    The HTTP method being invoked.
-   * @param uri           The URI.
-   * @param executeResult This flag is set into the ActionInvocation to control whether or not the result is executed or
-   *                      not.
+   * @param httpMethod The HTTP method being invoked.
+   * @param uri        The URI.
    * @return The action invocation and never null. This invocation might be a redirect for index handling.
    */
-  ActionInvocation map(HTTPMethod httpMethod, String uri, boolean executeResult);
+  ActionInvocation map(HTTPMethod httpMethod, String uri);
 }

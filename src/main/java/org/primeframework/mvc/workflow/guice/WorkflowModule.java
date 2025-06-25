@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2023, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package org.primeframework.mvc.workflow.guice;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
+import io.fusionauth.http.HTTPProcessingException;
 import org.primeframework.mvc.ErrorException;
 import org.primeframework.mvc.action.result.DefaultMVCWorkflowFinalizer;
 import org.primeframework.mvc.action.result.MVCWorkflowFinalizer;
@@ -27,6 +28,7 @@ import org.primeframework.mvc.workflow.DefaultMissingWorkflow;
 import org.primeframework.mvc.workflow.ErrorExceptionHandler;
 import org.primeframework.mvc.workflow.ErrorWorkflow;
 import org.primeframework.mvc.workflow.ExceptionHandler;
+import org.primeframework.mvc.workflow.HTTPProcessingExceptionHandler;
 import org.primeframework.mvc.workflow.MVCWorkflow;
 import org.primeframework.mvc.workflow.MissingWorkflow;
 import org.primeframework.mvc.workflow.TypedExceptionHandlerFactory;
@@ -61,6 +63,7 @@ public class WorkflowModule extends AbstractModule {
   protected void configure() {
     bind(TypedExceptionHandlerFactory.class);
     TypedExceptionHandlerFactory.addExceptionHandler(binder(), ErrorException.class, ErrorExceptionHandler.class);
+    TypedExceptionHandlerFactory.addExceptionHandler(binder(), HTTPProcessingException.class, HTTPProcessingExceptionHandler.class);
 
     bindErrorWorkflow();
     bindExceptionHandler();
