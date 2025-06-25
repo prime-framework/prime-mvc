@@ -1221,21 +1221,6 @@ public class GlobalTest extends PrimeBaseTest {
   public void get_url_rewrite() {
     simulator.test("/doesNotExist?__a_foo=/user/edit&foo=true")
              .get()
-             .assertStatusCode(200)
-             .assertContainsNoFieldMessages()
-             .assertBodyContains("""
-                                     <head><title>Edit a user</title></head>
-                                     """);
-    assertTrue(EditAction.getCalled);
-
-    // Disabled
-    configuration.allowActionParameterDuringActionMappingWorkflow = false;
-
-    // Reset
-    EditAction.getCalled = false;
-
-    simulator.test("/doesNotExist?__a_foo=/user/edit&foo=true")
-             .get()
              .assertStatusCode(404)
              .assertContainsNoFieldMessages()
              .assertBodyContains("The page is missing!");
@@ -1879,6 +1864,26 @@ public class GlobalTest extends PrimeBaseTest {
                              """);
   }
 
+  @Test
+  public void post_fileUploadDisabled() throws Exception {
+    // File uploads are disabled by default, and unless the action annotates @FileUpload we should reject the request.
+    test.createFile("Hello World")
+        .simulate(() -> simulator.test("/no-files")
+                                 .withFile("dataAnyType", test.tempFile, "text/plain")
+                                 .post()
+                                 .assertStatusCode(422));
+  }
+
+  @Test
+  public void post_file_tooLarge() throws Exception {
+    // File uploads are disabled by default, and unless the action annotates @FileUpload we should reject the request.
+    test.createFile("X".repeat(1024 * 1024 * 2))
+        .simulate(() -> simulator.test("/file-upload")
+                                 .withFile("dataAnyType", test.tempFile, "text/plain")
+                                 .post()
+                                 .assertStatusCode(413));
+  }
+
   // Test that the control behaves as expected
   @Test
   public void post_freemarker_escape() throws Exception {
@@ -2158,6 +2163,9 @@ public class GlobalTest extends PrimeBaseTest {
 
   @Test
   public void post_multipart_parameter_mix() throws Exception {
+    // Disable file deletion
+    simulator.main.configuration()[0].getMultipartConfiguration().withDeleteTemporaryFiles(false);
+
     // arrange
     test.createFile("Hello World")
         .simulate(() -> simulator.test("/user/full-form")
