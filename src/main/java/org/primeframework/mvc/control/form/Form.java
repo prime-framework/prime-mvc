@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2018, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -134,10 +134,10 @@ public class Form extends AbstractControl {
           current.action.getClass() != actionInvocation.configuration.actionClass) {
         // - Now that we know we need it, map the action before setting it as the current value in the invocation store
         //   And we can now verify we can build the action. Not sure this is necessary?
-        actionInvocation = actionMapper.map(httpMethod, action, false);
+        actionInvocation = actionMapper.map(httpMethod, action);
         if (actionInvocation == null || actionInvocation.action == null) {
           throw new PrimeException("The form action [" + action + "] is not a valid URI that maps to an action " +
-              "class by the Prime MVC.");
+                                   "class by the Prime MVC.");
         }
 
         // Call setCurrent first, then prepare the action

@@ -23,6 +23,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.inject.Inject;
 import io.fusionauth.http.HTTPMethod;
+import io.fusionauth.http.io.MultipartConfiguration;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.NotAllowedException;
@@ -31,6 +32,7 @@ import org.primeframework.mvc.http.HTTPTools;
 import org.primeframework.mvc.http.Status;
 import org.primeframework.mvc.parameter.DefaultParameterParser;
 import org.primeframework.mvc.parameter.InternalParameters;
+import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,7 +83,7 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
 
     HTTPMethod method = request.getMethod();
     boolean executeResult = InternalParameters.is(request, InternalParameters.EXECUTE_RESULT);
-    ActionInvocation actionInvocation = actionMapper.map(method, uri, executeResult);
+    ActionInvocation actionInvocation = actionMapper.map(method, uri);
 
     // This case is a redirect because the URI maps to something new and there isn't an action associated with it. For
     // example, this is how the index handling works.
@@ -101,16 +103,8 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
       throw new NotAllowedException();
     }
 
-    // Note that multipart file handling is disabled by default. Enable it if the action has indicated it is expecting a file upload.
-    boolean expectingFileUploads = !actionInvocation.configuration.fileUploadMembers.isEmpty();
-    if (expectingFileUploads) {
-      // Note we could optionally inspect all the FileUpload annotations, and take the MAX of maxSize if set, and set the max file size for this
-      // specific request. In most cases - assuming we have just a single FileUpload annotation per action, this would effectively allow java-http
-      // to enforce this value.
-      // Note that this method may return null. We do not expect this in production and we should throw an NPE if this occurs.
-      // TODO : Daniel : This isn't going to work, need to review this workflow to see how early we can modify the config.
-//      request.getMultipartConfiguration().withFileUploadEnabled(true);
-    }
+    // Handle multipart file configuration
+    handleMultiPartConfiguration(actionInvocation);
 
     // Start the timers and grab some meters for errors
     Timer.Context perPathTimer = null;
@@ -189,5 +183,42 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
       }
     }
     return uri;
+  }
+
+  private void handleMultiPartConfiguration(ActionInvocation actionInvocation) {
+    // Note that multipart file handling is disabled by default. Enable it if the action has indicated it is expecting a file upload.
+    boolean expectingFileUploads = !actionInvocation.configuration.fileUploadMembers.isEmpty();
+    if (!expectingFileUploads) {
+      return;
+    }
+
+    // Note we could optionally inspect all the FileUpload annotations, and take the MAX of maxSize if set, and set the max file size for this
+    // specific request. In most cases - assuming we have just a single FileUpload annotation per action, this would effectively allow java-http
+    // to enforce this value.
+    MultipartConfiguration multipartConfiguration = request.getMultiPartStreamProcessor().getMultiPartConfiguration();
+    multipartConfiguration.withFileUploadEnabled(true);
+
+    // Take the largest configured file size, or if non have specified a max file size, use the configured default.
+    long configuredMaxFileSize = multipartConfiguration.getMaxFileSize();
+    var fileUploadMembers = actionInvocation.configuration.fileUploadMembers;
+    long maxFileSize = fileUploadMembers.values().stream()
+                                        .map(FileUpload::maxSize)
+                                        .filter(m -> m != -1)
+                                        .max(Long::compareTo)
+                                        .orElse(configuredMaxFileSize);
+    multipartConfiguration.withMaxFileSize(maxFileSize);
+
+    // If each file specifies a max size, then this will be the sum. It may also be 0 if no FileUpload members specified a max size.
+    long expectedFileSizes = fileUploadMembers.values().stream()
+                                              .map(FileUpload::maxSize)
+                                              .filter(m -> m != -1)
+                                              .count();
+    long calculatedExpectedFileSize = maxFileSize * fileUploadMembers.size();
+
+    // Take the larger of the two and add 1MB
+    long adjustedMaxRequestSize = Math.max(expectedFileSizes, calculatedExpectedFileSize) + (1024 * 1024);
+    if (Math.max(expectedFileSizes, calculatedExpectedFileSize) > multipartConfiguration.getMaxRequestSize()) {
+      multipartConfiguration.withMaxRequestSize(adjustedMaxRequestSize);
+    }
   }
 }
