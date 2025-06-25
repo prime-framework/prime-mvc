@@ -49,7 +49,6 @@ public class HTTPProcessingExceptionHandler implements TypedExceptionHandler<HTT
 
   @Override
   public void handle(HTTPProcessingException exception) {
-//    // Set the result code.  if null, grab from mvc configuration
     String code = buildResultCode(exception);
     resultStore.set(code);
 
