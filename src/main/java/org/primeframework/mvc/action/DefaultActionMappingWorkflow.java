@@ -152,6 +152,10 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
   }
 
   private void handleMultiPartConfiguration(ActionInvocation actionInvocation) {
+    if (actionInvocation.configuration == null) {
+      return;
+    }
+
     // Note that multipart file handling is disabled by default. Enable it if the action has indicated it is expecting a file upload.
     boolean expectingFileUploads = !actionInvocation.configuration.fileUploadMembers.isEmpty();
     if (!expectingFileUploads) {
