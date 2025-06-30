@@ -157,18 +157,17 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
     }
 
     // Note that multipart file handling is disabled by default. Enable it if the action has indicated it is expecting a file upload.
+    // - It is possible the default has been changed. This is ok, if the action invocation is not expecting any files, keep the default as configured
+    //   by the implementation.
     boolean expectingFileUploads = !actionInvocation.configuration.fileUploadMembers.isEmpty();
     if (!expectingFileUploads) {
       return;
     }
 
-    // Note we could optionally inspect all the FileUpload annotations, and take the MAX of maxSize if set, and set the max file size for this
-    // specific request. In most cases - assuming we have just a single FileUpload annotation per action, this would effectively allow java-http
-    // to enforce this value.
     MultipartConfiguration multipartConfiguration = request.getMultiPartStreamProcessor().getMultiPartConfiguration();
     multipartConfiguration.withFileUploadEnabled(true);
 
-    // Take the largest configured file size, or if non have specified a max file size, use the configured default.
+    // Take the largest configured file size, or if none have specified a max file size, use the configured default.
     long configuredMaxFileSize = multipartConfiguration.getMaxFileSize();
     var fileUploadMembers = actionInvocation.configuration.fileUploadMembers;
     long maxFileSize = fileUploadMembers.values().stream()
@@ -186,6 +185,7 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
     long calculatedExpectedFileSize = maxFileSize * fileUploadMembers.size();
 
     // Take the larger of the two and add 1MB
+    // - The 1MB is just a guess, and provides some overhead for anything else in the request body such as form-data.
     long adjustedMaxRequestSize = Math.max(expectedFileSizes, calculatedExpectedFileSize) + (1024 * 1024);
     if (Math.max(expectedFileSizes, calculatedExpectedFileSize) > multipartConfiguration.getMaxRequestSize()) {
       multipartConfiguration.withMaxRequestSize(adjustedMaxRequestSize);
