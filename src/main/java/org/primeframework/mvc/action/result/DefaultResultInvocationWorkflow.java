@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2023, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Map;
 
 import com.google.inject.Inject;
 import org.primeframework.mvc.action.ActionInvocation;
@@ -43,6 +44,8 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
 
   private final MVCConfiguration configuration;
 
+  private final Map<String, ActionResultDefinition> defaultResultMappings;
+
   private final ResultFactory factory;
 
   private final ResourceLocator resourceLocator;
@@ -51,10 +54,12 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
 
   @Inject
   public DefaultResultInvocationWorkflow(ActionInvocationStore actionInvocationStore, MVCConfiguration configuration,
+                                         Map<String, ActionResultDefinition> defaultResults,
                                          ResultStore resultStore, ResourceLocator resourceLocator,
                                          ResultFactory factory) {
     this.actionInvocationStore = actionInvocationStore;
     this.configuration = configuration;
+    this.defaultResultMappings = defaultResults;
     this.resultStore = resultStore;
     this.resourceLocator = resourceLocator;
     this.factory = factory;
@@ -89,7 +94,14 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
       }
 
       if (annotation == null) {
-        annotation = new ForwardImpl("", resultCode);
+        var defaultMapping = defaultResultMappings.get(resultCode);
+        if (defaultMapping != null) {
+          annotation = defaultMapping.getAnnotation(resultCode);
+        }
+
+        if (annotation == null) {
+          annotation = new ForwardImpl("", resultCode);
+        }
       }
 
       // Call pre-render methods registered for this result

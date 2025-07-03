@@ -1871,6 +1871,13 @@ public class GlobalTest extends PrimeBaseTest {
         .simulate(() -> simulator.test("/no-files")
                                  .withFile("dataAnyType", test.tempFile, "text/plain")
                                  .post()
+                                 .assertStatusCode(422))
+
+        // This action does not have an explicit mapping configured, but it should default.
+        .createFile("Hello World")
+        .simulate(() -> simulator.test("/no-files-no-result-mapping")
+                                 .withFile("dataAnyType", test.tempFile, "text/plain")
+                                 .post()
                                  .assertStatusCode(422));
   }
 
