@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2015-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package org.primeframework.mvc.security;
 
 import java.net.URI;
+import java.util.Set;
 
 import com.google.inject.Inject;
 import io.fusionauth.http.HTTPMethod;
@@ -30,6 +31,11 @@ import org.primeframework.mvc.security.csrf.CSRFProvider;
  * @author Brian Pontarelli
  */
 public class UserLoginSecurityScheme implements SecurityScheme {
+
+  // Set of HTTP methods that are considered unsafe and require CSRF protection. Can be overridden by subclasses if CSRF
+  // protection is not required for certain methods.
+  protected Set<HTTPMethod> unsafeHttpMethods = Set.of(HTTPMethod.POST, HTTPMethod.PUT, HTTPMethod.PATCH, HTTPMethod.DELETE);
+
   private final MVCConfiguration configuration;
 
   private final UserLoginConstraintsValidator constraintsValidator;
@@ -72,8 +78,8 @@ public class UserLoginSecurityScheme implements SecurityScheme {
       return;
     }
 
-    // CSRF on POST only
-    if (HTTPMethod.POST.is(method)) {
+    // CSRF on modifying requests
+    if (unsafeHttpMethods.contains(method)) {
       // Check for CSRF request origins
       String source = HTTPTools.getOriginHeader(request);
       if (source == null) {
@@ -86,7 +92,7 @@ public class UserLoginSecurityScheme implements SecurityScheme {
         throw new UnauthorizedException();
       }
 
-      // Handle CSRF tokens (for POST only)
+      // Handle CSRF tokens (for modifying requests)
       if (!csrfProvider.validateRequest(request)) {
         // TODO : Should we do something less brute force here?
         throw new UnauthorizedException();

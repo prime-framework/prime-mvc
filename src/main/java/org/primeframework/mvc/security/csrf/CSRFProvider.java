@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2024, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2020-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,13 @@ import io.fusionauth.http.server.HTTPRequest;
  */
 public interface CSRFProvider {
   /**
+   * @return the CSRF header name
+   */
+  default String getHeaderName() {
+    return "X-CSRF-Token";
+  }
+
+  /**
    * @return the CSRF parameter name
    */
   default String getParameterName() {
@@ -38,13 +45,25 @@ public interface CSRFProvider {
   String getToken(HTTPRequest request);
 
   /**
-   * Return the CSRF token provided on the HTTP request. This is generally going to be due to a form POST request.
+   * Return the CSRF token provided on the HTTP request.
    *
    * @param request the HTTP request
    * @return the CSRF token value if found in the HTTP request.
    */
   default String getTokenFromRequest(HTTPRequest request) {
-    return request.getParameter(getParameterName());
+    // Check the request for the CSRF token in the header and parameter.
+    String headerToken = request.getHeader(getHeaderName());
+    String paramToken = request.getParameter(getParameterName());
+
+    // If both the header and parameter are provided, they must match else return null so we fail
+    if (headerToken != null && paramToken != null) {
+      if (!headerToken.equals(paramToken)) {
+        return null;
+      }
+    }
+
+    // By default, we return the parameter token if it exists, otherwise the header token.
+    return paramToken != null ? paramToken : headerToken;
   }
 
   /**
