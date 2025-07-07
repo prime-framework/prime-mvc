@@ -16,7 +16,9 @@
 package org.primeframework.mvc.workflow;
 
 import com.google.inject.Inject;
+import io.fusionauth.http.ContentTooLargeException;
 import io.fusionauth.http.HTTPProcessingException;
+import io.fusionauth.http.UnprocessableContentException;
 import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.action.result.ResultStore;
 import org.primeframework.mvc.message.MessageStore;
@@ -24,6 +26,8 @@ import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleMessage;
 import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.message.l10n.MissingMessageException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Handles {@link io.fusionauth.http.HTTPProcessingException} when thrown.
@@ -31,6 +35,8 @@ import org.primeframework.mvc.message.l10n.MissingMessageException;
  * @author Daniel DeGroff
  */
 public class HTTPProcessingExceptionHandler implements TypedExceptionHandler<HTTPProcessingException> {
+  private static final Logger logger = LoggerFactory.getLogger(HTTPProcessingExceptionHandler.class);
+
   private final MessageProvider messageProvider;
 
   private final MessageStore messageStore;
@@ -49,7 +55,7 @@ public class HTTPProcessingExceptionHandler implements TypedExceptionHandler<HTT
 
   @Override
   public void handle(HTTPProcessingException exception) {
-    String code = buildResultCode(exception);
+    String code = getResultCode(exception);
     resultStore.set(code);
 
     // This may be modified by the result code, but this is the default.
@@ -66,20 +72,21 @@ public class HTTPProcessingExceptionHandler implements TypedExceptionHandler<HTT
     }
   }
 
-  private String buildResultCode(HTTPProcessingException exception) {
-    String name = exception.getClass().getSimpleName().replace("Exception", "");
-    StringBuilder result = new StringBuilder();
-    for (char c : name.toCharArray()) {
-      if (Character.isUpperCase(c)) {
-        if (!result.isEmpty()) {
-          result.append("-");
-        }
-        result.append(Character.toLowerCase(c));
-
-      } else {
-        result.append(c);
-      }
+  /**
+   * Note that the {@link HTTPProcessingException} comes from java-http so it does not know about result codes.
+   *
+   * @param exception the exception
+   * @return the derived result code.
+   */
+  private String getResultCode(HTTPProcessingException exception) {
+    if (exception.getClass() == ContentTooLargeException.class) {
+      return "content-too-large";
+    } else if (exception.getClass() == UnprocessableContentException.class) {
+      return "unprocessable-content";
     }
-    return result.toString();
+
+    // Unexpected, but it is ok to just return error.
+    logger.debug("Unexpected exception [{}]. Using [error] result code as a default.", exception.getClass());
+    return "error";
   }
 }

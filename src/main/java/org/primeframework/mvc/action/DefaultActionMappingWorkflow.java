@@ -23,6 +23,7 @@ import com.codahale.metrics.Timer;
 import com.google.inject.Inject;
 import io.fusionauth.http.HTTPMethod;
 import io.fusionauth.http.io.MultipartConfiguration;
+import io.fusionauth.http.io.MultipartFileUploadPolicy;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.NotAllowedException;
@@ -165,7 +166,7 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
     }
 
     MultipartConfiguration multipartConfiguration = request.getMultiPartStreamProcessor().getMultiPartConfiguration();
-    multipartConfiguration.withFileUploadEnabled(true);
+    multipartConfiguration.withFileUploadPolicy(MultipartFileUploadPolicy.Allow);
 
     // Take the largest configured file size, or if none have specified a max file size, use the configured default.
     long configuredMaxFileSize = multipartConfiguration.getMaxFileSize();
