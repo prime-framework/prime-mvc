@@ -385,7 +385,8 @@ public class RequestResult {
    */
   public RequestResult assertBodyFile(Path path, Object... values) throws IOException {
     if (values.length == 0) {
-      return assertBody(Files.readString(path));
+      var body = Files.readString(path).trim();
+      return assertBody(body);
     }
     return assertBody(BodyTools.processTemplateForAssertion(path, values));
   }
@@ -1870,7 +1871,7 @@ public class RequestResult {
     ActionMapper actionMapper = get(ActionMapper.class);
 
     // Using the ActionMapper so that URL segments are properly handled and the correct URL is used for message lookups.
-    ActionInvocation actionInvocation = actionMapper.map(null, request.getPath(), true);
+    ActionInvocation actionInvocation = actionMapper.map(null, request.getPath());
     actionInvocationStore.setCurrent(actionInvocation);
 
     return messageProvider;

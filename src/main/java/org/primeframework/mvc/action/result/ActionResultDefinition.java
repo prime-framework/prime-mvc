@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2025, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,22 +13,24 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.action;
+package org.primeframework.mvc.action.result;
 
-import io.fusionauth.http.HTTPMethod;
+import java.lang.annotation.Annotation;
 
 /**
- * This interface defines the method that maps URIs to actions.
+ * An interface to define an action result definition. This can be bound and replace having to add a result annotation to each action.
  *
- * @author Brian Pontarelli
+ * @author Daniel DeGroff
  */
-public interface ActionMapper {
+public interface ActionResultDefinition {
   /**
-   * Maps the given URI to an action invocation.
-   *
-   * @param httpMethod The HTTP method being invoked.
-   * @param uri        The URI.
-   * @return The action invocation and never null. This invocation might be a redirect for index handling.
+   * @param resultCode the result code to use for the mapping
+   * @return the constructed annotation.
    */
-  ActionInvocation map(HTTPMethod httpMethod, String uri);
+  Annotation getAnnotation(String resultCode);
+
+  /**
+   * @return the status code for the HTTP response
+   */
+  int getStatus();
 }

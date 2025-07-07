@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package org.primeframework.mvc.action.guice;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
+import com.google.inject.multibindings.MapBinder;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.ActionInvocationWorkflow;
 import org.primeframework.mvc.action.ActionMapper;
@@ -30,11 +31,13 @@ import org.primeframework.mvc.action.config.ActionConfigurationBuilder;
 import org.primeframework.mvc.action.config.ActionConfigurationProvider;
 import org.primeframework.mvc.action.config.DefaultActionConfigurationBuilder;
 import org.primeframework.mvc.action.config.DefaultActionConfigurationProvider;
+import org.primeframework.mvc.action.result.ActionResultDefinition;
 import org.primeframework.mvc.action.result.DefaultResourceLocator;
 import org.primeframework.mvc.action.result.DefaultResultInvocationWorkflow;
 import org.primeframework.mvc.action.result.ResourceLocator;
 import org.primeframework.mvc.action.result.ResultInvocationWorkflow;
 import org.primeframework.mvc.action.result.ResultStore;
+import org.primeframework.mvc.action.result.StatusActionResultDefinition;
 import org.primeframework.mvc.action.result.ThreadLocalResultStore;
 
 /**
@@ -49,6 +52,14 @@ public class ActionModule extends AbstractModule {
 
   protected void bindConfigurationProvider() {
     bind(ActionConfigurationProvider.class).to(DefaultActionConfigurationProvider.class).in(Singleton.class);
+  }
+
+  protected void bindDefaultResultMappings() {
+    MapBinder<String, ActionResultDefinition> defaultResultMappings = MapBinder.newMapBinder(binder(), String.class, ActionResultDefinition.class);
+    defaultResultMappings.addBinding("not-allowed").toInstance(new StatusActionResultDefinition(405));
+    defaultResultMappings.addBinding("content-too-large").toInstance(new StatusActionResultDefinition(413));
+    defaultResultMappings.addBinding("unprocessable-content").toInstance(new StatusActionResultDefinition(422));
+    defaultResultMappings.addBinding("not-implemented").toInstance(new StatusActionResultDefinition(501));
   }
 
   protected void bindMapper() {
@@ -86,6 +97,9 @@ public class ActionModule extends AbstractModule {
     // Configuration
     bindConfigurationBuilder();
     bindConfigurationProvider();
+
+    // Default result mappings
+    bindDefaultResultMappings();
 
     // Invocation
     bindStore();

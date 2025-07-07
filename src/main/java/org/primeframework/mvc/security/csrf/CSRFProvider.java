@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2024, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2020-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,8 +45,7 @@ public interface CSRFProvider {
   String getToken(HTTPRequest request);
 
   /**
-   * Return the CSRF token provided on the HTTP request. This is generally going to be due to a form POST request
-   * but is valid for any "unsafe" HTTP method that is protected by CSRF (POST, PUT, PATCH, DELETE).
+   * Return the CSRF token provided on the HTTP request.
    *
    * @param request the HTTP request
    * @return the CSRF token value if found in the HTTP request.
@@ -57,8 +56,8 @@ public interface CSRFProvider {
     String paramToken = request.getParameter(getParameterName());
 
     // If both the header and parameter are provided, they must match else return null so we fail
-    if(headerToken != null && paramToken != null) {
-      if(!headerToken.equals(paramToken)) {
+    if (headerToken != null && paramToken != null) {
+      if (!headerToken.equals(paramToken)) {
         return null;
       }
     }
