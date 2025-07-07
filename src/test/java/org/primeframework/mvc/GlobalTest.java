@@ -1219,6 +1219,7 @@ public class GlobalTest extends PrimeBaseTest {
 
   @Test
   public void get_url_rewrite() {
+    // Ensure a legacy configuration no longer has any affect on the request mapper.
     simulator.test("/doesNotExist?__a_foo=/user/edit&foo=true")
              .get()
              .assertStatusCode(404)
