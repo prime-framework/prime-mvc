@@ -15,10 +15,14 @@
  */
 package org.example.action.user;
 
+import javax.inject.Inject;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
 import io.fusionauth.http.FileInfo;
+import io.fusionauth.http.server.HTTPRequest;
 import org.example.domain.Role;
 import org.example.domain.UserField;
 import org.example.domain.UserType;
@@ -41,6 +45,8 @@ public class FullFormAction {
 
   public static String stringFieldFromLastPost;
 
+  private final HTTPRequest request;
+
   public List<Integer> ages = new ArrayList<>();
 
   @FileUpload(contentTypes = {"*"})
@@ -56,7 +62,9 @@ public class FullFormAction {
 
   public UserType[] userTypes = UserType.values();
 
-  public FullFormAction() {
+  @Inject
+  public FullFormAction(HTTPRequest request) {
+    this.request = request;
     for (int i = 1; i < 100; i++) {
       ages.add(i);
     }
@@ -64,6 +72,13 @@ public class FullFormAction {
   }
 
   public static void reset() {
+    if (imageFromLastPost != null) {
+      try {
+        Files.deleteIfExists(imageFromLastPost.getFile());
+      } catch (IOException ignore) {
+      }
+    }
+
     roleIdsFromLastPost = null;
     imageFromLastPost = null;
     agesFromLastPost = null;
@@ -75,8 +90,13 @@ public class FullFormAction {
   }
 
   public String post() {
+    // Do not delete files automatically for this request
+    request.getMultiPartStreamProcessor().getMultiPartConfiguration().withDeleteTemporaryFiles(false);
     roleIdsFromLastPost = roleIds;
     imageFromLastPost = image;
+    if (imageFromLastPost != null) {
+      imageFromLastPost.getFile().toFile().deleteOnExit();
+    }
     agesFromLastPost = ages;
     stringFieldFromLastPost = stringField;
     return "success";

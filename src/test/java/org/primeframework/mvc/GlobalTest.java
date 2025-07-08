@@ -2171,9 +2171,6 @@ public class GlobalTest extends PrimeBaseTest {
 
   @Test
   public void post_multipart_parameter_mix() throws Exception {
-    // Disable file deletion so we can assert on the file after the action completes.
-    simulator.main.configuration()[0].getMultipartConfiguration().withDeleteTemporaryFiles(false);
-
     // arrange
     test.createFile("Hello World")
         .simulate(() -> simulator.test("/user/full-form")
