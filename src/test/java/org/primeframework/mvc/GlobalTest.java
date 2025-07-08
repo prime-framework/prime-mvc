@@ -437,6 +437,31 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void get_default_results() throws Exception {
+    // Take default of 'success' See DefaultForwardResultAction
+    simulator.test("/default-forward-result")
+             .get()
+             .assertStatusCode(200);
+
+    // Unknown result code, still a 200 using ForwardImpl
+    simulator.test("/default-forward-result")
+             .withURLParameter("resultCode", "foo")
+             .get()
+             .assertStatusCode(200);
+
+    // Take default of 'success' See RequestedDefaultForwardResultAction
+    simulator.test("/requested-default-forward-result")
+             .get()
+             .assertStatusCode(200);
+
+    // Unknown result code, still a 200 using ForwardImpl, see RequestedDefaultForwardResultAction
+    simulator.test("/requested-default-forward-result")
+             .withURLParameter("resultCode", "foo")
+             .get()
+             .assertStatusCode(200);
+  }
+
+  @Test
   public void get_developmentExceptions() {
     // Bad annotation @Action("{id}") it should be @Action("{uuid}")
     simulator.test("/invalid-api/42")

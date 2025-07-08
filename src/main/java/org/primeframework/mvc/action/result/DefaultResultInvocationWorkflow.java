@@ -100,7 +100,17 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
         }
 
         if (annotation == null) {
-          annotation = new ForwardImpl("", resultCode);
+          if (actionInvocation.configuration != null) {
+            try {
+              annotation = (Annotation) actionInvocation.configuration.defaultActionResult.getConstructor(String.class, String.class)
+                                                                                          .newInstance("", resultCode);
+            } catch (Exception e) {
+              throw new RuntimeException(e);
+            }
+          } else {
+            // We don't always have an action invocation.
+            annotation = new ForwardImpl("", resultCode);
+          }
         }
       }
 

@@ -16,14 +16,15 @@
 package org.example.action;
 
 import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.action.result.annotation.Forward;
+import org.primeframework.mvc.action.result.StatusResult.StatusImpl;
+import org.primeframework.mvc.action.result.annotation.DefaultResult;
 
 /**
  * @author Daniel DeGroff
  */
 @Action
-@Forward
-public class DefaultForwardResultAction {
+@DefaultResult(StatusImpl.class)
+public class RequestedDefaultForwardResultAction {
   public String resultCode = "success";
 
   public String get() {

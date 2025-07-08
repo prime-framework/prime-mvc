@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2024, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,6 +46,8 @@ import org.primeframework.mvc.action.ValidationMethodConfiguration;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.annotation.AllowUnknownParameters;
 import org.primeframework.mvc.action.annotation.AlternateMessageResources;
+import org.primeframework.mvc.action.result.ForwardResult.ForwardImpl;
+import org.primeframework.mvc.action.result.annotation.DefaultResult;
 import org.primeframework.mvc.action.result.annotation.ResultAnnotation;
 import org.primeframework.mvc.action.result.annotation.ResultContainerAnnotation;
 import org.primeframework.mvc.content.ValidContentTypes;
@@ -100,6 +102,7 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
     }
 
     Action action = actionClass.getAnnotation(Action.class);
+    Class<?> defaultActionResult = findDefaultActionResult(actionClass);
     String uri = !action.baseURI().equals("") ? action.baseURI() : uriBuilder.build(actionClass);
     boolean allowKnownParameters = actionClass.getAnnotation(AllowUnknownParameters.class) != null;
     Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods = findExecuteMethods(actionClass);
@@ -144,7 +147,7 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
                                                                         .toList())
                                                 .orElse(List.of());
 
-    return new ActionConfiguration(actionClass, allowKnownParameters, constraintValidationMethods, executeMethods, validationMethods, formPrepareMethods, authorizationMethods, jwtAuthorizationMethods, postValidationMethods, preParameterMethods, postParameterMethods, resultAnnotations, preParameterMembers, preRenderMethodsMap, fileUploadMembers, memberNames, securitySchemes, scopeFields, additionalConfiguration, uri, preValidationMethods, unknownParametersField, validContentTypes, alternateMessageURIs);
+    return new ActionConfiguration(actionClass, allowKnownParameters, constraintValidationMethods, defaultActionResult, executeMethods, validationMethods, formPrepareMethods, authorizationMethods, jwtAuthorizationMethods, postValidationMethods, preParameterMethods, postParameterMethods, resultAnnotations, preParameterMembers, preRenderMethodsMap, fileUploadMembers, memberNames, securitySchemes, scopeFields, additionalConfiguration, uri, preValidationMethods, unknownParametersField, validContentTypes, alternateMessageURIs);
   }
 
   /**
@@ -551,6 +554,29 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
     }
 
     return result;
+  }
+
+  private Class<?> findDefaultActionResult(Class<?> actionClass) {
+    DefaultResult defaultResult = actionClass.getAnnotation(DefaultResult.class);
+    Class<?> defaultResultClass = ForwardImpl.class;
+    if (defaultResult != null) {
+      Class<?> requestedDefaultClass = defaultResult.value();
+      ResultAnnotation resultAnnotation = null;
+      for (Class<?> inter : requestedDefaultClass.getInterfaces()) {
+        resultAnnotation = inter.getAnnotation(ResultAnnotation.class);
+        if (resultAnnotation != null) {
+          break;
+        }
+      }
+
+      if (resultAnnotation == null) {
+        throw new PrimeException("The DefaultResult annotation value must be a Result Annotation. A result annotation must have the annotation @ResultAnnotation.");
+      }
+
+      defaultResultClass = requestedDefaultClass;
+    }
+
+    return defaultResultClass;
   }
 
   private List<String> findSecuritySchemes(Class<?> actionClass) {

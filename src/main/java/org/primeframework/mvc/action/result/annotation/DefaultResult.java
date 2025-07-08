@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,20 +13,21 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.example.action;
+package org.primeframework.mvc.action.result.annotation;
 
-import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.action.result.annotation.Forward;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
+ * This annotation marks the default result to be used when a mapping is not provided.
+ *
  * @author Daniel DeGroff
  */
-@Action
-@Forward
-public class DefaultForwardResultAction {
-  public String resultCode = "success";
-
-  public String get() {
-    return resultCode;
-  }
+@Retention(RUNTIME)
+@Target(TYPE)
+public @interface DefaultResult {
+  Class<?> value();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2024, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,6 +60,8 @@ public class ActionConfiguration {
 
   public final Map<HTTPMethod, ConstraintOverrideMethodConfiguration> constraintValidationMethods;
 
+  public final Class<?> defaultActionResult;
+
   public final Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods;
 
   public final Map<String, FileUpload> fileUploadMembers;
@@ -105,6 +107,7 @@ public class ActionConfiguration {
   public ActionConfiguration(Class<?> actionClass,
                              boolean allowUnknownParameters,
                              Map<HTTPMethod, ConstraintOverrideMethodConfiguration> constraintValidationMethods,
+                             Class<?> defaultActionResult,
                              Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods,
                              Map<HTTPMethod, List<ValidationMethodConfiguration>> validationMethods,
                              List<Method> formPrepareMethods,
@@ -131,6 +134,7 @@ public class ActionConfiguration {
     this.actionClass = actionClass;
     this.allowUnknownParameters = allowUnknownParameters;
     this.constraintValidationMethods = constraintValidationMethods;
+    this.defaultActionResult = defaultActionResult;
     this.formPrepareMethods = formPrepareMethods;
     this.authorizationMethods = authorizationMethods;
     this.alternateMessageURIs = alternateMessageURIs;
