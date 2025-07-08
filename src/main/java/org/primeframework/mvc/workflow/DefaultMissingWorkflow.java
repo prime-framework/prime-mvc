@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2021-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ public class DefaultMissingWorkflow implements MissingWorkflow {
 
   @Override
   public void perform(WorkflowChain workflowChain) throws IOException {
-    ActionInvocation missingInvocation = actionMapper.map(HTTPMethod.GET, configuration.missingPath(), true);
+    ActionInvocation missingInvocation = actionMapper.map(HTTPMethod.GET, configuration.missingPath());
     actionInvocationStore.setCurrent(missingInvocation);
     WorkflowChain chain = new SubWorkflowChain(workflows, workflowChain);
     chain.continueWorkflow();

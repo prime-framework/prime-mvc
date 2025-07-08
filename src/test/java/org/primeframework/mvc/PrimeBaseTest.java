@@ -42,6 +42,7 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 import com.google.inject.util.Modules;
 import io.fusionauth.http.HTTPMethod;
+import io.fusionauth.http.io.MultipartConfiguration;
 import io.fusionauth.http.log.AccumulatingLoggerFactory;
 import io.fusionauth.http.log.BaseLogger;
 import io.fusionauth.http.log.Level;
@@ -216,6 +217,13 @@ public abstract class PrimeBaseTest {
     SecureAction.UnknownParameters.clear();
 
     TestUnhandledExceptionHandler.reset();
+
+    // Reset class filter
+    MockStaticClasspathResourceFilter.TestFunction = null;
+
+    // Reset file deletion as the default behavior
+    // - Reset to the defaults set by java-http
+    simulator.main.configuration()[0].withMultipartConfiguration(new MultipartConfiguration());
   }
 
   @BeforeSuite

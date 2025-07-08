@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2025, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,28 +15,15 @@
  */
 package org.example.action;
 
-import io.fusionauth.http.FileInfo;
 import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.action.result.annotation.JSON;
 import org.primeframework.mvc.action.result.annotation.Status;
-import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
 
 /**
  * @author Daniel DeGroff
  */
 @Action
-@Status.List({
-    @Status,
-    @Status(code = "content-too-large", status = 413)
-})
-@JSON(code = "input", status = 400)
-public class FileUploadAction {
-  @FileUpload(contentTypes = {"*"})
-  public FileInfo dataAnyType;
-
-  @FileUpload(contentTypes = {"text/html"})
-  public FileInfo dataTextHtml;
-
+@Status(code = "unprocessable-content", status = 422)
+public class NoFilesAction {
   public String post() {
     return "success";
   }

@@ -1,5 +1,5 @@
 /*
-` * Copyright (c) 2012-2022, Inversoft Inc., All Rights Reserved
+` * Copyright (c) 2012-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,8 +42,10 @@ public class ContentModule extends AbstractModule {
     ContentHandlerFactory.addContentHandler(binder(), "application/json-patch+json", JacksonPatchContentHandler.class);
     ContentHandlerFactory.addContentHandler(binder(), "application/merge-patch+json", JacksonPatchContentHandler.class);
     ContentHandlerFactory.addContentHandler(binder(), "application/octet-stream", BinaryContentHandler.class);
+    // Note that multipart and form data are handled by the server.
     ContentHandlerFactory.addContentHandler(binder(), "multipart/form-data", ServerHandledContentHandler.class);
     ContentHandlerFactory.addContentHandler(binder(), "application/x-www-form-urlencoded", ServerHandledContentHandler.class);
+
     // Default exploding handler to handle missing Content-Type header, or un-supported values.
     ContentHandlerFactory.addContentHandler(binder(), "", DefaultContentHandler.class);
 

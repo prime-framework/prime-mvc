@@ -619,7 +619,7 @@ public class GlobalTest extends PrimeBaseTest {
   public void get_fullFormWithAllAttributes() throws Exception {
     simulator.test("/user/full-form")
              .get()
-             .assertBody(Files.readString(Path.of("src/test/resources/html/full-form.html")).trim());
+             .assertBodyFile(Path.of("src/test/resources/html/full-form.html"));
   }
 
   @Test
@@ -824,7 +824,7 @@ public class GlobalTest extends PrimeBaseTest {
   public void get_metrics() throws Exception {
     simulator.test("/user/full-form")
              .get()
-             .assertBody(Files.readString(Path.of("src/test/resources/html/full-form.html")).trim());
+             .assertBodyFile(Path.of("src/test/resources/html/full-form.html"));
 
     Map<String, Timer> timers = metricRegistry.getTimers();
     assertEquals(timers.get("prime-mvc.[/user/full-form].requests").getCount(), 1);
@@ -1219,6 +1219,7 @@ public class GlobalTest extends PrimeBaseTest {
 
   @Test
   public void get_url_rewrite() {
+    // Ensure a legacy configuration no longer has any affect on the request mapper.
     simulator.test("/doesNotExist?__a_foo=/user/edit&foo=true")
              .get()
              .assertStatusCode(404)
@@ -1256,7 +1257,7 @@ public class GlobalTest extends PrimeBaseTest {
 
   @Test
   public void hacked() {
-    // Make sure we don't invoke freemarker.template.utility.Execute
+    // Make sure we don't invoke "freemarker.template.utility.Execute"
     simulator.test("/hacked")
              .get()
              .assertStatusCode(500)
@@ -1864,6 +1865,33 @@ public class GlobalTest extends PrimeBaseTest {
                              """);
   }
 
+  @Test
+  public void post_fileUploadDisabled() throws Exception {
+    // File uploads are disabled by default, and unless the action annotates @FileUpload we should reject the request.
+    test.createFile("Hello World")
+        .simulate(() -> simulator.test("/no-files")
+                                 .withFile("dataAnyType", test.tempFile, "text/plain")
+                                 .post()
+                                 .assertStatusCode(422))
+
+        // This action does not have an explicit mapping configured, but it should default.
+        .createFile("Hello World")
+        .simulate(() -> simulator.test("/no-files-no-result-mapping")
+                                 .withFile("dataAnyType", test.tempFile, "text/plain")
+                                 .post()
+                                 .assertStatusCode(422));
+  }
+
+  @Test
+  public void post_file_tooLarge() throws Exception {
+    // File uploads are disabled by default, and unless the action annotates @FileUpload we should reject the request.
+    test.createFile("X".repeat(1024 * 1024 * 2))
+        .simulate(() -> simulator.test("/file-upload")
+                                 .withFile("dataAnyType", test.tempFile, "text/plain")
+                                 .post()
+                                 .assertStatusCode(413));
+  }
+
   // Test that the control behaves as expected
   @Test
   public void post_freemarker_escape() throws Exception {
@@ -2143,6 +2171,9 @@ public class GlobalTest extends PrimeBaseTest {
 
   @Test
   public void post_multipart_parameter_mix() throws Exception {
+    // Disable file deletion so we can assert on the file after the action completes.
+    simulator.main.configuration()[0].getMultipartConfiguration().withDeleteTemporaryFiles(false);
+
     // arrange
     test.createFile("Hello World")
         .simulate(() -> simulator.test("/user/full-form")
