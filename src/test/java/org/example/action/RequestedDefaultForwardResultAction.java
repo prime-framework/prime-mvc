@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,16 @@
 package org.example.action;
 
 import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.action.result.StatusResult.StatusImpl;
-import org.primeframework.mvc.action.result.annotation.DefaultResult;
+import org.primeframework.mvc.action.result.annotation.Forward;
 
 /**
  * @author Daniel DeGroff
  */
 @Action
-@DefaultResult(StatusImpl.class)
+@Forward.List({
+    @Forward,
+    @Forward(code = "*", status = 201),
+})
 public class RequestedDefaultForwardResultAction {
   public String resultCode = "success";
 

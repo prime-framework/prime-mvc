@@ -17,11 +17,14 @@ package org.primeframework.mvc.action.result;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.List;
 import java.util.Map;
 
 import com.google.inject.Inject;
+import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.ForwardResult.ForwardImpl;
@@ -100,15 +103,16 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
         }
 
         if (annotation == null) {
-          if (actionInvocation.configuration != null) {
-            try {
-              annotation = (Annotation) actionInvocation.configuration.defaultActionResult.getConstructor(String.class, String.class)
-                                                                                          .newInstance("", resultCode);
-            } catch (Exception e) {
-              throw new RuntimeException(e);
+          if (actionInvocation.action != null) {
+            // Note that if an action exists, a configuration exists
+            annotation = actionInvocation.configuration.resultConfigurations.get("*");
+            if (annotation != null) {
+              annotation = proxyAnnotation(annotation, resultCode);
             }
-          } else {
-            // We don't always have an action invocation.
+          }
+
+          // We don't always have an action invocation.
+          if (annotation == null) {
             annotation = new ForwardImpl("", resultCode);
           }
         }
@@ -149,5 +153,38 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
     // The action either didn't have a result and the Forward template was missing, or there was no action and Forward template for the URI.
     // In either case, this should be a 404 so we will let the Prime MVC workflow at the top level handle that
     chain.continueWorkflow();
+  }
+
+  private Annotation proxyAnnotation(Annotation annotation, String resultCode) {
+    try {
+      Class<?> annotationType = annotation.annotationType();
+      return (Annotation) Proxy.newProxyInstance(
+          annotationType.getClassLoader(),
+          new Class[]{annotationType},
+          new AnnotationInvocationHandler(annotation, resultCode));
+    } catch (Exception e) {
+      throw new PrimeException("Unable to proxy the default result code [*]. This is unexpected.", e);
+    }
+  }
+
+  public static class AnnotationInvocationHandler implements InvocationHandler {
+    private final Annotation annotation;
+
+    private final String resultCode;
+
+    public AnnotationInvocationHandler(Annotation annotation, String resultCode) {
+      this.annotation = annotation;
+      this.resultCode = resultCode;
+    }
+
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+      // The purpose of this proxy handler is to be able to modify the return value for "code" which is the result code.
+      if (method.getName().equals("code")) {
+        return resultCode;
+      }
+
+      return method.invoke(annotation, args);
+    }
   }
 }

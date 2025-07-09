@@ -28,7 +28,6 @@ import org.example.action.user.EditAction;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.config.ActionConfigurationProvider;
-import org.primeframework.mvc.action.result.ForwardResult.ForwardImpl;
 import org.primeframework.mvc.workflow.WorkflowChain;
 import org.testng.annotations.Test;
 import static org.easymock.EasyMock.capture;
@@ -78,7 +77,7 @@ public class DefaultActionMappingWorkflowTest extends PrimeBaseTest {
     EasyMock.expect(provider.lookup(fullURI)).andReturn(
         new ActionInvocation(
             EditAction.class, null, uri, extension,
-            new ActionConfiguration(EditAction.class, false, null, ForwardImpl.class, executeMethods, new HashMap<>(), new ArrayList<>(), new HashMap<>(), new HashMap<>(), new ArrayList<>(), new HashMap<>(),
+            new ActionConfiguration(EditAction.class, false, null, executeMethods, new HashMap<>(), new ArrayList<>(), new HashMap<>(), new HashMap<>(), new ArrayList<>(), new HashMap<>(),
                                     new ArrayList<>(), new HashMap<>(), new HashMap<>(), null, new HashMap<>(), new HashSet<>(), new ArrayList<>(),
                                     new ArrayList<>(), new HashMap<>(), uri, new ArrayList<>(), null, null, null)
         )

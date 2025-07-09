@@ -33,7 +33,6 @@ import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.ExecuteMethodConfiguration;
 import org.primeframework.mvc.action.config.ActionConfiguration;
-import org.primeframework.mvc.action.result.ForwardResult.ForwardImpl;
 import org.primeframework.mvc.content.binary.BinaryActionConfiguration;
 import org.primeframework.mvc.content.guice.ContentHandlerFactory;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration;
@@ -74,7 +73,7 @@ public class DefaultContentWorkflowTest extends PrimeBaseTest {
       additionalConfig.put(BinaryActionConfiguration.class, new BinaryActionConfiguration("binaryRequest", null));
 
       KitchenSinkAction action = new KitchenSinkAction(null);
-      ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, false, null, ForwardImpl.class, null, null, null, null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, additionalConfig, null, null, null, null, null);
+      ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, false, null, null, null, null, null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, additionalConfig, null, null, null, null, null);
       store.setCurrent(new ActionInvocation(action, null, null, null, config));
 
       WorkflowChain chain = createStrictMock(WorkflowChain.class);
@@ -134,7 +133,7 @@ public class DefaultContentWorkflowTest extends PrimeBaseTest {
     additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(requestMembers, null, null));
 
     KitchenSinkAction action = new KitchenSinkAction(null);
-    ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, false, null, ForwardImpl.class, null, null, null, null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, additionalConfig, null, null, null, null, null);
+    ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, false, null, null, null, null, null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, additionalConfig, null, null, null, null, null);
     store.setCurrent(new ActionInvocation(action, new ExecuteMethodConfiguration(HTTPMethod.POST, null, null), null, null, config));
 
     WorkflowChain chain = createStrictMock(WorkflowChain.class);

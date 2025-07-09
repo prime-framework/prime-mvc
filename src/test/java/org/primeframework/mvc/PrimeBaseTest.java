@@ -59,7 +59,6 @@ import org.primeframework.mvc.action.ExecuteMethodConfiguration;
 import org.primeframework.mvc.action.ValidationMethodConfiguration;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.action.config.DefaultActionConfigurationBuilder;
-import org.primeframework.mvc.action.result.ForwardResult.ForwardImpl;
 import org.primeframework.mvc.action.result.MVCWorkflowFinalizer;
 import org.primeframework.mvc.action.result.ResultStore;
 import org.primeframework.mvc.config.MVCConfiguration;
@@ -316,7 +315,7 @@ public abstract class PrimeBaseTest {
     resultConfigurations.put(resultCode, annotation);
 
     return new ActionInvocation(action, executeMethod, uri, extension,
-                                new ActionConfiguration(EditAction.class, false, null, ForwardImpl.class, executeMethods, validationMethods, new ArrayList<>(), null, null, new ArrayList<>(), new HashMap<>(), new ArrayList<>(), resultConfigurations, new HashMap<>(), null, new HashMap<>(), new HashSet<>(), Collections.emptyList(), new ArrayList<>(), new HashMap<>(), uri, new ArrayList<>(), null, null, null));
+                                new ActionConfiguration(EditAction.class, false, null, executeMethods, validationMethods, new ArrayList<>(), null, null, new ArrayList<>(), new HashMap<>(), new ArrayList<>(), resultConfigurations, new HashMap<>(), null, new HashMap<>(), new HashSet<>(), Collections.emptyList(), new ArrayList<>(), new HashMap<>(), uri, new ArrayList<>(), null, null, null));
   }
 
   /**

@@ -13,21 +13,23 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc.action.result.annotation;
+package org.example.action;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import org.primeframework.mvc.action.annotation.Action;
+import org.primeframework.mvc.action.result.annotation.Forward;
 
 /**
- * This annotation marks the default result to be used when a mapping is not provided.
- *
  * @author Daniel DeGroff
  */
-@Retention(RUNTIME)
-@Target(TYPE)
-public @interface DefaultResult {
-  Class<?> value();
+@Action
+@Forward.List({
+    @Forward,
+    @Forward(code = "*", status = 201),
+})
+public class RequestedDefaultForwardResultNoTemplateAction {
+  public String resultCode = "success";
+
+  public String get() {
+    return resultCode;
+  }
 }

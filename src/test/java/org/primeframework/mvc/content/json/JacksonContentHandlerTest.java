@@ -71,7 +71,7 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
     additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(requestMembers, null, null));
 
     KitchenSinkAction action = new KitchenSinkAction(null);
-    ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, false, null, ForwardImpl.class, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null, null, null, null, null);
+    ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, false, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, additionalConfig, null, null, null, null, null);
     ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
     expect(store.getCurrent()).andReturn(new ActionInvocation(action, new ExecuteMethodConfiguration(HTTPMethod.POST, null, null), "/action", null, config));
     replay(store);
