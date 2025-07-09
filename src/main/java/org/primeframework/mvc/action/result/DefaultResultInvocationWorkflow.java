@@ -96,6 +96,12 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
         annotation = actionInvocation.configuration.resultConfigurations.get(resultCode);
       }
 
+      // If the current action has not provided a resultCode mapping, in order, resolve a default result.
+      //  Using:
+      //  1. the bound defaultResultMappings
+      //  2. the action defined a '*' mapping which should be used as a default.
+      //  3. the fail-safe ForwardImpl
+
       if (annotation == null) {
         var defaultMapping = defaultResultMappings.get(resultCode);
         if (defaultMapping != null) {
@@ -104,13 +110,13 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
 
         if (annotation == null) {
           if (actionInvocation.action != null) {
-            // Note that if an action exists, a configuration exists
+            // Note that if an action exists, a configuration exists, so we should not need to check for null on configuration.
             annotation = actionInvocation.configuration.resultConfigurations.get("*");
             if (annotation != null) {
-              // Proxying the default result will allow us to return the actual result code instead of '*' when the code() method is invoked.
+              // Proxying the annotation will allow us to return the actual result code instead of '*' when the code() method is invoked.
               // - The primary reason for this is debug. See AbstractForwardResult. But any result handler could decide to use this
               //   resultCode in theory for debug or other purposes. This proxy allows us to override the code() method.
-              annotation = proxyAnnotation(annotation, resultCode);
+              annotation = newProxyInstance(annotation, resultCode);
             }
           }
 
@@ -130,6 +136,7 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
       }
 
       long start = System.currentTimeMillis();
+      @SuppressWarnings("rawtypes")
       Result result = factory.build(annotation.annotationType());
       boolean handled = result.execute(annotation);
 
@@ -148,6 +155,7 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
     String uri = resourceLocator.locateIndex(configuration.templateDirectory());
     if (uri != null) {
       Annotation annotation = new RedirectImpl(uri, "success", true, false);
+      @SuppressWarnings("rawtypes")
       Result redirectResult = factory.build(annotation.annotationType());
       redirectResult.execute(annotation);
       return;
@@ -158,8 +166,9 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
     chain.continueWorkflow();
   }
 
-  private Annotation proxyAnnotation(Annotation annotation, String resultCode) {
+  private Annotation newProxyInstance(Annotation annotation, String resultCode) {
     try {
+      // Note that the annotation object here is already a proxy. Asking this object for getClass() will not return the correct class.
       Class<?> annotationType = annotation.annotationType();
       return (Annotation) Proxy.newProxyInstance(
           annotationType.getClassLoader(),
