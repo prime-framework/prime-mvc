@@ -195,6 +195,7 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
         return resultCode;
       }
 
+      // For all other methods, defer to the actual annotation
       return method.invoke(annotation, args);
     }
   }
