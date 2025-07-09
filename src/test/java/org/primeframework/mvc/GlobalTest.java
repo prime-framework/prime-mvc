@@ -446,7 +446,7 @@ public class GlobalTest extends PrimeBaseTest {
                              Default Forward""");
     TestUnhandledExceptionHandler.assertNoUnhandledException();
 
-    // Unknown result code, still a 200 using ForwardImpl
+    // Unknown result code, still a 200 using ForwardImpl because this is the default in DefaultResultInvocationWorkflow
     simulator.test("/default-forward-result")
              .withURLParameter("resultCode", "foo")
              .get()
@@ -462,7 +462,7 @@ public class GlobalTest extends PrimeBaseTest {
              .assertBodyIsEmpty();
     TestUnhandledExceptionHandler.assertNoUnhandledException();
 
-    // Unknown result code, this should use the default mapping which results in a 201
+    // Unknown result code, this should use the default mapping of '*' which results in a 201
     simulator.test("/requested-default-status-result")
              .withURLParameter("resultCode", "foo")
              .get()
@@ -479,7 +479,7 @@ public class GlobalTest extends PrimeBaseTest {
                              """);
     TestUnhandledExceptionHandler.assertNoUnhandledException();
 
-    // Ensure the normal mapping works, expecting an .ftl per the forward result
+    // Unknown result code of 'foo', this should use the default mapping of '*' which results in a 201
     simulator.test("/requested-default-forward-result")
              .withURLParameter("resultCode", "foo")
              .get()
@@ -490,13 +490,13 @@ public class GlobalTest extends PrimeBaseTest {
     TestUnhandledExceptionHandler.assertNoUnhandledException();
 
     // No template, so expect an exception. Ensure the exception has the correct result code.
-    // - Should not be '*' ideally would be 'foo'
     simulator.test("/requested-default-forward-result-no-template")
              .withURLParameter("resultCode", "foo")
              .get()
              // 500 because the template is missing
              .assertStatusCode(500);
 
+    // Ensure the exception contains the invalid result code of 'foo' and not '*' which is found in the default mapping.
     TestUnhandledExceptionHandler.assertLastUnhandledException(new PrimeException(
         "Missing result for action class [org.example.action.RequestedDefaultForwardResultNoTemplateAction] URI [/requested-default-forward-result-no-template] and result code [foo]"));
   }
