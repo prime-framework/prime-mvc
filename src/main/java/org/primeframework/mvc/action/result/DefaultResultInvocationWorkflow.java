@@ -107,6 +107,9 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
             // Note that if an action exists, a configuration exists
             annotation = actionInvocation.configuration.resultConfigurations.get("*");
             if (annotation != null) {
+              // Proxying the default result will allow us to return the actual result code instead of '*' when the code() method is invoked.
+              // - The primary reason for this is debug. See AbstractForwardResult. But any result handler could decide to use this
+              //   resultCode in theory for debug or other purposes. This proxy allows us to override the code() method.
               annotation = proxyAnnotation(annotation, resultCode);
             }
           }
