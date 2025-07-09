@@ -100,7 +100,7 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
       //  Using:
       //  1. the bound defaultResultMappings
       //  2. the action defined a '*' mapping which should be used as a default.
-      //  3. the fail-safe ForwardImpl
+      //  3. the fail-safe ForwardImpl.
 
       if (annotation == null) {
         var defaultMapping = defaultResultMappings.get(resultCode);
@@ -120,7 +120,6 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
             }
           }
 
-          // We don't always have an action invocation.
           if (annotation == null) {
             annotation = new ForwardImpl("", resultCode);
           }
