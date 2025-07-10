@@ -216,6 +216,9 @@ public abstract class PrimeBaseTest {
     SecureAction.UnknownParameters.clear();
 
     TestUnhandledExceptionHandler.reset();
+
+    // Reset class filter
+    MockStaticClasspathResourceFilter.TestFunction = null;
   }
 
   @BeforeSuite

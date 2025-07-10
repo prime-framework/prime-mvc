@@ -437,6 +437,71 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void get_default_results() {
+    // Take default of 'success' See DefaultForwardResultAction
+    simulator.test("/default-forward-result")
+             .get()
+             .assertStatusCode(200)
+             .assertBody("""
+                             Default Forward""");
+    TestUnhandledExceptionHandler.assertNoUnhandledException();
+
+    // Unknown result code, still a 200 using ForwardImpl because this is the default in DefaultResultInvocationWorkflow
+    simulator.test("/default-forward-result")
+             .withURLParameter("resultCode", "foo")
+             .get()
+             .assertStatusCode(200)
+             .assertBody("""
+                             Default Forward""");
+    TestUnhandledExceptionHandler.assertNoUnhandledException();
+
+    // Take default of 'success' See RequestedDefaultForwardResultAction
+    simulator.test("/requested-default-status-result")
+             .get()
+             .assertStatusCode(200)
+             .assertBodyIsEmpty();
+    TestUnhandledExceptionHandler.assertNoUnhandledException();
+
+    // Unknown result code, this should use the default mapping of '*' which results in a 201
+    simulator.test("/requested-default-status-result")
+             .withURLParameter("resultCode", "foo")
+             .get()
+             .assertStatusCode(201)
+             .assertBodyIsEmpty();
+    TestUnhandledExceptionHandler.assertNoUnhandledException();
+
+    // Ensure the normal mapping works, expecting an .ftl per the forward result
+    simulator.test("/requested-default-forward-result")
+             .get()
+             .assertStatusCode(200)
+             .assertBody("""
+                             Hi!
+                             """);
+    TestUnhandledExceptionHandler.assertNoUnhandledException();
+
+    // Unknown result code of 'foo', this should use the default mapping of '*' which results in a 201
+    simulator.test("/requested-default-forward-result")
+             .withURLParameter("resultCode", "foo")
+             .get()
+             .assertStatusCode(201)
+             .assertBody("""
+                             Hi!
+                             """);
+    TestUnhandledExceptionHandler.assertNoUnhandledException();
+
+    // No template, so expect an exception. Ensure the exception has the correct result code.
+    simulator.test("/requested-default-forward-result-no-template")
+             .withURLParameter("resultCode", "foo")
+             .get()
+             // 500 because the template is missing
+             .assertStatusCode(500);
+
+    // Ensure the exception contains the invalid result code of 'foo' and not '*' which is found in the default mapping.
+    TestUnhandledExceptionHandler.assertLastUnhandledException(new PrimeException(
+        "Missing result for action class [org.example.action.RequestedDefaultForwardResultNoTemplateAction] URI [/requested-default-forward-result-no-template] and result code [foo]"));
+  }
+
+  @Test
   public void get_developmentExceptions() {
     // Bad annotation @Action("{id}") it should be @Action("{uuid}")
     simulator.test("/invalid-api/42")
@@ -619,7 +684,7 @@ public class GlobalTest extends PrimeBaseTest {
   public void get_fullFormWithAllAttributes() throws Exception {
     simulator.test("/user/full-form")
              .get()
-             .assertBody(Files.readString(Path.of("src/test/resources/html/full-form.html")).trim());
+             .assertBodyFile(Path.of("src/test/resources/html/full-form.html"));
   }
 
   @Test
@@ -824,7 +889,7 @@ public class GlobalTest extends PrimeBaseTest {
   public void get_metrics() throws Exception {
     simulator.test("/user/full-form")
              .get()
-             .assertBody(Files.readString(Path.of("src/test/resources/html/full-form.html")).trim());
+             .assertBodyFile(Path.of("src/test/resources/html/full-form.html"));
 
     Map<String, Timer> timers = metricRegistry.getTimers();
     assertEquals(timers.get("prime-mvc.[/user/full-form].requests").getCount(), 1);
@@ -1219,6 +1284,7 @@ public class GlobalTest extends PrimeBaseTest {
 
   @Test
   public void get_url_rewrite() {
+    // Ensure a legacy configuration no longer has any affect on the request mapper.
     simulator.test("/doesNotExist?__a_foo=/user/edit&foo=true")
              .get()
              .assertStatusCode(404)
@@ -1256,7 +1322,7 @@ public class GlobalTest extends PrimeBaseTest {
 
   @Test
   public void hacked() {
-    // Make sure we don't invoke freemarker.template.utility.Execute
+    // Make sure we don't invoke "freemarker.template.utility.Execute"
     simulator.test("/hacked")
              .get()
              .assertStatusCode(500)
@@ -1862,6 +1928,33 @@ public class GlobalTest extends PrimeBaseTest {
                              methodG:value-method-getValue
                              methodH:value-method-value2
                              """);
+  }
+
+  @Test
+  public void post_fileUploadDisabled() throws Exception {
+    // File uploads are disabled by default, and unless the action annotates @FileUpload we should reject the request.
+    test.createFile("Hello World")
+        .simulate(() -> simulator.test("/no-files")
+                                 .withFile("dataAnyType", test.tempFile, "text/plain")
+                                 .post()
+                                 .assertStatusCode(422))
+
+        // This action does not have an explicit mapping configured, but it should default.
+        .createFile("Hello World")
+        .simulate(() -> simulator.test("/no-files-no-result-mapping")
+                                 .withFile("dataAnyType", test.tempFile, "text/plain")
+                                 .post()
+                                 .assertStatusCode(422));
+  }
+
+  @Test
+  public void post_file_tooLarge() throws Exception {
+    // File uploads are disabled by default, and unless the action annotates @FileUpload we should reject the request.
+    test.createFile("X".repeat(1024 * 1024 * 2))
+        .simulate(() -> simulator.test("/file-upload")
+                                 .withFile("dataAnyType", test.tempFile, "text/plain")
+                                 .post()
+                                 .assertStatusCode(413));
   }
 
   // Test that the control behaves as expected

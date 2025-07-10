@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2025, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,20 +13,24 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.example.action;
+package org.primeframework.mvc.action.result;
 
-import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.action.result.annotation.Forward;
+import java.lang.annotation.Annotation;
 
 /**
+ * An interface to define an action result definition. This can be bound and replace having to add a result annotation to each action.
+ *
  * @author Daniel DeGroff
  */
-@Action
-@Forward
-public class DefaultForwardResultAction {
-  public String resultCode = "success";
+public interface ActionResultDefinition {
+  /**
+   * @param resultCode the result code to use for the mapping
+   * @return the constructed annotation.
+   */
+  Annotation getAnnotation(String resultCode);
 
-  public String get() {
-    return resultCode;
-  }
+  /**
+   * @return the status code for the HTTP response
+   */
+  int getStatus();
 }

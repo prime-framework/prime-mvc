@@ -153,10 +153,6 @@ public class DefaultParameterParser implements ParameterParser {
                                   Map<String, List<String>> checkBoxes,
                                   Map<String, List<String>> radioButtons, Set<String> actions) {
     for (String key : parameters.keySet()) {
-      if (InternalParameters.isInternalParameter(key)) {
-        continue;
-      }
-
       boolean optional = key.endsWith(".x") || key.endsWith(".y") || key.equals(csrfProvider.getParameterName());
 
       if (key.startsWith(CHECKBOX_PREFIX)) {

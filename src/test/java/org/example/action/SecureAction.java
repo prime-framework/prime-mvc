@@ -59,6 +59,10 @@ public class SecureAction {
     return "success";
   }
 
+  public String patch() {
+    return "success";
+  }
+
   public String post() {
     return "success";
   }

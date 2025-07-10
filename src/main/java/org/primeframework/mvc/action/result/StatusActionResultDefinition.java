@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2025, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,31 +13,30 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.example.action;
+package org.primeframework.mvc.action.result;
 
-import io.fusionauth.http.FileInfo;
-import org.primeframework.mvc.action.annotation.Action;
-import org.primeframework.mvc.action.result.annotation.JSON;
+import org.primeframework.mvc.action.result.StatusResult.StatusImpl;
 import org.primeframework.mvc.action.result.annotation.Status;
-import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
 
 /**
+ * A {@link Status} result definition.
+ *
  * @author Daniel DeGroff
  */
-@Action
-@Status.List({
-    @Status,
-    @Status(code = "content-too-large", status = 413)
-})
-@JSON(code = "input", status = 400)
-public class FileUploadAction {
-  @FileUpload(contentTypes = {"*"})
-  public FileInfo dataAnyType;
+public class StatusActionResultDefinition implements ActionResultDefinition {
+  private final int status;
 
-  @FileUpload(contentTypes = {"text/html"})
-  public FileInfo dataTextHtml;
+  public StatusActionResultDefinition(int status) {
+    this.status = status;
+  }
 
-  public String post() {
-    return "success";
+  @Override
+  public Status getAnnotation(String resultCode) {
+    return new StatusImpl(resultCode, status);
+  }
+
+  @Override
+  public int getStatus() {
+    return status;
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package org.primeframework.mvc.action.result;
 
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 
 import com.google.inject.Inject;
 import io.fusionauth.http.server.HTTPResponse;
@@ -67,5 +68,60 @@ public class StatusResult extends AbstractResult<Status> {
   @Override
   protected boolean getDisableCacheControl(Status result) {
     return result.disableCacheControl();
+  }
+
+  public static class StatusImpl implements Status {
+    private final String cacheControl;
+
+    private final String code;
+
+    private final boolean disableCacheControl;
+
+    private final int status;
+
+    private final String statusStr;
+
+    public StatusImpl(String code, int status) {
+      this.cacheControl = "no-cache";
+      this.code = code;
+      this.disableCacheControl = false;
+      this.status = status;
+      this.statusStr = "";
+    }
+
+    @Override
+    public Class<? extends Annotation> annotationType() {
+      return Status.class;
+    }
+
+    @Override
+    public String cacheControl() {
+      return cacheControl;
+    }
+
+    @Override
+    public String code() {
+      return code;
+    }
+
+    @Override
+    public boolean disableCacheControl() {
+      return disableCacheControl;
+    }
+
+    @Override
+    public Header[] headers() {
+      return new Header[0];
+    }
+
+    @Override
+    public int status() {
+      return status;
+    }
+
+    @Override
+    public String statusStr() {
+      return statusStr;
+    }
   }
 }

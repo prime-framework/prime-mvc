@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2024, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,19 @@
  */
 package org.example.action.user;
 
+import javax.inject.Inject;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
 import io.fusionauth.http.FileInfo;
+import io.fusionauth.http.server.HTTPRequest;
 import org.example.domain.Role;
 import org.example.domain.UserField;
 import org.example.domain.UserType;
 import org.primeframework.mvc.action.annotation.Action;
+import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
 import static java.util.Arrays.asList;
 
 /**
@@ -40,8 +45,11 @@ public class FullFormAction {
 
   public static String stringFieldFromLastPost;
 
-  public List<Integer> ages = new ArrayList<Integer>();
+  private final HTTPRequest request;
 
+  public List<Integer> ages = new ArrayList<>();
+
+  @FileUpload(contentTypes = {"*"})
   public FileInfo image;
 
   public List<Integer> roleIds;
@@ -54,7 +62,9 @@ public class FullFormAction {
 
   public UserType[] userTypes = UserType.values();
 
-  public FullFormAction() {
+  @Inject
+  public FullFormAction(HTTPRequest request) {
+    this.request = request;
     for (int i = 1; i < 100; i++) {
       ages.add(i);
     }
@@ -62,6 +72,13 @@ public class FullFormAction {
   }
 
   public static void reset() {
+    if (imageFromLastPost != null) {
+      try {
+        Files.deleteIfExists(imageFromLastPost.getFile());
+      } catch (IOException ignore) {
+      }
+    }
+
     roleIdsFromLastPost = null;
     imageFromLastPost = null;
     agesFromLastPost = null;
@@ -73,8 +90,13 @@ public class FullFormAction {
   }
 
   public String post() {
+    // Do not delete files automatically for this request
+    request.getMultiPartStreamProcessor().getMultiPartConfiguration().withDeleteTemporaryFiles(false);
     roleIdsFromLastPost = roleIds;
     imageFromLastPost = image;
+    if (imageFromLastPost != null) {
+      imageFromLastPost.getFile().toFile().deleteOnExit();
+    }
     agesFromLastPost = ages;
     stringFieldFromLastPost = stringField;
     return "success";

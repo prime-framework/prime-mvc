@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2023, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,14 @@ package org.primeframework.mvc.action.result;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.List;
+import java.util.Map;
 
 import com.google.inject.Inject;
+import org.primeframework.mvc.PrimeException;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.result.ForwardResult.ForwardImpl;
@@ -43,6 +47,8 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
 
   private final MVCConfiguration configuration;
 
+  private final Map<String, ActionResultDefinition> defaultResultMappings;
+
   private final ResultFactory factory;
 
   private final ResourceLocator resourceLocator;
@@ -51,10 +57,12 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
 
   @Inject
   public DefaultResultInvocationWorkflow(ActionInvocationStore actionInvocationStore, MVCConfiguration configuration,
+                                         Map<String, ActionResultDefinition> defaultResults,
                                          ResultStore resultStore, ResourceLocator resourceLocator,
                                          ResultFactory factory) {
     this.actionInvocationStore = actionInvocationStore;
     this.configuration = configuration;
+    this.defaultResultMappings = defaultResults;
     this.resultStore = resultStore;
     this.resourceLocator = resourceLocator;
     this.factory = factory;
@@ -88,8 +96,43 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
         annotation = actionInvocation.configuration.resultConfigurations.get(resultCode);
       }
 
+      // If the current action has not provided a resultCode mapping, in order, resolve a default result.
+      //  Using:
+      //  1. the bound defaultResultMappings
+      //  2. the action defined a '*' mapping which should be used as a default.
+      //  3. the fail-safe ForwardImpl.
+
       if (annotation == null) {
-        annotation = new ForwardImpl("", resultCode);
+        var defaultMapping = defaultResultMappings.get(resultCode);
+        if (defaultMapping != null) {
+          annotation = defaultMapping.getAnnotation(resultCode);
+        }
+
+        if (annotation == null) {
+          if (actionInvocation.action != null) {
+            // Note that if an action exists, a configuration exists, so we should not need to check for null on configuration.
+            annotation = actionInvocation.configuration.resultConfigurations.get("*");
+            if (annotation != null) {
+              // Proxying the annotation will allow us to return the actual result code instead of '*' when the code() method is invoked.
+              // - The primary reason for this is debug. See AbstractForwardResult. But any result handler could decide to use this
+              //   resultCode in theory for debug or other purposes. This proxy allows us to override the code() method.
+              annotation = newProxyInstance(annotation, resultCode);
+              logger.debug("Missing result annotation for action class [{}] URI [{}] for result code [{}]. A default mapping of [@{}] was configured using the [*] result code. " +
+                           "This is not an error. This message is provided in case you do wish to define an explicit mapping.",
+                           actionInvocation.configuration.actionClass.getName(), actionInvocation.uri(), resultCode, annotation.annotationType().getSimpleName());
+            }
+          }
+
+          if (annotation == null) {
+            annotation = new ForwardImpl("", resultCode);
+            // Only debug log this if there was an action that could have declared the result mapping.
+            if (actionInvocation.action != null) {
+              logger.debug("Missing result annotation for action class [{}] URI [{}] for result code [{}]. The default mapping of [@{}] was used. " +
+                           "This is not an error. This message is provided in case you do wish to define an explicit mapping.",
+                           actionInvocation.configuration.actionClass.getName(), actionInvocation.uri(), resultCode, annotation.annotationType().getSimpleName());
+            }
+          }
+        }
       }
 
       // Call pre-render methods registered for this result
@@ -101,6 +144,7 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
       }
 
       long start = System.currentTimeMillis();
+      @SuppressWarnings("rawtypes")
       Result result = factory.build(annotation.annotationType());
       boolean handled = result.execute(annotation);
 
@@ -119,6 +163,7 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
     String uri = resourceLocator.locateIndex(configuration.templateDirectory());
     if (uri != null) {
       Annotation annotation = new RedirectImpl(uri, "success", true, false);
+      @SuppressWarnings("rawtypes")
       Result redirectResult = factory.build(annotation.annotationType());
       redirectResult.execute(annotation);
       return;
@@ -127,5 +172,40 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
     // The action either didn't have a result and the Forward template was missing, or there was no action and Forward template for the URI.
     // In either case, this should be a 404 so we will let the Prime MVC workflow at the top level handle that
     chain.continueWorkflow();
+  }
+
+  private Annotation newProxyInstance(Annotation annotation, String resultCode) {
+    try {
+      // Note that the annotation object here is already a proxy. Asking this object for getClass() will not return the correct class.
+      Class<?> annotationType = annotation.annotationType();
+      return (Annotation) Proxy.newProxyInstance(
+          annotationType.getClassLoader(),
+          new Class[]{annotationType},
+          new AnnotationInvocationHandler(annotation, resultCode));
+    } catch (Exception e) {
+      throw new PrimeException("Unable to proxy the default result code [*]. This is unexpected.", e);
+    }
+  }
+
+  public static class AnnotationInvocationHandler implements InvocationHandler {
+    private final Annotation annotation;
+
+    private final String resultCode;
+
+    public AnnotationInvocationHandler(Annotation annotation, String resultCode) {
+      this.annotation = annotation;
+      this.resultCode = resultCode;
+    }
+
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+      // The purpose of this proxy handler is to be able to modify the return value for "code" which is the result code.
+      if (method.getName().equals("code")) {
+        return resultCode;
+      }
+
+      // For all other methods, defer to the actual annotation
+      return method.invoke(annotation, args);
+    }
   }
 }
