@@ -117,11 +117,20 @@ public class DefaultResultInvocationWorkflow implements ResultInvocationWorkflow
               // - The primary reason for this is debug. See AbstractForwardResult. But any result handler could decide to use this
               //   resultCode in theory for debug or other purposes. This proxy allows us to override the code() method.
               annotation = newProxyInstance(annotation, resultCode);
+              logger.debug("Missing result annotation for action class [{}] URI [{}] for result code [{}]. A default mapping of [@{}] was configured using the [*] result code. " +
+                           "This is not an error. This message is provided in case you do wish to define an explicit mapping.",
+                           actionInvocation.configuration.actionClass.getName(), actionInvocation.uri(), resultCode, annotation.annotationType().getSimpleName());
             }
           }
 
           if (annotation == null) {
             annotation = new ForwardImpl("", resultCode);
+            // Only debug log this if there was an action that could have declared the result mapping.
+            if (actionInvocation.action != null) {
+              logger.debug("Missing result annotation for action class [{}] URI [{}] for result code [{}]. The default mapping of [@{}] was used. " +
+                           "This is not an error. This message is provided in case you do wish to define an explicit mapping.",
+                           actionInvocation.configuration.actionClass.getName(), actionInvocation.uri(), resultCode, annotation.annotationType().getSimpleName());
+            }
           }
         }
       }
