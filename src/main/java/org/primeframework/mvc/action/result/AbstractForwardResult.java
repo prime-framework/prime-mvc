@@ -153,7 +153,7 @@ public abstract class AbstractForwardResult<U extends Annotation> extends Abstra
   private String locateDefault(ActionInvocation actionInvocation, U forward) {
     String page = resourceLocator.locate(configuration.templateDirectory());
     if (page == null) {
-      throw new PrimeException("Missing result for action class [" + actionInvocation.configuration.actionClass + "] URI [" +
+      throw new PrimeException("Missing result for action class [" + actionInvocation.configuration.actionClass.getName() + "] URI [" +
                                actionInvocation.uri() + "] and result code [" + getCode(forward) + "]");
     }
     return page;

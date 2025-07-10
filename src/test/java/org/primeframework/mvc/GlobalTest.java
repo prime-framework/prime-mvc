@@ -437,6 +437,71 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void get_default_results() {
+    // Take default of 'success' See DefaultForwardResultAction
+    simulator.test("/default-forward-result")
+             .get()
+             .assertStatusCode(200)
+             .assertBody("""
+                             Default Forward""");
+    TestUnhandledExceptionHandler.assertNoUnhandledException();
+
+    // Unknown result code, still a 200 using ForwardImpl because this is the default in DefaultResultInvocationWorkflow
+    simulator.test("/default-forward-result")
+             .withURLParameter("resultCode", "foo")
+             .get()
+             .assertStatusCode(200)
+             .assertBody("""
+                             Default Forward""");
+    TestUnhandledExceptionHandler.assertNoUnhandledException();
+
+    // Take default of 'success' See RequestedDefaultForwardResultAction
+    simulator.test("/requested-default-status-result")
+             .get()
+             .assertStatusCode(200)
+             .assertBodyIsEmpty();
+    TestUnhandledExceptionHandler.assertNoUnhandledException();
+
+    // Unknown result code, this should use the default mapping of '*' which results in a 201
+    simulator.test("/requested-default-status-result")
+             .withURLParameter("resultCode", "foo")
+             .get()
+             .assertStatusCode(201)
+             .assertBodyIsEmpty();
+    TestUnhandledExceptionHandler.assertNoUnhandledException();
+
+    // Ensure the normal mapping works, expecting an .ftl per the forward result
+    simulator.test("/requested-default-forward-result")
+             .get()
+             .assertStatusCode(200)
+             .assertBody("""
+                             Hi!
+                             """);
+    TestUnhandledExceptionHandler.assertNoUnhandledException();
+
+    // Unknown result code of 'foo', this should use the default mapping of '*' which results in a 201
+    simulator.test("/requested-default-forward-result")
+             .withURLParameter("resultCode", "foo")
+             .get()
+             .assertStatusCode(201)
+             .assertBody("""
+                             Hi!
+                             """);
+    TestUnhandledExceptionHandler.assertNoUnhandledException();
+
+    // No template, so expect an exception. Ensure the exception has the correct result code.
+    simulator.test("/requested-default-forward-result-no-template")
+             .withURLParameter("resultCode", "foo")
+             .get()
+             // 500 because the template is missing
+             .assertStatusCode(500);
+
+    // Ensure the exception contains the invalid result code of 'foo' and not '*' which is found in the default mapping.
+    TestUnhandledExceptionHandler.assertLastUnhandledException(new PrimeException(
+        "Missing result for action class [org.example.action.RequestedDefaultForwardResultNoTemplateAction] URI [/requested-default-forward-result-no-template] and result code [foo]"));
+  }
+
+  @Test
   public void get_developmentExceptions() {
     // Bad annotation @Action("{id}") it should be @Action("{uuid}")
     simulator.test("/invalid-api/42")
