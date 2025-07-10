@@ -25,7 +25,7 @@ guavaVersion = "32.1.2-jre"
 guiceVersion = "6.0.0"
 jacksonVersion = "2.15.2"
 jsoupVersion = "1.16.2"
-logbackVersion = "1.4.14"
+logbackVersion = "1.5.13"
 slf4jVersion = "2.0.13"
 testngVersion = "7.8.0"
 
@@ -182,7 +182,14 @@ target(name: "idea", description: "Updates the IntelliJ IDEA module file") {
 void updatePOM() {
   pom.update()
 
-  // Hack. I think we need to update the pom plugin to optionally have a version mapping back to maven.
+  // Note that the POM plugin does not handle non semantic versions correctly.
+  // - However, these dependencies are coming from savant, so we do not know the version they were in Maven.
+  //   The longer term fix I think it is to delete these from savant and just pull them from Maven, but there are
+  //   complications in doing that unless we wholesale delete all artifacts from Savant that can be found in Maven
+  //   all at once.
+  // - We can live with this for a while longer. Or if we can upgrade these deps then we don't need these mappings
+  //   assuming we can pull them from maven.
+  //   But I don't know that we will ever update inject:1.0.0.
   file.copy(to: ".") {
     fileSet(dir: ".", includePatterns: [~/pom.xml/])
     // com.github.java-json-tools:json-patch:1.13.0 -> 1.13
