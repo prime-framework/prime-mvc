@@ -74,7 +74,7 @@ public class TokenAction {
     // if additional parameters were sent, validate them
     MockOAuthUserLoginSecurityContext.additionalParameters.forEach((key, value) -> {
       assertTrue(unknownParameters.containsKey(key), "Missing additional parameter: " + key);
-      assertEquals(unknownParameters.get(key), value.toArray(new String[0]), "Mismatched additional parameter value for: " + key);
+      assertEquals(unknownParameters.get(key), value.toArray(), "Mismatched additional parameter value for: " + key);
     });
 
     JWT jwt = new JWT();
