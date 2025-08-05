@@ -271,6 +271,8 @@ public class JWTRefreshTokenLoginTest {
 
     // Setting 'expired: true' on the request just tells the Login action to create an expired JWT and store it in the LoginContext.
     // - So we expect this to succeed, but the login context wil now contain an expired JWT. This means it will be refreshed on first use.
+    //
+    // The refresh action is what will call the token endpoint with the additional parameters.
     simulator.test("/oauth/login")
              .withParameter("expired", "true")
              .post()
