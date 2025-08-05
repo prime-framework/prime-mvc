@@ -27,6 +27,7 @@ import io.fusionauth.http.server.HTTPListenerConfiguration;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
 import io.fusionauth.http.server.HTTPServerConfiguration;
+import org.example.action.oauth.TokenAction;
 import org.primeframework.mvc.PrimeBaseTest.TestContentModule;
 import org.primeframework.mvc.PrimeBaseTest.TestMVCConfigurationModule;
 import org.primeframework.mvc.cors.CORSConfigurationProvider;
@@ -50,6 +51,8 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 /**
  * @author Brian Pontarelli
@@ -261,8 +264,8 @@ public class JWTRefreshTokenLoginTest {
   @Test
   public void refreshTokenEndpoint_additionalParameters() {
     // The token action should get called with the additional parameters we configure on the security context.
-    // This will be validated in the TokenAction.
-    MockOAuthUserLoginSecurityContext.additionalParameters.put("tenantId", List.of(new UUID(5, 0).toString()));
+    var tenantId = new UUID(5, 0).toString();
+    MockOAuthUserLoginSecurityContext.additionalParameters.put("tenantId", List.of(tenantId));
     MockOAuthUserLoginSecurityContext.TokenEndpoint = "http://localhost:" + simulator.getPort() + "/oauth/token";
     MockOAuthUserLoginSecurityContext.ValidateJWTOnLogin = false;
 
@@ -279,6 +282,11 @@ public class JWTRefreshTokenLoginTest {
              .get()
              .assertStatusCode(200)
              .assertBodyContains("Logged in");
+
+    // Ensure that the tenantId was added to the request and caught in unknown parameters
+    // if additional parameters were sent, validate them
+    assertTrue(TokenAction.UnknownParameters.containsKey("tenantId"), "Missing tenantId in unknown parameters");
+    assertEquals(TokenAction.UnknownParameters.get("tenantId"), new String[]{tenantId}, "Mismatched tenantId in unknown parameters");
   }
 
   public static class TestScopeModule extends AbstractModule {

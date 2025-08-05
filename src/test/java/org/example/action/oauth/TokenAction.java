@@ -39,6 +39,9 @@ import static org.testng.Assert.assertTrue;
 @Action
 @JSON
 public class TokenAction {
+  @UnknownParameters
+  public static Map<String, String[]> UnknownParameters = new HashMap<>();
+
   @FieldName("client_id")
   public String clientId;
 
@@ -51,9 +54,6 @@ public class TokenAction {
 
   @JSONResponse
   public RefreshResponse response = new RefreshResponse();
-
-  @UnknownParameters
-  public Map<String, String[]> unknownParameters = new HashMap<>();
 
   @Inject
   private HTTPRequest httpRequest;
@@ -70,12 +70,6 @@ public class TokenAction {
       case client_secret_basic -> assertEquals(httpRequest.getHeader("Authorization"), "Basic dGhlIGNsaWVudCBJRDp0aGUgY2xpZW50IHNlY3JldA==");
       case none -> assertTrue(true);
     }
-
-    // if additional parameters were sent, validate them
-    MockOAuthUserLoginSecurityContext.additionalParameters.forEach((key, value) -> {
-      assertTrue(unknownParameters.containsKey(key), "Missing additional parameter: " + key);
-      assertEquals(unknownParameters.get(key), value.toArray(), "Mismatched additional parameter value for: " + key);
-    });
 
     JWT jwt = new JWT();
     jwt.audience = "prime-tests";
