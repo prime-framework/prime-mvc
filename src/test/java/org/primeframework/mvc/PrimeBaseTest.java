@@ -80,6 +80,7 @@ import org.primeframework.mvc.message.scope.RequestScope;
 import org.primeframework.mvc.security.CBCCipherProvider;
 import org.primeframework.mvc.security.CipherProvider;
 import org.primeframework.mvc.security.GCMCipherProvider;
+import org.primeframework.mvc.security.MockOAuthUserLoginSecurityContext;
 import org.primeframework.mvc.security.MockStaticClasspathResourceFilter;
 import org.primeframework.mvc.security.MockStaticResourceFilter;
 import org.primeframework.mvc.security.MockUserLoginSecurityContext;
@@ -200,6 +201,9 @@ public abstract class PrimeBaseTest {
     // Clear the roles and logged in user
     MockUserLoginSecurityContext.roles.clear();
     MockUserLoginSecurityContext.currentUser = null;
+
+    // clear any additional params set in the MockOAuthUserLoginSecurityContext
+    MockOAuthUserLoginSecurityContext.additionalParameters.clear();
 
     // Reset CSRF configuration
     configuration.csrfEnabled = false;
