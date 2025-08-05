@@ -15,8 +15,12 @@
  */
 package org.primeframework.mvc.security;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import com.google.inject.Inject;
 import io.fusionauth.http.server.HTTPRequest;
@@ -36,6 +40,8 @@ public class MockOAuthUserLoginSecurityContext extends BaseJWTRefreshTokenCookie
   public static String TokenEndpoint = "http://localhost:8000/oauth/token";
 
   public static boolean ValidateJWTOnLogin = true;
+
+  public static Map<String, List<String>> additionalParameters = new HashMap<>();
 
   public static String clientId;
 
@@ -95,7 +101,8 @@ public class MockOAuthUserLoginSecurityContext extends BaseJWTRefreshTokenCookie
     return new OAuthConfiguration().with(c -> c.authenticationMethod = tokenAuthenticationMethod)
                                    .with(c -> c.clientId = clientId)
                                    .with(c -> c.clientSecret = clientSecret)
-                                   .with(c -> c.tokenEndpoint = TokenEndpoint);
+                                   .with(c -> c.tokenEndpoint = TokenEndpoint)
+                                   .with(c -> c.additionalParameters.putAll(additionalParameters));
   }
 
   @Override

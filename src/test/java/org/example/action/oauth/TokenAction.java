@@ -17,6 +17,8 @@ package org.example.action.oauth;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.google.inject.Inject;
 import io.fusionauth.http.server.HTTPRequest;
@@ -27,6 +29,7 @@ import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.annotation.JSON;
 import org.primeframework.mvc.content.json.annotation.JSONResponse;
 import org.primeframework.mvc.parameter.annotation.FieldName;
+import org.primeframework.mvc.parameter.annotation.UnknownParameters;
 import org.primeframework.mvc.security.MockOAuthUserLoginSecurityContext;
 import org.primeframework.mvc.security.oauth.RefreshResponse;
 import static org.example.action.oauth.LoginAction.Subject;
@@ -49,6 +52,9 @@ public class TokenAction {
   @JSONResponse
   public RefreshResponse response = new RefreshResponse();
 
+  @UnknownParameters
+  public Map<String, String[]> unknownParameters = new HashMap<>();
+
   @Inject
   private HTTPRequest httpRequest;
 
@@ -64,6 +70,13 @@ public class TokenAction {
       case client_secret_basic -> assertEquals(httpRequest.getHeader("Authorization"), "Basic dGhlIGNsaWVudCBJRDp0aGUgY2xpZW50IHNlY3JldA==");
       case none -> assertTrue(true);
     }
+
+    // if additional parameters were sent, validate them
+    MockOAuthUserLoginSecurityContext.additionalParameters.forEach((key, value) -> {
+      assertTrue(unknownParameters.containsKey(key), "Missing additional parameter: " + key);
+      assertEquals(unknownParameters.get(key), value.toArray(new String[0]), "Mismatched additional parameter value for: " + key);
+    });
+
     JWT jwt = new JWT();
     jwt.audience = "prime-tests";
     jwt.issuedAt = ZonedDateTime.now(ZoneOffset.UTC);
