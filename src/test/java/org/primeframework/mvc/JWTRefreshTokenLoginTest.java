@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2021-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,9 @@
  */
 package org.primeframework.mvc;
 
+import java.util.List;
+import java.util.UUID;
+
 import com.codahale.metrics.MetricRegistry;
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
@@ -24,6 +27,7 @@ import io.fusionauth.http.server.HTTPListenerConfiguration;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
 import io.fusionauth.http.server.HTTPServerConfiguration;
+import org.example.action.oauth.TokenAction;
 import org.primeframework.mvc.PrimeBaseTest.TestContentModule;
 import org.primeframework.mvc.PrimeBaseTest.TestMVCConfigurationModule;
 import org.primeframework.mvc.cors.CORSConfigurationProvider;
@@ -47,6 +51,8 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 /**
  * @author Brian Pontarelli
@@ -254,6 +260,36 @@ public class JWTRefreshTokenLoginTest {
              .get()
              .assertStatusCode(200)
              .assertBodyContains("Logged in");
+  }
+
+  @Test
+  public void refreshTokenEndpoint_additionalParameters() {
+    // The token action should get called with the additional parameters we configure on the security context.
+    var tenantId = new UUID(5, 0).toString();
+    MockOAuthUserLoginSecurityContext.additionalParameters.put("tenantId", List.of(tenantId));
+    MockOAuthUserLoginSecurityContext.TokenEndpoint = "http://localhost:" + simulator.getPort() + "/oauth/token";
+    MockOAuthUserLoginSecurityContext.ValidateJWTOnLogin = false;
+
+    // Setting 'expired: true' on the request just tells the Login action to create an expired JWT and store it in the LoginContext.
+    // - So we expect this to succeed, but the login context wil now contain an expired JWT. This means it will be refreshed on first use.
+    //
+    // The refresh action is what will call the token endpoint with the additional parameters.
+    simulator.test("/oauth/login")
+             .withParameter("expired", "true")
+             .post()
+             .assertStatusCode(200);
+
+    // The JWT in the security context was found to be expired on first use even though login succeeded.
+    // - This will have caused us to refresh the token, so this action should succeed.
+    simulator.test("/oauth/protected-resource")
+             .get()
+             .assertStatusCode(200)
+             .assertBodyContains("Logged in");
+
+    // Ensure that the tenantId was added to the request and caught in unknown parameters
+    // if additional parameters were sent, validate them
+    assertTrue(TokenAction.UnknownParameters.containsKey("tenantId"), "Missing tenantId in unknown parameters");
+    assertEquals(TokenAction.UnknownParameters.get("tenantId"), new String[]{tenantId}, "Mismatched tenantId in unknown parameters");
   }
 
   public static class TestScopeModule extends AbstractModule {

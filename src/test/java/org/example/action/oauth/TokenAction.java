@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2021-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@ package org.example.action.oauth;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.google.inject.Inject;
 import io.fusionauth.http.server.HTTPRequest;
@@ -27,6 +29,7 @@ import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.annotation.JSON;
 import org.primeframework.mvc.content.json.annotation.JSONResponse;
 import org.primeframework.mvc.parameter.annotation.FieldName;
+import org.primeframework.mvc.parameter.annotation.UnknownParameters;
 import org.primeframework.mvc.security.MockOAuthUserLoginSecurityContext;
 import org.primeframework.mvc.security.oauth.RefreshResponse;
 import static org.example.action.oauth.LoginAction.Subject;
@@ -36,6 +39,9 @@ import static org.testng.Assert.assertTrue;
 @Action
 @JSON
 public class TokenAction {
+  @UnknownParameters
+  public static Map<String, String[]> UnknownParameters = new HashMap<>();
+
   @FieldName("client_id")
   public String clientId;
 
@@ -64,6 +70,7 @@ public class TokenAction {
       case client_secret_basic -> assertEquals(httpRequest.getHeader("Authorization"), "Basic dGhlIGNsaWVudCBJRDp0aGUgY2xpZW50IHNlY3JldA==");
       case none -> assertTrue(true);
     }
+
     JWT jwt = new JWT();
     jwt.audience = "prime-tests";
     jwt.issuedAt = ZonedDateTime.now(ZoneOffset.UTC);
