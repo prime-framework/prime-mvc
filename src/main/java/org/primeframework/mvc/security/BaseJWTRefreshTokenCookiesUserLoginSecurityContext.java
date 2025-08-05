@@ -288,6 +288,8 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
       body.put("client_secret", List.of(oauthConfiguration.clientSecret));
     }
 
+    body.putAll(oauthConfiguration.additionalParameters);
+
     HttpRequest refreshRequest = requestBuilder.header(Headers.ContentType, ContentTypes.Form)
                                                .POST(new FormBodyPublisher(body))
                                                .build();
