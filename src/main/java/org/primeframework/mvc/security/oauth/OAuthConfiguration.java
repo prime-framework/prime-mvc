@@ -15,12 +15,18 @@
  */
 package org.primeframework.mvc.security.oauth;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.primeframework.mvc.util.Buildable;
 
 /**
  * @author Daniel DeGroff
  */
 public class OAuthConfiguration implements Buildable<OAuthConfiguration> {
+  public Map<String, List<String>> additionalParameters = new HashMap<>();
+
   public TokenAuthenticationMethod authenticationMethod = TokenAuthenticationMethod.client_secret_basic;
 
   public String clientId;

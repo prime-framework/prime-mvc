@@ -85,10 +85,6 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
     this.refreshTokenCookie = new CookieProxy(refreshTokenCookieName(), (long) Integer.MAX_VALUE, cookieSameSite());
   }
 
-  public Map<String, List<String>> additionalTokenCallParams() {
-    return Map.of();
-  }
-
   @Override
   public Object getCurrentUser() {
     // Cache in the request
@@ -292,7 +288,7 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
       body.put("client_secret", List.of(oauthConfiguration.clientSecret));
     }
 
-    body.putAll(additionalTokenCallParams());
+    body.putAll(oauthConfiguration.additionalParameters);
 
     HttpRequest refreshRequest = requestBuilder.header(Headers.ContentType, ContentTypes.Form)
                                                .POST(new FormBodyPublisher(body))
