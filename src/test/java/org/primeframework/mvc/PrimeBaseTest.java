@@ -51,6 +51,7 @@ import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
 import io.fusionauth.http.server.HTTPServerConfiguration;
 import org.example.action.SecureAction;
+import org.example.action.oauth.TokenAction;
 import org.example.action.user.EditAction;
 import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ExecuteMethodConfiguration;
@@ -77,6 +78,7 @@ import org.primeframework.mvc.message.scope.RequestScope;
 import org.primeframework.mvc.security.CBCCipherProvider;
 import org.primeframework.mvc.security.CipherProvider;
 import org.primeframework.mvc.security.GCMCipherProvider;
+import org.primeframework.mvc.security.MockOAuthUserLoginSecurityContext;
 import org.primeframework.mvc.security.MockStaticClasspathResourceFilter;
 import org.primeframework.mvc.security.MockStaticResourceFilter;
 import org.primeframework.mvc.security.MockUserLoginSecurityContext;
@@ -198,6 +200,9 @@ public abstract class PrimeBaseTest {
     MockUserLoginSecurityContext.roles.clear();
     MockUserLoginSecurityContext.currentUser = null;
 
+    // clear any additional params set in the MockOAuthUserLoginSecurityContext
+    MockOAuthUserLoginSecurityContext.additionalParameters.clear();
+
     // Reset CSRF configuration
     configuration.csrfEnabled = false;
 
@@ -214,6 +219,7 @@ public abstract class PrimeBaseTest {
     // Reset
     EditAction.getCalled = false;
     SecureAction.UnknownParameters.clear();
+    TokenAction.UnknownParameters.clear();
 
     TestUnhandledExceptionHandler.reset();
 
