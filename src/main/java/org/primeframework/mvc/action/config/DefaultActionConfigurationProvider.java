@@ -151,17 +151,17 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
         // Bad pattern
         if (!actionConfiguration.patternParts[i].endsWith("}")) {
           throw new PrimeException("Action annotation in class [" + actionConfiguration.actionClass +
-              "] contains an invalid URI parameter pattern [" + actionConfiguration.pattern + "]. A curly " +
-              "bracket is unclosed. If you want to include a curly bracket that is not " +
-              "a URI parameter capture, you need to escape it like \\{");
+                                   "] contains an invalid URI parameter pattern [" + actionConfiguration.pattern + "]. A curly " +
+                                   "bracket is unclosed. If you want to include a curly bracket that is not " +
+                                   "a URI parameter capture, you need to escape it like \\{");
         }
 
         // Can't have wildcard capture in the middle
         if (i != actionConfiguration.patternParts.length - 1) {
           throw new PrimeException("Action annotation in class [" + actionConfiguration.actionClass +
-              "] contains an invalid URI parameter pattern [" + actionConfiguration.pattern + "]. You cannot " +
-              "have a wildcard capture (i.e. {*foo}) in the middle of the pattern. It must " +
-              "be on the end of the pattern.");
+                                   "] contains an invalid URI parameter pattern [" + actionConfiguration.pattern + "]. You cannot " +
+                                   "have a wildcard capture (i.e. {*foo}) in the middle of the pattern. It must " +
+                                   "be on the end of the pattern.");
         }
 
         // Store the wildcard matched URI parameter
@@ -176,9 +176,9 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
       } else if (actionConfiguration.patternParts[i].startsWith("{")) {
         if (!actionConfiguration.patternParts[i].endsWith("}")) {
           throw new PrimeException("Action annotation in class [" + actionConfiguration.actionClass +
-              "] contains an invalid URI parameter pattern [" + actionConfiguration.pattern + "]. A curly " +
-              "bracket is unclosed. If you want to include a curly bracket that is not " +
-              "a URI parameter capture, you need to escape it like \\{");
+                                   "] contains an invalid URI parameter pattern [" + actionConfiguration.pattern + "]. A curly " +
+                                   "bracket is unclosed. If you want to include a curly bracket that is not " +
+                                   "a URI parameter capture, you need to escape it like \\{");
         }
 
         // Store the singular matched URI parameter
@@ -252,6 +252,18 @@ public class DefaultActionConfigurationProvider implements ActionConfigurationPr
       int endIndex = addedIndexURIPart ? uriParts.length - 1 : uriParts.length;
       String[] remainingURIParts = endIndex < (currentIndex + 1) ? new String[]{} : Arrays.copyOfRange(uriParts, currentIndex + 1, endIndex);
       Node actionNode = node.actions.get(uriPart);
+      if (canHandle(actionNode.actionConfiguration, remainingURIParts, state)) {
+        state.actionConfiguration = actionNode.actionConfiguration;
+        return true;
+      }
+    }
+
+    // Check if there is an index page that can handle this
+    if (node.actions.containsKey("index")) {
+      // If addedIndexURIPart is true then remove the last URI part for this part of the resolution
+      int endIndex = addedIndexURIPart ? uriParts.length - 1 : uriParts.length;
+      String[] remainingURIParts = endIndex < (currentIndex + 1) ? new String[]{} : Arrays.copyOfRange(uriParts, currentIndex, endIndex);
+      Node actionNode = node.actions.get("index");
       if (canHandle(actionNode.actionConfiguration, remainingURIParts, state)) {
         state.actionConfiguration = actionNode.actionConfiguration;
         return true;

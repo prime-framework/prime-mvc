@@ -2763,6 +2763,25 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void theRest_index() throws Exception {
+    UUID uuid = UUID.randomUUID();
+    test.simulate(() -> simulator.test("/the-rest/")
+                                 .withURLSegment(uuid)
+                                 .withURLSegment("foo")
+                                 .withURLSegment("bar")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertBody(
+                                     """
+                                         3
+                                         {uuid}
+                                         foo
+                                         bar
+                                         """
+                                         .replace("{uuid}", uuid.toString())));
+  }
+
+  @Test
   public void uriParameters() throws Exception {
     test.simulate(() -> simulator.test("/complex-rest/brian/static/pontarelli/then/a/bunch/of/stuff")
                                  .post()

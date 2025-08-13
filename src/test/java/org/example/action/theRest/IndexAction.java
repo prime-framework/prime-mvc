@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2019, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +13,20 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.mvc;
+package org.example.action.theRest;
+
+import java.util.List;
+
+import org.primeframework.mvc.action.annotation.Action;
 
 /**
- * This HTTP Method is not implemented by this MVC. Generally you'll want to return a <code>501</code> for this result
- * code.
- *
  * @author Daniel DeGroff
  */
-public class NotImplementedException extends ErrorException {
-  public NotImplementedException() {
-    super("not-implemented");
-    lookUpMessage = false;
+@Action("{*segments}")
+public class IndexAction {
+  public List<String> segments;
+
+  public String get() {
+    return "input";
   }
 }
