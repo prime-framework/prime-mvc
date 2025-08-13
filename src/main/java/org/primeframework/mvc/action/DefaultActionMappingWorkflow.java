@@ -95,7 +95,7 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
       Class<?> actionClass = actionInvocation.configuration.actionClass;
       logger.debug("The action class [{}] does not have a valid execute method for the HTTP method [{}]", actionClass.getCanonicalName(), method);
 
-      // Differentiate between not allowed for this action, vs no-implemented (supported by prime-mvc).
+      // Differentiate between not allowed for this action, vs not-implemented (supported by prime-mvc).
       if (HTTPMethod.StandardMethods.containsKey(method.name())) {
         throw new NotAllowedException();
       }
