@@ -1465,7 +1465,11 @@ public class GlobalTest extends PrimeBaseTest {
   public void notImplemented() {
     simulator.test("/not-allowed")
              .method("POTATO")
-             .assertStatusCode(405) // Not allowed since we can handle any name but the action doesn't have that method
+             // We currently only map out execute methods in the action that are named by a method
+             // defined in the HTTPMethod.StandardMethods. If an action does not define a standard HTTP
+             // method, a 405 will be returned. If you ask for a non-standard method that is not implemented
+             // by prime-mvc, you will receive a 501.
+             .assertStatusCode(501)
              .assertHeaderContains("Cache-Control", "no-cache");
   }
 
