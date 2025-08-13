@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2024, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import io.fusionauth.http.io.MultipartFileUploadPolicy;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
 import org.primeframework.mvc.NotAllowedException;
+import org.primeframework.mvc.NotImplementedException;
 import org.primeframework.mvc.http.HTTPTools;
 import org.primeframework.mvc.http.Status;
 import org.primeframework.mvc.parameter.fileupload.annotation.FileUpload;
@@ -93,7 +94,15 @@ public class DefaultActionMappingWorkflow implements ActionMappingWorkflow {
     if (actionInvocation.action != null && actionInvocation.method == null) {
       Class<?> actionClass = actionInvocation.configuration.actionClass;
       logger.debug("The action class [{}] does not have a valid execute method for the HTTP method [{}]", actionClass.getCanonicalName(), method);
-      throw new NotAllowedException();
+
+      // Differentiate between not allowed for this action, vs not-implemented (supported by prime-mvc).
+      if (HTTPMethod.StandardMethods.containsKey(method.name())) {
+        throw new NotAllowedException();
+      }
+
+      // Note that the DefaultActionConfigurationBuilder will only resolve executeMethods for methods named in StandardMethods.
+      // See HTTPMethod.StandardMethods and DefaultActionConfigurationBuilder.findExecuteMethods
+      throw new NotImplementedException();
     }
 
     // Handle multipart file configuration
