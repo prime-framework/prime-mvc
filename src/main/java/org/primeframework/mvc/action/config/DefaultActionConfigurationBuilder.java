@@ -414,7 +414,7 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
                                                                                       Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods) {
     // When a JWT scheme is not enabled, we will not call any of the JWT Authorization Methods.
     // - Note that anyone can bind a jwt security scheme, and they may wish to use these authorization methods.
-    //   So as long as the scheme contains "jwt", bind them. For example, you may wish to bind `jwt-1` and `jwt-` with
+    //   So as long as the scheme contains "jwt", bind them. For example, you may wish to bind `jwt-1` and `jwt-2` with
     //   different constraint validations.
     // - In theory we could just always bind them, however we do validate that the action is properly configured to
     //   have a method to cover the expected HTTP verbs, etc. Ideally we would keep this logic to keep the user from
