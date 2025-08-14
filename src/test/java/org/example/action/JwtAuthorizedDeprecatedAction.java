@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2025, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.example.action;
 
+import io.fusionauth.http.HTTPValues.Methods;
 import io.fusionauth.jwt.domain.JWT;
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.annotation.Status;
@@ -23,16 +24,17 @@ import org.primeframework.mvc.security.annotation.JWTAuthorizeMethod;
 /**
  * @author Daniel DeGroff
  */
-@Action(requiresAuthentication = true, scheme = "jwt")
+@Action(requiresAuthentication = true, jwtEnabled = true)
 @Status.List({
-    @Status(code = "success", status = 200),
+    @Status(),
     @Status(code = "unauthenticated", status = 401),
     @Status(code = "unauthorized", status = 401)
 })
-public class JwtAuthorizedDisabledAction {
-  @JWTAuthorizeMethod
+// Use the deprecated jwtEnabled instead of scheme = jwt
+public class JwtAuthorizedDeprecatedAction {
+  @JWTAuthorizeMethod(httpMethods = {Methods.GET})
   public boolean authorize(JWT jwt) {
-    return false;
+    return true;
   }
 
   public String get() {
