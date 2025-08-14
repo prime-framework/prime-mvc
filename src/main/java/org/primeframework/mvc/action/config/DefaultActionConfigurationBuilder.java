@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2024, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -414,7 +414,7 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
                                                                                       Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods) {
     // When a JWT scheme is not enabled, we will not call any of the JWT Authorization Methods.
     // - Note that anyone can bind a jwt security scheme, and they may wish to use these authorization methods.
-    //   So as long as the scheme contains "jwt", bind them. For example, you may wish to bind `jwt-1` and `jwt-` with
+    //   So as long as the scheme contains "jwt", bind them. For example, you may wish to bind `jwt-1` and `jwt-2` with
     //   different constraint validations.
     // - In theory we could just always bind them, however we do validate that the action is properly configured to
     //   have a method to cover the expected HTTP verbs, etc. Ideally we would keep this logic to keep the user from
@@ -462,8 +462,8 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
     if (!jwtMethods.keySet().containsAll(authenticatedMethods)) {
       throw new PrimeException("The action class [" + actionClass + "] is missing at a JWT Authorization method. " +
                                "The class must define one or more methods annotated " + JWTAuthorizeMethod.class.getSimpleName() + " when [jwtEnabled] " +
-                               "is set to [true] which deprecated, or you are using a jwt based security scheme. You action has" +
-                               " defined the following security schemes [" + String.join(", ", securitySchemes) + "].Ensure that for each execute " +
+                               "is set to [true], which is deprecated, or you are using a jwt based security scheme. Your action has " +
+                               "defined the following security schemes [" + String.join(", ", securitySchemes) + "].Ensure that for each execute " +
                                "method in your action such as post, put, get and delete that a method is configured to authorize the JWT.");
     }
 

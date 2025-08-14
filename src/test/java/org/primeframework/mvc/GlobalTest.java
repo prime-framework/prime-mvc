@@ -808,14 +808,12 @@ public class GlobalTest extends PrimeBaseTest {
   public void get_jwtDisabledJwtAuthentication() throws Exception {
     // Send in a JWT Authorization header when the Action has JWT disabled. Should always get a 401. When a JWT is provided, the action expects JWT to be enabled.
     test.simulate(() -> simulator.test("/jwt-authorized-disabled")
-                                 .withURLParameter("authorized", true)
                                  .withHeader("Authorization", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkifQ.qHdut1UR4-2FSAvh7U3YdeRR5r5boVqjIGQ16Ztp894")
                                  .get()
                                  .assertStatusCode(401));
 
     // Same, use Bearer scheme
     test.simulate(() -> simulator.test("/jwt-authorized-disabled")
-                                 .withURLParameter("authorized", true)
                                  .withHeader("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkifQ.qHdut1UR4-2FSAvh7U3YdeRR5r5boVqjIGQ16Ztp894")
                                  .get()
                                  .assertStatusCode(401));
@@ -867,9 +865,9 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
-  public void get_jwt_other_scheme() throws Exception {
-    // Test and action with a jwt based scheme, but not named 'jwt'
-    test.simulate(() -> simulator.test("/jwt-authorized-other")
+  public void get_jwt_jwtEnabled_deprecated() throws Exception {
+    // Test an action using the deprecated jwtEnabled instead of the jwt scheme
+    test.simulate(() -> simulator.test("/jwt-authorized-deprecated")
                                  .withHeader("Authorization", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkifQ.qHdut1UR4-2FSAvh7U3YdeRR5r5boVqjIGQ16Ztp894")
                                  .get()
                                  .assertHeaderContains("Cache-Control", "no-cache")
@@ -877,9 +875,9 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
-  public void get_jwt_scheme() throws Exception {
-    // Test an action using the 'scheme' instead of jwtEnabled
-    test.simulate(() -> simulator.test("/jwt-authorized-latest")
+  public void get_jwt_other_scheme() throws Exception {
+    // Test an action with a jwt based scheme, but not named 'jwt'
+    test.simulate(() -> simulator.test("/jwt-authorized-other")
                                  .withHeader("Authorization", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkifQ.qHdut1UR4-2FSAvh7U3YdeRR5r5boVqjIGQ16Ztp894")
                                  .get()
                                  .assertHeaderContains("Cache-Control", "no-cache")
