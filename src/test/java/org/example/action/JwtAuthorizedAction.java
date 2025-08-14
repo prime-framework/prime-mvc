@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2018, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2016-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import org.primeframework.mvc.security.annotation.JWTAuthorizeMethod;
 /**
  * @author Daniel DeGroff
  */
-@Action(requiresAuthentication = true, jwtEnabled = true)
+@Action(requiresAuthentication = true, scheme = "jwt")
 @Status.List({
     @Status(),
     @Status(code = "unauthenticated", status = 401),

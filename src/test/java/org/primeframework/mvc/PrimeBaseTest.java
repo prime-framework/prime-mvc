@@ -78,6 +78,7 @@ import org.primeframework.mvc.message.scope.RequestScope;
 import org.primeframework.mvc.security.CBCCipherProvider;
 import org.primeframework.mvc.security.CipherProvider;
 import org.primeframework.mvc.security.GCMCipherProvider;
+import org.primeframework.mvc.security.JWTSecurityScheme;
 import org.primeframework.mvc.security.MockOAuthUserLoginSecurityContext;
 import org.primeframework.mvc.security.MockStaticClasspathResourceFilter;
 import org.primeframework.mvc.security.MockStaticResourceFilter;
@@ -87,6 +88,7 @@ import org.primeframework.mvc.security.StaticResourceFilter;
 import org.primeframework.mvc.security.UserLoginSecurityContext;
 import org.primeframework.mvc.security.VerifierProvider;
 import org.primeframework.mvc.security.csrf.CSRFProvider;
+import org.primeframework.mvc.security.guice.SecuritySchemeFactory;
 import org.primeframework.mvc.test.RequestBuilder.HTTPRequestConsumer;
 import org.primeframework.mvc.test.RequestSimulator;
 import org.primeframework.mvc.util.ThrowingRunnable;
@@ -239,6 +241,7 @@ public abstract class PrimeBaseTest {
         bind(MessageObserver.class).toInstance(messageObserver);
         bind(MetricRegistry.class).toInstance(metricRegistry);
         bind(UserLoginSecurityContext.class).to(MockUserLoginSecurityContext.class);
+        SecuritySchemeFactory.addSecurityScheme(binder(), "jwt-other", JWTSecurityScheme.class);
 
         // Test Content-Type
         ContentHandlerFactory.addContentHandler(binder(), "application/test+json", JacksonContentHandler.class);
