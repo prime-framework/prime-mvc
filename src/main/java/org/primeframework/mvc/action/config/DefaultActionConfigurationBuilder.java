@@ -462,7 +462,7 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
     if (!jwtMethods.keySet().containsAll(authenticatedMethods)) {
       throw new PrimeException("The action class [" + actionClass + "] is missing at a JWT Authorization method. " +
                                "The class must define one or more methods annotated " + JWTAuthorizeMethod.class.getSimpleName() + " when [jwtEnabled] " +
-                               "is set to [true] which deprecated, or you are using a jwt based security scheme. You action has" +
+                               "is set to [true], which is deprecated, or you are using a jwt based security scheme. Your action has" +
                                " defined the following security schemes [" + String.join(", ", securitySchemes) + "]. Ensure that for each execute " +
                                "method in your action such as post, put, get and delete that a method is configured to authorize the JWT.");
     }
