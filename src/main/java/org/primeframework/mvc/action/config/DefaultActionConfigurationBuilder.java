@@ -412,8 +412,15 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
   protected Map<HTTPMethod, List<JWTMethodConfiguration>> findJwtAuthorizationMethods(Class<?> actionClass,
                                                                                       List<String> securitySchemes,
                                                                                       Map<HTTPMethod, ExecuteMethodConfiguration> executeMethods) {
-    // When JWT scheme is not enabled, we will not call any of the JWT Authorization Methods.
-    if (!securitySchemes.contains("jwt")) {
+    // When a JWT scheme is not enabled, we will not call any of the JWT Authorization Methods.
+    // - Note that anyone can bind a jwt security scheme, and they may wish to use these authorization methods.
+    //   So as long as the scheme contains "jwt", bind them. For example, you may wish to bind `jwt-1` and `jwt-` with
+    //   different constraint validations.
+    // - In theory we could just always bind them, however we do validate that the action is properly configured to
+    //   have a method to cover the expected HTTP verbs, etc. Ideally we would keep this logic to keep the user from
+    //   not using these methods correctly. But if we wanted to tell the user it's their problem, we could remove
+    //   some of that validation and just always bind them.
+    if (securitySchemes.stream().noneMatch(s -> s.contains("jwt"))) {
       return Collections.emptyMap();
     }
 
@@ -454,15 +461,17 @@ public class DefaultActionConfigurationBuilder implements ActionConfigurationBui
 
     if (!jwtMethods.keySet().containsAll(authenticatedMethods)) {
       throw new PrimeException("The action class [" + actionClass + "] is missing at a JWT Authorization method. " +
-                               "The class must define one or more methods annotated " + JWTAuthorizeMethod.class.getSimpleName() + " when [jwtEnabled] is set to [true]. "
-                               + "Ensure that for each execute method in your action such as post, put, get and delete that a method is configured to authorize the JWT.");
+                               "The class must define one or more methods annotated " + JWTAuthorizeMethod.class.getSimpleName() + " when [jwtEnabled] " +
+                               "is set to [true] which deprecated, or you are using a jwt based security scheme. You action has" +
+                               " defined the following security schemes [" + String.join(", ", securitySchemes) + "].Ensure that for each execute " +
+                               "method in your action such as post, put, get and delete that a method is configured to authorize the JWT.");
     }
 
     return jwtMethods;
   }
 
   /**
-   * Finds all of the result configurations for the action class.
+   * Finds all the result configurations for the action class.
    *
    * @param actionClass The action class.
    * @return The map of all the result configurations.

@@ -5,7 +5,7 @@
 
   <groupId>org.primeframework</groupId>
   <artifactId>prime-mvc</artifactId>
-  <version>5.2.0</version>
+  <version>5.3.0</version>
   <packaging>jar</packaging>
 
   <name>FusionAuth App</name>
