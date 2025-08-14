@@ -24,14 +24,14 @@ import org.primeframework.mvc.security.annotation.JWTAuthorizeMethod;
 /**
  * @author Daniel DeGroff
  */
-@Action(requiresAuthentication = true, scheme = "jwt")
+@Action(requiresAuthentication = true, jwtEnabled = true)
 @Status.List({
     @Status(),
     @Status(code = "unauthenticated", status = 401),
     @Status(code = "unauthorized", status = 401)
 })
-// Use the 'jwt' scheme
-public class JwtAuthorizedLatestAction {
+// Use the deprecated jwtEnabled instead of scheme = jwt
+public class JwtAuthorizedDeprecatedAction {
   @JWTAuthorizeMethod(httpMethods = {Methods.GET})
   public boolean authorize(JWT jwt) {
     return true;
