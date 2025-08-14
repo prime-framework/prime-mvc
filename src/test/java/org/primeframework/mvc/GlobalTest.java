@@ -868,7 +868,7 @@ public class GlobalTest extends PrimeBaseTest {
 
   @Test
   public void get_jwt_other_scheme() throws Exception {
-    // Test and action with a jwt based scheme, but not named 'jwt'
+    // Test an action with a jwt based scheme, but not named 'jwt'
     test.simulate(() -> simulator.test("/jwt-authorized-other")
                                  .withHeader("Authorization", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkifQ.qHdut1UR4-2FSAvh7U3YdeRR5r5boVqjIGQ16Ztp894")
                                  .get()
