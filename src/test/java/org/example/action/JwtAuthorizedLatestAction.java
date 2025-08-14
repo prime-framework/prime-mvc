@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2025, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,19 +24,17 @@ import org.primeframework.mvc.security.annotation.JWTAuthorizeMethod;
 /**
  * @author Daniel DeGroff
  */
-@Action(requiresAuthentication = true, jwtEnabled = true)
+@Action(requiresAuthentication = true, scheme = "jwt")
 @Status.List({
     @Status(),
     @Status(code = "unauthenticated", status = 401),
     @Status(code = "unauthorized", status = 401)
 })
-// Use the deprecated jwtEnabled on the action instead of 'jwt' scheme
-public class JwtAuthorizedAction {
-  public static boolean authorized;
-
+// Use the 'jwt' scheme
+public class JwtAuthorizedLatestAction {
   @JWTAuthorizeMethod(httpMethods = {Methods.GET})
   public boolean authorize(JWT jwt) {
-    return authorized;
+    return true;
   }
 
   public String get() {

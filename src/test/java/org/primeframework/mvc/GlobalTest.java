@@ -867,6 +867,26 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void get_jwt_other_scheme() throws Exception {
+    // Test and action with a jwt based scheme, but not named 'jwt'
+    test.simulate(() -> simulator.test("/jwt-authorized-other")
+                                 .withHeader("Authorization", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkifQ.qHdut1UR4-2FSAvh7U3YdeRR5r5boVqjIGQ16Ztp894")
+                                 .get()
+                                 .assertHeaderContains("Cache-Control", "no-cache")
+                                 .assertStatusCode(200));
+  }
+
+  @Test
+  public void get_jwt_scheme() throws Exception {
+    // Test an action using the 'scheme' instead of jwtEnabled
+    test.simulate(() -> simulator.test("/jwt-authorized-latest")
+                                 .withHeader("Authorization", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkifQ.qHdut1UR4-2FSAvh7U3YdeRR5r5boVqjIGQ16Ztp894")
+                                 .get()
+                                 .assertHeaderContains("Cache-Control", "no-cache")
+                                 .assertStatusCode(200));
+  }
+
+  @Test
   public void get_largeFTL() {
     simulator.test("/large-ftl")
              .get()
