@@ -214,6 +214,30 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void follow_meta_refresh() throws Exception {
+    // use upper case Refresh and URL, and lower case refresh and url
+    test.forEach("uc", "uc")
+        .test(param -> test
+            .simulate(() -> simulator
+                .test("/meta/refresh")
+                .withURLParameter("test", param)
+                .get()
+                .assertStatusCode(200)
+                .assertBodyContains("""
+                                        <meta http-equiv="{refresh}" content="0; {url}=/meta/target">
+                                        """
+                                        .replace("{refresh}", param.equals("uc") ? "Refresh" : "refresh")
+                                        .replace("{url}", param.equals("uc") ? "URL" : "url"))
+
+                .followMetaRefresh(result -> result
+                    .assertStatusCode(200)
+                    .assertBody("""
+                                    We made it!
+                                    """)))
+        );
+  }
+
+  @Test
   public void get() throws Exception {
     // Not called yet
     assertEquals(MockMVCWorkflowFinalizer.Called.get(), 0);
