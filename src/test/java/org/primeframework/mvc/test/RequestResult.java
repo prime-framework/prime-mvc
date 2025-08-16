@@ -1892,13 +1892,14 @@ public class RequestResult {
       if (element.hasAttr("http-equiv")) {
         String value = element.attr("http-equiv");
         // Never null
-        if (value.equals("refresh")) {
+        if (value.equalsIgnoreCase("refresh")) {
           String content = element.attr("content");
           // Handle this
           String[] parts = content.split(";");
           for (String part : parts) {
-            if (part.startsWith("URL=")) {
-              String uri = part.substring(4);
+            String trimmedPart = part.trim();
+            if (trimmedPart.toLowerCase(Locale.ROOT).startsWith("url=")) {
+              String uri = trimmedPart.substring(4);
               if (uri.startsWith("'")) {
                 uri = uri.substring(1, uri.length() - 1);
               }
