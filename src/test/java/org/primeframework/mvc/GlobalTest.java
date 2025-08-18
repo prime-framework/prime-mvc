@@ -216,7 +216,7 @@ public class GlobalTest extends PrimeBaseTest {
   @Test
   public void follow_meta_refresh() throws Exception {
     // use upper case Refresh and URL, and lower case refresh and url
-    test.forEach("uc", "uc")
+    test.forEach("lc", "uc")
         .test(param -> test
             .simulate(() -> simulator
                 .test("/meta/refresh")
