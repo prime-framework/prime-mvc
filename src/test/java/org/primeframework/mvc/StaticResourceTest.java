@@ -54,7 +54,7 @@ public class StaticResourceTest extends PrimeBaseTest {
     simulator.test("/org/primeframework/mvc/PrimeMVCRequestHandler.class")
              .get()
              .assertStatusCode(200)
-             .assertContentLength(3188);
+             .assertContentLength(2939);
   }
 
   @Test

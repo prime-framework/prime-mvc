@@ -73,7 +73,7 @@ public class PrimeMVCRequestHandler implements HTTPHandler, Closeable {
     try {
       injector.getInstance(MVCWorkflow.class).perform(null);
     } catch (ConnectionClosedException | SocketException e) {
-      // Catch, ignore and let java-http handle
+      // Catch, ignore and let java-http handle these
       throw e;
     } catch (Throwable t) {
       logger.error("Error encountered", t);
