@@ -16,6 +16,7 @@
 package org.primeframework.mvc;
 
 import java.io.Closeable;
+import java.net.SocketException;
 
 import com.google.inject.Injector;
 import io.fusionauth.http.HTTPMethod;
@@ -71,9 +72,9 @@ public class PrimeMVCRequestHandler implements HTTPHandler, Closeable {
 
     try {
       injector.getInstance(MVCWorkflow.class).perform(null);
-    } catch (ConnectionClosedException e) {
-      response.setStatus(408);
-      logger.debug("Connection closed. This is generally caused due to a timeout, or a slow connection.", e);
+    } catch (ConnectionClosedException | SocketException e) {
+      // Catch, ignore and let java-http handle
+      throw e;
     } catch (Throwable t) {
       logger.error("Error encountered", t);
       throw t; // java-http will cause this error to write back a 500 if possible and close the socket
