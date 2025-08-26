@@ -17,13 +17,20 @@ package org.primeframework.mvc;
 
 import io.fusionauth.http.log.Logger;
 import io.fusionauth.http.server.HTTPUnexpectedExceptionHandler;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Daniel DeGroff
  */
 public class PrimeMVCUnexpectedExceptionHandler implements HTTPUnexpectedExceptionHandler {
+  private static final org.slf4j.Logger logger = LoggerFactory.getLogger(PrimeMVCUnexpectedExceptionHandler.class);
+
   @Override
-  public int handle(Logger logger, Throwable t) {
+  public int handle(Logger unused, Throwable t) {
+    // TODO : Review : I don't love this : I could just use the provided logger as well.
+    //        In practice I probably shouldn't pass in a logger, because it will be difficult to know
+    //        what logger by package naming you need to adjust for logging levels.
+    //        It gets a little tricky in the Default impl in java-http since I don't want to have to inject anything.
     logger.error("Error encountered", t);
     return 500;
   }
