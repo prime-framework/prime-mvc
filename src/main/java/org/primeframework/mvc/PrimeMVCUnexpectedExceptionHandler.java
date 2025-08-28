@@ -15,6 +15,7 @@
  */
 package org.primeframework.mvc;
 
+import io.fusionauth.http.server.ExceptionHandlerContext;
 import io.fusionauth.http.server.HTTPUnexpectedExceptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,8 +27,7 @@ public class PrimeMVCUnexpectedExceptionHandler implements HTTPUnexpectedExcepti
   private static final Logger logger = LoggerFactory.getLogger(PrimeMVCUnexpectedExceptionHandler.class);
 
   @Override
-  public int handle(Throwable t) {
-    logger.error("Error encountered", t);
-    return 500;
+  public void handle(ExceptionHandlerContext context) {
+    logger.error("Error encountered", context.getThrowable());
   }
 }
