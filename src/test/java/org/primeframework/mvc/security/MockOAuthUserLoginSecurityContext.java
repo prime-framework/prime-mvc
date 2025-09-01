@@ -20,11 +20,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import com.google.inject.Inject;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
+import io.fusionauth.jwt.domain.JWT;
 import org.primeframework.mvc.security.oauth.OAuthConfiguration;
 import org.primeframework.mvc.security.oauth.TokenAuthenticationMethod;
 import org.primeframework.mvc.security.oauth.Tokens;
@@ -111,7 +111,7 @@ public class MockOAuthUserLoginSecurityContext extends BaseJWTRefreshTokenCookie
   }
 
   @Override
-  protected Object retrieveUserForJWT(String jwt) {
+  protected Object retrieveUserForJWT(JWT decodedJWT, String jwt) {
     return CurrentUser;
   }
 }

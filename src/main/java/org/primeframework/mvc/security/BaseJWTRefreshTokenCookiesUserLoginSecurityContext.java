@@ -98,7 +98,7 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
       return null;
     }
 
-    user = retrieveUserForJWT(tokens.jwt);
+    user = retrieveUserForJWT(tokens.decodedJWT, tokens.jwt);
     if (user == null) {
       jwtCookie.delete(request, response);
     } else {
@@ -207,12 +207,13 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
   protected abstract String refreshTokenCookieName();
 
   /**
-   * Retrieve a user given an encoded JWT string.
+   * Retrieve a user with the encoded JWT string or the decoded JWT object.
    *
-   * @param jwt the encoded JWT string
+   * @param decodedJWT the decoded JWT object
+   * @param jwt        the encoded JWT string
    * @return a user object.
    */
-  protected abstract Object retrieveUserForJWT(String jwt);
+  protected abstract Object retrieveUserForJWT(JWT decodedJWT, String jwt);
 
   /**
    * The JWT that is passed to this method is known to be valid. The signature has been validated, and the JWT is not expired.
