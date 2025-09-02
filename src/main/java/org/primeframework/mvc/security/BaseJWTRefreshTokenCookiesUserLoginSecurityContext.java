@@ -98,7 +98,7 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
       return null;
     }
 
-    user = retrieveUserForJWT(tokens.jwt);
+    user = retrieveUserForJWT(tokens.decodedJWT, tokens.jwt);
     if (user == null) {
       jwtCookie.delete(request, response);
     } else {
@@ -207,12 +207,13 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
   protected abstract String refreshTokenCookieName();
 
   /**
-   * Retrieve a user given an encoded JWT string.
+   * Retrieve a user with the encoded JWT string or the decoded JWT object.
    *
-   * @param jwt the encoded JWT string
+   * @param decodedJWT the decoded JWT object
+   * @param jwt        the encoded JWT string
    * @return a user object.
    */
-  protected abstract Object retrieveUserForJWT(String jwt);
+  protected abstract Object retrieveUserForJWT(JWT decodedJWT, String jwt);
 
   /**
    * The JWT that is passed to this method is known to be valid. The signature has been validated, and the JWT is not expired.
@@ -223,6 +224,7 @@ public abstract class BaseJWTRefreshTokenCookiesUserLoginSecurityContext impleme
    * @return true if the validation is ok and the JWT can be used. False if the JWT is not ok- and it should not be used. Returning true will still
    *     allow a refresh token to be used if available.
    */
+  @SuppressWarnings("BooleanMethodIsAlwaysInverted")
   protected boolean validateJWTClaims(@SuppressWarnings("unused") JWT jwt) {
     return true;
   }
