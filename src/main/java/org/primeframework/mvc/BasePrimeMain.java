@@ -123,7 +123,12 @@ public abstract class BasePrimeMain {
 
       // Create the server
       var server = new HTTPServer().withConfiguration(config)
+                                   // Note that by calling each of these methods directly, we are functionally
+                                   // ignoring these three values on the configuration object provided by
+                                   // BasePrimeMain. This just means that the implementor cannot currently
+                                   // provide their own request handler, exception handler or instrumentor.
                                    .withHandler(requestHandler)
+                                   .withUnexpectedExceptionHandler(new PrimeMVCUnexpectedExceptionHandler())
                                    .withInstrumenter(instrumenter);
 
       servers.add(new PrimeHTTPServer(requestHandler, server));

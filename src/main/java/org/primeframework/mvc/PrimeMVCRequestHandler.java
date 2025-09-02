@@ -22,7 +22,6 @@ import io.fusionauth.http.HTTPMethod;
 import io.fusionauth.http.server.HTTPHandler;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
-import io.fusionauth.http.server.io.ConnectionClosedException;
 import org.primeframework.mvc.action.result.MVCWorkflowFinalizer;
 import org.primeframework.mvc.guice.GuiceBootstrap;
 import org.primeframework.mvc.http.HTTPObjectsHolder;
@@ -69,14 +68,12 @@ public class PrimeMVCRequestHandler implements HTTPHandler, Closeable {
     HTTPObjectsHolder.setRequest(request);
     HTTPObjectsHolder.setResponse(response);
 
+    // Do not catch any exceptions, the HTTP server will handle exceptions.
+    // - If we do want to log or perform any specific handling when an unexpected
+    //   exception is thrown, you may configure an UnexpectedException handler.
+    //   See HTTPServerConfiguration.withUnexpectedExceptionHandler
     try {
       injector.getInstance(MVCWorkflow.class).perform(null);
-    } catch (ConnectionClosedException e) {
-      response.setStatus(408);
-      logger.debug("Connection closed. This is generally caused due to a timeout, or a slow connection.", e);
-    } catch (Throwable t) {
-      logger.error("Error encountered", t);
-      throw t; // java-http will cause this error to write back a 500 if possible and close the socket
     } finally {
       HTTPObjectsHolder.clearRequest();
       HTTPObjectsHolder.clearResponse();
