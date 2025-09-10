@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2023, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2016-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,10 @@ import io.fusionauth.http.server.HTTPResponse;
  * @author Daniel DeGroff
  */
 public class DefaultJWTRequestAdapter implements JWTRequestAdapter {
+  private static final String BearerScheme = "bearer ";
+
+  private static final String JWTScheme = "jwt ";
+
   protected final HTTPRequest request;
 
   protected final HTTPResponse response;
@@ -52,11 +56,12 @@ public class DefaultJWTRequestAdapter implements JWTRequestAdapter {
   public String getEncodedJWT() {
     String authorization = request.getHeader("Authorization");
     if (authorization != null) {
-      // Support Bearer and JWT scheme
-      if (authorization.startsWith("Bearer ")) {
-        return authorization.substring("Bearer ".length());
-      } else if (authorization.startsWith("JWT ")) {
-        return authorization.substring("JWT ".length());
+      // Support Bearer and JWT scheme. The JWT scheme is only for backwards compatability with usage.
+      // - Match on scheme case-insensitive, but return the un-modified value.
+      if (authorization.toLowerCase().startsWith(BearerScheme)) {
+        return authorization.substring(BearerScheme.length());
+      } else if (authorization.toLowerCase().startsWith(JWTScheme)) {
+        return authorization.substring(JWTScheme.length());
       }
     }
 

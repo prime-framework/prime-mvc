@@ -783,9 +783,22 @@ public class GlobalTest extends PrimeBaseTest {
                                  .assertHeaderContains("Cache-Control", "no-cache")
                                  .assertStatusCode(200));
 
+    // Test with JWT scheme, mixed case
+    test.simulate(() -> simulator.test("/jwt-authorized")
+                                 .withHeader("Authorization", "jWt eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkifQ.qHdut1UR4-2FSAvh7U3YdeRR5r5boVqjIGQ16Ztp894")
+                                 .get()
+                                 .assertHeaderContains("Cache-Control", "no-cache")
+                                 .assertStatusCode(200));
+
     // Test with Bearer scheme
     test.simulate(() -> simulator.test("/jwt-authorized")
                                  .withHeader("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkifQ.qHdut1UR4-2FSAvh7U3YdeRR5r5boVqjIGQ16Ztp894")
+                                 .get()
+                                 .assertStatusCode(200));
+
+    // Test with Bearer scheme, mixed case
+    test.simulate(() -> simulator.test("/jwt-authorized")
+                                 .withHeader("Authorization", "bEaReR eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkifQ.qHdut1UR4-2FSAvh7U3YdeRR5r5boVqjIGQ16Ztp894")
                                  .get()
                                  .assertStatusCode(200));
 
