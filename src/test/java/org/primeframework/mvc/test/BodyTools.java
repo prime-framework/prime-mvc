@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2018, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2015-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,7 @@ import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Set;
 
 import freemarker.cache.FileTemplateLoader;
 import freemarker.ext.beans.BeansWrapperBuilder;
@@ -86,7 +85,7 @@ public final class BodyTools {
    * @return The result of executing the template.
    * @throws IOException If the template could not be loaded, parsed or executed.
    */
-  public static String processTemplateWithMap(Path path, Map<String, Object> values, boolean createMissingTemplates)
+  public static String processTemplateWithMap(Path path, DetectionMap values, boolean createMissingTemplates)
       throws IOException {
     StringWriter writer = new StringWriter();
     Template template = null;
@@ -102,6 +101,11 @@ public final class BodyTools {
 
     try {
       template.process(values, writer);
+      Set<Object> unusedVariables = values.getUnusedVariables();
+      if (!unusedVariables.isEmpty()) {
+        throw new IllegalArgumentException("The following variables are not used in the [%s] template: %s".formatted(path,
+                                                                                                                     unusedVariables));
+      }
       return writer.toString();
     } catch (TemplateException e) {
       throw new RuntimeException(e);
@@ -114,13 +118,13 @@ public final class BodyTools {
    * @param values The array of values.
    * @return The Map.
    */
-  private static Map<String, Object> toMap(Object... values) {
+  private static DetectionMap toMap(Object... values) {
     if (values.length % 2 != 0) {
       String key = values[values.length - 1].toString();
       throw new IllegalArgumentException("Invalid mapping values. Must have a multiple of 2. Missing value for key [" + key + "]");
     }
 
-    Map<String, Object> map = new HashMap<>();
+    DetectionMap map = new DetectionMap();
     for (int i = 0; i < values.length; i = i + 2) {
       map.put(values[i].toString(), values[i + 1]);
     }

@@ -26,7 +26,8 @@ public class BodyToolsTest {
   @Test
   public void processTemplateWithMap_all_variables_used() throws Exception {
     // arrange
-    Map<String, Object> values = Map.of("message", "howdy");
+    DetectionMap values = new DetectionMap();
+    values.put("message", "howdy");
 
     // act
     String result = BodyTools.processTemplateWithMap(Paths.get("src/test/web/templates/echo.ftl"),
@@ -40,7 +41,8 @@ public class BodyToolsTest {
   @Test
   public void processTemplateWithMap_unused_variables() throws Exception {
     // arrange
-    Map<String, Object> values = Map.of("message", "howdy", "othervariable", "value");
+    DetectionMap values = new DetectionMap();
+    values.putAll(Map.of("message", "howdy", "othervariable", "value"));
 
     // act + assert
     try {
@@ -51,7 +53,7 @@ public class BodyToolsTest {
     } catch (Exception e) {
       assertEquals(e.getClass(), IllegalArgumentException.class,
                    "Expected this exception type");
-      assertEquals(e.getMessage(), "The following variables are not used in the [src/test/web/templates/echo.ftl] template: othervariable",
+      assertEquals(e.getMessage(), "The following variables are not used in the [src/test/web/templates/echo.ftl] template: [othervariable]",
                    "othervariable is in the map but is not used");
     }
   }
