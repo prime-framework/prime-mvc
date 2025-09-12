@@ -38,10 +38,15 @@ public class DetectionMap extends HashMap<String, Object> {
     return super.getOrDefault(key, defaultValue);
   }
 
-  public Set<Object> getUnusedVariables(String... excludeKeys) {
-    Set<String> excludeSet = Set.of(excludeKeys);
+  /**
+   * Gets variables that were put in the map since instantiation, but not accessed
+   *
+   * @param excludePrefix excludes keys that start with this value
+   * @return unused variables
+   */
+  public Set<Object> getUnusedVariables(String excludePrefix) {
     return keySet().stream()
-                   .filter(key -> !variablesAccessed.contains(key) && !excludeSet.contains(key))
+                   .filter(key -> !variablesAccessed.contains(key) && !key.startsWith(excludePrefix))
                    .collect(Collectors.toSet());
   }
 }

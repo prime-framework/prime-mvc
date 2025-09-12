@@ -101,8 +101,8 @@ public final class BodyTools {
 
     try {
       template.process(values, writer);
-      // used in some classes like RequestResult, and should be ignored
-      Set<Object> unusedVariables = values.getUnusedVariables("_to_milli");
+      // used in some classes like RequestResult, and should be ignored. Other implementations may also add functions, etc. that start with _
+      Set<Object> unusedVariables = values.getUnusedVariables("_");
       if (!unusedVariables.isEmpty()) {
         throw new IllegalArgumentException("The following variables are not used in the [%s] template: %s".formatted(path,
                                                                                                                      unusedVariables));
