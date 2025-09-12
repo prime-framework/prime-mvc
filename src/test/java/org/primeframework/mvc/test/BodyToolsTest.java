@@ -39,6 +39,22 @@ public class BodyToolsTest {
   }
 
   @Test
+  public void processTemplateWithMap_to_milli() throws Exception {
+    // arrange
+    DetectionMap values = new DetectionMap();
+    // used in some classes like RequestResult, and should be ignored
+    values.put("_to_milli", "howdy");
+
+    // act
+    String result = BodyTools.processTemplateWithMap(Paths.get("src/test/web/templates/echo.ftl"),
+                                                     values,
+                                                     false);
+
+    // assert
+    assertEquals(result, "missing");
+  }
+
+  @Test
   public void processTemplateWithMap_unused_variables() throws Exception {
     // arrange
     DetectionMap values = new DetectionMap();

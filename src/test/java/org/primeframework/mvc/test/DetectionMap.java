@@ -38,9 +38,10 @@ public class DetectionMap extends HashMap<String, Object> {
     return super.getOrDefault(key, defaultValue);
   }
 
-  public Set<Object> getUnusedVariables() {
+  public Set<Object> getUnusedVariables(String... excludeKeys) {
+    Set<String> excludeSet = Set.of(excludeKeys);
     return keySet().stream()
-                   .filter(key -> !variablesAccessed.contains(key))
+                   .filter(key -> !variablesAccessed.contains(key) && !excludeSet.contains(key))
                    .collect(Collectors.toSet());
   }
 }

@@ -101,7 +101,8 @@ public final class BodyTools {
 
     try {
       template.process(values, writer);
-      Set<Object> unusedVariables = values.getUnusedVariables();
+      // used in some classes like RequestResult, and should be ignored
+      Set<Object> unusedVariables = values.getUnusedVariables("_to_milli");
       if (!unusedVariables.isEmpty()) {
         throw new IllegalArgumentException("The following variables are not used in the [%s] template: %s".formatted(path,
                                                                                                                      unusedVariables));
