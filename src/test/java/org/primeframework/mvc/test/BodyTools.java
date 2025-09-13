@@ -107,7 +107,9 @@ public final class BodyTools {
                                                               "actual");
       if (!unusedVariables.isEmpty()) {
         throw new IllegalArgumentException("The following variables are not used in the [%s] template: %s".formatted(path,
-                                                                                                                     unusedVariables));
+                                                                                                                     unusedVariables.stream()
+                                                                                                                                    .sorted()
+                                                                                                                                    .toList()));
       }
       return writer.toString();
     } catch (TemplateException e) {
