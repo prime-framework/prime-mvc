@@ -102,6 +102,10 @@ public class RequestResult {
 
   private final Set<String> IgnoredHeadersOnRedirect = Set.of("authorization", "referer", ObserverMessageStoreId.toLowerCase());
 
+  public RequestResult headResult;
+
+  public RequestResult tailResult;
+
   private String body;
 
   public RequestResult(Injector injector, HTTPRequest request, HTTPResponseWrapper response,
@@ -1727,12 +1731,21 @@ public class RequestResult {
                              (request.getQueryString() == null || request.getQueryString().isEmpty() ? "" : "?" + request.getQueryString()));
     headersCopy.forEach((name, value) -> value.forEach(v -> rb.withHeader(name, v)));
 
+    // Keep a pointer to the top
+    if (headResult == null) {
+      headResult = this;
+    }
+
     RequestResult result = rb.get();
+    // Preserve the header pointer
+    result.headResult = headResult;
+    result.headResult.tailResult = result;
     consumer.accept(result);
-    return result;
+    return result.headResult.tailResult;
   }
 
-  private RequestResult _submitForm(String selector, ThrowingConsumer<DOMHelper> domHelper, ThrowingConsumer<RequestResult> result) throws Exception {
+  private RequestResult _submitForm(String selector, ThrowingConsumer<DOMHelper> domHelper, ThrowingConsumer<RequestResult> consumer)
+      throws Exception {
     String body = getBodyAsString();
     Document document = Jsoup.parse(body);
     Element form = document.selectFirst(selector);
@@ -1782,15 +1795,24 @@ public class RequestResult {
       }
     }
 
-    RequestResult requestResult = null;
+    RequestResult result;
     if (method.equalsIgnoreCase(Methods.GET)) {
-      requestResult = rb.get();
+      result = rb.get();
     } else if (method.equalsIgnoreCase(Methods.POST)) {
-      requestResult = rb.post();
+      result = rb.post();
+    } else {
+      throw new IllegalStateException("Unexpected method [" + method + "]");
     }
 
-    result.accept(requestResult);
-    return requestResult;
+    // Keep a pointer to the top
+    if (headResult == null) {
+      headResult = this;
+    }
+
+    result.headResult = headResult;
+    result.headResult.tailResult = result;
+    consumer.accept(result);
+    return result.headResult.tailResult;
   }
 
   private Object[] appendArray(Object[] values, Object... objects) {
@@ -1875,7 +1897,7 @@ public class RequestResult {
     return messageProvider;
   }
 
-  private RequestResult handleFollowMetaRefresh(ThrowingConsumer<RequestResult> result) throws Exception {
+  private RequestResult handleFollowMetaRefresh(ThrowingConsumer<RequestResult> consumer) throws Exception {
 
     // Look for and find an element that looks like this:
     //    <meta http-equiv="refresh" content="0;URL='/foo'">
@@ -1914,11 +1936,19 @@ public class RequestResult {
                 }
               }
 
+              // Keep a pointer to the top
+              if (headResult == null) {
+                headResult = this;
+              }
+
               RequestBuilder rb = new RequestBuilder(uri, injector, userAgent, messageObserver, port);
 
-              RequestResult requestResult = rb.get();
-              result.accept(requestResult);
-              return requestResult;
+              RequestResult result = rb.get();
+              // Preserve the header pointer
+              result.headResult = headResult;
+              result.headResult.tailResult = result;
+              consumer.accept(result);
+              return result.headResult.tailResult;
             }
           }
         }
@@ -1936,7 +1966,7 @@ public class RequestResult {
     boolean recheck = false;
 
     // Bail early they are not even the same size
-    if (actual.keySet().size() != expected.keySet().size()) {
+    if (actual.size() != expected.size()) {
       // Check for optional parameters, if we don't have any, we know we are done.
       if (expected.values().stream().noneMatch(v -> v.size() > 0 && v.getFirst().equals("___optional___"))) {
         return false;

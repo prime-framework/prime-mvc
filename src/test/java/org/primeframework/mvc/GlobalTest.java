@@ -1246,6 +1246,131 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void get_redirects_nested() throws Exception {
+    // See if we can nest many redirects
+    test.simulate(() -> simulator
+        .test("/router/redirect")
+        .get()
+        .assertStatusCode(302)
+        .assertRedirect("/router/redirect/1")
+        .followRedirect(r1 -> r1
+            .assertStatusCode(302)
+            .assertRedirect("/router/redirect/2")
+            .followRedirect(r2 -> r2
+                .assertStatusCode(302)
+                .assertRedirect("/router/redirect/3")
+                .followRedirect(r3 -> r3
+                    .assertStatusCode(302)
+                    .assertRedirect("/router/redirect/4")
+                    .followRedirect(r4 -> r4
+                        .assertStatusCode(302)
+                        .assertRedirect("/router/redirect/5")
+                        .followRedirect(r5 -> r5
+                            .assertStatusCode(200)
+                            .assertBodyIsEmpty()))))));
+
+    // See if we can be more civilized and come back out to the top level as well
+    test.simulate(() -> simulator
+        .test("/router/redirect")
+        .get()
+        .assertStatusCode(302)
+        .assertRedirect("/router/redirect/1")
+        .followRedirect(r1 -> r1
+            .assertStatusCode(302)
+            .assertRedirect("/router/redirect/2"))
+        .followRedirect(r2 -> r2
+            .assertStatusCode(302)
+            .assertRedirect("/router/redirect/3"))
+        .followRedirect(r3 -> r3
+            .assertStatusCode(302)
+            .assertRedirect("/router/redirect/4"))
+        .followRedirect(r4 -> r4
+            .assertStatusCode(302)
+            .assertRedirect("/router/redirect/5"))
+        .followRedirect(r5 -> r5
+            .assertStatusCode(200)
+            .assertBodyIsEmpty())
+    );
+
+    // Mix it up, go deep but not all the way
+    test.simulate(() -> simulator
+        .test("/router/redirect/")
+        .get()
+        .assertStatusCode(302)
+        .assertRedirect("/router/redirect/1")
+        .followRedirect(r1 -> r1
+            .assertStatusCode(302)
+            .assertRedirect("/router/redirect/2")
+            .followRedirect(r2 -> r2
+                .assertStatusCode(302)
+                .assertRedirect("/router/redirect/3")
+                .followRedirect(r3 -> r3
+                    .assertStatusCode(302)
+                    .assertRedirect("/router/redirect/4")
+                    .followRedirect(r4 -> r4
+                        .assertStatusCode(302)
+                        .assertRedirect("/router/redirect/5")))))
+        .followRedirect(r5 -> r5
+            .assertStatusCode(200)
+            .assertBodyIsEmpty())
+    );
+
+    // Mix in a submitForm
+    test.simulate(() -> simulator
+        .test("/router/submit-form")
+        .get()
+        .assertStatusCode(200)
+        .assertHTML(html -> html.assertElementExists("form"))
+        .submitForm("form", r1 -> r1
+            .assertStatusCode(302)
+            .assertRedirect("/router/redirect/1")
+            .followRedirect(r2 -> r2
+                .assertStatusCode(302)
+                .assertRedirect("/router/redirect/2")
+                .followRedirect(r3 -> r3
+                    .assertStatusCode(302)
+                    .assertRedirect("/router/redirect/3")
+                    .followRedirect(r4 -> r4
+                        .assertStatusCode(302)
+                        .assertRedirect("/router/redirect/4")
+                        .followRedirect(r5 -> r5
+                            .assertStatusCode(302)
+                            .assertRedirect("/router/redirect/5")))))
+            .followRedirect(r6 -> r6
+                .assertStatusCode(200)
+                .assertBodyIsEmpty())
+        )
+    );
+
+    // Mix in a metaRefresh
+    test.simulate(() -> simulator
+        .test("/router/meta-refresh")
+        .get()
+        .assertStatusCode(200)
+        .assertHTML(html -> html.assertElementExists("meta[http-equiv=Refresh]"))
+        .followMetaRefresh(r1 -> r1
+            .assertStatusCode(302)
+            .assertRedirect("/router/redirect/1")
+            .followRedirect(r2 -> r2
+                .assertStatusCode(302)
+                .assertRedirect("/router/redirect/2")
+                .followRedirect(r3 -> r3
+                    .assertStatusCode(302)
+                    .assertRedirect("/router/redirect/3"))
+                .followRedirect(r4 -> r4
+                    .assertStatusCode(302)
+                    .assertRedirect("/router/redirect/4")
+                    .followRedirect(r5 -> r5
+                        .assertStatusCode(302)
+                        .assertRedirect("/router/redirect/5"))))
+            .followRedirect(r6 -> r6
+                .assertStatusCode(200)
+                .assertBodyIsEmpty())
+        )
+    );
+  }
+
+  @Test
   public void get_secure() throws Exception {
     test.simulate(() -> simulator.test("/secure")
                                  .get()
