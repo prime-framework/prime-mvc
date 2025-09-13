@@ -17,6 +17,7 @@ package org.primeframework.mvc.test;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -50,6 +51,17 @@ public class DetectionMap extends HashMap<String, Object> {
     Set<String> excludeKeySet = Set.of(excludeKeys);
     return keySet().stream()
                    .filter(key -> !variablesAccessed.contains(key) && !key.startsWith(excludePrefix) && !excludeKeySet.contains(key))
+                   // optional variables do not have to be used in the template
+                   .filter(key -> !(super.get(key) instanceof Optional<?>))
                    .collect(Collectors.toSet());
+  }
+
+  @Override
+  public Object put(String key, Object value) {
+    // go ahead and evaluate optional values for FreeMarker
+    if (value instanceof Optional<?> opt && opt.isPresent()) {
+      value = opt.get();
+    }
+    return super.put(key, value);
   }
 }

@@ -17,6 +17,7 @@ package org.primeframework.mvc.test;
 
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.Optional;
 
 import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
@@ -53,6 +54,36 @@ public class BodyToolsTest {
 
     // assert
     assertEquals(result, "missing");
+  }
+
+  @Test
+  public void processTemplateWithMap_optional_variable_unused() throws Exception {
+    // arrange
+    DetectionMap values = new DetectionMap();
+    values.putAll(Map.of("message", "howdy", "othervariable", Optional.of("value")));
+
+    // act
+    String result = BodyTools.processTemplateWithMap(Paths.get("src/test/web/templates/echo.ftl"),
+                                                     values,
+                                                     false);
+
+    // assert
+    assertEquals(result, "howdy");
+  }
+
+  @Test
+  public void processTemplateWithMap_optional_variable_used() throws Exception {
+    // arrange
+    DetectionMap values = new DetectionMap();
+    values.put("message", Optional.of("howdy"));
+
+    // act
+    String result = BodyTools.processTemplateWithMap(Paths.get("src/test/web/templates/echo.ftl"),
+                                                     values,
+                                                     false);
+
+    // assert
+    assertEquals(result, "howdy");
   }
 
   @Test
