@@ -42,11 +42,14 @@ public class DetectionMap extends HashMap<String, Object> {
    * Gets variables that were put in the map since instantiation, but not accessed
    *
    * @param excludePrefix excludes keys that start with this value
+   * @param excludeKeys   exclude these act keys
    * @return unused variables
    */
-  public Set<Object> getUnusedVariables(String excludePrefix) {
+  public Set<Object> getUnusedVariables(String excludePrefix,
+                                        String... excludeKeys) {
+    Set<String> excludeKeySet = Set.of(excludeKeys);
     return keySet().stream()
-                   .filter(key -> !variablesAccessed.contains(key) && !key.startsWith(excludePrefix))
+                   .filter(key -> !variablesAccessed.contains(key) && !key.startsWith(excludePrefix) && !excludeKeySet.contains(key))
                    .collect(Collectors.toSet());
   }
 }

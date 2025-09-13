@@ -39,11 +39,12 @@ public class BodyToolsTest {
   }
 
   @Test
-  public void processTemplateWithMap_to_milli() throws Exception {
+  public void processTemplateWithMap_functions() throws Exception {
     // arrange
     DetectionMap values = new DetectionMap();
     // used in some classes like RequestResult, and should be ignored
-    values.put("_to_milli", "howdy");
+    values.putAll(Map.of("_to_milli", "howdy",
+                         "actual", "someactualthing"));
 
     // act
     String result = BodyTools.processTemplateWithMap(Paths.get("src/test/web/templates/echo.ftl"),
