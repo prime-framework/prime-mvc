@@ -27,16 +27,30 @@ import java.util.stream.Collectors;
 public class DetectionMap extends HashMap<String, Object> {
   public final Set<String> variablesAccessed = new HashSet<>();
 
+  private static Object withOptionalEvaluated(Object value) {
+    if (value == null) {
+      return null;
+    }
+
+    // if an Optional is used in a template variable, we don't want it to be considered an unused value
+    // and we want to evaluate it so FreeMarker does not have to
+    if (value instanceof Optional<?> opt && opt.isPresent()) {
+      return opt.get();
+    }
+
+    return value;
+  }
+
   @Override
   public Object get(Object key) {
     variablesAccessed.add((String) key);
-    return super.get(key);
+    return withOptionalEvaluated(super.get(key));
   }
 
   @Override
   public Object getOrDefault(Object key, Object defaultValue) {
     variablesAccessed.add((String) key);
-    return super.getOrDefault(key, defaultValue);
+    return withOptionalEvaluated(super.getOrDefault(key, defaultValue));
   }
 
   /**
@@ -54,14 +68,5 @@ public class DetectionMap extends HashMap<String, Object> {
                    // optional variables do not have to be used in the template
                    .filter(key -> !(super.get(key) instanceof Optional<?>))
                    .collect(Collectors.toSet());
-  }
-
-  @Override
-  public Object put(String key, Object value) {
-    // go ahead and evaluate optional values for FreeMarker
-    if (value instanceof Optional<?> opt && opt.isPresent()) {
-      value = opt.get();
-    }
-    return super.put(key, value);
   }
 }
