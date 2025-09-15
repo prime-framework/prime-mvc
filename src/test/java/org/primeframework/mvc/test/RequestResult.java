@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -101,6 +102,8 @@ public class RequestResult {
   public final MockUserAgent userAgent;
 
   private final Set<String> IgnoredHeadersOnRedirect = Set.of("authorization", "referer", ObserverMessageStoreId.toLowerCase());
+
+  public LinkedList<RequestResult> chained;
 
   private String body;
 
@@ -1301,7 +1304,7 @@ public class RequestResult {
    *
    * @param selector The selector used to find the form in the DOM
    * @param result   A consumer for the request result from following the redirect.
-   * @return This.
+   * @return the request result returned by this action, or the last nested result.
    */
   public RequestResult executeFormPostInResponseBody(String selector, ThrowingConsumer<RequestResult> result)
       throws Exception {
@@ -1315,7 +1318,7 @@ public class RequestResult {
    * @param selector  The selector used to find the form in the DOM
    * @param domHelper A consumer for the DOM Helper
    * @param result    A consumer for the request result from following the redirect.
-   * @return This.
+   * @return the request result returned by this action, or the last nested result.
    */
   public RequestResult executeFormPostInResponseBody(String selector, ThrowingConsumer<DOMHelper> domHelper,
                                                      ThrowingConsumer<RequestResult> result)
@@ -1331,7 +1334,7 @@ public class RequestResult {
    *
    * @param selector The selector used to find the form in the DOM
    * @param result   A consumer for the request result from following the redirect.
-   * @return This.
+   * @return the request result returned by this action, or the last nested result.
    */
   public RequestResult executeFormPostInResponseBodyReturnPostResult(String selector, ThrowingConsumer<RequestResult> result)
       throws Exception {
@@ -1346,7 +1349,7 @@ public class RequestResult {
    * @param selector  The selector used to find the form in the DOM
    * @param domHelper A consumer for the DOM Helper
    * @param result    A consumer for the request result from following the redirect.
-   * @return This.
+   * @return the request result returned by this action, or the last nested result.
    */
   public RequestResult executeFormPostInResponseBodyReturnPostResult(String selector, ThrowingConsumer<DOMHelper> domHelper,
                                                                      ThrowingConsumer<RequestResult> result)
@@ -1360,7 +1363,7 @@ public class RequestResult {
    * Prefer {@link #followMetaRefresh(ThrowingConsumer)}.
    *
    * @param result A consumer for the request result from following the redirect.
-   * @return This.
+   * @return the request result returned by this action, or the last nested result.
    */
   public RequestResult executeMetaRefreshReturnResult(ThrowingConsumer<RequestResult> result) throws Exception {
     return handleFollowMetaRefresh(result);
@@ -1372,7 +1375,7 @@ public class RequestResult {
    * Prefer {@link #followRedirect(ThrowingConsumer)}
    *
    * @param consumer The request result from following the redirect.
-   * @return This.
+   * @return the request result returned by this action, or the last nested result.
    */
   public RequestResult executeRedirect(ThrowingConsumer<RequestResult> consumer) throws Exception {
     _followRedirect(consumer);
@@ -1385,7 +1388,7 @@ public class RequestResult {
    * Prefer {@link #followRedirect(ThrowingConsumer)}
    *
    * @param consumer The request result from following the redirect.
-   * @return This.
+   * @return the request result returned by this action, or the last nested result.
    */
   public RequestResult executeRedirectReturnResult(ThrowingConsumer<RequestResult> consumer) throws Exception {
     return _followRedirect(consumer);
@@ -1395,20 +1398,38 @@ public class RequestResult {
    * Attempt to follow a meta-refresh
    *
    * @param result A consumer for the request result from following the redirect.
-   * @return This.
+   * @return the request result returned by this action, or the last nested result.
    */
   public RequestResult followMetaRefresh(ThrowingConsumer<RequestResult> result) throws Exception {
     return handleFollowMetaRefresh(result);
   }
 
   /**
+   * Attempt to follow a meta-refresh
+   *
+   * @return the request result returned by this action, or the last nested result.
+   */
+  public RequestResult followMetaRefresh() throws Exception {
+    return handleFollowMetaRefresh(null);
+  }
+
+  /**
    * Follow the redirect and accept a consumer to assert on the response.
    *
    * @param consumer The request result from following the redirect.
-   * @return This.
+   * @return the request result returned by this action, or the last nested redirect.
    */
   public RequestResult followRedirect(ThrowingConsumer<RequestResult> consumer) throws Exception {
     return _followRedirect(consumer);
+  }
+
+  /**
+   * Follow the redirect and accept a consumer to assert on the response.
+   *
+   * @return the request result returned by this action, or the last nested redirect.
+   */
+  public RequestResult followRedirect() throws Exception {
+    return _followRedirect(null);
   }
 
   /**
@@ -1610,11 +1631,10 @@ public class RequestResult {
    * Attempt to submit the form found in the response body and return the result.
    *
    * @param selector The selector used to find the form in the DOM
-   * @param result   The request result
-   * @return This.
+   * @return the request result returned by this action, or the last nested result.
    */
-  public RequestResult submitForm(String selector, ThrowingConsumer<RequestResult> result) throws Exception {
-    return _submitForm(selector, null, result);
+  public RequestResult submitForm(String selector, ThrowingConsumer<RequestResult> consumer) throws Exception {
+    return _submitForm(selector, null, consumer);
   }
 
   /**
@@ -1622,12 +1642,12 @@ public class RequestResult {
    *
    * @param selector  The selector used to find the form in the DOM
    * @param domHelper A consumer for the DOM Helper
-   * @param result    The request result
-   * @return This.
+   * @param consumer  The request result consumer
+   * @return the request result returned by this action, or the last nested result.
    */
-  public RequestResult submitForm(String selector, ThrowingConsumer<DOMHelper> domHelper, ThrowingConsumer<RequestResult> result)
+  public RequestResult submitForm(String selector, ThrowingConsumer<DOMHelper> domHelper, ThrowingConsumer<RequestResult> consumer)
       throws Exception {
-    return _submitForm(selector, domHelper, result);
+    return _submitForm(selector, domHelper, consumer);
   }
 
   private RequestResult _assertBodyContains(boolean escape, String... strings) {
@@ -1728,11 +1748,21 @@ public class RequestResult {
     headersCopy.forEach((name, value) -> value.forEach(v -> rb.withHeader(name, v)));
 
     RequestResult result = rb.get();
-    consumer.accept(result);
-    return result;
+
+    if (chained == null) {
+      chained = new LinkedList<>();
+    }
+
+    result.chained = chained;
+    chained.add(result);
+    if (consumer != null) {
+      consumer.accept(result);
+    }
+    return chained.getLast();
   }
 
-  private RequestResult _submitForm(String selector, ThrowingConsumer<DOMHelper> domHelper, ThrowingConsumer<RequestResult> result) throws Exception {
+  private RequestResult _submitForm(String selector, ThrowingConsumer<DOMHelper> domHelper, ThrowingConsumer<RequestResult> consumer)
+      throws Exception {
     String body = getBodyAsString();
     Document document = Jsoup.parse(body);
     Element form = document.selectFirst(selector);
@@ -1782,15 +1812,26 @@ public class RequestResult {
       }
     }
 
-    RequestResult requestResult = null;
+    RequestResult result;
     if (method.equalsIgnoreCase(Methods.GET)) {
-      requestResult = rb.get();
+      result = rb.get();
     } else if (method.equalsIgnoreCase(Methods.POST)) {
-      requestResult = rb.post();
+      result = rb.post();
+    } else {
+      throw new IllegalStateException("Unexpected method [" + method + "]");
     }
 
-    result.accept(requestResult);
-    return requestResult;
+    if (chained == null) {
+      chained = new LinkedList<>();
+    }
+
+    result.chained = chained;
+    result.chained.add(result);
+    if (consumer != null) {
+      consumer.accept(result);
+    }
+
+    return chained.getLast();
   }
 
   private Object[] appendArray(Object[] values, Object... objects) {
@@ -1875,7 +1916,7 @@ public class RequestResult {
     return messageProvider;
   }
 
-  private RequestResult handleFollowMetaRefresh(ThrowingConsumer<RequestResult> result) throws Exception {
+  private RequestResult handleFollowMetaRefresh(ThrowingConsumer<RequestResult> consumer) throws Exception {
 
     // Look for and find an element that looks like this:
     //    <meta http-equiv="refresh" content="0;URL='/foo'">
@@ -1915,10 +1956,18 @@ public class RequestResult {
               }
 
               RequestBuilder rb = new RequestBuilder(uri, injector, userAgent, messageObserver, port);
+              RequestResult result = rb.get();
 
-              RequestResult requestResult = rb.get();
-              result.accept(requestResult);
-              return requestResult;
+              if (chained == null) {
+                chained = new LinkedList<>();
+              }
+
+              result.chained = chained;
+              result.chained.add(result);
+              if (consumer != null) {
+                consumer.accept(result);
+              }
+              return result.chained.getLast();
             }
           }
         }
@@ -1936,7 +1985,7 @@ public class RequestResult {
     boolean recheck = false;
 
     // Bail early they are not even the same size
-    if (actual.keySet().size() != expected.keySet().size()) {
+    if (actual.size() != expected.size()) {
       // Check for optional parameters, if we don't have any, we know we are done.
       if (expected.values().stream().noneMatch(v -> v.size() > 0 && v.getFirst().equals("___optional___"))) {
         return false;
