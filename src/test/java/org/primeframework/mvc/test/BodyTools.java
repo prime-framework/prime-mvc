@@ -106,10 +106,10 @@ public final class BodyTools {
       Set<Object> unusedVariables = values.getUnusedVariables("_",
                                                               "actual");
       if (!unusedVariables.isEmpty()) {
-        throw new IllegalArgumentException("The following variables are not used in the [%s] template: %s".formatted(path,
-                                                                                                                     unusedVariables.stream()
-                                                                                                                                    .sorted()
-                                                                                                                                    .toList()));
+        throw new IllegalArgumentException("Variables %s are not used in the [%s] template. If it's acceptable for the variable to not be used, wrap it in an Optional".formatted(unusedVariables.stream()
+                                                                                                                                                                                                 .sorted()
+                                                                                                                                                                                                 .toList(),
+                                                                                                                                                                                  path));
       }
       return writer.toString();
     } catch (TemplateException e) {
