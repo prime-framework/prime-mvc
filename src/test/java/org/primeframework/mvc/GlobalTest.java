@@ -1368,6 +1368,39 @@ public class GlobalTest extends PrimeBaseTest {
                 .assertBodyIsEmpty())
         )
     );
+
+    // Perform assertions on top-level
+    test.simulate(() -> simulator
+        .test("/router/meta-refresh")
+        .get()
+        .assertStatusCode(200)
+        .assertHTML(html -> html.assertElementExists("meta[http-equiv=Refresh]"))
+
+        // top-level
+        .followMetaRefresh()
+        .assertStatusCode(302)
+        .assertRedirect("/router/redirect/1")
+
+        // nested
+        .followRedirect(r2 -> r2
+            .assertStatusCode(302)
+            .assertRedirect("/router/redirect/2")
+            .followRedirect()
+            .assertStatusCode(302)
+            .assertRedirect("/router/redirect/3"))
+        .followRedirect(r4 -> r4
+            .assertStatusCode(302)
+            .assertRedirect("/router/redirect/4")
+            .followRedirect(r5 -> r5
+                .assertStatusCode(302)
+                .assertRedirect("/router/redirect/5")))
+
+        // top-level
+        .followRedirect()
+        .assertStatusCode(200)
+        .assertBodyIsEmpty()
+
+    );
   }
 
   @Test

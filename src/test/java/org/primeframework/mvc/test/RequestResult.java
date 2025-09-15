@@ -1304,7 +1304,7 @@ public class RequestResult {
    *
    * @param selector The selector used to find the form in the DOM
    * @param result   A consumer for the request result from following the redirect.
-   * @return This.
+   * @return the request result returned by this action, or the last nested result.
    */
   public RequestResult executeFormPostInResponseBody(String selector, ThrowingConsumer<RequestResult> result)
       throws Exception {
@@ -1318,7 +1318,7 @@ public class RequestResult {
    * @param selector  The selector used to find the form in the DOM
    * @param domHelper A consumer for the DOM Helper
    * @param result    A consumer for the request result from following the redirect.
-   * @return This.
+   * @return the request result returned by this action, or the last nested result.
    */
   public RequestResult executeFormPostInResponseBody(String selector, ThrowingConsumer<DOMHelper> domHelper,
                                                      ThrowingConsumer<RequestResult> result)
@@ -1334,7 +1334,7 @@ public class RequestResult {
    *
    * @param selector The selector used to find the form in the DOM
    * @param result   A consumer for the request result from following the redirect.
-   * @return This.
+   * @return the request result returned by this action, or the last nested result.
    */
   public RequestResult executeFormPostInResponseBodyReturnPostResult(String selector, ThrowingConsumer<RequestResult> result)
       throws Exception {
@@ -1349,7 +1349,7 @@ public class RequestResult {
    * @param selector  The selector used to find the form in the DOM
    * @param domHelper A consumer for the DOM Helper
    * @param result    A consumer for the request result from following the redirect.
-   * @return This.
+   * @return the request result returned by this action, or the last nested result.
    */
   public RequestResult executeFormPostInResponseBodyReturnPostResult(String selector, ThrowingConsumer<DOMHelper> domHelper,
                                                                      ThrowingConsumer<RequestResult> result)
@@ -1363,7 +1363,7 @@ public class RequestResult {
    * Prefer {@link #followMetaRefresh(ThrowingConsumer)}.
    *
    * @param result A consumer for the request result from following the redirect.
-   * @return This.
+   * @return the request result returned by this action, or the last nested result.
    */
   public RequestResult executeMetaRefreshReturnResult(ThrowingConsumer<RequestResult> result) throws Exception {
     return handleFollowMetaRefresh(result);
@@ -1375,7 +1375,7 @@ public class RequestResult {
    * Prefer {@link #followRedirect(ThrowingConsumer)}
    *
    * @param consumer The request result from following the redirect.
-   * @return This.
+   * @return the request result returned by this action, or the last nested result.
    */
   public RequestResult executeRedirect(ThrowingConsumer<RequestResult> consumer) throws Exception {
     _followRedirect(consumer);
@@ -1388,7 +1388,7 @@ public class RequestResult {
    * Prefer {@link #followRedirect(ThrowingConsumer)}
    *
    * @param consumer The request result from following the redirect.
-   * @return This.
+   * @return the request result returned by this action, or the last nested result.
    */
   public RequestResult executeRedirectReturnResult(ThrowingConsumer<RequestResult> consumer) throws Exception {
     return _followRedirect(consumer);
@@ -1398,20 +1398,38 @@ public class RequestResult {
    * Attempt to follow a meta-refresh
    *
    * @param result A consumer for the request result from following the redirect.
-   * @return This.
+   * @return the request result returned by this action, or the last nested result.
    */
   public RequestResult followMetaRefresh(ThrowingConsumer<RequestResult> result) throws Exception {
     return handleFollowMetaRefresh(result);
   }
 
   /**
+   * Attempt to follow a meta-refresh
+   *
+   * @return the request result returned by this action, or the last nested result.
+   */
+  public RequestResult followMetaRefresh() throws Exception {
+    return handleFollowMetaRefresh(null);
+  }
+
+  /**
    * Follow the redirect and accept a consumer to assert on the response.
    *
    * @param consumer The request result from following the redirect.
-   * @return This.
+   * @return the request result returned by this action, or the last nested redirect.
    */
   public RequestResult followRedirect(ThrowingConsumer<RequestResult> consumer) throws Exception {
     return _followRedirect(consumer);
+  }
+
+  /**
+   * Follow the redirect and accept a consumer to assert on the response.
+   *
+   * @return the request result returned by this action, or the last nested redirect.
+   */
+  public RequestResult followRedirect() throws Exception {
+    return _followRedirect(null);
   }
 
   /**
@@ -1613,11 +1631,10 @@ public class RequestResult {
    * Attempt to submit the form found in the response body and return the result.
    *
    * @param selector The selector used to find the form in the DOM
-   * @param result   The request result
-   * @return This.
+   * @return the request result returned by this action, or the last nested result.
    */
-  public RequestResult submitForm(String selector, ThrowingConsumer<RequestResult> result) throws Exception {
-    return _submitForm(selector, null, result);
+  public RequestResult submitForm(String selector, ThrowingConsumer<RequestResult> consumer) throws Exception {
+    return _submitForm(selector, null, consumer);
   }
 
   /**
@@ -1625,12 +1642,12 @@ public class RequestResult {
    *
    * @param selector  The selector used to find the form in the DOM
    * @param domHelper A consumer for the DOM Helper
-   * @param result    The request result
-   * @return This.
+   * @param consumer  The request result consumer
+   * @return the request result returned by this action, or the last nested result.
    */
-  public RequestResult submitForm(String selector, ThrowingConsumer<DOMHelper> domHelper, ThrowingConsumer<RequestResult> result)
+  public RequestResult submitForm(String selector, ThrowingConsumer<DOMHelper> domHelper, ThrowingConsumer<RequestResult> consumer)
       throws Exception {
-    return _submitForm(selector, domHelper, result);
+    return _submitForm(selector, domHelper, consumer);
   }
 
   private RequestResult _assertBodyContains(boolean escape, String... strings) {
@@ -1738,7 +1755,9 @@ public class RequestResult {
 
     result.chained = chained;
     chained.add(result);
-    consumer.accept(result);
+    if (consumer != null) {
+      consumer.accept(result);
+    }
     return chained.getLast();
   }
 
@@ -1808,7 +1827,10 @@ public class RequestResult {
 
     result.chained = chained;
     result.chained.add(result);
-    consumer.accept(result);
+    if (consumer != null) {
+      consumer.accept(result);
+    }
+
     return chained.getLast();
   }
 
@@ -1942,7 +1964,9 @@ public class RequestResult {
 
               result.chained = chained;
               result.chained.add(result);
-              consumer.accept(result);
+              if (consumer != null) {
+                consumer.accept(result);
+              }
               return result.chained.getLast();
             }
           }
