@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2018, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2015-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,7 @@ import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Set;
 
 import freemarker.cache.FileTemplateLoader;
 import freemarker.ext.beans.BeansWrapperBuilder;
@@ -52,7 +51,7 @@ public final class BodyTools {
    * @throws IOException If the template could not be loaded, parsed or executed.
    */
   public static String processTemplate(Path path, Object... values) throws IOException {
-    return processTemplateWithMap(path, toMap(values), false);
+    return processTemplateWithMap(path, toMap(values));
   }
 
   /**
@@ -68,7 +67,7 @@ public final class BodyTools {
    * @throws IOException If the template could not be loaded, parsed or executed.
    */
   public static String processTemplateForAssertion(Path path, Object... values) throws IOException {
-    return processTemplateWithMap(path, toMap(values), true);
+    return processTemplateWithMap(path, toMap(values));
   }
 
   /**
@@ -80,13 +79,12 @@ public final class BodyTools {
    *     .done());
    * </pre>
    *
-   * @param path                   Path to the FreeMarker template.
-   * @param values                 Map of key value pairs of replacement values.
-   * @param createMissingTemplates set true to create templates when they do not exists
+   * @param path   Path to the FreeMarker template.
+   * @param values Map of key value pairs of replacement values.
    * @return The result of executing the template.
    * @throws IOException If the template could not be loaded, parsed or executed.
    */
-  public static String processTemplateWithMap(Path path, Map<String, Object> values, boolean createMissingTemplates)
+  public static String processTemplateWithMap(Path path, DetectionMap values)
       throws IOException {
     StringWriter writer = new StringWriter();
     Template template = null;
@@ -102,6 +100,16 @@ public final class BodyTools {
 
     try {
       template.process(values, writer);
+      // used in some classes like RequestResult, and should be ignored. Other implementations may also add functions, etc. that start with _
+      // 'actual' is also used in assertJSONFileWithActual
+      Set<Object> unusedVariables = values.getUnusedVariables("_",
+                                                              "actual");
+      if (!unusedVariables.isEmpty()) {
+        throw new IllegalArgumentException("Unused values %s found in the [%s] template. If it's acceptable for the variable to be unused, wrap it in an Optional".formatted(unusedVariables.stream()
+                                                                                                                                                                                            .sorted()
+                                                                                                                                                                                            .toList(),
+                                                                                                                                                                             path));
+      }
       return writer.toString();
     } catch (TemplateException e) {
       throw new RuntimeException(e);
@@ -114,13 +122,13 @@ public final class BodyTools {
    * @param values The array of values.
    * @return The Map.
    */
-  private static Map<String, Object> toMap(Object... values) {
+  private static DetectionMap toMap(Object... values) {
     if (values.length % 2 != 0) {
       String key = values[values.length - 1].toString();
       throw new IllegalArgumentException("Invalid mapping values. Must have a multiple of 2. Missing value for key [" + key + "]");
     }
 
-    Map<String, Object> map = new HashMap<>();
+    DetectionMap map = new DetectionMap();
     for (int i = 0; i < values.length; i = i + 2) {
       map.put(values[i].toString(), values[i + 1]);
     }
