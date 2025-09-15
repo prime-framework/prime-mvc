@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -102,9 +103,7 @@ public class RequestResult {
 
   private final Set<String> IgnoredHeadersOnRedirect = Set.of("authorization", "referer", ObserverMessageStoreId.toLowerCase());
 
-  public RequestResult headResult;
-
-  public RequestResult tailResult;
+  public LinkedList<RequestResult> chained;
 
   private String body;
 
@@ -1731,17 +1730,16 @@ public class RequestResult {
                              (request.getQueryString() == null || request.getQueryString().isEmpty() ? "" : "?" + request.getQueryString()));
     headersCopy.forEach((name, value) -> value.forEach(v -> rb.withHeader(name, v)));
 
-    // Keep a pointer to the top
-    if (headResult == null) {
-      headResult = this;
+    RequestResult result = rb.get();
+
+    if (chained == null) {
+      chained = new LinkedList<>();
     }
 
-    RequestResult result = rb.get();
-    // Preserve the header pointer
-    result.headResult = headResult;
-    result.headResult.tailResult = result;
+    result.chained = chained;
+    chained.add(result);
     consumer.accept(result);
-    return result.headResult.tailResult;
+    return chained.getLast();
   }
 
   private RequestResult _submitForm(String selector, ThrowingConsumer<DOMHelper> domHelper, ThrowingConsumer<RequestResult> consumer)
@@ -1804,15 +1802,14 @@ public class RequestResult {
       throw new IllegalStateException("Unexpected method [" + method + "]");
     }
 
-    // Keep a pointer to the top
-    if (headResult == null) {
-      headResult = this;
+    if (chained == null) {
+      chained = new LinkedList<>();
     }
 
-    result.headResult = headResult;
-    result.headResult.tailResult = result;
+    result.chained = chained;
+    result.chained.add(result);
     consumer.accept(result);
-    return result.headResult.tailResult;
+    return chained.getLast();
   }
 
   private Object[] appendArray(Object[] values, Object... objects) {
@@ -1936,19 +1933,17 @@ public class RequestResult {
                 }
               }
 
-              // Keep a pointer to the top
-              if (headResult == null) {
-                headResult = this;
+              RequestBuilder rb = new RequestBuilder(uri, injector, userAgent, messageObserver, port);
+              RequestResult result = rb.get();
+
+              if (chained == null) {
+                chained = new LinkedList<>();
               }
 
-              RequestBuilder rb = new RequestBuilder(uri, injector, userAgent, messageObserver, port);
-
-              RequestResult result = rb.get();
-              // Preserve the header pointer
-              result.headResult = headResult;
-              result.headResult.tailResult = result;
+              result.chained = chained;
+              result.chained.add(result);
               consumer.accept(result);
-              return result.headResult.tailResult;
+              return result.chained.getLast();
             }
           }
         }
