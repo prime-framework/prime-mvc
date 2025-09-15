@@ -51,7 +51,7 @@ public final class BodyTools {
    * @throws IOException If the template could not be loaded, parsed or executed.
    */
   public static String processTemplate(Path path, Object... values) throws IOException {
-    return processTemplateWithMap(path, toMap(values), false);
+    return processTemplateWithMap(path, toMap(values));
   }
 
   /**
@@ -67,7 +67,7 @@ public final class BodyTools {
    * @throws IOException If the template could not be loaded, parsed or executed.
    */
   public static String processTemplateForAssertion(Path path, Object... values) throws IOException {
-    return processTemplateWithMap(path, toMap(values), true);
+    return processTemplateWithMap(path, toMap(values));
   }
 
   /**
@@ -79,13 +79,12 @@ public final class BodyTools {
    *     .done());
    * </pre>
    *
-   * @param path                   Path to the FreeMarker template.
-   * @param values                 Map of key value pairs of replacement values.
-   * @param createMissingTemplates set true to create templates when they do not exists
+   * @param path   Path to the FreeMarker template.
+   * @param values Map of key value pairs of replacement values.
    * @return The result of executing the template.
    * @throws IOException If the template could not be loaded, parsed or executed.
    */
-  public static String processTemplateWithMap(Path path, DetectionMap values, boolean createMissingTemplates)
+  public static String processTemplateWithMap(Path path, DetectionMap values)
       throws IOException {
     StringWriter writer = new StringWriter();
     Template template = null;

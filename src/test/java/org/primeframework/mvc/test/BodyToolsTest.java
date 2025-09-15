@@ -32,8 +32,8 @@ public class BodyToolsTest {
 
     // act
     String result = BodyTools.processTemplateWithMap(Paths.get("src/test/web/templates/echo.ftl"),
-                                                     values,
-                                                     false);
+                                                     values
+    );
 
     // assert
     assertEquals(result, "howdy");
@@ -49,8 +49,8 @@ public class BodyToolsTest {
 
     // act
     String result = BodyTools.processTemplateWithMap(Paths.get("src/test/web/templates/echo.ftl"),
-                                                     values,
-                                                     false);
+                                                     values
+    );
 
     // assert
     assertEquals(result, "missing");
@@ -64,8 +64,8 @@ public class BodyToolsTest {
 
     // act
     String result = BodyTools.processTemplateWithMap(Paths.get("src/test/web/templates/echo.ftl"),
-                                                     values,
-                                                     false);
+                                                     values
+    );
 
     // assert
     assertEquals(result, "howdy");
@@ -79,8 +79,8 @@ public class BodyToolsTest {
 
     // act
     String result = BodyTools.processTemplateWithMap(Paths.get("src/test/web/templates/echo.ftl"),
-                                                     values,
-                                                     false);
+                                                     values
+    );
 
     // assert
     assertEquals(result, "howdy");
@@ -95,8 +95,8 @@ public class BodyToolsTest {
     // act + assert
     try {
       BodyTools.processTemplateWithMap(Paths.get("src/test/web/templates/echo.ftl"),
-                                       values,
-                                       false);
+                                       values
+      );
       fail("Expected an exception");
     } catch (Exception e) {
       assertEquals(e.getClass(), IllegalArgumentException.class,
