@@ -13,13 +13,13 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v4
-      - name: setup java  
+      - name: setup java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: |
-           21
-           17
+            21
+            17
       - name: savant setup
         run: |
           curl -O https://repository.savantbuild.org/org/savantbuild/savant-core/2.0.0/savant-2.0.0.tar.gz
@@ -48,12 +48,6 @@ jobs:
       - name: run tests/integrate
         run: |
           sb clean int
-      - name: publish test report
-        # v4
-        uses: mikepenz/action-junit-report@db71d41eb79864e25ab0337e395c352e84523afe
-        if: success() || failure() # always run even if the previous step fails
-        with:
-          report_paths: 'build/test-reports/junitreports/**/*.xml'
       - name: capture reports
         uses: actions/upload-artifact@v4
         if: success() || failure() # always run even if the previous step fails
