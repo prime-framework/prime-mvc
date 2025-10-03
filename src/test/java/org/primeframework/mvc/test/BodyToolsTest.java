@@ -15,6 +15,7 @@
  */
 package org.primeframework.mvc.test;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Optional;
@@ -57,6 +58,30 @@ public class BodyToolsTest {
   }
 
   @Test
+  public void processTemplateWithMap_new_file() throws Exception {
+    // if the file was just created, don't complain about unused variables.
+
+    Path newFile = Paths.get("src/test/web/templates/new_file.ftl");
+    try {
+      // arrange
+      DetectionMap values = new DetectionMap();
+      values.putAll(Map.of("message", "howdy", "othervariable", "value"));
+
+      // act
+      String result = BodyTools.processTemplateWithMap(newFile,
+                                                       values);
+
+      // assert
+      assertEquals(result,
+                   "{\"prime-mvc-auto-generated\": true}");
+    } finally {
+      if (newFile.toFile().exists()) {
+        newFile.toFile().delete();
+      }
+    }
+  }
+
+  @Test
   public void processTemplateWithMap_optional_variable_unused() throws Exception {
     // arrange
     DetectionMap values = new DetectionMap();
@@ -95,8 +120,7 @@ public class BodyToolsTest {
     // act + assert
     try {
       BodyTools.processTemplateWithMap(Paths.get("src/test/web/templates/echo.ftl"),
-                                       values
-      );
+                                       values);
       fail("Expected an exception");
     } catch (Exception e) {
       assertEquals(e.getClass(), IllegalArgumentException.class,

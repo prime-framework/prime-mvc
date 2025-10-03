@@ -88,10 +88,12 @@ public final class BodyTools {
       throws IOException {
     StringWriter writer = new StringWriter();
     Template template = null;
+    boolean freshlyCreatedFile = false;
     try {
       template = config.getTemplate(path.toAbsolutePath().toString());
     } catch (TemplateNotFoundException e) {
       if (Files.notExists(path.toAbsolutePath())) {
+        freshlyCreatedFile = true;
         Files.writeString(path.toAbsolutePath(), "{\"prime-mvc-auto-generated\": true}", StandardOpenOption.SYNC, StandardOpenOption.DSYNC, StandardOpenOption.CREATE_NEW);
         config.clearTemplateCache();
         template = config.getTemplate(path.toAbsolutePath().toString());
@@ -104,7 +106,8 @@ public final class BodyTools {
       // 'actual' is also used in assertJSONFileWithActual
       Set<Object> unusedVariables = values.getUnusedVariables("_",
                                                               "actual");
-      if (!unusedVariables.isEmpty()) {
+      // if it's a freshly created file, don't annoy them yet
+      if (!freshlyCreatedFile && !unusedVariables.isEmpty()) {
         throw new IllegalArgumentException("Unused values %s found in the [%s] template. If it's acceptable for the variable to be unused, wrap it in an Optional".formatted(unusedVariables.stream()
                                                                                                                                                                                             .sorted()
                                                                                                                                                                                             .toList(),
