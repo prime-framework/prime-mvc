@@ -55,6 +55,8 @@ import io.fusionauth.http.HTTPMethod;
 import io.fusionauth.http.HTTPValues.Headers;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
+import io.fusionauth.jwks.domain.JSONWebKey;
+import io.fusionauth.jwt.Signer;
 import org.primeframework.mock.MockUserAgent;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.http.FormBodyPublisher;
@@ -94,6 +96,14 @@ public class RequestBuilder {
   public final MockUserAgent userAgent;
 
   public boolean useTLS;
+
+  private String bearerToken;
+
+  private JSONWebKey dPoPJWK;
+
+  private DPoPProofProvider dPoPProofProvider;
+
+  private Signer dPoPSigner;
 
   private byte[] body;
 
@@ -330,6 +340,12 @@ public class RequestBuilder {
     throw new IllegalStateException("This handling is not implemented yet");
   }
 
+  public RequestBuilder withAuthorizationBearerToken(String encodedJWT) {
+    this.bearerToken = encodedJWT;
+    request.setHeader("Authorization", "Bearer " + encodedJWT);
+    return this;
+  }
+
   /**
    * Adds an Authorization header to the request using the specified value.
    * <p>Shorthand for calling
@@ -491,6 +507,17 @@ public class RequestBuilder {
    */
   public RequestBuilder withCookie(String name, String value) throws Exception {
     return withCookie(name, value, false, false);
+  }
+
+  public RequestBuilder withDPoPKeys(JSONWebKey jwk, Signer signer) throws Exception {
+    this.dPoPJWK = jwk;
+    this.dPoPSigner = signer;
+    return this;
+  }
+
+  public RequestBuilder withDPoPProofProvider(DPoPProofProvider dPoPProofProvider) throws Exception {
+    this.dPoPProofProvider = dPoPProofProvider;
+    return this;
   }
 
   /**
@@ -827,6 +854,10 @@ public class RequestBuilder {
     request.setHost(requestURI.getHost());
     request.setScheme(requestURI.getScheme());
 
+    if (dPoPProofProvider != null) {
+      request.addHeader("DPoP", dPoPProofProvider.generateDPoPProof(request.getMethod(), requestURI.toString()));
+    }
+
     // Now that the cookies are ready, if the CSRF token is enabled and the parameter isn't set, we set it to be consistent
     // since the [@control.form] would normally set that into the form and into the request.
     if (request.getMethod() == HTTPMethod.POST) {
@@ -953,6 +984,12 @@ public class RequestBuilder {
 
     result.init();
     return result;
+  }
+
+  private void setDPoPHeader() {
+    if (dPoPJWK != null && dPoPSigner != null) {
+      // set it
+    }
   }
 
   private List<io.fusionauth.http.Cookie> getCookies(HttpResponse<byte[]> response) {
