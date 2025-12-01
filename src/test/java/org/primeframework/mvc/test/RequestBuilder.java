@@ -54,6 +54,8 @@ import io.fusionauth.http.HTTPMethod;
 import io.fusionauth.http.HTTPValues.Headers;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
+import io.fusionauth.jwks.domain.JSONWebKey;
+import io.fusionauth.jwt.Signer;
 import org.primeframework.mock.MockUserAgent;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.http.FormBodyPublisher;
@@ -93,6 +95,10 @@ public class RequestBuilder {
   public final MockUserAgent userAgent;
 
   public boolean useTLS;
+
+  private String bearerToken;
+
+  private DPoPProofProvider dPoPProofProvider;
 
   private byte[] body;
 
@@ -328,6 +334,12 @@ public class RequestBuilder {
     throw new IllegalStateException("This handling is not implemented yet");
   }
 
+  public RequestBuilder withAuthorizationBearerToken(String encodedJWT) {
+    this.bearerToken = encodedJWT;
+    request.setHeader("Authorization", "Bearer " + encodedJWT);
+    return this;
+  }
+
   /**
    * Adds an Authorization header to the request using the specified value.
    * <p>Shorthand for calling
@@ -489,6 +501,11 @@ public class RequestBuilder {
    */
   public RequestBuilder withCookie(String name, String value) throws Exception {
     return withCookie(name, value, false, false);
+  }
+
+  public RequestBuilder withDPoPProofProvider(DPoPProofProvider dPoPProofProvider) throws Exception {
+    this.dPoPProofProvider = dPoPProofProvider;
+    return this;
   }
 
   /**
@@ -824,6 +841,10 @@ public class RequestBuilder {
     request.setPort(port);
     request.setHost(requestURI.getHost());
     request.setScheme(requestURI.getScheme());
+
+    if (dPoPProofProvider != null) {
+      request.addHeader("DPoP", dPoPProofProvider.generateDPoPProof(request.getMethod(), requestURI.toString(), this.bearerToken));
+    }
 
     // Now that the cookies are ready, if the CSRF token is enabled and the parameter isn't set, we set it to be consistent
     // since the [@control.form] would normally set that into the form and into the request.
