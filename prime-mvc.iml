@@ -82,44 +82,44 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/io/fusionauth/fusionauth-jwt/5.3.2/fusionauth-jwt-5.3.2.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/io/fusionauth/fusionauth-jwt/6.0.0/fusionauth-jwt-6.0.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/io/fusionauth/fusionauth-jwt/5.3.2/fusionauth-jwt-5.3.2-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/io/fusionauth/fusionauth-jwt/6.0.0/fusionauth-jwt-6.0.0-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/com/fasterxml/jackson/core/jackson-databind/2.15.2/jackson-databind-2.15.2.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/com/fasterxml/jackson/core/jackson-databind/2.15.4/jackson-databind-2.15.4.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/com/fasterxml/jackson/core/jackson-databind/2.15.2/jackson-databind-2.15.2-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/com/fasterxml/jackson/core/jackson-databind/2.15.4/jackson-databind-2.15.4-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/com/fasterxml/jackson/core/jackson-annotations/2.15.2/jackson-annotations-2.15.2.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/com/fasterxml/jackson/core/jackson-annotations/2.15.4/jackson-annotations-2.15.4.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/com/fasterxml/jackson/core/jackson-annotations/2.15.2/jackson-annotations-2.15.2-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/com/fasterxml/jackson/core/jackson-annotations/2.15.4/jackson-annotations-2.15.4-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/com/fasterxml/jackson/core/jackson-core/2.15.2/jackson-core-2.15.2.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/com/fasterxml/jackson/core/jackson-core/2.15.4/jackson-core-2.15.4.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/com/fasterxml/jackson/core/jackson-core/2.15.2/jackson-core-2.15.2-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/com/fasterxml/jackson/core/jackson-core/2.15.4/jackson-core-2.15.4-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
