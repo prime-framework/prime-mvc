@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2017, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.example.action.ParameterHandlerAction.Fruit;
+
 /**
  * This is a test user with fields.
  *
@@ -39,6 +41,8 @@ public class UserField {
 
   public Integer favoriteYear;
 
+  public Fruit fruit;
+
   public Integer id;
 
   public Map<Integer, Integer> ids = new HashMap<>();
@@ -48,6 +52,8 @@ public class UserField {
   public Locale locale;
 
   public String name;
+
+  public Nested nested;
 
   public String password;
 
@@ -62,5 +68,9 @@ public class UserField {
 
   public UserField(String name) {
     this.name = name;
+  }
+
+  public static class Nested {
+    public Fruit fruit;
   }
 }

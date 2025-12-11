@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2023, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2013-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -191,6 +193,33 @@ public abstract class BaseJacksonContentHandler implements ContentHandler {
       messageStore.add(new SimpleMessage(MessageType.ERROR, code, messageProvider.getMessage(code, "unknown", "Possible conversion error", e.getMessage())));
     } else {
       messageStore.add(new SimpleFieldMessage(MessageType.ERROR, field, code, messageProvider.getMessage(code, field, "Possible conversion error", e.getMessage())));
+    }
+  }
+
+  private void addFieldError(InvalidFormatException e) {
+    // Build the path so we can make the error
+    String field = buildField(e);
+    String code = "[invalidJSON]";
+
+    // If we cannot find the field, make this a general error.
+    if (field.equals("")) {
+      messageStore.add(new SimpleMessage(MessageType.ERROR, code, messageProvider.getMessage(code, "unknown", "Possible conversion error", e.getMessage())));
+    } else {
+      Pattern stuff = Pattern.compile("Cannot deserialize value of type `\\S+` from \\S+ (\\S+): not one of the values accepted for Enum class: \\[(.*)]$.*",
+                                      Pattern.DOTALL | Pattern.MULTILINE);
+      String messageText = e.getMessage();
+      Matcher m = stuff.matcher(messageText);
+      String message = null;
+      if (m.matches()) {
+        code = "[invalid]%s".formatted(field);
+        message = messageProvider.getMessage(code,
+                                             m.group(1),
+                                             m.group(2));
+      }
+      if (message == null) {
+        message = messageProvider.getMessage(code, field, "Possible conversion error", messageText);
+      }
+      messageStore.add(new SimpleFieldMessage(MessageType.ERROR, field, code, message));
     }
   }
 
