@@ -55,6 +55,9 @@ import static org.primeframework.mvc.util.ObjectTools.defaultIfNull;
  * @author Brian Pontarelli
  */
 public abstract class BaseJacksonContentHandler implements ContentHandler {
+  private static final Pattern invalidEnumerationValue = Pattern.compile("Cannot deserialize value of type `\\S+` from \\S+ (\\S+): not one of the values accepted for Enum class: \\[(.*)]$.*",
+                                                                         Pattern.DOTALL | Pattern.MULTILINE);
+
   private static final Logger logger = LoggerFactory.getLogger(BaseJacksonContentHandler.class);
 
   protected final ExpressionEvaluator expressionEvaluator;
@@ -205,17 +208,17 @@ public abstract class BaseJacksonContentHandler implements ContentHandler {
     if (field.equals("")) {
       messageStore.add(new SimpleMessage(MessageType.ERROR, code, messageProvider.getMessage(code, "unknown", "Possible conversion error", e.getMessage())));
     } else {
-      Pattern stuff = Pattern.compile("Cannot deserialize value of type `\\S+` from \\S+ (\\S+): not one of the values accepted for Enum class: \\[(.*)]$.*",
-                                      Pattern.DOTALL | Pattern.MULTILINE);
       String messageText = e.getMessage();
-      Matcher m = stuff.matcher(messageText);
+      Matcher matchesEnumNotValidValue = invalidEnumerationValue.matcher(messageText);
       String message = null;
-      if (m.matches()) {
+      if (matchesEnumNotValidValue.matches()) {
         code = "[invalid]%s".formatted(field);
+        // if we have an invalid enum value, provide a better message
         message = messageProvider.getMessage(code,
-                                             m.group(1),
-                                             m.group(2));
+                                             matchesEnumNotValidValue.group(1),
+                                             matchesEnumNotValidValue.group(2));
       }
+      // otherwise, fall back to what we know
       if (message == null) {
         message = messageProvider.getMessage(code, field, "Possible conversion error", messageText);
       }
