@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2024, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,7 @@ import org.primeframework.mvc.message.SimpleMessage;
 import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.validation.ValidationException;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.createStrictMock;
@@ -61,6 +62,71 @@ import static org.testng.Assert.fail;
  */
 public class JacksonContentHandlerTest extends PrimeBaseTest {
   @Inject public ExpressionEvaluator expressionEvaluator;
+
+  @DataProvider(name = "trueFalse")
+  private static Object[][] getTrueFalse() {
+    return new Object[][]{
+        {true},
+        {false}
+    };
+  }
+
+  @Test(dataProvider = "trueFalse")
+  public void enum_values(boolean nested) throws IOException {
+    Map<Class<?>, Object> additionalConfig = new HashMap<>();
+    Map<HTTPMethod, RequestMember> requestMembers = new HashMap<>();
+    requestMembers.put(HTTPMethod.POST, new RequestMember("jsonRequest", UserField.class));
+    additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(requestMembers, null, null));
+
+    KitchenSinkAction action = new KitchenSinkAction(null);
+    ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, false, null, null, null, null, null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, additionalConfig, null, null, null, null, null);
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(
+        new ActionInvocation(action, new ExecuteMethodConfiguration(HTTPMethod.POST, null, null), "/action", null, config));
+    replay(store);
+
+    String expected = nested ? """
+        {
+          "nested": {
+            "fruit": "bar"
+          }
+        }
+        """ : """
+        {
+          "fruit": "foo"
+        }
+        """;
+
+    HTTPRequest request = new HTTPRequest();
+    request.setInputStream(new ByteArrayInputStream(expected.getBytes()));
+    request.setContentLength((long) expected.getBytes().length);
+    request.setContentType("application/json");
+
+    MessageProvider messageProvider = createStrictMock(MessageProvider.class);
+    expect(messageProvider.getMessage(eq(nested ? "[invalid]nested.fruit" : "[invalid]fruit"),
+                                      eq(nested ? "bar" : "foo"),
+                                      eq("Apple, Orange"))).andReturn("Bad value");
+    replay(messageProvider);
+
+    MessageStore messageStore = createStrictMock(MessageStore.class);
+    messageStore.add(new SimpleFieldMessage(MessageType.ERROR,
+                                            nested ? "nested.fruit" : "fruit",
+                                            nested ? "[invalid]nested.fruit" : "[invalid]fruit",
+                                            "Bad value"));
+    replay(messageStore);
+
+    JacksonContentHandler handler = new JacksonContentHandler(request, store, new ObjectMapper(), expressionEvaluator, messageProvider, messageStore);
+    try {
+      handler.handle();
+      fail("Should have thrown");
+    } catch (ValidationException e) {
+      // Expected
+    }
+
+    assertNull(action.jsonRequest);
+
+    verify(store, messageProvider, messageStore);
+  }
 
   @Test
   public void handle() throws IOException {
