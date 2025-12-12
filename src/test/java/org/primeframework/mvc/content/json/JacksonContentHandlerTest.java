@@ -104,7 +104,7 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
 
     MessageProvider messageProvider = createStrictMock(MessageProvider.class);
     expect(messageProvider.getMessage(eq(nested ? "[invalid]nested.fruit" : "[invalid]fruit"),
-                                      eq(nested ? "\"bar\"" : "\"foo\""),
+                                      eq(nested ? "bar" : "foo"),
                                       eq("Apple, Orange"))).andReturn("Bad value");
     replay(messageProvider);
 
