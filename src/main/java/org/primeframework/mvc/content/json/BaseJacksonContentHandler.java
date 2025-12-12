@@ -55,7 +55,7 @@ import static org.primeframework.mvc.util.ObjectTools.defaultIfNull;
  * @author Brian Pontarelli
  */
 public abstract class BaseJacksonContentHandler implements ContentHandler {
-  private static final Pattern invalidEnumerationValue = Pattern.compile("Cannot deserialize value of type `\\S+` from \\S+ (\\S+): not one of the values accepted for Enum class: \\[(.*)]$.*",
+  private static final Pattern invalidEnumerationValue = Pattern.compile("Cannot deserialize value of type `\\S+` from \\S+ \"(\\S+)\": not one of the values accepted for Enum class: \\[(.*)]$.*",
                                                                          Pattern.DOTALL | Pattern.MULTILINE);
 
   private static final Logger logger = LoggerFactory.getLogger(BaseJacksonContentHandler.class);
@@ -216,9 +216,6 @@ public abstract class BaseJacksonContentHandler implements ContentHandler {
         // if we have an invalid enum value, provide a better message
         String possibleValues = matchesEnumNotValidValue.group(2);
         String valueUsed = matchesEnumNotValidValue.group(1);
-        if (valueUsed.startsWith("\"") && valueUsed.endsWith("\"")) {
-          valueUsed = valueUsed.substring(1, valueUsed.length() - 1);
-        }
         message = messageProvider.getMessage(code,
                                              valueUsed,
                                              possibleValues);
