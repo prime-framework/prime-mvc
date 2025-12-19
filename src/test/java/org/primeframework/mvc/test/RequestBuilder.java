@@ -39,7 +39,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -901,7 +900,7 @@ public class RequestBuilder {
 
     // Copy over headers
     request.getHeaders().forEach((name, values) ->
-                                     values.forEach(value -> requestBuilder.setHeader(name, value)));
+                                     values.forEach(value -> requestBuilder.header(name, value)));
 
     // Set cookies
     if (request.getHeaders().keySet().stream().noneMatch(name -> name.equalsIgnoreCase(Headers.Cookie)) && !request.getCookies().isEmpty()) {
