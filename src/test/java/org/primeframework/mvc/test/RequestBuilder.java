@@ -105,8 +105,7 @@ public class RequestBuilder {
     this.injector = injector;
     this.userAgent = userAgent;
     this.messageObserver = messageObserver;
-    this.request = new HTTPRequest().with(r -> r.addLocales(Locale.US))
-                                    .with(r -> r.setPath(path));
+    this.request = new HTTPRequest().with(r -> r.setPath(path));
     this.port = port;
     //Injections optionally HTTPRequestConsumer
     injector.injectMembers(this);

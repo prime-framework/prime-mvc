@@ -1544,6 +1544,17 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void headers() throws IOException {
+    // Make sure multiple headers with the same name get returned
+    simulator.test("/header-values")
+        .withHeader("foo", "bar")
+        .withHeader("foo", "baz")
+        .get()
+        .assertStatusCode(200)
+        .assertJSONValuesAt("/foo", List.of("bar", "baz"));
+  }
+
+  @Test
   public void head() {
     simulator.test("/head")
              .head()
