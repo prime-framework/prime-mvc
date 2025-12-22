@@ -103,7 +103,7 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
     request.setContentType("application/json");
 
     MessageProvider messageProvider = createStrictMock(MessageProvider.class);
-    expect(messageProvider.getMessage(eq(nested ? "[invalid]nested.fruit" : "[invalid]fruit"),
+    expect(messageProvider.getMessage(eq(nested ? "[invalidEnum]nested.fruit" : "[invalidEnum]fruit"),
                                       eq(nested ? "bar" : "foo"),
                                       eq("Apple, Orange"))).andReturn("Bad value");
     replay(messageProvider);
@@ -111,7 +111,7 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
     MessageStore messageStore = createStrictMock(MessageStore.class);
     messageStore.add(new SimpleFieldMessage(MessageType.ERROR,
                                             nested ? "nested.fruit" : "fruit",
-                                            nested ? "[invalid]nested.fruit" : "[invalid]fruit",
+                                            nested ? "[invalidEnum]nested.fruit" : "[invalidEnum]fruit",
                                             "Bad value"));
     replay(messageStore);
 

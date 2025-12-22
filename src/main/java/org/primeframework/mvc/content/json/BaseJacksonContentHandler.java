@@ -212,7 +212,7 @@ public abstract class BaseJacksonContentHandler implements ContentHandler {
       Matcher matchesEnumNotValidValue = invalidEnumerationValue.matcher(messageText);
       String message = null;
       if (matchesEnumNotValidValue.matches() && matchesEnumNotValidValue.groupCount() == 2) {
-        code = "[invalid]%s".formatted(field);
+        code = "[invalidEnum]%s".formatted(field);
         // if we have an invalid enum value, provide a better message
         String possibleValues = matchesEnumNotValidValue.group(2);
         String valueUsed = matchesEnumNotValidValue.group(1);
