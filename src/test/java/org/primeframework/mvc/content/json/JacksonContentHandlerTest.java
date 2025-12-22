@@ -19,6 +19,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,6 +35,7 @@ import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.ExecuteMethodConfiguration;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration.RequestMember;
+import org.primeframework.mvc.message.FieldMessage;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
@@ -63,6 +65,10 @@ import static org.testng.Assert.fail;
 public class JacksonContentHandlerTest extends PrimeBaseTest {
   @Inject public ExpressionEvaluator expressionEvaluator;
 
+  @Inject public MessageProvider messageProvider;
+
+  @Inject public MessageStore messageStore;
+
   @DataProvider(name = "trueFalse")
   private static Object[][] getTrueFalse() {
     return new Object[][]{
@@ -72,7 +78,11 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
   }
 
   @Test(dataProvider = "trueFalse")
-  public void enum_values(boolean nested) throws IOException {
+  public void enum_values_message_exists(boolean nested) throws IOException {
+    // Use case: Given:
+    //           - A JSON request uses a value, for an enum field, that is not in the list of enumeration values.
+    //           - An invalidOption message exists for that field
+    //           Then: The "custom" field error is used, instead of the "out of the box" Jackson error
     Map<Class<?>, Object> additionalConfig = new HashMap<>();
     Map<HTTPMethod, RequestMember> requestMembers = new HashMap<>();
     requestMembers.put(HTTPMethod.POST, new RequestMember("jsonRequest", UserField.class));
@@ -102,18 +112,63 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
     request.setContentLength((long) expected.getBytes().length);
     request.setContentType("application/json");
 
-    MessageProvider messageProvider = createStrictMock(MessageProvider.class);
-    expect(messageProvider.getMessage(eq(nested ? "[invalid]nested.fruit" : "[invalid]fruit"),
-                                      eq(nested ? "bar" : "foo"),
-                                      eq("Apple, Orange"))).andReturn("Bad value");
-    replay(messageProvider);
+    JacksonContentHandler handler = new JacksonContentHandler(request, store, new ObjectMapper(), expressionEvaluator, messageProvider, messageStore);
+    try {
+      handler.handle();
+      fail("Should have thrown");
+    } catch (ValidationException e) {
+      // Expected
+    }
 
-    MessageStore messageStore = createStrictMock(MessageStore.class);
-    messageStore.add(new SimpleFieldMessage(MessageType.ERROR,
-                                            nested ? "nested.fruit" : "fruit",
-                                            nested ? "[invalid]nested.fruit" : "[invalid]fruit",
-                                            "Bad value"));
-    replay(messageStore);
+    assertNull(action.jsonRequest);
+    assertTrue(messageStore.getGeneralMessages().isEmpty());
+    Map<String, List<FieldMessage>> fieldMessages = messageStore.getFieldMessages();
+    assertEquals(fieldMessages.size(), 1, "only 1 field");
+    assertTrue(fieldMessages.containsKey(nested ? "nested.fruit" : "fruit"),
+               "expected correct key for fieldMessages but got: " + fieldMessages.keySet());
+    assertEquals(fieldMessages.get(nested ? "nested.fruit" : "fruit"),
+                 List.of(new SimpleFieldMessage(MessageType.ERROR,
+                                                nested ? "nested.fruit" : "fruit",
+                                                "[invalidOption]" + (nested ? "nested.fruit" : "fruit"),
+                                                nested ? "the supplied value of [bar] was not a valid nested fruit value. Valid values are [Apple, Orange]" :
+                                                    "the supplied value of [foo] was not a valid fruit value. Valid values are [Apple, Orange]")));
+  }
+
+  @Test(dataProvider = "trueFalse")
+  public void enum_values_no_message_exists(boolean nested) throws Exception {
+    // Use case: Given:
+    //           - A JSON request uses a value, for an enum field, that is not in the list of enumeration values.
+    //           - Unlike the enum_values_message_exists case, An invalidOption message does NOT exist for that field (fruit2)
+    //           Then: The "out of the box" Jackson error
+
+    Map<Class<?>, Object> additionalConfig = new HashMap<>();
+    Map<HTTPMethod, RequestMember> requestMembers = new HashMap<>();
+    requestMembers.put(HTTPMethod.POST, new RequestMember("jsonRequest", UserField.class));
+    additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(requestMembers, null, null));
+
+    KitchenSinkAction action = new KitchenSinkAction(null);
+    ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, false, null, null, null, null, null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, additionalConfig, null, null, null, null, null);
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(
+        new ActionInvocation(action, new ExecuteMethodConfiguration(HTTPMethod.POST, null, null), "/action", null, config));
+    replay(store);
+
+    String expected = nested ? """
+        {
+          "nested": {
+            "fruit2": "bar"
+          }
+        }
+        """ : """
+        {
+          "fruit2": "foo"
+        }
+        """;
+
+    HTTPRequest request = new HTTPRequest();
+    request.setInputStream(new ByteArrayInputStream(expected.getBytes()));
+    request.setContentLength((long) expected.getBytes().length);
+    request.setContentType("application/json");
 
     JacksonContentHandler handler = new JacksonContentHandler(request, store, new ObjectMapper(), expressionEvaluator, messageProvider, messageStore);
     try {
@@ -124,8 +179,19 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
     }
 
     assertNull(action.jsonRequest);
-
-    verify(store, messageProvider, messageStore);
+    assertTrue(messageStore.getGeneralMessages().isEmpty());
+    Map<String, List<FieldMessage>> fieldMessages = messageStore.getFieldMessages();
+    assertEquals(fieldMessages.size(), 1, "only 1 field");
+    assertTrue(fieldMessages.containsKey(nested ? "nested.fruit2" : "fruit2"),
+               "expected correct key for fieldMessages but got: " + fieldMessages.keySet());
+    assertEquals(fieldMessages.get(nested ? "nested.fruit2" : "fruit2"),
+                 List.of(new SimpleFieldMessage(MessageType.ERROR,
+                                                nested ? "nested.fruit2" : "fruit2",
+                                                "[invalidJSON]",
+                                                nested ? "Unable to parse JSON. The property [nested.fruit2] was invalid. The error was [Possible conversion error]. The detailed exception was [Cannot deserialize value of type `org.example.action.ParameterHandlerAction$Fruit` from String \"bar\": not one of the values accepted for Enum class: [Apple, Orange]\n" +
+                                                         " at [Source: (ByteArrayInputStream); line: 3, column: 15] (through reference chain: org.example.domain.UserField[\"nested\"]->org.example.domain.UserField$Nested[\"fruit2\"])]." :
+                                                    "Unable to parse JSON. The property [fruit2] was invalid. The error was [Possible conversion error]. The detailed exception was [Cannot deserialize value of type `org.example.action.ParameterHandlerAction$Fruit` from String \"foo\": not one of the values accepted for Enum class: [Apple, Orange]\n" +
+                                                    " at [Source: (ByteArrayInputStream); line: 2, column: 13] (through reference chain: org.example.domain.UserField[\"fruit2\"])].")));
   }
 
   @Test

@@ -43,6 +43,8 @@ public class UserField {
 
   public Fruit fruit;
 
+  public Fruit fruit2;
+
   public Integer id;
 
   public Map<Integer, Integer> ids = new HashMap<>();
@@ -72,5 +74,7 @@ public class UserField {
 
   public static class Nested {
     public Fruit fruit;
+
+    public Fruit fruit2;
   }
 }
