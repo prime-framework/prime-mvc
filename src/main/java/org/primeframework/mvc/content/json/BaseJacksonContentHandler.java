@@ -43,6 +43,7 @@ import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
 import org.primeframework.mvc.message.SimpleMessage;
 import org.primeframework.mvc.message.l10n.MessageProvider;
+import org.primeframework.mvc.message.l10n.MissingMessageException;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.validation.ValidationException;
 import org.slf4j.Logger;
@@ -212,13 +213,19 @@ public abstract class BaseJacksonContentHandler implements ContentHandler {
       Matcher matchesEnumNotValidValue = invalidEnumerationValue.matcher(messageText);
       String message = null;
       if (matchesEnumNotValidValue.matches() && matchesEnumNotValidValue.groupCount() == 2) {
-        code = "[invalidOption]%s".formatted(field);
+        String customCode = "[invalidOption]%s".formatted(field);
         // if we have an invalid enum value, provide a better message
         String possibleValues = matchesEnumNotValidValue.group(2);
         String valueUsed = matchesEnumNotValidValue.group(1);
-        message = messageProvider.getMessage(code,
-                                             valueUsed,
-                                             possibleValues);
+        try {
+          message = messageProvider.getMessage(customCode,
+                                               valueUsed,
+                                               possibleValues);
+          // since the message was found, use the custom code when adding to the messageStore below
+          code = customCode;
+        } catch (MissingMessageException ignored) {
+          // if the message is missing, it's OK to fall back to the default Jackson message
+        }
       }
       // otherwise, fall back to what we know
       if (message == null) {
