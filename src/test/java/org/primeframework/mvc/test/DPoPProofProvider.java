@@ -19,6 +19,10 @@ import javax.annotation.Nullable;
 
 import io.fusionauth.http.HTTPMethod;
 
+/**
+ * Interface for generating DPoP Proofs. Allows one to plug in their
+ * own DPoP Proof generation to HTTP requests in a test framework.
+ */
 public interface DPoPProofProvider {
   String generateDPoPProof(HTTPMethod httpMethod, String htu, @Nullable String accessToken);
 }

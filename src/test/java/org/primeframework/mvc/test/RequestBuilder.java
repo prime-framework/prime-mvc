@@ -503,7 +503,7 @@ public class RequestBuilder {
     return withCookie(name, value, false, false);
   }
 
-  public RequestBuilder withDPoPProofProvider(DPoPProofProvider dPoPProofProvider) throws Exception {
+  public RequestBuilder withDPoPProofProvider(DPoPProofProvider dPoPProofProvider) {
     this.dPoPProofProvider = dPoPProofProvider;
     return this;
   }
