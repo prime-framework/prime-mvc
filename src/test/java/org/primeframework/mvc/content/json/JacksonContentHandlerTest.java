@@ -19,6 +19,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,6 +35,7 @@ import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.ExecuteMethodConfiguration;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration.RequestMember;
+import org.primeframework.mvc.message.FieldMessage;
 import org.primeframework.mvc.message.MessageStore;
 import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleFieldMessage;
@@ -62,6 +64,10 @@ import static org.testng.Assert.fail;
  */
 public class JacksonContentHandlerTest extends PrimeBaseTest {
   @Inject public ExpressionEvaluator expressionEvaluator;
+
+  @Inject public MessageProvider messageProvider;
+
+  @Inject public MessageStore messageStore;
 
   @DataProvider(name = "trueFalse")
   private static Object[][] getTrueFalse() {
@@ -102,19 +108,6 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
     request.setContentLength((long) expected.getBytes().length);
     request.setContentType("application/json");
 
-    MessageProvider messageProvider = createStrictMock(MessageProvider.class);
-    expect(messageProvider.getMessage(eq(nested ? "[invalidEnum]nested.fruit" : "[invalidEnum]fruit"),
-                                      eq(nested ? "bar" : "foo"),
-                                      eq("Apple, Orange"))).andReturn("Bad value");
-    replay(messageProvider);
-
-    MessageStore messageStore = createStrictMock(MessageStore.class);
-    messageStore.add(new SimpleFieldMessage(MessageType.ERROR,
-                                            nested ? "nested.fruit" : "fruit",
-                                            nested ? "[invalidEnum]nested.fruit" : "[invalidEnum]fruit",
-                                            "Bad value"));
-    replay(messageStore);
-
     JacksonContentHandler handler = new JacksonContentHandler(request, store, new ObjectMapper(), expressionEvaluator, messageProvider, messageStore);
     try {
       handler.handle();
@@ -124,8 +117,16 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
     }
 
     assertNull(action.jsonRequest);
-
-    verify(store, messageProvider, messageStore);
+    assertTrue(messageStore.getGeneralMessages().isEmpty());
+    Map<String, List<FieldMessage>> fieldMessages = messageStore.getFieldMessages();
+    assertEquals(fieldMessages.size(), 1, "only 1 field");
+    assertTrue(fieldMessages.containsKey(nested ? "nested.fruit" : "fruit"),
+               "expected correct key for fieldMessages but got: " + fieldMessages.keySet());
+    assertEquals(fieldMessages.get(nested ? "nested.fruit" : "fruit"),
+                 List.of(new SimpleFieldMessage(MessageType.ERROR,
+                                                nested ? "nested.fruit" : "fruit",
+                                                "[invalidEnum]" + (nested ? "nested.fruit" : "fruit"),
+                                                nested ? "foo" : "bar")));
   }
 
   @Test
