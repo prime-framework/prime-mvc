@@ -39,7 +39,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -105,8 +104,7 @@ public class RequestBuilder {
     this.injector = injector;
     this.userAgent = userAgent;
     this.messageObserver = messageObserver;
-    this.request = new HTTPRequest().with(r -> r.addLocales(Locale.US))
-                                    .with(r -> r.setPath(path));
+    this.request = new HTTPRequest().with(r -> r.setPath(path));
     this.port = port;
     //Injections optionally HTTPRequestConsumer
     injector.injectMembers(this);
@@ -902,7 +900,7 @@ public class RequestBuilder {
 
     // Copy over headers
     request.getHeaders().forEach((name, values) ->
-                                     values.forEach(value -> requestBuilder.setHeader(name, value)));
+                                     values.forEach(value -> requestBuilder.header(name, value)));
 
     // Set cookies
     if (request.getHeaders().keySet().stream().noneMatch(name -> name.equalsIgnoreCase(Headers.Cookie)) && !request.getCookies().isEmpty()) {
