@@ -79,6 +79,10 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
 
   @Test(dataProvider = "trueFalse")
   public void enum_values(boolean nested) throws IOException {
+    // Use case: Given:
+    //           - A JSON request uses a value, for an enum field, that is not in the list of enumeration values.
+    //           - An invalidOption message exists for that field
+    //           Then: The "custom" field error is used, instead of the "out of the box" Jackson error
     Map<Class<?>, Object> additionalConfig = new HashMap<>();
     Map<HTTPMethod, RequestMember> requestMembers = new HashMap<>();
     requestMembers.put(HTTPMethod.POST, new RequestMember("jsonRequest", UserField.class));
@@ -125,8 +129,9 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
     assertEquals(fieldMessages.get(nested ? "nested.fruit" : "fruit"),
                  List.of(new SimpleFieldMessage(MessageType.ERROR,
                                                 nested ? "nested.fruit" : "fruit",
-                                                "[invalidEnum]" + (nested ? "nested.fruit" : "fruit"),
-                                                nested ? "foo" : "bar")));
+                                                "[invalidOption]" + (nested ? "nested.fruit" : "fruit"),
+                                                nested ? "the supplied value of [bar] was not a valid nested fruit value. Valid values are [Apple, Orange]" :
+                                                    "the supplied value of [foo] was not a valid fruit value. Valid values are [Apple, Orange]")));
   }
 
   @Test
