@@ -847,11 +847,6 @@ public class RequestBuilder {
     }
 
     List<Locale> locales = request.getLocales();
-    if (locales.isEmpty()) {
-      // request.getLocale() returns a default locale if none are set by httpRequestConsumer but
-      // we still want to set to the system's default, if none were explicitly set.
-      locales = List.of(Locale.getDefault());
-    }
     String contentType = request.getContentType();
     Charset characterEncoding = request.getCharacterEncoding();
     HTTPMethod method = request.getMethod();
@@ -892,9 +887,12 @@ public class RequestBuilder {
     var requestBuilder = HttpRequest.newBuilder()
                                     .method(request.getMethod().name(), bodyPublisher);
 
-    if (!locales.isEmpty()) {
-      requestBuilder.setHeader("Accept-Language", locales.stream().map(Locale::toLanguageTag).collect(Collectors.joining(", ")));
+    if (locales.isEmpty()) {
+      // request.getLocale() returns a default locale if none are set by httpRequestConsumer but
+      // we still want to set to the system's default, if none were explicitly set.
+      locales = List.of(Locale.getDefault());
     }
+    requestBuilder.setHeader("Accept-Language", locales.stream().map(Locale::toLanguageTag).collect(Collectors.joining(", ")));
 
     if (contentType != null) {
       requestBuilder.setHeader(Headers.ContentType, contentType + (characterEncoding != null ? "; charset=" + characterEncoding : ""));
