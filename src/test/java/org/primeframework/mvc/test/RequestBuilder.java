@@ -509,17 +509,6 @@ public class RequestBuilder {
   }
 
   /**
-   * Encrypt the provided value and add a cookie with the encrypted value to the request
-   *
-   * @param name  The name of the cookie.
-   * @param value The unencrypted value of the cookie.
-   * @return This.
-   */
-  public RequestBuilder withEncryptedCookie(String name, String value) throws Exception {
-    return withCookie(name, value, false, true);
-  }
-
-  /**
    * Add a cookie to the request.
    *
    * @param cookie The cookie.
@@ -541,6 +530,17 @@ public class RequestBuilder {
   public RequestBuilder withEncoding(Charset encoding) {
     request.setCharacterEncoding(encoding);
     return this;
+  }
+
+  /**
+   * Encrypt the provided value and add a cookie with the encrypted value to the request
+   *
+   * @param name  The name of the cookie.
+   * @param value The unencrypted value of the cookie.
+   * @return This.
+   */
+  public RequestBuilder withEncryptedCookie(String name, String value) throws Exception {
+    return withCookie(name, value, false, true);
   }
 
   /**
@@ -908,9 +908,12 @@ public class RequestBuilder {
     var requestBuilder = HttpRequest.newBuilder()
                                     .method(request.getMethod().name(), bodyPublisher);
 
-    if (!locales.isEmpty()) {
-      requestBuilder.setHeader("Accept-Language", locales.stream().map(Locale::toLanguageTag).collect(Collectors.joining(", ")));
+    if (locales.isEmpty()) {
+      // request.getLocale() returns a default locale if none are set by httpRequestConsumer but
+      // we still want to set to the system's default, if none were explicitly set.
+      locales = List.of(Locale.getDefault());
     }
+    requestBuilder.setHeader("Accept-Language", locales.stream().map(Locale::toLanguageTag).collect(Collectors.joining(", ")));
 
     if (contentType != null) {
       requestBuilder.setHeader(Headers.ContentType, contentType + (characterEncoding != null ? "; charset=" + characterEncoding : ""));
