@@ -45,4 +45,9 @@ public class HeaderValuesAction {
     headers.putAll(httpRequest.getHeaders());
     return "success";
   }
+
+  public String post() {
+    headers.putAll(httpRequest.getHeaders());
+    return "success";
+  }
 }

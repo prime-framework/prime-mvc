@@ -54,6 +54,8 @@ import io.fusionauth.http.HTTPMethod;
 import io.fusionauth.http.HTTPValues.Headers;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
+import io.fusionauth.jwks.domain.JSONWebKey;
+import io.fusionauth.jwt.Signer;
 import org.primeframework.mock.MockUserAgent;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.http.FormBodyPublisher;
@@ -93,6 +95,10 @@ public class RequestBuilder {
   public final MockUserAgent userAgent;
 
   public boolean useTLS;
+
+  private String bearerToken;
+
+  private DPoPProofProvider dPoPProofProvider;
 
   private byte[] body;
 
@@ -328,6 +334,12 @@ public class RequestBuilder {
     throw new IllegalStateException("This handling is not implemented yet");
   }
 
+  public RequestBuilder withAuthorizationBearerToken(String encodedJWT) {
+    this.bearerToken = encodedJWT;
+    request.setHeader("Authorization", "Bearer " + encodedJWT);
+    return this;
+  }
+
   /**
    * Adds an Authorization header to the request using the specified value.
    * <p>Shorthand for calling
@@ -491,15 +503,9 @@ public class RequestBuilder {
     return withCookie(name, value, false, false);
   }
 
-  /**
-   * Encrypt the provided value and add a cookie with the encrypted value to the request
-   *
-   * @param name  The name of the cookie.
-   * @param value The unencrypted value of the cookie.
-   * @return This.
-   */
-  public RequestBuilder withEncryptedCookie(String name, String value) throws Exception {
-    return withCookie(name, value, false, true);
+  public RequestBuilder withDPoPProofProvider(DPoPProofProvider dPoPProofProvider) {
+    this.dPoPProofProvider = dPoPProofProvider;
+    return this;
   }
 
   /**
@@ -524,6 +530,17 @@ public class RequestBuilder {
   public RequestBuilder withEncoding(Charset encoding) {
     request.setCharacterEncoding(encoding);
     return this;
+  }
+
+  /**
+   * Encrypt the provided value and add a cookie with the encrypted value to the request
+   *
+   * @param name  The name of the cookie.
+   * @param value The unencrypted value of the cookie.
+   * @return This.
+   */
+  public RequestBuilder withEncryptedCookie(String name, String value) throws Exception {
+    return withCookie(name, value, false, true);
   }
 
   /**
@@ -825,6 +842,10 @@ public class RequestBuilder {
     request.setHost(requestURI.getHost());
     request.setScheme(requestURI.getScheme());
 
+    if (dPoPProofProvider != null) {
+      request.addHeader("DPoP", dPoPProofProvider.generateDPoPProof(request.getMethod(), requestURI.toString(), this.bearerToken));
+    }
+
     // Now that the cookies are ready, if the CSRF token is enabled and the parameter isn't set, we set it to be consistent
     // since the [@control.form] would normally set that into the form and into the request.
     if (request.getMethod() == HTTPMethod.POST) {
@@ -887,9 +908,12 @@ public class RequestBuilder {
     var requestBuilder = HttpRequest.newBuilder()
                                     .method(request.getMethod().name(), bodyPublisher);
 
-    if (!locales.isEmpty()) {
-      requestBuilder.setHeader("Accept-Language", locales.stream().map(Locale::toLanguageTag).collect(Collectors.joining(", ")));
+    if (locales.isEmpty()) {
+      // request.getLocale() returns a default locale if none are set by httpRequestConsumer but
+      // we still want to set to the system's default, if none were explicitly set.
+      locales = List.of(Locale.getDefault());
     }
+    requestBuilder.setHeader("Accept-Language", locales.stream().map(Locale::toLanguageTag).collect(Collectors.joining(", ")));
 
     if (contentType != null) {
       requestBuilder.setHeader(Headers.ContentType, contentType + (characterEncoding != null ? "; charset=" + characterEncoding : ""));

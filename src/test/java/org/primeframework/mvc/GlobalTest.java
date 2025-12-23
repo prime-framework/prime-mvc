@@ -15,6 +15,7 @@
  */
 package org.primeframework.mvc;
 
+import javax.annotation.Nullable;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -49,6 +50,7 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import freemarker.template.Configuration;
+import io.fusionauth.http.HTTPMethod;
 import io.fusionauth.http.HTTPValues.Headers;
 import io.fusionauth.http.HTTPValues.Methods;
 import org.example.action.JwtAuthorizedAction;
@@ -72,6 +74,7 @@ import org.primeframework.mvc.parameter.el.InvalidExpressionException;
 import org.primeframework.mvc.security.CBCCipherProvider;
 import org.primeframework.mvc.security.DefaultEncryptor;
 import org.primeframework.mvc.security.Encryptor;
+import org.primeframework.mvc.test.DPoPProofProvider;
 import org.primeframework.mvc.util.URIBuilder;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
@@ -1552,6 +1555,39 @@ public class GlobalTest extends PrimeBaseTest {
         .get()
         .assertStatusCode(200)
         .assertJSONValuesAt("/foo", List.of("bar", "baz"));
+  }
+
+  @Test
+  public void dpopHeader() throws IOException {
+    // Make sure DPoPProofProvider gets invoked with proper values
+    // (a real DPoPProofProvider would generate a signed JWT)
+    DPoPProofProvider provider = (httpMethod, htu, accessToken) -> httpMethod.toString() + ":" + htu + ":" + accessToken;
+
+    simulator.test("/header-values")
+        .withDPoPProofProvider(provider)
+        .get()
+        .assertStatusCode(200)
+        .assertJSONValuesAt("/dpop", List.of("GET:http://localhost:9080/header-values:null"));
+
+    simulator.test("/header-values")
+        .withDPoPProofProvider(provider)
+             .withAuthorizationBearerToken("fake.token")
+        .get()
+        .assertStatusCode(200)
+        .assertJSONValuesAt("/dpop", List.of("GET:http://localhost:9080/header-values:fake.token"));
+
+    simulator.test("/header-values")
+        .withDPoPProofProvider(provider)
+        .post()
+        .assertStatusCode(200)
+        .assertJSONValuesAt("/dpop", List.of("POST:http://localhost:9080/header-values:null"));
+
+    simulator.test("/header-values")
+        .withDPoPProofProvider(provider)
+        .withAuthorizationBearerToken("fake.token")
+        .post()
+        .assertStatusCode(200)
+        .assertJSONValuesAt("/dpop", List.of("POST:http://localhost:9080/header-values:fake.token"));
   }
 
   @Test
