@@ -24,5 +24,12 @@ import io.fusionauth.http.HTTPMethod;
  * own DPoP Proof generation to HTTP requests in a test framework.
  */
 public interface DPoPProofProvider {
+  /**
+   * Generates a DPoP Proof.
+   * @param httpMethod  The HTTP Method. To be provided as the htm claim.
+   * @param htu         The HTTP URI. To be provided as the htu claim.
+   * @param accessToken (Optional) The access token. To be provided as the hashed ath claim.
+   * @return The DPoP Proof to be used in the DPoP header.
+   */
   String generateDPoPProof(HTTPMethod httpMethod, String htu, @Nullable String accessToken);
 }

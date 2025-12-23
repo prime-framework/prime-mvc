@@ -1571,6 +1571,19 @@ public class GlobalTest extends PrimeBaseTest {
 
     simulator.test("/header-values")
         .withDPoPProofProvider(provider)
+             .withAuthorizationBearerToken("fake.token")
+        .get()
+        .assertStatusCode(200)
+        .assertJSONValuesAt("/dpop", List.of("GET:http://localhost:9080/header-values:fake.token"));
+
+    simulator.test("/header-values")
+        .withDPoPProofProvider(provider)
+        .post()
+        .assertStatusCode(200)
+        .assertJSONValuesAt("/dpop", List.of("POST:http://localhost:9080/header-values:null"));
+
+    simulator.test("/header-values")
+        .withDPoPProofProvider(provider)
         .withAuthorizationBearerToken("fake.token")
         .post()
         .assertStatusCode(200)
