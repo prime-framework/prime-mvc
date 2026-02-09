@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="Ask2AgentMigrationStateService">
-    <option name="migrationStatus" value="COMPLETED" />
-  </component>
   <component name="CCaseConfig">
     <option name="checkoutReserved" value="false" />
     <option name="markExternalChangeAsUpToDate" value="true" />
@@ -407,9 +404,6 @@
   <component name="ModuleEditorState">
     <option name="LAST_EDITED_MODULE_NAME" />
     <option name="LAST_EDITED_TAB_NAME" />
-  </component>
-  <component name="PMDPlugin">
-    <option name="skipTestSources" value="false" />
   </component>
   <component name="Palette2">
     <group name="Swing">

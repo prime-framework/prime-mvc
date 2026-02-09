@@ -534,6 +534,14 @@ public class RequestBuilder {
     return withCookie(name, value, false, false);
   }
 
+  /**
+   * Provide a DPoPProofProvider to be used for adding a DPoP proof header to the request.
+   * An HTTP header will be added with name DPoP and value of what
+   * dPoPProofProvider.generateDPoPProof() returns.
+   *
+   * @param dPoPProofProvider an implementation of DPoPProofProvider
+   * @return This.
+   */
   public RequestBuilder withDPoPProofProvider(DPoPProofProvider dPoPProofProvider) {
     this.dPoPProofProvider = dPoPProofProvider;
     return this;

@@ -1595,7 +1595,6 @@ public class GlobalTest extends PrimeBaseTest {
   @Test
   public void bearerTokenAuthHeader() throws IOException {
     // Exercise the withAuthorizationBearerToken() call
-    // Ensure we can't call withAuthorizationBearerToken() and withAuthorizationDPoPToken()
 
     simulator.test("/header-values")
         .withAuthorizationBearerToken("fake.token")
