@@ -1571,9 +1571,10 @@ public class GlobalTest extends PrimeBaseTest {
 
     simulator.test("/header-values")
         .withDPoPProofProvider(provider)
-             .withAuthorizationBearerToken("fake.token")
+        .withAuthorizationDPoPToken("fake.token")
         .get()
         .assertStatusCode(200)
+        .assertJSONValuesAt("/authorization", List.of("DPoP fake.token"))
         .assertJSONValuesAt("/dpop", List.of("GET:http://localhost:9080/header-values:fake.token"));
 
     simulator.test("/header-values")
@@ -1584,10 +1585,32 @@ public class GlobalTest extends PrimeBaseTest {
 
     simulator.test("/header-values")
         .withDPoPProofProvider(provider)
-        .withAuthorizationBearerToken("fake.token")
+        .withAuthorizationDPoPToken("fake.token")
         .post()
         .assertStatusCode(200)
+        .assertJSONValuesAt("/authorization", List.of("DPoP fake.token"))
         .assertJSONValuesAt("/dpop", List.of("POST:http://localhost:9080/header-values:fake.token"));
+  }
+
+  @Test
+  public void bearerTokenAuthHeader() throws IOException {
+    // Exercise the withAuthorizationBearerToken() call
+    // Ensure we can't call withAuthorizationBearerToken() and withAuthorizationDPoPToken()
+
+    simulator.test("/header-values")
+        .withAuthorizationBearerToken("fake.token")
+        .get()
+        .assertStatusCode(200)
+        .assertJSONValuesAt("/authorization", List.of("Bearer fake.token"));
+  }
+
+  @Test(expectedExceptions = IllegalStateException.class)
+  public void bearerTokenAndDPoPTokenAuthHeader() throws IOException {
+    // Ensure we can't call withAuthorizationBearerToken() and withAuthorizationDPoPToken()
+
+    simulator.test("/header-values")
+        .withAuthorizationBearerToken("fake.bearer.token")
+        .withAuthorizationDPoPToken("fake.dpop.token");
   }
 
   @Test

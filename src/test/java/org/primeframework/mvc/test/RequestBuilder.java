@@ -98,6 +98,8 @@ public class RequestBuilder {
 
   private String bearerToken;
 
+  private String dPoPToken;
+
   private DPoPProofProvider dPoPProofProvider;
 
   private byte[] body;
@@ -334,9 +336,38 @@ public class RequestBuilder {
     throw new IllegalStateException("This handling is not implemented yet");
   }
 
+  /**
+   * Adds an Authorization header to the request using the DPoP scheme with the specified encodedJWT.
+   * <p>Shorthand for calling
+   * <pre>
+   *   withHeader("Authorization", "Bearer " + value)
+   * </pre>
+   *
+   * @param encodedJWT The Bearer token.
+   * @return This.
+   */
   public RequestBuilder withAuthorizationBearerToken(String encodedJWT) {
+    if (dPoPToken != null) {
+      throw new IllegalStateException("Cannot set Authorization bearer token after setting DPoP token");
+    }
     this.bearerToken = encodedJWT;
     request.setHeader("Authorization", "Bearer " + encodedJWT);
+    return this;
+  }
+
+  /**
+   * Adds an Authorization header to the request using the DPoP scheme with the specified encodedJWT.
+   * Furthermore, the encodedJWT will be passed to the DPoPProofProvider.
+   *
+   * @param encodedJWT the DPoP bound access token
+   * @return This.
+   */
+  public RequestBuilder withAuthorizationDPoPToken(String encodedJWT) {
+    if (bearerToken != null) {
+      throw new IllegalStateException("Cannot set Authorization DPoP token after setting bearer token");
+    }
+    this.dPoPToken = encodedJWT;
+    request.setHeader("Authorization", "DPoP " + encodedJWT);
     return this;
   }
 
@@ -843,7 +874,7 @@ public class RequestBuilder {
     request.setScheme(requestURI.getScheme());
 
     if (dPoPProofProvider != null) {
-      request.addHeader("DPoP", dPoPProofProvider.generateDPoPProof(request.getMethod(), requestURI.toString(), this.bearerToken));
+      request.addHeader("DPoP", dPoPProofProvider.generateDPoPProof(request.getMethod(), requestURI.toString(), this.dPoPToken));
     }
 
     // Now that the cookies are ready, if the CSRF token is enabled and the parameter isn't set, we set it to be consistent
