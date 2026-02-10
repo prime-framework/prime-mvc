@@ -337,10 +337,10 @@ public class RequestBuilder {
   }
 
   /**
-   * Adds an Authorization header to the request using the DPoP scheme with the specified encodedJWT.
+   * Adds an Authorization header to the request using the Bearer scheme with the specified encodedJWT.
    * <p>Shorthand for calling
    * <pre>
-   *   withHeader("Authorization", "Bearer " + value)
+   *   withHeader("Authorization", "Bearer " + encodedJWT)
    * </pre>
    *
    * @param encodedJWT The Bearer token.
