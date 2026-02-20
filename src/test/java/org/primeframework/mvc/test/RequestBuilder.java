@@ -54,6 +54,8 @@ import io.fusionauth.http.HTTPMethod;
 import io.fusionauth.http.HTTPValues.Headers;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
+import io.fusionauth.jwks.domain.JSONWebKey;
+import io.fusionauth.jwt.Signer;
 import org.primeframework.mock.MockUserAgent;
 import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.http.FormBodyPublisher;
@@ -93,6 +95,12 @@ public class RequestBuilder {
   public final MockUserAgent userAgent;
 
   public boolean useTLS;
+
+  private String bearerToken;
+
+  private String dPoPToken;
+
+  private DPoPProofProvider dPoPProofProvider;
 
   private byte[] body;
 
@@ -329,6 +337,41 @@ public class RequestBuilder {
   }
 
   /**
+   * Adds an Authorization header to the request using the Bearer scheme with the specified encodedJWT.
+   * <p>Shorthand for calling
+   * <pre>
+   *   withHeader("Authorization", "Bearer " + encodedJWT)
+   * </pre>
+   *
+   * @param encodedJWT The Bearer token.
+   * @return This.
+   */
+  public RequestBuilder withAuthorizationBearerToken(String encodedJWT) {
+    if (dPoPToken != null) {
+      throw new IllegalStateException("Cannot set Authorization bearer token after setting DPoP token");
+    }
+    this.bearerToken = encodedJWT;
+    request.setHeader("Authorization", "Bearer " + encodedJWT);
+    return this;
+  }
+
+  /**
+   * Adds an Authorization header to the request using the DPoP scheme with the specified encodedJWT.
+   * Furthermore, the encodedJWT will be passed to the DPoPProofProvider.
+   *
+   * @param encodedJWT the DPoP bound access token
+   * @return This.
+   */
+  public RequestBuilder withAuthorizationDPoPToken(String encodedJWT) {
+    if (bearerToken != null) {
+      throw new IllegalStateException("Cannot set Authorization DPoP token after setting bearer token");
+    }
+    this.dPoPToken = encodedJWT;
+    request.setHeader("Authorization", "DPoP " + encodedJWT);
+    return this;
+  }
+
+  /**
    * Adds an Authorization header to the request using the specified value.
    * <p>Shorthand for calling
    * <pre>
@@ -489,6 +532,19 @@ public class RequestBuilder {
    */
   public RequestBuilder withCookie(String name, String value) throws Exception {
     return withCookie(name, value, false, false);
+  }
+
+  /**
+   * Provide a DPoPProofProvider to be used for adding a DPoP proof header to the request.
+   * An HTTP header will be added with name DPoP and value of what
+   * dPoPProofProvider.generateDPoPProof() returns.
+   *
+   * @param dPoPProofProvider an implementation of DPoPProofProvider
+   * @return This.
+   */
+  public RequestBuilder withDPoPProofProvider(DPoPProofProvider dPoPProofProvider) {
+    this.dPoPProofProvider = dPoPProofProvider;
+    return this;
   }
 
   /**
@@ -824,6 +880,10 @@ public class RequestBuilder {
     request.setPort(port);
     request.setHost(requestURI.getHost());
     request.setScheme(requestURI.getScheme());
+
+    if (dPoPProofProvider != null) {
+      request.addHeader("DPoP", dPoPProofProvider.generateDPoPProof(request.getMethod(), requestURI.toString(), this.dPoPToken));
+    }
 
     // Now that the cookies are ready, if the CSRF token is enabled and the parameter isn't set, we set it to be consistent
     // since the [@control.form] would normally set that into the form and into the request.
