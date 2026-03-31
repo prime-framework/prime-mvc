@@ -789,6 +789,21 @@ public class RequestBuilder {
   }
 
   /**
+   * Adds a header to the request only if the value is non-null. If the value is null, this method is a no-op.
+   * Follows the same pattern as {@link #withSingleHeader(String, String)}, it will replace if called sequentially
+   *
+   * @param name  The name of the header.
+   * @param value The value of the header, or {@code null} to skip adding the header.
+   * @return This.
+   */
+  public RequestBuilder withHeaderIfPresent(String name, String value) {
+    if (value != null) {
+      request.setHeader(name, value);
+    }
+    return this;
+  }
+
+  /**
    * Add a single URL query string parameter.
    *
    * @param name  the name of the parameter.

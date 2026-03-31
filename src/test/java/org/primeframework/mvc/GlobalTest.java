@@ -1558,6 +1558,23 @@ public class GlobalTest extends PrimeBaseTest {
   }
 
   @Test
+  public void headers_withHeaderIfPresent() throws IOException {
+    // Null value should not add the header
+    simulator.test("/header-values")
+             .withHeaderIfPresent("foo", null)
+             .get()
+             .assertStatusCode(200)
+             .assertJSONValuesAt("/foo", null);
+
+    // Non-null value should add the header
+    simulator.test("/header-values")
+             .withHeaderIfPresent("foo", "bar")
+             .get()
+             .assertStatusCode(200)
+             .assertJSONValuesAt("/foo", List.of("bar"));
+  }
+
+  @Test
   public void dpopHeader() throws IOException {
     // Make sure DPoPProofProvider gets invoked with proper values
     // (a real DPoPProofProvider would generate a signed JWT)
