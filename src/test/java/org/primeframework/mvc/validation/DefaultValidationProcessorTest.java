@@ -19,7 +19,16 @@ import java.util.List;
 
 import com.google.inject.Inject;
 import io.fusionauth.http.HTTPMethod;
+import org.example.action.PostValidationOrderChild;
+import org.example.action.PostValidationOrderNoAnnotationChild;
+import org.example.action.PostValidationOrderOverrideChild;
+import org.example.action.PreValidationOrderChild;
+import org.example.action.PreValidationOrderNoAnnotationChild;
+import org.example.action.PreValidationOrderOverrideChild;
 import org.example.action.ValidationMethods;
+import org.example.action.ValidationOrderChild;
+import org.example.action.ValidationOrderNoAnnotationChild;
+import org.example.action.ValidationOrderOverrideChild;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.message.MessageStore;
@@ -187,5 +196,149 @@ public class DefaultValidationProcessorTest extends PrimeBaseTest {
 
     assertTrue(action.preValidation);
     assertTrue(action.postValidation);
+  }
+
+  @Test
+  public void validationMethodOrdering_inheritedDifferentNames() {
+    // Base declares zzzValidateA, zzzValidateB (depth=1); child declares aaaValidateC, aaaValidateD (depth=0).
+    // The zzz/aaa prefixes make depth-first ordering visually obvious: base's zzz methods fire
+    // before child's aaa methods even though zzz sorts after aaa alphabetically.
+    request.setMethod(HTTPMethod.PUT);
+
+    ValidationOrderChild action = new ValidationOrderChild();
+    store.setCurrent(makeActionInvocation(action, HTTPMethod.PUT, ""));
+
+    DefaultValidationProcessor processor = new DefaultValidationProcessor(request, store, messageStore);
+    processor.validate();
+
+    assertEquals(action.invocationOrder, java.util.List.of("zzzValidateA", "zzzValidateB", "aaaValidateC", "aaaValidateD"));
+  }
+
+  @Test
+  public void validationMethodOrdering_override_reannotated() {
+    // Child re-annotates zzzValidateA. getMethods() deduplicates: child's zzzValidateA is at depth=0,
+    // base's zzzValidateB is at depth=1 and fires first.
+    // Expected invocation order: [zzzValidateB, zzzValidateA-child]
+    request.setMethod(HTTPMethod.PUT);
+
+    ValidationOrderOverrideChild action = new ValidationOrderOverrideChild();
+    store.setCurrent(makeActionInvocation(action, HTTPMethod.PUT, ""));
+
+    DefaultValidationProcessor processor = new DefaultValidationProcessor(request, store, messageStore);
+    processor.validate();
+
+    assertEquals(action.invocationOrder, java.util.List.of("zzzValidateB", "zzzValidateA-child"));
+  }
+
+  @Test
+  public void validationMethodOrdering_override_annotationLost() {
+    // Child overrides zzzValidateA WITHOUT re-adding @ValidationMethod. Java does not inherit method
+    // annotations — the unannotated child override replaces the annotated base method in getMethods(),
+    // so zzzValidateA is silently dropped. Only zzzValidateB (from the base) is invoked.
+    request.setMethod(HTTPMethod.PUT);
+
+    ValidationOrderNoAnnotationChild action = new ValidationOrderNoAnnotationChild();
+    store.setCurrent(makeActionInvocation(action, HTTPMethod.PUT, ""));
+
+    DefaultValidationProcessor processor = new DefaultValidationProcessor(request, store, messageStore);
+    processor.validate();
+
+    assertEquals(action.invocationOrder, java.util.List.of("zzzValidateB"));
+  }
+
+  @Test
+  public void preValidationMethodOrdering_inheritedDifferentNames() {
+    // Base declares zzzPreA, zzzPreB (depth=1); child declares aaaPreC, aaaPreD (depth=0).
+    // The zzz/aaa prefixes make depth-first ordering visually obvious: base's zzz methods fire
+    // before child's aaa methods even though zzz sorts after aaa alphabetically.
+    request.setMethod(HTTPMethod.PUT);
+
+    PreValidationOrderChild action = new PreValidationOrderChild();
+    store.setCurrent(makeActionInvocation(action, HTTPMethod.PUT, ""));
+
+    DefaultValidationProcessor processor = new DefaultValidationProcessor(request, store, messageStore);
+    processor.validate();
+
+    assertEquals(action.invocationOrder, java.util.List.of("zzzPreA", "zzzPreB", "aaaPreC", "aaaPreD"));
+  }
+
+  @Test
+  public void preValidationMethodOrdering_override_reannotated() {
+    // Child re-annotates zzzPreA. getMethods() deduplicates: child's zzzPreA is at depth=0,
+    // base's zzzPreB is at depth=1 and fires first.
+    // Expected invocation order: [zzzPreB, zzzPreA-child]
+    request.setMethod(HTTPMethod.PUT);
+
+    PreValidationOrderOverrideChild action = new PreValidationOrderOverrideChild();
+    store.setCurrent(makeActionInvocation(action, HTTPMethod.PUT, ""));
+
+    DefaultValidationProcessor processor = new DefaultValidationProcessor(request, store, messageStore);
+    processor.validate();
+
+    assertEquals(action.invocationOrder, java.util.List.of("zzzPreB", "zzzPreA-child"));
+  }
+
+  @Test
+  public void preValidationMethodOrdering_override_annotationLost() {
+    // Child overrides zzzPreA WITHOUT re-adding @PreValidationMethod. Java does not inherit method
+    // annotations — the unannotated child override replaces the annotated base method in getMethods(),
+    // so zzzPreA is silently dropped. Only zzzPreB (from the base) is invoked.
+    request.setMethod(HTTPMethod.PUT);
+
+    PreValidationOrderNoAnnotationChild action = new PreValidationOrderNoAnnotationChild();
+    store.setCurrent(makeActionInvocation(action, HTTPMethod.PUT, ""));
+
+    DefaultValidationProcessor processor = new DefaultValidationProcessor(request, store, messageStore);
+    processor.validate();
+
+    assertEquals(action.invocationOrder, java.util.List.of("zzzPreB"));
+  }
+
+  @Test
+  public void postValidationMethodOrdering_inheritedDifferentNames() {
+    // Base declares zzzPostA, zzzPostB (depth=1); child declares aaaPostC, aaaPostD (depth=0).
+    // The zzz/aaa prefixes make depth-first ordering visually obvious: base's zzz methods fire
+    // before child's aaa methods even though zzz sorts after aaa alphabetically.
+    request.setMethod(HTTPMethod.PUT);
+
+    PostValidationOrderChild action = new PostValidationOrderChild();
+    store.setCurrent(makeActionInvocation(action, HTTPMethod.PUT, ""));
+
+    DefaultValidationProcessor processor = new DefaultValidationProcessor(request, store, messageStore);
+    processor.validate();
+
+    assertEquals(action.invocationOrder, java.util.List.of("zzzPostA", "zzzPostB", "aaaPostC", "aaaPostD"));
+  }
+
+  @Test
+  public void postValidationMethodOrdering_override_reannotated() {
+    // Child re-annotates zzzPostA. getMethods() deduplicates: child's zzzPostA is at depth=0,
+    // base's zzzPostB is at depth=1 and fires first.
+    // Expected invocation order: [zzzPostB, zzzPostA-child]
+    request.setMethod(HTTPMethod.PUT);
+
+    PostValidationOrderOverrideChild action = new PostValidationOrderOverrideChild();
+    store.setCurrent(makeActionInvocation(action, HTTPMethod.PUT, ""));
+
+    DefaultValidationProcessor processor = new DefaultValidationProcessor(request, store, messageStore);
+    processor.validate();
+
+    assertEquals(action.invocationOrder, java.util.List.of("zzzPostB", "zzzPostA-child"));
+  }
+
+  @Test
+  public void postValidationMethodOrdering_override_annotationLost() {
+    // Child overrides zzzPostA WITHOUT re-adding @PostValidationMethod. Java does not inherit method
+    // annotations — the unannotated child override replaces the annotated base method in getMethods(),
+    // so zzzPostA is silently dropped. Only zzzPostB (from the base) is invoked.
+    request.setMethod(HTTPMethod.PUT);
+
+    PostValidationOrderNoAnnotationChild action = new PostValidationOrderNoAnnotationChild();
+    store.setCurrent(makeActionInvocation(action, HTTPMethod.PUT, ""));
+
+    DefaultValidationProcessor processor = new DefaultValidationProcessor(request, store, messageStore);
+    processor.validate();
+
+    assertEquals(action.invocationOrder, java.util.List.of("zzzPostB"));
   }
 }

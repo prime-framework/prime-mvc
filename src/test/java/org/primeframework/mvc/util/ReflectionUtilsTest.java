@@ -29,9 +29,21 @@ import java.util.TreeSet;
 
 import org.example.action.Extension;
 import org.example.action.ExtensionInheritanceAction;
+import org.example.action.PostValidationOrderChild;
+import org.example.action.PostValidationOrderNoAnnotationChild;
+import org.example.action.PostValidationOrderOverrideChild;
+import org.example.action.PreValidationOrderChild;
+import org.example.action.PreValidationOrderNoAnnotationChild;
+import org.example.action.PreValidationOrderOverrideChild;
+import org.example.action.ValidationOrderChild;
+import org.example.action.ValidationOrderNoAnnotationChild;
+import org.example.action.ValidationOrderOverrideChild;
 import org.example.domain.InvalidJavaBeanGetter;
 import org.example.domain.InvalidJavaBeanSetter;
 import org.primeframework.mvc.parameter.annotation.PostParameterMethod;
+import org.primeframework.mvc.validation.ValidationMethod;
+import org.primeframework.mvc.validation.annotation.PostValidationMethod;
+import org.primeframework.mvc.validation.annotation.PreValidationMethod;
 import org.testng.annotations.Test;
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
@@ -98,6 +110,117 @@ public class ReflectionUtilsTest {
     List<Method> methods = ReflectionUtils.findAllMethodsWithAnnotation(ExtensionInheritanceAction.class, PostParameterMethod.class);
     System.out.println(methods);
     assertEquals(methods, asList(Extension.class.getMethod("method"), Extension.class.getMethod("method1"), ExtensionInheritanceAction.class.getMethod("method2"), ExtensionInheritanceAction.class.getMethod("method3")));
+  }
+
+  @Test
+  public void validationMethodOrdering_differentNames() throws Exception {
+    // Base declares zzzValidateA, zzzValidateB (depth=1); child declares aaaValidateC, aaaValidateD (depth=0).
+    // The zzz/aaa prefixes make the depth-first ordering visually obvious: base's zzz methods execute
+    // before child's aaa methods even though zzz sorts after aaa alphabetically.
+    List<Method> methods = ReflectionUtils.findAllMethodsWithAnnotation(ValidationOrderChild.class, ValidationMethod.class);
+    assertEquals(methods, asList(
+        ValidationOrderChild.class.getMethod("zzzValidateA"),
+        ValidationOrderChild.class.getMethod("zzzValidateB"),
+        ValidationOrderChild.class.getMethod("aaaValidateC"),
+        ValidationOrderChild.class.getMethod("aaaValidateD")
+    ));
+  }
+
+  @Test
+  public void validationMethodOrdering_override_reannotated() throws Exception {
+    // Child re-annotates zzzValidateA — getMethods() returns only the child's override (depth=0).
+    // zzzValidateB is not overridden so it remains on the base (depth=1) and executes first.
+    // Expected: [zzzValidateB (base, depth=1), zzzValidateA (child, depth=0)]
+    List<Method> methods = ReflectionUtils.findAllMethodsWithAnnotation(ValidationOrderOverrideChild.class, ValidationMethod.class);
+    assertEquals(methods, asList(
+        ValidationOrderOverrideChild.class.getMethod("zzzValidateB"),
+        ValidationOrderOverrideChild.class.getMethod("zzzValidateA")
+    ));
+  }
+
+  @Test
+  public void validationMethodOrdering_override_annotationLost() throws Exception {
+    // Child overrides zzzValidateA WITHOUT re-adding @ValidationMethod. Java does not inherit method
+    // annotations, so getMethods() returns the child's unannotated override and zzzValidateA disappears
+    // from the annotated method list entirely. Only zzzValidateB (base, depth=1) remains.
+    List<Method> methods = ReflectionUtils.findAllMethodsWithAnnotation(ValidationOrderNoAnnotationChild.class, ValidationMethod.class);
+    assertEquals(methods, asList(
+        ValidationOrderNoAnnotationChild.class.getMethod("zzzValidateB")
+    ));
+  }
+
+  @Test
+  public void preValidationMethodOrdering_differentNames() throws Exception {
+    // Base declares zzzPreA, zzzPreB (depth=1); child declares aaaPreC, aaaPreD (depth=0).
+    // The zzz/aaa prefixes make the depth-first ordering visually obvious: base's zzz methods execute
+    // before child's aaa methods even though zzz sorts after aaa alphabetically.
+    List<Method> methods = ReflectionUtils.findAllMethodsWithAnnotation(PreValidationOrderChild.class, PreValidationMethod.class);
+    assertEquals(methods, asList(
+        PreValidationOrderChild.class.getMethod("zzzPreA"),
+        PreValidationOrderChild.class.getMethod("zzzPreB"),
+        PreValidationOrderChild.class.getMethod("aaaPreC"),
+        PreValidationOrderChild.class.getMethod("aaaPreD")
+    ));
+  }
+
+  @Test
+  public void preValidationMethodOrdering_override_reannotated() throws Exception {
+    // Child re-annotates zzzPreA — getMethods() returns only the child's override (depth=0).
+    // zzzPreB is not overridden so it remains on the base (depth=1) and executes first.
+    // Expected: [zzzPreB (base, depth=1), zzzPreA (child, depth=0)]
+    List<Method> methods = ReflectionUtils.findAllMethodsWithAnnotation(PreValidationOrderOverrideChild.class, PreValidationMethod.class);
+    assertEquals(methods, asList(
+        PreValidationOrderOverrideChild.class.getMethod("zzzPreB"),
+        PreValidationOrderOverrideChild.class.getMethod("zzzPreA")
+    ));
+  }
+
+  @Test
+  public void preValidationMethodOrdering_override_annotationLost() throws Exception {
+    // Child overrides zzzPreA WITHOUT re-adding @PreValidationMethod. Java does not inherit method
+    // annotations, so getMethods() returns the child's unannotated override and zzzPreA disappears
+    // from the annotated method list entirely. Only zzzPreB (base, depth=1) remains.
+    List<Method> methods = ReflectionUtils.findAllMethodsWithAnnotation(PreValidationOrderNoAnnotationChild.class, PreValidationMethod.class);
+    assertEquals(methods, asList(
+        PreValidationOrderNoAnnotationChild.class.getMethod("zzzPreB")
+    ));
+  }
+
+  @Test
+  public void postValidationMethodOrdering_differentNames() throws Exception {
+    // Base declares zzzPostA, zzzPostB (depth=1); child declares aaaPostC, aaaPostD (depth=0).
+    // The zzz/aaa prefixes make the depth-first ordering visually obvious: base's zzz methods execute
+    // before child's aaa methods even though zzz sorts after aaa alphabetically.
+    List<Method> methods = ReflectionUtils.findAllMethodsWithAnnotation(PostValidationOrderChild.class, PostValidationMethod.class);
+    assertEquals(methods, asList(
+        PostValidationOrderChild.class.getMethod("zzzPostA"),
+        PostValidationOrderChild.class.getMethod("zzzPostB"),
+        PostValidationOrderChild.class.getMethod("aaaPostC"),
+        PostValidationOrderChild.class.getMethod("aaaPostD")
+    ));
+  }
+
+  @Test
+  public void postValidationMethodOrdering_override_reannotated() throws Exception {
+    // Child re-annotates zzzPostA — getMethods() returns only the child's override (depth=0).
+    // zzzPostB is not overridden so it remains on the base (depth=1) and executes first.
+    // Expected: [zzzPostB (base, depth=1), zzzPostA (child, depth=0)]
+    List<Method> methods = ReflectionUtils.findAllMethodsWithAnnotation(PostValidationOrderOverrideChild.class, PostValidationMethod.class);
+    assertEquals(methods, asList(
+        PostValidationOrderOverrideChild.class.getMethod("zzzPostB"),
+        PostValidationOrderOverrideChild.class.getMethod("zzzPostA")
+    ));
+  }
+
+  @Test
+  public void postValidationMethodOrdering_override_annotationLost() throws Exception {
+    // Child overrides zzzPostA WITHOUT re-adding @PostValidationMethod. Java does not inherit method
+    // annotations, so getMethods() returns the child's unannotated override and zzzPostA disappears
+    // from the annotated method list entirely. Only zzzPostB (base, depth=1) remains.
+    List<Method> methods = ReflectionUtils.findAllMethodsWithAnnotation(PostValidationOrderNoAnnotationChild.class, PostValidationMethod.class);
+    assertEquals(methods, asList(
+        PostValidationOrderNoAnnotationChild.class.getMethod("zzzPostB")
+    ));
   }
 
   @Test
