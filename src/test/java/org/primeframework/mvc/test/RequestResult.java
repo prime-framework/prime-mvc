@@ -483,25 +483,13 @@ public class RequestResult {
     return this;
   }
 
-  @SuppressWarnings("StringConcatenationInsideStringBufferAppend")
-  public RequestResult assertFieldHasNoErrors(String field) {
-    Map<String, List<FieldMessage>> msgs = messageObserver.getFieldMessages();
-    List<FieldMessage> errorMessages = msgs.getOrDefault(field, List.of()).stream()
-            .filter(fieldMessage -> fieldMessage.getType() == MessageType.ERROR).toList();
-
-    if (errorMessages.isEmpty()) {
-      return this;
-    }
-
-    StringBuilder sb = new StringBuilder("The MessageStore contains the following error codes for field %s:\n".formatted(field));
-    errorMessages.stream().map(Message::getCode).forEach(m -> sb.append(m + "\n"));
-    throw new AssertionError(sb);
-  }
-
-  public RequestResult assertFieldHasErrorMessageFromKey(String field, String key, Object... values) {
-    return assertFieldHasErrorMessage(field, getMessageProviderToLookupMessages().getMessage(key, values));
-  }
-
+  /**
+   * Verifies that a specific error code exists for a field.
+   *
+   * @param field The field name.
+   * @param code  The error code.
+   * @return This.
+   */
   @SuppressWarnings("StringConcatenationInsideStringBufferAppend")
   public RequestResult assertFieldHasErrorCode(String field, String code) {
     Map<String, List<FieldMessage>> msgs = messageObserver.getFieldMessages();
@@ -526,6 +514,12 @@ public class RequestResult {
     throw new AssertionError(sb);
   }
 
+  /**
+   * Verifies that a specific error message exists for a field.
+   * @param field The field name.
+   * @param message The error message.
+   * @return This.
+   */
   @SuppressWarnings("StringConcatenationInsideStringBufferAppend")
   public RequestResult assertFieldHasErrorMessage(String field, String message) {
     Map<String, List<FieldMessage>> msgs = messageObserver.getFieldMessages();
@@ -548,6 +542,39 @@ public class RequestResult {
     errorMessages.stream().filter(SimpleFieldMessage.class::isInstance).map(m -> ((SimpleFieldMessage) m).message)
             .forEach(m -> sb.append(m + "\n"));
 
+    throw new AssertionError(sb);
+  }
+
+  /**
+   * Verifies that a specific error message exists for a field.
+   *
+   * @param field  The field name.
+   * @param key    The message key.
+   * @param values The replacement values.
+   * @return This.
+   */
+  public RequestResult assertFieldHasErrorMessageFromKey(String field, String key, Object... values) {
+    return assertFieldHasErrorMessage(field, getMessageProviderToLookupMessages().getMessage(key, values));
+  }
+
+  /**
+   * Verifies that there are no error messages associated with a specified field in the method store.
+   *
+   * @param field The field name.
+   * @return This.
+   */
+  @SuppressWarnings("StringConcatenationInsideStringBufferAppend")
+  public RequestResult assertFieldHasNoErrors(String field) {
+    Map<String, List<FieldMessage>> msgs = messageObserver.getFieldMessages();
+    List<FieldMessage> errorMessages = msgs.getOrDefault(field, List.of()).stream()
+            .filter(fieldMessage -> fieldMessage.getType() == MessageType.ERROR).toList();
+
+    if (errorMessages.isEmpty()) {
+      return this;
+    }
+
+    StringBuilder sb = new StringBuilder("The MessageStore contains the following error codes for field %s:\n".formatted(field));
+    errorMessages.stream().map(Message::getCode).forEach(m -> sb.append(m + "\n"));
     throw new AssertionError(sb);
   }
 
