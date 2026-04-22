@@ -15,8 +15,8 @@
  */
 package org.primeframework.mvc.test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.util.DefaultIndenter;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -558,7 +558,7 @@ public class RequestResult {
   }
 
   /**
-   * Verifies that there are no error messages associated with a specified field in the method store.
+   * Verifies that there are no error messages associated with a specified field in the message store.
    *
    * @param field The field name.
    * @return This.
