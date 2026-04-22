@@ -15,8 +15,32 @@
  */
 package org.primeframework.mvc.test;
 
-import com.fasterxml.jackson.core.util.DefaultIndenter;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.util.DefaultIndenter;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,23 +64,21 @@ import org.primeframework.mvc.action.ActionInvocation;
 import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.ActionMapper;
 import org.primeframework.mvc.http.HTTPObjectsHolder;
-import org.primeframework.mvc.message.*;
+import org.primeframework.mvc.message.FieldMessage;
+import org.primeframework.mvc.message.Message;
+import org.primeframework.mvc.message.MessageType;
+import org.primeframework.mvc.message.SimpleFieldMessage;
+import org.primeframework.mvc.message.SimpleMessage;
+import org.primeframework.mvc.message.TestMessageObserver;
 import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.message.l10n.MissingMessageException;
 import org.primeframework.mvc.message.scope.CookieFlashScope;
 import org.primeframework.mvc.security.Encryptor;
-import org.primeframework.mvc.util.*;
-
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.*;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
+import org.primeframework.mvc.util.CookieTools;
+import org.primeframework.mvc.util.QueryStringBuilder;
+import org.primeframework.mvc.util.QueryStringTools;
+import org.primeframework.mvc.util.ThrowingFunction;
+import org.primeframework.mvc.util.ThrowingRunnable;
 import static java.util.Arrays.asList;
 import static org.primeframework.mvc.message.TestMessageObserver.ObserverMessageStoreId;
 
@@ -484,101 +506,6 @@ public class RequestResult {
   }
 
   /**
-   * Verifies that a specific error code exists for a field.
-   *
-   * @param field The field name.
-   * @param code  The error code.
-   * @return This.
-   */
-  @SuppressWarnings("StringConcatenationInsideStringBufferAppend")
-  public RequestResult assertFieldHasErrorCode(String field, String code) {
-    Map<String, List<FieldMessage>> msgs = messageObserver.getFieldMessages();
-    List<FieldMessage> errorMessages = msgs.getOrDefault(field, List.of()).stream()
-            .filter(fieldMessage -> fieldMessage.getType() == MessageType.ERROR).toList();
-
-    if (errorMessages.isEmpty()) {
-      throw new AssertionError("The MessageStore does not contain any error messages for the field [" + field + "]");
-    }
-
-    if (errorMessages.stream()
-            .anyMatch(fieldMessage -> code.equals(fieldMessage.getCode()))) {
-      return this;
-    }
-
-    StringBuilder sb = new StringBuilder("The MessageStore does not contain the specified error code for the %s field.\n".formatted(field));
-    sb.append("\nYou asserted the field had the following error code:\n");
-    sb.append(code);
-    sb.append("\n\nThe field contains the following error codes:\n");
-    errorMessages.stream().map(Message::getCode).forEach(m -> sb.append(m + "\n"));
-
-    throw new AssertionError(sb);
-  }
-
-  /**
-   * Verifies that a specific error message exists for a field.
-   * @param field The field name.
-   * @param message The error message.
-   * @return This.
-   */
-  @SuppressWarnings("StringConcatenationInsideStringBufferAppend")
-  public RequestResult assertFieldHasErrorMessage(String field, String message) {
-    Map<String, List<FieldMessage>> msgs = messageObserver.getFieldMessages();
-    List<FieldMessage> errorMessages = msgs.getOrDefault(field, List.of()).stream()
-            .filter(fieldMessage -> fieldMessage.getType() == MessageType.ERROR).toList();
-
-    if (errorMessages.isEmpty()) {
-      throw new AssertionError("The MessageStore does not contain any error messages for the field [" + field + "]");
-    }
-    if (errorMessages.stream()
-            .anyMatch(fieldMessage -> fieldMessage instanceof SimpleFieldMessage simpleFieldMessage
-                    && message.equals(simpleFieldMessage.message))) {
-      return this;
-    }
-
-    StringBuilder sb = new StringBuilder("The MessageStore does not contain the specified error message for the %s field.\n".formatted(field));
-    sb.append("\nYou asserted the field had the following error message:\n");
-    sb.append(message);
-    sb.append("\n\nThe field contains the following error messages:\n");
-    errorMessages.stream().filter(SimpleFieldMessage.class::isInstance).map(m -> ((SimpleFieldMessage) m).message)
-            .forEach(m -> sb.append(m + "\n"));
-
-    throw new AssertionError(sb);
-  }
-
-  /**
-   * Verifies that a specific error message exists for a field.
-   *
-   * @param field  The field name.
-   * @param key    The message key.
-   * @param values The replacement values.
-   * @return This.
-   */
-  public RequestResult assertFieldHasErrorMessageFromKey(String field, String key, Object... values) {
-    return assertFieldHasErrorMessage(field, getMessageProviderToLookupMessages().getMessage(key, values));
-  }
-
-  /**
-   * Verifies that there are no error messages associated with a specified field in the message store.
-   *
-   * @param field The field name.
-   * @return This.
-   */
-  @SuppressWarnings("StringConcatenationInsideStringBufferAppend")
-  public RequestResult assertFieldHasNoErrors(String field) {
-    Map<String, List<FieldMessage>> msgs = messageObserver.getFieldMessages();
-    List<FieldMessage> errorMessages = msgs.getOrDefault(field, List.of()).stream()
-            .filter(fieldMessage -> fieldMessage.getType() == MessageType.ERROR).toList();
-
-    if (errorMessages.isEmpty()) {
-      return this;
-    }
-
-    StringBuilder sb = new StringBuilder("The MessageStore contains the following error codes for field %s:\n".formatted(field));
-    errorMessages.stream().map(Message::getCode).forEach(m -> sb.append(m + "\n"));
-    throw new AssertionError(sb);
-  }
-
-  /**
    * Verifies that the system has general errors. This doesn't assert the error itself, just that the general error code.
    *
    * @param messageCodes The name of the error code(s). Not the fully rendered message(s)
@@ -909,6 +836,101 @@ public class RequestResult {
     }
 
     return this;
+  }
+
+  /**
+   * Verifies that a specific error code exists for a field.
+   *
+   * @param field The field name.
+   * @param code  The error code.
+   * @return This.
+   */
+  @SuppressWarnings("StringConcatenationInsideStringBufferAppend")
+  public org.primeframework.mvc.test.RequestResult assertFieldHasErrorCode(String field, String code) {
+    Map<String, List<FieldMessage>> msgs = messageObserver.getFieldMessages();
+    List<FieldMessage> errorMessages = msgs.getOrDefault(field, List.of()).stream()
+            .filter(fieldMessage -> fieldMessage.getType() == MessageType.ERROR).toList();
+
+    if (errorMessages.isEmpty()) {
+      throw new AssertionError("The MessageStore does not contain any error messages for the field [" + field + "]");
+    }
+
+    if (errorMessages.stream()
+            .anyMatch(fieldMessage -> code.equals(fieldMessage.getCode()))) {
+      return this;
+    }
+
+    StringBuilder sb = new StringBuilder("The MessageStore does not contain the specified error code for the %s field.\n".formatted(field));
+    sb.append("\nYou asserted the field had the following error code:\n");
+    sb.append(code);
+    sb.append("\n\nThe field contains the following error codes:\n");
+    errorMessages.stream().map(Message::getCode).forEach(m -> sb.append(m + "\n"));
+
+    throw new AssertionError(sb);
+  }
+
+  /**
+   * Verifies that a specific error message exists for a field.
+   * @param field The field name.
+   * @param message The error message.
+   * @return This.
+   */
+  @SuppressWarnings("StringConcatenationInsideStringBufferAppend")
+  public org.primeframework.mvc.test.RequestResult assertFieldHasErrorMessage(String field, String message) {
+    Map<String, List<FieldMessage>> msgs = messageObserver.getFieldMessages();
+    List<FieldMessage> errorMessages = msgs.getOrDefault(field, List.of()).stream()
+            .filter(fieldMessage -> fieldMessage.getType() == MessageType.ERROR).toList();
+
+    if (errorMessages.isEmpty()) {
+      throw new AssertionError("The MessageStore does not contain any error messages for the field [" + field + "]");
+    }
+    if (errorMessages.stream()
+            .anyMatch(fieldMessage -> fieldMessage instanceof SimpleFieldMessage simpleFieldMessage
+                    && message.equals(simpleFieldMessage.message))) {
+      return this;
+    }
+
+    StringBuilder sb = new StringBuilder("The MessageStore does not contain the specified error message for the %s field.\n".formatted(field));
+    sb.append("\nYou asserted the field had the following error message:\n");
+    sb.append(message);
+    sb.append("\n\nThe field contains the following error messages:\n");
+    errorMessages.stream().filter(SimpleFieldMessage.class::isInstance).map(m -> ((SimpleFieldMessage) m).message)
+            .forEach(m -> sb.append(m + "\n"));
+
+    throw new AssertionError(sb);
+  }
+
+  /**
+   * Verifies that a specific error message exists for a field.
+   *
+   * @param field  The field name.
+   * @param key    The message key.
+   * @param values The replacement values.
+   * @return This.
+   */
+  public org.primeframework.mvc.test.RequestResult assertFieldHasErrorMessageFromKey(String field, String key, Object... values) {
+    return assertFieldHasErrorMessage(field, getMessageProviderToLookupMessages().getMessage(key, values));
+  }
+
+  /**
+   * Verifies that there are no error messages associated with a specified field in the message store.
+   *
+   * @param field The field name.
+   * @return This.
+   */
+  @SuppressWarnings("StringConcatenationInsideStringBufferAppend")
+  public org.primeframework.mvc.test.RequestResult assertFieldHasNoErrors(String field) {
+    Map<String, List<FieldMessage>> msgs = messageObserver.getFieldMessages();
+    List<FieldMessage> errorMessages = msgs.getOrDefault(field, List.of()).stream()
+            .filter(fieldMessage -> fieldMessage.getType() == MessageType.ERROR).toList();
+
+    if (errorMessages.isEmpty()) {
+      return this;
+    }
+
+    StringBuilder sb = new StringBuilder("The MessageStore contains the following error codes for field %s:\n".formatted(field));
+    errorMessages.stream().map(Message::getCode).forEach(m -> sb.append(m + "\n"));
+    throw new AssertionError(sb);
   }
 
   /**
