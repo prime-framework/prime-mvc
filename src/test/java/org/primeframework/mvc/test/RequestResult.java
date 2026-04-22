@@ -845,8 +845,7 @@ public class RequestResult {
    * @param code  The error code.
    * @return This.
    */
-  @SuppressWarnings("StringConcatenationInsideStringBufferAppend")
-  public org.primeframework.mvc.test.RequestResult assertFieldHasErrorCode(String field, String code) {
+  public RequestResult assertFieldHasErrorCode(String field, String code) {
     Map<String, List<FieldMessage>> msgs = messageObserver.getFieldMessages();
     List<FieldMessage> errorMessages = msgs.getOrDefault(field, List.of()).stream()
             .filter(fieldMessage -> fieldMessage.getType() == MessageType.ERROR).toList();
@@ -864,7 +863,7 @@ public class RequestResult {
     sb.append("\nYou asserted the field had the following error code:\n");
     sb.append(code);
     sb.append("\n\nThe field contains the following error codes:\n");
-    errorMessages.stream().map(Message::getCode).forEach(m -> sb.append(m + "\n"));
+    errorMessages.stream().map(Message::getCode).forEach(m -> sb.append(m).append("\n"));
 
     throw new AssertionError(sb);
   }
@@ -876,8 +875,7 @@ public class RequestResult {
    * @param message The error message.
    * @return This.
    */
-  @SuppressWarnings("StringConcatenationInsideStringBufferAppend")
-  public org.primeframework.mvc.test.RequestResult assertFieldHasErrorMessage(String field, String message) {
+  public RequestResult assertFieldHasErrorMessage(String field, String message) {
     Map<String, List<FieldMessage>> msgs = messageObserver.getFieldMessages();
     List<FieldMessage> errorMessages = msgs.getOrDefault(field, List.of()).stream()
             .filter(fieldMessage -> fieldMessage.getType() == MessageType.ERROR).toList();
@@ -896,7 +894,7 @@ public class RequestResult {
     sb.append(message);
     sb.append("\n\nThe field contains the following error messages:\n");
     errorMessages.stream().filter(SimpleFieldMessage.class::isInstance).map(m -> ((SimpleFieldMessage) m).message)
-            .forEach(m -> sb.append(m + "\n"));
+            .forEach(m -> sb.append(m).append("\n"));
 
     throw new AssertionError(sb);
   }
@@ -909,7 +907,7 @@ public class RequestResult {
    * @param values The replacement values.
    * @return This.
    */
-  public org.primeframework.mvc.test.RequestResult assertFieldHasErrorMessageFromKey(String field, String key, Object... values) {
+  public RequestResult assertFieldHasErrorMessageFromKey(String field, String key, Object... values) {
     return assertFieldHasErrorMessage(field, getMessageProviderToLookupMessages().getMessage(key, values));
   }
 
@@ -919,8 +917,7 @@ public class RequestResult {
    * @param field The field name.
    * @return This.
    */
-  @SuppressWarnings("StringConcatenationInsideStringBufferAppend")
-  public org.primeframework.mvc.test.RequestResult assertFieldHasNoErrors(String field) {
+  public RequestResult assertFieldHasNoErrors(String field) {
     Map<String, List<FieldMessage>> msgs = messageObserver.getFieldMessages();
     List<FieldMessage> errorMessages = msgs.getOrDefault(field, List.of()).stream()
             .filter(fieldMessage -> fieldMessage.getType() == MessageType.ERROR).toList();
@@ -930,7 +927,7 @@ public class RequestResult {
     }
 
     StringBuilder sb = new StringBuilder("The MessageStore contains the following error codes for field %s:\n".formatted(field));
-    errorMessages.stream().map(Message::getCode).forEach(m -> sb.append(m + "\n"));
+    errorMessages.stream().map(Message::getCode).forEach(m -> sb.append(m).append("\n"));
     throw new AssertionError(sb);
   }
 
