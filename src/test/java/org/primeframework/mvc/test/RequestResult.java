@@ -914,7 +914,7 @@ public class RequestResult {
   /**
    * Verifies that there are no error messages associated with a specified field in the message store.
    *
-   * @param field The field name.
+   * @param field The field name. No assertion error will be thrown if the field does not exist.
    * @return This.
    */
   public RequestResult assertFieldHasNoErrors(String field) {
