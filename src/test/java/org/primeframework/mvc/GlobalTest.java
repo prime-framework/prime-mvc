@@ -15,7 +15,6 @@
  */
 package org.primeframework.mvc;
 
-import javax.annotation.Nullable;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -50,7 +49,6 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import freemarker.template.Configuration;
-import io.fusionauth.http.HTTPMethod;
 import io.fusionauth.http.HTTPValues.Headers;
 import io.fusionauth.http.HTTPValues.Methods;
 import org.example.action.JwtAuthorizedAction;
@@ -81,6 +79,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertSame;
+import static org.testng.Assert.assertThrows;
 import static org.testng.Assert.assertTrue;
 import static org.testng.AssertJUnit.assertFalse;
 import static org.testng.FileAssert.fail;
@@ -930,6 +929,19 @@ public class GlobalTest extends PrimeBaseTest {
              .get()
              .assertStatusCode(200)
              .assertBodyContains("large FTL");
+  }
+
+  @Test
+  public void get_fieldMessage() throws Exception {
+    test.simulate(() -> simulator.test("/field-message")
+                                 .get()
+                                 .assertStatusCode(200)
+                                 .assertFieldHasNoErrors("foo")
+                                 .assertFieldHasNoErrors("bar")
+                                 .custom(r -> assertThrows(AssertionError.class, () -> r.assertFieldHasNoErrors("baz")))
+                                 .assertFieldHasErrorMessage("baz", "baz has an error")
+                                 .assertFieldHasErrorMessageFromKey("baz", "[ERROR]", "baz")
+                                 .assertFieldHasErrorCode("baz", "[ERROR]baz"));
   }
 
   @Test

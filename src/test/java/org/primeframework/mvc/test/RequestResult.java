@@ -839,6 +839,99 @@ public class RequestResult {
   }
 
   /**
+   * Verifies that a specific error code exists for a field.
+   *
+   * @param field The field name.
+   * @param code  The error code.
+   * @return This.
+   */
+  public RequestResult assertFieldHasErrorCode(String field, String code) {
+    Map<String, List<FieldMessage>> msgs = messageObserver.getFieldMessages();
+    List<FieldMessage> errorMessages = msgs.getOrDefault(field, List.of()).stream()
+            .filter(fieldMessage -> fieldMessage.getType() == MessageType.ERROR).toList();
+
+    if (errorMessages.isEmpty()) {
+      throw new AssertionError("The MessageStore does not contain any error messages for the field [" + field + "]");
+    }
+
+    if (errorMessages.stream()
+            .anyMatch(fieldMessage -> code.equals(fieldMessage.getCode()))) {
+      return this;
+    }
+
+    StringBuilder sb = new StringBuilder("The MessageStore does not contain the specified error code for the %s field.\n".formatted(field));
+    sb.append("\nYou asserted the field had the following error code:\n");
+    sb.append(code);
+    sb.append("\n\nThe field contains the following error codes:\n");
+    errorMessages.stream().map(Message::getCode).forEach(m -> sb.append(m).append("\n"));
+
+    throw new AssertionError(sb);
+  }
+
+  /**
+   * Verifies that a specific error message exists for a field.
+   * 
+   * @param field The field name.
+   * @param message The error message.
+   * @return This.
+   */
+  public RequestResult assertFieldHasErrorMessage(String field, String message) {
+    Map<String, List<FieldMessage>> msgs = messageObserver.getFieldMessages();
+    List<FieldMessage> errorMessages = msgs.getOrDefault(field, List.of()).stream()
+            .filter(fieldMessage -> fieldMessage.getType() == MessageType.ERROR).toList();
+
+    if (errorMessages.isEmpty()) {
+      throw new AssertionError("The MessageStore does not contain any error messages for the field [" + field + "]");
+    }
+    if (errorMessages.stream()
+            .anyMatch(fieldMessage -> fieldMessage instanceof SimpleFieldMessage simpleFieldMessage
+                    && message.equals(simpleFieldMessage.message))) {
+      return this;
+    }
+
+    StringBuilder sb = new StringBuilder("The MessageStore does not contain the specified error message for the %s field.\n".formatted(field));
+    sb.append("\nYou asserted the field had the following error message:\n");
+    sb.append(message);
+    sb.append("\n\nThe field contains the following error messages:\n");
+    errorMessages.stream().filter(SimpleFieldMessage.class::isInstance).map(m -> ((SimpleFieldMessage) m).message)
+            .forEach(m -> sb.append(m).append("\n"));
+
+    throw new AssertionError(sb);
+  }
+
+  /**
+   * Verifies that a specific error message exists for a field.
+   *
+   * @param field  The field name.
+   * @param key    The message key.
+   * @param values The replacement values.
+   * @return This.
+   */
+  public RequestResult assertFieldHasErrorMessageFromKey(String field, String key, Object... values) {
+    return assertFieldHasErrorMessage(field, getMessageProviderToLookupMessages().getMessage(key, values));
+  }
+
+  /**
+   * Verifies that there are no error messages associated with a specified field in the message store.
+   *
+   * @param field The field name. No assertion error will be thrown if the field does not exist.
+   * @return This.
+   */
+  public RequestResult assertFieldHasNoErrors(String field) {
+    Map<String, List<FieldMessage>> msgs = messageObserver.getFieldMessages();
+    List<FieldMessage> errorMessages = msgs.getOrDefault(field, List.of()).stream()
+            .filter(fieldMessage -> fieldMessage.getType() == MessageType.ERROR).toList();
+
+    if (errorMessages.isEmpty()) {
+      return this;
+    }
+
+    StringBuilder sb = new StringBuilder("The MessageStore contains the following error codes for field %s:\n".formatted(field));
+    errorMessages.stream().map(Message::getCode).forEach(m -> sb.append(m).append("\n"));
+    throw new AssertionError(sb);
+  }
+
+  /**
    * @param consumer a consumer of the HTML asserter
    * @return return a new HTML asserter
    * @throws Exception exceptions that happen..
