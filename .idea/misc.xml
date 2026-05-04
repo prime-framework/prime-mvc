@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="EntryPointsManager">
+    <list size="4">
+      <item index="0" class="java.lang.String" itemvalue="com.google.inject.Inject" />
+      <item index="1" class="java.lang.String" itemvalue="org.primeframework.mvc.action.annotation.Action" />
+      <item index="2" class="java.lang.String" itemvalue="org.primeframework.mvc.parameter.annotation.PreRenderMethod" />
+      <item index="3" class="java.lang.String" itemvalue="org.primeframework.mvc.parameter.annotation.UnknownParameters" />
+    </list>
+    <writeAnnotations>
+      <writeAnnotation name="com.google.inject.Inject" />
+    </writeAnnotations>
+  </component>
+</project>

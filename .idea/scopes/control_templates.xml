@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="control-templates" pattern="file[prime-mvc]:src/main/ftl/control-templates/*" />
+</component>
