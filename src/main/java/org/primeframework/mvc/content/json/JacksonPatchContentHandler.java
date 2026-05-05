@@ -16,6 +16,9 @@
 package org.primeframework.mvc.content.json;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,6 +36,7 @@ import org.primeframework.mvc.message.MessageType;
 import org.primeframework.mvc.message.SimpleMessage;
 import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
+import org.primeframework.mvc.util.ReflectionUtils;
 import org.primeframework.mvc.validation.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,13 +74,48 @@ public class JacksonPatchContentHandler extends BaseJacksonContentHandler {
 
     // Build the patch from the incoming request body
     Patch patch = objectMapper.readerFor(contentType.equals("application/json-patch+json")
-                                  ? JsonPatch.class
-                                  : JsonMergePatch.class)
+                                             ? JsonPatch.class
+                                             : JsonMergePatch.class)
                               .readValue(request.getInputStream());
 
     // Patch the current object
-    JsonNode patched = patch.apply(objectMapper.valueToTree(currentValue));
+    JsonNode source = objectMapper.valueToTree(currentValue);
+    JsonNode patched = patch.apply(source);
+
+    // Deserialize into a fully patched request object first.
+    // This stays with the patch behavior we were using before and we can
+    // continue assigning this object on the request for non-final members.
     Object patchedObject = objectMapper.readerFor(requestMember.type).readValue(patched);
+
+    // For non-final request members we keep the original assignment behavior.
+    // For final request members, reassignment is not possible, so we copy
+    // patched object state onto the existing instance instead. readerForUpdating couldn't
+    // be used because values that had been removed from the source were left intact in
+    // the target object (they would need to be set to null, instead of removed, if we wanted
+    // readerForUpdating to work correctly)
+    if (isFinalRequestMember(action.getClass(), requestMember.name)) {
+      copyFields(patchedObject, currentValue);
+      return;
+    }
+
     expressionEvaluator.setValue(requestMember.name, action, patchedObject);
+  }
+
+  private void copyFields(Object source, Object target) throws IOException {
+    try {
+      Map<String, Field> fields = ReflectionUtils.findFields(source.getClass());
+      for (Field field : fields.values()) {
+        if (!Modifier.isFinal(field.getModifiers())) {
+          field.set(target, field.get(source));
+        }
+      }
+    } catch (IllegalAccessException e) {
+      throw new IOException("Unable to copy patched object to current value", e);
+    }
+  }
+
+  private boolean isFinalRequestMember(Class<?> actionClass, String memberName) {
+    Field field = ReflectionUtils.findFields(actionClass).get(memberName);
+    return field != null && Modifier.isFinal(field.getModifiers());
   }
 }
