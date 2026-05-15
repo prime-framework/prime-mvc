@@ -55,7 +55,7 @@ public class ManagedCookieTest extends PrimeBaseTest {
 
         // Send the bad cookie value directly on a GET request to avoid it being written by PMVC
         simulator.test("/managed-cookie")
-                .withCookie("cookie", badCookieValue)
+                .withCookie(new Cookie("cookie", badCookieValue))
                 .get()
                 // The cookie is base64-decoded and parsed as JSON
                 .assertBody("5")
@@ -97,7 +97,7 @@ public class ManagedCookieTest extends PrimeBaseTest {
         var legacyCookieWithNoCompression = Base64.getEncoder().encodeToString(json);
         var modernCookie = CookieTools.toCookie(value.getBytes(), true, false, encryptor);
         test.simulate(() -> simulator.test("/compressed-managed-cookie")
-                        .withCookie("cookie", legacyCookieWithNoCompression)
+                        .withCookie(new Cookie("cookie", legacyCookieWithNoCompression))
                         .get()
                         .assertStatusCode(200)
                         .assertBody(value)
@@ -126,7 +126,7 @@ public class ManagedCookieTest extends PrimeBaseTest {
         var legacyCookieWithNoCompression = Base64.getEncoder().encodeToString(json);
         var modernCookie = CookieTools.toCookie(value.getBytes(), true, false, encryptor);
         test.simulate(() -> simulator.test("/compressed-managed-cookie")
-                        .withCookie("cookie", legacyCookieWithNoCompression)
+                        .withCookie(new Cookie("cookie", legacyCookieWithNoCompression))
                         .get()
                         .assertStatusCode(200)
                         .assertBody(value)
@@ -187,7 +187,7 @@ public class ManagedCookieTest extends PrimeBaseTest {
 
         // Make a request with the raw cookie value included in the header
         test.simulate(() -> simulator.test("/managed-cookie")
-                        .withCookie("cookie", cookie)
+                        .withCookie(new Cookie("cookie", cookie))
                         .get()
                         .assertStatusCode(200)
                         // The body contains string after removing header bytes
@@ -242,7 +242,7 @@ public class ManagedCookieTest extends PrimeBaseTest {
         // This is the legacy version, but it should work even though the EncryptedManagedCookieAction
         // has compression enabled
         test.simulate(() -> simulator.test("/encrypted-managed-cookie")
-                        .withCookie("cookie", legacyEncoded)
+                        .withCookie(new Cookie("cookie", legacyEncoded))
                         .get()
                         .assertStatusCode(200)
                         .assertNormalizedBody("foo")
@@ -357,6 +357,7 @@ public class ManagedCookieTest extends PrimeBaseTest {
 
         // The first request is a modern, base64-encoded cookie with headers. The value is the JSON String `"foo"`
         test.simulate(() -> simulator.test("/managed-cookie")
+                // direct Cookie constructor will not put a header on the value
                 .withCookie(new Cookie("cookie", jsonStr))
                 .get()
                 .assertStatusCode(200)
