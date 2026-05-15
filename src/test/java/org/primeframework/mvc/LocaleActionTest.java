@@ -15,51 +15,52 @@
  */
 package org.primeframework.mvc;
 
-import java.util.Locale;
-
+import io.fusionauth.http.Cookie;
 import org.testng.annotations.Test;
+
+import java.util.Locale;
 
 /**
  * @author Brian Pontarelli
  */
 @Test
 public class LocaleActionTest extends PrimeBaseTest {
-  @Test
-  public void getFromBrowser() {
-    simulator.test("/locale")
-             .withHeader("Accept-Language", Locale.CHINESE.toString())
-             .get()
-             .assertStatusCode(200)
-             .assertBodyContains("Locale:zh");
-  }
+    @Test
+    public void getFromBrowser() {
+        simulator.test("/locale")
+                .withHeader("Accept-Language", Locale.CHINESE.toString())
+                .get()
+                .assertStatusCode(200)
+                .assertBodyContains("Locale:zh");
+    }
 
-  @Test
-  public void getFromCookie() throws Exception {
-    // The cookie overrides the header
-    simulator.test("/locale")
-             .withHeader("Accept-Language", Locale.CHINESE.toString())
-             .withCookie("prime-locale", "fr")
-             .get()
-             .assertStatusCode(200)
-             .assertBodyContains("Locale:fr");
-  }
+    @Test
+    public void getFromCookie() throws Exception {
+        // The cookie overrides the header
+        simulator.test("/locale")
+                .withHeader("Accept-Language", Locale.CHINESE.toString())
+                .withCookie(new Cookie("prime-locale", "fr"))
+                .get()
+                .assertStatusCode(200)
+                .assertBodyContains("Locale:fr");
+    }
 
-  @Test
-  public void set() {
-    simulator.test("/locale")
-             .withParameter("locale", "zh")
-             .post()
-             .assertStatusCode(200)
-             .assertBodyContains("Locale:zh")
-             .assertCookie("prime-locale", "zh");
-  }
+    @Test
+    public void set() {
+        simulator.test("/locale")
+                .withParameter("locale", "zh")
+                .post()
+                .assertStatusCode(200)
+                .assertBodyContains("Locale:zh")
+                .assertCookie("prime-locale", "zh");
+    }
 
-  @Test
-  public void setDeleteCookie() {
-    simulator.test("/locale")
-             .post()
-             .assertStatusCode(200)
-             .assertBodyContains("Locale:empty")
-             .assertCookieWasDeleted("prime-locale");
-  }
+    @Test
+    public void setDeleteCookie() {
+        simulator.test("/locale")
+                .post()
+                .assertStatusCode(200)
+                .assertBodyContains("Locale:empty")
+                .assertCookieWasDeleted("prime-locale");
+    }
 }
