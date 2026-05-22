@@ -479,11 +479,11 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
     request.setContentType("application/json");
 
     MessageProvider messageProvider = createStrictMock(MessageProvider.class);
-    expect(messageProvider.getMessage(eq("[invalidRequestBody]"))).andReturn("The request body is not valid JSON.");
+    expect(messageProvider.getMessage(eq("[invalidJSON]"), eq("request body"), eq("Request body is not valid JSON"), isA(String.class))).andReturn("The request body is not valid JSON.");
     replay(messageProvider);
 
     MessageStore messageStore = createStrictMock(MessageStore.class);
-    messageStore.add(new SimpleMessage(MessageType.ERROR, "[invalidRequestBody]", "The request body is not valid JSON."));
+    messageStore.add(new SimpleMessage(MessageType.ERROR, "[invalidJSON]", "The request body is not valid JSON."));
     replay(messageStore);
 
     JacksonContentHandler handler = new JacksonContentHandler(request, store, new ObjectMapper(), expressionEvaluator, messageProvider, messageStore);
