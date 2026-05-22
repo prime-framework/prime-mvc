@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2025, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2014-2026, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,73 +29,73 @@ logbackVersion = "1.5.13"
 slf4jVersion = "2.0.13"
 testngVersion = "7.8.0"
 
-project(group: "org.primeframework", name: "prime-mvc", version: "5.10.3", licenses: ["ApacheV2_0"]) {
-  workflow {
-    fetch {
-      // Dependency resolution order:
-      //
-      // 1. Hit the savant cache
-      cache()
-      //
-      // 2. Look in public savant repo
-      url(url: "https://repository.savantbuild.org")
-      //
-      // 3. No dice, see if we can find it in Maven central
-      maven()
+project(group: "org.primeframework", name: "prime-mvc", version: "5.11.0", licenses: ["ApacheV2_0"]) {
+    workflow {
+        fetch {
+            // Dependency resolution order:
+            //
+            // 1. Hit the savant cache
+            cache()
+            //
+            // 2. Look in public savant repo
+            url(url: "https://repository.savantbuild.org")
+            //
+            // 3. No dice, see if we can find it in Maven central
+            maven()
+        }
+        publish {
+            cache()
+        }
+        semanticVersions {
+            mapping(id: "com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava", version: "9999.0.0")
+            mapping(id: "com.google.guava:guava-parent:26.0-android", version: "26.0.0")
+        }
     }
-    publish {
-      cache()
-    }
-    semanticVersions {
-      mapping(id: "com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava", version: "9999.0.0")
-      mapping(id: "com.google.guava:guava-parent:26.0-android", version: "26.0.0")
-    }
-  }
 
-  publishWorkflow {
-    subversion(repository: "https://svn.savantbuild.org")
-  }
+    publishWorkflow {
+        subversion(repository: "https://svn.savantbuild.org")
+    }
 
-  dependencies {
-    group(name: "compile") {
-      dependency(id: "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}")
-      dependency(id: "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}")
-      dependency(id: "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}")
-      dependency(id: "com.github.java-json-tools:json-patch:${jsonPatchVersion}")
-      dependency(id: "com.google.code.findbugs:jsr305:3.0.2", skipCompatibilityCheck: true)
-      dependency(id: "com.google.inject:guice:${guiceVersion}")
-      dependency(id: "io.dropwizard.metrics:metrics-core:${dropWizardVersion}")
-      dependency(id: "io.fusionauth:fusionauth-jwt:${fusionAuthJWTVersion}")
-      dependency(id: "io.fusionauth:java-http:${javaHTTPVersion}")
-      dependency(id: "jakarta.inject:jakarta.inject-api:2.0.1")
-      dependency(id: "javax.inject:javax.inject:1.0.0")
-      dependency(id: "org.freemarker:freemarker:${freemarkerVersion}")
-      dependency(id: "org.ow2.asm:asm:${asmVersion}")
-      dependency(id: "org.slf4j:slf4j-api:${slf4jVersion}", skipCompatibilityCheck: true)
+    dependencies {
+        group(name: "compile") {
+            dependency(id: "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}")
+            dependency(id: "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}")
+            dependency(id: "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}")
+            dependency(id: "com.github.java-json-tools:json-patch:${jsonPatchVersion}")
+            dependency(id: "com.google.code.findbugs:jsr305:3.0.2", skipCompatibilityCheck: true)
+            dependency(id: "com.google.inject:guice:${guiceVersion}")
+            dependency(id: "io.dropwizard.metrics:metrics-core:${dropWizardVersion}")
+            dependency(id: "io.fusionauth:fusionauth-jwt:${fusionAuthJWTVersion}")
+            dependency(id: "io.fusionauth:java-http:${javaHTTPVersion}")
+            dependency(id: "jakarta.inject:jakarta.inject-api:2.0.1")
+            dependency(id: "javax.inject:javax.inject:1.0.0")
+            dependency(id: "org.freemarker:freemarker:${freemarkerVersion}")
+            dependency(id: "org.ow2.asm:asm:${asmVersion}")
+            dependency(id: "org.slf4j:slf4j-api:${slf4jVersion}", skipCompatibilityCheck: true)
+        }
+        group(name: "runtime") {
+            dependency(id: "com.google.guava:guava:${guavaVersion}", skipCompatibilityCheck: true)
+        }
+        group(name: "test-compile", export: false) {
+            dependency(id: "org.easymock:easymock:${easyMockVersion}")
+            dependency(id: "org.testng:testng:${testngVersion}")
+            dependency(id: "org.jsoup:jsoup:${jsoupVersion}")
+        }
+        group(name: "test-runtime", export: false) {
+            dependency(id: "ch.qos.logback:logback-classic:${logbackVersion}")
+            dependency(id: "ch.qos.logback:logback-core:${logbackVersion}")
+        }
     }
-    group(name: "runtime") {
-      dependency(id: "com.google.guava:guava:${guavaVersion}", skipCompatibilityCheck: true)
-    }
-    group(name: "test-compile", export: false) {
-      dependency(id: "org.easymock:easymock:${easyMockVersion}")
-      dependency(id: "org.testng:testng:${testngVersion}")
-      dependency(id: "org.jsoup:jsoup:${jsoupVersion}")
-    }
-    group(name: "test-runtime", export: false) {
-      dependency(id: "ch.qos.logback:logback-classic:${logbackVersion}")
-      dependency(id: "ch.qos.logback:logback-core:${logbackVersion}")
-    }
-  }
 
-  publications {
-    standard()
-    main {
-      publication(name: "${project.name}-simulator", type: "jar",
-                  file: "build/jars/${project.name}-simulator-${project.version}.jar",
-                  source: "build/jars/${project.name}-simulator-${project.version}-src.jar"
-      )
+    publications {
+        standard()
+        main {
+            publication(name: "${project.name}-simulator", type: "jar",
+                    file: "build/jars/${project.name}-simulator-${project.version}.jar",
+                    source: "build/jars/${project.name}-simulator-${project.version}-src.jar"
+            )
+        }
     }
-  }
 }
 
 // Plugins
@@ -113,89 +113,89 @@ javaTestNG.settings.javaVersion = "21"
 javaTestNG.settings.jvmArguments = "--add-exports java.base/sun.security.x509=ALL-UNNAMED --add-exports java.base/sun.security.util=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED"
 
 target(name: "clean", description: "Cleans the project") {
-  java.clean()
+    java.clean()
 }
 
 target(name: "compile", description: "Compiles the project") {
-  java.compileMain()
+    java.compileMain()
 
-  // Allow the user of sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl in tests (but not in production code)
-  java.settings.compilerArguments = "-XDignore.symbol.file --add-exports java.base/sun.security.x509=ALL-UNNAMED --add-exports java.base/sun.security.util=ALL-UNNAMED"
-  java.compileTest()
+    // Allow the user of sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl in tests (but not in production code)
+    java.settings.compilerArguments = "-XDignore.symbol.file --add-exports java.base/sun.security.x509=ALL-UNNAMED --add-exports java.base/sun.security.util=ALL-UNNAMED"
+    java.compileTest()
 
-  file.copy(to: "build/classes/main") {
-    fileSet(dir: "src/main/ftl")
-  }
+    file.copy(to: "build/classes/main") {
+        fileSet(dir: "src/main/ftl")
+    }
 }
 
 target(name: "jar", description: "JARs the project", dependsOn: ["compile"]) {
-  java.jar()
+    java.jar()
 
-  // Create a separate test jar that only includes org/primeframework
-  file.copy(to: "build/classes/simulator") {
-    fileSet(dir: "build/classes/test", includePatterns: [~/org\/primeframework.+/])
-  }
+    // Create a separate test jar that only includes org/primeframework
+    file.copy(to: "build/classes/simulator") {
+        fileSet(dir: "build/classes/test", includePatterns: [~/org\/primeframework.+/])
+    }
 
-  // Create a separate test jar that only includes org/primeframework
-  file.copy(to: "build/src/simulator") {
-    fileSet(dir: "src/test/java", includePatterns: [~/org\/primeframework.+/])
-  }
+    // Create a separate test jar that only includes org/primeframework
+    file.copy(to: "build/src/simulator") {
+        fileSet(dir: "src/test/java", includePatterns: [~/org\/primeframework.+/])
+    }
 
-  file.jar(file: "build/jars/${project.name}-simulator-${project.version}.jar") {
-    fileSet(dir: "build/classes/simulator")
-  }
+    file.jar(file: "build/jars/${project.name}-simulator-${project.version}.jar") {
+        fileSet(dir: "build/classes/simulator")
+    }
 
-  file.jar(file: "build/jars/${project.name}-simulator-${project.version}-src.jar") {
-    fileSet(dir: "build/src/simulator")
-  }
+    file.jar(file: "build/jars/${project.name}-simulator-${project.version}-src.jar") {
+        fileSet(dir: "build/src/simulator")
+    }
 }
 
 target(name: "pom", description: "Updates the pom.xml file") {
-  updatePOM()
+    updatePOM()
 }
 
 target(name: "test", description: "Runs the project's tests", dependsOn: ["jar"]) {
-  javaTestNG.test()
+    javaTestNG.test()
 }
 
 target(name: "doc", description: "Generate the project's JavaDoc", dependsOn: ["jar"]) {
-  java.document()
+    java.document()
 }
 
 target(name: "int", description: "Releases a local integration build of the project", dependsOn: ["test"]) {
-  dependency.integrate()
+    dependency.integrate()
 }
 
 target(name: "list-unused-dependencies", description: "Lists the unused dependencies of the project", dependsOn: ["compile"]) {
-  dependency.listUnusedDependencies()
+    dependency.listUnusedDependencies()
 }
 
 target(name: "release", description: "Releases a full version of the project", dependsOn: ["test"]) {
-  release.release()
+    release.release()
 }
 
 target(name: "idea", description: "Updates the IntelliJ IDEA module file") {
-  idea.iml()
-  updatePOM()
+    idea.iml()
+    updatePOM()
 }
 
 void updatePOM() {
-  pom.update()
+    pom.update()
 
-  // Note that the POM plugin does not handle non semantic versions correctly.
-  // - However, these dependencies are coming from savant, so we do not know the version they were in Maven.
-  //   The longer term fix I think it is to delete these from savant and just pull them from Maven, but there are
-  //   complications in doing that unless we wholesale delete all artifacts from Savant that can be found in Maven
-  //   all at once.
-  // - We can live with this for a while longer. Or if we can upgrade these deps then we don't need these mappings
-  //   assuming we can pull them from maven.
-  //   But I don't know that we will ever update inject:1.0.0.
-  file.copy(to: ".") {
-    fileSet(dir: ".", includePatterns: [~/pom.xml/])
-    // com.github.java-json-tools:json-patch:1.13.0 -> 1.13
-    filter(token: "<version>1.13.0</version>", value: "<version>1.13</version>")
-    // javax.inject:javax.inject:1.0.0 -> 1
-    filter(token: "<artifactId>javax.inject</artifactId>\n      <version>1.0.0</version>",
-           value: "<artifactId>javax.inject</artifactId>\n      <version>1</version>")
-  }
+    // Note that the POM plugin does not handle non semantic versions correctly.
+    // - However, these dependencies are coming from savant, so we do not know the version they were in Maven.
+    //   The longer term fix I think it is to delete these from savant and just pull them from Maven, but there are
+    //   complications in doing that unless we wholesale delete all artifacts from Savant that can be found in Maven
+    //   all at once.
+    // - We can live with this for a while longer. Or if we can upgrade these deps then we don't need these mappings
+    //   assuming we can pull them from maven.
+    //   But I don't know that we will ever update inject:1.0.0.
+    file.copy(to: ".") {
+        fileSet(dir: ".", includePatterns: [~/pom.xml/])
+        // com.github.java-json-tools:json-patch:1.13.0 -> 1.13
+        filter(token: "<version>1.13.0</version>", value: "<version>1.13</version>")
+        // javax.inject:javax.inject:1.0.0 -> 1
+        filter(token: "<artifactId>javax.inject</artifactId>\n      <version>1.0.0</version>",
+                value: "<artifactId>javax.inject</artifactId>\n      <version>1</version>")
+    }
 }
