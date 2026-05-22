@@ -1,17 +1,5 @@
 /*
- * Copyright (c) 2001-2025, Inversoft Inc., All Rights Reserved
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
- * either express or implied. See the License for the specific
- * language governing permissions and limitations under the License.
+ * Copyright (c) 2001-2026, FusionAuth, All Rights Reserved
  */
 package org.primeframework.mvc.content.json;
 
@@ -455,6 +443,46 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
 
     assertNull(action.jsonRequest);
 
+    verify(store, messageProvider, messageStore);
+  }
+
+  @Test
+  public void handleMalformedBody() throws IOException {
+    Map<Class<?>, Object> additionalConfig = new HashMap<>();
+    Map<HTTPMethod, RequestMember> requestMembers = new HashMap<>();
+    requestMembers.put(HTTPMethod.POST, new RequestMember("jsonRequest", UserField.class));
+    additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(requestMembers, null, null));
+
+    KitchenSinkAction action = new KitchenSinkAction(null);
+    ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, false, null, null, null, null, null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, additionalConfig, null, null, null, null, null);
+
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(
+        new ActionInvocation(action, new ExecuteMethodConfiguration(HTTPMethod.POST, null, null), "/action", null, config));
+    replay(store);
+
+    HTTPRequest request = new HTTPRequest();
+    request.setInputStream(new ByteArrayInputStream("undefined".getBytes()));
+    request.setContentLength((long) "undefined".getBytes().length);
+    request.setContentType("application/json");
+
+    MessageProvider messageProvider = createStrictMock(MessageProvider.class);
+    expect(messageProvider.getMessage(eq("[invalidRequestBody]"))).andReturn("The request body is not valid JSON.");
+    replay(messageProvider);
+
+    MessageStore messageStore = createStrictMock(MessageStore.class);
+    messageStore.add(new SimpleMessage(MessageType.ERROR, "[invalidRequestBody]", "The request body is not valid JSON."));
+    replay(messageStore);
+
+    JacksonContentHandler handler = new JacksonContentHandler(request, store, new ObjectMapper(), expressionEvaluator, messageProvider, messageStore);
+    try {
+      handler.handle();
+      fail("Should have thrown");
+    } catch (ValidationException e) {
+      // Expected
+    }
+
+    assertNull(action.jsonRequest);
     verify(store, messageProvider, messageStore);
   }
 

@@ -141,6 +141,10 @@ public abstract class BaseJacksonContentHandler implements ContentHandler {
         String field = buildField(e);
         messageStore.add(new SimpleMessage(MessageType.ERROR, "[invalidJSON]", messageProvider.getMessage("[invalidJSON]", field, "Unrecognized property", e.getMessage())));
         throw new ValidationException(e);
+      } catch (JsonParseException e) {
+        logger.debug("Error parsing JSON request body - body is not valid JSON", e);
+        messageStore.add(new SimpleMessage(MessageType.ERROR, "[invalidRequestBody]", messageProvider.getMessage("[invalidRequestBody]")));
+        throw new ValidationException(e);
       } catch (JsonMappingException e) {
         logger.debug("Error parsing JSON request", e);
 
