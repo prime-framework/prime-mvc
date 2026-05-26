@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2025, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2026, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,6 @@
  */
 package org.primeframework.mvc.content.json;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import io.fusionauth.http.HTTPMethod;
@@ -35,27 +28,22 @@ import org.primeframework.mvc.action.ActionInvocationStore;
 import org.primeframework.mvc.action.ExecuteMethodConfiguration;
 import org.primeframework.mvc.action.config.ActionConfiguration;
 import org.primeframework.mvc.content.json.JacksonActionConfiguration.RequestMember;
-import org.primeframework.mvc.message.FieldMessage;
-import org.primeframework.mvc.message.MessageStore;
-import org.primeframework.mvc.message.MessageType;
-import org.primeframework.mvc.message.SimpleFieldMessage;
-import org.primeframework.mvc.message.SimpleMessage;
+import org.primeframework.mvc.message.*;
 import org.primeframework.mvc.message.l10n.MessageProvider;
 import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.validation.ValidationException;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-import static org.easymock.EasyMock.createNiceMock;
-import static org.easymock.EasyMock.createStrictMock;
-import static org.easymock.EasyMock.eq;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.isA;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNull;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.easymock.EasyMock.*;
+import static org.testng.Assert.*;
 
 /**
  * Tests the jackson configurator test.
@@ -455,6 +443,46 @@ public class JacksonContentHandlerTest extends PrimeBaseTest {
 
     assertNull(action.jsonRequest);
 
+    verify(store, messageProvider, messageStore);
+  }
+
+  @Test
+  public void handleMalformedBody() throws IOException {
+    Map<Class<?>, Object> additionalConfig = new HashMap<>();
+    Map<HTTPMethod, RequestMember> requestMembers = new HashMap<>();
+    requestMembers.put(HTTPMethod.POST, new RequestMember("jsonRequest", UserField.class));
+    additionalConfig.put(JacksonActionConfiguration.class, new JacksonActionConfiguration(requestMembers, null, null));
+
+    KitchenSinkAction action = new KitchenSinkAction(null);
+    ActionConfiguration config = new ActionConfiguration(KitchenSinkAction.class, false, null, null, null, null, null, null, null, null, null, null, null, null, null, null, Collections.emptyList(), null, additionalConfig, null, null, null, null, null);
+
+    ActionInvocationStore store = createStrictMock(ActionInvocationStore.class);
+    expect(store.getCurrent()).andReturn(
+        new ActionInvocation(action, new ExecuteMethodConfiguration(HTTPMethod.POST, null, null), "/action", null, config));
+    replay(store);
+
+    HTTPRequest request = new HTTPRequest();
+    request.setInputStream(new ByteArrayInputStream("undefined".getBytes()));
+    request.setContentLength((long) "undefined".getBytes().length);
+    request.setContentType("application/json");
+
+    MessageProvider messageProvider = createStrictMock(MessageProvider.class);
+    expect(messageProvider.getMessage(eq("[invalidJSON]"), eq("request body"), eq("Request body is not valid JSON"), isA(String.class))).andReturn("The request body is not valid JSON.");
+    replay(messageProvider);
+
+    MessageStore messageStore = createStrictMock(MessageStore.class);
+    messageStore.add(new SimpleMessage(MessageType.ERROR, "[invalidJSON]", "The request body is not valid JSON."));
+    replay(messageStore);
+
+    JacksonContentHandler handler = new JacksonContentHandler(request, store, new ObjectMapper(), expressionEvaluator, messageProvider, messageStore);
+    try {
+      handler.handle();
+      fail("Should have thrown");
+    } catch (ValidationException e) {
+      // Expected
+    }
+
+    assertNull(action.jsonRequest);
     verify(store, messageProvider, messageStore);
   }
 

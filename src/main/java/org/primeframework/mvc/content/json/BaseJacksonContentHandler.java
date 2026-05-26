@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2025, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2013-2026, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,6 @@
  * language governing permissions and limitations under the License.
  */
 package org.primeframework.mvc.content.json;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -48,6 +40,15 @@ import org.primeframework.mvc.parameter.el.ExpressionEvaluator;
 import org.primeframework.mvc.validation.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import static org.primeframework.mvc.util.ObjectTools.defaultIfNull;
 
 /**
@@ -140,6 +141,10 @@ public abstract class BaseJacksonContentHandler implements ContentHandler {
         logger.debug("Error parsing JSON request", e);
         String field = buildField(e);
         messageStore.add(new SimpleMessage(MessageType.ERROR, "[invalidJSON]", messageProvider.getMessage("[invalidJSON]", field, "Unrecognized property", e.getMessage())));
+        throw new ValidationException(e);
+      } catch (JsonParseException e) {
+        logger.debug("Error parsing JSON request body - body is not valid JSON", e);
+        messageStore.add(new SimpleMessage(MessageType.ERROR, "[invalidJSON]", messageProvider.getMessage("[invalidJSON]", "request body", "Request body is not valid JSON", e.getMessage())));
         throw new ValidationException(e);
       } catch (JsonMappingException e) {
         logger.debug("Error parsing JSON request", e);
