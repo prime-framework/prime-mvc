@@ -15,103 +15,100 @@
  */
 package org.primeframework.mvc.security;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.google.inject.Inject;
 import io.fusionauth.http.server.HTTPRequest;
 import io.fusionauth.http.server.HTTPResponse;
+import io.fusionauth.jwt.JWTDecoder;
 import io.fusionauth.jwt.domain.JWT;
 import org.primeframework.mvc.security.oauth.OAuthConfiguration;
 import org.primeframework.mvc.security.oauth.TokenAuthenticationMethod;
 import org.primeframework.mvc.security.oauth.Tokens;
 
+import java.util.*;
+
 /**
  * @author Brian Pontarelli
  */
 public class MockOAuthUserLoginSecurityContext extends BaseJWTRefreshTokenCookiesUserLoginSecurityContext {
-  public static Object CurrentUser;
+    public static Object CurrentUser;
 
-  public static Set<String> Roles = new HashSet<>();
+    public static Set<String> Roles = new HashSet<>();
 
-  public static String TokenEndpoint = "http://localhost:8000/oauth/token";
+    public static String TokenEndpoint = "http://localhost:8000/oauth/token";
 
-  public static boolean ValidateJWTOnLogin = true;
+    public static boolean ValidateJWTOnLogin = true;
 
-  public static Map<String, List<String>> additionalParameters = new HashMap<>();
+    public static Map<String, List<String>> additionalParameters = new HashMap<>();
 
-  public static String clientId;
+    public static String clientId;
 
-  public static String clientSecret;
+    public static String clientSecret;
 
-  public static TokenAuthenticationMethod tokenAuthenticationMethod;
+    public static TokenAuthenticationMethod tokenAuthenticationMethod;
 
-  @Inject
-  public MockOAuthUserLoginSecurityContext(HTTPRequest request, HTTPResponse response,
-                                           VerifierProvider verifierProvider) {
-    super(request, response, verifierProvider);
-  }
-
-  public static void reset() {
-    TokenEndpoint = "http://localhost:8000/oauth/token";
-    ValidateJWTOnLogin = true;
-    tokenAuthenticationMethod = TokenAuthenticationMethod.none;
-  }
-
-  @Override
-  public Set<String> getCurrentUsersRoles() {
-    return Roles;
-  }
-
-  @Override
-  public String getSessionId() {
-    return CurrentUser != null ? Integer.toString(CurrentUser.hashCode()) : null;
-  }
-
-  @Override
-  public void login(Object context) {
-    if (ValidateJWTOnLogin) {
-      super.login(context);
+    @Inject
+    public MockOAuthUserLoginSecurityContext(HTTPRequest request, HTTPResponse response,
+                                             VerifierProvider verifierProvider, JWTDecoder jwtDecoder) {
+        super(request, response, verifierProvider, jwtDecoder);
     }
 
-    // This is a Mock version, it does not validate the JWT on login.
-    if (!(context instanceof Tokens tokens)) {
-      throw new IllegalArgumentException("The login context for [BaseJWTRefreshTokenCookiesUserLoginSecurityContext] is expected to be of type [" + Tokens.class.getCanonicalName() + "] but an object of type [" + context.getClass().getCanonicalName() + "] was provided. This is a development time error.");
+    public static void reset() {
+        TokenEndpoint = "http://localhost:8000/oauth/token";
+        ValidateJWTOnLogin = true;
+        tokenAuthenticationMethod = TokenAuthenticationMethod.none;
     }
 
-    if (tokens.jwt != null) {
-      jwtCookie.add(request, response, tokens.jwt);
+    @Override
+    public Set<String> getCurrentUsersRoles() {
+        return Roles;
     }
 
-    if (tokens.refreshToken != null) {
-      refreshTokenCookie.add(request, response, tokens.refreshToken);
+    @Override
+    public String getSessionId() {
+        return CurrentUser != null ? Integer.toString(CurrentUser.hashCode()) : null;
     }
-  }
 
-  @Override
-  protected String jwtCookieName() {
-    return "prime-jwt";
-  }
+    @Override
+    public void login(Object context) {
+        if (ValidateJWTOnLogin) {
+            super.login(context);
+        }
 
-  @Override
-  protected OAuthConfiguration oauthConfiguration() {
-    return new OAuthConfiguration().with(c -> c.authenticationMethod = tokenAuthenticationMethod)
-                                   .with(c -> c.clientId = clientId)
-                                   .with(c -> c.clientSecret = clientSecret)
-                                   .with(c -> c.tokenEndpoint = TokenEndpoint)
-                                   .with(c -> c.additionalParameters.putAll(additionalParameters));
-  }
+        // This is a Mock version, it does not validate the JWT on login.
+        if (!(context instanceof Tokens tokens)) {
+            throw new IllegalArgumentException("The login context for [BaseJWTRefreshTokenCookiesUserLoginSecurityContext] is expected to be of type [" + Tokens.class.getCanonicalName() + "] but an object of type [" + context.getClass().getCanonicalName() + "] was provided. This is a development time error.");
+        }
 
-  @Override
-  protected String refreshTokenCookieName() {
-    return "prime-refresh-token";
-  }
+        if (tokens.jwt != null) {
+            jwtCookie.add(request, response, tokens.jwt);
+        }
 
-  @Override
-  protected Object retrieveUserForJWT(JWT decodedJWT, String jwt) {
-    return CurrentUser;
-  }
+        if (tokens.refreshToken != null) {
+            refreshTokenCookie.add(request, response, tokens.refreshToken);
+        }
+    }
+
+    @Override
+    protected String jwtCookieName() {
+        return "prime-jwt";
+    }
+
+    @Override
+    protected OAuthConfiguration oauthConfiguration() {
+        return new OAuthConfiguration().with(c -> c.authenticationMethod = tokenAuthenticationMethod)
+                .with(c -> c.clientId = clientId)
+                .with(c -> c.clientSecret = clientSecret)
+                .with(c -> c.tokenEndpoint = TokenEndpoint)
+                .with(c -> c.additionalParameters.putAll(additionalParameters));
+    }
+
+    @Override
+    protected String refreshTokenCookieName() {
+        return "prime-refresh-token";
+    }
+
+    @Override
+    protected Object retrieveUserForJWT(JWT decodedJWT, String jwt) {
+        return CurrentUser;
+    }
 }

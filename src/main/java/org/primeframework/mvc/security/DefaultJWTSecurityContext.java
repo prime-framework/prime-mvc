@@ -15,56 +15,54 @@
  */
 package org.primeframework.mvc.security;
 
-import java.util.Map;
-
 import com.google.inject.Inject;
-import io.fusionauth.jwt.InvalidJWTException;
-import io.fusionauth.jwt.InvalidJWTSignatureException;
-import io.fusionauth.jwt.JWTException;
-import io.fusionauth.jwt.JWTExpiredException;
-import io.fusionauth.jwt.JWTUnavailableForProcessingException;
-import io.fusionauth.jwt.Verifier;
+import io.fusionauth.jwt.*;
 import io.fusionauth.jwt.domain.JWT;
+
+import java.util.Map;
 
 /**
  * @author Daniel DeGroff
  */
 public class DefaultJWTSecurityContext implements JWTSecurityContext {
-  protected final JWTRequestAdapter requestAdapter;
+    protected final JWTRequestAdapter requestAdapter;
 
-  protected final VerifierProvider verifierProvider;
+    protected final VerifierProvider verifierProvider;
 
-  @Inject
-  public DefaultJWTSecurityContext(JWTRequestAdapter requestAdapter, VerifierProvider verifierProvider) {
-    this.requestAdapter = requestAdapter;
-    this.verifierProvider = verifierProvider;
-  }
+    protected final JWTDecoder jwtDecoder;
 
-  @Override
-  public JWT getJWT() {
-    try {
-      String encodedJWT = requestAdapter.getEncodedJWT();
-      if (encodedJWT == null) {
-        throw new UnauthenticatedException();
-      }
-
-      // If we do not have any verifiers, do not attempt to decode the JWT.
-      // - This is a fail-safe against validating a JWT with an alg of 'none'.
-      //   In practice, at least in FusionAuth, we'll always have at least one
-      //   verifier. But to protect other users of this library, do not attempt
-      //   a JWT unless we have a verifier.
-      Map<String, Verifier> verifiers = verifierProvider.get();
-      if (verifiers.isEmpty()) {
-        throw new UnauthenticatedException();
-      }
-
-      return JWT.getDecoder().decode(encodedJWT, verifiers);
-    } catch (InvalidJWTException | InvalidJWTSignatureException | JWTExpiredException |
-             JWTUnavailableForProcessingException e) {
-      requestAdapter.invalidateJWT();
-      throw new UnauthenticatedException();
-    } catch (JWTException e) {
-      throw new UnauthenticatedException();
+    @Inject
+    public DefaultJWTSecurityContext(JWTRequestAdapter requestAdapter, VerifierProvider verifierProvider, JWTDecoder jwtDecoder) {
+        this.requestAdapter = requestAdapter;
+        this.verifierProvider = verifierProvider;
+        this.jwtDecoder = jwtDecoder;
     }
-  }
+
+    @Override
+    public JWT getJWT() {
+        try {
+            String encodedJWT = requestAdapter.getEncodedJWT();
+            if (encodedJWT == null) {
+                throw new UnauthenticatedException();
+            }
+
+            // If we do not have any verifiers, do not attempt to decode the JWT.
+            // - This is a fail-safe against validating a JWT with an alg of 'none'.
+            //   In practice, at least in FusionAuth, we'll always have at least one
+            //   verifier. But to protect other users of this library, do not attempt
+            //   a JWT unless we have a verifier.
+            Map<String, Verifier> verifiers = verifierProvider.get();
+            if (verifiers.isEmpty()) {
+                throw new UnauthenticatedException();
+            }
+
+            return jwtDecoder.decode(encodedJWT, verifiers);
+        } catch (InvalidJWTException | InvalidJWTSignatureException | JWTExpiredException |
+                 JWTUnavailableForProcessingException e) {
+            requestAdapter.invalidateJWT();
+            throw new UnauthenticatedException();
+        } catch (JWTException e) {
+            throw new UnauthenticatedException();
+        }
+    }
 }
