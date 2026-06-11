@@ -14,7 +14,7 @@
  * language governing permissions and limitations under the License.
  */
 
-asmVersion = "9.5.0"
+asmVersion = "9.10.1"
 dropWizardVersion = "3.2.6"
 easyMockVersion = "5.2.0"
 freemarkerVersion = "2.3.32"
@@ -29,7 +29,7 @@ logbackVersion = "1.5.13"
 slf4jVersion = "2.0.13"
 testngVersion = "7.8.0"
 
-project(group: "org.primeframework", name: "prime-mvc", version: "5.10.2", licenses: ["ApacheV2_0"]) {
+project(group: "org.primeframework", name: "prime-mvc", version: "5.10.3", licenses: ["ApacheV2_0"]) {
   workflow {
     fetch {
       // Dependency resolution order:
@@ -194,8 +194,6 @@ void updatePOM() {
     fileSet(dir: ".", includePatterns: [~/pom.xml/])
     // com.github.java-json-tools:json-patch:1.13.0 -> 1.13
     filter(token: "<version>1.13.0</version>", value: "<version>1.13</version>")
-    // org.ow2.asm:asm:9.5.0 --> 9.5
-    filter(token: "<version>9.5.0</version>", value: "<version>9.5</version>")
     // javax.inject:javax.inject:1.0.0 -> 1
     filter(token: "<artifactId>javax.inject</artifactId>\n      <version>1.0.0</version>",
            value: "<artifactId>javax.inject</artifactId>\n      <version>1</version>")

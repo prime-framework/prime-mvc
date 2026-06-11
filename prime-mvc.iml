@@ -148,11 +148,11 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.cache/savant/org/ow2/asm/asm/9.5.0/asm-9.5.0.jar!/" />
+          <root url="jar://$USER_HOME$/.m2/repository/org/ow2/asm/asm/9.10.1/asm-9.10.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$USER_HOME$/.cache/savant/org/ow2/asm/asm/9.5.0/asm-9.5.0-src.jar!/" />
+          <root url="jar://$USER_HOME$/.m2/repository/org/ow2/asm/asm/9.10.1/asm-9.10.1-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
