@@ -39,7 +39,8 @@ public interface MVCConfiguration {
   /**
    * @return The maximum allowed index for indexed collection or array parameters (e.g. {@code foo[index]=bar}), or
    *     {@code -1} for no limit. Providing no limit is not recommended and only present as default
-   *     for backwards compatibility.
+   *     for backwards compatibility. Note this is the limit on index per dimension, so an n-dimensional array would
+   *     be bounded by this value at each dimension.
    */
   int maximumParameterCollectionIndex();
 
