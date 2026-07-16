@@ -125,7 +125,7 @@ public class Expression {
   private Object createValue() {
     // Peek at the next atom, in case this is an array
     Object key = hasNext() ? peek() : null;
-    Object value = accessor.createValue(key);
+    Object value = accessor.createValue(key, configuration.maximumParameterCollectionIndex());
     setCurrentValue(value);
     return value;
   }
@@ -179,7 +179,7 @@ public class Expression {
         GlobalConverter converter = converterProvider.lookup(Integer.class);
         Integer index = (Integer) converter.convertFromStrings(Integer.class, null, null, atom);
 
-        accessor = new IndexedCollectionAccessor(converterProvider, accessor, index, accessor.getMemberAccessor());
+        accessor = new IndexedCollectionAccessor(converterProvider, accessor, index, accessor.getMemberAccessor(), configuration.maximumParameterCollectionIndex());
       } else if (Map.class.isAssignableFrom(type)) {
         accessor = new MapAccessor(converterProvider, accessor, atom, accessor.getMemberAccessor());
       } else {

@@ -56,6 +56,8 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
 
   public boolean ignoreEmptyParameters;
 
+  public int maximumParameterCollectionIndex = -1;
+
   public String localeCookieName = "prime-locale";
 
   public String messageDirectory = "messages";
@@ -114,6 +116,11 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
   @Override
   public boolean ignoreEmptyParameters() {
     return ignoreEmptyParameters;
+  }
+
+  @Override
+  public int maximumParameterCollectionIndex() {
+    return maximumParameterCollectionIndex;
   }
 
   @Override

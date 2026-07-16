@@ -31,12 +31,15 @@ import org.primeframework.mvc.util.TypeTools;
 public class IndexedCollectionAccessor extends Accessor {
   Integer index;
 
+  int maximumIndex;
+
   MemberAccessor memberAccessor;
 
   public IndexedCollectionAccessor(ConverterProvider converterProvider, Accessor accessor, Integer index,
-                                   MemberAccessor memberAccessor) {
+                                   MemberAccessor memberAccessor, int maximumIndex) {
     super(converterProvider, accessor);
     this.index = index;
+    this.maximumIndex = maximumIndex;
     this.type = TypeTools.componentType(this.type, memberAccessor.toString());
     if (this.type instanceof TypeVariable<?>) {
       this.type = TypeTools.resolveGenericType(memberAccessor.declaringClass, this.currentClass, (TypeVariable<?>) this.type);
@@ -98,6 +101,14 @@ public class IndexedCollectionAccessor extends Accessor {
    */
   @SuppressWarnings("unchecked")
   private Object pad(Object object, Expression expression) {
+    if (index != null && index < 0) {
+      throw new InvalidIndexException("The parameter index [" + index + "] is invalid");
+    }
+
+    if (maximumIndex >= 0 && index != null && index > maximumIndex) {
+      throw new InvalidIndexException("The parameter index [" + index + "] exceeds the configured maximum [" + maximumIndex + "]");
+    }
+
     if (object instanceof List list) {
       int length = list.size();
       if (length <= index) {

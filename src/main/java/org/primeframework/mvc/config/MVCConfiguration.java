@@ -37,6 +37,13 @@ public interface MVCConfiguration {
   boolean allowUnknownParameters();
 
   /**
+   * @return The maximum allowed index for indexed collection or array parameters (e.g. {@code foo[index]=bar}), or
+   *     {@code -1} for no limit. Providing no limit is not recommended and only present as default
+   *     for backwards compatibility.
+   */
+  int maximumParameterCollectionIndex();
+
+  /**
    * @return true if auto HTML escaping will be enabled for all templates.
    */
   boolean autoHTMLEscapingEnabled();

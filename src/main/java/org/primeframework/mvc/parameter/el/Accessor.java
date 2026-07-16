@@ -161,10 +161,11 @@ public abstract class Accessor {
   /**
    * Creates a new instance of the current type.
    *
-   * @param key This is only used when creating arrays. It is the next atom, which is always the size of the array.
+   * @param key          This is only used when creating arrays. It is the next atom, which is always the size of the array.
+   * @param maximumIndex The configured maximum parameter collection index, or {@code -1} for no limit.
    * @return The new value.
    */
-  protected Object createValue(Object key) {
+  protected Object createValue(Object key, int maximumIndex) {
     Class<?> typeClass = TypeTools.rawType(type);
     Object value = null;
     if (Map.class == typeClass) {
@@ -185,7 +186,15 @@ public abstract class Accessor {
                                             "available to determine the size of the array");
       }
 
-      value = Array.newInstance(typeClass.getComponentType(), Integer.parseInt(key.toString()) + 1);
+      int index = Integer.parseInt(key.toString());
+      if (index < 0) {
+        throw new InvalidIndexException("The parameter index [" + index + "] is invalid");
+      }
+      if (maximumIndex >= 0 && index > maximumIndex) {
+        throw new InvalidIndexException("The parameter index [" + index + "] exceeds the configured maximum [" + maximumIndex + "]");
+      }
+
+      value = Array.newInstance(typeClass.getComponentType(), index + 1);
     } else {
       try {
         if (typeClass == Object.class) {
