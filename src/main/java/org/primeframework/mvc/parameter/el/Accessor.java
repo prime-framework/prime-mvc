@@ -284,11 +284,11 @@ public abstract class Accessor {
     int index = Integer.parseInt(key.toString());
 
     if (index < 0) {
-      throw new InvalidCollectionSizeException("The parameter index [" + index + "] is invalid");
+      throw new InvalidCollectionSizeException(index);
     }
 
     if (maximumLength >= 0 && index >= maximumLength) {
-      throw new InvalidCollectionSizeException("The parameter index [" + index + "] exceeds the configured maximum length of the collection");
+      throw new InvalidCollectionSizeException(index);
     }
 
     return index;

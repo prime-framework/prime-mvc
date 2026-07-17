@@ -102,11 +102,11 @@ public class IndexedCollectionAccessor extends Accessor {
   @SuppressWarnings("unchecked")
   private Object pad(Object object, Expression expression) {
     if (index != null && index < 0) {
-      throw new InvalidCollectionSizeException("The parameter index [" + index + "] is invalid");
+      throw new InvalidCollectionSizeException(index);
     }
 
     if (maximumCollectionSize >= 0 && index != null && index >= maximumCollectionSize) {
-      throw new InvalidCollectionSizeException("The pInvalidCollectionSizeExceptionarameter index [" + index + "] exceeds the configured maximum length of the collection");
+      throw new InvalidCollectionSizeException(index);
     }
 
     if (object instanceof List list) {
