@@ -56,7 +56,7 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
 
   public boolean ignoreEmptyParameters;
 
-  public int maximumParameterCollectionIndex = -1;
+  public int collectionSizeLimit = -1;
 
   public String localeCookieName = "prime-locale";
 
@@ -120,7 +120,7 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
 
   @Override
   public int maximumParameterCollectionIndex() {
-    return maximumParameterCollectionIndex;
+    return collectionSizeLimit;
   }
 
   @Override

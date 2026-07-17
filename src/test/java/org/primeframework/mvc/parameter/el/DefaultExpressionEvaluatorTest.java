@@ -307,7 +307,7 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
   public void maximumParameterCollectionIndex() {
     ActionField action = new ActionField();
     action.user = new UserField();
-    configuration.maximumParameterCollectionIndex = 100;
+    configuration.collectionSizeLimit = 100;
 
     try {
       // Exceeds the limit on an existing list — triggers IndexedCollectionAccessor.pad()
@@ -341,14 +341,14 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
       assertNull(action.user.securityQuestions[50]);
 
       // No limit (-1) allows any index
-      configuration.maximumParameterCollectionIndex = -1;
+      configuration.collectionSizeLimit = -1;
       action.user.securityQuestions = null;
       evaluator.setValue("user.securityQuestions[500]", action, ArrayUtils.toArray("question"), null);
       assertEquals(action.user.securityQuestions.length, 501);
       assertEquals(action.user.securityQuestions[500], "question");
 
       // Negative index is rejected regardless of the configured limit
-      configuration.maximumParameterCollectionIndex = 100;
+      configuration.collectionSizeLimit = 100;
       try {
         evaluator.setValue("names[-1]", action, ArrayUtils.toArray("test"), null);
         fail("Expected an exception for a negative index.");
@@ -356,7 +356,7 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
         assertEquals(e.getMessage(), "The parameter index [-1] is invalid");
       }
     } finally {
-      configuration.maximumParameterCollectionIndex = -1;
+      configuration.collectionSizeLimit = -1;
     }
   }
 
