@@ -314,8 +314,8 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
       try {
         evaluator.setValue("names[101]", action, ArrayUtils.toArray("test"), null);
         fail("Expected an [InvalidIndexException] exception.");
-      } catch (InvalidIndexException e) {
-        assertEquals(e.getMessage(), "The parameter index [101] exceeds the configured maximum [100]");
+      } catch (InvalidCollectionSizeException e) {
+        assertEquals(e.getMessage(), "The parameter index [101] exceeds the configured maximum length of the collection");
       }
 
       // Exceeds the limit on a null array — triggers Accessor.createValue()
@@ -323,8 +323,8 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
       try {
         evaluator.setValue("user.securityQuestions[999]", action, ArrayUtils.toArray("test"), null);
         fail("Expected an [InvalidIndexException] exception.");
-      } catch (InvalidIndexException e) {
-        assertEquals(e.getMessage(), "The parameter index [999] exceeds the configured maximum [100]");
+      } catch (InvalidCollectionSizeException e) {
+        assertEquals(e.getMessage(), "The parameter index [999] exceeds the configured maximum length of the collection");
       }
 
       // Within the limit works normally
@@ -334,9 +334,9 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
 
       // Exactly at the limit works
       action.user.securityQuestions = null;
-      evaluator.setValue("user.securityQuestions[100]", action, ArrayUtils.toArray("question"), null);
-      assertEquals(action.user.securityQuestions.length, 101);
-      assertEquals(action.user.securityQuestions[100], "question");
+      evaluator.setValue("user.securityQuestions[99]", action, ArrayUtils.toArray("question"), null);
+      assertEquals(action.user.securityQuestions.length, 100);
+      assertEquals(action.user.securityQuestions[99], "question");
       assertNull(action.user.securityQuestions[0]);
       assertNull(action.user.securityQuestions[50]);
 
@@ -346,13 +346,15 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
       evaluator.setValue("user.securityQuestions[500]", action, ArrayUtils.toArray("question"), null);
       assertEquals(action.user.securityQuestions.length, 501);
       assertEquals(action.user.securityQuestions[500], "question");
+      assertNull(action.user.securityQuestions[0]);
+      assertNull(action.user.securityQuestions[499]);
 
       // Negative index is rejected regardless of the configured limit
       configuration.collectionSizeLimit = 100;
       try {
         evaluator.setValue("names[-1]", action, ArrayUtils.toArray("test"), null);
         fail("Expected an exception for a negative index.");
-      } catch (InvalidIndexException e) {
+      } catch (InvalidCollectionSizeException e) {
         assertEquals(e.getMessage(), "The parameter index [-1] is invalid");
       }
     } finally {

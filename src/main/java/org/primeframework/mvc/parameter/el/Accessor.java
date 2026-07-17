@@ -161,16 +161,17 @@ public abstract class Accessor {
   /**
    * Creates a new instance of the current type.
    *
-   * @param key          This is only used when creating arrays. It is the next atom, which is always the size of the array.
-   * @param maximumIndex The configured maximum parameter collection index, or {@code -1} for no limit.
+   * @param key           This is only used when creating arrays. It is the next atom, which is always the size of the array.
+   * @param maximumLength The configured maximum size of the collection, or {@code -1} for no limit.
    * @return The new value.
    */
-  protected Object createValue(Object key, int maximumIndex) {
+  protected Object createValue(Object key, int maximumLength) {
     Class<?> typeClass = TypeTools.rawType(type);
     Object value = null;
     if (Map.class == typeClass) {
       value = new HashMap<>();
     } else if (List.class == typeClass) {
+      validateIndex(key, maximumLength);
       value = new ArrayList<>();
     } else if (Set.class == typeClass) {
       value = new HashSet<>();
@@ -186,14 +187,7 @@ public abstract class Accessor {
                                             "available to determine the size of the array");
       }
 
-      int index = Integer.parseInt(key.toString());
-      if (index < 0) {
-        throw new InvalidIndexException("The parameter index [" + index + "] is invalid");
-      }
-      if (maximumIndex >= 0 && index > maximumIndex) {
-        throw new InvalidIndexException("The parameter index [" + index + "] exceeds the configured maximum [" + maximumIndex + "]");
-      }
-
+      int index = validateIndex(key, maximumLength);
       value = Array.newInstance(typeClass.getComponentType(), index + 1);
     } else {
       try {
@@ -284,5 +278,19 @@ public abstract class Accessor {
       throw new UpdateExpressionException("You can only set values into arrays and Lists. You are setting a parameter into [" +
                                           getMemberAccessor() + "] which is of type [" + this.object.getClass() + "]");
     }
+  }
+
+  private int validateIndex(Object key, int maximumLength) {
+    int index = Integer.parseInt(key.toString());
+
+    if (index < 0) {
+      throw new InvalidCollectionSizeException("The parameter index [" + index + "] is invalid");
+    }
+
+    if (maximumLength >= 0 && index >= maximumLength) {
+      throw new InvalidCollectionSizeException("The parameter index [" + index + "] exceeds the configured maximum length of the collection");
+    }
+
+    return index;
   }
 }

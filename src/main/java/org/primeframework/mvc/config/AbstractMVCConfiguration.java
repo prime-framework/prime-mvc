@@ -119,7 +119,7 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
   }
 
   @Override
-  public int maximumParameterCollectionIndex() {
+  public int collectionSizeLimit() {
     return collectionSizeLimit;
   }
 

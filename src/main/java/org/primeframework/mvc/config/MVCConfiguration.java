@@ -42,7 +42,7 @@ public interface MVCConfiguration {
    *     for backwards compatibility. Note this is the limit on index per dimension, so an n-dimensional array would
    *     be bounded by this value at each dimension.
    */
-  int maximumParameterCollectionIndex();
+  int collectionSizeLimit();
 
   /**
    * @return true if auto HTML escaping will be enabled for all templates.

@@ -31,15 +31,15 @@ import org.primeframework.mvc.util.TypeTools;
 public class IndexedCollectionAccessor extends Accessor {
   Integer index;
 
-  int maximumIndex;
+  int maximumCollectionSize;
 
   MemberAccessor memberAccessor;
 
   public IndexedCollectionAccessor(ConverterProvider converterProvider, Accessor accessor, Integer index,
-                                   MemberAccessor memberAccessor, int maximumIndex) {
+                                   MemberAccessor memberAccessor, int maximumCollectionSize) {
     super(converterProvider, accessor);
     this.index = index;
-    this.maximumIndex = maximumIndex;
+    this.maximumCollectionSize = maximumCollectionSize;
     this.type = TypeTools.componentType(this.type, memberAccessor.toString());
     if (this.type instanceof TypeVariable<?>) {
       this.type = TypeTools.resolveGenericType(memberAccessor.declaringClass, this.currentClass, (TypeVariable<?>) this.type);
@@ -102,11 +102,11 @@ public class IndexedCollectionAccessor extends Accessor {
   @SuppressWarnings("unchecked")
   private Object pad(Object object, Expression expression) {
     if (index != null && index < 0) {
-      throw new InvalidIndexException("The parameter index [" + index + "] is invalid");
+      throw new InvalidCollectionSizeException("The parameter index [" + index + "] is invalid");
     }
 
-    if (maximumIndex >= 0 && index != null && index > maximumIndex) {
-      throw new InvalidIndexException("The parameter index [" + index + "] exceeds the configured maximum [" + maximumIndex + "]");
+    if (maximumCollectionSize >= 0 && index != null && index >= maximumCollectionSize) {
+      throw new InvalidCollectionSizeException("The pInvalidCollectionSizeExceptionarameter index [" + index + "] exceeds the configured maximum length of the collection");
     }
 
     if (object instanceof List list) {
