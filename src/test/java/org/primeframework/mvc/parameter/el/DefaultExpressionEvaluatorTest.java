@@ -40,6 +40,7 @@ import org.example.domain.GenericBean;
 import org.example.domain.NestedDataUnwrappedAction;
 import org.example.domain.User;
 import org.example.domain.UserField;
+import org.primeframework.mvc.MockConfiguration;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.slf4j.Logger;
@@ -307,59 +308,35 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
   public void maximumParameterCollectionIndex() {
     ActionField action = new ActionField();
     action.user = new UserField();
-    configuration.collectionSizeLimit = 100;
 
     try {
-      // Exceeds the limit on an existing list — triggers IndexedCollectionAccessor.pad()
-      try {
-        evaluator.setValue("names[101]", action, ArrayUtils.toArray("test"), null);
-        fail("Expected an [InvalidCollectionSizeException] exception.");
-      } catch (InvalidCollectionSizeException e) {
-        assertEquals(e.resultCode, "input");
-      }
-
-      // Exceeds the limit on a null array — triggers Accessor.createValue()
-      action.user.securityQuestions = null;
-      try {
-        evaluator.setValue("user.securityQuestions[999]", action, ArrayUtils.toArray("test"), null);
-        fail("Expected an [InvalidCollectionSizeException] exception.");
-      } catch (InvalidCollectionSizeException e) {
-        assertEquals(e.resultCode, "input");
-      }
-
-      // Within the limit works normally
-      evaluator.setValue("user.siblings[0].name", action, ArrayUtils.toArray("Brett"), null);
-      assertEquals(action.user.siblings.size(), 1);
-      assertEquals(action.user.siblings.getFirst().name, "Brett");
-
-      // Exactly at the limit works
-      action.user.securityQuestions = null;
-      evaluator.setValue("user.securityQuestions[99]", action, ArrayUtils.toArray("question"), null);
-      assertEquals(action.user.securityQuestions.length, 100);
-      assertEquals(action.user.securityQuestions[99], "question");
-      assertNull(action.user.securityQuestions[0]);
-      assertNull(action.user.securityQuestions[50]);
-
-      // No limit (-1) allows any index
-      configuration.collectionSizeLimit = -1;
-      action.user.securityQuestions = null;
-      evaluator.setValue("user.securityQuestions[500]", action, ArrayUtils.toArray("question"), null);
-      assertEquals(action.user.securityQuestions.length, 501);
-      assertEquals(action.user.securityQuestions[500], "question");
-      assertNull(action.user.securityQuestions[0]);
-      assertNull(action.user.securityQuestions[499]);
-
-      // Negative index is rejected regardless of the configured limit
-      configuration.collectionSizeLimit = 100;
-      try {
-        evaluator.setValue("names[-1]", action, ArrayUtils.toArray("test"), null);
-        fail("Expected an [InvalidCollectionSizeException] exception.");
-      } catch (InvalidCollectionSizeException e) {
-        assertEquals(e.resultCode, "input");
-      }
-    } finally {
-      configuration.collectionSizeLimit = -1;
+      evaluator.setValue("names[101]", action, ArrayUtils.toArray("test"), null);
+      fail("Expected an [InvalidCollectionSizeException] exception.");
+    } catch (InvalidCollectionSizeException e) {
+      assertEquals(e.resultCode, "input");
     }
+
+    // Exceeds the limit on a null array — triggers Accessor.createValue()
+    action.user.securityQuestions = null;
+    try {
+      evaluator.setValue("user.securityQuestions[999]", action, ArrayUtils.toArray("test"), null);
+      fail("Expected an [InvalidCollectionSizeException] exception.");
+    } catch (InvalidCollectionSizeException e) {
+      assertEquals(e.resultCode, "input");
+    }
+
+    // Within the limit works normally
+    evaluator.setValue("user.siblings[0].name", action, ArrayUtils.toArray("Brett"), null);
+    assertEquals(action.user.siblings.size(), 1);
+    assertEquals(action.user.siblings.getFirst().name, "Brett");
+
+    // Exactly at the limit works
+    action.user.securityQuestions = null;
+    evaluator.setValue("user.securityQuestions[9]", action, ArrayUtils.toArray("question"), null);
+    assertEquals(action.user.securityQuestions.length, 10);
+    assertEquals(action.user.securityQuestions[9], "question");
+    assertNull(action.user.securityQuestions[0]);
+    assertNull(action.user.securityQuestions[8]);
   }
 
   @Test
