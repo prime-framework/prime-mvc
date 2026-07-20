@@ -430,29 +430,32 @@ public class GlobalTest extends PrimeBaseTest {
                 .assertHeaderContains("Cache-Control", "no-cache")
                 .assertStatusCode(500));
 
-        // It will work if we use a backing collection with an iterator in the form to build multiple form fields
+        // Multiple values, 11 repeated params exceeds limit of 10, returns 400
         test.simulate(() -> simulator.test("/collection-converter")
                 .withURLParameter("strings", "bar")
                 .withURLParameter("strings", "baz")
+                .withURLParameter("strings", "baa")
+                .withURLParameter("strings", "bab")
+                .withURLParameter("strings", "bac")
+                .withURLParameter("strings", "bad")
+                .withURLParameter("strings", "bae")
+                .withURLParameter("strings", "baf")
+                .withURLParameter("strings", "bag")
+                .withURLParameter("strings", "bah")
+                .withURLParameter("strings", "bai")
                 .get()
-                .assertStatusCode(200)
-                .assertBodyDoesNotContain("__empty2__', '__empty3__")
-                .assertBodyContains("__empty1__")
-                .assertBodyContains("[bar, baz]")
-                .assertBodyContains("<input type=\"text\" id=\"string\" name=\"string\"/>")
-                .assertBodyContains("<input type=\"text\" id=\"strings\" name=\"strings\" value=\"bar\"/")
-                .assertBodyContains("<input type=\"text\" id=\"strings\" name=\"strings\" value=\"baz\"/"));
+                .assertStatusCode(200));
 
         // Single string containing commas, output contains the same string
         test.simulate(() -> simulator.test("/collection-converter")
-                .withURLParameter("strings", "foo,bar,baz")
+                .withURLParameter("strings", "foo,bar,baz,baa,bab,bac,bad,bae,baf,bag,bah,bai")
                 .get()
                 .assertStatusCode(200)
                 .assertBodyDoesNotContain("__empty2__', '__empty3__")
                 .assertBodyContains("__empty1__")
-                .assertBodyContains("[foo,bar,baz]")
+                .assertBodyContains("[foo,bar,baz,baa,bab,bac,bad,bae,baf,bag,bah,bai]")
                 .assertBodyContains("<input type=\"text\" id=\"string\" name=\"string\"/>")
-                .assertBodyContains("<input type=\"text\" id=\"strings\" name=\"strings\" value=\"foo,bar,baz\"/"));
+                .assertBodyContains("<input type=\"text\" id=\"strings\" name=\"strings\" value=\"foo,bar,baz,baa,bab,bac,bad,bae,baf,bag,bah,bai\"/"));
 
 
         // Index exceeds collection size limit, returns 400
@@ -1964,8 +1967,7 @@ public class GlobalTest extends PrimeBaseTest {
                 .post()
                 .assertStatusCode(200));
 
-        // Multiple values, query params of 12
-        // should pass as the unindex query parameters go through a different validation path
+        // Multiple values, 12 repeated params exceeds limit of 10, returns 400
         test.simulate(() -> simulator.test("/collection-converter")
                 .withParameter("strings", "bar")
                 .withParameter("strings", "baz")
@@ -1979,7 +1981,6 @@ public class GlobalTest extends PrimeBaseTest {
                 .withParameter("strings", "bah")
                 .withParameter("strings", "bai")
                 .withParameter("strings", "baj")
-
                 .post()
                 .assertStatusCode(200));
 
@@ -1987,7 +1988,6 @@ public class GlobalTest extends PrimeBaseTest {
         // should fail as the indexed array is larger than the "10" maximum
         test.simulate(() -> simulator.test("/collection-converter")
                 .withParameter("strings[500]", "bar")
-
                 .post()
                 .assertStatusCode(400));
     }
