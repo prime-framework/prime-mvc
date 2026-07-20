@@ -19,12 +19,11 @@ package org.primeframework.mvc.parameter.el;
 import org.primeframework.mvc.ErrorException;
 
 public class InvalidCollectionSizeException extends ErrorException {
+  public InvalidCollectionSizeException() {
+    super("input");
+  }
 
-    public InvalidCollectionSizeException() {
-        super("input");
-    }
-
-    public InvalidCollectionSizeException(Object... args) {
-        super("input", args);
-    }
+  public InvalidCollectionSizeException(Object... args) {
+    super("input", args);
+  }
 }
