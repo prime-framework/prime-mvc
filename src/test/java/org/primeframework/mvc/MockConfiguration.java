@@ -33,6 +33,8 @@ public class MockConfiguration extends AbstractMVCConfiguration {
 
   public boolean autoHTMLEscapingEnabled = true;
 
+  public int collectionSizeLimit = 10;
+
   public Key cookieEncryptionKey;
 
   public boolean csrfEnabled;
@@ -56,7 +58,7 @@ public class MockConfiguration extends AbstractMVCConfiguration {
 
   @Override
   public int collectionSizeLimit() {
-    return 10;
+    return collectionSizeLimit;
   }
 
   @Override

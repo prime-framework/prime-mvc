@@ -340,6 +340,33 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
   }
 
   @Test
+  public void maximumParameterCollectionIndex_noLimit() {
+    ActionField action = new ActionField();
+    action.user = new UserField();
+
+    try {
+      // No limit (-1) allows any index
+      configuration.collectionSizeLimit = -1;
+      action.user.securityQuestions = null;
+      evaluator.setValue("user.securityQuestions[500]", action, ArrayUtils.toArray("question"), null);
+      assertEquals(action.user.securityQuestions.length, 501);
+      assertEquals(action.user.securityQuestions[500], "question");
+      assertNull(action.user.securityQuestions[0]);
+      assertNull(action.user.securityQuestions[499]);
+
+      // Negative index still fails even with no limit
+      try {
+        evaluator.setValue("names[-1]", action, ArrayUtils.toArray("test"), null);
+        fail("Expected an [InvalidCollectionSizeException] exception.");
+      } catch (InvalidCollectionSizeException e) {
+        assertEquals(e.resultCode, "input");
+      }
+    } finally {
+      configuration.collectionSizeLimit = 10;
+    }
+  }
+
+  @Test
   public void genericInheritanceImplements() {
     GenericBean bean = new GenericBean();
     evaluator.setValue("mapSubclass['foo']", bean, "value");
