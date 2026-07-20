@@ -55,6 +55,11 @@ public class MockConfiguration extends AbstractMVCConfiguration {
   }
 
   @Override
+  public int collectionSizeLimit() {
+    return 10;
+  }
+
+  @Override
   public boolean allowUnknownParameters() {
     return allowUnknownParameters;
   }

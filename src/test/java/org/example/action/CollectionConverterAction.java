@@ -26,6 +26,7 @@ import org.primeframework.mvc.action.result.annotation.Status;
 @Action
 @Status.List({
     @Status,
+    @Status(code = "input", status = 400),
     @Status(code = "error", status = 500)
 })
 public class CollectionConverterAction {
@@ -34,7 +35,7 @@ public class CollectionConverterAction {
   public List<String> strings;
 
   public String get() {
-    return "input";
+    return "render";
   }
 
   public String post() {

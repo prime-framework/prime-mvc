@@ -453,6 +453,13 @@ public class GlobalTest extends PrimeBaseTest {
                 .assertBodyContains("[foo,bar,baz]")
                 .assertBodyContains("<input type=\"text\" id=\"string\" name=\"string\"/>")
                 .assertBodyContains("<input type=\"text\" id=\"strings\" name=\"strings\" value=\"foo,bar,baz\"/"));
+
+
+        // Index exceeds collection size limit, returns 400
+        test.simulate(() -> simulator.test("/collection-converter")
+                .withURLParameter("strings[500]", "bar")
+                .get()
+                .assertStatusCode(400));
     }
 
     @Test
@@ -1956,6 +1963,33 @@ public class GlobalTest extends PrimeBaseTest {
                 .withParameter("strings", "baz")
                 .post()
                 .assertStatusCode(200));
+
+        // Multiple values, query params of 12
+        // should pass as the unindex query parameters go through a different validation path
+        test.simulate(() -> simulator.test("/collection-converter")
+                .withParameter("strings", "bar")
+                .withParameter("strings", "baz")
+                .withParameter("strings", "baa")
+                .withParameter("strings", "bab")
+                .withParameter("strings", "bac")
+                .withParameter("strings", "bad")
+                .withParameter("strings", "bae")
+                .withParameter("strings", "baf")
+                .withParameter("strings", "bag")
+                .withParameter("strings", "bah")
+                .withParameter("strings", "bai")
+                .withParameter("strings", "baj")
+
+                .post()
+                .assertStatusCode(200));
+
+        // Multiple values, output contains these two values in a collection
+        // should fail as the indexed array is larger than the "10" maximum
+        test.simulate(() -> simulator.test("/collection-converter")
+                .withParameter("strings[500]", "bar")
+
+                .post()
+                .assertStatusCode(400));
     }
 
     @Test
