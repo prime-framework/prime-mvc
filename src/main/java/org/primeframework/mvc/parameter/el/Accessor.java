@@ -281,7 +281,16 @@ public abstract class Accessor {
   }
 
   private int validateIndex(Object key, int maximumLength) {
-    int index = Integer.parseInt(key.toString());
+    if (key == null) {
+      throw new IndexExpressionException("Encountered an indexed property without an index");
+    }
+
+    final int index;
+    try {
+      index = Integer.parseInt(key.toString());
+    } catch (NumberFormatException e) {
+      throw new IndexExpressionException("Encountered a non-numeric index [" + key + "]", e);
+    }
 
     if (index < 0) {
       throw new InvalidCollectionSizeException(index);
