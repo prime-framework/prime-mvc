@@ -430,7 +430,7 @@ public class GlobalTest extends PrimeBaseTest {
                 .assertHeaderContains("Cache-Control", "no-cache")
                 .assertStatusCode(500));
 
-        // Multiple values, 11 repeated params exceeds limit of 10, returns 400
+        // Multiple values, 11 repeated params exceeds limit of 10, returns 200
         test.simulate(() -> simulator.test("/collection-converter")
                 .withURLParameter("strings", "bar")
                 .withURLParameter("strings", "baz")
@@ -444,7 +444,21 @@ public class GlobalTest extends PrimeBaseTest {
                 .withURLParameter("strings", "bah")
                 .withURLParameter("strings", "bai")
                 .get()
-                .assertStatusCode(200));
+                .assertBodyDoesNotContain("__empty2__', '__empty3__")
+                .assertBodyContains("__empty1__")
+                .assertBodyContains("[bar, baz, baa, bab, bac, bad, bae, baf, bag, bah, bai]")
+                .assertBodyContains("<input type=\"text\" id=\"strings\" name=\"strings\" value=\"bar\"/")
+                .assertBodyContains("<input type=\"text\" id=\"strings\" name=\"strings\" value=\"baz\"/")
+                .assertBodyContains("<input type=\"text\" id=\"strings\" name=\"strings\" value=\"baa\"/")
+                .assertBodyContains("<input type=\"text\" id=\"strings\" name=\"strings\" value=\"bab\"/")
+                .assertBodyContains("<input type=\"text\" id=\"strings\" name=\"strings\" value=\"bac\"/")
+                .assertBodyContains("<input type=\"text\" id=\"strings\" name=\"strings\" value=\"bad\"/")
+                .assertBodyContains("<input type=\"text\" id=\"strings\" name=\"strings\" value=\"bae\"/")
+                .assertBodyContains("<input type=\"text\" id=\"strings\" name=\"strings\" value=\"baf\"/")
+                .assertBodyContains("<input type=\"text\" id=\"strings\" name=\"strings\" value=\"bag\"/")
+                .assertBodyContains("<input type=\"text\" id=\"strings\" name=\"strings\" value=\"bah\"/")
+                .assertBodyContains("<input type=\"text\" id=\"strings\" name=\"strings\" value=\"bai\"/")
+                .assertBodyContains("<input type=\"text\" id=\"string\" name=\"string\"/>"));
 
         // Single string containing commas, output contains the same string
         test.simulate(() -> simulator.test("/collection-converter")
