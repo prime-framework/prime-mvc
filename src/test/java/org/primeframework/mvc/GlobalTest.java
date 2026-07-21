@@ -430,7 +430,7 @@ public class GlobalTest extends PrimeBaseTest {
                 .assertHeaderContains("Cache-Control", "no-cache")
                 .assertStatusCode(500));
 
-        // Multiple values, 11 repeated params exceeds limit of 10, returns 400
+        // Multiple values via repeated params are intentionally NOT constrained by collectionSizeLimit (only indexed params are), should return 200
         test.simulate(() -> simulator.test("/collection-converter")
                 .withURLParameter("strings", "bar")
                 .withURLParameter("strings", "baz")
