@@ -20,7 +20,9 @@ import java.util.IllformedLocaleException;
 import java.util.Locale;
 import java.util.Map;
 
+import com.google.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
+import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.parameter.convert.AbstractGlobalConverter;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
@@ -34,6 +36,10 @@ import org.primeframework.mvc.util.LocaleTools;
  */
 @GlobalConverter
 public class LocaleConverter extends AbstractGlobalConverter {
+  @Inject
+  public LocaleConverter(MVCConfiguration configuration) {
+    super(configuration);
+  }
   // Mostly copied from jackson-databind version 2.13.0
 
   protected final static String LOCALE_EXT_MARKER = "_#";

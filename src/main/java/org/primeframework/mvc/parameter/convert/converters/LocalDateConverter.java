@@ -41,6 +41,7 @@ public class LocalDateConverter extends AbstractGlobalConverter {
 
   @Inject
   public LocalDateConverter(MVCConfiguration configuration) {
+    super(configuration);
     this.emptyIsNull = configuration.emptyParametersAreNull();
   }
 

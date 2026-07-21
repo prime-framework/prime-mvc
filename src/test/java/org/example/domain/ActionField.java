@@ -38,6 +38,8 @@ public class ActionField extends ParentField {
 
   public boolean foo;
 
+  public int[] ids;
+
   public List<String> list;
 
   public Map<String, String> map;

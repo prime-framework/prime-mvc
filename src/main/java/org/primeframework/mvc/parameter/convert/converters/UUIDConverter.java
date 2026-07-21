@@ -39,6 +39,7 @@ public class UUIDConverter extends AbstractGlobalConverter {
 
   @Inject
   public UUIDConverter(MVCConfiguration configuration) {
+    super(configuration);
     this.emptyIsNull = configuration.emptyParametersAreNull();
   }
 

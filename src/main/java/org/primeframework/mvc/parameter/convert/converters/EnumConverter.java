@@ -39,6 +39,7 @@ public class EnumConverter extends AbstractGlobalConverter {
 
   @Inject
   public EnumConverter(MVCConfiguration configuration) {
+    super(configuration);
     this.emptyIsNull = configuration.emptyParametersAreNull();
   }
 

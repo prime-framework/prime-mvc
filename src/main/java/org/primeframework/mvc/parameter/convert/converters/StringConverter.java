@@ -36,6 +36,7 @@ public class StringConverter extends AbstractGlobalConverter {
 
   @Inject
   public StringConverter(MVCConfiguration configuration) {
+    super(configuration);
     this.emptyIsNull = configuration.emptyParametersAreNull();
   }
 

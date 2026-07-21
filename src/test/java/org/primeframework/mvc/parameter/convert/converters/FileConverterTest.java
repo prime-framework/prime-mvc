@@ -37,7 +37,7 @@ public class FileConverterTest {
   @Test
   public void fromStrings() {
     Map<String, String> map = new HashMap<>();
-    GlobalConverter converter = new FileConverter();
+    GlobalConverter converter = new FileConverter(new org.primeframework.mvc.MockConfiguration());
     File f = (File) converter.convertFromStrings(File.class, map, "testExpr", ArrayUtils.toArray((String) null));
     assertNull(f);
 
@@ -65,7 +65,7 @@ public class FileConverterTest {
 
   @Test
   public void toStrings() {
-    GlobalConverter converter = new FileConverter();
+    GlobalConverter converter = new FileConverter(new org.primeframework.mvc.MockConfiguration());
     String str = converter.convertToString(File.class, null, "testExpr", null);
     assertNull(str);
 

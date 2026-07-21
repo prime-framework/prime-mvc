@@ -31,6 +31,7 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import com.google.inject.Inject;
+import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.parameter.convert.AbstractGlobalConverter;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
@@ -51,7 +52,8 @@ public class CollectionConverter extends AbstractGlobalConverter {
   private final ConverterProvider provider;
 
   @Inject
-  public CollectionConverter(ConverterProvider provider) {
+  public CollectionConverter(ConverterProvider provider, MVCConfiguration configuration) {
+    super(configuration);
     this.provider = provider;
   }
 
@@ -136,6 +138,7 @@ public class CollectionConverter extends AbstractGlobalConverter {
    */
   protected Object stringsToObject(String[] values, Type convertTo, Map<String, String> dynamicAttributes,
                                    String expression) throws ConversionException, ConverterStateException {
+    validateCollectionSize(values.length);
     Class<?> rawType = TypeTools.rawType(convertTo);
     Class<?> parameter = parameterType(convertTo);
     Collection collection = makeCollection(rawType);

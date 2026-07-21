@@ -43,6 +43,7 @@ public class ZonedDateTimeConverter extends AbstractGlobalConverter {
 
   @Inject
   public ZonedDateTimeConverter(MVCConfiguration configuration) {
+    super(configuration);
     this.emptyIsNull = configuration.emptyParametersAreNull();
   }
 

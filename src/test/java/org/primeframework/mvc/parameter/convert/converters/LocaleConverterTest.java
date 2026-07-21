@@ -35,7 +35,7 @@ import static org.testng.Assert.assertNull;
 public class LocaleConverterTest {
   @Test(dataProvider = "localeData")
   public void allLocalesFromBCP47Strings(Locale locale) {
-    GlobalConverter converter = new LocaleConverter();
+    GlobalConverter converter = new LocaleConverter(new org.primeframework.mvc.MockConfiguration());
     Locale localeOut = (Locale) converter.convertFromStrings(Locale.class, null, "testExpr", ArrayUtils.toArray(locale.toLanguageTag()));
     assertEquals(locale.getLanguage(), localeOut.getLanguage());
     assertEquals(locale.getCountry(), localeOut.getCountry());
@@ -44,7 +44,7 @@ public class LocaleConverterTest {
 
   @Test(dataProvider = "localeData")
   public void allLocalesFromStrings(Locale locale) {
-    GlobalConverter converter = new LocaleConverter();
+    GlobalConverter converter = new LocaleConverter(new org.primeframework.mvc.MockConfiguration());
     Locale localeOut = (Locale) converter.convertFromStrings(Locale.class, null, "testExpr", ArrayUtils.toArray(locale.toString()));
     assertEquals(locale.getLanguage(), localeOut.getLanguage());
     assertEquals(locale.getCountry(), localeOut.getCountry());
@@ -53,7 +53,7 @@ public class LocaleConverterTest {
 
   @Test
   public void fromStrings() {
-    GlobalConverter converter = new LocaleConverter();
+    GlobalConverter converter = new LocaleConverter(new org.primeframework.mvc.MockConfiguration());
     Locale locale = (Locale) converter.convertFromStrings(Locale.class, null, "testExpr", ArrayUtils.toArray((String) null));
     assertNull(locale);
 
@@ -103,7 +103,7 @@ public class LocaleConverterTest {
 
   @Test
   public void toStrings() {
-    GlobalConverter converter = new LocaleConverter();
+    GlobalConverter converter = new LocaleConverter(new org.primeframework.mvc.MockConfiguration());
     String str = converter.convertToString(Locale.class, null, "testExpr", null);
     assertNull(str);
 

@@ -20,7 +20,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 
+import com.google.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
+import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.parameter.convert.AbstractGlobalConverter;
 import org.primeframework.mvc.parameter.convert.ConversionException;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
@@ -34,6 +36,10 @@ import org.primeframework.mvc.parameter.convert.annotation.GlobalConverter;
  */
 @GlobalConverter
 public class URLConverter extends AbstractGlobalConverter {
+  @Inject
+  public URLConverter(MVCConfiguration configuration) {
+    super(configuration);
+  }
   protected String objectToString(Object value, Type convertFrom, Map<String, String> attributes, String expression)
       throws ConversionException, ConverterStateException {
     URL url = (URL) value;

@@ -21,6 +21,8 @@ import java.lang.reflect.Type;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.primeframework.mvc.config.MVCConfiguration;
+import org.primeframework.mvc.parameter.el.InvalidCollectionSizeException;
 import org.primeframework.mvc.util.TypeTools;
 
 /**
@@ -34,6 +36,11 @@ import org.primeframework.mvc.util.TypeTools;
  * @author Brian Pontarelli
  */
 public abstract class AbstractGlobalConverter implements GlobalConverter {
+  protected final MVCConfiguration configuration;
+
+  protected AbstractGlobalConverter(MVCConfiguration configuration) {
+    this.configuration = configuration;
+  }
   /**
    * Handles the following cases:
    * <p/>
@@ -224,6 +231,7 @@ public abstract class AbstractGlobalConverter implements GlobalConverter {
       finalArray = Array.newInstance(rawType.getComponentType(), 0);
     } else {
       String[] parts = value.split(",");
+      validateCollectionSize(parts.length);
       finalArray = Array.newInstance(rawType.getComponentType(), parts.length);
       for (int i = 0; i < parts.length; i++) {
         Object singleValue = stringToObject(parts[i], rawType.getComponentType(), dynamicAttributes, expression);
@@ -269,6 +277,8 @@ public abstract class AbstractGlobalConverter implements GlobalConverter {
       return null;
     }
 
+    validateCollectionSize(values.length);
+
     Object finalArray;
     Class<?> rawType = TypeTools.rawType(convertTo);
     if (values.length == 0) {
@@ -299,4 +309,11 @@ public abstract class AbstractGlobalConverter implements GlobalConverter {
   protected abstract Object stringsToObject(String[] values, Type convertTo, Map<String, String> dynamicAttributes,
                                             String expression)
       throws ConversionException, ConverterStateException;
+
+  protected void validateCollectionSize(int size) {
+    int limit = configuration.collectionSizeLimit();
+    if (limit >= 0 && size > limit) {
+      throw new InvalidCollectionSizeException(size);
+    }
+  }
 }

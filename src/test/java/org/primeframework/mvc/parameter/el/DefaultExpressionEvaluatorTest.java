@@ -366,6 +366,31 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
   }
 
   @Test
+  public void commaDelimitedStringToArray() {
+    ActionField action = new ActionField();
+    action.user = new UserField();
+
+    // Single comma-delimited string on a String[] field — no split occurs, stored as single element
+    evaluator.setValue("user.securityQuestions", action, new String[]{"a,b,c,d,e,f,g,h,i,j,k,l"}, null);
+    assertEquals(action.user.securityQuestions.length, 1);
+    assertEquals(action.user.securityQuestions[0], "a,b,c,d,e,f,g,h,i,j,k,l");
+
+    // Single comma-delimited string converted to int[] with 12 elements — exceeds limit of 10
+    try {
+      evaluator.setValue("ids", action, new String[]{"1,2,3,4,5,6,7,8,9,10,11,12"}, null);
+      fail("Expected an [InvalidCollectionSizeException] exception.");
+    } catch (InvalidCollectionSizeException e) {
+      assertEquals(e.resultCode, "input");
+    }
+
+    // Single comma-delimited string within limit works
+    evaluator.setValue("ids", action, new String[]{"1,2,3,4,5"}, null);
+    assertEquals(action.ids.length, 5);
+    assertEquals(action.ids[0], 1);
+    assertEquals(action.ids[4], 5);
+  }
+
+  @Test
   public void genericInheritanceImplements() {
     GenericBean bean = new GenericBean();
     evaluator.setValue("mapSubclass['foo']", bean, "value");

@@ -442,11 +442,11 @@ public class GlobalTest extends PrimeBaseTest {
                 .withURLParameter("strings", "baf")
                 .withURLParameter("strings", "bag")
                 .withURLParameter("strings", "bah")
-                .withURLParameter("strings", "bai")
                 .get()
+                .assertStatusCode(200)
                 .assertBodyDoesNotContain("__empty2__', '__empty3__")
                 .assertBodyContains("__empty1__")
-                .assertBodyContains("[bar, baz, baa, bab, bac, bad, bae, baf, bag, bah, bai]")
+                .assertBodyContains("[bar, baz, baa, bab, bac, bad, bae, baf, bag, bah]")
                 .assertBodyContains("<input type=\"text\" id=\"strings\" name=\"strings\" value=\"bar\"/")
                 .assertBodyContains("<input type=\"text\" id=\"strings\" name=\"strings\" value=\"baz\"/")
                 .assertBodyContains("<input type=\"text\" id=\"strings\" name=\"strings\" value=\"baa\"/")
@@ -457,8 +457,25 @@ public class GlobalTest extends PrimeBaseTest {
                 .assertBodyContains("<input type=\"text\" id=\"strings\" name=\"strings\" value=\"baf\"/")
                 .assertBodyContains("<input type=\"text\" id=\"strings\" name=\"strings\" value=\"bag\"/")
                 .assertBodyContains("<input type=\"text\" id=\"strings\" name=\"strings\" value=\"bah\"/")
-                .assertBodyContains("<input type=\"text\" id=\"strings\" name=\"strings\" value=\"bai\"/")
                 .assertBodyContains("<input type=\"text\" id=\"string\" name=\"string\"/>"));
+
+        // Multiple values, 11 repeated params exceeds limit of 10, returns 200
+        test.simulate(() -> simulator.test("/collection-converter")
+                .withURLParameter("strings", "bar")
+                .withURLParameter("strings", "baz")
+                .withURLParameter("strings", "baa")
+                .withURLParameter("strings", "bab")
+                .withURLParameter("strings", "bac")
+                .withURLParameter("strings", "bad")
+                .withURLParameter("strings", "bae")
+                .withURLParameter("strings", "baf")
+                .withURLParameter("strings", "bag")
+                .withURLParameter("strings", "bah")
+                .withURLParameter("strings", "bai")
+                .withURLParameter("strings", "baj")
+                .withURLParameter("strings", "bak")
+                .get()
+                .assertStatusCode(400));
 
         // Single string containing commas, output contains the same string
         test.simulate(() -> simulator.test("/collection-converter")
@@ -1996,7 +2013,7 @@ public class GlobalTest extends PrimeBaseTest {
                 .withParameter("strings", "bai")
                 .withParameter("strings", "baj")
                 .post()
-                .assertStatusCode(200));
+                .assertStatusCode(400));
 
         // Multiple values, output contains these two values in a collection
         // should fail as the indexed array is larger than the "10" maximum

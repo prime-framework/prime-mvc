@@ -33,7 +33,7 @@ import static org.testng.Assert.fail;
 public class URLConverterTest {
   @Test
   public void fromStrings() throws MalformedURLException {
-    GlobalConverter converter = new URLConverter();
+    GlobalConverter converter = new URLConverter(new org.primeframework.mvc.MockConfiguration());
     URL url = (URL) converter.convertFromStrings(URL.class, null, "testExpr", ArrayUtils.toArray((String) null));
     assertNull(url);
 
@@ -50,7 +50,7 @@ public class URLConverterTest {
 
   @Test
   public void toStrings() throws MalformedURLException {
-    GlobalConverter converter = new URLConverter();
+    GlobalConverter converter = new URLConverter(new org.primeframework.mvc.MockConfiguration());
     String str = converter.convertToString(URL.class, null, "testExpr", null);
     assertNull(str);
 

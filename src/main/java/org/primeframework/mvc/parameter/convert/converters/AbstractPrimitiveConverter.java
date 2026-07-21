@@ -35,6 +35,7 @@ public abstract class AbstractPrimitiveConverter extends AbstractGlobalConverter
   private final boolean emptyIsNull;
 
   protected AbstractPrimitiveConverter(MVCConfiguration configuration) {
+    super(configuration);
     this.emptyIsNull = configuration.emptyParametersAreNull();
   }
 
