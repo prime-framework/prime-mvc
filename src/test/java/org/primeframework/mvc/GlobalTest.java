@@ -1967,7 +1967,7 @@ public class GlobalTest extends PrimeBaseTest {
                 .post()
                 .assertStatusCode(200));
 
-        // Multiple values, 12 repeated params exceeds limit of 10, returns 400
+        // Multiple values via repeated params are intentionally NOT constrained by collectionSizeLimit (only indexed params are), should return 200
         test.simulate(() -> simulator.test("/collection-converter")
                 .withParameter("strings", "bar")
                 .withParameter("strings", "baz")
