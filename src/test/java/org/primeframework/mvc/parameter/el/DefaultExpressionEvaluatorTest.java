@@ -40,7 +40,6 @@ import org.example.domain.GenericBean;
 import org.example.domain.NestedDataUnwrappedAction;
 import org.example.domain.User;
 import org.example.domain.UserField;
-import org.primeframework.mvc.MockConfiguration;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.slf4j.Logger;

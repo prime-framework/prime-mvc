@@ -161,8 +161,8 @@ public abstract class Accessor {
   /**
    * Creates a new instance of the current type.
    *
-   * @param key           This is only used when creating arrays. It is the next atom, which is always the size of the array.
-   * @param maximumLength The configured maximum size of the collection, or {@code -1} for no limit.
+   * @param key           The next atom in the expression, used when creating arrays and indexed collections (typically an index).
+   * @param maximumLength The configured maximum allowed indexed collection/array size, or {@code -1} for no limit.
    * @return The new value.
    */
   protected Object createValue(Object key, int maximumLength) {
