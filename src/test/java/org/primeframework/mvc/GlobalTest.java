@@ -1984,9 +1984,7 @@ public class GlobalTest extends PrimeBaseTest {
                 .post()
                 .assertStatusCode(200));
 
-        // Multiple values, output contains these two values in a collection
-        // should fail as the indexed array is larger than the "10" maximum
-        test.simulate(() -> simulator.test("/collection-converter")
+        // Indexed parameter exceeds collection size limit, returns 400
                 .withParameter("strings[500]", "bar")
                 .post()
                 .assertStatusCode(400));
