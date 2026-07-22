@@ -40,6 +40,7 @@ import org.example.domain.GenericBean;
 import org.example.domain.NestedDataUnwrappedAction;
 import org.example.domain.User;
 import org.example.domain.UserField;
+import org.example.domain.UserType;
 import org.primeframework.mvc.PrimeBaseTest;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.slf4j.Logger;
@@ -366,7 +367,7 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
   }
 
   @Test
-  public void commaDelimitedStringToArray() {
+  public void collectionSizeLimit_commaDelimitedString() {
     ActionField action = new ActionField();
     action.user = new UserField();
 
@@ -388,6 +389,161 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
     assertEquals(action.ids.length, 5);
     assertEquals(action.ids[0], 1);
     assertEquals(action.ids[4], 5);
+  }
+
+  @Test
+  public void collectionSizeLimit_arrayTypes() {
+    ActionField action = new ActionField();
+    action.user = new UserField();
+
+    // Enum[] — comma-delimited exceeds limit
+    try {
+      evaluator.setValue("userTypes", action, new String[]{"COOL,MELLOW,COOL,MELLOW,COOL,MELLOW,COOL,MELLOW,COOL,MELLOW,COOL"}, null);
+      fail("Expected an [InvalidCollectionSizeException] exception.");
+    } catch (InvalidCollectionSizeException e) {
+      assertEquals(e.resultCode, "input");
+    }
+
+    // Enum[] — within limit produces typed values
+    evaluator.setValue("userTypes", action, new String[]{"COOL,MELLOW,COOL"}, null);
+    assertEquals(action.userTypes.length, 3);
+    assertEquals(action.userTypes[0], UserType.COOL);
+    assertEquals(action.userTypes[1], UserType.MELLOW);
+    assertEquals(action.userTypes[2], UserType.COOL);
+
+    // Locale[] — repeated params exceed limit
+    try {
+      evaluator.setValue("localeArray", action, new String[]{"en", "fr", "de", "es", "it", "pt", "ja", "ko", "zh", "ru", "ar"}, null);
+      fail("Expected an [InvalidCollectionSizeException] exception.");
+    } catch (InvalidCollectionSizeException e) {
+      assertEquals(e.resultCode, "input");
+    }
+
+    // Locale[] — within limit produces typed values
+    evaluator.setValue("localeArray", action, new String[]{"en", "fr", "de"}, null);
+    assertEquals(action.localeArray.length, 3);
+    assertEquals(action.localeArray[0], Locale.ENGLISH);
+    assertEquals(action.localeArray[1], Locale.FRENCH);
+    assertEquals(action.localeArray[2], Locale.GERMAN);
+
+    // UUID[] — repeated params exceed limit
+    try {
+      evaluator.setValue("uuids", action, new String[]{
+          "00000000-0000-0000-0000-000000000001", "00000000-0000-0000-0000-000000000002",
+          "00000000-0000-0000-0000-000000000003", "00000000-0000-0000-0000-000000000004",
+          "00000000-0000-0000-0000-000000000005", "00000000-0000-0000-0000-000000000006",
+          "00000000-0000-0000-0000-000000000007", "00000000-0000-0000-0000-000000000008",
+          "00000000-0000-0000-0000-000000000009", "00000000-0000-0000-0000-000000000010",
+          "00000000-0000-0000-0000-000000000011"}, null);
+      fail("Expected an [InvalidCollectionSizeException] exception.");
+    } catch (InvalidCollectionSizeException e) {
+      assertEquals(e.resultCode, "input");
+    }
+
+    // UUID[] — within limit produces typed values
+    evaluator.setValue("uuids", action, new String[]{"00000000-0000-0000-0000-000000000001", "00000000-0000-0000-0000-000000000002"}, null);
+    assertEquals(action.uuids.length, 2);
+    assertEquals(action.uuids[0], java.util.UUID.fromString("00000000-0000-0000-0000-000000000001"));
+    assertEquals(action.uuids[1], java.util.UUID.fromString("00000000-0000-0000-0000-000000000002"));
+
+    // ZoneId[] — repeated params exceed limit
+    try {
+      evaluator.setValue("zoneIds", action, new String[]{
+          "US/Eastern", "US/Central", "US/Mountain", "US/Pacific", "Europe/London",
+          "Europe/Paris", "Europe/Berlin", "Asia/Tokyo", "Asia/Shanghai", "Australia/Sydney",
+          "Africa/Cairo"}, null);
+      fail("Expected an [InvalidCollectionSizeException] exception.");
+    } catch (InvalidCollectionSizeException e) {
+      assertEquals(e.resultCode, "input");
+    }
+
+    // ZoneId[] — within limit produces typed values
+    evaluator.setValue("zoneIds", action, new String[]{"US/Eastern", "US/Pacific"}, null);
+    assertEquals(action.zoneIds.length, 2);
+    assertEquals(action.zoneIds[0], java.time.ZoneId.of("US/Eastern"));
+    assertEquals(action.zoneIds[1], java.time.ZoneId.of("US/Pacific"));
+
+    // File[] — repeated params exceed limit
+    try {
+      evaluator.setValue("files", action, new String[]{
+          "/a", "/b", "/c", "/d", "/e", "/f", "/g", "/h", "/i", "/j", "/k"}, null);
+      fail("Expected an [InvalidCollectionSizeException] exception.");
+    } catch (InvalidCollectionSizeException e) {
+      assertEquals(e.resultCode, "input");
+    }
+
+    // File[] — within limit produces typed values
+    evaluator.setValue("files", action, new String[]{"/tmp/a", "/tmp/b"}, null);
+    assertEquals(action.files.length, 2);
+    assertEquals(action.files[0], new java.io.File("/tmp/a"));
+    assertEquals(action.files[1], new java.io.File("/tmp/b"));
+
+    // LocalDate[] — repeated params exceed limit
+    try {
+      evaluator.setValue("localDates", action, new String[]{
+          "2026-01-01", "2026-01-02", "2026-01-03", "2026-01-04", "2026-01-05",
+          "2026-01-06", "2026-01-07", "2026-01-08", "2026-01-09", "2026-01-10",
+          "2026-01-11"}, null);
+      fail("Expected an [InvalidCollectionSizeException] exception.");
+    } catch (InvalidCollectionSizeException e) {
+      assertEquals(e.resultCode, "input");
+    }
+
+    // LocalDate[] — within limit produces typed values
+    evaluator.setValue("localDates", action, new String[]{"2026-01-01", "2026-06-15"}, Collections.emptyMap());
+    assertEquals(action.localDates.length, 2);
+    assertEquals(action.localDates[0], java.time.LocalDate.of(2026, 1, 1));
+    assertEquals(action.localDates[1], java.time.LocalDate.of(2026, 6, 15));
+  }
+
+  @Test
+  public void collectionSizeLimit_listTypes() {
+    ActionField action = new ActionField();
+
+    // List<String> — repeated params exceed limit
+    try {
+      evaluator.setValue("names", action, new String[]{"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k"}, null);
+      fail("Expected an [InvalidCollectionSizeException] exception.");
+    } catch (InvalidCollectionSizeException e) {
+      assertEquals(e.resultCode, "input");
+    }
+
+    // List<String> — within limit produces typed values
+    evaluator.setValue("names", action, new String[]{"Alice", "Bob", "Charlie"}, null);
+    assertEquals(action.names.size(), 3);
+    assertEquals(action.names.get(0), "Alice");
+    assertEquals(action.names.get(2), "Charlie");
+
+    // List<Locale> — repeated params exceed limit
+    try {
+      evaluator.setValue("locales", action, new String[]{"en", "fr", "de", "es", "it", "pt", "ja", "ko", "zh", "ru", "ar"}, null);
+      fail("Expected an [InvalidCollectionSizeException] exception.");
+    } catch (InvalidCollectionSizeException e) {
+      assertEquals(e.resultCode, "input");
+    }
+
+    // List<Locale> — within limit produces typed values
+    evaluator.setValue("locales", action, new String[]{"en", "fr"}, null);
+    assertEquals(action.locales.size(), 2);
+    assertEquals(action.locales.get(0), Locale.ENGLISH);
+    assertEquals(action.locales.get(1), Locale.FRENCH);
+
+    // List<ZoneId> — repeated params exceed limit
+    try {
+      evaluator.setValue("timeZones", action, new String[]{
+          "US/Eastern", "US/Central", "US/Mountain", "US/Pacific", "Europe/London",
+          "Europe/Paris", "Europe/Berlin", "Asia/Tokyo", "Asia/Shanghai", "Australia/Sydney",
+          "Africa/Cairo"}, null);
+      fail("Expected an [InvalidCollectionSizeException] exception.");
+    } catch (InvalidCollectionSizeException e) {
+      assertEquals(e.resultCode, "input");
+    }
+
+    // List<ZoneId> — within limit produces typed values
+    evaluator.setValue("timeZones", action, new String[]{"US/Eastern", "Europe/London"}, null);
+    assertEquals(action.timeZones.size(), 2);
+    assertEquals(action.timeZones.get(0), java.time.ZoneId.of("US/Eastern"));
+    assertEquals(action.timeZones.get(1), java.time.ZoneId.of("Europe/London"));
   }
 
   @Test

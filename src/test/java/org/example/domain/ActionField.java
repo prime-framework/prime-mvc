@@ -15,11 +15,17 @@
  */
 package org.example.domain;
 
+import java.io.File;
+import java.net.URI;
+import java.net.URL;
+import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * This is a test action with fields.
@@ -36,9 +42,27 @@ public class ActionField extends ParentField {
 
   public boolean bar;
 
+  public File[] files;
+
   public boolean foo;
 
   public int[] ids;
+
+  public LocalDate[] localDates;
+
+  public Locale[] localeArray;
+
+  public URI[] uris;
+
+  public URL[] urls;
+
+  public UUID[] uuids;
+
+  public UserType[] userTypes;
+
+  public ZoneId[] zoneIds;
+
+  public ZonedDateTime[] zonedDateTimes;
 
   public List<String> list;
 
