@@ -125,7 +125,7 @@ public class BodyToolsTest {
     } catch (Exception e) {
       assertEquals(e.getClass(), IllegalArgumentException.class,
                    "Expected this exception type");
-      assertEquals(e.getMessage(), "Unused values [othervariable] found in the [src/test/web/templates/echo.ftl] template. If it's acceptable for the variable to be unused, wrap it in an Optional",
+      assertEquals(e.getMessage(), "No variable [othervariable] found in the [src/test/web/templates/echo.ftl] template. If it's acceptable for the value to be unused, wrap it in an Optional",
                    "othervariable is in the map but is not used");
     }
   }
