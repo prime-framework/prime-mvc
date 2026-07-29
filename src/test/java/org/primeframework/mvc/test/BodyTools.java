@@ -108,7 +108,7 @@ public final class BodyTools {
                                                               "actual");
       // if it's a freshly created file, don't annoy them yet
       if (!freshlyCreatedFile && !unusedVariables.isEmpty()) {
-        throw new IllegalArgumentException("No variable %s found in the [%s] template. If it's acceptable for the value to be unused, wrap it in an Optional".formatted(unusedVariables.stream()
+        throw new IllegalArgumentException("Unused variable(s) %s passed into the [%s] template. If it's acceptable for the value to be unused, wrap it in an Optional".formatted(unusedVariables.stream()
                                                                                                                                                                                             .sorted()
                                                                                                                                                                                             .toList(),
                                                                                                                                                                              path));
