@@ -29,7 +29,7 @@ logbackVersion = "1.5.13"
 slf4jVersion = "2.0.13"
 testngVersion = "7.8.0"
 
-project(group: "org.primeframework", name: "prime-mvc", version: "5.11.0", licenses: ["ApacheV2_0"]) {
+project(group: "org.primeframework", name: "prime-mvc", version: "5.11.1", licenses: ["ApacheV2_0"]) {
     workflow {
         fetch {
             // Dependency resolution order:
@@ -53,7 +53,7 @@ project(group: "org.primeframework", name: "prime-mvc", version: "5.11.0", licen
     }
 
     publishWorkflow {
-        subversion(repository: "https://internal.svn.fusionauth.io")
+        subversion(repository: "https://svn.savantbuild.org")
     }
 
     dependencies {
