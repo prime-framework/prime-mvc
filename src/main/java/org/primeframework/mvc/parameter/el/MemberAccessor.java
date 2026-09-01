@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2019, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2026, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.TypeVariable;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -130,6 +131,14 @@ public class MemberAccessor extends Accessor {
   }
 
   public void set(String[] values, Expression expression) {
+    Class<?> typeClass = TypeTools.rawType(type);
+    if (values != null && (typeClass.isArray() || Collection.class.isAssignableFrom(typeClass))) {
+      int collectionSizeLimit = expression.getCollectionSizeLimit();
+      if (values.length > collectionSizeLimit) {
+        throw new InvalidCollectionSizeException(values.length);
+      }
+    }
+
     set(convert(expression, field, values), expression);
   }
 

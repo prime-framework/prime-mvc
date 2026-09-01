@@ -56,7 +56,9 @@ public interface ExpressionEvaluator {
    * @param expression The expression that defines the value to get from the object.
    * @param object     The object to get the value from.
    * @return The value from the object.
-   * @throws ExpressionException If the expression is invalid or there was an error during processing.
+   * @throws ExpressionException              If the expression is invalid or there was an error during processing.
+   * @throws InvalidCollectionSizeException   (unchecked) If a collection index exceeds the configured maximum size.
+   *                                          Defaults to the "input" result code.
    */
   <T> T getValue(String expression, Object object) throws ExpressionException;
 
@@ -71,7 +73,9 @@ public interface ExpressionEvaluator {
    *                   stored in the HttpServletRequest and can be fetched via the ParameterWorkflow. These are passed
    *                   to the Converter to assist in conversion from objects to Strings.
    * @return The String value from the object. This value has been converted.
-   * @throws ExpressionException If the expression is invalid or there was an error during processing.
+   * @throws ExpressionException              If the expression is invalid or there was an error during processing.
+   * @throws InvalidCollectionSizeException   (unchecked) If a collection index exceeds the configured maximum size.
+   *                                          Defaults to the "input" result code.
    */
   String getValue(String expression, Object object, Map<String, String> attributes) throws ExpressionException;
 
@@ -81,7 +85,9 @@ public interface ExpressionEvaluator {
    * @param expression The expression.
    * @param object     The object.
    * @param value      The value to set into the object.
-   * @throws ExpressionException If the expression is invalid or there was an error during processing.
+   * @throws ExpressionException              If the expression is invalid or there was an error during processing.
+   * @throws InvalidCollectionSizeException   (unchecked) If a collection index exceeds the configured maximum size.
+   *                                          Defaults to the "input" result code.
    */
   void setValue(String expression, Object object, Object value) throws ExpressionException;
 
@@ -98,10 +104,12 @@ public interface ExpressionEvaluator {
    *                   form and a particular parameter had some attributes associated with it. Those attributes are
    *                   stored in the HttpServletRequest and can be fetched via the ParameterWorkflow. These are passed
    *                   to the Converter to assist in conversion from objects to Strings.
-   * @throws ConversionException     If the conversion failed.
-   * @throws ConverterStateException If there isn't a converter or the converter could not run because it was missing a
-   *                                 required attribute.
-   * @throws ExpressionException     If the expression is invalid or there was an error during processing.
+   * @throws ConversionException              If the conversion failed.
+   * @throws ConverterStateException          If there isn't a converter or the converter could not run because it was
+   *                                          missing a required attribute.
+   * @throws ExpressionException              If the expression is invalid or there was an error during processing.
+   * @throws InvalidCollectionSizeException   (unchecked) If a collection index exceeds the configured maximum size.
+   *                                          Defaults to the "input" result code.
    */
   void setValue(String expression, Object object, String[] values, Map<String, String> attributes)
       throws ConversionException, ConverterStateException, ExpressionException;

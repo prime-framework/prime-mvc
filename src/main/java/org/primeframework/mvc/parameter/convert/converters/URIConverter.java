@@ -34,7 +34,6 @@ import org.primeframework.mvc.parameter.convert.annotation.GlobalConverter;
  */
 @GlobalConverter
 public class URIConverter extends AbstractGlobalConverter {
-
   protected String objectToString(Object value, Type convertFrom, Map<String, String> attributes, String expression)
       throws ConversionException, ConverterStateException {
     URI url = (URI) value;

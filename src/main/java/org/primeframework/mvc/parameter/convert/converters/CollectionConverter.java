@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2018, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2026, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -136,6 +136,7 @@ public class CollectionConverter extends AbstractGlobalConverter {
    */
   protected Object stringsToObject(String[] values, Type convertTo, Map<String, String> dynamicAttributes,
                                    String expression) throws ConversionException, ConverterStateException {
+    validateCollectionSize(values.length);
     Class<?> rawType = TypeTools.rawType(convertTo);
     Class<?> parameter = parameterType(convertTo);
     Collection collection = makeCollection(rawType);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2024, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2026, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import org.primeframework.mvc.config.MVCConfiguration;
 import org.primeframework.mvc.parameter.convert.ConverterProvider;
 import org.primeframework.mvc.parameter.convert.ConverterStateException;
 import org.primeframework.mvc.parameter.convert.GlobalConverter;
+import org.primeframework.mvc.util.TypeTools;
 
 /**
  * This class is the evaluation context.
@@ -86,6 +87,10 @@ public class Expression {
     return converter.convertToString(type, attributes, expression, current);
   }
 
+  public int getCollectionSizeLimit() {
+    return configuration.collectionSizeLimit();
+  }
+
   public String getExpression() {
     return expression;
   }
@@ -125,6 +130,21 @@ public class Expression {
   private Object createValue() {
     // Peek at the next atom, in case this is an array
     Object key = hasNext() ? peek() : null;
+
+    // Validate the index before allocating an array or collection sized by the index
+    if (key != null && accessor.type != null) {
+      Class<?> rawType = TypeTools.rawType(accessor.type);
+      if (rawType.isArray() || Collection.class.isAssignableFrom(rawType)) {
+        try {
+          validateIndex(Integer.parseInt(key.toString()));
+        } catch (NumberFormatException e) {
+          if (rawType.isArray()) {
+            throw new IndexExpressionException("Invalid array index [" + key + "] in the expression [" + expression + "]. Array indices must be integers.", e);
+          }
+        }
+      }
+    }
+
     Object value = accessor.createValue(key);
     setCurrentValue(value);
     return value;
@@ -178,6 +198,7 @@ public class Expression {
       if (Collection.class.isAssignableFrom(type) || current.getClass().isArray()) {
         GlobalConverter converter = converterProvider.lookup(Integer.class);
         Integer index = (Integer) converter.convertFromStrings(Integer.class, null, null, atom);
+        validateIndex(index);
 
         accessor = new IndexedCollectionAccessor(converterProvider, accessor, index, accessor.getMemberAccessor());
       } else if (Map.class.isAssignableFrom(type)) {
@@ -299,5 +320,21 @@ public class Expression {
 
   private boolean skip() {
     return accessor != null && accessor.isIndexed();
+  }
+
+  private void validateIndex(Integer index) {
+    if (index == null) {
+      throw new IndexExpressionException("Encountered an indexed property without an index in the expression [" + expression + "]");
+    }
+
+    if (index < 0) {
+      throw new InvalidCollectionSizeException(index);
+    }
+
+    int limit = configuration.collectionSizeLimit();
+    if (index >= limit) {
+      // index is 0-based, so the implied collection size is index + 1
+      throw new InvalidCollectionSizeException(index + 1);
+    }
   }
 }

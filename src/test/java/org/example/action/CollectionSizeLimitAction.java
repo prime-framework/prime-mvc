@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2026, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2026, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,26 +16,27 @@
 package org.example.action;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.primeframework.mvc.action.annotation.Action;
 import org.primeframework.mvc.action.result.annotation.Status;
 
-/**
- * @author Daniel DeGroff
- */
 @Action
 @Status.List({
     @Status,
-    @Status(code = "input", status = 400),
-    @Status(code = "error", status = 500)
+    @Status(code = "input", status = 400)
 })
-public class CollectionConverterAction {
-  public List<String> string;
+public class CollectionSizeLimitAction {
+  public int[] ids;
 
-  public List<String> strings;
+  public String[] namesArray;
+
+  public List<String> namesList;
+
+  public List<UUID> uuids;
 
   public String get() {
-    return "render";
+    return "success";
   }
 
   public String post() {

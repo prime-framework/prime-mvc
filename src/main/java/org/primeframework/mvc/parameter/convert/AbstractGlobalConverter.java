@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2018, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2026, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,10 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Map;
 
+import com.google.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
+import org.primeframework.mvc.config.MVCConfiguration;
+import org.primeframework.mvc.parameter.el.InvalidCollectionSizeException;
 import org.primeframework.mvc.util.TypeTools;
 
 /**
@@ -34,6 +37,9 @@ import org.primeframework.mvc.util.TypeTools;
  * @author Brian Pontarelli
  */
 public abstract class AbstractGlobalConverter implements GlobalConverter {
+  @Inject
+  protected MVCConfiguration configuration;
+
   /**
    * Handles the following cases:
    * <p/>
@@ -201,6 +207,33 @@ public abstract class AbstractGlobalConverter implements GlobalConverter {
   }
 
   /**
+   * This method follows the same logic as the java split with no positive limit by trimming any trailing commas.
+   * This allows us to determine the size of the resulting array without having to allocate memory.
+   *
+   * @param value The value of the array
+   * @return The length of the resulting array after a split(",") is performed
+   */
+  private int splitLength(String value) {
+    char delimiter = ',';
+    int end = value.length();
+    while (end > 0 && value.charAt(end - 1) == delimiter) {
+      end--;
+    }
+
+    if (end == 0) {
+      return 0;
+    }
+
+    int count = 1;
+    for (int i = 0; i < end; i++) {
+      if (value.charAt(i) == delimiter) {
+        count++;
+      }
+    }
+    return count;
+  }
+
+  /**
    * This performs the conversion from a single String value to an array of the given type.
    *
    * @param value             The value to convert to an array.
@@ -211,6 +244,8 @@ public abstract class AbstractGlobalConverter implements GlobalConverter {
    * @throws ConversionException     If the conversion failed.
    * @throws ConverterStateException if the converter didn't have all of the information it needed to perform the
    *                                 conversion.
+   * @throws InvalidCollectionSizeException   (unchecked) If a collection index exceeds the configured maximum size.
+   *                                          Defaults to the "input" result code.
    */
   protected Object stringToArray(String value, Type convertTo, Map<String, String> dynamicAttributes, String expression)
       throws ConversionException {
@@ -223,6 +258,8 @@ public abstract class AbstractGlobalConverter implements GlobalConverter {
     if (StringUtils.isBlank(value)) {
       finalArray = Array.newInstance(rawType.getComponentType(), 0);
     } else {
+      int size = splitLength(value);
+      validateCollectionSize(size);
       String[] parts = value.split(",");
       finalArray = Array.newInstance(rawType.getComponentType(), parts.length);
       for (int i = 0; i < parts.length; i++) {
@@ -269,6 +306,8 @@ public abstract class AbstractGlobalConverter implements GlobalConverter {
       return null;
     }
 
+    validateCollectionSize(values.length);
+
     Object finalArray;
     Class<?> rawType = TypeTools.rawType(convertTo);
     if (values.length == 0) {
@@ -299,4 +338,15 @@ public abstract class AbstractGlobalConverter implements GlobalConverter {
   protected abstract Object stringsToObject(String[] values, Type convertTo, Map<String, String> dynamicAttributes,
                                             String expression)
       throws ConversionException, ConverterStateException;
+
+  protected void validateCollectionSize(int size) {
+    if (configuration == null) {
+      return;
+    }
+
+    int collectionSizeLimit = configuration.collectionSizeLimit();
+    if (size > collectionSizeLimit) {
+      throw new InvalidCollectionSizeException(size);
+    }
+  }
 }
