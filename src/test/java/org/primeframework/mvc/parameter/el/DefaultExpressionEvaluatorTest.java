@@ -316,6 +316,8 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
       fail("Expected an [InvalidCollectionSizeException] exception.");
     } catch (InvalidCollectionSizeException e) {
       assertEquals(e.resultCode, "input");
+      assertEquals(e.args[0], 102);
+      assertEquals(e.args[1], 10);
     }
 
     // Exceeds the limit for an array backed collection, should fail
@@ -325,6 +327,8 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
       fail("Expected an [InvalidCollectionSizeException] exception.");
     } catch (InvalidCollectionSizeException e) {
       assertEquals(e.resultCode, "input");
+      assertEquals(e.args[0], 1000);
+      assertEquals(e.args[1], 10);
     }
 
     // Within the limit works normally
@@ -353,6 +357,8 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
       fail("Expected an [InvalidCollectionSizeException] exception.");
     } catch (InvalidCollectionSizeException e) {
       assertEquals(e.resultCode, "input");
+      assertEquals(e.args[0], -1);
+      assertEquals(e.args[1], 10);
     }
   }
 
@@ -389,6 +395,8 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
       fail("Expected an [InvalidCollectionSizeException] exception.");
     } catch (InvalidCollectionSizeException e) {
       assertEquals(e.resultCode, "input");
+      assertEquals(e.args[0], 500000001);
+      assertEquals(e.args[1], 10);
     }
 
     // Array should not have been allocated
@@ -426,6 +434,8 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
       fail("Expected an [InvalidCollectionSizeException] exception.");
     } catch (InvalidCollectionSizeException e) {
       assertEquals(e.resultCode, "input");
+      assertEquals(e.args[0], 11);
+      assertEquals(e.args[1], 10);
     }
     // Array should remain unchanged after the failed set
     assertEquals(action.user.securityQuestions.length, 2);
@@ -445,6 +455,8 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
       fail("Expected an [InvalidCollectionSizeException] exception.");
     } catch (InvalidCollectionSizeException e) {
       assertEquals(e.resultCode, "input");
+      assertEquals(e.args[0], 500000001);
+      assertEquals(e.args[1], 10);
     }
 
     // List should not have been allocated
@@ -469,6 +481,8 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
       fail("Expected an [InvalidCollectionSizeException] exception.");
     } catch (InvalidCollectionSizeException e) {
       assertEquals(e.resultCode, "input");
+      assertEquals(e.args[0], 101);
+      assertEquals(e.args[1], 10);
     }
     // Siblings list should be unchanged
     assertEquals(action.user.siblings.size(), 1);
@@ -479,6 +493,8 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
       fail("Expected an [InvalidCollectionSizeException] exception.");
     } catch (InvalidCollectionSizeException e) {
       assertEquals(e.resultCode, "input");
+      assertEquals(e.args[0], 101);
+      assertEquals(e.args[1], 10);
     }
     // Inner array should be unchanged
     assertEquals(action.user.siblings.get(0).securityQuestions.length, 1);
@@ -496,6 +512,8 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
       fail("Expected an [InvalidCollectionSizeException] exception.");
     } catch (InvalidCollectionSizeException e) {
       assertEquals(e.resultCode, "input");
+      assertEquals(e.args[0], 11);
+      assertEquals(e.args[1], 10);
     }
 
     // Outer exceeds, inner at limit — should fail on outer before reaching inner
@@ -504,6 +522,8 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
       fail("Expected an [InvalidCollectionSizeException] exception.");
     } catch (InvalidCollectionSizeException e) {
       assertEquals(e.resultCode, "input");
+      assertEquals(e.args[0], 11);
+      assertEquals(e.args[1], 10);
     }
     // Siblings list should remain at 10 (unchanged from the successful [9] set above)
     assertEquals(action.user.siblings.size(), 10);
@@ -526,6 +546,8 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
       fail("Expected an [InvalidCollectionSizeException] exception.");
     } catch (InvalidCollectionSizeException e) {
       assertEquals(e.resultCode, "input");
+      assertEquals(e.args[0], 12);
+      assertEquals(e.args[1], 10);
     }
 
     // Single comma-delimited string within limit works
@@ -547,6 +569,8 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
       fail("Expected an [InvalidCollectionSizeException] exception.");
     } catch (InvalidCollectionSizeException e) {
       assertEquals(e.resultCode, "input");
+      assertEquals(e.args[0], 11);
+      assertEquals(e.args[1], 10);
     }
 
     // Enum[] — within limit produces typed values
@@ -562,6 +586,8 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
       fail("Expected an [InvalidCollectionSizeException] exception.");
     } catch (InvalidCollectionSizeException e) {
       assertEquals(e.resultCode, "input");
+      assertEquals(e.args[0], 11);
+      assertEquals(e.args[1], 10);
     }
 
     // Locale[] — within limit produces typed values
@@ -583,6 +609,8 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
       fail("Expected an [InvalidCollectionSizeException] exception.");
     } catch (InvalidCollectionSizeException e) {
       assertEquals(e.resultCode, "input");
+      assertEquals(e.args[0], 11);
+      assertEquals(e.args[1], 10);
     }
 
     // UUID[] — within limit produces typed values
@@ -600,6 +628,8 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
       fail("Expected an [InvalidCollectionSizeException] exception.");
     } catch (InvalidCollectionSizeException e) {
       assertEquals(e.resultCode, "input");
+      assertEquals(e.args[0], 11);
+      assertEquals(e.args[1], 10);
     }
 
     // ZoneId[] — within limit produces typed values
@@ -615,6 +645,8 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
       fail("Expected an [InvalidCollectionSizeException] exception.");
     } catch (InvalidCollectionSizeException e) {
       assertEquals(e.resultCode, "input");
+      assertEquals(e.args[0], 11);
+      assertEquals(e.args[1], 10);
     }
 
     // File[] — within limit produces typed values
@@ -632,6 +664,8 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
       fail("Expected an [InvalidCollectionSizeException] exception.");
     } catch (InvalidCollectionSizeException e) {
       assertEquals(e.resultCode, "input");
+      assertEquals(e.args[0], 11);
+      assertEquals(e.args[1], 10);
     }
 
     // LocalDate[] — within limit produces typed values
@@ -652,6 +686,8 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
       fail("Expected an [InvalidCollectionSizeException] exception.");
     } catch (InvalidCollectionSizeException e) {
       assertEquals(e.resultCode, "input");
+      assertEquals(e.args[0], 11);
+      assertEquals(e.args[1], 10);
     }
 
     // List<String> — within limit produces typed values
@@ -666,6 +702,8 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
       fail("Expected an [InvalidCollectionSizeException] exception.");
     } catch (InvalidCollectionSizeException e) {
       assertEquals(e.resultCode, "input");
+      assertEquals(e.args[0], 11);
+      assertEquals(e.args[1], 10);
     }
 
     // List<Locale> — within limit produces typed values
@@ -683,6 +721,8 @@ public class DefaultExpressionEvaluatorTest extends PrimeBaseTest {
       fail("Expected an [InvalidCollectionSizeException] exception.");
     } catch (InvalidCollectionSizeException e) {
       assertEquals(e.resultCode, "input");
+      assertEquals(e.args[0], 11);
+      assertEquals(e.args[1], 10);
     }
 
     // List<ZoneId> — within limit produces typed values

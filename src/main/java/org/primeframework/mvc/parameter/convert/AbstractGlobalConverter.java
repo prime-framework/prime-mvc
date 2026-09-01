@@ -346,7 +346,7 @@ public abstract class AbstractGlobalConverter implements GlobalConverter {
 
     int collectionSizeLimit = configuration.collectionSizeLimit();
     if (size > collectionSizeLimit) {
-      throw new InvalidCollectionSizeException(size);
+      throw new InvalidCollectionSizeException(size, collectionSizeLimit);
     }
   }
 }

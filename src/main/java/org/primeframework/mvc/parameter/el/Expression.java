@@ -327,14 +327,14 @@ public class Expression {
       throw new IndexExpressionException("Encountered an indexed property without an index in the expression [" + expression + "]");
     }
 
+    int limit = configuration.collectionSizeLimit();
+
     if (index < 0) {
-      throw new InvalidCollectionSizeException(index);
+      throw new InvalidCollectionSizeException(index, limit);
     }
 
-    int limit = configuration.collectionSizeLimit();
     if (index >= limit) {
-      // index is 0-based, so the implied collection size is index + 1
-      throw new InvalidCollectionSizeException(index + 1);
+      throw new InvalidCollectionSizeException((index + 1), limit);
     }
   }
 }

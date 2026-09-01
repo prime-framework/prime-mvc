@@ -135,7 +135,7 @@ public class MemberAccessor extends Accessor {
     if (values != null && (typeClass.isArray() || Collection.class.isAssignableFrom(typeClass))) {
       int collectionSizeLimit = expression.getCollectionSizeLimit();
       if (values.length > collectionSizeLimit) {
-        throw new InvalidCollectionSizeException(values.length);
+        throw new InvalidCollectionSizeException(values.length, collectionSizeLimit);
       }
     }
 

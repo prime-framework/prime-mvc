@@ -67,7 +67,9 @@ public class CollectionSizeLimitTest extends PrimeBaseTest {
         .withURLParameter("namesList", "j")
         .withURLParameter("namesList", "k")
         .get()
-        .assertStatusCode(400));
+        .assertStatusCode(400)
+        .assertContainsGeneralErrorMessageCodes("[InvalidCollectionSizeException]")
+        .assertContainsErrors("The collection size of [11] exceeds the configured limit of [10]."));
   }
 
   @Test
@@ -86,7 +88,9 @@ public class CollectionSizeLimitTest extends PrimeBaseTest {
         .withURLParameter("namesArray", "j")
         .withURLParameter("namesArray", "k")
         .get()
-        .assertStatusCode(400));
+        .assertStatusCode(400)
+        .assertContainsGeneralErrorMessageCodes("[InvalidCollectionSizeException]")
+        .assertContainsErrors("The collection size of [11] exceeds the configured limit of [10]."));
   }
 
   @Test
@@ -120,7 +124,9 @@ public class CollectionSizeLimitTest extends PrimeBaseTest {
         .withURLParameter("namesArray[1]", "bar")
         .withURLParameter("namesArray[10]", "boom")
         .get()
-        .assertStatusCode(400));
+        .assertStatusCode(400)
+        .assertContainsGeneralErrorMessageCodes("[InvalidCollectionSizeException]")
+        .assertContainsErrors("The collection size of [11] exceeds the configured limit of [10]."));
   }
 
   @Test
@@ -131,7 +137,9 @@ public class CollectionSizeLimitTest extends PrimeBaseTest {
         .withURLParameter("namesArray[5]", "b")
         .withURLParameter("namesArray[10]", "c")
         .get()
-        .assertStatusCode(400));
+        .assertStatusCode(400)
+        .assertContainsGeneralErrorMessageCodes("[InvalidCollectionSizeException]")
+        .assertContainsErrors("The collection size of [11] exceeds the configured limit of [10]."));
   }
 
   @Test
@@ -140,7 +148,9 @@ public class CollectionSizeLimitTest extends PrimeBaseTest {
     test.simulate(() -> simulator.test("/collection-size-limit")
         .withURLParameter("namesArray[500]", "boom")
         .get()
-        .assertStatusCode(400));
+        .assertStatusCode(400)
+        .assertContainsGeneralErrorMessageCodes("[InvalidCollectionSizeException]")
+        .assertContainsErrors("The collection size of [501] exceeds the configured limit of [10]."));
   }
 
   @Test
@@ -158,7 +168,9 @@ public class CollectionSizeLimitTest extends PrimeBaseTest {
     test.simulate(() -> simulator.test("/collection-size-limit")
         .withURLParameter("ids", "1,2,3,4,5,6,7,8,9,10,11")
         .get()
-        .assertStatusCode(400));
+        .assertStatusCode(400)
+        .assertContainsGeneralErrorMessageCodes("[InvalidCollectionSizeException]")
+        .assertContainsErrors("The collection size of [11] exceeds the configured limit of [10]."));
   }
 
   @Test
@@ -197,7 +209,9 @@ public class CollectionSizeLimitTest extends PrimeBaseTest {
         .withURLParameter("namesList", "j")
         .withURLParameter("namesList", "k")
         .get()
-        .assertStatusCode(400));
+        .assertStatusCode(400)
+        .assertContainsGeneralErrorMessageCodes("[InvalidCollectionSizeException]")
+        .assertContainsErrors("The collection size of [11] exceeds the configured limit of [10]."));
   }
 
   @Test
@@ -217,7 +231,9 @@ public class CollectionSizeLimitTest extends PrimeBaseTest {
         .withURLParameter("namesList[0]", "Alice")
         .withURLParameter("namesList[10]", "Boom")
         .get()
-        .assertStatusCode(400));
+        .assertStatusCode(400)
+        .assertContainsGeneralErrorMessageCodes("[InvalidCollectionSizeException]")
+        .assertContainsErrors("The collection size of [11] exceeds the configured limit of [10]."));
   }
 
   @Test
@@ -236,7 +252,9 @@ public class CollectionSizeLimitTest extends PrimeBaseTest {
         .withParameter("namesList", "j")
         .withParameter("namesList", "k")
         .post()
-        .assertStatusCode(400));
+        .assertStatusCode(400)
+        .assertContainsGeneralErrorMessageCodes("[InvalidCollectionSizeException]")
+        .assertContainsErrors("The collection size of [11] exceeds the configured limit of [10]."));
   }
 
   @Test
@@ -246,7 +264,9 @@ public class CollectionSizeLimitTest extends PrimeBaseTest {
         .withParameter("namesArray[0]", "foo")
         .withParameter("namesArray[10]", "bar")
         .post()
-        .assertStatusCode(400));
+        .assertStatusCode(400)
+        .assertContainsGeneralErrorMessageCodes("[InvalidCollectionSizeException]")
+        .assertContainsErrors("The collection size of [11] exceeds the configured limit of [10]."));
   }
 
   @Test
@@ -255,7 +275,9 @@ public class CollectionSizeLimitTest extends PrimeBaseTest {
     test.simulate(() -> simulator.test("/collection-size-limit")
         .withURLParameter("namesArray[-1]", "bad")
         .get()
-        .assertStatusCode(400));
+        .assertStatusCode(400)
+        .assertContainsGeneralErrorMessageCodes("[InvalidCollectionSizeException]")
+        .assertContainsErrors("The collection size of [-1] exceeds the configured limit of [10]."));
   }
 
   @Test
@@ -264,7 +286,9 @@ public class CollectionSizeLimitTest extends PrimeBaseTest {
     test.simulate(() -> simulator.test("/collection-size-limit")
         .withURLParameter("namesList[-1]", "bad")
         .get()
-        .assertStatusCode(400));
+        .assertStatusCode(400)
+        .assertContainsGeneralErrorMessageCodes("[InvalidCollectionSizeException]")
+        .assertContainsErrors("The collection size of [-1] exceeds the configured limit of [10]."));
   }
 
   @Test
@@ -274,7 +298,9 @@ public class CollectionSizeLimitTest extends PrimeBaseTest {
         .withURLParameter("namesArray[0]", "first")
         .withURLParameter("ids", "1,2,3,4,5,6,7,8,9,10,11")
         .get()
-        .assertStatusCode(400));
+        .assertStatusCode(400)
+        .assertContainsGeneralErrorMessageCodes("[InvalidCollectionSizeException]")
+        .assertContainsErrors("The collection size of [11] exceeds the configured limit of [10]."));
   }
 
   @Test
