@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2024, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2026, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,15 @@ public interface MVCConfiguration {
    * @return true if unknown parameters should be allowed, false if they are not allowed.
    */
   boolean allowUnknownParameters();
+
+  /**
+   * @return The maximum allowed size for array/collection parameters bound from request input.
+   *     Applies to repeated params (e.g. {@code foo=a&foo=b}), comma-delimited expansion, and indexed params (e.g. {@code foo[0]=bar}).
+   *     For indexed params this is an exclusive upper bound: {@code index} must be in {@code [0, limit)}.
+   */
+  default int collectionSizeLimit() {
+    return 2048;
+  }
 
   /**
    * @return true if auto HTML escaping will be enabled for all templates.

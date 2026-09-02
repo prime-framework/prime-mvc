@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2023, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2026, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,8 @@ public class MockConfiguration extends AbstractMVCConfiguration {
 
   public boolean autoHTMLEscapingEnabled = true;
 
+  public int collectionSizeLimit = 10;
+
   public Key cookieEncryptionKey;
 
   public boolean csrfEnabled;
@@ -53,7 +55,6 @@ public class MockConfiguration extends AbstractMVCConfiguration {
     this.allowUnknownParameters = allowUnknownParameters;
     this.csrfEnabled = csrfEnabled;
   }
-
   @Override
   public boolean allowUnknownParameters() {
     return allowUnknownParameters;
@@ -68,6 +69,9 @@ public class MockConfiguration extends AbstractMVCConfiguration {
   public Path baseDirectory() {
     return Path.of("src/test/web");
   }
+
+  @Override
+  public int collectionSizeLimit() { return collectionSizeLimit; }
 
   @Override
   public Key cookieEncryptionKey() {

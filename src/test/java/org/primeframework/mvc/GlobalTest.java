@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2025, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2001-2026, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1956,6 +1956,29 @@ public class GlobalTest extends PrimeBaseTest {
                 .withParameter("strings", "baz")
                 .post()
                 .assertStatusCode(200));
+
+        // Multiple values, 12 repeated params exceeds limit of 10, returns 400
+        test.simulate(() -> simulator.test("/collection-converter")
+                .withParameter("strings", "bar")
+                .withParameter("strings", "baz")
+                .withParameter("strings", "baa")
+                .withParameter("strings", "bab")
+                .withParameter("strings", "bac")
+                .withParameter("strings", "bad")
+                .withParameter("strings", "bae")
+                .withParameter("strings", "baf")
+                .withParameter("strings", "bag")
+                .withParameter("strings", "bah")
+                .withParameter("strings", "bai")
+                .withParameter("strings", "baj")
+                .post()
+                .assertStatusCode(400));
+
+        // Indexed parameter, index 500 exceeds limit of 10, returns 400
+        test.simulate(() -> simulator.test("/collection-converter")
+                .withParameter("strings[500]", "bar")
+                .post()
+                .assertStatusCode(400));
     }
 
     @Test
@@ -2265,9 +2288,9 @@ public class GlobalTest extends PrimeBaseTest {
                         .assertStatusCode(413));
     }
 
-    // Test that the control behaves as expected
     @Test
     public void post_freemarker_escape() throws Exception {
+        // Test that the control behaves as expected
         simulator.test("/freemarker/escape")
                 .withParameter("listTest", "none")
                 .withParameter("listTest2", "none")

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2024, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2026, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,6 +55,8 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
   public long fileUploadMaxSize = MAX_SIZE;
 
   public boolean ignoreEmptyParameters;
+
+  public int collectionSizeLimit = 2048;
 
   public String localeCookieName = "prime-locale";
 
@@ -114,6 +116,11 @@ public abstract class AbstractMVCConfiguration implements MVCConfiguration {
   @Override
   public boolean ignoreEmptyParameters() {
     return ignoreEmptyParameters;
+  }
+
+  @Override
+  public int collectionSizeLimit() {
+    return collectionSizeLimit;
   }
 
   @Override
