@@ -1,3 +1,3 @@
 ## Prime MVC
 
-For additional information and documentation on Prime MVC refer to the project's [wiki](https://github.com/prime-framework/prime-mvc/wiki).
+This project is now deprecated. Please see https://lattejava.org/ for a comparable MVC framework and HTTP server option.
